@@ -40,7 +40,7 @@ class ClasseForm(ModelForm):
         choices=Documento.VISIBILIDADE_STATUS)
     perfil = forms.ChoiceField(
         label=Classe._meta.get_field('perfil').verbose_name,
-        choices=models.PERFIL_CLASSE)
+        choices=Classe.PERFIL_CLASSE)
     descricao = forms.CharField(
         label=Classe._meta.get_field('descricao').verbose_name,
         widget=forms.Textarea,

@@ -1,6 +1,8 @@
 {% extends "base_path.html" %}
 {% load i18n sigad_filters social_utils common_tags common_cmj_tags%}
+
 {% block head_title %}{{block.super}} - {{object}}{% endblock head_title %}
+
 {% block main_container_class %}container-path{% endblock %}
 
 {% block controls_content %}
@@ -21,7 +23,6 @@
       <a class="btn btn-outline-primary" href="{% url create_doc_url object.classe.id %}">{% trans "Adicionar item a" %} {{object.classe }}</a>
     {% endif %}
   {% endif %}
-
 {% endblock %}
 
 {% block base_functions %}
@@ -77,7 +78,6 @@
 
   {% if previous %}
     <div class="path-direction path-previous">
-
       <a href="{% if view.parlamentar %}/{{view.parlamentar.absolute_slug}}{% endif %}{% url 'cmj.sigad:path_view' previous.absolute_slug %}">
         <i class="fa fa-chevron-left" aria-hidden="true"><span>Anterior</span></i>
       </a>
@@ -93,7 +93,6 @@
               <img src="/{{previous.childs.view_childs.first.absolute_slug}}.128" alt="" />
             </div>
           {% endif %}
-
 
             {% with previous.parlamentares.count as count_parlamentares %}
               {% for parlamentar in previous.parlamentares.all %}
@@ -128,463 +127,449 @@
   {% endif %}
 
   {{block.super}}
-
-
-{% endblock %}
+{% endblock base_functions %}
 
 {% block base_container_header %}
-{% endblock %}
+{% endblock base_container_header %}
 
+{% block render_main_content %}
+  {% with  object.childs.view_childs.first  as container%}
+    <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
+      {% with object.parlamentares.count as count_parlamentares %}
+        {% for parlamentar in object.parlamentares.all %}
 
-{% block base_content %}
-  {% block render_content %}
+          {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
+            </div>
+          {% endif %}
 
-    {% with  object.childs.view_childs.first  as container%}
-      <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
-        {% with object.parlamentares.count as count_parlamentares %}
-          {% for parlamentar in object.parlamentares.all %}
+          {% if forloop.counter0|organize_avatars:count_parlamentares %}
+            <div class="path-parlamentares">
+          {% endif %}
 
-            {% if forloop.counter0 > 0 and forloop.counter0|organize_avatars:count_parlamentares %}
-              </div>
-            {% endif %}
-
-            {% if forloop.counter0|organize_avatars:count_parlamentares %}
-              <div class="path-parlamentares">
-            {% endif %}
-
-              {% if parlamentar.fotografia %}
-                <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="/{{ parlamentar.classe_set.first.absolute_slug }}" title="{{parlamentar}}">
-                  <img src="{{parlamentar.fotografia.url_cropping}}">
-                </a>
-              {% endif %}
-
-            {% if not forloop.last %}
-              <span class="linebreak"></span>
-            {% else %}
-              </div>
-            {% endif %}
-
-          {% endfor %}
-        {% endwith %}
-        {% block base_header %}
-          {{block.super}}
-        {% endblock %}
-        <div class="container container-simples">
-          {{object.texto|default:''|safe|urlize}}
-        </div>
-      </div>
-    {% endwith %}
-
-    {% for container in object.childs.view_childs %}
-      {% if container.tipo == container.TPD_CONTAINER_FILE and container.childs.exists %}
-        <div class="container container-file">
-          {% if container.titulo %}
-            <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{container.slug}}" target="_blank">
-              <i class="far fa-2x fa-file-{% if container.is_pdf_container %}pdf{% else %}archive{% endif %}"></i>
-            </a>
-            <div class="path-title-container" >
-              <a tabindex="{{view.tabindex}}" href="/{{container.slug}}" target="_blank">
-                <span >
-                  {{container.titulo|default:''|safe|urlize}}
-                </span>
+            {% if parlamentar.fotografia %}
+              <a class="avatar avatar{% if count_parlamentares >= 5 %}5{%else%}{{count_parlamentares}}{% endif %}" href="/{{ parlamentar.classe_set.first.absolute_slug }}" title="{{parlamentar}}">
+                <img src="{{parlamentar.fotografia.url_cropping}}">
               </a>
-            </div>
-            <div class="path-description">
-              {{container.descricao|default:''|safe|urlize}}
-            </div>
-            <span class="path-autor">
-              {{container.autor|default:''|safe|urlize}}
-            </span>
-
-            {% with rev=container.revisoes.first %}
-              <span class="data-pub">
-                {% if rev %}
-                {{rev.timestamp}} - {% trans "por:" %} {{rev.user|default:''}}
-                {% endif %}
-              </span>
-            {% endwith %}
-          {% endif %}
-
-          {% if not container.is_pdf_container %}
-            <div class="inner-container">
-              {% for item in container.childs.view_childs %}
-                <div class="inner-item">
-                  <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{item.slug}}" target="_blank">
-                    <i class="far fa-file-{% if item.is_pdf_container %}pdf{% else %}archive{% endif %}"></i>
-                  </a>
-                  <div class="path-title-container" >
-                    <a tabindex="{{view.tabindex}}" href="/{{item.slug}}" target="_blank">
-                      <span >
-                        {{item.titulo|default:'Arquivo'|safe|urlize}}
-                      </span>
-                    </a>
-                  </div>
-                  <div class="path-description">
-                    {{item.descricao|default:''|safe|urlize}}
-                  </div>
-                  <span class="path-autor">
-                    {{item.autor|default:''|safe|urlize}}
-                  </span>
-
-                  {% with rev=item.revisoes.first %}
-                    <span class="data-pub">
-                      {% if rev %}
-                        {{rev.timestamp}} - {% trans "por:" %} {{rev.user|default:''}}
-                      {% endif %}
-                    </span>
-                  {% endwith %}
-                </div>
-              {% endfor %}
-            </div>
-          {% endif %}
-
-        </div>
-      {% else %}
-
-        <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">
-
-          {% if container.titulo %}
-            <div class="path-title-container">
-                <br>{{container.titulo}}
-            </div>
-          {% endif %}
-
-
-          {% if container.descricao %}
-            <div class="path-description">
-              {{container.descricao}}
-            </div>
-          {% endif %}
-
-          {% for child in container.childs.view_childs %}
-            {% if child.tipo == child.TPD_TEXTO %}
-
-
-              {% if child.titulo %}
-                <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>
-              {% endif %}
-              {% if child.texto %}
-                {{child.texto|safe|urlize}}
-              {% endif %}
-
-
-            {% elif child.tipo == child.TPD_VIDEO %}
-
-
-              {% if child.titulo %}<span class="path-title-partes">{{child.titulo|safe|urlize}}</span>{% endif %}
-              {% if child.descricao %}<small>{{child.descricao|safe|urlize}}</small>{% endif %}
-
-              {% if child.texto %}
-                <div class="embed-responsive embed-responsive-16by9">
-                  {{child.texto|safe}}
-                </div>
-                <small>
-                  {% with object as doc %}
-                    {% if doc.extra_data.snippet.liveBroadcastContent == 'none'  %}
-                      {% if doc.extra_data.statistics %}
-                        <span class="statistics">
-                          &#8226;
-                          {% if doc.extra_data.statistics.viewCount == '0' %}
-                            Nenhuma Visualização
-                          {% elif doc.extra_data.statistics.viewCount == '1' %}
-                            1 Visualização
-                          {% else %}
-                            {{ doc.extra_data.statistics.viewCount }} Visualizações
-                          {% endif %}
-                          {% if doc.extra_data.statistics.likeCount != '0' %}
-                            &#8226; {{ doc.extra_data.statistics.likeCount }} <i class="fas fa-thumbs-up"></i>
-                          {% endif %}
-                          {% if doc.extra_data.statistics.dislikeCount != '0' and doc.extra_data_statistics.dislikeCount %}
-                            &#8226; {{ doc.extra_data.statistics.dislikeCount }} <i class="fas fa-thumbs-down"></i>
-                          {% endif %}
-                          <br>&#8226;
-                          {% if doc.extra_data.liveStreamingDetails.actualStartTime %}
-                          Transmitido há {{ doc.extra_data.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
-                          {% else %}
-                            há {{ doc.public_date|age:0}}
-                          {% endif %}
-                        </span>
-                      {% endif %}
-                    {% elif doc.extra_data.snippet.liveBroadcastContent == 'live'  %}
-                        <span class="{{doc.extra_data.snippet.liveBroadcastContent}}">
-                        AO VIVO AGORA
-                        </span>
-                    {% elif doc.extra_data.snippet.liveBroadcastContent == 'upcoming'  %}
-                        <span class="{{doc.extra_data.snippet.liveBroadcastContent}}">
-                        ESTREIA PROGRAMADA
-                        </span>
-                        <span class="upcoming-time">
-                        {{doc.extra_data.liveStreamingDetails.scheduledStartTime|parse_datetime}}
-                        </span>
-                    {% endif %}
-                  {% endwith %}
-                  </small>
-              {% endif %}
-
-
-            {% elif child.tipo == child.TPD_AUDIO %}
-
-
-              {% if child.titulo %}    <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>{% endif %}
-              {% if child.descricao %} <small>{{child.descricao|safe|urlize}}</small>{% endif %}
-              {% if child.texto %}
-                <div class="embed-responsive embed-responsive-16by9 embed-audio">
-                  {{child.texto|safe}}
-                </div>
-              {% endif %}
-
-
-            {% elif child.tipo == child.TPD_IMAGE and child.raiz.tipo != child.TD_VIDEO_NEWS %}
-              <div class="path-imagem {{child.alinhamento_css_class}}">
-
-                <a href="/{{child.absolute_slug}}" target="_blank">
-                  <img src="/{{child.absolute_slug}}{%if child.alinhamento == 4%}{%elif child.alinhamento == 1%}.1024.jpg{%else%}.512.jpg{%endif%}" alt="{% if child.titulo and not child.descricao %}{{child.titulo|default:child.parents.0.titulo}}{% endif %}{% if not child.titulo and child.descricao %}{{child.descricao|default:child.parents.0.descricao}}{% endif %}{% if not child.titulo and not child.descricao %}{{child.parents.0.descricao}}{% endif %}" />
-                </a>
-                <div  class="img-contexto">
-
-                  <span class="autor">{{child.autor|default:''}}</span>
-                  {% if child.titulo or child.descricao %}
-                    <div class="texto">
-                      <div class="titulo">{{child.titulo|default:child.parents.0.titulo}}</div>
-                      <div class="descricao">{{child.descricao|default:''}}</div>
-                    </div>
-                  {% endif %}
-
-                </div>
-              </div>
-
-            {% elif child.tipo == child.TPD_FILE %}
-
-                <div class="container-file">
-                  <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{child.slug}}" target="_blank">
-                    <i class="far fa-file-{% if child.is_pdf %}pdf{% else %}archive{% endif %}"></i>
-                  </a>
-                  <div class="path-title-container" >
-                    <a tabindex="{{view.tabindex}}" href="/{{child.slug}}" target="_blank">
-                      <span >
-                        {{child.titulo|default:'Arquivo'|safe|urlize}}
-                      </span>
-                    </a>
-                  </div>
-                  <div class="path-description">
-                    {{child.descricao|default:''|safe|urlize}}
-                  </div>
-                  <span class="path-autor">
-                    {{child.autor|default:''|safe|urlize}}
-                  </span>
-
-                  {% with rev=child.revisoes.first %}
-                    <span class="data-pub">
-                      {% if rev %}
-                        {{rev.timestamp}} - {% trans "por:" %} {{rev.user|default:''}}
-                      {% endif %}
-                    </span>
-                  {% endwith %}
-                </div>
-
-
-            {% elif child.tipo == child.TPD_GALLERY %}
-                {% with child as object %}
-                  {% include "path/path_gallery.html" %}
-                {% endwith %}
             {% endif %}
-          {% endfor %}
-        </div>
-      {% endif %}
-      {% comment %}
 
-      {% if forloop.first and not forloop.last %}
-        <div class="painel-corte">
-          <div class="btn btn-success">
-            {% trans "Continuar Lendo" %}
-          </div>
-        </div>
-      {% endif %}
-      {% endcomment %}
-    {% endfor %}
+          {% if not forloop.last %}
+            <span class="linebreak"></span>
+          {% else %}
+            </div>
+          {% endif %}
 
-
-  {% endblock %}
-
-
-<div class="container">
-          <table class="table bg-white">
-          {% for m in object.materias.all %}
-            <tr>
-              <td class="item-listas">
-                <div class="p-3">
-                  <div class="verbose_name">
-                    Matéria Legislativa
-                  </div>
-                  <div class="links-texto">
-                    {% if m.texto_original %}
-                      <a class="link-texto mr-3" href="{{m.texto_original.url}}" title="Texto Original">
-                        <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
-                      </a>
-                    {% endif %}
-                    {% if m.texto_articulado.exists %}
-                      <a class="link-texto" href="{% url 'sapl.materia:materia_ta' m.id%}">
-                        Texto Articulado
-                      </a>
-                    {% endif %}
-                  </div>
-
-                  <strong>
-                    <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
-                  </strong><br>
-                  {% if m.numero_protocolo %}
-                      <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} |
-                  {% endif %}
-                  <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
-                  <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
-                  <br>{{ m.ementa }}
-
-                  <small>
-                    {% if m.tramitacao_set.first.unidade_tramitacao_destino %}
-                      <br><strong>Localização Atual:</strong> &nbsp;{{m.tramitacao_set.first.unidade_tramitacao_destino}}</br>
-                      {% endif %}
-                      {% if m.tramitacao_set.first.status %}
-                        <strong>Status:</strong> &nbsp;{{m.tramitacao_set.first.status}}</br>
-                      {% endif %}
-                      {% if m.tramitacao_set.first.data_tramitacao %}
-                      <strong>Ultima Ação:</strong> &nbsp; {{m.tramitacao_set.first.texto}}</br>
-                      <strong>Data da última Tramitação:</strong> &nbsp;{{m.tramitacao_set.first.data_tramitacao}}</br>
-                      {% endif %}
-                      {% if m.tramitacao_set.first.data_fim_prazo %}
-                        <strong>Data Fim Prazo (Tramitação):</strong>&nbsp;{{m.tramitacao_set.first.data_fim_prazo|default_if_none:""}}</br>
-                      {% endif %}
-                      {% if m.registrovotacao_set.exists %}
-                          <strong>Foi a plenário em:</strong><br>
-                          {% for rv in m.registrovotacao_set.all %}
-                              {% if rv.ordem %}
-                                <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{m.id}}">
-                                  {{ rv.ordem.sessao_plenaria.data_inicio }} - {{ rv.ordem.resultado}} - {{ rv.ordem.registrovotacao_set.first.observacao}}
-                                </a>
-                              {% elif rv.expediente %}
-                                <a href="{% url 'sapl.sessao:expedientemateria_list' rv.expediente.sessao_plenaria_id %}#id{{m.id}}">
-                                  {{ rv.expediente.sessao_plenaria.data_inicio }}
-                                </a>
-                              {% endif %}
-                              </br>
-                          {% endfor %}
-                      {% endif %}
-
-                      {% if m.anexo_de.exists %}
-                        {% for a in m.materia_anexada_set.all %}
-                        <strong>Matéria Anexadora: </strong>&nbsp;
-                        <a href="{% url 'sapl.materia:materialegislativa_detail' a.materia_principal.id %}">
-                            {{ a.materia_principal }}&nbsp;
-                        </a>
-                        <strong>Data Anexação:</strong> {{a.data_anexacao}}
-                        </br>
-                        {% endfor %}
-                      {% endif %}
-                      {% if m.anexadas.all.exists %}
-                        {% for anexada in m.materia_principal_set.all %}
-                        <strong>Matéria Anexada: </strong>&nbsp;
-                        <a href="{% url 'sapl.materia:materialegislativa_detail' anexada.materia_anexada.id %}">
-                            {{ anexada.materia_anexada }}&nbsp;
-                        </a>
-                        <strong>Data Anexação:</strong> {{anexada.data_anexacao}}
-                        </br>
-                        {% endfor %}
-                      {% endif %}
-                      {% if m.documentoacessorio_set.all.exists %}
-                          <strong>Documentos Acessórios:</strong>
-                          <a href="{% url 'sapl.materia:documentoacessorio_list' m.id %}">
-                              {{ m.documentoacessorio_set.all.count }}
-                          </a>
-                          </br>
-                      {% endif %}
-                      {% if m.normajuridica_set.exists %}
-                          {% for nr in m.normajuridica_set.all %}
-                            {% if nr.tipo_id == 27 %}
-                              <strong>Autrografo: </strong>
-                            {% else %}
-                              <strong>Norma Jurídica Vinculada: </strong>
-                            {% endif %}
-                            <a href="{% url 'sapl.norma:normajuridica_detail' nr.id %}">
-                              {{ nr }}
-                            </a>
-                            </br>
-                          {% endfor %}
-                      {% endif %}
-                      {% if m.audienciapublica_set.exists %}
-                        <strong>Audiência(s) Pública(s): </strong>
-                        {% for ap in m.audienciapublica_set.all %}
-                          <a href="{% url 'sapl.audiencia:audienciapublica_detail' ap.id %}">
-                              {{ ap.nome }}
-                          </a>
-                          {% if not forloop.last %},&nbsp;{% endif %}
-                        {% endfor %}
-                      {% endif %}
-                      <p></p>
-                      {% if m.em_tramitacao and mail_service_configured %}
-                        <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
-                      {% endif %}
-                  </small>
-
-                  {% if m.url_video %}
-                    <div class="container">
-                      <div class="row justify-content-center">
-                        <div class="col col-sm-7">
-                          {% with m.url_video as url_video %}
-                            {% include 'youtube_widget.html' %}
-                          {% endwith %}
-                        </div>
-                      </div>
-                    </div>
-                  {% endif %}
-
-
-                  {% if m.metadata_model %}
-                    {% with m.metadata_model as md %}
-                      {% if md.metadata.genia.template == 'table1' %}
-                        {% include "materia/materialegislativa_genia_table1.html" %}
-                      {% endif %}
-                    {% endwith %}
-                  {% endif %}
-
-
-                </div>
-              </td>
-            </tr>
-          {% endfor %}
-          </table>
-</div>
-
-<div class="container text-center"><br><br>
-  <div class="container"><small>ShortLink: {{object.short_url|urlize}}</small></div>
-  <img class="qrcode d-none" src="{{object.short_url}}/qrcode" alt="">
-</div>
-
-
-{% endblock %}
-
-
-
-{% block cmj_extra_content %}
-{% if object != object.classe.capa %}
-  <div class="{% if path %}container{{path}}{% endif %} container-fluid container-footer d-print-none">
-    <div class="container">
-      <div class="row">
-        {% with 'path-item-list col-md-3' as css_class %}
-          {% include "path/path_list_docs.html" %}
-        {% endwith %}
+        {% endfor %}
+      {% endwith %}
+      {% block base_header %}
+        {{block.super}}
+      {% endblock %}
+      <div class="container container-simples">
+        {{object.texto|default:''|safe|urlize}}
       </div>
     </div>
+  {% endwith %}
+
+  {% for container in object.childs.view_childs %}
+    {% if container.tipo == container.TPD_CONTAINER_FILE and container.childs.exists %}
+      <div class="container container-file">
+        {% if container.titulo %}
+          <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{container.slug}}" target="_blank">
+            <i class="far fa-2x fa-file-{% if container.is_pdf_container %}pdf{% else %}archive{% endif %}"></i>
+          </a>
+          <div class="path-title-container" >
+            <a tabindex="{{view.tabindex}}" href="/{{container.slug}}" target="_blank">
+              <span >
+                {{container.titulo|default:''|safe|urlize}}
+              </span>
+            </a>
+          </div>
+          <div class="path-description">
+            {{container.descricao|default:''|safe|urlize}}
+          </div>
+          <span class="path-autor">
+            {{container.autor|default:''|safe|urlize}}
+          </span>
+
+          {% with rev=container.revisoes.first %}
+            <span class="data-pub">
+              {% if rev %}
+              {{rev.timestamp}} - {% trans "por:" %} {{rev.user|default:''}}
+              {% endif %}
+            </span>
+          {% endwith %}
+        {% endif %}
+
+        {% if not container.is_pdf_container %}
+          <div class="inner-container">
+            {% for item in container.childs.view_childs %}
+              <div class="inner-item">
+                <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{item.slug}}" target="_blank">
+                  <i class="far fa-file-{% if item.is_pdf_container %}pdf{% else %}archive{% endif %}"></i>
+                </a>
+                <div class="path-title-container" >
+                  <a tabindex="{{view.tabindex}}" href="/{{item.slug}}" target="_blank">
+                    <span >
+                      {{item.titulo|default:'Arquivo'|safe|urlize}}
+                    </span>
+                  </a>
+                </div>
+                <div class="path-description">
+                  {{item.descricao|default:''|safe|urlize}}
+                </div>
+                <span class="path-autor">
+                  {{item.autor|default:''|safe|urlize}}
+                </span>
+
+                {% with rev=item.revisoes.first %}
+                  <span class="data-pub">
+                    {% if rev %}
+                      {{rev.timestamp}} - {% trans "por:" %} {{rev.user|default:''}}
+                    {% endif %}
+                  </span>
+                {% endwith %}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
+      </div>
+    {% else %}
+
+      <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% else %} container-simples{% endif %} {% if forloop.first%}container-first{% endif %}">
+
+        {% if container.titulo %}
+          <div class="path-title-container">
+              <br>{{container.titulo}}
+          </div>
+        {% endif %}
+
+
+        {% if container.descricao %}
+          <div class="path-description">
+            {{container.descricao}}
+          </div>
+        {% endif %}
+
+        {% for child in container.childs.view_childs %}
+          {% if child.tipo == child.TPD_TEXTO %}
+
+
+            {% if child.titulo %}
+              <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>
+            {% endif %}
+            {% if child.texto %}
+              {{child.texto|safe|urlize}}
+            {% endif %}
+
+
+          {% elif child.tipo == child.TPD_VIDEO %}
+
+
+            {% if child.titulo %}<span class="path-title-partes">{{child.titulo|safe|urlize}}</span>{% endif %}
+            {% if child.descricao %}<small>{{child.descricao|safe|urlize}}</small>{% endif %}
+
+            {% if child.texto %}
+              <div class="embed-responsive embed-responsive-16by9">
+                {{child.texto|safe}}
+              </div>
+              <small>
+                {% with object as doc %}
+                  {% if doc.extra_data.snippet.liveBroadcastContent == 'none'  %}
+                    {% if doc.extra_data.statistics %}
+                      <span class="statistics">
+                        &#8226;
+                        {% if doc.extra_data.statistics.viewCount == '0' %}
+                          Nenhuma Visualização
+                        {% elif doc.extra_data.statistics.viewCount == '1' %}
+                          1 Visualização
+                        {% else %}
+                          {{ doc.extra_data.statistics.viewCount }} Visualizações
+                        {% endif %}
+                        {% if doc.extra_data.statistics.likeCount != '0' %}
+                          &#8226; {{ doc.extra_data.statistics.likeCount }} <i class="fas fa-thumbs-up"></i>
+                        {% endif %}
+                        {% if doc.extra_data.statistics.dislikeCount != '0' and doc.extra_data_statistics.dislikeCount %}
+                          &#8226; {{ doc.extra_data.statistics.dislikeCount }} <i class="fas fa-thumbs-down"></i>
+                        {% endif %}
+                        <br>&#8226;
+                        {% if doc.extra_data.liveStreamingDetails.actualStartTime %}
+                        Transmitido há {{ doc.extra_data.liveStreamingDetails.actualStartTime|parse_datetime|age:0}}
+                        {% else %}
+                          há {{ doc.public_date|age:0}}
+                        {% endif %}
+                      </span>
+                    {% endif %}
+                  {% elif doc.extra_data.snippet.liveBroadcastContent == 'live'  %}
+                      <span class="{{doc.extra_data.snippet.liveBroadcastContent}}">
+                      AO VIVO AGORA
+                      </span>
+                  {% elif doc.extra_data.snippet.liveBroadcastContent == 'upcoming'  %}
+                      <span class="{{doc.extra_data.snippet.liveBroadcastContent}}">
+                      ESTREIA PROGRAMADA
+                      </span>
+                      <span class="upcoming-time">
+                      {{doc.extra_data.liveStreamingDetails.scheduledStartTime|parse_datetime}}
+                      </span>
+                  {% endif %}
+                {% endwith %}
+                </small>
+            {% endif %}
+
+
+          {% elif child.tipo == child.TPD_AUDIO %}
+
+
+            {% if child.titulo %}    <span class="path-title-partes">{{child.titulo|safe|urlize}}</span>{% endif %}
+            {% if child.descricao %} <small>{{child.descricao|safe|urlize}}</small>{% endif %}
+            {% if child.texto %}
+              <div class="embed-responsive embed-responsive-16by9 embed-audio">
+                {{child.texto|safe}}
+              </div>
+            {% endif %}
+
+
+          {% elif child.tipo == child.TPD_IMAGE and child.raiz.tipo != child.TD_VIDEO_NEWS %}
+            <div class="path-imagem {{child.alinhamento_css_class}}">
+
+              <a href="/{{child.absolute_slug}}" target="_blank">
+                <img src="/{{child.absolute_slug}}{%if child.alinhamento == 4%}{%elif child.alinhamento == 1%}.1024.jpg{%else%}.512.jpg{%endif%}" alt="{% if child.titulo and not child.descricao %}{{child.titulo|default:child.parents.0.titulo}}{% endif %}{% if not child.titulo and child.descricao %}{{child.descricao|default:child.parents.0.descricao}}{% endif %}{% if not child.titulo and not child.descricao %}{{child.parents.0.descricao}}{% endif %}" />
+              </a>
+              <div  class="img-contexto">
+
+                <span class="autor">{{child.autor|default:''}}</span>
+                {% if child.titulo or child.descricao %}
+                  <div class="texto">
+                    <div class="titulo">{{child.titulo|default:child.parents.0.titulo}}</div>
+                    <div class="descricao">{{child.descricao|default:''}}</div>
+                  </div>
+                {% endif %}
+
+              </div>
+            </div>
+
+          {% elif child.tipo == child.TPD_FILE %}
+
+              <div class="container-file">
+                <a class="icon-container" tabindex="{{view.tabindex}}" href="/{{child.slug}}" target="_blank">
+                  <i class="far fa-file-{% if child.is_pdf %}pdf{% else %}archive{% endif %}"></i>
+                </a>
+                <div class="path-title-container" >
+                  <a tabindex="{{view.tabindex}}" href="/{{child.slug}}" target="_blank">
+                    <span >
+                      {{child.titulo|default:'Arquivo'|safe|urlize}}
+                    </span>
+                  </a>
+                </div>
+                <div class="path-description">
+                  {{child.descricao|default:''|safe|urlize}}
+                </div>
+                <span class="path-autor">
+                  {{child.autor|default:''|safe|urlize}}
+                </span>
+
+                {% with rev=child.revisoes.first %}
+                  <span class="data-pub">
+                    {% if rev %}
+                      {{rev.timestamp}} - {% trans "por:" %} {{rev.user|default:''}}
+                    {% endif %}
+                  </span>
+                {% endwith %}
+              </div>
+
+
+          {% elif child.tipo == child.TPD_GALLERY %}
+              {% with child as object %}
+                {% include "path/path_gallery.html" %}
+              {% endwith %}
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    {% comment %}
+
+    {% if forloop.first and not forloop.last %}
+      <div class="painel-corte">
+        <div class="btn btn-success">
+          {% trans "Continuar Lendo" %}
+        </div>
+      </div>
+    {% endif %}
+    {% endcomment %}
+  {% endfor %}
+{% endblock render_main_content %}
+
+{% block materia_content %}
+  <div class="container">
+    <table class="table bg-white">
+    {% for m in object.materias.all %}
+      <tr>
+        <td class="item-listas">
+          <div class="p-3">
+            <div class="verbose_name">
+              Matéria Legislativa
+            </div>
+            <div class="links-texto">
+              {% if m.texto_original %}
+                <a class="link-texto mr-3" href="{{m.texto_original.url}}" title="Texto Original">
+                  <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+                </a>
+              {% endif %}
+              {% if m.texto_articulado.exists %}
+                <a class="link-texto" href="{% url 'sapl.materia:materia_ta' m.id%}">
+                  Texto Articulado
+                </a>
+              {% endif %}
+            </div>
+
+            <strong>
+              <a href="{% url 'sapl.materia:materialegislativa_detail' m.id %}">{{m.tipo.sigla}} {{m.numero}}/{{m.ano}} - {{m.tipo}}</a>
+            </strong><br>
+            {% if m.numero_protocolo %}
+                <strong>Protocolo: </strong>{{m.numero_protocolo}}/{{m.ano}} |
+            {% endif %}
+            <strong>Data de Apresentação:</strong> {{m.data_apresentacao}}
+            <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
+            <br>{{ m.ementa }}
+
+            <small>
+              {% if m.tramitacao_set.first.unidade_tramitacao_destino %}
+                <br><strong>Localização Atual:</strong> &nbsp;{{m.tramitacao_set.first.unidade_tramitacao_destino}}</br>
+                {% endif %}
+                {% if m.tramitacao_set.first.status %}
+                  <strong>Status:</strong> &nbsp;{{m.tramitacao_set.first.status}}</br>
+                {% endif %}
+                {% if m.tramitacao_set.first.data_tramitacao %}
+                <strong>Ultima Ação:</strong> &nbsp; {{m.tramitacao_set.first.texto}}</br>
+                <strong>Data da última Tramitação:</strong> &nbsp;{{m.tramitacao_set.first.data_tramitacao}}</br>
+                {% endif %}
+                {% if m.tramitacao_set.first.data_fim_prazo %}
+                  <strong>Data Fim Prazo (Tramitação):</strong>&nbsp;{{m.tramitacao_set.first.data_fim_prazo|default_if_none:""}}</br>
+                {% endif %}
+                {% if m.registrovotacao_set.exists %}
+                    <strong>Foi a plenário em:</strong><br>
+                    {% for rv in m.registrovotacao_set.all %}
+                        {% if rv.ordem %}
+                          <a href="{% url 'sapl.sessao:ordemdia_list' rv.ordem.sessao_plenaria_id %}#id{{m.id}}">
+                            {{ rv.ordem.sessao_plenaria.data_inicio }} - {{ rv.ordem.resultado}} - {{ rv.ordem.registrovotacao_set.first.observacao}}
+                          </a>
+                        {% elif rv.expediente %}
+                          <a href="{% url 'sapl.sessao:expedientemateria_list' rv.expediente.sessao_plenaria_id %}#id{{m.id}}">
+                            {{ rv.expediente.sessao_plenaria.data_inicio }}
+                          </a>
+                        {% endif %}
+                        </br>
+                    {% endfor %}
+                {% endif %}
+
+                {% if m.anexo_de.exists %}
+                  {% for a in m.materia_anexada_set.all %}
+                  <strong>Matéria Anexadora: </strong>&nbsp;
+                  <a href="{% url 'sapl.materia:materialegislativa_detail' a.materia_principal.id %}">
+                      {{ a.materia_principal }}&nbsp;
+                  </a>
+                  <strong>Data Anexação:</strong> {{a.data_anexacao}}
+                  </br>
+                  {% endfor %}
+                {% endif %}
+                {% if m.anexadas.all.exists %}
+                  {% for anexada in m.materia_principal_set.all %}
+                  <strong>Matéria Anexada: </strong>&nbsp;
+                  <a href="{% url 'sapl.materia:materialegislativa_detail' anexada.materia_anexada.id %}">
+                      {{ anexada.materia_anexada }}&nbsp;
+                  </a>
+                  <strong>Data Anexação:</strong> {{anexada.data_anexacao}}
+                  </br>
+                  {% endfor %}
+                {% endif %}
+                {% if m.documentoacessorio_set.all.exists %}
+                    <strong>Documentos Acessórios:</strong>
+                    <a href="{% url 'sapl.materia:documentoacessorio_list' m.id %}">
+                        {{ m.documentoacessorio_set.all.count }}
+                    </a>
+                    </br>
+                {% endif %}
+                {% if m.normajuridica_set.exists %}
+                    {% for nr in m.normajuridica_set.all %}
+                      {% if nr.tipo_id == 27 %}
+                        <strong>Autrografo: </strong>
+                      {% else %}
+                        <strong>Norma Jurídica Vinculada: </strong>
+                      {% endif %}
+                      <a href="{% url 'sapl.norma:normajuridica_detail' nr.id %}">
+                        {{ nr }}
+                      </a>
+                      </br>
+                    {% endfor %}
+                {% endif %}
+                {% if m.audienciapublica_set.exists %}
+                  <strong>Audiência(s) Pública(s): </strong>
+                  {% for ap in m.audienciapublica_set.all %}
+                    <a href="{% url 'sapl.audiencia:audienciapublica_detail' ap.id %}">
+                        {{ ap.nome }}
+                    </a>
+                    {% if not forloop.last %},&nbsp;{% endif %}
+                  {% endfor %}
+                {% endif %}
+                <p></p>
+                {% if m.em_tramitacao and mail_service_configured %}
+                  <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
+                {% endif %}
+            </small>
+
+            {% if m.url_video %}
+              <div class="container">
+                <div class="row justify-content-center">
+                  <div class="col col-sm-7">
+                    {% with m.url_video as url_video %}
+                      {% include 'youtube_widget.html' %}
+                    {% endwith %}
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+
+
+            {% if m.metadata_model %}
+              {% with m.metadata_model as md %}
+                {% if md.metadata.genia.template == 'table1' %}
+                  {% include "materia/materialegislativa_genia_table1.html" %}
+                {% endif %}
+              {% endwith %}
+            {% endif %}
+
+
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </table>
   </div>
-{% endif %}
-{% endblock %}
 
+  <div class="container text-center"><br><br>
+    <div class="container"><small>ShortLink: {{object.short_url|urlize}}</small></div>
+    <img class="qrcode d-none" src="{{object.short_url}}/qrcode" alt="">
+  </div>
+{% endblock materia_content %}
 
-{% block extra_js  %}
+{% block cmj_extra_content %}
+  {% if object != object.classe.capa %}
+    <div class="{% if path %}container{{path}}{% endif %} container-fluid container-footer d-print-none">
+      <div class="container">
+        <div class="row">
+          {% with 'path-item-list col-md-3' as css_class %}
+            {% include "path/path_list_docs.html" %}
+          {% endwith %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock cmj_extra_content %}
 
-
-<script>
-  $(document).ready(function (){
-    //ContainerFirst();
-    Gallery().init();
-  });
-</script>
-{% endblock %}
+{% block extra_js %}
+  <script>
+    $(document).ready(function (){
+      //ContainerFirst();
+      Gallery().init();
+    });
+  </script>
+{% endblock extra_js %}

@@ -356,9 +356,12 @@
     .submapa .submapa .submapa {
       border-top: 0px dotted black;
     }
-
-
   }
+
+  .container-menu-lateral {
+    border-left: 1px solid transparentize(#a97905, 0.75);
+  }
+
 }
 
 .path-item-list {

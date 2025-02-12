@@ -15,22 +15,6 @@
 {% endblock %}
 
 {% block base_header %}
-
-{% comment %}
-  <div class=" float-right col-5 {% if not object.classe.childs.exists %}d-none{% endif %}">
-    {% if object.classe.childs.exists %}
-    <ul class="nav">
-      {% for ch in object.classe.childs.all %}
-      <li>
-        <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
-      </li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-  </div>
-{% endcomment %}
-
-
     <div style="position:relative;">
       <h1 class="path-title-classe {% if object.classe %}display-doc{% endif %}">
         {% if object.classe %}
@@ -89,4 +73,53 @@
         {% social_link_share object 'top-right block'%}
     </div>
 
-{% endblock %}
+{% endblock base_header %}
+
+{% block base_content %}
+{% block render_content %}
+
+{% if object.classe.menu_lateral %}
+<div class="container">
+{% endif %}
+
+  <div class="row">
+    <div class="col">
+      {% block render_main_content %}
+      {% endblock render_main_content%}
+    </div>
+    {% if object.classe.menu_lateral %}
+      <div class="col-md-4 container-menu-lateral">
+        {% block render_right_content %}
+          {% if object.classe.perfil == object.classe.CLASSE_DOCUMENTAL %}
+            {% if object.classe.parent.childs.exists %}
+              <ul class="nav">
+                {% for ch in object.classe.parent.childs.all %}
+                <li>
+                  <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
+                </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% else %}
+            {% if object.classe.childs.exists %}
+              <ul class="nav">
+                {% for ch in object.classe.childs.all %}
+                <li>
+                  <a href="/{{ch.absolute_slug}}">{{ch.apelido|default:ch.titulo}}</a>
+                </li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          {% endif %}
+        {% endblock render_right_content %}
+      </div>
+    {% endif %}
+  </div>
+
+
+{% if object.classe.menu_lateral %}
+</div>
+{% endif %}
+
+{% endblock render_content %}
+{% endblock base_content %}
