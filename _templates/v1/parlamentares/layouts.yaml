@@ -33,10 +33,10 @@ Parlamentar:
   {% trans 'Dados do Parlamentar' %}:
   - nome_parlamentar:8  ativo
   - nome_completo
-  - profissao
   - email telefone
   - biografia
 {% comment %}
+  - profissao
   - endereco_web
   - nivel_instrucao  sexo  data_nascimento
   - situacao_militar
