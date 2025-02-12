@@ -41,25 +41,6 @@ from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
 
-CLASSE_ESTRUTURAL = 0
-CLASSE_DOCUMENTAL = 1
-CLASSE_MISTA = 2
-CLASSE_REDIRECT = 98
-CLASSE_REDIRECT_VIEWS = 99
-
-PERFIL_CLASSE = (
-    (
-        CLASSE_ESTRUTURAL, _('Classe Estrutural')),
-    (
-        CLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
-    (
-        CLASSE_MISTA, _('Classe Mista')),
-    (
-        CLASSE_REDIRECT, _('Classe de Redirecionamento via URL')),
-    (
-        CLASSE_REDIRECT_VIEWS, _('Classe de Redirecionamento via Views'))
-)
-
 DOC_TEMPLATES_CHOICE_FILES = {
     1: {
         'template_name': 'path/path_documento.html',
@@ -739,6 +720,20 @@ class ClasseManager(models.Manager):
 
 class Classe(ShortUrl, CMSMixin):
     objects = ClasseManager()
+
+    CLASSE_ESTRUTURAL = 0
+    CLASSE_DOCUMENTAL = 1
+    CLASSE_MISTA = 2
+    CLASSE_REDIRECT = 98
+    CLASSE_REDIRECT_VIEWS = 99
+
+    PERFIL_CLASSE = (
+        (CLASSE_ESTRUTURAL, _('Classe Estrutural')),
+        (CLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
+        (CLASSE_MISTA, _('Classe Mista')),
+        (CLASSE_REDIRECT, _('Classe de Redirecionamento via URL')),
+        (CLASSE_REDIRECT_VIEWS, _('Classe de Redirecionamento via Views'))
+    )
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 

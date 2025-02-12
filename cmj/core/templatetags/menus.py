@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 import yaml
 
-from cmj.sigad.models import Classe, Documento, CLASSE_REDIRECT_VIEWS
+from cmj.sigad.models import Classe, Documento
 from cmj.utils import get_breadcrumb_classes
 
 logger = logging.getLogger(__name__)

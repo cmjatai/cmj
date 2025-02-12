@@ -30,7 +30,7 @@ from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
 from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos, \
     PermissionsUserClasse, PermissionsUserDocumento, CMSMixin, \
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse, \
-    CaixaPublicacaoRelationship, UrlShortener, CLASSE_REDIRECT_VIEWS
+    CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import MasterDetailCrud, Crud
@@ -296,7 +296,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                 return HttpResponseForbidden()
 
         elif self.classe and self.classe.url_redirect:
-            if self.classe.perfil == CLASSE_REDIRECT_VIEWS:
+            if self.classe.perfil == self.classe.CLASSE_REDIRECT_VIEWS:
                 if self.classe.url_redirect.endswith(',list'):
                     return redirect(
                         reverse_lazy(

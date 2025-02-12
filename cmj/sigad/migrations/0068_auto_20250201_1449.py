@@ -2,7 +2,6 @@
 
 from django.db import migrations
 from django.utils import timezone
-from cmj.sigad.models import CLASSE_REDIRECT
 
 
 def change_config_classes(apps, schema_editor):
@@ -26,7 +25,7 @@ def change_config_classes(apps, schema_editor):
                 classe.list_in_mapa = True
 
         if classe.url_redirect:
-            classe.perfil = CLASSE_REDIRECT
+            classe.perfil = classe.CLASSE_REDIRECT
         classe.save()
 
 
