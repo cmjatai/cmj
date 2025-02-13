@@ -1,5 +1,8 @@
 import logging
 
+from django.core.cache import cache
+
+from django.conf import settings
 from django import template
 from django.core.handlers.asgi import ASGIRequest
 from django.db.models import Q
@@ -40,8 +43,8 @@ def breadcrumb(context):
 
 
 @register.inclusion_tag('menus/sigad/menu.html', takes_context=True)
-def sigad_menu(context, path=None, pk=None):
-    return sigad_run(context, path, pk)
+def sigad_menu(context, field=None, parent=None):
+    return sigad_run(context, field, parent)
 
 
 def sigad_run(context, field, parent=None):
@@ -52,6 +55,55 @@ def sigad_run(context, field, parent=None):
     classes_publicas = Classe.objects.qs_classes_publicas().filter(**params)
     return {'classes': classes_publicas, 'field_name': field}
 
+
+@register.inclusion_tag('menus/nav.html', takes_context=True)
+def sigad_navbar(context, field=None):
+
+    user = context['user']
+
+    if not user.is_superuser:
+        menu = cache.get('portalcmj_menu_geral')
+        if menu:
+            return menu
+
+    raizes = sigad_run(context, field)['classes']
+    params = {
+        str(field): True,
+    }
+    def get_how_menu(classes):
+        item_list = []
+        for classe in classes:
+            item = {
+                'title': classe.apelido or classe.titulo,
+                'children': [],
+                'url': f'/{classe.absolute_slug}',
+                'active': '',
+            }
+            item_list.append(item)
+            item['children'] = get_how_menu(classe.childs.qs_classes_publicas().filter(**params))
+            if item['title'].startswith('__'):
+                item['title'] = ''
+            if classe.url_redirect.startswith('__'):
+                item['url'] = ''
+
+        return item_list
+
+    menu = get_how_menu(raizes)
+
+    if not user.is_anonymous and not user.is_only_socialuser():
+        menu = [
+            {
+                'title': _('Portal'),
+                'url': '',
+                'children': menu
+            }
+        ]
+
+    resp_menu = {'menu': menu}
+    if not user.is_superuser:
+        cache.set('portalcmj_menu_geral', resp_menu, 60)
+
+    return resp_menu
 
 @register.inclusion_tag('menus/menu.html', takes_context=True)
 def menu(context, path=None, pk=None):

@@ -164,10 +164,14 @@ class Parent(models.Model):
         parents = p[0].classe.parents_and_me + p
         return parents
 
-    def treechilds2list(self):
+    def treechilds2list(self, qs_name=None, params={}):
         yield self
-        for child in self.childs.view_childs():
-            for item in child.treechilds2list():
+        if not qs_name:
+            qs_name = 'view_childs'
+        if params:
+            params.update({'parent': self})
+        for child in getattr(self.childs, qs_name)().filter(**params):
+            for item in child.treechilds2list(qs_name=qs_name, params=params):
                 yield item
 
 

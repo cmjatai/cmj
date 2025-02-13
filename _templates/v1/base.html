@@ -36,23 +36,17 @@
       {% block global_container %}
         {% block navigation %}
           <nav class="navbar navbar-menu navbar-expand-lg navbar-dark">
-
-            <div class="container{{fluid}}">
-
-              <div class="navbar-collapse collapse" id="navbar-menu">
-            </div>
             <div class="container{{fluid}}">
               <div class="navbar-collapse collapse" id="navbar-menu">
 
                 <ul class="navbar-nav" id="menu_content">
-                  {% if user.is_anonymous %}
-                    {% navbar 'navbar/navbar_public.yaml' %}
-                  {% elif user.is_superuser %}
-                    {% navbar 'navbar/navbar_superuser.yaml' %}
-                  {% elif not user.is_only_socialuser %}
-                    {% navbar 'navbar/navbar_restrict.yaml' %}
-                  {% else %}
-                    {% navbar 'navbar/navbar_public.yaml' %}
+
+                  {% sigad_navbar 'list_in_menu' %}
+
+                  {% if user.is_superuser %}
+                    {% navbar 'navbar2/navbar_superuser.yaml' %}
+                  {% elif not user.is_anonymous and not user.is_only_socialuser %}
+                    {% navbar 'navbar2/navbar_restrict.yaml' %}
                   {% endif %}
                 </ul>
 

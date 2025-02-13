@@ -1,0 +1,38 @@
+{% load i18n common_cmj_tags %}
+
+{% yaml_render "navbar/public/navbar_atividadelegislativa.yaml" 0 %}
+
+- title: {% trans 'Proposições' %}
+  url: sapl.materia:proposicao_list
+  check_permission: materia.add_proposicao
+
+{% yaml_render "navbar/restrict/navbar_arq.yaml" 0 %}
+
+{% yaml_render "navbar/restrict/navbar_saap.yaml" 0 %}
+
+
+{% if perms.ouvidoria.list_solicitacao %}
+  {% yaml_render "navbar/public/navbar_esic.yaml" 0 %}
+{% endif %}
+
+{% if perms.sigad.view_documento %}
+- title: {% trans "Notícias" %}
+  url: '/noticias'
+{% endif %}
+
+{% if perms.protocoloadm.add_protocolo %}
+
+  {% yaml_render "navbar/restrict/navbar_protocolo.yaml" 0 %}
+
+{% else %}
+
+- title: {% trans 'Matérias Legislativas' %}
+  url: sapl.materia:pesquisar_materia
+  check_permission: protocoloadm.list_documentoadministrativo
+
+- title: {% trans 'Documentos' %}
+  url: sapl.protocoloadm:documentoadministrativo_list
+  check_permission: protocoloadm.list_documentoadministrativo
+{% endif %}
+
+

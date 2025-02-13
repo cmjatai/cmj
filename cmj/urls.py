@@ -65,11 +65,9 @@ urlpatterns_all = [
 
     re_path(r'^admin/', admin.site.urls),
 
-    #re_path(r'^index.html$', TemplateView.as_view(template_name='index.html')),
 
     re_path(r'^message$', TemplateView.as_view(template_name='base.html')),
     re_path('', include('social_django.urls', namespace='social')),
-
 
     re_path(r'', include(cmj.globalrules.urls)),
 
@@ -107,6 +105,9 @@ if settings.DEBUG_TOOLBAR_ACTIVE:
     urlpatterns_all.append(re_path('__debug__/', include(debug_toolbar.urls)))
 
 if settings.DEBUG:
+    urlpatterns_all.append(
+        re_path(r'^debug.html$', TemplateView.as_view(template_name='debug.html')))
+
     urlpatterns_all += static(settings.STATIC_URL,
                               document_root=settings.STATIC_ROOT)
 

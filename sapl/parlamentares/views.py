@@ -70,7 +70,7 @@ class BancadaCrud(Crud):
     class DetailView(Crud.DetailView):
 
         layout_key = 'BancadaDetail'
-        
+
         def get_context_data(self, **kwargs):
             context = Crud.DetailView.get_context_data(self, **kwargs)
 
@@ -693,12 +693,8 @@ class ParlamentarCrud(Crud):
         def take_legislatura_id(self):
             username = self.request.user.username
             try:
-                self.logger.debug("user=" + username +
-                                  ". Tentando obter id da legislatura.")
                 return int(self.request.GET['pk'])
             except:
-                self.logger.error(
-                    "user=" + username + ". Legislatura não possui ID. Buscando em todas as entradas.")
                 legislaturas = Legislatura.objects.all()
                 for l in legislaturas:
                     if l.atual():

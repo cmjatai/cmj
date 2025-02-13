@@ -1,0 +1,61 @@
+{% load i18n common_cmj_tags %}
+
+- title: {% trans 'Notícias' %}
+  url: /noticias
+- title: {% trans 'Mídias' %}
+  url: ''
+  children:
+  - title: {% trans 'TV Câmara - Ao Vivo' %}
+    url: /tv-cmj/ao-vivo
+  - title: ''
+    url: ''
+  - title: {% trans 'Rádio Câmara - Ao Vivo' %}
+    url: /radio-cmj/ao-vivo
+  - title: ''
+    url: ''
+  - title: {% trans 'Galeria de Vídeos' %}
+    url: /galerias/videos
+  - title: {% trans 'Galeria de Imagens' %}
+    url: /galerias/imagens
+  - title: {% trans 'Galeria de Áudios' %}
+    url: /galerias/audios
+
+{% comment %}
+  - title: {% trans 'TV CMJ' %}
+    url: ''
+    children:
+    - title: {% trans 'Sessões Transmitidas' %}
+      url: ''
+      children:
+      - title: {% trans 'Sessões Solenes' %}
+        url: /tv-cmj/sessoes/sessoes-solenes
+      - title: {% trans 'Sessões Plenárias' %}
+        url: ''
+        children:
+        - title: '{% trans '2020' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2020
+        - title: '{% trans '2019' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2019
+        - title: '{% trans '2018' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2018
+        - title: '{% trans '2017' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2017
+        - title: '{% trans '2016' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2016
+        - title: '{% trans '2015' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2015
+        - title: '{% trans '2014' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2014
+        - title: '{% trans '2013' %}'
+          url: /tv-cmj/sessoes/sessoes-plenarias/2013
+    - title: {% trans 'Audiências Públicas' %}
+      url: /tv-cmj/audiencias-publicas
+    - title: {% trans 'Entrevistas' %}
+      url: /tv-cmj/entrevistas
+    - title: {% trans 'Memórias de jataí' %}
+      url: /tv-cmj/memorias-de-jatai
+  - title: {% trans 'Rádio CMJ' %}
+    url: ''
+    children:
+
+{% endcomment %}

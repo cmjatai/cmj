@@ -1,0 +1,38 @@
+{% load i18n common_cmj_tags %}
+- title: {% trans 'Institucional' %}
+  url: ''
+  children:
+  - title: {% trans 'Mesa Diretora' %}
+    url: /parlamentar
+  - title: {% trans 'Comissões' %}
+    url: sapl.comissoes:comissao_list
+  - title: {% trans 'Blocos Parlamentares' %}
+    url: sapl.parlamentares:bloco_list
+  - title: {% trans 'Bancadas Partidárias' %}
+    url: sapl.parlamentares:bancada_list
+  - title: ''
+    url: ''
+
+  - title: {% trans 'Estrutura Organizacional' %}
+    url: /informacao/informacoes-institucionais/estrutura-organizacional
+  - title: {% trans 'Procuradoria Geral' %}
+    url: /institucional/procuradoria-geral
+
+  - title: ''
+    url: ''
+
+  - title: {% trans 'Nossa Jataí' %}
+    url: /institucional/nossa-jatai
+
+
+{% comment %}
+  - title: {% trans 'História' %}
+    url: ''
+    children:
+    - title: {% trans 'Prefeitos de Nossa História' %}
+      url: /institucional/historia/prefeitos-de-nossa-historia
+  - title: {% trans 'Agenda Pública' %}
+    url: /evento
+  - title: {% trans 'EGEL' %}
+    url: /escola
+{% endcomment %}
