@@ -61,10 +61,10 @@ def sigad_navbar(context, field=None):
 
     user = context['user']
 
-    if not user.is_superuser:
-        menu = cache.get('portalcmj_menu_geral')
-        if menu:
-            return menu
+    #if not user.is_superuser:
+    #    menu = cache.get('portalcmj_menu_geral')
+    #    if menu:
+    #        return menu
 
     raizes = sigad_run(context, field)['classes']
     params = {
@@ -100,8 +100,8 @@ def sigad_navbar(context, field=None):
         ]
 
     resp_menu = {'menu': menu}
-    if not user.is_superuser:
-        cache.set('portalcmj_menu_geral', resp_menu, 60)
+    #if not user.is_superuser:
+    #    cache.set('portalcmj_menu_geral', resp_menu, 60)
 
     return resp_menu
 

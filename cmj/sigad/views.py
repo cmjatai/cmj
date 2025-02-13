@@ -295,7 +295,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                     request.META['REQUEST_METHOD'] == 'GET':
                 return HttpResponseForbidden()
 
-        elif self.classe and self.classe.url_redirect:
+        elif self.classe and self.classe.url_redirect and not self.classe.url_redirect .startswith('__'):
             if self.classe.perfil == self.classe.CLASSE_REDIRECT_VIEWS:
                 if self.classe.url_redirect.endswith(',list'):
                     return redirect(
