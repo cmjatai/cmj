@@ -48,7 +48,7 @@
     li {
       &:hover {
         position: relative;
-        background: $hover_background_10pw;
+        background: $hover_background_20pw;
         & > ul {
           display: block;
           left: 100%;
@@ -128,7 +128,7 @@
           padding: 0 20px;
 
           &.dropdown-header {
-            color: #b2c6cd;
+            color: #fff;
             padding: 5px 15px 0;
             text-transform: uppercase;
             font-size: 70%;

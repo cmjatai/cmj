@@ -948,22 +948,22 @@ window.Acessibilidade = function () {
         KeysAcessibilidade.keys = ''
         switch (event.keyCode) {
           case 49: // 1
-            window.location = '/'
+            window.location = '/#main_content'
             break
           case 50: // 2
-            window.location = '#main_content'
-            break
-          case 51: // 3
             window.location = '/mapa-do-site'
             break
-          case 52: // 4
+          case 51: // 3
             window.location = '/pesquisar/'
             break
+          case 52: // 4
+            window.execFontSizeZoom('down')
+            break
           case 53: // 5
-            window.location = '#'
+            window.execFontSizeZoom('default')
             break
           case 54: // 6
-            window.location = '#'
+            window.execFontSizeZoom('up')
             break
           case 55: // 7
             window.toogleVLibras()
@@ -972,7 +972,7 @@ window.Acessibilidade = function () {
             window.toogleContrast()
             break
           case 57: // 9
-            window.location = '/informacao/sic-fisico'
+            window.location = '/fale-conosco'
             break
           case 48: // 0
             window.location = '/acessibilidade'
