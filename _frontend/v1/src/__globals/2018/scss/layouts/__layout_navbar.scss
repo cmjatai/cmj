@@ -445,10 +445,13 @@
     text-align: center;
     font-size: 73%;
     color: transparent;
+    max-width: 100px;
     &::after {
-      margin: 3px 0;
+      padding: 0px;
+      margin: 5px 0;
       background-image: url(~@/assets/img/logo_radar.png);
       background-position: center;
+      background-size: 95% auto;
     }
   }
   .container-e-sic {
@@ -494,7 +497,6 @@
       }
     }
     .item-sic {
-
       a {
         & > .sic-descricao {
           display: none;
