@@ -61,11 +61,30 @@ def sigad_navbar(context, field=None):
 
     user = context['user']
 
-    #if not user.is_superuser:
-    #    menu = cache.get('portalcmj_menu_geral')
-    #    if menu:
-    #        return menu
+    def encapsule_menu_em_dropdown_portal(menu):
+        if user.is_anonymous or user.is_only_socialuser():
+            print('por aqui anonimo')
+            return menu
+        else:
+            print('por aqui logado')
+            return [
+                {
+                    'title': _('Portal'),
+                    'url': '',
+                    'children': menu
+                }
+            ]
 
+
+    if not user.is_superuser:
+        menu = cache.get('portalcmj_menu_publico')
+        if menu:
+            print('pelo cache.')
+            return {
+                'menu': encapsule_menu_em_dropdown_portal(menu)
+            }
+
+    print('sem cache')
     raizes = sigad_run(context, field)['classes']
     params = {
         str(field): True,
@@ -89,21 +108,12 @@ def sigad_navbar(context, field=None):
         return item_list
 
     menu = get_how_menu(raizes)
+    if not user.is_superuser:
+        cache.set('portalcmj_menu_publico', menu, 600)
 
-    if not user.is_anonymous and not user.is_only_socialuser():
-        menu = [
-            {
-                'title': _('Portal'),
-                'url': '',
-                'children': menu
-            }
-        ]
+    menu = encapsule_menu_em_dropdown_portal(menu)
 
-    resp_menu = {'menu': menu}
-    #if not user.is_superuser:
-    #    cache.set('portalcmj_menu_geral', resp_menu, 60)
-
-    return resp_menu
+    return {'menu': menu}
 
 @register.inclusion_tag('menus/menu.html', takes_context=True)
 def menu(context, path=None, pk=None):
