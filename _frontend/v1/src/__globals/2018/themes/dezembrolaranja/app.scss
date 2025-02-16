@@ -15,17 +15,12 @@
     left: 10px;
     width: 36px;
     height: 48px;
-    position: absolute; 
+    position: absolute;
     z-index: 1;
   }
 }
-.header-accessibility {
-  .container {
-    padding-left: 44px;
-  }
-}
 @media screen and (max-width: 991px) {
-  
+
   .navbar-menu {
     z-index: 1;
   }

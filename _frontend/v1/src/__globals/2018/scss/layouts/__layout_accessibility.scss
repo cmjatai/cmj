@@ -1,44 +1,21 @@
 .header-accessibility {
-  background: darken($color_primary,15) $url_bg_png;
   position: relative;
-  .container {
-    position: relative;
-    display: flex;
-    justify-content: space-between;
-  }
+  background: darken($color_primary,15) $url_bg_png;
+
   .links-to-content, .links-accessibility {
     position: relative;
     display: flex;
     align-items: center;
   }
-  .btn-dropdown-accessibility {
+  .d-max-480, .btn-dropdown-accessibility {
     display: none;
   }
-  span {
-    color:white;
-    padding: 0 0.3rem;
-    line-height: 1;
+  .container-fluid {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
   }
-  .btn {
-    color: white;
-    font-size: 85%;
-    padding: 0.4rem 0.3rem;
-    gap: 3px;
-  }
-  .btn-link {
-    //color: #ca7d18;
-    .badge {
-      margin-left: 3px;
-      opacity: 0.7;
-      padding: 0.1rem 0.2rem;
-    }
-    &:hover {
-      box-shadow: 0 0 0 0;
-    }
-  }
-  .d-max-480 {
-    display: none;
-  }
+
   .group-font {
     display: flex;
     gap: 0.3rem;
@@ -57,24 +34,67 @@
       background-color: #fff3;
     }
   }
+  span {
+    color:white;
+    padding: 0 0.3rem;
+    line-height: 1;
+  }
+  .btn {
+    color: white;
+    font-size: 85%;
+    padding: 0.4rem 0.3rem;
+    gap: 3px;
+  }
+  .btn-link {
+    //color: #ca7d18;
+    .badge {
+      color:#000;
+      margin-left: 3px;
+      opacity: 0.7;
+      padding: 3px 4px 2px;
+      line-height: 1;
+    }
+    &:hover {
+      box-shadow: 0 0 0 0;
+    }
+  }
 }
 
-@media screen and (max-width: 1199.98px) {
-  .header-accessibility {
+@media screen and (max-width: 1399.98px) {
+  .header-accessibility{
     font-size: 90%;
     span {
       padding: 0 0.1rem;
     }
     .btn-link {
-      //font-size: 85%;
       padding: 0.4rem 0.2rem;
+      .badge {
+        padding: 2px 3px 1px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1199.98px) {
+  .header-accessibility{
+    font-size: 80%;
+    span {
+      padding: 0;
+    }
+    .btn {
+      gap: 1px;
+    }
+    .btn-link {
+      .badge {
+        padding: 2px 3px 1px;
+      }
     }
   }
 }
 
 @media screen and (max-width: 991.98px) {
   .header-accessibility {
-    .container {
+    .container-fluid{
       flex-direction: column;
     }
     .links-to-content {
@@ -119,9 +139,6 @@
     }
     .d-min-480 {
       display: none;
-    }
-    .dropdown-accessibility {
-      //min-height: 1rem;
     }
     .btn-dropdown-accessibility {
       display: inline-block;

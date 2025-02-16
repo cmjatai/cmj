@@ -948,19 +948,19 @@ window.Acessibilidade = function () {
         KeysAcessibilidade.keys = ''
         switch (event.keyCode) {
           case 49: // 1
-            window.location = '/#main_content'
+            window.location = '#main_content'
             break
           case 50: // 2
-            window.location = '/mapa-do-site'
+            window.location = '/'
             break
           case 51: // 3
             window.location = '/pesquisar/'
             break
           case 52: // 4
-            window.execFontSizeZoom('down')
+            window.location = '/mapa-do-site'
             break
           case 53: // 5
-            window.execFontSizeZoom('default')
+            window.execFontSizeZoom('down')
             break
           case 54: // 6
             window.execFontSizeZoom('up')
