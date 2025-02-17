@@ -1274,7 +1274,7 @@ class MasterDetailCrud(Crud):
                     params['__'.join(container[1:])] = self.request.user.pk
 
             try:
-                parent_object = parent_model.objects.get(**params)
+                self.parent_object = parent_model.objects.get(**params)
             except Exception as e:
                 username = self.request.user.username
                 self.logger.error("user=" + username + ". " + str(e))
@@ -1282,7 +1282,7 @@ class MasterDetailCrud(Crud):
 
             context[
                 'title'] = '%s <small>(%s)</small>' % (
-                context['title'], parent_object)
+                context['title'], self.parent_object)
             return context
 
         def get_queryset(self):

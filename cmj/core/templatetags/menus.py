@@ -27,6 +27,7 @@ def breadcrumb(context):
         'request': context['request'],
         'user': context['user']
     }
+
     if 'breadcrumb_classes' in context:
         breadcrumb_classes = context.get('breadcrumb_classes', [])
         #if breadcrumb_classes:
@@ -37,7 +38,8 @@ def breadcrumb(context):
         #        breadcrumb_classes[:-1]))
         #    breadcrumb_classes.append(last)
     else:
-        breadcrumb_classes = get_breadcrumb_classes(context, request=context['request'])
+        get_breadcrumb_classes(context, request=context['request'])
+        breadcrumb_classes =  context.get('breadcrumb_classes', [])
     rcontext['classes'] = breadcrumb_classes
     return rcontext
 

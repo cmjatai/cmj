@@ -26,6 +26,7 @@ from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
+from torch import classes
 from unipath.path import Path
 from weasyprint import HTML
 import magic
@@ -517,6 +518,8 @@ def get_breadcrumb_classes(context, request=None, response=None):
     from cmj.sigad.models import Documento, Classe
 
     obj = context.get('object', None)
+    view = context.get('view', None)
+    parent_object = view.parent_object if view and hasattr(view, 'parent_object') else None
 
     if obj and (isinstance(obj, Classe) or isinstance(obj, Documento)):
         context.update(
@@ -524,39 +527,62 @@ def get_breadcrumb_classes(context, request=None, response=None):
                 'title': obj,
                 'breadcrumb_classes': obj.classes_parents_and_me
             })
-        if isinstance(obj, Classe) and not obj.url_redirect:
+        if isinstance(obj, Documento) or (isinstance(obj, Classe) and not obj.url_redirect):
             return response
 
     path = request.path
-    fpath = request.get_full_path()
+    paths = [('fpath', request.get_full_path())]
 
-    paths = []
+    if path != paths[0][1]:
+        paths.append(('path', path))
+
     try:
         resolve_match = resolve(path)
-        view_name = str(resolve_match.view_name)
+        view_master = str(resolve_match.view_name)
+        paths.append(('view_master', view_master))
     except:
-        view_name = ''
-    else:
-        paths.append(view_name)
+        view_master = ''
 
-    if not view_name:
-        paths.append(fpath)
-        if path != paths[-1]:
-            paths.append(path)
+    path_parts = path.split('/')
+    for i, p in enumerate(path_parts):
+        if not p or p in paths:
+            continue
 
-    for i, path in enumerate(paths):
-        q = Q(url_redirect__istartswith=path)
-        if not view_name:
-            q = q | Q(slug=path[1:])
-        classe_redirect = Classe.objects.filter(q).first()
-        if classe_redirect:
-            breads = classe_redirect.classes_parents_and_me
+        p = '/'.join(path_parts[:len(path_parts) - i])
+        try:
+            resolve_match = resolve(p)
+            view_slave = str(resolve_match.view_name)
+        except:
+            view_slave = ''
+
+        if not view_slave:
+            continue
+
+        paths.append(('view_slave', view_slave))
+
+    for type_path, path in paths:
+        classes_redirect = list(
+            Classe.objects.filter(
+                url_redirect__istartswith=path
+                ).order_by('raiz__codigo', 'codigo')
+            )
+
+        full_redirects = list(filter(lambda x: x.url_redirect == path, classes_redirect))
+        #full_redirects = sorted(full_redirects, key=lambda x: len(x.slug))
+
+        if full_redirects:
+            classes_redirect = full_redirects
+
+        if classes_redirect:
+            breads = classes_redirect[0].classes_parents_and_me
+            if parent_object:
+                breads.append(parent_object)
             if obj:
-                breads.extend([obj])
+                breads.append(obj)
             context.update({'breadcrumb_classes': breads})
-            if not obj and path != view_name:
+            if not obj and type_path != 'view_slave':
                 context.update({
-                    'title': classe_redirect
+                    'title': classes_redirect[0]
                 })
             return response
 
@@ -567,7 +593,6 @@ def get_breadcrumb_classes(context, request=None, response=None):
                 'title': documento,
                 'breadcrumb_classes': documento.classes_parents_and_me
             })
-        return response
 
     return response
 

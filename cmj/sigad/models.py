@@ -7,6 +7,7 @@ import zipfile
 from PIL import Image, ImageFont
 from PIL.Image import LANCZOS
 from PIL.ImageDraw import Draw
+from django import db
 from django.conf import settings
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -380,7 +381,10 @@ class Slugged(Parent):
         max_length=250,
         blank=True, null=True, default='')
 
-    slug = models.SlugField(max_length=2000)
+    slug = models.SlugField(
+        max_length=2000,
+        db_index=True
+        )
 
     class Meta:
         abstract = True
@@ -414,7 +418,7 @@ class Slugged(Parent):
             if hasattr(self, 'classe'):
                 self.classe = self.parent.classe
 
-            self.raiz = self.parent.raiz if self.parent.raiz else self.parent
+        self.raiz = self.parent.raiz if self.parent and self.parent.raiz else self.parent
 
         super(Slugged, self).save(*args, **kwargs)
 
@@ -797,6 +801,7 @@ class Classe(ShortUrl, CMSMixin):
     url_redirect = models.CharField(
         _('URL de redirecionamento'),
         max_length=1024,
+        db_index=True,
         default='')
 
     class Meta:
