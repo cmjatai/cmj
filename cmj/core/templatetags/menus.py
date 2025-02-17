@@ -63,10 +63,8 @@ def sigad_navbar(context, field=None):
 
     def encapsule_menu_em_dropdown_portal(menu):
         if user.is_anonymous or user.is_only_socialuser():
-            print('por aqui anonimo')
             return menu
         else:
-            print('por aqui logado')
             return [
                 {
                     'title': _('Portal'),
@@ -84,7 +82,6 @@ def sigad_navbar(context, field=None):
                 'menu': encapsule_menu_em_dropdown_portal(menu)
             }
 
-    print('sem cache')
     raizes = sigad_run(context, field)['classes']
     params = {
         str(field): True,

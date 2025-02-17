@@ -221,7 +221,6 @@ def redesocial_post_function(sender, instance, **kwargs):
         instance.metadata = md
         instance.save()
 
-        print('chamou task_send_rede_social', td)
         logger.info('chamou task_send_rede_social')
         tasks.task_send_rede_social.apply_async(
             (

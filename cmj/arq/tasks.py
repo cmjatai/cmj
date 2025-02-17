@@ -135,7 +135,6 @@ class PDFAltaCompactacao:
             "--pdfa-image-compression jpeg",
         ] + list(args)
         r = console(' '.join(cmd))
-        print(r[2].decode('utf-8'))
 
     def substituir_imagens(self):
         #substitui as imagens do pdf grande pelas imagens compactadas
@@ -150,7 +149,7 @@ class PDFAltaCompactacao:
 
 
 def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs, task_name):
-    print(f'task_ocrmypdf_function {app_label} {model_name} {field_name} {id_list} {jobs} {task_name}')
+    #print(f'task_ocrmypdf_function {app_label} {model_name} {field_name} {id_list} {jobs} {task_name}')
     logger.info(f'task_ocrmypdf_function {app_label} {model_name} {field_name} {id_list} {jobs} {task_name}')
 
     model = apps.get_model(app_label, model_name)
@@ -205,7 +204,6 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs, tas
                 fn = f'{f}.tmp'
                 d_new.save(fn, garbage = 3, clean = True, deflate = True)
             except Exception as e:
-                print(e)
                 pass
             else:
                 fpath = f.name
@@ -246,11 +244,8 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs, tas
                 error_compact = False
 
         if cmd:
-            print(' '.join(cmd))
             logger.info(' '.join(cmd))
             r = console(' '.join(cmd))
-
-            print(r[2].decode('utf-8'))
             logger.info(r[2].decode('utf-8'))
 
         if r[0] or error_compact:
@@ -274,7 +269,7 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs, tas
 
 @app.task(queue='cq_arq', bind=True)
 def task_ocrmypdf(self, app_label, model_name, field_name, id_list, jobs, task_name):
-    print(f'task_ocrmypdf {app_label} {model_name} {field_name} {id_list} {jobs}')
+    #f'task_ocrmypdf {app_label} {model_name} {field_name} {id_list} {jobs}')
     logger.info(f'task_ocrmypdf {app_label} {model_name} {field_name} {id_list} {jobs}')
 
     task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs, task_name)

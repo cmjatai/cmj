@@ -63,13 +63,13 @@ class Command(BaseCommand):
         if self.s3_server:
             s3_server = self.s3_server
 
-        print('--------- Iniciando:', s3_server)
+        #print('--------- Iniciando:', s3_server)
         self.s3_server = s3_server
 
         self.s3_connect()
 
         if not settings.DEBUG:
-            print('--------- Atualizando backup do BD ----------')
+            #print('--------- Atualizando backup do BD ----------')
             self.update_backup_postgresql()
 
         self.start_time = timezone.localtime()
@@ -82,13 +82,13 @@ class Command(BaseCommand):
         except Exception as e:
             print('erro na sincronização:', e)
 
-        print('Encerrando conexão com ', self.s3_server)
+        #print('Encerrando conexão com ', self.s3_server)
         sleep(5)
         self.s3c = None
         self.s3r = None
         sleep(5)
 
-        print('Concluído...')
+        #print('Concluído...')
 
     def s3_connect(self):
 
@@ -163,7 +163,7 @@ class Command(BaseCommand):
             o.delete()
 
     def s3_sync(self, app_label=None, model_name=None, only_reset=False, count_exec=100):
-        print('--------- S3 Sync ---------')
+        #print('--------- S3 Sync ---------')
 
         reset = False
 
@@ -226,7 +226,7 @@ class Command(BaseCommand):
                 #        m._meta.model_name
                 #    ))
 
-                print(m)
+                #print(m)
                 for i in m.objects.all().order_by('-id'):  #
                     #print(i.id, i)
 
@@ -352,10 +352,8 @@ class Command(BaseCommand):
                                         timezone.localtime() -
                                         self.start_time >
                                         timedelta(seconds=self.exec_time)):
-                                    print(
-                                        '--------- {} ---------- INICIADO EM: {}'.format(self.s3_server, self.start_time))
-                                    print(
-                                        '--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, timezone.localtime()))
+                                    #print('--------- {} ---------- INICIADO EM: {}'.format(self.s3_server, self.start_time))
+                                    #print('--------- {} ---------- ENCERRADO EM: {}'.format(self.s3_server, timezone.localtime()))
 
                                     return
 
@@ -363,9 +361,8 @@ class Command(BaseCommand):
         try:
             existe_path = os.path.exists(ff.path)
             existe_original_path = os.path.exists(ff.original_path)
-            if not existe_path:
-                print('ARQUIVO PATH NÃO ENCONTRADO:',
-                      i.id, i, ff.name)
+            #if not existe_path:
+            #    print('ARQUIVO PATH NÃO ENCONTRADO:', i.id, i, ff.name)
             if not existe_original_path:
                 dir_name = os.path.dirname(ff.original_path)
                 list_dir = os.listdir(dir_name)
@@ -378,9 +375,9 @@ class Command(BaseCommand):
 
                     os.rename(original_file_rename_old,
                               original_file_rename_new)
-                else:
-                    print('ARQUIVO ORIGINAL PATH NÃO ENCONTRADO:',
-                          i.id, i, ff.name, len(ff.name))
+                #else:
+                #    print('ARQUIVO ORIGINAL PATH NÃO ENCONTRADO:',
+                #          i.id, i, ff.name, len(ff.name))
         except Exception as e:
             print(i, e)
 

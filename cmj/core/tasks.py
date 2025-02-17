@@ -40,7 +40,7 @@ def task_send_rede_social(self, rede, app_label, model_name, pk):
 
     send_func = f'send_{rede}_{app_label}_{model_name}'
 
-    print(f'print, task_send_rede_social iniciou execução: {send_func}')
+    #print(f'print, task_send_rede_social iniciou execução: {send_func}')
     logger.info(f'logger task_send_rede_social iniciou execução: {send_func}')
 
     gf = globals()
@@ -49,7 +49,7 @@ def task_send_rede_social(self, rede, app_label, model_name, pk):
 
 
 def send_telegram_sigad_documento(pk):
-    print('send documento iniciou execução')
+    #print('send documento iniciou execução')
     logger.info('send documento iniciou execução')
 
     instance = Documento.objects.filter(pk=pk).first()
@@ -104,7 +104,7 @@ def send_telegram_sigad_documento(pk):
 
     #<tg-spoiler>spoiler</tg-spoiler>
     # if settings.DEBUG:
-    print(text)
+    #print(text)
     logger.info(text)
     #    return
 
@@ -123,11 +123,11 @@ def send_telegram_sigad_documento(pk):
             }
         )
     except Exception as e:
-        print(e)
+        logger.error(e)
 
 
 def send_telegram_materia_materialegislativa(pk):
-    print('send matéria iniciou execução')
+    #print('send matéria iniciou execução')
     logger.info('send matéria iniciou execução')
 
     instance = MateriaLegislativa.objects.get(pk=pk)
@@ -163,7 +163,7 @@ Autoria:
 
     #<tg-spoiler>spoiler</tg-spoiler>
     # if settings.DEBUG:
-    print(text)
+    #print(text)
     logger.info(text)
     #    return
 
@@ -206,7 +206,7 @@ Autoria:
             )
 
     except Exception as e:
-        print(e)
+        logger.error(e)
 
 
 @app.task(queue='cq_core', bind=True)

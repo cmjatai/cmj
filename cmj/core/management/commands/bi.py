@@ -128,7 +128,7 @@ class Command(BaseCommand):
                 bi.results = value
                 bi.save()
 
-        print('Concluído')
+        # print('Concluído')
 
     def run_count_pages_from_file(self, filefield):
         count_pages = 0

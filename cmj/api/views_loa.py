@@ -254,9 +254,6 @@ class _LoaViewSet:
             vn=Sum('valor_norma'),
             alt=Subquery(sum_registros)
         )
-        if itens == 1000:
-            print(str(rs.query))
-            print(str(rs.query))
         rs = list(rs)
 
         r = []

@@ -540,7 +540,6 @@ class _ArqClasse:
     serializer_class = ArqClasseSerializer
 
     def dispatch(self, request, *args, **kwargs):
-        print(request.path)
         return super().dispatch(request, *args, **kwargs)
 
 
