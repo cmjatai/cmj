@@ -3530,6 +3530,7 @@ class MateriaLegislativaCheckView(ListView):
                 raise Http404
             else:
                 m.checkcheck = True if check else False
+                m.em_tramitacao = False
                 m.save(update_fields=('checkcheck', ))
                 return redirect('/materia/check')
 
