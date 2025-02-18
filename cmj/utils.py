@@ -26,7 +26,6 @@ from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
-from torch import classes
 from unipath.path import Path
 from weasyprint import HTML
 import magic
@@ -569,6 +568,8 @@ def get_breadcrumb_classes(context, request=None, response=None):
 
         full_redirects = list(filter(lambda x: x.url_redirect == path, classes_redirect))
         #full_redirects = sorted(full_redirects, key=lambda x: len(x.slug))
+
+        
 
         if full_redirects:
             classes_redirect = full_redirects

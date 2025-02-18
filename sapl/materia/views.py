@@ -7,6 +7,7 @@ import io
 import logging
 import os
 import shutil
+import sys
 import tempfile
 import traceback
 import zipfile
@@ -189,14 +190,22 @@ def tipos_autores_materias(user=None, restricao_regimental=True):
 
     sorted_r = dict(
         map(
-            lambda x: (
-                    x[0],
-                    dict(sorted(
-                        x[1].items(),
-                        key=lambda y: y[0].nome
-                    ))
+            lambda a: (
+                    a[0],
+                    dict( # 4 - Retorna para dicionário
+                        sorted( # 3 - Ordena por nome do autor
+                        a[1].items(),
+                        key=lambda b: b[0].nome
+                    )
+                )
+            ),
+            sorted(# 2 - Ordena por sequencia_regimental
+                filter( # 1 - Filtra tipos que não possuem campo sequencia_regimental
+                    lambda c: hasattr(c[0], 'sequencia_regimental'),
+                    r.items() # 0 - Converte em tupla de tipos e autores
                 ),
-                sorted(r.items(), key=lambda x: x[0].sequencia_regimental)
+                key=lambda d: d[0].sequencia_regimental
+            )
         )
     )
 
