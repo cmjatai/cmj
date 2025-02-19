@@ -81,9 +81,10 @@ class DiarioOficialCrud(Crud):
             text = []
             if obj.vinculodocdiariooficial_set.exists():
                 for vinculo in obj.vinculodocdiariooficial_set.all():
-                    text.append(
-                        f'<li><a href="{vinculo.reverse_link_content_object}">{vinculo.content_object}</a></li>'
-                    )
+                    if vinculo.content_object:
+                        text.append(
+                            f'<li><a href="{vinculo.reverse_link_content_object}">{vinculo.content_object}</a></li>'
+                        )
             else:
                 text.append(
                     f'<li>Não existe no PortalCMJ registros associados a este Diário</li>'
@@ -124,7 +125,9 @@ class DiarioOficialCrud(Crud):
             # VinculoDocDiarioOficial.objects.filter(diario=self.object).delete()
 
             for c in certs:
-                print(c.content_object)
+                if c.cancelado or c.revogado or c.content_object is None:
+                    continue
+                # print(c.content_object)
                 # continue
                 if not VinculoDocDiarioOficial.objects.filter(
                     diario=self.object,
