@@ -936,6 +936,11 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
         _('Cancelado '),
         choices=YES_NO_CHOICES,
         default=False)
+    
+    revogado = models.BooleanField(
+        _('Certidão Revogada'),
+        choices=YES_NO_CHOICES,
+        default=False)
 
     certificado = PortalFileField(
         blank=True,

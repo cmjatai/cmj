@@ -526,6 +526,9 @@ class CertidaoPublicacaoCrud(Crud):
 
             hash = args[0].hash_code  # self.split_bylen(args[0].hash_code, 64)
 
+            if args[0].revogado:
+                return f'''<span class="text-danger">Certidão Revogada</span>''', ''
+
             if hasattr(args[0].content_object, 'anexo_de') and\
                     args[0].content_object.anexo_de.exists():
                 vinculo = f'Vínculo com: {args[0].content_object.anexo_de.first()}'
@@ -565,6 +568,10 @@ class CertidaoPublicacaoCrud(Crud):
 
         def hook_id(self, *args, **kwargs):
             cert = '%06d' % int(args[1])
+            if args[0].revogado:
+                return f'''{cert}<br>
+                    Certidão Revogada<br>
+                    ''', ''
             if args[0].cancelado:
                 return f'''{cert}<br>
                     Certidão Cancelada<br>
@@ -596,11 +603,18 @@ class CertidaoPublicacaoCrud(Crud):
 
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
-            if self.object.cancelado:
+            if self.object.revogado:
+                messages.add_message(
+                    self.request,
+                    messages.ERROR,
+                    _('Certidão Revogada!'))
+            elif self.object.cancelado:
                 messages.add_message(
                     self.request,
                     messages.ERROR,
                     _('Certidão Cancelada!'))
+
+            if self.object.revogado or self.object.cancelado:
                 return redirect(
                     reverse('cmj.core:certidaopublicacao_list',
                             kwargs={})
@@ -610,6 +624,8 @@ class CertidaoPublicacaoCrud(Crud):
 
             if 'certificar' in request.GET and request.user.is_superuser:
                 return self.certidao_digital_de_publicacao(request, context)
+            elif 'revogar' in request.GET and request.user.is_superuser:
+                return self.revogar_certidao_digital_de_publicacao(request, context)
 
             return self.certidao_publicacao(request, context)
 
@@ -636,6 +652,38 @@ class CertidaoPublicacaoCrud(Crud):
                 context['print'] = f"{print_value}cm"
             context['content_object_url'] = self.content_object_url()
             return context
+
+        def revogar_certidao_digital_de_publicacao(self, request, context):
+            revogar = request.GET.get('revogar', '')
+            if revogar:
+                md = self.object.metadata
+                if not md:
+                    md = {}
+                try:
+                    md['revogacao'] = {
+                    'revogado': True,
+                    'revogacao': revogar,
+                    'revogacao_data': timezone.localtime(),
+                    'revogacao_user': request.user.id,
+                    'revogacao_user_name': request.user.get_full_name(),
+                    'documento__epigrafe': self.object.content_object.epigrafe,
+                    'documento__render_description': self.object.content_object.render_description,
+                    }
+                except:
+                    pass
+                else:
+                    self.object.metadata = md
+
+                self.object.cancelado = True
+                self.object.revogado = True
+                self.object.content_object = None
+                self.object.modifier = request.user
+                self.object.save()
+
+            return redirect(
+                reverse('cmj.core:certidaopublicacao_list',
+                        kwargs={})
+            )
 
         def certidao_digital_de_publicacao(self, request, context):
             self.certidao_publicacao(
