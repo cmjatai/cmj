@@ -712,7 +712,10 @@ TIPOS_IMG_PERMITIDOS = (
 def fabrica_validador_de_tipos_de_arquivo(lista, nome):
 
     def restringe_tipos_de_arquivo(value):
-        if not os.path.splitext(value.path)[1][:1]:
+        name_file = value.path if hasattr(value, 'path') else value.name if hasattr(
+            value, 'name') else ''
+
+        if not os.path.splitext(name_file)[1][:1]:
             raise ValidationError(_(
                 'Não é possível fazer upload de arquivos sem extensão.'))
         try:
