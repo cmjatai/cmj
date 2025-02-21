@@ -109,7 +109,8 @@ class BreadCrumbMiddleware:
         pass
 
     def process_template_response(self, request, response):
-
-        context = response.context_data
-
-        return get_breadcrumb_classes(context, request, response)
+        try:
+            context = response.context_data
+            return get_breadcrumb_classes(context, request, response)
+        except:
+            return response

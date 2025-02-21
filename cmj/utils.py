@@ -2,12 +2,15 @@ from collections import defaultdict
 from datetime import date, datetime, timedelta
 from functools import wraps
 from unicodedata import normalize as unicodedata_normalize
+
 import logging
 import re
 import ssl
 import subprocess
 import threading
+import magic
 
+from bs4 import BeautifulSoup as bs4
 from crispy_forms.bootstrap import Alert
 from django.apps import apps
 from django.conf import settings
@@ -28,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
 from unipath.path import Path
 from weasyprint import HTML
-import magic
 
 from cmj.celery import app as celery_app
 
@@ -510,11 +512,22 @@ def make_pdf(base_url,
 
 
 def get_breadcrumb_classes(context, request=None, response=None):
-
     if not context or not request or request.path == '/':
         return response
 
     from cmj.sigad.models import Documento, Classe
+
+    try:
+        context.update(
+            {
+                'head_title_sufix': context.get(
+                    'head_title_sufix',
+                    bs4(context.get('title', ''), 'html.parser').get_text()
+                ),
+            }
+        )
+    except:
+        pass
 
     obj = context.get('object', None)
     view = context.get('view', None)
@@ -524,7 +537,8 @@ def get_breadcrumb_classes(context, request=None, response=None):
         context.update(
             {
                 'title': obj,
-                'breadcrumb_classes': obj.classes_parents_and_me
+                'breadcrumb_classes': obj.classes_parents_and_me,
+                'head_title_sufix': obj.apelido or obj.titulo
             })
         if isinstance(obj, Documento) or (isinstance(obj, Classe) and not obj.url_redirect):
             return response
@@ -569,7 +583,7 @@ def get_breadcrumb_classes(context, request=None, response=None):
         full_redirects = list(filter(lambda x: x.url_redirect == path, classes_redirect))
         #full_redirects = sorted(full_redirects, key=lambda x: len(x.slug))
 
-        
+
 
         if full_redirects:
             classes_redirect = full_redirects
@@ -583,7 +597,8 @@ def get_breadcrumb_classes(context, request=None, response=None):
             context.update({'breadcrumb_classes': breads})
             if not obj and type_path != 'view_slave':
                 context.update({
-                    'title': classes_redirect[0]
+                    'title': classes_redirect[0],
+                    'head_title_sufix': classes_redirect[0].apelido or classes_redirect[0].titulo
                 })
             return response
 
