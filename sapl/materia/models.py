@@ -1,4 +1,5 @@
 
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
@@ -15,7 +16,7 @@ from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
-from cmj.mixins import CommonMixin
+from cmj.mixins import CommonMixin, PluginSignMixin
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor, \
     TipoAutor, Metadata
 from sapl.comissoes.models import Comissao, Reuniao
@@ -578,6 +579,77 @@ class MateriaLegislativa(CommonMixin):
         autorias = [
             autoria.autor for autoria in Autoria.objects.autores_coautores().filter(materia=self)]
         return autorias
+
+    def homologar(self, compression=False, original2copia=True, x=193, y=50):
+        from sapl.sessao.tasks import task_add_selo_votacao_function
+
+        self.registrovotacao_set.all().update(selo_votacao=False)
+
+        protocolo = self.protocolo_gr.first()
+
+        for field_file in self.FIELDFILE_NAME:
+            if original2copia:
+                paths = '{},{}'.format(
+                    getattr(self, field_file).original_path,
+                    getattr(self, field_file).path,
+                )
+
+            else:
+                paths = getattr(self, field_file).path
+
+            psm = PluginSignMixin()
+            cmd = psm.cmd_mask
+
+            params = {
+                'plugin': psm.plugin_path,
+                'comando': 'cert_protocolo',
+                'in_file': paths,
+                'certificado': settings.CERT_PRIVATE_KEY_ID,
+                'password': settings.CERT_PRIVATE_KEY_ACCESS,
+                'data_ocorrencia': formats.date_format(
+                    timezone.localtime(
+                        protocolo.timestamp) if protocolo.timestamp else p.data,
+                    'd/m/Y'
+                ),
+                'hora_ocorrencia': formats.date_format(
+                    timezone.localtime(
+                        protocolo.timestamp) if protocolo.timestamp else protocolo.hora,
+                    'H:i'
+                ),
+                'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
+                'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
+                'titulopre': 'Protocolo: {}/{}'.format(protocolo.numero, protocolo.ano),
+                'titulo': self.epigrafe_short,
+                'titulopos': '',
+                'x': x,
+                'y': y,
+                'w': 12,
+                'h': 60,
+                'cor': "0, 76, 64, 255",
+                'compression': compression,
+                'debug': False # settings.DEBUG
+            }
+            cmd = cmd.format(
+                **params
+            )
+
+            psm.run(cmd)
+
+            del params['plugin']
+            del params['in_file']
+            del params['certificado']
+            del params['password']
+            del params['debug']
+            del params['comando']
+            self.metadata['selos'] = {'cert_protocolo': params}
+
+            # print(cmd)
+            # return
+
+        self.save()
+
+        for rv in self.registrovotacao_set.all():
+            task_add_selo_votacao_function(rv.id)
 
 
 class AutoriaManager(models.Manager):

@@ -85,7 +85,7 @@ def task_add_selo_votacao_function(pk):
         paths = materia_votada.texto_original.path
 
         autor = materia_votada.autores.all().first()
-        compression = False if not autor else autor.tipo.descricao == 'Executivo'
+        compression = materia_votada.metadata['selos']['cert_protocolo'].get('compression', False)
 
         try:
             x = materia_votada.metadata['selos']['cert_protocolo']['x']

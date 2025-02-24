@@ -2417,10 +2417,20 @@ class MateriaLegislativaCrud(Crud):
             # )
             if 'download' in request.GET:
                 return self.download(request.GET.get('download'))
+
             if 'ia_run' in request.GET and request.user.has_perm('core.generate_analise_genia'):
                 return self.is_run()
             elif 'cabec_autografo' in request.GET:
                 return self.cabec_autografo(request.GET.get('cabec_autografo'))
+
+            if 'homologar' in request.GET and request.user.is_superuser:
+                self.object = self.get_object()
+                x = int(self.request.GET.get('x', 193))
+                y = int(self.request.GET.get('y', 50))
+                compression = self.request.GET.get('compression', False)
+                original2copia = self.request.GET.get('original2copia', True)
+                self.object.homologar(x=x, y=y, compression=compression, original2copia=original2copia)
+
             return Crud.DetailView.get(self, request, *args, **kwargs)
 
         def hook_documentoadministrativo_set__deprecated(self, obj):
