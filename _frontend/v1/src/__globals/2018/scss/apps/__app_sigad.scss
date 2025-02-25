@@ -27,7 +27,7 @@
   .avatar {
     padding: 0 0 0 0;
     display: inline-block;
-    opacity: 0.75;
+    opacity: 1;
     margin-left: 10px;
 
     img {
@@ -37,7 +37,7 @@
     }
 
     &:hover {
-      opacity: 1;
+      opacity: 0.8;
     }
   }
 
