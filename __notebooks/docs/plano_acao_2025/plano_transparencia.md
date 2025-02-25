@@ -89,7 +89,9 @@ A implementação de 100% dos critérios essenciais é requisito mínimo para a 
   * **Produtos:**
     * Verificação da visibilidade do Portal da Transparência na página principal do PortalCMJ.
       * https://www.jatai.go.leg.br/transparencia/portal-de-transparencia
-      ![Print Screen do produto](imgs/image_001.png)
+
+      [<img src="imgs/image_003.png" width="80%"/>](imgs/image_003.png)
+
 
 #### Receitas
 
