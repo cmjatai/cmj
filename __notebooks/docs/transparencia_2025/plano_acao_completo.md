@@ -69,13 +69,13 @@ Os critérios classificados como “essenciais” são aqueles referentes a info
 
 O Poder Legislativo possui 11 critérios essenciais que se desdobram em 21 subcritérios.
 
-A implementação de 100% dos critérios essenciais é requisito mínimo para a obtenção de qualquer dos Selos de Qualidade da Transparência Pública.
+**A implementação de 100% dos critérios essenciais é requisito mínimo para a obtenção de qualquer dos Selos de Qualidade da Transparência Pública.**
 
 #### Informações Prioritárias
 
-* **Atividade 1.1:** Garantir a existência de um site oficial próprio da Câmara, com visibilidade do Portal da Transparência e ferramenta de pesquisa. [(Descrição Completa)](#11-possui-sítio-oficial-próprio-na-internet)
+* **Atividade 1.1:** Garantir a existência de um site oficial próprio da Câmara, com visibilidade do Portal da Transparência e ferramenta de pesquisa.
 
-  * **Pergunta:** Possui sítio oficial próprio na internet?
+  * **Pergunta:** Possui sítio oficial próprio na internet? [(PNTP)](#11-possui-sítio-oficial-próprio-na-internet)
   * **Responsável:** DDE
   * **Produtos:**
     * PortalCMJ próprio em funcionamento _full-time_.
@@ -86,7 +86,7 @@ A implementação de 100% dos critérios essenciais é requisito mínimo para a 
 
 
 * **Atividade 1.2:**
-  * **Pergunta:** Possui portal da transparência próprio ou compartilhado na internet? (p. 36)
+  * **Pergunta:** Possui portal da transparência próprio ou compartilhado na internet? [(PNTP)](#12-possui-portal-da-transparência-próprio-ou-compartilhado-na-internet)
   * **Responsável:** DDE
   * **Produtos:**
     * Verificação da visibilidade do Portal da Transparência na página principal do PortalCMJ.
@@ -96,7 +96,7 @@ A implementação de 100% dos critérios essenciais é requisito mínimo para a 
 #### Receitas
 
 * **Atividade 3.1:** Padronizar a divulgação das receitas da Câmara, destacando previsão e realização.
-  * **Pergunta:** Divulga as receitas do Poder ou órgão, evidenciando sua previsão e realização? (p. 44)
+  * **Pergunta:** Divulga as receitas do Poder ou órgão, evidenciando sua previsão e realização? [(PNTP)](#31-divulga-as-receitas-do-poder-ou-órgão-evidenciando-sua-previsão-e-realização)
   * **Responsável:** ????
   * **Produtos:**
     * Publicação dos dados de receitas com detalhamento orçamentário e natureza da receita.
@@ -110,7 +110,7 @@ A implementação de 100% dos critérios essenciais é requisito mínimo para a 
 Padronizar a divulgação das despesas da Câmara, destacando execução e classificação orçamentária.
 
 * **Atividade 4.1:**
-  * **Pergunta:** Divulga as despesas do Poder ou órgão, detalhando sua execução (empenho, liquidação e pagamento) e identificando sua classificação orçamentária (unidade orçamentária, a função, a subfunção, categoria econômica, grupo de despesa, elemento de despesa e a fonte dos recursos)? (p. 52)
+  * **Pergunta:** Divulga as despesas do Poder ou órgão, detalhando sua execução (empenho, liquidação e pagamento) e identificando sua classificação orçamentária (unidade orçamentária, a função, a subfunção, categoria econômica, grupo de despesa, elemento de despesa e a fonte dos recursos)? [(PNTP)](#41-divulga-as-despesas-do-poder-ou-órgão-detalhando-sua-execução-empenho-liquidação-e-pagamento-e-identificando-sua-classificação-orçamentária-unidade-orçamentária-a-função-a-subfunção-categoria-econômica-grupo-de-despesa-elemento-de-despesa-e-a-fonte-dos-recursos)
   * **Responsável:** ????
   * **Produtos:**
     * Publicação dos dados de despesas com detalhamento orçamentário e natureza da despesa.
@@ -122,24 +122,27 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php
 
 * **Atividade 4.2:**
-  * **Pergunta:** Divulga informações pormenorizadas das despesas do Poder ou órgão, detalhando o beneficiário do pagamento, o bem fornecido ou serviço prestado e o procedimento licitatório originário? (p. 55)
+  * **Pergunta:** Divulga informações pormenorizadas das despesas do Poder ou órgão, detalhando o beneficiário do pagamento, o bem fornecido ou serviço prestado e o procedimento licitatório originário? [(PNTP)](#42-divulga-informações-pormenorizadas-das-despesas-do-poder-ou-órgão-detalhando-o-beneficiário-do-pagamento-o-bem-fornecido-ou-serviço-prestado-e-o-procedimento-licitatório-originário)
   * **Responsável:** ????
   * **Produtos:**
     * Publicação dos dados de despesas com detalhamento do beneficiário, bem/serviço e procedimento licitatório.
     * Implementação de ferramentas de pesquisa por período e tipo de despesa.
     * Publicação de histórico de informações dos últimos 3 anos.
   * **Links:**
-    * ???
+    * Nos mesmos links anteriores, clicando nos detalhes de cada despesa.
+      * http://camaradejatai.sigepnet.com.br/transparencia/despesa_empenhada.php
+      * http://camaradejatai.sigepnet.com.br/transparencia/despesa_liquidada.php
+      * http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php
 
 #### Planejamento e Prestação de Contas
 
 * **Atividade 11.5** Divulgar o Relatório de Gestão ou Atividades com atualização, série histórica e filtros de pesquisa.
-  * **Pergunta:** Divulga o Relatório de Gestão ou Atividades? (p. 98)
+  * **Pergunta:** Divulga o Relatório de Gestão ou Atividades? [(PNTP)](#115-divulga-o-relatório-de-gestão-fiscal-rgf)
   * **Responsável:** Diretoria de Finanças
   * **Produtos:**
     * Publicação do Relatório de Gestão ou Atividades com atualização, série histórica e filtros de pesquisa.
   * **Links:**
-    * ???
+    * https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/relatorios-de-gestao-fiscal
 
 ### Fase 3: Implementação das Obrigações Específicas do Poder Legislativo
 
@@ -353,6 +356,33 @@ Para este critério, sugere-se a possibilidade de acesso automatizado por sistem
 Instrumento que permite inserir ou escolher texto, filtrando ou direcionando as opções de dados dentro dos conjuntos específicos de informações, previstos em cada critério. Para as receitas são necessários filtros no mínimo por exercício (ano) e mês ou período.
 
 ## 4. Despesa
+
+### 4.1 Divulga as despesas do Poder ou órgão, detalhando sua execução (empenho, liquidação e pagamento) e identificando sua classificação orçamentária (unidade orçamentária, a função, a subfunção, categoria econômica, grupo de despesa, elemento de despesa e a fonte dos recursos)?
+
+* Fundamentação: Arts. 7º, VI e 8º, §1º, inciso III, da Lei nº 12.527/2011 - LAI; arts. 48, §1º, inciso II e 48-A, inciso I, da LC nº 101/20; art. 8º, inciso I, do Decreto nº 10.540/20.
+* Classificação: Essencial.
+
+**Disponibilidade:**
+Devem ser disponibilizadas as seguintes informações quanto à despesa do Poder ou do órgão:
+
+* total empenhado, liquidado e pago no período (essa informação pode vir consolidada ou ser resultante da soma do detalhamento da despesa);
+
+As informações exigidas (empenho, liquidação e pagamento) devem estar disponibilizadas em arquivo único, para facilitar a visualização e a comparabilidade.
+
+* classificação orçamentária, discriminando a unidade orçamentária, a função, a subfunção, a natureza da despesa (categoria econômica, grupo, elemento de despesa) e a fonte dos recursos.
+
+**Atualidade:**
+As informações serão consideradas atualizadas quando as mais recentes tiverem sido disponibilizadas até o primeiro dia útil subsequente à data dos registros contábeis nos respectivos sistemas. É o que se costuma chamar de “atualização em tempo real”. Para efeitos de padronização nacional, considera-se não atendido o critério se as informações estiverem sem atualização há mais de 5 dias úteis anteriores ao dia da avaliação.
+
+**Série Histórica:**
+Considera-se que existe histórico de informações quando os dados disponibilizados
+referirem-se, pelo menos, a 3 anos que antecedem a pesquisa.
+
+**Gravação de Relatórios:**
+Possibilidade de gravar um conjunto de informações selecionadas em pelo menos um formato editável (em extensões do tipo txt, csv, odt, calc, rtf, json e outros), dentro de um conjunto específico de informações. Para este critério, sugere-se a possibilidade de acesso automatizado por sistemas externos em formatos estruturados e legíveis por máquina.
+
+**Filtro de Pesquisa:**
+Instrumento que permite inserir ou escolher texto, filtrando ou direcionando as opções de dados dentro do conjunto específico de informações referentes à despesa, no mínimo, exercício (ano), mês, por classificação orçamentária.
 
 ### 4.2 Divulga informações pormenorizadas das despesas do Poder ou órgão, detalhando o beneficiário do pagamento, o bem fornecido ou serviço prestado e o procedimento licitatório originário?
 
