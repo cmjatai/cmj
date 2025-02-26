@@ -79,12 +79,10 @@ A implementação de 100% dos critérios essenciais é requisito mínimo para a 
   * **Responsável:** DDE
   * **Produtos:**
     * PortalCMJ próprio em funcionamento _full-time_.
-      * https://www.jatai.go.leg.br
-      [<img src="imgs/image_001.png" width="80%"/>](imgs/image_001.png)
-
     * Ferramenta de busca otimizada no PortalCMJ.
-      * https://www.jatai.go.leg.br/pesquisar
-      [<img src="imgs/image_002.png" width="80%"/>](imgs/image_002.png)
+  * **Links:**
+    * https://www.jatai.go.leg.br
+    * https://www.jatai.go.leg.br/pesquisar
 
 
 * **Atividade 1.2:**
@@ -92,22 +90,56 @@ A implementação de 100% dos critérios essenciais é requisito mínimo para a 
   * **Responsável:** DDE
   * **Produtos:**
     * Verificação da visibilidade do Portal da Transparência na página principal do PortalCMJ.
-      * https://www.jatai.go.leg.br/transparencia/portal-de-transparencia
-
-      [<img src="imgs/image_003.png" width="80%"/>](imgs/image_003.png)
-
+  * **Links:**
+    * https://www.jatai.go.leg.br/transparencia/portal-de-transparencia
 
 #### Receitas
 
 * **Atividade 3.1:** Padronizar a divulgação das receitas da Câmara, destacando previsão e realização.
-
   * **Pergunta:** Divulga as receitas do Poder ou órgão, evidenciando sua previsão e realização? (p. 44)
   * **Responsável:** ????
   * **Produtos:**
     * Publicação dos dados de receitas com detalhamento orçamentário e natureza da receita.
     * Implementação de ferramentas de pesquisa por período e tipo de receita.
+    * Publicação de histórico de informações dos últimos 3 anos.
+  * **Links:**
+    * http://camaradejatai.sigepnet.com.br/transparencia/transferencia_de_recursos.php
 
+#### Despesas
 
+Padronizar a divulgação das despesas da Câmara, destacando execução e classificação orçamentária.
+
+* **Atividade 4.1:**
+  * **Pergunta:** Divulga as despesas do Poder ou órgão, detalhando sua execução (empenho, liquidação e pagamento) e identificando sua classificação orçamentária (unidade orçamentária, a função, a subfunção, categoria econômica, grupo de despesa, elemento de despesa e a fonte dos recursos)? (p. 52)
+  * **Responsável:** ????
+  * **Produtos:**
+    * Publicação dos dados de despesas com detalhamento orçamentário e natureza da despesa.
+    * Implementação de ferramentas de pesquisa por período e tipo de despesa.
+    * Publicação de histórico de informações dos últimos 3 anos.
+  * **Links:**
+    * http://camaradejatai.sigepnet.com.br/transparencia/despesa_empenhada.php
+    * http://camaradejatai.sigepnet.com.br/transparencia/despesa_liquidada.php
+    * http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php
+
+* **Atividade 4.2:**
+  * **Pergunta:** Divulga informações pormenorizadas das despesas do Poder ou órgão, detalhando o beneficiário do pagamento, o bem fornecido ou serviço prestado e o procedimento licitatório originário? (p. 55)
+  * **Responsável:** ????
+  * **Produtos:**
+    * Publicação dos dados de despesas com detalhamento do beneficiário, bem/serviço e procedimento licitatório.
+    * Implementação de ferramentas de pesquisa por período e tipo de despesa.
+    * Publicação de histórico de informações dos últimos 3 anos.
+  * **Links:**
+    * ???
+
+#### Planejamento e Prestação de Contas
+
+  * **Atividade 11.5** Divulgar o Relatório de Gestão ou Atividades com atualização, série histórica e filtros de pesquisa.
+    * **Pergunta:** Divulga o Relatório de Gestão ou Atividades? (p. 98)
+    * **Responsável:** Diretoria de Finanças
+    * **Produtos:**
+      * Publicação do Relatório de Gestão ou Atividades com atualização, série histórica e filtros de pesquisa.
+    * **Links:**
+      * ???
 
 ### Fase 3: Implementação das Obrigações Específicas do Poder Legislativo
 
