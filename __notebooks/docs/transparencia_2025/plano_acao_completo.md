@@ -73,7 +73,7 @@ A implementação de 100% dos critérios essenciais é requisito mínimo para a 
 
 #### Informações Prioritárias
 
-* **Atividade 1.1:** Garantir a existência de um site oficial próprio da Câmara, com visibilidade do Portal da Transparência e ferramenta de pesquisa. [(Descrição Completa)](###-1.1-Possui-sítio-oficial-próprio-na-internet?)
+* **Atividade 1.1:** Garantir a existência de um site oficial próprio da Câmara, com visibilidade do Portal da Transparência e ferramenta de pesquisa. [(Descrição Completa)](#11-possui-sítio-oficial-próprio-na-internet)
 
   * **Pergunta:** Possui sítio oficial próprio na internet?
   * **Responsável:** DDE
