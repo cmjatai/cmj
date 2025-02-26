@@ -71,31 +71,27 @@ O Poder Legislativo possui 11 critérios essenciais que se desdobram em 21 subcr
 
 **A implementação de 100% dos critérios essenciais é requisito mínimo para a obtenção de qualquer dos Selos de Qualidade da Transparência Pública.**
 
-#### Informações Prioritárias
+#### Fase 2: Informações Prioritárias
 
-* **Atividade 1.1:** Garantir a existência de um site oficial próprio da Câmara, com visibilidade do Portal da Transparência e ferramenta de pesquisa.
-
+* **Atividade 1.1**
   * **Pergunta:** Possui sítio oficial próprio na internet? [(PNTP)](#11-possui-sítio-oficial-próprio-na-internet)
   * **Responsável:** DDE
   * **Produtos:**
     * PortalCMJ próprio em funcionamento _full-time_.
-    * Ferramenta de busca otimizada no PortalCMJ.
   * **Links:**
-    * https://www.jatai.go.leg.br
-    * https://www.jatai.go.leg.br/pesquisar
+    * <https://www.jatai.go.leg.br>
 
-
-* **Atividade 1.2:**
+* **Atividade 1.2**
   * **Pergunta:** Possui portal da transparência próprio ou compartilhado na internet? [(PNTP)](#12-possui-portal-da-transparência-próprio-ou-compartilhado-na-internet)
   * **Responsável:** DDE
   * **Produtos:**
     * Verificação da visibilidade do Portal da Transparência na página principal do PortalCMJ.
   * **Links:**
-    * https://www.jatai.go.leg.br/transparencia/portal-de-transparencia
+    * <https://www.jatai.go.leg.br/transparencia/portal-de-transparencia>
 
-#### Receitas
+#### Fase 2: Receitas
 
-* **Atividade 3.1:** Padronizar a divulgação das receitas da Câmara, destacando previsão e realização.
+* **Atividade 3.1**
   * **Pergunta:** Divulga as receitas do Poder ou órgão, evidenciando sua previsão e realização? [(PNTP)](#31-divulga-as-receitas-do-poder-ou-órgão-evidenciando-sua-previsão-e-realização)
   * **Responsável:** ????
   * **Produtos:**
@@ -103,13 +99,13 @@ O Poder Legislativo possui 11 critérios essenciais que se desdobram em 21 subcr
     * Implementação de ferramentas de pesquisa por período e tipo de receita.
     * Publicação de histórico de informações dos últimos 3 anos.
   * **Links:**
-    * http://camaradejatai.sigepnet.com.br/transparencia/transferencia_de_recursos.php
+    * <https://www.jatai.go.leg.br/informacao/despesas-e-receitas/duodecimo>
 
-#### Despesas
+#### Fase 2: Despesas
 
 Padronizar a divulgação das despesas da Câmara, destacando execução e classificação orçamentária.
 
-* **Atividade 4.1:**
+* **Atividade 4.1**
   * **Pergunta:** Divulga as despesas do Poder ou órgão, detalhando sua execução (empenho, liquidação e pagamento) e identificando sua classificação orçamentária (unidade orçamentária, a função, a subfunção, categoria econômica, grupo de despesa, elemento de despesa e a fonte dos recursos)? [(PNTP)](#41-divulga-as-despesas-do-poder-ou-órgão-detalhando-sua-execução-empenho-liquidação-e-pagamento-e-identificando-sua-classificação-orçamentária-unidade-orçamentária-a-função-a-subfunção-categoria-econômica-grupo-de-despesa-elemento-de-despesa-e-a-fonte-dos-recursos)
   * **Responsável:** ????
   * **Produtos:**
@@ -117,11 +113,11 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Implementação de ferramentas de pesquisa por período e tipo de despesa.
     * Publicação de histórico de informações dos últimos 3 anos.
   * **Links:**
-    * http://camaradejatai.sigepnet.com.br/transparencia/despesa_empenhada.php
-    * http://camaradejatai.sigepnet.com.br/transparencia/despesa_liquidada.php
-    * http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php
+    * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_empenhada.php>
+    * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_liquidada.php>
+    * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php>
 
-* **Atividade 4.2:**
+* **Atividade 4.2**
   * **Pergunta:** Divulga informações pormenorizadas das despesas do Poder ou órgão, detalhando o beneficiário do pagamento, o bem fornecido ou serviço prestado e o procedimento licitatório originário? [(PNTP)](#42-divulga-informações-pormenorizadas-das-despesas-do-poder-ou-órgão-detalhando-o-beneficiário-do-pagamento-o-bem-fornecido-ou-serviço-prestado-e-o-procedimento-licitatório-originário)
   * **Responsável:** ????
   * **Produtos:**
@@ -130,27 +126,310 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Publicação de histórico de informações dos últimos 3 anos.
   * **Links:**
     * Nos mesmos links anteriores, clicando nos detalhes de cada despesa.
-      * http://camaradejatai.sigepnet.com.br/transparencia/despesa_empenhada.php
-      * http://camaradejatai.sigepnet.com.br/transparencia/despesa_liquidada.php
-      * http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php
+      * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_empenhada.php>
+      * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_liquidada.php>
+      * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php>
 
-#### Planejamento e Prestação de Contas
+#### Fase 2: Planejamento e Prestação de Contas
 
-* **Atividade 11.5** Divulgar o Relatório de Gestão ou Atividades com atualização, série histórica e filtros de pesquisa.
-  * **Pergunta:** Divulga o Relatório de Gestão ou Atividades? [(PNTP)](#115-divulga-o-relatório-de-gestão-fiscal-rgf)
+* **Atividade 11.5**
+  * **Pergunta:** Divulga o Relatório de Gestão Fiscal? [(PNTP)](#115-divulga-o-relatório-de-gestão-fiscal-rgf)
   * **Responsável:** Diretoria de Finanças
   * **Produtos:**
     * Publicação do Relatório de Gestão ou Atividades com atualização, série histórica e filtros de pesquisa.
   * **Links:**
-    * https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/relatorios-de-gestao-fiscal
+    * <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/relatorios-de-gestao-fiscal>
 
-### Fase 3: Implementação das Obrigações Específicas do Poder Legislativo
+### Fase 3: Implementação dos Critérios Comuns Obrigatórios
 
-...
+#### Fase 3: Informações Prioritárias
+
+* **Atividade 1.3**
+  * **Pergunta:** O acesso ao portal transparência está visível na capa do site? [(PNTP)](#13-o-acesso-ao-portal-transparência-está-visível-na-capa-do-site)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Verificação da visibilidade do Portal da Transparência na página principal do PortalCMJ.
+
+* **Atividade 1.4**
+  * **Pergunta:** O site e o portal de transparência contêm ferramenta de pesquisa de conteúdo que permita o acesso à informação? [(PNTP)](#14-o-site-e-o-portal-de-transparência-contêm-ferramenta-de-pesquisa-de-conteúdo-que-permita-o-acesso-à-informação)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Implementação de ferramenta de busca otimizada no PortalCMJ.
+    * Verificação da visibilidade e funcionalidade da ferramenta de pesquisa no Portal da Transparência.
+  * **Links:**
+    * <https://www.jatai.go.leg.br/pesquisar>
+    * <http://camaradejatai.sigepnet.com.br/?portal=1>
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/employee-transparency.jsf>
+
+#### Fase 3: Informações Institucionais
+
+* **Atividade 2.1**
+  * **Pergunta:** Divulga a sua estrutura organizacional? [(PNTP)](#21-divulga-a-sua-estrutura-organizacional)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação da estrutura organizacional da Câmara no PortalCMJ.
+  * **Links:**
+    * <https://www.jatai.go.leg.br/institucional/estrutura-organizacional>
+
+* **Atividade 2.2**
+  * **Pergunta:** Divulga competências e/ou atribuições? [(PNTP)](#22-divulga-competências-eou-atribuições)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação das competências e/ou atribuições da Câmara no PortalCMJ.
+  * **Links:**
+    * <https://www.jatai.go.leg.br/institucional/estrutura-organizacional/estrutura-parlamentar>
+
+* **Atividade 2.3**
+  * **Pergunta:** Identifica o nome dos atuais responsáveis pela gestão do Poder/Órgão? [(PNTP)](#23-identifica-o-nome-dos-atuais-responsáveis-pela-gestão-do-poderórgão)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação dos nomes dos atuais responsáveis pela gestão da Câmara no PortalCMJ.
+  * **Links:**
+    * <https://www.jatai.go.leg.br/institucional/mesa-diretora>
+
+* **Atividade 2.4**
+  * **Pergunta:** Divulga os endereços e telefones atuais do Poder ou órgão e e-mails institucionais? [(PNTP)](#24-divulga-os-endereços-e-telefones-atuais-do-poder-ou-órgão-e-e-mails-institucionais)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação dos endereços e telefones atuais da Câmara no PortalCMJ.
+  * **Links:**
+    * <https://www.jatai.go.leg.br/fale-conosco/telefones-e-emails>
+
+* **Atividade 2.5**
+  * **Pergunta:** Divulga o horário de atendimento? [(PNTP)](#25-divulga-o-horário-de-atendimento)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação do horário de atendimento da Câmara no PortalCMJ.
+  * **Links:**
+    * <https://www.jatai.go.leg.br/fale-conosco/sic-fisico>
+
+* **Atividade 2.6**
+  * **Pergunta:** Divulga os atos normativos próprios? [(PNTP)](#26-divulga-os-atos-normativos-próprios)
+  * **Responsável:** Departamento Legislativo
+  * **Produtos:**
+    * Publicação dos atos normativos próprios da Câmara no PortalCMJ.
+  * **Links:**
+    * Decretos Legislativos: <https://www.jatai.go.leg.br/atos-normativos/decretos-legislativos>
+    * Resoluções: <https://www.jatai.go.leg.br/atos-normativos/resolucoes>
+    * Portarias: <https://www.jatai.go.leg.br/atos-normativos/portarias>
+
+* **Atividade 2.7**
+  * **Pergunta:** Divulga as perguntas e respostas mais frequentes relacionadas às atividades desenvolvidas pelo Poder/Órgão? [(PNTP)](#27-divulga-as-perguntas-e-respostas-mais-frequentes-relacionadas-às-atividades-desenvolvidas-pelo-poderórgão)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação das perguntas frequentes (FAQ) da Câmara no PortalCMJ.
+    * Publicação das respostas às perguntas frequentes no Portal da Transparência.
+  * **Links:**
+    * PortalCMJ: ???
+    * Portal da Transparência: <https://www.jatai.go.leg.br/informacao/informacoes-institucionais/perguntas-frequentes>
+
+#### Fase 3: Convênios e Transferências
+
+* **Atividade 5.1**
+  * **Pergunta:** Identifica as transferências recebidas a partir da celebração de convênios/acordos? [(PNTP)](#51-identifica-as-transferências-recebidas-a-partir-da-celebração-de-convêniosacordos-com-indicação-no-mínimo-do-valor-total-previsto-dos-recursos-envolvidos-do-valor-recebido-do-objeto-da-origem-órgão-repassadorconcedente-e-data-do-repasse)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação das informações sobre convênios e transferências recebidas no Portal da Transparência
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/convenios-e-transferencias/transferencias-recebidas>
+
+* **Atividade 5.2**
+  * **Pergunta:** Identifica as transferências realizadas a partir da celebração de convênios/acordos/ajustes, com indicação, no mínimo, do beneficiário, do objeto, do valor total previsto para repasse, do valor concedido e a data do repasse? [(PNTP)](#52-identifica-as-transferências-realizadas-a-partir-da-celebração-de-convêniosacordosajustes-com-indicação-no-mínimo-do-beneficiário-do-objeto-do-valor-total-previsto-para-repasse-do-valor-concedido-e-a-data-do-repasse)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação das informações sobre convênios e transferências realizadas no Portal da Transparência
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/outras-informacoes/transferencias-concedidas>
+
+* **Atividade 5.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Identifica os acordos firmados que não envolvam transferência de recursos financeiros, identificando as partes, o objeto e as obrigações ajustadas? [(PNTP)](#53-identifica-os-acordos-firmados-que-não-envolvam-transferência-de-recursos-financeiros-identificando-as-partes-o-objeto-e-as-obrigações-ajustadas)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação das informações sobre acordos firmados no Portal da Transparência
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/outras-informacoes/convenios-parcerias-e-acordos>
+
+#### Fase 3: Recursos Humanos
+
+* **Atividade 6.1**
+  * **Pergunta:** Divulga a relação nominal dos servidores/autoridades/membros, seus cargos/funções, as respectivas lotações, as suas datas de admissão/exoneração/inativação e a carga horária semanal do cargo/função ocupada/desempenhada? [(PNTP)](#61-divulga-a-relação-nominal-dos-servidoresautoridadesmembros-seus-cargosfunções-as-respectivas-lotações-as-suas-datas-de-admissãoexoneraçãoinativação-e-a-carga-horária-semanal-do-cargofunção-ocupadadesempenhada)
+  * **Responsável:** RH
+  * **Produtos:**
+    * Publicação da relação nominal dos servidores no Portal da Transparência
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/recursos-humanos/folha-de-pagamento>
+
+* **Atividade 6.2**
+  * **Pergunta:** Identifica a remuneração nominal de cada servidor/autoridade/Membro e a tabela com o padrão remuneratório dos cargos e funções? [(PNTP)](#62-identifica-a-remuneração-nominal-de-cada-servidorautoridademembro-e-a-tabela-com-o-padrão-remuneratório-dos-cargos-e-funções)
+  * **Responsável:** RH
+  * **Produtos:**
+    * Publicação do padrão remuneratório dos cargos e funções no Portal da Transparência
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/recursos-humanos/padrao-remuneratorio>
+
+* **Atividade 6.5**
+  * **Pergunta:** Divulga a íntegra dos editais de concursos e seleções públicas realizados pelo Poder ou órgão para provimento de cargos e empregos públicos? [(PNTP)](#65-divulga-a-íntegra-dos-editais-de-concursos-e-seleções-públicas-realizados-pelo-poder-ou-órgão-para-provimento-de-cargos-e-empregos-públicos)
+  * **Responsável:** RH
+  * **Produtos:**
+    * Publicação dos editais de concursos e seleções públicas no PortalCMJ
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/recursos-humanos/concursos-publicos>
+    * <https://www.jatai.go.leg.br/informacao/recursos-humanos/processos-seletivos>
+
+* **Atividade 6.6**
+  * **Pergunta:** Divulga informações sobre os demais atos dos concursos públicos e processos seletivos do Poder ou órgão: vagas efetivamente preenchidas, lista de aprovados com as classificações, fila de espera/cadastro reserva e validade? [(PNTP)](#66-divulga-informações-sobre-os-demais-atos-dos-concursos-públicos-e-processos-seletivos-do-poder-ou-órgão-vagas-efetivamente-preenchidas-lista-de-aprovados-com-as-classificações-fila-de-esperacadastro-reserva-e-validade)
+  * **Responsável:** RH
+  * **Produtos:**
+    * Publicação das informações sobre concursos públicos e processos seletivos no PortalCMJ
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/recursos-humanos/concursos-publicos>
+    * <https://www.jatai.go.leg.br/informacao/recursos-humanos/processos-seletivos>
+
+#### Fase 3: Diárias
+
+* **Atividade 7.1**
+  * **Pergunta:** Divulga o nome e o cargo/função do beneficiário, além do valor total recebido, número de diárias usufruídas por afastamento, período de afastamento, motivo do afastamento e local de destino? [(PNTP)](#71-divulga-o-nome-e-o-cargofunção-do-beneficiário-além-do-valor-total-recebido-número-de-diárias-usufruídas-por-afastamento-período-de-afastamento-motivo-do-afastamento-e-local-de-destino)
+  * **Responsável:** Controle Interno
+  * **Produtos:**
+    * Publicação das informações sobre diarias
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/diarias/diarias-e-passagens>
+
+* **Atividade 7.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga tabela ou relação que explicite os valores das diárias dentro do Estado, fora do Estado e fora do país, conforme legislação local? [(PNTP)](#72-divulga-tabela-ou-relação-que-explicite-os-valores-das-diárias-dentro-do-estado-fora-do-estado-e-fora-do-país-conforme-legislação-local)
+  * **Responsável:** Controle Interno
+  * **Produtos:**
+    * Publicação das informações sobre diarias
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/diarias/tabela-de-valores-de-diarias>
+
+#### Fase 3: Licitações
+
+* **Atividade 8.1**
+  * **Pergunta:** Divulga a relação das licitações em ordem sequencial, informando o número e modalidade licitatória, o objeto, valor estimado/homologado e a situação? [(PNTP)](#81-divulga-a-relação-das-licitações-em-ordem-sequencial-informando-o-número-e-modalidade-licitatória-o-objeto-valor-estimadohomologado-e-a-situação)
+  * **Responsável:** Departamento de Licitações
+  * **Produtos:**
+    * Publicação das informações sobre licitações
+  * **Links:**
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/bidding-transparency.jsf>
+
+* **Atividade 8.2**
+  * **Pergunta:** DDivulga a íntegra dos editais de licitação? [(PNTP)](#82-divulga-a-íntegra-dos-editais-de-licitação)
+  * **Responsável:** Departamento de Licitações
+  * **Produtos:**
+    * Publicação dos editais das licitações
+  * **Links:**
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/bidding-transparency.jsf>
+    * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-em-andamento>
+    * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-encerradas>
+
+* **Atividade 8.3**
+  * **Pergunta:** Divulga a íntegra dos demais documentos das fases interna e externa das licitações? [(PNTP)](#83-divulga-a-íntegra-dos-demais-documentos-das-fases-interna-e-externa-das-licitações)
+  * **Responsável:** Departamento de Licitações
+  * **Produtos:**
+    * Publicação dos documentos das fases interna e externa das licitações
+  * **Links:**
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/bidding-transparency.jsf>
+    * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-em-andamento>
+    * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-encerradas>
+
+* **Atividade 8.4**
+  * **Pergunta:** Divulga a íntegra dos principais documentos dos processos de dispensa e inexigibilidade de licitação? [(PNTP)](#84-divulga-a-íntegra-dos-principais-documentos-dos-processos-de-dispensa-e-inexigibilidade-de-licitação)
+  * **Responsável:** Departamento de Compras
+  * **Produtos:**
+    * Publicação dos principais documentos dos processos de dispensa e inexigibilidade de licitação
+  * **Links:**
+    * Dispensas: <https://www.jatai.go.leg.br/informacao/licitacoes/dispensas>
+    * Inexigibilidades: <https://www.jatai.go.leg.br/informacao/licitacoes/inexigibilidade>
+    * Link do Portal de Transparência: <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/dispensation-bidding-transparency.jsf>
+
+* **Atividade 8.5**
+  * **Pergunta:** Divulga a íntegra das Atas de Adesão – SRP? [(PNTP)](#85-divulga-a-íntegra-das-atas-de-adesão---srp)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação das Atas de Adesão – SRP
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/contratos/atas-de-registros-de-preco>
+
+#### Fase 3: Contratos
+
+* **Atividade 9.1**
+  * **Pergunta:** Divulga a relação dos contratos celebrados em ordem sequencial, com o seu respectivo resumo, contendo, no mínimo, indicação do contratado(a), do valor, do objeto e da vigência, bem como dos aditivos deles decorrentes? [(PNTP)](#91-divulga-a-relação-dos-contratos-celebrados-em-ordem-sequencial-com-o-seu-respectivo-resumo-contendo-no-mínimo-indicação-do-contratadoa-do-valor-do-objeto-e-da-vigência-bem-como-dos-aditivos-deles-decorrentes)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação da relação dos contratos celebrados...
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/contratos/contratos-em-vigencia>
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/contract-transparency.jsf>
+
+* **Atividade 9.2**
+  * **Pergunta:** Divulga o inteiro teor dos contratos e dos respectivos termos aditivos? [(PNTP)](#92-divulga-o-inteiro-teor-dos-contratos-e-dos-respectivos-termos-aditivos)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação do inteiro teor dos contratos e dos respectivos termos aditivos
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/contratos/contratos-em-vigencia>
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/contract-transparency.jsf>
+
+* **Atividade 9.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga a relação/lista dos fiscais de cada contrato vigente e encerrado? [(PNTP)](#93-divulga-a-relaçãolista-dos-fiscais-de-cada-contrato-vigente-e-encerrado)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação da relação/lista dos fiscais de cada contrato vigente e encerrado
+  * **Links:**
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/tax-contract.jsf>
+
+* **Atividade 9.4** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga a ordem cronológica de seus pagamentos, bem como as justificativas que fundamentaram a eventual alteração dessa ordem? [(PNTP)](#94-divulga-a-ordem-cronológica-de-seus-pagamentos-bem-como-as-justificativas-que-fundamentaram-a-eventual-alteração-dessa-ordem)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação da ordem cronológica de seus pagamentos
+  * **Links:**
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/order-of-payment.jsf>
+
+#### Fase 3: Obras
+
+* **Atividade 10.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga os quantitativos, e os preços unitários e totais contratados? [(PNTP)](#102-divulga-os-quantitativos-e-os-preços-unitários-e-totais-contratados)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação dos quantitativos, e os preços unitários e totais contratados
+  * **Links:**
+    * ????
 
 ### Fase 4: Implementação das Recomendações e Melhoria Contínua
 
-...
+#### Fase 4: Licitações
+
+* **Atividade 8.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga o plano de contratações anual (art. 12, VII, da Lei n. 14.133)? [(PNTP)](#86-divulga-o-plano-de-contratações-anual-art-12-vii-da-lei-n-14133)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação do plano de contratações anual
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/licitacoes/plano-de-contratacoes-anual>
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/annual-hiring-plan.jsf>
+
+* **Atividade 8.7** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga a relação dos licitantes e/ou contratados sancionados administrativamente pelo Poder ou órgão? [(PNTP)](#87-divulga-a-relação-dos-licitantes-eou-contratados-sancionados-administrativamente-pelo-poder-ou-órgão)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação da relação dos licitantes e/ou contratados sancionados administrativamente pelo Poder ou órgão
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/licitacoes/sancoes-administrativas>
+
+#### Fase 4: Obras
+
+* **Atividade 10.1** - <span style="color: red;">PARTE NÃO ATENDIDA EM 2024</span>
+  * **Pergunta:** Divulga informações sobre obras: data de início, etapas, percentual concluído, status e previsão de conclusão? [(PNTP)](#101-divulga-informações-sobre-obras-data-de-início-etapas-percentual-concluído-status-e-previsão-de-conclusão)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação das informações sobre obras
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras>
+
+
+
 
 ## Considerações Finais
 
@@ -408,7 +687,7 @@ Possibilidade de gravar um conjunto de informações selecionadas em pelo menos 
 **Filtro de Pesquisa:**
 Instrumento que permite inserir ou escolher texto, filtrando ou direcionando as opções de dados dentro do conjunto específico de informações referentes à despesa, sendo exigido no mínimo para atendimento deste critério a consulta por nome e CPF ou CNPJ do credor, mês, exercício (ano).
 
-## 5.  Convênios e Transferências
+## 5. Convênios e Transferências
 
 ### 5.1 Identifica as transferências recebidas a partir da celebração de convênios/acordos com indicação, no mínimo, do valor total previsto dos recursos envolvidos, do valor recebido, do objeto, da origem (órgão repassador/concedente) e data do repasse?
 
@@ -760,7 +1039,7 @@ Considera-se que existe histórico de informações quando os dados disponibiliz
 **Filtro de Pesquisa:**
 Instrumento que permite inserir ou escolher texto, filtrando ou direcionando as opções de dados dentro do conjunto específico de informações aqui identificadas.
 
-### 8.5 Divulga a íntegra das Atas de Adesão – SRP?
+### 8.5 Divulga a íntegra das Atas de Adesão - SRP?
 
 * Fundamentação: Arts. 7º, VI, e 8º, §1º, IV, da Lei nº 12.527/2011 – LAI; art. 11, III, do Decreto nº 7.892/2013 e art. 18, §4º, do Decreto nº 11.462/2023.
 * Classificação: Obrigatória.
