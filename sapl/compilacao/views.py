@@ -1040,6 +1040,8 @@ class TextView(CompMixin, ListView):
     def is_reader(self):
         if self.request.user.is_anonymous:
             return True
+        if self.object.privacidade >= STATUS_TA_EDITION:
+            return False
         not_reader_if_any_of_perms = (
             'compilacao.change_dispositivo_edicao_dinamica',
             'compilacao.add_nota',

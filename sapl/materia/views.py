@@ -450,7 +450,7 @@ class ProposicaoTaView(IntegracaoTaView):
             proposicao = get_object_or_404(self.model, pk=kwargs['pk'])
 
             if not proposicao.data_envio and\
-                    request.user not in proposicao.autor.operadoes.all():
+                    request.user not in proposicao.autor.operadores.all():
                 raise Http404()
 
             return IntegracaoTaView.get(self, request, *args, **kwargs)
