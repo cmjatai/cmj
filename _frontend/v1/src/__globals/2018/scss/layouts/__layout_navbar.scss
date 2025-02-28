@@ -185,7 +185,7 @@
       transition: all 1s ease;
       //padding: 10px 5px;
       &::after {
-        opacity: 0.4;
+        opacity: 0.2;
         transition: all 1s ease;
       }
     }
@@ -460,7 +460,7 @@
       z-index: $zindex-popup;
       position: absolute;
       margin-top: 0px;
-      padding: 11px 10px 10px 10px;
+      padding: 11px 10px 100px 10px;
       right: 12px;
       left: 12px;
       display: none;
@@ -485,7 +485,7 @@
           position: absolute;
           z-index: -1;
           top: 12px;
-          bottom: 36px;
+          bottom: 100px;
           left: 12px;
           right: 12px;
         }
