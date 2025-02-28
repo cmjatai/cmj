@@ -395,7 +395,72 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Produtos:**
     * Publicação dos quantitativos, e os preços unitários e totais contratados
   * **Links:**
+    * https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras
+
+* **Atividade 10.3**
+  * **Pergunta:** Divulga os quantitativos executados e os preços praticados? [(PNTP)](#103-divulga-os-quantitativos-executados-e-os-preços-praticados
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação dos quantitativos executados e os preços praticados
+  * **Links:**
+    * https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras
+
+* **Atividade 10.4**
+  * **Pergunta:** Divulga relação das obras paralisadas contendo o motivo, o responsável pela inexecução temporária do objeto do contrato e a data prevista para o reinício da sua execução? [(PNTP)](#104-divulga-relação-das-obras-paralisadas-contendo-o-motivo-o-responsável-pela-inexecução-temporária-do-objeto-do-contrato-e-a-data-prevista-para-o-reinício-da-sua-execução)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação da relação das obras paralisadas.
+  * **Links:**
+    * https://www.jatai.go.leg.br/informacao/outras-informações/acompanhamento-de-obras
+
+#### Fase 3: Planejamento e Prestação de Contas
+
+* **Atividade 11.1**
+  * **Pergunta:** Publica a Prestação de Contas do Ano Anterior (Balanço Geral)? [(PNTP)](#111-publica-a-prestação-de-contas-do-ano-anterior-balanço-geral)
+  * **Responsável:** ????
+  * **Produtos:**
+    * Publicação da Prestação de Contas do Ano Anterior (Balanço Geral)
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/balancete-financeiro>
+
+* **Atividade 11.2**
+  * **Pergunta:** Divulga o Relatório de Gestão ou Atividades? [(PNTP)](#112-divulga-o-relatório-de-gestão-ou-atividades)
+  * **Responsável:** ????
+  * **Produtos:**
+    * Publicação do Relatório de Gestão ou Atividades
+  * **Links:**
     * ????
+
+* **Atividade 11.3**
+  * **Pergunta:** Divulga o resultado da apreciação e/ou julgamento das contas pelo Tribunal de Contas? [(PNTP)](#113-divulga-o-resultado-da-apreciação-eou-julgamento-das-contas-pelo-tribunal-de-contas)
+  * **Responsável:** ????
+  * **Produtos:**
+    * Publicação do resultado da apreciação e/ou julgamento das contas pelo Tribunal de Contas
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/julgamento-de-contas>
+
+* **Atividade 11.4**
+  * **Pergunta:** Divulga o resultado do julgamento das Contas do Chefe do Poder Executivo pelo Poder Legislativo? [(PNTP)](#114-divulga-o-resultado-do-julgamento-das-contas-do-chefe-do-poder-executivo-pelo-poder-legislativo)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Este Item é aplicavel apena ao Executivo, no entanto, o Poder Legislativo deve publicar o processo legislativo do jugalmento das contas, bem como o decreto legislativo resultante do julgamento, além disso, antes do processo legislativo iniciar deve-se publicar o parecer prévio do tcm.
+  * **Links:**
+    * Pareceres do TCM: <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-executivo/balanco-anual>
+    * Julgamento de Contas: <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-executivo/julgamento-de-contas>
+
+* **Atividade 11.5**
+  * **Pergunta:** Divulga o Relatório de Gestão Fiscal? [(PNTP)](#115-divulga-o-relatório-de-gestão-fiscal-rgf)
+  * **Responsável:** ????
+  * **Produtos:**
+    * Publicação do Relatório de Gestão Fiscal
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/relatorios-de-gestao-fiscal>
+
+#### SIC
+
+* **Atividade 12.1**
+
+...
 
 ### Fase 4: Implementação das Recomendações e Melhoria Contínua
 
@@ -428,6 +493,15 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras>
 
+#### Fase 4: Planejamento e Prestação de Contas
+
+* **Atividade 11.7** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga os objetivos estratégicos do Poder ou órgão e os indicadores definidos para mensurar o alcance desses objetivos (plano estratégico institucional ou instrumento equivalente)? [(PNTP)](#117-divulga-os-objetivos-estratégicos-do-poder-ou-órgão-e-os-indicadores-definidos-para-mensurar-o-alcance-desses-objetivos-plano-estratégico-institucional-ou-instrumento-equivalente)
+  * **Responsável:** ????
+  * **Produtos:**
+    * Publicação dos objetivos estratégicos do Poder ou órgão e os indicadores definidos para mensurar o alcance desses objetivos
+  * **Links:**
+    * ????
 
 
 
@@ -1299,12 +1373,25 @@ No caso de Tribunais de Contas que não têm suas contas apreciadas pela própri
 Para atendimento ao critério, não basta a divulgação da conclusão do Acórdão ou Parecer emitido pelo Tribunal de Contas. É necessário que haja a disponibilização do documento na íntegra.
 
 **Atualidade:**
-
 Considera-se que as informações estejam atualizadas quando o último Acórdão ou Parecer do Tribunal de Contas relativamente às contas do Poder ou órgão estiverem disponíveis, observada a especificidade das Cortes de Contas indicada no item “disponibilidade”. Também devem constar no portal a indicação de quais são as contas cuja apreciação ainda está pendente.
 
 **Série Histórica:**
-
 Considera-se que existe histórico de informações quando estiverem disponíveis os últimos 3 julgamentos/pareceres sobre as contas estiverem disponíveis.
+
+### 11.4 Divulga o resultado do julgamento das Contas do Chefe do Poder Executivo pelo Poder Legislativo?
+
+* Fundamentação: Art. 56, §3º, da LC nº 101/00.
+* Classificação: Obrigatória.
+* Aplicável a: Executivo. (A Câmara de Jataí Publica tb tais documentos)
+
+**Disponibilidade:**
+Deve ser divulgado o resultado dos Pareceres Prévios emitidos pelo Tribunal de Contas sobre as contas do Chefe do Poder Executivo bem como o resultado dos julgamentos pelo Poder Legislativo. É necessária a informação e a disponibilização das íntegras das Decisões (podendo ser um link para o Portal do Legislativo ou Tribunal de Contas, desde que acesse diretamente o local em que está a Decisão).
+
+**Atualidade:**
+Considera-se que as informações estejam atualizadas quando o último (mais recente) Parecer emitido pelo Tribunal estiver divulgado, bem como o mais recente julgamento pelo Poder Legislativo estiver disponível. Também devem constar no portal a indicação de quais são as contas cuja apreciação ainda está pendente.
+
+**Série Histórica:**
+Considera-se que existe histórico de informações quando os dados disponibilizados referirem-se, pelo menos, os últimos 3 pareceres e julgamentos estiverem disponíveis.
 
 ### 11.5 Divulga o Relatório de Gestão Fiscal (RGF)?
 
