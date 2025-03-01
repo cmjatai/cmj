@@ -13,12 +13,8 @@ PROJECT_DIR = Path(__file__).ancestor(3)
 def front_version():
     if FRONTEND_VERSION == 'v1':
         return ['_templates/v1']
-    elif FRONTEND_VERSION == 'v2':
-        return ['_templates/v2', '_templates/v1']
-    elif FRONTEND_VERSION == 'v3':
-        return ['_templates/v3', '_templates/v1']
     elif FRONTEND_VERSION == 'v4':
-        return ['_templates/v4'] #, '_templates/v1']
+        return ['_templates/v4', '_templates/v1']
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
@@ -76,23 +72,23 @@ FRONTEND_BRASAO_PATH = {
     '256': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_256.png'),
     '512': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_512.png'),
     '1024': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('brasao_1024.png')
-} 
+}
 
 FRONTEND_ESCOLA_PATH = {
     '1024': PROJECT_DIR_FRONTEND.child('public').child('brasao').child('escola_1024.png')
 }
-if FRONTEND_VERSION == 'v1':
-    WEBPACK_LOADER = {
-        'DEFAULT': {
-            'CACHE': not DEBUG,
-            'BUNDLE_DIR_NAME': 'dist/',
-            'STATS_FILE': PROJECT_DIR_FRONTEND.child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
-        }
-    }
 
-    if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
-        WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND.child(
-            f'webpack-stats.json')
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'CACHE': not DEBUG,
+        'BUNDLE_DIR_NAME': 'dist/',
+        'STATS_FILE': PROJECT_DIR_FRONTEND.child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
+    }
+}
+
+if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
+    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND.child(
+        f'webpack-stats.json')
 
 
 STATICFILES_DIRS = (

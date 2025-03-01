@@ -51,8 +51,7 @@ INSTALLED_APPS = (
     'sapl',  # não retire, é necessário para os templates centralizados do sapl
 )
 
-if FRONTEND_VERSION == 'v1':
-    INSTALLED_APPS = INSTALLED_APPS + ('webpack_loader', )
+INSTALLED_APPS = INSTALLED_APPS + ('webpack_loader', )
 
 SAPL_APPS = (
     'sapl.audiencia',

@@ -45,6 +45,21 @@ services:
       #- "10.3.163.200:8080:8080"
       #- "192.168.15.8:8080:8080"
       #- "127.0.0.1:8080:8080"
+  cmjfront4:
+    build:
+      context: ../_frontend/v4/
+      dockerfile: ../../docker/DockerfileFront4Dev
+    #command: yarn build
+    restart: no
+    container_name: cmjfront4
+    labels:
+       NAME: "cmjfront4"
+    volumes:
+      - ../:/var/cmjatai/cmj
+    networks:
+      - cmj-net
+    ports:
+      - "8181:8181"
   cmj:
     build:
       context: ../

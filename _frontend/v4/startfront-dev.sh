@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-yarn
-yarn format
-yarn dev
+#rm yarn.lock
+yarn install
+yarn serve
