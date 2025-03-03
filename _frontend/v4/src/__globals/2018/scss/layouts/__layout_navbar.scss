@@ -1,5 +1,5 @@
 .navbar {
-  background: darken($color_primary, 7%) $url_bg_png;
+  background: darken($color_main_bg, 7%) $url_bg_png;
 
   padding: 0px;
   .navbar-nav {
@@ -33,11 +33,11 @@
       display: flex;
       align-items: center;
       color: lighten($color_text_menu, 15);
-      font-family: Lato, Helvetica, sans-serif;
+      font-family: Rubik, Helvetica, sans-serif;
       font-weight: 400;
       padding: 0 6px;
       &:hover {
-        color: white;
+        color: black;
       }
       &::after {
         position: absolute;
@@ -61,7 +61,7 @@
         border-color: $color_border_menu_hover;
         margin: -1px 0 0 0;
         padding: 0;
-        background: $color_primary $url_bg_png;
+        background: $color_main_bg $url_bg_png;
         a {
           line-height: 2em;
         }
@@ -105,7 +105,7 @@
 
 .navbar-menu {
   z-index: $zindex-navbar-menu;
-  border-bottom: 1px solid #00cbad;
+  border-bottom: 1px solid $color-primary;
   .navbar-nav {
     z-index: 2;
     & > li {
@@ -123,12 +123,12 @@
     li {
       ul {
         min-width: auto;
-        background: darken($color_primary, 5%) $url_bg_png;
+        background: darken($color_main_bg, 5%) $url_bg_png;
         li {
           padding: 0 20px;
 
           &.dropdown-header {
-            color: #fff;
+            color: $color-primary;
             padding: 5px 15px 0;
             text-transform: uppercase;
             font-size: 70%;
@@ -148,7 +148,7 @@
 
 .navbar-topo {
   z-index: $zindex-navbar-topo;
-  background: $color_primary;
+  background: $color_main_bg;
   padding: 0 0 0 0;
   .before {
     content: "";
@@ -384,7 +384,7 @@
     .brand-name {
       display: flex;
       flex-direction: column;
-      color: white;
+      color: $color_text_brand;
       line-height: 1;
       font-family: Arial;
       justify-content: center;

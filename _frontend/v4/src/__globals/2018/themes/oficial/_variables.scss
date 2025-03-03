@@ -1,22 +1,22 @@
 $color_primary: #114d81; //006556
 $color_new_primary: #114d81; //114d81
 
-$color_text_brand: white;
-$color_text_brand_hover: #fff;
+$color_text_brand: #114d81;
+$color_text_brand_hover: #07355e;
 
-$color_text_menu: #a4f81d;
+$color_text_menu: #114d81;
 
-$color_border_menu_hover: rgba(240, 239, 231, 0.3);
+$color_border_menu_hover: #9ac9f3;
 
 
-$color_text: #006556;
+$color_text: #114d81;
 
 $color_main_bg: #fff; //(255, 255, 255, 0.5); //#fff; //
 
 $color_container_bg: #f0efe7;
 $color_container_border: darken(#f0efe7, 5);
 
-$color_text_title: #a97905;
+$color_text_title: #cad804;
 
 $url_bg_png: url(~@/assets/img/bg.png);
 
@@ -24,8 +24,8 @@ $hover_background_05p: rgba(0, 0, 0, 0.05);
 $hover_background_10p: rgba(0, 0, 0, 0.1);
 $hover_background_20p: rgba(0, 0, 0, 0.2);
 $hover_background_50p: rgba(0, 0, 0, 0.5);
-$hover_background_10pw: rgba(205, 255, 200, 0.1);
-$hover_background_20pw: rgba(205, 255, 200, .2);
+$hover_background_10pw: rgba(#114d81, 0.1);
+$hover_background_20pw: rgba(#114d81, .2);
 
 // variaveis wrapper ########################################
 $width-wrapper-lg: 320px !default;

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load i18n cache common_cmj_tags %}
+{% block body_class %}body-initial{% endblock body_class %}
+{% block base_header %}{% endblock %}
+
+{% block second_header %}
+{% endblock %}
+{% block base_functions %}{% endblock %}
+{% block main_container_class %}container-fluid p-0 container{{fluid}}{{path}}{% endblock %}
+{% block content_container %}
+{{ block.super }}
+{% endblock %}
+{% block base_content %}
+
+{% cache 300 cache_pagina_inicial%}
+<div id="main_content">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-5 mt-lg-3 mb-lg-3">
+        {% include "path/pagina_inicial_noticias_principais.html" %}
+      </div>
+    </div>
+  </div>
+  {% include "base_acesso_rapido.html" %}
+  {% include "path/pagina_inicial_video_aovivo.html" %}
+</div>
+
+{% comment %}
+  <div class="container d-none">
+    <div class="row">
+      <div class="col-lg-8 pr-lg-0 mt-lg-4 mt-3" id="main_content">
+      </div>
+      <div class="col-lg-4 d-flex flex-column mt-lg-4 pl-lg-1">
+        {% include "path/pagina_inicial_buttons.html" %}
+      </div>
+    </div>
+  </div>
+{% endcomment %}
+
+{% with ""|transmissao_ao_vivo as aovivo %}
+  {% if not aovivo.exists %}
+    {% include "path/pagina_inicial_ultimos_videos.html" %}
+  {% endif %}
+{% endwith %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6">
+        {% include "path/pagina_inicial_noticias_secudarias.html" %}
+      </div>
+      <div class="col-lg-6">
+        {% with noticias_dos_parlamentares as object_list %}
+          {% include "path/pagina_inicial_noticia_parlamentares.html" %}
+        {% endwith %}
+      </div>
+      <div class="col-lg-12">
+        {% comment %}
+          {% include "path/pagina_inicial_links.html" %}
+          {% include "path/pagina_inicial_ultimas_publicacoes.html" %}
+          {% include "path/pagina_inicial_noticias_procuradoria.html" %}
+        {% endcomment %}
+      </div>
+    </div>
+  </div>
+
+{% endcache %}
+{% endblock %}

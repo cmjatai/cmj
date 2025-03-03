@@ -1,14 +1,14 @@
 
 // ADJUST tela de login ########################################
 .html-login {
-  background-color: $color_primary;
+  background-color: $color_main_bg;
   background-image: none;
   a.navbar-brand {
     font-size: 50px;
     margin-left: -10px !important;
   }
   body, .navbar {
-    background-color: $color_primary;
+    background-color: $color_main_bg;
     background-image: none;
   }
 }
@@ -51,7 +51,7 @@
     margin: 0;
     font-weight: normal;
     font-size: 2em;
-    background: $color_primary;
+    background: $color_main_bg;
     padding: 0 20px;
   }
   .input-icon {

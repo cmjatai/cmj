@@ -1,0 +1,49 @@
+{% load i18n sigad_filters social_utils%}
+
+{% with 'noticias_destaque'|caixa_publicacao:None as noticias_destaque %}
+  <div id="carousel-custom" class="carousel carousel-custom slide" data-ride="carousel" data-interval="7000">
+    <ol class="carousel-indicators">
+      {% for d in  noticias_destaque.docs%}
+        <li data-target="#carousel-custom" data-slide-to="{{forloop.counter0}}" {% if forloop.first %}class="active"{% endif %}></li>
+      {% endfor %}
+    </ol>
+    {% if perms.sigad.change_documento %}
+      <div class="btn-edit-destaques">
+        <a href="{% url 'cmj.sigad:caixapublicacao_update' noticias_destaque.cp.pk %}" title="{% trans "Editar Caixa de Publicação" %}">
+          <i class="fas fa-edit" aria-hidden="true"></i>
+        </a>
+      </div>
+    {% endif %}
+    <div class="carousel-inner" role="listbox" >
+      {% for d in  noticias_destaque.docs%}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <div class="autor">{{d.1.autor|default:''}}</div>
+          {% social_link_share d.0 'absolute-center' %}
+          <div class="d-block w-100 imagem" style="background-image: url(/{{d.1.absolute_slug}}.1024.jpg);" data="{{d.1.absolute_slug}}.1024.jpg">
+            {% comment %}
+            <img src="/{{d.1.absolute_slug}}" alt="{% if d.1.titulo %}{{d.0.titulo}}{% else %}{{d.0.titulo}}{% endif %}">
+            {% endcomment %}
+            <div class="carousel-caption">
+              <p class="d-none d-sm-block">{{d.0.descricao}}</p>
+              <a tabindex="{{view.tabindex}}" href="/{{d.0.slug}}" title="{{d.0.descricao}}">
+              <h1 class="titulo">
+                  {{d.0.titulo}}
+                </h1>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Controls -->
+    <a class="carousel-control-prev" href="#carousel-custom" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="sr-only">Previous</span>
+    </a>
+    <a class=" carousel-control-next" href="#carousel-custom" role="button" data-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="sr-only">Next</span>
+    </a>
+  </div>
+{% endwith %}
