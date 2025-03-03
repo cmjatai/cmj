@@ -49,45 +49,70 @@ window.AppLOA = function () {
   instance.EmendaLoaCrudLIST = function (container) {
     const form = container.find('form')
     const formData = new FormData(form[0])
-    const formProps = Object.fromEntries(formData)
+    const formProps = {}
+    for (const [key, value] of formData.entries()) {
+      if (key in formProps) {
+        if (!Array.isArray(formProps[key])) {
+          formProps[key] = [formProps[key]]
+        }
+        formProps[key].push(value)
+      } else {
+        formProps[key] = value
+      }
+    }
 
     delete formProps.agrupamento
     delete formProps.tipo_agrupamento
     delete formProps.pdf
 
-    if (instance.isObjectEmpty(formProps)) {
-      const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
-      const lsData = JSON.parse(lsJson)
-
-      if (!instance.isObjectEmpty(lsData)) {
-        _.forOwn(lsData, (value, key) => {
-          _.forEach(form.find(`input[name="${key}"]`), (item) => {
-            if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
-              item.checked = true
-              $(`label[for="${item.id}"] span`).addClass('active')
-            } else {
-              item.value = value
-            }
-          })
-        })
-        window.loadingCMJ('Atualizando listagem...')
-        form.submit()
-      }
-    } else {
-      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(formProps))
-    }
-    let changeAction = function (event) {
+    const changeAction = function () {
       const formData = new FormData(form[0])
       const parlamentares = formData.getAll('parlamentares')
       const fase = formData.getAll('fase')
       const finalidade = formData.getAll('finalidade')
       const tipo = formData.getAll('tipo')
-      const formProps = finalidade.length > 0 || tipo.length > 0 || fase.length > 0 || parlamentares.length > 0 ? { fase, parlamentares, tipo } : {}
-      const formJson = JSON.stringify(formProps)
-      localStorage.setItem('portalcmj_emendaloa_filter', formJson)
+
+      const formProps = finalidade.length > 0 || tipo.length > 0 || fase.length > 0 || parlamentares.length > 0
+        ? { fase, parlamentares, tipo, finalidade }
+        : {}
+
+      if (!instance.isObjectEmpty(formProps)) {
+        localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(formProps))
+      }
+
       window.loadingCMJ('Atualizando listagem...')
       form.submit()
     }
+
+    if (instance.isObjectEmpty(formProps)) {
+      try {
+        const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
+        if (lsJson) {
+          const lsData = JSON.parse(lsJson)
+
+          if (!instance.isObjectEmpty(lsData)) {
+            _.forOwn(lsData, (value, key) => {
+              _.forEach(form.find(`input[name="${key}"]`), (item) => {
+                if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
+                  item.checked = true
+                  $(`label[for="${item.id}"] span`).addClass('active')
+                } else if (!Array.isArray(value)) {
+                  item.value = value
+                }
+              })
+            })
+            window.loadingCMJ('Atualizando listagem...')
+            form.submit()
+          }
+        }
+      } catch (error) {
+        console.error('Erro ao carregar filtros:', error)
+        localStorage.removeItem('portalcmj_emendaloa_filter')
+      }
+    } else {
+      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(formProps))
+    }
+
     const sAgrup = form.find('select[name="agrupamento"]')
     const rTipoAgrup = form.find('input[type="radio"][name="tipo_agrupamento"]')
     sAgrup.change((event) => {
@@ -127,21 +152,16 @@ window.AppLOA = function () {
         }
       }).change()
     form
-      .find('input[type="checkbox"]')
-      .change((event) => {
-        changeAction()
-      })
-    form
-      .find('input[type="text"]')
-      .change((event) => {
-        changeAction()
-      })
+      .find('input[type="checkbox"], input[type="text"]')
+      .on('change', changeAction)
+
     form
       .find('input[type="submit"]')
-      .click((event) => {
+      .on('click', function (event) {
         window.loadingCMJ('Gerando Listagem em PDF...')
       })
-    form.keypress((event) => {
+
+    form.on('keypress', function (event) {
       if (event.keyCode === 13) {
         event.preventDefault()
         return false

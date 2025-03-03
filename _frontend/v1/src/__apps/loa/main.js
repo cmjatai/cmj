@@ -49,45 +49,94 @@ window.AppLOA = function () {
   instance.EmendaLoaCrudLIST = function (container) {
     const form = container.find('form')
     const formData = new FormData(form[0])
-    const formProps = Object.fromEntries(formData)
+    const formProps = {}
+
+    for (const [key, value] of formData.entries()) {
+      if (key in formProps) {
+        if (!Array.isArray(formProps[key])) {
+          formProps[key] = [formProps[key]]
+        }
+        formProps[key].push(value)
+      } else {
+        if (value !== '') {
+          formProps[key] = value
+        }
+      }
+    }
 
     delete formProps.agrupamento
     delete formProps.tipo_agrupamento
     delete formProps.pdf
 
-    if (instance.isObjectEmpty(formProps)) {
-      const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
-      const lsData = JSON.parse(lsJson)
-
-      if (!instance.isObjectEmpty(lsData)) {
-        _.forOwn(lsData, (value, key) => {
-          _.forEach(form.find(`input[name="${key}"]`), (item) => {
-            if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
-              item.checked = true
-              $(`label[for="${item.id}"] span`).addClass('active')
-            } else {
-              item.value = value
-            }
-          })
-        })
-        window.loadingCMJ('Atualizando listagem...')
-        form.submit()
-      }
-    } else {
-      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(formProps))
-    }
-    let changeAction = function (event) {
+    // Função auxiliar para capturar os dados relevantes de filtro
+    const getFilterData = function () {
       const formData = new FormData(form[0])
       const parlamentares = formData.getAll('parlamentares')
       const fase = formData.getAll('fase')
-      const finalidade = formData.getAll('finalidade')
+      const finalidade = formData.get('finalidade')
       const tipo = formData.getAll('tipo')
-      const formProps = finalidade.length > 0 || tipo.length > 0 || fase.length > 0 || parlamentares.length > 0 ? { fase, parlamentares, tipo } : {}
-      const formJson = JSON.stringify(formProps)
-      localStorage.setItem('portalcmj_emendaloa_filter', formJson)
+
+      return {
+        parlamentares: parlamentares.length > 0 ? parlamentares : [],
+        fase: fase.length > 0 ? fase : [],
+        finalidade: finalidade !== '' ? [finalidade] : [],
+        tipo: tipo.length > 0 ? tipo : []
+      }
+    }
+
+    // Verifica se há filtros selecionados no formulário atual
+    if (instance.isObjectEmpty(formProps)) {
+      try {
+        const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
+
+        // Verifica se existe dados salvos e se são válidos
+        if (lsJson) {
+          const lsData = JSON.parse(lsJson)
+
+          if (!instance.isObjectEmpty(lsData)) {
+            _.forOwn(lsData, (value, key) => {
+              _.forEach(form.find(`input[name="${key}"]`), (item) => {
+                if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
+                  item.checked = true
+                  $(`label[for="${item.id}"] span`).addClass('active')
+                } else if (!Array.isArray(value)) {
+                  item.value = value
+                } else if (Array.isArray(value) && value.length > 0 && item.type === 'text') {
+                  // Tratamento específico para campos de texto que foram salvos como array
+                  item.value = value[0]
+                }
+              })
+            })
+
+            // Verifica se realmente tem filtros aplicados antes de submeter o form
+            const filterData = getFilterData()
+            if (!instance.isObjectEmpty(filterData)) {
+              window.loadingCMJ('Atualizando listagem...')
+              form.submit()
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao recuperar filtros do localStorage:', e)
+        // Limpa localStorage se houver erro no JSON
+        localStorage.removeItem('portalcmj_emendaloa_filter')
+      }
+    } else {
+      // Salva filtros atuais no localStorage
+      const filterData = getFilterData()
+      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(filterData))
+    }
+
+    // Simplifica a função de mudança para usar getFilterData
+    let changeAction = function (event) {
+      const filterData = getFilterData()
+      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(filterData))
+
       window.loadingCMJ('Atualizando listagem...')
       form.submit()
     }
+
+    // Resto do código permanece igual
     const sAgrup = form.find('select[name="agrupamento"]')
     const rTipoAgrup = form.find('input[type="radio"][name="tipo_agrupamento"]')
     sAgrup.change((event) => {

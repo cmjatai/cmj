@@ -33,7 +33,7 @@
       display: flex;
       align-items: center;
       color: lighten($color_text_menu, 15);
-      font-family: Lato, Helvetica, sans-serif;
+      font-family: Rubik, Helvetica, sans-serif;
       font-weight: 400;
       padding: 0 6px;
       &:hover {
@@ -48,7 +48,7 @@
     li {
       &:hover {
         position: relative;
-        background: $hover_background_20pw;
+        background: $hover_background_10pw;
         & > ul {
           display: block;
           left: 100%;
@@ -123,8 +123,8 @@
     li {
       ul {
         min-width: auto;
-        background: darken($color_primary, 5%) $url_bg_png;
         li {
+          background: darken($color_primary, 5%) $url_bg_png;
           padding: 0 20px;
 
           &.dropdown-header {
