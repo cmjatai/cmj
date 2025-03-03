@@ -123,8 +123,8 @@
     li {
       ul {
         min-width: auto;
+        background: darken($color_primary, 7%) $url_bg_png;
         li {
-          background: darken($color_primary, 5%) $url_bg_png;
           padding: 0 20px;
 
           &.dropdown-header {
