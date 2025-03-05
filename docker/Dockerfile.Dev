@@ -13,10 +13,12 @@ RUN pip install -r ia-requirements.txt
 #RUN pip install sentence-transformers
 
 ENV HOME=/var/cmjatai/cmj
-
-RUN adduser --home=/var/cmjatai/cmj --disabled-password --comment "" --shell=/bin/bash cmj
 RUN mkdir -p /var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj_media
+
+RUN addgroup --gid 1001 cmj
+RUN adduser --home=/var/cmjatai/cmj --uid 1001 --gid 1001 --disabled-password --comment "" --shell=/bin/bash cmj
+RUN chown -R cmj:cmj /var/cmjatai
 USER cmj
 
 WORKDIR ${HOME}

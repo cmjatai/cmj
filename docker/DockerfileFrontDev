@@ -6,22 +6,15 @@ ENV LC_ALL C.UTF-8
 #ENV RUN1_PACKAGES bash vim
 #RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
 
-# Define environment variables
-ENV USER_NAME=leandro
-ENV GROUP_NAME=leandro
-ENV USER_ID=$USER_ID
-ENV GROUP_ID=$GROUP_ID
-ENV USER_ID=${USER_ID:-1001}
-ENV GROUP_ID=${GROUP_ID:-1001}
+ENV HOME=/var/cmjatai/cmj/_frontend/v1
+RUN mkdir -p ${HOME}
 
-RUN addgroup --gid ${GROUP_ID} ${GROUP_NAME}
-RUN adduser --disabled-password --gecos '' --uid ${USER_ID} --ingroup ${GROUP_NAME} ${USER_NAME}
+RUN addgroup --gid 1001 cmj
+RUN adduser --home=${HOME} --uid 1001 --gid 1001 --disabled-password --comment "" --shell=/bin/bash cmj
+RUN chown -R cmj:cmj ${HOME}
+USER cmj
 
-RUN mkdir -p /var/cmjatai/cmj/_frontend/v1
-RUN chown -R leandro:leandro /var/cmjatai/cmj/_frontend/v1
-
-
-WORKDIR /var/cmjatai/cmj/_frontend/v1
+WORKDIR ${HOME}
 
 EXPOSE 8080/tcp
 
