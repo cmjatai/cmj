@@ -65,7 +65,7 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfile.Dev
     container_name: cmj
-    user: "root:root"
+    user: ${UID_GID}
     labels:
       NAME: "cmj"
     restart: no

@@ -1,4 +1,4 @@
-FROM python:3.12.7-bookworm
+FROM python:3.12.9-bookworm
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -12,7 +12,7 @@ RUN apt-get update && \
 ENV RUN0_PACKAGES="apt-utils apt-file libpq-dev build-essential pkg-config \
     libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
     libcairo2-dev software-properties-common graphviz graphviz-dev \
-    procps nmap git vim bash curl curl jq bash"
+    procps nmap git vim bash curl curl jq pngquant"
 RUN apt-get install -y --no-install-recommends $RUN0_PACKAGES
 
 ENV RUN1_PACKAGES="python3-dev python3-lxml python3-magic postgresql-client\
@@ -55,7 +55,9 @@ RUN tar vzxfp ghostscript-10.04.0.tar.gz
 WORKDIR /ghostscript/ghostscript-10.04.0
 RUN ./configure && make && make install
 
-WORKDIR /root
+ENV HOME=/root
+
+WORKDIR ${HOME}
 
 RUN fc-cache -fv && \
     pip3 install --no-cache-dir --upgrade pip setuptools

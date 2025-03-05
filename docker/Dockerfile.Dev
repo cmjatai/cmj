@@ -1,4 +1,4 @@
-FROM leandrojatai/portalcmj:base.0003
+FROM leandrojatai/portalcmj:base.0004
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -6,20 +6,20 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-RUN apt-get install -y --no-install-recommends pngquant
-
-COPY requirements/* $HOME
+COPY requirements/ia-requirements.txt $HOME
 RUN pip install -r ia-requirements.txt
-RUN pip install opencv-python
 
 #RUN pip install pgvector
 #RUN pip install sentence-transformers
+
+ENV HOME=/var/cmjatai/cmj
 
 RUN adduser --home=/var/cmjatai/cmj --disabled-password --comment "" --shell=/bin/bash cmj
 RUN mkdir -p /var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj_media
 USER cmj
-WORKDIR /var/cmjatai/cmj/
+
+WORKDIR ${HOME}
 
 ENV DEBIAN_FRONTEND=teletype
 

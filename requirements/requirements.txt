@@ -1,4 +1,4 @@
-django==4.2.18
+django==4.2.19
 django-image-cropping==1.7.0
 django-haystack==3.2.1
 django-extensions==3.2.3
@@ -12,8 +12,10 @@ python-telegram-bot==21.6
 django-crispy-forms==2.3
 crispy-bootstrap4==2024.1
 
-pytz==2024.2
-num2words==0.5.13
+
+ipython==8.33.0
+pytz==2025.1
+num2words==0.5.14
 
 gunicorn==23.0.0
 daphne==4.1.2
@@ -28,6 +30,8 @@ django-celery-results==2.5.1
 git+https://github.com/LeandroJatai/celery-haystack.git
 
 pymupdf==1.25.1
+pymupdf4llm==0.0.17
+
 ocrmypdf==16.8.0
 #pikepdf>=5.0.0,<6.0.0
 trml2pdf
@@ -76,8 +80,7 @@ unipath==1.1
 qrcode
 kazoo==2.8.0
 
-
-ipython
+opencv-python==4.11.0.86
 
 #git+https://github.com/interlegis/django-admin-bootstrapped.git
 #git+https://github.com/interlegis/trml2pdf.git

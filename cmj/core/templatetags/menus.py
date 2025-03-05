@@ -82,7 +82,6 @@ def sigad_navbar(context, field=None):
     if not user.is_superuser:
         menu = cache.get('portalcmj_menu_publico')
         if menu:
-            print('pelo cache.')
             return {
                 'menu': encapsule_menu_em_dropdown_portal(menu)
             }

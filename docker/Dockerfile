@@ -1,4 +1,4 @@
-FROM leandrojatai/portalcmj:base.0003
+FROM leandrojatai/portalcmj:base.0004
 
 # TODO:
 #    A imagem gerada a partir deste dockerfile
@@ -17,17 +17,15 @@ RUN mkdir -p /var/cmjatai/cmj_data
 RUN mkdir -p /var/cmjatai/cmj_media
 RUN mkdir -p /var/cmjatai/BD_POSTGRESQL
 
-WORKDIR /var/cmjatai/cmj/
+ENV HOME=/var/cmjatai/cmj
+WORKDIR ${HOME}
 
-# instalados na base
+# instalados na imagem base
 #COPY requirements/requirements.txt $HOME
 #RUN pip install -r /var/cmjatai/cmj/requirements.txt
 
-COPY requirements/* $HOME
+COPY requirements/ia-requirements.txt $HOME
 RUN pip install -r ia-requirements.txt
-
-RUN apt-get install -y --no-install-recommends pngquant
-RUN pip install opencv-python
 
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
