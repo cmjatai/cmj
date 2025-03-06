@@ -476,7 +476,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
-            ('finalidade', 'materia'),
+            ('finalidade'),
             'valor_computado',
             ('tipo', 'fase'),
             'parlamentares'
@@ -611,11 +611,11 @@ class EmendaLoaCrud(MasterDetailCrud):
                                 <a href="{reverse('sapl.materia:materialegislativa_detail',kwargs={'pk': item.materia.id})}">
                                 {item.materia.epigrafe_short}
                                 </a>
-                            </span> - 
+                            </span> -
                     '''
 
                 col_emenda = f'''
-                    
+
                     <div class="loa-mat">
                         {materia}
                         <small>
@@ -740,19 +740,23 @@ class EmendaLoaCrud(MasterDetailCrud):
                             if 'sem_registro' in cd['tipo_agrupamento']:
                                 continue
 
-                            qs_rc = item.registrocontabil_set.all()
+                            qs_rc = item.registrocontabil_set.order_by('valor')
 
                             registros = []
                             for rc in qs_rc:
 
                                 rc = str(rc).split(' - ')
+                                if '-' not in rc[0]:
+                                    rc0_split = rc[0].split(' ')
+                                    rc0_split[-1] = f'+{rc0_split[-1]}'
+                                    rc[0] = ' '.join(rc0_split)
                                 while len(rc[0]) < 17:
                                     rc[0] = rc[0].replace(' ', '  ', 1)
                                 rc[0] = rc[0].replace(' ', '&nbsp;')
                                 registros.append(f'<li>{" - ".join(rc)}</li>')
 
                             cols[0][0] = cols[0][0].replace(
-                                '<ul></ul>', f'<small class="courier">Deduções e Inserções:</small><ul>{"".join(registros)}</ul>')
+                                '<ul></ul>', f'<small class="courier"><small>AÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
 
                             """deducao_insercao = qs_rc.filter(
                                 **{
@@ -835,22 +839,34 @@ class EmendaLoaCrud(MasterDetailCrud):
         def hook_fase(self, *args, **kwargs):
             return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
 
+        def hook_header_finalidade(self, *args, **kwargs):
+            return 'Descrição da Emenda'
+
         def hook_finalidade(self, *args, **kwargs):
-            o = args[0].indicacao or ''
-            if o:
-                o = f'<small class="text-gray">{o}</small><br>'
+            emenda, display_base, url = args
 
-            f = args[1]
-            f = f'{f[0].upper()}{f[1:]}'
-            f = f'{o}{f}'
+            render = []
+            materia = emenda.materia
+            if materia:
+                render.append(f'<small><strong>Matéria Legislativa:</strong> {materia}</small><br>')
 
-            return f, args[2]
+            unidade_orcamentaria = emenda.unidade or emenda.indicacao
+            if unidade_orcamentaria:
+                render.append(f'<small class="text-gray"><strong>Órgão Executor:</strong> {unidade_orcamentaria}</small><br>')
 
-        def hook_materia(self, *args, **kwargs):
-            if args[0].materia:
-                return f'<small class="text-gray"><strong>Matéria Legislativa:</strong> {args[0].materia}<br><i>{args[0].materia.ementa}</i></small>', args[2]
-            else:
-                return '', args[2]
+            registrocontabil_insercao_set = emenda.registrocontabil_set.filter(
+                valor__gt=Decimal('0.00')
+            )
+            for rc in registrocontabil_insercao_set:
+                render.append(f'<small class="text-gray"><strong>Ação Orçamentária:</strong> {rc.despesa.acao}</small><br>')
+
+
+            finalidade = emenda.finalidade
+            finalidade = f'{finalidade[0].upper()}{finalidade[1:]}'
+            finalidade = f'<small class="text-gray"><strong>Entidade/Finalidade:</strong> {finalidade}</small><br>'
+            render.append(finalidade)
+
+            return ''.join(render), url
 
         def hook_parlamentares(self, *args, **kwargs):
             pls = []
