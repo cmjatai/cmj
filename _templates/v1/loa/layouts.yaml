@@ -70,7 +70,7 @@ RegistroAjusteLoa:
 
 RegistroAjusteLoaDetail:
   {% trans 'Dados Gerais' %}:
-  - tipo:2 emendaloa|fk_urlize_for_detail
+  - tipo:2 emendaloa
   - registroajusteloaparlamentar_set:5 descricao
 
 AgrupamentoCreate:

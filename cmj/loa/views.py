@@ -1366,6 +1366,15 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
                 'cmj.loa:oficioajusteloa_detail',
                 kwargs={'pk': self.object.oficio_ajuste_loa_id})
 
+        def hook_emendaloa(self, obj, verbose_name='', field_display=''):
+            if not obj.emendaloa:
+                return '', ''
+
+            url = reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': obj.emendaloa.id})
+            field_display = f'{obj.emendaloa.materia.epigrafe_short} - {obj.emendaloa.indicacao}<br>{obj.emendaloa.finalidade}'
+            field_display = f'<a href="{url}">{field_display}</a>'
+            return verbose_name, field_display
+
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = RegistroAjusteLoaForm
 
