@@ -183,6 +183,13 @@
       right: 0;
       color: green;
     }
+    .text-muted {
+      display: block;
+      font-size: 70%;
+      text-align: center;
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
   }
   &.emendaloa-update, &.agrupamento-update {
     .busca-render-emendaloa, .emendaloa-selecteds {

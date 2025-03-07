@@ -1,6 +1,7 @@
 from decimal import Decimal
 import logging
 
+from attr import field
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
@@ -23,6 +24,7 @@ from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, UnidadeOrcamentaria
 from cmj.utils import make_pdf
+from sapl import parlamentares
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Parlamentar
 
@@ -1242,7 +1244,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
-            'epigrafe', 'parlamentares'
+            'registroajusteloa_set'
         ]
 
     class CreateView(MasterDetailCrud.CreateView):
@@ -1268,6 +1270,58 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
         def get_queryset(self):
             return MasterDetailCrud.ListView.get_queryset(self)
 
+        def hook_header_registroajusteloa_set(self):
+            return 'Registros de Ajuste Técnico'
+
+        def hook_registroajusteloa_set(self, obj, field_display='', url=''):
+            ajustes = []
+
+            url = reverse_lazy(
+                'cmj.loa:oficioajusteloa_detail',
+                kwargs={'pk': obj.id})
+
+            epigrafe = f'<h2><a class="text-nowrap" href="{url}">{obj.epigrafe}</a></h2>'
+            ajustes.append(epigrafe)
+
+            parlamentares = ' - '.join(map(lambda x: str(x), obj.parlamentares.all()))
+            ajustes.append(f'<h4><strong>Parlamentares:</strong> {parlamentares}</h4>')
+
+            for ajuste in obj.registroajusteloa_set.all():
+                url = reverse_lazy(
+                    'cmj.loa:registroajusteloa_detail',
+                    kwargs={'pk': ajuste.id})
+
+                a_str = f'R$ {ajuste.str_valor}'
+                if ajuste.soma_valor < Decimal('0.00'):
+                    a_str = f'<span class="text-danger">{a_str}</span>'
+                elif ajuste.soma_valor == Decimal('0.00'):
+                    a_str = f'<span class="text-danger">R$ 0,00</span>'
+
+                emenda_epigrafe = ajuste.emendaloa.materia.epigrafe_short if ajuste.emendaloa else ""
+                emenda_epigrafe = f'<strong>Emenda:</strong> {emenda_epigrafe if emenda_epigrafe else "Ajuste sem ligação com emenda impositiva."}<br>'
+
+                a_str = f'''
+                    <tr>
+                        <td align="center">
+                            <a href="{url}">
+                                <strong style="white-space: nowrap">
+                                    {a_str}
+                                </strong>
+                            </a>
+                        </td>
+                        <td>
+                          {emenda_epigrafe}
+                          <small>
+                            <em>{ajuste.descricao}</em>
+                          </small>
+                        </td>
+                    </tr>
+                '''
+
+                ajustes.append(a_str)
+
+            return f'<table>{"".join(ajustes)}</table>', ''
+
     class DetailView(MasterDetailCrud.DetailView):
         template_name = 'loa/oficioajusteloa_detail.html'
         paginate_by = 100
@@ -1279,11 +1333,22 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
         def hook_header_str_valor(self):
             return 'Valor (R$)'
 
+        def hook_str_valor(self, obj, verbose_name='', field_display=''):
+            return verbose_name, f'{field_display if field_display != "0" else "0,00"}'
+
+        def hook_descricao(self, obj, verbose_name='', field_display=''):
+
+            emenda_epigrafe = obj.emendaloa.materia.epigrafe_short if obj.emendaloa else ""
+            emenda_epigrafe = f'<strong>Emenda:</strong> {emenda_epigrafe if emenda_epigrafe else "Ajuste sem ligação com emenda impositiva."}<br>'
+
+            return verbose_name, f'{emenda_epigrafe}<em>{field_display}</em>'
+
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             path = context.get('path', '')
             context['path'] = f'{path} oficioajusteloa-detail'
             return context
+
 
 
 class RegistroAjusteLoaCrud(MasterDetailCrud):

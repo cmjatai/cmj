@@ -812,11 +812,23 @@ class CrudDetailView(PermissionRequiredContainerCrudMixin,
 
     def _as_row(self, obj):
         try:
-            return [(
-                get_field_display(obj, name)[1],
-                self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,))
-                if i == 0 else None)
-                for i, name in enumerate(self.list_field_names_set)]
+            try:
+                r = []
+                for i, name in enumerate(self.list_field_names_set):
+                    c = self.get_column(name, '', obj=obj).get('text', '')
+                    r.append(
+                        (
+                            c,
+                            self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,)) if not i else None
+                        )
+                    )
+                return r
+            except Exception as e:
+                return [(
+                    get_field_display(obj, name)[1],
+                    self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,))
+                    if i == 0 else None)
+                    for i, name in enumerate(self.list_field_names_set)]
         except Exception as e:
             username = self.request.user.username
             self.logger.error("user=" + username + ". " + str(e))

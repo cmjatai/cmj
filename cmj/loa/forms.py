@@ -908,11 +908,12 @@ class EmendaLoaFilterSet(FilterSet):
 
     parlamentares = LoaParlModelMultipleChoiceFilter(
         queryset=Parlamentar.objects.all(),
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple,
+        help_text='Clique nos parlamentares para adicionar ou remover do filtro.',
     )
 
     finalidade = CharFilter(label='Busca por termos',
-                            help_text='Filtra os termos acima nos campos finalidade e Unidade Orçamentária',
+                            help_text='Filtra os termos acima nos campos finalidade ou Unidade Orçamentária',
                             method='filter_finalidade')
 
     class Meta:
@@ -948,6 +949,13 @@ class EmendaLoaFilterSet(FilterSet):
             html = re.sub(
                 '<div><div class="custom-control custom-checkbox">',
                 '<div class="container-avatar d-flex justify-content-center w-100"><div class="custom-control custom-checkbox">',
+                html, count=1)
+
+            help_text_parlamentares = f'<small id="hint_id_parlamentares" class="form-text text-muted">{form.fields["parlamentares"].help_text}</small>\n</div>'
+            help_reverse = help_text_parlamentares.split('\n')
+            html = re.sub(
+                help_text_parlamentares,
+                f'{help_reverse[1]}\n{help_reverse[0]}',
                 html, count=1)
 
             html_parts = []

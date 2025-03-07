@@ -173,7 +173,7 @@ class EmendaLoa(models.Model):
     APROVACAO_LEGISLATIVA = 25
     APROVACAO_LEGAL = 30
     IMPEDIMENTO_TECNICO = 40
-    IMPEDIMENTO_OFICIADO = 50
+    IMPEDIMENTO_SANADO = 50
     FASE_CHOICE = (
         (PROPOSTA, _('Proposta Legislativa')),
         (PROPOSTA_LIBERADA, _('Proposta Liberada para Edição Contábil')),
@@ -183,7 +183,7 @@ class EmendaLoa(models.Model):
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
         (IMPEDIMENTO_TECNICO, _('Impedimento Técnico')),
-        (IMPEDIMENTO_OFICIADO, _('Impedimento Técnico Oficiado'))
+        (IMPEDIMENTO_SANADO, _('Impedimento Técnico Sanado'))
     )
 
     metadata = JSONField(
@@ -479,6 +479,14 @@ class RegistroAjusteLoa(models.Model):
 
     @property
     def str_valor(self):
+        soma = self.soma_valor
+        str_v = formats.number_format(soma, force_grouping=True)
+        if '-' in str_v:
+            str_v = f'({str_v[1:]})'
+        return str_v
+
+    @property
+    def soma_valor(self):
         soma = sum(
             list(
                 filter(
@@ -487,10 +495,7 @@ class RegistroAjusteLoa(models.Model):
                 )
             )
         )
-        str_v = formats.number_format(soma, force_grouping=True)
-        if '-' in str_v:
-            str_v = f'({str_v[1:]})'
-        return str_v
+        return soma
 
     def __str__(self):
         return f'R$ {self.str_valor} - {self.oficio_ajuste_loa}'

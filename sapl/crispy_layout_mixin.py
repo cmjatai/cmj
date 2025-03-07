@@ -272,8 +272,9 @@ class CrispyLayoutFormMixin:
             rows = self.get_layout_set()[0][1:]
             return [fieldname for row in rows for fieldname, __ in row]
 
-    def get_column(self, fieldname, span):
-        obj = self.get_object()
+    def get_column(self, fieldname, span, obj=None):
+        if not obj:
+            obj = self.get_object()
 
         func = None
         if '|' in fieldname:
