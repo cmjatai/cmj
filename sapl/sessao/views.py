@@ -1410,7 +1410,7 @@ class SessaoCrud(Crud):
 
             response = Crud.DetailView.get(self, request, *args, **kwargs)
 
-            if 'add_selo_votacao' in request.GET:
+            if 'add_selo_votacao' in request.GET and self.user.has_perm('sessao.add_sessaoplenaria'):
                 if self.object.tipo.gera_selo_votacao:
                     self.add_selo_votacao()
                     messages.add_message(

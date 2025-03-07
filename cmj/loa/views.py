@@ -1302,7 +1302,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
                 a_str = f'''
                     <tr>
-                        <td align="center">
+                        <td align="right">
                             <a href="{url}">
                                 <strong style="white-space: nowrap">
                                     {a_str}
