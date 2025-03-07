@@ -335,11 +335,24 @@ def customize_link_materia(context, pk, has_permission, user=None):
 
         #                   <b>Processo:</b> %s </br>
 
-        url_prot_mostrar = reverse('sapl.protocoloadm:protocolo_homologar',
-                kwargs={'pk': obj.materia.protocolo_gr.first().pk})
+        action_signs = ''
+        if user.is_superuser:
+            url_prot_mostrar = reverse('sapl.protocoloadm:protocolo_homologar',
+                    kwargs={'pk': obj.materia.protocolo_gr.first().pk})
 
-        url_sessao_detail = reverse('sapl.sessao:sessaoplenaria_detail',
-                kwargs={'pk': pk}) + f'?add_selo_votacao&materia_unica={obj.materia.id}'
+            url_sessao_detail = reverse('sapl.sessao:sessaoplenaria_detail',
+                    kwargs={'pk': pk}) + f'?add_selo_votacao&materia_unica={obj.materia.id}'
+            action_signs = f'''
+                <div class="d-none actions-signs">
+                    <div class="preview"></div>
+                    <div class="d-flex actions flex-column justify-content-center">
+                        <a class="btn btn-link" target="blank" href="{url_prot_mostrar}?recreate&compression=True">SPcc</a>
+                        <a class="btn btn-link" target="blank" href="{url_prot_mostrar}?recreate&compression=False">SPsc</a>
+
+                        <a class="btn btn-link" target="blank" href="{url_sessao_detail}&compression=True">SVcc</a>
+                        <a class="btn btn-link" target="blank" href="{url_sessao_detail}&compression=False">SVsc</a>
+                    </div>
+                </div>'''
 
         title_materia = f'''
         <div class="d-flex ordemdia_materia justify-content-between align-items-center" id="mat_od_%s">
@@ -354,16 +367,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
                 <b>Protocolo:</b> {num_protocolo if num_protocolo else ''} </br>
                 <b>Turno:</b> {turno} </br>
             </div>
-            <div class="d-none actions-signs">
-                <div class="preview"></div>
-                <div class="d-flex actions flex-column justify-content-center">
-                    <a class="btn btn-link" target="blank" href="{url_prot_mostrar}?recreate&compression=True">SPcc</a>
-                    <a class="btn btn-link" target="blank" href="{url_prot_mostrar}?recreate&compression=False">SPsc</a>
-
-                    <a class="btn btn-link" target="blank" href="{url_sessao_detail}&compression=True">SVcc</a>
-                    <a class="btn btn-link" target="blank" href="{url_sessao_detail}&compression=False">SVsc</a>
-                </div>
-            </div>
+            {action_signs}
         </div>'''
 
 
