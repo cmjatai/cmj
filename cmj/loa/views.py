@@ -228,6 +228,7 @@ class LoaCrud(Crud):
             template = loader.get_template('loa/loaparlamentar_set_list.html')
 
             loaparlamentares = l.loaparlamentar_set.order_by(
+                '-parlamentar__ativo',
                 'parlamentar__nome_parlamentar')
 
             resumo_emendas_impositivas = []
@@ -309,49 +310,19 @@ class LoaCrud(Crud):
                         resumo_parlamentar[k]['impedimento_tecnico']
                     )
 
-                    '''
-                    params.update(
-                        dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
-                    impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
-                        **params).aggregate(Sum('valor'))
-
-                    resumo_parlamentar[k]['impedimento_tecnico'] = (
-                        impedimento_tecnico['valor__sum'] or Decimal('0.00')
-                    )
-
-                    ajuste_remanescente = RegistroAjusteLoaParlamentar.objects.filter(
-                        parlamentar=lp.parlamentar,
-                        registro__oficio_ajuste_loa__loa=l,
-                        registro__tipo=k,
-                    ).exclude(
-                        registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
-                    ).aggregate(Sum('valor'))
-
-                    ajuste_de_impedimento = RegistroAjusteLoaParlamentar.objects.filter(
-                        parlamentar=lp.parlamentar,
-                        registro__emendaloa__tipo=k,
-                        registro__oficio_ajuste_loa__loa=l,
-                        registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
-                    ).aggregate(Sum('valor'))
-
-                    resumo_parlamentar[k]['impedimento_tecnico'] += (
-                        ajuste_de_impedimento['valor__sum'] or Decimal('0.00')
-                    )
-
-                    resumo_parlamentar[k]['ja_destinado'] += (
-                        ajuste_remanescente['valor__sum'] or Decimal('0.00')
-                    )
-
-                    resumo_parlamentar[k]['sem_destinacao'] = \
-                        resumo_parlamentar[k]['sem_destinacao'] - \
-                        resumo_parlamentar[k]['ja_destinado'] - \
-                        resumo_parlamentar[k]['impedimento_tecnico']
-                    '''
                     totais[k]['ja_destinado'] += resumo_parlamentar[k]['ja_destinado']
                     totais[k]['impedimento_tecnico'] += resumo_parlamentar[k]['impedimento_tecnico']
                     totais[k]['sem_destinacao'] += resumo_parlamentar[k]['sem_destinacao']
 
                 resumo_emendas_impositivas.append(resumo_parlamentar)
+
+            resumo_emendas_impositivas.sort(
+                key=lambda x: (
+                    not x['loaparlamentar'].parlamentar.ativo,
+                    -x[10]['ja_destinado'],
+                    x['loaparlamentar'].parlamentar.nome_parlamentar
+                )
+            )
 
             is_us = self.request.user.is_superuser
 
@@ -391,6 +362,44 @@ class LoaCrud(Crud):
 
             return 'Resumo Geral das Emendas Impositivas Parlamentares', rendered
 
+            '''
+            params.update(
+                dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
+            impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
+                **params).aggregate(Sum('valor'))
+
+            resumo_parlamentar[k]['impedimento_tecnico'] = (
+                impedimento_tecnico['valor__sum'] or Decimal('0.00')
+            )
+
+            ajuste_remanescente = RegistroAjusteLoaParlamentar.objects.filter(
+                parlamentar=lp.parlamentar,
+                registro__oficio_ajuste_loa__loa=l,
+                registro__tipo=k,
+            ).exclude(
+                registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+            ).aggregate(Sum('valor'))
+
+            ajuste_de_impedimento = RegistroAjusteLoaParlamentar.objects.filter(
+                parlamentar=lp.parlamentar,
+                registro__emendaloa__tipo=k,
+                registro__oficio_ajuste_loa__loa=l,
+                registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
+            ).aggregate(Sum('valor'))
+
+            resumo_parlamentar[k]['impedimento_tecnico'] += (
+                ajuste_de_impedimento['valor__sum'] or Decimal('0.00')
+            )
+
+            resumo_parlamentar[k]['ja_destinado'] += (
+                ajuste_remanescente['valor__sum'] or Decimal('0.00')
+            )
+
+            resumo_parlamentar[k]['sem_destinacao'] = \
+                resumo_parlamentar[k]['sem_destinacao'] - \
+                resumo_parlamentar[k]['ja_destinado'] - \
+                resumo_parlamentar[k]['impedimento_tecnico']
+            '''
 
 class UnidadeOrcamentariaCrud(MasterDetailCrud):
     model = UnidadeOrcamentaria

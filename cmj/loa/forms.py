@@ -27,7 +27,7 @@ from cmj.utils import normalize
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
-from sapl.utils import FileFieldCheckMixin
+from sapl.utils import FileFieldCheckMixin, parlamentares_ativos
 
 
 logger = logging.getLogger(__name__)
@@ -101,8 +101,8 @@ class MateriaCheckFormMixin:
 class LoaParlModelMultipleChoiceFilter(ModelMultipleChoiceFilter):
 
     def get_queryset(self, request):
-        return self.parent.loa.parlamentares.all()
-
+        return self.parent.loa.parlamentares.filter(
+                emendaloaparlamentar_set__isnull=False).distinct()
 
 class LoaForm(MateriaCheckFormMixin, ModelForm):
 
@@ -147,9 +147,19 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        instance = self.instance
+
+        if not instance or not instance.pk or not instance.materia:
+            parlamentares = Parlamentar.objects.filter(ativo=True)
+        else:
+            ano_materia = instance.materia.ano
+            parlamentares = Parlamentar.objects.filter(
+                Q(ativo=True) | Q(emendaloaparlamentar_set__emendaloa__materia__ano=ano_materia)
+            ).distinct()
         self.fields['parlamentares'].choices = [
-            (p.pk, p) for p in Parlamentar.objects.filter(ativo=True)
+            (p.pk, p) for p in parlamentares
         ]
+
 
     def clean(self):
         cd = super().clean()
@@ -159,7 +169,7 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 
         try:
             yo = yaml.full_load(cd['yaml_obs'])
-            print(yo)
+            #print(yo)
         except Exception as e:
             raise ValidationError(
                 'Erro na validação das observações de Rodapé.')
@@ -186,6 +196,9 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             i.perc_disp_diversos / Decimal(100),
             rounding=ROUND_DOWN)
 
+        if not i.materia or not i.materia.normajuridica():
+            i.rcl_previa = i.receita_corrente_liquida
+
         # if i.disp_diversos + i.disp_saude != i.disp_total:
         #    i.disp_diversos = i.disp_total - i.disp_saude
         #    i.perc_disp_diversos = quantize(
@@ -194,27 +207,10 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 
         i = super().save(commit)
 
-        lps = i.loaparlamentar_set.all()
-        count_lps = lps.count()
-
-        if count_lps:
-            idtp = quantize(i.disp_total / Decimal(count_lps),
-                            rounding=ROUND_DOWN)
-            idsp = quantize(i.disp_saude / Decimal(count_lps),
-                            rounding=ROUND_DOWN)
-            iddp = quantize(i.disp_diversos / Decimal(count_lps),
-                            rounding=ROUND_DOWN)
-
-            # if iddp + idsp != idtp:
-            #    iddp = idtp - idsp
-
-            for lp in lps:
-                lp.disp_total = idtp
-                lp.disp_saude = idsp
-                lp.disp_diversos = iddp
-                lp.save()
+        i.update_disponibilidades()
 
         return i
+
 
 
 class EmendaLoaValorWidget(SplitArrayWidget):

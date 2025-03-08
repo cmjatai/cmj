@@ -24,17 +24,21 @@
     {% endif %}
     <tr>
       <th class="text-left font-weight-bold">
-        <a href="{% url 'cmj.loa:emendaloa_list' lp.loaparlamentar.loa.id %}?parlamentares={{ lp.loaparlamentar.parlamentar.id }}">
-          {{lp.loaparlamentar.parlamentar}}
-        </a>
+        <div class="d-flex justify-content-between">
+          <a href="{% url 'cmj.loa:emendaloa_list' lp.loaparlamentar.loa.id %}?parlamentares={{ lp.loaparlamentar.parlamentar.id }}">
+            {{lp.loaparlamentar.parlamentar}} {% if lp.loaparlamentar.parlamentar.ativo %}<span class="ml-2 badge badge-success">Ativo</span>{% else %}<span class="ml-2 badge badge-danger">Inativo</span>{% endif %}</span>
+          </a>
+          <small title="Disponibidade Total = Saúde + Diversos">{{lp.loaparlamentar.disp_total|decimal2str}}</small>
+        </div>
       </th>
-      {% if columns.saude.ja_destinado %}<td class="text-right text-blue">{{lp.10.ja_destinado|decimal2str}}</td>{% endif %}
-      {% if columns.saude.impedimento_tecnico %}<td class="text-right text-red">{{lp.10.impedimento_tecnico|decimal2str}}</td>{% endif %}
-      {% if columns.saude.sem_destinacao %}<td class="text-right text-orange">{{lp.10.sem_destinacao|decimal2str}}</td>{% endif %}
 
-      {% if columns.diversos.ja_destinado %}<td class="text-right text-blue">{{lp.99.ja_destinado|decimal2str}}</td>{% endif %}
-      {% if columns.diversos.impedimento_tecnico %}<td class="text-right text-red">{{lp.99.impedimento_tecnico|decimal2str}}</td>{% endif %}
-      {% if columns.diversos.sem_destinacao %}<td class="text-right text-orange">{{lp.99.sem_destinacao|decimal2str}}</td>{% endif %}
+      {% if columns.saude.ja_destinado %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-blue{% else %}text-gray{% endif %}">{{lp.10.ja_destinado|decimal2str}}</td>{% endif %}
+      {% if columns.saude.impedimento_tecnico %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-red{% else %}text-gray{% endif %}">{{lp.10.impedimento_tecnico|decimal2str}}</td>{% endif %}
+      {% if columns.saude.sem_destinacao %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-orange{% else %}text-gray{% endif %}">{{lp.10.sem_destinacao|decimal2str}}</td>{% endif %}
+
+      {% if columns.diversos.ja_destinado %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-blue{% else %}text-gray{% endif %}">{{lp.99.ja_destinado|decimal2str}}</td>{% endif %}
+      {% if columns.diversos.impedimento_tecnico %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-red{% else %}text-gray{% endif %}">{{lp.99.impedimento_tecnico|decimal2str}}</td>{% endif %}
+      {% if columns.diversos.sem_destinacao %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-orange{% else %}text-gray{% endif %}">{{lp.99.sem_destinacao|decimal2str}}</td>{% endif %}
     </tr>
     {% endfor %}
   </table>

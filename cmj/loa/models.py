@@ -43,6 +43,11 @@ class Loa(models.Model):
         related_name='loa',
         on_delete=PROTECT)
 
+    rcl_previa = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        verbose_name=_('Receita Corrente Líquida - Prévia (R$)'),
+    )
+
     receita_corrente_liquida = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal('0.00'),
         verbose_name=_('Receita Corrente Líquida - RCL (R$)'),
@@ -112,6 +117,87 @@ class Loa(models.Model):
         nj = self.materia.normajuridica() if self.materia else ''
         descr = nj or (self.materia or '')
         return f'LOA {self.ano} - {descr}'
+
+    def update_disponibilidades(self):
+
+        def set_values_for_lp(lp, disp_total, disp_saude, disp_diversos, count_lps):
+            idtp = quantize(disp_total / Decimal(count_lps), rounding=ROUND_DOWN)
+            idsp = quantize(disp_saude / Decimal(count_lps), rounding=ROUND_DOWN)
+            iddp = quantize(disp_diversos / Decimal(count_lps), rounding=ROUND_DOWN)
+            # if iddp + idsp != idtp:
+            #    iddp = idtp - idsp
+            lp.disp_total = idtp
+            lp.disp_saude = idsp
+            lp.disp_diversos = iddp
+
+        lps = self.loaparlamentar_set.all()
+        if not lps.filter(parlamentar__ativo=False).exists():
+            count_lps = lps.count()
+            if count_lps:
+                for lp in lps:
+                    set_values_for_lp(lp, self.disp_total, self.disp_saude, self.disp_diversos, count_lps)
+                    lp.save()
+            return self
+
+        disp_previa_total = quantize(self.rcl_previa * self.perc_disp_total / Decimal(100), rounding=ROUND_DOWN)
+        disp_previa_saude = quantize(self.rcl_previa * self.perc_disp_saude / Decimal(100), rounding=ROUND_DOWN)
+        disp_previa_diversos = quantize(self.rcl_previa * self.perc_disp_diversos / Decimal(100), rounding=ROUND_DOWN)
+
+        parlamentares_ativos_sem_emendas = Parlamentar.objects.filter(
+            ativo=True, emendaloaparlamentar_set__isnull=True)
+
+        parlamentares_ativos_com_emendas = Parlamentar.objects.filter(
+            ativo=True).exclude(emendaloaparlamentar_set__isnull=True).distinct()
+
+        parlamentares_inativos_com_emendas = Parlamentar.objects.filter(
+            ativo=False).exclude(emendaloaparlamentar_set__isnull=True).distinct()
+
+        imp_inativos_saude = Decimal('0.00')
+        imp_inativos_diversos = Decimal('0.00')
+        for lp in lps:
+            if lp.parlamentar in parlamentares_inativos_com_emendas:
+                soma_imp_saude = lp.parlamentar.emendaloaparlamentar_set.filter(
+                    emendaloa__loa = self,
+                    emendaloa__fase = EmendaLoa.IMPEDIMENTO_TECNICO,
+                    emendaloa__tipo = EmendaLoa.SAUDE
+                ).aggregate(Sum('valor'))
+                soma_imp_diversos = lp.parlamentar.emendaloaparlamentar_set.filter(
+                    emendaloa__loa = self,
+                    emendaloa__fase = EmendaLoa.IMPEDIMENTO_TECNICO,
+                    emendaloa__tipo = EmendaLoa.DIVERSOS
+                ).aggregate(Sum('valor'))
+
+                soma_imp_saude = soma_imp_saude['valor__sum'] or Decimal('0.00')
+                soma_imp_diversos = soma_imp_diversos['valor__sum'] or Decimal('0.00')
+                dps = disp_previa_saude
+                dpd = disp_previa_diversos
+                set_values_for_lp(
+                    lp, dps + dpd, dps, dpd, parlamentares_ativos_com_emendas.count() + parlamentares_inativos_com_emendas.count()
+                )
+                lp.disp_total -= soma_imp_saude + soma_imp_diversos
+                lp.disp_saude -= soma_imp_saude
+                lp.disp_diversos -= soma_imp_diversos
+                lp.save()
+                imp_inativos_saude += soma_imp_saude
+                imp_inativos_diversos += soma_imp_diversos
+
+        for lp in lps:
+            if lp.parlamentar in parlamentares_ativos_com_emendas:
+                set_values_for_lp(
+                    lp, self.disp_total + imp_inativos_saude + imp_inativos_diversos,
+                    self.disp_saude + imp_inativos_saude,
+                    self.disp_diversos + imp_inativos_diversos,
+                    parlamentares_ativos_com_emendas.count() + parlamentares_ativos_sem_emendas.count()
+                    )
+            elif lp.parlamentar in parlamentares_ativos_sem_emendas:
+                set_values_for_lp(
+                    lp,
+                    self.disp_total - disp_previa_total + imp_inativos_saude + imp_inativos_diversos,
+                    self.disp_saude - disp_previa_saude + imp_inativos_saude,
+                    self.disp_diversos - disp_previa_diversos + imp_inativos_diversos,
+                    parlamentares_ativos_com_emendas.count() + parlamentares_ativos_com_emendas.count()
+                    )
+            lp.save()
 
 
 class LoaParlamentar(models.Model):
@@ -333,8 +419,10 @@ class EmendaLoa(models.Model):
             self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.unidade:
             self.indicacao = self.unidade.especificacao
-
-        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+            
+        r = models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        self.loa.update_disponibilidades()
+        return r
 
 
 class EmendaLoaParlamentar(models.Model):

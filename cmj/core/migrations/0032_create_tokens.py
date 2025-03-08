@@ -17,5 +17,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(adiciona_token_de_usuarios)
+        migrations.RunPython(adiciona_token_de_usuarios) 
     ]
