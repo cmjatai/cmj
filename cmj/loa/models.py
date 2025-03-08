@@ -121,12 +121,11 @@ class Loa(models.Model):
     def update_disponibilidades(self):
 
         def set_values_for_lp(lp, disp_total, disp_saude, disp_diversos, count_lps):
-            idtp = quantize(disp_total / Decimal(count_lps), rounding=ROUND_DOWN)
             idsp = quantize(disp_saude / Decimal(count_lps), rounding=ROUND_DOWN)
             iddp = quantize(disp_diversos / Decimal(count_lps), rounding=ROUND_DOWN)
             # if iddp + idsp != idtp:
             #    iddp = idtp - idsp
-            lp.disp_total = idtp
+            lp.disp_total = idsp + iddp
             lp.disp_saude = idsp
             lp.disp_diversos = iddp
 
@@ -139,10 +138,6 @@ class Loa(models.Model):
                     lp.save()
             return self
 
-        disp_previa_total = quantize(self.rcl_previa * self.perc_disp_total / Decimal(100), rounding=ROUND_DOWN)
-        disp_previa_saude = quantize(self.rcl_previa * self.perc_disp_saude / Decimal(100), rounding=ROUND_DOWN)
-        disp_previa_diversos = quantize(self.rcl_previa * self.perc_disp_diversos / Decimal(100), rounding=ROUND_DOWN)
-
         parlamentares_ativos_sem_emendas = Parlamentar.objects.filter(
             ativo=True, emendaloaparlamentar_set__isnull=True)
 
@@ -151,6 +146,16 @@ class Loa(models.Model):
 
         parlamentares_inativos_com_emendas = Parlamentar.objects.filter(
             ativo=False).exclude(emendaloaparlamentar_set__isnull=True).distinct()
+
+        count_parlamentares_ativos = Decimal(parlamentares_ativos_com_emendas.count() + parlamentares_ativos_sem_emendas.count())
+
+        disp_previa_total = quantize(self.rcl_previa * self.perc_disp_total / Decimal(100), rounding=ROUND_DOWN)
+        disp_previa_saude = quantize(self.rcl_previa * self.perc_disp_saude / Decimal(100), rounding=ROUND_DOWN)
+        disp_previa_diversos = quantize(self.rcl_previa * self.perc_disp_diversos / Decimal(100), rounding=ROUND_DOWN)
+
+        disp_previa_total = quantize(disp_previa_total / count_parlamentares_ativos, rounding=ROUND_DOWN) * count_parlamentares_ativos
+        disp_previa_saude = quantize(disp_previa_saude / count_parlamentares_ativos, rounding=ROUND_DOWN) * count_parlamentares_ativos
+        disp_previa_diversos = quantize(disp_previa_diversos / count_parlamentares_ativos, rounding=ROUND_DOWN) * count_parlamentares_ativos
 
         imp_inativos_saude = Decimal('0.00')
         imp_inativos_diversos = Decimal('0.00')
@@ -181,13 +186,15 @@ class Loa(models.Model):
                 imp_inativos_saude += soma_imp_saude
                 imp_inativos_diversos += soma_imp_diversos
 
+
+
         for lp in lps:
             if lp.parlamentar in parlamentares_ativos_com_emendas:
                 set_values_for_lp(
                     lp, self.disp_total + imp_inativos_saude + imp_inativos_diversos,
                     self.disp_saude + imp_inativos_saude,
                     self.disp_diversos + imp_inativos_diversos,
-                    parlamentares_ativos_com_emendas.count() + parlamentares_ativos_sem_emendas.count()
+                    count_parlamentares_ativos
                     )
             elif lp.parlamentar in parlamentares_ativos_sem_emendas:
                 set_values_for_lp(
@@ -195,7 +202,7 @@ class Loa(models.Model):
                     self.disp_total - disp_previa_total + imp_inativos_saude + imp_inativos_diversos,
                     self.disp_saude - disp_previa_saude + imp_inativos_saude,
                     self.disp_diversos - disp_previa_diversos + imp_inativos_diversos,
-                    parlamentares_ativos_com_emendas.count() + parlamentares_ativos_com_emendas.count()
+                    count_parlamentares_ativos
                     )
             lp.save()
 
@@ -419,7 +426,7 @@ class EmendaLoa(models.Model):
             self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.unidade:
             self.indicacao = self.unidade.especificacao
-            
+
         r = models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
         self.loa.update_disponibilidades()
         return r
