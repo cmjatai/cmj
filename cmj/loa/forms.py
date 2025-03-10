@@ -797,7 +797,7 @@ class RegistroAjusteLoaForm(ModelForm):
             self.emendas.update(map(lambda e: e.emendaloa, emendas))
 
         self.fields['emendaloa'].choices = [('', '---------')] + [
-            (e.pk, f'{e} - {e.materia.epigrafe_short if e.materia else ""}') for e in self.emendas
+            (e.pk, f'{e.materia.epigrafe_short if e.materia else ""} - {e}') for e in self.emendas
         ]
 
         initial_pv = []
@@ -818,7 +818,8 @@ class RegistroAjusteLoaForm(ModelForm):
             widget=self.fields['parlamentares__valor'].base_field.widget,
             parlamentares=list(self.parlamentares),
             user=None,
-            attrs={'class': 'text-right'}
+            attrs={'class': 'text-right'},
+            instance=self.instance
         )
 
     def save(self, commit=True):
