@@ -1,0 +1,16 @@
+@import '_variables.scss';
+
+body, html {
+  font-size: 1rem;
+}
+
+body {
+  background-image: $url_bg_png;
+
+  &.body-print {
+    background: #fff;
+    #wrapper {
+      padding: 0;
+    }
+  }
+}
