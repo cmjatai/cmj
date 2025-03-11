@@ -243,7 +243,7 @@ class LoaCrud(Crud):
                 result = f'''
                     {field_display}
                     <em>({percentage:3.1f}%)</em>
-                    <small><small class="text-gray"><hr><em>Valor por Parlamentar:</em>
+                    <small><small class="text-gray"><hr><em>Valor por Parlamentar</em>
                         <strong>R$ {valor_por_parlamentar}</strong>
                     </small></small>
                 '''
