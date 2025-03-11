@@ -1,4 +1,4 @@
-from decimal import Decimal
+from decimal import ROUND_DOWN, Decimal
 import logging
 
 from attr import field
@@ -22,7 +22,7 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
     RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
-    Agrupamento, UnidadeOrcamentaria
+    Agrupamento, UnidadeOrcamentaria, quantize
 from cmj.utils import make_pdf
 from sapl import parlamentares
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
@@ -212,20 +212,55 @@ class LoaCrud(Crud):
                 field_display = field_display.replace(
                     strm, l.materia.epigrafe_short)
             return verbose_name, field_display
+        def _hook_disp_generic(self, l, verbose_name='', field_display='', field_type=''):
+            """
+            Generic function to handle display of disp_* fields
+
+            Parameters:
+            - l: Loa object
+            - verbose_name: Field verbose name
+            - field_display: Field display value
+            - field_type: One of 'total', 'saude', or 'diversos'
+            - show_per_parliamentarian: Whether to show value per parliamentarian
+            """
+            percentage_attr = f'perc_disp_{field_type}'
+            percentage = getattr(l, percentage_attr, 0)
+
+            result = f'{field_display} <em>({percentage:3.1f}%)</em>'
+
+            count_parlamentar_ativos = l.loaparlamentar_set.filter(parlamentar__ativo=True).count()
+
+            if count_parlamentar_ativos > 0:
+                disp_value = getattr(l, f'disp_{field_type}')
+                valor_por_parlamentar = formats.number_format(
+                    quantize(
+                        disp_value / count_parlamentar_ativos,
+                        rounding=ROUND_DOWN
+                    ),
+                    force_grouping=True
+                )
+
+                result = f'''
+                    {field_display}
+                    <em>({percentage:3.1f}%)</em>
+                    <small><small class="text-gray"><hr><em>Valor por Parlamentar:</em>
+                        <strong>R$ {valor_por_parlamentar}</strong>
+                    </small></small>
+                '''
+
+            return verbose_name, result
 
         def hook_disp_total(self, l, verbose_name='', field_display=''):
-            return verbose_name, f'{field_display} <em>({l.perc_disp_total:3.1f}%)</em>'
+            return self._hook_disp_generic(l, verbose_name, field_display, 'total')
 
         def hook_disp_saude(self, l, verbose_name='', field_display=''):
-            return verbose_name, f'{field_display} <em>({l.perc_disp_saude:3.1f}%)</em>'
+            return self._hook_disp_generic(l, verbose_name, field_display, 'saude')
 
         def hook_disp_diversos(self, l, verbose_name='', field_display=''):
-            return verbose_name, f'{field_display} <em>({l.perc_disp_diversos:3.1f}%)</em>'
+            return self._hook_disp_generic(l, verbose_name, field_display, 'diversos')
 
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
-
-            template = loader.get_template('loa/loaparlamentar_set_list.html')
 
             loaparlamentares = l.loaparlamentar_set.order_by(
                 '-parlamentar__ativo',
@@ -358,6 +393,7 @@ class LoaCrud(Crud):
                 )
             )
 
+            template = loader.get_template('loa/loaparlamentar_set_list.html')
             rendered = template.render(context, self.request)
 
             return 'Resumo Geral das Emendas Impositivas Parlamentares', rendered
@@ -1396,7 +1432,7 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
         def cancel_url(self):
             return reverse_lazy(
                 'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': self.kwargs['pk']})
+                kwargs={'pk': self.object.oficio_ajuste_loa.id})
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = RegistroAjusteLoaForm
