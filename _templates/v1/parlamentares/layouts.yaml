@@ -34,6 +34,7 @@ Parlamentar:
   - nome_parlamentar:8  ativo
   - nome_completo
   - email telefone
+  - equipe|markdown
   - biografia
 {% comment %}
   - profissao
@@ -63,6 +64,7 @@ ParlamentarUpdate:
   - fotografia fotografia_cropping
   - capa capa_cropping
   - biografia
+  - equipe
 
 ParlamentarCreate:
   {% trans 'Dados do Parlamentar' %}:
@@ -81,6 +83,7 @@ ParlamentarCreate:
   - fotografia
   - capa
   - biografia
+  - equipe
 
 Filiacao:
   {% trans 'Filiações Partidárias' %}:

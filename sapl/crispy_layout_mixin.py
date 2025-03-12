@@ -1,7 +1,7 @@
-import dis
+
 from math import ceil
 import re
-
+import markdown as md
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Fieldset, Layout, Submit
@@ -14,6 +14,8 @@ from django.utils.translation import gettext as _
 import yaml
 
 re_start_tag = re.compile('<[^>]*>')
+
+markdown_regex = re.compile(r'(.*)\[\[\[\[(.*)\]\]\]\](.*)', re.DOTALL)
 
 def to_column(name_span):
     fieldname, span = name_span
@@ -373,6 +375,30 @@ class CrispyLayoutFormMixin:
             verbose_name = ''
 
         return verbose_name, display
+
+    def markdown(self, obj, fieldname):
+        field = obj._meta.get_field(fieldname)
+        value = getattr(obj, fieldname)
+        match = markdown_regex.match(value)
+
+        if not match:
+            return field.verbose_name, md.markdown(value, extensions=[
+                'markdown.extensions.fenced_code',
+                'markdown.extensions.codehilite'
+            ])
+
+        groups = match.groups()
+        value = groups[1]
+
+        mv = md.markdown(value, extensions=[
+            'markdown.extensions.fenced_code',
+            'markdown.extensions.codehilite'
+        ])
+
+        return field.verbose_name, '{}{}{}'.format(groups[0], mv, groups[2])
+
+
+
 
     @property
     def layout_display(self):

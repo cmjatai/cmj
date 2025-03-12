@@ -369,6 +369,8 @@ class Parlamentar(models.Model):
         default=False,
         choices=YES_NO_CHOICES,
         verbose_name=_('Ativo na Casa?'))
+    equipe = models.TextField(
+        blank=True, verbose_name=_('Equipe do Parlamentar'), default='')
     biografia = models.TextField(
         blank=True, verbose_name=_('Biografia'))
     fotografia = PortalImageCropField(
@@ -748,7 +750,7 @@ class Bancada(models.Model):
     legislatura = models.ForeignKey(Legislatura,
                                     on_delete=models.PROTECT,
                                     verbose_name=_('Legislatura'))
-    nome = models.CharField( 
+    nome = models.CharField(
         max_length=80,
         verbose_name=_('Nome da Bancada'))
     partido = models.ForeignKey(Partido,

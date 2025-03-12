@@ -202,7 +202,9 @@ class ParlamentarForm(FileFieldCheckMixin, ModelForm):
 
         widgets = {
             'biografia': forms.Textarea(
-                attrs={'id': 'texto-rico'})}
+                attrs={'id': 'texto-rico'}),
+            'equipe': forms.Textarea()
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -256,7 +258,8 @@ class ParlamentarCreateForm(ParlamentarForm):
             'fotografia': forms.ClearableFileInput(),
             'capa': forms.ClearableFileInput(),
             'biografia': forms.Textarea(
-                attrs={'id': 'texto-rico'})
+                attrs={'id': 'texto-rico'}),
+            'equipe': forms.Textarea()
         }
 
     def clean(self):

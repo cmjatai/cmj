@@ -1,5 +1,5 @@
 {% extends "base_path.html" %}
-{% load i18n sigad_filters social_utils cropping thumbnail menus %}
+{% load i18n common_tags sigad_filters social_utils cropping thumbnail menus %}
 {% load webpack_static from webpack_loader %}
 
 {% block main_container_class %}container container-path-parlamentar{% endblock main_container_class %}
@@ -64,7 +64,7 @@
   <div class="container container-path">
     <div class="row">
         {% with slug as prefixo_slug %}
-            <div class="col-12 col-md-9">
+            <div class="col-12 col-md-7">
               {% with 0 as split_row %}
                 {% with 'path-item-list px-2' as css_class %}
                   {% include "path/path_list_docs.html" %}
@@ -73,6 +73,20 @@
             </div>
             <div class="col order-first order-md-last">
             {% block sections_nav %}{% subnav 'parlamentares/subnav.yaml' object.parlamentar.id%}{% endblock sections_nav %}
+
+            <div class="mt-5">
+
+              {{object.parlamentar.equipe|markdown|safe}}
+              <hr>
+
+              <h1>
+                <strong>
+                Biografia do Parlamentar
+                </strong>
+              </h1>
+              {{object.parlamentar.biografia|safe}}
+
+            </div>
             </div>
         {% endwith %}
       </div>

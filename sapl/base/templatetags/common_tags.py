@@ -1,5 +1,5 @@
-from _functools import reduce
 import re
+import markdown as md
 
 from django import template
 from django.template.defaultfilters import stringfilter
@@ -385,3 +385,28 @@ def obfuscate_value(value, key):
     if key in ["hash", "google_recaptcha_secret_key", "password", "google_recaptcha_site_key", "hash_code"]:
         return "***************"
     return value
+
+
+md_regex = re.compile(r'(.*)\[\[\[\[(.*)\]\]\]\](.*)', re.DOTALL)
+
+@register.filter
+def markdown(value):
+    match = md_regex.match(value)
+
+    if not match:
+        return md.markdown(value, extensions=[
+            'markdown.extensions.fenced_code',
+            'markdown.extensions.codehilite'
+        ])
+
+    groups = match.groups()
+    value = groups[1]
+
+    mv = md.markdown(value, extensions=[
+        'markdown.extensions.fenced_code',
+        'markdown.extensions.codehilite'
+    ])
+
+    return '{}{}{}'.format(groups[0], mv, groups[2])
+
+
