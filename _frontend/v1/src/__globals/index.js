@@ -13,7 +13,7 @@ import 'jquery-ui/ui/i18n/datepicker-pt-BR'
 import 'jquery-ui-themes/themes/pepper-grinder/jquery-ui.min.css'
 
 import tinymce from 'tinymce/tinymce'
-import './2018/js/tinymce/lang/pt_BR.js'
+import './js/tinymce/lang/pt_BR.js'
 
 import 'tinymce/themes/silver'
 import 'tinymce/icons/default'
@@ -26,12 +26,14 @@ import 'tinymce/models/dom'
 import 'jquery-mask-plugin'
 
 import './2018/scss/app.scss'
+// import './2025/scss/app.scss'
 
-import './2018/js/image_cropping'
-import './2018/js/functions'
+import './js/image_cropping'
+import './js/functions'
 
-import './2018/js/jquery.runner'
-import './2018/js/app_cmj'
+import './js/jquery.runner'
+
+import './js/app_cmj'
 
 import * as moment from 'moment'
 import 'moment/locale/pt-br'
