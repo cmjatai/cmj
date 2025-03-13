@@ -227,6 +227,9 @@
     display: flex;
     padding: 10px 0;
     align-items: center;
+    overflow: initial;
+    background-color: transparent;
+    border-width: 0;
     a {
       font-size: 1.3em;
       i {
@@ -243,6 +246,11 @@
           font-size: 160%;
           padding: 5px;
         }
+      }
+    }
+    &:hover {
+      a:hover {
+        background-color: transparent;
       }
     }
   }

@@ -103,7 +103,6 @@
           {% if documento.descricao %}
 
             <div class="descricao">
-                {% social_link_share documento 'float-right'%}
               <p tabindex="{{view.tabindex}}" >
                 {{documento.descricao|striptags|safe}}
               </p>
@@ -112,6 +111,7 @@
                   {{documento.texto|default:""|striptags|safe|truncatewords_html:50}}
                 </small>
               {% endif %}
+              {% social_link_share documento 'float-right'%}
 
             </div>
           {% endif %}

@@ -87,7 +87,8 @@ class ShortAdminCrud(Crud):
             return """
                 <div class="text-center">
                     <a class="d-inline-block" href="{}">{}</a>
-                    <a class="copylink" title="Copiar Link" data_href="{}">
+                    <a data-social-sharing="copylink" title="Copiar Link" href="{}">
+                      <i class="fas fa-link"></i>
                       <span class="d-none">Copiar Link</span>
                     </a>
                 </div>
@@ -136,7 +137,8 @@ class ShortAdminCrud(Crud):
             return 'ShorLink', """
                 <div class="text-center">
                     <a class="d-block" href="{}">{}</a>
-                    <a class="copylink" title="Copiar Link" data_href="{}">
+                    <a data-social-sharing="copylink" title="Copiar Link" href="{}">
+                      <i class="fas fa-link"></i>
                       <span class="d-none">Copiar Link</span>
                     </a>
                 </div>

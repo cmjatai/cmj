@@ -917,8 +917,10 @@ img.qrcode {
           font-size: 1.4em;
         }
 
-        .navbar-social-links a {
-          font-size: 0.8em;
+        .navbar-social-links {
+          a {
+            font-size: 0.8em;
+          }
         }
 
         .avatar {
