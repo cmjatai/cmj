@@ -658,6 +658,9 @@ class ParlamentarCrud(Crud):
         def get_template_names(self):
             return ['parlamentares/base_parlamentares.html']
 
+        def hook_equipe(self, obj, verbose_name='', field_display=''):
+            return '', field_display
+
     class UpdateView(Crud.UpdateView):
         form_class = ParlamentarForm
 
