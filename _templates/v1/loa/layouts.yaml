@@ -52,9 +52,11 @@ EmendaLoaDetail:
       col-md-12:
       - registroajusteloa_set
       - documentos_acessorios
+{% if perms.emendas.change_emendaloa %}
     {% trans 'Registro de Alterações' %}:
       col-md-12:
       - auditlog
+{% endif %}
 
 
 OficioAjusteLoa:

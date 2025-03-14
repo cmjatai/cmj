@@ -15,7 +15,7 @@
 
 
 <strong>
-  <a href="{% url 'sapl.materia:documentoacessorio_detail' object.id %}">
+  <a href="{{object.arquivo.url}}?u={% now "u"%}" >
       {% if object.is_signed %}
         <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
       {% endif %}

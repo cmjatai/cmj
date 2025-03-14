@@ -1,5 +1,6 @@
 from decimal import ROUND_DOWN, Decimal
 import logging
+import re
 
 from attr import field
 from django.contrib import messages
@@ -655,7 +656,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 if item.materia:
                     materia = f'''
                             <span class="materia">
-                                <a href="{reverse('sapl.materia:materialegislativa_detail',kwargs={'pk': item.materia.id})}">
+                                <a href="{reverse('cmj.loa:emendaloa_detail',kwargs={'pk': item.id})}">
                                 {item.materia.epigrafe_short}
                                 </a>
                             </span> -
@@ -884,7 +885,17 @@ class EmendaLoaCrud(MasterDetailCrud):
             return f'{link_pdf}<br>{tipo}', args[2]
 
         def hook_fase(self, *args, **kwargs):
-            return f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>', args[2]
+            fase_display = f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>'
+            el = args[0]
+            link_pdf = ''
+            if el.fase == EmendaLoa.IMPEDIMENTO_TECNICO:
+                doc_acessorio = el.materia.documentoacessorio_set.order_by('data').first()
+                if doc_acessorio:
+                    link_pdf = f'<a title="Acesse Impedimento Técnico" href="{doc_acessorio.arquivo.url}"><i class="far fa-2x fa-file-pdf"></i></a>'
+                return f'{fase_display}<br>{link_pdf}', args[2]
+
+
+            return fase_display, args[2]
 
         def hook_header_finalidade(self, *args, **kwargs):
             return 'Descrição da Emenda'
@@ -1145,7 +1156,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 strm = str(el.materia)
                 field_display = field_display.replace(
                     strm, el.materia.epigrafe_short)
-            return verbose_name, field_display
+            return 'Processo Legislativo da Emenda Impositiva', field_display
 
         def hook_registroajusteloa_set(self, el, verbose_name='', field_display=''):
 
