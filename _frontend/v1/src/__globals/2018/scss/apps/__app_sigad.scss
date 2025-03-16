@@ -121,10 +121,10 @@
   }
 
   a:not(.btn) {
-    color: #794905;
+    color: $color_text_title;
 
     &:hover {
-      color: darken(#794905, 15%);
+      color: darken($color_text_title, 15%);
     }
   }
 
@@ -337,16 +337,16 @@
       li {
         list-style-type: none;
         &::before {
-          color: #794905;
+          color: $color_text_title;
           content: "\2022";
         }
       }
     }
     .title {
-      color: #794905;
+      color: $color_text_title;
 
       &:hover {
-        color: darken(#794905, 15%);
+        color: darken($color_text_title, 15%);
       }
     }
     .submapa .submapa {
@@ -424,7 +424,7 @@
   }
 
   .descricao {
-    color: #006556;
+    color: $color_text;
     font-size: 90%;
     padding: 0;
     padding: 0 $grid-gutter-width*0.25;
@@ -514,8 +514,8 @@
 .title-container-noticias {
   font-variant: small-caps;
   font-weight: bold;
-  color: #006556;
-  border-bottom: 1px solid #006556;
+  color: $color_text;
+  border-bottom: 1px solid $color_text;
   display: inline-block;
   min-width: 55%;
   margin-bottom: 1rem;
@@ -654,7 +654,7 @@
         display: inline-block;
         width: 100%;
         &:hover {
-          color: #006556;
+          color: $color_text;
           transition: all 0.3s ease-in-out;
           font-weight: 600;
         }
@@ -730,7 +730,7 @@
         }
 
         .descricao {
-          color: #006556;
+          color: $color_text;
           font-size: 90%;
           font-style: italic;
           padding: 10px;

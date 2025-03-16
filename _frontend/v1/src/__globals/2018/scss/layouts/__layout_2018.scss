@@ -89,7 +89,7 @@
 }
 
 .text-ementa {
-  color: #a26c06 !important;
+  color: $color_text_descricao !important;
   font-size: 150%;
   padding: 0 0.5em 0 0;
   line-height: 1.3;
@@ -128,7 +128,7 @@
   .childs {
     .text-ementa {
       font-size: 110%;
-      color: #a26c06 !important;
+      color: $color_text_descricao !important;
     }
     .link-texto {
       padding: 6px 9px;

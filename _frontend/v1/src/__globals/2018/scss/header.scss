@@ -56,3 +56,9 @@
 @import 'mixins';
 
 @import '_colors';
+
+
+
+:root {
+  --color-text: #{$color_text};
+}

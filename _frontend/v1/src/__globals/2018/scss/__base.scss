@@ -100,12 +100,12 @@ strong {
 
 
 a {
-  color: $color_primary;
+  color: $color_text_link;
 }
 
 a:focus,
 a:hover {
-  color: darken($color_primary, 20%);
+  color: darken($color_text_link, 20%);
 }
 
 .bg-back-image {

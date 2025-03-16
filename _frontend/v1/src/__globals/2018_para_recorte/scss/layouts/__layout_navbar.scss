@@ -469,7 +469,7 @@
         .col-md {
           padding: 8px;
           &:hover {
-            background-color: #0065560f;
+            background-color: transparentize($color_text, 0.9);
           }
         }
       }

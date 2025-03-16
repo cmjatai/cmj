@@ -1,0 +1,28 @@
+@import '../oficial/_variables.scss';
+
+$color_primary: #114d81; //006556
+$color_new_primary: #114d81; //114d81
+
+$color_text_brand: white;
+$color_text_brand_hover: #fff;
+
+$color_text_menu: #c7e6ff;
+
+$color_border_menu_hover: rgba(240, 239, 231, 0.3);
+
+
+$color_text: #114d81;
+$color_text_reverse: #fff;
+
+$color_main_bg: #fff; //(255, 255, 255, 0.5); //#fff; //
+
+$color_container_bg: #f0efe7;
+$color_container_border: darken(#f0efe7, 5);
+
+$color_text_link: #015fb1;
+$color_text_title: #0539a9;
+$color_text_descricao: #007969;
+
+@import '~bootstrap/scss/functions';
+@import '~bootstrap/scss/variables';
+

@@ -37,7 +37,7 @@
     background: darken($color_main_bg, 10%) $url_bg_png;
     &:not(.active) {
       a {
-        color: #794905;
+        color: $color_text_title;
       }
     }
     li {

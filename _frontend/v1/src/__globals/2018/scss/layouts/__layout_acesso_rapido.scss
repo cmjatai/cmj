@@ -1,5 +1,5 @@
 .container-acesso-rapido {
-  background: #794905 $url_bg_png;
+  background: $color_text_title $url_bg_png;
   padding: 20px 0 15px;
   display: flex;
   flex-direction: column;
@@ -141,7 +141,7 @@
       }
     }
     &:hover {
-      background: radial-gradient(#794905 1%, transparent 60%);
+      background: radial-gradient($color_text_title 1%, transparent 60%);
       &::before {
         opacity: 1;
       }

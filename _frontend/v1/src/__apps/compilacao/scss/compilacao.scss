@@ -1,3 +1,5 @@
+@import "~@/__globals/2018/themes/_variables.scss";
+
 $color_actions: #16407c;
 $color_actions_border: #CCC;
 $color_buttons: #2980B9;
@@ -700,7 +702,7 @@ a:link:after, a:visited:after {
     }
   }
   .urlize {
-    color: #006556;
+    color: $color_text;
     &:visited, &:active, &:link {
       text-decoration: none !important;
     }

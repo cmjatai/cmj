@@ -128,7 +128,7 @@
           padding: 0 20px;
 
           &.dropdown-header {
-            color: #fff;
+            color: #a7d0f7;
             padding: 5px 15px 0;
             text-transform: uppercase;
             font-size: 70%;
@@ -477,7 +477,7 @@
         .col-md {
           padding: 8px;
           &:hover {
-            background-color: #0065560f;
+            background-color: transparentize($color_text, 0.95);
           }
         }
       }
@@ -518,7 +518,7 @@
           border-radius: 3px;
           font-size: 85%;
           line-height: 1.3;
-          color: #747c01;
+          color: $color_text_title;
           font-style: italic;
         }
         &:hover {
