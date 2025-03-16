@@ -30,12 +30,12 @@ RUN pip install -r ia-requirements.txt
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
 ADD scripts     /var/cmjatai/cmj/scripts
+ADD solr        /var/cmjatai/cmj/solr
+ADD docker      /var/cmjatai/cmj/docker
 ADD _frontend   /var/cmjatai/cmj/_frontend
 ADD _templates  /var/cmjatai/cmj/_templates
 ADD cmj         /var/cmjatai/cmj/cmj
 ADD sapl        /var/cmjatai/cmj/sapl
-ADD solr        /var/cmjatai/cmj/solr
-ADD docker      /var/cmjatai/cmj/docker
 
 COPY cmj/.env $HOME/cmj/
 COPY key_cert.pfx $HOME
