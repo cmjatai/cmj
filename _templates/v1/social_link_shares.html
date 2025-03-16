@@ -1,5 +1,8 @@
 {% load i18n%}
 {% if url %}
+{% if 'clearfix' in css_class %}
+<div class="clearfix"></div>
+{% endif %}
   <span class="navbar-social-links {{css_class}}">
     <a data-social-sharing="facebook" title="{% trans "Compartilhar no Facebook" %} [{{titulo}}]" href="https://www.facebook.com/sharer/sharer.php?u={{url}}">
       <i class="fab fa-facebook-f" aria-hidden="true"></i>

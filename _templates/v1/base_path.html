@@ -70,24 +70,25 @@
         {{ object.parents.0.descricao|striptags|safe|linebreaksbr  }}
       {% endif %}
         {% endblock %}
-        {% social_link_share object 'top-right block mt-3'%}
+          {% social_link_share object 'top-right mt-3 clearfix block' %}
     </div>
 
 {% endblock base_header %}
 
 {% block base_content %}
-{% block render_content %}
+  {% block render_content %}
 
-{% if object.classe.menu_lateral %}
-<div class="container">
-{% endif %}
-
-  <div class="row">
-    <div class="col">
-      {% block render_main_content %}
-      {% endblock render_main_content%}
-    </div>
     {% if object.classe.menu_lateral %}
+    <div class="container">
+      <div class="row">
+        <div class="col">
+    {% endif %}
+
+    {% block render_main_content %}
+    {% endblock render_main_content%}
+
+    {% if object.classe.menu_lateral %}
+      </div>
       <div class="col-md-4 container-menu-lateral">
         {% block render_right_content %}
           {% if object.classe.perfil == object.classe.CLASSE_DOCUMENTAL %}
@@ -114,17 +115,16 @@
         {% endblock render_right_content %}
       </div>
     {% endif %}
-  </div>
 
+    {% if object.classe.menu_lateral %}
+      </div>
+    </div>
+    {% endif %}
 
-{% if object.classe.menu_lateral %}
-</div>
-{% endif %}
+  {% endblock render_content %}
 
-{% endblock render_content %}
-
-{% block base_extra_content %}
-{% endblock base_extra_content %}
+  {% block base_extra_content %}
+  {% endblock base_extra_content %}
 
 {% endblock base_content %}
 

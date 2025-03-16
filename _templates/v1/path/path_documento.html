@@ -548,32 +548,35 @@
 
     <div class="container text-center"><br><br>
       <div class="container"><small>ShortLink: {{object.short_url|urlize}}</small></div>
-      <img class="qrcode d-none" src="{{object.short_url}}/qrcode" alt="">
+      {% comment %}
+       <img class="qrcode d-none" src="{{object.short_url}}/qrcode" alt="">
+       {% endcomment %}
     </div>
   {% endblock materia_content %}
 
-  {% block cmj_extra_content %}
-    {% if object != object.classe.capa %}
-      <div class="{% if path %}container{{path}}{% endif %} container-fluid container-footer d-print-none">
-        <div class="container">
-          <div class="row">
-            {% with 'path-item-list col-md-3' as css_class %}
-              {% include "path/path_list_docs.html" %}
-            {% endwith %}
-          </div>
-        </div>
-      </div>
-    {% endif %}
-  {% endblock cmj_extra_content %}
-
-  {% block extra_js %}
-    <script>
-      $(document).ready(function (){
-        //ContainerFirst();
-        Gallery().init();
-      });
-    </script>
-  {% endblock extra_js %}
 {% endblock base_extra_content %}
 
 
+
+{% block cmj_extra_content %}
+{% if object != object.classe.capa %}
+  <div class="{% if path %}container{{path}}{% endif %} container-fluid container-footer d-print-none">
+    <div class="container">
+      <div class="row">
+        {% with 'path-item-list col-md-3' as css_class %}
+          {% include "path/path_list_docs.html" %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endblock cmj_extra_content %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function (){
+    //ContainerFirst();
+    Gallery().init();
+  });
+</script>
+{% endblock extra_js %}
