@@ -131,17 +131,22 @@ class Loa(models.Model):
 
         legislatura_atual = Legislatura.cache_legislatura_atual()
         materia_in_legislatura_atual = True
+        loa_in_legislatura_atual = True
         if self.materia:
             materia_in_legislatura_atual = legislatura_atual['data_inicio'] <= self.materia.data_apresentacao <= legislatura_atual['data_fim']
+            loa_in_legislatura_atual = legislatura_atual['data_inicio'].year <= self.ano <= legislatura_atual['data_fim'].year
 
         lps = self.loaparlamentar_set.all()
-        if not self.materia or not materia_in_legislatura_atual or not lps.filter(parlamentar__ativo=False).exists():
+        count_lps = lps.count()
+
+        if loa_in_legislatura_atual and  materia_in_legislatura_atual:
             count_lps = lps.count()
             if count_lps:
                 for lp in lps:
                     set_values_for_lp(lp, self.disp_total, self.disp_saude, self.disp_diversos, count_lps)
                     lp.save()
             return self
+
 
         parlamentares_ativos_sem_emendas = Parlamentar.objects.filter(
             ativo=True, emendaloaparlamentar_set__isnull=True)
