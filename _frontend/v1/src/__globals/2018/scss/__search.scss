@@ -11,7 +11,7 @@
     button {
       padding-left: 2em;
       padding-right: 2em;
-      color: rgba(0, 101, 86, 0.7);
+      color: $color_text_link;
     }
   }
   ul {
@@ -54,10 +54,10 @@
     }
   }
   .btn {
-      border: 1px solid #ced4da;
+      border: 1px solid $color_border_input;
       background-color: white;
       padding: 0.375rem 0.75rem;
-      color: rgba(0, 101, 86, 0.9);
+      color: rgba($color_text_link, 0.9);
   }
   .bs-actionsbox {
     padding-top: 0 ;

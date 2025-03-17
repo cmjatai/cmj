@@ -2,6 +2,7 @@
 body, html {
   font-size: 1rem;
 }
+
 body {
   background: $color_main_bg $url_bg_png;
   &.body-print {
@@ -121,7 +122,6 @@ a:hover {
   margin: 0;
 }
 
-
 .table {
   margin-bottom: 0;
 
@@ -130,8 +130,10 @@ a:hover {
     vertical-align: middle;
     border-top: 1px solid #fff;
     border-bottom: 1px solid #fff;
+  }
 
-    //border: 1px solid #fff;
+  thead th, th {
+    background-color: darken($bg_color_table_base, 7);
   }
 
   thead {
@@ -149,10 +151,26 @@ a:hover {
     }
   }
 
+  tbody {
+    tr:nth-child(odd) {
+      // background-color: lighten($hover_background_05p, 50);
+    }
+
+    tr:hover {
+      background-color: darken($bg_color_table_base, 5);
+    }
+    td:not(:first-child) {
+      border-left: 1px solid #fff;
+    }
+    td:not(:last-child) {
+      border-right: 1px solid #fff;
+    }
+  }
+
   th {
     text-align: center;
     padding: 15px 10px;
-    background-color: darken($color_container_bg, 5);
+    background-color: darken($bg_color_table_base, 5);
 
     a {
       display: inline-block;
@@ -160,34 +178,14 @@ a:hover {
     }
 
     &:hover {
-      background-color: darken($color_container_bg, 10);
+      background-color: darken($bg_color_table_base, 10);
     }
-  }
-
-  tbody {
-    tr:nth-child(odd) {
-      background-color: lighten($hover_background_05p, 40);
-    }
-
-    tr:hover {
-      background-color: darken($color_container_bg, 10);
-    }
-
-    td:not(:first-child) {
-      border-left: 1px solid #fff;
-    }
-
-    td:not(:last-child) {
-      border-right: 1px solid #fff;
-    }
-
   }
 
   .row-unread {
     td {
       background-color: #e3d4b5;
     }
-
   }
 }
 
@@ -260,36 +258,6 @@ p.control-label {
   }
 }
 
-// ADJUST DRUNKEN PARROT STYLES ########################################
-.panel-primary {
-  border-color: $color_primary;
-
-  .panel-heading {
-    background-color: $color_primary;
-    color: lighten($color_primary, 20%);
-  }
-
-  .panel-footer {
-    padding: 0;
-    background-color: $color_primary;
-    border-width: 0;
-
-    small {
-      color: lighten($color_primary, 20%);
-      text-align: center;
-      display: block;
-    }
-  }
-
-  .panel-body {
-    padding: 0;
-
-    .panel-empty {
-      padding: 1em;
-    }
-  }
-}
-
 .h1,
 h1 {
   font-size: 35px;
@@ -339,24 +307,6 @@ input[type="radio"] {
   }
 }
 
-
-
-.panel-nota-site-antigo {
-  margin-left: 10px;
-  margin-bottom: 15px;
-  font-size: 60%;
-
-  .panel-heading {
-    border: 0px;
-    text-align: center;
-    padding: 5px;
-    line-height: 1.2em;
-  }
-
-  .panel-body {
-    padding: 5px;
-  }
-}
 
 .tags {
   display: inline-block;

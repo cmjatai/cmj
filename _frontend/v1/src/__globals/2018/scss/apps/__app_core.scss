@@ -70,16 +70,18 @@
     margin: 0 10%;
     text-align: right;
   }
+
   input {
     height: 3em;
     font-size: 1.3em;
-    border: 1px solid rgba($color_primary, 0.7);
+    border: 1px solid rgba($color_border_input, 0.7);
 
     padding: 1em 1em 1em 2.2em;
     background-color: rgba(255, 255, 255, 0.8);
     &:focus {
       background-color: white;
     }
+    
     @include placeholder($color_primary, 0.5, 1em, normal);
 
 

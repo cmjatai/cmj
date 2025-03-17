@@ -1,9 +1,5 @@
 @import "~@/__globals/2018/themes/_variables.scss";
 
-$color_actions: #16407c;
-$color_actions_border: #CCC;
-$color_buttons: #2980B9;
-
 @mixin background-top-down($top, $bottom) {
   background-image: -webkit-linear-gradient(top, $top, $bottom);
   background-image: -moz-linear-gradient(top, $top, $bottom);
@@ -18,33 +14,6 @@ $color_buttons: #2980B9;
   -ms-border-radius: $radius;
   -o-border-radius: $radius;
   border-radius: $radius;
-}
-@mixin placeholder($color, $opacity, $fontsize, $fontweight) {
-
-  &::-webkit-input-placeholder {
-    color: $color !important;
-    opacity: $opacity;
-    font-size:$fontsize;
-    font-weight: $fontweight;
-  }
-  &::-moz-placeholder {
-    color: $color !important;
-    opacity: $opacity;
-    font-size:$fontsize;
-    font-weight: $fontweight;
-  }
-  &::-moz-placeholder {
-    color: $color !important;
-    opacity: $opacity;
-    font-size:$fontsize;
-    font-weight: $fontweight;
-  }
-  &:-ms-input-placeholder {
-    color: $color !important;
-    opacity: $opacity;
-    font-size:$fontsize;
-    font-weight: $fontweight;
-  }
 }
 
 a:link:after, a:visited:after {
