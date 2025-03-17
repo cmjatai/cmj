@@ -18,7 +18,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.utils import texto_upload_path, get_settings_auth_user_model
 from sapl.materia.models import MateriaLegislativa
-from sapl.parlamentares.models import Parlamentar
+from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.utils import PortalFileField, OverwriteStorage
 
 
@@ -129,8 +129,13 @@ class Loa(models.Model):
             lp.disp_saude = idsp
             lp.disp_diversos = iddp
 
+        legislatura_atual = Legislatura.cache_legislatura_atual()
+        materia_in_legislatura_atual = True
+        if self.materia:
+            materia_in_legislatura_atual = legislatura_atual['data_inicio'] <= self.materia.data_apresentacao <= legislatura_atual['data_fim']
+
         lps = self.loaparlamentar_set.all()
-        if not lps.filter(parlamentar__ativo=False).exists():
+        if not self.materia or not materia_in_legislatura_atual or not lps.filter(parlamentar__ativo=False).exists():
             count_lps = lps.count()
             if count_lps:
                 for lp in lps:

@@ -27,7 +27,7 @@ from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa
 from cmj.utils import make_pdf
 from sapl import parlamentares
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
-from sapl.parlamentares.models import Parlamentar
+from sapl.parlamentares.models import Legislatura, Parlamentar
 
 
 class LoaContextDataMixin:
@@ -213,6 +213,7 @@ class LoaCrud(Crud):
                 field_display = field_display.replace(
                     strm, l.materia.epigrafe_short)
             return verbose_name, field_display
+
         def _hook_disp_generic(self, l, verbose_name='', field_display='', field_type=''):
             """
             Generic function to handle display of disp_* fields
@@ -229,13 +230,25 @@ class LoaCrud(Crud):
 
             result = f'{field_display} <em>({percentage:3.1f}%)</em>'
 
-            count_parlamentar_ativos = l.loaparlamentar_set.filter(parlamentar__ativo=True).count()
+            legislatura_atual = Legislatura.cache_legislatura_atual()
+            materia_in_legislatura_atual = True
+            loa_in_legislatura_atual = True
 
-            if count_parlamentar_ativos > 0:
+            if l.materia:
+                materia_in_legislatura_atual = legislatura_atual['data_inicio'] <= l.materia.data_apresentacao <= legislatura_atual['data_fim']
+                loa_in_legislatura_atual = legislatura_atual['data_inicio'].year <= l.ano <= legislatura_atual['data_fim'].year
+
+            lps = l.loaparlamentar_set.all()
+            count_lps = lps.count()
+
+            if not loa_in_legislatura_atual or not materia_in_legislatura_atual:
+                count_lps = Parlamentar.objects.filter(ativo=True).count()
+
+            if count_lps > 0:
                 disp_value = getattr(l, f'disp_{field_type}')
                 valor_por_parlamentar = formats.number_format(
                     quantize(
-                        disp_value / count_parlamentar_ativos,
+                        disp_value / count_lps,
                         rounding=ROUND_DOWN
                     ),
                     force_grouping=True

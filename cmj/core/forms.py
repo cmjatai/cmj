@@ -169,6 +169,9 @@ class AuditLogFilterSet(django_filters.FilterSet):
 
         params = {}
         for k, v in value:
+            if k == 'id':
+                params['object_id'] = v
+                continue
             try:
                 v = int(v)
                 params[f'obj__0__fields__{k}'] = v

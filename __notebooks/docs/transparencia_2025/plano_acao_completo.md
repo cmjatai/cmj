@@ -459,8 +459,55 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 #### SIC
 
 * **Atividade 12.1**
+  * **Pergunta:** Indica a unidade/setor responsável pelo SIC? [(PNTP)](#121-indica-a-unidadesetor-responsável-pelo-sic)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação da unidade/setor responsável pelo SIC
+  * **Links:**
+    * <https://www.jatai.go.leg.br/fale-conosco/sic-fisico>
 
-...
+* **Atividade 12.2**
+  * **Pergunta:** Indica o endereço físico, o telefone e o e-mail da unidade responsável pelo SIC, além do horário de funcionamento? [(PNTP)](#122-indica-o-endereço-físico-o-telefone-e-o-e-mail-da-unidade-responsável-pelo-sic-além-do-horário-de-funcionamento)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação do endereço, telefone e e-mail do SIC
+  * **Links:**
+    * <https://www.jatai.go.leg.br/fale-conosco/sic-fisico>
+
+* **Atividade 12.3**
+  * **Pergunta:** Há possibilidade de envio de pedidos de informação de forma eletrônica (e­-SIC)? [(PNTP)](#123-há-possibilidade-de-envio-de-pedidos-de-informação-de-forma-eletrônica-e-sic)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação do e-SIC
+  * **Links:**
+    * Identificada: <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-identificadas>
+    * Anônima: <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-anonimas>
+
+* **Atividade 12.4**
+  * **Pergunta:** A solicitação por meio de eSic é simples, ou seja, sem a exigência de itens de identificação do requerente que dificultem ou impossibilitem o acesso à informação, tais como: envio de documentos, assinatura reconhecida, declaração de responsabilidade, maioridade? [(PNTP)](#124-a-solicitação-por-meio-de-esic-é-simples-ou-seja-sem-a-exigência-de-itens-de-identificação-do-requerente-que-dificultem-ou-impossibilitem-o-acesso-à-informação-tais-como-envio-de-documentos-assinatura-reconhecida-declaração-de-responsabilidade-maioridade)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação simples da solicitação por meio de eSic
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-identificadas>
+    * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-anonimas>
+
+* **Atividade 12.5**
+  * **Pergunta:** Divulga nesta seção, instrumento normativo local que regulamente a Lei
+nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normativo-local-que-regulamente-a-lei-nº-125272011--lai)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação do instrumento normativo local que regulamente a LAI
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/sic/regulamentacao>
+
+* **Atividade 12.7**
+  * **Pergunta:** Divulga relatório anual estatístico contendo a quantidade de pedidos de acesso recebidos, atendidos, indeferidos, bem como informações genéricas sobre os solicitantes? [(PNTP)](#127-divulga-relatório-anual-estatístico-contendo-a-quantidade-de-pedidos-de-acesso-recebidos-atendidos-indeferidos-bem-como-informações-genéricas-sobre-os-solicitantes)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação do relatório anual estatístico
+  * **Links:**
+    * 
 
 ### Fase 4: Implementação das Recomendações e Melhoria Contínua
 
@@ -502,6 +549,17 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Publicação dos objetivos estratégicos do Poder ou órgão e os indicadores definidos para mensurar o alcance desses objetivos
   * **Links:**
     * ????
+
+#### Fase 4: SIC
+
+* **Atividade 12.6**
+  * **Pergunta:** Divulga, na seção relativa ao e-SIC, os prazos de resposta ao cidadão, incluindo o recursal, e as autoridades competentes para o exame dos pedidos, além do procedimento referente à realização do pedido e de eventual recurso? [(PNTP)](#126-divulga-na-seção-relativa-ao-e-sic-os-prazos-de-resposta-ao-cidadão-incluindo-o-recursal-e-as-autoridades-competentes-para-o-exame-dos-pedidos-além-do-procedimento-referente-à-realização-do-pedido-e-de-eventual-recurso)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação dos prazos de resposta ao cidadão, incluindo o recursal, e as autoridades competentes para o exame dos pedidos, além do procedimento referente à realização do pedido e de eventual recurso
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-identificadas>
+    * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-anonimas>
 
 
 
