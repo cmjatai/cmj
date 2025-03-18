@@ -17,8 +17,8 @@ def registrovotacao_post_signal(sender, instance, **kwargs):
     if not settings.DEBUG or (
             settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
         tasks.task_add_selo_votacao.apply_async(
-            (instance.pk, ),
+            ([instance.pk, ], ),
             countdown=5
         )
     else:
-        tasks.task_add_selo_votacao_function(instance.pk)
+        tasks.task_add_selo_votacao_function([instance.pk,])

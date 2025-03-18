@@ -4282,7 +4282,7 @@ class VotacaoEmBlocoOrdemDia(VotacaoEmBlocoExpediente):
     def get_queryset(self):
         return OrdemDia.objects.filter(sessao_plenaria_id=self.kwargs['pk'],
                                        resultado='',
-                                       retiradapauta=None)
+                                       retiradapauta=None).order_by('numero_ordem')
 
 
 class VotacaoEmBlocoSimbolicaView(PermissionRequiredForAppCrudMixin, TemplateView):
