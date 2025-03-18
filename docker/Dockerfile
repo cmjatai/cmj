@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED=1
 
 RUN mkdir -p /var/cmjatai/cmj/run
 RUN mkdir -p /var/cmjatai/cmj/logs/celery
-RUN mkdir -p /var/cmjatai/cmj_data
+RUN mkdir -p /var/cmjatai/cmj_data 
 RUN mkdir -p /var/cmjatai/cmj_media
 RUN mkdir -p /var/cmjatai/BD_POSTGRESQL
 

@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 
-echo -e "\033[38;2;255;255;0;2m\033[1m====> StartDEV Mode PROD...\033[0m"
-
-#/bin/bash docker/wait-for-pg.sh "postgresql://cmj_st1:cmj_st1@10.3.163.253:5432/cmj"
-/bin/bash docker/wait-for-pg.sh "postgresql://cmj_st1:cmj_st1@192.168.15.8:5432/cmj"
+echo -e "\033[38;2;255;255;0;2m\033[1m====> StartDEV...\033[0m"
+echo "${UID}:${GID}"
+#/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@cmjdb:5432/cmj"
 
 ## SOLR
 USE_SOLR="${USE_SOLR:=False}"
-SOLR_URL="${SOLR_URL:=http://localhost:8983}"
+SOLR_URL="${SOLR_URL:=http://solr:solr@cmjsolr:8983}"
 SOLR_COLLECTIONS="${SOLR_COLLECTIONS:=portalcmj_cmj}"
 NUM_SHARDS=${NUM_SHARDS:=1}
 RF=${RF:=1}
@@ -27,7 +26,7 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
     echo "========================================="
 
     echo "running Solr script"
-    /bin/bash wait-for-solr.sh $SOLR_URL
+    /bin/bash docker/wait-for-solr.sh $SOLR_URL
     CHECK_SOLR_RETURN=$?
 
     if [ $CHECK_SOLR_RETURN == 1 ]; then
@@ -38,7 +37,8 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
             echo "Assuming embedded ZooKeeper instalation..."
         fi
 
-        python3 solr_cli.py -u $SOLR_URL -c $SOLR_COLLECTIONS -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED
+        python3 docker/solr_cli.py -u $SOLR_URL -c $SOLR_COLLECTIONS -s $NUM_SHARDS -rf $RF -ms $MAX_SHARDS_PER_NODE $ZK_EMBEDDED
+
     else
         echo "Solr is offline, not possible to connect."
     fi
@@ -46,6 +46,7 @@ if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
 else
     echo "Solr support is not initialized."
 fi
+
 
 rm /var/cmjatai/cmj/logs/celery/*.pid
 celery multi start 5 -A cmj -l INFO -Q:1 cq_arq -Q:2 cq_core -Q:3 cq_videos -Q:4 cq_base -Q:5 celery -c 2 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
