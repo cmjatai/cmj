@@ -2311,9 +2311,6 @@ class MateriaLegislativaCrud(Crud):
 
                 for d in m.documentoacessorio_set.all():
 
-                    if d.data > timezone.localtime().date() - timedelta(days=30):
-                        continue
-
                     m_paths.append((d, prefixo, getattr(d.arquivo, ff)))
 
             def get_docadm_anexados_from(d):

@@ -2,7 +2,7 @@
 {% load i18n crispy_forms_tags %}
 
 {% block base_content %}
-        
+
     {% if sessao_iniciada %}
     <form method="POST" enctype="application/x-www-form-urlencoded" id="form" action="{% url 'sapl.sessao:votacaoblocosimb' pk %}">
         {% csrf_token %}
@@ -24,18 +24,18 @@
             </td>
             </tr>
         </table>
-        
+
         <br>
-        
+
         <h3 id='frase_selecione'>{% if expediente %} Selecione o(s) expediente(s) desejado(s). {% else %} Selecione a(s) ordem(s) do dia desejada(s). {% endif %}</h3>
-        
+
         <table id='tab_mats' class="table table-striped table-bordered">
             <thead class="thead-default">
                 <tr>
                     <td><h3> {% if expediente %}  {% trans "Expediente" %} {% else %} {% trans "Ordem do Dia" %} {% endif %} </h3></td>
                 </tr>
             </thead>
-            
+
             <div class="checkbox" id="check_all">
                 <label for="id_check_all">
                     <input type="checkbox" id="id_check_all" onchange="checkAll(this)" /> Marcar/Desmarcar Todos
@@ -46,42 +46,44 @@
             {% if o.tipo_votacao == 1 or o.tipo_votacao == 2 %}
                 <tr class="{% if o.tipo_votacao == 1 %}Simbolica{% else %}Nominal{% endif %}"  {% if o.tipo_votacao == 2 %} style="display:none;" {% endif %}>
                 <td>
-                    <input type="checkbox" name="marcadas_{{o.tipo_votacao}}" id="{{o.id}}" value="{{o.id}}" {% if check %} checked {% endif %}>
-                    <strong><a href="{% url 'sapl.materia:materialegislativa_detail' o.materia.id %}">{{o.materia.tipo.sigla}} {{o.materia.numero}}/{{o.materia.ano}} - {{o.materia.tipo}}</strong></a></br>
-                    {% if o.materia.numeracao_set.last %}
-                    <strong>Processo:</strong> &nbsp; {{o.materia.numeracao_set.last}}</br>
-                    {% endif %}
-                    <strong>Autor:</strong>
-                    {% for a in o.materia.autoria_set.all %}
-                    {% if not forloop.first %}
-                        , &nbsp;&nbsp; {{a.autor|default_if_none:""}}
-                    {% else %}
-                        &nbsp;{{a.autor|default_if_none:""}}
-                    {% endif %}
-                    {% endfor %}
-                    </br>
-                    {% if o.materia.numero_protocolo %}
-                    <strong>Protocolo:</strong> &nbsp; {{o.materia.numero_protocolo}}</br>
-                    {% endif %}
-                    {% if  o.materia.tramitacao_set.first %}
-                    {% if o.materia.tramitacao_set.first.turno %}
-                        <strong>Turno:</strong>&nbsp;
-                        {% for t in turno_choices %}
-                        {% if t.0 == o.materia.tramitacao_set.first.turno %}
-                            {{ t.1 }}
+                    <label for="{{o.id}}" class="d-block">
+                        <input type="checkbox" name="marcadas_{{o.tipo_votacao}}" id="{{o.id}}" value="{{o.id}}" {% if check %} checked {% endif %}>
+                        <strong><a href="{% url 'sapl.materia:materialegislativa_detail' o.materia.id %}">{{o.materia.tipo.sigla}} {{o.materia.numero}}/{{o.materia.ano}} - {{o.materia.tipo}}</strong></a></br>
+                        {% if o.materia.numeracao_set.last %}
+                        <strong>Processo:</strong> &nbsp; {{o.materia.numeracao_set.last}}</br>
                         {% endif %}
-                        {% endfor %}</br>
-                    {% endif %}
-                    {% endif %}
-                    <strong>Ementa:</strong>&nbsp;{{ o.materia.ementa|safe }}</br>
-                    <p></p>
+                        <strong>Autor:</strong>
+                        {% for a in o.materia.autoria_set.all %}
+                        {% if not forloop.first %}
+                            , &nbsp;&nbsp; {{a.autor|default_if_none:""}}
+                        {% else %}
+                            &nbsp;{{a.autor|default_if_none:""}}
+                        {% endif %}
+                        {% endfor %}
+                        </br>
+                        {% if o.materia.numero_protocolo %}
+                        <strong>Protocolo:</strong> &nbsp; {{o.materia.numero_protocolo}}</br>
+                        {% endif %}
+                        {% if  o.materia.tramitacao_set.first %}
+                        {% if o.materia.tramitacao_set.first.turno %}
+                            <strong>Turno:</strong>&nbsp;
+                            {% for t in turno_choices %}
+                            {% if t.0 == o.materia.tramitacao_set.first.turno %}
+                                {{ t.1 }}
+                            {% endif %}
+                            {% endfor %}</br>
+                        {% endif %}
+                        {% endif %}
+                        <strong>Ementa:</strong>&nbsp;{{ o.materia.ementa|safe }}</br>
+                        <p></p>
+                    </label>
                 </td>
-                </tr>         
+                </tr>
             {% endif %}
             {% endfor %}
         </table>
 
-        
+
         <table class="table table-striped table-bordered" style="display:none" id="nenhuma_mat">
             <tr>
                 <td>
@@ -118,17 +120,17 @@
         function checkAll(elem) {
             let checkboxes = document.getElementsByName('marcadas_1');
             for (let i = 0; i < checkboxes.length; i++) {
-                if (checkboxes[i].type == 'checkbox') 
+                if (checkboxes[i].type == 'checkbox')
                     checkboxes[i].checked = elem.checked;
             }
-        
+
             checkboxes = document.getElementsByName('marcadas_2');
             for (let i = 0; i < checkboxes.length; i++) {
-                if (checkboxes[i].type == 'checkbox') 
+                if (checkboxes[i].type == 'checkbox')
                     checkboxes[i].checked = elem.checked;
             }
         }
-    
+
         function alteraTipoVotacao() {
             $(".Simbolica").toggle();
             $(".Nominal").toggle();

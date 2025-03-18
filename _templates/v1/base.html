@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="reply-to" content="manager@jatai.go.leg.br">
-    <meta name="theme-color" content="#006556">
+    <meta name="theme-color" content="#114d81">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% if head_title %}{{head_title}}{% else %}PortalCMJ - Câmara de Jataí{% endif %}{% endblock %} - {% block head_title_sufix %}{% if head_title_sufix %}{{head_title_sufix}}{% else %}Portal da Câmara Municipal de Jataí - Estado de Goiás{% endif %}{% endblock head_title_sufix %}</title>
     <meta name="description" content="{% block meta_description %}{% if meta_description %}{{meta_description}}{% else %}PortalCMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.{% endif %}{% endblock meta_description %}">
@@ -153,7 +153,7 @@
             </div>
 
             {% block cmj_extra_content %}{% endblock %}
-            
+
           {% endblock content_container %}
         </main>
       {% endblock global_container %}
