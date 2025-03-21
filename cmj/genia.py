@@ -42,6 +42,9 @@ class GoogleGenerativeIA:
 
         if self.action.startswith('generate'):
             self.delete()
+            self.temperature = self.request.GET.get('temperature', self.temperature)
+            self.top_k = self.request.GET.get('top_k', self.top_k)
+            self.top_p = self.request.GET.get('top_p', self.top_p)
             return self.generate()
         elif self.action == 'delete':
             self.delete()
