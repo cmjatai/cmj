@@ -297,6 +297,10 @@ input[type="radio"] {
   display: inline-block;
 }
 
+.custom-select {
+  border-color: $color_border_input;
+}
+
 .embed-audio {
   padding-bottom: 18%;
 }
