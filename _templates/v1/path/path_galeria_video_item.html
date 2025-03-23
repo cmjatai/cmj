@@ -59,7 +59,7 @@
               ESTREIA PROGRAMADA
               </span>
               <span class="upcoming-time">
-              {{doc.extra_data.liveStreamingDetails.scheduledStartTime|parse_datetime}}
+              {{doc.extra_data.liveStreamingDetails.scheduledStartTime|parse_datetime|default:''}}
               </span>
           {% endif %}
       </div>
