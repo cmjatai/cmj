@@ -507,7 +507,149 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Produtos:**
     * Publicação do relatório anual estatístico
   * **Links:**
-    * 
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-indicators.jsf>
+
+* **Atividade 12.8**
+  * **Pergunta:** Divulga lista de documentos classificados em cada grau de sigilo, contendo pelo menos o assunto sobre o qual versa a informação, a categoria na qual ela se encontra, o dispositivo legal que fundamenta a classificação e o respectivo prazo? [(PNTP)](#128-divulga-lista-de-documentos-classificados-em-cada-grau-de-sigilo-contendo-pelo-menos-o-assunto-sobre-o-qual-versa-a-informação-a-categoria-na-qual-ela-se-encontra-o-dispositivo-legal-que-fundamenta-a-classificação-e-o-respectivo-prazo)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação da lista de documentos classificados
+  * **Links:**
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-list-information.jsf>
+
+* **Atividade 12.9**
+  * **Pergunta:** Divulga lista das informações que tenham sido desclassificadas nos últimos 12 (doze) meses? [(PNTP)](#129-divulga-lista-das-informações-que-tenham-sido-desclassificadas-nos-últimos-12-doze-meses)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação da lista das informações desclassificadas
+  * **Links:**
+    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-list-information.jsf>
+
+#### Acessibilidade
+
+* **Atividade 13.1**
+  * **Pergunta:** O site oficial e o portal de transparência contêm símbolo de acessibilidade em destaque? [(PNTP)](#131-o-site-oficial-e-o-portal-de-transparência-contêm-símbolo-de-acessibilidade-em-destaque)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação do símbolo de acessibilidade
+  * **Links:**
+    * <https://www.jatai.go.leg.br/acessibilidade>
+
+* **Atividade 13.2**
+  * **Pergunta:** O site e o portal de transparência contêm exibição do “caminho” de páginas percorridas pelo usuário? [(PNTP)](#132-o-site-e-o-portal-de-transparência-contêm-exibição-do-caminho-de-páginas-percorridas-pelo-usuário)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação do “caminho” de páginas percorridas pelo usuário
+  * **Links:**
+    * <https://www.jatai.go.leg.br/acessibilidade>
+
+* **Atividade 13.3**
+  * **Pergunta:** O site e o portal de transparência contêm opção de alto contraste? [(PNTP)](#133-o-site-e-o-portal-de-transparência-contêm-opção-de-alto-contraste)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação da opção de alto contraste
+  * **Links:**
+    * <https://www.jatai.go.leg.br/acessibilidade>
+
+* **Atividade 13.4**
+  * **Pergunta:** O site e o portal de transparência contêm ferramenta de redimensionamento de texto? [(PNTP)](#134-o-site-e-o-portal-de-transparência-contêm-ferramenta-de-redimensionamento-de-texto)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação da ferramenta de redimensionamento de texto
+  * **Links:**
+    * <https://www.jatai.go.leg.br/acessibilidade>
+
+* **Atividade 13.5**
+  * **Pergunta:** Contém mapa do site institucional? [(PNTP)](#135-contém-mapa-do-site-institucional)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação do mapa do site institucional
+  * **Links:**
+    * <https://www.jatai.go.leg.br/mapa-do-site>
+
+#### Ouvidoria
+
+* **Atividade 14.1**
+  * **Pergunta:** Há informações sobre o atendimento presencial pela Ouvidoria (Indicação de endereço físico, telefone e e-mail da unidade responsável, além do horário de funcionamento)? [(PNTP)](#141-há-informações-sobre-o-atendimento-presencial-pela-ouvidoria-indicação-de-endereço-físico-telefone-e-e-mail-da-unidade-responsável-além-do-horário-de-funcionamento)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação das informações sobre o atendimento presencial pela Ouvidoria
+  * **Links:**
+    * <https://www.jatai.go.leg.br/fale-conosco/ouvidoria>
+
+* **Atividade 14.2**
+  * **Pergunta:** Divulga Carta de Serviços ao Usuário? [(PNTP)](#142-divulga-carta-de-serviços-ao-usuário)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação da Carta de Serviços ao Usuário
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/ouvidoria/carta-de-servicos-aos-usuarios>
+
+* **Atividade 14.3**
+  * **Pergunta:** Há canal eletrônico de acesso/interação com a Ouvidoria (Ouvidoria e/ou Fale Conosco)? [(PNTP)](#143-há-canal-eletrônico-de-acessointeração-com-o-poder-ou-órgão-ouvidoria-eou-fale-conosco)
+  * **Responsável:** Ouvidoria
+  * **Produtos:**
+    * Publicação do canal eletrônico de acesso/interação com a Ouvidoria
+  * **Links:**
+    * <https://www.jatai.go.leg.br/fale-conosco/ouvidoria>
+
+#### LGPD e Governo Digital
+
+* **Atividade 15.1**
+  * **Pergunta:** Identifica o encarregado/responsável pelo tratamento de dados pessoais e disponibiliza Canal de Comunicação (telefone e/ou e-mail)? [(PNTP)](#151-identifica-o-encarregadoresponsável-pelo-tratamento-de-dados-pessoais-e-disponibiliza-canal-de-comunicação-telefone-eou-e-mail)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação do encarregado/responsável pelo tratamento de dados pessoais
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/lgpd/encarregado-lgpd>
+
+* **Atividade 15.2**
+  * **Pergunta:** Publica a sua Política de Privacidade e Proteção de Dados? [(PNTP)](#152-publica-a-sua-política-de-privacidade-e-proteção-de-dados)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação da Política de Privacidade e Proteção de Dados
+  * **Links:**
+    * <https://www.jatai.go.leg.br/politica-de-privacidade>
+
+* **Atividade 15.3**
+  * **Pergunta:** Possibilita a demanda e o acesso a serviços públicos por meio digital, sem necessidade de solicitação presencial? [(PNTP)](#153-possibilita-a-demanda-e-o-acesso-a-serviços-públicos-por-meio-digital-sem-necessidade-de-solicitação-presencial)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação da possibilidade de demanda e acesso a serviços públicos por meio digital
+      * O Conteúdo de "Acesso Rápido" está presente na capa do portal, já a guia lateral, fica disponível em toda página acessada.
+  * **Links:**
+    * <https://www.jatai.go.leg.br/>
+
+* **Atividade 15.4**
+  * **Pergunta:** Possibilita o acesso automatizado por sistemas externos em formatos abertos, estruturados e legíveis por máquina? [(PNTP)](#154-possibilita-o-acesso-automatizado-por-sistemas-externos-em-formatos-abertos-estruturados-e-legíveis-por-máquina)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação do acesso automatizado por sistemas externos
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/lgpd/acesso-automatizado>
+
+#### Atividades Finalisticas
+
+* **Atividade 20.1**
+  * **Pergunta:** Divulga a composição da Casa, com a biografia dos parlamentares? [(PNTP)](#201-divulga-a-composição-da-casa-com-a-biografia-dos-parlamentares)
+  * **Responsável:** DDE
+  * **Produtos:**
+    * Publicação da composição da Casa, com a biografia dos parlamentares
+  * **Links:**
+    * <https://www.jatai.go.leg.br/parlamentar>
+    
+
+20.1 Divulga a composição da Casa, com a biografia dos parlamentares?
+20.2 Divulga as leis e atos infralegais (resoluções, decretos, etc.) produzidos?
+20.3 Divulga projetos de leis e de atos infralegais, bem como as respectivas tramitações (contemplando ementa, documentos anexos, situação atual, autor, relator)?
+20.4 Divulga a pauta das sessões do Plenário?
+20.5 Divulga a pauta das Comissões?
+20.6 Divulga as atas das sessões, incluindo a lista de presença dos parlamentares em cada sessão?
+20.7 Divulga lista sobre as votações nominais?
+20.8 Divulga o ato que aprecia as Contas do Chefe do Poder Executivo (Decreto) e o teor do julgamento (Ata ou Resumo da Sessão que aprovou ou rejeitou as contas)?
+20.9 Há transmissão de sessões, audiências públicas, consultas públicas ou outras formas de participação popular via meios de comunicação como rádio, TV, internet, entre outros?
+20.10 Divulga a regulamentação e os valores relativos às cotas para exercício da atividade parlamentar/verba indenizatória?
+20.11 Divulga dados sobre as atividades legislativas dos parlamentares?
 
 ### Fase 4: Implementação das Recomendações e Melhoria Contínua
 
@@ -552,7 +694,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### Fase 4: SIC
 
-* **Atividade 12.6**
+* **Atividade 12.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga, na seção relativa ao e-SIC, os prazos de resposta ao cidadão, incluindo o recursal, e as autoridades competentes para o exame dos pedidos, além do procedimento referente à realização do pedido e de eventual recurso? [(PNTP)](#126-divulga-na-seção-relativa-ao-e-sic-os-prazos-de-resposta-ao-cidadão-incluindo-o-recursal-e-as-autoridades-competentes-para-o-exame-dos-pedidos-além-do-procedimento-referente-à-realização-do-pedido-e-de-eventual-recurso)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -560,6 +702,25 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-identificadas>
     * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-anonimas>
+
+* **Atividade 15.5**
+  * **Pergunta:** Regulamenta a Lei Federal nº 14.129/2021 e divulga a normativa em seu portal? [(PNTP)](#155-regulamenta-a-lei-federal-nº-141292021-e-divulga-a-normativa-em-seu-portal)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Redefinir a Comissão de Implementação da LGPD e avançar regulamentação
+    * <span style="color: red;">Portaria nº 43/2023 instituiu comissão para regulamentar a Lei Federal nº 14.129/2021. Precisa</span>
+  * **Links:**
+    * Portaria: <https://www.jatai.go.leg.br/informacao/lgpd/regulamentacao>
+
+* **Atividade 15.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Realiza e divulga resultados de pesquisas de satisfação? [(PNTP)](#156-realiza-e-divulga-resultados-de-pesquisas-de-satisfação)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Realização de pesquisa de satisfação
+    * Publicação dos resultados
+  * **Links:**
+    * Sem Links
+
 
 
 
