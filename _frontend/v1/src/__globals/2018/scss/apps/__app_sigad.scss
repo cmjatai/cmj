@@ -166,13 +166,13 @@
     color: $color_primary;
     margin-bottom: 0.9em;
     font-size: 90%;
-    margin-left: 5%;
+    // margin-left: 5%;
     text-align: center;
     font-style: italic;
   }
 
   .path-data-pub {
-    border-top: 1px solid transparentize(#a97905, 0.6);
+    border-top: 1px solid transparentize($color_border_input, 0.6);
     text-align: center;
     font-size: 0.6em;
     margin: 0;
@@ -182,6 +182,7 @@
     position: absolute;
     left: 0;
     right: 0;
+    z-index: 1;
 
     .container-versions {
       display: inline-block;
@@ -194,7 +195,7 @@
         content: '';
         display: block;
         height: 3px;
-        background-color: transparentize(#a97905, 0.6);
+        background-color: transparentize($color_border_input, 0.6);
       }
 
       a {

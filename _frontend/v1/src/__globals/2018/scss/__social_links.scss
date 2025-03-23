@@ -29,7 +29,7 @@
   display: inline-block;
   padding: 0;
   line-height: 1;
-  z-index: 1;
+  // z-index: 1;
   border-radius: 5px;
   overflow: hidden;
 
@@ -158,6 +158,13 @@
     display: block;
     width: 100%;
     clear: both;
+    border: 1px solid transparentize($color_border_input, 0.6);
+    border-left-width: 0;
+    border-right-width: 0;
+    border-radius: 0;
+    small {
+      font-size: 70%;
+    }
   }
   span {
     display: none;
