@@ -637,19 +637,62 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
     * Publicação da composição da Casa, com a biografia dos parlamentares
   * **Links:**
     * <https://www.jatai.go.leg.br/parlamentar>
-    
 
-20.1 Divulga a composição da Casa, com a biografia dos parlamentares?
-20.2 Divulga as leis e atos infralegais (resoluções, decretos, etc.) produzidos?
-20.3 Divulga projetos de leis e de atos infralegais, bem como as respectivas tramitações (contemplando ementa, documentos anexos, situação atual, autor, relator)?
-20.4 Divulga a pauta das sessões do Plenário?
-20.5 Divulga a pauta das Comissões?
-20.6 Divulga as atas das sessões, incluindo a lista de presença dos parlamentares em cada sessão?
-20.7 Divulga lista sobre as votações nominais?
-20.8 Divulga o ato que aprecia as Contas do Chefe do Poder Executivo (Decreto) e o teor do julgamento (Ata ou Resumo da Sessão que aprovou ou rejeitou as contas)?
-20.9 Há transmissão de sessões, audiências públicas, consultas públicas ou outras formas de participação popular via meios de comunicação como rádio, TV, internet, entre outros?
-20.10 Divulga a regulamentação e os valores relativos às cotas para exercício da atividade parlamentar/verba indenizatória?
-20.11 Divulga dados sobre as atividades legislativas dos parlamentares?
+* **Atividade 20.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga as leis e atos infralegais (resoluções, decretos, etc.) produzidos? [(PNTP)](#202-divulga-as-leis-e-atos-infralegais-resoluções-decretos-etc-produzidos)
+  * **Responsável:** DDE, Departamento Legislativo
+  * **Produtos:**
+    * Publicação das leis e atos infralegais produzidos
+  * **Links:**
+    * <https://www.jatai.go.leg.br/atos-normativos/pesquisar>
+
+* **Atividade 20.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga projetos de leis e de atos infralegais, bem como as respectivas tramitações (contemplando ementa, documentos anexos, situação atual, autor, relator)? [(PNTP)](#203-divulga-projetos-de-leis-e-de-atos-infralegais-bem-como-as-respectivas-tramitações-contemplando-ementa-documentos-anexos-situação-atual-autor-relator)
+  * **Responsável:** DDE, Departamento Legislativo
+  * **Produtos:**
+    * Publicação dos projetos de leis e de atos infralegais
+  * **Links:**
+    * <https://www.jatai.go.leg.br/atividade-legislativa/pesquisar>
+
+* **Atividade 20.4**
+  * **Pergunta:** Divulga a pauta das sessões do Plenário? [(PNTP)](#204-divulga-a-pauta-das-sessões-do-plenário)
+  * **Responsável:** DDE, Departamento Legislativo
+  * **Produtos:**
+    * Publicação da pauta das sessões do Plenário
+  * **Links:**
+    * <https://www.jatai.go.leg.br/atividade-legislativa/pautas-das-sessoes-plenarias>
+
+* **Atividade 20.5**
+  * **Pergunta:** Divulga a pauta das Comissões? [(PNTP)](#205-divulga-a-pauta-das-comissões)
+  * **Responsável:** DDE, Departamento Legislativo
+  * **Produtos:**
+    * Publicação da pauta das Comissões
+  * **Links:**
+    * <https://www.jatai.go.leg.br/atividade-legislativa/pautas-das-comissoes>
+
+* **Atividade 20.6**
+  * **Pergunta:** Divulga as atas das sessões, incluindo a lista de presença dos parlamentares em cada sessão? [(PNTP)](#206-divulga-as-atas-das-sessões-incluindo-a-lista-de-presença-dos-parlamentares-em-cada-sessão)
+  * **Responsável:** DDE, Departamento Legislativo
+  * **Produtos:**
+    * Publicação das atas das sessões
+  * **Links:**
+    * <https://www.jatai.go.leg.br/atividade-legislativa/atas-das-sessoes>
+
+* **Atividade 20.7**
+  * **Pergunta:** Divulga lista sobre as votações nominais? [(PNTP)](#207-divulga-lista-sobre-as-votações-nominais)
+  * **Responsável:** DDE, Departamento Legislativo
+  * **Produtos:**
+    * Publicação da lista sobre as votações nominais
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/atividade-legislativa/votacoes-nominais>
+
+* **Atividade 20.8**
+  * **Pergunta:** Divulga o ato que aprecia as Contas do Chefe do Poder Executivo (Decreto) e o teor do julgamento (Ata ou Resumo da Sessão que aprovou ou rejeitou as contas)? [(PNTP)](#208-divulga-o-ato-que-aprecia-as-contas-do-chefe-do-poder-executivo-decreto-e-o-teor-do-julgamento-ata-ou-resumo-da-sessão-que-aprovou-ou-rejeitou-as-contas)
+  * **Responsável:** DDE, Departamento Legislativo
+  * **Produtos:**
+    * Publicação do ato que aprecia as Contas do Chefe do Poder Executivo
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-executivo/julgamento-de-contas>
 
 ### Fase 4: Implementação das Recomendações e Melhoria Contínua
 
@@ -721,6 +764,33 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * Sem Links
 
+#### Fase 4: Atividade Finalísticas
+
+* **Atividade 20.9**
+  * **Pergunta:** Há transmissão de sessões, audiências públicas, consultas públicas ou outras formas de participação popular via meios de comunicação como rádio, TV, internet, entre outros? [(PNTP)](#209-há-transmissão-de-sessões-audiências-públicas-consultas-públicas-ou-outras-formas-de-participação-popular-via-meios-de-comunicação-como-rádio-tv-internet-entre-outros)
+  * **Responsável:** TV Câmara
+  * **Produtos:**
+    * Publicação da transmissão de sessões, audiências públicas, consultas públicas ou outras formas de participação popular
+  * **Links:**
+    * <https://www.jatai.go.leg.br/tv-cmj/ao-vivo>
+
+* **Atividade 20.10** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+  * **Pergunta:** Divulga a regulamentação e os valores relativos às cotas para exercício da atividade parlamentar/verba indenizatória? [(PNTP)](#2010-divulga-a-regulamentação-e-os-valores-relativos-às-cotas-para-exercício-da-atividade-parlamentarverba-indenizatória)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Não Existe Regulamentação para as cotas parlamentares. É redirecionado para uma página com o seguinte texto: "A Câmara Municipal de Jataí, declara inexistência de regulamentação e, por consequência, valores relativos às cotas para exercício da atividade parlamentar ou verbas indenizatórias até o presente momento."
+  * **Links:**
+    * <https://www.jatai.go.leg.br/informacao/atividade-legislativa/cotas-e-gastos-parlamentares>
+
+* **Atividade 20.11**
+  * **Pergunta:** Divulga dados sobre as atividades legislativas dos parlamentares? [(PNTP)](#2011-divulga-dados-sobre-as-atividades-legislativas-dos-parlamentares)
+  * **Responsável:** ???
+  * **Produtos:**
+    * Publicação dos dados sobre as atividades legislativas dos parlamentares
+  * **Links:**
+    * <https://www.jatai.go.leg.br/sistema/relatorios/materia-por-autor?legislatura_atual>
+
+20.11 Divulga dados sobre as atividades legislativas dos parlamentares?
 
 
 
