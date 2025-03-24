@@ -35,7 +35,7 @@
     "popper.js": "^1.16.1",
     "register-service-worker": "^1.7.1",
     "split.js": "^1.6.5",
-    "tinymce": "^7.0.0",
+    "tinymce": "^7.7.2",
     "vue": "^2.7.16",
     "vue-chartjs": "^4",
     "vue-cookie": "^1.1.4",

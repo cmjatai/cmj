@@ -164,7 +164,11 @@
         {{block.super}}
       {% endblock %}
       <div class="container container-simples">
-        {{object.texto|default:''|safe|urlize}}
+        {% if 'markdown' in object.texto %}
+          {{object.texto|default:''|markdown|safe}}
+        {% else %}
+          {{object.texto|default:''|safe|urlize}}
+        {% endif %}
       </div>
     </div>
   {% endwith %}

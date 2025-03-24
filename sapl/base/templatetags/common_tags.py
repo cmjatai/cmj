@@ -1,5 +1,8 @@
 import re
+
 import markdown as md
+from markdown.extensions.toc import slugify_unicode
+from markdown.extensions.toc import TocExtension as makeTocExtension
 
 from django import template
 from django.template.defaultfilters import stringfilter
@@ -395,16 +398,14 @@ def markdown(value):
 
     if not match:
         return md.markdown(value, extensions=[
-            'markdown.extensions.fenced_code',
-            'markdown.extensions.codehilite'
+            makeTocExtension(slugify=slugify_unicode), #TOC
         ])
 
     groups = match.groups()
     value = groups[1]
 
     mv = md.markdown(value, extensions=[
-        'markdown.extensions.fenced_code',
-        'markdown.extensions.codehilite'
+        makeTocExtension(slugify=slugify_unicode), #TOC
     ])
 
     return '{}{}{}'.format(groups[0], mv, groups[2])
