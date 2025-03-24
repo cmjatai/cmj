@@ -14,6 +14,7 @@ body {
 }
 
 main {
+  min-height: 70vh;
   &.appvue:hover {
     position: relative;
     z-index: 2650;
