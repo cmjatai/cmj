@@ -648,8 +648,7 @@ class MateriaLegislativa(CommonMixin):
 
         self.save()
 
-        for rv in self.registrovotacao_set.all():
-            task_add_selo_votacao_function(rv.id)
+        task_add_selo_votacao_function(list(self.registrovotacao_set.values_list('id', flat=True)))
 
 
 class AutoriaManager(models.Manager):
