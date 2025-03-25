@@ -378,13 +378,18 @@
 .mce-branding {
   display: none !important;
 }
-
+.container-segmentos {
+  display: flex;
+  flex-direction: row;
+}
 .btn-segmentos {
   background: darken($color_main_bg, 10%) $url_bg_png;
   flex: 1 1 20%;
-  font-size: 1.4rem;
+  font-size: 1.2rem;
   align-items: center;
   display: flex;
+  justify-content: center;
+  margin: 0 1px;
 
   span {
     font-variant: small-caps;
@@ -396,17 +401,15 @@
     background: darken($color_main_bg, 30%) $url_bg_png;
   }
 
-  &:not(:last-child) {
-    margin-bottom: 0.25rem;
-  }
   i {
+    flex: 0 0 auto;
     color: $color_text;
-    width: 4rem;
-    height: 4rem;
+    width: 3.5rem;
+    height: 3.5rem;
     text-align: center;
     border: 3px solid #fff;
     border-radius: 50%;
-    line-height: 4rem;
+    line-height: 3.3rem;
     margin: 5px 10px;
   }
 }
@@ -460,7 +463,22 @@
   }
 }
 
-@media screen and (max-width: 767px)  {
+@media screen and (max-width: 991.98px)  {
+  .container-segmentos {
+    flex-direction: column;
+    .btn-segmentos {
+      justify-content: left;
+      margin: 1px 0;
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px)  {
+  .container-segmentos {
+    flex-direction: column;
+    .btn-segmentos {
+    }
+  }
   .item-listas {
     .col-md-auto {
       padding-right: 15px;

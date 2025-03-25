@@ -13,29 +13,50 @@
 {% block base_content %}
 
 {% cache 300 cache_pagina_inicial%}
-<div id="main_content">
-  {% include "path/pagina_inicial_noticias_principais.html" %}
-  {% include "base_acesso_rapido.html" %}
-  {% include "path/pagina_inicial_video_aovivo.html" %}
-</div>
 
-{% comment %}
-  <div class="container d-none">
-    <div class="row">
-      <div class="col-lg-8 pr-lg-0 mt-lg-4 mt-3" id="main_content">
-      </div>
-      <div class="col-lg-4 d-flex flex-column mt-lg-4 pl-lg-1">
-        {% include "path/pagina_inicial_buttons.html" %}
-      </div>
+<div class="container" id="main_content">
+  <div class="row">
+    <div class="col-12 py-4">
+      {% include "path/pagina_inicial_noticias_principais.html" %}
     </div>
   </div>
-{% endcomment %}
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="col-12">
+      {% include "path/pagina_inicial_buttons.html" %}
+    </div>
+  </div>
+</div>
+
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-12">
+      {% include "path/pagina_inicial_video_aovivo.html" %}
+    </div>
+  </div>
+</div>
 
 {% with ""|transmissao_ao_vivo as aovivo %}
   {% if not aovivo.exists %}
-    {% include "path/pagina_inicial_ultimos_videos.html" %}
+    <div class="container">
+      <div class="row">
+        <div class="col-12">
+          {% include "path/pagina_inicial_ultimos_videos.html" %}
+        </div>
+      </div>
+    </div>
   {% endif %}
 {% endwith %}
+
+<div class="container-fluid' mt-4">
+  <div class="row">
+    <div class="col-12 p-0">
+      {% include "base_acesso_rapido.html" %}
+    </div>
+  </div>
+</div>
 
   <div class="container">
     <div class="row">

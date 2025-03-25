@@ -1,10 +1,10 @@
 .container-acesso-rapido {
-  background: $color_text_title $url_bg_png;
+  background: lighten($color_text_title, 20) $url_bg_png;
   padding: 20px 0 15px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  min-height: 0;
+  min-height: 50vh;
 
   h1 {
     color: #fff;
@@ -34,6 +34,9 @@
     //background: black;
     padding: 0px;
     margin: 0 -0.7rem;
+  }
+  .colmeia {
+    //margin-bottom: 2em;
   }
 
   .favo {
@@ -158,12 +161,16 @@
 
 @media screen and (max-width: 1199.98px) {
   .container-acesso-rapido {
+    min-height: auto;
     .favo {
       .action-acesso-rapido {
         .inner {
           font-size: 1rem;
         }
       }
+    }
+    .colmeia {
+      margin-bottom: 0em;
     }
   }
 }
