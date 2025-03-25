@@ -40,7 +40,7 @@ Ser reconhecidamente um órgão público transparente, acessível e confiável, 
 
 ### **Fase 1: Diagnóstico e Planejamento**
 
-* **Atividade:** Estudo da Cartilha do PNTP, descartando recomendações exclusivas de outros poderes e identificando as obrigações comuns e específicas ao Poder Legislativo.
+##### **Atividade:** Estudo da Cartilha do PNTP, descartando recomendações exclusivas de outros poderes e identificando as obrigações comuns e específicas ao Poder Legislativo.
 
   * **Responsável:** DDE e Controle Interno
 
@@ -48,7 +48,7 @@ Ser reconhecidamente um órgão público transparente, acessível e confiável, 
     * Lista consolidada das obrigações do Poder Legislativo, com base na Cartilha.
     * Checklist com as lacunas atuais do portal da Câmara, comparando com as exigências da Cartilha.
 
-* **Atividade:** Reunião com os chefes de departamento para apresentar o PNTP e o plano de ação.
+##### **Atividade:** Reunião com os chefes de departamento para apresentar o PNTP e o plano de ação.
 
   * **Responsável:** Gestor Público
 
@@ -56,7 +56,7 @@ Ser reconhecidamente um órgão público transparente, acessível e confiável, 
     * Conscientização e engajamento da equipe.
     * Definição de responsabilidades por departamento e cargo.
 
-* **Atividade:** Elaboração do cronograma detalhado de implementação, definindo prazos realistas para cada item.
+##### **Atividade:** Elaboração do cronograma detalhado de implementação, definindo prazos realistas para cada item.
 
   * **Responsável:** Gestor Público e Chefes de Departamento
 
@@ -73,7 +73,7 @@ O Poder Legislativo possui 11 critérios essenciais que se desdobram em 21 subcr
 
 #### **Fase 2: Informações Prioritárias**
 
-* **Atividade 1.1**
+##### **Atividade 1.1**
   * **Pergunta:** Possui sítio oficial próprio na internet? [(PNTP)](#11-possui-sítio-oficial-próprio-na-internet)
   * **Responsável:** DDE
   * **Produtos:**
@@ -81,7 +81,7 @@ O Poder Legislativo possui 11 critérios essenciais que se desdobram em 21 subcr
   * **Links:**
     * <https://www.jatai.go.leg.br>
 
-* **Atividade 1.2**
+##### **Atividade 1.2**
   * **Pergunta:** Possui portal da transparência próprio ou compartilhado na internet? [(PNTP)](#12-possui-portal-da-transparência-próprio-ou-compartilhado-na-internet)
   * **Responsável:** DDE
   * **Produtos:**
@@ -91,7 +91,7 @@ O Poder Legislativo possui 11 critérios essenciais que se desdobram em 21 subcr
 
 #### **Fase 2: Receitas**
 
-* **Atividade 3.1**
+##### **Atividade 3.1**
   * **Pergunta:** Divulga as receitas do Poder ou órgão, evidenciando sua previsão e realização? [(PNTP)](#31-divulga-as-receitas-do-poder-ou-órgão-evidenciando-sua-previsão-e-realização)
   * **Responsável:** ????
   * **Produtos:**
@@ -105,7 +105,7 @@ O Poder Legislativo possui 11 critérios essenciais que se desdobram em 21 subcr
 
 Padronizar a divulgação das despesas da Câmara, destacando execução e classificação orçamentária.
 
-* **Atividade 4.1**
+##### **Atividade 4.1**
   * **Pergunta:** Divulga as despesas do Poder ou órgão, detalhando sua execução (empenho, liquidação e pagamento) e identificando sua classificação orçamentária (unidade orçamentária, a função, a subfunção, categoria econômica, grupo de despesa, elemento de despesa e a fonte dos recursos)? [(PNTP)](#41-divulga-as-despesas-do-poder-ou-órgão-detalhando-sua-execução-empenho-liquidação-e-pagamento-e-identificando-sua-classificação-orçamentária-unidade-orçamentária-a-função-a-subfunção-categoria-econômica-grupo-de-despesa-elemento-de-despesa-e-a-fonte-dos-recursos)
   * **Responsável:** ????
   * **Produtos:**
@@ -117,7 +117,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_liquidada.php>
     * <http://camaradejatai.sigepnet.com.br/transparencia/despesa_paga.php>
 
-* **Atividade 4.2**
+##### **Atividade 4.2**
   * **Pergunta:** Divulga informações pormenorizadas das despesas do Poder ou órgão, detalhando o beneficiário do pagamento, o bem fornecido ou serviço prestado e o procedimento licitatório originário? [(PNTP)](#42-divulga-informações-pormenorizadas-das-despesas-do-poder-ou-órgão-detalhando-o-beneficiário-do-pagamento-o-bem-fornecido-ou-serviço-prestado-e-o-procedimento-licitatório-originário)
   * **Responsável:** ????
   * **Produtos:**
@@ -132,7 +132,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 2: Planejamento e Prestação de Contas**
 
-* **Atividade 11.5**
+##### **Atividade 11.5**
   * **Pergunta:** Divulga o Relatório de Gestão Fiscal? [(PNTP)](#115-divulga-o-relatório-de-gestão-fiscal-rgf)
   * **Responsável:** Diretoria de Finanças
   * **Produtos:**
@@ -144,13 +144,13 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Informações Prioritárias**
 
-* **Atividade 1.3**
+##### **Atividade 1.3**
   * **Pergunta:** O acesso ao portal transparência está visível na capa do site? [(PNTP)](#13-o-acesso-ao-portal-transparência-está-visível-na-capa-do-site)
   * **Responsável:** DDE
   * **Produtos:**
     * Verificação da visibilidade do Portal da Transparência na página principal do PortalCMJ.
 
-* **Atividade 1.4**
+##### **Atividade 1.4**
   * **Pergunta:** O site e o portal de transparência contêm ferramenta de pesquisa de conteúdo que permita o acesso à informação? [(PNTP)](#14-o-site-e-o-portal-de-transparência-contêm-ferramenta-de-pesquisa-de-conteúdo-que-permita-o-acesso-à-informação)
   * **Responsável:** DDE
   * **Produtos:**
@@ -163,7 +163,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Informações Institucionais**
 
-* **Atividade 2.1**
+##### **Atividade 2.1**
   * **Pergunta:** Divulga a sua estrutura organizacional? [(PNTP)](#21-divulga-a-sua-estrutura-organizacional)
   * **Responsável:** DDE
   * **Produtos:**
@@ -171,7 +171,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/institucional/estrutura-organizacional>
 
-* **Atividade 2.2**
+##### **Atividade 2.2**
   * **Pergunta:** Divulga competências e/ou atribuições? [(PNTP)](#22-divulga-competências-eou-atribuições)
   * **Responsável:** DDE
   * **Produtos:**
@@ -179,7 +179,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/institucional/estrutura-organizacional/estrutura-parlamentar>
 
-* **Atividade 2.3**
+##### **Atividade 2.3**
   * **Pergunta:** Identifica o nome dos atuais responsáveis pela gestão do Poder/Órgão? [(PNTP)](#23-identifica-o-nome-dos-atuais-responsáveis-pela-gestão-do-poderórgão)
   * **Responsável:** DDE
   * **Produtos:**
@@ -187,7 +187,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/institucional/mesa-diretora>
 
-* **Atividade 2.4**
+##### **Atividade 2.4**
   * **Pergunta:** Divulga os endereços e telefones atuais do Poder ou órgão e e-mails institucionais? [(PNTP)](#24-divulga-os-endereços-e-telefones-atuais-do-poder-ou-órgão-e-e-mails-institucionais)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -195,7 +195,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/fale-conosco/telefones-e-emails>
 
-* **Atividade 2.5**
+##### **Atividade 2.5**
   * **Pergunta:** Divulga o horário de atendimento? [(PNTP)](#25-divulga-o-horário-de-atendimento)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -203,7 +203,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/fale-conosco/sic-fisico>
 
-* **Atividade 2.6**
+##### **Atividade 2.6**
   * **Pergunta:** Divulga os atos normativos próprios? [(PNTP)](#26-divulga-os-atos-normativos-próprios)
   * **Responsável:** Departamento Legislativo
   * **Produtos:**
@@ -213,7 +213,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Resoluções: <https://www.jatai.go.leg.br/atos-normativos/resolucoes>
     * Portarias: <https://www.jatai.go.leg.br/atos-normativos/portarias>
 
-* **Atividade 2.7**
+##### **Atividade 2.7**
   * **Pergunta:** Divulga as perguntas e respostas mais frequentes relacionadas às atividades desenvolvidas pelo Poder/Órgão? [(PNTP)](#27-divulga-as-perguntas-e-respostas-mais-frequentes-relacionadas-às-atividades-desenvolvidas-pelo-poderórgão)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -225,7 +225,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Convênios e Transferências**
 
-* **Atividade 5.1**
+##### **Atividade 5.1**
   * **Pergunta:** Identifica as transferências recebidas a partir da celebração de convênios/acordos? [(PNTP)](#51-identifica-as-transferências-recebidas-a-partir-da-celebração-de-convêniosacordos-com-indicação-no-mínimo-do-valor-total-previsto-dos-recursos-envolvidos-do-valor-recebido-do-objeto-da-origem-órgão-repassadorconcedente-e-data-do-repasse)
   * **Responsável:** ???
   * **Produtos:**
@@ -233,7 +233,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/convenios-e-transferencias/transferencias-recebidas>
 
-* **Atividade 5.2**
+##### **Atividade 5.2**
   * **Pergunta:** Identifica as transferências realizadas a partir da celebração de convênios/acordos/ajustes, com indicação, no mínimo, do beneficiário, do objeto, do valor total previsto para repasse, do valor concedido e a data do repasse? [(PNTP)](#52-identifica-as-transferências-realizadas-a-partir-da-celebração-de-convêniosacordosajustes-com-indicação-no-mínimo-do-beneficiário-do-objeto-do-valor-total-previsto-para-repasse-do-valor-concedido-e-a-data-do-repasse)
   * **Responsável:** ???
   * **Produtos:**
@@ -241,7 +241,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/outras-informacoes/transferencias-concedidas>
 
-* **Atividade 5.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 5.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Identifica os acordos firmados que não envolvam transferência de recursos financeiros, identificando as partes, o objeto e as obrigações ajustadas? [(PNTP)](#53-identifica-os-acordos-firmados-que-não-envolvam-transferência-de-recursos-financeiros-identificando-as-partes-o-objeto-e-as-obrigações-ajustadas)
   * **Responsável:** ???
   * **Produtos:**
@@ -251,7 +251,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Recursos Humanos**
 
-* **Atividade 6.1**
+##### **Atividade 6.1**
   * **Pergunta:** Divulga a relação nominal dos servidores/autoridades/membros, seus cargos/funções, as respectivas lotações, as suas datas de admissão/exoneração/inativação e a carga horária semanal do cargo/função ocupada/desempenhada? [(PNTP)](#61-divulga-a-relação-nominal-dos-servidoresautoridadesmembros-seus-cargosfunções-as-respectivas-lotações-as-suas-datas-de-admissãoexoneraçãoinativação-e-a-carga-horária-semanal-do-cargofunção-ocupadadesempenhada)
   * **Responsável:** RH
   * **Produtos:**
@@ -259,7 +259,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/recursos-humanos/folha-de-pagamento>
 
-* **Atividade 6.2**
+##### **Atividade 6.2**
   * **Pergunta:** Identifica a remuneração nominal de cada servidor/autoridade/Membro e a tabela com o padrão remuneratório dos cargos e funções? [(PNTP)](#62-identifica-a-remuneração-nominal-de-cada-servidorautoridademembro-e-a-tabela-com-o-padrão-remuneratório-dos-cargos-e-funções)
   * **Responsável:** RH
   * **Produtos:**
@@ -267,7 +267,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/recursos-humanos/padrao-remuneratorio>
 
-* **Atividade 6.5**
+##### **Atividade 6.5**
   * **Pergunta:** Divulga a íntegra dos editais de concursos e seleções públicas realizados pelo Poder ou órgão para provimento de cargos e empregos públicos? [(PNTP)](#65-divulga-a-íntegra-dos-editais-de-concursos-e-seleções-públicas-realizados-pelo-poder-ou-órgão-para-provimento-de-cargos-e-empregos-públicos)
   * **Responsável:** RH
   * **Produtos:**
@@ -276,7 +276,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * <https://www.jatai.go.leg.br/informacao/recursos-humanos/concursos-publicos>
     * <https://www.jatai.go.leg.br/informacao/recursos-humanos/processos-seletivos>
 
-* **Atividade 6.6**
+##### **Atividade 6.6**
   * **Pergunta:** Divulga informações sobre os demais atos dos concursos públicos e processos seletivos do Poder ou órgão: vagas efetivamente preenchidas, lista de aprovados com as classificações, fila de espera/cadastro reserva e validade? [(PNTP)](#66-divulga-informações-sobre-os-demais-atos-dos-concursos-públicos-e-processos-seletivos-do-poder-ou-órgão-vagas-efetivamente-preenchidas-lista-de-aprovados-com-as-classificações-fila-de-esperacadastro-reserva-e-validade)
   * **Responsável:** RH
   * **Produtos:**
@@ -287,7 +287,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Diárias**
 
-* **Atividade 7.1**
+##### **Atividade 7.1**
   * **Pergunta:** Divulga o nome e o cargo/função do beneficiário, além do valor total recebido, número de diárias usufruídas por afastamento, período de afastamento, motivo do afastamento e local de destino? [(PNTP)](#71-divulga-o-nome-e-o-cargofunção-do-beneficiário-além-do-valor-total-recebido-número-de-diárias-usufruídas-por-afastamento-período-de-afastamento-motivo-do-afastamento-e-local-de-destino)
   * **Responsável:** Controle Interno
   * **Produtos:**
@@ -295,7 +295,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/diarias/diarias-e-passagens>
 
-* **Atividade 7.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 7.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga tabela ou relação que explicite os valores das diárias dentro do Estado, fora do Estado e fora do país, conforme legislação local? [(PNTP)](#72-divulga-tabela-ou-relação-que-explicite-os-valores-das-diárias-dentro-do-estado-fora-do-estado-e-fora-do-país-conforme-legislação-local)
   * **Responsável:** Controle Interno
   * **Produtos:**
@@ -305,7 +305,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Licitações**
 
-* **Atividade 8.1**
+##### **Atividade 8.1**
   * **Pergunta:** Divulga a relação das licitações em ordem sequencial, informando o número e modalidade licitatória, o objeto, valor estimado/homologado e a situação? [(PNTP)](#81-divulga-a-relação-das-licitações-em-ordem-sequencial-informando-o-número-e-modalidade-licitatória-o-objeto-valor-estimadohomologado-e-a-situação)
   * **Responsável:** Departamento de Licitações
   * **Produtos:**
@@ -313,7 +313,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/bidding-transparency.jsf>
 
-* **Atividade 8.2**
+##### **Atividade 8.2**
   * **Pergunta:** DDivulga a íntegra dos editais de licitação? [(PNTP)](#82-divulga-a-íntegra-dos-editais-de-licitação)
   * **Responsável:** Departamento de Licitações
   * **Produtos:**
@@ -323,7 +323,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-em-andamento>
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-encerradas>
 
-* **Atividade 8.3**
+##### **Atividade 8.3**
   * **Pergunta:** Divulga a íntegra dos demais documentos das fases interna e externa das licitações? [(PNTP)](#83-divulga-a-íntegra-dos-demais-documentos-das-fases-interna-e-externa-das-licitações)
   * **Responsável:** Departamento de Licitações
   * **Produtos:**
@@ -333,7 +333,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-em-andamento>
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-encerradas>
 
-* **Atividade 8.4**
+##### **Atividade 8.4**
   * **Pergunta:** Divulga a íntegra dos principais documentos dos processos de dispensa e inexigibilidade de licitação? [(PNTP)](#84-divulga-a-íntegra-dos-principais-documentos-dos-processos-de-dispensa-e-inexigibilidade-de-licitação)
   * **Responsável:** Departamento de Compras
   * **Produtos:**
@@ -343,7 +343,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Inexigibilidades: <https://www.jatai.go.leg.br/informacao/licitacoes/inexigibilidade>
     * Link do Portal de Transparência: <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/dispensation-bidding-transparency.jsf>
 
-* **Atividade 8.5**
+##### **Atividade 8.5**
   * **Pergunta:** Divulga a íntegra das Atas de Adesão – SRP? [(PNTP)](#85-divulga-a-íntegra-das-atas-de-adesão---srp)
   * **Responsável:** ???
   * **Produtos:**
@@ -353,7 +353,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Contratos**
 
-* **Atividade 9.1**
+##### **Atividade 9.1**
   * **Pergunta:** Divulga a relação dos contratos celebrados em ordem sequencial, com o seu respectivo resumo, contendo, no mínimo, indicação do contratado(a), do valor, do objeto e da vigência, bem como dos aditivos deles decorrentes? [(PNTP)](#91-divulga-a-relação-dos-contratos-celebrados-em-ordem-sequencial-com-o-seu-respectivo-resumo-contendo-no-mínimo-indicação-do-contratadoa-do-valor-do-objeto-e-da-vigência-bem-como-dos-aditivos-deles-decorrentes)
   * **Responsável:** ???
   * **Produtos:**
@@ -362,7 +362,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * <https://www.jatai.go.leg.br/informacao/contratos/contratos-em-vigencia>
     * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/contract-transparency.jsf>
 
-* **Atividade 9.2**
+##### **Atividade 9.2**
   * **Pergunta:** Divulga o inteiro teor dos contratos e dos respectivos termos aditivos? [(PNTP)](#92-divulga-o-inteiro-teor-dos-contratos-e-dos-respectivos-termos-aditivos)
   * **Responsável:** ???
   * **Produtos:**
@@ -371,7 +371,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * <https://www.jatai.go.leg.br/informacao/contratos/contratos-em-vigencia>
     * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/contract-transparency.jsf>
 
-* **Atividade 9.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 9.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga a relação/lista dos fiscais de cada contrato vigente e encerrado? [(PNTP)](#93-divulga-a-relaçãolista-dos-fiscais-de-cada-contrato-vigente-e-encerrado)
   * **Responsável:** ???
   * **Produtos:**
@@ -379,7 +379,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/tax-contract.jsf>
 
-* **Atividade 9.4** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 9.4** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga a ordem cronológica de seus pagamentos, bem como as justificativas que fundamentaram a eventual alteração dessa ordem? [(PNTP)](#94-divulga-a-ordem-cronológica-de-seus-pagamentos-bem-como-as-justificativas-que-fundamentaram-a-eventual-alteração-dessa-ordem)
   * **Responsável:** ???
   * **Produtos:**
@@ -389,23 +389,23 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Obras**
 
-* **Atividade 10.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 10.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga os quantitativos, e os preços unitários e totais contratados? [(PNTP)](#102-divulga-os-quantitativos-e-os-preços-unitários-e-totais-contratados)
   * **Responsável:** ???
   * **Produtos:**
     * Publicação dos quantitativos, e os preços unitários e totais contratados
   * **Links:**
-    * https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras
+    * <https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras>
 
-* **Atividade 10.3**
+##### **Atividade 10.3**
   * **Pergunta:** Divulga os quantitativos executados e os preços praticados? [(PNTP)](#103-divulga-os-quantitativos-executados-e-os-preços-praticados
   * **Responsável:** ???
   * **Produtos:**
     * Publicação dos quantitativos executados e os preços praticados
   * **Links:**
-    * https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras
+    * <https://www.jatai.go.leg.br/informacao/outras-informacoes/acompanhamento-de-obras>
 
-* **Atividade 10.4**
+##### **Atividade 10.4**
   * **Pergunta:** Divulga relação das obras paralisadas contendo o motivo, o responsável pela inexecução temporária do objeto do contrato e a data prevista para o reinício da sua execução? [(PNTP)](#104-divulga-relação-das-obras-paralisadas-contendo-o-motivo-o-responsável-pela-inexecução-temporária-do-objeto-do-contrato-e-a-data-prevista-para-o-reinício-da-sua-execução)
   * **Responsável:** ???
   * **Produtos:**
@@ -415,7 +415,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **Fase 3: Planejamento e Prestação de Contas**
 
-* **Atividade 11.1**
+##### **Atividade 11.1**
   * **Pergunta:** Publica a Prestação de Contas do Ano Anterior (Balanço Geral)? [(PNTP)](#111-publica-a-prestação-de-contas-do-ano-anterior-balanço-geral)
   * **Responsável:** ????
   * **Produtos:**
@@ -423,7 +423,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/balancete-financeiro>
 
-* **Atividade 11.2**
+##### **Atividade 11.2**
   * **Pergunta:** Divulga o Relatório de Gestão ou Atividades? [(PNTP)](#112-divulga-o-relatório-de-gestão-ou-atividades)
   * **Responsável:** ????
   * **Produtos:**
@@ -431,7 +431,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * ????
 
-* **Atividade 11.3**
+##### **Atividade 11.3**
   * **Pergunta:** Divulga o resultado da apreciação e/ou julgamento das contas pelo Tribunal de Contas? [(PNTP)](#113-divulga-o-resultado-da-apreciação-eou-julgamento-das-contas-pelo-tribunal-de-contas)
   * **Responsável:** ????
   * **Produtos:**
@@ -439,7 +439,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-legislativo/julgamento-de-contas>
 
-* **Atividade 11.4**
+##### **Atividade 11.4**
   * **Pergunta:** Divulga o resultado do julgamento das Contas do Chefe do Poder Executivo pelo Poder Legislativo? [(PNTP)](#114-divulga-o-resultado-do-julgamento-das-contas-do-chefe-do-poder-executivo-pelo-poder-legislativo)
   * **Responsável:** DDE
   * **Produtos:**
@@ -448,7 +448,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Pareceres do TCM: <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-executivo/balanco-anual>
     * Julgamento de Contas: <https://www.jatai.go.leg.br/informacao/planejamento-e-prestacao-de-contas/poder-executivo/julgamento-de-contas>
 
-* **Atividade 11.5**
+##### **Atividade 11.5**
   * **Pergunta:** Divulga o Relatório de Gestão Fiscal? [(PNTP)](#115-divulga-o-relatório-de-gestão-fiscal-rgf)
   * **Responsável:** ????
   * **Produtos:**
@@ -458,7 +458,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
 
 #### **SIC**
 
-* **Atividade 12.1**
+##### **Atividade 12.1**
   * **Pergunta:** Indica a unidade/setor responsável pelo SIC? [(PNTP)](#121-indica-a-unidadesetor-responsável-pelo-sic)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -466,7 +466,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/fale-conosco/sic-fisico>
 
-* **Atividade 12.2**
+##### **Atividade 12.2**
   * **Pergunta:** Indica o endereço físico, o telefone e o e-mail da unidade responsável pelo SIC, além do horário de funcionamento? [(PNTP)](#122-indica-o-endereço-físico-o-telefone-e-o-e-mail-da-unidade-responsável-pelo-sic-além-do-horário-de-funcionamento)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -474,7 +474,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/fale-conosco/sic-fisico>
 
-* **Atividade 12.3**
+##### **Atividade 12.3**
   * **Pergunta:** Há possibilidade de envio de pedidos de informação de forma eletrônica (e­-SIC)? [(PNTP)](#123-há-possibilidade-de-envio-de-pedidos-de-informação-de-forma-eletrônica-e-sic)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -483,7 +483,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Identificada: <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-identificadas>
     * Anônima: <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-anonimas>
 
-* **Atividade 12.4**
+##### **Atividade 12.4**
   * **Pergunta:** A solicitação por meio de eSic é simples, ou seja, sem a exigência de itens de identificação do requerente que dificultem ou impossibilitem o acesso à informação, tais como: envio de documentos, assinatura reconhecida, declaração de responsabilidade, maioridade? [(PNTP)](#124-a-solicitação-por-meio-de-esic-é-simples-ou-seja-sem-a-exigência-de-itens-de-identificação-do-requerente-que-dificultem-ou-impossibilitem-o-acesso-à-informação-tais-como-envio-de-documentos-assinatura-reconhecida-declaração-de-responsabilidade-maioridade)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -492,7 +492,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-identificadas>
     * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-anonimas>
 
-* **Atividade 12.5**
+##### **Atividade 12.5**
   * **Pergunta:** Divulga nesta seção, instrumento normativo local que regulamente a Lei
 nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normativo-local-que-regulamente-a-lei-nº-125272011--lai)
   * **Responsável:** Ouvidoria
@@ -501,7 +501,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/sic/regulamentacao>
 
-* **Atividade 12.7**
+##### **Atividade 12.7**
   * **Pergunta:** Divulga relatório anual estatístico contendo a quantidade de pedidos de acesso recebidos, atendidos, indeferidos, bem como informações genéricas sobre os solicitantes? [(PNTP)](#127-divulga-relatório-anual-estatístico-contendo-a-quantidade-de-pedidos-de-acesso-recebidos-atendidos-indeferidos-bem-como-informações-genéricas-sobre-os-solicitantes)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -509,7 +509,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-indicators.jsf>
 
-* **Atividade 12.8**
+##### **Atividade 12.8**
   * **Pergunta:** Divulga lista de documentos classificados em cada grau de sigilo, contendo pelo menos o assunto sobre o qual versa a informação, a categoria na qual ela se encontra, o dispositivo legal que fundamenta a classificação e o respectivo prazo? [(PNTP)](#128-divulga-lista-de-documentos-classificados-em-cada-grau-de-sigilo-contendo-pelo-menos-o-assunto-sobre-o-qual-versa-a-informação-a-categoria-na-qual-ela-se-encontra-o-dispositivo-legal-que-fundamenta-a-classificação-e-o-respectivo-prazo)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -517,7 +517,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-list-information.jsf>
 
-* **Atividade 12.9**
+##### **Atividade 12.9**
   * **Pergunta:** Divulga lista das informações que tenham sido desclassificadas nos últimos 12 (doze) meses? [(PNTP)](#129-divulga-lista-das-informações-que-tenham-sido-desclassificadas-nos-últimos-12-doze-meses)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -527,7 +527,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Acessibilidade**
 
-* **Atividade 13.1**
+##### **Atividade 13.1**
   * **Pergunta:** O site oficial e o portal de transparência contêm símbolo de acessibilidade em destaque? [(PNTP)](#131-o-site-oficial-e-o-portal-de-transparência-contêm-símbolo-de-acessibilidade-em-destaque)
   * **Responsável:** DDE
   * **Produtos:**
@@ -535,7 +535,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/acessibilidade>
 
-* **Atividade 13.2**
+##### **Atividade 13.2**
   * **Pergunta:** O site e o portal de transparência contêm exibição do “caminho” de páginas percorridas pelo usuário? [(PNTP)](#132-o-site-e-o-portal-de-transparência-contêm-exibição-do-caminho-de-páginas-percorridas-pelo-usuário)
   * **Responsável:** DDE
   * **Produtos:**
@@ -543,7 +543,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/acessibilidade>
 
-* **Atividade 13.3**
+##### **Atividade 13.3**
   * **Pergunta:** O site e o portal de transparência contêm opção de alto contraste? [(PNTP)](#133-o-site-e-o-portal-de-transparência-contêm-opção-de-alto-contraste)
   * **Responsável:** DDE
   * **Produtos:**
@@ -551,7 +551,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/acessibilidade>
 
-* **Atividade 13.4**
+##### **Atividade 13.4**
   * **Pergunta:** O site e o portal de transparência contêm ferramenta de redimensionamento de texto? [(PNTP)](#134-o-site-e-o-portal-de-transparência-contêm-ferramenta-de-redimensionamento-de-texto)
   * **Responsável:** DDE
   * **Produtos:**
@@ -559,7 +559,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/acessibilidade>
 
-* **Atividade 13.5**
+##### **Atividade 13.5**
   * **Pergunta:** Contém mapa do site institucional? [(PNTP)](#135-contém-mapa-do-site-institucional)
   * **Responsável:** DDE
   * **Produtos:**
@@ -569,7 +569,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Ouvidoria**
 
-* **Atividade 14.1**
+##### **Atividade 14.1**
   * **Pergunta:** Há informações sobre o atendimento presencial pela Ouvidoria (Indicação de endereço físico, telefone e e-mail da unidade responsável, além do horário de funcionamento)? [(PNTP)](#141-há-informações-sobre-o-atendimento-presencial-pela-ouvidoria-indicação-de-endereço-físico-telefone-e-e-mail-da-unidade-responsável-além-do-horário-de-funcionamento)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -577,7 +577,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/fale-conosco/ouvidoria>
 
-* **Atividade 14.2**
+##### **Atividade 14.2**
   * **Pergunta:** Divulga Carta de Serviços ao Usuário? [(PNTP)](#142-divulga-carta-de-serviços-ao-usuário)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -585,7 +585,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/ouvidoria/carta-de-servicos-aos-usuarios>
 
-* **Atividade 14.3**
+##### **Atividade 14.3**
   * **Pergunta:** Há canal eletrônico de acesso/interação com a Ouvidoria (Ouvidoria e/ou Fale Conosco)? [(PNTP)](#143-há-canal-eletrônico-de-acessointeração-com-o-poder-ou-órgão-ouvidoria-eou-fale-conosco)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -595,7 +595,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **LGPD e Governo Digital**
 
-* **Atividade 15.1**
+##### **Atividade 15.1**
   * **Pergunta:** Identifica o encarregado/responsável pelo tratamento de dados pessoais e disponibiliza Canal de Comunicação (telefone e/ou e-mail)? [(PNTP)](#151-identifica-o-encarregadoresponsável-pelo-tratamento-de-dados-pessoais-e-disponibiliza-canal-de-comunicação-telefone-eou-e-mail)
   * **Responsável:** DDE
   * **Produtos:**
@@ -603,7 +603,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/lgpd/encarregado-lgpd>
 
-* **Atividade 15.2**
+##### **Atividade 15.2**
   * **Pergunta:** Publica a sua Política de Privacidade e Proteção de Dados? [(PNTP)](#152-publica-a-sua-política-de-privacidade-e-proteção-de-dados)
   * **Responsável:** DDE
   * **Produtos:**
@@ -611,7 +611,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/politica-de-privacidade>
 
-* **Atividade 15.3**
+##### **Atividade 15.3**
   * **Pergunta:** Possibilita a demanda e o acesso a serviços públicos por meio digital, sem necessidade de solicitação presencial? [(PNTP)](#153-possibilita-a-demanda-e-o-acesso-a-serviços-públicos-por-meio-digital-sem-necessidade-de-solicitação-presencial)
   * **Responsável:** DDE
   * **Produtos:**
@@ -620,7 +620,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/>
 
-* **Atividade 15.4**
+##### **Atividade 15.4**
   * **Pergunta:** Possibilita o acesso automatizado por sistemas externos em formatos abertos, estruturados e legíveis por máquina? [(PNTP)](#154-possibilita-o-acesso-automatizado-por-sistemas-externos-em-formatos-abertos-estruturados-e-legíveis-por-máquina)
   * **Responsável:** DDE
   * **Produtos:**
@@ -630,7 +630,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Atividades Finalisticas**
 
-* **Atividade 20.1**
+##### **Atividade 20.1**
   * **Pergunta:** Divulga a composição da Casa, com a biografia dos parlamentares? [(PNTP)](#201-divulga-a-composição-da-casa-com-a-biografia-dos-parlamentares)
   * **Responsável:** DDE
   * **Produtos:**
@@ -638,7 +638,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/parlamentar>
 
-* **Atividade 20.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 20.2** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga as leis e atos infralegais (resoluções, decretos, etc.) produzidos? [(PNTP)](#202-divulga-as-leis-e-atos-infralegais-resoluções-decretos-etc-produzidos)
   * **Responsável:** DDE, Departamento Legislativo
   * **Produtos:**
@@ -646,7 +646,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/atos-normativos/pesquisar>
 
-* **Atividade 20.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 20.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga projetos de leis e de atos infralegais, bem como as respectivas tramitações (contemplando ementa, documentos anexos, situação atual, autor, relator)? [(PNTP)](#203-divulga-projetos-de-leis-e-de-atos-infralegais-bem-como-as-respectivas-tramitações-contemplando-ementa-documentos-anexos-situação-atual-autor-relator)
   * **Responsável:** DDE, Departamento Legislativo
   * **Produtos:**
@@ -654,7 +654,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/atividade-legislativa/pesquisar>
 
-* **Atividade 20.4**
+##### **Atividade 20.4**
   * **Pergunta:** Divulga a pauta das sessões do Plenário? [(PNTP)](#204-divulga-a-pauta-das-sessões-do-plenário)
   * **Responsável:** DDE, Departamento Legislativo
   * **Produtos:**
@@ -662,7 +662,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/atividade-legislativa/pautas-das-sessoes-plenarias>
 
-* **Atividade 20.5**
+##### **Atividade 20.5**
   * **Pergunta:** Divulga a pauta das Comissões? [(PNTP)](#205-divulga-a-pauta-das-comissões)
   * **Responsável:** DDE, Departamento Legislativo
   * **Produtos:**
@@ -670,7 +670,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/atividade-legislativa/pautas-das-comissoes>
 
-* **Atividade 20.6**
+##### **Atividade 20.6**
   * **Pergunta:** Divulga as atas das sessões, incluindo a lista de presença dos parlamentares em cada sessão? [(PNTP)](#206-divulga-as-atas-das-sessões-incluindo-a-lista-de-presença-dos-parlamentares-em-cada-sessão)
   * **Responsável:** DDE, Departamento Legislativo
   * **Produtos:**
@@ -678,7 +678,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/atividade-legislativa/atas-das-sessoes>
 
-* **Atividade 20.7**
+##### **Atividade 20.7**
   * **Pergunta:** Divulga lista sobre as votações nominais? [(PNTP)](#207-divulga-lista-sobre-as-votações-nominais)
   * **Responsável:** DDE, Departamento Legislativo
   * **Produtos:**
@@ -686,7 +686,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/atividade-legislativa/votacoes-nominais>
 
-* **Atividade 20.8**
+##### **Atividade 20.8**
   * **Pergunta:** Divulga o ato que aprecia as Contas do Chefe do Poder Executivo (Decreto) e o teor do julgamento (Ata ou Resumo da Sessão que aprovou ou rejeitou as contas)? [(PNTP)](#208-divulga-o-ato-que-aprecia-as-contas-do-chefe-do-poder-executivo-decreto-e-o-teor-do-julgamento-ata-ou-resumo-da-sessão-que-aprovou-ou-rejeitou-as-contas)
   * **Responsável:** DDE, Departamento Legislativo
   * **Produtos:**
@@ -698,7 +698,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Fase 4: Licitações**
 
-* **Atividade 8.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 8.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga o plano de contratações anual (art. 12, VII, da Lei n. 14.133)? [(PNTP)](#86-divulga-o-plano-de-contratações-anual-art-12-vii-da-lei-n-14133)
   * **Responsável:** ???
   * **Produtos:**
@@ -707,7 +707,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
     * <https://www.jatai.go.leg.br/informacao/licitacoes/plano-de-contratacoes-anual>
     * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/annual-hiring-plan.jsf>
 
-* **Atividade 8.7** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 8.7** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga a relação dos licitantes e/ou contratados sancionados administrativamente pelo Poder ou órgão? [(PNTP)](#87-divulga-a-relação-dos-licitantes-eou-contratados-sancionados-administrativamente-pelo-poder-ou-órgão)
   * **Responsável:** ???
   * **Produtos:**
@@ -717,7 +717,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Fase 4: Obras**
 
-* **Atividade 10.1** - <span style="color: red;">PARTE NÃO ATENDIDA EM 2024</span>
+##### **Atividade 10.1** - <span style="color: red;">PARTE NÃO ATENDIDA EM 2024</span>
   * **Pergunta:** Divulga informações sobre obras: data de início, etapas, percentual concluído, status e previsão de conclusão? [(PNTP)](#101-divulga-informações-sobre-obras-data-de-início-etapas-percentual-concluído-status-e-previsão-de-conclusão)
   * **Responsável:** ???
   * **Produtos:**
@@ -727,7 +727,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Fase 4: Planejamento e Prestação de Contas**
 
-* **Atividade 11.7** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 11.7** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga os objetivos estratégicos do Poder ou órgão e os indicadores definidos para mensurar o alcance desses objetivos (plano estratégico institucional ou instrumento equivalente)? [(PNTP)](#117-divulga-os-objetivos-estratégicos-do-poder-ou-órgão-e-os-indicadores-definidos-para-mensurar-o-alcance-desses-objetivos-plano-estratégico-institucional-ou-instrumento-equivalente)
   * **Responsável:** ????
   * **Produtos:**
@@ -737,7 +737,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Fase 4: SIC**
 
-* **Atividade 12.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 12.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga, na seção relativa ao e-SIC, os prazos de resposta ao cidadão, incluindo o recursal, e as autoridades competentes para o exame dos pedidos, além do procedimento referente à realização do pedido e de eventual recurso? [(PNTP)](#126-divulga-na-seção-relativa-ao-e-sic-os-prazos-de-resposta-ao-cidadão-incluindo-o-recursal-e-as-autoridades-competentes-para-o-exame-dos-pedidos-além-do-procedimento-referente-à-realização-do-pedido-e-de-eventual-recurso)
   * **Responsável:** Ouvidoria
   * **Produtos:**
@@ -746,7 +746,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
     * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-identificadas>
     * <https://www.jatai.go.leg.br/informacao/sic/esic-solicitacoes-anonimas>
 
-* **Atividade 15.5**
+##### **Atividade 15.5**
   * **Pergunta:** Regulamenta a Lei Federal nº 14.129/2021 e divulga a normativa em seu portal? [(PNTP)](#155-regulamenta-a-lei-federal-nº-141292021-e-divulga-a-normativa-em-seu-portal)
   * **Responsável:** ???
   * **Produtos:**
@@ -755,7 +755,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * Portaria: <https://www.jatai.go.leg.br/informacao/lgpd/regulamentacao>
 
-* **Atividade 15.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 15.6** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Realiza e divulga resultados de pesquisas de satisfação? [(PNTP)](#156-realiza-e-divulga-resultados-de-pesquisas-de-satisfação)
   * **Responsável:** ???
   * **Produtos:**
@@ -766,7 +766,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
 
 #### **Fase 4: Atividade Finalísticas**
 
-* **Atividade 20.9**
+##### **Atividade 20.9**
   * **Pergunta:** Há transmissão de sessões, audiências públicas, consultas públicas ou outras formas de participação popular via meios de comunicação como rádio, TV, internet, entre outros? [(PNTP)](#209-há-transmissão-de-sessões-audiências-públicas-consultas-públicas-ou-outras-formas-de-participação-popular-via-meios-de-comunicação-como-rádio-tv-internet-entre-outros)
   * **Responsável:** TV Câmara
   * **Produtos:**
@@ -774,7 +774,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/tv-cmj/ao-vivo>
 
-* **Atividade 20.10** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
+##### **Atividade 20.10** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga a regulamentação e os valores relativos às cotas para exercício da atividade parlamentar/verba indenizatória? [(PNTP)](#2010-divulga-a-regulamentação-e-os-valores-relativos-às-cotas-para-exercício-da-atividade-parlamentarverba-indenizatória)
   * **Responsável:** ???
   * **Produtos:**
@@ -782,7 +782,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/atividade-legislativa/cotas-e-gastos-parlamentares>
 
-* **Atividade 20.11**
+##### **Atividade 20.11**
   * **Pergunta:** Divulga dados sobre as atividades legislativas dos parlamentares? [(PNTP)](#2011-divulga-dados-sobre-as-atividades-legislativas-dos-parlamentares)
   * **Responsável:** ???
   * **Produtos:**
