@@ -136,7 +136,6 @@ window.AppLOA = function () {
       form.submit()
     }
 
-    // Resto do código permanece igual
     const sAgrup = form.find('select[name="agrupamento"]')
     const rTipoAgrup = form.find('input[type="radio"][name="tipo_agrupamento"]')
     sAgrup.change((event) => {
@@ -176,13 +175,13 @@ window.AppLOA = function () {
         }
       }).change()
     form
-      .find('input[type="checkbox"]')
+      .find('#div_id_parlamentares input[type="checkbox"]')
       .change((event) => {
         changeAction()
       })
     form
-      .find('input[type="text"]')
-      .change((event) => {
+      .find('button[type="button"]')
+      .click((event) => {
         changeAction()
       })
     form

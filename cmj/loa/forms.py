@@ -2,6 +2,9 @@ from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN
 import logging
 import re
 
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton
+from crispy_forms.layout import Field
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset, HTML, Div, Submit
 from django import forms
@@ -910,7 +913,7 @@ class EmendaLoaFilterSet(FilterSet):
     )
 
     finalidade = CharFilter(label='Busca por termos',
-                            help_text='Filtra os termos acima nos campos finalidade ou Unidade Orçamentária',
+                            help_text='Os Termos informados serão buscados nos campos finalidade ou Unidade Orçamentária',
                             method='filter_finalidade')
 
     class Meta:
@@ -1009,20 +1012,28 @@ class EmendaLoaFilterSet(FilterSet):
         self.loa = kwargs.pop('loa')
         super().__init__(*args, **kwargs)
 
+        finalidade_field = FieldWithButtons(
+            Field('finalidade',
+                    placeholder=_('Informe termos a filtrar...')),
+            StrictButton(
+                _('Filtrar'), css_class='btn-secondary',
+                type='button'
+            )
+        )
         row = to_row(
             [
                 (
                     to_row(
                         [
                             ('parlamentares', 12),
+                            ('fase', 5),
                             (
                                 to_row([
-                                    ('finalidade', 12),
                                     ('tipo', 12),
+                                    (finalidade_field, 12),
                                 ]),
                                 7
                             ),
-                            ('fase', 5),
                         ]
                     ),
                     8

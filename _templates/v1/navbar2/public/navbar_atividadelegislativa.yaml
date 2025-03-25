@@ -3,7 +3,7 @@
   children:
   - title: {% trans 'Matérias Legislativas' %}
     url: {% url 'cmj.search:materia_haystack_search' %}
-  - title: {% trans 'LOAs - Emendas Impositivas' %}
+  - title: {% trans 'Orçamento Impositivo' %}
     url: {% url 'cmj.loa:loa_list' %}
   - title: {% trans 'Sessões Plenárias' %}
     url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}

@@ -62,6 +62,14 @@ class LoaCrud(Crud):
             return list_field_names
 
         @property
+        def verbose_name(self):
+            return _('Lei Orçamentária Anual')
+
+        @property
+        def verbose_name_plural(self):
+            return _('Leis Orçamentárias Anuais')
+
+        @property
         def list_url(self):
             url = super().list_url
             if self.request.user.is_anonymous:
@@ -173,6 +181,24 @@ class LoaCrud(Crud):
 
     class DetailView(Crud.DetailView):
         layout_key = 'LoaDetail'
+
+        @property
+        def extras_list_url(self):
+            btns = []
+
+            btns.extend(
+                [
+                    (
+                        reverse('cmj.loa:emendaloa_list',
+                                kwargs={'pk': self.kwargs['pk']}),
+                        'btn-primary',
+                        _('Listas Emendas Impositivas')
+                    )
+                ]
+            )
+
+            btns = list(filter(None, btns))
+            return btns
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
