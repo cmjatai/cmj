@@ -28,12 +28,19 @@
           {% else %}
             {{tipo}} <strong>({{formatos.individual|length}})</strong>
           {% endif %}
-
         </a>
         <br>
       {% endif %}
     {% endfor %}
   {% endfor %}
   </div>
+
   {{ block.super }}
+{% endblock %}
+{% block extra_content %}
+<em>NOTA:
+Está em dúvida da escrita de uma proposição?<br>A Câmara de Belo Horizonte possui um
+Guia de Redação de excelente qualidade e você pode conferir inúmeros modelos de
+proposições <a target=_blank href="https://www.jatai.go.leg.br/media/files/guia_de_redacao_-_outubro_de_2024.pdf">clicando aqui.</a>
+</em>
 {% endblock %}

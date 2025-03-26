@@ -106,7 +106,7 @@
 
 .navbar-menu {
   z-index: $zindex-navbar-menu;
-  border-bottom: 3px solid $color_border_menu_bottom;
+  border-bottom: 3px solid $bg_color_thematic;
   .navbar-nav {
     z-index: 2;
     & > li {

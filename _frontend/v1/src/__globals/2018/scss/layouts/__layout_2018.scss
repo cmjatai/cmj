@@ -383,7 +383,7 @@
   flex-direction: row;
 }
 .btn-segmentos {
-  background: darken($color_border_menu_bottom, 10%) $url_bg_png;
+  background: darken($bg_color_thematic, 10%) $url_bg_png;
   flex: 1 1 20%;
   font-size: 1.2rem;
   align-items: center;
@@ -394,7 +394,7 @@
   span {
     font-variant: small-caps;
     font-weight: bold;
-    color: invert($color_border_menu_bottom);
+    color: invert($bg_color_thematic);
   }
   &:hover {
     text-decoration: none;
@@ -403,11 +403,11 @@
 
   i {
     flex: 0 0 auto;
-    color: invert($color_border_menu_bottom);
+    color: invert($bg_color_thematic);
     width: 3.5rem;
     height: 3.5rem;
     text-align: center;
-    border: 3px solid invert($color_border_menu_bottom);
+    border: 3px solid invert($bg_color_thematic);
     border-radius: 50%;
     line-height: 3.3rem;
     margin: 5px 10px;
