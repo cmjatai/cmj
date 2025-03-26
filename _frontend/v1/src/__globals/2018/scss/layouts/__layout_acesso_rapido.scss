@@ -1,5 +1,5 @@
 .container-acesso-rapido {
-  background: $bg_color_thematic $url_bg_png;
+  background: darken($bg_color_thematic, 10%) $url_bg_png;
   padding: 20px 0 15px;
   display: flex;
   flex-direction: column;
@@ -55,7 +55,7 @@
       position: absolute;
       width: 100%;
       height: 100%;
-      opacity: 0.3;
+      opacity: 0.6;
     }
     &[id^=favo] {
       &::before {

@@ -21,13 +21,13 @@
 
 @keyframes keyframe_opacity {
   0% {
-  opacity: 0.3;
+  opacity: 0.6;
   }
   8% {
     opacity: 1;
   }
   16% {
-    opacity: 0.3;
+    opacity: 0.6;
   }
   // 100% {
   //  opacity: 0.3;
@@ -385,20 +385,21 @@
 .btn-segmentos {
   background: darken($bg_color_thematic, 10%) $url_bg_png;
   flex: 1 1 20%;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   align-items: center;
   display: flex;
   justify-content: center;
   margin: 0 1px;
 
   span {
+    font-family: "Rubik";
     font-variant: small-caps;
-    font-weight: bold;
+    font-weight: 500;
     color: invert($bg_color_thematic);
   }
   &:hover {
     text-decoration: none;
-    background: darken($color_main_bg, 30%) $url_bg_png;
+    background: darken($color_main_bg, 60%) $url_bg_png;
   }
 
   i {
@@ -463,6 +464,14 @@
   }
 }
 
+@media screen and (max-width: 1399.98px)  {
+  .container-segmentos {
+    .btn-segmentos {
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+  }
+}
 @media screen and (max-width: 991.98px)  {
   .container-segmentos {
     flex-direction: column;
