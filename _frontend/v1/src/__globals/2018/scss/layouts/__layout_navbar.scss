@@ -103,9 +103,10 @@
   }
 }
 
+
 .navbar-menu {
   z-index: $zindex-navbar-menu;
-  border-bottom: 1px solid $color_text_menu;
+  border-bottom: 3px solid $color_border_menu_bottom;
   .navbar-nav {
     z-index: 2;
     & > li {
@@ -145,13 +146,18 @@
     }
   }
 }
+.body-initial {
+  .navbar-menu {
+    border-bottom-width: 5px;
+  }
+}
 
 .navbar-topo {
   z-index: $zindex-navbar-topo;
   background: $color_primary;
   padding: 0 0 0 0;
   .before {
-    content: "";
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
@@ -167,7 +173,7 @@
     //background: radial-gradient(transparent, $color_primary);
     transition: all 1s ease;
     &::after {
-      content: "";
+      content: '';
       position: absolute;
       z-index: -1;
       background-image: url(~@/assets/img/fundo_topo_compressed.jpg);
@@ -265,8 +271,6 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
-
-
   }
 
   .row-2 {
@@ -282,7 +286,7 @@
       opacity: 0.5;
       transition: all 1s ease-in-out;
       &::after {
-        content: " ";
+        content: ' ';
         transition: all 1s ease-in-out;
         // background-color: white;
         position: absolute;
@@ -354,7 +358,7 @@
         right: 1px;
         bottom: 1px;
         &:hover {
-          background-color:$hover_background_10p;
+          background-color: $hover_background_10p;
         }
       }
       input {
@@ -371,7 +375,6 @@
       }
     }
   }
-
 }
 
 #portallogo {
@@ -382,7 +385,7 @@
     margin: 0;
     align-items: center;
 
-    font-family: "Graduate";
+    font-family: 'Graduate';
     img {
       padding: 0 20px;
       padding-left: 0;
@@ -416,7 +419,8 @@
 }
 .container-transparencia {
   display: flex;
-  .link-e-sic, .link-radar {
+  .link-e-sic,
+  .link-radar {
     display: inline-block;
     position: relative;
     border-radius: 7px;
@@ -426,7 +430,7 @@
     line-height: 1em;
     font-weight: 700;
     &::after {
-      content: "";
+      content: '';
       display: block;
       position: absolute;
       margin: 7px 10px;
@@ -487,7 +491,7 @@
         padding: 8px;
         border-radius: 10px;
         &::before {
-          content: "";
+          content: '';
           box-shadow: 0px 24px 24px 12px #0007;
           position: absolute;
           z-index: -1;
@@ -565,7 +569,7 @@
   :hover {
     .link-e-sic {
       &::before {
-        content: "";
+        content: '';
         position: absolute;
         width: 0;
         height: 0;
@@ -574,7 +578,7 @@
         border-color: transparent transparent #fff;
         right: 20%;
         top: 100%;
-        }
+      }
     }
   }
 }
@@ -829,7 +833,6 @@
       }
     }
   }
-
 }
 
 @media screen and (max-width: 575.98px) {
@@ -887,7 +890,7 @@
   .navbar-menu {
     .dropdown-menu {
       &::before {
-        content: " ";
+        content: ' ';
         background: transparent;
         position: absolute;
         top: -20px;
