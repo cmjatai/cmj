@@ -55,7 +55,7 @@
         <div class="col-12">
           <div class="text-red">
             <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
-            <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
+            <a href="{{ r.norma_principal.urlize }}">
               {{ r.norma_principal.epigrafe }}
             </a>
           </div>
@@ -69,7 +69,7 @@
     {% if p.tipo_vinculo.sigla != "Z" %}
         <div class="col-{% if n.get_normas_relacionadas.10|length > 6 %}6{%else%}12{%endif%}  small text-blue">
           <b>{{ p.tipo_vinculo.descricao_ativa }}</b>&nbsp;
-          <a href="{% url 'sapl.norma:normajuridica_detail' p.norma_relacionada.pk %}">
+          <a href="{{ p.norma_relacionada.urlize }}">
             {{ p.norma_relacionada.epigrafe }}
           </a>
         </div>
@@ -82,7 +82,7 @@
       {% if r.tipo_vinculo.sigla != "R" %}
         <div class="col-{% if n.get_normas_relacionadas.1|length > 6 %}6{%else%}12{%endif%} small text-blue">
           <b>{{ r.tipo_vinculo.descricao_passiva }}</b>&nbsp;
-          <a href="{% url 'sapl.norma:normajuridica_detail' r.norma_principal.pk %}">
+          <a href="{{ r.norma_principal.urlize }}">
             {{ r.norma_principal.epigrafe }}
           </a>
         </div>

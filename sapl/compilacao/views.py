@@ -1029,11 +1029,18 @@ class TextView(CompMixin, ListView):
 
         sign = self.kwargs.get('sign', '')
 
-        if self.is_reader() and self.object.is_cached(sign=sign):
-            context = ContextMixin.get_context_data(self, **kwargs)
-            context['object'] = self.object
+        if self.is_reader():
 
-            return self.render_to_response(context)
+            if not sign and request.path.startswith('/ta/'):
+                content_object = self.object.content_object
+                if content_object and content_object._meta.model_name == 'normajuridica':
+                    return redirect(content_object.urlize())
+
+            if self.object.is_cached(sign=sign):
+                context = ContextMixin.get_context_data(self, **kwargs)
+                context['object'] = self.object
+
+                return self.render_to_response(context)
 
         return ListView.get(self, request, *args, **kwargs)
 

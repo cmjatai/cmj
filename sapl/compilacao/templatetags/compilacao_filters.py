@@ -321,34 +321,3 @@ def list(obj):
 @register.filter
 def can_use_dynamic_editing(texto_articulado, user):
     return texto_articulado.can_use_dynamic_editing(user)
-
-sigla_norma_conversao = {
-    'LOM': ('LOM', ()),
-    'RI': ('RI', ()),
-    'LEI': ('L', ('numero',)),
-    'LC': ('LC', ('numero','ano')),
-    'LE': ('LE', ('numero','ano')),
-    'DL': ('DL', ('numero','ano')),
-    'PLE': ('PLE', ('numero','ano')),
-    'PR': ('PR', ('numero','ano')),
-    'RES': ('RES', ('numero','ano')),
-    'ATG': ('ATG', ('numero','ano')),
-    'ELO': ('ELO', ('numero','ano')),
-}
-
-
-@register.simple_tag(takes_context=True)
-def urlize_norma(context, view_name, norma):
-    #if context['perms']['norma']['add_normajuridica']:
-    #    return reverse(view_name, args=(norma.pk, ))
-
-    sigla = norma.tipo.sigla
-    url = f'/{sigla}'
-    if sigla in sigla_norma_conversao:
-        url = f'/{sigla_norma_conversao[sigla][0]}'
-        sufix = []
-        for field in sigla_norma_conversao[sigla][1]:
-            sufix.append(f'{getattr(norma, field)}')
-        url += '-'.join(sufix)
-
-    return url

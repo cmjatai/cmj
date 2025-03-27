@@ -4,7 +4,7 @@
 
 <strong>
   <a class="text-epigrafe text-{{ cert.content_object|meta_model_value:'model_name' }}"
-      href="{% urlize_norma 'sapl.norma:normajuridica_detail' n %}">
+      href="{{ n.urlize }}">
     {% if n.is_signed %}
       <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
     {% endif %}

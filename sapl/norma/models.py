@@ -1,3 +1,4 @@
+from functools import cached_property
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
@@ -216,6 +217,33 @@ class NormaJuridica(CommonMixin):
         return anexos
 
     @property
+    def sigla_norma_conversao(self):
+        return {
+            'LOM': ('LOM', ()),
+            'RI': ('RI', ()),
+            'LEI': ('L', ('numero',)),
+            'LC': ('LC', ('numero','ano')),
+            'LE': ('LE', ('numero','ano')),
+            'DL': ('DL', ('numero','ano')),
+            'PLE': ('PLE', ('numero','ano')),
+            'PR': ('PR', ('numero','ano')),
+            'RES': ('RES', ('numero','ano')),
+            'ATG': ('ATG', ('numero','ano')),
+            'ELO': ('ELO', ('numero','ano')),
+        }
+
+    def urlize(self):
+        sigla = self.tipo.sigla
+        url = f'/{sigla}'
+        if sigla in self.sigla_norma_conversao:
+            url = f'/{self.sigla_norma_conversao[sigla][0]}'
+            sufix = []
+            for field in self.sigla_norma_conversao[sigla][1]:
+                sufix.append(f'{getattr(self, field)}')
+            url += '-'.join(sufix)
+        return url
+
+    @property
     def is_signed(self):
         try:
             return self.metadata and self.metadata['signs'] and \
@@ -243,14 +271,14 @@ class NormaJuridica(CommonMixin):
     def __descr__(self):
         return self.ementa
 
-    def __str__(self):
+    @property
+    def epigrafe(self):
         return _('%(tipo)s nº %(numero)s de %(data)s') % {
             'tipo': self.tipo,
             'numero': self.numero,
             'data': defaultfilters.date(self.data, r"d \d\e F \d\e Y")}
 
-    @property
-    def epigrafe(self):
+    def __str__(self):
         return _('%(tipo)s nº %(numero)s de %(data)s') % {
             'tipo': self.tipo,
             'numero': self.numero,
