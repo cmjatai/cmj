@@ -143,7 +143,7 @@
   }
 
   &.pagina-inicial {
-    background: darken($color_main_bg, 10%) $url_bg_png;
+    // background: darken($color_main_bg, 10%) $url_bg_png;
     ///min-height: 90vh;
     //margin: 1em 0 0;
     padding: 15px 0;
@@ -154,11 +154,12 @@
     }
 
     .video-list {
-      margin: 0 1em;
-
+      margin: 0;
+      gap: 5px;
+      justify-content: stretch;
       .item {
-        padding-top: 0;
-        padding-bottom: 0;
+        flex: 1 1 24%;
+        padding:0;
         margin: 0;
       }
     }
@@ -255,7 +256,7 @@
   .container-videos {
     &.portlet-aovivo {
       .container {
-        width: 100%;
+        //width: 100%;
       }
     }
   }
@@ -264,15 +265,7 @@
 @media screen and (max-width: 991.98px) {
   .container-videos {
     &.pagina-inicial {
-      margin-left: 0;
-      margin-right: 0;
-
       .video-list {
-        margin: 0 0.5em;
-
-        .item {
-          padding-bottom: 15px;
-        }
       }
     }
   }
@@ -280,58 +273,31 @@
 
 @media screen and (max-width: 767.98px) {
   .container-videos {
-    .video-list {
-      margin: 50px -15px;
-
-      .item {
-        padding: 0px 0px 15px;
-        margin-bottom: 5px;
-      }
-
-      .inner-text {
-        line-height: 1.2;
-        padding: 0 10px;
-
-        .titulo {
-          padding-top: 5px;
+    &.pagina-inicial {
+      .video-list {
+        .item {
+          flex: 1 1 49%;
         }
       }
-    }
-
-    &.pagina-inicial {
-
-      //background: transparent;
-      .item {
-        padding: 5px;
-        margin-bottom: 5px;
-      }
-
     }
   }
 }
 
 @media screen and (max-width: 575.98px) {
   .container-videos {
-    &.portlet-aovivo {
-      //padding: 1px 5px 1rem;
-      //min-height: 0;
-    }
-
     &.pagina-inicial {
-      padding: 0.4em 0 0 0;
+      padding: 0;
 
       .video-list {
-        margin: 0;
+        .item {
+          flex: 1 1 100%;
+          margin-bottom: 1.5em;
+        }
       }
 
       .title-container-noticias {
         padding: 0 0.5em;
         margin-bottom: 0.5em;
-      }
-
-      .item {
-        padding: 0.5em;
-        margin-bottom: 5px;
       }
 
       .upcoming-time {
