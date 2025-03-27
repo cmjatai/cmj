@@ -394,21 +394,21 @@
   span {
     font-family: "Rubik";
     font-variant: small-caps;
-    font-weight: 500;
-    color: invert($bg_color_thematic);
+    font-weight: 400;
+    color: $text_color_thematic;
   }
   &:hover {
     text-decoration: none;
-    background: darken($color_main_bg, 60%) $url_bg_png;
+    background: darken($color_main_bg, 70%) $url_bg_png;
   }
 
   i {
     flex: 0 0 auto;
-    color: invert($bg_color_thematic);
+    color: $text_color_thematic;
     width: 3.5rem;
     height: 3.5rem;
     text-align: center;
-    border: 3px solid invert($bg_color_thematic);
+    border: 3px solid transparentize($text_color_thematic, 0.4);
     border-radius: 50%;
     line-height: 3.3rem;
     margin: 5px 10px;
