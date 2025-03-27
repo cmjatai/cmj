@@ -531,7 +531,14 @@ class CertidaoPublicacaoCrud(Crud):
 
             if hasattr(args[0].content_object, 'anexo_de') and\
                     args[0].content_object.anexo_de.exists():
-                vinculo = f'Vínculo com: {args[0].content_object.anexo_de.first()}'
+                url = reverse(
+                    'sapl.%s:%s_detail' % (
+                        args[0].content_object._meta.app_label,
+                        args[0].content_object._meta.model_name
+                    ),
+                    kwargs={'pk': args[0].content_object.anexo_de.first().id}
+                )
+                vinculo = f'<a href="{url}">Vínculo com: {args[0].content_object.anexo_de.first()}</a>'
             else:
                 vinculo = ''
 
@@ -637,7 +644,14 @@ class CertidaoPublicacaoCrud(Crud):
 
             if hasattr(self.object.content_object, 'anexo_de') and\
                     self.object.content_object.anexo_de.exists():
-                vinculo = f'Vínculo com: {self.object.content_object.anexo_de.first()}'
+                url = reverse(
+                    'sapl.%s:%s_detail' % (
+                        self.object.content_object._meta.app_label,
+                        self.object.content_object._meta.model_name
+                    ),
+                    kwargs={'pk': self.object.content_object.anexo_de.first().id}
+                )
+                vinculo = f'<a href="{url}">Vínculo com: {self.object.content_object.anexo_de.first()}</a>'
             else:
                 vinculo = ''
             return vinculo

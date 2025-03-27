@@ -9,7 +9,9 @@
   position: relative;
   &::before {
     content: " ";
-    background: url(~@/__globals/2018/themes/marco_lilas/img/marco_lilas.png) no-repeat top left;
+    background-image: url(~@/__globals/2018/themes/marco_lilas/img/marco_lilas.png);
+    background-position: top left;
+    background-repeat: no-repeat;
     background-size: auto 100%;
     opacity: 1;
     bottom: 0px;
@@ -24,12 +26,14 @@
 @media screen and (min-width: 992px) {
   .brand-name {
     &::before {
+      background-image: url(~@/__globals/2018/themes/marco_lilas/img/marco_lilas_rotate.png);
+      //transform: rotate(-15deg);
+      left: 0%;
+
       width: 70%;
       height: 70%;
-      bottom: -5px;
-      left: 0%;
-      margin-left: -8%;
-      transform: rotate(-15deg);
+      bottom: -15px;
+      margin-left: -11px;
     }
   }
 }
