@@ -317,9 +317,9 @@ class CompMixin(PermissionRequiredMixin):
             }.items()))
 
             if tipo_norma not in ('LOM', 'RI'):
-                nj = NormaJuridica.objects.filter(
+                self.normajuridica = NormaJuridica.objects.filter(
                     **params).order_by('-ano').first()
-                ta = nj.texto_articulado.first()
+                ta = self.normajuridica.texto_articulado.first()
             else:
                 ta = TextoArticulado.objects.get(
                     pk=281 if tipo_norma == 'LOM' else 2222)
@@ -991,6 +991,13 @@ class TextView(CompMixin, ListView):
     def dispatch(self, request, *args, **kwargs):
 
         self.object = self.ta
+        if not self.object:
+            return redirect(
+                reverse(
+                    'sapl.norma:normajuridica_detail', kwargs={
+                        'pk': self.normajuridica.id}
+                    )
+                )
         perm = self.object.has_view_permission(self.request, message=False)
 
         if perm is None:
