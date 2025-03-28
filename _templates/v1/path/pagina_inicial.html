@@ -30,24 +30,23 @@
   </div>
 </div>
 
-<div class="container mt-4">
-  <div class="row">
-    <div class="col-12">
-      {% include "path/pagina_inicial_video_aovivo.html" %}
-    </div>
-  </div>
-</div>
-
 {% with ""|transmissao_ao_vivo as aovivo %}
-  {% if not aovivo.exists %}
-    <div class="container">
+  {% if aovivo.exists %}
+    <div class="container mt-4">
       <div class="row">
         <div class="col-12">
-          {% include "path/pagina_inicial_ultimos_videos.html" %}
+          {% include "path/pagina_inicial_video_aovivo.html" %}
         </div>
       </div>
     </div>
   {% endif %}
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        {% include "path/pagina_inicial_ultimos_videos.html" %}
+      </div>
+    </div>
+  </div>
 {% endwith %}
 
 <div class="container-fluid mt-4">

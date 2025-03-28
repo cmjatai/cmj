@@ -1,7 +1,5 @@
 @import 'header';
 
-@import '../themes/theme_custom';
-
 @import '_base';
 
 @import 'apps/app';
@@ -11,6 +9,8 @@
 @import 'layouts/layout';
 
 @import '__search';
+
+@import '../themes/theme_custom';
 
 @import '_alto_contraste';
 
