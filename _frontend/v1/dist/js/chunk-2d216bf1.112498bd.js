@@ -1,1 +1,0 @@
-(window.webpackJsonp=window.webpackJsonp||[]).push([["chunk-2d216bf1"],{c47a:function(n,t,u){"use strict";u.r(t);var e={name:"loa-layout",methods:{},mounted:function(){}},o=u("2877"),a=Object(o.a)(e,(function(){var n=this._self._c;return n("div",[n("router-view")],1)}),[],!1,null,null,null);t.default=a.exports}}]);
