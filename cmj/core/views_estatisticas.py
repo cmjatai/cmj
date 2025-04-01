@@ -274,7 +274,7 @@ def get_legislacao_municipal():
 -------------------
 O PortalCMJ possui o módulo de **Compilação de Leis**,
 desenvolvido integralmente pela CMJ, disponibiliza a base de leis
-do Município de Jataí e gerência os vínculos de vigência,
+do Município de Jataí e gerencia os vínculos de vigência,
 alteração, revogação e inclusão.
 '''
     return (mark1, 5), (mark2, 7)
@@ -296,8 +296,8 @@ def get_arqdocs():
 O PortalCMJ possui o **Módulo ARQ**, desenvolvido integralmente pela CMJ, responsável por tratar e indexar os documentos que estão sendo digitalizados do arquivo físico.
 Este módulo possui alta capacidade de processamento em paralelo de OCR e conversão de PDFs para o formato de arquivamento PDF/A-2b.
 
-Contando com uma estratégia de agendamento (gerenciado pela ferramenta _redis_ e _celery_), centenas de arquivos pode ser
-digitalizados e adicionados diretamente na agenda e processamento. Este mecanismo tranfere
+Contando com uma estratégia de agendamento (gerenciado pelas ferramentas _redis_ e _celery_), centenas de arquivos pode ser
+digitalizados e adicionados diretamente na agenda de processamento. Este mecanismo transfere
 o processamento para o servidor do PortalCMJ e libera a máquina do usuário para dar continuidade em outras tarefas, ou mesmo
 ser desligada.
 
