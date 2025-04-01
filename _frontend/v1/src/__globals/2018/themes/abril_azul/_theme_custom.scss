@@ -9,30 +9,38 @@
       background-image: url(~@/__globals/2018/themes/abril_azul/img/abril_azul_laco.png);
       background-position: top left;
       background-repeat: no-repeat;
-      background-size: auto 100%;
+      background-size: 100% 100%;
       left: 0%;
-      bottom: -17px;
-      margin-left: -6px;
-      width: 70%;
-      height: 70%;
+      bottom: -23px;
+      margin-left: -8px;
+      width: 50px;
+      height: 70px;
 
       transition: all 1s ease-in-out;
     }
     &:hover {
-      text-shadow: 0 0 1em  #fff,
+      /*text-shadow: 0 0 1em  #fff,
       1em 0 1em #f00,
       0 1em 1em #ff0,
       -1em 0 1em #0f0,
       0 -1em 1em #0ff,
       -1em -1em 1em #00f,
-      1em 1em 1em #f0f;
+      1em 1em 1em #f0f;*/
       cursor: default;
       &::before {
         transition: all 0.5s ease-in-out;
         width: 155%;
         height: 155%;
-        margin-bottom: -8px;
+        // margin-bottom: -8px;
         background-image: url(~@/__globals/2018/themes/abril_azul/img/abril_azul.png);
+        background-size: 100% 100%;
+        box-shadow: 0 0 0.5em  #fff,
+        0.5em 0 0.5em #f00,
+        0 0.5em 0.5em #ff0,
+        -0.5em 0 0.5em #0f0,
+        0 -0.5em 0.5em #0ff,
+        -0.5em -0.5em 0.5em #00f,
+        0.5em 0.5em 0.5em #f0f;
       }
     }
   }
