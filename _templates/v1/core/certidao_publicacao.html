@@ -114,7 +114,7 @@
       <small>
         {% with view.vinculo as vinculo%}
           {% if vinculo %}
-            {{ vinculo }}
+            {{ vinculo|safe }}
           {% endif %}
         {% endwith %}
       </small>

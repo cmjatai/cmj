@@ -33,8 +33,8 @@
       {% include 'search/search_widget.html' %}
       <hr>
     {% endcomment %}
+    {% endif %}
     {% crispy filter.form %}
-  {% endif %}
 {% endblock detail_content %}
 
 {% block table_content %}

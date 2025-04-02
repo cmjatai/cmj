@@ -31,16 +31,38 @@
         transition: all 0.5s ease-in-out;
         width: 155%;
         height: 155%;
-        // margin-bottom: -8px;
+        margin-bottom: -7px;
+        border-radius: 50%;
         background-image: url(~@/__globals/2018/themes/abril_azul/img/abril_azul.png);
         background-size: 100% 100%;
-        box-shadow: 0 0 0.5em  #fff,
+        box-shadow:
+        //0 0 5em 1em #fff,
+        0.6em 0 0.6em -0.3em #f00,
+        0 0.6em 0.6em -0.3em #ff0,
+        -0.6em 0 0.6em -0.3em #0f0,
+        0 -0.4em 0.6em -0.3em #0ff,
+        0em -0.6em 0.6em -0.3em #00f,
+
+
+
+        ;
+
+        /*
+        0 0 0.5em  #fff,
         0.5em 0 0.5em #f00,
         0 0.5em 0.5em #ff0,
         -0.5em 0 0.5em #0f0,
         0 -0.5em 0.5em #0ff,
         -0.5em -0.5em 0.5em #00f,
         0.5em 0.5em 0.5em #f0f;
+
+        box-shadow1: 0 0 0.5em  #fff,
+        0.5em 0 0.5em #f00,
+        0 0.5em 0.5em #ff0,
+        -0.5em 0 0.5em #0f0,
+        0 -0.5em 0.5em #0ff,
+        -0.5em -0.5em 0.5em #00f,
+        0.5em 0.5em 0.5em #f0f;*/
       }
     }
   }
