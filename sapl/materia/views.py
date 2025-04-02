@@ -65,7 +65,7 @@ from sapl.materia.forms import (AnexadaForm, AutoriaForm,
                                 DocumentoAcessorioProtocoloForm,
                                 AssuntoMateriaForm)
 from sapl.norma.models import LegislacaoCitada
-from sapl.parlamentares.models import Legislatura
+from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.protocoloadm.models import Protocolo
 from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MEDIA_ROOT, MAX_DOC_UPLOAD_SIZE
@@ -931,6 +931,62 @@ class ProposicaoCrud(Crud):
                             'conteudo_gerado_related', ]  # 'cancelado', ]
         ordered_list = False
 
+        def impedimentos_de_envio(self, obj=None):
+            if not obj:
+                obj = self.object
+            imp = []
+
+            limite_minimo_coletivo = obj.tipo.tipo_conteudo_related.limite_minimo_coletivo
+            limite_por_autor_tramitando = obj.tipo.tipo_conteudo_related.limite_por_autor_tramitando
+            if not obj.metadata or not limite_minimo_coletivo:
+                return imp, limite_minimo_coletivo, limite_por_autor_tramitando, 0
+
+            signs = obj.metadata.get(
+                'signs', {}
+            ).get(
+                'texto_original', {}
+            ).get('signs', [])
+
+            signs = set(map(lambda x: x[0], signs))
+
+            len_signs = len(signs)
+
+            if not len_signs:
+                return imp, limite_minimo_coletivo, limite_por_autor_tramitando, 0
+
+            if len(signs) >= limite_minimo_coletivo:
+                return imp, limite_minimo_coletivo, limite_por_autor_tramitando, len_signs
+
+            tam = tipos_autores_materias()
+
+            autores_com_materias_em_tramitacao = tam.get(
+                obj.tipo.tipo_conteudo_related, {})
+
+            autores_key_nome_completo = dict(
+                map(
+                    lambda el: (
+                        (el[0], el[0].autor_related.nome_completo), el[1]),
+                    autores_com_materias_em_tramitacao.items())
+            )
+
+            assinantes_com_mat_em_tramitacao = signs.intersection(
+                set(dict(autores_key_nome_completo.keys()).values())
+            )
+
+            autores_key_nome_completo = filter(
+                lambda el: el[0][1] in assinantes_com_mat_em_tramitacao,
+                autores_key_nome_completo.items()
+            )
+
+            for registro in autores_key_nome_completo:
+                autor, formatos = registro
+                fmt_individual = formatos['individual']
+
+                if len(fmt_individual) >= limite_por_autor_tramitando:
+                    imp.append((autor[0], autor[1], len(fmt_individual)))
+
+            return imp, limite_minimo_coletivo, limite_por_autor_tramitando, len_signs
+
     class BaseLocalMixin:
         form_class = ProposicaoForm
         layout_key = None
@@ -971,56 +1027,6 @@ class ProposicaoCrud(Crud):
 
         logger = logging.getLogger(__name__)
 
-        def impedimentos_de_envio(self):
-            imp = []
-
-            if not self.object.metadata or not self.object.tipo.tipo_conteudo_related.limite_minimo_coletivo:
-                return imp
-
-            signs = self.object.metadata.get(
-                'signs', {}
-            ).get(
-                'texto_original', {}
-            ).get('signs', [])
-
-            signs = set(map(lambda x: x[0], signs))
-
-            if not signs:
-                return imp
-
-            if len(signs) >= self.object.tipo.tipo_conteudo_related.limite_minimo_coletivo:
-                return imp
-
-            tam = tipos_autores_materias()
-
-            autores_com_materias_em_tramitacao = tam.get(
-                self.object.tipo.tipo_conteudo_related, {})
-
-            autores_key_nome_completo = dict(
-                map(
-                    lambda el: (
-                        (el[0], el[0].autor_related.nome_completo), el[1]),
-                    autores_com_materias_em_tramitacao.items())
-            )
-
-            assinantes_com_mat_em_tramitacao = signs.intersection(
-                set(dict(autores_key_nome_completo.keys()).values())
-            )
-
-            autores_key_nome_completo = filter(
-                lambda el: el[0][1] in assinantes_com_mat_em_tramitacao,
-                autores_key_nome_completo.items()
-            )
-
-            for registro in autores_key_nome_completo:
-                autor, formatos = registro
-                fmt_individual = formatos['individual']
-
-                if len(fmt_individual) >= self.object.tipo.tipo_conteudo_related.limite_por_autor_tramitando:
-                    imp.append((autor[0], autor[1], len(fmt_individual)))
-
-            return imp
-
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
             context['subnav_template_name'] = ''
@@ -1041,6 +1047,12 @@ class ProposicaoCrud(Crud):
 
             p = self.object
 
+            p_md_signs_texto_original = p.metadata.get(
+                'signs', {}
+            ).get(
+                'texto_original', {}
+            )
+
             if not action:
                 u = request.user
                 oa = u.operadorautor_set.all().first()
@@ -1049,12 +1061,23 @@ class ProposicaoCrud(Crud):
                     raise PermissionDenied(
                         "Proposição de criação e edição por: {}".format(p.user))
 
+                msg_error = ''
+                if p.tipo.exige_assinatura_digital:
+                    signs = p_md_signs_texto_original.get('signs', {})
+                    if isinstance(p.autor.autor_related, Parlamentar):
+                        signs = set(map(lambda x: x[0], signs))
+                        if p.autor.autor_related.nome_completo not in signs:
+                            msg_error = _(
+                                f'Documento não possui assinatura digital do Parlamentar: {p.autor}')
+
+                if msg_error:
+                    messages.error(request, msg_error)
+
                 return Crud.DetailView.get(self, request, *args, **kwargs)
 
             msg_error = ''
             if p:
                 if action == 'send':
-
                     if p.data_envio and p.data_recebimento:
                         msg_error = _('Proposição já foi enviada e recebida.')
                     elif p.data_envio:
@@ -1064,23 +1087,13 @@ class ProposicaoCrud(Crud):
                         msg_error = _('Proposição não possui nenhum tipo de '
                                       'Texto associado.')
                     elif p.tipo.exige_assinatura_digital and \
-                            p.metadata.get(
-                                'signs', {}
-                            ).get(
-                                'texto_original', {}
-                            ).get(
+                            p_md_signs_texto_original.get(
                                 'running_extraction', False
                             ):
                         msg_error = _(
                             'Assinaturas Eletrônicas em processo de extração. Aguarde a conclusão para posterior envio...')
                     elif p.tipo.exige_assinatura_digital and \
-                            (
-                                not p.metadata.get('signs', {}) or
-                                not p.metadata.get(
-                                    'signs', {}).get(
-                                    'texto_original', {}).get(
-                                        'signs', {})
-                            ):
+                            not p_md_signs_texto_original.get('signs', {}):
                         msg_error = _(
                             'Documento não possui assinatura digital.')
                     else:
@@ -1095,7 +1108,7 @@ class ProposicaoCrud(Crud):
 
                         impedimentos = self.impedimentos_de_envio()
 
-                        if not impedimentos:
+                        """if not impedimentos:
                             tam = tipos_autores_materias(self.request.user)
 
                             if tcr.limite_por_autor_tramitando and tcr in tam:
@@ -1107,8 +1120,9 @@ class ProposicaoCrud(Crud):
                                     'individual', set()
                                 )
                                 if len(fmt_individual) >= tcr.limite_por_autor_tramitando:
-                                    msg_error = msg_pre_error
-                        else:
+                                    msg_error = msg_pre_error"""
+
+                        if impedimentos[0]:
                             msg_error = msg_pre_error
 
                         if not msg_error:
@@ -1439,19 +1453,16 @@ class ProposicaoCrud(Crud):
             for obj in object_list:
 
                 if obj.data_envio is None:
-                    tcr = obj.tipo.tipo_conteudo_related
-                    if tcr.limite_por_autor_tramitando and tcr in tam:
-                        fmt_individual = tam.get(
-                            tcr, {}
-                        ).get(
-                            obj.autor, {}
-                        ).get('individual', set())
 
-                        if len(fmt_individual) >= tcr.limite_por_autor_tramitando:
-                            obj.data_envio = """
-                            <strong class="text-red">Limite Regimental atingido.</strong>
+                    impedimentos = self.impedimentos_de_envio(obj=obj)
+
+                    if impedimentos[0]:
+                        parls = ', '.join(
+                            [x[1] for x in impedimentos[0]])
+                        obj.data_envio = f"""
+                            <strong class="text-red">Limite Regimental atingido devido a contagem individual de:<br>{parls}</strong>
                             """
-                            continue
+                        continue
 
                     obj.data_envio = 'Em elaboração...'
                     if obj.justificativa_devolucao:

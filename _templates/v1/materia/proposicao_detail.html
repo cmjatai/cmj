@@ -39,7 +39,7 @@
   {% else %}
     {% block editions_actions_send %}
       {% if object.metadata.signs and object.metadata.signs.texto_original.signs or not object.tipo.exige_assinatura_digital %}
-        {% if not impedimentos_de_envio %}
+        {% if not impedimentos_de_envio.0 %}
           <div class="actions btn-group" role="group">
             <a href="{{ view.detail_url }}?action=send" class="btn btn-primary">{% trans 'Enviar' %}</a>
           </div>
@@ -67,14 +67,14 @@
       {% endwith %}
     </div>
 
-    {% if impedimentos_de_envio %}
+    {% if impedimentos_de_envio.0 %}
       <div class="col-sm-6">
         <div id="div_id_impedimento" class="form-group">
           <p class="control-label text-red">Impedimentos de envio devido a contagem individual</p>
           <div class="controls">
             <div class="form-control-static">
               <ul>
-                {% for autor, nome_completo, length_fmt_individual in impedimentos_de_envio %}
+                {% for autor, nome_completo, length_fmt_individual in impedimentos_de_envio.0 %}
                   <li>{{ autor }} ({{length_fmt_individual}})</li>
                 {% endfor %}
               </ul>
