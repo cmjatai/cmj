@@ -1097,7 +1097,6 @@ class ProposicaoCrud(Crud):
                         msg_error = _(
                             'Documento não possui assinatura digital.')
                     else:
-
                         tcr = p.tipo.tipo_conteudo_related
                         msg_pre_error = _(
                             f'''Limite Regimental atingido.
@@ -1108,22 +1107,15 @@ class ProposicaoCrud(Crud):
 
                         impedimentos = self.impedimentos_de_envio()
 
-                        """if not impedimentos:
-                            tam = tipos_autores_materias(self.request.user)
-
-                            if tcr.limite_por_autor_tramitando and tcr in tam:
-                                fmt_individual = tam.get(
-                                    tcr, {}
-                                ).get(
-                                    p.autor, {}
-                                ).get(
-                                    'individual', set()
-                                )
-                                if len(fmt_individual) >= tcr.limite_por_autor_tramitando:
-                                    msg_error = msg_pre_error"""
-
                         if impedimentos[0]:
                             msg_error = msg_pre_error
+
+                        if p.tipo.exige_assinatura_digital:
+                            signs = p_md_signs_texto_original.get('signs', {})
+                            if isinstance(p.autor.autor_related, Parlamentar):
+                                signs = set(map(lambda x: x[0], signs))
+                                if p.autor.autor_related.nome_completo not in signs:
+                                    msg_error = True
 
                         if not msg_error:
 
@@ -1196,7 +1188,7 @@ class ProposicaoCrud(Crud):
                         messages.success(request, _(
                             'Proposição Retornada com sucesso.'))
 
-                if msg_error:
+                if msg_error and not isinstance(msg_error, bool):
                     messages.error(request, msg_error)
 
             # retornar redirecionando para limpar a variavel action
