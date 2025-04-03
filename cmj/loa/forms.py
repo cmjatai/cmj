@@ -773,6 +773,7 @@ class RegistroAjusteLoaForm(ModelForm):
     parlamentares__valor = SplitArrayField(
         DecimalField(required=False, max_digits=14, decimal_places=2,), 10,
         label='Valores por Parlamentar',
+        help_text='Valores negativos sem seleção de emenda são meramente informativos com a finalidade de concentração em outro item.',
         required=False
     )
 

@@ -355,8 +355,16 @@ class LoaCrud(Crud):
                         registro__oficio_ajuste_loa__loa=l,
                     ).aggregate(Sum('valor'))
 
+                    ajustes_negativos_sem_emendas = RegistroAjusteLoaParlamentar.objects.filter(
+                        parlamentar=lp.parlamentar,
+                        registro__tipo=k,
+                        registro__oficio_ajuste_loa__loa=l,
+                        registro__emendaloa__isnull=True,
+                        valor__lt=0
+                    ).aggregate(Sum('valor'))
+
                     resumo_parlamentar[k]['ja_destinado'] += (
-                        ajustes['valor__sum'] or Decimal('0.00')
+                        (ajustes['valor__sum'] or Decimal('0.00')) - (ajustes_negativos_sem_emendas['valor__sum'] or Decimal('0.00'))
                     )
 
                     # ------------------------------------
