@@ -334,23 +334,29 @@ class PortalFieldImage(ImageFieldFile):
             #    return self.storage.url(self.name)
 
             field_name_action = self.field.name.replace('_', '-')
-            return '%s' % reverse(
+            url = '%s' % reverse(
                 'sapl.api:%s_%s-%s' % (
                     self.instance._meta.app_label,
                     self.instance._meta.model_name,
                     field_name_action
                 ),
-                kwargs={'pk': self.instance.pk})
+                kwargs={'pk': self.instance.pk}
+            )
+            ext = self.name.split('.')[-1]
+            if url and url[-1] == '/':
+                url = url[:-1]
+                url = f'{url}.{ext}'
+            return url
         except:
             return ''
 
     @property
     def url_cropping(self):
         url = self.url
-
+        ext = self.name.split('.')[-1]
         if url and url[-1] == '/':
             url = url[:-1]
-            url = f'{url}.c1024.png'
+            url = f'{url}.c1024.{ext}'
 
         return url
 
