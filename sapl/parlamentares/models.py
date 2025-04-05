@@ -640,7 +640,7 @@ class ComposicaoMesa(models.Model):
     class Meta:
         verbose_name = _('Ocupação de cargo na Mesa')
         verbose_name_plural = _('Ocupações de cargo na Mesa')
-        ordering = ['id']
+        ordering = ['sessao_legislativa__data_inicio']
 
     def __str__(self):
         return _('%(parlamentar)s - %(cargo)s') % {

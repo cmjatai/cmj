@@ -1,5 +1,6 @@
 
 from datetime import datetime, timedelta, date
+from functools import wraps
 from random import choice
 from string import ascii_letters, digits
 import csv
@@ -11,6 +12,7 @@ import sys
 import tempfile
 import traceback
 import zipfile
+from django.views.decorators.cache import cache_page
 
 from crispy_forms.layout import HTML
 from django import template
@@ -2155,10 +2157,23 @@ class MateriaAssuntoCrud(MasterDetailCrud):
         pass
 
 
+def cache_page_materia_detail(timeout):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            u = request.user
+            if u.is_anonymous or not u.has_perm('materia.add_materialegislativa'):
+                # Cache the page for anonymous users
+                return cache_page(timeout)(view_func)(request, *args, **kwargs)
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator
+
 class MateriaLegislativaCrud(Crud):
     model = MateriaLegislativa
     help_topic = 'materia_legislativa'
     public = [RP_LIST, RP_DETAIL]
+
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = ['tipo', 'numero', 'ano', 'data_apresentacao']
@@ -2244,6 +2259,7 @@ class MateriaLegislativaCrud(Crud):
         def get_success_url(self):
             return self.search_url
 
+    cache_page_materia_detail(60 * 5)
     class DetailView(GoogleGenerativeIA, BtnCertMixin, Crud.DetailView):
 
         layout_key = 'MateriaLegislativaDetail'

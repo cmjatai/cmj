@@ -539,6 +539,7 @@
   .path-parlamentares {
     display: none;
   }
+
   .container-topo-parlamentar {
     margin: 0 -15px;
     .path-capa {
@@ -572,6 +573,8 @@
         right: 0;
         margin-top: 1px;
         position: absolute;
+
+        z-index: 1;
         top: 100%;
         // background: darken($color_main_bg, 15%) $url_bg_png;
         .active {
@@ -619,12 +622,32 @@
         }
       }
     }
-    header {
-
-    }
   }
+
   .container-path {
     margin: 0;
+
+    .widget-parlamentar {
+
+      padding-left: 5px;
+      padding-right: 5px;
+      font-size: 0.7em;
+      font-family: "Roboto Condensed";
+      color: $color-primary;
+      ul {
+        padding-left: 1.5em;
+        margin: 0;
+      }
+      .row {
+        margin-left: -5px;
+        margin-right: -5px;
+      }
+      .col, .form-control-static {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+    }
+
     padding: 0;
     .nav {
       margin: -70px -15px 0 0;

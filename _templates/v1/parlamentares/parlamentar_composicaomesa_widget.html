@@ -1,0 +1,18 @@
+{% for participacao in parlamentar.composicaomesa_set.all  %}
+  {% if forloop.first %}
+    <div class="widget-composicaomesa">
+      <h2>
+        <strong>
+        Participações em Mesas Diretoras
+        </strong>
+      </h2>
+      <ul>
+  {% endif %}
+  <li>
+    <strong>{{ participacao.cargo.descricao }} - {{ participacao.sessao_legislativa.data_inicio|date:"m/Y" }} a {{ participacao.sessao_legislativa.data_fim|date:"m/Y" }}</strong>
+  </li>
+  {% if forloop.last %}
+    </ul>
+  </div>
+  {% endif %}
+{% endfor %}

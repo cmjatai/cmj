@@ -43,8 +43,11 @@
           </div>
 
         </div>
-
-
+        <header class="masthead">
+          {% block sections_nav %}
+            {% subnav 'parlamentares/subnav.yaml' object.parlamentar.id%}
+          {% endblock sections_nav %}
+        </header>
       </div>
     </div>
   </div>
@@ -61,6 +64,7 @@
 
 {% block base_content %}
   <div class="container container-path">
+
     <div class="row">
         {% with slug as prefixo_slug %}
             <div class="col-12 col-md-7">
@@ -70,22 +74,84 @@
                 {% endwith %}
               {% endwith %}
             </div>
-            <div class="col order-first order-md-last">
-            {% block sections_nav %}{% subnav 'parlamentares/subnav.yaml' object.parlamentar.id%}{% endblock sections_nav %}
-
-            <div class="mt-5">
+            <div class="col order-first order-md-last widget-parlamentar">
+              <div class="row">
+                <div class="col col-sm-8">
+                  <div id="div_id_nome_parlamentar" class="form-group">
+                    <p class="control-label">Nome Parlamentar</p>
+                    <div class="controls">
+                        <div class="form-control-static">{{ object.parlamentar.nome_parlamentar }}</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col col-sm-4">
+                  <div id="div_id_ativo" class="form-group">
+                    <p class="control-label">Ativo na Casa?</p>
+                    <div class="controls">
+                        <div class="form-control-static">{{ object.parlamentar.get_ativo_display }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col col-sm-12">
+                  <div id="div_id_nome_completo" class="form-group">
+                    <p class="control-label">Nome Completo</p>
+                    <div class="controls">
+                        <div class="form-control-static">{{ object.parlamentar.nome_completo }}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% if object.parlamentar.ativo %}
+                <div class="row">
+                  <div class="col col-sm-8">
+                    <div id="div_id_email" class="form-group">
+                      <p class="control-label">E-mail</p>
+                      <div class="controls">
+                          <div class="form-control-static">{{ object.parlamentar.email }}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col col-sm-4">
+                    <div id="div_id_telefone" class="form-group">
+                      <p class="control-label">Telefone</p>
+                      <div class="controls">
+                          <div class="form-control-static">{{ object.parlamentar.telefone }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <hr>
+              {% endif %}
 
               {{object.parlamentar.equipe|markdown|safe}}
               <hr>
 
-              <h1>
-                <strong>
-                Biografia do Parlamentar
-                </strong>
-              </h1>
-              {{object.parlamentar.biografia|safe}}
+              {% if object.parlamentar.composicaomesa_set.exists %}
+                {% with object.parlamentar as parlamentar %}
+                  {% include "parlamentares/parlamentar_composicaomesa_widget.html" %}
+                {% endwith %}
+                <hr>
+              {% endif %}
 
-            </div>
+              {% if object.parlamentar.participacao_set.exists %}
+                {% with object.parlamentar as parlamentar %}
+                  {% include "comissoes/parlamentar_participacao_widget.html" %}
+                {% endwith %}
+                <hr>
+              {% endif %}
+
+              {% if object.parlamentar.biografia %}
+                <div class="container-biografia">
+                  <h1>
+                    <strong>
+                      Biografia do Parlamentar
+                    </strong>
+                  </h1>
+                  {{object.parlamentar.biografia|safe}}
+                </div>
+              {% endif %}
             </div>
         {% endwith %}
       </div>

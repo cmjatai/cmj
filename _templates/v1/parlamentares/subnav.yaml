@@ -8,15 +8,15 @@
 - title: {% trans 'Proposições' %}
   url: sapl.parlamentares:proposicao_parlamentar_list
   check_permission: materia.add_proposicao
-- title: {% trans 'Relatorias' %}
-  url: sapl.parlamentares:relatoria_parlamentar_list
-- title: {% trans 'Filiação Partidária' %}
+- title: {% trans 'Filiações Partidárias' %}
   url: sapl.parlamentares:filiacao_list
 - title: {% trans 'Mandatos' %}
   url: sapl.parlamentares:mandato_list
 - title: {% trans 'Afastamentos' %}
   url: sapl.parlamentares:afastamentoparlamentar_list
 {% if user.is_superuser %}
+- title: {% trans 'Relatorias' %}
+  url: sapl.parlamentares:relatoria_parlamentar_list
 - title: {% trans 'Dependentes' %}
   url: sapl.parlamentares:dependente_list
   check_permission: parlamentares.list_dependente

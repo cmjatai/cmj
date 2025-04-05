@@ -1,0 +1,21 @@
+{% for participacao in parlamentar.participacao_set.all reversed %}
+  {% if forloop.first %}
+    <div class="widget-part-comissoes">
+      <h2>
+        <strong>
+        Participação em Comissões
+        </strong>
+      </h2>
+      <ul>
+  {% endif %}
+  <li>
+    <a href="{% url 'sapl.comissoes:composicao_detail' participacao.composicao.id %}">
+      <strong>{{ participacao.composicao.comissao.sigla }}</strong> - {{ participacao.composicao.comissao.nome }}
+     - {{ participacao.composicao.periodo.data_inicio|date:"m/Y" }} a {{ participacao.composicao.periodo.data_fim|date:"m/Y" }}
+    </a>
+  </li>
+  {% if forloop.last %}
+    </ul>
+  </div>
+  {% endif %}
+{% endfor %}
