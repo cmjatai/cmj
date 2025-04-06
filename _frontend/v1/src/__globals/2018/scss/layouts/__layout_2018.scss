@@ -117,8 +117,44 @@
     margin-right: 15px;
   }
 
+  .preview {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 15px;
+    left: 85px;
+    min-height: 200px;
+    //height: 100%;
+    //width: calc(100% - 100px);
+    background-color: #fff;
+    overflow: auto;
+    z-index: 99999;
+    span {
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      left: 0;
+    }
+    img {
+      z-index: 1;
+    }
+  }
+
   &:hover {
-    background-color: $color_container_bg;
+    background-color: #fff;
+
+    .preview {
+      display: block;
+    }
+  }
+}
+
+.container-search {
+  .link-texto {
+    .preview {
+      bottom: 0;
+      right: 0;
+    }
   }
 }
 

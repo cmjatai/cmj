@@ -111,6 +111,12 @@
       {% if object.texto_original %}
         <a class="link-texto" href="{{object.texto_original.url}}?u={% now "u"%}" title="Texto Original">
           <i class="far fa-2x fa-file-{% if '.pdf' in object.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
+          <div class="preview">
+            <span class="p-5">
+              Carregando imagem da primeira página da matéria...
+            </span>
+            <img loading="lazy" src="{{object.texto_original.url}}?page=1&dpi=300&u={% now "u"%}" title="" alt="Preview da Primeira Página do Documento... Clique para abrir o PDF completo" class="img-fluid">
+          </div>
         </a>
       {% endif %}
     </div>
