@@ -120,12 +120,12 @@
   .preview {
     display: none;
     position: absolute;
-    top: 0;
+    top: -15px;
     right: 15px;
     left: 85px;
     min-height: 200px;
-    //height: 100%;
-    //width: calc(100% - 100px);
+    max-height: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     background-color: #fff;
     overflow: auto;
     z-index: 99999;
@@ -152,8 +152,7 @@
 .container-search {
   .link-texto {
     .preview {
-      bottom: 0;
-      right: 0;
+      bottom: -15px;
     }
   }
 }
@@ -571,6 +570,9 @@
       }
       .link-texto {
         margin: 0px 10px 0 0px;
+        .preview {
+          left: 65px
+        }
       }
     }
   }
