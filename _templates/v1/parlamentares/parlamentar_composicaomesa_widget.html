@@ -1,4 +1,4 @@
-{% for participacao in parlamentar.composicaomesa_set.all  %}
+{% for participacao in parlamentar.composicaomesa_set.all reversed %}
   {% if forloop.first %}
     <div class="widget-composicaomesa">
       <h2>

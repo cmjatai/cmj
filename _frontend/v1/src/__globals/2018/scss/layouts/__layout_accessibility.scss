@@ -18,17 +18,17 @@
 
   .group-font {
     display: flex;
-    gap: 0.3rem;
+    gap: 0.25rem;
     align-items: center;
     span {
-      padding: 0.2rem 0.3rem;
+      padding: 0.2rem 0.2rem;
       font-size: 85%;
     }
     .btn-link {
       line-height: 1rem;
       text-decoration: none;
       margin: 0;
-      padding: 0.2rem 0.3rem;
+      padding: 0.2rem 0.2rem;
       //margin: 0.2rem 0;
       //padding: 0rem 0.2rem;
       background-color: #fff3;
@@ -36,7 +36,7 @@
   }
   span {
     color:white;
-    padding: 0 0.3rem;
+    padding: 0 0.2rem;
     line-height: 1;
   }
   .btn {

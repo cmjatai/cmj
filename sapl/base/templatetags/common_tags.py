@@ -411,3 +411,12 @@ def markdown(value):
     return '{}{}{}'.format(groups[0], mv, groups[2])
 
 
+
+@register.filter
+def order_by(queryset, fields):
+    """
+    Orders a queryset by the given fields.
+    """
+    if not fields:
+        return queryset
+    return queryset.order_by(*list(map(lambda x: x.strip(), fields.split(','))))

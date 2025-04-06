@@ -1,5 +1,5 @@
 {% load i18n %}
-- title: {% trans 'Início' %}
+- title: {% trans 'Parlamentar' %}
   url: sapl.parlamentares:parlamentar_detail
 - title: {% trans 'Matérias' %}
   url: sapl.parlamentares:parlamentar_materias

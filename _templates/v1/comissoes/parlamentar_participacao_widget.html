@@ -1,4 +1,5 @@
-{% for participacao in parlamentar.participacao_set.all reversed %}
+{% load common_tags %}
+{% for participacao in parlamentar.participacao_set.all|order_by:'-composicao__periodo__data_inicio, composicao__comissao__sigla' %}
   {% if forloop.first %}
     <div class="widget-part-comissoes">
       <h2>
@@ -8,10 +9,15 @@
       </h2>
       <ul>
   {% endif %}
-  <li>
+  {% ifchanged participacao.composicao.periodo.data_inicio %}
+  <li role="separator" class="divider"></li>
+  {% endifchanged %}
+  <li class="hover_background_05p p-1">
     <a href="{% url 'sapl.comissoes:composicao_detail' participacao.composicao.id %}">
       <strong>{{ participacao.composicao.comissao.sigla }}</strong> - {{ participacao.composicao.comissao.nome }}
-     - {{ participacao.composicao.periodo.data_inicio|date:"m/Y" }} a {{ participacao.composicao.periodo.data_fim|date:"m/Y" }}
+     <br>
+     <small>{{participacao.cargo.nome}}: <em>{{ participacao.composicao.periodo.data_inicio|date:"m/Y" }} a {{ participacao.composicao.periodo.data_fim|date:"m/Y" }}</em></small>
+
     </a>
   </li>
   {% if forloop.last %}

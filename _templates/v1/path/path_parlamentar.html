@@ -67,16 +67,9 @@
 
     <div class="row">
         {% with slug as prefixo_slug %}
-            <div class="col-12 col-md-7">
-              {% with 0 as split_row %}
-                {% with 'path-item-list px-2' as css_class %}
-                  {% include "path/path_list_docs.html" %}
-                {% endwith %}
-              {% endwith %}
-            </div>
-            <div class="col order-first order-md-last widget-parlamentar">
+            <div class="col widget-parlamentar">
               <div class="row">
-                <div class="col col-sm-8">
+                <div class="col-md-8">
                   <div id="div_id_nome_parlamentar" class="form-group">
                     <p class="control-label">Nome Parlamentar</p>
                     <div class="controls">
@@ -84,7 +77,7 @@
                     </div>
                   </div>
                 </div>
-                <div class="col col-sm-4">
+                <div class="col-md-4">
                   <div id="div_id_ativo" class="form-group">
                     <p class="control-label">Ativo na Casa?</p>
                     <div class="controls">
@@ -94,7 +87,7 @@
                 </div>
               </div>
               <div class="row">
-                <div class="col col-sm-12">
+                <div class="col-md-12">
                   <div id="div_id_nome_completo" class="form-group">
                     <p class="control-label">Nome Completo</p>
                     <div class="controls">
@@ -105,7 +98,7 @@
               </div>
               {% if object.parlamentar.ativo %}
                 <div class="row">
-                  <div class="col col-sm-8">
+                  <div class="col-12 col-xxl-8">
                     <div id="div_id_email" class="form-group">
                       <p class="control-label">E-mail</p>
                       <div class="controls">
@@ -113,7 +106,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="col col-sm-4">
+                  <div class="col-12 col-xxl-4">
                     <div id="div_id_telefone" class="form-group">
                       <p class="control-label">Telefone</p>
                       <div class="controls">
@@ -152,6 +145,13 @@
                   {{object.parlamentar.biografia|safe}}
                 </div>
               {% endif %}
+            </div>
+            <div class="col-12 col-sm-6 col-lg-7 col-xl-8 order-last order-sm-first ">
+              {% with 0 as split_row %}
+                {% with 'path-item-list px-2' as css_class %}
+                  {% include "path/path_list_docs.html" %}
+                {% endwith %}
+              {% endwith %}
             </div>
         {% endwith %}
       </div>
