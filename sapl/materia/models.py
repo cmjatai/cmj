@@ -1,4 +1,7 @@
 
+import glob
+import logging
+import os
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
@@ -28,6 +31,7 @@ from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
                         texto_upload_path, get_settings_auth_user_model,
                         OverwriteStorage, PortalFileField)
 
+logger = logging.getLogger(__name__)
 
 EM_TRAMITACAO = [(1, 'Sim'),
                  (0, 'Não')]
@@ -547,10 +551,26 @@ class MateriaLegislativa(CommonMixin):
                               update_fields=update_fields)
             self.texto_original = texto_original
 
+        if self.texto_original:
+            self.clear_cache()
+
         return models.Model.save(self, force_insert=force_insert,
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
+
+    def clear_cache(self, page=None):
+        try:
+            fcache = glob.glob(
+                f'{self.texto_original.path}-p{page:0>3}*'
+                if page else f'{self.texto_original.path}*.png'
+            )
+
+            for f in fcache:
+                os.remove(f)
+
+        except Exception as e:
+            logger.error(f'Erro ao limpar cache de: {self.arquivo.path}. {e}')
 
     def autografos(self):
         return self.normajuridica_set.filter(tipo_id=27)

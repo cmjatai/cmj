@@ -154,6 +154,22 @@ class ResponseFileMixin:
         grade = request.GET.get('grade', '0')
         anon = request.GET.get('anon', '')
 
+        try:
+            dpi = int(dpi)
+            dpi = min(max(dpi, 72), 300)
+            opcoes_dpi = (72, 100, 150, 200, 300)
+            if dpi not in opcoes_dpi:
+                # se o dpi não estiver na lista, pega o mais próximo
+                # (maior ou igual)
+                for i in opcoes_dpi:
+                    if dpi <= i:
+                        dpi = i
+                        break
+
+
+        except Exception:
+            dpi = 72
+
         if not item:
             logger.info(f'response_file not item')
             raise NotFound

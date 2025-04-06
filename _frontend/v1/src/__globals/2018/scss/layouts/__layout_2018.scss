@@ -19,6 +19,24 @@
   }
 }
 
+@keyframes keyframe_rotate {
+  50% {
+    transform: rotate(135deg);
+  }
+  70% {
+    transform: rotate(855deg);
+  }
+  75% {
+    transform: scale(2.5) rotate(855deg);
+  }
+  80% {
+    transform: scale(1) rotate(855deg);
+  }
+  100% {
+    transform: rotate(135deg);
+  }
+}
+
 @keyframes keyframe_opacity {
   0% {
   opacity: 0.6;
@@ -36,6 +54,11 @@
 .animation-pulse {
   animation: 10s ease-in-out infinite keyframe_pulse;
   text-shadow: 0 0 15px #fff;
+}
+
+.fa-sign-in-alt {
+  transform: rotate(135deg);
+  animation: keyframe_rotate 7s ease-in-out backwards;
 }
 
 .container-box {
@@ -122,8 +145,8 @@
     position: absolute;
     top: -15px;
     right: 15px;
-    left: 85px;
-    min-height: 200px;
+    left: 84px;
+    min-height: 60vh;
     max-height: none;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     background-color: #fff;
@@ -153,6 +176,18 @@
   .link-texto {
     .preview {
       bottom: -15px;
+      @keyframes keyframe_linktexto_preview {
+        0% {
+          bottom: -15px;
+          top: -15px;
+        }
+        100% {
+          bottom: -100px;
+          top: -100px;
+          max-height: 90vh;
+        }
+      }
+      // animation: keyframe_linktexto_preview 1s linear 0s 1 forwards;
     }
   }
 }
