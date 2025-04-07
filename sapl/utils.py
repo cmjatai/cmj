@@ -327,7 +327,7 @@ class PortalFileField(models.FileField):
 class PortalFieldImage(ImageFieldFile):
 
     @property
-    def url(self):
+    def _url(self):
         try:
             self._require_file()
             # if settings.DEBUG:
@@ -342,6 +342,14 @@ class PortalFieldImage(ImageFieldFile):
                 ),
                 kwargs={'pk': self.instance.pk}
             )
+            return url
+        except:
+            return ''
+
+    @property
+    def url(self):
+        try:
+            url = self._url
             ext = self.name.split('.')[-1]
             if url and url[-1] == '/':
                 url = url[:-1]
@@ -352,11 +360,20 @@ class PortalFieldImage(ImageFieldFile):
 
     @property
     def url_cropping(self):
-        url = self.url
+        url = self._url
         ext = self.name.split('.')[-1]
         if url and url[-1] == '/':
             url = url[:-1]
             url = f'{url}.c1024.{ext}'
+
+        return url
+
+    def url_cropped(self, size=1024):
+        url = self._url
+        ext = self.name.split('.')[-1]
+        if url and url[-1] == '/':
+            url = url[:-1]
+            url = f'{url}.c{size}.{ext}'
 
         return url
 

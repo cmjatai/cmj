@@ -126,26 +126,15 @@ class ParlamentarSerializerVerbose(SaplSerializerMixin):
     logger = logging.getLogger(__name__)
 
     def crop_fotografia(self, obj):
-        thumbnail_url = ""
         try:
-            import os
-            if not obj.fotografia or not os.path.exists(obj.fotografia.path):
-                return thumbnail_url
-            thumbnail_url = get_backend().get_thumbnail_url(
-                obj.fotografia,
-                {
-                    'size': (128, 128),
-                    'box': obj.cropping,
-                    'crop': True,
-                    'detail': True,
-                }
-            )
+            return obj.fotografia.url_cropped(size=128)
+
         except Exception as e:
             self.logger.error(e)
             self.logger.error('erro processando arquivo: %s' %
                               obj.fotografia.path)
 
-        return thumbnail_url
+        return ''
 
     def check_titular(self, obj):
         is_titular = None
