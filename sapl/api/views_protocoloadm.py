@@ -67,7 +67,7 @@ class _DocumentoAdministrativoViewSet(ControlAccessFileForContainerMixin):
                 qs_new = DocumentoAdministrativo.objects.filter(pk=pk)
                 d = qs_new.first()
 
-                if d and d.materia:
+                if d and (d.materia or d.vinculodocadminmateria_set.exists()):
                     if d.workspace.tipo == AreaTrabalho.TIPO_PUBLICO:
                         return qs_new
                     elif d.workspace.tipo == AreaTrabalho.TIPO_PROCURADORIA:
