@@ -73,20 +73,26 @@ def model_name(instance):
 def split(value, arg):
     return value.split(arg)
 
-
 @register.filter
 def to_str(arg):
     return str(arg)
 
+@register.filter
+def to_int(arg):
+    return int(arg)
+
+@register.filter
+def calc_int_subtr(a, b):
+    return int(a) - int(b)
 
 @register.filter
 def to_dict(arg):
     return arg.__dict__
 
-
 @register.filter
 def to_descr(arg):
     return arg.__descr__
+
 
 
 @register.filter

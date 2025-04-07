@@ -52,7 +52,7 @@
         <div class="container-table">
           <div class="result-count">Total de Matérias: <strong>{{paginator.count}}</strong></div>
             {% if paginator.count %}
-            {% for m in page_obj %}
+              {% for m in page_obj %}
                 <div class="item-listas p-2">
                   <div class="item-raiz">
                     <div class="float-right">
@@ -356,10 +356,10 @@
 
 
                       </div>
-            {% endfor %}
-          {% else  %}
-            <tr><td><h3>Nenhuma matéria encontrada com essas especificações</h3></tr>
-          {% endif %}
+              {% endfor %}
+            {% else  %}
+              <tr><td><h3>Nenhuma matéria encontrada com essas especificações filtradas</h3></tr>
+            {% endif %}
           </table>
         </div>
       {% include "paginacao.html" %}

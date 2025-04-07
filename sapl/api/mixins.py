@@ -165,8 +165,6 @@ class ResponseFileMixin:
                     if dpi <= i:
                         dpi = i
                         break
-
-
         except Exception:
             dpi = 72
 

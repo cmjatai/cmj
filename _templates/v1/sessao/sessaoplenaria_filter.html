@@ -41,7 +41,92 @@
   {% crispy filter.form %}
 
   {% if show_results %}
-    <div class="container container-videos">
+
+    <div class="container-table">
+      <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
+
+      {% for sessao in page_obj %}
+        <div class="item-listas">
+          <div class="item-raiz p-3 m-0">
+            <div class="links-texto">
+              {% if sessao.upload_ata %}
+                <a class="link-texto btn btn-primary btn-sm page-preview m-0 mr-3" href="{{sessao.upload_ata.url}}?u={% now "u"%}" title="Ata Aprovada">
+                  <strong>
+                    Ata<br>Aprovada
+                  </strong>
+                  <div class="preview">
+                    <span class="p-5">
+                      Carregando imagem da primeira página da ata da sessão...
+                    </span>
+                    <img loading="lazy" src="{{sessao.upload_ata.url}}?page=1&dpi=200&u={% now "u"%}" title="" alt="Preview da Primeira Página do Documento... Clique para abrir o PDF completo" class="img-fluid">
+                  </div>
+                </a>
+              {% else %}
+                {% if sessao.finalizada %}
+                  <a class="link-texto btn btn-outline-secundary m-0 mr-3" href="{% url 'sapl.sessao:resumo_ata' sessao.id %}" title="Resgistro Automático das votações, prazos e presença.">
+                    <small><em>
+                      Ata<br>Eletrônica
+                    </em>
+                    </small>
+                  </a>
+                  {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="item-texto">
+              <div class="item-texto-titulo">
+                <a href="{% url 'sapl.sessao:resumo' sessao.id %}">{{sessao}}</a>
+              </div>
+              <div class="item-texto-descricao">
+
+                <strong>Legislatura:</strong> {{sessao.legislatura}} | <strong>Sessão Legislativa:</strong> {{sessao.sessao_legislativa}}</br>
+                <strong>Abertura:</strong> {{sessao.data_inicio}} às {{sessao.hora_inicio}} | <strong>Tipo:</strong> {{sessao.tipo}}</br>
+              </div>
+              <div class="item-texto-acao">
+                {% if sessao.upload_pauta and not sessao.upload_ata %}
+                  <a class="btn btn-primary page-preview" href="{{sessao.upload_pauta.url}}">
+                    Pauta da {{sessao.tipo}}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      {% empty %}
+        {% if filter.form.data.data_inicio__year %}
+          {% now "Y" as current_year %}
+          {% with filter.form.data.data_inicio__year as year_filter %}
+
+            {% if year_filter and current_year|calc_int_subtr:year_filter < 10 %}
+              <h3 class="p-5">
+                Não ocorreram sessões/reuniões que atendam aos critérios de busca acima!
+                <br><br>
+                <small><em>
+                  OBS: Todas as ocorrências nos últimos 10 anos estão registradas, então,
+                  se não foi listada nenhuma sessão/reunião com seus critérios de busca, é devido a não ocorrência.
+                  </em>
+                </small>
+              </h3>
+            {% else %}
+              <h3 class="p-5">
+                Nenhuma Sessão/Reunião cadastrada que atenda aos critérios de busca acima!
+              </h3>
+            {% endif %}
+          {% endwith %}
+        {% endif %}
+      {% endfor %}
+
+        {% include "paginacao.html" %}
+
+    </div>
+  {% endif %}
+
+    {% comment %}
+
+    <br><br><br>
+
+    <div class="container container-sessao_old">
       <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
         <div class="row sessao-list align-items-stretch">
         {% for s in page_obj %}
@@ -92,9 +177,8 @@
           <h3>Nenhuma Sessão Plenária encontrada com essas especificações</h3>
         {% endfor %}
       </div>
-      {% include "paginacao.html" %}
     </div>
-  {% endif %}
+    {% endcomment %}
 {% endblock table_content %}
 
 

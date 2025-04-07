@@ -140,6 +140,9 @@
     margin-right: 15px;
   }
 
+}
+
+.page-preview {
   .preview {
     display: none;
     position: absolute;
@@ -152,6 +155,7 @@
     background-color: #fff;
     overflow: auto;
     z-index: 99999;
+    margin-bottom: 2em;
     span {
       position: absolute;
       z-index: -1;
@@ -164,16 +168,15 @@
   }
 
   &:hover {
-    background-color: #fff;
-
     .preview {
       display: block;
     }
   }
 }
 
+
 .container-search {
-  .link-texto {
+  .page-preview {
     .preview {
       bottom: -15px;
       @keyframes keyframe_linktexto_preview {

@@ -2,9 +2,7 @@
   //margin: 0;
   //padding: 0;
 
-  .video-list,
-  .sessao-list {
-
+  .video-list {
     .card-image,
     .inner-imagem {
       position: relative;
@@ -128,17 +126,6 @@
         font-family: Graduate;
         font-variant: small-caps;
       }
-    }
-  }
-
-  .sessao-list {
-    .card {
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .item {
-      margin-bottom: 2em;
     }
   }
 
