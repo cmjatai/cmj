@@ -61,9 +61,16 @@
                     <img loading="lazy" src="{{sessao.upload_ata.url}}?page=1&dpi=200&u={% now "u"%}" title="" alt="Preview da Primeira Página do Documento... Clique para abrir o PDF completo" class="img-fluid">
                   </div>
                 </a>
+              {% elif not sessao.finalizada %}
+                <a class="link-texto btn btn-info m-0 mr-3" href="{% url 'sapl.sessao:pauta_sessao_detail' sessao.id %}" title="Pauta da Sessão">
+                  <small><em>
+                    Pauta<br>da Sessão
+                  </em>
+                  </small>
+                </a>
               {% else %}
                 {% if sessao.finalizada %}
-                  <a class="link-texto btn btn-outline-secundary m-0 mr-3" href="{% url 'sapl.sessao:resumo_ata' sessao.id %}" title="Resgistro Automático das votações, prazos e presença.">
+                  <a class="link-texto btn btn-success m-0 mr-3" href="{% url 'sapl.sessao:resumo_ata' sessao.id %}" title="Resgistro Automático das votações, prazos e presença.">
                     <small><em>
                       Ata<br>Eletrônica
                     </em>
@@ -117,7 +124,7 @@
         {% endif %}
       {% endfor %}
 
-        {% include "paginacao.html" %}
+      {% include "paginacao.html" %}
 
     </div>
   {% endif %}
