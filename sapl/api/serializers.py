@@ -123,7 +123,11 @@ class ParlamentarSerializerVerbose(SaplSerializerMixin):
     titular = serializers.SerializerMethodField('check_titular')
     partido = serializers.SerializerMethodField('check_partido')
     fotografia_cropped = serializers.SerializerMethodField('crop_fotografia')
+    fotografia = serializers.SerializerMethodField('get_fotografia')
     logger = logging.getLogger(__name__)
+
+    def get_fotografia(self, obj):
+        return settings.SITE_URL + self.crop_fotografia(obj)
 
     def crop_fotografia(self, obj):
         try:
