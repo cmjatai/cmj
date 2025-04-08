@@ -1,0 +1,30 @@
+@page {
+  size: A4 portrait;
+  margin-top: 3.5cm;
+  margin-left: 0.7cm;
+  margin-right: 0.7cm;
+  margin-bottom: 1.2cm;
+
+  @bottom-right {  
+    height: 0.5cm;
+    font-size: 7pt;
+  }
+  @bottom-center {
+    border-top: 1px solid black;
+    font-size: 6pt;
+    height: 0.5cm;
+    font-style: italic;
+  }
+  @bottom-left {
+    height: 0.5cm;
+    font-size: 7pt;
+  }
+}
+
+html {
+  font-family: sans-serif;
+}
+
+ul {
+  line-height: 1.5;
+}

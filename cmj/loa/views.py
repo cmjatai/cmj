@@ -24,7 +24,7 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, UnidadeOrcamentaria, quantize
-from cmj.utils import make_pdf
+from cmj.utils_report import make_pdf
 from sapl import parlamentares
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Legislatura, Parlamentar

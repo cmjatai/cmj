@@ -1,9 +1,9 @@
 from django.urls.conf import re_path
 
-from sapl.relatorios.views_new import RelatorioPautaSessao
+from sapl.relatorios.views import RelatorioMateriasPorAutor
 
 from .apps import AppConfig
-from .views import (relatorio_capa_processo,
+from .views_old import (relatorio_capa_processo, RelatorioPautaSessao,
                     relatorio_documento_administrativo, relatorio_espelho,
                     relatorio_etiqueta_protocolo, relatorio_materia,
                     relatorio_ordem_dia, relatorio_pauta_sessao,
@@ -16,6 +16,19 @@ app_name = AppConfig.name
 
 urlpatterns = [
 
+
+    # Relatórios Refatorados
+    re_path(r'^sistema/relatorios/materia-por-autor$',
+        RelatorioMateriasPorAutor.as_view(), name='materia_por_autor'),
+
+
+
+
+
+
+
+
+    # Relatórios Antigos
 
     re_path(r'^relatorios/sessao/(?P<pk>\d+)/pauta$',
         RelatorioPautaSessao.as_view(), name='rel_sessao_pauta'),
@@ -51,4 +64,5 @@ urlpatterns = [
         relatorio_protocolo, name='relatorio_protocolo'),
     re_path(r'^relatorios/(?P<nro>\d+)/(?P<ano>\d+)/etiqueta-protocolo$',
         relatorio_etiqueta_protocolo, name='relatorio_etiqueta_protocolo'),
+
 ]

@@ -1,0 +1,54 @@
+{% load i18n %}
+{% load crispy_forms_tags %}
+{% load common_cmj_tags common_tags %}
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<meta charset="utf-8"></meta>
+<head>
+  <title>{{title_pdf|default:'PortalCMJ'}}</title>
+  <style>
+    {% include "css/base.css" %}
+
+    {% block head_extra_css %}
+    {% endblock head_extra_css %}
+
+    {% block head_page_counter_css %}
+      @page {
+        @bottom-center{
+          content: "Página " counter(page) " de " counter(pages);
+          padding-top: 0.5cm;
+          font-style: italic;
+          color: #444;
+        }
+      }
+      a {
+        text-decoration: none;
+      }
+    {% endblock head_page_counter_css %}
+  </style>
+</head>
+<body>
+  {% block header_content %}
+    <header>
+      <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
+    </header>
+  {% endblock header_content %}
+
+  {% block title %}
+    <h2>{{title|safe}}</h2>
+    {% if filters %}
+      <small>{{filters|safe}}</small><br>
+    {% endif %}
+  {% endblock title %}
+
+  {% block body_content %}{% endblock body_content %}
+
+  {% block footer_content %}
+    <footer>
+      <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
+    </footer>
+  {% endblock footer_content %}
+</body>
+</html>

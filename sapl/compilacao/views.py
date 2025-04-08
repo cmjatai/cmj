@@ -34,7 +34,7 @@ from django.views.generic.edit import (CreateView, DeleteView, FormView,
 from django.views.generic.list import ListView
 import pymupdf
 
-from cmj.utils import media_cache_storage, make_pdf
+from cmj.utils import media_cache_storage
 from sapl.compilacao.apps import AppConfig
 from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
                                    DispositivoEdicaoAlteracaoForm,

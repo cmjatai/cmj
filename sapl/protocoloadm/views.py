@@ -50,8 +50,8 @@ from sapl.protocoloadm.forms import ProtocoloDocumentoAcessorioForm, \
     VinculoDocAdminMateriaEmLoteFilterSet, VinculoDocAdminMateriaForm
 from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo, \
     VinculoDocAdminMateria
-from sapl.relatorios.views import relatorio_doc_administrativos, get_rodape, \
-    make_pdf
+from sapl.relatorios.views_old import relatorio_doc_administrativos
+
 from sapl.utils import (create_barcode, get_base_url, get_client_ip,
                         get_mime_type_from_file_extension, lista_anexados,
                         show_results_filter_set, mail_service_configured,

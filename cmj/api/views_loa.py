@@ -31,13 +31,13 @@ from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar
     AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento, quantize,\
     Fonte
 from cmj.utils import run_sql
+from cmj.utils_report import make_pdf
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize,\
     wrapper_queryset_response_for_drf_action
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
 from sapl.api.serializers import SaplSerializerMixin
 from sapl.parlamentares.models import Parlamentar
-from sapl.relatorios.views import make_pdf
 
 
 logger = logging.getLogger(__name__)

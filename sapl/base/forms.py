@@ -994,54 +994,6 @@ class RelatorioMateriasPorAnoAutorTipoFilterSet(django_filters.FilterSet):
         )
 
 
-class RelatorioMateriasPorAutorFilterSet(django_filters.FilterSet):
-
-    autoria__autor = django_filters.CharFilter(widget=forms.HiddenInput())
-
-    #@property
-    # def qs(self):
-    #    parent = super().qs
-    # return parent.order_by('autoria__autor', '-ano',
-    # 'tipo__sequencia_regimental', '-numero').distinct()
-
-    @property
-    def qs(self):
-        qs = super().qs
-        return qs.select_related('tipo').order_by('tipo__sequencia_regimental', '-numero')
-
-    class Meta(FilterOverridesMetaMixin):
-        model = MateriaLegislativa
-        fields = ['tipo', 'data_apresentacao']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        self.filters['tipo'].label = 'Tipo de Matéria'
-
-        row1 = to_row(
-            [('tipo', 12)])
-        row2 = to_row(
-            [('data_apresentacao', 12)])
-        row3 = to_row(
-            [('autoria__autor', 0),
-             (Button('pesquisar',
-                     'Pesquisar Autor',
-                     css_class='btn btn-primary btn-sm'), 2),
-             (Button('limpar',
-                     'limpar Autor',
-                     css_class='btn btn-primary btn-sm'), 10)])
-
-        self.form.helper = SaplFormHelper()
-        self.form.helper.form_method = 'GET'
-        self.form.helper.layout = Layout(
-            Fieldset(_('Pesquisar'),
-                     row1, row2,
-                     HTML(autor_label),
-                     HTML(autor_modal),
-                     row3,
-                     form_actions(label='Pesquisar'))
-        )
-
 
 class CasaLegislativaForm(FileFieldCheckMixin, ModelForm):
 
