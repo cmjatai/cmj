@@ -8,9 +8,10 @@ REST_FRAMEWORK = {
 
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
-        "drfautoapi.JpgRenderer",
-        "drfautoapi.PngRenderer",
         "drfautoapi.PDFRenderer",
+        "drfautoapi.PngRenderer",
+        "drfautoapi.JpgRenderer",
+        "drfautoapi.JpegRenderer",
     ),
     "DEFAULT_CONTENT_NEGOTIATION_CLASS": "drfautoapi.DrfautoapiNegotiation",
     "DEFAULT_PERMISSION_CLASSES": (

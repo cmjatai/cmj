@@ -22,9 +22,13 @@ class FilesRenderer(BaseRenderer):
         raise Http404
 
 
+class JpegRenderer(FilesRenderer):
+    media_type = 'image/jpeg'
+    format = r'[a-zA-Z0-9]*\.?(jpeg|jpg)' 
+
 class JpgRenderer(FilesRenderer):
     media_type = 'image/jpg'
-    format = r'[a-zA-Z0-9]*\.?jpg'
+    format = r'[a-zA-Z0-9]*\.?(jpg|jpeg)'
 
 
 class PngRenderer(FilesRenderer):
