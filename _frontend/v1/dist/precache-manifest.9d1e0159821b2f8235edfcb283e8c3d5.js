@@ -28,12 +28,16 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "81efd75fcc3b25227950",
+    "revision": "f1edab619c84d3f8f749",
     "url": "/static/css/app.215f3461.css"
   },
   {
     "revision": "331c4591ee4b65991c30",
     "url": "/static/css/chunk-0ec9d5db.1c736b92.css"
+  },
+  {
+    "revision": "a28cfc90a319595d5c5d",
+    "url": "/static/css/chunk-2e902971.bf72237e.css"
   },
   {
     "revision": "738c1735a91d9d10fb42",
@@ -58,10 +62,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "ef297d2ebfaa8fd0660c",
     "url": "/static/css/chunk-6f0ff250.55478430.css"
-  },
-  {
-    "revision": "525ba4b0badd364f274c",
-    "url": "/static/css/chunk-753c49cc.e0c63c90.css"
   },
   {
     "revision": "73fc5e7b2bc96e1b22c9",
@@ -368,12 +368,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "43b525355f5d14a3ef0407e53fd849e0",
+    "revision": "18cbff8baaf1b9cc02895d4bbf13ef44",
     "url": "/static/index.html"
   },
   {
-    "revision": "81efd75fcc3b25227950",
-    "url": "/static/js/app.016ce923.js"
+    "revision": "f1edab619c84d3f8f749",
+    "url": "/static/js/app.65b9040c.js"
   },
   {
     "revision": "331c4591ee4b65991c30",
@@ -386,6 +386,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "3a660e3a559bd6541868",
     "url": "/static/js/chunk-2d216bf1.112498bd.js"
+  },
+  {
+    "revision": "a28cfc90a319595d5c5d",
+    "url": "/static/js/chunk-2e902971.e65fc304.js"
   },
   {
     "revision": "738c1735a91d9d10fb42",
@@ -410,10 +414,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "ef297d2ebfaa8fd0660c",
     "url": "/static/js/chunk-6f0ff250.eb4d24be.js"
-  },
-  {
-    "revision": "525ba4b0badd364f274c",
-    "url": "/static/js/chunk-753c49cc.3790e50b.js"
   },
   {
     "revision": "904dc4c5f111b793c329",

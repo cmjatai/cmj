@@ -127,11 +127,12 @@ class ParlamentarSerializerVerbose(SaplSerializerMixin):
     logger = logging.getLogger(__name__)
 
     def get_fotografia(self, obj):
-        return settings.SITE_URL + self.crop_fotografia(obj)
+        return settings.SITE_URL + '/' + self.crop_fotografia(obj)
 
     def crop_fotografia(self, obj):
         try:
-            return obj.fotografia.url_cropped(size=128)
+            url = obj.fotografia.url_cropped(size=128)
+            return url[1:]
 
         except Exception as e:
             self.logger.error(e)

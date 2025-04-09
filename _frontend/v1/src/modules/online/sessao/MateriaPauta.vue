@@ -12,22 +12,34 @@
             `link-file-${materia.id}`,
             !blob ? 'd-none' : '',
           ]"
-          @click="clickFile"
-        >
+          @click="clickFile">
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
+        <small :class="!baixando ? 'd-none' : ''">Baixando<br />Arquivo</small>
         <a
           :class="[
             'btn btn-link',
-            `link-file-${materia.id}`,
-
+            `link-file-${materia.id}`
           ]"
           :href="materia.texto_original"
           target="_blank"
         >
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
-        <small :class="!baixando ? 'd-none' : ''">Baixando<br />Arquivo</small>
+        <hr>
+        <div class="page-preview">
+          <div class="btn" @click="togglePreview">
+            <i :class="['fas fa-eye', preview ? 'd-block':'d-none']"></i>
+            <i :class="['far fa-eye-slash', preview ? 'd-none':'d-block']"></i>
+          </div>
+          <div :class="['preview-online', preview ? 'd-block':'d-none']" :id="`preview-${materia.id}`">
+            <span class="p-5">
+              Carregando imagem da primeira página da matéria...
+            </span>
+            <div @click="togglePreview" class="btn btn-danger">X</div>
+            <img loading="lazy" :src="`${materia.texto_original}?page=1&dpi=190`" title="" alt="Preview da Primeira Página do Documento... Clique para abrir o PDF completo" class="img-fluid">
+          </div>
+        </div>
       </div>
 
       <div class="data-header">
@@ -78,7 +90,8 @@ export default {
       },
       tipo_string: '',
       blob: null,
-      baixando: false
+      baixando: false,
+      preview: false
     }
   },
   watch: {
@@ -119,7 +132,10 @@ export default {
     }, 1000) */
   },
   methods: {
-
+    togglePreview () {
+      const t = this
+      t.preview = !t.preview
+    },
     fetchUltimaTramitacao () {
       const t = this
       return t.utils
@@ -215,6 +231,35 @@ export default {
 
 <style lang="scss">
 .materia-pauta {
+  hr {
+    border: 0.5px solid #777;
+    margin: 5px 0 0 -15px;
+    width: 100%;
+  }
+  .page-preview {
+    .preview-online {
+      position: absolute;
+      top: -15px;
+      right: 15px;
+      left: 55px;
+      min-height: 60vh;
+      max-height: none;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      background-color: #fff;
+      overflow: auto;
+      z-index: 10000;
+      margin-bottom: 2em;
+      span {
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+      }
+      img {
+        z-index: 1;
+      }
+    }
+  }
   .epigrafe {
     color: #044079;
     font-size: 125%;
@@ -239,11 +284,19 @@ export default {
     }
     .link-file {
       float: left;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   }
-  .btn-link {
+  .btn, .btn-link {
     cursor: pointer;
     margin: 0.5rem 0.5rem 0 -0.5rem;
+  }
+  .btn.btn-danger {
+    position: absolute;
+    margin: 5px;
+    padding: 0px 10px;
   }
   .detail-header {
     display: flex;
@@ -288,11 +341,10 @@ export default {
 }
 
 @media screen and (max-width: 480px) {
-
-.materia-pauta {
-  .btn-link {
-    margin: 0.5rem -0.3rem 0 -0.5rem;
+  .materia-pauta {
+    .btn-link {
+      margin: 0.5rem -0.3rem 0 -0.5rem;
+    }
   }
-}
 }
 </style>
