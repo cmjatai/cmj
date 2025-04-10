@@ -32,7 +32,12 @@ class RelatorioMixin:
     def get(self, request, *args, **kwargs):
         response = super(RelatorioMixin, self).get(request)
 
-        if 'relatorio' not in request.GET:
+        format = kwargs.get('format', None)
+
+        if 'relatorio' in request.GET:
+            format = 'pdf'
+
+        if not format or format != 'pdf':
             return response
 
         return self.export_pdf(request, response.context_data, *args, **kwargs)
@@ -60,7 +65,7 @@ class RelatorioMixin:
     def get_template_names(self) -> list[str]:
         prefix = type(self).__name__
 
-        return [f'relatorios/{prefix}_filter.html']
+        return [f'relatorios/{prefix}_html.html']
 
     def get_template_pdf(self) -> str:
         prefix = type(self).__name__
@@ -68,7 +73,7 @@ class RelatorioMixin:
 
 
 
-class RelatorioMateriasPorAutor(RelatorioMixin, FilterView):
+class RelatorioMateriasPorAutorView(RelatorioMixin, FilterView):
     model = MateriaLegislativa
     filterset_class = RelatorioMateriasPorAutorFilterSet
 
@@ -212,3 +217,7 @@ class RelatorioMateriasPorAutor(RelatorioMixin, FilterView):
         context['result_dict'] = dict(sorted(context['result_dict'].items()))
 
         return context
+
+
+class RelatorioGestaoView(RelatorioMixin, TemplateView):
+    pass

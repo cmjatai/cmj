@@ -28,16 +28,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "f1edab619c84d3f8f749",
-    "url": "/static/css/app.215f3461.css"
+    "revision": "f7279e2b82405d7e07ad",
+    "url": "/static/css/app.d9330a58.css"
   },
   {
     "revision": "331c4591ee4b65991c30",
     "url": "/static/css/chunk-0ec9d5db.1c736b92.css"
-  },
-  {
-    "revision": "a28cfc90a319595d5c5d",
-    "url": "/static/css/chunk-2e902971.bf72237e.css"
   },
   {
     "revision": "738c1735a91d9d10fb42",
@@ -50,6 +46,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "c3ba9e53558cb70d1367",
     "url": "/static/css/chunk-3ef0b8f8.1f33f65a.css"
+  },
+  {
+    "revision": "6f1fdf86e03f0bd7641c",
+    "url": "/static/css/chunk-58aa24cd.7c557d58.css"
   },
   {
     "revision": "0968c8679051720dbbac",
@@ -368,12 +368,12 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "18cbff8baaf1b9cc02895d4bbf13ef44",
+    "revision": "af0975522f91b08ff4e65a0186ce965a",
     "url": "/static/index.html"
   },
   {
-    "revision": "f1edab619c84d3f8f749",
-    "url": "/static/js/app.65b9040c.js"
+    "revision": "f7279e2b82405d7e07ad",
+    "url": "/static/js/app.0f12dc0c.js"
   },
   {
     "revision": "331c4591ee4b65991c30",
@@ -388,10 +388,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-2d216bf1.112498bd.js"
   },
   {
-    "revision": "a28cfc90a319595d5c5d",
-    "url": "/static/js/chunk-2e902971.e65fc304.js"
-  },
-  {
     "revision": "738c1735a91d9d10fb42",
     "url": "/static/js/chunk-2f6a5bb1.c88d20f9.js"
   },
@@ -402,6 +398,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "c3ba9e53558cb70d1367",
     "url": "/static/js/chunk-3ef0b8f8.1c5e48d1.js"
+  },
+  {
+    "revision": "6f1fdf86e03f0bd7641c",
+    "url": "/static/js/chunk-58aa24cd.e4daabd7.js"
   },
   {
     "revision": "0968c8679051720dbbac",

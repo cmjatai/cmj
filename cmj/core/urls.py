@@ -13,7 +13,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
-    app_vue_view, template_render, CertidaoPublicacaoCrud, BiView,\
+    app_vue_view, template_render, CertidaoPublicacaoCrud, BiView, \
     MediaPublicView, PesquisarAuditLogView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     UserCrud, CmjPasswordResetView, CmjPasswordResetEncaminhadoView,\
@@ -90,7 +90,6 @@ urlpatterns = user_urlpatterns + [
 
     re_path(r'^estatisticas$', BiView.as_view(),
             name='bi_render'),
-
 
     re_path(r'^api/enderecos.json', TrechoJsonSearchView.as_view(
         {'get': 'list'}), name='trecho_search_rest_json'),
