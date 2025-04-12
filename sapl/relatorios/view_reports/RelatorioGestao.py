@@ -3,7 +3,8 @@ from django.db.models.aggregates import Count
 
 from cmj.core.views_estatisticas import get_redessociais
 from sapl.comissoes.models import Composicao, Participacao
-from sapl.norma.models import TipoNormaJuridica
+from sapl.materia.models import AssuntoMateria, TipoMateriaLegislativa
+from sapl.norma.models import AssuntoNorma, TipoNormaJuridica
 from sapl.parlamentares.models import ComposicaoMesa, Legislatura
 from sapl.relatorios.view_reports.mixins import RelatorioMixin
 from django.views.generic import TemplateView
@@ -32,11 +33,11 @@ class View(RelatorioMixin, TemplateView):
                 self.get_capa()
             ]
         )
-        print(context['html_capa'])
         context['html_body'] = self.get_html(
             [
                 self.get_comissoes(),
-                self.get_normas()
+                self.get_normas(),
+                self.get_materias(),
             ]
         )
         return context
@@ -141,20 +142,66 @@ class View(RelatorioMixin, TemplateView):
 
     def get_normas(self):
 
-        mark = [f'## Atos Normativos e Legislativos de {self.ano}']
+        mark = [f'## Atos Normativos/Legislativos de {self.ano}']
         tipos = TipoNormaJuridica.objects.filter(
-            normajuridica_set__data__year=2024
+            normajuridica_set__data__year=self.ano
         ).annotate(Count('normajuridica_set')).order_by('relevancia')
         for t in tipos:
             mark.append('')
-            mark.append(f'* [{t.descricao} ({t.normajuridica_set__count})](http://www.jatai.go.leg.br/pesquisar/norma?tipo_i={t.pk}&ano_i={self.ano})')
+            mark.append(f'* [{t.descricao} ({t.normajuridica_set__count})]'
+                        f'(http://www.jatai.go.leg.br/pesquisar/norma?tipo_i={t.pk}&ano_i={self.ano})')
 
         mark.append('')
         mark.append(f'##### _Clique no tipo de norma para acessar a listagem dos atos referente ao ano {self.ano}._')
 
-        mark.append(f'### Assuntos tratados nos Atos Normativos/Legislativos de {self.ano}')
+        mark2 = []
+        mark2.append(f'### Assuntos tratados nos Atos Normativos/Legislativos de {self.ano}')
+
+        assuntos = AssuntoNorma.objects.filter(
+            normajuridica__data__year=self.ano
+        ).annotate(Count('normajuridica')).order_by('assunto')
+        for a in assuntos:
+            mark2.append('')
+            mark2.append(
+                f'* [{a.assunto} ({a.normajuridica__count})]'
+                f'(http://www.jatai.go.leg.br/pesquisar/norma?assuntos_is={a.pk}&ano_i={self.ano})'
+            )
 
 
         return (
             ('\n'.join(mark), 'container-atos-normativos col-md-12', 'markdown'),
+            ('\n'.join(mark2), 'container-assuntos-normativos col-md-12', 'markdown'),
+        )
+
+    def get_materias(self):
+
+        mark = [f'## Matérias Legislativas no ano de {self.ano}.']
+        tipos =TipoMateriaLegislativa.objects.filter(
+            materialegislativa__ano=self.ano,
+        ).annotate(Count('materialegislativa')).order_by('nivel_agrupamento', 'sequencia_regimental')
+
+        for t in tipos:
+            mark.append('')
+            mark.append(f'* [{t.descricao} ({t.materialegislativa__count})]'
+                        f'(http://www.jatai.go.leg.br/pesquisar/materia?tipo_i={t.pk}&ano_i={self.ano})')
+
+        mark.append('')
+        mark.append(f'##### _Clique no tipo de matéria para acessar a listagem dos atos referente ao ano {self.ano}._')
+
+        mark.append(f'### Assuntos dos Requerimentos de {self.ano}')
+
+        assuntos = AssuntoMateria.objects.filter(
+            materialegislativa__ano=self.ano,
+            materialegislativa__tipo_id=3
+        ).annotate(Count('materialegislativa')).order_by('assunto')
+        for a in assuntos:
+            mark.append('')
+            mark.append(
+                f'* [{a.assunto} ({a.materialegislativa__count})]'
+                f'(http://www.jatai.go.leg.br/pesquisar/materia?assuntos_is={a.pk}&ano_i={self.ano})'
+            )
+
+
+        return (
+            ('\n'.join(mark), 'container-materias col-md-12', 'markdown'),
         )

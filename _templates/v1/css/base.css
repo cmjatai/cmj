@@ -123,6 +123,3 @@ header img, footer img {
   width: 210mm;
   z-index: 0;
 }
-.fullpage:last-child {
-  break-before: none;
-}
