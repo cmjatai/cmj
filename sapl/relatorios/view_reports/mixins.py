@@ -45,9 +45,3 @@ class RelatorioMixin:
         prefix = type(self).__name__
         return f'relatorios/pdf/{prefix}_pdf.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(RelatorioMixin, self).get_context_data(**kwargs)
-        if hasattr(self, 'get_markdown'):
-            context['markdown'] = self.get_markdown()
-            
-        return context

@@ -1,6 +1,8 @@
+
 .container-show{
   font-size: 14pt;
   text-align: left;
+  z-index: 2;
   h1 {
     color: #045;
   }

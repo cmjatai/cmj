@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models.aggregates import Count
 
 from cmj.core.views_estatisticas import get_redessociais
@@ -11,28 +12,42 @@ from django.utils import timezone
 from markdown.extensions.toc import slugify_unicode
 from markdown.extensions.toc import TocExtension as makeTocExtension
 
-markstyles = '''<style>
-</style>
-'''
 class View(RelatorioMixin, TemplateView):
 
-    def get_markdown(self):
+    def get(self, request, *args, **kwargs):
         self.ano = self.kwargs.get('ano', None)
+        self.site_url = settings.SITE_URL
         try:
             self.ano = int(self.ano)
         except ValueError:
             self.ano = timezone.now().year
         if self.ano < 1900 or self.ano > 2100:
             self.ano = timezone.now().year
+        return super(View, self).get(request, *args, **kwargs)
 
-        mark = (
-            self.get_capa(),
-            self.get_comissoes(),
-            self.get_normas()
+    def get_context_data(self, **kwargs):
+        context = super(View, self).get_context_data(**kwargs)
+        context['html_capa'] = self.get_html(
+            [
+                self.get_capa()
+            ]
         )
+        print(context['html_capa'])
+        context['html_body'] = self.get_html(
+            [
+                self.get_comissoes(),
+                self.get_normas()
+            ]
+        )
+        return context
 
+
+    def get_html(self, markdowns):
+        """
+        Retorna o HTML do relatório
+        """
         html = []
-        for i, mt in enumerate(mark):
+        for i, mt in enumerate(markdowns):
             cols = []
             for m in mt:
                 css_class = ''
@@ -40,63 +55,14 @@ class View(RelatorioMixin, TemplateView):
                 if isinstance(m, tuple):
                     m, css_class, tipo = m
                 if tipo == 'markdown':
-
                     m = md.markdown(m, extensions=[
                         makeTocExtension(slugify=slugify_unicode), #TOC
                     ])
                 cols.append(f'<div class="{css_class}">{m}</div>')
             row = f'<div class="row {"page-break" if i else ""}">{"".join(cols)}</div>'
             html.append(row)
+        return ''.join(html)
 
-        mdr = [f'{markstyles}<div class="container container-bi container-show">{h}</div>' for h in html]
-
-        return ''.join(mdr)
-
-    def get_normas(self):
-
-        mark = [f'## Atos Normativos e Legislativos de {self.ano}']
-        tipos = TipoNormaJuridica.objects.filter(
-            normajuridica_set__data__year=2024
-        ).annotate(Count('normajuridica_set')).order_by('relevancia')
-        for t in tipos:
-            mark.append('')
-            mark.append(f'* [{t.descricao} ({t.normajuridica_set__count})](http://www.jatai.go.leg.br/pesquisar/norma?tipo_i={t.pk}&ano_i={self.ano})')
-
-        mark.append('')
-        mark.append('##### _Clique no tipo de norma para acessar a listagem dos atos referente ao ano {self.ano}._')
-
-        mark.append(f'### Assuntos tratados nos Atos Normativos e Legislativos de {self.ano}')
-
-
-        return (
-            ('\n'.join(mark), 'container-atos-normativos col-md-12', 'markdown'),
-        )
-
-    def get_comissoes(self):
-        """
-        Retorna a página de comissões do relatório
-        """
-        mark = [f'## Comissões']
-        participacoes = Participacao.objects.filter(
-            composicao__periodo__data_inicio__year__lte=self.ano,
-            composicao__periodo__data_fim__year__gte=self.ano,
-        ).order_by(
-            'composicao__comissao__nome',
-            'cargo_id'
-        )
-
-        comissao_atual = None
-        for participacao in participacoes:
-            if participacao.composicao.comissao != comissao_atual:
-                comissao_atual = participacao.composicao.comissao
-                mark.append('')
-                mark.append(f'#### {comissao_atual.sigla} - {comissao_atual.nome}')
-
-            mark.append(f'* {participacao.cargo.nome.upper()}: **{participacao.parlamentar.nome_parlamentar}**')
-
-        return (
-            ('\n'.join(mark), 'col-md-12', 'markdown'),
-        )
 
     def get_capa(self):
         """
@@ -111,7 +77,7 @@ class View(RelatorioMixin, TemplateView):
                 <br>
                 <span class="capa-ano">
                 {self.ano}
-                </div>'''
+            </div>'''
 
         mark1 = []
 
@@ -133,14 +99,62 @@ class View(RelatorioMixin, TemplateView):
         for m in membros_da_mesa:
             mark1.append(f'* {m.cargo.descricao.upper()}: **{m.parlamentar.nome_parlamentar}**')
 
-        mark1.append(f'## Parlamentares')
+        mark2 = []
+        mark2.append(f'## Parlamentares')
         parlamentares = legislatura.mandato_set.values_list(
             'parlamentar__nome_parlamentar', flat=True
         ).order_by('parlamentar__nome_parlamentar').distinct()
         for p in parlamentares:
-            mark1.append(f'* **{p}**')
+            mark2.append(f'* **{p}**')
 
         return (
-            (html0, 12, 'html'),
-            ('\n'.join(mark1), 'col-md-12', 'markdown')
+            (html0, 'col-md-12 capa-titulo', 'html'),
+            ('\n'.join(mark1), 'col-md-12 capa-mesa', 'markdown'),
+            ('\n'.join(mark2), 'col-md-12 capa-parlamentares', 'markdown')
+        )
+
+    def get_comissoes(self):
+        """
+        Retorna a página de comissões do relatório
+        """
+        mark = [f'## Comissões']
+        participacoes = Participacao.objects.filter(
+            composicao__periodo__data_inicio__year__lte=self.ano,
+            composicao__periodo__data_fim__year__gte=self.ano,
+        ).order_by(
+            'composicao__comissao__nome',
+            'cargo_id'
+        )
+
+        comissao_atual = None
+        for participacao in participacoes:
+            if participacao.composicao.comissao != comissao_atual:
+                comissao_atual = participacao.composicao.comissao
+                mark.append('')
+                mark.append(f'#### [{comissao_atual.sigla} - {comissao_atual.nome}]({self.site_url}/comissao/{comissao_atual.pk})')
+
+            mark.append(f'* {participacao.cargo.nome.upper()}: **{participacao.parlamentar.nome_parlamentar}**')
+
+        return (
+            ('\n'.join(mark), 'col-md-12', 'markdown'),
+        )
+
+    def get_normas(self):
+
+        mark = [f'## Atos Normativos e Legislativos de {self.ano}']
+        tipos = TipoNormaJuridica.objects.filter(
+            normajuridica_set__data__year=2024
+        ).annotate(Count('normajuridica_set')).order_by('relevancia')
+        for t in tipos:
+            mark.append('')
+            mark.append(f'* [{t.descricao} ({t.normajuridica_set__count})](http://www.jatai.go.leg.br/pesquisar/norma?tipo_i={t.pk}&ano_i={self.ano})')
+
+        mark.append('')
+        mark.append(f'##### _Clique no tipo de norma para acessar a listagem dos atos referente ao ano {self.ano}._')
+
+        mark.append(f'### Assuntos tratados nos Atos Normativos/Legislativos de {self.ano}')
+
+
+        return (
+            ('\n'.join(mark), 'container-atos-normativos col-md-12', 'markdown'),
         )
