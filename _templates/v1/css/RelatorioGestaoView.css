@@ -1,0 +1,54 @@
+.container-show{
+  font-size: 14pt;
+  text-align: left;
+  h1 {
+    color: #045;
+  }
+  h2 {
+    margin-top: 1em;
+  }
+  h3 {
+    margin: 1cm 0 0 0;
+  }
+  h4 {
+    margin: 0.7cm 0 0 0;
+  }
+  p {
+    text-indent: 1cm;
+    margin: 5px 0;
+    color: #045;
+  }
+  ul {
+    margin: 1rem 0 0 0;
+    ul {
+      margin: 0;
+    }
+  }
+  li {
+    color: #045;
+    p {
+      margin: 0;
+      text-indent: 0cm;
+    }
+    li {
+      font-style: italic;
+      color: #049;
+    }
+  }
+  .capa {
+    font-size: 40pt;
+    text-align: center;
+    font-weight: bold;
+    line-height: 1.5em;
+    .capa-ano {
+      line-height: 1.5em;
+      font-size: 80pt;
+      font-weight: bold;
+      color: #045;
+    }
+  }
+}
+
+.page-break {
+  page-break-before: always;
+}

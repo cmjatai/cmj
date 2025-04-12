@@ -2,6 +2,7 @@
 import glob
 import logging
 import os
+from time import sleep
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
@@ -559,7 +560,7 @@ class MateriaLegislativa(CommonMixin):
                                  using=using,
                                  update_fields=update_fields)
 
-    def clear_cache(self, page=None):
+    def clear_cache(self, page=None, error=0):
         try:
             fcache = glob.glob(
                 f'{self.texto_original.path}-p{page:0>3}*'
@@ -570,7 +571,13 @@ class MateriaLegislativa(CommonMixin):
                 os.remove(f)
 
         except Exception as e:
-            logger.error(f'Erro ao limpar cache de: {self.arquivo.path}. {e}')
+            if not error:
+                error = 1
+            logger.error(f'Erro ao limpar cache de: {self.texto_original.path}. {e}')
+
+        if error == 1:
+            sleep(3)
+            self.clear_cache(page=page, error=2)
 
     def autografos(self):
         return self.normajuridica_set.filter(tipo_id=27)

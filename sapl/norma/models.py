@@ -108,6 +108,7 @@ class NormaJuridica(CommonMixin):
     tipo = models.ForeignKey(
         TipoNormaJuridica,
         on_delete=models.PROTECT,
+        related_name='normajuridica_set',
         verbose_name=_('Tipo da Norma Jurídica'))
     materia = models.ForeignKey(
         MateriaLegislativa, blank=True, null=True,

@@ -61,6 +61,15 @@ class Legislatura(models.Model):
             'start': self.data_inicio.year,
             'end': self.data_fim.year}
 
+    @property
+    def nome(self):
+        if not self.data_fim:
+            self.data_fim = timezone.now().date()
+        return _('%(numero)sª Legislatura | %(start)s - %(end)s') % {
+            'numero': self.numero,
+            'start': self.data_inicio.year,
+            'end': self.data_fim.year}
+
 
 class SessaoLegislativa(models.Model):
     TIPO_SESSAO_CHOICES = Choices(

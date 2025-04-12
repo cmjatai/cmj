@@ -1,33 +1,65 @@
 <template>
-  <div :class="['materia-pauta']">
+  <div :class="['materia-pauta']" :id="`mp${type}-${materia.id}`">
     <a :href="materia.link_detail_backend" target="_blank" class="epigrafe"
       >{{ tipo_string }} n&#186; {{ materia.numero }}/{{ materia.ano }}</a
     >
 
     <div :class="['item-header', tipo_string ? '' : 'd-none']">
-      <div class="link-file" :id="`${type}-${materia.id}`">
+      <div class="link-file" :id="`${type}-${materia.id}`" :key="`${type}-${materia.id}`">
         <a
           :class="[
             'btn btn-link',
             `link-file-${materia.id}`,
             !blob ? 'd-none' : '',
           ]"
-          @click="clickFile"
-        >
+          @click="clickFile">
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
+        <small :class="!baixando ? 'd-none' : ''">Baixando<br />Arquivo</small>
         <a
           :class="[
             'btn btn-link',
-            `link-file-${materia.id}`,
-
+            `link-file-${materia.id}`
           ]"
           :href="materia.texto_original"
           target="_blank"
         >
           <i class="far fa-2x fa-file-pdf"></i>
         </a>
-        <small :class="!baixando ? 'd-none' : ''">Baixando<br />Arquivo</small>
+        <hr>
+        <div class="page-preview" :key="`pp-${type}-${materia.id}`" :id="`pp-${type}-${materia.id}`">
+          <div class="btn btn-preview " @click="togglePreview">
+            <i :class="['fas fa-eye', preview ? 'd-block':'d-none']"></i>
+            <i :class="['far fa-eye-slash', preview ? 'd-none':'d-block']"></i>
+          </div>
+          <div :class="['preview-online', preview ? 'd-block':'d-none']" :id="`pon-${materia.id}`">
+            <span class="p-5">
+              Carregando imagem da primeira página da matéria...
+            </span>
+
+            <div class="preview-direction">
+              <div class="inner-direction btn-group">
+                <span class="btn btn-secondary preview-previous" @click="changePage(-1)"  v-show="materia._paginas > 1">
+                  <i class="fas fa-chevron-left" aria-hidden="true"><span>Página Anterior</span></i>
+                </span>
+                <div class="preview-currentpage">
+                  <small><em>Página Atual</em></small>
+                  <div>
+                    <span class="currentpage">{{preview_page}}</span> de <span class="totalpage">{{materia._paginas}}</span>
+                  </div>
+                </div>
+                <span class="btn btn-secondary preview-next" @click="changePage(1)"  v-show="materia._paginas > 1">
+                  <i class="fas fa-chevron-right" aria-hidden="true"><span>Próxima Página</span></i>
+                </span>
+              </div>
+            </div>
+            <div @click="togglePreview" class="btn btn-danger">X</div>
+            <img loading="lazy" :src="`${materia.texto_original}?page=${preview_page}&dpi=190&u=${utimes}`" title="" alt="Preview da Primeira Página do Documento..." class="img-fluid">
+            <div class="loading" v-if="preview_loading">
+              <div class="loader"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="data-header">
@@ -63,7 +95,6 @@
   </div>
 </template>
 <script>
-// import axios from 'axios'
 export default {
   name: 'materia-pauta',
   props: ['materia', 'type'],
@@ -78,7 +109,12 @@ export default {
       },
       tipo_string: '',
       blob: null,
-      baixando: false
+      baixando: false,
+      preview: false,
+      preview_page: 1,
+      preview_loading: false,
+      paginas_abertas: [],
+      utimes: 0
     }
   },
   watch: {
@@ -111,15 +147,54 @@ export default {
     if (!t.blob && t.materia.id !== undefined) {
       t.refresh()
     }
-    /*
-    setTimeout(() => {
-      if (!t.blob) {
-        t.refresh()
+    t.$root.$on('closePreviews', (id) => {
+      if (t.materia.id !== id) {
+        t.preview = false
       }
-    }, 1000) */
+    })
   },
   methods: {
+    changePage (direction) {
+      const t = this
+      if (t.preview_page + direction > 0 && t.preview_page + direction <= t.materia._paginas) {
+        t.preview_page += direction
+        t.utimes++
 
+        if (t.preview_page > 1 && !t.paginas_abertas.includes(t.preview_page)) {
+          t.preview_loading = true
+          setTimeout(() => {
+            t.preview_loading = false
+            t.paginas_abertas.push(t.preview_page)
+          }, 3000)
+        }
+      }
+    },
+    togglePreview () {
+      const t = this
+      t.preview = !t.preview
+      t.preview_loading = true && t.preview
+      setTimeout(() => {
+        t.preview_loading = false
+      }, 1000)
+      if (t.preview) {
+        t.$root.$emit('closePreviews', t.materia.id)
+        // scrolling
+        setTimeout(() => {
+          const preview = document.getElementById(`mp${t.type}-${t.materia.id}`)
+          const main = document.getElementsByClassName('main')[0]
+          let curtop = 0
+          let obj = preview
+          do {
+            curtop += obj.offsetTop
+            obj = obj.offsetParent
+          } while (obj && obj.tagName !== 'BODY')
+          main.scrollTo({
+            top: curtop - 120,
+            behavior: 'smooth'
+          })
+        }, 1000)
+      }
+    },
     fetchUltimaTramitacao () {
       const t = this
       return t.utils
@@ -215,6 +290,96 @@ export default {
 
 <style lang="scss">
 .materia-pauta {
+  position: relative;
+  clear: both;
+  .btn-link {
+    cursor: pointer;
+    margin: 0.5rem 0.5rem 0 -0.5rem;
+  }
+  hr {
+    border: 0.5px solid #777;
+    margin: 16px 0 0 -15px;
+    width: 100%;
+  }
+  .page-preview {
+    .btn.btn-danger {
+      position: absolute;
+      margin: 5px;
+      padding: 0px 15px;
+      z-index: 3;
+      font-size: 1.5em;
+    }
+    .btn-preview {
+      zoom: 1.3;
+      margin: 0.5rem 0.0rem 0.5rem -10px;
+      //padding: 10px;
+      .fa-eye {
+        color: #044079;
+      }
+    }
+    .preview-online {
+      position: absolute;
+      top: -45px;
+      right: -16px;
+      left: 60px;
+      min-height: 60vh;
+      max-height: none;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      background-color: #fff;
+      overflow: auto;
+      z-index: 10000;
+      margin-bottom: 2em;
+      & > span {
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+      }
+      img {
+        z-index: 1;
+      }
+      .preview-direction {
+        position: fixed;
+        bottom: 0;
+        left: 154px;
+        right: 98px;
+        display: flex;
+        justify-content: center;
+        background: linear-gradient(to bottom, #fff0, #ffff);
+        padding: 1em;
+        .inner-direction {
+          display: flex;
+          align-items: stretch;
+          border-radius: 5px;
+        }
+
+        .preview-previous, .preview-next {
+          font-size: 2em;
+        }
+        .preview-previous {
+          left: 0;
+        }
+        .preview-next {
+          right: 0;
+        }
+        .preview-currentpage {
+          border: 1px solid #00000055;
+          background-color: #ddd;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: flex-start;
+          gap: 5px;
+          padding: 2px 2em;
+          .currentpage, .totalpage {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #044079;
+          }
+        }
+      }
+    }
+  }
   .epigrafe {
     color: #044079;
     font-size: 125%;
@@ -229,21 +394,19 @@ export default {
     text-align: left;
   }
   .item-header {
-    //display: grid;
-    //grid-template-columns: minmax(0, 50px) auto;
-    //align-items: center;
-    //grid-column-gap: 1em;
+    display: grid;
+    grid-template-columns: minmax(0, 50px) auto;
+    align-items: start;
+    grid-column-gap: 0em;
     small {
       text-align: center;
       display: inline-block;
     }
     .link-file {
-      float: left;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
-  }
-  .btn-link {
-    cursor: pointer;
-    margin: 0.5rem 0.5rem 0 -0.5rem;
   }
   .detail-header {
     display: flex;
@@ -288,11 +451,10 @@ export default {
 }
 
 @media screen and (max-width: 480px) {
-
-.materia-pauta {
-  .btn-link {
-    margin: 0.5rem -0.3rem 0 -0.5rem;
+  .materia-pauta {
+    .btn-link {
+      margin: 0.5rem -0.3rem 0 -0.5rem;
+    }
   }
-}
 }
 </style>

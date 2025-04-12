@@ -1,0 +1,29 @@
+{% extends "base_pdf.html" %}
+
+
+{% block head_extra_css %}
+  {% include 'css/RelatorioGestaoView.css' %}
+  .container-show {
+    margin-top: 1cm;
+    .capa {
+      font-size: 30pt;
+      .capa-ano {
+        font-size: 50pt;
+        margin-bottom: 1.5cm;
+        display: block;
+      }
+    }
+    .container-atos-normativos {
+      li {
+        padding: 0.2cm 0;
+        font-size: 16pt;
+      }
+    }
+  }
+{% endblock head_extra_css %}
+
+{% block body_content %}
+
+{{markdown|safe}}
+
+{% endblock body_content %}

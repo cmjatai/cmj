@@ -30,7 +30,6 @@
 {% block table_content %}
 
 <div class="container-search">
-  {% if not show_results %}
     {% include 'search/search_help_text.html' %}
     {% crispy form %}
 
@@ -39,7 +38,6 @@
       <br> Clique na lupa para pesquisar.
     </small>
 
-  {% else %}
 
     <div class="container-table">
 
@@ -64,7 +62,9 @@
           </div>
         {% endif %}
       {% empty %}
-        <h3 class="p-5">Nenhuma Norma encontrada com os critérios de busca acima!</h3>
+        {% if show_results %}
+          <h3 class="p-5">Nenhuma Norma encontrada com os critérios de busca acima!</h3>
+        {% endif %}
       {% endfor %}
     </div>
 
@@ -72,6 +72,5 @@
     {% include "paginacao.html" %}
   {% endif %}
 
-{% endif %}
 </div>
 {% endblock %}

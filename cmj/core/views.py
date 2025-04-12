@@ -20,9 +20,7 @@ from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import RedirectView, View
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
+from django.views.generic import RedirectView, View, DetailView, ListView, TemplateView
 from django.views.static import serve as view_static_server
 from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
