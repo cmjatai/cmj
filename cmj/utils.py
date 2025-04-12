@@ -35,6 +35,8 @@ from weasyprint import HTML
 
 from cmj.celery import app as celery_app
 
+logger = logging.getLogger(__name__)
+
 
 media_protected_storage = FileSystemStorage(
     location=settings.MEDIA_PROTECTED_ROOT, base_url='DO_NOT_USE')
@@ -59,6 +61,20 @@ def get_celery_worker_status():
         'scheduled_tasks': scheduled_tasks
     }
     return result
+
+
+def start_task(task_name, task, eta, expires=86400):
+
+    s_tasks = get_celery_worker_status().get('scheduled_tasks', [])
+    s_tasks = [t['request']['name'] for k, v in s_tasks.items() for t in v if 'request' in t and 'name' in t['request']]
+
+    if task_name not in s_tasks:
+        logger.info(f'START TRUE {task_name} {eta}')
+        expires = eta + timedelta(seconds=expires)
+        task.apply_async(eta=eta, expires=expires)
+        return True
+    logger.info(f'START FALSE {task_name} {eta}')
+    return False
 
 
 def pil_image(source, exif_orientation=False, **options):

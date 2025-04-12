@@ -9,10 +9,9 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from cmj.mixins import CmjAuditoriaModelMixin
+from cmj.mixins import CmjAuditoriaModelMixin, CmjModelMixin
 from cmj.utils import get_settings_auth_user_model
 from sapl.utils import (LISTA_DE_UFS, YES_NO_CHOICES)
-
 
 RELATORIO_ATOS_ACESSADOS = (('S', _('Sim')),
                             ('N', _('Não')))
@@ -352,7 +351,7 @@ class OperadorAutor(CmjAuditoriaModelMixin):
         return self.user_name
 
 
-class Metadata(models.Model):
+class Metadata(CmjModelMixin):
     content_type = models.ForeignKey(
         ContentType,
         blank=True,

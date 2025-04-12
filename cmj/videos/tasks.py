@@ -8,6 +8,7 @@ import dateutil.parser
 from django.utils import timezone
 
 from cmj.celery import app
+from cmj.utils import start_task
 from cmj.videos.functions import pull_youtube_metadata_video, pull_youtube,\
     vincular_sistema_aos_videos, video_documento_na_galeria
 from cmj.videos.models import Video, PullExec
@@ -15,40 +16,6 @@ from cmj.videos.models import Video, PullExec
 
 logger = logging.getLogger(__name__)
 
-
-def get_tasks_scheduled():
-
-    from cmj.celery import app as celery_app
-
-    i = celery_app.control.inspect()
-
-    tasks = set()
-    try:
-        if i:
-            queues = i.scheduled()
-            if queues:
-                for k, tarefas_agendadas in queues.items():
-                    for ta in tarefas_agendadas:
-                        tasks.add(ta['request']['name'])
-    except:
-        pass
-    return tasks
-
-
-def start_task(task_name, task, eta):
-
-    tasks = get_tasks_scheduled()
-    #t_str = ', '.join(tasks)
-
-    #logger.debug(f'{task_name} {eta} SET: {t_str}')
-
-    if f'cmj.videos.tasks.{task_name}' not in tasks:
-        logger.info(f'START TRUE {task_name} {eta}')
-        expires = eta + timedelta(days=1)
-        task.apply_async(eta=eta, expires=expires)
-        return True
-    logger.info(f'START FALSE {task_name} {eta}')
-    return False
 
 
 @app.task(queue='cq_videos', bind=True)
@@ -67,7 +34,7 @@ def task_pull_youtube_geral(*args, **kwargs):
         except:
             pass
 
-        start_task('task_pull_youtube_geral',
+        start_task('cmj.videos.tasks.task_pull_youtube_geral',
                    task_pull_youtube_geral,
                    timezone.now() + timedelta(seconds=120))
 
@@ -87,7 +54,7 @@ def task_pull_youtube_live(*args, **kwargs):
             except:
                 pass
 
-        start_task('task_pull_youtube_live',
+        start_task('cmj.videos.tasks.task_pull_youtube_live',
                    task_pull_youtube_live,
                    timezone.now() + timedelta(seconds=300))
 
@@ -116,7 +83,7 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                     f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
 
             if liveBroadcastContent == 'live':
-                start_task('task_pull_youtube_live',
+                start_task('cmj.videos.tasks.task_pull_youtube_live',
                            task_pull_youtube_live,
                            timezone.now() + timedelta(seconds=60))
 
@@ -132,7 +99,7 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                     scheduledStartTime = timezone.now() + timedelta(seconds=60)
 
         if scheduledStartTime and scheduledStartTime < (timezone.now() + timedelta(seconds=3600)):
-            start_task('task_pull_youtube_upcoming',
+            start_task('cmj.videos.tasks.task_pull_youtube_upcoming',
                        task_pull_youtube_upcoming,
                        scheduledStartTime)
 
@@ -146,7 +113,7 @@ def task_pull_youtube(self, *args, **kwargs):
 
     print(f'RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}')
     logger.info(f'RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}')
-    new_started = start_task('task_pull_youtube',
+    new_started = start_task('cmj.videos.tasks.task_pull_youtube',
                              task_pull_youtube,
                              now + td)
 
@@ -165,14 +132,14 @@ def task_pull_youtube(self, *args, **kwargs):
 
     now = timezone.now()
 
-    start_task('task_pull_youtube_geral',
+    start_task('cmj.videos.tasks.task_pull_youtube_geral',
                task_pull_youtube_geral,
                now + timedelta(seconds=60))
 
-    start_task('task_pull_youtube_upcoming',
+    start_task('cmj.videos.tasks.task_pull_youtube_upcoming',
                task_pull_youtube_upcoming,
                now + timedelta(seconds=40))
 
-    start_task('task_pull_youtube_live',
+    start_task('cmj.videos.tasks.task_pull_youtube_live',
                task_pull_youtube_live,
                now + timedelta(seconds=20))

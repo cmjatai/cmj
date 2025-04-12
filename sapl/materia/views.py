@@ -2260,7 +2260,7 @@ class MateriaLegislativaCrud(Crud):
             return self.search_url
 
     cache_page_materia_detail(60 * 5)
-    class DetailView(GoogleGenerativeIA, BtnCertMixin, Crud.DetailView):
+    class DetailView(BtnCertMixin, Crud.DetailView):
 
         layout_key = 'MateriaLegislativaDetail'
         template_name = "materia/materialegislativa_detail.html"
@@ -2403,8 +2403,26 @@ class MateriaLegislativaCrud(Crud):
             context = self.get_context_data(object=self.object)
             return self.render_to_response(context)
 
-        def is_run(self):
-            md = super().ia_run()
+        def get_btn_generate(self, viewname):
+            return [
+                (
+                    '{}?ia_run=generate'.format(
+                        reverse(
+                            viewname,
+                            kwargs={'pk': self.kwargs['pk']}
+                        )
+                    ),
+                    'btn-primary',
+                    _('Gerar Análise por I.A.')
+                )
+            ]
+
+        def ia_run(self):
+            gen = GoogleGenerativeIA()
+            gen.model = self.model
+            gen.object = self.kwargs['pk']
+
+            md = gen.run(request=self.request)
 
             if md and md.metadata:
                 temas = md.metadata.get('genia', {}).get('temas', [])
@@ -2435,7 +2453,7 @@ class MateriaLegislativaCrud(Crud):
                 return self.download(request.GET.get('download'))
 
             if 'ia_run' in request.GET and request.user.has_perm('core.generate_analise_genia'):
-                return self.is_run()
+                return self.ia_run()
             elif 'cabec_autografo' in request.GET:
                 return self.cabec_autografo(request.GET.get('cabec_autografo'))
 

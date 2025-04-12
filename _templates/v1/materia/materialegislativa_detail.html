@@ -220,7 +220,7 @@
     {% include "materia/tramitacao_list_container.html" %}
   {% endwith %}
 
-  {% if object.ano and object.metadata_model %}
+  {% if object.ano > 2024 and object.metadata_model %}
     {% with object.metadata_model as md %}
       {% if md.metadata.genia.template == 'table1' %}
         {% include "materia/materialegislativa_genia_table1.html" %}
