@@ -102,7 +102,7 @@ def task_classifica_materialegislativa(self, *args, **kwargs):
         logger.error(f'Erro ao executar task_classifica_materialegislativa: {e}')
 
     start_task(
-        'cmj.base.tasks.task_classifica_materialegislativa',
+        'sapl.base.tasks.task_classifica_materialegislativa',
         task_classifica_materialegislativa,
         timezone.now() + timezone.timedelta(seconds=120)
     )

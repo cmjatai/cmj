@@ -95,7 +95,7 @@ class GoogleGenerativeIA:
             return self.generate()
         elif self.action == 'delete':
             self.delete()
-            if hasattr(self, 'request'):
+            if self.request:
                 messages.add_message(
                     self.request, messages.SUCCESS,
                     _('Análise removida com sucesso!'))
@@ -238,7 +238,6 @@ class GoogleGenerativeIA:
             metadata = {'genia': json.loads(answer.text)}
             metadata['genia']['model_name'] = self.ia_model_name
             metadata['genia']['template'] = 'table1'
-            metadata['genia']['prompt'] = prompt
             metadata['genia']['temperature'] = self.temperature
             metadata['genia']['top_k'] = self.top_k
             metadata['genia']['top_p'] = self.top_p
@@ -250,7 +249,7 @@ class GoogleGenerativeIA:
 
             md.save()
 
-            if hasattr(self, 'request'):
+            if self.request:
                 messages.add_message(
                     self.request, messages.SUCCESS,
                     _('Análise gerada com sucesso!'))
@@ -260,7 +259,7 @@ class GoogleGenerativeIA:
         except Exception as e:
             logger.error(e)
 
-            if hasattr(self, 'request'):
+            if self.request:
                 messages.add_message(
                     self.request, messages.ERROR,
                     _('Ocorreu erro na geração da análise!'))
