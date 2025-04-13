@@ -64,7 +64,8 @@ def task_classifica_materialegislativa_function():
             Q(tipo__prompt='') | Q(tipo__prompt=None) | Q(id__in=metadata_de_materias),
         ).filter(
             ano__lte=2024
-        ).values_list('id', flat=True).order_by('-ano')
+        ).values_list('id', flat=True).order_by('-ano', '-numero')
+
 
     md = None
     for mid in materias[:1]:
@@ -91,6 +92,8 @@ def task_classifica_materialegislativa_function():
                     assunto=assunto,
                     materia=obj
                 )
+            obj.save()
+
 
 
 @app.task(queue='cq_base', bind=True)
