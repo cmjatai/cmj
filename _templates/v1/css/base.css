@@ -107,7 +107,7 @@ header img, footer img {
   left: 0;
   margin: 0;
   max-width: none;
-  object-fit: cover;
+  object-fit: cover; 
   position: absolute;
   width: 210mm;
   z-index: 2;

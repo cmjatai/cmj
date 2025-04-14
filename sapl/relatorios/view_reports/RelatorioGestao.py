@@ -169,8 +169,8 @@ class View(RelatorioMixin, TemplateView):
 
 
         return (
-            ('\n'.join(mark), 'container-atos-normativos col-md-12', 'markdown'),
-            ('\n'.join(mark2), 'container-assuntos-normativos col-md-12', 'markdown'),
+            ('\n'.join(mark), 'container-docs col-md-12', 'markdown'),
+            ('\n'.join(mark2), 'container-assuntos-docs col-md-12', 'markdown'),
         )
 
     def get_materias(self):
@@ -185,23 +185,25 @@ class View(RelatorioMixin, TemplateView):
             mark.append(f'* [{t.descricao} ({t.materialegislativa__count})]'
                         f'(http://www.jatai.go.leg.br/pesquisar/materia?tipo_i={t.pk}&ano_i={self.ano})')
 
-        mark.append('')
         mark.append(f'##### _Clique no tipo de matéria para acessar a listagem dos atos referente ao ano {self.ano}._')
 
-        mark.append(f'### Assuntos dos Requerimentos de {self.ano}')
+        mark2 = []
+        mark2.append(f'### Assuntos dos Requerimentos de {self.ano}')
 
         assuntos = AssuntoMateria.objects.filter(
             materialegislativa__ano=self.ano,
             materialegislativa__tipo_id=3
         ).annotate(Count('materialegislativa')).order_by('assunto')
         for a in assuntos:
-            mark.append('')
-            mark.append(
+            mark2.append('')
+            mark2.append(
                 f'* [{a.assunto} ({a.materialegislativa__count})]'
                 f'(http://www.jatai.go.leg.br/pesquisar/materia?assuntos_is={a.pk}&ano_i={self.ano})'
             )
 
 
         return (
-            ('\n'.join(mark), 'container-materias col-md-12', 'markdown'),
+            ('\n'.join(mark), 'container-docs col-md-12', 'markdown'),
+            ('\n'.join(mark2), 'container-assuntos-docs col-md-12', 'markdown'),
+
         )
