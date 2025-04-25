@@ -143,8 +143,8 @@ CACHES = {
     #    'LOCATION': '/var/tmp/django_cache',
     # }
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', #if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
-        #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
+        #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', #if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
         'LOCATION': 'unique-snowflake',
     }
     # "default": {

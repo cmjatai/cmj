@@ -1,0 +1,126 @@
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+
+{% block widgets_form_css %}
+<style>
+  .app-externo {
+    .inner {
+      position: relative;
+      padding: 10px;
+      border-radius: 15px;
+      font-family: "Roboto Condensed", sans-serif;
+      background-color: #114d81;
+      color: white;
+    }
+    a {
+      text-decoration: none;
+      color: white !important;
+    }
+    a.spl-link-site, a.tcm-link-site {
+      font-weight: bold;
+      font-size: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    a.tcm-link-site {
+      gap: 5px;
+      font-size: 1.5rem;
+    }
+    a.spl-link-install {
+      display: flex;
+      border: 1px solid gray;
+      border-radius: 10px;
+      overflow: hidden;
+      flex-direction: column;
+      align-items: center;
+      margin: 25px 20px 20px;
+      .action {
+        text-align: center;
+      }
+      .descr {
+        font-size: 80%;
+      }
+      &:hover {
+        background-color: white;
+        color: black !important;
+      }
+    }
+    .spl-descricao {
+      a {
+        text-decoration: none;
+        color: black !important;
+      }
+    }
+
+    &:hover {
+      .spl-descricao {
+        display: block;
+        font-size: 80%;
+        margin: 10px 0;
+        padding: 10px;
+        line-height: 1.2;
+        text-align: left;
+        color: black;
+        background-color: white;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+</style>
+{% endblock widgets_form_css %}
+
+<div class="row align-items-center">
+
+  <div class="col-6 col-xl-4 col-lg-5 mt-4">
+    <div class="app-externo">
+      <div class="inner py-5">
+        <a class="tcm-link-site" href="https://www.tcmgo.tc.br/pentaho/api/repos/cidadao/app/index.html?=undefined&bookmarkState=%7B%22impl%22%3A%22client%22%2C%22params%22%3A%7B%22paramMunicipio%22%3A%22Jata%C3%AD%22%7D%7D">
+          <img src="{% webpack_static 'img/logo_portaldocidadao.png' %}" alt="Logo SPL" class="img-fluid" style="width: 100px; height: auto;">
+          &nbsp;<span>PORTAL DO<br>CIDADÃO</span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-8 col-lg-7 mt-4">
+    <small>
+        O Portal do Cidadão é uma plataforma desenvolvida pelo Tribunal de Contas dos Municípios de Goiás (TCM-GO)
+        que visa facilitar o acesso à informação pública, promovendo a transparência e o controle social.
+        <br><strong>Importante:</strong> Não é de responsabilidade da Câmara Municipal de Jataí o funcionamento do Portal do Cidadão.
+    </small>
+  </div>
+</div>
+<hr>
+<div class="row align-items-center">
+  <div class="col-6 col-xl-4 col-lg-5">
+    <div class="app-externo">
+      <div class="inner">
+        <a class="spl-link-site" href="https://sapl.app">
+          <img src="{% webpack_static 'img/spl_logo.png' %}" alt="Logo SPL" class="img-fluid" style="width: 100px; height: auto;">
+          &nbsp;<span>Câmara</span>
+        </a>
+        <a href="https://movasp.com/redirectapp/splcamara" class="spl-link-install">
+          <span class="action">Baixe o APP</span>
+          <span class="descr">
+            Disponível para Android e iOS.
+          </span>
+          <span class="stores">
+            <i class="fab fa-app-store-ios"></i>
+            &nbsp;<i class="fab fa-google-play"></i>
+          </span>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="col-6 col-xl-8 col-lg-7">
+    <small>
+        O aplicativo <strong>SPL Câmara</strong> é um solução que impulsiona o controle social
+        ao ser mais uma ferramenta de comunicação entre a Câmara Municipal de Jataí e a população.
+        <br>No entanto é um aplicativo desenvolvido por terceiros, que utiliza a API de Dados Abertos da Câmara Municipal de Jataí.
+        <br><strong>Importante:</strong> Não é de responsabilidade da Câmara Municipal de Jataí
+        a interpretação dada ao conteúdo extraído via API de Dados Abertos, bem como do funcionamento do aplicativo.
+    </small>
+  </div>
+
+</div>

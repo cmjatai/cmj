@@ -9,6 +9,7 @@ from django import template
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django_filters.views import FilterView
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.db.models import Q
@@ -22,7 +23,6 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import RedirectView, View, DetailView, ListView, TemplateView
 from django.views.static import serve as view_static_server
-from django_filters.views import FilterView
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication, \
     BasicAuthentication

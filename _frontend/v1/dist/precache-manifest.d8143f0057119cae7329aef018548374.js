@@ -28,8 +28,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "f7279e2b82405d7e07ad",
-    "url": "/static/css/app.d9330a58.css"
+    "revision": "028305ab43fc29ca9e01",
+    "url": "/static/css/app.c370bfbf.css"
   },
   {
     "revision": "331c4591ee4b65991c30",
@@ -380,15 +380,19 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/search_box_icon36_delete.png"
   },
   {
+    "revision": "f44e50fa5d4b59582aefd69db029343f",
+    "url": "/static/img/spl_logo.png"
+  },
+  {
     "revision": "9a0717578fe8e07bbd512ec97725cdc0",
     "url": "/static/img/user.png"
   },
   {
-    "revision": "af0975522f91b08ff4e65a0186ce965a",
+    "revision": "4fdb197ff4a80bf7a391bbe9504bb701",
     "url": "/static/index.html"
   },
   {
-    "revision": "f7279e2b82405d7e07ad",
+    "revision": "028305ab43fc29ca9e01",
     "url": "/static/js/app.0f12dc0c.js"
   },
   {
@@ -722,6 +726,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "1448b0502cbc52a71d7b2a5eaa9f3847",
     "url": "/static/js/skins/ui/tinymce-5/skin.shadowdom.min.css"
+  },
+  {
+    "revision": "09e89b66eeb6647dece0197619aec778",
+    "url": "/static/logo_portaldocidadao.png"
   },
   {
     "revision": "a0f2247a0047149e2a62a059c7319a6e",

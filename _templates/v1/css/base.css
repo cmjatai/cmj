@@ -75,11 +75,9 @@ body {
   margin: 0;
 }
 
-
 section {
   break-after: left;
 }
-
 
 header {
   position: fixed;

@@ -431,5 +431,5 @@ class customize(object):
         ApiViewSetConstrutor._built_sets[
             self.model._meta.app_config][self.model] = _ApiViewSet
         return _ApiViewSet
-    
-    
+
+

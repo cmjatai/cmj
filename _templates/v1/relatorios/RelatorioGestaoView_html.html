@@ -4,21 +4,15 @@
 {% block widgets_form_css %}
 <style>
   {% include 'css/RelatorioGestaoView.css' %}
-  .container-show {
-    margin: 5vh 0;
-    .capa {
-      .capa-ano {
-        display: block;
-        margin-bottom: 5vh;
-      }
-    }
-  }
 </style>
 {% endblock widgets_form_css %}
 
 
 {% block content_container %}
-
-  {{markdown|safe}}
-
+  <div class="container relatorio-gestao relatorio-gestao-html">
+    {{html_capa|safe}}
+  </div>
+  <div class="container relatorio-gestao relatorio-gestao-html">
+    {{html_body|safe}}
+  </div>
 {% endblock %}

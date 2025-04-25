@@ -28,17 +28,20 @@
 }
 
 @keyframes keyframe_rotate {
-  50% {
+  10% {
     transform: rotate(135deg);
   }
-  70% {
+  30% {
     transform: rotate(855deg);
   }
-  75% {
-    transform: scale(2.5) rotate(855deg);
+  35% {
+    transform: scale(3) rotate(855deg);
   }
-  80% {
+  40% {
     transform: scale(1) rotate(855deg);
+  }
+  60% {
+    transform: rotate(135deg);
   }
   100% {
     transform: rotate(135deg);
@@ -71,7 +74,7 @@
 
 .fa-sign-in-alt {
   transform: rotate(135deg);
-  animation: keyframe_rotate 7s ease-in-out backwards;
+  animation: keyframe_rotate 7s ease-in-out infinite;
 }
 
 .container-box {
@@ -345,9 +348,11 @@
     }
   }
 }
+
 .form-control {
   border: 1px solid $color_border_input;
 }
+
 .form-control-static {
   .link-texto {
     line-height: 1.15;
@@ -476,14 +481,16 @@
 .container-segmentos {
   display: flex;
   flex-direction: row;
+  justify-content: stretch;
+  align-items: stretch;
 }
 .btn-segmentos {
   background: darken($bg_color_thematic, 10%) $url_bg_png;
-  flex: 1 1 20%;
+  flex: 1 1 25%;
   font-size: 1.4rem;
   align-items: center;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   margin: 0 1px;
 
   span {

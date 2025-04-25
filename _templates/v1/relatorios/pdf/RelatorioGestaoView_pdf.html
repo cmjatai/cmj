@@ -3,110 +3,34 @@
 {% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
 
-{% block head_extra_css %}
+{% block head_page_counter_css %}
   {% include 'css/RelatorioGestaoView.css' %}
-  .container-show {
-    .capa-titulo {
-      background: #0003;
-      .capa {
-        color: #fff;
-        top: 0.7cm;
-        width: auto;
-        right: 0.7cm;
-        margin: 0;
-        padding: 0;
-        line-height: 1.1em;
-        text-align: right;
-        font-size: 35pt;
-        .capa-ano {
-          line-height: 1.5em;
-          color: #fff;
-          display: block;
-          margin: 0.5cm 0;
-          padding: 0;
-        }
-      }
-    }
-    .capa-mesa {
-      top: 18cm;
-      left: 0cm;
-      right: 3cm;
-      width: auto;
-      height: auto;
-      padding: 0.5cm;
-      background: #fffc;
-      h1, h2, h3 {
-        margin: 0;
-        padding: 0;
-      }
-      ul {
-        margin: 0;
-      }
-    }
-    .capa-parlamentares {
-      top: 23cm;
-      left: 3cm;
-      right: 0cm;
-      width: auto;
-      height: auto;
-      padding: 0.5cm;
-      background: #fffc;
-      h1, h2, h3 {
-        margin: 0;
-        padding: 0;
-      }
-      ul {
-        margin: 0;
-        columns: 2;
-        width: 14cm;
 
-      }
-    }
-    .container-atos-normativos {
-      ul {
-        margin-top: 0;
-        margin-bottom: 0
-        padding: 0;
-      }
-      li {
-        padding: 0 0;
-        font-size: 16pt;
-      }
-    }
-    .container-assuntos-normativos {
-      ul {
-        margin: 0;
-        padding: 0;
-        columns: 2;
-        li {
-          font-size: 13pt;
-        }
-      }
+  @page {
+    @bottom-center{
+      content: "";
+      padding-top: 0.5cm;
+      font-style: italic;
+      color: #444;
     }
   }
-{% endblock head_extra_css %}
+{% endblock head_page_counter_css %}
 
 {% block header_content %}
+  <section class="fullpage">
+    <img src="{% webpack_static 'img/foto_chao_camara_retrato.jpg' %}">
+    <div class="relatorio-gestao relatorio-gestao-pdf ">
+      {{html_capa|safe}}
+    </div>
+  </section>
 
-<section class="fullpage">
-  <img src="{% webpack_static 'img/foto_chao_camara_retrato.jpg' %}">
-
-  <div class="container-show">
-    {{html_capa|safe}}
-  </div>
-
-</section>
-
-
-<header>
-  <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
-</header>
+  <header>
+    <img src="{% webpack_static 'img/pdf_cabec.jpg' %}">
+  </header>
 {% endblock header_content %}
 
 {% block body_content %}
-
-<div class="container-show">
-  {{html_body|safe}}
-</div>
-
+  <div class="relatorio-gestao relatorio-gestao-pdf">
+    {{html_body|safe}}
+  </div>
 {% endblock body_content %}

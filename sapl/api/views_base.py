@@ -55,7 +55,7 @@ class _AutorViewSet:
         * /api/base/autor/bancada
             devolve apenas autores que são bancadas parlamentares
         * /api/base/autor/frente
-            devolve apenas autores que são Frene parlamentares
+            devolve apenas autores que são Frente parlamentares
         * /api/base/autor/orgao
             devolve apenas autores que são Órgãos
     """
