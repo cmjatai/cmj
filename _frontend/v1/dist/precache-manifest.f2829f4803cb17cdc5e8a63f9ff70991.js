@@ -324,6 +324,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/logo_interlegis.png"
   },
   {
+    "revision": "09e89b66eeb6647dece0197619aec778",
+    "url": "/static/img/logo_portaldocidadao.png"
+  },
+  {
     "revision": "a1a5cb8ccda80ba8d2e53de044a749a0",
     "url": "/static/img/logo_sic.png"
   },
@@ -726,10 +730,6 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
   {
     "revision": "1448b0502cbc52a71d7b2a5eaa9f3847",
     "url": "/static/js/skins/ui/tinymce-5/skin.shadowdom.min.css"
-  },
-  {
-    "revision": "09e89b66eeb6647dece0197619aec778",
-    "url": "/static/logo_portaldocidadao.png"
   },
   {
     "revision": "a0f2247a0047149e2a62a059c7319a6e",
