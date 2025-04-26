@@ -515,9 +515,12 @@ def valor_abs_str(valor):
 
 @register.filter
 def sessaoplenarias_futuras(limite=0):
+
     sessoes_futuras = cache.get('portalcmj_sessoes_futuras')
 
     if sessoes_futuras is not None:
+        if limite > 0:
+            return sessoes_futuras[:limite]
         return sessoes_futuras
 
     # Se não estiver no cache, busca no banco de dados
@@ -531,10 +534,9 @@ def sessaoplenarias_futuras(limite=0):
         finalizada=False
     ).order_by('data_inicio')
 
-    if limite > 0:
-        #sessoes_futuras = list(sessoes_futuras[:limite])
-        sessoes_futuras = list(sessoes_futuras[:limite])
-
     cache.set('portalcmj_sessoes_futuras', sessoes_futuras, 600)
+
+    if limite > 0:
+        sessoes_futuras = list(sessoes_futuras[:limite])
 
     return sessoes_futuras
