@@ -1,0 +1,25 @@
+{% load i18n common_cmj_tags %}
+
+
+{% for sessao in 4|sessaoplenarias_futuras %}
+  {% if forloop.first %}
+    <div class="col-12 col-lg-5 widget-sessoes">
+      <h2 class="title-container">Próximas Sessões</h2>
+      <div class="inner">
+  {% endif %}
+
+  <div class="item-sessao">
+    <a href="{% url 'sapl.sessao:resumo' sessao.id %}">{{sessao.epigrafe}}</a>
+    <span class="data-sessao">
+      <strong>Abertura:</strong> {{sessao.data_inicio}} às {{sessao.hora_inicio}} | <strong>Tipo:</strong> {{sessao.tipo}}
+    </span>
+    <span class="legislatura">
+      <strong>Legislatura:</strong> {{sessao.legislatura}} | <strong>Sessão Legislativa:</strong> {{sessao.sessao_legislativa}}
+    </span>
+  </div>
+
+  {% if forloop.last %}
+</div>
+    </div>
+  {% endif %}
+{% endfor %}

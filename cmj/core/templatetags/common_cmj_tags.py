@@ -1,4 +1,5 @@
 
+
 from copy import deepcopy
 from datetime import timedelta
 import json
@@ -8,6 +9,7 @@ from dateutil.relativedelta import relativedelta
 from django import template
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.template.defaultfilters import stringfilter
@@ -512,8 +514,27 @@ def valor_abs_str(valor):
 
 
 @register.filter
-def sessaoplenaria_hoje(obj):
+def sessaoplenarias_futuras(limite=0):
+    sessoes_futuras = cache.get('portalcmj_sessoes_futuras')
+
+    if sessoes_futuras is not None:
+        return sessoes_futuras
+
+    # Se não estiver no cache, busca no banco de dados
+    # e armazena no cache
+    # por 10 minutos (600 segundos)
+
     hoje = timezone.localdate()
-    return SessaoPlenaria.objects.filter(
-        data_inicio = hoje
-        ).exists()
+
+    sessoes_futuras = SessaoPlenaria.objects.filter(
+        data_inicio__gte=hoje,
+        finalizada=False
+    ).order_by('data_inicio')
+
+    if limite > 0:
+        #sessoes_futuras = list(sessoes_futuras[:limite])
+        sessoes_futuras = list(sessoes_futuras[:limite])
+
+    cache.set('portalcmj_sessoes_futuras', sessoes_futuras, 600)
+
+    return sessoes_futuras

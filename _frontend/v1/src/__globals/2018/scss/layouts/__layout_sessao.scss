@@ -1,3 +1,54 @@
+.widget-sessoes {
+  font-family: "Roboto Condensed", sans-serif;
+  font-size: 1rem;
+  height: 60vh;
+  margin-top: 1.5rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  h2 {
+    margin: 0;
+  }
+  .inner {
+    overflow-y:auto;
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: stretch;
+
+  }
+
+  span.legislatura {
+    font-size: 0.8rem;
+    font-weight: 400;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  span.data-sessao {
+    font-size: 0.8rem;
+    font-weight: 400;
+  }
+
+  .item-sessao {
+    padding: 5px 0.5rem;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: center;
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #ddd;
+    }
+    &:hover {
+      background-color: $hover_background_05p;
+    }
+
+  }
+}
+
 .container-sessao_old {
   //margin: 0;
   //padding: 0;
@@ -83,7 +134,10 @@
 }
 
 @media screen and (max-width: 991.98px) {
-
+  .widget-sessoes {
+    height: auto;
+    margin-bottom: 1rem;
+  }
 }
 
 @media screen and (max-width: 767.98px) {
