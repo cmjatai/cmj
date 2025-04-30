@@ -130,8 +130,10 @@ class Loa(models.Model):
             lp.disp_diversos = iddp
 
         legislatura_atual = Legislatura.cache_legislatura_atual()
+
         materia_in_legislatura_atual = True
         loa_in_legislatura_atual = True
+
         if self.materia:
             materia_in_legislatura_atual = legislatura_atual['data_inicio'] <= self.materia.data_apresentacao <= legislatura_atual['data_fim']
             loa_in_legislatura_atual = legislatura_atual['data_inicio'].year <= self.ano <= legislatura_atual['data_fim'].year
@@ -139,7 +141,9 @@ class Loa(models.Model):
         lps = self.loaparlamentar_set.all()
         count_lps = lps.count()
 
-        if loa_in_legislatura_atual and  materia_in_legislatura_atual:
+        if (loa_in_legislatura_atual and  materia_in_legislatura_atual) or (
+            not loa_in_legislatura_atual and not materia_in_legislatura_atual
+        ):
             count_lps = lps.count()
             if count_lps:
                 for lp in lps:
