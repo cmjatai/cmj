@@ -741,12 +741,13 @@ class TimeExecution(object):
         self.start = timezone.localtime()
         if self.print_date:
             print(self.start)
+        logger.debug('TimeExecution:', self.start)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         end = timezone.localtime()
         if self.print_date:
             print(end)
-        print('TimeExecution:', end - self.start)
+        logger.debug('TimeExecution:', end - self.start)
 
 
 class CmjEmailBackend(EmailBackend):

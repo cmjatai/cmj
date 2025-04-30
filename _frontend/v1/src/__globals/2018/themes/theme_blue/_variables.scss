@@ -9,7 +9,10 @@ $color_text_menu: #9DFF00; // 9DFF00 ffFF99
 $bg_color_thematic: $color_primary;
 $text_color_thematic: #fff;
 $border_width_thematic: 1px;
+
 $border_color_thematic: #9DFF00;
+$border_color_thematic: darken($border_color_thematic, 30);
+
 
 $color_border_menu_hover: rgba(231, 233, 240, 0.3);
 

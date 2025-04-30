@@ -404,6 +404,7 @@ def markdown(value):
 
     if not match:
         return md.markdown(value, extensions=[
+            'tables',
             makeTocExtension(slugify=slugify_unicode), #TOC
         ])
 
@@ -411,6 +412,7 @@ def markdown(value):
     value = groups[1]
 
     mv = md.markdown(value, extensions=[
+        'tables',
         makeTocExtension(slugify=slugify_unicode), #TOC
     ])
 
