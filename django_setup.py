@@ -25,3 +25,5 @@ def django_setup() -> None:
 
 
 django_setup()
+
+

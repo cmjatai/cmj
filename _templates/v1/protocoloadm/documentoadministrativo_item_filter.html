@@ -143,6 +143,11 @@
     </div>
   {% endif %}
 
+  {% if d.numero_externo %}
+    <a class="d-inline-block ml-2 mb-2 mt-n2 btn btn-sm btn-warning" href="http://gestaopublica.camara.jatai.bsit-br.com.br/portal/dispensation-bidding-transparency.jsf?dispensation-bidding-id={{d.numero_externo}}" target="_blank">
+      Confira também este Processo no Portal da Transparência
+    </a>
+  {% endif %}
 
   {% for anexado in d.documento_principal_set.childs_anexados %}
     {% if forloop.first %}

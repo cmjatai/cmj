@@ -158,9 +158,9 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         label='Ano',
         choices=choice_anos_com_documentoadministrativo)
 
-    tramitacao = django_filters.ChoiceFilter(required=False,
-                                             label='Em Tramitação?',
-                                             choices=YES_NO_CHOICES)
+    #tramitacao = django_filters.ChoiceFilter(required=False,
+    #                                         label='Em Tramitação?',
+    #                                         choices=YES_NO_CHOICES)
 
     signeds = django_filters.ChoiceFilter(
         required=False,
@@ -170,7 +170,10 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
     assunto = django_filters.CharFilter(
         label=_('Assunto'),
-        lookup_expr='icontains')
+        lookup_expr='icontains',
+        help_text='Digite termos a serem consultados no assunto do documento.<br>'
+            'Para uma busca ampla, dentro dos documentos, utilize a "Pesquisa Textual"')
+
 
     interessado = django_filters.CharFilter(
         label=_('Interessado'),
@@ -243,18 +246,18 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
         row2 = to_row(
             [
                 ('mostrar_anexos', 2),
-                ('tramitacao', 2),
-                ('data', 4),
-                ('data_vencimento', 4),
+                #('tramitacao', 2),
+                ('data', 5),
+                ('data_vencimento', 5),
             ]
         )
 
         row3 = to_row(
             [
-                ('assunto', 3),
-                ('interessado', 3),
-                ('signeds', 3),
-                ('o', 3),
+                ('assunto', 7),
+                #('interessado', 3),
+                #('signeds', 3),
+                ('o', 5),
             ]
         )
 
