@@ -1,0 +1,107 @@
+.relatorio-gestao {
+  .capa-titulo {
+    .capa {
+      font-size: 40pt;
+      text-align: center;
+      font-weight: bold;
+      line-height: 1.2em;
+      .capa-ano {
+        line-height: 1.7em;
+        font-size: 200%;
+        font-weight: bold;
+      }
+    }
+  }
+  a {
+    text-decoration: none;
+  }
+  ul {
+    margin: 0;
+    padding-left: 0.7cm;
+    li {
+      line-height: 1.3;
+    }
+  }
+
+  h1, h2, h3, h4 {
+    padding: 0;
+    margin: 0;
+    color: #004455;
+  }
+  h1 {
+    margin: 0.7cm 0 0.5cm 0.7cm;
+  }
+  h2 {
+    margin: 0.5cm 0 0.5cm 0.5cm;
+  }
+  h3 {
+    margin: 0.5cm 0 0.3cm 0.3cm;
+  }
+  h4 {
+    margin: 0.2cm 0 0cm 0cm;
+  }
+
+  .new-page {
+    break-before: always;
+  }
+
+  .inside-columns {
+    break-inside: avoid-column;
+  }
+
+  &.relatorio-gestao-html {
+    .capa-titulo {
+      margin: 2cm 0;
+    }
+    div {
+     background-color: white;
+     margin: 1em 0;
+    }
+  }
+
+  &.relatorio-gestao-pdf {
+    .capa-titulo {
+      background: #0003;
+      .capa {
+        font-size: 35pt;
+        text-align: right;
+        color: white;
+        width: 203mm;
+        top: 7mm;
+      }
+    }
+    .capa-mesa, .capa-parlamentares {
+      background: #fffc;
+      padding: 0.5cm;
+      top: 18cm;
+      left: 0cm;
+      right: 0cm;
+      width: auto;
+      height: auto;
+      h1, h2, h3, h4 {
+        margin: 0;
+        padding: 0;
+      }
+    }
+    .capa-mesa {
+      right: 4cm;
+      top: 17.5cm;
+      line-height: 1.5;
+    }
+    .capa-parlamentares {
+      top: 23.5cm;
+      left: 4cm;
+      line-height: 1.2;
+      ul {
+        columns: 2;
+        width: 14cm;
+      }
+    }
+    .columns2 {
+      columns: 2;
+      column-gap: 0.3cm;
+      break-inside: avoid;
+    }
+  }
+}
+
