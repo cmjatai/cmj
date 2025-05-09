@@ -309,3 +309,4 @@ class View(RelatorioMixin, TemplateView):
         return (
             ('\n'.join(mark), 'col-md-12', 'markdown'),
         )
+    

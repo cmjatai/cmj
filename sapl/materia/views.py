@@ -2461,7 +2461,7 @@ class MateriaLegislativaCrud(Crud):
                 self.object = self.get_object()
                 x = int(self.request.GET.get('x', 193))
                 y = int(self.request.GET.get('y', 50))
-                compression = self.request.GET.get('compression', False)
+                compression = self.request.GET.get('compression', None)
                 original2copia = self.request.GET.get('original2copia', True)
                 self.object.homologar(x=x, y=y, compression=compression, original2copia=original2copia)
 

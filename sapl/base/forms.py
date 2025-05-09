@@ -424,6 +424,7 @@ class AutorForm(ModelForm):
         model = Autor
         fields = ['tipo',
                   'nome',
+                  'sign_compression',
                   'cargo',
                   'autor_related',
                   'q', ]
@@ -444,7 +445,8 @@ class AutorForm(ModelForm):
             data_field='autor_related')
 
         autor_select = Row(to_column(('tipo', 3)),
-                           Div(to_column(('nome', 7)),
+                           to_column(('sign_compression', 3)),
+                           Div(to_column(('nome', 6)),
                                to_column(('cargo', 5)),
                                css_class="div_nome_cargo row col"),
                            to_column((autor_related, 9)),

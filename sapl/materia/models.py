@@ -607,12 +607,16 @@ class MateriaLegislativa(CommonMixin):
             autoria.autor for autoria in Autoria.objects.autores_coautores().filter(materia=self)]
         return autorias
 
-    def homologar(self, compression=False, original2copia=True, x=193, y=50):
+    def homologar(self, compression=None, original2copia=True, x=193, y=50):
         from sapl.sessao.tasks import task_add_selo_votacao_function
 
         self.registrovotacao_set.all().update(selo_votacao=False)
 
         protocolo = self.protocolo_gr.first()
+
+        if compression is None:
+            autores = self.autores.values_list('sign_compression', flat=True)
+            compression = all(autores)
 
         for field_file in self.FIELDFILE_NAME:
             if original2copia:

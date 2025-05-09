@@ -179,7 +179,7 @@ class AutorCrud(CrudAux):
 
     class BaseMixin(CrudAux.BaseMixin):
         paginate_by = 500
-        list_field_names = ['tipo', 'nome', 'operadores']
+        list_field_names = ['tipo', 'nome', 'operadores', 'sign_compression']
 
     class DetailView(CrudAux.DetailView):
 
