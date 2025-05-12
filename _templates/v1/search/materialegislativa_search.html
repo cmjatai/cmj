@@ -3,12 +3,17 @@
 {% load common_cmj_tags highlight %}
 {% load common_tags sigad_filters  %}
 
-
 {% block title %}
-  <h1 class="page-header bg-red text-white container-search" >
+  <h1 class="page-header d-flex bg-red text-white container-search justify-content-between" >
     Pesquisar Matérias Legislativas
 
-  {% if not show_results %}
+    {% if show_results %}
+      <div class="bg-white rounded">
+        {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materia_materialegislativa-list'  %}
+          {% include "crud/format_options.html" %}
+        {% endwith %}
+      </div>
+    {% else %}
       <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
         ?
       </a>
@@ -16,12 +21,13 @@
   </h1>
 {% endblock title %}
 
-{% block extra_actions %}
-  {% if show_results %}
-    {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materia_materialegislativa-list'  %}
-      {% include "crud/format_options.html" %}
-    {% endwith %}
+{% block container_actions %}
+  {% if not user.is_anonymous or show_results %}
+    {{ block.super }}
   {% endif %}
+{% endblock container_actions %}
+
+{% block extra_actions %}
 {% endblock %}
 
 {% block extra_content %} {% endblock %}
@@ -32,25 +38,28 @@
 <div class="container-search">
   {% if not show_results %}
     {% include 'search/search_help_text.html' %}
-    {% crispy form %}
 
-    <small class="d-none text-red text-right">
-	    O botão "Processar Pesquisa" foi removido. Pequisas de Matérias, Textual e Parametrizada, foram unificadas.
-	    <br> Clique na lupa para pesquisar.
-    </small>
-
-    {% if tipos_autores_materias %}
-      <br>
-      <fieldset>
-        <legend>
-          <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?em_tramitacao_b=1">
-            Acesso Rápido às Matérias em Tramitação
-          </a>
-        </legend>
-        <br>
-      </fieldset>
-      {% include 'materia/materias_em_tramitacao_widget.html' %}
-    {% endif %}
+    <div class="row">
+      <div class="col-12">
+        {% crispy form %}
+      </div>
+      <div class="col-12 col-md-7">
+      </div>
+      <div class="col-12 col-md-5">
+        {% if tipos_autores_materias %}
+          <br>
+          <fieldset>
+            <legend>
+              <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?em_tramitacao_b=1">
+                Acesso Rápido às Matérias em Tramitação
+              </a>
+            </legend>
+            <br>
+          </fieldset>
+          {% include 'materia/materias_em_tramitacao_widget.html' %}
+        {% endif %}
+      </div>
+    </div>
 
   {% else %}
 
