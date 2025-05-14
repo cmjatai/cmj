@@ -15,7 +15,7 @@ import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
-class GoogleGenerativeIA:
+class GoogleGenerativeAnaliseIA:
 
     ia_model_name = "gemini-2.0-flash-exp"
 

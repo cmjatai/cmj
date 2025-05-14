@@ -41,7 +41,7 @@ import weasyprint
 
 from cmj import celery
 from cmj.core.models import AreaTrabalho
-from cmj.genia import GoogleGenerativeIA
+from cmj.genia import GoogleGenerativeAnaliseIA
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin, \
     AudigLogFilterMixin
@@ -174,7 +174,7 @@ def tipos_autores_materias(user=None, restricao_regimental=True):
     if restricao_regimental:
         for p in proposicoes_enviadas_sem_recebimento:
 
-            tipo_correspondente = p.tipo.tipo_conteudo_related
+            tipo_correspondente = p.tipo.tipo_conteudo_related_test52
 
             coletivo = tipo_correspondente.limite_minimo_coletivo and m.autores.count(
             ) >= tipo_correspondente.limite_minimo_coletivo
@@ -537,7 +537,7 @@ class TipoProposicaoCrud(CrudAux):
 
     class BaseMixin(CrudAux.BaseMixin):
         list_field_names = [
-            "descricao", "content_type", 'tipo_conteudo_related']
+            "descricao", "content_type", 'tipo_conteudo_related_test52']
 
     class CreateView(CrudAux.CreateView):
         form_class = TipoProposicaoForm
@@ -551,7 +551,7 @@ class TipoProposicaoCrud(CrudAux):
             initial = CrudAux.UpdateView.get_initial(self)
             ct = self.object.content_type
             initial['content_type'] = f'{ct.app_label}/{ct.model}'
-            initial['tipo_conteudo_related'] = self.object.object_id
+            initial['tipo_conteudo_related_test52'] = self.object.object_id
             return initial
 
 
@@ -938,8 +938,8 @@ class ProposicaoCrud(Crud):
                 obj = self.object
             imp = []
 
-            limite_minimo_coletivo = obj.tipo.tipo_conteudo_related.limite_minimo_coletivo
-            limite_por_autor_tramitando = obj.tipo.tipo_conteudo_related.limite_por_autor_tramitando
+            limite_minimo_coletivo = obj.tipo.tipo_conteudo_related_test52.limite_minimo_coletivo
+            limite_por_autor_tramitando = obj.tipo.tipo_conteudo_related_test52.limite_por_autor_tramitando
             if not obj.metadata or not limite_minimo_coletivo:
                 return imp, limite_minimo_coletivo, limite_por_autor_tramitando, 0
 
@@ -962,7 +962,7 @@ class ProposicaoCrud(Crud):
             tam = tipos_autores_materias()
 
             autores_com_materias_em_tramitacao = tam.get(
-                obj.tipo.tipo_conteudo_related, {})
+                obj.tipo.tipo_conteudo_related_test52, {})
 
             autores_key_nome_completo = dict(
                 map(
@@ -1099,7 +1099,7 @@ class ProposicaoCrud(Crud):
                         msg_error = _(
                             'Documento não possui assinatura digital.')
                     else:
-                        tcr = p.tipo.tipo_conteudo_related
+                        tcr = p.tipo.tipo_conteudo_related_test52
                         msg_pre_error = _(
                             f'''Limite Regimental atingido.
                             O envio só será possível quando a quantidade
@@ -1143,12 +1143,12 @@ class ProposicaoCrud(Crud):
                             try:
                                 self.logger.debug("user=" + username + ". Tentando obter número do objeto MateriaLegislativa com "
                                                   "atributos tipo={} e ano={}."
-                                                  .format(p.tipo.tipo_conteudo_related, p.ano))
+                                                  .format(p.tipo.tipo_conteudo_related_test52, p.ano))
 
                                 # if p.numero_materia_futuro:
                                 #    numero = p.numero_materia_futuro
                                 # else:
-                                #    numero = MateriaLegislativa.objects.filter(tipo=p.tipo.tipo_conteudo_related,
+                                #    numero = MateriaLegislativa.objects.filter(tipo=p.tipo.tipo_conteudo_related_test52,
                                 #                                               ano=p.ano).last().numero + 1
                                 # messages.success(request, _(
                                 #    '%s : nº %s de %s <br>Atenção! Este número é apenas um provável '
@@ -2418,7 +2418,7 @@ class MateriaLegislativaCrud(Crud):
             ]
 
         def ia_run(self):
-            gen = GoogleGenerativeIA()
+            gen = GoogleGenerativeAnaliseIA()
             gen.model = self.model
             gen.object = self.kwargs['pk']
 

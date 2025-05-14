@@ -1861,7 +1861,7 @@ class TipoProposicaoForm(ModelForm):
         required=False,
         widget=forms.RadioSelect())
 
-    tipo_conteudo_related = forms.IntegerField(
+    tipo_conteudo_related_test52 = forms.IntegerField(
         widget=forms.HiddenInput(),
         required=True)
 
@@ -1870,13 +1870,13 @@ class TipoProposicaoForm(ModelForm):
         fields = ['descricao',
                   'content_type',
                   'tipo_conteudo_related_radio',
-                  'tipo_conteudo_related',
+                  'tipo_conteudo_related_test52',
                   'perfis',
                   'tipo_autores',
                   'exige_assinatura_digital'
                   ]
 
-        widgets = {'tipo_conteudo_related': forms.HiddenInput(),
+        widgets = {'tipo_conteudo_related_test52': forms.HiddenInput(),
                    'perfis': widgets.CheckboxSelectMultiple(),
                    'tipo_autores': widgets.CheckboxSelectMultiple()}
 
@@ -1901,7 +1901,7 @@ class TipoProposicaoForm(ModelForm):
                         Row(
                             to_column(('content_type', 12)),
                             to_column(('tipo_conteudo_related_radio', 12)),
-                            to_column(('tipo_conteudo_related', 12)),
+                            to_column(('tipo_conteudo_related_test52', 12)),
                         ),
                         7
                     )
@@ -1938,19 +1938,19 @@ class TipoProposicaoForm(ModelForm):
             raise ValidationError(
                 _('Meta Tipo Inexistente.'))
 
-        if 'tipo_conteudo_related' not in cd or not cd[
-           'tipo_conteudo_related']:
+        if 'tipo_conteudo_related_test52' not in cd or not cd[
+           'tipo_conteudo_related_test52']:
             self.logger.error("Seleção de Tipo não definida.")
             raise ValidationError(
                 _('Seleção de Tipo não definida.'))
 
         if not content_type.model_class().objects.filter(
-                pk=cd['tipo_conteudo_related']).exists():
+                pk=cd['tipo_conteudo_related_test52']).exists():
             self.logger.error("O Registro definido (%s) não está na base de %s."
-                              % (cd['tipo_conteudo_related'], content_type))
+                              % (cd['tipo_conteudo_related_test52'], content_type))
             raise ValidationError(
                 _('O Registro definido (%s) não está na base de %s.'
-                  ) % (cd['tipo_conteudo_related'], content_type))
+                  ) % (cd['tipo_conteudo_related_test52'], content_type))
 
         # """
         # A unicidade de tipo proposição para tipo de conteudo
@@ -1959,7 +1959,7 @@ class TipoProposicaoForm(ModelForm):
         # para um tipo de matéria.
 
         unique_value = self._meta.model.objects.filter(
-            content_type=content_type, object_id=cd['tipo_conteudo_related'])
+            content_type=content_type, object_id=cd['tipo_conteudo_related_test52'])
 
         if self.instance.pk:
             unique_value = unique_value.exclude(pk=self.instance.pk)
@@ -1972,7 +1972,7 @@ class TipoProposicaoForm(ModelForm):
                   'que foi defindo como (%s) para (%s)'
                   ) % (unique_value,
                        content_type,
-                       unique_value.tipo_conteudo_related))
+                       unique_value.tipo_conteudo_related_test52))
 
         return self.cleaned_data
 
@@ -1983,9 +1983,9 @@ class TipoProposicaoForm(ModelForm):
 
         assert tipo_proposicao.content_type
 
-        tipo_proposicao.tipo_conteudo_related = \
+        tipo_proposicao.tipo_conteudo_related_test52 = \
             tipo_proposicao.content_type.model_class(
-            ).objects.get(pk=self.cleaned_data['tipo_conteudo_related'])
+            ).objects.get(pk=self.cleaned_data['tipo_conteudo_related_test52'])
 
         return super().save(True)
 
@@ -2465,10 +2465,10 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
         if cd['numero_materia_futuro'] and \
                 'tipo' in cd and cd['tipo'] and \
-                MateriaLegislativa.objects.filter(tipo=cd['tipo'].tipo_conteudo_related,
+                MateriaLegislativa.objects.filter(tipo=cd['tipo'].tipo_conteudo_related_test52,
                                                   ano=timezone.now().year,
                                                   numero=cd['numero_materia_futuro']):
-            raise ValidationError(_("A matéria {} {}/{} já existe.".format(cd['tipo'].tipo_conteudo_related.descricao,
+            raise ValidationError(_("A matéria {} {}/{} já existe.".format(cd['tipo'].tipo_conteudo_related_test52.descricao,
                                                                            cd['numero_materia_futuro'],
                                                                            timezone.now().year)))
 
@@ -2968,7 +2968,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 self.logger.error("Erro ao obter modelo. " + str(e))
                 pass
 
-            tipo = self.instance.tipo.tipo_conteudo_related
+            tipo = self.instance.tipo.tipo_conteudo_related_test52
             if tipo.sequencia_numeracao:
                 numeracao = tipo.sequencia_numeracao
             ano = timezone.now().year
@@ -3101,14 +3101,14 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             doc = DocumentoAcessorio()
             doc.materia = proposicao.materia_de_vinculo
             doc.autor = str(proposicao.autor)
-            doc.tipo = proposicao.tipo.tipo_conteudo_related
+            doc.tipo = proposicao.tipo.tipo_conteudo_related_test52
 
             doc.ementa = proposicao.descricao
             """ FIXME verificar questão de nome e data de documento,
             doc acessório. Possivelmente pode possuir data anterior a
             data de envio e/ou recebimento dada a incorporação.
             """
-            doc.nome = str(proposicao.tipo.tipo_conteudo_related)[:30]
+            doc.nome = str(proposicao.tipo.tipo_conteudo_related_test52)[:30]
             doc.data = proposicao.data_envio
 
             doc.arquivo = proposicao.texto_original = File(
@@ -3193,13 +3193,13 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         protocolo.numero_paginas = cd['numero_de_paginas']
         protocolo.anulado = False
 
-        protocolo.tipo_conteudo_protocolado = proposicao.tipo.tipo_conteudo_related
+        protocolo.tipo_conteudo_protocolado = proposicao.tipo.tipo_conteudo_related_test52
         protocolo.conteudo_protocolado = conteudo_gerado
 
         protocolo.tipo_processo = '0'
         if self.instance.tipo.content_type.model_class(
         ) in (TipoMateriaLegislativa, TipoDocumento):
-            # protocolo.tipo_materia = proposicao.tipo.tipo_conteudo_related
+            # protocolo.tipo_materia = proposicao.tipo.tipo_conteudo_related_test52
             protocolo.tipo_processo = '1'
 
         protocolo.save()

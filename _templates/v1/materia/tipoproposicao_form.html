@@ -17,8 +17,8 @@
 <script type="text/javascript">
 
 $(document).ready(function(){
-  var initial_select = parseInt($("input[name=tipo_conteudo_related]").val());
-  $("input[name=tipo_conteudo_related]").remove();
+  var initial_select = parseInt($("input[name=tipo_conteudo_related_test52]").val());
+  $("input[name=tipo_conteudo_related_test52]").remove();
   $('#id_content_type').change(function(event) {
     const url_part_pattern = this[event.target.selectedIndex].value
     const url = `/api/${url_part_pattern}/?o=id&page=1&page_size=100`
@@ -45,7 +45,7 @@ $(document).ready(function(){
             <div class="radio">
               <label id="id_tipo_conteudo_related_${val.id}">
                 <input type="radio"
-                  name="tipo_conteudo_related"
+                  name="tipo_conteudo_related_test52"
                   id="id_tipo_conteudo_related_${val.id}"
                   value="${val.id}"
                   ${(initial_select ?'checked="checked"':'')}>

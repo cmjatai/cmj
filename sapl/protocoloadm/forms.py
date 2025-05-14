@@ -604,7 +604,7 @@ class ProtocoloDocumentForm(ModelForm):
 
 class ProtocoloDocumentoAcessorioForm(ModelForm):
 
-    tipo_conteudo_protocolado = forms.ModelChoiceField(
+    tipo_conteudo_protocolado_test52 = forms.ModelChoiceField(
         label=_('Tipo de Documento Acessório'),
         required=True,
         queryset=TipoDocumento.objects.all(),
@@ -640,7 +640,7 @@ class ProtocoloDocumentoAcessorioForm(ModelForm):
         model = Protocolo
         fields = [
             'tipo_protocolo',
-            'tipo_conteudo_protocolado',
+            'tipo_conteudo_protocolado_test52',
             'numero_paginas',
             'assunto',
             'interessado',
@@ -656,7 +656,7 @@ class ProtocoloDocumentoAcessorioForm(ModelForm):
         row1 = to_row(
             [
                 ('tipo_protocolo', 0),
-                ('tipo_conteudo_protocolado', 5),
+                ('tipo_conteudo_protocolado_test52', 5),
                 ('numero_paginas', 3),
                 (InlineRadios('data_hora_manual'), 4),
             ])
@@ -711,7 +711,7 @@ class ProtocoloDocumentoAcessorioForm(ModelForm):
             *args, **kwargs)
 
         if not config.protocolo_manual:
-            self.fields['data_hora_manual'].widget = forms.HiddenInput()
+            self.fields['data_hora_manual'].widget = forms.HiddenInput() 
 
 
 class ProtocoloMateriaForm(ModelForm):

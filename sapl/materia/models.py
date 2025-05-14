@@ -73,7 +73,7 @@ class TipoProposicao(models.Model):
     )
     object_id = models.PositiveIntegerField(
         blank=True, null=True, default=None)
-    tipo_conteudo_related = SaplGenericForeignKey(
+    tipo_conteudo_related_test52 = SaplGenericForeignKey(
         'content_type', 'object_id', verbose_name=_('Tipo Correspondente'))
 
     tipo_autores = models.ManyToManyField(

@@ -102,7 +102,7 @@ Relatoria:
 TipoProposicao:
   {% trans 'Tipo Proposição' %}:
   - descricao content_type exige_assinatura_digital
-  - tipo_conteudo_related perfis
+  - tipo_conteudo_related_test52 perfis
   - tipo_autores
 
 Proposicao:

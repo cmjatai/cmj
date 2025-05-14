@@ -1,0 +1,26 @@
+{% load i18n %}
+
+{% if dashboard.dash_apps|length > 1 %}
+  <ul class="nav nav-tabs" id="sigiDashTab" role="tablist">
+    {% for app in dashboard.dash_apps.keys %}
+      <li class="nav-item" role="presentation">
+        <button class="nav-link{% if forloop.first %} active{% endif %}" id="{{ app.name|slugify }}-tab" data-bs-toggle="tab" data-bs-target="#{{ app.name|slugify }}-tab-pane" type="button" role="tab" aria-controls="{{ app.name|slugify }}-tab-pane"{% if forloop.first %} aria-selected="true"{% endif %}>{{ app.verbose_name }}</button>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<div class="tab-content pt-2" id="sigiDashTabContent">
+  {% for app, cards in dashboard.dash_apps.items %}
+    <div class="tab-pane fade show{% if forloop.first %} active{% endif %}" id="{{ app.name|slugify }}-tab-pane" role="tabpanel" aria-labelledby="{{ app.name|slugify }}-tab" tabindex="0">
+      <div class="row g-2">
+        {% for card in cards.values %}
+          <div class="col">
+            {{ card }}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% endfor %}
+</div>
+

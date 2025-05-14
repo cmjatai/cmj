@@ -2,7 +2,7 @@
 
 import datetime
 from django.db import migrations, models
-from django.utils.timezone import utc
+from django.utils import timezone
 
 
 class Migration(migrations.Migration):
@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='arqdoc',
             name='data',
-            field=models.DateField(default=datetime.datetime(2024, 2, 2, 19, 44, 59, 387141, tzinfo=utc), verbose_name='Data do Documento'),
+            field=models.DateField(default=datetime.datetime(2024, 2, 2, 19, 44, 59, 387141, ), verbose_name='Data do Documento'),
             preserve_default=False,
         ),
         migrations.AlterField(

@@ -6,7 +6,7 @@ from sapl.base.email_utils import do_envia_email_tramitacao
 from sapl.materia.models import AssuntoMateria, MateriaAssunto, StatusTramitacao, UnidadeTramitacao, MateriaLegislativa
 from sapl.protocoloadm.models import StatusTramitacaoAdministrativo, DocumentoAdministrativo
 
-from cmj.genia import GoogleGenerativeIA
+from cmj.genia import GoogleGenerativeAnaliseIA
 from sapl.materia.models import MateriaLegislativa
 from sapl.base.models import Metadata
 from django.db.models import Q
@@ -47,7 +47,7 @@ def task_classifica_materialegislativa_function():
     """
     Função para classificar o materias legislativas que seus tipos possuem prompt definido.
     """
-    gen = GoogleGenerativeIA()
+    gen = GoogleGenerativeAnaliseIA()
     gen.model = MateriaLegislativa
 
     ultimo_metadata = Metadata.objects.filter(
