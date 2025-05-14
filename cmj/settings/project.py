@@ -50,7 +50,7 @@ INITIAL_VALUE_FORMS_MUNICIPIO = config(
     'INITIAL_VALUE_FORMS_MUNICIPIO', default='')
 INITIAL_VALUE_FORMS_CEP = config('INITIAL_VALUE_FORMS_CEP', default='')
 
-SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.JSONSerializer'
 
 ROOT_URLCONF = 'cmj.urls'
 

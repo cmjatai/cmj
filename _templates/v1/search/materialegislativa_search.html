@@ -41,21 +41,21 @@
 
     <div class="row">
       <div class="col-12">
+      </div>
+      <div class="col-12 col-md-8">
         {% crispy form %}
       </div>
-      <div class="col-12 col-md-7">
-      </div>
-      <div class="col-12 col-md-5">
+      <div class="col-12 col-md-4 " style="border-left: 1px solid white;">
         {% if tipos_autores_materias %}
           <br>
           <fieldset>
-            <legend>
+            <h3>
               <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?em_tramitacao_b=1">
                 Acesso Rápido às Matérias em Tramitação
               </a>
-            </legend>
-            <br>
+            </h3>
           </fieldset>
+          <hr>
           {% include 'materia/materias_em_tramitacao_widget.html' %}
         {% endif %}
       </div>

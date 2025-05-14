@@ -10,23 +10,34 @@
 
   {% for autor, formatos in autores.items %}
 
-    <a href="{% url 'cmj.search:materia_haystack_search' %}?tipo_i={{tipo.id}}&em_tramitacao_b=1&autoria_is={{autor.id}}">
+    <a class="d-flex justify-content-between hover_background_05p" href="{% url 'cmj.search:materia_haystack_search' %}?tipo_i={{tipo.id}}&em_tramitacao_b=1&autoria_is={{autor.id}}">
+
       {% if tipo.limite_minimo_coletivo %}
-        {% if autor.autor_related %}
-        {{autor.autor_related}}
-        {% else %}
-        {{autor.nome}}
-        {% endif %}
-        &nbsp; - &nbsp;<em class="text-light-blue"><small title="A contagem individual é feita de acordo com o que rege o R.I.">Contagem Individual: <strong>({{formatos.individual|length}})</strong> - Contagem Coletiva: <strong>({{formatos.coletivo|length}})</strong></small></em>
+        <span>
+          {% if autor.autor_related %}
+          {{autor.autor_related}}
+          {% else %}
+          {{autor.nome}}
+          {% endif %}
+        </span>
+        <em class="text-light-blue">
+          <small>
+            <small title="A contagem individual é feita de acordo com o que rege o R.I.">
+
+              Individuais: <strong>({{formatos.individual|length|stringformat:"02d" }})</strong> - Coletivos: <strong>({{formatos.coletivo|length}})</strong>
+            </small>
+          </small>
+        </em>
       {% else %}
-        {% if autor.autor_related %}
-        {{autor.autor_related}} <strong>({{formatos.individual|length}})</strong>
-        {% else %}
-        {{autor.nome}} <strong>({{formatos.individual|length}})</strong>
-        {% endif %}
+          <span>
+          {% if autor.autor_related %}
+            {{autor.autor_related}} <strong>({{formatos.individual|length}})</strong>
+          {% else %}
+            {{autor.nome}} <strong>({{formatos.individual|length}})</strong>
+          {% endif %}
+          </span>
       {% endif %}
     </a>
-    <br>
 {% endfor %}
 <br>
 {% endfor %}

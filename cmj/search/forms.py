@@ -297,23 +297,30 @@ class MateriaSearchForm(SearchForm):
             (HTML('''
                 <small class="text-blue">
                   <strong>
-                    O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... &nbsp;&nbsp;
+                    O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... <br>
                     Clique na lupa após definir seus critérios de pesquisa.
                   </strong>
                 </small>'''), 12),
 
-            (Div(), 2),
-            (q_field, 8),
-            (Div(), 2),
+            (Div(), 1),
+            (q_field, 10),
+            (Div(), 1),
 
-            ('em_tramitacao_b', 2),
-            ('tipo_i', 4),
-            ('numero_i', 2),
-            ('ano_i', 2),
-            ('tipo_listagem', 2)
+            ('tipo_i', 9),
+            ('em_tramitacao_b', 3),
         ])
 
         row2 = to_row([
+            ('numero_i', 4),
+            ('ano_i', 4,),
+            ('tipo_listagem', 4),
+            ('uta_i', 6),
+            ('sta_i', 6),
+        ])
+
+
+
+        row3 = to_row([
             (Div(
                 HTML(autor_label),
                 HTML(autor_modal),
@@ -327,11 +334,9 @@ class MateriaSearchForm(SearchForm):
                             css_class='btn btn-secondary btn-sm mt-1 p-0 w-100'), 12),
                 ], css_class='row flex-column'),
                 css_class="form-group"
-            ), 2),
-            ('uta_i', 3),
-            ('sta_i', 3),
-            ('assuntos_is', 2),
-            ('ordenacao', 2),
+            ), 4),
+            ('assuntos_is', 5),
+            ('ordenacao', 3),
         ])
 
         self.helper = FormHelper()
@@ -339,7 +344,8 @@ class MateriaSearchForm(SearchForm):
         self.helper.layout = Layout(
             Fieldset('',
                      row1,
-                     row2)
+                     row2,
+                     row3)
         )
 
         super().__init__(*args, **kwargs)

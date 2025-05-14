@@ -416,7 +416,7 @@ class AutorForm(ModelForm):
         label='Pesquise o nome do Autor com o '
         'tipo Selecionado e marque o escolhido.')
 
-    autor_related = ChoiceWithoutValidationField(label='',
+    autor_related_test52 = ChoiceWithoutValidationField(label='',
                                                  required=False,
                                                  widget=forms.RadioSelect())
 
@@ -426,12 +426,12 @@ class AutorForm(ModelForm):
                   'nome',
                   'sign_compression',
                   'cargo',
-                  'autor_related',
+                  'autor_related_test52',
                   'q', ]
 
     def __init__(self, *args, **kwargs):
 
-        autor_related = Div(
+        autor_related_test52 = Div(
             FieldWithButtons(
                 Field('q',
                       placeholder=_('Pesquisar por possíveis autores para '
@@ -442,16 +442,16 @@ class AutorForm(ModelForm):
             css_class='hidden',
             data_action='create',
             data_application='AutorSearch',
-            data_field='autor_related')
+            data_field='autor_related_test52')
 
         autor_select = Row(to_column(('tipo', 3)),
                            to_column(('sign_compression', 3)),
                            Div(to_column(('nome', 6)),
                                to_column(('cargo', 5)),
                                css_class="div_nome_cargo row col"),
-                           to_column((autor_related, 9)),
+                           to_column((autor_related_test52, 9)),
                            to_column((Div(
-                               Field('autor_related'),
+                               Field('autor_related_test52'),
                                css_class='radiogroup-autor-related hidden'),
                                12)))
 
@@ -462,13 +462,13 @@ class AutorForm(ModelForm):
 
         if self.instance.pk:
             if self.instance.autor_related:
-                self.fields['autor_related'].choices = [
+                self.fields['autor_related_test52'].choices = [
                     (self.instance.autor_related.pk,
                      self.instance.autor_related)]
 
                 self.fields['q'].initial = ''
 
-            self.fields['autor_related'].initial = self.instance.autor_related
+            self.fields['autor_related_test52'].initial = self.instance.autor_related
 
     def valida_igualdade(self, texto1, texto2, msg):
         if texto1 != texto2:
@@ -509,7 +509,7 @@ class AutorForm(ModelForm):
                 raise ValidationError(
                     _('O Nome do Autor deve ser informado.'))
         else:
-            if 'autor_related' not in cd or not cd['autor_related']:
+            if 'autor_related_test52' not in cd or not cd['autor_related_test52']:
                 self.logger.error('Registro de %s não escolhido para ser '
                                   'vinculado ao cadastro de Autor' % tipo.descricao)
                 raise ValidationError(
@@ -517,15 +517,15 @@ class AutorForm(ModelForm):
                       'vinculado ao cadastro de Autor') % tipo.descricao)
 
             if not tipo.content_type.model_class().objects.filter(
-                    pk=cd['autor_related']).exists():
+                    pk=cd['autor_related_test52']).exists():
                 self.logger.error('O Registro definido (%s-%s) não está na base '
-                                  'de %s.' % (cd['autor_related'], cd['q'], tipo.descricao))
+                                  'de %s.' % (cd['autor_related_test52'], cd['q'], tipo.descricao))
                 raise ValidationError(
                     _('O Registro definido (%s-%s) não está na base de %s.'
-                      ) % (cd['autor_related'], cd['q'], tipo.descricao))
+                      ) % (cd['autor_related_test52'], cd['q'], tipo.descricao))
 
             qs_autor_selected = qs_autor.filter(
-                object_id=cd['autor_related'],
+                object_id=cd['autor_related_test52'],
                 content_type_id=cd['tipo'].content_type_id)
             if qs_autor_selected.exists():
                 autor = qs_autor_selected.first()
@@ -547,7 +547,7 @@ class AutorForm(ModelForm):
             autor.autor_related = None
         else:
             autor.autor_related = autor.tipo.content_type.model_class(
-            ).objects.get(pk=self.cleaned_data['autor_related'])
+            ).objects.get(pk=self.cleaned_data['autor_related_test52'])
             autor.nome = str(autor.autor_related)
 
         autor.save()

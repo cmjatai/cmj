@@ -90,7 +90,16 @@
                   {% notificacoes_unread %}
 
                   <ul class="dropdown-menu">
-                    <li class=" text-right"><a href="{% url 'cmj.core:logout' %}">{% trans "Sair" %}</a></li>
+                    <li class=" text-right">
+
+                          <form class="m-0" action="{% url 'cmj.core:logout' %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item text-white">
+                              <i class="fas fa-sign-out" aria-hidden="true"></i> Sair
+                            </button>
+                          </form>
+
+                    </li>
                     <li  class="divider"></li>
                     <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
                     <li  class="divider"></li>

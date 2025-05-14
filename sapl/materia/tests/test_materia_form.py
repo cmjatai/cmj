@@ -159,7 +159,7 @@ def test_valida_campos_obrigatorios_tipo_proposicao_form():
     assert not form.is_valid()
 
     errors = form.errors
-    assert errors['tipo_conteudo_related'] == [_('Este campo é obrigatório.')]
+    assert errors['tipo_conteudo_related_test52'] == [_('Este campo é obrigatório.')]
     assert errors['descricao'] == [_('Este campo é obrigatório.')]
     assert errors['content_type'] == [_('Este campo é obrigatório.')]
 

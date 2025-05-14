@@ -551,7 +551,7 @@ class TipoProposicaoCrud(CrudAux):
             initial = CrudAux.UpdateView.get_initial(self)
             ct = self.object.content_type
             initial['content_type'] = f'{ct.app_label}/{ct.model}'
-            initial['tipo_conteudo_related'] = self.object.object_id
+            initial['tipo_conteudo_related_test52'] = self.object.object_id
             return initial
 
 
