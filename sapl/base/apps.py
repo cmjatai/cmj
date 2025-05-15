@@ -1,3 +1,4 @@
+from time import sleep
 from django import apps
 from django.utils.translation import gettext_lazy as _
 import inspect
@@ -37,6 +38,8 @@ class AppConfig(apps.AppConfig):
 
             if not i.registered():
                 return
+
+            sleep(int(60 + random.random()))
 
             if i:
                 queues = i.scheduled()

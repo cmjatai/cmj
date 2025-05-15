@@ -194,7 +194,8 @@ def task_analise_similaridade_entre_materias_function():
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
 
     try:
-        task_analise_similaridade_entre_materias_function()
+        #task_analise_similaridade_entre_materias_function()
+        pass
     except Exception as e:
         logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
 

@@ -304,19 +304,18 @@ Não faça considerações adicionais e ou mesmo conclusão extra. Neste context
     def run(self, similaridade, *args, **kwargs):
         # não presuma semelhança com run da classe acima
 
-        original = similaridade.materia_1
-        analisada = similaridade.materia_2
+        mat1 = similaridade.materia_1
+        mat2 = similaridade.materia_2
 
-        doc_original = pymupdf.open(original.texto_original.path)
-        text_original = ' '.join([page.get_text() for page in doc_original])
-        text_original = clean_text(text_original)
+        doc1 = pymupdf.open(mat1.texto_original.path)
+        text1 = ' '.join([page.get_text() for page in doc1])
+        text1 = clean_text(text1)
 
-        doc_analisada = pymupdf.open(analisada.texto_original.path)
-        text_analisada = ' '.join([page.get_text() for page in doc_analisada])
-        text_analisada = clean_text(text_analisada)
+        doc2 = pymupdf.open(mat2.texto_original.path)
+        text2 = ' '.join([page.get_text() for page in doc2])
+        text2 = clean_text(text2)
 
-        prompt = self.make_prompt(text_original, text_analisada, original.epigrafe_short, analisada.epigrafe_short)
-
+        prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
 
         ia_model = self.get_iamodel_configured()
         answer = ia_model.generate_content(prompt)
