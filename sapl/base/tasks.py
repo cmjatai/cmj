@@ -2,11 +2,13 @@ import logging
 from tracemalloc import start
 from cmj.celery import app
 from cmj.utils import start_task
+from sapl import materia
 from sapl.base.email_utils import do_envia_email_tramitacao
-from sapl.materia.models import AssuntoMateria, MateriaAssunto, StatusTramitacao, UnidadeTramitacao, MateriaLegislativa
+from sapl.materia.models import AnaliseSimilaridade, AssuntoMateria, MateriaAssunto, StatusTramitacao, UnidadeTramitacao, MateriaLegislativa
+from sapl.parlamentares.models import Legislatura
 from sapl.protocoloadm.models import StatusTramitacaoAdministrativo, DocumentoAdministrativo
 
-from cmj.genia import GoogleGenerativeIA
+from cmj.genia import IAAnaliseSimilaridadeService, IAClassificacaoMateriaService
 from sapl.materia.models import MateriaLegislativa
 from sapl.base.models import Metadata
 from django.db.models import Q
@@ -47,7 +49,7 @@ def task_classifica_materialegislativa_function():
     """
     Função para classificar o materias legislativas que seus tipos possuem prompt definido.
     """
-    gen = GoogleGenerativeIA()
+    gen = IAClassificacaoMateriaService()
     gen.model = MateriaLegislativa
 
     ultimo_metadata = Metadata.objects.filter(
@@ -98,7 +100,7 @@ def task_classifica_materialegislativa_function():
 
 @app.task(queue='cq_base', bind=True)
 def task_classifica_materialegislativa(self, *args, **kwargs):
-
+    # desativada, não sendo chamada - ja processou toda a base de antes de 2025.
     try:
         task_classifica_materialegislativa_function()
     except Exception as e:
@@ -107,5 +109,97 @@ def task_classifica_materialegislativa(self, *args, **kwargs):
     start_task(
         'sapl.base.tasks.task_classifica_materialegislativa',
         task_classifica_materialegislativa,
+        timezone.now() + timezone.timedelta(seconds=120)
+    )
+
+def task_analise_similaridade_entre_materias_function():
+    # Função para analisar a similaridade entre matérias
+
+    legislatura_atual = Legislatura.cache_legislatura_atual()
+    if not legislatura_atual:
+        return
+
+    def gera_registros_de_analise_vazios():
+        requerimentos = MateriaLegislativa.objects.filter(
+            tipo_id=3, ano__gte=legislatura_atual['data_inicio'].year, ano__lte=legislatura_atual['data_fim'].year
+        ).prefetch_related('autores', 'assuntos'
+                        ).order_by('-id').distinct()
+
+        # cria uma lista de tuplas contendo o id do requerimento, uma tumpla com os ids dos autores e uma tupla com os ids dos assuntos
+        requerimentos_ids = []
+        for requerimento in requerimentos:
+            requerimentos_ids.append(
+                (requerimento.id, tuple(requerimento.autores.values_list('id', flat=True)),
+                tuple(requerimento.assuntos.values_list('id', flat=True)))
+            )
+
+        # ordena a lista pela quantidade de assuntos
+        requerimentos_ids = sorted(requerimentos_ids, key=lambda x: (len(x[2]), len(x[1])), reverse=True)
+
+        # ordena internamente cada tupla e assuntos
+        for i, r in enumerate(requerimentos_ids):
+            requerimentos_ids[i] = (r[0], tuple(sorted(r[1])), tuple(sorted(r[2])))
+
+        # cria uma lista dois a dois de todos os requerimentos com todos menos com ele mesmo, e se o autor for o mesmo
+        requerimentos_comparacao = {}
+        for i, r1 in enumerate(requerimentos_ids):
+            for j, r2 in enumerate(requerimentos_ids):
+                if i == j:
+                    continue
+                if r1[1] == r2[1]:
+                    continue
+                if len(r1[1]) >=5 or len(r2[1]) >= 5:
+                    continue
+                set1 = set(r1[2])
+                set2 = set(r2[2])
+                intersection = set1.intersection(set2)
+                requerimentos_comparacao[(r1[0], r2[0])] = tuple(intersection)
+
+        # remove os requerimentos que possuem chave invertida
+        # ou seja, dado (a, b), remove (b, a)
+
+        requerimentos_comparados = {}
+        for k, v in requerimentos_comparacao.items():
+            if (k[1], k[0]) in requerimentos_comparados:
+                continue
+            requerimentos_comparados[k] = v
+
+        # ordena a comparação pela quantidade de elementos na interseção
+        requerimentos_comparados = sorted(requerimentos_comparados.items(), key=lambda x: len(x[1]), reverse=True)
+
+        for i, r in enumerate(requerimentos_comparados):
+            analise, created = AnaliseSimilaridade.objects.get_or_create(
+                materia_1_id=r[0][0],
+                materia_2_id=r[0][1],
+            )
+            analise.qtd_assuntos_comuns = len(r[1])
+            analise.save()
+        return
+
+    # recupera uma analise para enviar a ia.
+    analise = AnaliseSimilaridade.objects.filter(
+        similaridade = -1
+    ).order_by('-qtd_assuntos_comuns').first()
+    if not analise:
+        gera_registros_de_analise_vazios()
+        analise = AnaliseSimilaridade.objects.filter(similaridade = -1).first()
+    if not analise:
+        return
+
+    gen = IAAnaliseSimilaridadeService()
+    gen.run(analise)
+
+
+@app.task(queue='cq_base', bind=True)
+def task_analise_similaridade_entre_materias(self, *args, **kwargs):
+
+    try:
+        task_analise_similaridade_entre_materias_function()
+    except Exception as e:
+        logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
+
+    start_task(
+        'sapl.base.tasks.task_analise_similaridade_entre_materias',
+        task_analise_similaridade_entre_materias,
         timezone.now() + timezone.timedelta(seconds=120)
     )

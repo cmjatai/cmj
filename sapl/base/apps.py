@@ -43,9 +43,9 @@ class AppConfig(apps.AppConfig):
                 if queues:
                     for k, tarefas_agendadas in queues.items():
                         for ta in tarefas_agendadas:
-                            if ta['request']['name'] == 'sapl.base.tasks.task_classifica_materialegislativa':
+                            if ta['request']['name'] == 'sapl.base.tasks.task_analise_similaridade_entre_materias':
                                 return
-            tasks.task_classifica_materialegislativa.apply_async(
+            tasks.task_analise_similaridade_entre_materias.apply_async(
                 countdown=int(60 + random.random() * 120)
             )
         except:

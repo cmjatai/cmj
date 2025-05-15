@@ -1,4 +1,4 @@
-FROM leandrojatai/portalcmj:base.0004
+FROM leandrojatai/portalcmj:base.0005
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8

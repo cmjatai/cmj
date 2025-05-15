@@ -169,3 +169,9 @@ MateriaLegislativaDetail:
   - indexacao
   - observacao
 {% endcomment %}
+
+AnaliseSimilaridade:
+  {% trans 'Análise de Similaridade' %}:
+  - materia_2
+  - data_analise similaridade ia_name
+  - analise

@@ -347,6 +347,7 @@ class MateriaLegislativa(CommonMixin):
         blank=True, verbose_name=_('Observação'))
     resultado = models.TextField(blank=True)
     # XXX novo
+
     anexadas = models.ManyToManyField(
         'self',
         blank=True,
@@ -356,6 +357,16 @@ class MateriaLegislativa(CommonMixin):
         through_fields=(
             'materia_principal',
             'materia_anexada'))
+
+    similaridades = models.ManyToManyField(
+        'self',
+        blank=True,
+        through='AnaliseSimilaridade',
+        symmetrical=False,
+        related_name='similaridade_set',
+        through_fields=(
+            'materia_1',
+            'materia_2'))
 
     assuntos = models.ManyToManyField(
         'AssuntoMateria',
@@ -1490,3 +1501,42 @@ class MateriaEmTramitacao(models.Model):
 
     def __str__(self):
         return '{}/{}'.format(self.materia, self.tramitacao)
+
+class AnaliseSimilaridade(models.Model):
+    materia_1 = models.ForeignKey(
+        MateriaLegislativa, related_name='materia_1_set',
+        on_delete=models.CASCADE,
+        verbose_name=_('Matéria 1'))
+    materia_2 = models.ForeignKey(
+        MateriaLegislativa, related_name='materia_2_set',
+        on_delete=models.CASCADE,
+        verbose_name=_('Matéria 2'))
+
+    analise = models.TextField(
+        blank=True, null=True, verbose_name=_('Análise de Similaridade'))
+    data_analise = models.DateTimeField(
+        blank=True, null=True, verbose_name=_('Data da Análise'))
+    ia_name = models.CharField(
+        max_length=50, blank=True, null=True,
+        verbose_name=_('Nome do Algoritmo de IA'))
+
+    qtd_assuntos_comuns = models.SmallIntegerField(
+        verbose_name=_("Qtd de Assuntos Comuns"), default=-0)
+
+    similaridade = models.SmallIntegerField(
+        verbose_name=_("Similaridade"), default=-1)
+
+    class Meta:
+        verbose_name = _('Análise de Similaridade')
+        verbose_name_plural = _('Análises de Similaridade')
+        ordering = ['id']
+
+    def __str__(self):
+        return _('Matéria 1: %(materia_1)s'
+                 ' - Matéria 2: %(materia_2)s'
+                 ' - Similaridade: %(similaridade)s') % {
+            'materia_1': self.materia_1,
+            'materia_2': self.materia_2,
+            'similaridade': self.similaridade
+        }
+

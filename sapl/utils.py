@@ -39,6 +39,10 @@ import magic
 import six
 import weasyprint
 
+import markdown as md
+from markdown.extensions.toc import slugify_unicode
+from markdown.extensions.toc import TocExtension as makeTocExtension
+
 from sapl.crispy_layout_mixin import SaplFormHelper
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 
@@ -47,6 +51,16 @@ from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 # por conta dos leitores de códigos de barra, que trocavam
 # a '/' por '&' ou ';'
 SEPARADOR_HASH_PROPOSICAO = 'K'
+
+
+def md2html(md_text):
+    """
+    Converte o texto markdown para html
+    """
+    return md.markdown(md_text, extensions=[
+        makeTocExtension(slugify=slugify_unicode), #TOC
+    ])
+
 
 
 def dont_break_out(value, max_part=50):

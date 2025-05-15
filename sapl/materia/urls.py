@@ -2,7 +2,7 @@ from django.urls.conf import re_path, include
 
 from sapl.materia.views import (AcompanhamentoConfirmarView,
                                 AcompanhamentoExcluirView,
-                                AcompanhamentoMateriaView, AnexadaCrud,
+                                AcompanhamentoMateriaView, AnaliseSimilaridadeCrud, AnexadaCrud,
                                 AssuntoMateriaCrud, AutoriaCrud,
                                 AutoriaMultiCreateView, ConfirmarProposicao,
                                 CriarProtocoloMateriaView, DespachoInicialCrud,
@@ -82,7 +82,9 @@ urlpatterns_materia = [
                              LegislacaoCitadaCrud.get_urls() +
                              TramitacaoCrud.get_urls() +
                              RelatoriaCrud.get_urls() +
-                             DocumentoAcessorioCrud.get_urls())),
+                             DocumentoAcessorioCrud.get_urls() +
+                             AnaliseSimilaridadeCrud.get_urls()
+                             )),
 
     re_path(r'^materia/(?P<pk>[0-9]+)/create_simplificado$',
         CriarProtocoloMateriaView.as_view(),

@@ -12,6 +12,7 @@ import sys
 import tempfile
 import traceback
 import zipfile
+from django.urls import reverse_lazy
 from django.views.decorators.cache import cache_page
 
 from crispy_forms.layout import HTML
@@ -37,11 +38,12 @@ from django.views.generic import ListView, TemplateView, CreateView, UpdateView
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
+import markdown
 import weasyprint
 
 from cmj import celery
 from cmj.core.models import AreaTrabalho
-from cmj.genia import GoogleGenerativeIA
+from cmj.genia import IAClassificacaoMateriaService
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin, \
     AudigLogFilterMixin
@@ -73,7 +75,7 @@ from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MEDIA_ROOT, MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (YES_NO_CHOICES, autor_label, autor_modal, SEPARADOR_HASH_PROPOSICAO,
                         gerar_hash_arquivo, get_base_url, get_client_ip,
-                        get_mime_type_from_file_extension, montar_row_autor,
+                        get_mime_type_from_file_extension, md2html, montar_row_autor,
                         show_results_filter_set, mail_service_configured, lista_anexados,
                         gerar_pdf_impressos)
 import requests as rq
@@ -93,7 +95,7 @@ from .forms import (AcessorioEmLoteFilterSet, AcompanhamentoMateriaForm,
                     filtra_tramitacao_status,
                     ExcluirTramitacaoEmLote, compara_tramitacoes_mat,
                     TramitacaoEmLoteForm)
-from .models import (AcompanhamentoMateria, Anexada, AssuntoMateria, Autoria,
+from .models import (AcompanhamentoMateria, AnaliseSimilaridade, Anexada, AssuntoMateria, Autoria,
                      DespachoInicial, DocumentoAcessorio, MateriaAssunto,
                      MateriaLegislativa, Numeracao, Orgao, Origem, Proposicao,
                      RegimeTramitacao, Relatoria, StatusTramitacao,
@@ -2418,7 +2420,7 @@ class MateriaLegislativaCrud(Crud):
             ]
 
         def ia_run(self):
-            gen = GoogleGenerativeIA()
+            gen = IAClassificacaoMateriaService()
             gen.model = self.model
             gen.object = self.kwargs['pk']
 
@@ -3619,3 +3621,40 @@ class CriarDocumentoAcessorioProtocolo(PermissionRequiredMixin, CreateView):
         doc['protocolo'] = protocolo
 
         return doc
+
+class AnaliseSimilaridadeCrud(MasterDetailCrud):
+    model = AnaliseSimilaridade
+    parent_field = 'materia_1'
+    public = [RP_LIST]
+
+    class ListView(MasterDetailCrud.ListView):
+        def get_queryset(self):
+            pk = self.kwargs['pk']
+            qs = AnaliseSimilaridade.objects.filter(
+                Q(materia_1__id=pk) | Q(materia_2__id=pk),
+                similaridade__gt=0).order_by('-similaridade')
+            return qs
+
+        def hook_analise(self, obj, ss, url):
+            if obj.analise:
+                return md2html(obj.analise), ''
+            return '',''
+
+        def hook_header_materia_2(self, *args, **kwargs):
+            return _('Matéria Comparada')
+
+        def hook_materia_2(self, obj, ss, url):
+
+            if obj.materia_2_id == int(self.kwargs['pk']):
+                materia = obj.materia_1
+            else:
+                materia = obj.materia_2
+            if materia:
+                url = reverse_lazy(
+                    'sapl.materia:materialegislativa_detail',
+                    kwargs={'pk': materia.id})
+                return f'<a href="{url}">{str(materia)}</a>', ''
+            return '', ''
+
+        def hook_similaridade(self, obj, ss, url):
+            return f'<span class="d-block text-center">{ss}%<span>', ''

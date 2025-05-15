@@ -49,7 +49,7 @@ from sapl.rules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                         SAPL_GROUP_PROTOCOLO, SAPL_GROUP_SESSAO,
                         SAPL_GROUP_VOTANTE, SAPL_GROUP_AUDIENCIA)
 from sapl.sessao import models as sessao
-
+from django.contrib.contenttypes.models import ContentType
 
 __base__ = [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE]
 __listdetailchange__ = [RP_LIST, RP_DETAIL, RP_CHANGE]
@@ -63,6 +63,7 @@ rules_group_administrativo = {
         (get_user_model(), [
             menu_dados_auxiliares,
         ], set()),
+        (ContentType, [], set(__perms_publicas__)),
         (materia.MateriaLegislativa, [
          'can_access_impressos'], __perms_publicas__),
         # TODO: tratar em sapl.api a questão de ostencivo e restritivo

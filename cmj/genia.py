@@ -15,17 +15,36 @@ import google.generativeai as genai
 
 logger = logging.getLogger(__name__)
 
-class GoogleGenerativeIA:
-
+class IAGenaiBase:
     ia_model_name = "gemini-2.0-flash-exp"
+    temperature = 0.1
+    top_k = 40
+    top_p = 0.95
+    response_mime_type = "application/json"
+
+    def get_iamodel_configured(self):
+        generation_config = {
+          "temperature": self.temperature,
+          "top_p": self.top_p,
+          "top_k": self.top_k,
+          # "max_output_tokens": 8192,
+          "response_mime_type": self.response_mime_type,
+        }
+
+        genai.configure(api_key=settings.GEMINI_API_KEY)
+
+        model = genai.GenerativeModel(
+          model_name=self.ia_model_name,
+          generation_config=generation_config,
+        )
+
+        return model
+
+class IAClassificacaoMateriaService(IAGenaiBase):
 
     _model = None # Model from app django
     _content_type = None # ContentType from app django
     _object = None # Object from app django
-
-    temperature = 0.1
-    top_k = 40
-    top_p = 0.95
 
     @property
     def model(self):
@@ -149,24 +168,6 @@ class GoogleGenerativeIA:
 
         return metadata.metadata['genia']
 
-    def get_model_configured(self):
-        generation_config = {
-          "temperature": self.temperature,
-          "top_p": self.top_p,
-          "top_k": self.top_k,
-          # "max_output_tokens": 8192,
-          "response_mime_type": "application/json",
-        }
-
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-
-        model = genai.GenerativeModel(
-          model_name=self.ia_model_name,
-          generation_config=generation_config,
-        )
-
-        return model
-
     def make_prompt(self, context):
         obj = self.object
 
@@ -228,7 +229,7 @@ class GoogleGenerativeIA:
             if not prompt:
                 return
 
-            ia_model = self.get_model_configured()
+            ia_model = self.get_iamodel_configured()
             answer = ia_model.generate_content(prompt)
 
             obj = self.object
@@ -263,4 +264,74 @@ class GoogleGenerativeIA:
                 messages.add_message(
                     self.request, messages.ERROR,
                     _('Ocorreu erro na geração da análise!'))
+
+
+class IAAnaliseSimilaridadeService(IAGenaiBase):
+    """
+    Classe para análise de similaridade
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.response_mime_type = 'text/plain'
+
+    def make_prompt(self, original, analisado, o_epigrafe, a_epigrafe):
+
+        prompt0 = f"""
+Assuma a personalidade de um especialista em produção de textos legislativos em uma câmara municipal,
+com experiência em redação de documentos oficiais. Sua tarefa é analisar dois textos e identificar se eles tratam do mesmo assunto.
+Os textos podem ter diferenças de redação, mas você deve se concentrar no conteúdo e na intenção dos pedidos.
+Para tal tarefa, compare o conteúdo de <ORIGINAL></ORIGINAL> com o conteúdo de <ANALISADO></ANALISADO>.
+Para citar estes dois conteúdos, nomeie eles respectivamente da seguinte maneira:
+"{o_epigrafe}" e "{a_epigrafe}".
+Remova de sua análise os autores pois são irrelevantes para a comparação requerida.
+O importante é o que está sendo pedido, quem será o beneficiário do pedido e para qual localidade
+está sendo feito tal pedido.
+Não faça considerações adicionais e ou mesmo conclusão extra. Neste contexto responda:
+
+- Os textos estão pedindo o mesmo benefício para a mesma localidade?
+- Descreva de forma sucinta e direta o que está sendo pedido em <ORIGINAL></ORIGINAL> e <ANALISADO></ANALISADO> informando também os beneficiários e as localidades citadas.
+- Calcule a semelhança percentual entre os documentos desconsiderando autores, focando na solicitação e no beneficiário, qual semelhança percentual entre <ORIGINAL></ORIGINAL> e <ANALISADO></ANALISADO>? Coloque o resultado em percentual com uma marcação de colchetes, exemplo: "[[ 100% ]]".
+- formate a resposta em MARKDOWN, utilizando linguagem dissertativa com os títulos e subtítulos necessários para facilitar a leitura, utilizando negrito e itálico quando necessário
+- Não utilize a palavra "plágio" em sua resposta, se necessário expressar tal sentido, utilize a palavra "similaridade".
+
+<ORIGINAL>{original}</ORIGINAL>
+
+<ANALISADO>{analisado}</ANALISADO>
+"""
+        return prompt0
+
+    def run(self, similaridade, *args, **kwargs):
+        # não presuma semelhança com run da classe acima
+
+        original = similaridade.materia_1
+        analisada = similaridade.materia_2
+
+        doc_original = pymupdf.open(original.texto_original.path)
+        text_original = ' '.join([page.get_text() for page in doc_original])
+        text_original = clean_text(text_original)
+
+        doc_analisada = pymupdf.open(analisada.texto_original.path)
+        text_analisada = ' '.join([page.get_text() for page in doc_analisada])
+        text_analisada = clean_text(text_analisada)
+
+        prompt = self.make_prompt(text_original, text_analisada, original.epigrafe_short, analisada.epigrafe_short)
+
+
+        ia_model = self.get_iamodel_configured()
+        answer = ia_model.generate_content(prompt)
+
+        similaridade.analise = answer.text
+        similaridade.ia_name = self.ia_model_name
+        similaridade.data_analise = timezone.localtime()
+
+        try:
+            similaridade_value = similaridade.analise.split('[[ ')[1].split('%')[0]
+            similaridade.similaridade = int(similaridade_value)
+        except Exception as e:
+            logger.error(e)
+            similaridade.similaridade = 0
+        similaridade.save()
+
+
 
