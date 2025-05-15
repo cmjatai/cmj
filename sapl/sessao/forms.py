@@ -785,6 +785,9 @@ class PautaSessaoFilterSet(SessaoPlenariaFilterSet):
         qs = super(PautaSessaoFilterSet, self).qs
         return qs.exclude(tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO)
 
+    def __init__(self, *args, **kwargs):
+        super(PautaSessaoFilterSet, self).__init__(*args, **kwargs)
+
 class PautaComissaoFilterSet(SessaoPlenariaFilterSet):
     titulo = _('Pesquisa de Pauta das Comissões')
 

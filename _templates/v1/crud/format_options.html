@@ -2,12 +2,12 @@
 
 
 <div class=" d-md-flex justify-content-end">
-  <div class="actions btn-group" role="group">
-    <a class="btn btn-outline-secondary" href="{% url url_reverse %}?format=csv{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em CSV."><i class="fas fa-file-csv"></i></a>
-    <a class="btn btn-outline-secondary" href="{% url url_reverse %}?format=xlsx{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em XLSX."><i class="fas fa-file-excel"></i></a>
-    <a class="btn btn-outline-secondary" href="{% url url_reverse %}?format=json{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em JSON."><i class="far fa-file-code"></i></a>
+  <div class="actions btn-group btn-exports" role="group">
+    <a class="btn btn-success" href="{% url url_reverse %}?format=csv{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em CSV."><i class="fas fa-file-csv"></i></a>
+    <a class="btn btn-success" href="{% url url_reverse %}?format=xlsx{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em XLSX."><i class="fas fa-file-excel"></i></a>
+    <a class="btn btn-success" href="{% url url_reverse %}?format=json{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em JSON."><i class="far fa-file-code"></i></a>
     {% if url_openapi and not request.GET.q %}
-      <a class="btn btn-outline-secondary" href="{% url url_openapi %}?{{ request.GET.items|params_search_to_api }}" title="OpenAPI">OpenAPI</i></a>
+      <a class="btn btn-success" href="{% url url_openapi %}?{{ request.GET.items|params_search_to_api }}" title="OpenAPI">OpenAPI</i></a>
     {% endif %}
   </div>
 </div>

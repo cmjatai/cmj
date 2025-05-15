@@ -125,7 +125,7 @@ urlpatterns = [
     # PAUTA COMISSÃO
     re_path(r'^sessao/pauta-comissao$',
             PautaComissaoView.as_view(), name='pauta_comissao'),
-    re_path(r'^sessao/pauta-comissoes/pesquisar-pauta$',
+    re_path(r'^sessao/pauta-comissao/pesquisar-pauta$',
             PesquisarPautaComissaoView.as_view(), name='pesquisar_comissao_pauta'),
     re_path(r'^sessao/pauta-comissao/(?P<pk>\d+)$',
             PautaComissaoDetailView.as_view(), name='pauta_comissao_detail'),

@@ -6,12 +6,21 @@
 
 {% block sections_nav %} {% endblock %}
 
+
 {% block base_content %}
+  {% block actions %}
+    {% if  filter_url %}
+      <div class="py-2">
+        {% with 'sapl.sessao:pesquisar_pauta' as url_reverse %}
+        {% include "crud/format_options.html" %}
+        {% endwith %}
+      </div>
+    {% endif %}
+  {% endblock %}
 
   {% crispy filter.form %}
 
-  {% if not filter_url %}
-  {% endif %}
+
 
   {% if filter_url %}
     <p></p>

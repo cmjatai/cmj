@@ -15,6 +15,10 @@
   }
 }
 
+.btn-exports {
+  gap: 2px;
+}
+
 .btn-excluir {
   @include btn($danger, null, #fff, $danger);
 }

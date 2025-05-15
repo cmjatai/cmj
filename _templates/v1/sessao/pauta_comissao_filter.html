@@ -8,6 +8,17 @@
 
 {% block base_content %}
 
+  {% block actions %}
+
+    {% if filter_url %}
+      <div class="py-2">
+        {% with 'sapl.sessao:pesquisar_comissao_pauta' as url_reverse %}
+        {% include "crud/format_options.html" %}
+        {% endwith %}
+      </div>
+    {% endif %}
+  {% endblock %}
+
   {% crispy filter.form %}
 
   {% if not filter_url %}
@@ -16,24 +27,37 @@
   {% if filter_url %}
     <p></p>
     <table class="table table-striped table-hover">
-      <thead class="thead-default"><tr><td><h3>Resultados</h3></td></tr></thead>
+      <thead class="thead-default">
+        <tr>
+          <th>
+            Reuniões de Comissões
+          </th>
+          <th>
+            Relatório em PDF
+          </th>
+        </tr>
+      </thead>
+      <tbody>
       {% if page_obj|length %}
         {% if numero_res > 1 %}
           <h3>Foram encontradas {{numero_res}} pautas das comissões.</h3></br>
         {% elif numero_res == 1 %}
-          <h3>Foi encontrada {{numero_res}} pauta das comissoes.</h3></br>
+          <h3>Foi encontrada {{numero_res}} pauta das comissões.</h3></br>
         {% endif %}
-
         {% for s in page_obj %}
           <tr>
-            <td><a href="{% url 'sapl.sessao:pauta_comissao_detail' s.id %}"><strong>{{s}}</strong></br></a></td><td>
-					  <a href="{% url 'sapl.relatorios:relatorio_pauta_sessao' s.pk %}"><img height="30" width="30" src="{% webpack_static 'img/pdflogo.png' %}"></a>
-				    </td>
+            <td>
+              <a href="{% url 'sapl.sessao:pauta_comissao_detail' s.id %}"><strong>{{s}}</strong></br></a>
+            </td>
+            <td class="text-center">
+              <a href="{% url 'sapl.relatorios:relatorio_pauta_sessao' s.pk %}"><img height="30" width="30" src="{% webpack_static 'img/pdflogo.png' %}"></a>
+            </td>
           </tr>
         {% endfor %}
       {% else  %}
-        <tr><td><h3>Nenhuma Pauta de Comissão encontrada com essas especificações</h3></tr>
+        <tr><td><h3>Nenhuma Pauta de Comissão encontrada com essas especificações</h3></td></tr>
       {% endif %}
+      </tbody>
     </table>
     {% include "paginacao.html" %}
   {% endif %}

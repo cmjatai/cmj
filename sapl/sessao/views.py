@@ -3814,14 +3814,18 @@ class PesquisarSessaoPlenariaView(AudigLogFilterMixin, MultiFormatOutputMixin, F
     queryset_values_for_formats = False
 
     fields_base_report = [
-        'id', 'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim', '',
+        'id',
+        'data_inicio',
+        'hora_inicio',
+        'data_fim',
+        'hora_fim',
+        '',
     ]
     fields_report = {
         'csv': fields_base_report,
         'xlsx': fields_base_report,
         'json': fields_base_report,
     }
-
     def hook_header_(self):
         return force_str(_('Título'))
 
