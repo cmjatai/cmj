@@ -376,6 +376,10 @@ class Slugged(Parent):
         max_length=250,
         blank=True, null=True, default='')
 
+    subtitle = models.TextField(
+        verbose_name=_('Subtítulo'),
+        blank=True, null=True, default='')
+
     apelido = models.CharField(
         verbose_name=_('Apelido'),
         max_length=250,

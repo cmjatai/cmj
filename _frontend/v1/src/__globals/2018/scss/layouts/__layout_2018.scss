@@ -475,15 +475,18 @@
     margin-right: $grid-gutter-width;
   }
 }
+
 .mce-branding {
   display: none !important;
 }
+
 .container-segmentos {
   display: flex;
   flex-direction: row;
   justify-content: stretch;
   align-items: stretch;
 }
+
 .btn-segmentos {
   background: darken($bg_color_thematic, 10%) $url_bg_png;
   flex: 1 1 25%;
@@ -494,6 +497,10 @@
   justify-content: flex-start;
   margin: 0 1px;
 
+  &:first-child, &:last-child {
+    background-color: #00a65a;
+  }
+  
   span {
     font-family: "Rubik";
     font-variant: small-caps;

@@ -64,6 +64,7 @@ class ClasseForm(ModelForm):
             'visibilidade',
             'perfil',
             'descricao',
+            'subtitle',
             'parent',
             'tipo_doc_padrao',
             'template_doc_padrao',
@@ -96,6 +97,7 @@ class ClasseForm(ModelForm):
         ])
         row4 = to_row([
             ('descricao', 12),
+            ('subtitle', 12)
         ])
         row3 = to_row([
             ('list_in_mapa', 2),

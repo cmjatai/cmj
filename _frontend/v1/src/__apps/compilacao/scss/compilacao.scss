@@ -134,6 +134,40 @@ a:link:after, a:visited:after {
   }
 }
 
+.cp-header {
+  display: flex;
+  flex-direction: column;
+  padding: 1em 0;
+  .row1 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 2em;
+    .cp-header-name {
+      display: flex;
+      flex-direction: column;
+      color: $color_primary;
+      align-items: center;
+      font-size: 1.5em;
+      .header-name {
+        font-size: 1.5em;
+        font-weight: bold;
+      }
+    }
+  }
+  .row2 {
+    h1.page-header {
+      font-size: 1.5em;
+      margin: 1em 0 0 0;
+      color: black;
+      background: none;
+      font-weight: bold;
+      text-align: center;
+      border: 0;
+    }
+  }
+}
+
 .cp {
   .vigencia-active {
     margin-top: 30px;
@@ -142,7 +176,6 @@ a:link:after, a:visited:after {
   table {
     display: table;
   }
-
   .cp-linha-vigencias {
     display: flex;
     flex-direction: row;

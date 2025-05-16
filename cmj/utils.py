@@ -500,6 +500,7 @@ def get_breadcrumb_classes(context, request=None, response=None):
         context.update(
             {
                 'title': obj,
+                'subtitle': obj.subtitle,
                 'breadcrumb_classes': obj.classes_parents_and_me,
                 'head_title_sufix': obj.apelido or obj.titulo
             })
@@ -546,8 +547,6 @@ def get_breadcrumb_classes(context, request=None, response=None):
         full_redirects = list(filter(lambda x: x.url_redirect == path, classes_redirect))
         #full_redirects = sorted(full_redirects, key=lambda x: len(x.slug))
 
-
-
         if full_redirects:
             classes_redirect = full_redirects
 
@@ -561,6 +560,7 @@ def get_breadcrumb_classes(context, request=None, response=None):
             if not obj and type_path != 'view_slave':
                 context.update({
                     'title': classes_redirect[0],
+                    'subtitle': classes_redirect[0].subtitle,
                     'head_title_sufix': classes_redirect[0].apelido or classes_redirect[0].titulo
                 })
             return response

@@ -5,47 +5,46 @@
 {% load webpack_static from webpack_loader %}
 
 <div class="d-flex justify-content-between pt-3 d-print-none">
-  <a href="{% url 'cmj.search:norma_haystack_search' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
-
-
+  <a href="{% url 'cmj.search:norma_haystack_search' %}" class="btn btn-outline-primary">
+    {% trans 'Fazer nova pesquisa' %}
+  </a>
   <a class="link-texto" href="javascript:window.print()" title="Imprimir Texto Compilado. Para gerar PDF do texto, utilize a opção &#34;Salvar como PDF&#34; do seu navegador.">
-    <i class="fas fa-print"></i></a>
-
-  <a class="btn btn-outline-primary" href="{% url object|urldetail_content_type:object.content_object object.content_object.pk %}?display" title="Dados Complementares">Dados Complementares</a>
+    <i class="fas fa-print"></i>
+  </a>
+  <a class="btn btn-outline-primary" href="{% url object|urldetail_content_type:object.content_object object.content_object.pk %}?display" title="Dados Complementares">
+    Dados Complementares
+  </a>
 </div>
 
+<div class="cp-header">
+  <div class="row1">
+    <div class="cp-header-brazao">
+      <img
+        height="100"
+        src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
+        alt="Logotipo">
+    </div>
 
-<div class="pt-3 d-flex justify-content-center  align-items-center">
-  <div class="pr-5">
-    <img
-      height="100"
-      src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
-      alt="Logotipo"
-      class="img-responsive visible-lg-inline-block vcenter">
+    <div class="cp-header-name">
+      <span class="header-name">
+        {% if nome %}
+          {{ nome }}
+        {% else %}
+          {% trans 'Sem Nome Cadastrado' %}
+        {% endif %}
+      </span>
+      <span>
+        Poder Legislativo
+      </span>
+    </div>
   </div>
-  <div class="control-label">
-    <h1 class="text-center">
-      {% if nome %}
-        <b>{{ nome }}</b>
-      {% else %}
-        <b>{% trans 'Sem Nome Cadastrado' %}</b>
-      {% endif %}
-    </h1>
-    <h2 class="text-center">
-      Poder Legislativo
-    </h2>
-  </div>
-
-</div>
-
-<div class="row">
-  <div class="col pt-3">
-    <h2 class="text-center">
-      <strong>
+  <div class="row2">
+    <h1 class="page-header">
         {{object.content_object}}
-      </strong>
-    </h2>
+    </h1>
   </div>
+
+
 </div>
 
 <div class="row bg-gray py-2">

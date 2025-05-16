@@ -6,14 +6,7 @@
 {% block title %}
   <h1 class="page-header d-flex bg-red text-white container-search justify-content-between" >
     Pesquisar Matérias Legislativas
-
-    {% if show_results %}
-      <div class="bg-white rounded">
-        {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materia_materialegislativa-list'  %}
-          {% include "crud/format_options.html" %}
-        {% endwith %}
-      </div>
-    {% else %}
+    {% if not show_results %}
       <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
         ?
       </a>
@@ -27,7 +20,13 @@
   {% endif %}
 {% endblock container_actions %}
 
-{% block extra_actions %}
+{% block actions %}
+{{ block.super }}
+  <div class="bg-white rounded">
+    {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materia_materialegislativa-list'  %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  </div>
 {% endblock %}
 
 {% block extra_content %} {% endblock %}

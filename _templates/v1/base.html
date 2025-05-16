@@ -131,6 +131,12 @@
                 {% endif %}
               {% endblock base_workspace %}
 
+              {% block subtitle %}
+                  {% if subtitle %}
+                    <em>{{ subtitle|safe|linebreaksbr }}</em>
+                  {% endif %}
+              {% endblock %}
+
               {# Feedback messages #}
               {% for message in messages %}
                 <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible" role="alert">
