@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+import datetime
 import logging
 
 from PyPDF4.pdf import PdfFileReader
@@ -277,7 +277,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
                         data = data.replace('Z', '+')
                     data = data.replace("'", '')
 
-                    fd = datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
+                    fd = datetime.datetime.strptime(data[2:], '%Y%m%d%H%M%S%z')
             except:
                 pass
 
@@ -392,7 +392,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
         except Exception as e:
             return {}
 
-        data_min = datetime(1970, 1, 1, tzinfo=timezone.utc)
+        data_min = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
 
         try:
             signs = sorted(signs, key=lambda sign: (

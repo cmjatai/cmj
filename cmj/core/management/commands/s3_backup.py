@@ -1,4 +1,7 @@
-from datetime import datetime, timedelta
+import datetime
+from datetime import datetime as datetime_class
+from datetime import timedelta
+
 import logging
 import os
 from time import sleep
@@ -55,7 +58,7 @@ class Command(BaseCommand):
         self.s3_server = options['s3_server']
         self.s3_full = options['s3_full']
 
-        init = datetime.now()
+        init = datetime_class.now()
 
         s3_servers = ('s3_aws', 's3_cmj')
         s3_server = s3_servers[init.hour % 2]
@@ -463,7 +466,7 @@ class Command(BaseCommand):
                 if metadata[self.s3_server][fn][attr_path]:
                     # return 0
                     t = os.path.getmtime(getattr(ff, attr_path))
-                    date_file = datetime.fromtimestamp(t, timezone.utc)
+                    date_file = datetime_class.fromtimestamp(t, datetime.timezone.utc)
 
                     if parse_datetime(metadata[self.s3_server][fn][attr_path]) > date_file:
                         result = self.validate_file(
@@ -525,7 +528,7 @@ class Command(BaseCommand):
         for item in list_dir:
 
             t = os.path.getmtime(f'{path_name}{item}')
-            date_file = datetime.fromtimestamp(t, timezone.utc)
+            date_file = datetime_class.fromtimestamp(t, datetime.timezone.utc)
 
             obj = self.s3r.Object(
                 'cmjatai-postgresql',
