@@ -1,10 +1,15 @@
-from time import sleep
+import logging
+import random
 from django import apps
 from django.utils.translation import gettext_lazy as _
 import inspect
-import random
 
 from django.conf import settings
+
+from cmj.utils import start_task
+from django.utils import timezone
+
+logger = logging.getLogger(__name__)
 
 class AppConfig(apps.AppConfig):
     name = 'sapl.base'
@@ -14,7 +19,9 @@ class AppConfig(apps.AppConfig):
     def ready(self):
         from . import signals
         from . import tasks
+
         from cmj.celery import app as celery_app
+        from sapl.base.tasks import task_analise_similaridade_entre_materias
 
         apps.AppConfig.ready(self)
 
@@ -33,23 +40,11 @@ class AppConfig(apps.AppConfig):
         if 'sqlite3' in settings.DATABASES['default']['ENGINE']:
             return
 
-        try:
-            i = celery_app.control.inspect()
+        time_sleep = 60 + random.randint(0, 300)
 
-            if not i.registered():
-                return
-
-            sleep(int(60 + random.random()))
-
-            if i:
-                queues = i.scheduled()
-                if queues:
-                    for k, tarefas_agendadas in queues.items():
-                        for ta in tarefas_agendadas:
-                            if ta['request']['name'] == 'sapl.base.tasks.task_analise_similaridade_entre_materias':
-                                return
-            tasks.task_analise_similaridade_entre_materias.apply_async(
-                countdown=int(60 + random.random() * 120)
-            )
-        except:
-            pass
+        logger.info(f'Iniciando task_analise_similaridade_entre_materias em {time_sleep} segundos')
+        start_task(
+            'sapl.base.tasks.task_analise_similaridade_entre_materias',
+            task_analise_similaridade_entre_materias,
+            timezone.now() + timezone.timedelta(seconds=120)
+        )

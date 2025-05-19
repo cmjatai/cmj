@@ -1,6 +1,6 @@
-import logging
+
 from tracemalloc import start
-from cmj.celery import app
+from cmj.celery import app as cmj_celery_app
 from cmj.utils import start_task
 from sapl import materia
 from sapl.base.email_utils import do_envia_email_tramitacao
@@ -14,11 +14,12 @@ from sapl.base.models import Metadata
 from django.db.models import Q
 from django.utils import timezone
 
+from celery.utils.log import get_task_logger
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 
-@app.task(queue='cq_base')
+@cmj_celery_app.task(queue='cq_base')
 def task_envia_email_tramitacao(kwargs):
     print(f'task_envia_email_tramitacao: {kwargs}')
     logger.info(f'task_envia_email_tramitacao: {kwargs}')
@@ -98,7 +99,7 @@ def task_classifica_materialegislativa_function():
 
 
 
-@app.task(queue='cq_base', bind=True)
+@cmj_celery_app.task(queue='cq_base', bind=True)
 def task_classifica_materialegislativa(self, *args, **kwargs):
     # desativada, não sendo chamada - ja processou toda a base de antes de 2025.
     try:
@@ -190,17 +191,20 @@ def task_analise_similaridade_entre_materias_function():
     gen.run(analise)
 
 
-@app.task(queue='cq_base', bind=True)
+@cmj_celery_app.task(queue='cq_base', bind=True)
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
 
-    try:
-        #task_analise_similaridade_entre_materias_function()
-        pass
-    except Exception as e:
-        logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
-
-    start_task(
+    restart = start_task(
         'sapl.base.tasks.task_analise_similaridade_entre_materias',
         task_analise_similaridade_entre_materias,
         timezone.now() + timezone.timedelta(seconds=120)
     )
+
+    if restart:
+        logger.info('Executando...')
+        try:
+            task_analise_similaridade_entre_materias_function()
+            pass
+        except Exception as e:
+            logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
+

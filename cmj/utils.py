@@ -54,18 +54,19 @@ def get_celery_worker_status():
     active_tasks = i.active()
     scheduled_tasks = i.scheduled()
     result = {
-        'availability': availability,
-        'stats': stats,
-        'registered_tasks': registered_tasks,
-        'active_tasks': active_tasks,
-        'scheduled_tasks': scheduled_tasks
+        'availability': availability or {},
+        'stats': stats or {},
+        'registered_tasks': registered_tasks or {},
+        'active_tasks': active_tasks or {},
+        'scheduled_tasks': scheduled_tasks or {}
     }
     return result
 
 
 def start_task(task_name, task, eta, expires=86400):
 
-    s_tasks = get_celery_worker_status().get('scheduled_tasks', [])
+    s_tasks = get_celery_worker_status().get('scheduled_tasks', {})
+
     s_tasks = [t['request']['name'] for k, v in s_tasks.items() for t in v if 'request' in t and 'name' in t['request']]
 
     if task_name not in s_tasks:
