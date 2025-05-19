@@ -22,11 +22,13 @@
 
 {% block actions %}
 {{ block.super }}
-  <div class="bg-white rounded">
-    {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materia_materialegislativa-list'  %}
+  {% if show_results %}
+    <div class="bg-white rounded">
+      {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materia_materialegislativa-list'  %}
       {% include "crud/format_options.html" %}
-    {% endwith %}
-  </div>
+      {% endwith %}
+    </div>
+  {% endif %}
 {% endblock %}
 
 {% block extra_content %} {% endblock %}
