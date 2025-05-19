@@ -43,7 +43,8 @@ INSTALLED_APPS = (
     'haystack',
     'django_celery_results',
     'celery_haystack',
-
+    'django_celery_beat',
+    
     # 'whoosh',
     # 'speedinfo',
     # 'taggit',

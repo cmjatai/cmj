@@ -1,4 +1,4 @@
-FROM leandrojatai/portalcmj:base.0004
+FROM leandrojatai/portalcmj:base.0005
 
 # TODO:
 #    A imagem gerada a partir deste dockerfile
@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED=1
 
 RUN mkdir -p /var/cmjatai/cmj/run
 RUN mkdir -p /var/cmjatai/cmj/logs/celery
-RUN mkdir -p /var/cmjatai/cmj_data 
+RUN mkdir -p /var/cmjatai/cmj_data
 RUN mkdir -p /var/cmjatai/cmj_media
 RUN mkdir -p /var/cmjatai/BD_POSTGRESQL
 
@@ -23,9 +23,11 @@ WORKDIR ${HOME}
 # instalados na imagem base
 #COPY requirements/requirements.txt $HOME
 #RUN pip install -r /var/cmjatai/cmj/requirements.txt
+RUN pip install django-celery-beat==2.8.1
 
 COPY requirements/ia-requirements.txt $HOME
 RUN pip install -r ia-requirements.txt
+
 
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts

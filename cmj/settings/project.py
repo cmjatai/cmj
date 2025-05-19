@@ -16,6 +16,8 @@ from .logs import *
 from .medias import *
 from .middleware import *
 
+
+
 host = socket.gethostbyname_ex(socket.gethostname())[0]
 
 config = AutoConfig()
@@ -130,11 +132,14 @@ CHANNEL_LAYERS = {
 
 CELERY_BROKER_URL = 'redis://{}:{}'.format(REDIS_HOST, REDIS_PORT)
 CELERY_RESULT_BACKEND = 'django-db'
-CELERY_CACHE_BACKEND = 'default'
+CELERY_RESULT_EXTENDED = True
 
-#CELERY_ACCEPT_CONTENT = ['application/json']
-#CELERY_RESULT_SERIALIZER = 'json'
-#CELERY_TASK_SERIALIZER = 'json'
+CELERY_CACHE_BACKEND = 'default'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'America/Sao_Paulo'
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
 
 CACHES = {

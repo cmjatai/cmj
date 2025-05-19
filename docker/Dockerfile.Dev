@@ -14,6 +14,7 @@ RUN pip install -r requirements.txt
 
 #RUN pip install pgvector
 #RUN pip install sentence-transformers
+RUN pip install django-celery-beat==2.8.1
 
 ENV HOME=/var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj

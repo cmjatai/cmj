@@ -40,11 +40,11 @@ class AppConfig(apps.AppConfig):
         if 'sqlite3' in settings.DATABASES['default']['ENGINE']:
             return
 
-        time_sleep = 60 + random.randint(0, 300)
+        #time_sleep = 60 + random.randint(0, 300)
 
-        logger.info(f'Iniciando task_analise_similaridade_entre_materias em {time_sleep} segundos')
-        start_task(
-            'sapl.base.tasks.task_analise_similaridade_entre_materias',
-            task_analise_similaridade_entre_materias,
-            timezone.now() + timezone.timedelta(seconds=120)
-        )
+        #logger.info(f'Iniciando task_analise_similaridade_entre_materias em {time_sleep} segundos')
+        #start_task(
+        #    'sapl.base.tasks.task_analise_similaridade_entre_materias',
+        #    task_analise_similaridade_entre_materias,
+        #    timezone.now() + timezone.timedelta(seconds=120)
+        #)

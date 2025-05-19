@@ -194,17 +194,17 @@ def task_analise_similaridade_entre_materias_function():
 @cmj_celery_app.task(queue='cq_base', bind=True)
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
 
-    restart = start_task(
-        'sapl.base.tasks.task_analise_similaridade_entre_materias',
-        task_analise_similaridade_entre_materias,
-        timezone.now() + timezone.timedelta(seconds=120)
-    )
+    #restart = start_task(
+    #    'sapl.base.tasks.task_analise_similaridade_entre_materias',
+    #    task_analise_similaridade_entre_materias,
+    #    timezone.now() + timezone.timedelta(seconds=120)
+    #)
 
-    if restart:
-        logger.info('Executando...')
-        try:
-            task_analise_similaridade_entre_materias_function()
-            pass
-        except Exception as e:
-            logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
+    #if restart:
+    logger.info('Executando...')
+    try:
+        task_analise_similaridade_entre_materias_function()
+        pass
+    except Exception as e:
+        logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
 
