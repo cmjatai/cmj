@@ -1529,7 +1529,7 @@ class AnaliseSimilaridade(models.Model):
     class Meta:
         verbose_name = _('Análise de Similaridade')
         verbose_name_plural = _('Análises de Similaridade')
-        ordering = ['id']
+        ordering = ['-data_analise', '-qtd_assuntos_comuns']
 
     def __str__(self):
         return _('Matéria 1: %(materia_1)s'

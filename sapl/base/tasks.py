@@ -97,7 +97,7 @@ def task_classifica_materialegislativa_function():
                     materia=obj
                 )
             obj.save()
-            
+
         task_analise_similaridade_entre_materias_function(only_materia_id=mid)
 
 
@@ -125,7 +125,7 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
 
     hoje = timezone.now()
 
-    def gera_registros_de_analise_vazios(materia_id=None):
+    def gera_registros_de_analise_vazios():
         # gera registros de analise com similaridade -1
         # para todas as materias que não possuem analise
         requerimentos = MateriaLegislativa.objects.filter(
@@ -191,28 +191,39 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             analise.save()
         return
 
+    q = Q()
     if only_materia_id:
-        gera_registros_de_analise_vazios(only_materia_id)
+        gera_registros_de_analise_vazios()
+        q = Q(
+            Q(materia_1_id=only_materia_id) | Q(materia_2_id=only_materia_id)
+        )
 
 
-    # recupera uma analise gerada no dia para enviar a ia.
     analise = AnaliseSimilaridade.objects.filter(
+        q,
         similaridade = -1,
-        data_analise__date__gte=(hoje-timedelta(days=7)).date(),
-    ).order_by('-data_analise', '-qtd_assuntos_comuns').first()
+        qtd_assuntos_comuns__gt=0,
+        data_analise__gte=(hoje-timedelta(days=7)),
+    ).first()
 
     if not analise:
         # recupera uma analise para enviar a ia.
         analise = AnaliseSimilaridade.objects.filter(
             similaridade = -1,
-        ).order_by('-data_analise', '-qtd_assuntos_comuns').first()
+            qtd_assuntos_comuns__gt=0
+        ).first()
 
     if not analise:
         gera_registros_de_analise_vazios()
-        analise = AnaliseSimilaridade.objects.filter(similaridade = -1).first()
+        analise = AnaliseSimilaridade.objects.filter(
+            similaridade = -1
+        ).first()
+
 
     if not analise:
         return
+
+
 
     gen = IAAnaliseSimilaridadeService()
     analise = gen.run(analise)
@@ -241,6 +252,5 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
         return json.dumps({
             'materia_1_id': analise.materia_1_id,
             'materia_2_id': analise.materia_2_id,
-            'analise': display(Markdown(analise.analise))
         })
 
