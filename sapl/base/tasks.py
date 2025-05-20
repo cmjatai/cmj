@@ -97,6 +97,8 @@ def task_classifica_materialegislativa_function():
                     materia=obj
                 )
             obj.save()
+            
+        task_analise_similaridade_entre_materias_function(only_materia_id=mid)
 
 
 
@@ -121,7 +123,7 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
     if not legislatura_atual:
         return
 
-    hoje = timezone.now().date()
+    hoje = timezone.now()
 
     def gera_registros_de_analise_vazios(materia_id=None):
         # gera registros de analise com similaridade -1
@@ -229,6 +231,7 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
 
     #if restart:
     logger.info('Executando...')
+    analise = None
     try:
         analise = task_analise_similaridade_entre_materias_function()
     except Exception as e:
