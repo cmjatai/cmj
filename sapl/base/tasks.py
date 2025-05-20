@@ -1,4 +1,6 @@
+from IPython.display import Markdown, display
 
+import json
 from tracemalloc import start
 from cmj.celery import app as cmj_celery_app
 from cmj.utils import start_task
@@ -113,14 +115,16 @@ def task_classifica_materialegislativa(self, *args, **kwargs):
         timezone.now() + timezone.timedelta(seconds=120)
     )
 
-def task_analise_similaridade_entre_materias_function():
+def task_analise_similaridade_entre_materias_function(only_materia_id=None):
     # Função para analisar a similaridade entre matérias
 
     legislatura_atual = Legislatura.cache_legislatura_atual()
     if not legislatura_atual:
         return
 
-    def gera_registros_de_analise_vazios():
+    def gera_registros_de_analise_vazios(materia_id=None):
+        # gera registros de analise com similaridade -1
+        # para todas as materias que não possuem analise
         requerimentos = MateriaLegislativa.objects.filter(
             tipo_id=3, ano__gte=legislatura_atual['data_inicio'].year, ano__lte=legislatura_atual['data_fim'].year
         ).prefetch_related('autores', 'assuntos'
@@ -190,6 +194,8 @@ def task_analise_similaridade_entre_materias_function():
     gen = IAAnaliseSimilaridadeService()
     gen.run(analise)
 
+    return analise
+
 
 @cmj_celery_app.task(queue='cq_base', bind=True)
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
@@ -203,8 +209,14 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
     #if restart:
     logger.info('Executando...')
     try:
-        task_analise_similaridade_entre_materias_function()
-        pass
+        analise = task_analise_similaridade_entre_materias_function()
     except Exception as e:
         logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
+
+    if analise:
+        return json.dumps({
+            'materia_1_id': analise.materia_1_id,
+            'materia_2_id': analise.materia_2_id,
+            'analise': display(Markdown(analise.analise))
+        })
 
