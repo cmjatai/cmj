@@ -1,10 +1,9 @@
+from datetime import timedelta
 from IPython.display import Markdown, display
 
 import json
-from tracemalloc import start
 from cmj.celery import app as cmj_celery_app
 from cmj.utils import start_task
-from sapl import materia
 from sapl.base.email_utils import do_envia_email_tramitacao
 from sapl.materia.models import AnaliseSimilaridade, AssuntoMateria, MateriaAssunto, StatusTramitacao, UnidadeTramitacao, MateriaLegislativa
 from sapl.parlamentares.models import Legislatura
@@ -122,11 +121,15 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
     if not legislatura_atual:
         return
 
+    hoje = timezone.now().date()
+
     def gera_registros_de_analise_vazios(materia_id=None):
         # gera registros de analise com similaridade -1
         # para todas as materias que não possuem analise
         requerimentos = MateriaLegislativa.objects.filter(
-            tipo_id=3, ano__gte=legislatura_atual['data_inicio'].year, ano__lte=legislatura_atual['data_fim'].year
+            tipo_id=3,
+            ano__gte=legislatura_atual['data_inicio'].year,
+            ano__lte=legislatura_atual['data_fim'].year
         ).prefetch_related('autores', 'assuntos'
                         ).order_by('-id').distinct()
 
@@ -173,26 +176,44 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
         requerimentos_comparados = sorted(requerimentos_comparados.items(), key=lambda x: len(x[1]), reverse=True)
 
         for i, r in enumerate(requerimentos_comparados):
+            if only_materia_id and r[0][0] != only_materia_id:
+                continue
             analise, created = AnaliseSimilaridade.objects.get_or_create(
                 materia_1_id=r[0][0],
                 materia_2_id=r[0][1],
             )
+            if created:
+                analise.data_analise = hoje
+
             analise.qtd_assuntos_comuns = len(r[1])
             analise.save()
         return
 
-    # recupera uma analise para enviar a ia.
+    if only_materia_id:
+        gera_registros_de_analise_vazios(only_materia_id)
+
+
+    # recupera uma analise gerada no dia para enviar a ia.
     analise = AnaliseSimilaridade.objects.filter(
-        similaridade = -1
-    ).order_by('-qtd_assuntos_comuns').first()
+        similaridade = -1,
+        data_analise__date__gte=(hoje-timedelta(days=7)).date(),
+    ).order_by('-data_analise', '-qtd_assuntos_comuns').first()
+
+    if not analise:
+        # recupera uma analise para enviar a ia.
+        analise = AnaliseSimilaridade.objects.filter(
+            similaridade = -1,
+        ).order_by('-data_analise', '-qtd_assuntos_comuns').first()
+
     if not analise:
         gera_registros_de_analise_vazios()
         analise = AnaliseSimilaridade.objects.filter(similaridade = -1).first()
+
     if not analise:
         return
 
     gen = IAAnaliseSimilaridadeService()
-    gen.run(analise)
+    analise = gen.run(analise)
 
     return analise
 

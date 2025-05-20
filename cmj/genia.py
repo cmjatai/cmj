@@ -331,6 +331,7 @@ Não faça considerações adicionais e ou mesmo conclusão extra. Neste context
             logger.error(e)
             similaridade.similaridade = 0
         similaridade.save()
+        return similaridade
 
 
 
