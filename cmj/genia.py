@@ -307,11 +307,11 @@ Não faça considerações adicionais e ou mesmo conclusão extra. Neste context
         mat1 = similaridade.materia_1
         mat2 = similaridade.materia_2
 
-        doc1 = pymupdf.open(mat1.texto_original.path)
+        doc1 = pymupdf.open(mat1.texto_original.original_path)
         text1 = ' '.join([page.get_text() for page in doc1])
         text1 = clean_text(text1)
 
-        doc2 = pymupdf.open(mat2.texto_original.path)
+        doc2 = pymupdf.open(mat2.texto_original.original_path)
         text2 = ' '.join([page.get_text() for page in doc2])
         text2 = clean_text(text2)
 
