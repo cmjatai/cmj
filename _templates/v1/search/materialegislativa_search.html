@@ -3,6 +3,14 @@
 {% load common_cmj_tags highlight %}
 {% load common_tags sigad_filters  %}
 
+    {% block head_content %}
+
+      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+      <script type="module" src="/static/js/dashboard.js"></script>
+
+    {% endblock %}
+
+
 {% block title %}
   <h1 class="page-header d-flex bg-red text-white container-search justify-content-between" >
     Pesquisar Matérias Legislativas
@@ -45,6 +53,7 @@
       </div>
       <div class="col-12 col-md-8">
         {% crispy form %}
+        {% include 'core/dashboard.html' %}
       </div>
       <div class="col-12 col-md-4 " style="border-left: 1px solid white;">
         {% if tipos_autores_materias %}

@@ -29,6 +29,7 @@ django-celery-beat==2.8.1
 #celery-haystack==0.10
 
 git+https://github.com/LeandroJatai/celery-haystack.git
+git+https://github.com/LeandroJatai/django-dashboard.git
 
 pymupdf==1.25.1
 pymupdf4llm==0.0.17
