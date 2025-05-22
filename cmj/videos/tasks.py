@@ -142,4 +142,4 @@ def task_pull_youtube(self, *args, **kwargs):
 
     start_task('cmj.videos.tasks.task_pull_youtube_live',
                task_pull_youtube_live,
-               now + timedelta(seconds=20))
+               now + timedelta(seconds=20)) 

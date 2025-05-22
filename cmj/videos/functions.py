@@ -148,7 +148,7 @@ def pull_youtube():
                   '&publishedAfter={}'
                   '&publishedBefore={}'
                   '&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
-                  '&part=snippet,id&order=date&maxResults=50')
+                  '&part=snippet,id&order=date&type=video&maxResults=50')
 
     now = timezone.now()
 
@@ -176,6 +176,7 @@ def pull_youtube():
             p = PullExec()
             p.pull = pull
             p.quota = 100
+            p.data_exec = timezone.localtime()
             p.save()
 
             r = None

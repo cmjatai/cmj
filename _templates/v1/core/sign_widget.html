@@ -17,7 +17,9 @@
             </span>
             <small class="sig-data">
               {% if data|islist %}
-                Assinado em: {{data.0|parse_datetime|date:"DATETIME_FORMAT" }}
+                {% if data.0 %}
+                  Assinado em: {{data.0|parse_datetime|date:"DATETIME_FORMAT" }}
+                {% endif %}
                 <br><small>{{data.1}}</small>
               {% else %}
                 Assinado em: {{data|parse_datetime|date:"DATETIME_FORMAT" }}
