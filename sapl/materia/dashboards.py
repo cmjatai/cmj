@@ -6,8 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class MateriaDashboard(Dashcard):
-    title = _('Distribuição das Matérias por Assunto')
-    description = _('Distribuição das matérias por assunto')
+    title = _('Distribuição de Requerimentos por Assunto')
+    description = _('Distribuição de Requerimentos por assunto')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
     label_field = "assuntos__assunto"
@@ -15,7 +15,7 @@ class MateriaDashboard(Dashcard):
 
     datasets = [
         {
-        "label": _("Qtd. de Matérias para o Assunto"),
+        "label": _("Qtd. de Requerimentos para o Assunto"),
         "data_field": ("assuntos", Count)
         }
     ]
