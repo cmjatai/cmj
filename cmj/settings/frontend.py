@@ -45,6 +45,8 @@ TEMPLATES = [
                 'sapl.context_processors.parliament_info',
                 'sapl.context_processors.mail_service_configured',
 
+                'dashboard.context_processors.dashboard',
+
             ],
             'loaders': [
                 'cmj.utils.CmjLoader',
