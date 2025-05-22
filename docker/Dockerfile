@@ -21,9 +21,8 @@ ENV HOME=/var/cmjatai/cmj
 WORKDIR ${HOME}
 
 # instalados na imagem base
-#COPY requirements/requirements.txt $HOME
-#RUN pip install -r /var/cmjatai/cmj/requirements.txt
-RUN pip install django-celery-beat==2.8.1
+COPY requirements/requirements.txt $HOME
+RUN pip install -r /var/cmjatai/cmj/requirements.txt
 
 COPY requirements/ia-requirements.txt $HOME
 RUN pip install -r ia-requirements.txt
