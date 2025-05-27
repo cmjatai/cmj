@@ -1,0 +1,31 @@
+{% load i18n %}
+<div class="table-responsive">
+  <table class="table table-sm table-hover">
+    <thead>
+      <tr>
+        <th>
+          {{ label_name|default:_("Label")}}
+        </th>
+        {% for label in labels %}
+          <th>{{ label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody class="table-group-divider">
+      {% for dataset in datasets %}
+        <tr>
+          <th>{{ dataset.label }}</th>
+          {% if dataset.data.values %} {# Dicionário #}
+            {% for value in dataset.data.values %}
+              <td>{{ value }}</td>
+            {% endfor %}
+          {% else %} {# Lista #}
+            {% for value in dataset.data %}
+              <td>{{ value }}</td>
+            {% endfor %}
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
