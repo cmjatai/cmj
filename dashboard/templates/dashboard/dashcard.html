@@ -1,0 +1,46 @@
+{% load i18n %}
+<div class="card">
+  <div class="card-header">
+    <div class="d-flex flex-row">
+      <div class="me-auto">{{ card.title }}</div>
+      {% if card.export_formats %}
+        <div class="dropdown">
+          <a class="dropdown-toggle me-1" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="{% translate "Exportar" %}"><i class="bi bi-box-arrow-down"><span class="visually-hidden">{% translate "Exportar" %}</span></i></a>
+          <ul class="dropdown-menu">
+            {% for fmt, label, contenttype in card.export_formats %}
+              <li>
+                <a class="export-link dropdown-item" href="{{ card.url }}?export={{ fmt }}" data-chart-target="#{{ card.dash_name|slugify }}_{% if card.chart_type == card.TYPE_HTML %}html{% else %}chart{% endif %}">
+                  <i class="bi bi-filetype-{{ fmt }}"></i> {{ label }}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card-body">
+    {% if filter %}
+      <form action="{{ card.url }}" role="chart-filter" data-chart-target="#{{ card.dash_name|slugify }}_{% if card.chart_type == card.TYPE_HTML %}html{% else %}chart{% endif %}">
+        {{ filter.form }}
+      </form>
+    {% endif %}
+    {% if previous_page or next_page %}
+      <nav aria-label="Chart navigation">
+        <ul class="pagination pagination-sm">
+          <li class="page-item{% if previous_page is None %} disabled{% endif %}">
+            <a class="page-link dash-nav previous" {% if previous_page %}href="{{ card.url }}?{{ previous_page }}"{% endif %} aria-label="{% translate "Previous" %}" data-chart-target="#{{ card.dash_name|slugify }}_{% if card.chart_type == card.TYPE_HTML %}html{% else %}chart{% endif %}"><span aria-hidden="true">&laquo;</span></a>
+          </li>
+          <li class="page-item{% if next_page is None %} disabled{% endif %}">
+            <a class="page-link dash-nav next" {% if next_page %}href="{{ card.url }}?{{ next_page }}"{% endif %} aria-label="{% translate "Next" %}" data-chart-target="#{{ card.dash_name|slugify }}_{% if card.chart_type == card.TYPE_HTML %}html{% else %}chart{% endif %}"><span aria-hidden="true">&raquo;</span></a>
+          </li>
+        </ul>
+      </nav>
+    {% endif %}
+    {% if card.chart_type == card.TYPE_HTML %}
+      <div id="{{ card.dash_name|slugify }}_html" data-url="{{ card.url }}"></div>
+    {% else %}
+      <canvas id="{{ card.dash_name|slugify }}_chart" data-url="{{ card.url }}"></canvas>
+    {% endif %}
+  </div>
+</div>
