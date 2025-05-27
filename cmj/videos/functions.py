@@ -297,6 +297,17 @@ def vincular_sistema_aos_videos():
                                     i.titulo = v.titulo
                                     i.descricao = v.json['snippet']['description']
                                     i.save()"""
+
+                            if isinstance(i, Documento):
+                                if i.visibilidade == Documento.STATUS_PRIVATE and i.classe_id == 233:
+                                    time_created = timezone.localtime() - i.created
+                                    if time_created < timedelta(days=3):
+                                        continue
+                                    i.delete()
+                                    vp.delete()
+                                    v.delete()
+
+
                             continue
 
                         vp = VideoParte()
