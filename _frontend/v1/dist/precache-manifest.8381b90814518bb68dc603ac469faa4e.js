@@ -460,6 +460,10 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/construct.0d44f4b6.js"
   },
   {
+    "revision": "8e82868ffb4c2a267257f2fb2aa633f8",
+    "url": "/static/js/dashboard_custom.js"
+  },
+  {
     "revision": "5501762945e6bad86732",
     "url": "/static/js/loa.cf977957.js"
   },
