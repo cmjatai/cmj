@@ -17,7 +17,6 @@ from cmj.videos.models import Video, PullExec
 logger = logging.getLogger(__name__)
 
 
-
 @app.task(queue='cq_videos', bind=True)
 def task_pull_youtube_geral(*args, **kwargs):
 
@@ -28,7 +27,9 @@ def task_pull_youtube_geral(*args, **kwargs):
     if v:
         print(f'TASK GERAL {v.id} {v.vid} {v.created} {v.modified}')
         try:
-            v = pull_youtube_metadata_video(v)
+            v, executado = pull_youtube_metadata_video(v)
+            if not executado:
+                return
             logger.info(
                 f'TASK GERAL {v.id} {v.vid} {v.created} {v.modified}')
         except:
@@ -49,7 +50,9 @@ def task_pull_youtube_live(*args, **kwargs):
         for v in live:
             print(f'TASK LIVE {v.id} {v.vid} {v.created} {v.modified}')
             try:
-                v = pull_youtube_metadata_video(v)
+                v, executado = pull_youtube_metadata_video(v)
+                if not executado:
+                    continue
                 logger.info(f'TASK LIVE {v.id} {v.vid} {v.created} {v.modified}')
             except:
                 pass
@@ -72,7 +75,9 @@ def task_pull_youtube_upcoming(*args, **kwargs):
         for v in upcoming:
             print(f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
             try:
-                v = pull_youtube_metadata_video(v)
+                v, executado = pull_youtube_metadata_video(v)
+                if not executado:
+                    continue
                 logger.info(
                     f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
                 liveBroadcastContent = v.json['snippet']['liveBroadcastContent']
@@ -81,6 +86,7 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                     f'TASK UPCOMING ERROR {v.id} {v.vid} {v.created} {v.modified}')
                 logger.error(
                     f'TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}')
+                continue
 
             if liveBroadcastContent == 'live':
                 start_task('cmj.videos.tasks.task_pull_youtube_live',
@@ -142,4 +148,4 @@ def task_pull_youtube(self, *args, **kwargs):
 
     start_task('cmj.videos.tasks.task_pull_youtube_live',
                task_pull_youtube_live,
-               now + timedelta(seconds=20)) 
+               now + timedelta(seconds=20))

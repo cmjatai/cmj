@@ -35,6 +35,12 @@ def pull_youtube_metadata_video(v):
 
     #'&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
 
+    if v.content_object and \
+            isinstance(v.content_object, Documento) and \
+            v.content_object.visibilidade == Documento.STATUS_PRIVATE:
+        print(f'Video {v.vid} is private, skipping metadata pull.')
+        return v, False
+
     if not DEBUG_TASKS:
         url = url_search.format(
             settings.GOOGLE_URL_API_NEW_KEY,
@@ -46,12 +52,12 @@ def pull_youtube_metadata_video(v):
         data = rr._content.decode('utf-8')
         if rr.status_code != 200:
             print(rr.status_code)
-            return
+            return v, False
 
         r = json.loads(data)
         if 'items' not in r:
             print(r)
-            return
+            return v, False
 
         if rr.status_code == 200 and not r['items']:
 
@@ -63,7 +69,7 @@ def pull_youtube_metadata_video(v):
                         d.delete()
                 vp.delete()
             v.delete()
-            return
+            return v, False
 
         v.json = r['items'][0]
 
@@ -111,7 +117,7 @@ def pull_youtube_metadata_video(v):
                     dp.extra_data = v.json
                     dp.save()
 
-    return v
+    return v, True
 
 
 def update_auto_now(m, disabled=True):
@@ -344,7 +350,7 @@ def video_documento_na_galeria():
         documento.tipo = Documento.TD_VIDEO_NEWS
         documento.template_doc = 1
         documento.owner_id = 1
-        documento.visibilidade = Documento.STATUS_PUBLIC
+        documento.visibilidade = Documento.STATUS_PRIVATE
 
         documento.extra_data = v.json
         documento.save()
