@@ -16,7 +16,7 @@ def front_version():
     elif FRONTEND_VERSION == 'v4':
         return ['_templates/v4', '_templates/v1']
 
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting' 
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 
 TEMPLATES = [
@@ -45,7 +45,7 @@ TEMPLATES = [
                 'sapl.context_processors.parliament_info',
                 'sapl.context_processors.mail_service_configured',
 
-                'dashboard.dashboard.context_processors.dashboard',
+                'cmj.dashboard.context_processors.dashboard',
 
             ],
             'loaders': [

@@ -45,7 +45,6 @@ INSTALLED_APPS = (
     'celery_haystack',
     'django_celery_beat',
 
-    'dashboard',
 
     # 'whoosh',
     # 'speedinfo',
@@ -87,6 +86,8 @@ CMJ_APPS = (
     'cmj.sigad',
     'cmj.search',
     'cmj.api',
+
+    'cmj.dashboard',
 )
 
 RULES_APPS = (

@@ -30,7 +30,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls.conf import re_path, include
 from django.views.generic.base import TemplateView
-from dashboard.dashboard.registry import dashboard
+from cmj.dashboard.registry import dashboard
 
 
 import cmj.agenda.urls

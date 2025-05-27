@@ -1,5 +1,5 @@
 
-from dashboard.dashboard import Dashcard
+from cmj.dashboard import Dashcard
 from django.db.models import Count
 from sapl.materia.models import MateriaLegislativa
 from django.utils.translation import gettext_lazy as _
