@@ -1,6 +1,7 @@
 import logging
 import socket
 import sys
+import os
 
 from decouple import AutoConfig
 from dj_database_url import parse as db_url
@@ -15,7 +16,6 @@ from .languages import *
 from .logs import *
 from .medias import *
 from .middleware import *
-
 
 
 host = socket.gethostbyname_ex(socket.gethostname())[0]

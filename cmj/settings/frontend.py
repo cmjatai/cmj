@@ -12,11 +12,11 @@ PROJECT_DIR = Path(__file__).ancestor(3)
 
 def front_version():
     if FRONTEND_VERSION == 'v1':
-        return ['_templates/v1']
+        return ['_templates/v1', 'dashboard/dashboard/templates',]
     elif FRONTEND_VERSION == 'v4':
         return ['_templates/v4', '_templates/v1']
 
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting' 
 
 
 TEMPLATES = [
@@ -45,7 +45,7 @@ TEMPLATES = [
                 'sapl.context_processors.parliament_info',
                 'sapl.context_processors.mail_service_configured',
 
-                'dashboard.context_processors.dashboard',
+                'dashboard.dashboard.context_processors.dashboard',
 
             ],
             'loaders': [

@@ -1,9 +1,0 @@
-from .dashboard import Dashcard, getcolor
-
-__all__ = ["Dashcard", "getcolor"]
-
-
-# TODO: django-dashboard foi adicionado ao projeto,
-# até a criação do dashboard com vários cards e filtro global.
-# Depois de implementado, retornar para o projeto original e commitar em:
-# https://github.com/LeandroJatai/django-dashboard
