@@ -1,0 +1,8 @@
+global:
+  scrape_interval:  5s  # Define o intervalo de scrape para 5 segundos. O padrão é a cada 1 minuto.
+  evaluation_interval:  5s  # Avalia as regras a cada 5 segundos. O padrão é a cada 1 minuto.
+
+scrape_configs:
+  - job_name:  "prometheus"
+    static_configs:
+      -  targets: [ "cmj:9000" ]
