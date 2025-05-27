@@ -187,7 +187,7 @@ def pull_youtube():
 
             r = None
 
-            if not DEBUG_TASKS:
+            if True or not DEBUG_TASKS:
                 url = url_search.format(
                     settings.GOOGLE_URL_API_NEW_KEY,
                     pageToken,
@@ -215,6 +215,15 @@ def pull_youtube():
             for i in r['items']:
 
                 if not 'videoId' in i['id']:
+                    continue
+
+                if not 'snippet' in i:
+                    continue
+
+
+                channelTitle = i['snippet'].get('channelTitle', '')
+
+                if channelTitle != 'Câmara Municipal Jataí':
                     continue
 
                 qs = Video.objects.filter(vid=i['id']['videoId'])
