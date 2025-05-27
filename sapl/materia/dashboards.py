@@ -4,6 +4,51 @@ from django.db.models import Count
 from sapl.materia.models import MateriaLegislativa
 from django.utils.translation import gettext_lazy as _
 
+from django_filters import FilterSet, ChoiceFilter
+
+from sapl.utils import choice_anos_com_materias
+
+class MateriaFilterSet(FilterSet):
+
+    ano = ChoiceFilter(
+        required=False,
+        label='Ano das Matérias',
+        choices=choice_anos_com_materias)
+
+    class Meta:
+        model = MateriaLegislativa
+        fields = {
+            'ano': ['exact', ],
+        }
+
+
+class MateriaTotalizer: #(Dashcard):
+    title = _('Total de Matérias Legislativas')
+    chart_type = Dashcard.TYPE_HTML
+    model = MateriaLegislativa
+    label_field = "id", Count
+    label_name = _("Requerimentos")
+
+    filterset = MateriaFilterSet
+
+    datasets = [
+        {
+            "label": _("Qtd. de Requerimentos"),
+            "data_field": ("id", Count)
+        }
+    ]
+
+    def get_datasets(self, request, queryset=None):
+        return [
+            {
+                "data": [
+                    queryset.count()
+                    ]
+            }
+        ]
+
+    def get_labels(self, request, queryset=None):
+        return ['{}'.format(self.label_name)]
 
 class MateriaDashboard(Dashcard):
     title = _('Distribuição de Requerimentos por Assunto')
@@ -23,38 +68,6 @@ class MateriaDashboard(Dashcard):
         "scales": {"x": {"stacked": True}, "y": {"stacked": True}},
         "plugins": {"tooltip": {"mode": "index"}},
     }
-    """chart_options = {
-        "legend": {
-            "display": True,
-            "position": "right",
-            "labels": {
-                "fontSize": 12,
-                "padding": 20
-            }
-        },
-        "title": {
-            "display": True,
-            "text": 'Distribuição das Matérias por Assunto',
-            "fontSize": 16,
-            "padding": 20
-        },
-        "responsive": True,
-        "maintainAspectRatio": False,
-        "aspectRatio": 1,
-        "cutoutPercentage": 70,
-        "animation": {
-            "animateScale": True,
-            "animateRotate": True
-        },
-        "tooltips": {
-            "enabled": True,
-            "mode": 'index',
-            "intersect": False,
-            "callbacks": {
-                "label": lambda tooltipItem, data: f"{data['labels'][tooltipItem['index']]}: {tooltipItem['yLabel']}"
-            }
-        }
-    }"""
 
     def get_datasets(self, request, queryset=None):
         ds = super().get_datasets(request, queryset)
