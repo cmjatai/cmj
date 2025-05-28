@@ -58,11 +58,14 @@
       <div class="col-12 col-md-8">
 
         {% crispy form %}
+
         <hr>
-        {% include 'core/dashboard.html' %}
+        {{ dashboard.dash_sets.materiasearchdashboard }}
+
         <small class="text-black-50">
-          OBS: Classificação de Assuntos automatizada. Feita pela Inteligência Artificial Gemini 2.0.
+          OBS: Classificação de Assuntos é automatizada. Feita pela Inteligência Artificial Gemini 2.0.
         </small>
+
       </div>
       <div class="col-12 col-md-4 " style="border-left: 1px solid white;">
         {% if tipos_autores_materias %}

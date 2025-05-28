@@ -13,7 +13,7 @@
     "@fortawesome/fontawesome-free": "^5.14.0",
     "@tinymce/tinymce-vue": "^3.2.0",
     "autosize": "^4.0.2",
-    "axios": "^1.7.7",
+    "axios": "^1.9.0",
     "axios-progress-bar": "^1.2.0",
     "bootstrap": "^4.5.2",
     "bootstrap-icons": "^1.11.3",

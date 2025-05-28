@@ -1,8 +1,8 @@
-from .dashboard import Dashcard, getcolor
+from .dashboard import FilterBaseDashboard, Dashcard, getcolor
 
 default_app_config = 'dashboard.apps.DashboardConfig'
 
-__all__ = ["Dashcard", "getcolor"]
+__all__ = ["Dashcard", "getcolor", "FilterBaseDashboard"]
 
 
 # TODO: django-dashboard foi adicionado ao projeto,
