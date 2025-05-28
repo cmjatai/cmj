@@ -1,35 +1,58 @@
 
-from cmj.dashboard import Dashcard
-from django.db.models import Count
-from sapl.materia.models import MateriaLegislativa
-from django.utils.translation import gettext_lazy as _
+import re
 
-from django_filters import FilterSet, ChoiceFilter
+from django import forms
+from cmj.dashboard import Dashcard, FilterBaseDashboard
+from django.db.models import Count
+from sapl.materia.forms import CHOICE_TRAMITACAO
+from sapl.materia.models import AssuntoMateria, MateriaLegislativa
+from django.utils.translation import gettext_lazy as _
+from django_filters.views import FilterView
+from django_filters import FilterSet, CharFilter, ChoiceFilter, ModelMultipleChoiceFilter
 
 from sapl.utils import choice_anos_com_materias
 
 class MateriaFilterSet(FilterSet):
 
-    ano = ChoiceFilter(
+    ano_i = ChoiceFilter(
         required=False,
+        field_name='ano',
         label='Ano das Matérias',
         choices=choice_anos_com_materias)
 
+    assuntos_is = ModelMultipleChoiceFilter(
+        required=False,
+        field_name='materiaassunto__assunto',
+        queryset=AssuntoMateria.objects.all(),
+        label=_('Assunto'))
+
+    em_tramitacao_b = ChoiceFilter(
+        required=False,
+        field_name='em_tramitacao',
+        label=_('Em tramitação'),
+        choices=CHOICE_TRAMITACAO
+    )
+
+    autoria_is = CharFilter(
+        required=False,
+        field_name='autoria__autor',
+        widget=forms.HiddenInput(attrs={'id': 'id_autoria__autor'}))
+
     class Meta:
         model = MateriaLegislativa
-        fields = {
-            'ano': ['exact', ],
+        fields = { 
         }
 
 
-class MateriaTotalizer: #(Dashcard):
+
+class MateriaTotalizer(Dashcard):
     title = _('Total de Matérias Legislativas')
     chart_type = Dashcard.TYPE_HTML
     model = MateriaLegislativa
     label_field = "id", Count
     label_name = _("Requerimentos")
 
-    filterset = MateriaFilterSet
+    render_filterset = False
 
     datasets = [
         {
@@ -57,6 +80,8 @@ class MateriaDashboard(Dashcard):
     model = MateriaLegislativa
     label_field = "assuntos__assunto"
     label_name = _("Assuntos")
+
+    render_filterset = False
 
     datasets = [
         {
@@ -87,7 +112,8 @@ class MateriaDashboard(Dashcard):
 
         # Sort the labels and datasets__data by datasets__data
         sorted_data = sorted(zip(labels, datasets__data), key=lambda x: x[1], reverse=True)
-        labels, datasets__data = zip(*sorted_data)
+        if sorted_data:
+            labels, datasets__data = zip(*sorted_data)
 
         # agrupa os dados da posição 20 em diante
         if len(labels) > 20:
@@ -103,3 +129,13 @@ class MateriaDashboard(Dashcard):
         cd['data']['datasets'][0]['data'] = datasets__data
 
         return cd
+
+
+class MateriaSearchDashboard(FilterBaseDashboard):
+    cards = [
+        MateriaTotalizer,
+        MateriaDashboard,
+    ]
+
+    filterset = MateriaFilterSet
+

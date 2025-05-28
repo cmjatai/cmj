@@ -1,0 +1,17 @@
+{% load i18n %}
+{% if filter and render_filterset %}
+  <form action="{{ card.url }}"
+    role="chart-global-filter"
+    data-chart-target="{{ dash.dashboard_name|slugify }}">
+    {{ filter.form }}
+  </form>
+{% endif %}
+
+<div class="row" id="{{ dash.dashboard_name }}">
+  {% for kclass, card in cards %}
+    <div class="col-12">
+      {{ card }}
+    </div>
+  {% endfor %}
+</div>
+

@@ -20,7 +20,7 @@
     </div>
   </div>
   <div class="card-body">
-    {% if filter %}
+    {% if filter and render_filterset %}
       <form action="{{ card.url }}" role="chart-filter" data-chart-target="#{{ card.dash_name|slugify }}_{% if card.chart_type == card.TYPE_HTML %}html{% else %}chart{% endif %}">
         {{ filter.form }}
       </form>

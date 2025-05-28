@@ -1,4 +1,5 @@
 import datetime
+from django import template
 import pandas as pd
 from collections import defaultdict, OrderedDict
 from random import randint, seed
@@ -46,6 +47,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
     title = ""
     model = None
     filterset = None
+    render_filterset = True
     label_field = None
     label_name = None
     datasets = None
@@ -233,15 +235,17 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         if self.template_name:
             template_names = [self.template_name]
         else:
+            default_name = 'dashboard_card' if self.dash_set else 'dashboard'
             template_names = [
                 f"dashboard/{self.app_config.label}/{self.dash_name}.html",
-                f"dashboard/{self.app_config.label}/dashcard.html",
-                f"dashboard/dashcard.html",
+                f"dashboard/{self.app_config.label}/{default_name}.html",
+                f"dashboard/{default_name}.html",
             ]
 
         context = {
             "card": self,
             "filter": self.get_filter(),
+            "render_filterset": self.render_filterset,
             "previous_page": self.get_prev_page(),
             "next_page": self.get_next_page(),
         }
@@ -356,3 +360,58 @@ class Dashcard(View, metaclass=MediaDefiningClass):
             return JsonResponse(data)
         else:
             return self.export_data(request, fmt=export)
+
+
+class FilterBaseDashboard(View, metaclass=MediaDefiningClass):
+    """
+    Classe base para dashboards que utilizam filtro compartilhado
+    entre os cards.
+    Pode ser utilizada para dashboards que possuem cards com filtros
+    diferentes, mas que compartilham o mesmo conjunto de filtros.
+    """
+    cards = []
+    template_name = None
+    filterset = None
+    render_filterset = True
+    app_config = None
+    get_filter = Dashcard.get_filter
+
+    def __init__(self, app_config, **kwargs):
+        self.app_config = app_config
+        self.cards = defaultdict(dict)
+        super().__init__(**kwargs)
+
+    def __str__(self):
+        return self.render()
+
+    @property
+    def dashboard_name(self):
+        return self.__class__.__name__.lower()
+
+    def get_extra_context(self, request=None):
+        """
+        Override this method in subclasses to provide extra template context
+        """
+        return {}
+
+    def render(self):
+        if self.template_name:
+            template_names = [self.template_name]
+        else:
+            template_names = [
+                f"dashboard/{self.app_config.label}/{self.dashboard_name}.html",
+                f"dashboard/{self.app_config.label}/dashboard.html",
+                f"dashboard/dashboard.html",
+            ]
+
+        context = {
+            "dash": self,
+            "cards": self.cards.items(),
+            "filter": self.get_filter(),
+            'render_filterset': self.render_filterset,
+            #"previous_page": self.get_prev_page(),
+            #"next_page": self.get_next_page(),
+        }
+
+        context.update(self.get_extra_context())
+        return render_to_string(template_names, context)

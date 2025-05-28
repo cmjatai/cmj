@@ -432,7 +432,7 @@ window.autorModal = function () {
 
       function clean_if_exists (fieldname) {
         if ($(fieldname).length > 0) {
-          $(fieldname).val('')
+          $(fieldname).val('').trigger('change')
         }
       }
 
@@ -499,7 +499,7 @@ window.autorModal = function () {
 
           // MateriaLegislativa pesquisa Autor via a tabela Autoria
           if ($('#id_autoria__autor').length) {
-            $('#id_autoria__autor').val(id)
+            $('#id_autoria__autor').val(id).trigger('change')
           }
           // Protocolo pesquisa a própria tabela de Autor
           if ($('#id_autor').length) {

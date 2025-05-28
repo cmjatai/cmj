@@ -6,7 +6,7 @@ from django.apps import apps
 from django.forms.widgets import MediaDefiningClass, Media
 from django.utils.module_loading import module_has_submodule
 from django.utils.safestring import mark_safe
-from .dashboard import Dashcard
+from .dashboard import Dashcard, FilterBaseDashboard
 
 DEFAULT_CHARTJS_URL = (
     "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
@@ -24,6 +24,16 @@ class Dashboard(metaclass=MediaDefiningClass):
 
     def __init__(self):
         dash_apps = defaultdict(dict)
+
+        dash_sets = defaultdict(dict)
+
+        dash_lists = defaultdict(dict)
+
+        is_dashs = (
+            lambda obj: isinstance(obj, type)
+            and issubclass(obj, FilterBaseDashboard)
+            and obj is not FilterBaseDashboard
+        )
         is_dash_card = (
             lambda obj: isinstance(obj, type)
             and issubclass(obj, Dashcard)
@@ -33,7 +43,22 @@ class Dashboard(metaclass=MediaDefiningClass):
             if module_has_submodule(app_config.module, "dashboards"):
                 dash_module = import_module(f"{app_config.name}.dashboards")
                 for name, klass in inspect.getmembers(dash_module, is_dash_card):
-                    dash_apps[app_config].update({klass: klass(app_config)})
+                    obj = klass(app_config)
+                    dash_apps[app_config].update({klass: obj})
+                    dash_lists[name].update({klass: obj})
+
+        for app_config in apps.get_app_configs():
+            if module_has_submodule(app_config.module, "dashboards"):
+                dash_module = import_module(f"{app_config.name}.dashboards")
+                for name, klass in inspect.getmembers(dash_module, is_dashs):
+                    dash_set = klass(app_config)
+                    dash_sets[name.lower()] = dash_set
+
+                    for card in klass.cards:
+                        card.filterset = dash_set.filterset if card.filterset is None else card.filterset
+                        card.dash_set = dash_set
+                        obj = dash_lists[card.__name__]
+                        dash_set.cards.update({card: obj[card]})
 
         ordered_apps = OrderedDict()
 
@@ -43,6 +68,7 @@ class Dashboard(metaclass=MediaDefiningClass):
                 ordered_apps[app][card] = dash_apps[app][card]
 
         self.dash_apps = ordered_apps
+        self.dash_sets = dash_sets
 
     def get_urls(self):
         return [
