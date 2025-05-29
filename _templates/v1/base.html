@@ -133,7 +133,11 @@
 
               {% block subtitle %}
                   {% if subtitle %}
-                    <em>{{ subtitle|safe|linebreaksbr }}</em>
+                    <h2 class="page-header p-0 px-4">
+                      <small><small>
+                        <em>{{ subtitle|safe|linebreaksbr }}</em>
+                      </small></small>
+                    </h2>
                   {% endif %}
               {% endblock %}
 

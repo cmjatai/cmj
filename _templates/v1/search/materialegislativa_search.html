@@ -1,6 +1,6 @@
 {% extends 'crud/detail.html' %}
 {% load i18n crispy_forms_tags cropping thumbnail  %}
-{% load common_cmj_tags highlight %}
+{% load common_cmj_tags highlight menus %}
 {% load common_tags sigad_filters  %}
 {% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
@@ -31,7 +31,9 @@
 {% endblock container_actions %}
 
 {% block actions %}
-{{ block.super }}
+
+  {{ block.super }}
+
   {% if show_results %}
     <div class="bg-white rounded">
       {% with url_reverse='cmj.search:materia_haystack_search' url_openapi='sapl.api:materia_materialegislativa-list'  %}
@@ -81,14 +83,10 @@
   {% else %}
 
   <div class="container-table">
-
-
     {% for result in page.object_list %}
-
       {% if forloop.first %}
         <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
       {% endif %}
-
         {% if result.object %}
 
           {% with result.object as m %}

@@ -20,8 +20,8 @@ logger = logging.getLogger(__name__)
 register = template.Library()
 
 
-@register.inclusion_tag('base_breadcrumb.html', takes_context=True)
-def breadcrumb(context):
+def breadcrumb_function(context):
+
     rcontext = {
         'classes': [],
         'request': context['request'],
@@ -44,6 +44,20 @@ def breadcrumb(context):
         rcontext['classes'] = breadcrumb_classes
     except:
         pass
+    filter_classes = list(filter(lambda x: hasattr(x, 'subtitle'), rcontext['classes']))
+    context.update({'breadcrumb_subtitle': filter_classes[-1].subtitle if filter_classes else ''})
+    return rcontext
+
+
+
+@register.inclusion_tag('base_breadcrumb.html', takes_context=True)
+def breadcrumb(context):
+    """Renderiza o breadcrumb do Sigad
+
+    O breadcrumb é renderizado a partir da variável
+    breadcrumb_classes no contexto.
+    """
+    rcontext = breadcrumb_function(context)
     return rcontext
 
 

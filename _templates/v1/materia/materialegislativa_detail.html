@@ -1,5 +1,5 @@
 {% extends "crud/detail.html" %}
-{% load i18n sigad_filters cropping common_cmj_tags %}
+{% load i18n sigad_filters cropping common_cmj_tags menus %}
 
 {% block head_title %}{{object}}{% endblock head_title %}
 {% block meta_description%}{{object.ementa}}{% endblock meta_description %}
@@ -43,6 +43,7 @@
     {% include 'core/sign_widget.html' %}
   {% endwith %}
   </div>
+  {{ breadcrumb_subtitle }}
 
 {% endblock title %}
 
