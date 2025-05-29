@@ -2,8 +2,10 @@
 {% if materia_expediente %}
 <fieldset>
   <legend>Matérias do Expediente</legend>
-      <table class="table">
-      {% for m in materia_expediente %}
+  {% for m in materia_expediente %}
+        {% if forloop.first %}
+          <table class="table">
+        {% endif %}
         <tr>
           <td class="item-listas">
             <div class="item-raiz">
@@ -25,8 +27,14 @@
             </div>
           </td>
         </tr>
+        {% if forloop.last %}
+          </table>
+        {% endif %}
+      {% empty %}
+        <tr>
+          <td colspan="2">Nenhuma matéria no expediente desta sessão.</td>
+        </tr>
       {% endfor %}
-      </table>
 </fieldset>
 <br>
 <br>

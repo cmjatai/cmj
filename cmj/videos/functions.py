@@ -10,21 +10,15 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
-from zmq import CHANNEL
-
 from cmj.sigad.models import Documento
 from cmj.videos.models import PullYoutube, Video, VideoParte, PullExec
 import requests as rq
-
 
 logger = logging.getLogger(__name__)
 
 DEBUG_TASKS = settings.DEBUG
 
 CHANNEL_ID = 'UCZXKjzKW2n1w4JQ3bYlrA-w'  # Câmara Municipal Jataí
-
-
-
 
 def pull_youtube_metadata_video(v, force=False):
 

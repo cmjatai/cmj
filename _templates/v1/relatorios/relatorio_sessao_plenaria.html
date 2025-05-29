@@ -43,6 +43,17 @@
       {% endif %}
     {% endfor%}
 
+    <h2 class="gray-title">Lista de Presença da Ordem do Dia</h2>
+    {% for membro in lst_presenca_ordem_dia%}
+      {% if forloop.first %}
+        <ul>
+      {% endif %}
+      <li>{{membro.nom_parlamentar}}/{{membro.sgl_partido}}</li>
+      {% if forloop.last %}
+        </ul>
+      {% endif %}
+    {% endfor%}
+
     {% comment %}
       <h2 class="gray-title">Justificativas de Ausência da Sessão</h2>
       <table class="grayTable">
@@ -74,59 +85,53 @@
 
 
   <h2 class="gray-title">Matérias do Expediente</h2>
-
-  <table class="grayTable">
-    <thead>
-      <tr>
-        <th>Matéria</th>
-        <th>Ementa</th>
-        <th>Resultado da Votação</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for materia in lst_expediente_materia%}
+  {% if lst_expediente_materia %}
+    <table class="grayTable">
+      <thead>
         <tr>
-          <td style="width: 5cm">
-            <dl>
-              <dt>
-                <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
-                  <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
-                </a>
-              </dt>
-              <dt><b>Turno:</b> {{materia.des_turno}}</dt>
-              <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
-            </dl>
-          </td>
-          <td>{{ materia.txt_ementa|safe }}</td>
-          <td style="width: 5cm; text-align: center;">
-            <b>{{ materia.nom_resultado }}</b><br>
-            <em>{{ materia.votacao_observacao }}</em>
-          </td>
+          <th>Matéria</th>
+          <th>Ementa</th>
+          <th>Resultado da Votação</th>
         </tr>
+      </thead>
+      <tbody>
+        {% for materia in lst_expediente_materia%}
+          <tr>
+            <td style="width: 5cm">
+              <dl>
+                <dt>
+                  <a href="{{"SITE_URL"|settings_key_filter}}{% url 'sapl.materia:materialegislativa_detail' materia.id_materia %}">
+                    <b>{{materia.num_ordem}} - {{materia.epigrafe_materia}}</b>
+                  </a>
+                </dt>
+                <dt><b>Turno:</b> {{materia.des_turno}}</dt>
+                <dt><b>{{materia.num_autores}}:</b> {{materia.nom_autor}}</dt>
+              </dl>
+            </td>
+            <td>{{ materia.txt_ementa|safe }}</td>
+            <td style="width: 5cm; text-align: center;">
+              <b>{{ materia.nom_resultado }}</b><br>
+              <em>{{ materia.votacao_observacao }}</em>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% if lst_expediente_materia %}
+      <h2 class="gray-title">Matérias Anexadas</h2>
+      {% for materia in lst_expediente_materia %}
+        {% for anexada in materia.materia.anexadas.all %}
+          <p>{{anexada}}</p>
+        {% endfor %}
       {% endfor %}
-    </tbody>
-  </table>
+    {% else %}
+      <p>Nenhuma matéria anexada nesta sessão.</p>
+    {% endif %}
 
-  {% comment %}
-    <h2 class="gray-title">Oradores do Expediente</h2>
-
-    {% for orador in lst_oradores_expediente%}
-      <tr>
-        <p> <b>{{orador.num_ordem}}</b> - {{orador.nom_parlamentar}}/{{orador.sgl_partido}}</p>
-      </tr>
-    {% endfor %}
-  {% endcomment %}
-
-    <h2 class="gray-title">Lista de Presença da Ordem do Dia</h2>
-    {% for membro in lst_presenca_ordem_dia%}
-      {% if forloop.first %}
-        <ul>
-      {% endif %}
-      <li>{{membro.nom_parlamentar}}/{{membro.sgl_partido}}</li>
-      {% if forloop.last %}
-        </ul>
-      {% endif %}
-    {% endfor%}
+  {% else %}
+    <p>Nenhuma matéria no expediente desta sessão.</p>
+  {% endif %}
 
     <h2 class="gray-title">Matérias da Ordem do Dia</h2>
 

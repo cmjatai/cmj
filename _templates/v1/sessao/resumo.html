@@ -8,35 +8,67 @@
 
 
 {% block title %}
-	<h1 class="page-header">
-		Resumo <small><small>({{sessaoplenaria}})</small></small>
-	</h1>
+  <h1 class="page-header">
+    Resumo <small><small>({{sessaoplenaria}})</small></small>
+  </h1>
 {% endblock %}
 
-{% block container_actions %}
+{% block actions %}
+<div>
+  <a class="btn btn-sm btn-outline-primary" href="{%url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}" class="">Fazer nova Pesquisa</a>
+</div>
+<div>
+  {% if sessaoplenaria.upload_ata %}
+    <a class="link-texto btn btn-primary btn-sm page-preview m-0 mr-3" href="{{sessaoplenaria.upload_ata.url}}?u={% now "u"%}" title="Ata Aprovada">
+      <strong>
+        Ata Aprovada
+      </strong>
+      <div class="preview">
+        <span class="p-5">
+          Carregando imagem da primeira página da ata da sessão...
+        </span>
+        <img loading="lazy" src="{{sessaoplenaria.upload_ata.url}}?page=1&dpi=200&u={% now "u"%}" title="" alt="Preview da Primeira Página do Documento... Clique para abrir o PDF completo" class="img-fluid">
+      </div>
+    </a>
+  {% elif not sessaoplenaria.finalizada %}
+    <a class="link-texto btn btn-sm btn-info m-0 mr-3" href="{% url 'sapl.sessao:pauta_sessao_detail' sessaoplenaria.id %}" title="Pauta da Sessão">
+      <small><em>
+        Pauta da Sessão
+      </em>
+      </small>
+    </a>
+  {% else %}
+    {% if sessaoplenaria.finalizada %}
+      <a class="link-texto btn btn-sm btn-success m-0 mr-3" href="{% url 'sapl.sessao:resumo_ata' sessaoplenaria.id %}" title="Resgistro Automático das votações, prazos e presença.">
+        <small><em>
+          Ata Eletrônica
+        </em>
+        </small>
+      </a>
+      {% endif %}
+    {% endif %}
+</div>
+<div>
+    <a class="btn btn-primary" href="{% url 'sapl.relatorios:relatorio_sessao_plenaria_pdf' sessaoplenaria.pk %}">
+    PDF
+    </a>
+</div>
 {% endblock %}
 
 {% block detail_content %}
-<div>
-	<p align="right" class="pt-4">
-		<strong>
-			<a href="{% url 'sapl.relatorios:relatorio_sessao_plenaria_pdf' sessaoplenaria.pk %}">
-				Impressão PDF
-			</a>
-		</strong>
-	</p>
 
-</div>
-
-	{% include 'sessao/blocos_resumo/'|add:primeiro_ordenacao %}
-
+    {% include 'sessao/blocos_resumo/'|add:primeiro_ordenacao %}
     {% include 'sessao/blocos_resumo/'|add:segundo_ordenacao %}
-
     {% include 'sessao/blocos_resumo/'|add:terceiro_ordenacao %}
 
-    {% include 'sessao/blocos_resumo/'|add:quarto_ordenacao %}
-
-    {% include 'sessao/blocos_resumo/'|add:quinto_ordenacao %}
+    <div class="row">
+        <div class="col-12 col-md-6">
+            {% include 'sessao/blocos_resumo/'|add:quarto_ordenacao %}
+        </div>
+        <div class="col-12 col-md-6">
+            {% include 'sessao/blocos_resumo/'|add:quinto_ordenacao %}
+        </div>
+    </div>
 
     {% include 'sessao/blocos_resumo/'|add:sexto_ordenacao %}
 
