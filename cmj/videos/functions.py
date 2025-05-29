@@ -10,6 +10,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+from zmq import CHANNEL
 
 from cmj.sigad.models import Documento
 from cmj.videos.models import PullYoutube, Video, VideoParte, PullExec
@@ -20,8 +21,15 @@ logger = logging.getLogger(__name__)
 
 DEBUG_TASKS = settings.DEBUG
 
+CHANNEL_ID = 'UCZXKjzKW2n1w4JQ3bYlrA-w'  # Câmara Municipal Jataí
 
-def pull_youtube_metadata_video(v):
+
+
+
+def pull_youtube_metadata_video(v, force=False):
+
+    if not force and DEBUG_TASKS:
+        return v, False
 
     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     headers = {}
@@ -35,43 +43,41 @@ def pull_youtube_metadata_video(v):
 
     #'&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
 
-    if v.content_object and \
-            isinstance(v.content_object, Documento) and \
-            v.content_object.visibilidade == Documento.STATUS_PRIVATE:
-        print(f'Video {v.vid} is private, skipping metadata pull.')
+    channelId = v.json.get('snippet', {}).get('channelId', '')
+    if channelId != CHANNEL_ID:
+        print(f'Video {v.vid} is not from the expected channel, skipping metadata pull.')
         return v, False
 
-    if not DEBUG_TASKS:
-        url = url_search.format(
-            settings.GOOGLE_URL_API_NEW_KEY,
-            v.vid
-        )
+    url = url_search.format(
+        settings.GOOGLE_URL_API_NEW_KEY,
+        v.vid
+    )
 
-        rr = rq.get(url, headers=headers)
+    rr = rq.get(url, headers=headers)
 
-        data = rr._content.decode('utf-8')
-        if rr.status_code != 200:
-            print(rr.status_code)
-            return v, False
+    data = rr._content.decode('utf-8')
+    if rr.status_code != 200:
+        print(rr.status_code)
+        return v, False
 
-        r = json.loads(data)
-        if 'items' not in r:
-            print(r)
-            return v, False
+    r = json.loads(data)
+    if 'items' not in r:
+        print(r)
+        return v, False
 
-        if rr.status_code == 200 and not r['items']:
+    if rr.status_code == 200 and not r['items']:
 
-            for vp in v.videoparte_set.all():
-                if isinstance(vp.content_object, Documento):
-                    d = vp.content_object
+        for vp in v.videoparte_set.all():
+            if isinstance(vp.content_object, Documento):
+                d = vp.content_object
 
-                    if d.classe_id == 233:
-                        d.delete()
-                vp.delete()
-            v.delete()
-            return v, False
+                if d.classe_id == 233:
+                    d.delete()
+            vp.delete()
+        v.delete()
+        return v, False
 
-        v.json = r['items'][0]
+    v.json = r['items'][0]
 
     now = timezone.now()
 
@@ -141,7 +147,10 @@ def update_auto_now(m, disabled=True):
                 dua.auto_now_add = dua._auto_now_add
 
 
-def pull_youtube():
+def pull_youtube(force=False):
+
+    if not force and DEBUG_TASKS:
+        return
 
     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     headers = {}
@@ -153,7 +162,7 @@ def pull_youtube():
                   '&pageToken={}'
                   '&publishedAfter={}'
                   '&publishedBefore={}'
-                  '&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
+                  '&channelId={}'
                   '&part=snippet,id&order=date&type=video&maxResults=50')
 
     now = timezone.now()
@@ -187,19 +196,19 @@ def pull_youtube():
 
             r = None
 
-            if True or not DEBUG_TASKS:
-                url = url_search.format(
-                    settings.GOOGLE_URL_API_NEW_KEY,
-                    pageToken,
-                    publishedAfter,
-                    publishedBefore
-                )
+            url = url_search.format(
+                settings.GOOGLE_URL_API_NEW_KEY,
+                pageToken,
+                publishedAfter,
+                publishedBefore,
+                CHANNEL_ID
+            )
 
-                r = rq.get(url, headers=headers)
+            r = rq.get(url, headers=headers)
 
-                data = r._content.decode('utf-8')
+            data = r._content.decode('utf-8')
 
-                r = json.loads(data)
+            r = json.loads(data)
 
             pageToken = None
 
@@ -221,9 +230,9 @@ def pull_youtube():
                     continue
 
 
-                channelTitle = i['snippet'].get('channelTitle', '')
+                ichannelId = i['snippet'].get('channelId', '')
 
-                if channelTitle != 'Câmara Municipal Jataí':
+                if ichannelId != CHANNEL_ID:
                     continue
 
                 qs = Video.objects.filter(vid=i['id']['videoId'])
@@ -256,9 +265,9 @@ def pull_youtube():
     update_auto_now(Video, disabled=False)
 
 
-def vincular_sistema_aos_videos():
+def vincular_sistema_aos_videos(force=False):
 
-    if DEBUG_TASKS:
+    if not force and DEBUG_TASKS:
         return
 
     videos = Video.objects.order_by('-created')
@@ -335,10 +344,11 @@ def vincular_sistema_aos_videos():
                         pass
 
 
-def video_documento_na_galeria():
-
-    if DEBUG_TASKS:
+def video_documento_na_galeria(force=False):
+    if not force and DEBUG_TASKS:
         return
+
+    update_auto_now(Documento, disabled=False)
 
     videos = Video.objects.order_by('-created')
 
@@ -370,7 +380,7 @@ def video_documento_na_galeria():
         documento.tipo = Documento.TD_VIDEO_NEWS
         documento.template_doc = 1
         documento.owner_id = 1
-        documento.visibilidade = Documento.STATUS_PRIVATE
+        documento.visibilidade = Documento.STATUS_PUBLIC
 
         documento.extra_data = v.json
         documento.save()
