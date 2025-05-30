@@ -507,19 +507,30 @@
           display: inline-block;
           position: absolute;
           top: 0;
-          background-color: lighten($color_primary, 60%);
+          background-color: lighten($color_primary, 55%);
           color: $text_color_thematic;
           right: 100%;
-          margin: 2px 1px;
+          margin: 4px 3px;
           font-family: "Roboto Condensed";
           line-height: 1;
           font-size: 0.8em;
-          padding: 2px 2px 1px 5px;
+          padding: 1px 2px 0px 3px;
           border-radius: 3px;
+          &:empty {
+            border-radius: 50%;
+            padding: 5px;
+            background-color: #ccc;
+            margin: 7px;
+          }
         }
         &:hover {
           .item-atricon {
-            background-color: $color_primary;
+            background-color: lighten($color_primary, 35%);
+          }
+          li:hover {
+            .item-atricon {
+              background-color: $color_primary;
+            }
           }
         }
       }

@@ -21,9 +21,7 @@
                   {% for item in classe|list_in_informacao %}
                     {% if item.visibilidade == 0 %}
                       <li class="item-sic">
-                        {% if item.atricon %}
-                          <span class="item-atricon" title="Código na Matriz Atricon">{{item.atricon}}</span>
-                        {% endif %}
+                          <span class="item-atricon" title="Código na Matriz Atricon">{{item.atricon|default:""}}</span>
                         <div>
                           <a href="/{{item.absolute_slug}}">{{item.apelido|default:item.titulo}}
                             {% if item.descricao %}
@@ -41,6 +39,7 @@
                             <ul>
                           {% endif %}
                             <li class="item-sic">
+                              <span class="item-atricon" title="Código na Matriz Atricon">{{child.atricon|default:""}}</span>
                               <div>
                                 <a href="/{{child.absolute_slug}}">{{child.apelido|default:child.titulo}}
                                   {% if child.descricao %}
