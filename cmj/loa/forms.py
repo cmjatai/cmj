@@ -26,7 +26,7 @@ import yaml
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
     Agrupamento, quantize
-from cmj.utils import normalize
+from cmj.utils import normalize, DecimalField
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
@@ -35,35 +35,6 @@ from sapl.utils import FileFieldCheckMixin, parlamentares_ativos
 
 logger = logging.getLogger(__name__)
 
-
-class DecimalInput(TextInput):
-
-    def get_context(self, name, value, attrs):
-        context = TextInput.get_context(self, name, value, attrs)
-        widget = context.get('widget', None)
-        attrs = widget.get('attrs', None) if widget else None
-        if attrs:
-            css_class = attrs.get('class', '')
-            attrs.update({
-                'class': f'{css_class} text-right'
-            })
-        return context
-
-
-class DecimalField(forms.DecimalField):
-    widget = DecimalInput
-
-    def to_python(self, value):
-        if value and '.' in value and ',' in value:
-            if value.rindex(',') > value.rindex('.'):
-                value = value.replace('.', '').replace(',', '.')
-            else:
-                value = value.replace(',', '')
-        elif value and ',' in value:
-            value = value.replace(',', '.')
-
-        value = forms.DecimalField.to_python(self, value)
-        return value
 
 
 class MateriaCheckFormMixin:

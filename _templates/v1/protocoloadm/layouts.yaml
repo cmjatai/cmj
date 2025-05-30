@@ -17,7 +17,7 @@ DocumentoAdministrativo:
   - documento_principal_set__documento_anexado|m2m_urlize_for_detail
 
   {% trans 'Outras Informações' %}:
-  - data_vencimento dias_prazo data_fim_prazo
+  - data_vencimento valor_estimado dias_prazo data_fim_prazo
   - numero_externo
   - observacao
 

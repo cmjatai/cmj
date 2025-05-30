@@ -479,14 +479,23 @@ class CertidaoPublicacaoCrud(Crud):
     DeleteView = None
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ['id', 'created',
-                            'content_type', 'content_object', 'signs']
+        list_field_names = [
+            'id', 'created',
+            ('content_object', 'diariooficial'),
+            'signs',
+
+        ]
 
         @property
         def create_url(self):
             return ''
 
     class ListView(Crud.ListView):
+
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            #ctx['fluid'] = '-fluid'
+            return ctx
 
         def has_permission(self):
             return True
@@ -495,6 +504,18 @@ class CertidaoPublicacaoCrud(Crud):
 
         def split_bylen(self, item, maxlen):
             return [item[ind:ind + maxlen] for ind in range(0, len(item), maxlen)]
+
+        def hook_header_diariooficial(self, **kwargs):
+            return 'Diário Oficial'
+
+        def hook_diariooficial(self, *args, **kwargs):
+            obj = args[0].content_object
+            if not obj.diariooficial:
+                return args[1], args[2]
+            url = obj.diariooficial.arquivo.url
+            return '<hr class="divider"><a href="%s" target="_blank"><small>%s</small></a>' % (
+                url, obj.diariooficial), args[2]
+
 
         def hook_header_signs(self, **kwargs):
             return 'Assinaturas Digitais'

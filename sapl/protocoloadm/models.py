@@ -314,6 +314,10 @@ class DocumentoAdministrativo(CommonMixin):
     data_fim_prazo = models.DateField(
         blank=True, null=True, verbose_name=_('Data Fim Prazo'))
 
+    valor_estimado = models.DecimalField(
+        max_digits=15, decimal_places=2, blank=True, null=True,
+        verbose_name=_('Valor Estimado'))
+
     data_vencimento = models.DateField(
         blank=True, null=True, verbose_name=_('Data de Vencimento'))
 
@@ -654,7 +658,7 @@ class Anexado(models.Model):
         verbose_name = _('Anexado')
         verbose_name_plural = _('Anexados')
         ordering = ('-data_anexacao',
-                    '-documento_anexado___certidao__created')
+                    'id')
 
     def __str__(self):
         return _('Anexado: %(documento_anexado_tipo)s %(documento_anexado_numero)s'

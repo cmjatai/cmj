@@ -1415,6 +1415,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             'numero',
             'ano',
             'data',
+            'valor_estimado',
             'numero_protocolo',
             'ano_protocolo',
             'assunto',
@@ -1615,7 +1616,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             [('tipo', 5), ('numero', 2), ('ano', 2), ('visibilidade', 3)])
 
         row2 = to_row(
-            [('data', 3), ('data_vencimento', 3), ('numero_protocolo', 3), ('ano_protocolo', 3)])
+            [('data', 2), ('data_vencimento', 2), ('valor_estimado', 3), ('numero_protocolo', 3), ('ano_protocolo', 2)])
 
         row2_5 = to_row(
             [('epigrafe', 12)])

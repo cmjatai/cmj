@@ -9,6 +9,8 @@ import re
 import ssl
 import subprocess
 import threading
+from django import forms
+from django.forms import TextInput
 import magic
 
 from bs4 import BeautifulSoup as bs4
@@ -770,3 +772,33 @@ class AlertSafe(Alert):
     def __init__(self, content, dismiss=True, block=False, css_id=None, css_class=None, template=None, **kwargs):
         super().__init__(SafeString(content), dismiss,
                          block, css_id, css_class, template, **kwargs)
+
+
+class DecimalInput(TextInput):
+
+    def get_context(self, name, value, attrs):
+        context = TextInput.get_context(self, name, value, attrs)
+        widget = context.get('widget', None)
+        attrs = widget.get('attrs', None) if widget else None
+        if attrs:
+            css_class = attrs.get('class', '')
+            attrs.update({
+                'class': f'{css_class} text-right'
+            })
+        return context
+
+class DecimalField(forms.DecimalField):
+    widget = DecimalInput
+
+    def to_python(self, value):
+        if value and '.' in value and ',' in value:
+            if value.rindex(',') > value.rindex('.'):
+                value = value.replace('.', '').replace(',', '.')
+            else:
+                value = value.replace(',', '')
+        elif value and ',' in value:
+            value = value.replace(',', '.')
+
+        value = forms.DecimalField.to_python(self, value)
+        return value
+

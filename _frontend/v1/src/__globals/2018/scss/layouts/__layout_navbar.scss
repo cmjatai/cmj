@@ -560,6 +560,7 @@
           line-height: 1.3;
           color: $color_text_title;
           font-style: italic;
+          z-index: 1;
         }
         &:hover {
           .sic-descricao {
