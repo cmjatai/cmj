@@ -749,6 +749,8 @@ class Classe(ShortUrl, CMSMixin):
 
     codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
 
+    atricon = models.CharField(verbose_name=_('Atricon'), max_length=10, default='')
+
     perfil = models.IntegerField(
         _('Perfil da Classe'),
         choices=PERFIL_CLASSE,
@@ -760,7 +762,7 @@ class Classe(ShortUrl, CMSMixin):
         default=DOC_TEMPLATES_CHOICE.noticia)
 
     tipo_doc_padrao = models.IntegerField(
-        _('Tipo Padrão para Documentos desta Classe'),
+        _('Tipo Padrão para Docs da Classe'),
         choices=CMSMixin.tipo_parte_doc['documentos'],
         default=CMSMixin.TD_DOC)
 

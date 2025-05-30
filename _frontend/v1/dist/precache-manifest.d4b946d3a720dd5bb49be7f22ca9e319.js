@@ -28,43 +28,43 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/brasao/escola_1024.png"
   },
   {
-    "revision": "dd844015595f74d69604",
-    "url": "/static/css/app.e9fdca2a.css"
+    "revision": "a8e803473a4af029b55b",
+    "url": "/static/css/app.ec923b30.css"
   },
   {
-    "revision": "1fa7b3643c50ea10c033",
+    "revision": "49911938808fa9681cdb",
     "url": "/static/css/chunk-185bce9d.e32376be.css"
   },
   {
-    "revision": "f660c6d062541f1a8373",
+    "revision": "9dbf3b2cff17b2c1e31f",
     "url": "/static/css/chunk-2f6a5bb1.dcab6d0b.css"
   },
   {
-    "revision": "c4a642bf8e40dc174c41",
+    "revision": "e6bf12a805b0dda64705",
     "url": "/static/css/chunk-5fb8b196.2316f325.css"
   },
   {
-    "revision": "35a3d28b024a50f8a4e7",
+    "revision": "b37eff5e6f73f4ffc991",
     "url": "/static/css/chunk-6452ad7c.4af96183.css"
   },
   {
-    "revision": "abaea912316e4cbcaa94",
+    "revision": "ecdf80276fa919310e71",
     "url": "/static/css/chunk-6f0ff250.55478430.css"
   },
   {
-    "revision": "3269d240a8c2af476eea",
+    "revision": "2bf715ccbeb7a2441027",
     "url": "/static/css/chunk-ad6ab1be.043a2397.css"
   },
   {
-    "revision": "504fa6c6e8f84dd1eaa7",
+    "revision": "ca1f33a697222c947b10",
     "url": "/static/css/chunk-b91e4dd4.e4842490.css"
   },
   {
-    "revision": "4f6d8c2d0931feb949cd",
+    "revision": "0ad4922eb1677529da03",
     "url": "/static/css/chunk-d67dac4a.245afcfd.css"
   },
   {
-    "revision": "f38c46d5195342fc2efb",
+    "revision": "97fcb6827be02bac2677",
     "url": "/static/css/chunk-vendors.3ff36de3.css"
   },
   {
@@ -72,7 +72,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/compilacao.b83dffc4.css"
   },
   {
-    "revision": "d90cd0ec4db9a0ddfaf7",
+    "revision": "c355e7e0ee989d2bb0dd",
     "url": "/static/css/construct.475dffe8.css"
   },
   {
@@ -392,72 +392,72 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "5c563272e1fa4e362c7e547fdb2450f4",
+    "revision": "12817acaf25513a8ff904cf330608c54",
     "url": "/static/index.html"
   },
   {
-    "revision": "dd844015595f74d69604",
-    "url": "/static/js/app.d1f86981.js"
+    "revision": "a8e803473a4af029b55b",
+    "url": "/static/js/app.2b743e67.js"
   },
   {
-    "revision": "1fa7b3643c50ea10c033",
-    "url": "/static/js/chunk-185bce9d.858adc33.js"
+    "revision": "49911938808fa9681cdb",
+    "url": "/static/js/chunk-185bce9d.e8cd2559.js"
   },
   {
-    "revision": "d92b46b6f74576c307ad",
-    "url": "/static/js/chunk-2d0cb66a.24032a5e.js"
+    "revision": "6928ee0fb17e48db3d47",
+    "url": "/static/js/chunk-2d0cb66a.713f5c86.js"
   },
   {
-    "revision": "755947d5fb62e43e1a40",
-    "url": "/static/js/chunk-2d216bf1.7929e368.js"
+    "revision": "c1b0248cc1293c5507de",
+    "url": "/static/js/chunk-2d216bf1.79e29fc5.js"
   },
   {
-    "revision": "f660c6d062541f1a8373",
-    "url": "/static/js/chunk-2f6a5bb1.5b95a56b.js"
+    "revision": "9dbf3b2cff17b2c1e31f",
+    "url": "/static/js/chunk-2f6a5bb1.22021926.js"
   },
   {
     "revision": "44b5acb4faa716a9b102",
     "url": "/static/js/chunk-47a0da7e.7d1f8c45.js"
   },
   {
-    "revision": "c4a642bf8e40dc174c41",
-    "url": "/static/js/chunk-5fb8b196.6b43ef0e.js"
+    "revision": "e6bf12a805b0dda64705",
+    "url": "/static/js/chunk-5fb8b196.53a195fd.js"
   },
   {
-    "revision": "35a3d28b024a50f8a4e7",
-    "url": "/static/js/chunk-6452ad7c.634520ba.js"
+    "revision": "b37eff5e6f73f4ffc991",
+    "url": "/static/js/chunk-6452ad7c.90c07e94.js"
   },
   {
-    "revision": "abaea912316e4cbcaa94",
-    "url": "/static/js/chunk-6f0ff250.18ef9c83.js"
+    "revision": "ecdf80276fa919310e71",
+    "url": "/static/js/chunk-6f0ff250.879e1bf0.js"
   },
   {
-    "revision": "f1bbc8e3d324899c5a4e",
-    "url": "/static/js/chunk-7a782422.51ee371d.js"
+    "revision": "46662cfa67cf0ddcbd74",
+    "url": "/static/js/chunk-7a782422.b2898455.js"
   },
   {
-    "revision": "3269d240a8c2af476eea",
-    "url": "/static/js/chunk-ad6ab1be.70c39b7a.js"
+    "revision": "2bf715ccbeb7a2441027",
+    "url": "/static/js/chunk-ad6ab1be.b46c35a7.js"
   },
   {
-    "revision": "504fa6c6e8f84dd1eaa7",
-    "url": "/static/js/chunk-b91e4dd4.533fa5ef.js"
+    "revision": "ca1f33a697222c947b10",
+    "url": "/static/js/chunk-b91e4dd4.71d5fadf.js"
   },
   {
-    "revision": "4f6d8c2d0931feb949cd",
-    "url": "/static/js/chunk-d67dac4a.b3d7a981.js"
+    "revision": "0ad4922eb1677529da03",
+    "url": "/static/js/chunk-d67dac4a.41deddc8.js"
   },
   {
-    "revision": "f38c46d5195342fc2efb",
-    "url": "/static/js/chunk-vendors.319f3059.js"
+    "revision": "97fcb6827be02bac2677",
+    "url": "/static/js/chunk-vendors.6288f84d.js"
   },
   {
     "revision": "8fc945c1945784fd820f",
     "url": "/static/js/compilacao.6a4edeb4.js"
   },
   {
-    "revision": "d90cd0ec4db9a0ddfaf7",
-    "url": "/static/js/construct.0d44f4b6.js"
+    "revision": "c355e7e0ee989d2bb0dd",
+    "url": "/static/js/construct.9048d9ed.js"
   },
   {
     "revision": "8e82868ffb4c2a267257f2fb2aa633f8",
@@ -544,39 +544,39 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/skins/content/writer/content.min.css"
   },
   {
-    "revision": "89e955439d816abf01d5be4f5c2306b6",
+    "revision": "a81f21dded3a28cd6a69e058482e9325",
     "url": "/static/js/skins/ui/oxide-dark/content.css"
   },
   {
-    "revision": "df1379ec74243abc6dc857b66a2693ea",
+    "revision": "b27b20c2f358404b2138fb51bd227990",
     "url": "/static/js/skins/ui/oxide-dark/content.inline.css"
   },
   {
-    "revision": "e13510efae0904ac38e3c4cb297c7184",
+    "revision": "cb77d29b0f7f21b50e80c842ba8612df",
     "url": "/static/js/skins/ui/oxide-dark/content.inline.js"
   },
   {
-    "revision": "94540af7ebbeae43ea448fc88916ebfd",
+    "revision": "a6c412072a15b50ad031a077d877e678",
     "url": "/static/js/skins/ui/oxide-dark/content.inline.min.css"
   },
   {
-    "revision": "58c96fb3225b9070a98695af123bf967",
+    "revision": "c5f12f08e0df261443c0c9b3fe4f790f",
     "url": "/static/js/skins/ui/oxide-dark/content.js"
   },
   {
-    "revision": "36cb4fc9ff5b2928afeefed50ea0bdc3",
+    "revision": "aa57b3161b164cd73df4db5205e08f4a",
     "url": "/static/js/skins/ui/oxide-dark/content.min.css"
   },
   {
-    "revision": "d11422d307d901cd2a7b1883f9eb5dde",
+    "revision": "b02cb5429aa20ec4e46aae8b262786f9",
     "url": "/static/js/skins/ui/oxide-dark/skin.css"
   },
   {
-    "revision": "db175e0e30c7d0a83a9da2d90d70b970",
+    "revision": "c6955fab969ecdb4f259ef05ddc12b94",
     "url": "/static/js/skins/ui/oxide-dark/skin.js"
   },
   {
-    "revision": "4eea65c2930d8cea6f47f17e49a66663",
+    "revision": "cde5978275cd657e1c3142fcc0834a62",
     "url": "/static/js/skins/ui/oxide-dark/skin.min.css"
   },
   {
@@ -592,39 +592,39 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/skins/ui/oxide-dark/skin.shadowdom.min.css"
   },
   {
-    "revision": "fba96f3698e33a459a54439e70ab7cd4",
+    "revision": "9d07f566e722dfe95f538778f481c868",
     "url": "/static/js/skins/ui/oxide/content.css"
   },
   {
-    "revision": "df1379ec74243abc6dc857b66a2693ea",
+    "revision": "b27b20c2f358404b2138fb51bd227990",
     "url": "/static/js/skins/ui/oxide/content.inline.css"
   },
   {
-    "revision": "7500db94fefd33633e81dfd228aa9d5f",
+    "revision": "de8c1cf867891f83538bd89d07d96358",
     "url": "/static/js/skins/ui/oxide/content.inline.js"
   },
   {
-    "revision": "94540af7ebbeae43ea448fc88916ebfd",
+    "revision": "a6c412072a15b50ad031a077d877e678",
     "url": "/static/js/skins/ui/oxide/content.inline.min.css"
   },
   {
-    "revision": "e6db01a152dc98207a62a9a1ad8e0ba1",
+    "revision": "989f816397edd4b304da863f48fda91c",
     "url": "/static/js/skins/ui/oxide/content.js"
   },
   {
-    "revision": "8938a7a1d13729b2083720b447e2bc99",
+    "revision": "821a32db5e28e6b996697e2e07626349",
     "url": "/static/js/skins/ui/oxide/content.min.css"
   },
   {
-    "revision": "a6cf520641a017bc218b7444231a6fec",
+    "revision": "ad61522bcbda78cfaf7c498ec8262940",
     "url": "/static/js/skins/ui/oxide/skin.css"
   },
   {
-    "revision": "730ef9234d7667d8608bc88d6dfb8fcb",
+    "revision": "a76b50e3459064ee98d212963136bd92",
     "url": "/static/js/skins/ui/oxide/skin.js"
   },
   {
-    "revision": "ca17ba180439c4e527f554d19c20e1ca",
+    "revision": "4c1369cf6083f903e3216a5124f15290",
     "url": "/static/js/skins/ui/oxide/skin.min.css"
   },
   {
@@ -640,39 +640,39 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/skins/ui/oxide/skin.shadowdom.min.css"
   },
   {
-    "revision": "3aa5b810b18528a64f7ea791b7117df8",
+    "revision": "88176b46d5b3cef7ed0dce3f9b2e7978",
     "url": "/static/js/skins/ui/tinymce-5-dark/content.css"
   },
   {
-    "revision": "df1379ec74243abc6dc857b66a2693ea",
+    "revision": "b27b20c2f358404b2138fb51bd227990",
     "url": "/static/js/skins/ui/tinymce-5-dark/content.inline.css"
   },
   {
-    "revision": "0c083e569943a12f6e15f97976103113",
+    "revision": "f0eb7e184865f7bc0720ccdc0e172729",
     "url": "/static/js/skins/ui/tinymce-5-dark/content.inline.js"
   },
   {
-    "revision": "94540af7ebbeae43ea448fc88916ebfd",
+    "revision": "a6c412072a15b50ad031a077d877e678",
     "url": "/static/js/skins/ui/tinymce-5-dark/content.inline.min.css"
   },
   {
-    "revision": "a7ed416616fdf315b71b0dfc6ebb53f7",
+    "revision": "ed1e7b7415d372ec3d6e01781b67e5fd",
     "url": "/static/js/skins/ui/tinymce-5-dark/content.js"
   },
   {
-    "revision": "e6e8625086a812fb56dff6fc24b52a1c",
+    "revision": "99f63ebfa6fa0e68c3a37d941d385151",
     "url": "/static/js/skins/ui/tinymce-5-dark/content.min.css"
   },
   {
-    "revision": "a6c72f18aeb12498d4b6842adf223315",
+    "revision": "d0da2845486c4b75e1063cfbceb87e96",
     "url": "/static/js/skins/ui/tinymce-5-dark/skin.css"
   },
   {
-    "revision": "8cf2f87cbdf2223caf1321a3da393a6b",
+    "revision": "9999bcdaef9d2d6647454dc92ce9810d",
     "url": "/static/js/skins/ui/tinymce-5-dark/skin.js"
   },
   {
-    "revision": "e66b862e6e7563af2f8788588ba465bf",
+    "revision": "259ccbe515d9596d0a839b67d59e1e66",
     "url": "/static/js/skins/ui/tinymce-5-dark/skin.min.css"
   },
   {
@@ -688,39 +688,39 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css"
   },
   {
-    "revision": "fba96f3698e33a459a54439e70ab7cd4",
+    "revision": "9d07f566e722dfe95f538778f481c868",
     "url": "/static/js/skins/ui/tinymce-5/content.css"
   },
   {
-    "revision": "df1379ec74243abc6dc857b66a2693ea",
+    "revision": "b27b20c2f358404b2138fb51bd227990",
     "url": "/static/js/skins/ui/tinymce-5/content.inline.css"
   },
   {
-    "revision": "49c1f9db748353d539ed23fa0f5bfe27",
+    "revision": "d3e81b6cf4bd844128775cc04035dcef",
     "url": "/static/js/skins/ui/tinymce-5/content.inline.js"
   },
   {
-    "revision": "94540af7ebbeae43ea448fc88916ebfd",
+    "revision": "a6c412072a15b50ad031a077d877e678",
     "url": "/static/js/skins/ui/tinymce-5/content.inline.min.css"
   },
   {
-    "revision": "7f19a974066223c0039dff35a35d32b4",
+    "revision": "c6f4441c116126ef1f299ccfdcbc733d",
     "url": "/static/js/skins/ui/tinymce-5/content.js"
   },
   {
-    "revision": "8938a7a1d13729b2083720b447e2bc99",
+    "revision": "821a32db5e28e6b996697e2e07626349",
     "url": "/static/js/skins/ui/tinymce-5/content.min.css"
   },
   {
-    "revision": "6232e54dc10aae91c439cc3efa113b5e",
+    "revision": "349974f70449a482750f5181a4fa7455",
     "url": "/static/js/skins/ui/tinymce-5/skin.css"
   },
   {
-    "revision": "a89156645ff55c24a948a0373eebda90",
+    "revision": "2da33d74c83d0c128ea2a2c55a8d80b6",
     "url": "/static/js/skins/ui/tinymce-5/skin.js"
   },
   {
-    "revision": "a0bf9d641c70cb85322e1b7a4b0676ab",
+    "revision": "1e616f9e05fac9163d97a9b296dc84fd",
     "url": "/static/js/skins/ui/tinymce-5/skin.min.css"
   },
   {

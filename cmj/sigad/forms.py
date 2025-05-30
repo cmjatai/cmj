@@ -48,17 +48,22 @@ class ClasseForm(ModelForm):
 
     parent = forms.ModelChoiceField(
         queryset=Classe.objects.all(),
-        label=_('Classse Ascendente'),
+        label=_('Classe Ascendente'),
         required=False)
 
     url_redirect = forms.CharField(
         label=Classe._meta.get_field('url_redirect').verbose_name,
         required=False)
 
+    atricon = forms.CharField(
+        label=Classe._meta.get_field('atricon').verbose_name,
+        required=False)
+
     class Meta:
         model = Classe
         fields = [
             'codigo',
+            'atricon',
             'titulo',
             'apelido',
             'visibilidade',
@@ -75,46 +80,49 @@ class ClasseForm(ModelForm):
             'list_in_menu',
             'menu_lateral',
             'url_redirect'
-
         ]
 
     def __init__(self, *args, **kwargs):
 
         row1 = to_row([
-            ('parent', 2),
-            ('codigo', 2),
-            ('titulo', 3),
-            ('apelido', 3),
-            ('perfil', 2),
+            ('visibilidade', 2),
+            ('parent', 3),
+            ('codigo', 1),
+            ('atricon', 1),
+            ('parlamentar', 2),
+            ('list_in_mapa', 3),
         ])
 
         row2 = to_row([
-            ('visibilidade', 2),
             ('template_classe', 3),
             ('tipo_doc_padrao', 3),
-            ('template_doc_padrao', 2),
-            ('parlamentar', 2),
+            ('template_doc_padrao', 3),
+            ('list_in_inf', 3),
+        ])
+        row3 = to_row([
+            ('perfil', 4),
+            ('url_redirect', 5),
+            ('list_in_menu', 3),
         ])
         row4 = to_row([
+            ('titulo', 4),
+            ('apelido', 5),
+            ('menu_lateral', 3),
             ('descricao', 12),
             ('subtitle', 12)
         ])
-        row3 = to_row([
-            ('list_in_mapa', 2),
-            ('list_in_inf', 2),
-            ('list_in_menu', 2),
-            ('menu_lateral', 2),
-            ('url_redirect', 4),
-        ])
 
         self.helper = FormHelper()
+        self.helper.attrs.update({
+            'class': 'form-compact'
+            })
         self.helper.layout = SaplFormLayout(
             Fieldset(_('Identificação Básica'),
                      row1, row2, row3, row4))
 
         super(ClasseForm, self).__init__(*args, **kwargs)
 
-        print(self.fields['parent'].choices)
+        #print(self.fields['parent'].choices)
 
         pc = []
 

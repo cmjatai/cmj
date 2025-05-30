@@ -500,7 +500,7 @@
   &:first-child, &:last-child {
     background-color: #00a65a;
   }
-  
+
   span {
     font-family: "Rubik";
     font-variant: small-caps;
@@ -573,6 +573,20 @@
     font-size: 0.9rem;
   }
 }
+
+.form-compact {
+  .row {
+    margin: 0 -3px;
+  }
+  div[class^="col-"] {
+    padding: 0 5px;
+  }
+  label {
+    margin: 0;
+  }
+}
+
+
 
 @media screen and (max-width: 1399.98px)  {
   .container-segmentos {

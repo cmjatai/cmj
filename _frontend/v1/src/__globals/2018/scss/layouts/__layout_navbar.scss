@@ -502,6 +502,27 @@
           right: 12px;
         }
       }
+      .subclasse-sic {
+        .item-atricon {
+          display: inline-block;
+          position: absolute;
+          top: 0;
+          background-color: lighten($color_primary, 60%);
+          color: $text_color_thematic;
+          right: 100%;
+          margin: 2px 1px;
+          font-family: "Roboto Condensed";
+          line-height: 1;
+          font-size: 0.8em;
+          padding: 2px 2px 1px 5px;
+          border-radius: 3px;
+        }
+        &:hover {
+          .item-atricon {
+            background-color: $color_primary;
+          }
+        }
+      }
     }
     &:hover {
       .popup-sic {
@@ -512,6 +533,7 @@
       }
     }
     .item-sic {
+      position: relative;
       a {
         & > .sic-descricao {
           display: none;
