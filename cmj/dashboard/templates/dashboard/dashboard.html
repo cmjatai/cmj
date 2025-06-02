@@ -1,17 +1,25 @@
-{% load i18n %}
-{% if filter and render_filterset %}
-  <form action="{{ card.url }}"
-    role="chart-global-filter"
-    data-chart-target="{{ dash.dashboard_name|slugify }}">
-    {{ filter.form }}
-  </form>
-{% endif %}
+{% load i18n crispy_forms_tags common_tags %}
+{% for row in grid.rows %}
+  <div class="row">
+    {% for cardname, size in row.cols %}
+      <div class="col-{{ size }}">
+        {% if cardname == '__filter__' %}
+          {% if filter and render_filterset %}
+            <form action="{{ card.url }}"
+              role="chart-global-filter"
+              data-chart-target="{{ dash.dashboard_name|slugify }}">
+              {{ filter.form|crispy}}
+            </form>
+          {% endif %}
+        {% elif cardname == '__empty__' %}
+            
+        {% else %}
+          {{ cards|lookup:cardname }}
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endfor %}
 
-<div class="row" id="{{ dash.dashboard_name }}">
-  {% for kclass, card in cards %}
-    <div class="col-12">
-      {{ card }}
-    </div>
-  {% endfor %}
-</div>
+
 

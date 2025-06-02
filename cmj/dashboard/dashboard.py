@@ -1,5 +1,5 @@
 import datetime
-from django import template
+from django.apps import apps
 import pandas as pd
 from collections import defaultdict, OrderedDict
 from random import randint, seed
@@ -370,13 +370,34 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
     diferentes, mas que compartilham o mesmo conjunto de filtros.
     """
     cards = []
+    grid = {}
     template_name = None
     filterset = None
     render_filterset = True
     app_config = None
-    get_filter = Dashcard.get_filter
 
-    def __init__(self, app_config, **kwargs):
+
+    def get_filter(self, data=None, queryset=None):
+        if self.filterset is None:
+            return None
+        filter =self.filterset(data=data, queryset=queryset)
+
+        return filter
+
+    def apply_filters(self, request, queryset):
+        filter = self.get_filter(data=request.GET, queryset=queryset)
+        if filter is not None:
+            queryset = filter.qs
+        return queryset
+
+
+    def __init__(self, app_config=None, **kwargs):
+        if app_config is None:
+            if self.app_config is None:
+                raise ImproperlyConfigured(
+                    "The app_config property must be defined"
+                )
+            app_config = apps.get_app_config(self.app_config)
         self.app_config = app_config
         self.cards = defaultdict(dict)
         super().__init__(**kwargs)
@@ -406,7 +427,8 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
 
         context = {
             "dash": self,
-            "cards": self.cards.items(),
+            "grid": self.grid,
+            "cards": {k: v[1] for k, v in self.cards.items()},
             "filter": self.get_filter(),
             'render_filterset': self.render_filterset,
             #"previous_page": self.get_prev_page(),
