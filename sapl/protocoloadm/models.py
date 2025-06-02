@@ -316,7 +316,7 @@ class DocumentoAdministrativo(CommonMixin):
 
     valor_estimado = models.DecimalField(
         max_digits=15, decimal_places=2, blank=True, null=True,
-        verbose_name=_('Valor Estimado'))
+        verbose_name=_('Valor Efetivo/Estimado'))
 
     data_vencimento = models.DateField(
         blank=True, null=True, verbose_name=_('Data de Vencimento'))

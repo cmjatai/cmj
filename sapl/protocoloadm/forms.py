@@ -17,7 +17,7 @@ import django_filters
 
 from cmj.core.models import AreaTrabalho
 from cmj.mixins import GoogleRecapthaMixin
-from cmj.utils import CHOICE_SIGNEDS, AlertSafe
+from cmj.utils import CHOICE_SIGNEDS, AlertSafe, DecimalField
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.crispy_layout_mixin import (SaplFormHelper, SaplFormLayout,
                                       form_actions, to_column, to_row)
@@ -1402,6 +1402,9 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             'visibilidade').verbose_name,
         choices=DocumentoAdministrativo.PRIVACIDADE_DOC_ADM_STATUS,
         widget=forms.Select(attrs={'class': 'selector'}))
+
+    valor_estimado = DecimalField(
+        label='Valor Efetivo/Estimado', required=False, max_digits=14, decimal_places=2,)
 
     class Meta:
         model = DocumentoAdministrativo

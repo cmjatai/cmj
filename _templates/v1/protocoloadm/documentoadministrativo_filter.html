@@ -1,7 +1,7 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
 {% load crispy_forms_tags %}
-{% load common_tags %}
+{% load common_tags common_cmj_tags %}
 
 {% block sections_nav %} {% endblock %}
 
@@ -99,6 +99,10 @@
                   <br><strong>Data do documento:</strong> {{d.data}} | {{d.tipo}} | {{d.tipo.sigla}} {{d.numero}}/{{d.ano}}
                   {% if d.data_vencimento %}
                     | <strong>Data de Vencimento:</strong> {{d.data_vencimento}}
+                  {% endif %}
+
+                  {% if d.valor_estimado %}
+                    | <strong>Valor Efetivo/Estimado:</strong> {{d.valor_estimado|decimal2str}}
                   {% endif %}
 
                   {% if d.protocolo_gr.exists %}
