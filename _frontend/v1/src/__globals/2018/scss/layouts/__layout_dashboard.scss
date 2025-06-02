@@ -3,6 +3,12 @@
   div[class*="col-"] {
     padding-bottom: 1rem;
   }
+  form {
+    margin: 0;
+    div[class*="col-"] {
+      padding-bottom: 0;
+    }
+  }
 
   h1 {
     text-align: center;
