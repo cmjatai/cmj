@@ -57,8 +57,8 @@ class Dashboard(metaclass=MediaDefiningClass):
                     for card in klass.cards:
                         card.filterset = dash_set.filterset if card.filterset is None else card.filterset
                         card.dash_set = dash_set
-                        obj = dash_lists[card.__name__]
-                        dash_set.cards.update({card: obj[card]})
+                        obj = tuple(dash_lists[card.__name__].items())[0]
+                        dash_set.cards.update({obj[1].dash_name: obj})
 
         ordered_apps = OrderedDict()
 

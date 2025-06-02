@@ -9,6 +9,7 @@ from sapl.materia.models import AssuntoMateria, MateriaLegislativa
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 from django_filters import FilterSet, CharFilter, ChoiceFilter, ModelMultipleChoiceFilter
+from django.views.generic import TemplateView
 
 from sapl.utils import choice_anos_com_materias
 
@@ -131,8 +132,9 @@ class MateriaDashboard(Dashcard):
         return cd
 
 
-class MateriaSearchDashboard(GridDashboard):
+class MateriaSearchDashboard(GridDashboard, TemplateView):
 
+    app_config = 'materia'
     cards = [
         MateriaTotalizer,
         MateriaDashboard,
@@ -140,3 +142,23 @@ class MateriaSearchDashboard(GridDashboard):
 
     filterset = MateriaFilterSet
 
+    grid = {
+        'rows': [
+            {
+
+                'cols': [
+                    ('__filter__', 9),
+                    ('materiatotalizer', 3),
+                ]
+            },
+            {
+                'cols': [
+                    ('__empty__', 3),
+                    ('materiadashboard', 9),
+                ]
+            }
+        ]
+    }
+
+    def get_template_names(self):
+        return ['dashboard/materia/materia_search_dashboard.html']

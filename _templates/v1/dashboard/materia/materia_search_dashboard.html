@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+
+
+{% block head_content %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
+{% endblock %}
+
+{% block base_content %}
+  {{ dashboard.dash_sets.materiasearchdashboard }}
+{% endblock base_content %}
