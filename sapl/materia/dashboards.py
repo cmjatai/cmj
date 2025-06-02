@@ -2,7 +2,7 @@
 import re
 
 from django import forms
-from cmj.dashboard import Dashcard, FilterBaseDashboard
+from cmj.dashboard import Dashcard, GridDashboard
 from django.db.models import Count
 from sapl.materia.forms import CHOICE_TRAMITACAO
 from sapl.materia.models import AssuntoMateria, MateriaLegislativa
@@ -40,7 +40,7 @@ class MateriaFilterSet(FilterSet):
 
     class Meta:
         model = MateriaLegislativa
-        fields = { 
+        fields = {
         }
 
 
@@ -131,7 +131,8 @@ class MateriaDashboard(Dashcard):
         return cd
 
 
-class MateriaSearchDashboard(FilterBaseDashboard):
+class MateriaSearchDashboard(GridDashboard):
+
     cards = [
         MateriaTotalizer,
         MateriaDashboard,

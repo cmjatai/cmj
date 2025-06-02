@@ -362,7 +362,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
             return self.export_data(request, fmt=export)
 
 
-class FilterBaseDashboard(View, metaclass=MediaDefiningClass):
+class GridDashboard(View, metaclass=MediaDefiningClass):
     """
     Classe base para dashboards que utilizam filtro compartilhado
     entre os cards.
