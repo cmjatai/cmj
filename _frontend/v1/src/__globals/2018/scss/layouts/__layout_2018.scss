@@ -574,12 +574,12 @@
   }
 }
 
-.form-compact {
+.form-compact, .grid-compact {
   .row {
-    margin: 0 -3px;
+    margin: 0 -0.5rem;
   }
   div[class^="col-"] {
-    padding: 0 5px;
+    padding: 0 0.5rem;
   }
   label {
     margin: 0;

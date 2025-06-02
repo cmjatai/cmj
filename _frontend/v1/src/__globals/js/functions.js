@@ -40,7 +40,7 @@ window.refreshSelectPicker = function () {
       $('html, body').animate(
         {
           scrollTop:
-            $('.div-search').offset().top // - window.innerHeight / 9
+            $(event.target.form).offset().top - '20' // - window.innerHeight / 9
         },
         500
       )
