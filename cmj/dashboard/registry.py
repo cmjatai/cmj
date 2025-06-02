@@ -6,7 +6,7 @@ from django.apps import apps
 from django.forms.widgets import MediaDefiningClass, Media
 from django.utils.module_loading import module_has_submodule
 from django.utils.safestring import mark_safe
-from .dashboard import Dashcard, FilterBaseDashboard
+from .dashboard import Dashcard, GridDashboard
 
 DEFAULT_CHARTJS_URL = (
     "https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
@@ -31,8 +31,8 @@ class Dashboard(metaclass=MediaDefiningClass):
 
         is_dashs = (
             lambda obj: isinstance(obj, type)
-            and issubclass(obj, FilterBaseDashboard)
-            and obj is not FilterBaseDashboard
+            and issubclass(obj, GridDashboard)
+            and obj is not GridDashboard
         )
         is_dash_card = (
             lambda obj: isinstance(obj, type)
