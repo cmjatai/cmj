@@ -1,15 +1,25 @@
 
+from collections import OrderedDict
 import re
 
 from django import forms
 from cmj.dashboard import Dashcard, GridDashboard
 from django.db.models import Count
+from django.db.models.functions import TruncMonth
+from sapl.crispy_layout_mixin import to_row
 from sapl.materia.forms import CHOICE_TRAMITACAO
 from sapl.materia.models import AssuntoMateria, MateriaLegislativa, StatusTramitacao, TipoMateriaLegislativa, UnidadeTramitacao
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 from django_filters import FilterSet, CharFilter, ChoiceFilter, ModelMultipleChoiceFilter, MultipleChoiceFilter
 from django.views.generic import TemplateView
+from django.utils import timezone
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Div, Field, Layout, HTML, Button, Fieldset
+
+from sapl.utils import RangeWidgetNumber, choice_anos_com_materias, autor_label, \
+    autor_modal, choice_anos_com_normas
 
 from sapl.utils import choice_anos_com_materias
 
@@ -46,7 +56,6 @@ class MateriaFilterSet(FilterSet):
             'data-dropup-auto': 'false'
         })
     )
-
 
     assuntos_is = ModelMultipleChoiceFilter(
         required=False,
@@ -112,8 +121,101 @@ class MateriaFilterSet(FilterSet):
 
     class Meta:
         model = MateriaLegislativa
+
+        class Form(forms.Form):
+            crispy_field_template = (
+                'tipo_i',
+                'ano_i',
+                'assuntos_is',
+                'em_tramitacao_b',
+                'autoria_is',
+                'sta_i',
+                'uta_i',
+            )
+        form = Form
+
         fields = {
         }
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        row1 = to_row([
+            ('tipo_i', 12),
+            ('em_tramitacao_b', 6),
+            ('ano_i', 6),
+        ])
+
+        row2 = to_row([
+            ('uta_i', 12),
+            ('sta_i', 12),
+        ])
+
+        row3 = to_row([
+            ('assuntos_is', 12),
+            (Div(
+                HTML(autor_label),
+                HTML(autor_modal),
+                to_row([
+                    ('autoria_is', 0),
+                    (Button('pesquisar',
+                            'Selecionar Autor',
+                            css_class='btn btn-secondary btn-sm mt-1 w-100'), 12),
+                    (Button('limpar',
+                            'Limpar Autor',
+                            css_class='btn btn-secondary btn-sm mt-1 p-0 w-100'), 12),
+                ], css_class='row flex-column'),
+                css_class="form-group"
+            ), 6),
+        ])
+
+        self.form.helper = FormHelper()
+        self.form.helper.form_tag = False
+        self.form.helper.layout = Layout(
+                     row1,
+                     row2,
+                     row3)
+
+
+        return
+        grupos_de_tipos = (
+            ('1', 'Mais Acessadas'),
+            ('3', ' '),
+            ('7', 'Matérias Acessórias'),
+            ('9', '  ')
+        )
+        gtd = dict(grupos_de_tipos)  # {k: v for k, v in grupos_de_tipos}
+
+        grupo_choices = OrderedDict()
+        for nivel, valor in grupos_de_tipos:
+            if valor not in grupo_choices:
+                grupo_choices[valor] = []
+
+        for tml in TipoMateriaLegislativa.objects.order_by('nivel_agrupamento', 'sequencia_regimental'):
+            grupo_choices[gtd[tml.nivel_agrupamento]].append(
+                (tml.id, f'{tml.sigla} - {tml.descricao}'))
+
+        choices = []
+        for g, items in grupo_choices.items():
+            choices.append((' ', items,))
+        self.form.fields['tipo_i'].choices = choices
+
+        uta_choices = OrderedDict()
+        for uta in UnidadeTramitacao.objects.filter(
+            ativo=True,
+            # tramitacoes_destino__isnull=False
+            materiasemtramitacao_set__isnull=False
+            ).order_by('comissao', 'orgao', 'parlamentar').distinct():
+            uta_obj = uta.comissao or uta.orgao or uta.parlamentar
+
+            grupo = uta_obj._meta.verbose_name_plural
+            if grupo not in uta_choices:
+                uta_choices[grupo] = []
+
+            uta_choices[grupo].append((uta.id, str(uta)))
+
+        self.form.fields['uta_i'].choices = uta_choices.items()
 
 
 class MateriaTotalizer(Dashcard):
@@ -170,10 +272,10 @@ class MateriaDashboard(Dashcard):
         "data_field": ("assuntos", Count)
         }
     ]
-    chart_options = {
-        "scales": {"x": {"stacked": True}, "y": {"stacked": True}},
-        "plugins": {"tooltip": {"mode": "index"}},
-    }
+    #chart_options = {
+    #    "scales": {"x": {"stacked": True}, "y": {"stacked": True}},
+    ##    "plugins": {"tooltip": {"mode": "index"}},
+    #}
 
     def get_datasets(self, request, queryset=None):
         ds = super().get_datasets(request, queryset)
@@ -211,6 +313,65 @@ class MateriaDashboard(Dashcard):
 
         return cd
 
+class MateriaMonthlyDashboard(Dashcard):
+    title = _('Distribuição Mensal de Matérias')
+    description = _('Distribuição de Matérias por mês')
+    chart_type = Dashcard.TYPE_BAR
+    model = MateriaLegislativa
+    label_field = ("data_apresentacao", TruncMonth, lambda d: d.strftime("%m/%Y"))
+
+    render_filterset = False
+
+    style="height: 35vh;"
+
+    datasets = [
+        {
+            "label": _("Qtd. de Matérias por Mês"),
+            "type": Dashcard.TYPE_BAR,
+            "data_field": ("*", Count)
+        },
+        {
+            "label": _("Tendência"),
+            "type": Dashcard.TYPE_LINE,
+            "data_field": ("*", Count),
+            "tension": 0.3,
+        }
+    ]
+    chart_options = {
+        "maintainAspectRatio": False,
+    }
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if not request.GET.getlist('ano_i'):
+            now = timezone.now()
+            qs = qs.filter(data_apresentacao__year__gt=now.year-9)
+        return qs
+
+    def get_datasets(self, request, queryset=None):
+        ds = super().get_datasets(request, queryset)
+
+        data_line = ds[1]['data']
+        # para cada elemento de data_line, calcula a média do início até o elemento atual
+
+        periodo = 12
+        new_data_line = [0] * len(data_line)
+        for i, v in enumerate(data_line):
+            if i >= periodo:
+                # calcula a média dos últimos 12 meses
+                new_data_line[i] = sum(data_line[i-periodo:i]) / periodo
+            else:
+                new_data_line[i] = sum(data_line[:i+1]) / (i+1) if i > 0 else v
+
+        ds[1]['data'] = new_data_line
+
+        return ds
+
+    def get_labels(self, request, queryset=None):
+        labels = super().get_labels(request, queryset)
+
+        return labels
+
 
 class MateriaSearchDashboard(GridDashboard):
 
@@ -218,6 +379,7 @@ class MateriaSearchDashboard(GridDashboard):
     cards = [
         MateriaTotalizer,
         MateriaTotalizerFiltered,
+        MateriaMonthlyDashboard,
         MateriaDashboard,
     ]
 
@@ -227,6 +389,7 @@ class MateriaSearchDashboard(GridDashboard):
                 'cols': [
                     ('materiatotalizer', 6),
                     ('materiatotalizerfiltered', 6),
+                    ('materiamonthlydashboard', 12),
                     ('materiadashboard', 12),
                 ]
             }
@@ -239,6 +402,7 @@ class MateriaDashboardView(GridDashboard, TemplateView):
     cards = [
         MateriaTotalizer,
         MateriaTotalizerFiltered,
+        MateriaMonthlyDashboard,
         MateriaDashboard,
     ]
 
@@ -257,6 +421,7 @@ class MateriaDashboardView(GridDashboard, TemplateView):
                                     'cols': [
                                         ('materiatotalizer', 6),
                                         ('materiatotalizerfiltered', 6),
+                                        ('materiamonthlydashboard', 12),
                                         ('materiadashboard', 12),
                                     ]
                                 }
