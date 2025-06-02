@@ -178,11 +178,6 @@ class MateriaSearchForm(SearchForm):
 
     _errors = []
 
-    ano_i = forms.ChoiceField(
-        required=False,
-        label=_('Ano da Matéria'),
-        choices=[(None, _('---------')), ] + choice_anos_com_materias())
-
     numero_i = forms.IntegerField(
         required=False,
         label=_('Número'),
@@ -198,6 +193,21 @@ class MateriaSearchForm(SearchForm):
         required=False,
         label=_('Ordenação'),
         choices=CHOICE_ORDENACAO
+    )
+
+    ano_i = forms.MultipleChoiceField(
+        required=False,
+        label=_('Anos das Matérias'),
+        choices=choice_anos_com_materias(),
+        widget=forms.SelectMultiple(attrs={
+            'title': _('Filtrar por um ou mais anos de matéria?'),
+            'class': 'selectpicker',
+            'data-actions-box': 'true',
+            'data-select-all-text': 'Selecionar Todos',
+            'data-deselect-all-text': 'Desmarcar Todos',
+            'data-header': 'Anos de Matéria Legislativa',
+            'data-dropup-auto': 'false'
+        })
     )
 
     tipo_i = forms.ModelMultipleChoiceField(
@@ -424,12 +434,12 @@ class MateriaSearchForm(SearchForm):
         return o
 
     def clean_ano_i(self, *args, **kwargs):
-        a = self.cleaned_data['ano_i']
-        if not a:
+        anos = self.cleaned_data['ano_i']
+        if not anos:
             return
         try:
-            a = int(a)
-            return a
+            anos = [int(a) for a in anos]
+            return anos
         except:
             raise ValidationError(
                 _('O campo "ano da matéria" deve ser um número.'))
@@ -442,6 +452,10 @@ class MateriaSearchForm(SearchForm):
         if assuntos_is:
             return assuntos_is.id
 
+    def clean(self, *args, **kwargs):
+        cd = super().clean(*args, **kwargs)
+        return cd
+
     def search(self):
         sqs = super().search().models(MateriaLegislativa)
 
@@ -451,6 +465,10 @@ class MateriaSearchForm(SearchForm):
             key: self.cleaned_data.get(key, None)
             for key in self.changed_data if key not in remove
         }
+
+        if params and 'ano_i' in params:
+            params['ano_i__in'] = params['ano_i']
+            del params['ano_i']
 
         if params and 'tipo_i' in params:
             params['tipo_i__in'] = params['tipo_i']

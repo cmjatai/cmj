@@ -8,7 +8,7 @@ from sapl.materia.forms import CHOICE_TRAMITACAO
 from sapl.materia.models import AssuntoMateria, MateriaLegislativa, StatusTramitacao, TipoMateriaLegislativa, UnidadeTramitacao
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
-from django_filters import FilterSet, CharFilter, ChoiceFilter, ModelMultipleChoiceFilter
+from django_filters import FilterSet, CharFilter, ChoiceFilter, ModelMultipleChoiceFilter, MultipleChoiceFilter
 from django.views.generic import TemplateView
 
 from sapl.utils import choice_anos_com_materias
@@ -31,11 +31,22 @@ class MateriaFilterSet(FilterSet):
         })
     )
 
-    ano_i = ChoiceFilter(
+    ano_i = MultipleChoiceFilter(
         required=False,
         field_name='ano',
-        label='Ano das Matérias',
-        choices=choice_anos_com_materias)
+        label=_('Anos das Matérias'),
+        choices=choice_anos_com_materias(),
+        widget=forms.SelectMultiple(attrs={
+            'title': _('Filtrar por um ou mais anos de matéria?'),
+            'class': 'selectpicker',
+            'data-actions-box': 'true',
+            'data-select-all-text': 'Selecionar Todos',
+            'data-deselect-all-text': 'Desmarcar Todos',
+            'data-header': 'Anos de Matéria Legislativa',
+            'data-dropup-auto': 'false'
+        })
+    )
+
 
     assuntos_is = ModelMultipleChoiceFilter(
         required=False,
