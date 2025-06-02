@@ -1,4 +1,14 @@
 
+.dashboard {
+  div[class*="col-"] {
+    padding-bottom: 1rem;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
+}
 
 .visually-hidden {
   display: none;

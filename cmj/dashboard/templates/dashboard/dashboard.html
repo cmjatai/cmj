@@ -1,25 +1,29 @@
 {% load i18n crispy_forms_tags common_tags %}
-{% for row in grid.rows %}
-  <div class="row">
-    {% for cardname, size in row.cols %}
-      <div class="col-{{ size }}">
-        {% if cardname == '__filter__' %}
-          {% if filter and render_filterset %}
-            <form action="{{ card.url }}"
-              role="chart-global-filter"
-              data-chart-target="{{ dash.dashboard_name|slugify }}">
-              {{ filter.form|crispy}}
-            </form>
+{% for row in rows %}
+  {% if forloop.first and not subrow%}
+    <div class="dashboard grid-compact" id="{{dash.dashboard_name }}{{subrow}}">
+  {% endif %}
+    <div class="row">
+      {% for cardname, size in row.cols %}
+        <div class="col-{{ size }}">
+          {% if cardname == '__filter__' %}
+            {% if filter and render_filterset %}
+              <form action=""
+                role="chart-global-filter"
+                data-chart-target="{{ dash.dashboard_name|slugify }}{{subrow}}">
+                {{ filter.form|crispy}}
+              </form>
+            {% endif %}
+          {% elif cardname == '__empty__' %}
+          {% elif cardname.rows %}
+                {% include "dashboard/dashboard.html" with rows=cardname.rows subrow='sub' %}
+          {% else %}
+            {{ cards|lookup:cardname }}
           {% endif %}
-        {% elif cardname == '__empty__' %}
-            
-        {% else %}
-          {{ cards|lookup:cardname }}
-        {% endif %}
-      </div>
-    {% endfor %}
-  </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% if forloop.last and not subrow %}
+    </div>
+  {% endif %}
 {% endfor %}
-
-
-

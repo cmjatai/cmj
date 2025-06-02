@@ -5,13 +5,10 @@
 {% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
 
-    {% block head_content %}
-
-      <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-      <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
-
-    {% endblock %}
-
+  {% block head_content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+    <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
+  {% endblock %}
 
 {% block title %}
   <h1 class="page-header d-flex bg-red text-white container-search justify-content-between" >
@@ -63,7 +60,7 @@
         {{ dashboard.dash_sets.materiasearchdashboard }}
 
         <small class="text-black-50">
-          OBS: Classificação de Assuntos é automatizada. Feita pela Inteligência Artificial Gemini 2.0.
+          OBS: Classificação de Assuntos é automatizada e realizada, atualmente, apenas para os Requerimentos. Feita pela Inteligência Artificial Gemini 2.0.
         </small>
 
       </div>

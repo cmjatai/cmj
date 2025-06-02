@@ -47,6 +47,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
     title = ""
     model = None
     filterset = None
+    filterable = True
     render_filterset = True
     label_field = None
     label_name = None
@@ -93,6 +94,8 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         )
 
     def get_filter(self, data=None, queryset=None):
+        if not self.filterable:
+            return None
         if self.filterset is None:
             return None
         return self.filterset(data=data, queryset=queryset)
@@ -235,7 +238,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         if self.template_name:
             template_names = [self.template_name]
         else:
-            default_name = 'dashboard_card' if self.dash_set else 'dashboard'
+            default_name = 'dashboard_card' if self.dash_set else 'dashcard'
             template_names = [
                 f"dashboard/{self.app_config.label}/{self.dash_name}.html",
                 f"dashboard/{self.app_config.label}/{default_name}.html",
@@ -344,11 +347,13 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         if self.template_html:
             template_names = [self.template_html]
         else:
+            default_name = 'dashboard_card_html' if self.dash_set else 'dashcard_html'
             template_names = [
-                f"dashboard/{self.app_config.label}/{self.dash_name}_html.html",
-                f"dashboard/{self.app_config.label}/dash_html.html",
-                f"dashboard/dashcard_html.html",
+                f"dashboard/{self.app_config.label}/{self.dash_name}.html",
+                f"dashboard/{self.app_config.label}/{default_name}.html",
+                f"dashboard/{default_name}.html",
             ]
+
         return render_to_string(
             request=request, template_name=template_names, context=context
         )
@@ -427,7 +432,7 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
 
         context = {
             "dash": self,
-            "grid": self.grid,
+            "rows": self.grid['rows'],
             "cards": {k: v[1] for k, v in self.cards.items()},
             "filter": self.get_filter(),
             'render_filterset': self.render_filterset,
@@ -437,3 +442,4 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
 
         context.update(self.get_extra_context())
         return render_to_string(template_names, context)
+

@@ -1,6 +1,6 @@
 from django.urls.conf import re_path, include
 
-from sapl.materia.dashboards import MateriaSearchDashboard
+from sapl.materia.dashboards import MateriaDashboardView
 from sapl.materia.views import (AcompanhamentoConfirmarView,
                                 AcompanhamentoExcluirView,
                                 AcompanhamentoMateriaView, AnaliseSimilaridadeCrud, AnexadaCrud,
@@ -87,7 +87,7 @@ urlpatterns_materia = [
                              AnaliseSimilaridadeCrud.get_urls()
                              )),
 
-    re_path(r'^materia/dash', MateriaSearchDashboard.as_view(),
+    re_path(r'^materia/dash', MateriaDashboardView.as_view(),
         name='materia_dashboard'),
 
     re_path(r'^materia/(?P<pk>[0-9]+)/create_simplificado$',
