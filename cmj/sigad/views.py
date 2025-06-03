@@ -32,6 +32,7 @@ from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos, \
     CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse, \
     CaixaPublicacaoRelationship, UrlShortener
 from cmj.utils import make_pagination
+from cmj.videos.models import Video, VideoParte
 from sapl.comissoes.models import Comissao
 from sapl.crud.base import MasterDetailCrud, Crud
 from sapl.parlamentares.models import Parlamentar, Legislatura
@@ -1413,10 +1414,18 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
             'cmj.sigad:path_view',
             kwargs={'slug': self.object.classe.slug})
 
-    def delete(self, request, *args, **kwargs):
+    def form_valid(self, form):
         self.object = self.get_object()
         success_url = self.get_success_url()
-        self.object.delete(user=request.user)
+        pk = self.object.pk
+        self.object.delete(user=self.request.user)
+
+        vps = VideoParte.objects.filter(object_id=pk)
+        videos = set(vps.values_list('video', flat=True))
+        vps.delete()
+        VideoParte.objects.filter(video__in=videos).delete()
+        Video.objects.filter(pk__in=videos).delete()
+
         return HttpResponseRedirect(success_url)
 
 

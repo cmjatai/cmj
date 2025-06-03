@@ -1252,6 +1252,8 @@ class Documento(ShortUrl, CMSMixin):
     def delete(self, using=None, keep_parents=False, user=None):
         # transfere  midia, caso exista, para ult rev de cada descendente
 
+        
+
         childs = self.childs.view_childs()
 
         for child in childs:
