@@ -1,7 +1,14 @@
 
 .dashboard {
+    font-family: "Roboto Condensed", Helvetica, sans-serif;
+  * {
+    line-height: 1;
+  }
   div[class*="col-"] {
     padding-bottom: 1rem;
+  }
+  .card-body {
+    padding: 0.5rem;
   }
   form {
     margin: 0;
@@ -10,8 +17,16 @@
     }
   }
 
+  h1, h2, h3 {
+    margin: 0;
+  }
   h1 {
     text-align: center;
+  }
+  .card-title {
+    font-family: "Roboto Condensed", Helvetica, sans-serif;
+    font-weight: 400;
+    padding: 0.5rem;
   }
 
 }

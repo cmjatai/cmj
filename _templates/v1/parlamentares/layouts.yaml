@@ -29,6 +29,20 @@ SessaoLegislativa:
   - data_inicio  data_fim
   - data_inicio_intervalo  data_fim_intervalo
 
+ParlamentarTeste:
+  version: 2
+  col-12 1:
+    {% trans 'Dados do Parlamentar' %}:
+      col-md-5:
+      - nome_parlamentar:8 ativo
+      - nome_completo
+      - email telefone
+      col-md-7:
+      - equipe|markdown
+  col-12 2:
+    {% trans 'Biografia' %}:
+      col-md-12:
+      - biografia
 Parlamentar:
   {% trans 'Dados do Parlamentar' %}:
   - nome_parlamentar:8  ativo

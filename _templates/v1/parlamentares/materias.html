@@ -1,6 +1,12 @@
 {% extends "crud/detail.html" %}
 {% load i18n %}
-{% load common_tags %}
+{% load common_tags dashboardtags %}
+{% load webpack_static from webpack_loader %}
+
+{% block head_content %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
+{% endblock %}
 
 {% block actions %}{% endblock %}
 
@@ -13,6 +19,10 @@
 {% endblock title %}
 
 {% block detail_content %}
+
+{% dash_grid 'materiaparlamentardashboard' dashboard.dash_grids autoria_is=autor_pk %}
+
+
 
 <table class="table table-striped table-bordered">
   {% for autoria in autoria.0 %}
