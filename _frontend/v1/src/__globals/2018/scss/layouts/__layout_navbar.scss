@@ -509,20 +509,23 @@
           top: 0;
           color: $text_color_thematic;
           right: 100%;
+          z-index: 1;
           font-family: "Roboto Condensed";
           line-height: 1;
           font-size: 0em;
           border-radius: 50%;
-          padding: 5px;
+          padding: 4px;
           background-color: #ccc;
-          margin: 7px;
+          margin: 8px;
+          white-space: nowrap;
+          transition: all 0.3s ease;
         }
         &:hover {
           .item-atricon {
             background-color: lighten($color_primary, 35%);
             line-height: 1;
             font-size: 0.8em;
-            padding: 1px 2px 0px 3px;
+            padding: 1px 2px 1px 3px;
             border-radius: 3px;
             margin: 3px 4px;
             &:empty {
