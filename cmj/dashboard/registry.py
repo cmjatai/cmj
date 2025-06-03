@@ -25,7 +25,7 @@ class Dashboard(metaclass=MediaDefiningClass):
     def __init__(self):
         dash_apps = defaultdict(dict)
 
-        dash_sets = defaultdict(dict)
+        dash_grids = defaultdict(dict)
 
         dash_lists = defaultdict(dict)
 
@@ -51,14 +51,14 @@ class Dashboard(metaclass=MediaDefiningClass):
             if module_has_submodule(app_config.module, "dashboards"):
                 dash_module = import_module(f"{app_config.name}.dashboards")
                 for name, klass in inspect.getmembers(dash_module, is_dashs):
-                    dash_set = klass(app_config)
-                    dash_sets[name.lower()] = dash_set
+                    dash_grid = klass(app_config)
+                    dash_grids[name.lower()] = dash_grid
 
                     for card in klass.cards:
-                        card.filterset = dash_set.filterset if card.filterset is None else card.filterset
-                        card.dash_set = dash_set
+                        card.filterset = dash_grid.filterset if card.filterset is None else card.filterset
+                        card.grids.add(dash_grid)
                         obj = tuple(dash_lists[card.__name__].items())[0]
-                        dash_set.cards.update({obj[1].dash_name: obj})
+                        dash_grid.cards.update({obj[1].dash_name: obj})
 
         ordered_apps = OrderedDict()
 
@@ -68,7 +68,7 @@ class Dashboard(metaclass=MediaDefiningClass):
                 ordered_apps[app][card] = dash_apps[app][card]
 
         self.dash_apps = ordered_apps
-        self.dash_sets = dash_sets
+        self.dash_grids = dash_grids
 
     def get_urls(self):
         return [

@@ -335,6 +335,7 @@ class MateriaMonthlyDashboard(Dashcard):
             "type": Dashcard.TYPE_LINE,
             "data_field": ("*", Count),
             "tension": 0.3,
+            "pointStyle": False
         }
     ]
     chart_options = {
@@ -440,3 +441,50 @@ class MateriaDashboardView(GridDashboard, TemplateView):
         context = super().get_context_data(**kwargs)
         context['title'] = _('Dashboard de Matérias Legislativas')
         return context
+
+
+
+
+class MateriaParlamentarDashboard(GridDashboard):
+
+    app_config = 'materia'
+    cards = [
+        MateriaMonthlyDashboard,
+        MateriaTotalizerFiltered
+    ]
+
+    class AutoriaFilterSet(FilterSet):
+
+
+        autoria_is = CharFilter(
+            required=False,
+            field_name='autoria__autor',
+            widget=forms.HiddenInput(attrs={'id': 'id_autoria__autor'})
+        )
+
+        class Meta:
+            model = MateriaLegislativa
+            fields = {
+            }
+
+        def get_queryset(self, queryset=None):
+            if not queryset:
+                queryset = super().get_queryset()
+            return queryset
+
+    render_filterset = True
+    filterset = AutoriaFilterSet
+
+    grid = {
+        'rows': [
+            {
+                'cols': [
+                    ('__filter__', 12),
+                    ('materiatotalizerfiltered', 12),
+                    ('materiamonthlydashboard', 12),
+                ]
+            }
+        ]
+    }
+
+

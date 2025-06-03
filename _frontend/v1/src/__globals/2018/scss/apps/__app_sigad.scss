@@ -633,11 +633,9 @@
 
   .container-path {
     // margin: 0;
-    padding: 0;
 
     .widget-parlamentar {
       background: #fafdff  $url_bg_png;
-      padding: 5px;
       font-size: 0.7em;
       font-family: "Roboto Condensed";
       color: $color-primary;
@@ -1014,7 +1012,11 @@ img.qrcode {
       zoom: 0.8;
     }
     .container-path {
+      padding: 0;
       font-size: 1.5em;
+      div[class*="col-"] {
+        padding: 5px;;
+      }
       .nav {
         margin-top: 1em;
       }

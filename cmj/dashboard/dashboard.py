@@ -51,7 +51,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
     render_filterset = True
     label_field = None
     label_name = None
-    datasets = None
+    grids = set()
     allow_export_formats = "_all_"
 
     @classonlymethod
@@ -238,7 +238,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         if self.template_name:
             template_names = [self.template_name]
         else:
-            default_name = 'dashboard_card' if self.dash_set else 'dashcard'
+            default_name = 'dashboard_card' if self.grids else 'dashcard'
             template_names = [
                 f"dashboard/{self.app_config.label}/{self.dash_name}.html",
                 f"dashboard/{self.app_config.label}/{default_name}.html",
@@ -347,7 +347,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         if self.template_html:
             template_names = [self.template_html]
         else:
-            default_name = 'dashboard_card_html' if self.dash_set else 'dashcard_html'
+            default_name = 'dashboard_card_html' if self.grids else 'dashcard_html'
             template_names = [
                 f"dashboard/{self.app_config.label}/{self.dash_name}.html",
                 f"dashboard/{self.app_config.label}/{default_name}.html",
@@ -381,12 +381,19 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
     render_filterset = True
     app_config = None
 
+    kwargs = {}
+
+    def __call__(self, *args, **kwds):
+        self.kwargs.update(kwds)
+        return self
 
     def get_filter(self, data=None, queryset=None):
         if self.filterset is None:
             return None
-        filter =self.filterset(data=data, queryset=queryset)
-
+        data = data or {}
+        data.update(self.kwargs)
+        #self.kwargs = {}  # Clear kwargs after using them
+        filter = self.filterset(data=data, queryset=queryset)
         return filter
 
     def apply_filters(self, request, queryset):
@@ -394,7 +401,6 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
         if filter is not None:
             queryset = filter.qs
         return queryset
-
 
     def __init__(self, app_config=None, **kwargs):
         if app_config is None:

@@ -71,10 +71,11 @@ function plot_charts(form) {
 
 
 $(function () {
-  $('form[role="chart-global-filter"] :input').on('change', function (e) {
+  let firstChild = $('form[role="chart-global-filter"] :input').on('change', function (e) {
     var form = $(this.form)
     plot_charts(form)
-  })
+  })[0]
+  $(firstChild).trigger('change')
 
   $('form[role="chart-filter"] :input').on('change', function (e) {
     var form = $(this.form)
@@ -92,7 +93,4 @@ $(function () {
     plot_chart(target, url)
   })
 
-  $('canvas[data-url],div[data-url]').each(function () {
-    plot_chart(this)
-  })
 })

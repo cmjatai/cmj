@@ -1,6 +1,11 @@
 {% extends "base_path.html" %}
-{% load i18n common_tags sigad_filters social_utils cropping thumbnail menus %}
+{% load i18n common_tags sigad_filters social_utils cropping thumbnail menus dashboardtags %}
 {% load webpack_static from webpack_loader %}
+
+{% block head_content %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
+{% endblock %}
 
 {% block main_container_class %}container container-path-parlamentar{% endblock main_container_class %}
 {% block base_functions %}{% endblock %}
@@ -64,97 +69,100 @@
 
 {% block base_content %}
   <div class="container container-path">
-
     <div class="row">
-        {% with slug as prefixo_slug %}
-            <div class="col widget-parlamentar">
-              <div class="row">
-                <div class="col-md-8">
-                  <div id="div_id_nome_parlamentar" class="form-group">
-                    <p class="control-label">Nome Parlamentar</p>
-                    <div class="controls">
-                        <div class="form-control-static">{{ object.parlamentar.nome_parlamentar }}</div>
-                    </div>
-                  </div>
+      {% with slug as prefixo_slug %}
+        <div class="col-12 col-lg-5 widget-parlamentar">
+          <div class="row">
+            <div class="col-md-8">
+              <div id="div_id_nome_parlamentar" class="form-group">
+                <p class="control-label">Nome Parlamentar</p>
+                <div class="controls">
+                    <div class="form-control-static">{{ object.parlamentar.nome_parlamentar }}</div>
                 </div>
-                <div class="col-md-4">
-                  <div id="div_id_ativo" class="form-group">
-                    <p class="control-label">Ativo na Casa?</p>
-                    <div class="controls">
-                        <div class="form-control-static">{{ object.parlamentar.get_ativo_display }}</div>
-                    </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div id="div_id_ativo" class="form-group">
+                <p class="control-label">Ativo na Casa?</p>
+                <div class="controls">
+                    <div class="form-control-static">{{ object.parlamentar.get_ativo_display }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <div id="div_id_nome_completo" class="form-group">
+                <p class="control-label">Nome Completo</p>
+                <div class="controls">
+                    <div class="form-control-static">{{ object.parlamentar.nome_completo }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          {% if object.parlamentar.ativo %}
+            <div class="row">
+              <div class="col-12 col-xxl-8">
+                <div id="div_id_email" class="form-group">
+                  <p class="control-label">E-mail</p>
+                  <div class="controls">
+                      <div class="form-control-static">{{ object.parlamentar.email }}</div>
                   </div>
                 </div>
               </div>
-              <div class="row">
-                <div class="col-md-12">
-                  <div id="div_id_nome_completo" class="form-group">
-                    <p class="control-label">Nome Completo</p>
-                    <div class="controls">
-                        <div class="form-control-static">{{ object.parlamentar.nome_completo }}</div>
-                    </div>
+              <div class="col-12 col-xxl-4">
+                <div id="div_id_telefone" class="form-group">
+                  <p class="control-label">Telefone</p>
+                  <div class="controls">
+                      <div class="form-control-static">{{ object.parlamentar.telefone }}</div>
                   </div>
                 </div>
               </div>
-              {% if object.parlamentar.ativo %}
-                <div class="row">
-                  <div class="col-12 col-xxl-8">
-                    <div id="div_id_email" class="form-group">
-                      <p class="control-label">E-mail</p>
-                      <div class="controls">
-                          <div class="form-control-static">{{ object.parlamentar.email }}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-12 col-xxl-4">
-                    <div id="div_id_telefone" class="form-group">
-                      <p class="control-label">Telefone</p>
-                      <div class="controls">
-                          <div class="form-control-static">{{ object.parlamentar.telefone }}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <hr>
-              {% endif %}
-
-              {{object.parlamentar.equipe|markdown|safe}}
-              <hr>
-
-              {% if object.parlamentar.composicaomesa_set.exists %}
-                {% with object.parlamentar as parlamentar %}
-                  {% include "parlamentares/parlamentar_composicaomesa_widget.html" %}
-                {% endwith %}
-                <hr>
-              {% endif %}
-
-              {% if object.parlamentar.participacao_set.exists %}
-                {% with object.parlamentar as parlamentar %}
-                  {% include "comissoes/parlamentar_participacao_widget.html" %}
-                {% endwith %}
-                <hr>
-              {% endif %}
-
-              {% if object.parlamentar.biografia %}
-                <div class="container-biografia">
-                  <h1>
-                    <strong>
-                      Biografia do Parlamentar
-                    </strong>
-                  </h1>
-                  {{object.parlamentar.biografia|safe}}
-                </div>
-              {% endif %}
             </div>
-            <div class="col-12 col-sm-6 col-lg-7 col-xl-8 order-last order-sm-first ">
-              {% with 0 as split_row %}
-                {% with 'path-item-list px-2' as css_class %}
-                  {% include "path/path_list_docs.html" %}
-                {% endwith %}
-              {% endwith %}
+          {% endif %}
+
+          {% dash_grid 'materiaparlamentardashboard' dashboard.dash_grids autoria_is=object.parlamentar.autor.first.id %}
+
+          {{object.parlamentar.equipe|markdown|safe}}
+          <hr>
+          {% if object.parlamentar.composicaomesa_set.exists %}
+            {% with object.parlamentar as parlamentar %}
+              {% include "parlamentares/parlamentar_composicaomesa_widget.html" %}
+            {% endwith %}
+            <hr>
+          {% endif %}
+
+          {% if object.parlamentar.participacao_set.exists %}
+            {% with object.parlamentar as parlamentar %}
+              {% include "comissoes/parlamentar_participacao_widget.html" %}
+            {% endwith %}
+            <hr>
+          {% endif %}
+
+          {% if object.parlamentar.biografia %}
+            <div class="container-biografia">
+              <h1>
+                <strong>
+                  Biografia do Parlamentar
+                </strong>
+              </h1>
+              {{object.parlamentar.biografia|safe}}
             </div>
-        {% endwith %}
-      </div>
+          {% endif %}
+
+
+
+        </div>
+        <div class="col-12 col-lg-7">
+
+          {% with 0 as split_row %}
+            {% with 'path-item-list px-2' as css_class %}
+              {% include "path/path_list_docs.html" %}
+            {% endwith %}
+          {% endwith %}
+
+        </div>
+      {% endwith %}
       {% include "paginacao.html" %}
-  </div>
+    </div>
 {% endblock %}

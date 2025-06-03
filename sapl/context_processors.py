@@ -10,7 +10,11 @@ from sapl.utils import mail_service_configured as mail_service_configured_utils
 def parliament_info(request):
     casa = get_casalegislativa()
     if casa:
-        return casa.__dict__
+        casa = casa.__dict__
+        del casa['_state']
+        del casa['id']
+        del casa['metadata']
+        return casa
     else:
         return {}
 
