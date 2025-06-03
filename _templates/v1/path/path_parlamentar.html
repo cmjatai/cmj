@@ -154,15 +154,14 @@
 
         </div>
         <div class="col-12 col-lg-7">
-
           {% with 0 as split_row %}
             {% with 'path-item-list px-2' as css_class %}
               {% include "path/path_list_docs.html" %}
             {% endwith %}
           {% endwith %}
-
         </div>
       {% endwith %}
-      {% include "paginacao.html" %}
     </div>
+    {% include "paginacao.html" %}
+  </div>
 {% endblock %}
