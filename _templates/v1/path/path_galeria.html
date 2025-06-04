@@ -19,7 +19,7 @@
   {% for galeria in object_list %}
     {% if forloop.first and galeria.tipo != galeria.TD_BI %}
       <div class="albuns-show-gallery invisible"></div>
-      <form class="invisible" method="post">{% csrf_token %}</form>
+      <form class="invisible" method="post" id="form-galeria-ajax">{% csrf_token %}</form>
     {% endif %}
     {% if forloop.first %}
       <div class="row">
@@ -96,7 +96,7 @@
 {% block extra_js  %}
   <script type="text/javascript">
     $(document).ready(function (){
-      var csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]')
+      var csrfmiddlewaretoken = $('#form-galeria-ajax input[name="csrfmiddlewaretoken"]')
       if (csrfmiddlewaretoken.length > 0) {
         var form_data = {
           'csrfmiddlewaretoken': csrfmiddlewaretoken[0].value
