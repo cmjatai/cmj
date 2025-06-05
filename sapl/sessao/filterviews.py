@@ -1,11 +1,12 @@
 
 import logging
+from django.forms import ValidationError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from crispy_forms.layout import (
     HTML, Button, Field, Fieldset, Layout, Row, Div
     )
-
+from django.contrib import messages
 from cmj.mixins import AudigLogFilterMixin, MultiFormatOutputMixin
 from sapl.crispy_layout_mixin import SaplFormHelper, SaplFormLayout, to_row
 from sapl.crud.base import make_pagination
@@ -70,6 +71,8 @@ class RegistroVotacaoFilterView(AudigLogFilterMixin, MultiFormatOutputMixin, Fil
         '-ordem__sessao_plenaria',
         '-ordem__numero_ordem')
 
+    formats_impl = 'csv', 'xlsx', 'json', 'pdf'
+
     fields_base_report = [
         'id',
         'materia',
@@ -84,8 +87,20 @@ class RegistroVotacaoFilterView(AudigLogFilterMixin, MultiFormatOutputMixin, Fil
         'json': fields_base_report,
     }
 
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except ValidationError as e:
+            messages.error(request, e.message)
+            logger.warning(f"Erro de validação: {e}")
+            return HttpResponseRedirect(
+                reverse('sapl.sessao:votacoes_pesquisa')
+            )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        format_result = getattr(self.request, self.request.method).get('format', None)
 
         context['title'] = _('Registros de Votação')
 
@@ -105,7 +120,37 @@ class RegistroVotacaoFilterView(AudigLogFilterMixin, MultiFormatOutputMixin, Fil
         context['show_results'] = show_results_filter_set(
             self.request.GET.copy())
 
+        cd = self.filterset.form.cleaned_data if self.filterset.form.is_valid() else {}
+
+        if format_result == 'pdf' and not cd.get('ano', ''):
+            raise ValidationError(_(
+                'Para gerar o relatório em PDF, é necessário filtrar ao menos por ano da votação.'
+            ))
+
+        filters = []
+        if cd.get('ano', ''):
+            filtro = f'<strong>Ano de Votação:</strong> {cd["ano"]}'
+            filters.append(filtro)
+
+        if cd.get('ordem__tipo_votacao', ''):
+            filtro = f'<strong>Tipo de Votação:</strong> {cd["ordem__tipo_votacao"]}'
+            filters.append(filtro)
+        if cd.get('tipo_resultado_votacao', ''):
+            filtro = f'<strong>Resultado da Votação:</strong> {cd["tipo_resultado_votacao"]}'
+            filters.append(filtro)
+        if cd.get('materia__tipo', ''):
+            filtro = f'<strong>Tipo de Matéria:</strong> {cd["materia__tipo"]}'
+            filters.append(filtro)
+
+        if filters:
+            filters.insert(0, '<strong>FILTROS APLICADOS</strong>')
+            filters.append('')
+
+        context['filters'] = '<br>'.join(filters)
+        context['title_pdf'] = _('Relatório de Registros de Votação')
+
         return context
+
 
 class PesquisarSessaoPlenariaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView):
     model = SessaoPlenaria

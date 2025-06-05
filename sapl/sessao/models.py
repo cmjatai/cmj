@@ -715,6 +715,10 @@ class RegistroVotacao(models.Model):
                      'votacao': self.tipo_resultado_votacao,
             'materia': self.materia}
 
+    @property
+    def item_sessao(self):
+        return self.ordem or self.expediente
+
     def clean(self):
         """Exatamente um dos campos ordem ou expediente deve estar preenchido.
         """

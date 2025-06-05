@@ -1,0 +1,76 @@
+{% extends "base_pdf.html" %}
+
+
+{% block head_extra_css %}
+  {% include "css/base_table.css" %}
+  table {
+    font-size: 11pt;
+  }
+  table td {
+    padding: 3px 7px ;
+  }
+  ul {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0.5cm;
+  }
+{% endblock head_extra_css %}
+
+{% block body_content %}
+
+<table>
+  <thead>
+    <tr><th class="text-center">REGISTROS DE VOTAÇÃO</th></tr>
+  </thead>
+  <tbody>
+    {% for rv in object_list %}
+      <tr>
+        <td>
+          <div class="item-listas p-2">
+            <div class="item-raiz">
+              <strong>
+                <a href="{% url 'sapl.materia:materialegislativa_detail' rv.materia.id %}">
+                  {{rv.materia.tipo.sigla}} {{rv.materia.numero}}/{{rv.materia.ano}} - {{rv.materia.tipo}}
+                </a>
+              </strong>
+              <ul class="m-0">
+                <li>
+                  <a href="{% url 'sapl.sessao:resumo' rv.item_sessao.sessao_plenaria_id %}"
+                    title="{{rv.item_sessao.sessao_plenaria}}">
+                    {{ rv.item_sessao.sessao_plenaria.data_inicio }}
+                    {% if rv.item_sessao.resultado %}
+                    - {{ rv.item_sessao.resultado }}
+                    {% else %}
+                    - {{ rv.tipo_resultado_votacao.nome }}
+                    {% endif %}
+                  </a>
+                  <i><br><small>{{rv.item_sessao.sessao_plenaria}}</small></i>
+                  <i>
+                    {% if rv.item_sessao.registrovotacao_set.first.observacao %}<br><small>{{ rv.item_sessao.registrovotacao_set.first.observacao}}</small>{% endif %}
+                  </i>
+                </li>
+                <li>
+                  <strong>Votação {{ rv.item_sessao.get_tipo_votacao_display }}:</strong><br>
+                  <strong>Sim: </strong>{{ rv.numero_votos_sim }} |
+                  <strong>Não: </strong>{{ rv.numero_votos_nao }}
+                  {% if rv.numero_abstencoes %}
+                    | <strong>Abstenções: </strong>{{ rv.numero_abstencoes }}
+                  {% endif %}
+                  {% if rv.item_sessao.tipo_votacao == 2 %}
+                    <br>-------------<br>
+                    {% for vp in rv.votoparlamentar_set.all %}
+                      <strong>{{vp.parlamentar}}</strong> ({{vp.voto}}){% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                  {% endif %}
+              </ul>
+            </div>
+          </div>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock body_content %}

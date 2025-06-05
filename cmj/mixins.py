@@ -23,6 +23,9 @@ from pdfrw.pdfreader import PdfReader
 from weasyprint import HTML
 from xlsxwriter.workbook import Workbook as XlsxWorkbook
 
+from cmj.utils_report import make_pdf
+from django.template.loader import render_to_string
+
 from cmj.utils import run_sql, get_settings_auth_user_model, ProcessoExterno
 from sapl.crispy_layout_mixin import to_row, SaplFormLayout, \
     form_actions
@@ -563,7 +566,7 @@ class MultiFormatOutputMixin:
 
             for subtitulo, ol in context['multi_object_list']:
                 ol.query.low_mark = 0
-                ol.query.high_mark = 0
+                ol.query.high_mark = None
 
             return getattr(self, f'render_to_{format_result}')(context)
 
@@ -762,3 +765,26 @@ class MultiFormatOutputMixin:
             verbose_name = '/'.join(verbose_name).strip()
             yield f'{verbose_name}'
 
+
+    def render_to_pdf(self, context):
+        base_url = self.request.build_absolute_uri()
+
+        template_pdf = self.get_template_pdf()
+
+        template = render_to_string(template_pdf, context)
+        pdf_file = make_pdf(base_url=base_url, main_template=template)
+
+        response = HttpResponse(content_type='application/pdf;')
+        response['Content-Disposition'] = 'inline; filename=relatorio.pdf'
+        response['Cache-Control'] = 'no-cache'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        response['Content-Length'] = len(pdf_file)
+        response['Content-Type'] = 'application/pdf'
+        response['Content-Transfer-Encoding'] = 'binary'
+        response.write(pdf_file)
+        return response
+
+    def get_template_pdf(self) -> str:
+        prefix = type(self).__name__
+        return f'relatorios/pdf/{prefix}_pdf.html'
