@@ -11,8 +11,11 @@
     url: sapl.sessao:pauta_sessao
   - title: {% trans 'Pautas das Comissões' %}
     url: sapl.sessao:pauta_comissao
+  - title: {% trans 'Votações' %}
+    url: sapl.sessao:votacoes_pesquisar
   - title: {% trans 'Relatórios' %}
     url: sapl.base:relatorios_list
+
   - title: {% trans 'Sessão OnLine' %}
     url: /online/
   - title: {% trans 'Tramitação em Lote' %}

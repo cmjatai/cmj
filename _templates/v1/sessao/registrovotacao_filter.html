@@ -3,19 +3,25 @@
 
 
 {% block actions %}
-  <div class="d-flex justify-content-end">
+  {% if show_results %}
+  <div class="w-100 d-flex justify-content-between">
+    <a href="{% url 'sapl.sessao:votacoes_pesquisa' %}" class="btn btn-outline-primary">{% trans 'Fazer nova pesquisa' %}</a>
+
     {% with 'sapl.sessao:votacoes_pesquisa' as url_reverse %}
-      {% include "crud/format_options.html" %}
+    {% include "crud/format_options.html" %}
     {% endwith %}
   </div>
-
+{% endif %}
 {% endblock %}
 
 {% block detail_content %}
+  {% if not show_results %}
     {% crispy filter.form %}
+  {% endif %}
 {% endblock %}
 
 {% block table_content %}
+{% if show_results %}
 
     <div class="container-table">
       <div class="result-count">Total de Registros de Votação: <strong>{{paginator.count}}</strong></div>
@@ -31,28 +37,28 @@
 
                 <ul class="m-0">
                   <li>
-                    <a href="{% url 'sapl.sessao:resumo' rv.ordem.sessao_plenaria_id %}"
-                      title="{{rv.ordem.sessao_plenaria}}">
-                      {{ rv.ordem.sessao_plenaria.data_inicio }}
-                      {% if rv.ordem.resultado %}
-                      - {{ rv.ordem.resultado }}
+                    <a href="{% url 'sapl.sessao:resumo' rv.item_sessao.sessao_plenaria_id %}"
+                      title="{{rv.item_sessao.sessao_plenaria}}">
+                      {{ rv.item_sessao.sessao_plenaria.data_inicio }}
+                      {% if rv.item_sessao.resultado %}
+                      - {{ rv.item_sessao.resultado }}
                       {% else %}
                       - {{ rv.tipo_resultado_votacao.nome }}
                       {% endif %}
                     </a>
-                    <i><br><small>{{rv.ordem.sessao_plenaria}}</small></i>
+                    <i><br><small>{{rv.item_sessao.sessao_plenaria}}</small></i>
                     <i>
-                      {% if rv.ordem.registrovotacao_set.first.observacao %}<br><small>{{ rv.ordem.registrovotacao_set.first.observacao}}</small>{% endif %}
+                      {% if rv.item_sessao.registrovotacao_set.first.observacao %}<br><small>{{ rv.ordem.registrovotacao_set.first.observacao}}</small>{% endif %}
                     </i>
                   </li>
                   <li>
-                    <strong>Votação {{ rv.ordem.get_tipo_votacao_display }}:</strong><br>
+                    <strong>Votação {{ rv.item_sessao.get_tipo_votacao_display }}:</strong><br>
                     <strong>Sim: </strong>{{ rv.numero_votos_sim }} |
                     <strong>Não: </strong>{{ rv.numero_votos_nao }}
                     {% if rv.numero_abstencoes %}
                       | <strong>Abstenções: </strong>{{ rv.numero_abstencoes }}
                     {% endif %}
-                    {% if rv.ordem.tipo_votacao == 2 %}
+                    {% if rv.item_sessao.tipo_votacao == 2 %}
                       <br>-------------<br>
                       {% for vp in rv.votoparlamentar_set.all %}
                         <strong>{{vp.parlamentar}}</strong> ({{vp.voto}}){% if not forloop.last %}, {% endif %}
@@ -68,4 +74,5 @@
       </table>
     </div>
     {% include "paginacao.html" %}
+{% endif %}
 {% endblock table_content %}
