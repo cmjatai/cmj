@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from django.views.generic.detail import DetailView
 
 from sapl.materia.models import Autoria
-from sapl.sessao.views import PesquisarSessaoPlenariaView
+from sapl.sessao.filterviews import PesquisarSessaoPlenariaView
 
 from .forms import (PautaSessaoFilterSet, PautaComissaoFilterSet,)
 from .models import (ExpedienteMateria, ExpedienteSessao, OradorExpediente, OrdemDia,

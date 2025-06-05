@@ -132,12 +132,14 @@
               {% endblock base_workspace %}
 
               {% block subtitle %}
-                  {% if subtitle %}
+                  {% if subtitle and '<' not in subtitle %}
                     <h2 class="page-header p-0 px-4">
                       <small><small>
-                        <em>{{ subtitle|safe|linebreaksbr }}</em>
+                        <em>{{ subtitle }}</em>
                       </small></small>
                     </h2>
+                  {% elif subtitle %}
+                    {{ subtitle|safe }}
                   {% endif %}
               {% endblock %}
 

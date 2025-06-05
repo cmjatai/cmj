@@ -621,6 +621,23 @@ def choice_anos(model):
     except Exception:
         return []
 
+def choice_anos_com_votacao():
+    from sapl.sessao.models import RegistroVotacao
+    try:
+        anos_list = RegistroVotacao.objects.filter(
+            ordem__isnull=False
+        ).distinct(
+            'ordem__sessao_plenaria__data_inicio__year'
+        ).order_by(
+            '-ordem__sessao_plenaria__data_inicio__year'
+        ).values_list(
+            'ordem__sessao_plenaria__data_inicio__year',
+            'ordem__sessao_plenaria__data_inicio__year'
+        )
+        return list(anos_list)
+    except Exception:
+        return []
+
 
 def choice_anos_com_materias():
     from sapl.materia.models import MateriaLegislativa

@@ -1,0 +1,71 @@
+{% extends "crud/detail.html" %}
+{% load i18n crispy_forms_tags common_cmj_tags %}
+
+
+{% block actions %}
+  <div class="d-flex justify-content-end">
+    {% with 'sapl.sessao:votacoes_pesquisa' as url_reverse %}
+      {% include "crud/format_options.html" %}
+    {% endwith %}
+  </div>
+
+{% endblock %}
+
+{% block detail_content %}
+    {% crispy filter.form %}
+{% endblock %}
+
+{% block table_content %}
+
+    <div class="container-table">
+      <div class="result-count">Total de Registros de Votação: <strong>{{paginator.count}}</strong></div>
+        {% if paginator.count %}
+          {% for rv in page_obj %}
+            <div class="item-listas p-2">
+              <div class="item-raiz">
+                <strong>
+                  <a href="{% url 'sapl.materia:materialegislativa_detail' rv.materia.id %}">
+                    {{rv.materia.tipo.sigla}} {{rv.materia.numero}}/{{rv.materia.ano}} - {{rv.materia.tipo}}
+                  </a>
+                </strong><br>
+
+                <ul class="m-0">
+                  <li>
+                    <a href="{% url 'sapl.sessao:resumo' rv.ordem.sessao_plenaria_id %}"
+                      title="{{rv.ordem.sessao_plenaria}}">
+                      {{ rv.ordem.sessao_plenaria.data_inicio }}
+                      {% if rv.ordem.resultado %}
+                      - {{ rv.ordem.resultado }}
+                      {% else %}
+                      - {{ rv.tipo_resultado_votacao.nome }}
+                      {% endif %}
+                    </a>
+                    <i><br><small>{{rv.ordem.sessao_plenaria}}</small></i>
+                    <i>
+                      {% if rv.ordem.registrovotacao_set.first.observacao %}<br><small>{{ rv.ordem.registrovotacao_set.first.observacao}}</small>{% endif %}
+                    </i>
+                  </li>
+                  <li>
+                    <strong>Votação {{ rv.ordem.get_tipo_votacao_display }}:</strong><br>
+                    <strong>Sim: </strong>{{ rv.numero_votos_sim }} |
+                    <strong>Não: </strong>{{ rv.numero_votos_nao }}
+                    {% if rv.numero_abstencoes %}
+                      | <strong>Abstenções: </strong>{{ rv.numero_abstencoes }}
+                    {% endif %}
+                    {% if rv.ordem.tipo_votacao == 2 %}
+                      <br>-------------<br>
+                      {% for vp in rv.votoparlamentar_set.all %}
+                        <strong>{{vp.parlamentar}}</strong> ({{vp.voto}}){% if not forloop.last %}, {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                </ul>
+              </div>
+            </div>
+          {% endfor %}
+        {% else  %}
+          <tr><td><h3>Nenhum registro de votação encontrado com essas especificações filtradas</h3></td></tr>
+        {% endif %}
+      </table>
+    </div>
+    {% include "paginacao.html" %}
+{% endblock table_content %}
