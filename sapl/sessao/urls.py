@@ -1,12 +1,12 @@
 from django.urls.conf import re_path, include
 
+from sapl.sessao.filterviews import PesquisarSessaoPlenariaView, RegistroVotacaoFilterView
 from sapl.sessao.views import (AdicionarVariasMateriasExpediente,
                                AdicionarVariasMateriasOrdemDia,
                                ExpedienteMateriaCrud, ExpedienteView, JustificativaAusenciaCrud,
                                OcorrenciaSessaoView, MateriaOrdemDiaCrud, OradorOrdemDiaCrud,
                                MesaView, OradorCrud,
                                OradorExpedienteCrud, PainelView,
-                               PesquisarSessaoPlenariaView,
                                PresencaOrdemDiaView, PresencaView,
                                ResumoView, ResumoAtaView, RetiradaPautaCrud, SessaoCrud,
                                TipoJustificativaCrud, TipoExpedienteCrud, TipoResultadoVotacaoCrud,
@@ -215,5 +215,7 @@ urlpatterns = [
 
     re_path(r'^sessao/(?P<pk>\d+)/(?P<iso>\d+)/(?P<oid>\d+)/retirar-leitura$',
             retirar_leitura, name='retirar_leitura'),
+
+    re_path(r'^sessao/votacoes', RegistroVotacaoFilterView.as_view(), name='votacoes_pesquisa'),
 
 ]

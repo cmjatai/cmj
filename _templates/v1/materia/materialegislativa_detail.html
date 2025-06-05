@@ -43,7 +43,7 @@
     {% include 'core/sign_widget.html' %}
   {% endwith %}
   </div>
-  {{ breadcrumb_subtitle }}
+  {{ breadcrumb_subtitle|safe }}
 
 {% endblock title %}
 
