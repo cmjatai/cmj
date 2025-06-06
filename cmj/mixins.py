@@ -509,7 +509,7 @@ class AudigLogFilterMixin:
 
 class MultiFormatOutputMixin:
 
-    formats_impl = 'csv', 'xlsx', 'json'
+    formats_export = 'csv', 'xlsx', 'json'
 
     queryset_values_for_formats = True
 
@@ -527,7 +527,7 @@ class MultiFormatOutputMixin:
             'format', None)
 
         if format_result:
-            if format_result not in self.formats_impl:
+            if format_result not in self.formats_export:
                 raise ValidationError(
                     'Formato Inválido e/ou não implementado!')
 
@@ -549,6 +549,7 @@ class MultiFormatOutputMixin:
             return rendered
 
         context = self.get_context()
+        context.update({'formats_export': self.formats_export})
         return render(self.request, self.template, context)
 
     def render_to_response(self, context, **response_kwargs):
@@ -557,7 +558,7 @@ class MultiFormatOutputMixin:
             'format', None)
 
         if format_result:
-            if format_result not in self.formats_impl:
+            if format_result not in self.formats_export:
                 raise ValidationError(
                     'Formato Inválido e/ou não implementado!')
 
