@@ -279,6 +279,7 @@ class MateriaSearchForm(SearchForm):
 
     autoria_is = forms.CharField(
         required=False,
+        label=_('Autor'),
         widget=forms.HiddenInput(attrs={'id': 'id_autoria__autor'}))
 
     def no_query_found(self):

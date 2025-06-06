@@ -93,7 +93,9 @@ def to_dict(arg):
 def to_descr(arg):
     return arg.__descr__
 
-
+@register.filter
+def is_list(arg):
+    return isinstance(arg, list)
 
 @register.filter
 def get_last_item_from_list(list, arg):
