@@ -1,6 +1,7 @@
 
 import csv
 import io
+import json
 import logging
 
 from crispy_forms.helper import FormHelper
@@ -511,7 +512,12 @@ class MultiFormatOutputMixin:
 
     formats_export = 'csv', 'xlsx', 'json'
 
-    queryset_values_for_formats = True
+    queryset_values_for_formats = {
+        'csv': True,
+        'xlsx': True,
+        'json': True,
+        'pdf': True,
+    }
 
     class ValueResult(SearchResult):
         def _get_object(self):
@@ -545,14 +551,28 @@ class MultiFormatOutputMixin:
 
             context['object_list'] = items
 
+            context['title'] = context.get(
+                'title',
+                'Relatório - {}'.format(self.model._meta.verbose_name_plural)
+            )
+
             rendered = getattr(self, f'render_to_{format_result}')(context)
             return rendered
 
         context = self.get_context()
+
         context.update({'formats_export': self.formats_export})
+
         return render(self.request, self.template, context)
 
     def render_to_response(self, context, **response_kwargs):
+
+        context.update({'formats_export': self.formats_export})
+
+        context['title'] = context.get(
+            'title',
+            'Relatório - {}'.format(self.model._meta.verbose_name_plural)
+        )
 
         format_result = getattr(self.request, self.request.method).get(
             'format', None)
@@ -573,17 +593,17 @@ class MultiFormatOutputMixin:
 
         return super().render_to_response(context, **response_kwargs)
 
-    def render_to_json(self, context):
+    def to_json(self, context, for_format='json'):
 
         object_list = context['object_list']
 
-        if self.queryset_values_for_formats:
+        if self.queryset_values_for_formats[for_format]:
             object_list = object_list.values(
-                *self.fields_report['json'])
+                *self.fields_report[for_format])
 
         data = []
         for obj in object_list:
-            wr = list(self._write_row(obj, 'json'))
+            wr = list(self._write_row(obj, for_format))
 
             if not data:
                 data.append([wr])
@@ -605,14 +625,19 @@ class MultiFormatOutputMixin:
                             v[rc] = f'{v[rc]}\r\n{cell}'
 
             data[mri] = dict(
-                map(lambda i, j: (i, j), self.fields_report['json'], v))
+                map(lambda i, j: (i, j), self.fields_report[for_format], v))
 
-        json_metadata = {
+        json_results = {
             'headers': dict(
-                map(lambda i, j: (i, j), self.fields_report['json'], self._headers('json'))),
+                map(lambda i, j: (i, j), self.fields_report[for_format], self._headers(for_format))),
             'results': data
         }
-        response = JsonResponse(json_metadata)
+        context.update({'json_results': json_results})
+        return json_results
+
+    def render_to_json(self, context):
+        json_results = self.to_json(context)
+        response = JsonResponse(json_results)
         response['Content-Disposition'] = f'attachment; filename="portalcmj_{self.request.resolver_match.url_name}.json"'
         response['Cache-Control'] = 'no-cache'
         response['Pragma'] = 'no-cache'
@@ -631,7 +656,7 @@ class MultiFormatOutputMixin:
 
         object_list = context['object_list']
 
-        if self.queryset_values_for_formats:
+        if self.queryset_values_for_formats['csv']:
             object_list = object_list.values(
                 *self.fields_report['csv'])
 
@@ -661,7 +686,7 @@ class MultiFormatOutputMixin:
 
         object_list = context['object_list']
 
-        if self.queryset_values_for_formats:
+        if self.queryset_values_for_formats['xlsx']:
             object_list = object_list.values(
                 *self.fields_report['xlsx'])
 
@@ -772,6 +797,7 @@ class MultiFormatOutputMixin:
 
         template_pdf = self.get_template_pdf()
 
+        self.to_json(context, for_format='pdf')
         template = render_to_string(template_pdf, context)
         pdf_file = make_pdf(base_url=base_url, main_template=template)
 
@@ -788,4 +814,7 @@ class MultiFormatOutputMixin:
 
     def get_template_pdf(self) -> str:
         prefix = type(self).__name__
-        return f'relatorios/pdf/{prefix}_pdf.html'
+        return [
+            f'relatorios/pdf/{prefix}_pdf.html',
+            f'relatorios/pdf/json_to_pdf.html',
+        ]

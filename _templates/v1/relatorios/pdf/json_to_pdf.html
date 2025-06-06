@@ -1,0 +1,59 @@
+{% extends "base_pdf.html" %}
+{% load common_tags %}
+
+{% block head_extra_css %}
+
+  {% include "css/base_table.css" %}
+
+  table {
+    font-size: 11pt;
+    width: 196mm;
+  }
+  table td {
+    padding: 3px 7px;
+  }
+  ul {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 0.2cm;
+  }
+
+  .whitespace {
+    white-space: nowrap !important;
+  }
+
+{% endblock head_extra_css %}
+
+{% block body_content %}
+
+<table>
+  <thead>
+    <tr>
+      {% for head in json_results.headers.items %}
+        <th>{{ head.1 }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for row in json_results.results %}
+      <tr>
+        {% for field, value in row.items %}
+          <td>
+            {% if value|is_list %}
+              <ul>
+                {% for item in value %}
+                  <li>{{ item|safe }}</li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              {{ value|safe }}
+            {% endif %}
+          </td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+</table>
+
+{% endblock body_content %}

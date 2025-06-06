@@ -159,7 +159,12 @@ class PesquisarSessaoPlenariaView(AudigLogFilterMixin, MultiFormatOutputMixin, F
 
     viewname = 'sapl.sessao:pesquisar_sessao'
 
-    queryset_values_for_formats = False
+    queryset_values_for_formats = {
+        'csv': False,
+        'xlsx': False,
+        'json': False,
+        'pdf': False,
+    }
 
     fields_base_report = [
         'id',
