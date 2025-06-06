@@ -71,7 +71,7 @@ class RegistroVotacaoFilterView(AudigLogFilterMixin, MultiFormatOutputMixin, Fil
         '-ordem__sessao_plenaria',
         '-ordem__numero_ordem')
 
-    formats_impl = 'csv', 'xlsx', 'json', 'pdf'
+    formats_export = 'csv', 'xlsx', 'json', 'pdf'
 
     fields_base_report = [
         'id',

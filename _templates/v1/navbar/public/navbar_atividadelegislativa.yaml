@@ -12,7 +12,7 @@
   - title: {% trans 'Pautas das Comissões' %}
     url: sapl.sessao:pauta_comissao
   - title: {% trans 'Votações' %}
-    url: sapl.sessao:votacoes_pesquisar
+    url: sapl.sessao:votacoes_pesquisa
   - title: {% trans 'Relatórios' %}
     url: sapl.base:relatorios_list
 
