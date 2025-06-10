@@ -1,6 +1,8 @@
 {% load i18n common_cmj_tags %}
 - title: {% trans 'Atividade Legislativa' %}
   children:
+  - title: {% trans 'DASHBOARD' %}
+    url: sapl.materia:materia_dashboard
   - title: {% trans 'Matérias Legislativas' %}
     url: {% url 'cmj.search:materia_haystack_search' %}
   - title: {% trans 'Orçamento Impositivo' %}
