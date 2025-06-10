@@ -12,5 +12,8 @@
     {% else %}
       <canvas id="{{ card.dash_name|slugify }}_chart" data-url="{{ card.url }}" role="dashcard-render"></canvas>
     {% endif %}
+    {% if card.rodape %}
+    <span><em>{{ card.rodape }}</em></span>
+    {% endif %}
   </div>
 </div>

@@ -101,7 +101,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         return self.filterset(data=data, queryset=queryset)
 
     def apply_filters(self, request, queryset):
-        filter = self.get_filter(data=request.GET, queryset=queryset)
+        filter = self.get_filter(data=request.GET if hasattr(request, 'GET') else request, queryset=queryset)
         if filter is not None:
             queryset = filter.qs
         return queryset
@@ -251,6 +251,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
             "render_filterset": self.render_filterset,
             "previous_page": self.get_prev_page(),
             "next_page": self.get_next_page(),
+            'rodape': self.rodape if hasattr(self, 'rodape') else None,
         }
 
         context.update(self.get_extra_context())

@@ -349,16 +349,9 @@
                   </div>
                 {% endif %}
 
-                {% if m.tipo.turnos_aprovacao > 1 and m.em_tramitacao and perms.materia.add_materialegislativa %}
-                  {% if not m.texto_articulado.first or m.texto_articulado.first.dispositivos_set.count < 4 %}
-                    <strong class="text-red">ATENÇÂO!!! Verificar Texto Articulado...</strong><br>
-                  {% endif %}
-                {% endif %}
-
                 {% if m.em_tramitacao and mail_service_configured %}
                 <a class="btn btn-sm btn-outline-primary" href="{% url 'sapl.materia:acompanhar_materia' m.id %}" data-toggle="tooltip" data-placement="top" title="Registre seu email para acompanhamento desta matéria. Você receberá um email sempre que está materia tramitar.">Acompanhar Matéria</a>
                 {% endif %}
-
 
                 {% if False %}
                   {% if m.audienciapublica_set.exists %}
