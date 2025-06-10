@@ -1,10 +1,11 @@
 
 from collections import OrderedDict
 import re
+import sys
 
 from django import forms
 from cmj.dashboard import Dashcard, GridDashboard
-from django.db.models import Count
+from django.db.models import Count, F, Q
 from django.db.models.functions import TruncMonth
 from sapl.crispy_layout_mixin import to_row
 from sapl.materia.forms import CHOICE_TRAMITACAO
@@ -256,7 +257,42 @@ class MateriaTotalizerFiltered(MateriaTotalizer):
     render_filterset = False
     filterable = True
 
-class MateriaDashboard(Dashcard):
+class OrderedResultMixin:
+
+    def chartdata(self, request, queryset=None, limit=20):
+        cd =  super().chartdata(request, queryset)
+
+        labels = cd['data']['labels']
+        datasets__data = cd['data']['datasets'][0]['data']
+
+        # Sort the labels and datasets__data by datasets__data
+        sorted_data = sorted(
+            filter(
+                lambda y: y[0],
+                zip(labels, datasets__data)
+            ),
+            key=lambda x: x[1],
+            reverse=True
+            )
+        if sorted_data:
+            labels, datasets__data = zip(*sorted_data)
+
+        # agrupa os dados da posição 20 em diante
+        if len(labels) > limit:
+            labels = list(labels[:limit]) + ['Outros']
+            datasets__data = list(datasets__data[:limit]) + [sum(datasets__data[limit:])]
+        else:
+            labels = list(labels)
+            datasets__data = list(datasets__data)
+
+
+        # Update the chart data with sorted values
+        cd['data']['labels'] = labels
+        cd['data']['datasets'][0]['data'] = datasets__data
+
+        return cd
+
+class MateriaDashboard(OrderedResultMixin, Dashcard):
     title = _('Distribuição por Assunto')
     description = _('Distribuição de Matérias por assunto')
     chart_type = Dashcard.TYPE_BAR
@@ -287,31 +323,6 @@ class MateriaDashboard(Dashcard):
 
         return labels
 
-    def chartdata(self, request, queryset=None):
-        cd =  super().chartdata(request, queryset)
-
-        labels = cd['data']['labels']
-        datasets__data = cd['data']['datasets'][0]['data']
-
-        # Sort the labels and datasets__data by datasets__data
-        sorted_data = sorted(zip(labels, datasets__data), key=lambda x: x[1], reverse=True)
-        if sorted_data:
-            labels, datasets__data = zip(*sorted_data)
-
-        # agrupa os dados da posição 20 em diante
-        if len(labels) > 20:
-            labels = list(labels[:20]) + ['Outros']
-            datasets__data = list(datasets__data[:20]) + [sum(datasets__data[20:])]
-        else:
-            labels = list(labels)
-            datasets__data = list(datasets__data)
-
-
-        # Update the chart data with sorted values
-        cd['data']['labels'] = labels
-        cd['data']['datasets'][0]['data'] = datasets__data
-
-        return cd
 
 class MateriaMonthlyDashboard(Dashcard):
     title = _('Distribuição Mensal de Matérias')
@@ -322,7 +333,7 @@ class MateriaMonthlyDashboard(Dashcard):
 
     render_filterset = False
 
-    style="height: 35vh;"
+    style="height: 40vh;"
 
     datasets = [
         {
@@ -397,53 +408,6 @@ class MateriaSearchDashboard(GridDashboard):
         ]
     }
 
-class MateriaDashboardView(GridDashboard, TemplateView):
-
-    app_config = 'materia'
-    cards = [
-        MateriaTotalizer,
-        MateriaTotalizerFiltered,
-        MateriaMonthlyDashboard,
-        MateriaDashboard,
-    ]
-
-    filterset = MateriaFilterSet
-
-    grid = {
-        'rows': [
-            {
-
-                'cols': [
-                    ('__filter__', 3),
-                    (
-                        {
-                            'rows': [
-                                {
-                                    'cols': [
-                                        ('materiatotalizer', 6),
-                                        ('materiatotalizerfiltered', 6),
-                                        ('materiamonthlydashboard', 12),
-                                        ('materiadashboard', 12),
-                                    ]
-                                }
-                            ]
-                        }, 9
-                    )
-                ]
-            },
-        ]
-    }
-
-    def get_template_names(self):
-        return ['dashboard/materia/materia_search_dashboard.html']
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title'] = _('Dashboard de Matérias Legislativas')
-        return context
-
-
-
 
 class MateriaParlamentarDashboard(GridDashboard):
 
@@ -487,4 +451,100 @@ class MateriaParlamentarDashboard(GridDashboard):
         ]
     }
 
+class PartidoDashboard(OrderedResultMixin, Dashcard):
+    title = _('Distribuição de Matérias por Partido')
+    description = _('Distribuição de Matérias por partido')
+    chart_type = Dashcard.TYPE_BAR
+    model = MateriaLegislativa
+    label_field = "autoria__autor__parlamentar_set__filiacao__partido__sigla"
+    label_name = _("Partidos")
+    style="height: 40vh;"
 
+    render_filterset = False
+
+    datasets = [
+        {
+            "label": _("Qtd. de Matérias por Partido"),
+            "data_field": ("autoria__autor__parlamentar_set__filiacao__partido__sigla", Count)
+        }
+    ]
+    chart_options = {
+        "maintainAspectRatio": False,
+    }
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+
+        q = Q(
+            autoria__autor__parlamentar_set__filiacao__data_desfiliacao__isnull=True,
+            data_apresentacao__gte=F('autoria__autor__parlamentar_set__filiacao__data')
+            ) | Q(
+            data_apresentacao__range=(
+                F('autoria__autor__parlamentar_set__filiacao__data'),
+                F('autoria__autor__parlamentar_set__filiacao__data_desfiliacao')
+            )
+        )
+        q = q & Q(
+            autoria__autor__parlamentar_set__filiacao__partido__sigla__isnull=False
+        )
+
+        qs = qs.filter(q)
+        #    #autoria__autor__parlamentar_set__filiacao__data_desfiliacao__isnull=True,
+        #    #autoria__autor__parlamentar_set__ativo=True
+        #)
+        qs = qs.order_by(
+            'id',
+            ).distinct()
+        return qs
+
+    def get_datasets(self, request, queryset=None):
+        ds = super().get_datasets(request, queryset)
+        # agrupamento do dataset incorreto se autor for selecionado
+        return ds
+
+class MateriaDashboardView(GridDashboard, TemplateView):
+
+    app_config = 'materia'
+    cards = [
+        MateriaTotalizer,
+        MateriaTotalizerFiltered,
+        MateriaMonthlyDashboard,
+        MateriaDashboard,
+        PartidoDashboard,
+    ]
+
+    filterset = MateriaFilterSet
+
+    grid = {
+        'rows': [
+            {
+
+                'cols': [
+                    ('__filter__', 3),
+                    (
+                        {
+                            'rows': [
+                                {
+                                    'cols': [
+                                        ('materiatotalizerfiltered', 6),
+                                        ('materiatotalizer', 6),
+                                        ('materiamonthlydashboard', 6),
+                                        ('partidodashboard', 6),
+                                        ('materiadashboard', 12),
+                                    ]
+                                }
+                            ]
+                        }, 9
+                    )
+                ]
+            },
+        ]
+    }
+
+    def get_template_names(self):
+        return ['dashboard/materia/materia_search_dashboard.html']
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = _('Dashboard de Matérias Legislativas')
+        return context

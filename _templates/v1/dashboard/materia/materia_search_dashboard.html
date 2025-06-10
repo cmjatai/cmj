@@ -1,4 +1,6 @@
 {% extends "base.html" %}
+{% load i18n %}
+
 {% load webpack_static from webpack_loader %}
 
 {% block head_content %}
@@ -6,8 +8,12 @@
   <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
 {% endblock %}
 
+
+{% block second_header %}{% endblock second_header %}
+
 {% block content_container %}
-  <div class="container-fluid">
+<div class="container-fluid pt-1">
+    <h2 style="font-variant: small-caps;">{% trans "Dashboard de Matérias Legislativas" %}</h2>
     {{ dashboard.dash_grids.materiadashboardview }}
   </div>
 {% endblock content_container %}

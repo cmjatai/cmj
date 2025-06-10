@@ -75,7 +75,6 @@ $(function () {
     var form = $(this.form)
     plot_charts(form)
   })[0]
-  $(firstChild).trigger('change')
 
   $('form[role="chart-filter"] :input').on('change', function (e) {
     var form = $(this.form)
@@ -91,6 +90,17 @@ $(function () {
     var target = $(nav_btn.attr('data-chart-target'))
     var url = nav_btn.attr('href')
     plot_chart(target, url)
+  })
+
+  // Initial plot of charts
+  $('form[role="chart-global-filter"]').each(function (idx, item) {
+    var form = $(item)
+    // lê query string e aplica no filtro
+    let qs = new URLSearchParams(window.location.search)
+    for (const [key, value] of qs.entries()) {
+      form.find(`[name="${key}"]`).val(value)
+    }
+    plot_charts(form)
   })
 
 })
