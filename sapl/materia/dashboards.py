@@ -13,7 +13,7 @@ from sapl.materia.forms import CHOICE_TRAMITACAO
 from sapl.materia.models import AssuntoMateria, MateriaLegislativa, StatusTramitacao, TipoMateriaLegislativa, UnidadeTramitacao
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
-from django_filters import FilterSet, CharFilter, ChoiceFilter, ModelMultipleChoiceFilter, MultipleChoiceFilter
+from django_filters import FilterSet, CharFilter, ChoiceFilter, ModelChoiceFilter, ModelMultipleChoiceFilter, MultipleChoiceFilter
 from django.views.generic import TemplateView
 from django.utils import timezone
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
@@ -83,10 +83,12 @@ class MateriaFilterSet(FilterSet):
         choices=CHOICE_TRAMITACAO
     )
 
-    autoria_is = CharFilter(
+    autoria_is = ModelChoiceFilter(
         required=False,
         field_name='autoria__autor',
-        widget=forms.HiddenInput(attrs={'id': 'id_autoria__autor'}))
+        queryset=Autor.objects.all(),
+        widget=forms.HiddenInput(attrs={'id': 'id_autoria__autor'})
+    )
 
     uta_i = ModelMultipleChoiceFilter(
         required=False,
