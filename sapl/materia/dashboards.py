@@ -7,6 +7,7 @@ from django import forms
 from cmj.dashboard import Dashcard, GridDashboard
 from django.db.models import Count, F, Q
 from django.db.models.functions import TruncMonth
+from sapl.base.models import Autor
 from sapl.crispy_layout_mixin import to_row
 from sapl.materia.forms import CHOICE_TRAMITACAO
 from sapl.materia.models import AssuntoMateria, MateriaLegislativa, StatusTramitacao, TipoMateriaLegislativa, UnidadeTramitacao
@@ -501,6 +502,55 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
         ds = super().get_datasets(request, queryset)
         # agrupamento do dataset incorreto se autor for selecionado
         return ds
+
+    def chartdata(self, request, queryset=None, limit=20):
+        cd = super().chartdata(request, queryset, limit)
+
+        data = request.GET.get('autoria_is', {}) if hasattr(request, 'GET') else request
+
+        autor_id = data if isinstance(data, str) else data.get('autoria_is', None)
+        if not autor_id:
+            return cd
+
+        autor = Autor.objects.filter(id=autor_id).first()
+        if not autor:
+            return cd
+
+        filiacoes = autor.parlamentar_set.values_list(
+            'filiacao__partido__sigla',
+            'filiacao__parlamentar',
+            'filiacao__data',
+            'filiacao__data_desfiliacao'
+        ).distinct()
+
+        if not filiacoes:
+            return cd
+
+        # filtra os dados do dataset para incluir apenas as matérias do autor
+        labels = cd['data']['labels']
+        datasets__data = cd['data']['datasets'][0]['data']
+        filtered_labels = []
+        filtered_data = []
+        qs = queryset or self.get_queryset(request)
+        for label, data in zip(labels, datasets__data):
+
+            for f in filiacoes:
+                if f[0] != label:
+                    continue
+
+                q = Q(
+                    autoria__autor=autor,
+                    data_apresentacao__range=(f[2], f[3] or timezone.now())
+                )
+                qs_partido = qs.filter(q)
+
+                filtered_labels.append(label)
+                filtered_data.append(qs_partido.count())
+
+        cd['data']['labels'] = filtered_labels
+        cd['data']['datasets'][0]['data'] = filtered_data
+
+        return cd
 
 class MateriaDashboardView(GridDashboard, TemplateView):
 

@@ -265,7 +265,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         config = {
             "type": self.chart_type,
             "data": {"labels": labels, "datasets": datasets},
-            "querystr": request.GET.urlencode(),
+            "querystr": request.GET.urlencode() if hasattr(request, 'GET') else '',
         }
         if self.chart_type == Dashcard.TYPE_HTML:
             context = config.pop("data")
