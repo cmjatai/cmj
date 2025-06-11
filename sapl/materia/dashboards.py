@@ -1,4 +1,5 @@
 
+from cProfile import label
 from collections import OrderedDict
 import re
 import sys
@@ -85,9 +86,10 @@ class MateriaFilterSet(FilterSet):
 
     autoria_is = ModelChoiceFilter(
         required=False,
+        label='',
         field_name='autoria__autor',
         queryset=Autor.objects.all(),
-        widget=forms.HiddenInput(attrs={'id': 'id_autoria__autor'})
+        widget=forms.Select(attrs={'id': 'id_autoria__autor', 'class': 'd-none'}),
     )
 
     uta_i = ModelMultipleChoiceFilter(
