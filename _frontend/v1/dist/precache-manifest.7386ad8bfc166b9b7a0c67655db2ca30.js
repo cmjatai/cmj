@@ -460,7 +460,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/construct.19b05260.js"
   },
   {
-    "revision": "341123490fddf969eca4e3288f55271e",
+    "revision": "a57940c7ace87ec7636c8b98aef7286a",
     "url": "/static/js/dashboard_custom.js"
   },
   {

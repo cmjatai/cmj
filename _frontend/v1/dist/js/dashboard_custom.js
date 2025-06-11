@@ -93,16 +93,12 @@ $(function () {
 
   // Initial plot of charts
   $('form[role="chart-global-filter"]').each(function (idx, item) {
-    setTimeout(function () {
-      var form = $(item)
-      // lê query string e aplica no filtro
-      let qs = new URLSearchParams(window.location.search)
-      for (const [key, value] of qs.entries()) {
-        form.find(`[name="${key}"]`).val(value)
-      }
-      plot_charts(form)
+    var form = $(item)
+    // lê query string e aplica no filtro
+    let qs = new URLSearchParams(window.location.search)
+    for (const [key, value] of qs.entries()) {
+      form.find(`[name="${key}"]`).val(value).trigger('change')
     }
-    , 500)
-  }
-  )
+    plot_charts(form)
+  })
 })
