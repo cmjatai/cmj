@@ -6,7 +6,7 @@
   {% endif %}
     <div class="row">
       {% for cardname, size in row.cols %}
-        <div class="col-{{ size }}">
+        <div class="col-12 col-md-{{ size }}">
           {% if cardname == '__filter__' %}
             {% if filter and render_filterset %}
               <form action=""

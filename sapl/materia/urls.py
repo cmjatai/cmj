@@ -3,7 +3,7 @@ from django.urls.conf import re_path, include
 from sapl.materia.dashboards import MateriaDashboardView
 from sapl.materia.views import (AcompanhamentoConfirmarView,
                                 AcompanhamentoExcluirView,
-                                AcompanhamentoMateriaView, AnaliseSimilaridadeCrud, AnexadaCrud,
+                                AcompanhamentoMateriaView, AnaliseSimilaridadeCrud, AnaliseSimilaridadeRankingCrud, AnexadaCrud,
                                 AssuntoMateriaCrud, AutoriaCrud,
                                 AutoriaMultiCreateView, ConfirmarProposicao,
                                 CriarProtocoloMateriaView, DespachoInicialCrud,
@@ -89,6 +89,8 @@ urlpatterns_materia = [
 
     re_path(r'^materia/dash', MateriaDashboardView.as_view(),
         name='materia_dashboard'),
+
+    re_path(r'^materia/similaridades', include(AnaliseSimilaridadeRankingCrud.get_urls())),
 
     re_path(r'^materia/(?P<pk>[0-9]+)/create_simplificado$',
         CriarProtocoloMateriaView.as_view(),

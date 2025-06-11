@@ -3625,6 +3625,58 @@ class CriarDocumentoAcessorioProtocolo(PermissionRequiredMixin, CreateView):
 
         return doc
 
+
+class AnaliseSimilaridadeRankingCrud(Crud):
+    model = AnaliseSimilaridade
+    public = [RP_LIST, RP_DETAIL]
+    list_field_names = [
+        'data_analise',
+        'similaridade',
+        'ia_name',
+        'analise',
+    ]
+
+    CreateView = None
+    UpdateView = None
+
+    class BaseMixin(Crud.BaseMixin):
+
+        @classmethod
+        def url_name(cls, suffix):
+            return '%sranking_%s' % (cls.model._meta.model_name, suffix)
+
+    class ListView(Crud.ListView):
+
+        paginate_by = 100
+        template_name = 'materia/analisesimilaridaderanking_list.html'
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+            filtro_minino = max(min(int(self.request.GET.get('lm', 50)), 100), 10)
+            qs = qs.filter(
+                similaridade__gte=filtro_minino
+                ).order_by('-data_analise__year', '-data_analise__month', '-similaridade', '-data_analise__day')
+            return qs
+
+        def hook_analise(self, obj, ss, url):
+            if obj.analise:
+                return md2html(obj.analise), ''
+            return '',''
+
+        def hook_similaridade(self, obj, ss, url):
+            return f'<span class="d-block text-center">{ss}%<span>', ''
+
+    class DetailView(Crud.DetailView):
+        def hook_analise(self, obj, verbose_name='', field_display=''):
+            if obj.analise:
+                return _('Análise'), md2html(obj.analise)
+            return _('Análise'), ''
+        def get_context_data(self, **kwargs):
+            ctx = super().get_context_data(**kwargs)
+            ctx['subnav_template_name'] = ''
+            return ctx
+
+
 class AnaliseSimilaridadeCrud(MasterDetailCrud):
     model = AnaliseSimilaridade
     parent_field = 'materia_1'
@@ -3661,3 +3713,4 @@ class AnaliseSimilaridadeCrud(MasterDetailCrud):
 
         def hook_similaridade(self, obj, ss, url):
             return f'<span class="d-block text-center">{ss}%<span>', ''
+
