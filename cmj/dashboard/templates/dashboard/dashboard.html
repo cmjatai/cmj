@@ -2,7 +2,7 @@
 {% for row in rows %}
   {% if forloop.first and not subrow%}
     <div class="dashboard grid-compact" id="{{dash.dashboard_name }}{{subrow}}">
-      {{title}}
+      <div class="dashtitle">{{title}}</div>
   {% endif %}
     <div class="row">
       {% for cardname, size in row.cols %}

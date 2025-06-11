@@ -299,7 +299,6 @@ class OrderedResultMixin:
 
 class MateriaDashboard(OrderedResultMixin, Dashcard):
     title = _('Distribuição por Assunto')
-    description = _('Distribuição de Matérias por assunto')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
     label_field = "assuntos__assunto"
@@ -331,7 +330,6 @@ class MateriaDashboard(OrderedResultMixin, Dashcard):
 
 class MateriaMonthlyDashboard(Dashcard):
     title = _('Distribuição Mensal de Matérias')
-    description = _('Distribuição de Matérias por mês')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
     label_field = ("data_apresentacao", TruncMonth, lambda d: d.strftime("%m/%Y"))
@@ -458,7 +456,7 @@ class MateriaParlamentarDashboard(GridDashboard):
 
 class PartidoDashboard(OrderedResultMixin, Dashcard):
     title = _('Distribuição de Matérias por Partido')
-    description = _('Distribuição de Matérias por partido')
+    description = _('Apenas matérias com autoria de parlamentares')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
     label_field = "autoria__autor__parlamentar_set__filiacao__partido__sigla"
@@ -466,6 +464,7 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
     style="height: 40vh;"
 
     render_filterset = False
+
 
     datasets = [
         {

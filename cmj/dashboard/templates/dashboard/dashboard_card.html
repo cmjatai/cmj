@@ -1,6 +1,8 @@
 {% load i18n %}
 <div class="card">
   <div class="card-title">{{ card.title }}</div>
+  <div class="card-description">{{ card.description|default:'&nbsp;' }}</div>
+
   <div class="card-body" style="{{ card.style|default:'' }}">
     {% if filter and render_filterset %}
       <form action="{{ card.url }}" role="chart-filter" data-chart-target="#{{ card.dash_name|slugify }}_{% if card.chart_type == card.TYPE_HTML %}html{% else %}chart{% endif %}">
@@ -12,8 +14,8 @@
     {% else %}
       <canvas id="{{ card.dash_name|slugify }}_chart" data-url="{{ card.url }}" role="dashcard-render"></canvas>
     {% endif %}
-    {% if card.rodape %}
-    <span><em>{{ card.rodape }}</em></span>
-    {% endif %}
   </div>
+  {% if card.rodape %}
+    <div class="card-rodape"><em>{{ card.rodape }}</em></div>
+  {% endif %}
 </div>
