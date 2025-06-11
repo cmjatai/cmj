@@ -382,17 +382,11 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
     render_filterset = True
     app_config = None
 
-    kwargs = {}
-
-    def __call__(self, *args, **kwds):
-        self.kwargs.update(kwds)
-        return self
 
     def get_filter(self, data=None, queryset=None):
         if self.filterset is None:
             return None
         data = data or {}
-        data.update(self.kwargs)
         #self.kwargs = {}  # Clear kwargs after using them
         filter = self.filterset(data=data, queryset=queryset)
         return filter
@@ -427,7 +421,7 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
         """
         return {}
 
-    def render(self):
+    def render(self, kwargs={}):
         if self.template_name:
             template_names = [self.template_name]
         else:
@@ -441,7 +435,7 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
             "dash": self,
             "rows": self.grid['rows'],
             "cards": {k: v[1] for k, v in self.cards.items()},
-            "filter": self.get_filter(),
+            "filter": self.get_filter(data=kwargs),
             'render_filterset': self.render_filterset,
             #"previous_page": self.get_prev_page(),
             #"next_page": self.get_next_page(),

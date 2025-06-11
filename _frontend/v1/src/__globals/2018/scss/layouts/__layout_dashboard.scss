@@ -26,7 +26,18 @@
   .card-title {
     font-family: "Roboto Condensed", Helvetica, sans-serif;
     font-weight: 400;
-    padding: 0.5rem;
+    color: $color_text_title;
+    padding: 0.5rem 0.5rem 0 0.5rem;
+    margin: 0;
+    line-height: 1;
+  }
+  .card-description {
+    font-family: "Roboto Condensed", Helvetica, sans-serif;
+    font-style: italic;
+    color: $color_text_descricao;
+    padding-left: 1rem;
+    margin: 0;
+    line-height: 1;
   }
 
 }
