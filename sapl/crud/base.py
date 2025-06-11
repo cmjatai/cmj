@@ -321,6 +321,8 @@ class CrudBaseMixin(CrispyLayoutFormMixin):
     @property
     def list_url(self):
         obj = self.crud if hasattr(self, 'crud') else self
+        if not obj.ListView:
+            return ''
         if not obj.ListView.permission_required:
             return self.resolve_url(ACTION_LIST)
         else:
@@ -331,6 +333,8 @@ class CrudBaseMixin(CrispyLayoutFormMixin):
     @property
     def create_url(self):
         obj = self.crud if hasattr(self, 'crud') else self
+        if not obj.CreateView:
+            return ''
         if not obj.CreateView.permission_required:
             return self.resolve_url(ACTION_CREATE)
         else:
@@ -341,6 +345,8 @@ class CrudBaseMixin(CrispyLayoutFormMixin):
     @property
     def detail_url(self):
         obj = self.crud if hasattr(self, 'crud') else self
+        if not obj.DetailView:
+            return ''
         if not obj.DetailView.permission_required:
             return self.resolve_url(ACTION_DETAIL, args=(self.object.id,))
         else:
@@ -351,6 +357,8 @@ class CrudBaseMixin(CrispyLayoutFormMixin):
     @property
     def update_url(self):
         obj = self.crud if hasattr(self, 'crud') else self
+        if not obj.UpdateView:
+            return ''
         if not obj.UpdateView.permission_required:
             return self.resolve_url(ACTION_UPDATE, args=(self.object.id,))
         else:
@@ -361,6 +369,8 @@ class CrudBaseMixin(CrispyLayoutFormMixin):
     @property
     def delete_url(self):
         obj = self.crud if hasattr(self, 'crud') else self
+        if not obj.DeleteView:
+            return ''
         if not obj.DeleteView.permission_required:
             return self.resolve_url(ACTION_DELETE, args=(self.object.id,))
         else:

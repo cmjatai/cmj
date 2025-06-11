@@ -1,0 +1,22 @@
+{% extends "crud/list.html" %}
+{% load i18n %}
+{% load common_tags %}
+
+
+{% block more_buttons %}
+    <a href="{% url 'sapl.materia:analisesimilaridaderanking_list' %}?lm=50" class="btn btn-{% if not request.GET.lm == '50' %}outline-{% endif %}primary">
+      {% trans "Similaridades >= 50%" %}
+    </a>
+    <a href="{% url 'sapl.materia:analisesimilaridaderanking_list'  %}?lm=60" class="btn btn-{% if not request.GET.lm == '60' %}outline-{% endif %}primary">
+      {% trans "Similaridades >= 60%" %}
+    </a>
+    <a href="{% url 'sapl.materia:analisesimilaridaderanking_list'  %}?lm=70" class="btn btn-{% if not request.GET.lm == '70' %}outline-{% endif %}primary">
+      {% trans "Similaridades >= 70%" %}
+    </a>
+    <a href="{% url 'sapl.materia:analisesimilaridaderanking_list'  %}?lm=80" class="btn btn-{% if not request.GET.lm == '80' %}outline-{% endif %}primary">
+      {% trans "Similaridades >= 80%" %}
+    </a>
+    <a href="{% url 'sapl.materia:analisesimilaridaderanking_list'  %}?lm=90" class="btn btn-{% if not request.GET.lm == '90' %}outline-{% endif %}primary">
+      {% trans "Similaridades >= 90%" %}
+    </a>
+{% endblock more_buttons %}

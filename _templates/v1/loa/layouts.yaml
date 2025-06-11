@@ -73,6 +73,7 @@ RegistroAjusteLoa:
 RegistroAjusteLoaDetail:
   {% trans 'Dados Gerais' %}:
   - tipo:2 emendaloa
+  - oficio_ajuste_loa
   - registroajusteloaparlamentar_set:5 descricao
 
 AgrupamentoCreate:

@@ -4,6 +4,7 @@ from collections import OrderedDict
 import re
 import sys
 
+from click import style
 from django import forms
 from cmj.dashboard import Dashcard, GridDashboard
 from django.db.models import Count, F, Q
@@ -305,6 +306,7 @@ class MateriaDashboard(OrderedResultMixin, Dashcard):
     label_name = _("Assuntos")
 
     render_filterset = False
+    style="height: 80vh;"
 
     datasets = [
         {
@@ -312,6 +314,10 @@ class MateriaDashboard(OrderedResultMixin, Dashcard):
         "data_field": ("assuntos", Count)
         }
     ]
+    chart_options = {
+        "maintainAspectRatio": False,
+    }
+
     #chart_options = {
     #    "scales": {"x": {"stacked": True}, "y": {"stacked": True}},
     ##    "plugins": {"tooltip": {"mode": "index"}},

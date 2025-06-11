@@ -2,7 +2,7 @@
 - title: {% trans 'Atividade Legislativa' %}
   children:
   - title: {% trans 'DASHBOARD' %}
-    url: /materia/dash?ano_id={% now 'Y' %}
+    url: /materia/dash?ano_i={% now 'Y' %}
   - title: {% trans 'Matérias Legislativas' %}
     url: {% url 'cmj.search:materia_haystack_search' %}
   - title: {% trans 'Orçamento Impositivo' %}

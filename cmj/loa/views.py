@@ -1453,7 +1453,6 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
             return context
 
 
-
 class RegistroAjusteLoaCrud(MasterDetailCrud):
     model = RegistroAjusteLoa
     parent_field = 'oficio_ajuste_loa__loa'
@@ -1476,6 +1475,10 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
             url = reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': obj.emendaloa.id})
             field_display = f'{obj.emendaloa.materia.epigrafe_short} - {obj.emendaloa.indicacao}<br>{obj.emendaloa.finalidade}'
             field_display = f'<a href="{url}">{field_display}</a>'
+            return verbose_name, field_display
+
+        def hook_oficio_ajuste_loa(self, obj, verbose_name='', field_display=''):
+            field_display = f'<a href="{obj.oficio_ajuste_loa.arquivo.url}">{obj.oficio_ajuste_loa.epigrafe}</a>'
             return verbose_name, field_display
 
     class UpdateView(MasterDetailCrud.UpdateView):
