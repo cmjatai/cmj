@@ -287,6 +287,7 @@ class Autor(models.Model):
 
     cargo = models.CharField(max_length=50, blank=True)
 
+
     sign_compression = models.BooleanField(
         verbose_name=_('Assinatura com compressão'),
         choices=YES_NO_CHOICES, default=False)

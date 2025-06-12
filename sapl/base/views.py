@@ -47,6 +47,7 @@ from sapl.materia.models import (Autoria, MateriaLegislativa, Proposicao, Anexad
                                  DocumentoAcessorio, TipoDocumento)
 from sapl.norma.models import (
     NormaJuridica, TipoNormaJuridica)
+from sapl.parlamentares.forms import FiliacaoForm
 from sapl.parlamentares.models import (Parlamentar, Legislatura, Mandato, Filiacao,
                                        SessaoLegislativa, Bancada, AfastamentoParlamentar)
 from sapl.protocoloadm.models import (Protocolo, TipoDocumentoAdministrativo,
@@ -2086,6 +2087,33 @@ class RelatorioNormasPorAutorView(FilterView):
             ' - ' + self.request.GET['data_1'])
 
         return context
+
+class FiliacaoAutorCrud(MasterDetailCrud):
+    parent_field = 'autor'
+    model = Filiacao
+    help_path = 'filiacaoautor'
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            context[
+                'subnav_template_name'] = 'base/subnav_autor.yaml'
+            return context
+
+        def resolve_url(self, suffix, args=None):
+            namespace = 'sapl.base'
+            return reverse('%s:%s' % (namespace, self.url_name(suffix)),
+                        args=args)
+
+        @classmethod
+        def url_name(cls, suffix):
+            return '%sautor_%s' % (cls.model._meta.model_name, suffix)
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = FiliacaoForm
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = FiliacaoForm
 
 
 class OperadorAutorCrud(MasterDetailCrud):

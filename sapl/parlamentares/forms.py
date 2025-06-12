@@ -386,16 +386,26 @@ class FiliacaoForm(ModelForm):
         if not self.is_valid():
             return self.cleaned_data
 
-        filiacao = super(FiliacaoForm, self).save(commit=False)
+        filiacao = self.instance
         validacao = validar_datas(self.cleaned_data['data'],
                                   self.cleaned_data['data_desfiliacao'],
-                                  filiacao.parlamentar,
+                                  filiacao.parlamentar or filiacao.autor,
                                   filiacao)
 
         if not validacao[0]:
             raise ValidationError(validacao[1])
 
         return self.cleaned_data
+
+    def save(self, commit = True):
+        filiacao = self.instance
+        if not filiacao.id:
+            if filiacao.autor and filiacao.autor.autor_related:
+                filiacao.parlamentar = filiacao.autor.autor_related.first()
+            if filiacao.parlamentar:
+                filiacao.autor = filiacao.parlamentar.autor.first()
+
+        return super().save(commit)
 
 
 class ComposicaoColigacaoForm(ModelForm):

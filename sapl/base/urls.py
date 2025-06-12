@@ -13,7 +13,7 @@ from sapl.settings import EMAIL_SEND_USER, MEDIA_URL
 
 from .apps import AppConfig
 from .views import (AppConfigCrud, CasaLegislativaCrud,
-                    CreateUsuarioView, DeleteUsuarioView, EditUsuarioView,
+                    CreateUsuarioView, DeleteUsuarioView, EditUsuarioView, FiliacaoAutorCrud,
                     HelpTopicView, PesquisarUsuarioView, LogotipoView,
                     RelatorioAtasView, RelatorioAudienciaView,
                     RelatorioDataFimPrazoTramitacaoView,
@@ -54,7 +54,8 @@ admin_user = [
 urlpatterns = [
     re_path(r'^sistema/autor/tipo', include(TipoAutorCrud.get_urls())),
     re_path(r'^sistema/autor', include(AutorCrud.get_urls() +
-                                   OperadorAutorCrud.get_urls())),
+                                   OperadorAutorCrud.get_urls() +
+                                   FiliacaoAutorCrud.get_urls())),
 
     re_path(r'^sistema/ajuda/(?P<topic>\w+)$',
         HelpTopicView.as_view(), name='help_topic'),

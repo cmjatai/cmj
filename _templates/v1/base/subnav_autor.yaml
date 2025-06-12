@@ -3,3 +3,5 @@
   url: autor_detail
 - title: {% trans 'Operadores' %}
   url: operadorautor_list
+- title: {% trans 'Filiações' %}
+  url: sapl.base:filiacaoautor_list
