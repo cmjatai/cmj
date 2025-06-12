@@ -460,10 +460,10 @@ class MateriaParlamentarDashboard(GridDashboard):
 
 class PartidoDashboard(OrderedResultMixin, Dashcard):
     title = _('Distribuição de Matérias por Partido')
-    description = _('Apenas matérias com autoria de parlamentares e a partir de 2009.')
+    description = _('Contagem de matérias a partir de 2009.')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
-    label_field = "autoria__autor__parlamentar_set__filiacao__partido__sigla"
+    label_field = "autoria__autor__filiacao_set__partido__sigla"
     label_name = _("Partidos")
     style="height: 40vh;"
 
@@ -473,7 +473,7 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
     datasets = [
         {
             "label": _("Qtd. de Matérias por Partido"),
-            "data_field": ("autoria__autor__parlamentar_set__filiacao__partido__sigla", Count)
+            "data_field": ("autoria__autor__filiacao_set__partido__sigla", Count)
         }
     ]
     chart_options = {
@@ -484,18 +484,18 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
         qs = super().get_queryset(request)
 
         q = Q(
-            autoria__autor__parlamentar_set__filiacao__data_desfiliacao__isnull=True,
-            data_apresentacao__gte=F('autoria__autor__parlamentar_set__filiacao__data')
-            ) | Q(
+            autoria__autor__filiacao_set__data_desfiliacao__isnull=True,
+            data_apresentacao__gte=F('autoria__autor__filiacao_set__data')
+        ) | Q(
             data_apresentacao__range=(
-                F('autoria__autor__parlamentar_set__filiacao__data'),
-                F('autoria__autor__parlamentar_set__filiacao__data_desfiliacao')
+                F('autoria__autor__filiacao_set__data'),
+                F('autoria__autor__filiacao_set__data_desfiliacao')
             )
         )
         q = q & Q(
-            autoria__autor__parlamentar_set__filiacao__partido__sigla__isnull=False,
-            data_apresentacao__year__gte=2009,
-        )
+                autoria__autor__filiacao_set__partido__sigla__isnull=False,
+                data_apresentacao__year__gte=2009,
+            )
 
         qs = qs.filter(q)
         #    #autoria__autor__parlamentar_set__filiacao__data_desfiliacao__isnull=True,
@@ -549,7 +549,7 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
                 q = Q(
                     autoria__autor=autor,
                     data_apresentacao__range=(f[2], f[3] or timezone.now()),
-                    data_apresentacao__year__gte=2009 
+                    data_apresentacao__year__gte=2009
                 )
                 qs_partido = qs.filter(q)
 

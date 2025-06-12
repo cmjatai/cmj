@@ -517,13 +517,24 @@ class Dependente(models.Model):
 
 class Filiacao(models.Model):
     data = models.DateField(verbose_name=_('Data Filiação'))
-    parlamentar = models.ForeignKey(Parlamentar, on_delete=models.CASCADE)
-    partido = models.ForeignKey(Partido,
-                                on_delete=models.PROTECT,
-                                verbose_name=_('Partido'),
-                                related_name='filiacao_set')
+    parlamentar = models.ForeignKey(
+        Parlamentar,
+        on_delete=models.CASCADE,
+        verbose_name=_('Parlamentar'),
+        blank=True, null=True,
+        )
+    partido = models.ForeignKey(
+        Partido,
+        on_delete=models.PROTECT,
+        verbose_name=_('Partido'),
+        related_name='filiacao_set')
     data_desfiliacao = models.DateField(
         blank=True, null=True, verbose_name=_('Data Desfiliação'))
+
+    autor = models.ForeignKey(
+        Autor, blank=True, null=True,
+        on_delete=models.PROTECT, verbose_name=_('Autor'),
+        related_name='filiacao_set')
 
     class Meta:
         verbose_name = _('Filiação')
@@ -541,7 +552,7 @@ class Filiacao(models.Model):
 
     def __str__(self):
         return _('%(parlamentar)s - %(partido)s') % {
-            'parlamentar': self.parlamentar, 'partido': self.partido
+            'parlamentar': self.parlamentar or self.autor, 'partido': self.partido
         }
 
 
