@@ -1,10 +1,8 @@
 
-from cProfile import label
 from collections import OrderedDict
 import re
 import sys
 
-from click import style
 from django import forms
 from cmj.dashboard import Dashcard, GridDashboard
 from django.db.models import Count, F, Q
@@ -462,7 +460,7 @@ class MateriaParlamentarDashboard(GridDashboard):
 
 class PartidoDashboard(OrderedResultMixin, Dashcard):
     title = _('Distribuição de Matérias por Partido')
-    description = _('Apenas matérias com autoria de parlamentares')
+    description = _('Apenas matérias com autoria de parlamentares e a partir de 2009.')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
     label_field = "autoria__autor__parlamentar_set__filiacao__partido__sigla"
@@ -495,7 +493,8 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
             )
         )
         q = q & Q(
-            autoria__autor__parlamentar_set__filiacao__partido__sigla__isnull=False
+            autoria__autor__parlamentar_set__filiacao__partido__sigla__isnull=False,
+            data_apresentacao__year__gte=2009,
         )
 
         qs = qs.filter(q)
@@ -549,7 +548,8 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
 
                 q = Q(
                     autoria__autor=autor,
-                    data_apresentacao__range=(f[2], f[3] or timezone.now())
+                    data_apresentacao__range=(f[2], f[3] or timezone.now()),
+                    data_apresentacao__year__gte=2009 
                 )
                 qs_partido = qs.filter(q)
 
