@@ -4,14 +4,6 @@ import django.db.models.deletion
 from django.db import migrations, models
 
 
-def vincula_autor_parlamentar(apps, schema_editor):
-    Filiacao = apps.get_model('parlamentares', 'Filiacao')
-    for filiacao in Filiacao.objects.all():
-        if filiacao.parlamentar and filiacao.parlamentar.autor.exists():
-            filiacao.autor = filiacao.parlamentar.autor.first()
-        filiacao.save()
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -30,6 +22,5 @@ class Migration(migrations.Migration):
             name='parlamentar',
             field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='parlamentares.parlamentar', verbose_name='Parlamentar'),
         ),
-        migrations.RunPython(vincula_autor_parlamentar)
     ]
 

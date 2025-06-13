@@ -35,6 +35,11 @@ export const routes = [
         path: ':pkloa(\\d+)',
         name: 'loadetail_route',
         component: () => import('@/modules/loa/LoaDetail')
+      },
+      {
+        path: 'dash',
+        name: 'loadash_route',
+        component: () => import('@/modules/loa/LoaDash')
       }
     ]
   },

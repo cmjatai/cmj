@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% load webpack_static from webpack_loader %}
+
+{% block head_content %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
+  <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
+{% endblock %}
+
+
+{% block second_header %}{% endblock second_header %}
+
+{% block content_container %}
+<div class="container-fluid pt-1">
+    <h2 style="font-variant: small-caps;">{% trans "Dashboard das Leis Orçamentárias Anuais" %}</h2>
+    {{ dashboard.dash_grids.loadashboardview }}
+</div>
+{% endblock content_container %}
