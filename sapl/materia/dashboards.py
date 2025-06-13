@@ -598,7 +598,7 @@ class MateriaDashboardView(GridDashboard, TemplateView):
                 ]
             },
         ]
-    }
+    } 
 
     def get_template_names(self):
         return ['dashboard/materia/materia_search_dashboard.html']

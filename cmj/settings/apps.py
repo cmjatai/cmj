@@ -24,6 +24,8 @@ INSTALLED_APPS = (
     'django_extensions',
     'django.forms',
 
+    'django_vite',
+
     'social_django',
 
     'crispy_forms',

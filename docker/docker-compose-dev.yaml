@@ -42,6 +42,21 @@ services:
       - cmj-net
     ports:
       - "8080:8080"
+  cmjfront2025:
+    build:
+      context: ../_frontend/v2025/
+      dockerfile: ../../docker/Dockerfile.Dev.Front
+    #command: yarn build
+    restart: no
+    container_name: cmjfront2025
+    labels:
+       NAME: "cmjfront2025"
+    volumes:
+      - ../:/var/cmjatai/cmj
+    networks:
+      - cmj-net
+    ports:
+      - "5173:5173"
   cmj:
     build:
       context: ../

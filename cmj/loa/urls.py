@@ -1,6 +1,6 @@
 from django.urls.conf import re_path, include
 
-from cmj.loa.dashboards import LoaDashboard
+from cmj.loa.dashboards import LoaDashboardView
 from cmj.loa.views import LoaCrud, EmendaLoaCrud, OficioAjusteLoaCrud,\
     RegistroAjusteLoaCrud, AgrupamentoCrud, UnidadeOrcamentariaCrud
 
@@ -23,7 +23,7 @@ urlpatterns = [
         )
     ),
 
-    re_path(r'^loa/dash', LoaDashboard.as_view(),
+    re_path(r'^loa/dash', LoaDashboardView.as_view(),
         name='loa_dashboard'),
 
 ]
