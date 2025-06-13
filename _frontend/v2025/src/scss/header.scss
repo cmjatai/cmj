@@ -1,0 +1,15 @@
+:root {
+  --bs-warning-rgb: 219, 166, 5;
+  --bs-warning: #dba605;
+}
+
+header {
+  border-top: 5px solid $primary;
+  &.header-scrolled {
+    border-top: 3px solid $primary;
+  }
+}
+
+@include color-mode(dark) {
+
+}

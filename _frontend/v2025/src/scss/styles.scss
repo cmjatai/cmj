@@ -1,0 +1,218 @@
+$fa-font-path: '/static/webfonts';
+
+@import '@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '@fortawesome/fontawesome-free/scss/solid.scss';
+@import '@fortawesome/fontawesome-free/scss/brands.scss';
+@import '@fortawesome/fontawesome-free/scss/regular.scss';
+
+@import url(https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap);
+
+$heightBrand: 3rem;
+$heightBrasao: 6rem;
+
+$utilities: () !default;
+
+$utilities: map-merge(
+  (
+    "min-viewport-height": (
+      property: min-height,
+      class: min-vh,
+      values: (
+        50: 50vh,
+        60: 60vh,
+        70: 70vh,
+        80: 80vh,
+        90: 90vh,
+        100: 100vh
+      )
+    ),
+    "avatar": (
+      property: height width,
+      class: avatar,
+      values: (
+        1: 1rem,
+        2: 2rem,
+        3: 3rem,
+        4: 4rem,
+        5: 5rem,
+        6: 6rem,
+        7: 7rem,
+        8: 8rem,
+        9: 9rem
+      )
+    ),
+  ),
+  $utilities
+);
+
+$grid-gutter-width: 2rem !default;
+
+@import 'custom/bootstrap';
+
+@import 'header';
+
+a {
+  text-decoration: none;
+}
+
+main {
+  padding: 0;
+  margin: 0;
+  background: linear-gradient(to bottom, #f7f6f9, #e4e5f0);
+  .main-box {
+    position: relative;
+    background-color: #fff;
+    padding: 1rem;
+    margin-left: -1rem;
+    margin-right: -1rem;
+  }
+}
+
+footer {
+  .footer {
+  }
+}
+
+.bi.theme-icon {
+  width: 1em;
+  height: 1em;
+  fill: currentcolor;
+}
+
+.container-table {
+  .container-info-table {
+    display: flex;
+    flex-direction: column-reverse;
+    .totalize {
+      width: 100%;
+      text-align: center;
+      padding: 0;
+      margin: 0;
+    }
+  }
+  th {
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    background-color: lighten($primary, 10%);
+    white-space: nowrap;
+    a {
+      color: white;
+      text-decoration: none;
+      position: relative;
+
+      &.ordering {
+        margin: 0 1rem;
+
+        &::before, &::after {
+          opacity: 0.4;
+          position: absolute;
+          right: -0.8rem;
+          font-size: 0.8rem;
+          line-height: 0rem;
+        }
+
+        &::before {
+          content: "Δ";
+          top: 3px;
+        }
+        &::after {
+          content: "∇";
+          bottom: 3px;
+        }
+        &.asc::before {
+          opacity: 1;
+        }
+        &.desc::after {
+          opacity: 1;
+        }
+
+        &:hover {
+          &::before {
+            opacity: 1;
+          }
+        }
+        &.asc {
+          &:hover {
+            &::after {
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+  }
+  th, td {
+    vertical-align: middle;
+    &:not(:first-child) {
+      border-left: 1px solid #fff;
+    }
+  }
+}
+
+.color-modes {
+}
+
+// ######### Dark Mode #########
+
+@include color-mode(dark) {
+
+  footer {
+    background-color: #111;
+    border-top: 1px solid #333;
+
+  }
+
+  main {
+    background: linear-gradient(to bottom, #1110, #111f);
+    border-bottom: 0px solid #444;
+    .main-box {
+      background-color: #111;
+    }
+    .nav {
+      .nav-link:hover, .active {
+        border-bottom: 0;
+        background-color: #111;
+      }
+    }
+  }
+}
+
+@media (min-width: 768px) {
+  .container-table {
+    .container-info-table {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: end;
+      margin-top: -2.5rem;
+      z-index: -1;
+      .totalize {
+        width: auto;
+        text-align: right;
+      }
+    }
+  }
+}
+
+@media (min-width: 992px) {
+  .row {
+    > [class^="col"]:not(:last-child) {
+      padding-right: 0;
+    }
+  }
+}
+
+@media (min-width: 1200px) {
+  main {
+    .main-box {
+      padding: $grid-gutter-width ;
+    }
+  }
+  .row {
+    > [class^="col"]:not(:last-child) {
+      padding-right: $grid-gutter-width / 2;
+    }
+  }
+}
+@media print {
+}

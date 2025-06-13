@@ -1,0 +1,25 @@
+FROM node:20.19.2-bookworm
+
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
+#ENV RUN1_PACKAGES bash vim
+#RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
+
+ENV ROOT_HOME=/var/cmjatai
+ENV HOME=${ROOT_HOME}/cmj
+
+RUN mkdir -p ${HOME}
+
+RUN addgroup --gid 1001 cmj
+RUN adduser --home=${HOME} --uid 1001 --gid 1001 --disabled-password --comment "" --shell=/bin/bash cmj
+RUN chown -R cmj:cmj ${HOME}
+USER cmj
+
+WORKDIR ${HOME}/_frontend/v2025
+
+EXPOSE 5173/tcp
+
+VOLUME ["${HOME}"]
+
+CMD ["/var/cmjatai/cmj/_frontend/v2025/startfront-dev.sh"]
