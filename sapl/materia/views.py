@@ -3667,6 +3667,8 @@ class AnaliseSimilaridadeRankingCrud(Crud):
             return f'<span class="d-block text-center">{ss}%<span>', ''
 
     class DetailView(Crud.DetailView):
+        layout_key = 'AnaliseSimilaridadeRanking'
+        
         def hook_analise(self, obj, verbose_name='', field_display=''):
             if obj.analise:
                 return _('Análise'), md2html(obj.analise)

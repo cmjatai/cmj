@@ -175,3 +175,9 @@ AnaliseSimilaridade:
   - materia_2
   - data_analise similaridade ia_name
   - analise
+
+AnaliseSimilaridadeRanking:
+  {% trans 'Análise de Similaridade' %}:
+  - materia_1|fk_urlize_for_detail materia_2|fk_urlize_for_detail
+  - data_analise similaridade ia_name
+  - analise
