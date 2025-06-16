@@ -20,7 +20,7 @@ export const routes = [
       {
         path: 'dash',
         name: 'loadash_route',
-        component: () => import('~@/views/loa/LoaDashboard')
+        component: () => import('~@/views/loa/dash/LoaDashboard')
       }
     ]
   },

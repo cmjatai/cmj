@@ -353,7 +353,7 @@ class MateriaSearchForm(SearchForm):
         self.helper = FormHelper()
         self.helper.form_method = 'get'
         self.helper.attrs['role'] = 'chart-global-filter'
-        self.helper.attrs['data-chart-target'] = 'materiasearchdashboard'
+        self.helper.attrs['data-chart-target'] = 'MateriaSearchDashboard'
         self.helper.layout = Layout(
             Fieldset('',
                      row1,

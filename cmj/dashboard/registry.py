@@ -52,13 +52,13 @@ class Dashboard(metaclass=MediaDefiningClass):
                 dash_module = import_module(f"{app_config.name}.dashboards")
                 for name, klass in inspect.getmembers(dash_module, is_dashs):
                     dash_grid = klass(app_config)
-                    dash_grids[name.lower()] = dash_grid
+                    dash_grids[name] = dash_grid
 
                     for card in klass.cards:
                         card.filterset = dash_grid.filterset if card.filterset is None else card.filterset
                         card.grids.add(dash_grid)
                         obj = tuple(dash_lists[card.__name__].items())[0]
-                        dash_grid.cards.update({obj[1].dash_name: obj})
+                        dash_grid.cards.update({obj[1].dashcard_name: obj})
 
         ordered_apps = OrderedDict()
 

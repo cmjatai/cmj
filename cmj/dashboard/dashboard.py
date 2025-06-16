@@ -71,12 +71,12 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         return self.render()
 
     @property
-    def dash_name(self):
-        return self.__class__.__name__.lower()
+    def dashcard_name(self):
+        return self.__class__.__name__
 
     @property
     def url(self):
-        return reverse(f"dash:{self.app_config.label}_{self.dash_name}")
+        return reverse(f"dash:{self.app_config.label}_{self.dashcard_name.lower()}")
 
     @property
     def export_formats(self):
@@ -240,7 +240,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         else:
             default_name = 'dashboard_card' if self.grids else 'dashcard'
             template_names = [
-                f"dashboard/{self.app_config.label}/{self.dash_name}.html",
+                f"dashboard/{self.app_config.label}/{self.dashcard_name}.html",
                 f"dashboard/{self.app_config.label}/{default_name}.html",
                 f"dashboard/{default_name}.html",
             ]
@@ -323,7 +323,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
 
         df = self.to_dataframe(request)
 
-        filename = f"{self.dash_name}-{datetime.date.today():%Y-%m-%d}.{fmt}"
+        filename = f"{self.dashcard_name.lower()}-{datetime.date.today():%Y-%m-%d}.{fmt}"
         response = HttpResponse(
             headers={
                 "Content-Type": contenttype,
@@ -350,7 +350,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         else:
             default_name = 'dashboard_card_html' if self.grids else 'dashcard_html'
             template_names = [
-                f"dashboard/{self.app_config.label}/{self.dash_name}.html",
+                f"dashboard/{self.app_config.label}/{self.dashcard_name}.html",
                 f"dashboard/{self.app_config.label}/{default_name}.html",
                 f"dashboard/{default_name}.html",
             ]
@@ -413,7 +413,7 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
 
     @property
     def dashboard_name(self):
-        return self.__class__.__name__.lower()
+        return self.__class__.__name__
 
     def get_extra_context(self, request=None):
         """

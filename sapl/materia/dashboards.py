@@ -296,7 +296,7 @@ class OrderedResultMixin:
 
         return cd
 
-class MateriaDashboard(OrderedResultMixin, Dashcard):
+class MateriaAssuntoDashcard(OrderedResultMixin, Dashcard):
     title = _('Distribuição por Assunto')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
@@ -332,7 +332,7 @@ class MateriaDashboard(OrderedResultMixin, Dashcard):
         return labels
 
 
-class MateriaMonthlyDashboard(Dashcard):
+class MateriaMonthlyDashcard(Dashcard):
     title = _('Distribuição Mensal de Matérias')
     chart_type = Dashcard.TYPE_BAR
     model = MateriaLegislativa
@@ -398,18 +398,18 @@ class MateriaSearchDashboard(GridDashboard):
     cards = [
         MateriaTotalizer,
         MateriaTotalizerFiltered,
-        MateriaMonthlyDashboard,
-        MateriaDashboard,
+        MateriaMonthlyDashcard,
+        MateriaAssuntoDashcard,
     ]
 
     grid = {
         'rows': [
             {
                 'cols': [
-                    ('materiatotalizer', 6),
-                    ('materiatotalizerfiltered', 6),
-                    ('materiamonthlydashboard', 12),
-                    ('materiadashboard', 12),
+                    ('MateriaTotalizer', 6),
+                    ('MateriaTotalizerFiltered', 6),
+                    ('MateriaMonthlyDashcard', 12),
+                    ('MateriaAssuntoDashcard', 12),
                 ]
             }
         ]
@@ -420,7 +420,7 @@ class MateriaParlamentarDashboard(GridDashboard):
 
     app_config = 'materia'
     cards = [
-        MateriaMonthlyDashboard,
+        MateriaMonthlyDashcard,
         MateriaTotalizerFiltered
     ]
 
@@ -451,14 +451,14 @@ class MateriaParlamentarDashboard(GridDashboard):
             {
                 'cols': [
                     ('__filter__', 12),
-                    ('materiatotalizerfiltered', 12),
-                    ('materiamonthlydashboard', 12),
+                    ('MateriaTotalizerFiltered', 12),
+                    ('MateriaMonthlyDashcard', 12),
                 ]
             }
         ]
     }
 
-class PartidoDashboard(OrderedResultMixin, Dashcard):
+class PartidoDashcard(OrderedResultMixin, Dashcard):
     title = _('Distribuição de Matérias por Partido')
     description = _('Contagem de matérias a partir de 2009.')
     chart_type = Dashcard.TYPE_BAR
@@ -468,7 +468,6 @@ class PartidoDashboard(OrderedResultMixin, Dashcard):
     style="height: 40vh;"
 
     render_filterset = False
-
 
     datasets = [
         {
@@ -567,9 +566,9 @@ class MateriaDashboardView(GridDashboard, TemplateView):
     cards = [
         MateriaTotalizer,
         MateriaTotalizerFiltered,
-        MateriaMonthlyDashboard,
-        MateriaDashboard,
-        PartidoDashboard,
+        MateriaMonthlyDashcard,
+        MateriaAssuntoDashcard,
+        PartidoDashcard,
     ]
 
     filterset = MateriaFilterSet
@@ -585,11 +584,11 @@ class MateriaDashboardView(GridDashboard, TemplateView):
                             'rows': [
                                 {
                                     'cols': [
-                                        ('materiatotalizerfiltered', 6),
-                                        ('materiatotalizer', 6),
-                                        ('materiamonthlydashboard', 6),
-                                        ('partidodashboard', 6),
-                                        ('materiadashboard', 12),
+                                        ('MateriaTotalizerFiltered', 6),
+                                        ('MateriaTotalizer', 6),
+                                        ('MateriaMonthlyDashcard', 6),
+                                        ('PartidoDashcard', 6),
+                                        ('MateriaAssuntoDashcard', 12),
                                     ]
                                 }
                             ]
@@ -598,10 +597,10 @@ class MateriaDashboardView(GridDashboard, TemplateView):
                 ]
             },
         ]
-    } 
+    }
 
     def get_template_names(self):
-        return ['dashboard/materia/materia_search_dashboard.html']
+        return ['dashboard/materia/MateriaDashboardView_view.html']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

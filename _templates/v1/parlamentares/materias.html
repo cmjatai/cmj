@@ -20,9 +20,7 @@
 
 {% block detail_content %}
 
-{% dash_grid 'materiaparlamentardashboard' dashboard.dash_grids autoria_is=autor_pk %}
-
-
+{% dash_grid 'MateriaParlamentarDashboard' dashboard.dash_grids autoria_is=autor_pk %}
 
 <table class="table table-striped table-bordered">
   {% for autoria in autoria.0 %}

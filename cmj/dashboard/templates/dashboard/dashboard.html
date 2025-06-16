@@ -1,7 +1,7 @@
 {% load i18n crispy_forms_tags common_tags %}
 {% for row in rows %}
   {% if forloop.first and not subrow%}
-    <div class="dashboard grid-compact" id="{{dash.dashboard_name }}{{subrow}}">
+    <div class="dashboard grid-compact" id="{{ dash.dashboard_name }}{{ subrow }}">
       <div class="dashtitle">{{title}}</div>
   {% endif %}
     <div class="row">
@@ -11,7 +11,7 @@
             {% if filter and render_filterset %}
               <form action=""
                 role="chart-global-filter"
-                data-chart-target="{{ dash.dashboard_name|slugify }}{{subrow}}">
+                data-chart-target="{{ dash.dashboard_name }}{{ subrow }}">
                 {% crispy filter.form %}
               </form>
             {% endif %}
