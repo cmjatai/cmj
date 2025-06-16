@@ -7,6 +7,8 @@
     url: {% url 'cmj.search:materia_haystack_search' %}
   - title: {% trans 'Orçamento Impositivo' %}
     url: {% url 'cmj.loa:loa_list' %}
+  - title: {% trans 'Análise de Similaridade de Requerimentos' %}
+    url: {% url 'sapl.materia:analisesimilaridaderanking_list' %}?lm=50
   - title: {% trans 'Sessões Plenárias' %}
     url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
   - title: {% trans 'Pautas das Sessões' %}
