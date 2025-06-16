@@ -121,7 +121,7 @@
             </div>
           {% endif %}
 
-          {% dash_grid 'materiaparlamentardashboard' dashboard.dash_grids autoria_is=object.parlamentar.autor.first.id %}
+          {% dash_grid 'MateriaParlamentarDashboard' dashboard.dash_grids autoria_is=object.parlamentar.autor.first.id %}
 
           {{object.parlamentar.equipe|markdown|safe}}
           <hr>
