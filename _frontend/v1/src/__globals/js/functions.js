@@ -1,7 +1,17 @@
+window.onpageshow = event => {
+  if (event.persisted) {
+    $('body .loading').remove()
+  }
+}
 
-import dateFormat from 'dateformat'
-
-window.dateFormat = dateFormat
+window.loadingCMJ = function (msg) {
+  history.replaceState({ loading: true }, '', '#')
+  const html = `<div class="loading">
+  <div class="loader"></div>
+  <div class="message">${msg}</div>
+  </div>`
+  $(html).appendTo($('body'))
+}
 
 window.removeTinymce = function () {
   while (window.tinymce.editors && window.tinymce.editors.length > 0) {
@@ -39,8 +49,7 @@ window.refreshSelectPicker = function () {
     .on('show.bs.select', function (event) {
       $('html, body').animate(
         {
-          scrollTop:
-            $(event.target.form).offset().top - '20' // - window.innerHeight / 9
+          scrollTop: $(event.target.form).offset().top - 20 // - window.innerHeight / 9
         },
         500
       )
@@ -55,9 +64,7 @@ window.refreshDatePicker = function () {
         $('.ui-datepicker').css('z-index', 3)
       }, 500)
     }
-
   })
-
   let dateinput = document.querySelectorAll('.dateinput')
   _.each(dateinput, function (input, index) {
     input.setAttribute('autocomplete', 'off')
@@ -146,27 +153,6 @@ window.styleWithEndNameClass = function (endNameClass, attr, value = undefined) 
         rules[r].style[attr] = value
       }
     }
-  }
-}
-
-window.ContainerFirst = function () {
-  let first = $('.container-first')
-
-  if (first.height() > window.innerHeight) {
-    first.css('height', window.innerHeight)
-    let btn = first.find('.btn').click(function () {
-      this.parentElement.remove()
-      first.css('height', '')
-      first.removeClass('container-first')
-    })
-    if (btn.length === 0) {
-      first.css('height', '')
-      first.removeClass('container-first')
-    }
-  } else {
-    first.removeClass('.container-first')
-    first.css('height', '')
-    first.find('.painel-corte').remove()
   }
 }
 

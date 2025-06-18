@@ -6,14 +6,14 @@
   <div class="actions btn-group" role="group">
   {% block more_buttons %}
     <a href="{% url 'cmj.search:haystack_search' %}?q=&models=sessao.sessaoplenaria" class="btn btn-outline-primary">
-       Mudar para Pesquisa Textual 
+       Mudar para Pesquisa Textual
     </a>
     <button type="button"
         class="btn btn-warning"
         data-trigger="focus"
         data-container="body"
         data-toggle="popover"
-        data-placement="top"
+        data-placement="bottom"
         title="Sobre a Pesquisa Textual"
         data-content="Pesquisa Textual é diferente desta pesquisa em que escolhemos filtros específicos, uma pesquisa parametrizada. Na Pesquisa Textual é buscado conteúdo dentro dos documentos através de uma ferramenta sofisticada que leva em consideração as técnicas de escrita da lingua portuguesa. Experimente! No entanto, se você está buscando um conteúdo específico, como por exemplo uma Sessão Especial de Eleição da Mesa Diretora, então a pesquisa parametrizada pode ser o ideal.">
       ?
