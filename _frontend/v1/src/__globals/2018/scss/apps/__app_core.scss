@@ -81,7 +81,7 @@
     &:focus {
       background-color: white;
     }
-    
+
     @include placeholder($color_primary, 0.5, 1em, normal);
 
 
@@ -139,9 +139,15 @@
 
 }
 
-.container-login-inner {
-  .container-login {
-    //margin: 30px 15%;
+.input_password {
+  position: relative;
+  .fa-eye, .fa-eye-slash {
+    color: #444;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
   }
 }
 
