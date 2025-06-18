@@ -962,7 +962,7 @@ class ProposicaoCrud(Crud):
             if len(signs) >= limite_minimo_coletivo:
                 return imp, limite_minimo_coletivo, limite_por_autor_tramitando, len_signs
 
-            tam = tipos_autores_materias()
+            tam = tipos_autores_materias(self.request.user)
 
             autores_com_materias_em_tramitacao = tam.get(
                 obj.tipo.tipo_conteudo_related, {})
@@ -3668,7 +3668,7 @@ class AnaliseSimilaridadeRankingCrud(Crud):
 
     class DetailView(Crud.DetailView):
         layout_key = 'AnaliseSimilaridadeRanking'
-        
+
         def hook_analise(self, obj, verbose_name='', field_display=''):
             if obj.analise:
                 return _('Análise'), md2html(obj.analise)
