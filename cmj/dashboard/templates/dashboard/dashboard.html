@@ -12,7 +12,7 @@
               <form action=""
                 role="chart-global-filter"
                 data-chart-target="{{ dash.dashboard_name }}{{ subrow }}">
-                {% crispy filter.form %}
+                {{ filter.form|crispy:'bootstrap5' }}
               </form>
             {% endif %}
           {% elif cardname == '__empty__' %}

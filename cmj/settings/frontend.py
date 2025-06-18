@@ -54,8 +54,10 @@ TEMPLATES = [
 
 DAB_FIELD_RENDERER = \
     'django_admin_bootstrapped.renderers.BootstrapFieldRenderer'
-CRISPY_TEMPLATE_PACK = 'bootstrap5'
-CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap5'
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = ['bootstrap4', 'bootstrap5']
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 CRISPY_FAIL_SILENTLY = not DEBUG
 
 STATIC_URL = '/static/'
