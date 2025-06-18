@@ -3,7 +3,8 @@ export function EyePassword () {
 
   passwordInputs.forEach((input) => {
     const eyeIcon = document.createElement('i')
-    eyeIcon.classList.add('fa', 'fa-eye')
+    eyeIcon.classList.add('fa', 'fa-eye-slash')
+    eyeIcon.setAttribute('title', 'Exibir senha')
     eyeIcon.style.cursor = 'pointer'
 
     // adiciona a class input_password no pai do input se este não tiver
@@ -14,12 +15,14 @@ export function EyePassword () {
     eyeIcon.addEventListener('click', () => {
       if (input.type === 'password') {
         input.type = 'text'
-        eyeIcon.classList.remove('fa-eye')
-        eyeIcon.classList.add('fa-eye-slash')
-      } else {
-        input.type = 'password'
         eyeIcon.classList.remove('fa-eye-slash')
         eyeIcon.classList.add('fa-eye')
+        eyeIcon.setAttribute('title', 'Ocultar senha')
+      } else {
+        input.type = 'password'
+        eyeIcon.classList.remove('fa-eye')
+        eyeIcon.classList.add('fa-eye-slash')
+        eyeIcon.setAttribute('title', 'Exibir senha')
       }
     })
     input.parentNode.insertBefore(eyeIcon, input.nextSibling)
