@@ -2,12 +2,9 @@
 {% load i18n static %}
 {% block second_header %}{% endblock second_header %}
 {% block main_inner %}
-<router-view></router-view>
-  <div class="container">
-    <div class="row">
-      <div class="col-6 opacity-50 offset-3 d-flex justify-content-center align-items-center min-vh-70">
-        
-      </div>
-    </div>
+
+  <div class="container-fluid">
+    {{ dashboard.dash_grids.LoaDashboardView }}
   </div>
+
 {% endblock main_inner %}

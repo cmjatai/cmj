@@ -7,6 +7,7 @@ window.jQuery = $
 import './colormodes'
 import './scrollHeader'
 import './image_cropping'
+import './dashboard_custom'
 
 (() => {
   'use strict'

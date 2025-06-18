@@ -159,8 +159,9 @@ class Dashcard(View, metaclass=MediaDefiningClass):
                 if isinstance(data_field, tuple):
                     data_getter = data_field[1](data_field[0])
                     fmt_func = (
-                        data_field[2] if len(data_field) > 2 else same_func
+                        data_field[2] if len(data_field) > 2 and data_field[2] else same_func
                     )
+                    distinct = True if len(data_field) > 3 and data_field[3] else False
                 else:
                     data_getter = F(data_field)
                     fmt_func = same_func
@@ -201,6 +202,8 @@ class Dashcard(View, metaclass=MediaDefiningClass):
                     .annotate(value=data_getter)
                     .order_by("label")
                 )
+                if distinct:
+                    data_values = data_values.distinct("label")
                 dataset["data"] = [fmt_func(r["value"]) for r in data_values]
                 bgcolor = [
                     self.get_dataset_color(r["label"]) for r in data_values
