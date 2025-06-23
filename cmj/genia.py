@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 import pymupdf
 import yaml
 from django.utils import timezone
+from cmj.core.models import IAQuota
 from cmj.utils import clean_text
 from sapl.base.models import Metadata
 import google.generativeai as genai
@@ -33,12 +34,24 @@ class IAGenaiBase:
 
         genai.configure(api_key=settings.GEMINI_API_KEY)
 
+        qms = IAQuota.objects.quotas_with_margin()
+        if not qms:
+            raise Exception(_('Quota de IA excedida.'))
+
+        qms_custom = qms.filter(modelo=self.ia_model_name)
+        if not qms_custom:
+            quota = qms[0]
+            self.ia_model_name = quota.modelo
+        else:
+            qms = qms_custom
+            quota = qms[0]
+
         model = genai.GenerativeModel(
           model_name=self.ia_model_name,
           generation_config=generation_config,
         )
 
-        return model
+        return model, quota
 
 class IAClassificacaoMateriaService(IAGenaiBase):
 
@@ -187,10 +200,12 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             return ''
 
         if self.action == 'generate':
+            self.ia_model_name = prompt_object.get('ia_model_name', self.ia_model_name)
             self.temperature = prompt_object.get('temperature', self.temperature)
             self.top_k = prompt_object.get('top_k', self.top_k)
             self.top_p = prompt_object.get('top_p', self.top_p)
         elif self.action == 'generate_custom':
+            self.ia_model_name = prompt_object.get('ia_model_name', self.ia_model_name)
             self.temperature = float(self.GET.get('temperature', self.temperature))
             self.top_p = float(self.GET.get('top_p', self.top_p))
             self.top_k = int(self.GET.get('top_k', self.top_k))
@@ -229,8 +244,10 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             if not prompt:
                 return
 
-            ia_model = self.get_iamodel_configured()
+            ia_model, quota = self.get_iamodel_configured()
+
             answer = ia_model.generate_content(prompt)
+            quota.create_log()
 
             obj = self.object
 
@@ -317,8 +334,9 @@ Não faça considerações adicionais e ou mesmo conclusão extra. Neste context
 
         prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
 
-        ia_model = self.get_iamodel_configured()
+        ia_model, quota = self.get_iamodel_configured()
         answer = ia_model.generate_content(prompt)
+        quota.create_log()
 
         similaridade.analise = answer.text
         similaridade.ia_name = self.ia_model_name

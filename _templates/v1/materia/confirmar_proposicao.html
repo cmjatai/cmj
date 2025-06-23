@@ -49,7 +49,7 @@
         $.get(url, formData).done(function(data) {
           // if (data.pagination.total_entries == 1)
             $(".ementa_materia").html(
-              `<a target="_blank" href="{% url 'sapl.materia:materialegislativa_list' %}${data.results[0].id}">
+              `<a target="_blank" href="{% url 'sapl.materia:materialegislativa_list' %}/${data.results[0].id}">
                   <strong>${data.results[0].__str__}</strong>
                   </a>
                   <br>${data.results[0].ementa}`

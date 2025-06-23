@@ -936,7 +936,7 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
         _('Cancelado '),
         choices=YES_NO_CHOICES,
         default=False)
-    
+
     revogado = models.BooleanField(
         _('Certidão Revogada'),
         choices=YES_NO_CHOICES,
@@ -979,3 +979,96 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
         if not pk:
             cp.save()
         return cp
+
+
+class IAQuotaManager(models.Manager):
+    use_for_related_fields = True
+
+    def quotas_with_margin(self):
+        """
+        Retorna as quotas que possuem margem para serem utilizadas hoje.
+        """
+        hoje = timezone.now().date()
+        return self.get_queryset().filter(
+            models.Q(iaquotaslog_set__data=hoje) |
+            models.Q(iaquotaslog_set__data__isnull=True),
+            ativo=True
+        ).annotate(
+            total=models.Sum('iaquotaslog_set__peso')
+        ).filter(
+            models.Q(total__isnull=True) | models.Q(total__lt=models.F('quota_diaria'))
+        ).order_by('-total', '-quota_diaria')
+
+class IAQuota(models.Model):
+
+    objects = IAQuotaManager()
+
+    quota_diaria = models.PositiveIntegerField(
+        verbose_name=_('Quota Diária'),
+        default=0)
+
+    modelo = models.CharField(
+        max_length=100,
+        unique=True,
+        verbose_name=_('Modelo'), )
+
+    ativo = models.BooleanField(
+        _('Ativo'),
+        choices=YES_NO_CHOICES,
+        default=True)
+
+    class Meta:
+        verbose_name = _('Quota IA')
+        verbose_name_plural = _('Quotas IA')
+        ordering = ('-id', )
+
+    def has_margin(self):
+        """
+        Verifica se a quota tem margem para ser utilizada.
+        """
+        if not self.ativo:
+            return False
+
+        hoje = timezone.now().date()
+        sum_log = self.iaquotaslog_set.filter(data=hoje).aggregate(
+            total=models.Sum('peso'))['total'] or 0
+
+        return sum_log < self.quota_diaria
+
+    def create_log(self, peso=1):
+        """
+        Cria um log de utilização da quota.
+        """
+        log = IAQuotasLog(
+            quota=self,
+            peso=peso
+        )
+        log.save()
+        return log
+
+
+class IAQuotasLog(models.Model):
+
+    quota = models.ForeignKey(
+        IAQuota,
+        verbose_name=_('Quota'),
+        related_name='iaquotaslog_set',
+        on_delete=CASCADE)
+
+    data = models.DateField(
+        verbose_name=_('Data'),
+        help_text=_('Data do Log de Quota IA'),
+        default=timezone.now)
+
+    timestamp = models.DateTimeField(
+        verbose_name=_('Timestamp'),
+        editable=False, auto_now_add=True)
+
+    peso = models.PositiveIntegerField(
+        verbose_name=_('Peso'),
+        default=1)
+
+    class Meta:
+        verbose_name = _('Log de Quota IA')
+        verbose_name_plural = _('Logs de Quota IA')
+        ordering = ('-id', )
