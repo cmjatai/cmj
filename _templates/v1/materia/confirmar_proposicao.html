@@ -35,6 +35,7 @@
               'tipo'   : $("select[name=tipo_materia]").val(),
               'ano'    : $("input[name=ano_materia]").val(),
               'numero' : $("input[name=numero_materia]").val(),
+              'o': '-id',
         }
         if (formData.tipo == '' || formData.ano == '' || formData.numero == '') {
           $("#vinculo_proposicao").removeClass('hidden');
@@ -46,15 +47,15 @@
         $("#vinculo_proposicao").addClass('hidden');
 
         $.get(url, formData).done(function(data) {
-          if (data.pagination.total_entries == 1)
+          // if (data.pagination.total_entries == 1)
             $(".ementa_materia").html(
               `<a target="_blank" href="{% url 'sapl.materia:materialegislativa_list' %}${data.results[0].id}">
                   <strong>${data.results[0].__str__}</strong>
                   </a>
                   <br>${data.results[0].ementa}`
               ).removeClass('hidden');
-          else
-            $(".ementa_materia").html('<strong>Atenção!!!</strong> Matéria Legislativa não localizada!').removeClass('hidden');
+          // else
+          //   $(".ementa_materia").html('<strong>Atenção!!!</strong> Matéria Legislativa não localizada!').removeClass('hidden');
         });
   		});
 

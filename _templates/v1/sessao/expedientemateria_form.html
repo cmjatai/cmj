@@ -14,21 +14,21 @@
     var ano_materia = $("#id_ano_materia").val()
 
     if (tipo_materia && numero_materia && ano_materia) {
-      $.get("{% url 'sapl.sessao:recuperar_materia' %}", {
-          tipo_materia: tipo_materia,
-          numero_materia: numero_materia,
-          ano_materia: ano_materia
+      $.get('{% url 'sapl.api:materia_materialegislativa-list'%}', {
+          tipo: tipo_materia,
+          numero: numero_materia,
+          ano: ano_materia,
+          o: '-id'
         },
         function(data, status) {
-          if ($(".ementa-materia").length === 0) {
-            $("#div_id_tipo_materia").closest('.row').after(
-              $('<div class="row"/>').append(
-                $('<div class="col-xs-12"/>').append(
-                  $('<div class="alert alert-info ementa-materia"/>').html(data.ementa))))
-          }
-          else {
-            $('.ementa-materia').html(data.ementa)
-          }
+          $(".ementa-materia").remove()
+          $("#div_id_tipo_materia").closest('.row').after(
+            $('<div class="row"/>').append(
+              $('<div class="col-12"/>').append(
+                $('<div class="alert alert-info ementa-materia"/>').html(`
+                  <strong>${data.results[0].__str__}</strong><br>
+                  ${data.results[0].ementa}
+                `))))
         });
     }
   }

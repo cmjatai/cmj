@@ -785,9 +785,11 @@ def recuperar_materia(request):
     ano = request.GET['ano_materia']
 
     try:
-        materia = MateriaLegislativa.objects.get(tipo=tipo,
+        materia = MateriaLegislativa.objects.filter(tipo=tipo,
                                                  ano=ano,
-                                                 numero=numero)
+                                                 numero=numero).first()
+        if not materia:
+            raise ObjectDoesNotExist
         response = JsonResponse({'ementa': materia.ementa,
                                  'id': materia.id,
                                  'indexacao': materia.indexacao})
@@ -803,9 +805,12 @@ def recuperar_tramitacao(request):
     ano = request.GET['ano_materia']
 
     try:
-        materia = MateriaLegislativa.objects.get(tipo_id=tipo,
+        materia = MateriaLegislativa.objects.filter(tipo=tipo,
                                                  ano=ano,
-                                                 numero=numero)
+                                                 numero=numero).first()
+        if not materia:
+            raise ObjectDoesNotExist
+        
         tramitacao = {}
         for obj in materia.tramitacao_set.all():
             tramitacao[obj.id] = {

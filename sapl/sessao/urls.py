@@ -69,6 +69,7 @@ urlpatterns = [
 
     re_path(r'^sessao/recuperar-materia/',
             recuperar_materia, name="recuperar_materia"),
+            
     re_path(r'^sessao/recuperar-tramitacao/', recuperar_tramitacao),
 
     re_path(r'^sessao/recuperar-numero-sessao/',

@@ -842,6 +842,7 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
             if hasher == 'P%s%s%s' % (
                     self.kwargs['hash'], SEPARADOR_HASH_PROPOSICAO, proposicao.pk):
                 self.object = proposicao
+
         except Exception as e:
             self.logger.error("user=" + username + ". Objeto Proposicao com atributos (pk={}, data_envio=Not Null, "
                               "data_recebimento=Null) não encontrado. ".format(self.kwargs['pk']) + str(e))
