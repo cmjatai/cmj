@@ -990,11 +990,9 @@ class IAQuotaManager(models.Manager):
         """
         hoje = timezone.now().date()
         return self.get_queryset().filter(
-            models.Q(iaquotaslog_set__data=hoje) |
-            models.Q(iaquotaslog_set__data__isnull=True),
             ativo=True
         ).annotate(
-            total=models.Sum('iaquotaslog_set__peso')
+            total=models.Sum('iaquotaslog_set__peso', filter=models.Q(iaquotaslog_set__data=hoje))
         ).filter(
             models.Q(total__isnull=True) | models.Q(total__lt=models.F('quota_diaria'))
         ).order_by('-total', '-quota_diaria')

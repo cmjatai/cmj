@@ -302,14 +302,14 @@ Para tal tarefa, compare o conteúdo de <ORIGINAL></ORIGINAL> com o conteúdo de
 Para citar estes dois conteúdos, nomeie eles respectivamente da seguinte maneira:
 "{o_epigrafe}" e "{a_epigrafe}".
 Remova de sua análise os autores pois são irrelevantes para a comparação requerida.
-O importante é o que está sendo pedido, quem será o beneficiário do pedido e para qual localidade
-está sendo feito tal pedido.
-Não faça considerações adicionais e ou mesmo conclusão extra. Neste contexto responda:
+O importante é o que está sendo pedido, quem será o beneficiário do pedido e para qual localidade está sendo feito tal pedido.
+
+Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou frases destas instruções, sem considerações adicionais ou mesmo conclusões extras. Neste contexto responda:
 
 - Os textos estão pedindo o mesmo benefício para a mesma localidade?
 - Descreva de forma sucinta e direta o que está sendo pedido em <ORIGINAL></ORIGINAL> e <ANALISADO></ANALISADO> informando também os beneficiários e as localidades citadas.
 - Calcule a semelhança percentual entre os documentos desconsiderando autores, focando na solicitação e no beneficiário, qual semelhança percentual entre <ORIGINAL></ORIGINAL> e <ANALISADO></ANALISADO>? Coloque o resultado em percentual com uma marcação de colchetes, exemplo: "[[ 100% ]]".
-- formate a resposta em MARKDOWN, utilizando linguagem dissertativa com os títulos e subtítulos necessários para facilitar a leitura, utilizando negrito e itálico quando necessário
+- formate a resposta em MARKDOWN, utilizando linguagem dissertativa explicativa com os títulos e subtítulos necessários para facilitar a leitura, utilizando negrito e itálico quando necessário
 - Não utilize a palavra "plágio" em sua resposta, se necessário expressar tal sentido, utilize a palavra "similaridade".
 
 <ORIGINAL>{original}</ORIGINAL>
