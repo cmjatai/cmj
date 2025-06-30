@@ -2,7 +2,6 @@ from decimal import ROUND_DOWN, Decimal
 import logging
 import re
 
-from attr import field
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError

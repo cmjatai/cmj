@@ -56,7 +56,8 @@ class Command(BaseCommand):
 
         # 1) apaga auditlog de bots de buscas que nada foi filtrado,
         # senão apenas páginas variadas
-        run_sql('''delete from core_auditlog where id in (select id from (select id, count(p) 
+        run_sql('''
+            delete from core_auditlog where id in (select id from (select id, count(p)
                 from core_auditlog
                     left join lateral jsonb_object_keys(obj->'params') p on true
             where

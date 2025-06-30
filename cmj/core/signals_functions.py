@@ -20,6 +20,7 @@ from cmj.loa.models import ScrapRecord, DespesaPaga
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
 from cmj.videos.models import VideoParte, PullExec
+from sapl.materia.models import AnaliseSimilaridade
 
 
 logger = logging.getLogger(__name__)
@@ -46,6 +47,7 @@ def auditlog_signal_function(sender, **kwargs):
         PullExec,        # Conexão com youtube
         ScrapRecord,      # Extração Automática das Despesas e Receitas
         DespesaPaga,
+        AnaliseSimilaridade,  # Análise de Similaridade
     ):
         return
 
