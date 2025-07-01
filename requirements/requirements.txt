@@ -45,7 +45,7 @@ pdfrw
 WeasyPrint==62.3
 python-docx==1.1.2
 XlsxWriter==3.2.0
-Pillow==11.2.1
+Pillow==11.3.0
 markdown==3.7
 
 reportlab==4.2.5
