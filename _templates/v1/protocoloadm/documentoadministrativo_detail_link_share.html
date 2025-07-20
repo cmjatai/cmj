@@ -30,7 +30,7 @@
                 {% with d.metadata.zipfile.keys|length as zip_count %}
                   {% for zn in d.metadata.zipfile.keys %}
                     <a class="text-black-50"
-                    title="{% if zip_count > 1 %}Foi necessário segmentar o download dos arquivos do processo. Baixar parte {{forloop.counter}} de {{zip_count}}{% else %}Baixar arquivo compactado contendo todos os arquivos públicos do processo.{% endif %}"
+                    title="{% if zip_count > 1 %}Foi necessário segmentar o download dos arquivos do processo. Baixar parte {{forloop.counter}} de {{zip_count}}{% else %}Baixar arquivo compactado contendo todos os arquivos do processo.{% endif %}"
                     href="{% url 'sapl.protocoloadm:documentoadministrativo_detail_hash' d.link_share d.id %}?download={{zn}}">
                       <i class="fas fa-2x fa-download">{% if zip_count > 1%}{{forloop.counter}}{% endif %}</i>
                     </a>
