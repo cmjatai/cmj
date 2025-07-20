@@ -279,7 +279,8 @@
 
     .icon_selo_atricon {
       $size_selo: 5.5em;
-      display: flex;
+      // display: flex;
+      display: none;
       position: relative;
       width: $size_selo - 0.5em;
       height: 100%;
