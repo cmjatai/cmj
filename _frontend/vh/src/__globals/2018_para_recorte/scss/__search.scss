@@ -1,0 +1,122 @@
+.container-search {
+  .div-search {
+    input {
+      font-size: 2em;
+      line-height: 1em;
+    }
+    label {
+      font-size: 1.3em;
+      line-height: 1.5em;
+    }
+    button {
+      padding-left: 2em;
+      padding-right: 2em;
+      color: rgba(0, 101, 86, 0.7);
+    }
+  }
+  ul {
+    list-style: none;
+  }
+  .form-group {
+    padding-top: 1em;
+  }
+
+  .collapse {
+    margin: 10px 0;
+  }
+  .btn-ajuda {
+    position: absolute;
+    right: 1em;
+    line-height: 1;
+    padding: 5px 15px 3px;
+  }
+}
+
+.bootstrap-select {
+  width: 100% !important;
+  border: 0;
+  padding: 0;
+  .dropdown-toggle {
+
+  }
+  .selectpicker {
+  }
+  .dropdown-header  {
+    padding: 0 0.5em;
+    line-height: 3em;
+  }
+  .dropdown-menu {
+    z-index: $zindex-selectbox;
+    li {
+      a.opt {
+        padding-left: 1em;
+      }
+    }
+  }
+  .btn {
+      border: 1px solid #ced4da;
+      background-color: white;
+      padding: 0.375rem 0.75rem;
+      color: rgba(0, 101, 86, 0.9);
+  }
+  .bs-actionsbox {
+    padding-top: 0 ;
+    padding-bottom: 0;
+
+    border-bottom: 1px solid #4444;
+    .bs-select-all, .bs-deselect-all {
+      border: 0;
+    }
+  }
+  .container-search button {
+    padding: 0;
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+  .bootstrap-select {
+    position: relative;
+    width: 100%;
+    .dropdown-menu {
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+      right: 0;
+      li {
+        a.opt {
+          padding-left: 0.3rem;
+          padding-right: 2rem;
+          white-space: wrap;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .container-search {
+    font-size: 0.8em;
+    label{
+      font-size: 1.3em;
+    }
+    input{
+      font-size: 1.5em;
+    }
+    .fa-2x {
+      font-size: 1.3em;
+    }
+  }
+}
+
+@media screen and (max-width: 359px) {
+  .container-search {
+    .div-search {
+      button {
+        padding-left: 1em;
+        padding-right: 1em;
+        .fa-2x {
+          font-size: 100%;
+        }
+      }
+    }
+  }
+}

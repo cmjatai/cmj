@@ -1,0 +1,27 @@
+.container-ultimas-publicacoes {
+  position: relative;
+  margin-top: $grid-gutter-width;
+  //display: none;
+  font-size: 0px;
+  width: 100%;
+
+  .path-item-list {
+    width: calc(100%);
+    .inner {
+      padding: 5px 10px 10px;
+      margin: 0;
+      border-top: 1px solid #ddd;
+    }
+  }
+  .path-imagem {
+    width: 100%;
+    .imagem {
+      height: 150px;
+    }
+  }
+  .navbar-social-links {
+    a {
+      //font-size: 1.1rem;
+    }
+  }
+}
