@@ -1,0 +1,39 @@
+
+.navbar-brand {
+  &:hover {
+    text-shadow: 0px 0px 10px #eb3c7d;
+  }
+}
+
+.brand-name {
+  position: relative;
+  &::before {
+    content: " ";
+    background-image: url(~@/__globals/2018/themes/marco_lilas/img/marco_lilas.png);
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    opacity: 1;
+    bottom: 0px;
+    left: 100%;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+  }
+}
+
+@media screen and (min-width: 992px) {
+  .brand-name {
+    &::before {
+      background-image: url(~@/__globals/2018/themes/marco_lilas/img/marco_lilas_rotate.png);
+      //transform: rotate(-15deg);
+      left: 0%;
+
+      width: 70%;
+      height: 70%;
+      bottom: -15px;
+      margin-left: -11px;
+    }
+  }
+}
