@@ -1,85 +1,85 @@
-name: portalcmj
+name: portalsapl
 services:
-  cmjredis:
+  saplredis:
     image: redis:alpine
-    container_name: cmjredis
+    container_name: saplredis
     restart: always
     labels:
-       NAME: "cmjredis"
+       NAME: "saplredis"
     volumes:
       - credis_data:/data
     #ports:
     #  - "6379:6379"
     networks:
-      - cmj-net
-  cmjsolr:
+      - sapl-net
+  saplsolr:
     image: solr:9.5
     restart: always
     command: bin/solr start -c -f
-    container_name: cmjsolr
+    container_name: saplsolr
     labels:
-        NAME: "cmjsolr"
+        NAME: "saplsolr"
     volumes:
       - csolr9_data:/var/solr
       - csolr9_configsets:/opt/solr/server/solr/configsets
     #ports:
     #  - "8983:8983"
     networks:
-      - cmj-net
-  cmjdb:
+      - sapl-net
+  sapldb:
     image: postgres:14.5-alpine
     restart: always
-    container_name: cmjpostgres
+    container_name: saplpostgres
     labels:
-        NAME: "cmjpostgres"
+        NAME: "saplpostgres"
     environment:
       POSTGRES_PASSWORD: cmj
       POSTGRES_USER: cmj
       POSTGRES_DB: cmj
       PGDATA : /var/lib/postgresql/data/
     volumes:
-      - cmjdb_data:/var/lib/postgresql/data/
-    ports:
-      - "5432:5432"
+      - sapldb_data:/var/lib/postgresql/data/
+    #ports:
+    #  - "5432:5432"
     networks:
-      - cmj-net
-  cmj:
+      - sapl-net
+  sapl:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    container_name: cmj
+    container_name: sapl
     user: "root:root"
     labels:
-       NAME: "cmj"
+       NAME: "sapl"
     restart: always
     environment:
       DEBUG: 'False'
       USE_SOLR: 'True'
       SOLR_COLLECTIONS: portalcmj_cmj,portalcmj_arq
-      SOLR_URL: http://solr:solr@cmjsolr:8983
+      SOLR_URL: http://solr:solr@saplsolr:8983
       IS_ZK_EMBEDDED: 'True'
       TZ: America/Sao_Paulo
     volumes:
-      - cmj_data:/var/cmjatai/cmj_data
-      - cmj_media:/var/cmjatai/cmj_media
-      - cmj_logs:/var/cmjatai/cmj/logs
+      - sapl_data:/var/cmjatai/cmj_data
+      - sapl_media:/var/cmjatai/cmj_media
+      - sapl_logs:/var/cmjatai/cmj/logs
     depends_on:
-      - cmjdb
-      - cmjredis
-      - cmjsolr
+      - sapldb
+      - saplredis
+      - saplsolr
     ports:
-      - "8001:80"
+      - "8003:80"
     networks:
-      - cmj-net
+      - sapl-net
 networks:
-  cmj-net:
-    name: cmj-net
+  sapl-net:
+    name: sapl-net
     driver: bridge
 volumes:
-  cmjdb_data:
-  cmj_data:
-  cmj_media:
-  cmj_logs:
+  sapldb_data:
+  sapl_data:
+  sapl_media:
+  sapl_logs:
   csolr9_data:
   csolr9_configsets:
   credis_data:
