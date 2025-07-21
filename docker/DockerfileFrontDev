@@ -6,7 +6,7 @@ ENV LC_ALL C.UTF-8
 #ENV RUN1_PACKAGES bash vim
 #RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
 
-ENV HOME=/var/cmjatai/cmj/_frontend/v1
+ENV HOME=/var/cmjatai/cmj/_frontend/vh
 RUN mkdir -p ${HOME}
 
 RUN addgroup --gid 1001 cmj
@@ -20,4 +20,4 @@ EXPOSE 8080/tcp
 
 VOLUME ["/var/cmjatai/cmj"]
 
-CMD ["/var/cmjatai/cmj/_frontend/v1/startfront-dev.sh"]
+CMD ["/var/cmjatai/cmj/_frontend/vh/startfront-dev.sh"]

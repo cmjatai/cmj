@@ -1,0 +1,500 @@
+
+// ADJUST tela de login ########################################
+.html-login {
+  background-color: $color_primary;
+  background-image: none;
+  a.navbar-brand {
+    font-size: 50px;
+    margin-left: -10px !important;
+  }
+  body, .navbar {
+    background-color: $color_primary;
+    background-image: none;
+  }
+}
+.login-page {
+  footer {
+    border-width: 1px;
+    margin-top: 100px;
+    bottom: 0px;
+  }
+  footer > div:first-child {
+    display: none;
+  }
+
+}
+
+.container-login {
+  box-shadow: 0px 1px 5px #ccc;
+  min-height: 100%;
+  position: relative;
+  margin: 3% 15%;
+  background-color: transparent;
+  color: $color_primary;
+  border: 0;
+  .inner {
+    padding: $grid-gutter-width;
+    line-height: 1;
+  }
+  .logo-cmj {
+    position: absolute;
+    opacity: 0.7;
+    right: 15px;
+    top: 2px;
+    width: 60px;
+    z-index: 1;
+  }
+  .label2 {
+    color: white;
+    font-weight: normal;
+    font-size: 3em;
+    margin: 0;
+    font-weight: normal;
+    font-size: 2em;
+    background: $color_primary;
+    padding: 0 20px;
+  }
+  .input-icon {
+    margin: 30px 10% 0;
+    span.fa {
+      position: absolute;
+      padding: 0.45em 0.2em;
+      opacity: 0.6;
+    }
+  }
+  #login-form {
+    background: white;
+    overflow: hidden;
+  }
+  .row-recovery {
+    margin: 0 10%;
+    text-align: right;
+  }
+
+  input {
+    height: 3em;
+    font-size: 1.3em;
+    border: 1px solid rgba($color_border_input, 0.7);
+
+    padding: 1em 1em 1em 2.2em;
+    background-color: rgba(255, 255, 255, 0.8);
+    &:focus {
+      background-color: white;
+    }
+
+    @include placeholder($color_primary, 0.5, 1em, normal);
+
+
+  }
+
+  .btns-login {
+    margin: 1em 0;
+    .btn-login {
+      border: 0px solid $color_primary;
+      background-color: $color_primary;
+      cursor: pointer;
+      display: inline-block;
+      line-height: 3rem;
+      padding: 0 10px;
+      font-size: 1.2rem;
+      //position: relative;
+      width: 100%;
+      //letter-spacing: 0px;
+      text-align: center;
+
+      //line-height: 1.9rem;
+
+      color: white;
+      text-decoration: none;
+
+      i {
+        margin-right: 10px;
+        //line-height: 1.8rem;
+        //border-radius: 2px;
+        vertical-align: middle;
+        font-size: 2.4rem;
+      }
+
+
+      &[name="facebook"]  {
+        background-color:  #4267B2;
+      }
+      &[name="google-oauth2"] {
+        background-color: #e55;
+        i {
+          font-size: 2rem;
+        }
+      }
+      &:hover {
+        background: black $url_bg_png;
+      }
+    }
+    &.box-entry {
+      margin: $grid-gutter-width 0 0 0;
+      padding: 1em 2em;
+      border: 1px solid #ddd;
+    }
+
+  }
+
+}
+
+.input_password {
+  position: relative;
+  .fa-eye, .fa-eye-slash {
+    color: #444;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+}
+
+// #### ImpressoEnderecamentoRenderer #####################
+
+.ier {
+  background: darken($color_main_bg, 10%) $url_bg_png;
+  height: 100px;
+  margin: 0 $grid-gutter-width * 0.5 $grid-gutter-width $grid-gutter-width * 0.5;
+  overflow: hidden;
+  position: relative;
+  .etiqueta {
+    position: absolute;
+    background: white;
+  }
+}
+
+.bi-app {
+  padding-top: 1em;
+  //background: $hover_background_10p $url_bg_png;
+  .container-bi {
+    padding: 1em;
+    margin-bottom: 1em;
+    background-color: white;
+    //border-bottom: 1px solid #ccc;
+    //border-radius: 5px;
+    //box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.06), 0px 2px 6px rgba(0, 0, 0, 0.23);
+  }
+
+  .bi-footer {
+    padding-top: 1em;
+    //display: none;
+  }
+
+  .container-bi-global {
+    .inner {
+      background-color: white;
+      padding: 5px;
+      text-align: center;
+      height: 100%;
+      .key {
+        //white-space: nowrap;
+        font-size: 0.9em;
+        color: #777;
+        line-height: 1;
+      }
+      .value {
+        font-size: 1.5em;
+        font-family: Rubik, Helvetica, sans-serif;
+        color: #004c40;
+        // font-weight: bold;
+        padding: 0.5em 0;
+        line-height: 1;
+      }
+    }
+    [class^=col] {
+      padding-right: 5px;
+      padding-left: 5px;
+      margin-bottom: 10px;
+    }
+    .row {
+      padding: 0 10px;
+      align-items: stretch;
+    }
+  }
+
+  .legend-global {
+    border-bottom: 1px solid green;
+    font-size: 5em;
+    color: #004c40aa;
+    padding: 1rem 0 0 1rem;
+  }
+  .legend {
+    border-bottom: 1px solid green;
+    font-size: 2em;
+  }
+  .bi-graph {
+    font-size: 0.9rem;
+    .inner {
+      display: grid;
+      grid-template-areas:
+        "unset lx lx2 lx3"
+        "ly graph graph2 graph3";
+      grid-template-columns: auto 1fr 1fr 1fr;
+      line-height: 1.2;
+    }
+    .ly, .ly2, .ly3 {
+      grid-area: ly;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      color: #777;
+      .ly-item {
+        border-bottom: 1px dashed #ddd;
+        display: inline-block;
+        border-right: 1px dashed #ddd;
+        margin-right: 2px;
+      }
+    }
+    .ly2 {
+      grid-area: ly2;
+      display: none;
+    }
+    .ly3 {
+      grid-area: ly3;
+      display: none;
+    }
+    .graph {
+      grid-area: graph;
+    }
+    .graph2 {
+      grid-area: graph2;
+    }
+    .graph3 {
+      grid-area: graph3;
+    }
+    .lx {
+      grid-area: lx;
+    }
+    .lx2 {
+      grid-area: lx2;
+    }
+    .lx3 {
+      grid-area: lx3;
+    }
+    .lx-titulo {
+      color: #777;
+      margin-left: -0.5em;
+    }
+
+    .ly-item {
+      padding: 0px 5px 0px;
+    }
+
+  }
+  .bi-graph-barra-horizontal {
+    .graph, .graph2, .graph3 {
+      display: flex;
+      flex-direction: column;
+      .group-row {
+        display: flex;
+        flex-direction: column;
+        padding: 0px 0;
+        border-bottom: 1px dashed #ddd;
+        padding-right: 1em;
+      }
+      .g-row {
+        display: inline-block;
+        color: #555;
+        span {
+          display: inline-block;
+          text-align: right;
+          padding-top: 1px;
+          span {
+            padding: 0 5px;
+          }
+        }
+      }
+    }
+    .graph2, .graph3 {
+      border-left: 1px dashed #ddd;
+      padding-left: 2px;
+    }
+  }
+}
+
+@media screen and (max-width: 1399.98px) {
+  .bi-app {
+    .container-bi-global {
+      .inner {
+        .key {
+          font-size: 0.7em;
+        }
+        .value {
+          font-size: 1.3em;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1199px) {
+  .container-login {
+    margin: 0 10% $grid-gutter-width*0.5;
+    .btns-login {
+      .col-lg-6 {
+        padding: 0;
+      }
+      .btn-login {
+        margin-top: 10px;
+      }
+    }
+  }
+  .bi-app {
+    .container-bi-global {
+      .col {
+        flex: 1 1 12%;
+      }
+      .inner {
+        padding: 3px;
+      }
+    }
+  }
+}
+@media screen and (max-width: 991px) {
+  .container-login {
+    //margin: 0 10% $grid-gutter-width/2;
+    .inner {
+      //padding: $grid-gutter-width/2;
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      margin: 0;
+    }
+  }
+
+  .bi-app {
+    .legend-global {
+      font-size: 3em;
+    }
+    .bi-graph {
+      .inner {
+        grid-template-areas:
+          "lx lx"
+          "ly graph"
+          "lx2 lx2"
+          "ly2 graph2"
+          "lx3 lx3"
+          "ly3 graph3";
+        grid-template-columns: auto 1fr;
+
+        .graph {
+          padding-right: 0;
+        }
+        .graph2, .graph3 {
+          border-left: 0px dashed #ddd;
+        }
+        .ly2, .ly3 {
+          display: flex;
+        }
+        .lx2, .lx3 {
+          padding-top: 1em;
+        }
+      }
+    }
+  }
+
+
+
+}
+
+@media screen and (max-width: 767px) {
+  .container-login {
+    margin: $grid-gutter-width * 0.5 0;
+    .inner {
+      padding: $grid-gutter-width * 0.5;
+    }
+    .input-icon {
+      margin: $grid-gutter-width * 0.5;
+    }
+    .btns-login {
+      .btn-login {
+        //margin-top: 10px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .container-login {
+    input {
+      height: 2.5em;
+      font-size: 1.2em;
+      padding: 0.5em 0.7em 0.5em 2.2em;
+    }
+    .btns-login {
+      .btn-login {
+        letter-spacing: 1px;
+      }
+    }
+    .input-icon {
+      span.fa {
+        padding: 0.15em 0.2em;
+      }
+    }
+  }
+  .container-login-inner {
+    .container-login {
+      //margin: 10px 1%;
+    }
+    .inner-ouvidoria {
+      //padding: 0px;
+    }
+  }
+
+  .bi-app {
+    .legend-global {
+      font-size: 2.5em;
+    }
+    .container-bi {
+      padding: 0.5em;
+    }
+    .bi-graph {
+      .lx-titulo {
+        margin-left: 0;
+      }
+    }
+    .bi-graph-barra-horizontal {
+      .graph, .graph2, .graph3 {
+        .group-row {
+          padding-right: 0.5em;
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 480px) {
+  .bi-app {
+    .legend-global {
+      font-size: 2em;
+    }
+  }
+  .container-login {
+    //margin: 10px 0;
+    .input-icon {
+      margin: 15px 0 0;
+    }
+    .row-recovery {
+      margin: 0 10px;
+    }
+
+    .btns-login {
+      &.box-entry {
+        margin: 0;
+        padding: 15px;
+      }
+    }
+
+  }
+  .container-login-inner {
+    .container-login {
+      //margin: 10px 0;
+    }
+
+    .inner-ouvidoria {
+      //padding: 30px;
+    }
+  }
+}
