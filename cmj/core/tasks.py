@@ -38,6 +38,9 @@ def task_send_rede_social(self, rede, app_label, model_name, pk):
     # print(kwargs)
     # return
 
+    if 'www' not in settings.SITE_URL:
+        return
+
     send_func = f'send_{rede}_{app_label}_{model_name}'
 
     #print(f'print, task_send_rede_social iniciou execução: {send_func}')
