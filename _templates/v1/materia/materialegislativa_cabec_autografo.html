@@ -1,9 +1,9 @@
 AUTÓGRAFO Nº 0000, {% now "d \D\E F \D\E Y" %}.
-<p><a href="https://www.jatai.go.leg.br{% url 'sapl.materia:materialegislativa_detail' object.id %}">{{object.epigrafe}}</a></p>
+<p><a href="{{ site_url }}{% url 'sapl.materia:materialegislativa_detail' object.id %}">{{object.epigrafe}}</a></p>
 <p>Autoria: {% for autor in object.autores.all %}{{autor}}{% if not forloop.last %} - {% endif %}{% endfor %}</p>
 <p>Emendas:</p>
 {% for anexada in object.anexadas.materias_anexadas_ordem_crescente %}
-<p><a href="https://www.jatai.go.leg.br{% url 'sapl.materia:materialegislativa_detail' anexada.id %}">{{anexada.epigrafe}}</a></p>
+<p><a href="{{ site_url }}{% url 'sapl.materia:materialegislativa_detail' anexada.id %}">{{anexada.epigrafe}}</a></p>
 <p>Autoria: {% for autor in anexada.autores.all %}{{autor}}{% if not forloop.last %} - {% endif %}{% endfor %}</p>
 {% endfor %}
 <p>{{ object.ementa }}</p>

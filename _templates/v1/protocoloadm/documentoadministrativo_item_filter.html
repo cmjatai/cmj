@@ -139,7 +139,7 @@
     <div class="alert alert-secondary my-0">
       <strong>ATENÇÃO... <span class="text-maroon">Use o link abaixo para compartilhar!!!</span></strong><br>
       <div class="form-clickboard input-group input-group-sm d-flex">
-        <input class="form-control" readonly="readonly" type="text" value="https://www.jatai.go.leg.br{% url 'sapl.protocoloadm:documentoadministrativo_detail_hash' d.link_share  d.pk %}" id="input-copy-clipboard">
+        <input class="form-control" readonly="readonly" type="text" value="{{ site_url }}{% url 'sapl.protocoloadm:documentoadministrativo_detail_hash' d.link_share  d.pk %}" id="input-copy-clipboard">
         <div class="input-group-append">
           <button onclick="copyInputClipboard()" class="btn btn-outline-primary" type="button">
             <i class="fas fa-clipboard"></i> Copiar Link

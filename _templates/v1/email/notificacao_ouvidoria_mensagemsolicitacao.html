@@ -12,7 +12,7 @@
 
     <br><br>
     <a style="color: #ffffff; background-color: #02baf2; border-radius: 4px; padding: 7px 15px 6px 15px; text-decoration: none; text-transform: uppercase; font-weight: bold;"
-      href="https://www.jatai.go.leg.br{% url 'cmj.ouvidoria:solicitacao_interact' notificacao.content_object.solicitacao.pk%}">
+      href="{{ site_url }}{% url 'cmj.ouvidoria:solicitacao_interact' notificacao.content_object.solicitacao.pk%}">
       Acesse por aqui o Portal CMJ para enviar sua resposta
     </a>
     <br><br>

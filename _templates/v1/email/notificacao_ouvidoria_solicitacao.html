@@ -13,12 +13,12 @@
     <br><br><br>
     {% if notificacao.content_object.owner %}
       <a style="color: #ffffff; background-color: #02baf2; border-radius: 4px; padding: 7px 15px 6px 15px; text-decoration: none; text-transform: uppercase; font-weight: bold;"
-        href="https://www.jatai.go.leg.br{% url 'cmj.ouvidoria:solicitacao_interact' notificacao.content_object.pk%}">
+        href="{{ site_url }}{% url 'cmj.ouvidoria:solicitacao_interact' notificacao.content_object.pk%}">
           Acesse por aqui o Portal CMJ para enviar sua resposta
       </a>
     {% else %}
       <a style="color: #ffffff; background-color: #02baf2; border-radius: 4px; padding: 7px 15px 6px 15px; text-decoration: none; text-transform: uppercase; font-weight: bold;"
-        href="https://www.jatai.go.leg.br{% url 'cmj.ouvidoria:solicitacao_detail' notificacao.content_object.pk%}">
+        href="{{ site_url }}{% url 'cmj.ouvidoria:solicitacao_detail' notificacao.content_object.pk%}">
           Veja outros detalhes no Portal CMJ
       </a>
     {% endif %}

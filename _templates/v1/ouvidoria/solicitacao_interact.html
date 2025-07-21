@@ -22,7 +22,7 @@
         <strong>ATENÇÃO... <span class="text-maroon">Guarde o link abaixo!!!</span></strong><br>
         Com ele, <strong>sempre sem necessidade qualquer tipo de identificação,</strong><br>você poderá voltar a sua <strong>denúncia anônima</strong> e acompanhar as ações e interagir com a ouvidoria.
         <div class="form-clickboard input-group input-group-lg">
-          <input class="form-control" readonly="readonly" type="text" value="https://www.jatai.go.leg.br{% url 'cmj.ouvidoria:solicitacao_interact_hash' solicitacao.hash_code solicitacao.pk %}" id="input-copy-clipboard">
+          <input class="form-control" readonly="readonly" type="text" value="{{ site_url }}{% url 'cmj.ouvidoria:solicitacao_interact_hash' solicitacao.hash_code solicitacao.pk %}" id="input-copy-clipboard">
           <div class="input-group-append">
             <button onclick="copyInputClipboard()" class="btn btn-outline-primary" type="button">
               <i class="fas fa-clipboard"></i> Copiar Link

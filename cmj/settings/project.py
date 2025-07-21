@@ -35,7 +35,7 @@ FOLDER_DEBUG_CONTAINER = Path(
 
 ALLOWED_HOSTS = ['*']
 #SITE_URL = 'http://localhost'
-SITE_URL = 'https://www.jatai.go.leg.br'
+SITE_URL = config('SITE_URL', default='https://www.jatai.go.leg.br', cast=str)
 CSRF_TRUSTED_ORIGINS = [SITE_URL, ]
 SESSION_COOKIE_SECURE = not DEBUG
 
