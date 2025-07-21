@@ -29,7 +29,7 @@ services:
       - cmj-net
   cmjfront:
     build:
-      context: ../_frontend/v1/
+      context: ../_frontend/vh/
       dockerfile: ../../docker/DockerfileFrontDev
     #command: yarn build
     restart: no

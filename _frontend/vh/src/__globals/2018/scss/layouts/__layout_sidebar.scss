@@ -1,0 +1,469 @@
+$fator-xl: 1.06;
+
+@keyframes toggledin {
+  from {
+    width: $width-wrapper-closed;
+    overflow: hidden;
+    opacity: 0;
+  }
+  99% {
+    width: $width-wrapper-lg - 1;
+    overflow: hidden;
+    opacity: 1;
+  }
+  100% {
+    width: $width-wrapper-lg;
+    overflow: unset;
+  }
+}
+
+@keyframes toggledin_lg {
+  from {
+    width: $width-wrapper-closed * $fator-xl * 1.1;
+    overflow: hidden;
+    opacity: 0;
+  }
+  99% {
+    width: $width-wrapper-lg * $fator-xl - 1;
+    overflow: hidden;
+    opacity: 1;
+  }
+  100% {
+    width: $width-wrapper-lg * $fator-xl;
+    overflow: unset;
+  }
+}
+
+#wrapper {
+  padding-left: $width-wrapper-closed;
+  
+  .path-previous {
+    left: $width-wrapper-closed - 41px;
+  }
+  
+  aside {
+    width: $width-wrapper-closed;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    background: #212a2d $url_bg_png;
+    z-index: $zindex-sidebar;
+
+    font-size: 1rem;
+
+    background: -moz-linear-gradient(left, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
+    background: -webkit-linear-gradient(left, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
+    background: linear-gradient(to right, rgba(9, 20, 38, 0.99) 0%, #000000 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#091426', endColorstr='#000000',GradientType=1 );
+     
+    .container-aside {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      
+      opacity: 0.7;
+
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    ul {
+      display: none;
+      position: fixed;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      z-index: 1;
+      left: $width-wrapper-lg - 10px;
+      //right: 30px;
+      top: 30px;
+      bottom: 30px;
+      border-radius: 4px;
+
+      &.submenu {
+        display: none;
+        padding: 20px 30px;
+        a {
+          font-size: 1.4em;
+        }        
+        & > li {
+          //padding: 20px;
+          & > a {
+            font-size: 2em;
+          }
+        }             
+        ul {
+          display: block;
+          position: static;
+          padding-left: 20px;
+          padding-bottom: 20px;
+        }
+      }
+      &.submenu-materia {
+        background: #f56954f5 !important;    
+      }
+      &.submenu-docadm {
+        background: #00c0eef5 !important;    
+      }
+    }
+
+
+    .box {
+      //position: relative;
+      display: flex;
+      flex: 1 1 100%;
+      &:not(:last-child) {
+        border-bottom: 1px solid #555;
+
+      }
+      &.box-search:hover {
+        background: #fff3 !important; 
+      }
+      &.box-parlamentares:hover {
+        background: $color_parlamentar !important;
+      }
+      &.box-documento-administrativo:hover {
+        background: $color_documentoadministrativo !important;
+      }
+      &.box-norma:hover{
+        background: $color_normajuridica !important;
+        ul {
+          background: #00a65a;
+        }
+      }
+      &.box-norma-destaque:hover{
+        background: #b0b300 !important;
+        ul {
+          background: #3d9970;
+          top: -140px;
+          &::before {
+            background-color: #3d9970;
+            top: 150px;
+          }
+        }
+      }
+      &.box-sessao:hover{
+        background: $color_sessaoplenaria !important;
+      }
+      &.box-materia:hover{
+        background: $color_materialegislativa !important;
+      }
+      &.box-diario-oficial:hover {
+        background: $color_diariooficial !important;
+      }
+      &.box-comissao:hover {
+        background: $color_comissao !important;
+      }
+      &.box-transparencia:hover {
+        background: $color_transparencia !important;
+      }
+
+      & > .inner {
+        display: none;
+        align-self: center;
+        flex: 1 1 100%;
+  
+        & > a {
+          color: #aaa;
+          font-size: 1.1em;
+          //font-variant: small-caps;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+      }
+    }
+    
+    .icon {
+      width: 100%;
+      height: 100%;
+      
+      flex: 0 0 $width-wrapper-closed;
+      align-self: center;
+
+      background-size: 60% auto;
+      background-repeat: no-repeat;
+      background-position: center center;
+
+      opacity: 0.7;
+
+      &.icon-busca-textual {
+        background-image: url(~@/assets/img/search_box_icon36.png);
+      }
+      &.icon-parlamentares {
+        background-image: url(~@/assets/img/icon_parlamentares.png);
+      }
+      &.icon-atividade-legislativa {
+        background-image: url(~@/assets/img/icon_materia_legislativa.png);
+      }
+      &.icon-diario-oficial {
+        background-image: url(~@/assets/img/icon_diario_oficial.png);
+      }
+      &.icon-sessao-plenaria {
+        background-image: url(~@/assets/img/icon_plenarias.png);
+      }
+      &.icon-norma-juridica {
+        background-image: url(~@/assets/img/icon_normas_juridicas.png);
+      }
+      &.icon-norma-juridica-destaque {
+        background-image: url(~@/assets/img/icon_normas_juridicas_destaque.png);
+      }
+      &.icon-licitacao {
+        background-image: url(~@/assets/img/icon_licitacao.png);
+      }
+      &.icon-transparencia {
+        background-image: url(~@/assets/img/icon_transparencia.png);
+      }
+      &.icon-comissoes {
+        background-image: url(~@/assets/img/icon_comissoes.png);
+      }
+    }
+
+    .box {
+      &:hover {
+        .inner > ul {
+          display: block;
+          li:hover {
+            ul {
+              display: block;
+            }
+              
+          }
+        }
+      }
+    }
+
+    &:hover {
+      box-shadow: 0 20px 20px #2d3f2f;
+
+      .container-aside {
+        opacity: 1;
+      }
+
+      .box {
+        a {
+          color: white;
+        }
+        &:hover {
+          .icon {
+            opacity: 1;
+          }
+          a {
+            text-shadow: 0 0 20px white;
+          }
+          .submenu {
+            a {
+              text-shadow: 0 0 0 white;
+
+            }
+          }
+        }
+        .inner {
+          display: flex;
+        }
+      }
+    }
+  }
+}
+
+.container-tabaux {
+  .sidebar-tabaux {
+    .caret {
+      display: none;
+    }
+    .dropdown-menu {
+      padding: 0;
+    }
+    & > ul {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      text-align: right;
+      ul {
+        //display: flex;
+        right: 0;
+        //left: auto !important;
+        transform: none !important;
+        top: 100% !important;
+      }
+      a {
+        padding: 0 15px;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991.98px) {
+
+  #wrapper {
+    padding-left: 0;
+    .path-previous {
+      left: -33px;
+    }
+    aside {
+      width: 100%;
+      position: relative;
+      // height: 64px;
+
+      .container-aside {
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        opacity: 0.8;
+      }
+
+      ul {
+        left: 10px;
+        right: 10px;
+        top: 120px;
+        bottom: 0px;
+        text-align: left;
+        &::before {
+          content: '';
+          display: block;
+          background-color: transparent;
+          position: absolute;
+          top: -1em;
+          bottom: 0px;
+          left: -10px;
+          right: -10px;
+          z-index: -1;
+        }
+
+      }
+
+      .aside-hover {
+        display: none;
+      }
+
+      .box {
+        flex-direction: column;
+
+        &:not(:last-child)  {
+          border-bottom-width: 0;
+        }
+
+        & > .inner {
+          text-align: center;
+          display: inline-flex;
+          padding-bottom: 5px;
+          & > a {
+            font-size: 0.8em;
+            white-space: unset;
+            line-height: 1.2;
+            font-variant: normal;
+            padding: 0 2px;
+          }
+        }
+      }
+      .icon {
+        background-size: auto 70%;
+      }
+
+      &:hover {
+        width: 100%;
+        box-shadow: 0 0 0 #031d06;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+
+  #wrapper {
+    aside {
+      .container-aside {
+        opacity: 0.8;
+      }
+      .box {
+        & > .inner {
+          & > a {
+            font-size: 0.6em;
+          }
+        }
+      }
+      .icon {
+        background-size: auto 60%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+
+  #wrapper {
+    aside {
+      .container-aside {
+        opacity: 0.8;
+      }
+      .box {
+        & > .inner {
+          & > a {
+            //display: none;
+            padding: 0 3px;
+          }
+        }
+      }
+      .box-comissao, .box-search, .box-diario-oficial, .box-parlamentares {
+        display:none;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 992px) {
+  #wrapper {
+    aside {
+      z-index: $zindex-sidebar-desktop;
+      &:hover {
+        width: $width-wrapper-lg;
+        animation-delay: 0s;
+        animation-duration: 0.7s;
+        animation-name: toggledin; 
+      
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  #wrapper {
+    padding-left: $width-wrapper-closed * $fator-xl * 1.1;
+    .path-previous {
+      left: $width-wrapper-closed * $fator-xl * 1.1 - 41px;
+    }
+    aside {
+      width:  $width-wrapper-closed * $fator-xl * 1.1;
+
+      .icon {
+        flex: 0 0 $width-wrapper-closed * $fator-xl * 1.1;
+      }
+      ul {
+        left: $width-wrapper-lg * $fator-xl - 10px;
+      }
+
+      &:hover {
+        width: $width-wrapper-lg * $fator-xl;
+        animation-delay: 0s;
+        animation-duration: 0.7s;
+        animation-name: toggledin_lg; 
+        
+        .box {
+          & > .inner {
+            & > a {
+              font-size: 1.4em;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media print {
+  aside {
+    display: none !important;
+  }
+}
