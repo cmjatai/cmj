@@ -248,7 +248,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
                     issuer = cert.native['tbs_certificate']['issuer']
                     oname = issuer.get('organization_name', '')
 
-                    if oname == 'Gov-Br':
+                    if oname in ('Gov-Br', '1Doc'):
                         nome = subject['common_name'].split(':')[0]
                         continue
 
@@ -360,7 +360,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
                         issuer = cert.native['tbs_certificate']['issuer']
                         oname = issuer.get('organization_name', '')
 
-                        if oname == 'Gov-Br':
+                        if oname in ('Gov-Br', '1Doc'):
                             nome = subject['common_name'].split(':')[0]
                             continue
 
