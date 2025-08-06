@@ -101,7 +101,6 @@ def task_classifica_materialegislativa_function():
         task_analise_similaridade_entre_materias_function(only_materia_id=mid)
 
 
-
 @cmj_celery_app.task(queue='cq_base', bind=True)
 def task_classifica_materialegislativa(self, *args, **kwargs):
     # desativada, não sendo chamada - ja processou toda a base de antes de 2025.
@@ -219,11 +218,8 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             similaridade = -1
         ).first()
 
-
     if not analise:
         return
-
-
 
     gen = IAAnaliseSimilaridadeService()
     analise = gen.run(analise)

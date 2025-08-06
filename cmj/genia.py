@@ -1,5 +1,6 @@
 import json
 import logging
+import re
 
 from django.conf import settings
 from django.contrib import messages
@@ -52,6 +53,39 @@ class IAGenaiBase:
         )
 
         return model, quota
+
+    def _extract_pdf_text_robust(self, doc):
+        """
+        Extrai texto de PDF de forma mais robusta, tratando problemas de codificação
+        e caracteres especiais que podem aparecer em PDFs mal formados.
+        """
+        import re
+
+        text_parts = []
+
+        for page in doc:
+            try:
+                page_text = page.get_text()
+                private_use_pattern = re.compile(r'[\ue000-\uf8ff]')
+                private_use_count = len(private_use_pattern.findall(page_text))
+
+                if private_use_count > len(page_text) * 0.1:
+                    rect = pymupdf.Rect(0, 80, page.rect.width-45, page.rect.height-55)
+                    pix = page.get_pixmap(clip=rect, dpi=300)
+                    #pix.save("/tmp/temp_page.png")
+                    bpix = pix.pdfocr_tobytes()
+                    bpdf = pymupdf.open(stream=bpix)
+                    bpage = bpdf[0]
+                    page_text = bpage.get_textpage_ocr()
+                    page_text = page_text.extractText()
+
+                text_parts.append(page_text)
+
+            except Exception as e:
+                logger.warning(f"Erro ao extrair texto da página: {e}")
+                text_parts.append("")
+
+        return ' '.join(text_parts)
 
 class IAClassificacaoMateriaService(IAGenaiBase):
 
@@ -230,7 +264,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
                 continue
 
             doc = pymupdf.open(getattr(obj, fn).path)
-            doc_text = ' '.join([page.get_text() for page in doc])
+            doc_text = self._extract_pdf_text_robust(doc)
             doc_text = clean_text(doc_text)
 
             text += doc_text
@@ -325,11 +359,11 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
         mat2 = similaridade.materia_2
 
         doc1 = pymupdf.open(mat1.texto_original.original_path)
-        text1 = ' '.join([page.get_text() for page in doc1])
+        text1 = self._extract_pdf_text_robust(doc1)
         text1 = clean_text(text1)
 
         doc2 = pymupdf.open(mat2.texto_original.original_path)
-        text2 = ' '.join([page.get_text() for page in doc2])
+        text2 = self._extract_pdf_text_robust(doc2)
         text2 = clean_text(text2)
 
         prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
