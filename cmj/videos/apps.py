@@ -35,6 +35,9 @@ class AppConfig(apps.AppConfig):
         if 'sqlite3' in settings.DATABASES['default']['ENGINE']:
             return
 
+        if 'www' not in settings.SITE_URL:
+            return
+
         try:
             i = celery_app.control.inspect()
 
