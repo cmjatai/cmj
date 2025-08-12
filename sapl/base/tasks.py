@@ -239,8 +239,10 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
     #if restart:
     logger.info('Executando...')
     analise = None
+    only_materia_id = args[0] if args else None
+
     try:
-        analise = task_analise_similaridade_entre_materias_function()
+        analise = task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
     except Exception as e:
         logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
 

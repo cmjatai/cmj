@@ -49,7 +49,7 @@ from cmj.mixins import BtnCertMixin, CheckCheckMixin, MultiFormatOutputMixin, \
     AudigLogFilterMixin
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import Autor, CasaLegislativa, AppConfig as BaseAppConfig
-from sapl.base.tasks import task_analise_similaridade_entre_materias_function
+from sapl.base.tasks import task_analise_similaridade_entre_materias, task_analise_similaridade_entre_materias_function
 from sapl.comissoes.models import Comissao, Participacao, Composicao
 from sapl.compilacao.models import (STATUS_TA_IMMUTABLE_RESTRICT,
                                     STATUS_TA_PRIVATE)
@@ -2443,7 +2443,11 @@ class MateriaLegislativaCrud(Crud):
                         materia=obj
                     )
 
-            task_analise_similaridade_entre_materias_function(gen.object.id)
+            # task_analise_similaridade_entre_materias_function(gen.object.id)
+            task_analise_similaridade_entre_materias.apply_async(
+                (gen.object.id, ),
+                countdown=10
+            )
 
             return HttpResponseRedirect(reverse(
                 'sapl.materia:materialegislativa_detail',
