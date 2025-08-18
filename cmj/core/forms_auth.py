@@ -3,6 +3,7 @@ from crispy_forms.bootstrap import Alert, FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model, password_validation
 from django.contrib.auth.forms import AuthenticationForm, \
     SetPasswordForm, PasswordResetForm
@@ -444,6 +445,13 @@ class RecuperarSenhaForm(GoogleRecapthaMixin, PasswordResetForm):
             'is_active': True,
         })
         return (u for u in active_users)
+
+    def save(self, **kwargs):
+        kwargs['extra_email_context'] = {
+            'site_url': settings.SITE_URL,
+        }
+        super(RecuperarSenhaForm, self).save(**kwargs)
+
 
 
 class NovaSenhaForm(SetPasswordForm):

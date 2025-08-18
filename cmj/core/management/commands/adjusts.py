@@ -88,6 +88,63 @@ class Command(BaseCommand):
         mnt.desativa_auto_now()
         mnt.desativa_signals()
 
+        #replicar um documento acessorio
+        from django.core.files.base import File
+
+        d = DocumentoAcessorio.objects.get(pk=3759)
+        path = d.arquivo.original_path
+        for m in MateriaLegislativa.objects.filter(
+            tipo_id=27, ano=2024,
+            numero__in=list({
+                143, 125, 122, 121, 120, 119, 118, 117, 116, 114, 113, 108, 107, 106, 102,
+
+                94, 93, 92, 91, 89, 88, 83, 81, 80, 79, 78, 77, 76, 75, 74, 73, 72, 71, 70,
+                69, 68, 67, 66, 65, 64, 63, 62, 61, 60, 59, 58, 56, 54, 53, 52, 51, 50,
+                49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 32,
+                31, 30, 29, 28, 27, 26, 24, 23, 22, 21, 20, 19, 18, 17, 16, 15, 13,
+                11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+            })
+        ).order_by('numero'):
+            f = open(path, 'rb')
+            f = File(f)
+            d.id = None
+            d.arquivo = None
+            d.materia = m
+            d.save()
+            d.arquivo.save(path.split('/')[-1], f)
+            d.save()
+
+        return
+
+        d = DocumentoAcessorio.objects.get(pk=3446)
+        path = d.arquivo.original_path
+        for m in MateriaLegislativa.objects.filter(
+            tipo_id=27, ano=2023,
+            numero__in=list({
+                2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14,
+                15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 38, 39,
+                87, 104, 107, 63, 71,
+                80, 106, 37, 62, 67, 70, 94, 108,
+                117, 31, 41, 45,
+                46, 47, 55, 95, 113, 115,
+                52, 56, 69, 72, 75, 83, 84, 85, 96, 97,
+                98, 100, 101, 111, 114, 119, 120, 121, 122,
+                30,
+                32, 34, 48, 58, 81, 88, 99, 36, 92, 112, 43, 49, 61, 89, 103, 118, 44, 51, 57, 66, 76, 102,
+                79, 110, 93, 96,
+            })
+        ).order_by('numero'):
+            f = open(path, 'rb')
+            f = File(f)
+            d.id = None
+            d.arquivo = None
+            d.materia = m
+            d.save()
+            d.arquivo.save(path.split('/')[-1], f)
+            d.save()
+
+        return
+
         m = MateriaLegislativa.objects.get(pk=21501)
 
         fin = m.texto_original.path
@@ -305,32 +362,7 @@ class Command(BaseCommand):
             ad.save()
 
         return
-        d = DocumentoAcessorio.objects.get(pk=3446)
-        path = d.arquivo.original_path
-        for m in MateriaLegislativa.objects.filter(
-            tipo_id=27, ano=2023,
-            numero__in=list({
-                2, 3, 5, 7, 8, 9, 10, 11, 12, 13, 14,
-                15, 16, 17, 18, 19, 20, 21, 22, 23, 25, 26, 27, 28, 29, 38, 39,
-                87, 104, 107, 63, 71,
-                80, 106, 37, 62, 67, 70, 94, 108,
-                117, 31, 41, 45,
-                46, 47, 55, 95, 113, 115,
-                52, 56, 69, 72, 75, 83, 84, 85, 96, 97,
-                98, 100, 101, 111, 114, 119, 120, 121, 122,
-                30,
-                32, 34, 48, 58, 81, 88, 99, 36, 92, 112, 43, 49, 61, 89, 103, 118, 44, 51, 57, 66, 76, 102,
-                79, 110, 93, 96,
-            })
-        ).order_by('numero'):
-            f = open(path, 'rb')
-            f = File(f)
-            d.id = None
-            d.arquivo = None
-            d.materia = m
-            d.save()
-            d.arquivo.save(path.split('/')[-1], f)
-            d.save()
+
 
         # post_save.disconnect(dispatch_uid='timerefresh_post_signal')
 

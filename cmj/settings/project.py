@@ -36,7 +36,10 @@ FOLDER_DEBUG_CONTAINER = Path(
 ALLOWED_HOSTS = ['*']
 #SITE_URL = 'http://localhost'
 SITE_URL = config('SITE_URL', default='https://www.jatai.go.leg.br', cast=str)
-CSRF_TRUSTED_ORIGINS = [SITE_URL, ]
+CSRF_TRUSTED_ORIGINS = [
+    SITE_URL,
+    'https://cmjatai.1doc.com.br'
+    ]
 SESSION_COOKIE_SECURE = not DEBUG
 
 # https, colocar no nginx-> proxy_set_header X-Forwarded-Proto $scheme;
