@@ -4,7 +4,6 @@
 {% load static %}
 {% load webpack_static from webpack_loader %}
 
-
 <div class="links-texto">
   {% if object.arquivo %}
     <a class="link-texto" href="{{object.arquivo.url}}?u={% now "u"%}" title="Texto Original">
@@ -15,7 +14,7 @@
 
 
 <strong>
-  <a href="{{object.arquivo.url}}?u={% now "u"%}" >
+  <a href="{% if perms.materia.change_documentoacessorio %}{% url "sapl.materia:documentoacessorio_detail" object.id %}{% else %}{{object.arquivo.url}}?u={% now "u"%}{% endif %}" >
       {% if object.is_signed %}
         <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
       {% endif %}

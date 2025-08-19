@@ -70,10 +70,10 @@
           {% for value, href in value_list %}
           <td>
             {% if href %}
-            <a href="{{ href }}">{{ value|safe|default:"" }}</a>
+              <a href="{{ href }}">{{ value|safe|default:"" }}</a>
             {% elif value != 'core.Cep.None' %}
               {% if value|url %}
-                <a href="{{ value|safe }}"> {{ value|safe|default:"" }} </a></div>
+                <a href="{{ value|safe }}"> {{ value|safe|default:"" }} </a>
               {% else %}
                 {{ value|safe|default:"" }}
               {% endif %}

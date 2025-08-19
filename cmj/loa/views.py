@@ -123,6 +123,13 @@ class LoaCrud(Crud):
         def hook_header_perc_disp_diversos(self):
             return ''
 
+        def hook_header_btn_lista_emendas(self):
+            return ''
+
+        def hook_btn_lista_emendas(self, *args, **kwargs):
+            l = args[0]
+            return f' <em>(Emendas da LOA)</em>', f'/loa/{l.pk}/emendaloa'
+
         def hook_receita_corrente_liquida(self, *args, **kwargs):
             l = args[0]
 
@@ -130,19 +137,24 @@ class LoaCrud(Crud):
 
         def hook_ano(self, *args, **kwargs):
             l = args[0]
-            return f'LOA {args[1]}', args[2]
+            return f'''
+            <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
+            <a class="small" href="/loa/{l.id}/emendaloa" title="Listagem de Emendas da LOA">
+                <i class="fas fa-list"></i>
+            </a>
+            ''', ''
 
         def hook_perc_disp_total(self, *args, **kwargs):
             l = args[0]
-            return f' <i>({l.perc_disp_total:3.1f}%)</i>', ''
+            return f' <em>({l.perc_disp_total:3.1f}%)</em>', ''
 
         def hook_perc_disp_saude(self, *args, **kwargs):
             l = args[0]
-            return f' <i>({l.perc_disp_saude:3.1f}%)</i>', ''
+            return f' <em>({l.perc_disp_saude:3.1f}%)</em>', ''
 
         def hook_perc_disp_diversos(self, *args, **kwargs):
             l = args[0]
-            return f' <i>({l.perc_disp_diversos:3.1f}%)</i>', ''
+            return f' <em>({l.perc_disp_diversos:3.1f}%)</em>', ''
 
     class CreateView(Crud.CreateView):
         form_class = LoaForm
@@ -1207,7 +1219,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         def hook_registroajusteloa_set(self, el, verbose_name='', field_display=''):
 
             if not el.materia:
-                return '', ''
+                return 'Sem registros de Ajuste Técnico', ''
 
             ajustes = []
             for ajuste in el.registroajusteloa_set.all():
@@ -1223,6 +1235,9 @@ class EmendaLoaCrud(MasterDetailCrud):
                     </li>
                 """
                 ajustes.append(a_str)
+
+            if not ajustes:
+                return verbose_name, 'Sem registros de Ajuste Técnico'
 
             return verbose_name, f'<ul>{"".join(ajustes)}</ul>'
 
@@ -1246,8 +1261,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     f'<tr><td>{rendered}</td></tr>'
                 )
 
-            return 'Documentos da Adicionados à Emenda Impositiva', f'''
-                <div class="container-table">
+            return 'Documentos Adicionados à Emenda Impositiva', f'''
+                <div class="container-table m-0 mx-n3">
                     <table class="table table-form table-bordered table-hover w-100">
                         {"".join(docs)}
                     </table>
