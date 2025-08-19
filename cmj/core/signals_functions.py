@@ -51,6 +51,7 @@ def auditlog_signal_function(sender, **kwargs):
     ):
         return
 
+    logger.debug(f'START auditlog_post_signal {timezone.localtime()}')
     u = None
     stack = ''
     for i in inspect.stack():
@@ -92,6 +93,8 @@ def auditlog_signal_function(sender, **kwargs):
             al.visibilidade = instance.visibilidade
 
         al.save()
+
+        logger.debug(f'END auditlog_post_signal {timezone.localtime()}')
 
     except Exception as e:
         logger.error('Error saving auditing log object')
@@ -164,6 +167,8 @@ def redesocial_post_function(sender, instance, **kwargs):
 
     if hasattr(instance, 'parent') and instance.parent:
         return
+
+    logger.debug(f'START redesocial_post_signal {timezone.localtime()}')
 
     running = {
         'MateriaLegislativa': {
@@ -252,6 +257,8 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
         not inst._meta.app_config is None and \
             inst._meta.app_config.name[:4] in ('sapl', ):  # 'cmj.'):
 
+        logger.debug(f'START timerefresh_post_signal {timezone.localtime()}')
+
         try:
             if hasattr(inst, 'ws_sync') and not inst.ws_sync():
                 return
@@ -275,6 +282,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                            "Certifique se possuir um servidor de redis "
                            "ativo funcionando como configurado em "
                            "CHANNEL_LAYERS"))
+        logger.debug(f'END timerefresh_post_signal {timezone.localtime()}')
 
 
 def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs):
