@@ -23,6 +23,9 @@
   <div class="text-ementa pr-0">
     {{object.ementa|safe}}
   </div>
+  {% with object.metadata.signs.texto_integral.signs as signs %}
+    {% include 'core/sign_widget.html' %}
+  {% endwith %}
 </div>
 <div class="clearfix"></div>
 <div class="row">
