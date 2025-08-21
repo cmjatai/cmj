@@ -1072,7 +1072,8 @@ class ProposicaoCrud(Crud):
                     signs = p_md_signs_texto_original.get('signs', {})
                     if isinstance(p.autor.autor_related, Parlamentar):
                         signs = set(map(lambda x: x[0], signs))
-                        if p.autor.autor_related.nome_completo not in signs:
+                        signs = {s for s in signs if p.autor.autor_related.nome_completo.startswith(s)}
+                        if not signs:
                             msg_error = _(
                                 f'Documento não possui assinatura digital do Parlamentar: {p.autor}')
 
