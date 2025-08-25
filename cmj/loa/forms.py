@@ -75,8 +75,10 @@ class MateriaCheckFormMixin:
 class LoaParlModelMultipleChoiceFilter(ModelMultipleChoiceFilter):
 
     def get_queryset(self, request):
-        return self.parent.loa.parlamentares.filter(
-                emendaloaparlamentar_set__isnull=False).distinct()
+        if self.parent.loa.materia and self.parent.loa.materia.normajuridica():
+            return self.parent.loa.parlamentares.filter(emendaloaparlamentar_set__isnull=False).distinct()
+        else:
+            return self.parent.loa.parlamentares.all()
 
 class LoaForm(MateriaCheckFormMixin, ModelForm):
 
@@ -1052,7 +1054,7 @@ class EmendaLoaFilterSet(FilterSet):
         #self.form.initial['tipo_agrupamento'] = 'insercao'
         #self.form.fields['tipo_agrupamento'].initial = 'insercao'
 
-        if not self.loa.materia.em_tramitacao:
+        if not self.loa.materia or not self.loa.materia.em_tramitacao:
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[5:]
         else:
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:5]
