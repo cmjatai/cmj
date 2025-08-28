@@ -38,9 +38,20 @@
   {{ block.super }}
 {% endblock %}
 {% block extra_content %}
-<em>NOTA:
-Está em dúvida da escrita de uma proposição?<br>A Câmara de Belo Horizonte possui um
-Guia de Redação de excelente qualidade e você pode conferir inúmeros modelos de
-proposições <a target=_blank href="{{ site_url }}/media/files/guia_de_redacao_-_outubro_de_2024.pdf">clicando aqui.</a>
-</em>
+<div class="row small mt-n3">
+  <div class="col-5">
+    <em>
+      <strong class="text-green">NOTA 1:</strong> Precisando do Papel Timbrado?<br>
+      <a target=_blank href="{{ site_url }}/norma/10711/anexonormajuridica">Clique aqui para baixar o modelo atual de papel timbrado.</a>
+    </em>
+  </div>
+  <div class="col-7">
+    <em>
+      <strong class="text-green">NOTA 2:</strong>
+    Está em dúvida da escrita de uma proposição?<br>A Câmara de Belo Horizonte possui um
+    Guia de Redação de excelente qualidade e você pode conferir inúmeros modelos de
+    proposições <a target=_blank href="{{ site_url }}/media/files/guia_de_redacao_-_outubro_de_2024.pdf">clicando aqui.</a>
+    </em>
+  </div>
+</div>
 {% endblock %}
