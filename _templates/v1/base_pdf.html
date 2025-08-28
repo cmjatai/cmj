@@ -46,9 +46,11 @@
   {% block body_content %}{% endblock body_content %}
 
   {% block footer_content %}
+  {% comment %}
     <footer>
       <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
     </footer>
+  {% endcomment %}
   {% endblock footer_content %}
 </body>
 </html>

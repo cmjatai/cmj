@@ -10,7 +10,7 @@
 </head>
 <body>
   <div style="background-color: #eee; display: block; width:100%; text-align: center; padding: 20px 0;">
-    <table style="background-color: white; margin: 0 auto; max-width: 680px; border: 1px solid #ccc;">
+    <table style="background-color: white; margin: 0 auto; padding: 10px; max-width: 680px; border: 1px solid #ccc;">
       <tr>
         <td colspan=12>
           <img style="width: 100%; text-align: left;" src="{{ site_url }}{% webpack_static 'img/pdf_cabec.jpg' %}">
@@ -26,22 +26,24 @@
       {% endblock email_content_table %}
 
       {% block email_message_ti %}
-      <tr>
-        <td colspan=12 style="background-color: #f5f5f5; font-size: 85%; padding: 10px 0;">
-          {% block email_rodape %}
-            Caso não tenha realizado esta solicitação, favor ignorar este e-mail.<br>
-          {% endblock email_rodape %}
-          Atenciosamente,<br>
-          a equipe de T.I. da <b>Câmara Municipal de Jataí</b>.<br>
-          (64) 3636-0816
-        </td>
-      </tr>
+        <tr>
+          <td colspan=12 style="background-color: #f5f5f5; font-size: 85%; padding: 10px 0;">
+            {% block email_rodape %}
+              Caso não tenha realizado esta solicitação, favor ignorar este e-mail.<br>
+            {% endblock email_rodape %}
+            Atenciosamente,<br>
+            a equipe de T.I. da <b>Câmara Municipal de Jataí</b>.<br>
+            (64) 3636-0816
+          </td>
+        </tr>
       {% endblock email_message_ti %}
-      <tr>
-        <td colspan=12>
-          <img style="width: 100%; text-align: left;" src="{{ site_url }}{% webpack_static 'img/pdf_rodape.jpg' %}">
-        </td>
-      </tr>
+      {% comment %}
+        <tr>
+          <td colspan=12>
+            <img style="width: 100%; text-align: left;" src="{{ site_url }}{% webpack_static 'img/pdf_rodape.jpg' %}">
+          </td>
+        </tr>
+      {% endcomment %}
     </table>
   </div>
 </body>
