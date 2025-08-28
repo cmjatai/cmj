@@ -64,7 +64,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/chunk-f3b7518c.7c557d58.css"
   },
   {
-    "revision": "cedbbe2958be10a72065",
+    "revision": "425300a28264695fe057",
     "url": "/static/css/chunk-vendors.3ff36de3.css"
   },
   {
@@ -76,7 +76,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/css/construct.475dffe8.css"
   },
   {
-    "revision": "0ecbac08f2002e51c4ac",
+    "revision": "d7c81a5a28dbb081ba5d",
     "url": "/static/css/loa.2892fce6.css"
   },
   {
@@ -336,7 +336,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/manual.png"
   },
   {
-    "revision": "296d5d8e05785fd7d04439e18e9ff91d",
+    "revision": "1f22f15a76c2fd509eadcecc9e9c2b02",
     "url": "/static/img/pdf_cabec.jpg"
   },
   {
@@ -392,7 +392,7 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/img/user.png"
   },
   {
-    "revision": "3e6b30ff039568dee8901e385dab95b0",
+    "revision": "d656a9365268fbf533d3f981d8413bf8",
     "url": "/static/index.html"
   },
   {
@@ -452,8 +452,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/chunk-f3b7518c.0c80b0ba.js"
   },
   {
-    "revision": "cedbbe2958be10a72065",
-    "url": "/static/js/chunk-vendors.0e8caecc.js"
+    "revision": "425300a28264695fe057",
+    "url": "/static/js/chunk-vendors.5955b664.js"
   },
   {
     "revision": "8fc945c1945784fd820f",
@@ -468,8 +468,8 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "/static/js/dashboard_custom.js"
   },
   {
-    "revision": "0ecbac08f2002e51c4ac",
-    "url": "/static/js/loa.cf977957.js"
+    "revision": "d7c81a5a28dbb081ba5d",
+    "url": "/static/js/loa.5f90e651.js"
   },
   {
     "revision": "942025d6ac45441c4828",
