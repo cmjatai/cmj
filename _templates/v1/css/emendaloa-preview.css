@@ -1,15 +1,13 @@
 @page {
-  margin-left: 2cm;
+  margin-left: 2.5cm;
   margin-right: 2cm;
 }
 header {
-  left: -1.3cm;
+  left: -1.8cm;
   right: -1.3cm;
 }
 
 footer {
-  left: -1.3cm;
-  right: -1.3cm;
 }
 section {
   position: fixed;

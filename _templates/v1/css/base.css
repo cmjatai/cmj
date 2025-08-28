@@ -1,34 +1,33 @@
 @page {
   size: A4 portrait;
-  margin-top: 3.5cm;
+  margin-top: 4cm;
   margin-left: 0.7cm;
   margin-right: 0.7cm;
-  margin-bottom: 2cm;
+  margin-bottom: 2.5cm;
+
+  @bottom-right {
+    content: counter(page) "/" counter(pages);
+    position: absolute;
+    width: 4cm;
+    margin-top: 0.1cm;
+    border-top: 1px solid #114d81;
+    z-index: -1;
+    vertical-align: top;
+    font-size: 9pt;
+  }
 }
 
 @page :left {
   @bottom-left {
-    content: counter(page);
-    position: absolute;
-    z-index: -1;
   }
   @bottom-right {
-    content: string(heading);
-    position: absolute;
-    z-index: -1;
   }
 }
 
 @page :right {
   @bottom-left {
-    content: string(heading);
-    position: absolute;
-    z-index: -1;
   }
   @bottom-right {
-    content: counter(page);
-    position: absolute;
-    z-index: -1;
   }
 }
 
@@ -82,14 +81,15 @@ section {
 
 header {
   position: fixed;
-  top: -3cm;
+  top: -3.4cm;
   left: 0cm;
   right: 0cm;
 }
 
 footer {
   position: fixed;
-  bottom: -1.5cm;
+  bottom: 0cm;
+  border-top: 1px solid red;
   left: 0cm;
   right: 0cm;
 }

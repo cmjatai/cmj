@@ -649,10 +649,13 @@ class _EmendaLoaViewSet:
         base_url = request.build_absolute_uri()
 
         el = self.get_object()
-
+        el_changed = False
         if 'style' not in el.metadata:
-            el.metadata['style'] = {'lineHeight': 150}
-            el.save()
+            el.metadata['style'] = {
+                'lineHeight': 150,
+                'espacoAssinatura': 0
+            }
+            el_changed = True
 
         if 'lineHeight' in request.GET:
             lineHeight = float(el.metadata['style']['lineHeight'])
@@ -662,12 +665,28 @@ class _EmendaLoaViewSet:
 
             if lineHeight != el.metadata['style']['lineHeight']:
                 el.metadata['style']['lineHeight'] = lineHeight
-                el.save()
+                el_changed = True
+
+        if 'espacoAssinatura' in request.GET:
+            if 'espacoAssinatura' not in el.metadata['style']:
+                el.metadata['style']['espacoAssinatura'] = 0
+                el_changed = True
+
+            espacoAssinatura = int(el.metadata['style'].get('espacoAssinatura', 0))
+            espacoAssinatura = 1 if request.GET.get('espacoAssinatura', 0) == 'true' else 0
+
+            if espacoAssinatura != el.metadata['style'].get('espacoAssinatura', 0):
+                el.metadata['style']['espacoAssinatura'] = espacoAssinatura
+                el_changed = True
+
+        if el_changed:
+            el.save()
 
         context = {
             'view': self,
             'object': el,
-            'lineHeight': str(el.metadata['style']['lineHeight'] / 100.0)
+            'lineHeight': str(el.metadata['style']['lineHeight'] / 100.0),
+            'espacoAssinatura': str(el.metadata['style'].get('espacoAssinatura','') or '')
         }
 
         try:

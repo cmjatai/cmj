@@ -10,14 +10,17 @@
     {% include "css/base.css" %}
     {% include "css/base_table.css" %}
     {% include "css/emendaloa-list.css" %}
-    @page {
-      @bottom-center{
-          content: "Página " counter(page) " de " counter(pages);
-          padding-top: 0.5cm;
-          font-style: italic;
-          color: #444;
+
+    {% comment %}
+    @page :right {
+      @bottom-right{
+        content: "Página " counter(page) " de " counter(pages);
+        padding-top: 0cm;
+        font-style: italic;
+        color: #444;
       }
     }
+    {% endcomment %}
   </style>
 </head>
 <body>
@@ -118,10 +121,11 @@
     </h4>
   {% endfor %}
 
-
-
-  <footer>
-    <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
-  </footer>
-</body>
+  {% comment %}
+    <footer>
+      <hr>
+      <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
+    </footer>
+  {% endcomment %}
+  </body>
 </html>

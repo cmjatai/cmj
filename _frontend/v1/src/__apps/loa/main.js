@@ -241,10 +241,19 @@ window.AppLOA = function () {
     const form = container.find('form')
     instance.EmendaLoaCRUDToggleTipo(form)
   }
-  instance.EmendaLoaCrudUPDATE = function (container) {
+  instance.EmendaLoaCrudUPDATE = async function (container) {
     const pk = window.location.href.matchAll(/emendaloa\/(\d+)\//g).next().value[1]
     const form = container.find('form')
     const urlBase = `/api/loa/emendaloa/${pk}`
+
+    let pkObject = null
+    const pkObjectRefresh = async function () {
+      return axios.get(`${urlBase}/`)
+        .then((response) => {
+          pkObject = response.data
+        })
+    }
+    await pkObjectRefresh()
 
     instance.EmendaLoaCRUDToggleTipo(form)
 
@@ -260,12 +269,22 @@ window.AppLOA = function () {
             <label for="id_lineHeight">
               <span>Entrelinha (%)</span>
               <input type="number"
-                name="lineHeight" value="150"
+                name="lineHeight" value="${pkObject.metadata.style.lineHeight}"
                 step="5"
                 min="100"
                 max="350"
                 class="numberinput form-control text-center"
                 id="id_lineHeight">
+            </label>
+          </div>
+          <div>
+            <label for="id_espacoAssinatura">
+            <input type="checkbox"
+              ${pkObject.metadata.style.espacoAssinatura ? 'checked' : ''}
+              name="espacoAssinatura"
+              class="form-check-input"
+              id="id_espacoAssinatura">
+            <span>Deixar espaço para Assinaturas</span>
             </label>
           </div>
         </div>
@@ -274,6 +293,7 @@ window.AppLOA = function () {
     const preview = createPreview().find('img')[0]
     preview.onload = function (event) {
       preview.style.opacity = 1
+      pkObjectRefresh()
     }
 
     const rcs = form.find('.registro-render')
@@ -524,6 +544,9 @@ window.AppLOA = function () {
         action = '/updatevalorparlamentar/'
       } else if (field === 'lineHeight') {
         preview.src = `${urlBase}/view/?page=1&lineHeight=${value}&u=${Date.now()}`
+        return
+      } else if (field === 'espacoAssinatura') {
+        preview.src = `${urlBase}/view/?page=1&espacoAssinatura=${event.target.checked}&u=${Date.now()}`
         return
       } else if (field === 'parl_assinantes') {
         action = '/update_parlassinantes/'

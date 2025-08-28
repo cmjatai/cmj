@@ -53,7 +53,7 @@
     Autoria:
     {% for parl in object.parlamentares.all %}
       {% if forloop.first %}
-          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% if object.parlamentares.count > 1 %}s{% endif %}{% else %}{% if object.parlamentares.count > 1 %}s{% endif %}{% endif %}
+          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% if object.parlamentares.count > 1 %}s{% endif %}{% else %}{% if object.parlamentares.count > 1 %}es{% endif %}{% endif %}
       {% endif %}
       {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
     {% endfor %}
@@ -152,17 +152,27 @@
   {% endif %}
 </p>
 
-
-{% for parl in object.parlamentares.all %}
+{% if not espacoAssinatura %}
+  <small style="line-height: 1.2; display:block;">
+  Assina{% if object.parlamentares.count > 1 %}m{%endif%} Eletrônicamente:<br>
+    {% for parl in object.parlamentares.all %}
+      {% if forloop.first %}
+          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% if object.parlamentares.count > 1 %}s{% endif %}{% else %}{% if object.parlamentares.count > 1 %}es{% endif %}{% endif %}
+      {% endif %}
+      {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  </small>
+{% else %}
+  {% for parl in object.parlamentares.all %}
   {% if forloop.first %}
-    <div class="assinaturas">
-  {% endif %}
+  <div class="assinaturas">
+    {% endif %}
 
 
-  {% if forloop.counter0|divisibleby:3 %}
-    </div>
-    <div class="assinaturas">
-  {% endif %}
+    {% if forloop.counter0|divisibleby:3 %}
+  </div>
+  <div class="assinaturas">
+    {% endif %}
 
     <div class="assinatura">
       {{parl.nome_parlamentar}}
@@ -171,13 +181,16 @@
       </small>
     </div>
 
-  {% if forloop.last %}
-    </div>
+    {% if forloop.last %}
+  </div>
   {% endif %}
-{% endfor %}
+  {% endfor %}
+{% endif %}
 
-  <footer>
-    <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
-  </footer>
+{% comment %}
+<footer>
+  <img src="{% webpack_static 'img/pdf_rodape.jpg' %}">
+</footer>
+{% endcomment %}
 </body>
 </html>

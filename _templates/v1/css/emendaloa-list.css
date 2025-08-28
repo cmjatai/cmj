@@ -1,12 +1,8 @@
-@page {
-  margin-left: 0.5cm;
-  margin-right: 0.5cm;
-  size: A4 portrait;
 
-}
 header {
   left: 0cm;
   right: 0cm;
+  
 }
 footer {
   left: 0cm;
@@ -18,7 +14,6 @@ hr {
 h5 {
   margin-bottom: 0.1cm;
 }
-
 
 .d-flex {
 }
@@ -56,7 +51,6 @@ small {
 .text-center {
   text-align: center;
 }
-
 
 .text-right {
   text-align: right;
