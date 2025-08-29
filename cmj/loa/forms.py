@@ -670,6 +670,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         if not i_init.pk:
             i_init.owner = self.user
+            i_init.metadata = {
+                'style': {
+                    'lineHeight': 150,
+                    'espacoAssinatura': 1
+                }
+            }
 
         if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] not in ('0', 0):
             if not self.full_editor:

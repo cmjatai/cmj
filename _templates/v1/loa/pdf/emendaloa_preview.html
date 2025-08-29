@@ -14,6 +14,15 @@
     html {
       line-height: {{lineHeight}};
     }
+
+    .columns2 {
+      columns: 2;
+      column-gap: 0cm;
+      break-inside: avoid;
+      padding-left: 0.7cm;
+      padding-top: 0.3cm;
+      line-height: 1;
+    }
   </style>
 </head>
 <body>
@@ -157,9 +166,18 @@
   Assina{% if object.parlamentares.count > 1 %}m{%endif%} Eletrônicamente:<br>
     {% for parl in object.parlamentares.all %}
       {% if forloop.first %}
-          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% if object.parlamentares.count > 1 %}s{% endif %}{% else %}{% if object.parlamentares.count > 1 %}es{% endif %}{% endif %}
+      <ul class="columns2">
       {% endif %}
-      {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
+
+      <li>
+        <strong>{{parl.nome_parlamentar}}</strong><br>
+        <small>&nbsp;&nbsp;Vereador{% if parl.sexo == 'F' %}a{% endif %}</small>
+      </li>
+
+      {% if forloop.last %}
+      </ul>
+      {% endif %}
+
     {% endfor %}
   </small>
 {% else %}

@@ -957,12 +957,13 @@ class EmendaLoaRegistroContabil(models.Model):
     )
 
     def __str__(self):
-        valor_str = formats.number_format(self.valor, force_grouping=True)
-        return f'R$ {valor_str} - {self.despesa}'
+        return f'R$ {self.str_valor} - {self.despesa}'
 
     @property
     def str_valor(self):
-        return formats.number_format(self.valor, force_grouping=True)
+        str_valor = formats.number_format(self.valor, force_grouping=True)
+        str_valor = ' ' * (self._meta.get_field('valor').max_digits - len(str_valor)) + str_valor
+        return str_valor
 
     class Meta:
         verbose_name = _('Registro Contábil de Dedução e Inserção em Emendas')

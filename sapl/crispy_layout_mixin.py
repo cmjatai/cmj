@@ -159,6 +159,8 @@ def get_field_display(obj, fieldname):
             or 'GenericRelatedObjectManager' in str_type_from_value:
         display = '<ul>'
         for v in value.all():
+            v = str(v)
+            v = v.replace(' ', '&nbsp;')
             display += '<li>%s</li>' % str(v)
         display += '</ul>'
         if not verbose_name:

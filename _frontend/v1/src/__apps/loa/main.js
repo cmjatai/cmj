@@ -284,7 +284,7 @@ window.AppLOA = function () {
               name="espacoAssinatura"
               class="form-check-input"
               id="id_espacoAssinatura">
-            <span>Deixar espaço para Assinaturas</span>
+            <span>Incluir espaço para Assinaturas</span>
             </label>
           </div>
         </div>

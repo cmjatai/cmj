@@ -1237,7 +1237,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 ajustes.append(a_str)
 
             if not ajustes:
-                return verbose_name, 'Sem registros de Ajuste Técnico'
+                return verbose_name, 'Esta Emenda não possui registros de Ajuste Técnico'
 
             return verbose_name, f'<ul>{"".join(ajustes)}</ul>'
 
