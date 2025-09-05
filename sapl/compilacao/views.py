@@ -284,6 +284,7 @@ class IntegracaoTaView(TemplateView):
 
 class CompMixin(PermissionRequiredMixin):
     permission_required = []
+    _object = None
 
     def has_permission(self):
         perms = self.get_permission_required()
@@ -294,6 +295,16 @@ class CompMixin(PermissionRequiredMixin):
     @property
     def print(self):
         return 'print' in self.request.GET
+
+    @property
+    def object(self):
+        if self._object is None:
+            self._object = self.ta
+        return self._object
+
+    @object.setter
+    def object(self, value):
+        self._object = value
 
     @property
     def ta(self):
@@ -307,13 +318,15 @@ class CompMixin(PermissionRequiredMixin):
             tipo_norma = self.kwargs.get('tipo_norma', '').upper()
             numero_norma = self.kwargs.get('numero_norma', '')
             ano_norma = self.kwargs.get('ano_norma', '')
+            sufixo_urlize = self.kwargs.get('sufixo_urlize', '')
 
             tipo_norma = 'LEI' if tipo_norma == 'L' else tipo_norma
 
             params = dict(filter(lambda kv: kv[1], {
                 'tipo__sigla': tipo_norma,
                 'numero': numero_norma,
-                'ano': ano_norma
+                'ano': ano_norma,
+                'sufixo_urlize': sufixo_urlize
             }.items()))
 
             if tipo_norma not in ('LOM', 'RI'):
@@ -616,7 +629,6 @@ class TaDetailView(CompMixin, DetailView):
     model = TextoArticulado
 
     def has_permission(self):
-        self.object = self.ta
         if self.object.has_view_permission(self.request):
             return CompMixin.has_permission(self)
         else:
@@ -658,7 +670,6 @@ class TaUpdateView(CompMixin, UpdateView):
     permission_required = 'compilacao.change_textoarticulado'
 
     def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
         form = self.get_form()
         # if self.object and self.object.content_object:
         #    form.fields['tipo_ta'].required = False
@@ -985,12 +996,10 @@ class TextView(CompMixin, ListView):
         return '<b>Texto Articulado:</b> %s' % self.object
 
     def has_permission(self):
-        self.object = self.ta
         return self.object.has_view_permission(self.request)
 
     def dispatch(self, request, *args, **kwargs):
 
-        self.object = self.ta
         if not self.object:
             return redirect(
                 reverse(
@@ -1292,7 +1301,6 @@ class TextEditView(CompMixin, TemplateView):
     template_name = 'compilacao/text_edit.html'
 
     def has_permission(self):
-        self.object = self.ta
         return self.object.has_edit_permission(self.request)
 
     def importar_texto_materia(self, request, *args, **kwargs):

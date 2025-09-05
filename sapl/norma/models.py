@@ -127,6 +127,12 @@ class NormaJuridica(CommonMixin):
         max_length=1,
         verbose_name=_('Esfera Federação'),
         choices=ESFERA_FEDERACAO_CHOICES)
+
+    sufixo_urlize = models.CharField(
+        max_length=10,
+        verbose_name=_('Sufixo URLize'),
+        blank=True, default='')
+
     data = models.DateField(blank=False, null=True, verbose_name=_('Data'))
     data_publicacao = models.DateField(
         blank=True, null=True, verbose_name=_('Data de Publicação'))
@@ -242,6 +248,8 @@ class NormaJuridica(CommonMixin):
             for field in self.sigla_norma_conversao[sigla][1]:
                 sufix.append(f'{getattr(self, field)}')
             url += '-'.join(sufix)
+        if self.sufixo_urlize:
+            url += f'-{self.sufixo_urlize}'
         return url
 
     @property

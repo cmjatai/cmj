@@ -182,6 +182,7 @@ class NormaJuridicaForm(FileFieldCheckMixin, ModelForm):
                   'ano',
                   'data',
                   'esfera_federacao',
+                  'sufixo_urlize',
                   'complemento',
                   'tipo_materia',
                   'numero_materia',

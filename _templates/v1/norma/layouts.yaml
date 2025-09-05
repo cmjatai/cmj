@@ -15,7 +15,7 @@ TipoNormaJuridica:
 
 NormaJuridica:
   {% trans 'Identificação Básica' %}:
-  - tipo numero ano
+  - tipo:4 ano:3 numero:3 sufixo_urlize:2
   - data esfera_federacao complemento
   - materia mostrar_deliberacao
   - data_publicacao data_vigencia
@@ -34,7 +34,7 @@ AnexoNormaJuridica:
 
 NormaJuridicaCreate:
   {% trans 'Identificação Básica' %}:
-  - tipo  ano numero
+  - tipo:4 ano:3 numero:3 sufixo_urlize:2
   - data  esfera_federacao  complemento norma_de_destaque
   - tipo_materia numero_materia ano_materia mostrar_deliberacao
   - data_publicacao data_vigencia
