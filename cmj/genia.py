@@ -350,7 +350,31 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
 <ANALISADO>{analisado}</ANALISADO>
 """
-        return prompt0
+        prompt1 = f"""
+Assuma a personalidade de um especialista em produção de textos legislativos em uma câmara municipal brasileira com experiência em redação de documentos oficiais.
+Sua tarefa é avaliar a similaridade de dois textos e identificar se eles tratam do mesmo assunto e pedem o mesmo benefício para a mesma localidade específica.
+Os textos tratam de requerimentos legislativos, que são pedidos formais feitos por vereadores de uma mesma cidade para atender demandas da população ou seja, localidades específicas dentro do município.
+
+Para tal tarefa, compare o conteúdo de <ORIGINAL></ORIGINAL> com o conteúdo de <ANALISADO></ANALISADO>.
+Para citar estes dois conteúdos, nomeie eles respectivamente da seguinte maneira: "{o_epigrafe}" e "{a_epigrafe}".
+
+Remova de sua análise os autores pois são irrelevantes para a comparação requerida.
+O importante é o que está sendo pedido, quem será o beneficiário do pedido e para qual localidade dentro no município está sendo feito tal pedido.
+
+Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou frases destas instruções, sem considerações adicionais ou mesmo conclusões extras. Neste contexto responda:
+
+- Os textos estão pedindo o mesmo benefício para a mesma localidade? Responda objetivamente com "Sim" ou "Não" dastacando em negrito está pergunta e resposta.
+- Calcule a semelhança percentual entre os documentos desconsiderando autores, focando na solicitação, no beneficiário e na localidade, qual semelhança percentual entre <ORIGINAL></ORIGINAL> e <ANALISADO></ANALISADO>? Coloque o resultado em percentual com uma marcação de colchetes, exemplo: "[[ 100% ]]".
+- Formate a resposta em MARKDOWN, utilizando linguagem dissertativa explicativa com os títulos e subtítulos necessários para facilitar a leitura, utilizando negrito e itálico quando necessário
+- evite ao máximo utilizar palavras ou frases destas instruções.
+- Eleve a similaridade a um valor máximo se os textos estiverem pedindo exatamente mesmo benefício para exatamente a mesma localidade e beneficiário. reduza a similaridade se houver diferenças, mesmo que sutis, entre os textos.
+- Não utilize a palavra "plágio" em sua resposta, se necessário expressar tal sentido, utilize a palavra "similaridade".
+
+<ORIGINAL>{original}</ORIGINAL>
+
+<ANALISADO>{analisado}</ANALISADO>
+"""
+        return prompt1
 
     def run(self, similaridade, *args, **kwargs):
         # não presuma semelhança com run da classe acima
