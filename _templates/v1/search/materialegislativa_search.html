@@ -200,15 +200,15 @@
                     {% if m.tramitacao_set.first.unidade_tramitacao_destino %}
                       <strong>Data da última Tramitação:</strong><br>{{m.tramitacao_set.first.data_tramitacao}}</br>
                       {% if m.tramitacao_set.first.data_fim_prazo %}
-                          <strong>Data Fim Prazo (Tramitação):</strong> {{m.tramitacao_set.first.data_fim_prazo|default_if_none:""}}</br>
+                        <strong>Data Fim Prazo (Tramitação):</strong> {{m.tramitacao_set.first.data_fim_prazo|default_if_none:""}}</br>
                       {% endif %}
-                      <strong>Localização Atual:</strong> {{m.tramitacao_set.first.unidade_tramitacao_destino}}</br>
-                      {% endif %}
-                      {% if m.tramitacao_set.first.status %}
-                        <strong>Status:</strong> {{m.tramitacao_set.first.status}}</br>
+                        <strong>Localização Atual:</strong> {{m.tramitacao_set.first.unidade_tramitacao_destino}}</br>
                       {% endif %}
                       {% if m.tramitacao_set.first.data_tramitacao %}
-                      <strong>Ultima Ação:</strong> {{m.tramitacao_set.first.texto}}</br>
+                        <strong>Ultima Ação:</strong> {{m.tramitacao_set.first.texto}}</br>
+                      {% if m.tramitacao_set.first.status %}
+                        <span class="{{m.tramitacao_set.first.status.css_class}}"><strong>Status:</strong> {{m.tramitacao_set.first.status}}</span></br>
+                      {% endif %}
                     {% endif %}
 
                     {% if m.assuntos.exists %}

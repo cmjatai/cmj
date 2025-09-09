@@ -123,9 +123,9 @@
       {% with object.tramitacao_set.first as tram %}
         {% if tram.unidade_tramitacao_destino %}
           <strong>Localização Atual:</strong> &nbsp;{{tram.unidade_tramitacao_destino}}</br>
-          <strong>Status:</strong> {{tram.status}}<br>
           <strong>Ultima Ação:</strong> {{tram.texto}}<br>
           <strong>Data da última Tramitação:</strong> {{tram.data_tramitacao}}<br>
+          <span class="{{tram.status.css_class}}"><strong>Status:</strong> {{tram.status}}</span><br>
         {% endif %}
       {% endwith %}
       <br>

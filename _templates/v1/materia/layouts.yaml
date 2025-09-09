@@ -117,7 +117,7 @@ Proposicao:
 
 StatusTramitacao:
   {% trans 'Status Tramitação' %}:
-  - sigla:2  descricao:6  indicador:4
+  - sigla:2  descricao:4  indicador:3 css_class:3
 
 UnidadeTramitacao:
   {% trans 'Unidade Tramitação' %}:

@@ -1351,6 +1351,12 @@ class StatusTramitacao(models.Model):
         max_length=1, verbose_name=_('Indicador da Tramitação'),
         choices=INDICADOR_CHOICES)
 
+    css_class = models.CharField(
+        max_length=40, blank=True, default='',
+        verbose_name=_('Classe CSS'),
+        help_text=_('Classe CSS para estilização do status na listagem. '
+                    'Exemplo: "badge badge-success"'))
+
     class Meta:
         verbose_name = _('Status de Tramitação')
         verbose_name_plural = _('Status de Tramitação')
