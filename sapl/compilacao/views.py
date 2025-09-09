@@ -326,9 +326,9 @@ class CompMixin(PermissionRequiredMixin):
                 'tipo__sigla': tipo_norma,
                 'numero': numero_norma,
                 'ano': ano_norma,
-                'sufixo_urlize': sufixo_urlize
             }.items()))
 
+            params['sufixo_urlize'] = sufixo_urlize
             if tipo_norma not in ('LOM', 'RI'):
                 self.normajuridica = NormaJuridica.objects.filter(
                     **params).order_by('-ano').first()
