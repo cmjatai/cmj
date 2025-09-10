@@ -1931,7 +1931,7 @@ class TipoProposicaoForm(ModelForm):
         content_type = ContentType.objects.filter(
             app_label=content_type[0],
             model=content_type[1]).first()
-        cd['content_type_test52'] = content_type
+        cd['content_type'] = content_type
 
         if not content_type:
             self.logger.error("Meta Tipo Inexistente")
@@ -1980,6 +1980,11 @@ class TipoProposicaoForm(ModelForm):
     def save(self, commit=False):
 
         tipo_proposicao = self.instance
+
+        content_type = self.cleaned_data.get('content_type', None)
+        if not content_type:
+            content_type = self.instance.content_type
+        tipo_proposicao.content_type = content_type
 
         assert tipo_proposicao.content_type
 
