@@ -14,6 +14,7 @@ from django.template import loader
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from cmj.context_processors import site_url
 from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
 from cmj.loa.models import ScrapRecord, DespesaPaga
@@ -117,7 +118,11 @@ def notificacao_signal_function(sender, instance, **kwargs):
                 instance.content_object._meta.app_label,
                 instance.content_object._meta.model_name
             ),
-            {'notificacao': instance}, EMAIL_SEND_USER, instance.user.email)
+            {
+                'notificacao': instance,
+                'site_url': settings.SITE_URL
+            },
+             EMAIL_SEND_USER, instance.user.email)
 
         print('Uma Notificação foi enviada %s - user: %s - user_origin: %s' % (
             instance.pk,
