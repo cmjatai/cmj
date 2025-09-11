@@ -17,10 +17,12 @@ from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from numpy import isin
 
 from cmj.utils import media_cache_storage
 from sapl.compilacao.utils import (get_integrations_view_names, int_to_letter,
                                    int_to_roman)
+from sapl.crud.base import SearchMixin
 from sapl.utils import YES_NO_CHOICES, get_settings_auth_user_model
 
 
@@ -989,8 +991,31 @@ class Publicacao(TimestampedMixin):
             defaultfilters.date(self.data, r"d \d\e F \d\e Y"),
             self.ta)
 
+class CitacaoDeReferencia(models.Model):
 
-class UrlizeReferencia(models.Model):
+    epigrafe = models.CharField(
+        max_length=1024,
+        verbose_name=_('Epigrafe da Citação de Referência'),
+        db_index=True,
+        unique=True
+    )
+
+    class Meta:
+        verbose_name = _('Citação de Referência')
+        verbose_name_plural = _('Citações de Referências')
+        ordering = ['epigrafe']
+
+    def __str__(self):
+        return self.epigrafe
+
+class UrlizeReferencia(SearchMixin):
+
+    citacao = models.ForeignKey(
+        CitacaoDeReferencia,
+        blank=True, null=True, default=None,
+        verbose_name=_('Citação de Referência'),
+        related_name='urlize_referencias',
+        on_delete=PROTECT)
 
     chave = models.CharField(
         max_length=256,
@@ -1036,6 +1061,14 @@ class UrlizeReferencia(models.Model):
     def __str__(self):
         return f'{self.chave} - <br><small>{self.url}</small>'
 
+    @property
+    def fields_search(self):
+        return [
+            'chave',
+            'url',
+            'chave_automatica'
+        ]
+
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         self.chave = self.chave.lower().strip()
@@ -1044,11 +1077,20 @@ class UrlizeReferencia(models.Model):
     @classmethod
     def urlize(cls, texto, return_result_patterns=False):
 
-        def join(texto, chave_natural, url):
+        def join(texto, chave_natural, urlize_referencia):
+
+            if isinstance(urlize_referencia, dict):
+                url = urlize_referencia['url']
+                title = urlize_referencia['citacao__epigrafe'] if urlize_referencia['citacao__epigrafe'] else ''
+            else:
+                url = urlize_referencia.url
+                title = urlize_referencia.citacao.epigrafe if urlize_referencia.citacao else ''
+            if title:
+                title = f' title="{title}"'
 
             texto = texto.replace(
                 chave_natural,
-                f'<a class="urlize" href="{url}">{chave_natural}</a>'
+                f'<a class="urlize" href="{url}"{title}>{chave_natural}</a>'
             )
             return texto
 
@@ -1069,10 +1111,10 @@ class UrlizeReferencia(models.Model):
             #chave_natural = chave_natural.replace(' , ', ', ')
             chave_lower = chave_natural.lower()
 
-            ur, created = cls.objects.get_or_create(chave=chave_lower)
+            urlize_referencia, created = cls.objects.get_or_create(chave=chave_lower)
 
-            if not created and ur.url:
-                texto = join(texto, chave_natural, ur.url)
+            if not created and urlize_referencia.url:
+                texto = join(texto, chave_natural, urlize_referencia)
 
             if not created:
                 continue
@@ -1104,12 +1146,12 @@ class UrlizeReferencia(models.Model):
                                   kwargs={'ta_id': ta.id})
                     ur.url = url
                     ur.save()
-                    texto = join(texto, chave_natural, url)
+                    texto = join(texto, chave_natural, ur)
             except:
                 pass
 
         urs = list(cls.objects.filter(
-            chave_automatica=False).values('chave', 'url'))
+            chave_automatica=False).values('chave', 'url', 'citacao__epigrafe'))
 
         urs.sort(reverse=True, key=lambda u: len(u['chave']))
 
@@ -1141,7 +1183,7 @@ class UrlizeReferencia(models.Model):
             pf = pi + len(chave)
             chave_natural = texto[pi:pf]
 
-            texto = join(texto, chave_natural, ur['url'])
+            texto = join(texto, chave_natural, ur)
 
         return texto
 

@@ -33,7 +33,6 @@ from cmj.cerimonial.models import LocalTrabalho, Endereco, \
     IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato, \
     GrupoDeContatos, TopicoProcesso, Visita, Visitante, ClassificacaoProcesso, \
     AnexoProcesso
-from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento, \
     AreaTrabalho, Bairro
 from cmj.settings.medias import MAX_DOC_UPLOAD_SIZE
@@ -42,6 +41,7 @@ from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets, \
     form_actions, to_row, SaplFormHelper
 from sapl.utils import RangeWidgetNumber, FileFieldCheckMixin
 
+from sapl.crud.base import ListWithSearchForm
 
 class ListTextWidget(forms.TextInput):
 

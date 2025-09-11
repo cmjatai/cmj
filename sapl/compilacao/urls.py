@@ -2,7 +2,7 @@ from django.urls.conf import re_path, include
 
 from cmj.custom_path import re_ipath
 from sapl.compilacao import views
-from sapl.compilacao.views import (TipoDispositivoCrud, TipoNotaCrud,
+from sapl.compilacao.views import (CitacaoDeReferenciaCrud, TipoDispositivoCrud, TipoNotaCrud,
                                    TipoPublicacaoCrud, TipoVideCrud,
                                    VeiculoPublicacaoCrud,
                                    TipoTextoArticuladoCrud,
@@ -123,6 +123,8 @@ urlpatterns = [
         include(TipoTextoArticuladoCrud.get_urls())),
     re_path(r'^sistema/ta/config/urlize',
         include(UrlizeReferenciaCrud.get_urls())),
+    re_path(r'^sistema/ta/config/citacao',
+        include(CitacaoDeReferenciaCrud.get_urls())),
 
 
 

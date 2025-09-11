@@ -29,8 +29,7 @@ from rest_framework.authentication import SessionAuthentication, \
 from rest_framework.permissions import IsAuthenticated
 from weasyprint import HTML
 
-from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm, \
-    ListWithSearchForm, AuditLogFilterSet
+from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm, AuditLogFilterSet
 from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal, \
     Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho, \
     ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao, \
@@ -40,7 +39,7 @@ from cmj.core.views_estatisticas import get_numeros
 from cmj.mixins import PluginSignMixin
 from cmj.utils import normalize, run_sql, make_pagination
 from sapl.compilacao.models import Dispositivo
-from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
+from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST, ListWithSearchForm
 from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
 from sapl.parlamentares.models import Partido, Filiacao
 from sapl.utils import get_mime_type_from_file_extension,\

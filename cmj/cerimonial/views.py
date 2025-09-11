@@ -20,12 +20,11 @@ from cmj.cerimonial.models import TipoTelefone, TipoEndereco, \
     EmailPerfil, TelefonePerfil, EnderecoPerfil, FiliacaoPartidaria, \
     StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Processo, \
     AssuntoProcesso, ProcessoContato, GrupoDeContatos, Visita, AnexoProcesso
-from cmj.core.forms import ListWithSearchForm
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules.crud_custom import PerfilAbstractCrud, \
     PerfilDetailCrudPermission
 from sapl.crispy_layout_mixin import CrispyLayoutFormMixin
-from sapl.crud.base import CrudAux, Crud, MasterDetailCrud
+from sapl.crud.base import CrudAux, Crud, MasterDetailCrud, ListWithSearchForm
 
 # ---- Details Master Crud build ---------------------------
 TipoTelefoneCrud = CrudAux.build(TipoTelefone, 'tipotelefone')

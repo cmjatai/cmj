@@ -47,12 +47,23 @@ TipoTextoArticulado:
   - perfis
   - rodape_global
 
+CitacaoDeReferencia:
+  {% trans 'Citação de Referência' %}:
+  - epigrafe
+
+CitacaoDeReferenciaDetail:
+  {% trans 'Citação de Referência' %}:
+  - epigrafe
+  - urlize_referencias
+
 UrlizeReferencia:
   {% trans 'Urlize Referência' %}:
   - chave url chave_automatica:3
+  - citacao
 
 UrlizeReferenciaDetail:
   {% trans 'Urlize Referência' %}:
   - chave chave_automatica:3
   - url
+  - citacao
   - normas

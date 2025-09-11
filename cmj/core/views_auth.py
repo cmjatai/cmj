@@ -12,11 +12,10 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.edit import FormView, UpdateView
 
-from cmj.core.forms import ListWithSearchForm
 from cmj.core.forms_auth import CmjUserChangeForm, LoginForm,\
     RecuperarSenhaForm, CmjUserAdminForm, NovaSenhaForm
 from cmj.settings import EMAIL_SEND_USER
-from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE, Crud, CrudAux
+from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE, Crud, CrudAux, ListWithSearchForm
 
 
 class CmjUserChangeView(FormMessagesMixin, UpdateView):

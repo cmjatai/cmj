@@ -4,6 +4,7 @@ import io
 import logging
 import os
 import sys
+from django_filters.views import FilterView
 
 from braces.views import FormMessagesMixin
 from django import forms
@@ -47,7 +48,7 @@ from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
                                    PublicacaoForm, TaForm,
                                    TextNotificacoesForm, TipoTaForm, VideForm)
 from sapl.compilacao.models import (STATUS_TA_EDITION, STATUS_TA_PRIVATE,
-                                    STATUS_TA_PUBLIC, Dispositivo, Nota,
+                                    STATUS_TA_PUBLIC, CitacaoDeReferencia, Dispositivo, Nota,
                                     PerfilEstruturalTextoArticulado,
                                     Publicacao, TextoArticulado,
                                     TipoDispositivo, TipoNota, TipoPublicacao,
@@ -56,7 +57,7 @@ from sapl.compilacao.models import (STATUS_TA_EDITION, STATUS_TA_PRIVATE,
 from sapl.compilacao.utils import (DISPOSITIVO_SELECT_RELATED,
                                    DISPOSITIVO_SELECT_RELATED_EDIT,
                                    get_integrations_view_names)
-from sapl.crud.base import RP_DETAIL, RP_LIST, Crud, CrudAux, CrudListView, \
+from sapl.crud.base import RP_DETAIL, RP_LIST, Crud, CrudAux, CrudListView, ListWithSearchForm, \
     make_pagination
 from sapl.norma.models import NormaJuridica
 
@@ -101,12 +102,30 @@ def choice_model_type_foreignkey_in_extenal_views(id_tipo_ta=None):
                     yield i.pk, i
 
 
+class CitacaoDeReferenciaCrud(CrudAux):
+    model = CitacaoDeReferencia
+
+    class DetailView(CrudAux.DetailView):
+        layout_key = 'CitacaoDeReferenciaDetail'
+
+        def hook_urlize_referencias(self, obj, **kwargs):
+            items = ['<ul>']
+            for ur in obj.urlize_referencias.all():
+                url = reverse('sapl.compilacao:urlizereferencia_detail',
+                            kwargs={'pk': ur.pk})
+                items.append(
+                    f'<li><a href="{url}">{ur.chave}</a></li>')
+            items.append('</ul>')
+            items = ''.join(items)
+
+            return 'Links de Referências', items
+
 class UrlizeReferenciaCrud(CrudAux):
     model = UrlizeReferencia
     ordered_list = False
 
     class BaseMixin(CrudAux.BaseMixin):
-        list_field_names = ('id', ('chave', 'url'), 'chave_automatica')
+        list_field_names = ('id', ('chave','citacao', 'url'), 'chave_automatica')
 
         def post(self, request, *args, **kwargs):
             return super().post(request, *args, **kwargs)
@@ -120,7 +139,14 @@ class UrlizeReferenciaCrud(CrudAux):
                         'Chave já existe.'))
                 return self.form_invalid(form)
 
-            ds = Dispositivo.objects.filter(texto__icontains=self.object.chave)
+            urlize = form.instance
+
+            UrlizeReferencia.objects.filter(
+                url__exact=urlize.url
+            ).update(citacao=urlize.citacao)
+
+
+            ds = Dispositivo.objects.filter(texto__icontains=urlize.chave)
             ds = ds.order_by('ta_id')
             ds = ds.distinct('ta_id')
 
@@ -136,6 +162,7 @@ class UrlizeReferenciaCrud(CrudAux):
             return initial
 
     class ListView(CrudAux.ListView):
+        form_search_class = ListWithSearchForm
         paginate_by = 100
         ordering = '-chave_automatica', 'url', 'chave'
 
@@ -157,7 +184,7 @@ class UrlizeReferenciaCrud(CrudAux):
             for d in ds:
                 url = f'/ta/{d.ta_id}/text#{d.id}'
                 items.append(
-                    f'<li><a href="{url}">{d.ta} - {d.rotulo_padrao}</a></li>')
+                    f'<li><a href="{url}">{d.ta} - {d.rotulo_padrao()}</a></li>')
 
             items.append('</ul>')
             items = ''.join(items)
