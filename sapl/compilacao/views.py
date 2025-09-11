@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
 from django.core.files.base import File
 from django.core.signing import Signer
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from django.http.response import (HttpResponse, HttpResponseRedirect,
@@ -112,7 +112,13 @@ class UrlizeReferenciaCrud(CrudAux):
             return super().post(request, *args, **kwargs)
 
         def form_valid(self, form):
-            r = super().form_valid(form)
+            try:
+                r = super().form_valid(form)
+            except IntegrityError as e:
+                if 'compilacao_urlizereferencia_chave_key' in str(e):
+                    form.add_error('chave', _(
+                        'Chave já existe.'))
+                return self.form_invalid(form)
 
             ds = Dispositivo.objects.filter(texto__icontains=self.object.chave)
             ds = ds.order_by('ta_id')
