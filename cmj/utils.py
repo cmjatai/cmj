@@ -118,19 +118,20 @@ def clean_text(text, _normalizes=None):
     txt = text
     try:
         normalizes = _normalizes or (
-            (r'\n ?\d+ ?/ ?\d+ ?\n', '\n'),
-            (r'[ ]{2,}', ' '),
-            (r' \n', '\n'),
+            (r'\t', '\n'),                     # tab antes de nova linha
+            (r'\n ?\d+ ?/ ?\d+ ?\n', '\n'), # numeração de páginas
+            (r'[ ]{2,}', ' '), # espaços duplos
+            (r' \n', '\n'), # espaço antes de nova linha
             #('([^\.]|\S)\n(\S)', r'\1 \2'),
-            (r'(\w)\n(.)', r'\1 \2'),
-            (r'(,|\.)\n(.)', r'\1 \2'),
+            (r'(\w)\n(.)', r'\1 \2'), # letra antes de nova linha
+            (r'(,|\.)\n(.)', r'\1 \2'), # vírgula ou ponto antes de nova linha
             #('()\n()', r'\1 \2'),
-            (r'\n\n', '\n'),
-            (r'-\n', '-'),
-            (r'^\n', ''),
-            ('–', '-'),
-            ('•', '*'),
-            ('[“”]', '"'),
+            (r'\n\n', '\n'), # nova linha duplas
+            (r'-\n', '-'), # hífen no final da linha
+            (r'^\n', ''), # nova linha no início
+            ('–', '-'), # travessão para hífen
+            ('•', '*'), # bullet para asterisco
+            ('[“”]', '"'), # aspas duplas
             #('', ''),
             #('', ''),
             #('', ''),
