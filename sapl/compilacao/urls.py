@@ -108,7 +108,7 @@ urlpatterns = [
 
     re_ipath(r'^(?P<tipo_norma>(LOM|RI))$',
         views.TextView.as_view(), name = 'slug_ta_text_letters'),
-    re_ipath(r'^(?P<tipo_norma>(L|ATG|DL|ELO|LC|LEI|LOM|LE|PLE|PR|RI|RES))(?P<numero_norma>[0-9]*)-?(?P<ano_norma>[0-9]*)?-?(?P<sufixo_urlize>[A-Za-z]*)$',
+    re_ipath(r'^(?P<tipo_norma>(L|ATG|DL|DE|ELO|LC|LEI|LOM|LE|PLE|PR|RI|RES))(?P<numero_norma>[0-9]*)-?(?P<ano_norma>[0-9]*)?-?(?P<sufixo_urlize>[A-Za-z]*)$',
         views.TextView.as_view(), name = 'slug_ta_text'),
 
     re_path(r'^sistema/ta/config/tipo-nota',

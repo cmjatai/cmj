@@ -232,6 +232,7 @@ class NormaJuridica(CommonMixin):
             'LC': ('LC', ('numero','ano')),
             'LE': ('LE', ('numero','ano')),
             'DL': ('DL', ('numero','ano')),
+            'DE': ('DE', ('numero','ano')), 
             'PLE': ('PLE', ('numero','ano')),
             'PR': ('PR', ('numero','ano')),
             'RES': ('RES', ('numero','ano')),
