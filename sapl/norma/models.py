@@ -223,6 +223,13 @@ class NormaJuridica(CommonMixin):
             norma=self.id)
         return anexos
 
+    def is_revogado(self):
+        relacionadas = self.get_normas_relacionadas()[1]
+        for rel in relacionadas:
+            if rel.tipo_vinculo.revoga_integralmente:
+                return True
+        return False
+
     @property
     def sigla_norma_conversao(self):
         return {
@@ -232,7 +239,7 @@ class NormaJuridica(CommonMixin):
             'LC': ('LC', ('numero','ano')),
             'LE': ('LE', ('numero','ano')),
             'DL': ('DL', ('numero','ano')),
-            'DE': ('DE', ('numero','ano')), 
+            'DE': ('DE', ('numero','ano')),
             'PLE': ('PLE', ('numero','ano')),
             'PR': ('PR', ('numero','ano')),
             'RES': ('RES', ('numero','ano')),

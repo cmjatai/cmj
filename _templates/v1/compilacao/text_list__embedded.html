@@ -8,7 +8,7 @@
 {% else %}
 
 
-<div class="cp">
+<div class="cp {% if object.is_revogado %}cp-revogado{% endif %}">
   {% if object_list %}
     <div class="clearfix">
       <div class="actions btn-group float-right" role="group">

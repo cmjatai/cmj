@@ -713,6 +713,11 @@ a:link:after, a:visited:after {
       text-decoration: underline !important;
     }
   }
+
+  &.cp-revogado * {
+      text-decoration: line-through;
+      color: #999 !important;
+  }
 } /* end cp */
 
 .cp-print {

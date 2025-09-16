@@ -644,6 +644,12 @@ class TextoArticulado(TimestampedMixin):
             media_cache_storage.delete(f'{path_cache}/{f}')
         media_cache_storage.delete(path_cache)
 
+    def is_revogado(self):
+        content_object = self.content_object
+        if content_object and hasattr(content_object, 'is_revogado'):
+            return content_object.is_revogado()
+        return False
+
 
 class TipoNota(models.Model):
     sigla = models.CharField(
