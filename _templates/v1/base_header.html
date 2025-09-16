@@ -14,7 +14,7 @@
         <div id="portallogo">
           <div>
             <a class="navbar-brand" href="{{site_url}}/">
-              <img alt="Brasão da Câmara Municipal de Jataí" src="{% webpack_static 'brasao/brasao_128.png' %}">
+              <img alt="Brasão da Câmara Municipal de Jataí" src="{% webpack_static 'brasao/brasao_256.png' %}">
               <div class="brand-name">
                 <span>
                   Câmara Municipal de
@@ -33,9 +33,9 @@
         {% cache 300 cache_transmissao_ao_vivo %}
           <div>
             {% if ""|transmissao_ao_vivo %}
-            <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
-                <i class="fas fa-tv"></i> AoVivo
-            </a>
+              <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
+                  <i class="fas fa-tv"></i> AoVivo
+              </a>
             {% comment %}
               {% else %}
               <a class="btn bg-danger text-white p-0 px-1" href="/galerias/videos">

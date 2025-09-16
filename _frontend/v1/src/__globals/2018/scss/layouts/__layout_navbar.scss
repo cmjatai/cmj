@@ -379,7 +379,7 @@
 }
 
 #portallogo {
-  padding: 5px 10px;
+  // padding: 5px 10px;
   .navbar-brand {
     display: flex;
     padding: 0;
@@ -388,10 +388,10 @@
 
     // font-family: 'Graduate';
     img {
-      padding: 0 20px;
-      padding-left: 0;
+      padding-right: 16px;
       box-sizing: content-box;
-      width: 128px;
+      width: 189px;
+      margin-bottom: -16px;
     }
 
     .brand-name {
@@ -403,6 +403,8 @@
       font-family: "Roboto Condensed", Helvetica, sans-serif;
       justify-content: center;
       font-size: 1rem;
+      margin-top: 16px;
+      padding-right: 16px;
     }
 
     .brand-cidade {
@@ -853,12 +855,15 @@
   #portallogo {
     .navbar-brand {
       img {
-        height: 48px;
-        padding: 0 10px;
+        width: 65px;
+        margin-bottom: 0;
+        padding-right: 10px;
       }
 
       .brand-name {
-        font-size: 0.45rem;
+        font-size: 0.5rem;
+        margin-top: 0;
+        padding: 5px 10px 5px 0;
       }
 
       .brand-estado {
@@ -871,11 +876,10 @@
     #portallogo {
       .navbar-brand {
         img {
-          height: 56px;
-          padding: 0 10px;
+          width: 85px;
         }
         .brand-name {
-          font-size: 0.55rem;
+          font-size: 0.7rem;
         }
       }
     }
