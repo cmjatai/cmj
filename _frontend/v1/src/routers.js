@@ -32,6 +32,11 @@ export const routes = [
     name: 'loa_route',
     children: [
       {
+        path: '',
+        name: 'loalist_route',
+        component: () => import('@/modules/loa/LoaList')
+      },
+      {
         path: ':pkloa(\\d+)',
         name: 'loadetail_route',
         component: () => import('@/modules/loa/LoaDetail')

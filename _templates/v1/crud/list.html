@@ -50,7 +50,7 @@
             {% for name in headers %}
               <th>
                 {% if view.ordered_list %}
-	                <a title="{% trans 'Clique para alterar a ordem a listagem'%}" href="?o={% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}-{%endif%}{{forloop.counter}}{{ordering_url}}">{{ name }}
+	                <a title="{% trans 'Clique para alterar a ordem a listagem'%}" href="?o={% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}-{%endif%}{{forloop.counter}}{{ordering_url}}">{{ name|safe }}
 	                {% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}
 	                  <span class="caret top" title="{% trans 'Listado na Ordem Ascendente'%}"></span>
 	                {% elif 'o' in request.GET and forloop.counter == request.GET.o|str2intabs %}
@@ -58,7 +58,7 @@
 	                {% endif %}
 	                </a>
                 {% else %}
-                    {{ name }}
+                    {{ name|safe }}
                 {% endif %}
               </th>
             {% endfor %}

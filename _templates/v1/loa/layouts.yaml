@@ -7,8 +7,8 @@ Loa:
   - yaml_obs
 LoaDetail:
   {% trans 'Resumo Geral das Emendas Impositivas' %}:
-  - ano:2 receita_corrente_liquida:4 materia_ou_norma
-  - disp_total disp_saude disp_diversos
+  - ano:2 materia_ou_norma
+  - receita_corrente_liquida disp_total disp_saude disp_diversos
   - resumo_emendas_impositivas
 LoaDetailATE2022:
   {% trans 'Dados Gerais da LOA' %}:

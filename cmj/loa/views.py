@@ -128,18 +128,20 @@ class LoaCrud(Crud):
 
         def hook_btn_lista_emendas(self, *args, **kwargs):
             l = args[0]
-            return f' <em>(Emendas da LOA)</em>', f'/loa/{l.pk}/emendaloa'
+            return f' <em>(Emendas à LOA)</em>', f'/loa/{l.pk}/emendaloa'
 
         def hook_receita_corrente_liquida(self, *args, **kwargs):
             l = args[0]
-
             return args[1] if l.ano >= 2023 else '', args[2]
+
+        def hook_header_receita_corrente_liquida(self):
+            return 'Receita Corrente Líquida - RCL (R$)<br><small class="text-gray">Referente ao ano anterior ao da última LOA aprovada.</small>'
 
         def hook_ano(self, *args, **kwargs):
             l = args[0]
             return f'''
             <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
-            <a class="small" href="/loa/{l.id}/emendaloa" title="Listagem de Emendas da LOA">
+            <a class="small" href="/loa/{l.id}/emendaloa" title="Listagem de Emendas à LOA">
                 <i class="fas fa-list"></i>
             </a>
             ''', ''
@@ -250,6 +252,25 @@ class LoaCrud(Crud):
                 field_display = field_display.replace(
                     strm, l.materia.epigrafe_short)
             return verbose_name, field_display
+
+
+        def hook_receita_corrente_liquida(self, l, verbose_name='', field_display=''):
+
+            em_fase_execucao = l.rcl_previa != l.receita_corrente_liquida
+            header = f'RCL de {l.ano - (1 if em_fase_execucao else 2)}'
+            valor = formats.number_format(
+                l.receita_corrente_liquida if em_fase_execucao else l.rcl_previa,
+                force_grouping=True
+            )
+            return 'Receita Corrente Líquida', f'''
+                {valor}
+                <hr>
+                <small class="text-gray">
+                    <em>{header}</em>
+                    <em>(RCL referente ao ano anterior { "à Execução" if em_fase_execucao else "ao Projeto" })</em>
+                </small>
+            '''
+
 
         def _hook_disp_generic(self, l, verbose_name='', field_display='', field_type=''):
             """

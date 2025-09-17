@@ -21,9 +21,21 @@
     .container-table {
       margin: 0;
     }
+    div[class^=col] {
+      padding: 10px;
+    }
+
+    #div_id_receita_corrente_liquida {
+      .form-control-static {
+        font-size: 160%;
+        em {
+          font-size: 50%;
+        }
+      }
+    }
     .form-control-static {
       text-align: center;
-      font-size: 140%;
+      font-size: 110%;
       line-height: 1;
       padding: 0.7rem;
       font-weight: bold;
