@@ -32,7 +32,7 @@ from cmj.loa.models import OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza,\
     AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento, quantize,\
     Fonte
-from cmj.utils import run_sql
+from cmj.utils import TimeExecution, decimal2str, run_sql
 from cmj.utils_report import make_pdf
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize,\
     wrapper_queryset_response_for_drf_action
@@ -97,10 +97,11 @@ class _LoaViewSet:
 
             if request.method == 'POST' and view.action in (
                 'despesas_agrupadas',
+                'espelho',
             ):
                 return True
 
-            if request.method == 'GET' and view.action == 'retrieve':
+            if request.method == 'GET' and view.action in ('retrieve',):
                 self.object = view.get_object()
                 if not self.object.publicado and u.is_anonymous:
                     return False
@@ -402,6 +403,170 @@ class _LoaViewSet:
         r_anual = dict(r_anual)
 
         return Response(r_anual if hist else r)
+
+    @action(methods=['post', ], detail=True)
+    def espelho(self, request, *args, **kwargs):
+
+        loa = self.get_object()
+
+
+        filters_data = request.data
+
+        try:
+            itens = filters_data.pop('itens')
+            if itens != 1000:
+                itens = min(25, int(itens))
+
+            hist = filters_data.pop('hist')
+            hist = int(hist)
+        except:
+            itens = 20
+            hist = 0
+
+
+        # TODO: refatorar "sql_geral" para usar o modelo de dados de view não gerenciada pelo django
+        sql_geral = f"""SELECT
+                            d.id,
+                            d.valor_materia,
+                            loa.ano || '.' || o.codigo || '.' || u.codigo || '.' || f.codigo || '.' || sf.codigo || '.' || p.codigo || '.' || a.codigo || '.' || n.codigo || '.' || fte.codigo as codigo,
+                            loa.ano || o.codigo || u.codigo || f.codigo || sf.codigo || p.codigo || a.codigo || n.codigo || fte.codigo as codigo_base
+                        from loa_despesa d
+                            inner join loa_loa             loa on (loa.id = d.loa_id)
+                            inner join loa_orgao             o on (  o.id = d.orgao_id)
+                            inner join loa_unidadeorcamentaria           u on (  u.id = d.unidade_id)
+                            inner join loa_funcao            f on (  f.id = d.funcao_id)
+                            inner join loa_subfuncao        sf on ( sf.id = d.subfuncao_id)
+                            inner join loa_programa          p on (  p.id = d.programa_id)
+                            inner join loa_acao              a on (  a.id = d.acao_id)
+                            inner join loa_natureza          n on (  n.id = d.natureza_id)
+                            inner join loa_fonte           fte on (fte.id = d.fonte_id)
+                            where loa.id = {loa.pk} order by codigo_base
+        """
+
+        mask_union = """
+            (
+                SELECT DISTINCT
+                    Substr(codigo_base, 1, {partcb}) AS codigo_base, Substr(codigo, 1, {partc}) AS codigo,
+                    SUM(valor_materia) AS soma
+                    FROM (
+                        {sql_geral}
+                    ) todas_as_despesas
+                        GROUP BY
+                            Substr(codigo_base, 1, {partcb}), Substr(codigo, 1, {partc})
+                            HAVING SUM(valor_materia) > 0
+                        order by codigo_base
+            )
+        """
+
+        # TODO: refatorar mask para montar o case com laço
+        # mask_codigo = '1234.67.90.23.567.9012.4.678.0.2.45.78.01.345'
+        # mask_codbas = '1234 56 78 90 123 4567 89012 345678901234 567'
+        parts_codigo =      [4, 7, 10, 13, 17, 22, 28, 41, 45]
+        parts_codigo_base = [4, 6,  8, 10, 13, 17, 22, 34, 37]
+
+
+        agrupamento_select = filters_data.pop('agrupamento', 'fonte')
+        agrupamentos = dict([
+            ('orgao', 7),
+            ('unidade', 10),
+            ('funcao', 13),
+            ('subfuncao', 17),
+            ('programa', 22),
+            ('acao', 28),
+            ('natureza_1', 30),
+            ('natureza_2', 32),
+            ('natureza_3', 35),
+            ('natureza_4', 38),
+            ('natureza_5', 41),
+            ('fonte', 45),
+        ])
+
+
+        columns = [
+            'geral.codigo',
+            'geral.codigo_base',
+            'geral.soma',
+            f"""
+                CASE
+                    when LENGTH(codigo_base) = 6  then (select especificacao                   from loa_orgao                       where loa_orgao.codigo             = substr(codigo_base, 5, 2) limit 1)
+
+                    when LENGTH(codigo_base) = 8  then (select loa_unidadeorcamentaria.especificacao from loa_unidadeorcamentaria
+                                                            inner join loa_orgao on loa_orgao.id = loa_unidadeorcamentaria.orgao_id where loa_unidadeorcamentaria.codigo = substr(codigo_base, 7, 2) and loa_orgao.codigo = substr(codigo_base, 5, 2) limit 1)
+
+                    when LENGTH(codigo_base) = 10 then (select especificacao from loa_funcao    where loa_funcao.codigo    = substr(codigo_base, 9, 2) limit 1)
+                    when LENGTH(codigo_base) = 13 then (select especificacao from loa_subfuncao where loa_subfuncao.codigo = substr(codigo_base, 11, 3) limit 1)
+                    when LENGTH(codigo_base) = 17 then (select especificacao from loa_programa  where loa_programa.codigo  = substr(codigo_base, 14, 4) limit 1)
+                    when LENGTH(codigo_base) = 22 then (select especificacao from loa_acao      where loa_acao.codigo      = substr(codigo_base, 18, 5) limit 1)
+                    when LENGTH(codigo_base) = 34 then (select especificacao from loa_natureza  where loa_natureza.codigo  = substr(codigo_base, 23, 12) limit 1)
+                    when LENGTH(codigo_base) = 37 then (select especificacao from loa_fonte     where loa_fonte.codigo     = substr(codigo_base, 35, 3) limit 1)
+                        else ''
+                END as especificacao
+            """,
+        ]
+
+        sql_for_run = f"""
+            select
+                {', '.join(columns)}
+                from (
+                    {
+            'union '.join(
+                [
+                    mask_union.format(
+                        partc=partc, partcb=partcb, sql_geral=sql_geral
+                    )
+                    for partc, partcb in zip(parts_codigo, parts_codigo_base)
+                ]
+            )
+        }) geral order by codigo_base
+            """
+
+        with TimeExecution('gerar_espelho'):
+            results = run_sql(sql_for_run)
+
+        rs = []
+        lr_old = 0
+        value = Decimal(0)
+
+        #parts_codigo =      [4, 7, 10, 13, 17, 22, 28, 41, 46]
+        #parts_codigo_base = [4, 6,  8, 10, 13, 17, 22, 34, 37]
+
+        for i, r in enumerate(results):
+            agrupamento = agrupamentos.get(agrupamento_select, 45)
+            lr = len(r[0])
+            if lr > agrupamento:
+                continue
+            
+            # remove natureza da despesa do tipo X.X.XX.XX.00 se este for igual a X.X.XX.XX
+            if lr == 41 and r[1][-2:] == '00':
+                if r[2:4] == results[i - 1][2:4]:
+                    continue
+
+            r = list(r)
+            rs.append(r)
+
+            d2s = decimal2str(r[2])
+
+            if lr in (7,) or lr <= lr_old or value != r[2]:
+                value = r[2]
+                r[2] = '<strong>' + d2s + '</strong>'
+            elif lr in (45,):
+                r[2] = '<em>' + d2s + '</em>'
+            else:
+                r[2] = ''
+
+            lr_old = lr
+
+            r[0] = r[0][5:]
+            r[3] = r[3] or ''
+            if len(r[0]) > 36:
+                r[0] = f'{"&nbsp;" * 34}{r[0][36:]}'
+                r[3] = '<small>' + r[3] + '</small>'
+            elif len(r[0]) > 23:
+                r[0] = f'{"&nbsp;" * 22}{r[0][23:]}'
+            else:
+                r[3] = '<strong>' + r[3] + '</strong>'
+
+        return Response(rs)
 
 
 @customize(OficioAjusteLoa)

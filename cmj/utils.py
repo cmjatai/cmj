@@ -1,6 +1,7 @@
 
 from collections import defaultdict
 from datetime import date, datetime, timedelta
+import decimal
 from functools import wraps
 from unicodedata import normalize as unicodedata_normalize
 
@@ -27,7 +28,7 @@ from django.db.models.signals import pre_init, post_init, pre_save, post_save, \
     pre_delete, post_delete, post_migrate, pre_migrate, m2m_changed
 from django.template.loaders.filesystem import Loader
 from django.urls.base import resolve
-from django.utils import timezone
+from django.utils import timezone, formats
 from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
@@ -108,6 +109,45 @@ def clear_thumbnails_cache(queryset, field, time_create=0):
                     continue
             cf.remove()
 
+
+
+DECIMAL_PLACES = {i: (decimal.Decimal(10) ** -i) for i in range(0, 10)}
+
+def quantize(
+    value, decimal_places=2, rounding=decimal.ROUND_HALF_DOWN
+) -> decimal.Decimal:
+    return value.quantize(
+        DECIMAL_PLACES[decimal_places]
+        if isinstance(decimal_places, int)
+        else decimal_places,
+        rounding=rounding,
+    )
+
+def decimal2str(
+    value,
+    decimal_places=2,
+    rounding=decimal.ROUND_HALF_DOWN,
+    force_grouping=True,
+    use_l10n=True,
+) -> str:
+    try:
+        value = quantize(
+            value, decimal_places=DECIMAL_PLACES[decimal_places], rounding=rounding
+        )
+
+        return formats.number_format(
+            value,
+            decimal_pos=decimal_places,
+            use_l10n=use_l10n,
+            force_grouping=force_grouping,
+        )
+    except Exception as e:
+        # Log the error
+        logger.error(
+            f'Erro ao formatar o valor {value} com {decimal_places} casas decimais. '
+            f'Valor deve ser um Decimal ou um número válido. Erro: {str(e)}'
+        )
+        return str(value)
 
 def normalize(txt):
     return unicodedata_normalize(
@@ -466,13 +506,13 @@ def time_of_period(period):
 def run_sql(sql):
     result = []
     with connection.cursor() as cursor:
-
         result = cursor.execute(sql)
-
-        if sql.lower().startswith('select'):
+        try:
             result = cursor.fetchall()
-
+        except Exception as e:
+            pass
     return result
+
 
     # if settings.DEBUG:
     #    print(rows)

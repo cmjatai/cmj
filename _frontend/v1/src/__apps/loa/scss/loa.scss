@@ -23,11 +23,17 @@
       margin: 0;
     }
     div[class^=col] {
-      padding: 10px;
+      &:not(:first-child) {
+        padding-left: 7px;
+      }
+      &:not(:last-child) {
+        padding-right: 7px;
+      }
     }
     #div_id_receita_corrente_liquida {
       .form-control-static {
-        font-size: 160%;
+        font-size: 170%;
+        padding: 14px 0;
         em {
           font-size: 50%;
         }

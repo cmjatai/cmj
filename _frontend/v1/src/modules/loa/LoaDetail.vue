@@ -103,12 +103,27 @@
       <div class="row">
         <div class="col-12 container-doughnut p-3 mt-3">
           <DoughnutChart v-if="chartDataLoa" :height="height" :plugins="pluginsDun" :chartDataUser="chartDataLoa"/>
-
           <b-table striped hover class="local_table" :items="despesas_agrupadas_table"></b-table>
-
         </div>
 
         <div class="col-12 mt-3" v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
+
+        <div class="col-12 mt-3" v-if="espelho">
+          <table class="table table-sm table-bordered table-striped table_espelho">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(value, key) in espelho" :key="key">
+                <td v-html="value[0] + ' - ' + value[3]"></td>
+                <td v-html="value[2]"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
         <div class="col-12 container-barchart p-3 mt-3" v-if="chartDataHist">
           <div class="btn-barchart-left" @click="clickSlice(-1, 'hist')"><i class="fa fa-chevron-left"></i></div>
@@ -162,6 +177,7 @@ export default {
       loa: {
         id: this.$route.params.pkloa
       },
+      espelho: null,
       chartDataLoa: null,
       chartDataHist: null,
       chartDataExec: null,
@@ -557,70 +573,10 @@ export default {
               { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
         })
         .then(() => {
-          formFilter.hist = 1
-          t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
+          t.utils.postModelAction('loa', 'loa', t.loa.id, 'espelho', formFilter)
             .then((response) => {
-              let labels = response.data.labels.slice(t.barchart_offset, t.barchart_offset + t.barchart_max_items)
-              let cor = t.barchart_colors // t.build_colors(response.data.anos.length, 'a0')
-              let datasets = []
-              _.each(response.data.anos, function (label, idx) {
-                let data = []
-                if (idx === 0 && t.barchart_offset === 0) {
-                  t.barchart_length = response.data.pre_datasets[label].length
-                }
-                _.each(response.data.pre_datasets[label].slice(t.barchart_offset, t.barchart_offset + t.barchart_max_items), function (itemD, idd) {
-                  data.push(itemD.vm)
-                })
-                datasets.push({
-                  label,
-                  data,
-                  backgroundColor: cor[idx]
-                })
-              })
-              let chartDataHist = {
-                labels,
-                datasets
-              }
-              if (t.chartDataHist === null) {
-                t.chartDataHist = chartDataHist
-                return
-              }
-              const text = [
-                'HISTOGRAMA DO ORÇAMENTO DO MUNICÍPIO DE JATAÍ'
-              ]
-              const filters = []
-              _.forOwn(t.despesa, function (value, key) {
-                if (t.filters.includes(key) && value !== null) {
-                  filters.push(value.especificacao)
-                }
-              })
-              if (!_.isEmpty(filters)) {
-                text.push(`FILTRADO POR: ${filters.join(' / ')}`)
-              }
-              text.push(`Orçamento das despesas agrupadas por: ${t.agrupamentos[formFilter.agrupamento]}`)
-
-              t.$set(t.chartDataHist, 'labels', labels)
-              t.$set(t.chartDataHist, 'datasets', datasets)
-              t.$set(t.pluginsBar, 0, {
-                title: {
-                  display: true,
-                  text
-                }
-              })
+              t.espelho = response.data
             })
-            .then((response) => {
-              this.handleResize()
-            })
-            .catch((response) => t.sendMessage(
-              { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
-        })
-        .then(() => {
-          /* formFilter.itens = 1000
-          formFilter.hist = 0
-          t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
-            .then((response) => {
-              t.despesas_agrupadas = response.data
-            }) */
         })
         .then(() => {
           t.utils.getModelAction('loa', 'loa', t.loa.id, 'despesas_executadas')
@@ -837,6 +793,23 @@ export default {
   .local_table {
     td:nth-child(n + 3) {
       text-align: right;
+    }
+  }
+  .table_espelho {
+    font-size: 90%;
+    th, td {
+      font-family: 'Courier New', Courier, monospace;
+      padding: 0.1rem 0.3rem;
+      vertical-align: top;
+    }
+    td:nth-child(1) {
+      // font-size: 75%;
+      // font-weight: 600;
+    }
+    td:nth-child(2) {
+      width: 15%;
+      text-align: right;
+      white-space: nowrap;
     }
   }
 </style>
