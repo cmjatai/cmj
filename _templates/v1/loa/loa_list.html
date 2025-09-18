@@ -1,6 +1,8 @@
 {% extends "crud/list.html" %}
 {% block appvue_content %}{% endblock appvue_content %}
 {% block base_content %}
-{{ block.super }}
-<div id="app"></div>
+{% with "pagination-static" as type_pagination %}
+  {{ block.super }}
+  <div id="app"></div>
+{% endwith %}
 {% endblock base_content %}

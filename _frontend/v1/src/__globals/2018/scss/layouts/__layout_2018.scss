@@ -542,6 +542,14 @@
   left: 0;
   right: 0;
 
+  &.pagination-sticky {
+    position: sticky;
+  }
+
+  &.pagination-static {
+    position: static;
+  }
+
   .pagination {
     margin-bottom: 0;
   }

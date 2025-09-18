@@ -1,10 +1,11 @@
 <template>
   <div class="loa-list">
+    <h1>Histograma das Despesas</h1>
     <div class="container" v-if="!chartDataHist">
       <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
     </div>
     <div class="container" v-if="chartDataHist">
-      <strong class="d-block mx-3 my-2">Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes (Opções de filtro com base na LOA mais recente)</strong>
+      <em class="d-block mx-3 my-2 text-gray">Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes (Opções de filtro com base na LOA mais recente)</em>
       <div class="row c-fields">
         <div class="col-md-3">
           Órgãos

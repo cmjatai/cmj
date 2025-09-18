@@ -1,5 +1,5 @@
 {% if is_paginated %}
-  <nav class="nav-pagination">
+  <nav class="nav-pagination {{ type_pagination|default:'pagination-sticky'}}">
     <ul class="pagination justify-content-center">
       {% if page_obj.has_previous %}
         <li class="page-item">
@@ -10,11 +10,11 @@
           </a>
         </li>
       {% else %}
-        <li class="page-item disabled">        
+        <li class="page-item disabled">
           <a class="page-link" href="#" aria-label="Anterior">
             <span aria-hidden="true">&laquo;</span>
             <span class="sr-only">Anterior</span>
-          </a>       
+          </a>
         </li>
       {% endif %}
 

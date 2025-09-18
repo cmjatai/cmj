@@ -78,6 +78,7 @@ class LoaCrud(Crud):
 
     class ListView(Crud.ListView):
         ordered_list = False
+        paginate_by = 4
 
         def get(self, request, *args, **kwargs):
             response = super().get(request, *args, **kwargs)
