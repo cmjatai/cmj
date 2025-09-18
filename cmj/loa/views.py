@@ -135,7 +135,7 @@ class LoaCrud(Crud):
             return args[1] if l.ano >= 2023 else '', args[2]
 
         def hook_header_receita_corrente_liquida(self):
-            return 'Receita Corrente Líquida - RCL (R$)<br><small class="text-gray">Referente ao ano anterior ao da última LOA aprovada.</small>'
+            return 'Receita Corrente Líquida - RCL (R$)<br><small class="text-gray">RCL Referente ao ano anterior.</small>'
 
         def hook_ano(self, *args, **kwargs):
             l = args[0]
