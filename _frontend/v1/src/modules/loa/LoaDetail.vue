@@ -4,7 +4,10 @@
       <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
     </div>
     <div class="container" v-if="loa.ano && chartDataLoa">
-      <strong class="d-block mx-3 my-2">Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes</strong>
+      <strong class="d-block mx-3 my-2">
+        Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes,
+        <span class="text-danger">o gráfico e tabela serão atualizados automaticamente</span>.
+      </strong>
       <div class="row c-fields">
         <div class="col-md-3">
           Órgãos
@@ -112,7 +115,7 @@
           <table class="table table-sm table-bordered table-striped table_espelho">
             <thead>
               <tr>
-                <th>Código</th>
+                <th>Código / Especificação</th>
                 <th>Valor</th>
               </tr>
             </thead>
@@ -182,7 +185,7 @@ export default {
       chartDataHist: null,
       chartDataExec: null,
       data_exec: null,
-      height: 550,
+      height: 450,
       pluginsExec: [{
         title: {
           display: true,

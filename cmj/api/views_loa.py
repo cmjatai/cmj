@@ -423,6 +423,35 @@ class _LoaViewSet:
             itens = 20
             hist = 0
 
+        filter_sql = []
+        field_to_alias = {
+            'orgao': 'o',
+            'unidade': 'u',
+            'funcao': 'f',
+            'subfuncao': 'sf',
+            'programa': 'p',
+            'acao': 'a',
+            'natureza_1': 'n',
+            'natureza_2': 'n',
+            'natureza_3': 'n',
+            'natureza_4': 'n',
+            'natureza_5': 'n',
+            'fonte': 'fte',
+        }
+        for k, v in filters_data.items():
+            if v and k in field_to_alias:
+                if '/' in v:
+                    v = v.split('/')
+                    filter_sql.append(
+                        f" {field_to_alias[k]}.codigo = '{v[0]}' and {field_to_alias[k]}.orgao_id = {v[1]} "
+                    )
+                else:
+                    filter_sql.append(
+                        f" {field_to_alias[k]}.codigo = '{v}' "
+                    )
+        filter_sql = ' and '.join(filter_sql)
+        filter_sql = f' and {filter_sql} ' if filter_sql else ''
+
 
         # TODO: refatorar "sql_geral" para usar o modelo de dados de view não gerenciada pelo django
         sql_geral = f"""SELECT
@@ -440,7 +469,7 @@ class _LoaViewSet:
                             inner join loa_acao              a on (  a.id = d.acao_id)
                             inner join loa_natureza          n on (  n.id = d.natureza_id)
                             inner join loa_fonte           fte on (fte.id = d.fonte_id)
-                            where loa.id = {loa.pk} order by codigo_base
+                            where loa.id = {loa.pk} {filter_sql} order by codigo_base
         """
 
         mask_union = """
@@ -535,7 +564,7 @@ class _LoaViewSet:
             lr = len(r[0])
             if lr > agrupamento:
                 continue
-            
+
             # remove natureza da despesa do tipo X.X.XX.XX.00 se este for igual a X.X.XX.XX
             if lr == 41 and r[1][-2:] == '00':
                 if r[2:4] == results[i - 1][2:4]:
