@@ -13,7 +13,7 @@ from django.template import loader
 from django.template.loader import render_to_string
 from django.urls.base import reverse
 from django.urls.base import reverse_lazy
-from django.utils import formats
+from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
@@ -133,10 +133,44 @@ class LoaCrud(Crud):
 
         def hook_receita_corrente_liquida(self, *args, **kwargs):
             l = args[0]
-            return args[1] if l.ano >= 2023 else '', args[2]
+            if l.ano < 2023:
+                return ' - ' , args[2]
 
-        def hook_header_receita_corrente_liquida(self):
-            return 'Receita Corrente Líquida - RCL (R$)<br><small class="text-gray">RCL Referente ao ano anterior.</small>'
+            em_fase_execucao = l.rcl_previa != l.receita_corrente_liquida
+            ano_atual = timezone.now().year
+
+            if em_fase_execucao and l.ano == ano_atual:
+                return f'''
+                    {args[1]}
+                    <small class="text-gray">
+                        <small>
+                            <em>LOA em fase de Execução</em>
+                            <em>RCL referente ao ano anterior à Execução</em>
+                ''', ''
+            elif em_fase_execucao:
+                return f'''
+                    {args[1]}
+                    <small class="text-gray">
+                        <small>
+                            <em>LOA executada em {l.ano}</em>
+                            <em>RCL referente ao ano anterior à Execução</em>
+                ''', ''
+
+            rcl_previa = formats.number_format(l.rcl_previa, force_grouping=True)
+
+            return f'''
+                {rcl_previa}
+                <small class="text-gray">
+                    <small>
+                        <em>RCL referente ao ano anterior ao Projeto da LOA</em>
+                    </small>
+                </small>
+            ''', ''
+
+
+
+        # def hook_header_receita_corrente_liquida(self):
+        #     return 'Receita Corrente Líquida - RCL (R$)<br><small class="text-gray">RCL Referente ao ano anterior.</small>'
 
         def hook_ano(self, *args, **kwargs):
             l = args[0]

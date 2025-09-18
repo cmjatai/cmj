@@ -89,7 +89,6 @@ class _LoaViewSet:
     class LoaPermission(SaplModelPermissions):
         def has_permission(self, request, view):
             has_perm = super().has_permission(request, view)
-            print(view.action)
 
             if has_perm:
                 return has_perm
