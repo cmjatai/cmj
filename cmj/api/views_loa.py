@@ -2,6 +2,8 @@ from _collections import OrderedDict
 from decimal import Decimal
 import logging
 
+from django.contrib.auth.decorators import permission_required
+
 from django.apps.registry import apps
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.validators import RegexValidator
@@ -87,6 +89,7 @@ class _LoaViewSet:
     class LoaPermission(SaplModelPermissions):
         def has_permission(self, request, view):
             has_perm = super().has_permission(request, view)
+            print(view.action)
 
             if has_perm:
                 return has_perm
@@ -103,9 +106,8 @@ class _LoaViewSet:
                 if not self.object.publicado and u.is_anonymous:
                     return False
                 return True
-            # elif request.method == 'GET' and view.action == 'despesas_executadas':
-            #    return True
-
+            elif request.method == 'GET' and view.action == 'despesas_executadas':
+                return u.has_perm('loa.view_despesasexecutadas')
             return False
 
     permission_classes = (LoaPermission, )

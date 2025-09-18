@@ -17,14 +17,14 @@
       }
     }
   }
-  &.loa-detail {
+
+  &.loa-detail .container-detail{
     .container-table {
       margin: 0;
     }
     div[class^=col] {
       padding: 10px;
     }
-
     #div_id_receita_corrente_liquida {
       .form-control-static {
         font-size: 160%;
@@ -58,6 +58,7 @@
       }
     }
   }
+
   &.emendaloa-list {
     .context-actions {
       margin: 1.3rem 0;
@@ -88,7 +89,6 @@
         }
       }
     }
-
     form {
       $mp: 0.5em;
       background-color: white;
@@ -99,7 +99,6 @@
       .custom-control-input, input[name=salvar] {
         display: none;
       }
-
       [class^=row] {
         margin-left: -$mp;
         margin-right: -$mp;
@@ -108,20 +107,17 @@
         padding-left: $mp;
         padding-right: $mp;
       }
-
       .form-group {
         margin: 0;
         label {
           margin: 0;
         }
       }
-
       .relatorio-select {
         border-left: 5px solid #025d2b;
         padding-left: $mp;
         height: 100%;
       }
-
       #div_id_fase, #div_id_tipo, #div_id_finalidade {
         margin-top: 0.7rem;
         border-top: 1px solid #ddd;
@@ -133,11 +129,6 @@
           align-items: center;
         }
       }
-      #div_id_parlamentares {
-        & > label {
-          //display: none;
-        }
-      }
       #div_id_tipo {
         .custom-control {
           display: inline-block;
@@ -145,7 +136,6 @@
         }
       }
     }
-
     .container-avatar {
       align-items: center;
       .custom-control:first-of-type {

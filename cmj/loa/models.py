@@ -112,6 +112,9 @@ class Loa(models.Model):
         verbose_name = _('LOA')
         verbose_name_plural = _('LOAs')
         ordering = ['-id']
+        permissions = (
+            ('view_despesasexecutadas', _('View Despesas Executadas')),
+        )
 
     def __str__(self):
         nj = self.materia.normajuridica() if self.materia else ''

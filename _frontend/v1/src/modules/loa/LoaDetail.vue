@@ -1,5 +1,5 @@
 <template>
-  <div class="loa-detail">
+  <div class="vue-loa-detail">
     <div class="container" v-if="!loa.ano || !chartDataLoa">
       <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
     </div>
@@ -754,12 +754,16 @@ export default {
 </script>
 <style lang="scss" scoped>
   $mp: 3px;
-  .loa-detail {
+  .vue-loa-detail {
     margin-bottom: 2em;
   }
   [class^=col] {
     padding-left: $mp;
     padding-right: $mp;
+  }
+  .col-md-1 {
+    flex: 0 0 7.5%;
+    max-width: 7.5%;
   }
   .colwithbuttonclean {
     margin-left: -$mp;
@@ -776,6 +780,7 @@ export default {
   }
   .c-groups {
     font-size: 80%;
+    padding-top: $mp * 2;
     /*position: fixed;
     bottom: 0;
     right: 0;
@@ -829,8 +834,6 @@ export default {
       }
     }
   }
-</style>
-<style lang="scss">
   .local_table {
     td:nth-child(n + 3) {
       text-align: right;

@@ -1,5 +1,5 @@
 <template>
-  <div class="loa-list">
+  <div class="vue-loa-list">
     <h1>Histograma das Despesas</h1>
     <div class="container" v-if="!chartDataHist">
       <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
@@ -571,7 +571,7 @@ export default {
 </script>
 <style lang="scss" scoped>
   $mp: 3px;
-  .loa-list {
+  .vue-loa-list {
     margin-top: 2em;
   }
   [class^=col] {
@@ -646,8 +646,6 @@ export default {
       }
     }
   }
-</style>
-<style lang="scss">
   .local_table {
     td:nth-child(n + 3) {
       text-align: right;
