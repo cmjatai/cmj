@@ -85,16 +85,8 @@
           <div class="">
             <strong>Agrupamentos</strong>
             <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos__options" :select-size="1"/>
-          </div>
-          <div class="row">
-            <div class="col-6">
-              <strong>Máximo de Itens</strong>
-              <b-form-select v-model="despesa.itensselected" :options="itens" :select-size="1"/>
-            </div>
-            <div class="col-6">
-              <strong>Histograma</strong>
-              <b-form-select v-model="barchart_max_items__select" :options="itens_hist" :select-size="1"/>
-            </div>
+            <strong>Histograma</strong>
+            <b-form-select v-model="barchart_max_items__select" :options="itens_hist" :select-size="1"/>
           </div>
           <div class="col mt-1 text-right">
             <b-button class="bg-secondary" size="sm" @click="clearFilters(event)">Limpar Pesquisa</b-button>
