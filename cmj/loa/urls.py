@@ -2,7 +2,7 @@ from django.urls.conf import re_path, include
 
 from cmj.loa.dashboards import LoaDashboardView
 from cmj.loa.views import LoaCrud, EmendaLoaCrud, OficioAjusteLoaCrud,\
-    RegistroAjusteLoaCrud, AgrupamentoCrud, UnidadeOrcamentariaCrud
+    RegistroAjusteLoaCrud, AgrupamentoCrud, SubFuncaoCrud, UnidadeOrcamentariaCrud
 
 from .apps import AppConfig
 
@@ -19,7 +19,8 @@ urlpatterns = [
             OficioAjusteLoaCrud.get_urls() +
             RegistroAjusteLoaCrud.get_urls() +
             AgrupamentoCrud.get_urls() +
-            UnidadeOrcamentariaCrud.get_urls()
+            UnidadeOrcamentariaCrud.get_urls() +
+            SubFuncaoCrud.get_urls()
         )
     ),
 

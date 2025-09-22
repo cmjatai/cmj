@@ -23,7 +23,8 @@ from django_filters.filters import MultipleChoiceFilter, \
 from django_filters.filterset import FilterSet
 import yaml
 
-from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
+from cmj import loa
+from cmj.loa.models import Despesa, DespesaConsulta, EmendaLoaRegistroContabil, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
     Agrupamento, quantize
 from cmj.utils import normalize, DecimalField
@@ -117,7 +118,9 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             'perc_disp_saude',
             'perc_disp_diversos',
             'parlamentares',
-            'yaml_obs'
+            'yaml_obs',
+            'despesa_default_deducao_saude',
+            'despesa_default_deducao_diversos',
         ]
 
     def __init__(self, *args, **kwargs):
@@ -127,14 +130,24 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 
         if not instance or not instance.pk or not instance.materia:
             parlamentares = Parlamentar.objects.filter(ativo=True)
+            despesa_default_deducao_saude = Despesa.objects.none()
+            despesa_default_deducao_diversos = Despesa.objects.none()
         else:
             ano_materia = instance.materia.ano
             parlamentares = Parlamentar.objects.filter(
                 Q(ativo=True) | Q(emendaloaparlamentar_set__emendaloa__materia__ano=ano_materia)
             ).distinct()
+
+            despesa_default_deducao_saude = Despesa.objects.filter(loa=instance, funcao__codigo='99')
+            despesa_default_deducao_diversos = Despesa.objects.filter(loa=instance, funcao__codigo='99')
+
         self.fields['parlamentares'].choices = [
             (p.pk, p) for p in parlamentares
         ]
+        self.fields['despesa_default_deducao_saude'].queryset = despesa_default_deducao_saude
+        self.fields['despesa_default_deducao_diversos'].queryset = despesa_default_deducao_diversos
+
+
 
 
     def clean(self):
@@ -237,10 +250,10 @@ class AgrupamentoForm(ModelForm):
         label='Buscar', required=False,)
 
     perc_despesa = DecimalField(
-        label='Perc da Despesa', required=False, max_digits=5, decimal_places=2,)
+        label='Percentual da Despesa', required=False, max_digits=5, decimal_places=2,)
 
     despesa_codigo = forms.CharField(
-        label='Código', required=False,)
+        label='Código', required=False)
 
     despesa_orgao = forms.CharField(
         label='Orgão', required=False,)
@@ -252,6 +265,9 @@ class AgrupamentoForm(ModelForm):
 
     despesa_natureza = forms.CharField(
         label='Natureza', required=False,)
+
+    despesa_fonte = forms.CharField(
+        label='Fonte', required=False,)
 
     ano_loa = forms.CharField(
         label='',
@@ -277,12 +293,14 @@ class AgrupamentoForm(ModelForm):
 
         row4_1 = to_row([
             ('busca_despesa', 3),
-
             ('despesa_orgao', 2),
             ('despesa_unidade', 2),
+            ('despesa_natureza', 3),
+            ('despesa_fonte', 2),
+        ])
+        row4_2 = to_row([
+            ('perc_despesa', 2),
             ('despesa_codigo', 3),
-            ('despesa_natureza', 2),
-            ('perc_despesa', 3),
             ('despesa_especificacao', 'col'),
             (HTML('''
                 <button type="button" id="add_registro" class="btn btn-primary">+</button>
@@ -292,13 +310,13 @@ class AgrupamentoForm(ModelForm):
 
         ])
 
-        row4_2 = to_row([
+        row4_3 = to_row([
             (Div(css_class='registro-render'), 12),
         ])
 
         row4 = to_row([
-            (Fieldset(_('Registrar Deduções e Inserções'), row4_1), 6),
-            (Fieldset(_('Registros das Despesas Orçamentárias'), row4_2), 6)
+            (Fieldset(_('Registrar Deduções e Inserções'), row4_1, row4_2, css_class='fieldset-busca-registrocontabil'), 12),
+            (Fieldset(_('Registros das Despesas Orçamentárias'), row4_3), 12)
         ])
 
         row5_1 = to_row([
@@ -482,10 +500,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             row4_1 = to_row([
                 ('busca_despesa', 4),
 
-                ('despesa_orgao', 2),
+                ('despesa_orgao', 1),
                 ('despesa_unidade', 2),
-                ('despesa_natureza', 2),
+                ('despesa_natureza', 3),
                 ('despesa_fonte', 2),
+            ])
+            row4_2 = to_row([
 
                 ('valor_despesa', 3),
                 ('despesa_codigo', 3),
@@ -498,12 +518,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
             ])
 
-            row4_2 = to_row([
+            row4_3 = to_row([
                 (Div(css_class='registro-render'), 12),
             ])
             row4 = to_row([
-                (Fieldset(_('Registrar Deduções e Inserções'), row4_1), 12),
-                (Fieldset(_('Registros das Despesas Orçamentárias'), row4_2), 12)
+                (Fieldset(_('Registrar Deduções e Inserções'), row4_1, row4_2, css_class='fieldset-busca-registrocontabil'), 12),
+                (Fieldset(_('Registros das Despesas Orçamentárias'), row4_3), 12)
             ])
         else:
             row4 = []
@@ -525,8 +545,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         if not self.creating:
             row_form = to_row([
-                (rows_base, 7),
-                (Div(css_class='container-preview'), 5)
+                (rows_base, 8),
+                (Div(css_class='container-preview'), 4)
             ])
 
         super().__init__(*args, **kwargs)
@@ -668,7 +688,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         i_init = self.instance
 
-        if not i_init.pk:
+        created = not i_init.pk
+
+        if created:
             i_init.owner = self.user
             i_init.metadata = {
                 'style': {
@@ -692,6 +714,22 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             i = super().save(commit)
         except Exception as e:
             raise ValidationError('Erro')
+
+        if created:
+            rc = None
+            if i.tipo == EmendaLoa.SAUDE and i.loa.despesa_default_deducao_saude:
+                rc = EmendaLoaRegistroContabil()
+                rc.emendaloa = i
+                rc.despesa = i.loa.despesa_default_deducao_saude
+                rc.valor = i.valor * Decimal('-1.00')
+                rc.save()
+            elif i.tipo == EmendaLoa.DIVERSOS and i.loa.despesa_default_deducao_diversos:
+                rc = EmendaLoaRegistroContabil()
+                rc.emendaloa = i
+                rc.despesa = i.loa.despesa_default_deducao_diversos
+                rc.valor = i.valor * Decimal('-1.00')
+                rc.save()
+
 
         if not self.full_editor:
             if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] not in ('0', 0):

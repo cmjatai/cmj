@@ -22,7 +22,7 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
     RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
 from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
-    Agrupamento, UnidadeOrcamentaria, quantize
+    Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
 from cmj.utils_report import make_pdf
 from sapl import parlamentares
 from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
@@ -557,6 +557,11 @@ class UnidadeOrcamentariaCrud(MasterDetailCrud):
     parent_field = 'loa'
 
 
+class SubFuncaoCrud(MasterDetailCrud):
+    model = SubFuncao
+    parent_field = 'loa'
+
+
 class AgrupamentoCrud(MasterDetailCrud):
     model = Agrupamento
     parent_field = 'loa'
@@ -589,6 +594,11 @@ class AgrupamentoCrud(MasterDetailCrud):
             if self.request.user.has_perm('loa.emendaloa_full_editor'):
                 url = self.resolve_url('delete', args=(self.object.id,))
 
+            return url
+
+        @property
+        def cancel_url(self):
+            url = self.resolve_url('detail', args=(self.kwargs['pk'],))
             return url
 
     class DeleteView(MasterDetailCrud.DeleteView):
@@ -662,11 +672,23 @@ class EmendaLoaCrud(MasterDetailCrud):
             if url or self.request.user.is_anonymous:
                 return url
 
-            if self.request.user.has_perm('loa.emendaloa_full_editor') or \
-                    self.request.user.operadorautor_set.exists():
-                url = self.resolve_url('update', args=(self.object.id,))
+            if not url and self.object.fase >= EmendaLoa.EM_TRAMITACAO:
+                return ''
 
-            return url
+            url_perm = self.resolve_url('update', args=(self.object.id,))
+
+            if self.request.user.has_perm('loa.emendaloa_full_editor') and \
+                EmendaLoa.PROPOSTA < self.object.fase < EmendaLoa.EM_TRAMITACAO:
+                return url_perm
+            elif self.request.user.operadorautor_set.exists() and \
+                EmendaLoa.PROPOSTA <= self.object.fase < EmendaLoa.EM_TRAMITACAO and \
+                    self.object.parlamentares.filter(
+                        id__in=self.request.user.operadorautor_set.values_list(
+                            'autor__object_id', flat=True)
+                    ).exists():
+                return url_perm
+
+            return ''
 
         @property
         def detail_url(self):

@@ -199,6 +199,11 @@
     }
   }
   &.emendaloa-update, &.agrupamento-update {
+    .fieldset-busca-registrocontabil {
+      .col-1 {
+        text-align: center;
+      }
+    }
     .busca-render-emendaloa, .emendaloa-selecteds {
       background-color: #0001;
       min-height: 30vh;
@@ -252,10 +257,10 @@
       background-color: transparent;
     }
     form {
-      $mp: 8px;
+      $mp: 5px;
       .row {
         margin-left: $mp * -1;
-        margin-right: $mp * -1;;
+        margin-right: $mp * -1;
 
         [class^=col] {
           padding-left: $mp;
@@ -264,8 +269,8 @@
       }
       #div_id_busca_despesa {
         background-color: #0001;
-        padding: 3px 10px 10px;
-        margin: 0 0px -7px 0px;
+        padding: 8px 10px 10px;
+        margin: 0px 0px -7px 0px;
         border-radius: 5px;
         line-height: 1.3;
         label {

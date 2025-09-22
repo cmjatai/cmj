@@ -73,14 +73,14 @@
       Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
       para a recepção do valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-      que será {{ object.prefixo_finalidade}} {{ object.finalidade|default:"XXXXXXX" }}.
+      que será {{ object.prefixo_finalidade}} <strong>{{ object.finalidade|default:"XXXXXXX" }}</strong>.
     </p>
   {% else %}
     <p class="ementa">
       Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
       para a recepção do valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-      que será {{ object.prefixo_finalidade}} {{ object.finalidade|default:"XXXXXXX" }}.
+      que será {{ object.prefixo_finalidade}} <strong>{{ object.finalidade|default:"XXXXXXX" }}</strong>.
     </p>
   {% endif %}
 
@@ -112,7 +112,7 @@
           Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
           Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
             - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
-            {{object.prefixo_finalidade}} {{object.finalidade}}.
+            {{object.prefixo_finalidade}} <strong>{{object.finalidade}}</strong>.
     </p>
 
     {% if object.parlamentares.count > 1 and object.tipo %}

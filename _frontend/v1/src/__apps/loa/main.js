@@ -440,7 +440,7 @@ window.AppLOA = function () {
         busca_render.html('')
         return
       }
-      axios.get(`/api/loa/despesaconsulta/search/?page_size=5&ano=${ano_loa}&q=${event.target.value}`)
+      axios.get(`/api/loa/despesaconsulta/search/?page_size=10&ano=${ano_loa}&q=${event.target.value}`)
         .then((response) => {
           busca_render.html('')
           const inner = $('<div class="inner"></div>')
@@ -451,9 +451,9 @@ window.AppLOA = function () {
             $(`<div class="alert alert-warning">
               Nenhuma despesa encontrada nos anexos da LOA com esta informação. Você pode ainda fazer o registro manualmente no formulário acima.
             </div>`).appendTo(inner)
-          } else if (response.data.pagination.total_entries > 5) {
+          } else if (response.data.pagination.total_entries > 10) {
             let msg_rodape = `<div class="alert alert-warning">
-              <em>Mostrando 5 primeiros resultados de ${response.data.pagination.total_entries}.<br>Informe mais termos no campo de busca para reduzir os resultados.</em>
+              <em>Mostrando 10 primeiros resultados de ${response.data.pagination.total_entries}.<br>Informe mais termos no campo de busca para reduzir os resultados.</em>
             </div>`
             $(msg_rodape).appendTo(inner)
           }

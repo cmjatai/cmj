@@ -1,3 +1,4 @@
+from django.db import IntegrityError
 from _collections import OrderedDict
 from decimal import Decimal
 import logging
@@ -1083,7 +1084,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
 
         if not Funcao.objects.filter(codigo=codigo['funcao'], loa_id=loa_id).exists():
             raise DRFValidationError(
-                'Função não encontrada na base de funções.'
+                'Função não encontrada na base de funções. Só podem ser criados novos Programas, Ações e Naturezas.'
             )
 
         if not SubFuncao.objects.filter(
@@ -1091,7 +1092,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
                 loa_id=loa_id
         ).exists():
             raise DRFValidationError(
-                'SubFunção não encontrada na base de subfunções.'
+                'SubFunção não encontrada na base de subfunções. Só podem ser criados novos Programas, Ações e Naturezas.'
             )
 
         if not Fonte.objects.filter(
@@ -1099,7 +1100,7 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
                 loa_id=loa_id
         ).exists():
             raise DRFValidationError(
-                'Fonte não encontrada na base de fontes.'
+                'Fonte não encontrada na base de fontes. Só podem ser criados novos Programas, Ações e Naturezas.'
             )
 
         return attrs
@@ -1189,6 +1190,8 @@ class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
             ddict = d.__dict__
             ddict.pop('id')
             ddict.pop('_state')
+            ddict.pop('valor_materia')
+            ddict.pop('valor_norma')
             despesa, created = Despesa.objects.get_or_create(**ddict)
 
         validated_data = {
@@ -1238,6 +1241,12 @@ class _EmendaLoaRegistroContabilViewSet:
             raise DRFValidationError(
                 'Já Existe uma Despesa Orçamentária cadastrada com os dados acima. '
                 'Faça uma busca com o código informado.')
+
+        except IntegrityError as exc:
+            if 'unique constraint' in str(exc).lower():
+                raise DRFValidationError(
+                    'Já existe Registro desta Despesa nesta Emenda.')
+            raise DRFValidationError(str(exc))
 
         except Exception as exc:
             raise DRFValidationError('\n'.join(exc.messages))
@@ -1378,7 +1387,7 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
 
         if not Funcao.objects.filter(codigo=codigo['funcao'], loa_id=loa_id).exists():
             raise DRFValidationError(
-                'Função não encontrada na base de funções.'
+                'Função não encontrada na base de funções. Só podem ser criados novos Programas, Ações e Naturezas.'
             )
 
         if not SubFuncao.objects.filter(
@@ -1386,7 +1395,7 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
                 loa_id=loa_id
         ).exists():
             raise DRFValidationError(
-                'SubFunção não encontrada na base de subfunções.'
+                'SubFunção não encontrada na base de subfunções. Só podem ser criados novos Programas, Ações e Naturezas.'
             )
 
         if not Fonte.objects.filter(
@@ -1394,7 +1403,7 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
                 loa_id=loa_id
         ).exists():
             raise DRFValidationError(
-                'Fonte não encontrada na base de fontes.'
+                'Fonte não encontrada na base de fontes. Só podem ser criados novos Programas, Ações e Naturezas.'
             )
 
         return attrs
@@ -1484,6 +1493,8 @@ class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
             ddict = d.__dict__
             ddict.pop('id')
             ddict.pop('_state')
+            ddict.pop('valor_materia', None)
+            ddict.pop('valor_norma', None)
             despesa, created = Despesa.objects.get_or_create(**ddict)
 
         validated_data = {
@@ -1533,6 +1544,12 @@ class _AgrupamentoRegistroContabilViewSet:
             raise DRFValidationError(
                 'Já Existe uma Despesa Orçamentária cadastrada com os dados acima. '
                 'Faça uma busca com o código informado.')
+
+        except IntegrityError as ierr:
+            if 'unique constraint' in str(ierr).lower():
+                raise DRFValidationError(
+                    'Já existe Registro desta Despesa neste Agrupamento.')
+            raise DRFValidationError(str(ierr))
 
         except Exception as exc:
             raise DRFValidationError('\n'.join(exc.messages))

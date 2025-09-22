@@ -3,6 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from io import StringIO
 import csv
+from math import e
 
 from bs4 import BeautifulSoup as bs
 from django.conf.locale import ro
@@ -107,6 +108,20 @@ class Loa(models.Model):
         default=False, verbose_name=_('Publicado?'))
 
     #descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
+
+    despesa_default_deducao_saude = models.ForeignKey(
+        'Despesa',
+        blank=True, null=True, default=None,
+        verbose_name=_('Despesa Default Dedução Saúde'),
+        related_name='loa_despesa_default_deducao_saude',
+        on_delete=PROTECT)
+    despesa_default_deducao_diversos = models.ForeignKey(
+        'Despesa',
+        blank=True, null=True, default=None,
+        verbose_name=_('Despesa Default Dedução Diversos'),
+        related_name='loa_despesa_default_deducao_diversos',
+        on_delete=PROTECT)
+
 
     class Meta:
         verbose_name = _('LOA')
@@ -703,6 +718,9 @@ class Funcao(ElementoBase):
         verbose_name_plural = _('Funções')
         ordering = ['codigo']
 
+    def __str__(self):
+        return f'{self.codigo} - {self.especificacao} ({self.loa.ano})'
+
 
 class SubFuncao(ElementoBase):
 
@@ -967,6 +985,14 @@ class EmendaLoaRegistroContabil(models.Model):
         str_valor = formats.number_format(self.valor, force_grouping=True)
         str_valor = ' ' * (self._meta.get_field('valor').max_digits - len(str_valor)) + str_valor
         return str_valor
+
+    def delete(self, *args, **kwargs):
+        from cmj.loa.models import AgrupamentoEmendaLoa
+        # ao apagar uma EmendaLoaRegistroContabil, a emenda deve ser retirada de todo Agrupamento que a contenha
+        AgrupamentoEmendaLoa.objects.filter(
+            emendaloa=self.emendaloa).delete()
+        return super().delete(*args, **kwargs)
+
 
     class Meta:
         verbose_name = _('Registro Contábil de Dedução e Inserção em Emendas')

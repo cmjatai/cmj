@@ -3,7 +3,7 @@ Loa:
   {% trans 'Dados Gerais' %}:
   - ano:2 receita_corrente_liquida:3 tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
   - publicado perc_disp_total perc_disp_saude perc_disp_diversos
-  - parlamentares
+  - parlamentares despesa_default_deducao_saude despesa_default_deducao_diversos
   - yaml_obs
 LoaDetail:
   {% trans 'Resumo Geral das Emendas Impositivas' %}:
@@ -18,6 +18,13 @@ UnidadeOrcamentaria:
   {% trans 'Dados Gerais' %}:
   - codigo:4 especificacao:8
   - orgao:7 recebe_emenda_impositiva
+
+SubFuncao:
+  {% trans 'Dados Gerais' %}:
+  - codigo:4 especificacao:8
+  - funcao:7
+  {% trans 'Despesas' %}:
+  - despesa_set
 
 EmendaLoa:
   {% trans 'Dados Gerais' %}:
@@ -41,12 +48,13 @@ EmendaLoaDetail:
       - materia|fk_urlize_for_detail
       - indicacao
       - finalidade
-      - registrocontabil_set
       col-md-4:
       - valor
       - valor_computado
       - parlamentares
       - owner
+      col-md-12:
+      - registrocontabil_set
   col-12 2:
     {% trans 'Documentos da Emenda Impositiva' %}:
       col-md-12:
@@ -84,7 +92,7 @@ Agrupamento:
   {% trans 'Agrupamento' %}:
   - nome
   - emendas
-  - despesas
+  - agrupamentoregistrocontabil_set
 
 
 
