@@ -379,6 +379,15 @@ window.AppLOA = function () {
     const busca_despesa = form.find('input[name="busca_despesa"]')
 
     const add_registro = form.find('#add_registro')
+
+    const clean_form_search = form.find('#clean_form_search')
+    clean_form_search.click((event) => {
+      add_registro[0].data = null
+      form.find('input[name^="despesa_"], input[name$="_despesa"]')
+        .val('')
+        .attr('readonly', false)
+        .removeClass('is-invalid')
+    })
     add_registro.click((event) => {
       let pk_despesa = add_registro[0].data
       console.log(pk_despesa)
@@ -646,6 +655,15 @@ window.AppLOA = function () {
     const busca_despesa = form.find('input[name="busca_despesa"]')
 
     const add_registro = form.find('#add_registro')
+
+    const clean_form_search = form.find('#clean_form_search')
+    clean_form_search.click((event) => {
+      add_registro[0].data = null
+      form.find('input[name^="despesa_"], input[name$="_despesa"]')
+        .val('')
+        .attr('readonly', false)
+        .removeClass('is-invalid')
+    })
     add_registro.click((event) => {
       let pk_despesa = add_registro[0].data
       console.log(pk_despesa)

@@ -92,7 +92,6 @@ Agrupamento:
   {% trans 'Agrupamento' %}:
   - nome
   - emendas
-  - agrupamentoregistrocontabil_set
 
 
 

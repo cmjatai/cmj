@@ -33,15 +33,27 @@
 
   {% define object.totais_contabeis as otc %}
 
-  {% if object.tipo and object.fase < object.LIBERACAO_CONTABIL %}
-    <section class="{% if otc.divergencia_emenda == 0 %}blue{%else%}red{% endif %}">
-      EM EDIÇÃO
-    </section>
-  {% elif object.tipo and otc.divergencia_emenda != 0 %}
-    <section class="red">
-      DIVERGÊNCIA DE VALORES
-    </section>
+  {% if object.tipo %}
+    {% if object.fase < object.LIBERACAO_CONTABIL %}
+      {% if otc.divergencia_registros == 0 and otc.divergencia_emenda == 0  %}
+        <section class="blue">
+          EM EDIÇÃO
+        </section>
+      {% else %}
+        <section class="red">
+          EM EDIÇÃO
+        </section>
+      {% endif %}
+    {% else %}
+      {% if otc.divergencia_registros == 0 and otc.divergencia_emenda == 0  %}
+      {% else %}
+        <section class="red">
+          DIVERGÊNCIA DE VALORES
+        </section>
+      {% endif %}
+    {% endif %}
   {% endif %}
+
 
   <h3>EMENDA {% if object.tipo %}IMPOSITIVA{% else %}MODIFICATIVA{% endif %}, de
   {% if object.materia %}

@@ -491,6 +491,14 @@ class CertidaoPublicacaoCrud(Crud):
 
     class ListView(Crud.ListView):
 
+        paginate_by = 100
+        ordering = ('-created__year', '-certificado', '-id')
+
+        def get_paginate_by(self, queryset):
+            if self.request.user.is_superuser:
+                return 10
+            return super().get_paginate_by(queryset)
+
         def get_context_data(self, **kwargs):
             ctx = super().get_context_data(**kwargs)
             #ctx['fluid'] = '-fluid'
@@ -498,8 +506,6 @@ class CertidaoPublicacaoCrud(Crud):
 
         def has_permission(self):
             return True
-
-        paginate_by = 100
 
         def split_bylen(self, item, maxlen):
             return [item[ind:ind + maxlen] for ind in range(0, len(item), maxlen)]

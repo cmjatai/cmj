@@ -301,10 +301,15 @@ class AgrupamentoForm(ModelForm):
         row4_2 = to_row([
             ('perc_despesa', 2),
             ('despesa_codigo', 3),
-            ('despesa_especificacao', 'col'),
-            (HTML('''
-                <button type="button" id="add_registro" class="btn btn-primary">+</button>
-            '''), 'col-1'),
+            ('despesa_especificacao', 'col-4'),
+            (Div(HTML('''
+                <button type="button" id="clean_form_search" class="btn btn-secondary" title="Limpar Formulário de Busca">
+                    <i class="fas fa-backspace"></i>
+                </button>
+                <button type="button" id="add_registro" class="btn btn-primary" title="Adicionar Registro Contábil">
+                    <i class="fas fa-plus-circle"></i>
+                </button>
+            '''), css_class="btn-group btn-group"), 'col-2'),
 
             (Div(css_class='busca-render'), 12)
 
@@ -509,10 +514,15 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
                 ('valor_despesa', 3),
                 ('despesa_codigo', 3),
-                ('despesa_especificacao', 'col'),
-                (HTML('''
-                    <button type="button" id="add_registro" class="btn btn-primary">+</button>
-                '''), 'col-1'),
+                ('despesa_especificacao', 'col-4'),
+                (Div(HTML('''
+                    <button type="button" id="clean_form_search" class="btn btn-secondary" title="Limpar Formulário de Busca">
+                        <i class="fas fa-backspace"></i>
+                    </button>
+                    <button type="button" id="add_registro" class="btn btn-primary" title="Adicionar Registro Contábil">
+                        <i class="fas fa-plus-circle"></i>
+                    </button>
+                '''), css_class="btn-group btn-group"), 'col-2'),
 
                 (Div(css_class='busca-render'), 12)
 

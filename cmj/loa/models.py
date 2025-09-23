@@ -17,7 +17,7 @@ from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import texto_upload_path, get_settings_auth_user_model
+from cmj.utils import run_sql, texto_upload_path, get_settings_auth_user_model
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.utils import PortalFileField, OverwriteStorage
@@ -987,10 +987,10 @@ class EmendaLoaRegistroContabil(models.Model):
         return str_valor
 
     def delete(self, *args, **kwargs):
-        from cmj.loa.models import AgrupamentoEmendaLoa
-        # ao apagar uma EmendaLoaRegistroContabil, a emenda deve ser retirada de todo Agrupamento que a contenha
-        AgrupamentoEmendaLoa.objects.filter(
-            emendaloa=self.emendaloa).delete()
+        # remove emenda de agrupamento que possa pertercer sem causar recursividade do agrupamentoemendaloa_pre_delete
+        run_sql(f'DELETE FROM loa_agrupamentoemendaloa WHERE emendaloa_id = {self.emendaloa.id}')
+        # run_sql acima substitui: AgrupamentoEmendaLoa.objects.filter(emendaloa=self.emendaloa).delete()
+
         return super().delete(*args, **kwargs)
 
 
