@@ -1,7 +1,7 @@
 from django.urls.conf import re_path, include
 
 from cmj.loa.dashboards import LoaDashboardView
-from cmj.loa.views import LoaCrud, EmendaLoaCrud, OficioAjusteLoaCrud,\
+from cmj.loa.views import EntidadeCrud, LoaCrud, EmendaLoaCrud, OficioAjusteLoaCrud,\
     RegistroAjusteLoaCrud, AgrupamentoCrud, SubFuncaoCrud, UnidadeOrcamentariaCrud
 
 from .apps import AppConfig
@@ -27,4 +27,6 @@ urlpatterns = [
     re_path(r'^loa/dash', LoaDashboardView.as_view(),
         name='loa_dashboard'),
 
+    re_path(r'^sistema/entidade',
+        include(EntidadeCrud.get_urls())),
 ]

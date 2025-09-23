@@ -20,12 +20,12 @@ from django_filters.views import FilterView
 from cmj.core.models import AuditLog
 from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
     RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
-from cmj.loa.models import Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
+from cmj.loa.models import Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
 from cmj.utils_report import make_pdf
 from sapl import parlamentares
-from sapl.crud.base import Crud, MasterDetailCrud, RP_DETAIL, RP_LIST
+from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Legislatura, Parlamentar
 
 
@@ -1613,3 +1613,9 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
             return reverse_lazy(
                 'cmj.loa:oficioajusteloa_detail',
                 kwargs={'pk': self.object.oficio_ajuste_loa.id})
+
+
+class EntidadeCrud(CrudAux):
+    model = Entidade
+    public = [RP_LIST, RP_DETAIL]
+    frontend = Entidade._meta.app_label

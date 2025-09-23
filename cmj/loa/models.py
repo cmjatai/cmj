@@ -4,6 +4,8 @@ from decimal import Decimal
 from io import StringIO
 import csv
 from math import e
+from pyexpat import model
+from django.core.validators import RegexValidator
 
 from bs4 import BeautifulSoup as bs
 from django.conf.locale import ro
@@ -17,7 +19,7 @@ from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import run_sql, texto_upload_path, get_settings_auth_user_model
+from cmj.utils import UF, run_sql, texto_upload_path, get_settings_auth_user_model
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.utils import PortalFileField, OverwriteStorage
@@ -1604,3 +1606,129 @@ class ScrapRecord(models.Model):
         dp.save()
 
         return dp
+
+class Entidade(models.Model):
+    """ Entidades públicas ou privadas que recebem recursos de emendas impositivas/modificativas.
+
+    fields:
+        - nome: Nome da entidade. obrigatório.
+        - nome empresarial: Nome empresarial da entidade. obrigatório.
+        - cnpj: CNPJ da entidade. opcional.
+        - cnes: CNES da entidade. opcional.
+        - natureza juridica:
+            - Administração Pública
+            - Entidades empresariais
+            - Entidades sem fins lucrativos
+            - Outras
+        - logradouro: Logradouro da entidade. opcional.
+        - numero: Número do logradouro. opcional.
+        - complemento: Complemento do logradouro. opcional.
+        - bairro: Bairro da entidade. opcional.
+        - cidade: Cidade da entidade. opcional, default jataí.
+        - estado: Estado da entidade. opcional, usar choice cmj.utils.UF.
+        - cep: CEP da entidade. opcional.
+        - telefone: Telefone da entidade. opcional.
+        - email: Email da entidade. opcional.
+    """
+
+    ADMINISTRACAO_PUBLICA = 10
+    ENTIDADES_EMPRESARIAIS = 20
+    ENTIDADES_SEM_FINS_LUCRO = 30
+    OUTRAS = 99
+
+    NATUREZA_JURIDICA_CHOICE = (
+        (ADMINISTRACAO_PUBLICA, _('Administração Pública')),
+        (ENTIDADES_EMPRESARIAIS, _('Entidades empresariais')),
+        (ENTIDADES_SEM_FINS_LUCRO, _('Entidades sem fins lucrativos')),
+        (OUTRAS, _('Outras')),
+    )
+
+    nome = models.CharField(
+        max_length=256,
+        verbose_name=_("Nome"),
+    )
+
+    nome_empresarial = models.CharField(
+        max_length=256,
+        verbose_name=_("Nome Empresarial"),
+    )
+
+    cnpj = models.CharField(
+        max_length=18,
+        blank=True, null=True, default=None,
+        verbose_name=_("CNPJ"),
+        #validators=[CNPJValidator()],
+    )
+
+    cnes = models.CharField(
+        max_length=7,
+        blank=True, null=True, default=None,
+        verbose_name=_("CNES"),
+        validators=[RegexValidator(r'^\d{7}$', _('CNES inválido'))],
+    )
+
+    natureza_juridica = models.PositiveSmallIntegerField(
+        choices=NATUREZA_JURIDICA_CHOICE,
+        default=99,
+        verbose_name=_('Natureza Jurídica'),
+    )
+
+    logradouro = models.CharField(
+        max_length=256,
+        blank=True, null=True, default=None,
+        verbose_name=_("Logradouro"),
+    )
+
+    numero = models.CharField(
+        max_length=20,
+        blank=True, null=True, default=None,
+        verbose_name=_("Número"),
+    )
+
+    complemento = models.CharField(
+        max_length=256,
+        blank=True, null=True, default=None,
+        verbose_name=_("Complemento"),
+    )
+
+    bairro = models.CharField(
+        max_length=128,
+        blank=True, null=True, default=None,
+        verbose_name=_("Bairro"),
+    )
+
+    cidade = models.CharField(
+        max_length=128,
+        blank=True, null=True, default='Jataí',
+        verbose_name=_("Cidade"),
+    )
+
+    estado = models.CharField(
+        max_length=2,
+        choices=UF,
+        blank=True, null=True, default='GO',
+        verbose_name=_("Estado"),
+    )
+    cep = models.CharField(
+        max_length=9,
+        blank=True, null=True, default=None,
+        verbose_name=_("CEP"),
+        validators=[RegexValidator(r'^\d{5}-\d{3}$', _('CEP inválido'))],
+    )
+    telefone = models.CharField(
+        max_length=20,
+        blank=True, null=True, default=None,
+        verbose_name=_("Telefone"),
+    )
+    email = models.EmailField(
+        max_length=256,
+        blank=True, null=True, default=None,
+        verbose_name=_("Email"),
+    )
+    class Meta:
+        verbose_name = _('Entidade')
+        verbose_name_plural = _('Entidades')
+        ordering = ['nome']
+
+    def __str__(self):
+        return self.nome

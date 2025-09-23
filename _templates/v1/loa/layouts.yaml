@@ -93,6 +93,11 @@ Agrupamento:
   - nome
   - emendas
 
+Entidade:
+  {% trans 'Dados Gerais' %}:
+  - nome cnes:2 cnpj:3
+  - nome_empresarial natureza_juridica:5
+
 
 
 {% comment %}

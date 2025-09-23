@@ -35,7 +35,7 @@ from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_LOA_OPERADOR,
                              GROUP_SAAP_WORKSPACE_OPER_RECEPCAO, menu_recepcao,
                              GROUP_DRAFT_OPERADOR, GROUP_ARQ_OPERADOR)
-from cmj.loa.models import Loa, LoaParlamentar, EmendaLoa, EmendaLoaParlamentar,\
+from cmj.loa.models import Entidade, Loa, LoaParlamentar, EmendaLoa, EmendaLoaParlamentar,\
     OficioAjusteLoa, RegistroAjusteLoa, DespesaConsulta, Orgao,\
     UnidadeOrcamentaria, EmendaLoaRegistroContabil, Funcao, SubFuncao, Programa,\
     Acao, Natureza, Agrupamento, AgrupamentoEmendaLoa,\
@@ -203,6 +203,8 @@ rules_loa_group_operador = {
         (EmendaLoaParlamentar, __base__, __perms_publicas__),
         (OficioAjusteLoa, __base__, __perms_publicas__),
         (RegistroAjusteLoa, __base__, __perms_publicas__),
+
+        (Entidade, __base__, __perms_publicas__),
 
         (DespesaConsulta, __base__, __perms_publicas__),
 

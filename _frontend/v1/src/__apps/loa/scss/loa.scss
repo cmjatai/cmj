@@ -370,6 +370,13 @@
     }
   }
   &.emendaloa-detail {
+    #div_id_valor {
+      .form-control-static {
+        font-size: 130%;
+        text-align: center;
+        font-weight: bold;
+      }
+    }
     #div_id_registrocontabil_set {
       ul {
         font-family: 'Courier New', Courier, monospace;
