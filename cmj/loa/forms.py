@@ -121,6 +121,7 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             'yaml_obs',
             'despesa_default_deducao_saude',
             'despesa_default_deducao_diversos',
+            'despesa_default_deducao_educacao'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -132,20 +133,23 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             parlamentares = Parlamentar.objects.filter(ativo=True)
             despesa_default_deducao_saude = Despesa.objects.none()
             despesa_default_deducao_diversos = Despesa.objects.none()
+            despesa_default_deducao_educacao = Despesa.objects.none()
         else:
             ano_materia = instance.materia.ano
             parlamentares = Parlamentar.objects.filter(
                 Q(ativo=True) | Q(emendaloaparlamentar_set__emendaloa__materia__ano=ano_materia)
             ).distinct()
 
-            despesa_default_deducao_saude = Despesa.objects.filter(loa=instance, funcao__codigo='99')
-            despesa_default_deducao_diversos = Despesa.objects.filter(loa=instance, funcao__codigo='99')
+            despesa_default_deducao_diversos = Despesa.objects.filter(loa=instance, funcao__codigo='99', fonte__codigo__in=['100',]).order_by('fonte__codigo')
+            despesa_default_deducao_educacao = Despesa.objects.filter(loa=instance, funcao__codigo='99', fonte__codigo__in=['101',]).order_by('fonte__codigo')
+            despesa_default_deducao_saude = Despesa.objects.filter(loa=instance, funcao__codigo='99', fonte__codigo__in=['102',]).order_by('fonte__codigo')
 
         self.fields['parlamentares'].choices = [
             (p.pk, p) for p in parlamentares
         ]
-        self.fields['despesa_default_deducao_saude'].queryset = despesa_default_deducao_saude
         self.fields['despesa_default_deducao_diversos'].queryset = despesa_default_deducao_diversos
+        self.fields['despesa_default_deducao_educacao'].queryset = despesa_default_deducao_educacao
+        self.fields['despesa_default_deducao_saude'].queryset = despesa_default_deducao_saude
 
 
 
@@ -227,9 +231,9 @@ class EmendaLoaValorWidget(SplitArrayWidget):
             if self.user and not self.user.has_perms(
                     ('loa.add_emendaloa', 'loa.change_emendaloa')):
 
-                if self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
-                    w['attrs']['readonly'] = 'readonly'
-                    continue
+                #if self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
+                #    w['attrs']['readonly'] = 'readonly'
+                #    continue
 
                 if self.user == self.instance.owner:
                     continue
@@ -764,13 +768,19 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 rc.despesa = i.loa.despesa_default_deducao_saude
                 rc.valor = i.valor * Decimal('-1.00')
                 rc.save()
-            elif i.tipo == EmendaLoa.DIVERSOS and i.loa.despesa_default_deducao_diversos:
-                rc = EmendaLoaRegistroContabil()
-                rc.emendaloa = i
-                rc.despesa = i.loa.despesa_default_deducao_diversos
-                rc.valor = i.valor * Decimal('-1.00')
-                rc.save()
-
+            elif i.tipo == EmendaLoa.DIVERSOS:
+                if i.loa.despesa_default_deducao_diversos and i.unidade.area != UnidadeOrcamentaria.EDUCACAO_CHOICE:
+                    rc = EmendaLoaRegistroContabil()
+                    rc.emendaloa = i
+                    rc.despesa = i.loa.despesa_default_deducao_diversos
+                    rc.valor = i.valor * Decimal('-1.00')
+                    rc.save()
+                elif i.loa.despesa_default_deducao_educacao and i.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE:
+                    rc = EmendaLoaRegistroContabil()
+                    rc.emendaloa = i
+                    rc.despesa = i.loa.despesa_default_deducao_educacao
+                    rc.valor = i.valor * Decimal('-1.00')
+                    rc.save()
 
         if not self.full_editor:
             if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] not in ('0', 0):

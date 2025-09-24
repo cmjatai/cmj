@@ -119,11 +119,19 @@ class Loa(models.Model):
         verbose_name=_('Despesa Default Dedução Saúde'),
         related_name='loa_despesa_default_deducao_saude',
         on_delete=PROTECT)
+
     despesa_default_deducao_diversos = models.ForeignKey(
         'Despesa',
         blank=True, null=True, default=None,
         verbose_name=_('Despesa Default Dedução Diversos'),
         related_name='loa_despesa_default_deducao_diversos',
+        on_delete=PROTECT)
+
+    despesa_default_deducao_educacao = models.ForeignKey(
+        'Despesa',
+        blank=True, null=True, default=None,
+        verbose_name=_('Despesa Default Dedução Educação'),
+        related_name='loa_despesa_default_deducao_educacao',
         on_delete=PROTECT)
 
 
@@ -449,8 +457,43 @@ class EmendaLoa(models.Model):
     def atualiza_valor(self):
         if self.tipo:
             soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
+            valor_old = self.valor
             self.valor = soma_dict['valor__sum'] or Decimal('0.00')
             self.save()
+
+            registros = self.registrocontabil_set.all().order_by('valor')
+            if hasattr(self, 'agrupamentoemendaloa'):
+                registros.delete()
+                self.agrupamentoemendaloa.save()
+            else:
+                if registros.exists():
+                    soma_registros_old = registros.aggregate(Sum('valor'))
+                    soma_registros = Decimal('0.00')
+                    for r in registros:
+                        r.valor = quantize(r.valor * self.valor / valor_old, rounding=ROUND_HALF_DOWN) if valor_old else Decimal('0.00')
+                        soma_registros = soma_registros + r.valor
+                        r.save()
+                    divergencia = soma_registros_old.get('valor_sum', Decimal('0.00')) - soma_registros
+                    if divergencia:
+                        r = registros.last()
+                        r.valor = r.valor + divergencia
+                        r.save()
+                else:
+                    # criar um registro contabil com o valor da emenda com base no tipo da unidade orcamentaria
+                    if self.loa.despesa_default_deducao_diversos or self.loa.despesa_default_deducao_educacao or self.loa.despesa_default_deducao_saude:
+                        if self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
+                            despesa = self.loa.despesa_default_deducao_saude
+                        elif self.unidade and self.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE:
+                            despesa = self.loa.despesa_default_deducao_educacao
+                        else:
+                            despesa = self.loa.despesa_default_deducao_diversos
+
+                        if despesa:
+                            rc = EmendaLoaRegistroContabil()
+                            rc.emendaloa = self
+                            rc.despesa = despesa
+                            rc.valor = self.valor * (-1)
+                            rc.save()
         else:
             qspa = self.emendaloaparlamentar_set.all()
             valores = [quantize(self.valor / qspa.count())] * qspa.count()
@@ -741,6 +784,30 @@ class UnidadeOrcamentaria(ElementoBase):
         default=False,
         verbose_name=_('Recebe Verbas Emenda Impositiva'),
     )
+
+    SAUDE_CHOICE = 10
+    EDUCACAO_CHOICE = 20
+    ASSISTENCIA_SOCIAL_CHOICE = 30
+    SEGURANCA_PUBLICA_CHOICE = 40
+    CULTURA_CHOICE = 50
+    ESPORTE_CHOICE = 60
+    OUTROS_CHOICE = 70
+
+    area = models.PositiveSmallIntegerField(
+        choices=(
+            (SAUDE_CHOICE, _('Saúde')),
+            (EDUCACAO_CHOICE, _('Educação')),
+            (ASSISTENCIA_SOCIAL_CHOICE, _('Assistência Social')),
+            (SEGURANCA_PUBLICA_CHOICE, _('Segurança Pública')),
+            (CULTURA_CHOICE, _('Cultura')),
+            (ESPORTE_CHOICE, _('Esporte')),
+            (OUTROS_CHOICE, _('Outros')),
+        ),
+        default=OUTROS_CHOICE,
+        verbose_name=_('Tipo Geral'),
+    )
+
+
 
     class Meta:
         verbose_name = _('Unidade Orçamentária')
@@ -1677,19 +1744,27 @@ class TipoEntidade(models.Model):
         verbose_name=_("Descrição"),
     )
 
+    SAUDE_CHOICE = 10
+    EDUCACAO_CHOICE = 20
+    ASSISTENCIA_SOCIAL_CHOICE = 30
+    SEGURANCA_PUBLICA_CHOICE = 40
+    CULTURA_CHOICE = 50
+    ESPORTE_CHOICE = 60
+    OUTROS_CHOICE = 70
+
     #tipo_geral é uma classificação mais ampla que agrupa vários tipos de entidade
     # será um choice com valores fixos definidos no código sendo: saúde, educação, assistência social, segurança pública, cultura, esporte, outros. criando através de números
     tipo_geral = models.PositiveSmallIntegerField(
         choices=(
-            (10, _('Saúde')),
-            (20, _('Educação')),
-            (30, _('Assistência Social')),
-            (40, _('Segurança Pública')),
-            (50, _('Cultura')),
-            (60, _('Esporte')),
-            (70, _('Outros')),
+            (SAUDE_CHOICE, _('Saúde')),
+            (EDUCACAO_CHOICE, _('Educação')),
+            (ASSISTENCIA_SOCIAL_CHOICE, _('Assistência Social')),
+            (SEGURANCA_PUBLICA_CHOICE, _('Segurança Pública')),
+            (CULTURA_CHOICE, _('Cultura')),
+            (ESPORTE_CHOICE, _('Esporte')),
+            (OUTROS_CHOICE, _('Outros')),
         ),
-        default=70,
+        default=OUTROS_CHOICE,
         verbose_name=_('Tipo Geral'),
     )
 
@@ -1762,4 +1837,4 @@ class Entidade(models.Model):
         )
 
     def __str__(self):
-        return f'{self.nome_fantasia} - {self.tipo_entidade.descricao} -  {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'
+        return f'{self.nome_fantasia} - {self.tipo_entidade.descricao if self.tipo_entidade else ""} {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'

@@ -720,7 +720,7 @@ class _EmendaLoaViewSet:
                         participa = el.emendaloaparlamentar_set.filter(
                             parlamentar=parlamentar).exists()
 
-                        if el.fase > EmendaLoa.PROPOSTA_LIBERADA:
+                        if el.fase > EmendaLoa.PROPOSTA_LIBERADA and el.fase != EmendaLoa.LIBERACAO_CONTABIL:
                             fase = False
 
                 return (

@@ -304,7 +304,7 @@ window.AppLOA = function () {
     }
     createRegistroRender()
 
-    const refreshChangeRegistroDespesa = function () {
+    const refreshChangeRegistroDespesa = function (clear_render_list = false) {
       const inner = rcs.find('.inner')
       const footer = rcs.find('.footer')
       axios.get(`/api/loa/emendaloa/${pk}/totais/`)
@@ -336,6 +336,9 @@ window.AppLOA = function () {
         })
       axios.get(`/api/loa/emendaloaregistrocontabil/?emendaloa=${pk}&get_all=true`)
         .then((response) => {
+          if (clear_render_list) {
+            inner.html('')
+          }
           _.each(response.data, (value, idx) => {
             if (inner.find(`.item-rc[pk="${value.id}"]`).length > 0) {
               return
@@ -578,7 +581,7 @@ window.AppLOA = function () {
             window.location.reload()
           }
 
-          refreshChangeRegistroDespesa()
+          refreshChangeRegistroDespesa(true)
 
           preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
         })

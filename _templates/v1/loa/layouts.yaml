@@ -3,7 +3,8 @@ Loa:
   {% trans 'Dados Gerais' %}:
   - ano:2 receita_corrente_liquida:3 tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
   - publicado perc_disp_total perc_disp_saude perc_disp_diversos
-  - parlamentares despesa_default_deducao_saude despesa_default_deducao_diversos
+  - despesa_default_deducao_diversos despesa_default_deducao_educacao despesa_default_deducao_saude
+  - parlamentares
   - yaml_obs
 LoaDetail:
   {% trans 'Resumo Geral das Emendas Impositivas' %}:
@@ -16,7 +17,7 @@ LoaDetailATE2022:
 
 UnidadeOrcamentaria:
   {% trans 'Dados Gerais' %}:
-  - codigo:4 especificacao:8
+  - codigo:3 especificacao:6 area:3
   - orgao:7 recebe_emenda_impositiva
 
 SubFuncao:
