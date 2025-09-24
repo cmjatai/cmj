@@ -1,10 +1,12 @@
 from _decimal import ROUND_HALF_DOWN, ROUND_DOWN
 from datetime import datetime
 from decimal import Decimal
+from enum import unique
 from io import StringIO
 import csv
 from math import e
 from pyexpat import model
+import re
 from django.core.validators import RegexValidator
 
 from bs4 import BeautifulSoup as bs
@@ -14,7 +16,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction
 from django.db.models import manager
 from django.db.models.aggregates import Sum
-from django.db.models.deletion import PROTECT, CASCADE
+from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -281,7 +283,6 @@ class LoaParlamentar(models.Model):
         verbose_name_plural = _('Valores dos Parlamentares')
         ordering = ['id']
 
-
 class EmendaLoa(models.Model):
 
     SAUDE = 10
@@ -327,6 +328,13 @@ class EmendaLoa(models.Model):
     indicacao = models.TextField(
         verbose_name=_('Indicação'),
         blank=True, null=True, default=None)
+
+    entidade = models.ForeignKey(
+        'Entidade',
+        verbose_name=_('Entidade'),
+        related_name='emendaloa_set',
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
 
     unidade = models.ForeignKey(
         'UnidadeOrcamentaria',
@@ -393,7 +401,34 @@ class EmendaLoa(models.Model):
 
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
-        return f'R$ {valor_str} - {self.finalidade}'
+        return f'R$ {valor_str} - {self.finalidade_format}'
+
+    @property
+    def finalidade_format(self):
+        finalidade = self.finalidade
+        chaves = re.findall(r'\{(.*?)\}', finalidade)
+
+        for chave in chaves:
+            if '__' in chave:
+                partes = chave.split('__')
+                obj = self
+                for parte in partes:
+                    if hasattr(obj, parte):
+                        obj = getattr(obj, parte)
+                    else:
+                        obj = None
+                        break
+                valor = str(obj) if obj else ''
+            elif hasattr(self, chave):
+                valor = getattr(self, chave)
+                if isinstance(valor, models.Model):
+                    valor = str(valor)
+            finalidade = finalidade.replace(f'{{{chave}}}', str(valor))
+
+        finalidade = finalidade.format(
+            entidade=self.entidade,
+        )
+        return finalidade
 
     @property
     def str_valor(self):
@@ -1607,53 +1642,80 @@ class ScrapRecord(models.Model):
 
         return dp
 
-class Entidade(models.Model):
-    """ Entidades públicas ou privadas que recebem recursos de emendas impositivas/modificativas.
 
-    fields:
-        - nome: Nome da entidade. obrigatório.
-        - nome empresarial: Nome empresarial da entidade. obrigatório.
-        - cnpj: CNPJ da entidade. opcional.
-        - cnes: CNES da entidade. opcional.
-        - natureza juridica:
-            - Administração Pública
-            - Entidades empresariais
-            - Entidades sem fins lucrativos
-            - Outras
-        - logradouro: Logradouro da entidade. opcional.
-        - numero: Número do logradouro. opcional.
-        - complemento: Complemento do logradouro. opcional.
-        - bairro: Bairro da entidade. opcional.
-        - cidade: Cidade da entidade. opcional, default jataí.
-        - estado: Estado da entidade. opcional, usar choice cmj.utils.UF.
-        - cep: CEP da entidade. opcional.
-        - telefone: Telefone da entidade. opcional.
-        - email: Email da entidade. opcional.
-    """
+class NaturezaJuridica(models.Model):
 
-    ADMINISTRACAO_PUBLICA = 10
-    ENTIDADES_EMPRESARIAIS = 20
-    ENTIDADES_SEM_FINS_LUCRO = 30
-    OUTRAS = 99
-
-    NATUREZA_JURIDICA_CHOICE = (
-        (ADMINISTRACAO_PUBLICA, _('Administração Pública')),
-        (ENTIDADES_EMPRESARIAIS, _('Entidades empresariais')),
-        (ENTIDADES_SEM_FINS_LUCRO, _('Entidades sem fins lucrativos')),
-        (OUTRAS, _('Outras')),
+    codigo = models.CharField(
+        max_length=4,
+        verbose_name=_("Código"),
+        validators=[RegexValidator(r'^\d{4}$', _('Código inválido'))],
     )
 
-    nome = models.CharField(
+    descricao = models.CharField(
+        max_length=256,
+        verbose_name=_("Descrição"),
+    )
+
+    class Meta:
+        verbose_name = _('Natureza Jurídica')
+        verbose_name_plural = _('Naturezas Jurídicas')
+        ordering = ['codigo']
+
+    def __str__(self):
+        return f'{self.codigo} - {self.descricao}'
+
+class TipoEntidade(models.Model):
+
+    codigo = models.CharField(
+        max_length=3,
+        verbose_name=_("Código"),
+        validators=[RegexValidator(r'^\d{3}$', _('Código inválido'))],
+    )
+
+    descricao = models.CharField(
+        max_length=256,
+        verbose_name=_("Descrição"),
+    )
+
+    #tipo_geral é uma classificação mais ampla que agrupa vários tipos de entidade
+    # será um choice com valores fixos definidos no código sendo: saúde, educação, assistência social, segurança pública, cultura, esporte, outros. criando através de números
+    tipo_geral = models.PositiveSmallIntegerField(
+        choices=(
+            (10, _('Saúde')),
+            (20, _('Educação')),
+            (30, _('Assistência Social')),
+            (40, _('Segurança Pública')),
+            (50, _('Cultura')),
+            (60, _('Esporte')),
+            (70, _('Outros')),
+        ),
+        default=70,
+        verbose_name=_('Tipo Geral'),
+    )
+
+    class Meta:
+        verbose_name = _('Tipo de Entidade')
+        verbose_name_plural = _('Tipos de Entidades')
+        ordering = ['codigo']
+
+    def __str__(self):
+        return f'{self.codigo} - {self.descricao}'
+
+class Entidade(models.Model):
+    """ Entidades públicas ou privadas que recebem recursos de emendas impositivas/modificativas.
+    """
+
+    nome_fantasia = models.CharField(
         max_length=256,
         verbose_name=_("Nome"),
     )
 
-    nome_empresarial = models.CharField(
+    razao_social = models.CharField(
         max_length=256,
         verbose_name=_("Nome Empresarial"),
     )
 
-    cnpj = models.CharField(
+    cpfcnpj = models.CharField(
         max_length=18,
         blank=True, null=True, default=None,
         verbose_name=_("CNPJ"),
@@ -1667,68 +1729,37 @@ class Entidade(models.Model):
         validators=[RegexValidator(r'^\d{7}$', _('CNES inválido'))],
     )
 
-    natureza_juridica = models.PositiveSmallIntegerField(
-        choices=NATUREZA_JURIDICA_CHOICE,
-        default=99,
-        verbose_name=_('Natureza Jurídica'),
+    natureza_juridica = models.ForeignKey(
+        NaturezaJuridica,
+        blank=True, null=True, default=None,
+        verbose_name=_("Natureza Jurídica"),
+        on_delete=SET_NULL,
     )
 
-    logradouro = models.CharField(
-        max_length=256,
+    tipo_entidade = models.ForeignKey(
+        TipoEntidade,
         blank=True, null=True, default=None,
-        verbose_name=_("Logradouro"),
+        verbose_name=_("Tipo de Entidade"),
+        on_delete=SET_NULL,
     )
 
-    numero = models.CharField(
-        max_length=20,
-        blank=True, null=True, default=None,
-        verbose_name=_("Número"),
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
+    ativo = models.BooleanField(
+        default=False,
+        verbose_name=_('Ativo'),
     )
 
-    complemento = models.CharField(
-        max_length=256,
-        blank=True, null=True, default=None,
-        verbose_name=_("Complemento"),
-    )
 
-    bairro = models.CharField(
-        max_length=128,
-        blank=True, null=True, default=None,
-        verbose_name=_("Bairro"),
-    )
-
-    cidade = models.CharField(
-        max_length=128,
-        blank=True, null=True, default='Jataí',
-        verbose_name=_("Cidade"),
-    )
-
-    estado = models.CharField(
-        max_length=2,
-        choices=UF,
-        blank=True, null=True, default='GO',
-        verbose_name=_("Estado"),
-    )
-    cep = models.CharField(
-        max_length=9,
-        blank=True, null=True, default=None,
-        verbose_name=_("CEP"),
-        validators=[RegexValidator(r'^\d{5}-\d{3}$', _('CEP inválido'))],
-    )
-    telefone = models.CharField(
-        max_length=20,
-        blank=True, null=True, default=None,
-        verbose_name=_("Telefone"),
-    )
-    email = models.EmailField(
-        max_length=256,
-        blank=True, null=True, default=None,
-        verbose_name=_("Email"),
-    )
     class Meta:
         verbose_name = _('Entidade')
         verbose_name_plural = _('Entidades')
-        ordering = ['nome']
+        ordering = ['nome_fantasia']
+        unique_together = (
+            ('cpfcnpj', 'cnes'),
+        )
 
     def __str__(self):
-        return self.nome
+        return f'{self.nome_fantasia} - {self.tipo_entidade.descricao} -  {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'

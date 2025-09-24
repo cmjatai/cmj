@@ -184,6 +184,8 @@ def get_field_display(obj, fieldname):
         display = '<div class="dont-break-out">{}</div>'.format(display)
     elif 'DecimalField' in str_type_from_field:
         display = formats.number_format(value, force_grouping=True)
+    elif 'JSONField' in str_type_from_field:
+        display = str(value)
     else:
         display = str(value)
     return verbose_name, display

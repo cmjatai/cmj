@@ -24,7 +24,7 @@ from django_filters.filterset import FilterSet
 import yaml
 
 from cmj import loa
-from cmj.loa.models import Despesa, DespesaConsulta, EmendaLoaRegistroContabil, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
+from cmj.loa.models import Despesa, DespesaConsulta, EmendaLoaRegistroContabil, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
     Agrupamento, quantize
 from cmj.utils import normalize, DecimalField
@@ -451,6 +451,20 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     valor = DecimalField(
         label=_('Valor Global da Emenda (R$)'), required=False)
 
+    entidade = forms.ModelChoiceField(
+        queryset=Entidade.objects.filter(ativo=True),
+        label='Entidade',
+        required=False,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker',
+                'data-live-search': 'true',
+                'data-header': 'Entidades Cadastradas',
+                'data-dropup-auto': 'false'
+            }
+        )
+    )
+
     class Meta:
         model = EmendaLoa
         fields = [
@@ -459,7 +473,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             'prefixo_indicacao', 'indicacao',
             'prefixo_finalidade', 'finalidade',
             'parlamentares__valor', 'parl_assinantes',
-            'busca_despesa', 'ano_loa', 'unidade'  # 'registrocontabil_set'
+            'busca_despesa', 'ano_loa', 'unidade', 'entidade'  # 'registrocontabil_set'
         ]
 
     def __init__(self, *args, **kwargs):
@@ -487,6 +501,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         ])
 
         row3 = [
+            ('entidade', 12),
             ('prefixo_indicacao', 3),
             ('unidade', 9),
             ('prefixo_finalidade', 3),
@@ -660,6 +675,22 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             attrs={'class': 'text-right'},
             instance=self.instance
         )
+
+        def get_entidade_choice(e):
+            nome = e.nome_fantasia[:60].strip()
+            nome = nome + '&nbsp;' * (60 - len(nome))
+
+            tipo_entidade = str(e.tipo_entidade.descricao[:40].strip()) if e.tipo_entidade else ''
+            tipo_entidade = tipo_entidade + '&nbsp;' * (40 - len(tipo_entidade))
+
+            html = mark_safe(nome + ' - ' + tipo_entidade + f' {"cnes:" if e.cnes else "cnpj:"} {e.cnes or e.cpfcnpj or "Sem Identificação"}')
+
+            return e.id, html
+
+
+        self.fields['entidade'].choices = [('', '-------')] + [
+            get_entidade_choice(e) for e in
+            Entidade.objects.filter(ativo=True).order_by('nome_fantasia')]
 
     def clean(self):
         super().clean()
@@ -1029,6 +1060,10 @@ class EmendaLoaFilterSet(FilterSet):
                 if not item:
                     continue
                 q &= (Q(unidade__especificacao__icontains=item) |
+                      Q(entidade__razao_social__icontains=item) |
+                      Q(entidade__nome_fantasia__icontains=item) |
+                      Q(entidade__cnes__icontains=item) |
+                      Q(entidade__cpfcnpj__icontains=item) |
                       Q(finalidade__icontains=item))
 
             if q:

@@ -807,7 +807,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                         </small><br>
                         <span class="indicacao">{item.indicacao}</span>
                         <div>
-                            {item.finalidade}
+                            {item.finalidade_format}
                         </div>
                         <ul></ul>
                     </div>
@@ -1055,7 +1055,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 render.append(f'<small class="text-gray"><strong>Ação Orçamentária:</strong> {rc.despesa.acao}</small><br>')
 
 
-            finalidade = emenda.finalidade
+            finalidade = emenda.finalidade_format
             finalidade = f'{finalidade[0].upper()}{finalidade[1:]}'
             finalidade = f'<small class="text-gray"><strong>Entidade/Finalidade:</strong> {finalidade}</small><br>'
             render.append(finalidade)
@@ -1286,6 +1286,9 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def hook_indicacao(self, el, verbose_name='', field_display=''):
             return f'{verbose_name} (Unidade Orçamentária)', field_display
+
+        def hook_finalidade(self, el, verbose_name='', field_display=''):
+            return verbose_name, el.finalidade_format
 
         def hook_materia(self, el, verbose_name='', field_display=''):
             if el.materia:
@@ -1619,3 +1622,25 @@ class EntidadeCrud(CrudAux):
     model = Entidade
     public = [RP_LIST, RP_DETAIL]
     frontend = Entidade._meta.app_label
+
+    class DetailView(CrudAux.DetailView):
+        layout_key = 'EntidadeDetail'
+
+        def hook_metadata__import_fields(self, obj, verbose_name='', field_display=''):
+
+            import_fields = obj.metadata.get('import_fields', {})
+
+            if not import_fields:
+                return verbose_name, 'Nenhum campo de importação definido.'
+
+            lines = []
+            for k, v in import_fields.items():
+                if v:
+                    lines.append(f'<li><strong>{k}:</strong> {v}</li>')
+
+            return _('Dados importados da base do CNES'), f'<ul class="monospace">{"".join(lines)}</ul>'
+
+    class ListView(CrudAux.ListView):
+        ordering = ('-ativo', 'nome_fantasia')
+
+

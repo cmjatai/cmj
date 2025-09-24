@@ -46,6 +46,7 @@ EmendaLoaDetail:
       col-md-8:
       - tipo:5 fase:7
       - materia|fk_urlize_for_detail
+      - entidade
       - indicacao
       - finalidade
       col-md-4:
@@ -95,8 +96,17 @@ Agrupamento:
 
 Entidade:
   {% trans 'Dados Gerais' %}:
-  - nome cnes:2 cnpj:3
-  - nome_empresarial natureza_juridica:5
+  - cnes:2 cpfcnpj:3 nome_fantasia:4 ativo:2
+  - razao_social:7 tipo_entidade:3  natureza_juridica:5
+
+EntidadeDetail:
+  {% trans 'Dados Gerais' %}:
+  - cnes:2 cpfcnpj:3 ativo:2
+  - nome_fantasia:6 razao_social:6
+  - tipo_entidade:5 natureza_juridica:7
+  - metadata__import_fields
+
+
 
 
 

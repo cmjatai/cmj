@@ -1,3 +1,4 @@
+from attr import field
 from django.db import IntegrityError
 from _collections import OrderedDict
 from decimal import Decimal
@@ -619,10 +620,16 @@ class EmendaLoaSearchSerializer(SaplSerializerMixin):
     str_valor = SerializerMethodField()
     str_parlamentares = SerializerMethodField()
 
+
+    finalidade = SerializerMethodField()
+
     str_fase = SerializerMethodField()
 
     class Meta(SaplSerializerMixin.Meta):
         model = EmendaLoa
+
+    def get_finalidade(self, obj):
+        return obj.finalidade_format
 
     def get_str_fase(self, obj):
         return obj.get_fase_display()
@@ -640,6 +647,7 @@ class EmendaLoaSearchSerializer(SaplSerializerMixin):
 
 
 class EmendaLoaSerializer(SaplSerializerMixin):
+
 
     class Meta(SaplSerializerMixin.Meta):
         model = EmendaLoa
@@ -946,6 +954,10 @@ class _EmendaLoaViewSet:
 
             for termo in query:
                 q &= (Q(unidade__especificacao__icontains=termo) |
+                      Q(entidade__razao_social__icontains=termo) |
+                      Q(entidade__nome_fantasia__icontains=termo) |
+                      Q(entidade__cnes__icontains=termo) |
+                      Q(entidade__cpfcnpj__icontains=termo) |
                       Q(finalidade__icontains=termo))
 
             qs = qs.filter(fase__lt=EmendaLoa.LIBERACAO_CONTABIL, loa__ano=ano)

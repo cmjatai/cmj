@@ -198,6 +198,15 @@
       font-style: italic;
     }
   }
+  &.emendaloa-update, &.emendaloa-create {
+    #div_id_entidade {
+      li .text {
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold ;
+        font-size: 70%;
+      }
+    }
+  }
   &.emendaloa-update, &.agrupamento-update {
     .fieldset-busca-registrocontabil {
       .col-1 {
