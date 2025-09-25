@@ -492,7 +492,7 @@ class CertidaoPublicacaoCrud(Crud):
     class ListView(Crud.ListView):
 
         paginate_by = 100
-        ordering = ('-created__year', '-certificado', '-id')
+        ordering = ('-id')
 
         def get_paginate_by(self, queryset):
             if self.request.user.is_superuser:
