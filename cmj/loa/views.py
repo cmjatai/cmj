@@ -1623,6 +1623,11 @@ class EntidadeCrud(CrudAux):
     public = [RP_LIST, RP_DETAIL]
     frontend = Entidade._meta.app_label
 
+    class BaseMixin(CrudAux.BaseMixin):
+        list_field_names = [
+            'nome_fantasia', ('cnes', 'cpfcnpj'), 'ativo'
+        ]
+
     class DetailView(CrudAux.DetailView):
         layout_key = 'EntidadeDetail'
 

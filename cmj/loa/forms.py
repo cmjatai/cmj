@@ -760,27 +760,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         except Exception as e:
             raise ValidationError('Erro')
 
-        if created:
-            rc = None
-            if i.tipo == EmendaLoa.SAUDE and i.loa.despesa_default_deducao_saude:
-                rc = EmendaLoaRegistroContabil()
-                rc.emendaloa = i
-                rc.despesa = i.loa.despesa_default_deducao_saude
-                rc.valor = i.valor * Decimal('-1.00')
-                rc.save()
-            elif i.tipo == EmendaLoa.DIVERSOS:
-                if i.loa.despesa_default_deducao_diversos and i.unidade.area != UnidadeOrcamentaria.EDUCACAO_CHOICE:
-                    rc = EmendaLoaRegistroContabil()
-                    rc.emendaloa = i
-                    rc.despesa = i.loa.despesa_default_deducao_diversos
-                    rc.valor = i.valor * Decimal('-1.00')
-                    rc.save()
-                elif i.loa.despesa_default_deducao_educacao and i.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE:
-                    rc = EmendaLoaRegistroContabil()
-                    rc.emendaloa = i
-                    rc.despesa = i.loa.despesa_default_deducao_educacao
-                    rc.valor = i.valor * Decimal('-1.00')
-                    rc.save()
+        #if created:
+        #    i.save()
 
         if not self.full_editor:
             if 'parlamentares__valor' in self.cleaned_data and self.cleaned_data['tipo'] not in ('0', 0):
@@ -804,7 +785,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     elp.parlamentar = p
                     elp.valor = Decimal('1.00')
                     elp.save()
-                i.atualiza_valor()
+                i.save()
 
         return i
 

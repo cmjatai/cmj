@@ -23,6 +23,10 @@
       padding-top: 0.3cm;
       line-height: 1;
     }
+    .errors {
+      color: red;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -69,6 +73,17 @@
       que {{mat_loa.ementa}}
     </small>
   {% endwith %}
+
+  <br><br>
+  {% for erro in object.errors %}
+    {% if forloop.first %}
+      <ul class="errors">
+    {% endif %}
+      <li>{{ erro }}</li>
+    {% if forloop.last %}
+      </ul>
+    {% endif %}
+  {% endfor %}
 
   <h5>
     Autoria:

@@ -762,7 +762,7 @@ class _EmendaLoaViewSet:
             el.parlamentares.remove(pselected)
         else:
             el.parlamentares.add(pselected)
-        el.atualiza_valor()
+        el.save()
 
         serializer = self.get_serializer(el)
         return Response(serializer.data)
@@ -789,7 +789,6 @@ class _EmendaLoaViewSet:
         el = EmendaLoa.objects.get(pk=kwargs['pk'])
         el.valor = obj
         el.save()
-        el.atualiza_valor()
 
         serializer = self.get_serializer(el)
         return Response(serializer.data)
@@ -833,7 +832,7 @@ class _EmendaLoaViewSet:
         if not elp.valor:
             elp.delete()
 
-        el.atualiza_valor()
+        el.save()
 
         serializer = self.get_serializer(el)
 

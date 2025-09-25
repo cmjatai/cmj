@@ -417,8 +417,9 @@ class EmendaLoa(models.Model):
         chaves = re.findall(r'\{(.*?)\}', finalidade)
 
         for chave in chaves:
-            if '__' in chave:
-                partes = chave.split('__')
+            chave_strip = chave.strip()
+            if '__' in chave_strip:
+                partes = chave_strip.split('__')
                 obj = self
                 for parte in partes:
                     if hasattr(obj, parte):
@@ -427,15 +428,13 @@ class EmendaLoa(models.Model):
                         obj = None
                         break
                 valor = str(obj) if obj else ''
-            elif hasattr(self, chave):
-                valor = getattr(self, chave)
+            elif hasattr(self, chave_strip):
+                valor = getattr(self, chave_strip) or ''
                 if isinstance(valor, models.Model):
                     valor = str(valor)
+            valor = valor.upper() if valor and isinstance(valor, str) else valor
             finalidade = finalidade.replace(f'{{{chave}}}', str(valor))
 
-        finalidade = finalidade.format(
-            entidade=self.entidade,
-        )
         return finalidade
 
     @property
@@ -454,27 +453,75 @@ class EmendaLoa(models.Model):
             ),
         )
 
-    def atualiza_valor(self):
+    _syncing = False
+
+    def errors(self):
+        erros = []
+        if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.unidade:
+            erros.append('Emendas Impositivas devem ter Unidade Orçamentária.')
+
+        if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.entidade:
+            erros.append('Emendas Impositivas devem ter Entidade.')
+
+        if self.tipo == self.SAUDE and self.unidade and self.unidade.area != UnidadeOrcamentaria.SAUDE_CHOICE:
+            erros.append('Emendas Impositivas da Saúde devem ter Unidade Orçamentária classificadas como sendo da Área da Saúde.')
+            # existe registro com fonte diferente de 102?
+
+        if self.tipo == self.SAUDE and self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
+
+            if self.entidade and self.entidade.tipo_entidade.tipo_geral != TipoEntidade.SAUDE_CHOICE:
+                erros.append('Emendas Impositivas da Saúde devem ter Entidade do Tipo Saúde.')
+
+            registros = self.registrocontabil_set.all()
+            fontes_invalidas = registros.exclude(despesa__fonte__codigo='102')
+            if fontes_invalidas.exists():
+                erros.append('Emendas Impositivas da Saúde não podem ter registros com fonte diferente de 102.')
+
+        #if self.tipo == self.DIVERSOS and self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
+        #    erros.append('Emendas Impositivas de Áreas Diversas não podem ter Unidade Orçamentária classificadas como sendo da Área da Saúde.')
+
+        if self.tipo == self.DIVERSOS and self.unidade and self.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE:
+            # existe registro com fonte diferente de 101?
+            registros = self.registrocontabil_set.all()
+            fontes_invalidas = registros.exclude(despesa__fonte__codigo='101')
+            if fontes_invalidas.exists():
+                erros.append('Emendas Impositivas da Educação não podem ter registros com fonte diferente de 101.')
+
+        return erros
+
+    def sync(self):
+        registros = self.registrocontabil_set.all().order_by('valor')
+        old_self = EmendaLoa.objects.filter(pk=self.pk).first()
         if self.tipo:
             soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
-            valor_old = self.valor
             self.valor = soma_dict['valor__sum'] or Decimal('0.00')
             self.save()
 
-            registros = self.registrocontabil_set.all().order_by('valor')
             if hasattr(self, 'agrupamentoemendaloa'):
                 registros.delete()
                 self.agrupamentoemendaloa.save()
             else:
+                if old_self:
+                    valor_old = old_self.valor
+                    tipo_old = old_self.tipo
+                    unidade_old = old_self.unidade
+                else:
+                    valor_old = self.valor
+                    tipo_old = self.tipo
+                    unidade_old = self.unidade
+
+                if tipo_old != self.tipo or unidade_old != self.unidade:
+                    registros.delete()
+
                 if registros.exists():
-                    soma_registros_old = registros.aggregate(Sum('valor'))
+                    soma_registros_old = registros.aggregate(Sum('valor')).get('valor__sum', Decimal('0.00'))
                     soma_registros = Decimal('0.00')
                     for r in registros:
                         r.valor = quantize(r.valor * self.valor / valor_old, rounding=ROUND_HALF_DOWN) if valor_old else Decimal('0.00')
                         soma_registros = soma_registros + r.valor
                         r.save()
-                    divergencia = soma_registros_old.get('valor_sum', Decimal('0.00')) - soma_registros
-                    if divergencia:
+                    divergencia = soma_registros_old - soma_registros
+                    if not soma_registros_old and divergencia:
                         r = registros.last()
                         r.valor = r.valor + divergencia
                         r.save()
@@ -495,6 +542,8 @@ class EmendaLoa(models.Model):
                             rc.valor = self.valor * (-1)
                             rc.save()
         else:
+            registros.delete()
+            self.save()
             qspa = self.emendaloaparlamentar_set.all()
             valores = [quantize(self.valor / qspa.count())] * qspa.count()
             sum_valores = sum(valores)
@@ -507,8 +556,23 @@ class EmendaLoa(models.Model):
             for elp, v in elpv:
                 elp.valor = v
                 elp.save()
-
         return self
+
+    def save(
+            self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if self.unidade:
+            self.indicacao = self.unidade.especificacao
+
+        if not self._syncing:
+            self._syncing = True
+            r = self.sync()
+            self._syncing = False
+            return r
+
+        r = models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        self.loa.update_disponibilidades()
+        return r
+
 
     @property
     def totais_contabeis(self):
@@ -533,16 +597,6 @@ class EmendaLoa(models.Model):
             'divergencia_emenda': divergencia_emenda,
             'valor_emendaloa': self.valor
         }
-
-    def save(
-            self, force_insert=False, force_update=False, using=None, update_fields=None):
-        if self.unidade:
-            self.indicacao = self.unidade.especificacao
-
-        r = models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
-        self.loa.update_disponibilidades()
-        return r
-
 
 class EmendaLoaParlamentar(models.Model):
 
@@ -1837,4 +1891,4 @@ class Entidade(models.Model):
         )
 
     def __str__(self):
-        return f'{self.nome_fantasia} - {self.tipo_entidade.descricao if self.tipo_entidade else ""} {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'
+        return f'{self.nome_fantasia} - {self.tipo_entidade.descricao if self.tipo_entidade else ""} - {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'
