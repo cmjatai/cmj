@@ -21,6 +21,7 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.filters import MultipleChoiceFilter, \
     ModelMultipleChoiceFilter, CharFilter, ChoiceFilter
 from django_filters.filterset import FilterSet
+from numpy import full
 import yaml
 
 from cmj import loa
@@ -574,8 +575,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         if not self.creating:
             row_form = to_row([
-                (rows_base, 8),
-                (Div(css_class='container-preview'), 4)
+                (rows_base, 8 if full_editor else 7),
+                (Div(css_class='container-preview'), 4 if full_editor else 5)
             ])
 
         super().__init__(*args, **kwargs)

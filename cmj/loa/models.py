@@ -563,13 +563,16 @@ class EmendaLoa(models.Model):
         if self.unidade:
             self.indicacao = self.unidade.especificacao
 
-        if not self._syncing:
+        creating = not self.pk
+
+        if not self._syncing and not creating:
             self._syncing = True
             r = self.sync()
             self._syncing = False
             return r
 
         r = models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+
         self.loa.update_disponibilidades()
         return r
 

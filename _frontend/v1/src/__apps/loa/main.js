@@ -371,6 +371,23 @@ window.AppLOA = function () {
                     refreshChangeRegistroDespesa()
                     preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
                   })
+                  .catch((error) => {
+                    if (_.isString(error.response) || _.isString(error.response.data)) {
+                      $(`<div class="alert alert-danger">
+                        ${error.message}
+                        </div>`
+                      ).appendTo(inner)
+                      return
+                    }
+                    _.forOwn(error.response.data, function (value, key) {
+                      form.find(`input[name=despesa_${key}], input[name=${key}_despesa]`).addClass('is-invalid')
+
+                      $(`<div class="alert alert-danger">
+                        ${_.isString(value) ? value : value[0]}
+                        </div>`
+                      ).appendTo(inner)
+                    })
+                  })
               })
           })
         })
@@ -586,7 +603,7 @@ window.AppLOA = function () {
           preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
         })
         .catch((event) => {
-          console.log(event)
+          window.location.reload()
         })
     })
     form.trigger('change')
