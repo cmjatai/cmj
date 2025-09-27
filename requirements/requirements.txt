@@ -87,6 +87,8 @@ kazoo==2.8.0
 
 opencv-python==4.11.0.86
 
+python-osc==1.9.3
+
 #git+https://github.com/interlegis/django-admin-bootstrapped.git
 #git+https://github.com/interlegis/trml2pdf.git
 #git+git://github.com/cmjatai/sapl.git@master.para.portal.cmj

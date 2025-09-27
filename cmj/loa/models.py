@@ -469,7 +469,7 @@ class EmendaLoa(models.Model):
 
         if self.tipo == self.SAUDE and self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
 
-            if self.entidade and self.entidade.tipo_entidade.tipo_geral != TipoEntidade.SAUDE_CHOICE:
+            if self.entidade and self.entidade.tipo_entidade and self.entidade.tipo_entidade.tipo_geral != TipoEntidade.SAUDE_CHOICE:
                 erros.append('Emendas Impositivas da Saúde devem ter Entidade do Tipo Saúde.')
 
             registros = self.registrocontabil_set.all()
