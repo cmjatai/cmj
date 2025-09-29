@@ -1,0 +1,242 @@
+
+/* Estilos principais do sistema de cronômetros */
+
+/* Estados dos cronômetros */
+.state-stopped {
+    background-color: #6c757d !important;
+}
+
+.state-running {
+    background-color: #28a745 !important;
+    animation: pulse 2s infinite;
+}
+
+.state-paused {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.state-finished {
+    background-color: #17a2b8 !important;
+}
+
+/* Animação para cronômetros em execução */
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
+/* Display dos cronômetros */
+.timer-display {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.timer-display:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+
+.timer-display .display-4 {
+    font-weight: 300;
+    font-family: 'Courier New', monospace;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Barra de progresso personalizada */
+.progress {
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    transition: width 1s ease;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Botões de ação */
+.btn-group .btn {
+    transition: all 0.3s ease;
+}
+
+.btn-group .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Estados dos eventos */
+.event-started {
+    background-color: #28a745 !important;
+}
+
+.event-paused {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.event-resumed {
+    background-color: #17a2b8 !important;
+}
+
+.event-stopped {
+    background-color: #dc3545 !important;
+}
+
+.event-finished {
+    background-color: #6f42c1 !important;
+}
+
+/* Cards com hover effect */
+.card {
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+/* Árvore hierárquica */
+.timer-tree {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.timer-tree-node {
+    padding: 8px 0;
+    border-left: 2px solid #dee2e6;
+    margin-left: 10px;
+    padding-left: 15px;
+    position: relative;
+}
+
+.timer-tree-node:before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 20px;
+    width: 15px;
+    height: 1px;
+    background-color: #dee2e6;
+}
+
+.timer-tree-node.running {
+    border-left-color: #28a745;
+}
+
+.timer-tree-node.paused {
+    border-left-color: #ffc107;
+}
+
+.timer-tree-node.stopped {
+    border-left-color: #6c757d;
+}
+
+.timer-tree-node.finished {
+    border-left-color: #17a2b8;
+}
+
+/* Indicador de status WebSocket */
+#wsStatus {
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+#wsStatus.connected {
+    background-color: #28a745 !important;
+}
+
+#wsStatus.connecting {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+#wsStatus.disconnected {
+    background-color: #dc3545 !important;
+}
+
+/* Switches personalizados */
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .timer-display .display-4 {
+        font-size: 2rem;
+    }
+    
+    .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .btn-group .btn {
+        margin-bottom: 5px;
+    }
+}
+
+/* Animações de entrada */
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Highlight para mudanças */
+.highlight-change {
+    animation: highlightPulse 1s ease;
+}
+
+@keyframes highlightPulse {
+    0% { background-color: transparent; }
+    50% { background-color: rgba(255, 193, 7, 0.3); }
+    100% { background-color: transparent; }
+}
+
+/* Loading spinner */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Notificações toast */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1050;
+}
+
+.custom-toast {
+    min-width: 300px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+}

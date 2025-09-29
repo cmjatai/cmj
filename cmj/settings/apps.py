@@ -46,6 +46,7 @@ INSTALLED_APPS = (
     'django_celery_beat',
 
 
+
     # 'whoosh',
     # 'speedinfo',
     # 'taggit',
@@ -86,6 +87,8 @@ CMJ_APPS = (
     'cmj.sigad',
     'cmj.search',
     'cmj.api',
+
+    'cmj.panelset',
 
     'cmj.dashboard',
 )

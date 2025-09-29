@@ -1,0 +1,208 @@
+
+{% extends 'panelset/base_panelset.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Sistema de Cronômetros{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">
+                <i class="fas fa-tachometer-alt me-2"></i>Dashboard de Cronômetros
+            </h1>
+            <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary" onclick="refreshAllTimers()">
+                    <i class="fas fa-sync-alt me-1"></i>Atualizar
+                </button>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTimerModal">
+                    <i class="fas fa-plus me-1"></i>Novo Cronômetro
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estatísticas gerais -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-stopwatch fa-2x me-3"></i>
+                    <div>
+                        <h4 class="mb-0" id="totalTimers">{{ root_timers.count }}</h4>
+                        <small>Cronômetros Ativos</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-play fa-2x me-3"></i>
+                    <div>
+                        <h4 class="mb-0" id="runningTimers">0</h4>
+                        <small>Em Execução</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-pause fa-2x me-3"></i>
+                    <div>
+                        <h4 class="mb-0" id="pausedTimers">0</h4>
+                        <small>Pausados</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-stop fa-2x me-3"></i>
+                    <div>
+                        <h4 class="mb-0" id="stoppedTimers">0</h4>
+                        <small>Parados</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de cronômetros -->
+<div class="row">
+    <div class="col-12">
+        {% if root_timers %}
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Cronômetros Principais
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Estado</th>
+                                    <th>Duração</th>
+                                    <th>Tempo Decorrido</th>
+                                    <th>Tempo Restante</th>
+                                    <th>Filhos</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="timersTable">
+                                {% for timer in root_timers %}
+                                <tr id="timer-row-{{ timer.id }}" data-timer-id="{{ timer.id }}">
+                                    <td>
+                                        <strong>{{ timer.name }}</strong>
+                                        {% if timer.stop_parent_on_finish %}
+                                            <span class="badge bg-warning ms-1" title="Para pai ao terminar">
+                                                <i class="fas fa-stop"></i>
+                                            </span>
+                                        {% endif %}
+                                        {% if timer.reduce_parent_time %}
+                                            <span class="badge bg-info ms-1" title="Reduz tempo do pai">
+                                                <i class="fas fa-arrow-down"></i>
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge state-badge state-{{ timer.state }}">
+                                            {{ timer.get_state_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ timer.duration }}</td>
+                                    <td class="elapsed-time">--:--:--</td>
+                                    <td class="remaining-time">{{ timer.duration }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">
+                                            {{ timer.children.count }}
+                                            {% if timer.children.count == 1 %}filho{% else %}filhos{% endif %}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button class="btn btn-sm btn-success timer-start"
+                                                    data-timer-id="{{ timer.id }}"
+                                                    {% if timer.state != 'stopped' %}disabled{% endif %}>
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-warning timer-pause"
+                                                    data-timer-id="{{ timer.id }}"
+                                                    {% if timer.state != 'running' %}disabled{% endif %}>
+                                                <i class="fas fa-pause"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-secondary timer-resume"
+                                                    data-timer-id="{{ timer.id }}"
+                                                    {% if timer.state != 'paused' %}disabled{% endif %}>
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger timer-stop"
+                                                    data-timer-id="{{ timer.id }}"
+                                                    {% if timer.state == 'stopped' %}disabled{% endif %}>
+                                                <i class="fas fa-stop"></i>
+                                            </button>
+                                            <a href="{% url 'cmj.panelset:timer_detail' timer.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-stopwatch fa-4x text-muted mb-3"></i>
+                    <h4 class="text-muted">Nenhum cronômetro encontrado</h4>
+                    <p class="text-muted">Crie seu primeiro cronômetro para começar</p>
+                    <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#createTimerModal">
+                        <i class="fas fa-plus me-2"></i>Criar Primeiro Cronômetro
+                    </button>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de confirmação -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Ação</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmButton">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'timer_app/js/dashboard.js' %}"></script>
+{% endblock %}

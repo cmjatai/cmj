@@ -1,0 +1,276 @@
+
+{% extends 'panelset/base_panelset.html' %}
+{% load static %}
+
+{% block title %}{{ timer.name }} - Detalhes{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="{% url 'cmj.panelset:dashboard' %}">Dashboard</a>
+                </li>
+                <li class="breadcrumb-item active">{{ timer.name }}</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Informações principais do cronômetro -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-stopwatch me-2"></i>{{ timer.name }}
+                </h5>
+                <span class="badge state-badge state-{{ timer.state }} fs-6">
+                    {{ timer.get_state_display }}
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center">
+                        <div class="timer-display mb-3">
+                            <div class="display-4" id="elapsedTime">00:00:00</div>
+                            <small class="text-muted">Tempo Decorrido</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="timer-display mb-3">
+                            <div class="display-4" id="remainingTime">{{ timer.duration }}</div>
+                            <small class="text-muted">Tempo Restante</small>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="timer-display mb-3">
+                            <div class="display-4">{{ timer.duration }}</div>
+                            <small class="text-muted">Duração Total</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Barra de progresso -->
+                <div class="mb-4">
+                    <div class="progress" style="height: 30px;">
+                        <div class="progress-bar" id="progressBar" role="progressbar"
+                             style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <span id="progressText">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controles do cronômetro -->
+                <div class="text-center">
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-success btn-lg timer-start"
+                                data-timer-id="{{ timer.id }}"
+                                {% if timer.state != 'stopped' %}disabled{% endif %}>
+                            <i class="fas fa-play me-1"></i>Iniciar
+                        </button>
+                        <button class="btn btn-warning btn-lg timer-pause"
+                                data-timer-id="{{ timer.id }}"
+                                {% if timer.state != 'running' %}disabled{% endif %}>
+                            <i class="fas fa-pause me-1"></i>Pausar
+                        </button>
+                        <button class="btn btn-info btn-lg timer-resume"
+                                data-timer-id="{{ timer.id }}"
+                                {% if timer.state != 'paused' %}disabled{% endif %}>
+                            <i class="fas fa-play me-1"></i>Retomar
+                        </button>
+                        <button class="btn btn-danger btn-lg timer-stop"
+                                data-timer-id="{{ timer.id }}"
+                                {% if timer.state == 'stopped' %}disabled{% endif %}>
+                            <i class="fas fa-stop me-1"></i>Parar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configurações do cronômetro -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-cog me-2"></i>Configurações
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox"
+                                   id="stopParentSwitch"
+                                   {% if timer.stop_parent_on_finish %}checked{% endif %}
+                                   data-timer-id="{{ timer.id }}">
+                            <label class="form-check-label" for="stopParentSwitch">
+                                Parar cronômetro pai ao terminar
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox"
+                                   id="reduceParentSwitch"
+                                   {% if timer.reduce_parent_time %}checked{% endif %}
+                                   data-timer-id="{{ timer.id }}">
+                            <label class="form-check-label" for="reduceParentSwitch">
+                                Reduzir tempo do pai simultaneamente
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Eventos recentes -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-history me-2"></i>Eventos Recentes
+                </h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Evento</th>
+                                <th>Data/Hora</th>
+                                <th>Origem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTable">
+                            {% for event in timer.events.all|slice:":10" %}
+                            <tr>
+                                <td>
+                                    <span class="badge event-badge event-{{ event.event_type }}">
+                                        {{ event.get_event_type_display }}
+                                    </span>
+                                </td>
+                                <td>{{ event.timestamp|date:"d/m/Y H:i:s" }}</td>
+                                <td>
+                                    {% if event.triggered_by_child %}
+                                        <small class="text-muted">
+                                            Causado por: {{ event.triggered_by_child.name }}
+                                        </small>
+                                    {% else %}
+                                        Manual
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">
+                                    Nenhum evento registrado ainda
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar com hierarquia -->
+    <div class="col-lg-4">
+        <!-- Cronômetro pai -->
+        {% if timer.parent %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-arrow-up me-2"></i>Cronômetro Pai
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ timer.parent.name }}</strong><br>
+                        <small class="text-muted">{{ timer.parent.get_state_display }}</small>
+                    </div>
+                    <a href="{% url 'cmj.panelset:timer_detail' timer.parent.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Cronômetros filhos -->
+        {% if timer.children.exists %}
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">
+                    <i class="fas fa-arrow-down me-2"></i>Cronômetros Filhos
+                </h6>
+                <span class="badge bg-secondary">{{ timer.children.count }}</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush" id="childrenList">
+                    {% for child in timer.children.all %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center"
+                         data-child-id="{{ child.id }}">
+                        <div>
+                            <strong>{{ child.name }}</strong><br>
+                            <small class="text-muted child-state-{{ child.id }}">
+                                {{ child.get_state_display }}
+                            </small>
+                            {% if child.stop_parent_on_finish %}
+                                <span class="badge bg-warning ms-1" title="Para pai ao terminar">
+                                    <i class="fas fa-stop"></i>
+                                </span>
+                            {% endif %}
+                            {% if child.reduce_parent_time %}
+                                <span class="badge bg-info ms-1" title="Reduz tempo do pai">
+                                    <i class="fas fa-arrow-down"></i>
+                                </span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <a href="{% url 'cmj.panelset:timer_detail' child.id %}" class="btn btn-sm btn-outline-primary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Visualização da árvore -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-sitemap me-2"></i>Árvore Hierárquica
+                </h6>
+            </div>
+            <div class="card-body">
+                <div id="timerTree">
+                    <!-- Será preenchido via JavaScript com os dados da árvore -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WebSocket status -->
+<div class="position-fixed bottom-0 end-0 p-3">
+    <div id="wsStatus" class="badge bg-secondary">
+        <i class="fas fa-circle me-1"></i>Desconectado
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const TIMER_ID = '{{ timer.id }}';
+    const TIMER_DURATION = {{ timer.duration.total_seconds }};
+    const TREE_DATA = {{ tree_data|safe }};
+</script>
+<script src="{% static 'timer_app/js/timer_detail.js' %}"></script>
+{% endblock %}

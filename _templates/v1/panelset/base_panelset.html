@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema de Cronômetros{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'timer_app/css/timer.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'cmj.panelset:dashboard' %}">
+                <i class="fas fa-stopwatch me-2"></i>
+                Sistema de Cronômetros
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'cmj.panelset:dashboard' %}">
+                            <i class="fas fa-home me-1"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light btn-sm" data-bs-toggle="modal" data-bs-target="#createTimerModal">
+                            <i class="fas fa-plus me-1"></i>Novo Cronômetro
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Modal para criar novo cronômetro -->
+    <div class="modal fade" id="createTimerModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Criar Novo Cronômetro</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form id="createTimerForm">
+                    <div class="modal-body">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="timerName" class="form-label">Nome do Cronômetro</label>
+                            <input type="text" class="form-control" id="timerName" name="name" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="hours" class="form-label">Horas</label>
+                                <input type="number" class="form-control" id="hours" name="hours" min="0" max="23" value="0">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="minutes" class="form-label">Minutos</label>
+                                <input type="number" class="form-control" id="minutes" name="minutes" min="0" max="59" value="25">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="seconds" class="form-label">Segundos</label>
+                                <input type="number" class="form-control" id="seconds" name="seconds" min="0" max="59" value="0">
+                            </div>
+                        </div>
+                        <div class="mb-3 mt-3">
+                            <label for="parentTimer" class="form-label">Cronômetro Pai (opcional)</label>
+                            <select class="form-control" id="parentTimer" name="parent">
+                                <option value="">Nenhum (cronômetro raiz)</option>
+                                <!-- Será preenchido via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="stopParent" name="stop_parent_on_finish">
+                                    <label class="form-check-label" for="stopParent">
+                                        Parar cronômetro pai ao terminar
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="reduceParent" name="reduce_parent_time">
+                                    <label class="form-check-label" for="reduceParent">
+                                        Reduzir tempo do pai simultaneamente
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Criar Cronômetro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'timer_app/js/timer.js' %}"></script>
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>
