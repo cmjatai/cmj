@@ -29,7 +29,7 @@ from cmj.loa.models import Despesa, DespesaConsulta, EmendaLoaRegistroContabil, 
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
     Agrupamento, quantize
 from cmj.utils import normalize, DecimalField
-from sapl.crispy_layout_mixin import to_row, SaplFormLayout, SaplFormHelper
+from sapl.crispy_layout_mixin import form_actions, to_row, SaplFormLayout, SaplFormHelper
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import FileFieldCheckMixin, parlamentares_ativos
@@ -484,9 +484,12 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     def __init__(self, *args, **kwargs):
 
         self.creating = kwargs['initial'].pop('creating', None)
+
         self.user = kwargs['initial'].pop('user', None)
         self.loa = kwargs['initial']['loa']
+
         self.parls = list(self.loa.parlamentares.order_by('nome_parlamentar'))
+
         self.full_editor = full_editor = self.user.has_perm(
             'loa.emendaloa_full_editor') and not self.user.is_superuser
 
@@ -494,7 +497,6 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             ('tipo', 3),
             ('fase', 5),
             ('valor', 4),
-
             ('ano_loa', 0),
         ])
 
@@ -583,6 +585,27 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         self.helper = FormHelper()
 
+        btns = {}
+        if full_editor:
+            btns = {
+                'actions': form_actions(
+                    label='CONCLUIR EDIÇÃO CONTÁBIL E FINALIZAR',
+                    name="submit_concluir",
+                    more=[
+                        Submit('submit_devolver', 'DEVOLVER PARA CORREÇÃO', css_class='btn btn-secondary', title='Devolver para Correção'),
+                    ],
+                    disabled=False
+                )
+
+            }
+
+        self.helper.layout = SaplFormLayout(Fieldset(_('Dados Gerais'), row_form), **btns)
+
+        self.initial['ano_loa'] = self.loa.ano
+        if full_editor or self.user.is_superuser:
+            if self.instance.pk:
+                self.initial['valor_despesa'] = self.instance.valor
+
         self.fields['parl_assinantes'].choices = [
             (p.id, str(p)) for p in
             self.loa.parlamentares.all()]
@@ -594,57 +617,61 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 recebe_emenda_impositiva=True
             ).order_by('especificacao')]
 
-        btns = {}
-        if full_editor or self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
-            btns = {
-                'cancel_label': '',
-                'save_label': 'Encerrar Edição'
-            }
+        def get_entidade_choice(e):
+            nome = e.nome_fantasia[:60].strip()
+            nome = nome + '&nbsp;' * (60 - len(nome))
 
-        self.helper.layout = SaplFormLayout(
-            Fieldset(_('Dados Gerais'), row_form), **btns)
+            tipo_entidade = str(e.tipo_entidade.descricao[:40].strip()) if e.tipo_entidade else ''
+            tipo_entidade = tipo_entidade + '&nbsp;' * (40 - len(tipo_entidade))
 
-        self.initial['ano_loa'] = self.loa.ano
+            html = mark_safe(nome + ' - ' + tipo_entidade + f' {"cnes:" if e.cnes else "cnpj:"} {e.cnes or e.cpfcnpj or "Sem Identificação"}')
 
-        if not self.user.is_superuser and (
-            self.user.operadorautor_set.exists() or not self.user.has_perms(
-                ('loa.add_emendaloa', 'loa.change_emendaloa'))):
+            return e.id, html
 
-            if self.creating or self.instance.pk and self.instance.fase != EmendaLoa.LIBERACAO_CONTABIL:
-                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:1 if self.creating else 2]
+        self.fields['entidade'].choices = [('', '-------')] + [
+            get_entidade_choice(e) for e in
+            Entidade.objects.filter(ativo=True).order_by('nome_fantasia')
+            ]
 
-            if full_editor and self.instance.pk and self.instance.fase < EmendaLoa.EM_TRAMITACAO:
-                self.fields['fase'].widget.attrs['class'] = 'is-invalid'
-                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:4]
-
-            if self.instance.pk and self.instance.fase >= EmendaLoa.EM_TRAMITACAO:
-                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE
-
-            # self.fields['valor'].widget.attrs['disabled'] = 'disabled'
-            self.fields['valor'].widget.attrs['readonly'] = 'readonly'
-            # self.fields['valor'].widget.attrs['class'] = 'text-right'
-            self.fields['valor'].required = False
-
+        if not self.user.has_perm('loa.add_emendaloa'):
             self.fields['tipo_materia'].widget = HiddenInput()
             self.fields['numero_materia'].widget = HiddenInput()
             self.fields['ano_materia'].widget = HiddenInput()
-            if self.instance.pk and self.instance.fase == EmendaLoa.LIBERACAO_CONTABIL:
-                self.fields['tipo'].widget.attrs['disabled'] = 'disabled'
-                self.fields['fase'].widget.attrs['disabled'] = 'disabled'
-                self.fields['prefixo_indicacao'].widget.attrs['readonly'] = 'readonly'
-                self.fields['prefixo_finalidade'].widget.attrs['readonly'] = 'readonly'
-                self.fields['finalidade'].widget.attrs['readonly'] = 'readonly'
-                self.fields['indicacao'].widget.attrs['readonly'] = 'readonly'
 
-        if full_editor or self.user.is_superuser:
-            if self.instance.pk:
-                self.initial['valor_despesa'] = Decimal('0.00')
+            self.fields['valor'].widget.attrs['readonly'] = 'readonly'
+            self.fields['valor'].required = False
 
-                # rclist = self.instance.registrocontabil_set.all()
-                # self.fields['registrocontabil_set'].choices = [
-                #    (rc.id, str(rc)) for rc in rclist]
-                # self.initial['registrocontabil_set'] = rclist.values_list(
-                #    'id', flat=True)
+            if not full_editor:
+                if self.creating:
+                    self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:1]
+                else:
+                    self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:2]
+
+
+                if self.instance.fase > EmendaLoa.PROPOSTA_LIBERADA:
+                    self.fields['prefixo_indicacao'].widget.attrs['readonly'] = 'readonly'
+                    self.fields['prefixo_finalidade'].widget.attrs['readonly'] = 'readonly'
+                    self.fields['finalidade'].widget.attrs['readonly'] = 'readonly'
+                    self.fields['indicacao'].widget.attrs['readonly'] = 'readonly'
+
+                    self.fields['tipo'].choices = [(self.instance.tipo, self.instance.get_tipo_display())]
+                    self.fields['fase'].choices = [(self.instance.fase, self.instance.get_fase_display())]
+                    self.fields['unidade'].choices = [(self.instance.unidade.id, str(self.instance.unidade))]
+                    if self.instance.entidade:
+                        self.fields['entidade'].choices = [(self.instance.entidade.id, str(self.instance.entidade))]
+                    else:
+                        self.fields['entidade'].choices = [('', '-------')]
+
+            else:
+                self.fields['fase'].widget.attrs['class'] = 'is-invalid'
+                self.fields['fase'].choices = [(self.instance.fase, self.instance.get_fase_display())]
+
+
+
+
+
+
+
 
         if full_editor:
             self.fields.pop('parlamentares__valor')
@@ -680,22 +707,6 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             attrs={'class': 'text-right'},
             instance=self.instance
         )
-
-        def get_entidade_choice(e):
-            nome = e.nome_fantasia[:60].strip()
-            nome = nome + '&nbsp;' * (60 - len(nome))
-
-            tipo_entidade = str(e.tipo_entidade.descricao[:40].strip()) if e.tipo_entidade else ''
-            tipo_entidade = tipo_entidade + '&nbsp;' * (40 - len(tipo_entidade))
-
-            html = mark_safe(nome + ' - ' + tipo_entidade + f' {"cnes:" if e.cnes else "cnpj:"} {e.cnes or e.cpfcnpj or "Sem Identificação"}')
-
-            return e.id, html
-
-
-        self.fields['entidade'].choices = [('', '-------')] + [
-            get_entidade_choice(e) for e in
-            Entidade.objects.filter(ativo=True).order_by('nome_fantasia')]
 
     def clean(self):
         super().clean()

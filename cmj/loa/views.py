@@ -1187,6 +1187,16 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return MasterDetailCrud.UpdateView.post(self, request, *args, **kwargs)
 
+        def form_valid(self, form):
+            u = self.request.user
+            if u.has_perm('loa.emendaloa_full_editor'):
+                submit_concluir = 'submit_concluir' in self.request.POST
+                submit_devolver = 'submit_devolver' in self.request.POST
+                if submit_concluir or submit_devolver:
+                    form.instance.fase = EmendaLoa.LIBERACAO_CONTABIL if submit_concluir else EmendaLoa.PROPOSTA
+
+            return super().form_valid(form)
+
         def get(self, request, *args, **kwargs):
             u = request.user
             if not u.is_superuser and not u.is_anonymous:
@@ -1197,11 +1207,10 @@ class EmendaLoaCrud(MasterDetailCrud):
                             request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
                         return redirect(self.detail_url)
 
-                # if u.has_perm('loa.emendaloa_full_editor'):
-                #    if self.object.fase < EmendaLoa.PROPOSTA_LIBERADA:
-                #        messages.warning(
-                #            request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não liberada para edição contábil.')
-                #        return redirect(self.detail_url)
+                if u.has_perm('loa.emendaloa_full_editor') and \
+                    self.object.fase == EmendaLoa.PROPOSTA_LIBERADA:
+                    self.object.fase = EmendaLoa.EDICAO_CONTABIL
+                    self.object.save()
 
             return MasterDetailCrud.UpdateView.get(self, request, *args, **kwargs)
 
