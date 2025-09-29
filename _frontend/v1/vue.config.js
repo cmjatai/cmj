@@ -42,9 +42,7 @@ module.exports = {
 
   chainWebpack: config => {
 
-
-    config
-      .plugin('RelativeBundleTrackerPlugin')
+    config.plugin('RelativeBundleTrackerPlugin')
       .use(RelativeBundleTrackerPlugin, [{
         path: '.',
         filename: `./${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
@@ -84,6 +82,20 @@ module.exports = {
     } else {
       config.devtool('#eval-source-map')
     }
+
+    config.module
+      .rule('worker')
+      .test(/\.worker\.js$/)
+      .use('worker-loader')
+        .loader('worker-loader')
+        .options({
+          inline: 'fallback'
+        })
+        .end()
+    config.module
+      .rule('js')
+      .exclude
+        .add(/\.worker\.js$/);
 
     config.module
       .rule('images')

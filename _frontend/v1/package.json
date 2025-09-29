@@ -75,6 +75,7 @@
     "shelljs": "^0.8.4",
     "terser-webpack-plugin": "^1.2.3",
     "vue-template-compiler": "^2.7.16",
+    "worker-loader": "^3.0.8",
     "webpack-bundle-tracker": "^0.4.3",
     "webpack-cli": "^3.3.0"
   }

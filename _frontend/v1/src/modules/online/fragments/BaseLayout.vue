@@ -41,6 +41,9 @@
 </template>
 
 <script>
+
+import workerTimer from '@/timer/worker-timer'
+
 export default {
   name: 'base-layout',
   data () {
@@ -55,18 +58,21 @@ export default {
       this.sideleft_expand = !this.sideleft_expand
     },
     handleScroll () {
-      // console.log('scroll')
+      console.log('scroll')
       let t = this
       if (t.count_time === 0) {
         t.count_time += 1
         if (t.id_interval !== 0) {
-          clearInterval(t.id_interval)
+          workerTimer.clearInterval(t.id_interval)
         }
-        t.id_interval = setInterval(() => {
-          // console.log(t.count_time)
+        t.id_interval = workerTimer.setInterval(() => {
+          console.log(t.count_time, new Date())
           t.count_time += 1
         }, 5000)
       } else if (t.count_time > 12) {
+        workerTimer.clearInterval(t.id_interval)
+        t.id_interval = 0
+        console.log('reconnect')
         t.count_time = 0
         t.$disconnect()
         t.$connect()
@@ -77,6 +83,7 @@ export default {
   },
   mounted: function () {
     document.querySelector('body').classList.add('body-base-layout')
+    this.handleScroll()
   }
 }
 </script>
