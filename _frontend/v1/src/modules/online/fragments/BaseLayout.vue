@@ -58,7 +58,7 @@ export default {
       this.sideleft_expand = !this.sideleft_expand
     },
     handleScroll () {
-      console.log('scroll')
+      // console.log('scroll')
       let t = this
       if (t.count_time === 0) {
         t.count_time += 1
@@ -66,16 +66,20 @@ export default {
           workerTimer.clearInterval(t.id_interval)
         }
         t.id_interval = workerTimer.setInterval(() => {
-          console.log(t.count_time, new Date())
+          // console.log(t.count_time, new Date())
           t.count_time += 1
+          if (t.count_time > 60) {
+            t.handleScroll()
+          }
         }, 5000)
       } else if (t.count_time > 12) {
         workerTimer.clearInterval(t.id_interval)
         t.id_interval = 0
-        console.log('reconnect')
+        // console.log('reconnect')
         t.count_time = 0
         t.$disconnect()
         t.$connect()
+        t.handleScroll()
       } else {
         t.count_time = 0
       }
