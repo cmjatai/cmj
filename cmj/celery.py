@@ -19,4 +19,16 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 def debug_task(self):
     print(f"Request: {self.request!r}")
 
+# Configuração de tarefas periódicas
+from celery.schedules import crontab
 
+app.conf.beat_schedule = {
+    'check-finished-timers': {
+        'task': 'cmj.panelset.tasks.check_finished_timers',
+        'schedule': 1.0,  # A cada segundo
+    },
+    'cleanup-old-events': {
+        'task': 'cmj.panelset.tasks.cleanup_old_events',
+        'schedule': crontab(hour=2, minute=0),  # Diariamente às 2h
+    },
+}
