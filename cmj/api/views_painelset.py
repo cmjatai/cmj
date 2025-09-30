@@ -2,7 +2,9 @@ import logging
 
 from django.apps.registry import apps
 
-from cmj.painelset.models import Individuo
+from cmj.api.serializers_painelset import CronometroSerializer
+from cmj.painelset.cronometro_manager import CronometroManager
+from cmj.painelset.models import Cronometro, Individuo
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -15,7 +17,6 @@ ApiViewSetConstrutor.build_class(
         apps.get_app_config('painelset')
     ]
 )
-
 
 
 @customize(Individuo)
@@ -36,50 +37,46 @@ class _IndividuoViewSet:
         return Response(result)
 
 
+cronometro_manager = CronometroManager()
 
-'''''
-timer_manager = TimerManager()
-
-@customize(Timer)
-class _TimerViewSet:
-    serializer_class = TimerSerializer
+@customize(Cronometro)
+class _CronometroViewSet:
+    serializer_class = CronometroSerializer
 
     def perform_create(self, serializer):
-        """Criar cronômetro usando o TimerManager"""
-        timer = serializer.save()
+        """Criar cronômetro usando o CronometroManager"""
+        cronometro = serializer.save()
         # Notificar observers sobre criação
-        timer_manager.notify_observers(timer, 'created')
+        cronometro_manager.notify_observers(cronometro, 'created')
 
     @action(detail=True, methods=['post'])
     def start(self, request, pk=None):
-        """Iniciar cronômetro usando o TimerManager"""
-        result = timer_manager.start_timer(pk)
+        """Iniciar cronômetro usando o CronometroManager"""
+        result = cronometro_manager.start_cronometro(pk)
         return Response(result, status=status.HTTP_200_OK if result.get('success') else status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def pause(self, request, pk=None):
-        """Pausar cronômetro usando o TimerManager"""
-        result = timer_manager.pause_timer(pk)
+        """Pausar cronômetro usando o CronometroManager"""
+        result = cronometro_manager.pause_cronometro(pk)
         return Response(result, status=status.HTTP_200_OK if result.get('success') else status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def stop(self, request, pk=None):
-        """Parar cronômetro usando o TimerManager"""
-        result = timer_manager.stop_timer(pk)
+        """Parar cronômetro usando o CronometroManager"""
+        result = cronometro_manager.stop_cronometro(pk)
         return Response(result, status=status.HTTP_200_OK if result.get('success') else status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['post'])
     def resume(self, request, pk=None):
-        """Retomar cronômetro usando o TimerManager"""
-        result = timer_manager.resume_timer(pk)
+        """Retomar cronômetro usando o CronometroManager"""
+        result = cronometro_manager.resume_cronometro(pk)
         return Response(result, status=status.HTTP_200_OK if result.get('success') else status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['get'])
     def tree(self, request, pk=None):
-        """Obter árvore de cronômetros usando o TimerManager"""
-        tree_data = timer_manager.get_timer_tree(pk)
+        """Obter árvore de cronômetros usando o CronometroManager"""
+        tree_data = cronometro_manager.get_cronometro_tree(pk)
         if tree_data:
             return Response(tree_data)
-        return Response({'error': 'Timer not found'}, status=status.HTTP_404_NOT_FOUND)
-
-'''
+        return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
