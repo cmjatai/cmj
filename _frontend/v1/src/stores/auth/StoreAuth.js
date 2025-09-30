@@ -40,6 +40,18 @@ const actions = {
     }
     return fetch()
   },
+  hasPermission: ({ commit }, url) => {
+    const utils = Resources.Utils
+    const hasPermission = utils.hasPermission
+
+    let fetch = function () {
+      return hasPermission(url)
+        .then(response => {
+          return response.data
+        })
+    }
+    return fetch()
+  },
   loginPortalCMJ: ({ commit }, { username, password }) => {
     const utils = Resources.Utils
     const login = utils.login

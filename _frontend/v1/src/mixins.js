@@ -33,7 +33,8 @@ Vue.mixin({
       'getObject',
       'loginPortalCMJ',
       'logoutPortalCMJ',
-      'loginStatus'
+      'loginStatus',
+      'hasPermission'
     ]),
     nivel (value, teste_local) {
       return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'
@@ -149,6 +150,10 @@ Vue.mixin({
       wrapper.id = ''
 
       main[0].classList.add('appvue')
+    },
+    user_logged_in () {
+    },
+    user_logged_out () {
     }
   },
   created: function () {
@@ -160,5 +165,7 @@ Vue.mixin({
     */
     let _this = this
     EventBus.$on('ws-message', _this.on_ws_message)
+    EventBus.$on('user-logged-in', _this.user_logged_in)
+    EventBus.$on('user-logged-out', _this.user_logged_out)
   }
 })

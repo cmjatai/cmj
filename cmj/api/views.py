@@ -76,6 +76,15 @@ class AppSessionAuthView(ObtainAuthToken):
         logout(request)
         return Response({'detail': _('Desconexão efetuada com sucesso!')})
 
+    def options(self, request, *args, **kwargs):
+        perm = request.GET.get('perm', None)
+        if perm:
+            if not request.user.has_perm(perm):
+                raise PermissionDenied(
+                    _('Usuário não possui permissão: %s') % perm)
+            return Response({'status': 'ok', 'detail': _('Usuário possui permissão: %s') % perm})
+        return super().options(request, *args, **kwargs)
+
 
 CmjApiViewSetConstrutor = ApiViewSetConstrutor
 CmjApiViewSetConstrutor.import_modules([

@@ -43,6 +43,7 @@
   </div>
 </template>
 <script>
+import { EventBus } from '@/event-bus'
 export default {
   name: 'portalcmj-connect',
   data () {
@@ -78,12 +79,14 @@ export default {
       this.is_expanded = !this.is_expanded
     },
     close () {
-      this.clickToggle()
-      this
+      const t = this
+      t.clickToggle()
+      t
         .logoutPortalCMJ()
         .then((response) => {
-          this.sendMessage({ alert: 'info', message: 'Desconexão efetuada com sucesso!', time: 5 })
+          t.sendMessage({ alert: 'info', message: 'Desconexão efetuada com sucesso!', time: 5 })
           // window.location.href = '/'
+          EventBus.$emit('user-logged-out')
         })
     },
     submit (evt) {
@@ -98,6 +101,7 @@ export default {
           t.error_message = false
           t.sendMessage({ alert: 'info', message: 'Autenticação efetuada com sucesso!', time: 5 })
           t.clickToggle()
+          EventBus.$emit('user-logged-in')
         })
         .catch(() => {
           t.error_message = true
