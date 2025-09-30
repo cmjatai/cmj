@@ -18,6 +18,11 @@ export default {
     logout: () => axios.delete(
       `${basePath}/auth/session`
     ),
+    hasPermission: (permission) => axios({
+      url: `${basePath}/auth/session/?perm=${permission}`,
+      method: 'OPTIONS',
+      withCredentials: true
+    }),
     getVersion: () => axios({
       url: `${basePath}/version`,
       method: 'GET'

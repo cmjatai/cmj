@@ -70,7 +70,7 @@ export const routes = [
         ]
       },
       { path: 'painelset', // list
-        name: '',
+        name: 'painelset_list_link',
         component: () => import('@/modules/painelset/PainelSetModule.vue'),
         children: [
           {

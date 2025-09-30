@@ -59,13 +59,20 @@ export default {
           image: require('@/assets/img/icon_relatorios.png'),
           route: '',
           texto: 'Relatórios'
+        },
+        {
+          image: require('@/assets/img/icon_mesa_diretora.png'),
+          route: 'painelset_list_link',
+          texto: 'Painéis',
+          permission: 'painelset.list_evento',
+          hasPermission: false
         }
       ]
     }
   },
   computed: {
     links_filter: function () {
-      return this.links.filter(i => i.route !== '')
+      return this.links.filter(i => i.route !== '' && (i.permission === undefined || (i.hasPermission !== undefined && i.hasPermission)))
     }
   },
   methods: {
@@ -90,10 +97,35 @@ export default {
       setTimeout(() => {
         t.clicked = ''
       }, 500)
+    },
+    user_logged_in () {
+      let t = this
+      t.selected = ''
+      t.links.forEach((item, key) => {
+        if (item.permission !== undefined) {
+          t.hasPermission(item.permission)
+            .then((response) => {
+              t.links[key].hasPermission = true
+            })
+            .catch(() => {
+              t.links[key].hasPermission = false
+            })
+        }
+      })
+    },
+    user_logged_out () {
+      let t = this
+      t.selected = ''
+      t.links.forEach((item, key) => {
+        if (item.permission !== undefined) {
+          t.links[key].hasPermission = false
+        }
+      })
     }
   },
   mounted () {
     this.selected = this.$route.name
+    this.user_logged_in()
   }
 }
 </script>
