@@ -14,6 +14,7 @@ from sapl.materia.models import MateriaLegislativa
 from sapl.base.models import Metadata
 from django.db.models import Q
 from django.utils import timezone
+from django.conf import settings
 
 from celery.utils.log import get_task_logger
 
@@ -229,7 +230,8 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
 
 @cmj_celery_app.task(queue='cq_base', bind=True)
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
-
+    if settings.DEBUG:
+        return
     #restart = start_task(
     #    'sapl.base.tasks.task_analise_similaridade_entre_materias',
     #    task_analise_similaridade_entre_materias,
