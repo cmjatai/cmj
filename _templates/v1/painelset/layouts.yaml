@@ -1,0 +1,18 @@
+{% load i18n %}
+Evento:
+  {% trans 'Dados Básicos' %}:
+  - name:8 duration created_at
+  {% trans 'Demais Dados' %}:
+  - individuos parts
+  {% trans 'Descrição' %}:
+  - description
+Individuo:
+  {% trans 'Dados Gerais' %}:
+  - name role order
+  {% trans 'Evento' %}:
+  - evento
+  {% trans 'Parlamentar' %}:
+  - parlamentar
+ParteEvento:
+  {% trans 'Dados Gerais' %}:
+  - name duration order

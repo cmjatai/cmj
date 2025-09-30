@@ -45,6 +45,7 @@ import cmj.ouvidoria.urls
 import cmj.search.urls
 import cmj.sigad.urls
 import cmj.videos.urls
+import cmj.painelset.urls
 import sapl.api.urls
 import sapl.audiencia.urls
 import sapl.base.urls
@@ -81,7 +82,7 @@ urlpatterns_all = [
     re_path(r'', include(cmj.ouvidoria.urls)),
     re_path(r'', include(cmj.agenda.urls)),
     re_path(r'', include(cmj.videos.urls)),
-
+    re_path(r'', include(cmj.painelset.urls)),
 
     re_path(r'', include(sapl.audiencia.urls)),
     re_path(r'', include(sapl.comissoes.urls)),
