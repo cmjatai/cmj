@@ -85,6 +85,7 @@ CMJ_APPS = (
     'cmj.videos',
     'cmj.sigad',
     'cmj.search',
+    'cmj.painelset',
     'cmj.api',
 
     'cmj.dashboard',
