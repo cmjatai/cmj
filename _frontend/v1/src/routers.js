@@ -29,7 +29,7 @@ export const routes = [
   {
     path: '/loa/',
     component: () => import('@/modules/loa/LoaLayout'),
-    name: 'loa_route',
+    name: '',
     children: [
       {
         path: '',
@@ -49,12 +49,12 @@ export const routes = [
     ]
   },
   {
-    path: '/online',
+    path: '/online/',
     component: () => import('@/modules/online/OnlineLayout'),
     children: [
       {
-        path: '', // list
-        name: 'sessao_link',
+        path: 'sessao', // list
+        name: '',
         component: () => import('@/modules/online/sessao/SessaoPlenariaModule.vue'),
         children: [
           {
@@ -66,6 +66,29 @@ export const routes = [
             path: ':id/',
             name: 'sessao_plenaria_online_link',
             component: () => import('@/modules/online/sessao/SessaoPlenariaOnline.vue')
+          }
+        ]
+      },
+      { path: 'painelset', // list
+        name: '',
+        component: () => import('@/modules/painelset/PainelSetModule.vue'),
+        children: [
+          {
+            path: ':id/',
+            name: 'painelset_detail_link',
+            component: () => import('@/modules/painelset/PainelSetDetail.vue'),
+            children: [
+              {
+                path: 'admin',
+                name: 'painelset_admin_link',
+                component: () => import('@/modules/painelset/admin/PainelSetAdmin.vue')
+              },
+              {
+                path: ':painel_id',
+                name: 'painelset_painel_link',
+                component: () => import('@/modules/painelset/painel/PainelSetPainel.vue')
+              }
+            ]
           }
         ]
       }

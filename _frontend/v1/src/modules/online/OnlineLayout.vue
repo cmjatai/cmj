@@ -11,6 +11,7 @@
         <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
       </div>
     </template>
+
     <template slot="header-right">
       <portalcmj-connect></portalcmj-connect>
     </template>
@@ -60,6 +61,14 @@ export default {
     },
     aumentarFonte () {
       $('.base-layout .main').css('font-size', '+=1')
+    }
+  },
+  // implementar redirect de vue-router se a url for /online para /online/sessao
+  beforeRouteEnter (to, from, next) {
+    if (to.path === '/online' || to.path === '/online/') {
+      next('/online/sessao')
+    } else {
+      next()
     }
   }
 }
