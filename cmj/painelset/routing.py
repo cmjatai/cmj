@@ -4,5 +4,6 @@ from django.urls import re_path
 from . import consumers
 
 websocket_urlpatterns = [
-    re_path(r'ws/timer/(?P<timer_id>[0-9a-f-]+)/$', consumers.CronometroConsumer.as_asgi()),
+    # re_path(r'^ws/cronometro/$', consumers.CronometroConsumer.as_asgi()),
+    re_path(r'ws/cronometro/(?P<timer_id>[0-9]+)/$', consumers.CronometroConsumer.as_asgi()),
 ]

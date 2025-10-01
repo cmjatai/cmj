@@ -10,6 +10,7 @@ export default {
   name: 'sessaoplenaria-module',
   data () {
     return {
+      ws: '/ws/time-refresh/',
       models_init_cache: {
         base: ['autor'],
         sessao: [
@@ -37,11 +38,14 @@ export default {
     this.setSideleftVisivel(true)
     this.setSiderightVisivel(false)
     try {
-      this.$connect()
+      this.ws_reconnect()
     } catch (e) {
       console.log(e) // Logs the error
     }
     this.initCache()
+  },
+  beforeDestroy: function () {
+    this.$disconnect()
   },
   methods: {
     ...Vuex.mapActions([
