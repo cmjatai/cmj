@@ -2,7 +2,8 @@
   <div class="w-100 h-100 d-flex flex-column align-items-start inner inner-sideleft">
     <router-link :to="{ name: item.route }" v-for="(item, key) in links_filter" :key="key+1" @click.native="selectRoute(item)" :class="[isSelected(item), isClicked(item)]" @mouseover.native="mouseover(item)" @mouseleave.native="mouseleave(item)">
       <span class="hover-circle icon">
-        <b-img :src="item.image" fluid rounded="0" />
+        <i v-if="item.icon" :class="item.icon"></i>
+        <b-img v-else :src="item.image" fluid rounded="0" />
       </span>
       <span class="text-link">
         {{item.texto}}
@@ -61,7 +62,7 @@ export default {
           texto: 'Relatórios'
         },
         {
-          image: require('@/assets/img/icon_mesa_diretora.png'),
+          icon: 'fas fa-columns',
           route: 'painelset_list_link',
           texto: 'Painéis',
           permission: 'painelset.list_evento',
@@ -177,7 +178,12 @@ export default {
     }
     &.selected .icon  {
       border-radius: 50%;
+      width: $width-sideleft * 0.6;
+      height: $width-sideleft * 0.6;
       background-color: #dddddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
   }
 }

@@ -2,7 +2,9 @@ import {
   STATE_UPDATE,
   STATE_DELETE,
   SET_NIVEL_DETALHE,
-  SET_NIVEL_DETALHE_VISIVEL
+  SET_NIVEL_DETALHE_VISIVEL,
+  SET_SIDELEFT_VISIVEL,
+  SET_SIDERIGHT_VISIVEL
 } from './mutation-types'
 
 import Resources from '@/resources'
@@ -37,13 +39,23 @@ const mutations = {
 
   [SET_NIVEL_DETALHE_VISIVEL] (state, visivel) {
     state.nivel_detalhe_visivel = visivel
+  },
+
+  [SET_SIDELEFT_VISIVEL] (state, visivel) {
+    state.sideleft_visivel = visivel
+  },
+
+  [SET_SIDERIGHT_VISIVEL] (state, visivel) {
+    state.sideright_visivel = visivel
   }
 }
 
 const state = {
   cache: {},
   nivel_detalhe: 1,
-  nivel_detalhe_visivel: false
+  nivel_detalhe_visivel: false,
+  sideleft_visivel: true,
+  sideright_visivel: true
 }
 
 const getters = {
@@ -55,6 +67,12 @@ const getters = {
   },
   nivel_detalhe_visivel: (state) => {
     return state.nivel_detalhe_visivel
+  },
+  sideleft_visivel: (state) => {
+    return state.sideleft_visivel
+  },
+  sideright_visivel: (state) => {
+    return state.sideright_visivel
   },
   getCache: (state) => (metadata) => {
     if (!state.cache.hasOwnProperty(metadata.app)) {
@@ -76,6 +94,12 @@ const actions = {
   },
   setNivelDetalheVisivel: ({ commit }, visivel) => {
     commit(SET_NIVEL_DETALHE_VISIVEL, visivel)
+  },
+  setSideleftVisivel: ({ commit }, visivel) => {
+    commit(SET_SIDELEFT_VISIVEL, visivel)
+  },
+  setSiderightVisivel: ({ commit }, visivel) => {
+    commit(SET_SIDERIGHT_VISIVEL, visivel)
   },
   getObject: ({ commit, getters, dispatch }, metadata) => {
     let model = getters.getCache(metadata)

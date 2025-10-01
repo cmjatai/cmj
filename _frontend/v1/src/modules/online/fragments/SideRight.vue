@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 inner inner-sideright">
+  <div :class="['w-100', 'inner', 'inner-sideright', {'d-none': !sideright_visivel}]">
     <div class="menu">
       <ul>
         <li>
@@ -28,6 +28,12 @@ import NormaSimpleModalView from '@/components/norma/NormaSimpleModalView'
 
 export default {
   name: 'side-right',
+  props: {
+    sideright_visivel: {
+      type: Boolean,
+      default: true
+    }
+  },
   components: {
     NormaSimpleModalView
   },

@@ -5,15 +5,17 @@
 </template>
 
 <script>
-
+import Vuex from 'vuex'
 export default {
   name: 'painelset-module',
   data () {
     return {
     }
   },
-
   mounted: function () {
+    const t = this
+    t.setSideleftVisivel(true)
+    t.setSiderightVisivel(false)
     try {
       this.$connect()
     } catch (e) {
@@ -21,6 +23,10 @@ export default {
     }
   },
   methods: {
+    ...Vuex.mapActions([
+      'setSideleftVisivel',
+      'setSiderightVisivel'
+    ])
   }
 }
 </script>

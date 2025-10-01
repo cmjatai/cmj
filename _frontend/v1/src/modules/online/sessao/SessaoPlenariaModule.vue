@@ -5,7 +5,7 @@
 </template>
 
 <script>
-
+import Vuex from 'vuex'
 export default {
   name: 'sessaoplenaria-module',
   data () {
@@ -34,6 +34,8 @@ export default {
   },
 
   mounted: function () {
+    this.setSideleftVisivel(true)
+    this.setSiderightVisivel(false)
     try {
       this.$connect()
     } catch (e) {
@@ -42,6 +44,10 @@ export default {
     this.initCache()
   },
   methods: {
+    ...Vuex.mapActions([
+      'setSideleftVisivel',
+      'setSiderightVisivel'
+    ]),
     fetchList (page = null, _app = null, _model = null) {
       const t = this
       t.utils
