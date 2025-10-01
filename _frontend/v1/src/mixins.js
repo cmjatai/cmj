@@ -36,6 +36,22 @@ Vue.mixin({
       'loginStatus',
       'hasPermission'
     ]),
+    ws_endpoint (ws) {
+      return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + ws
+    },
+    ws_reconnect (ws = null) {
+      this.$disconnect()
+      if (ws !== null || this.ws !== undefined) {
+        this.$connect(this.ws_endpoint(ws !== null ? ws : this.ws))
+      } else {
+        try {
+          const wsslot = this.$slots.main[0].child.ws
+          this.$connect(this.ws_endpoint(wsslot))
+        } catch (e) {
+          this.$connect()
+        }
+      }
+    },
     nivel (value, teste_local) {
       return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'
     },

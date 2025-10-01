@@ -19,6 +19,7 @@ class CronometroConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         # Pegar ID do cronômetro da URL
+        print(self.scope['user'])
         self.cronometro_id = self.scope['url_route']['kwargs']['cronometro_id']
         self.cronometro_group_name = f'cronometro_{self.cronometro_id}'
 

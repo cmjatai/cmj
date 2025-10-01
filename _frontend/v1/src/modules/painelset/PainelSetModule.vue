@@ -17,7 +17,6 @@ export default {
     t.setSideleftVisivel(true)
     t.setSiderightVisivel(false)
     try {
-      this.$connect()
     } catch (e) {
       console.log(e) // Logs the error
     }

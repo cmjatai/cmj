@@ -6,6 +6,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 class TimeRefreshConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
+        #print('Conectando ao TimeRefreshConsumer')
         self.room_name = 'time_refresh_channel'
         self.room_group_name = 'group_%s' % self.room_name
 
@@ -18,6 +19,7 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
+        #print('Desconectando do TimeRefreshConsumer')
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name

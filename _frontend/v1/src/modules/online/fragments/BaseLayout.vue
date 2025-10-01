@@ -84,8 +84,7 @@ export default {
         t.id_interval = 0
         // console.log('reconnect')
         t.count_time = 0
-        t.$disconnect()
-        t.$connect()
+        t.ws_reconnect()
         t.handleScroll()
       } else {
         t.count_time = 0
