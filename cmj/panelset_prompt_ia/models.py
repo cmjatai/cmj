@@ -37,10 +37,8 @@ class Timer(models.Model):
     finished_at = models.DateTimeField(null=True, blank=True)
 
     # Configuração de comportamento hierárquico
-    stop_parent_on_finish = models.BooleanField(default=False,
+    pause_parent_on_start = models.BooleanField(default=False,
         help_text="Se True, para o cronômetro pai quando este terminar")
-    reduce_parent_time = models.BooleanField(default=False,
-        help_text="Se True, reduz simultaneamente o tempo do cronômetro pai")
 
     # Tempo acumulado (para pausas)
     accumulated_time = models.DurationField(default=timedelta())

@@ -13,7 +13,7 @@ class TimerSerializer(serializers.ModelSerializer):
         model = Timer
         fields = [
             'id', 'name', 'parent', 'duration', 'state',
-            'stop_parent_on_finish', 'reduce_parent_time',
+            'pause_parent_on_start',
             'created_at', 'started_at', 'paused_at', 'finished_at',
             'elapsed_time', 'remaining_time', 'children_count'
         ]
@@ -35,9 +35,9 @@ class TimerTreeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Timer
         fields = [
-            'id', 'name', 'state', 'duration', 
+            'id', 'name', 'state', 'duration',
             'elapsed_time', 'remaining_time',
-            'stop_parent_on_finish', 'reduce_parent_time',
+            'pause_parent_on_start', 
             'children'
         ]
 

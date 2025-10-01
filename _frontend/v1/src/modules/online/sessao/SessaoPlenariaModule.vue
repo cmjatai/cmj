@@ -38,6 +38,7 @@ export default {
     this.setSideleftVisivel(true)
     this.setSiderightVisivel(false)
     try {
+      this.$options.sockets.onmessage = this.handleWebSocketMessageTimeRefresh
       this.ws_reconnect()
     } catch (e) {
       console.log(e) // Logs the error

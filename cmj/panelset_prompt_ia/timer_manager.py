@@ -131,8 +131,7 @@ class TimerManager:
                 'duration': timer.duration.total_seconds(),
                 'elapsed_time': timer.elapsed_time.total_seconds(),
                 'remaining_time': timer.remaining_time.total_seconds(),
-                'stop_parent_on_finish': timer.stop_parent_on_finish,
-                'reduce_parent_time': timer.reduce_parent_time,
+                'pause_parent_on_start': timer.pause_parent_on_start,
                 'children': [build_tree_node(child) for child in timer.get_children()]
             }
 

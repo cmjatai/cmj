@@ -131,8 +131,7 @@ class CronometroManager:
                 'duration': cronometro.duration.total_seconds(),
                 'elapsed_time': cronometro.elapsed_time.total_seconds(),
                 'remaining_time': cronometro.remaining_time.total_seconds(),
-                'stop_parent_on_finish': cronometro.stop_parent_on_finish,
-                'reduce_parent_time': cronometro.reduce_parent_time,
+                'pause_parent_on_start': cronometro.pause_parent_on_start,
                 'children': [build_tree_node(child) for child in cronometro.get_children()]
             }
 
