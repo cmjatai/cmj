@@ -16,11 +16,11 @@
       <portalcmj-connect></portalcmj-connect>
     </template>
 
-    <template slot="sideleft">
+    <template slot="sideleft" :sideleft_visivel="sideleft_visivel">
       <side-left></side-left>
     </template>
 
-    <template slot="sideright">
+    <template slot="sideright" :sideright_visivel="sideright_visivel">
       <side-right></side-right>
     </template>
 
@@ -52,7 +52,9 @@ export default {
   },
   computed: {
     ...Vuex.mapGetters([
-      'nivel_detalhe_visivel'
+      'nivel_detalhe_visivel',
+      'sideleft_visivel',
+      'sideright_visivel'
     ])
   },
   methods: {

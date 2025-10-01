@@ -1,5 +1,5 @@
 <template>
-  <div :class="['base-layout', sideleft_expand ? 'left-expand': '']">
+  <div :class="['base-layout', sideleft_expand ? 'left-expand': '', sideleft_visivel ? '' : 'no-sideleft', sideright_visivel ? '' : 'no-sideright']">
 
     <header>
 
@@ -43,6 +43,7 @@
 <script>
 
 import workerTimer from '@/timer/worker-timer'
+import Vuex from 'vuex'
 
 export default {
   name: 'base-layout',
@@ -52,6 +53,12 @@ export default {
       count_time: 0,
       id_interval: 0
     }
+  },
+  computed: {
+    ...Vuex.mapGetters([
+      'sideleft_visivel',
+      'sideright_visivel'
+    ])
   },
   methods: {
     toogle_sideleft: function () {
@@ -115,6 +122,25 @@ export default {
   grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
   grid-template-rows: 60px auto;
   z-index: 4000;
+
+  &.no-sideleft {
+    grid-template-columns: 0px auto $width-sideright;
+    .sideleft {
+      display: none;
+    }
+  }
+  &.no-sideright {
+    grid-template-columns: $width-sideleft $width-sideleft * 3 auto 0px;
+    .sideright {
+      display: none;
+    }
+  }
+  &.no-sideleft.no-sideright {
+    grid-template-columns: 0px auto 0px;
+    .sideleft, .sideright {
+      display: none;
+    }
+  }
 
   .btn-outline-dark {
     border: 1px solid #bbb;
@@ -241,8 +267,17 @@ export default {
 
   .base-layout {
     grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
-
     font-size: 0.9rem;
+
+    &.no-sideleft {
+      grid-template-columns: 0px auto $width-sideright;
+    }
+    &.no-sideright {
+      grid-template-columns: $width-sideleft $width-sideleft * 3 auto 0px;
+    }
+    &.no-sideleft.no-sideright {
+      grid-template-columns: 0px auto 0px;
+    }
     header {
       grid-template-columns: $width-sideleft auto $width-sideleft * 1.2;
       .nav-toggler {
@@ -267,6 +302,16 @@ export default {
 
   .base-layout {
     grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
+
+    &.no-sideleft {
+      grid-template-columns: 0px auto $width-sideright;
+    }
+    &.no-sideright {
+      grid-template-columns: $width-sideleft $width-sideleft * 3 auto 0px;
+    }
+    &.no-sideleft.no-sideright {
+      grid-template-columns: 0px auto 0px;
+    }
 
     header {
       grid-template-columns: auto 1px $width-sideleft;
@@ -302,6 +347,16 @@ export default {
   .base-layout {
     grid-template-rows: 70px auto;
     grid-template-columns: $width-sideleft $width-sideleft * 3 auto $width-sideright;
+
+    &.no-sideleft {
+      grid-template-columns: 0px auto $width-sideright;
+    }
+    &.no-sideright {
+      grid-template-columns: $width-sideleft $width-sideleft * 3 auto 0px;
+    }
+    &.no-sideleft.no-sideright {
+      grid-template-columns: 0px auto 0px;
+    }
     header {
       height: 70px;
       .header-main {

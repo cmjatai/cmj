@@ -31,6 +31,8 @@ export default {
   mounted () {
     let t = this
     t.setNivelDetalheVisivel(true)
+    t.setSideleftVisivel(true)
+    t.setSiderightVisivel(true)
     t.$nextTick(() => {
       t
         .getObject({
@@ -51,7 +53,9 @@ export default {
   },
   methods: {
     ...Vuex.mapActions([
-      'setNivelDetalheVisivel'
+      'setNivelDetalheVisivel',
+      'setSideleftVisivel',
+      'setSiderightVisivel'
     ]),
     fetch (data) {
       let t = this
