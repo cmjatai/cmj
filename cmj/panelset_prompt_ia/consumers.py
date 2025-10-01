@@ -135,8 +135,7 @@ class TimerConsumer(AsyncWebsocketConsumer):
                 'remaining_time': timer.remaining_time.total_seconds(),
                 'parent_id': str(timer.parent.id) if timer.parent else None,
                 'children_count': timer.children.count(),
-                'stop_parent_on_finish': timer.stop_parent_on_finish,
-                'reduce_parent_time': timer.reduce_parent_time
+                'pause_parent_on_start': timer.pause_parent_on_start
             }
         except Timer.DoesNotExist:
             return None

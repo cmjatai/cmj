@@ -11,7 +11,7 @@
             <span v-if="evento.end_real"> - Finalizado em: {{ evento.end_real }} </span>
           </a>
           &nbsp;
-          <a href="#" @click.prevent="play(evento)"><i class="fas fa-play"></i></a>
+          <a href="#" @click.prevent="open(evento)"><i class="fas fa-toolbox"></i></a>
         </li>
       </ul>
     </div>
@@ -48,7 +48,7 @@ export default {
       'setSideleftVisivel',
       'setSiderightVisivel'
     ]),
-    play (eventoId) {
+    open (eventoId) {
       if (eventoId) {
         this.$router.push({ name: 'painelset_admin_link', params: { id: eventoId.id } })
       }

@@ -1,9 +1,13 @@
 
 import json
+
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
+
+from cmj.api.serializers_painelset import CronometroSerializer
 from .models import Cronometro
 from .cronometro_manager import CronometroManager
+from django.utils import timezone
 
 class CronometroConsumer(AsyncWebsocketConsumer):
     """
@@ -19,7 +23,7 @@ class CronometroConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         # Pegar ID do cronômetro da URL
-        print(self.scope['user'])
+        print(self.scope['user'], timezone.now())
         self.cronometro_id = self.scope['url_route']['kwargs']['cronometro_id']
         self.cronometro_group_name = f'cronometro_{self.cronometro_id}'
 
@@ -88,7 +92,8 @@ class CronometroConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({
                     'type': 'command_result',
                     'command': command,
-                    'result': result
+                    'result': result,
+                    'cronometro': await self.get_cronometro_data(cronometro_id)
                 }))
 
         except json.JSONDecodeError:
@@ -127,8 +132,9 @@ class CronometroConsumer(AsyncWebsocketConsumer):
         """Busca dados do cronômetro de forma assíncrona"""
         try:
             cronometro = Cronometro.objects.get(id=cronometro_id)
+            return CronometroSerializer(cronometro).data
             return {
-                'id': str(cronometro.id),
+                'id': cronometro.id,
                 'name': cronometro.name,
                 'state': cronometro.state,
                 'duration': cronometro.duration.total_seconds(),
@@ -136,8 +142,7 @@ class CronometroConsumer(AsyncWebsocketConsumer):
                 'remaining_time': cronometro.remaining_time.total_seconds(),
                 'parent_id': str(cronometro.parent.id) if cronometro.parent else None,
                 'children_count': cronometro.children.count(),
-                'stop_parent_on_finish': cronometro.stop_parent_on_finish,
-                'reduce_parent_time': cronometro.reduce_parent_time
+                'pause_parent_on_start': cronometro.pause_parent_on_start
             }
         except Cronometro.DoesNotExist:
             return None

@@ -26,7 +26,7 @@ class StopParentHandler(TimerEventHandler):
     """Handler para parar cronômetro pai quando filho terminar"""
 
     def handle(self, timer, event_data=None):
-        if timer.parent and timer.stop_parent_on_finish:
+        if timer.parent and timer.pause_parent_on_start:
             # Importação local para evitar circular import
             from .timer_commands import StopTimerCommand
 
@@ -39,23 +39,6 @@ class StopParentHandler(TimerEventHandler):
                     event_type='stopped',
                     triggered_by_child=timer
                 )
-
-        # Continuar cadeia
-        return super().handle(timer, event_data)
-
-class ReduceParentTimeHandler(TimerEventHandler):
-    """Handler para reduzir tempo do cronômetro pai proporcionalmente"""
-
-    def handle(self, timer, event_data=None):
-        if timer.parent and timer.reduce_parent_time:
-            parent = timer.parent
-            if parent.state == TimerState.RUNNING:
-                # Reduzir tempo do pai baseado no tempo decorrido do filho
-                elapsed_ratio = timer.elapsed_time / timer.duration
-                time_to_reduce = parent.duration * elapsed_ratio * 0.1  # 10% do tempo proporcional
-
-                parent.accumulated_time += time_to_reduce
-                parent.save()
 
         # Continuar cadeia
         return super().handle(timer, event_data)
@@ -108,11 +91,10 @@ class TimerEventChain:
     def _build_chain(self):
         """Constrói a cadeia de handlers"""
         stop_parent = StopParentHandler()
-        reduce_parent = ReduceParentTimeHandler()
         notification = NotificationHandler()
 
         # Configura a ordem da cadeia
-        stop_parent.set_next(reduce_parent).set_next(notification)
+        stop_parent.set_next(notification)
 
         return stop_parent
 

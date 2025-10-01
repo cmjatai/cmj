@@ -91,7 +91,9 @@ class Cronometro(models.Model):
             return timedelta()
 
         if self.state == CronometroState.RUNNING and self.started_at:
-            return self.accumulated_time + (timezone.now() - self.started_at)
+            tn = timezone.now()
+            r = self.accumulated_time + (tn - self.started_at)
+            return r
 
         return self.accumulated_time
 
@@ -133,7 +135,7 @@ class Evento(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
 
     start_previsto = models.DateTimeField(null=True, blank=True, verbose_name="Data e hora Prevista de Início")
-    
+
     start_real = models.DateTimeField(null=True, blank=True, verbose_name="Data e hora Real de Início")
     end_real = models.DateTimeField(null=True, blank=True, verbose_name="Data e hora Real de Término")
 
@@ -152,6 +154,22 @@ class Evento(models.Model):
 
     def __str__(self):
         return self.name
+
+    def get_or_create_unique_cronometro(self):
+        """Obtém ou cria um cronômetro único associado ao evento"""
+        cronometro, created = Cronometro.objects.get_or_create(
+            content_type=ContentType.objects.get_for_model(self),
+            object_id=self.id,
+            defaults={
+                'name': f'Cronômetro do Evento: {self.name}',
+                'duration': self.duration
+            }
+        )
+        if not created:
+            cronometro.duration = self.duration
+            cronometro.save()
+
+        return cronometro
 
 class ParteEvento(models.Model):
     """Modelo para representar uma Parte de um Evento, que possui um tempo específico."""
