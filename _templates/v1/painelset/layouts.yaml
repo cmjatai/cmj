@@ -1,7 +1,7 @@
 {% load i18n %}
 Evento:
   {% trans 'Dados Básicos' %}:
-  - name:8 duration created_at
+  - name:7 duration start_previsto:3
   {% trans 'Demais Dados' %}:
   - individuos parts
   {% trans 'Descrição' %}:

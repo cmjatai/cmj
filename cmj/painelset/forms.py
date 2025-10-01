@@ -55,18 +55,24 @@ class EventoForm(forms.ModelForm):
 
     class Meta:
         model = Evento
-        fields = ['name', 'description', 'duration']
+        fields = [
+            'name',
+            'description',
+            'duration',
+            'start_previsto',
+            ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         row1 = to_row([
             ('name', 6),
+            ('start_previsto', 3),
             ('duration', 3),
             ('vincular_parlamentares', 3),
-            ('partes', 4),
-            ('tribunas', 4),
-            ('individuos_extras', 4),
+            ('partes', 3),
+            ('tribunas', 3),
+            ('individuos_extras', 3),
             ('description', 12),
         ])
 

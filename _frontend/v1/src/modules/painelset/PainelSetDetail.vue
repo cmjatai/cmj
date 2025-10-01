@@ -1,5 +1,8 @@
 <template>
   <div class="painelset-detail">
+    <div v-if="$route.name === 'painelset_detail_link'" class="painelset-detail-header">
+      Detalhes do Painel Setting
+    </div>
     <router-view></router-view>
   </div>
 </template>
