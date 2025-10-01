@@ -76,19 +76,17 @@ export const routes = [
           {
             path: ':id/',
             name: 'painelset_detail_link',
-            component: () => import('@/modules/painelset/PainelSetDetail.vue'),
-            children: [
-              {
-                path: 'admin',
-                name: 'painelset_admin_link',
-                component: () => import('@/modules/painelset/admin/PainelSetAdmin.vue')
-              },
-              {
-                path: ':painel_id',
-                name: 'painelset_painel_link',
-                component: () => import('@/modules/painelset/painel/PainelSetPainel.vue')
-              }
-            ]
+            component: () => import('@/modules/painelset/PainelSetDetail.vue')
+          },
+          {
+            path: ':id/admin',
+            name: 'painelset_admin_link',
+            component: () => import('@/modules/painelset/admin/PainelSetAdmin.vue')
+          },
+          {
+            path: ':id/:painel_id',
+            name: 'painelset_painel_link',
+            component: () => import('@/modules/painelset/painel/PainelSetPainel.vue')
           }
         ]
       }

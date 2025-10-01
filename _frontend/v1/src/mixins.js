@@ -36,22 +36,6 @@ Vue.mixin({
       'loginStatus',
       'hasPermission'
     ]),
-    ws_endpoint (ws) {
-      return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + ws
-    },
-    ws_reconnect (ws = null) {
-      this.$disconnect()
-      if (ws !== null || this.ws !== undefined) {
-        this.$connect(this.ws_endpoint(ws !== null ? ws : this.ws))
-      } else {
-        try {
-          const wsslot = this.$slots.main[0].child.ws
-          this.$connect(this.ws_endpoint(wsslot))
-        } catch (e) {
-          this.$connect()
-        }
-      }
-    },
     nivel (value, teste_local) {
       return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'
     },
@@ -87,6 +71,22 @@ Vue.mixin({
     isString: function (value) {
       return typeof value === 'string' || value instanceof String
     },
+    ws_endpoint (ws) {
+      return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + ws
+    },
+    ws_reconnect (ws = null) {
+      this.$disconnect()
+      if (ws !== null || this.ws !== undefined) {
+        this.$connect(this.ws_endpoint(ws !== null ? ws : this.ws))
+      } else {
+        try {
+          const wsslot = this.$slots.main[0].child.ws
+          this.$connect(this.ws_endpoint(wsslot))
+        } catch (e) {
+          this.$connect()
+        }
+      }
+    },
     on_ws_message (data) {
       let _this = this
 
@@ -115,12 +115,48 @@ Vue.mixin({
         }
       }
     },
-
+    fetchModelOrderedList (app = null, model = null, ordering = null, page = 1, func = null) {
+      if (page === null || model === null || ordering === null) {
+        return
+      }
+      const t = this
+      return t.utils.getModelOrderedList(app, model, ordering, page)
+        .then((response) => {
+          t.init = true
+          _.each(response.data.results, (value, idx) => {
+            value.vue_validate = true
+            if (value.id in t.itens[`${model}_list`]) {
+              t.itens[`${model}_list`][value.id] = value
+            } else {
+              t.$set(t.itens[`${model}_list`], value.id, value)
+            }
+            if (func !== null) {
+              func(value)
+            }
+          })
+          t.$nextTick()
+            .then(function () {
+              if (response.data.pagination.next_page !== null) {
+                t.fetchModelOrderedList(app, model, ordering, response.data.pagination.next_page)
+              } else {
+                _.mapKeys(t.itens[`${model}_list`], function (obj, k) {
+                  if (!obj.vue_validate) {
+                    t.$delete(t.itens[`${model}_list`], obj.id)
+                  }
+                })
+              }
+            })
+        })
+        .catch((response) => {
+          t.init = true
+          t.sendMessage(
+            { alert: 'danger', message: 'Não foi possível recuperar a Listagem.', time: 5 })
+        })
+    },
     fetchModelListAction (app = null, model = null, action = null, page = 1, func = null) {
       if (page === null || model === null || action === null) {
         return
       }
-
       const t = this
       return t.utils.getModelListAction(app, model, action, page)
         .then((response) => {

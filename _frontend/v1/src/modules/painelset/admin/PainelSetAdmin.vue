@@ -1,6 +1,6 @@
 <template>
   <div class="painelset-admin">
-    <router-view></router-view>
+    Administração de Painel Settings
   </div>
 </template>
 

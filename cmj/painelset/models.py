@@ -132,6 +132,11 @@ class Evento(models.Model):
     description = models.TextField(blank=True, verbose_name="Descrição do Evento")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
 
+    start_previsto = models.DateTimeField(null=True, blank=True, verbose_name="Data e hora Prevista de Início")
+    
+    start_real = models.DateTimeField(null=True, blank=True, verbose_name="Data e hora Real de Início")
+    end_real = models.DateTimeField(null=True, blank=True, verbose_name="Data e hora Real de Término")
+
     duration = models.DurationField(help_text="Duração total planejada do evento", verbose_name="Duração do Evento")
 
     cronometro = GenericRelation(
