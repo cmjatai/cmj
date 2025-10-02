@@ -23,7 +23,6 @@ class CronometroSerializer(SaplSerializerMixin):
     remaining_time = SecondDurationField()
     elapsed_time = SecondDurationField()
     duration = SecondDurationField()
-    accumulated_time = SecondDurationField()
     children_count = serializers.SerializerMethodField()
 
     class Meta(SaplSerializerMixin.Meta):
@@ -34,7 +33,16 @@ class CronometroSerializer(SaplSerializerMixin):
     def get_children_count(self, obj):
         return obj.children.count()
 
+class CronometroTreeSerializer(CronometroSerializer):
+    """Serializer recursivo para árvore de cronômetros"""
+    children = serializers.SerializerMethodField()
 
+    class Meta(SaplSerializerMixin.Meta):
+        model = Cronometro
+
+    def get_children(self, obj):
+        children = obj.get_children()
+        return CronometroTreeSerializer(children, many=True).data
 
 
 class CronometroEventSerializer(SaplSerializerMixin):
@@ -42,23 +50,6 @@ class CronometroEventSerializer(SaplSerializerMixin):
     class Meta:
         model = CronometroEvent
         fields = ['id', 'cronometro', 'event_type', 'timestamp', 'triggered_by_child']
-
-class CronometroTreeSerializer(SaplSerializerMixin):
-    """Serializer recursivo para árvore de cronômetros"""
-    children = serializers.SerializerMethodField()
-
-    class Meta(SaplSerializerMixin.Meta):
-        model = Cronometro
-        fields = [
-            'id', 'name', 'state', 'duration',
-            'elapsed_time', 'remaining_time',
-            'pause_parent_on_start',
-            'children'
-        ]
-
-    def get_children(self, obj):
-        children = obj.get_children()
-        return CronometroTreeSerializer(children, many=True).data
 
 class EventoSerializer(SaplSerializerMixin):
     """Serializer para o modelo Evento"""

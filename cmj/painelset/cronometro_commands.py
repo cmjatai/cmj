@@ -1,7 +1,10 @@
 
 from abc import ABC, abstractmethod
+from unittest import result
 from django.utils import timezone
 from datetime import timedelta
+
+from cmj.api.serializers_painelset import CronometroTreeSerializer
 from .models import Cronometro, CronometroState, CronometroEvent
 
 class CronometroCommand(ABC):
@@ -17,7 +20,9 @@ class CronometroCommand(ABC):
         """Executa o comando"""
         try:
             self.cronometro = Cronometro.objects.get(id=self.cronometro_id)
-            return self._execute_command()
+            result = self._execute_command()
+            result['cronometro'] = CronometroTreeSerializer(self.cronometro).data
+            return result
         except Cronometro.DoesNotExist:
             return {"error": "Cronômetro não encontrado"}
 

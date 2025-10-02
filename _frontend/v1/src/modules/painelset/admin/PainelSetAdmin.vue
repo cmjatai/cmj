@@ -3,7 +3,7 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-6">
-          a<cronometro v-if="cronometro" :cronometro_id="cronometro.id"></cronometro>
+          <cronometro v-if="cronometro" :cronometro_id="cronometro.id"></cronometro>
         </div>
       </div>
     </div>

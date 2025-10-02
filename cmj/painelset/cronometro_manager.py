@@ -1,6 +1,8 @@
 
 from django.utils import timezone
 from datetime import timedelta
+
+from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer
 from .models import Cronometro, CronometroState
 from .cronometro_commands import (
     StartCronometroCommand, PauseCronometroCommand,
@@ -56,8 +58,7 @@ class CronometroManager:
         result = command.execute()
 
         if result.get('success'):
-            cronometro = Cronometro.objects.get(id=cronometro_id)
-            self.notify_observers(cronometro, 'started')
+            self.notify_observers(command.cronometro, 'started')
 
         return result
 
@@ -67,8 +68,7 @@ class CronometroManager:
         result = command.execute()
 
         if result.get('success'):
-            cronometro = Cronometro.objects.get(id=cronometro_id)
-            self.notify_observers(cronometro, 'paused')
+            self.notify_observers(command.cronometro, 'paused')
 
         return result
 
@@ -78,8 +78,7 @@ class CronometroManager:
         result = command.execute()
 
         if result.get('success'):
-            cronometro = Cronometro.objects.get(id=cronometro_id)
-            self.notify_observers(cronometro, 'resumed')
+            self.notify_observers(command.cronometro, 'resumed')
 
         return result
 
@@ -89,8 +88,7 @@ class CronometroManager:
         result = command.execute()
 
         if result.get('success'):
-            cronometro = Cronometro.objects.get(id=cronometro_id)
-            self.notify_observers(cronometro, 'stopped')
+            self.notify_observers(command.cronometro, 'stopped')
 
         return result
 
@@ -108,34 +106,24 @@ class CronometroManager:
                 result = command.execute()
 
                 if result.get('success'):
-                    finished_cronometros.append(cronometro)
-                    self.notify_observers(cronometro, 'finished')
+                    finished_cronometros.append(command.cronometro)
+                    self.notify_observers(command.cronometro, 'finished')
 
         return finished_cronometros
 
-    def get_cronometro_tree(self, root_cronometro_id):
+    def get_cronometro_data(self, cronometro):
         """
-        Retorna uma árvore hierárquica de cronômetros
-        Composite Pattern: navega pela estrutura hierárquica
+        Retorna os dados de um cronômetro e seus descendentes em formato serializado
         """
         try:
-            root = Cronometro.objects.get(id=root_cronometro_id)
+            if not isinstance(cronometro, Cronometro):
+                cronometro = Cronometro.objects.get(id=cronometro)
+            return {
+                "cronometro": CronometroTreeSerializer(cronometro).data
+            }
         except Cronometro.DoesNotExist:
             return None
 
-        def build_tree_node(cronometro):
-            return {
-                'id': str(cronometro.id),
-                'name': cronometro.name,
-                'state': cronometro.state,
-                'duration': cronometro.duration.total_seconds(),
-                'elapsed_time': cronometro.elapsed_time.total_seconds(),
-                'remaining_time': cronometro.remaining_time.total_seconds(),
-                'pause_parent_on_start': cronometro.pause_parent_on_start,
-                'children': [build_tree_node(child) for child in cronometro.get_children()]
-            }
-
-        return build_tree_node(root)
 
 # Observer concreto para logging
 class CronometroLogger:
