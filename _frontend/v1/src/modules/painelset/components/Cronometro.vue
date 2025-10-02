@@ -1,6 +1,43 @@
 <template>
-  <div class="cronometro-component">
-    <div v-if="cronometro">
+  <div :class="['cronometro-component', css_class]">
+    <div v-if="cronometro" class="box">
+      <div class="inner">
+        {{ displayTime }}
+        <div class="inner-rodape">
+          <div v-if="display === 'elapsed'">
+            <small>Tempo Decorrido</small>
+          </div>
+          <div v-else-if="display === 'remaining'">
+            <small>Tempo Restante</small>
+          </div>
+        </div>
+      </div>
+      <div :class="['controls', css_class_controls]" v-if="css_class_controls">
+        <div class="btn-group btn-group-sm" role="group" aria-label="First group">
+          <a class="btn btn-outline-dark" @click.stop="toogleDisplay" title="Alternar exibição">
+            <i class="fa fa-exchange-alt" aria-hidden="true"></i>
+          </a>
+          <a class="btn btn-outline-dark" @click.stop="startCronometro" v-if="cronometro.state === 'stopped'">
+            <i class="fa fa-play" aria-hidden="true"></i>
+          </a>
+          <a class="btn btn-outline-dark" @click.stop="pauseCronometro" v-if="cronometro.state === 'running'">
+            <i class="fa fa-pause" aria-hidden="true"></i>
+          </a>
+          <a class="btn btn-outline-dark" @click.stop="resumeCronometro" v-if="cronometro.state === 'paused'">
+            <i class="fa fa-play" aria-hidden="true"></i>
+          </a>
+          <a class="btn btn-outline-dark" @click.stop="stopCronometro" v-if="['running', 'paused'].includes(cronometro.state)">
+            <i class="fa fa-stop" aria-hidden="true"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div v-else>
+      <p>Carregando cronômetro...</p>
+    </div>
+    <div v-if="cronometro && debug_verbose">
+      <br><br>
+      <hr>
       <h3>{{ cronometro.name }}</h3>
       <p>Estado: {{ cronometro.state }}</p>
       <p>Duração: {{ cronometro.duration }}</p>
@@ -16,11 +53,36 @@
       <button @click="resumeCronometro" :disabled="cronometro.state !== 'paused'">Retomar</button>
       <button @click="stopCronometro" :disabled="cronometro.state === 'stopped'">Parar</button>
     </div>
-    <div v-else>
-      <p>Carregando cronômetro...</p>
-    </div>
   </div>
 </template>
+<style>
+.cronometro-component {
+  .box {
+    .inner {
+      cursor: pointer;
+      line-height: 1;
+      .inner-rodape {
+        font-size: 0.5em;
+        text-align: center;
+        margin-top: -3px;
+        color: #ccc;
+      }
+    }
+    .controls {
+      margin-top: -5%;
+      z-index: 1;
+      &.hover {
+        position: absolute;
+        top: 100%;
+        display: none;
+      }
+    }
+    &:hover .controls.hover {
+      display: block;
+    }
+  }
+}
+</style>
 <script>
 import workerTimer from '@/timer/worker-timer'
 
@@ -30,6 +92,14 @@ export default {
     cronometro_id: {
       type: Number,
       required: true
+    },
+    css_class: {
+      type: String,
+      default: ''
+    },
+    css_class_controls: {
+      type: String,
+      default: ''
     }
   },
   data () {
@@ -38,16 +108,32 @@ export default {
       wsSocket: null,
       cronometro: null,
       idInterval: null,
-      syncInterval: 30, // sincroniza o cronômetro a cada 10 segundos
-      countInterval: 0
+      syncInterval: 30, // sincroniza o cronômetro a cada 30 segundos
+      countInterval: 0,
+      debug_verbose: false,
+      display: 'elapsed', // 'elapsed', 'remaining'
+      modesDisplay: ['elapsed', 'remaining'] // modos disponíveis
     }
   },
   mounted: function () {
     console.log('Cronometro mounted, connecting to WebSocket:', this.ws)
     this.ws_client_cronometro()
-    this.runInterval()
+  },
+  beforeDestroy: function () {
+    if (this.wsSocket) {
+      console.log('Cronometro beforeDestroy, closing WebSocket')
+      this.wsSocket.close()
+    }
+    if (this.idInterval) {
+      workerTimer.clearInterval(this.idInterval)
+    }
   },
   methods: {
+    toogleDisplay () {
+      const currentIndex = this.modesDisplay.indexOf(this.display)
+      const nextIndex = (currentIndex + 1) % this.modesDisplay.length
+      this.display = this.modesDisplay[nextIndex]
+    },
     ws_client_cronometro () {
       const t = this
       if (t.wsSocket) {
@@ -57,18 +143,22 @@ export default {
       t.wsSocket = new WebSocket(this.ws_endpoint())
       t.wsSocket.onopen = () => {
         console.log('WebSocket conectado:', this.ws)
-        t.getCronometro()
       }
       t.wsSocket.onmessage = this.handleWebSocketMessageLocal
       t.wsSocket.onclose = () => {
-        console.log('WebSocket desconectado, tentando reconectar em 5 segundos...')
-        setTimeout(() => {
-          t.ws_client_cronometro()
-        }, 5000)
+        console.log('WebSocket desconectado...')
       }
       t.wsSocket.onerror = (error) => {
         console.error('Erro no WebSocket:', error)
         t.wsSocket.close()
+      }
+      t.wsSocket.onpagehide = () => {
+        console.log('WebSocket página oculta, fechando conexão')
+        t.wsSocket.close()
+      }
+      t.wsSocket.onpageshow = () => {
+        console.log('WebSocket página visível, reconectando')
+        t.ws_client_cronometro()
       }
       return t.wsSocket
     },
@@ -145,6 +235,15 @@ export default {
     }
   },
   computed: {
+    displayTime: function () {
+      if (this.display === 'elapsed') {
+        return this.elapsedTime
+      } else if (this.display === 'remaining') {
+        return this.remainingTime
+      } else {
+        return '00:00:00'
+      }
+    },
     elapsedTime: function () {
       // converte segundos para formato HH:MM:SS
       if (!this.cronometro || this.cronometro.elapsed_time == null) {
