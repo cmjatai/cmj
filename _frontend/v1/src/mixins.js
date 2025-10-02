@@ -72,7 +72,7 @@ Vue.mixin({
       return typeof value === 'string' || value instanceof String
     },
     ws_endpoint (ws) {
-      return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + ws
+      return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + (ws !== undefined ? ws : this.ws)
     },
     ws_reconnect (ws = null) {
       this.$disconnect()
@@ -114,6 +114,28 @@ Vue.mixin({
           _this.fetch(data)
         }
       }
+    },
+    handleWebSocketMessageTimeRefresh (event) {
+      /**
+       * Define um ouvinte para o socket implementado por VueNativeSock
+       */
+      let data = JSON.parse(event.data)
+      // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
+      // console.log(performance.now(), 'ws-message', data)
+      this.$nextTick(() => {
+        this.refreshState(data.message)
+          .then(value => {
+            // Emite um evento pelo barramento parelelo global.
+            // O componente que estiver ouvindo esse barramento será informado que um
+            // evento ws-message ocorreu. Será chamada o method on_ws_message
+            // console.log(performance.now(), 'ws-message-exec', data)
+            EventBus.$emit('ws-message', data.message)
+            // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
+          })
+          .catch(err => {
+            console.error('Erro ao atualizar o estado da aplicação', err)
+          })
+      })
     },
     fetchModelOrderedList (app = null, model = null, ordering = null, page = 1, func = null) {
       if (page === null || model === null || ordering === null) {
@@ -206,28 +228,6 @@ Vue.mixin({
     user_logged_in () {
     },
     user_logged_out () {
-    },
-    handleWebSocketMessageTimeRefresh (event) {
-      /**
-       * Define um ouvinte para o socket implementado por VueNativeSock
-       */
-      let data = JSON.parse(event.data)
-      // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-      // console.log(performance.now(), 'ws-message', data)
-      this.$nextTick(() => {
-        this.refreshState(data.message)
-          .then(value => {
-            // Emite um evento pelo barramento parelelo global.
-            // O componente que estiver ouvindo esse barramento será informado que um
-            // evento ws-message ocorreu. Será chamada o method on_ws_message
-            // console.log(performance.now(), 'ws-message-exec', data)
-            EventBus.$emit('ws-message', data.message)
-            // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-          })
-          .catch(err => {
-            console.error('Erro ao atualizar o estado da aplicação', err)
-          })
-      })
     }
   },
   created: function () {

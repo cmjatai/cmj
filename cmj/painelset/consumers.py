@@ -1,4 +1,5 @@
 
+import asyncio
 import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
@@ -36,11 +37,15 @@ class CronometroConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
         # Enviar estado inicial do cronômetro
-        cronometro_data = await self.get_cronometro_data(self.cronometro_id)
+
+        cronometro_data = await database_sync_to_async(
+            self.cronometro_manager.get_cronometro_data
+        )(self.cronometro_id)
         if cronometro_data:
             await self.send(text_data=json.dumps({
-                'type': 'cronometro_state',
-                'cronometro': cronometro_data
+                'type': 'command_result',
+                'command': 'get',
+                'result': cronometro_data
             }))
 
     async def disconnect(self, close_code):
@@ -81,19 +86,17 @@ class CronometroConsumer(AsyncWebsocketConsumer):
                     self.cronometro_manager.stop_cronometro
                 )(cronometro_id)
 
-            elif command == 'get_tree':
-                tree_data = await database_sync_to_async(
-                    self.cronometro_manager.get_cronometro_tree
+            elif command == 'get':
+                result = await database_sync_to_async(
+                    self.cronometro_manager.get_cronometro_data
                 )(cronometro_id)
-                result = {'success': True, 'tree': tree_data}
 
             # Enviar resultado de volta
             if result:
                 await self.send(text_data=json.dumps({
                     'type': 'command_result',
                     'command': command,
-                    'result': result,
-                    'cronometro': await self.get_cronometro_data(cronometro_id)
+                    'result': result
                 }))
 
         except json.JSONDecodeError:
@@ -106,6 +109,7 @@ class CronometroConsumer(AsyncWebsocketConsumer):
                 'type': 'error',
                 'message': str(e)
             }))
+
 
     # Handlers para mensagens do grupo (enviadas pela Chain of Responsibility)
     async def cronometro_update(self, event):
@@ -126,23 +130,3 @@ class CronometroConsumer(AsyncWebsocketConsumer):
             'parent_cronometro_id': event['parent_cronometro_id'],
             'state': event['state']
         }))
-
-    @database_sync_to_async
-    def get_cronometro_data(self, cronometro_id):
-        """Busca dados do cronômetro de forma assíncrona"""
-        try:
-            cronometro = Cronometro.objects.get(id=cronometro_id)
-            return CronometroSerializer(cronometro).data
-            return {
-                'id': cronometro.id,
-                'name': cronometro.name,
-                'state': cronometro.state,
-                'duration': cronometro.duration.total_seconds(),
-                'elapsed_time': cronometro.elapsed_time.total_seconds(),
-                'remaining_time': cronometro.remaining_time.total_seconds(),
-                'parent_id': str(cronometro.parent.id) if cronometro.parent else None,
-                'children_count': cronometro.children.count(),
-                'pause_parent_on_start': cronometro.pause_parent_on_start
-            }
-        except Cronometro.DoesNotExist:
-            return None

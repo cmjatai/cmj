@@ -1,9 +1,3 @@
-<!--
- componente Vue para exibir e controlar um cronômetro.
- fields:
- {"id":1,"__str__":"Cronômetro do Evento: Painel Geral de Sessões Ordinárias - Legislatura 2025/2028 (stopped)","link_detail_backend":"","elapsed_time":"0.0","remaining_time":"14400.0","children_count":0,"name":"Cronômetro do Evento: Painel Geral de Sessões Ordinárias - Legislatura 2025/2028","duration":"04:00:00","state":"stopped","created_at":"2025-10-01T16:00:12.433865-03:00","started_at":null,"paused_at":null,"finished_at":null,"pause_parent_on_start":false,"accumulated_time":"00:00:00","object_id":4,"parent":null,"content_type":319}
-
--->
 <template>
   <div class="cronometro-component">
     <div v-if="cronometro">
@@ -12,7 +6,6 @@
       <p>Duração: {{ cronometro.duration }}</p>
       <p>Tempo Decorrido: {{ elapsedTime }}</p>
       <p>Tempo Restante: {{ remainingTime }}</p>
-      <p>Tempo Acumulado: {{ accumulatedTime }}</p>
       <p>Iniciado em: {{ cronometro.started_at }}</p>
       <p>Pausado em: {{ cronometro.paused_at }}</p>
       <p>Finalizado em: {{ cronometro.finished_at }}</p>
@@ -42,8 +35,113 @@ export default {
   data () {
     return {
       ws: `/ws/cronometro/${this.cronometro_id}/`,
+      wsSocket: null,
       cronometro: null,
-      id_interval: null
+      idInterval: null,
+      syncInterval: 30, // sincroniza o cronômetro a cada 10 segundos
+      countInterval: 0
+    }
+  },
+  mounted: function () {
+    console.log('Cronometro mounted, connecting to WebSocket:', this.ws)
+    this.ws_client_cronometro()
+    this.runInterval()
+  },
+  methods: {
+    ws_client_cronometro () {
+      const t = this
+      if (t.wsSocket) {
+        t.wsSocket.close()
+      }
+      // conexão particular utilizando o WebSocket nativo
+      t.wsSocket = new WebSocket(this.ws_endpoint())
+      t.wsSocket.onopen = () => {
+        console.log('WebSocket conectado:', this.ws)
+        t.getCronometro()
+      }
+      t.wsSocket.onmessage = this.handleWebSocketMessageLocal
+      t.wsSocket.onclose = () => {
+        console.log('WebSocket desconectado, tentando reconectar em 5 segundos...')
+        setTimeout(() => {
+          t.ws_client_cronometro()
+        }, 5000)
+      }
+      t.wsSocket.onerror = (error) => {
+        console.error('Erro no WebSocket:', error)
+        t.wsSocket.close()
+      }
+      return t.wsSocket
+    },
+    runInterval () {
+      if (this.idInterval) {
+        workerTimer.clearInterval(this.idInterval)
+      }
+      // Atualiza o cronômetro a cada segundo se estiver em execução
+      this.idInterval = workerTimer.setInterval(() => {
+        if (this.cronometro && this.cronometro.state === 'running') {
+          this.cronometro.elapsed_time = this.cronometro.elapsed_time + 1
+          this.cronometro.remaining_time = this.cronometro.remaining_time - 1
+        }
+        this.countInterval += 1
+        if (this.countInterval >= this.syncInterval) {
+          this.getCronometro()
+          this.countInterval = 0
+        }
+      }, 1000)
+    },
+    handleWebSocketMessageLocal (message) {
+      console.log('Mensagem recebida do WebSocket:')
+      const data = JSON.parse(message.data)
+      if (
+        data.type === 'command_result' &&
+        data.result && data.result.cronometro &&
+        data.result.cronometro.id === this.cronometro_id
+      ) {
+        this.cronometro = { ...this.cronometro, ...data.result.cronometro }
+        if (data.command === 'start') {
+          console.log('Cronômetro iniciado:', data)
+        } else if (data.command === 'pause') {
+          console.log('Cronômetro pausado:', data)
+        } else if (data.command === 'stop') {
+          console.log('Cronômetro parado:', data)
+        } else if (data.command === 'resume') {
+          console.log('Cronômetro retomado:', data)
+        } else if (data.command === 'get') {
+          console.log('Estado do cronômetro atualizado:', data)
+        }
+        this.runInterval()
+      }
+    },
+    startCronometro () {
+      this.wsSocket.send(JSON.stringify({
+        command: 'start',
+        cronometro_id: this.cronometro.id
+      }))
+    },
+    pauseCronometro () {
+      this.wsSocket.send(JSON.stringify({
+        command: 'pause',
+        cronometro_id: this.cronometro.id
+      }))
+    },
+    resumeCronometro () {
+      this.wsSocket.send(JSON.stringify({
+        command: 'resume',
+        cronometro_id: this.cronometro.id
+      }))
+    },
+    stopCronometro () {
+      this.wsSocket.send(JSON.stringify({
+        command: 'stop',
+        cronometro_id: this.cronometro.id
+      }))
+    },
+    getCronometro () {
+      // qual o estado atual do cronometro no servidor?
+      this.wsSocket.send(JSON.stringify({
+        command: 'get',
+        cronometro_id: this.cronometro_id
+      }))
     }
   },
   computed: {
@@ -85,66 +183,6 @@ export default {
       return [hours, minutes, seconds]
         .map(v => v < 10 ? '0' + v : v)
         .join(':') // "HH:MM:SS"
-    }
-  },
-  mounted: function () {
-    console.log('Cronometro mounted, connecting to WebSocket:', this.ws)
-    this.$options.sockets.onmessage = this.handleWebSocketMessageLocal
-    this.ws_reconnect()
-    this.restartInterval()
-  },
-  methods: {
-    restartInterval () {
-      if (this.id_interval) {
-        workerTimer.clearInterval(this.id_interval)
-      }
-      // Atualiza o cronômetro a cada segundo se estiver em execução
-      this.id_interval = workerTimer.setInterval(() => {
-        if (this.cronometro && this.cronometro.state === 'running') {
-          this.cronometro.elapsed_time = this.cronometro.elapsed_time + 1
-          this.cronometro.remaining_time = this.cronometro.remaining_time - 1
-        }
-      }, 1000)
-    },
-    handleWebSocketMessageLocal (message) {
-      const data = JSON.parse(message.data)
-      if (data.type === 'cronometro_state' && data.cronometro.id === this.cronometro_id) {
-        this.cronometro = { ...this.cronometro, ...data.cronometro }
-      } else if (data.type === 'command_result') {
-        this.cronometro = { ...this.cronometro, ...data.cronometro }
-        if (data.command === 'start') {
-          console.log('Cronômetro iniciado:', data)
-        } else if (data.command === 'pause') {
-          console.log('Cronômetro pausado:', data)
-        } else if (data.command === 'stop') {
-          console.log('Cronômetro parado:', data)
-        }
-        this.restartInterval()
-      }
-    },
-    startCronometro () {
-      this.$socket.send(JSON.stringify({
-        command: 'start',
-        cronometro_id: this.cronometro.id
-      }))
-    },
-    pauseCronometro () {
-      this.$socket.send(JSON.stringify({
-        command: 'pause',
-        cronometro_id: this.cronometro.id
-      }))
-    },
-    resumeCronometro () {
-      this.$socket.send(JSON.stringify({
-        command: 'resume',
-        cronometro_id: this.cronometro.id
-      }))
-    },
-    stopCronometro () {
-      this.$socket.send(JSON.stringify({
-        command: 'stop',
-        cronometro_id: this.cronometro.id
-      }))
     }
   }
 }
