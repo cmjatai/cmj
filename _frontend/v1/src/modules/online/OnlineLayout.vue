@@ -7,6 +7,11 @@
     <template slot="header-detail">
       <nivel-detalhe v-if="nivel_detalhe_visivel"></nivel-detalhe>
       <div class="btn-group btn-group-sm accessibility" role="group" aria-label="First group">
+        <a href="#" class="btn btn-outline-dark" @click.prevent="fullscreen = !fullscreen" :title="fullscreen ? 'Sair do modo tela cheia' : 'Entrar no modo tela cheia'">
+          <i :class="fullscreen ? 'fas fa-compress' : 'fas fa-expand'"></i>
+        </a>
+      </div>
+      <div class="btn-group btn-group-sm accessibility" role="group" aria-label="Second group">
         <a class="btn btn-outline-dark" @click="diminuirFonte">a</a>
         <a class="btn btn-outline-dark" @click="aumentarFonte">A</a>
       </div>
@@ -49,6 +54,22 @@ export default {
     SideLeft,
     Brand,
     NivelDetalhe
+  },
+  data () {
+    return {
+      fullscreen: false
+    }
+  },
+  watch: {
+    fullscreen (newVal) {
+      if (newVal) {
+        document.documentElement.requestFullscreen()
+      } else {
+        if (document.fullscreenElement) {
+          document.exitFullscreen()
+        }
+      }
+    }
   },
   computed: {
     ...Vuex.mapGetters([

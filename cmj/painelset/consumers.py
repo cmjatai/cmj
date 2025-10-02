@@ -24,9 +24,9 @@ class CronometroConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         # Pegar ID do cronômetro da URL
-        print(self.scope['user'], timezone.now())
         self.cronometro_id = self.scope['url_route']['kwargs']['cronometro_id']
         self.cronometro_group_name = f'cronometro_{self.cronometro_id}'
+        print(self.scope['user'], timezone.now(), self.cronometro_group_name)
 
         # Juntar-se ao grupo do cronômetro
         await self.channel_layer.group_add(
@@ -93,11 +93,16 @@ class CronometroConsumer(AsyncWebsocketConsumer):
 
             # Enviar resultado de volta
             if result:
-                await self.send(text_data=json.dumps({
+                """await self.send(text_data=json.dumps({
                     'type': 'command_result',
                     'command': command,
                     'result': result
-                }))
+                }))"""
+                await self.channel_layer.group_send(self.cronometro_group_name, {
+                    'type': 'command_result',
+                    'command': command,
+                    'result': result
+                })
 
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({
@@ -109,6 +114,14 @@ class CronometroConsumer(AsyncWebsocketConsumer):
                 'type': 'error',
                 'message': str(e)
             }))
+
+    async def command_result(self, event):
+        """Enviar resultado do comando para o cliente"""
+        await self.send(text_data=json.dumps({
+            'type': 'command_result',
+            'command': event['command'],
+            'result': event['result']
+        }))
 
 
     # Handlers para mensagens do grupo (enviadas pela Chain of Responsibility)
