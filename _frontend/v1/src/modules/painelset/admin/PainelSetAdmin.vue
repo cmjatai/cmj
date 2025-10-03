@@ -3,14 +3,14 @@
     <div class="container-fluid p-2">
       <div class="row header mx-n2">
         <div class="col-auto">
-          <cronometro
+          <cronometro-global
             v-if="cronometro"
             :cronometro_id="cronometro.id"
             css_class_controls="hover"
             css_class="cronometro-global"
             :controls="['start', 'pause', 'resume', 'toggleDisplay']"
             @cronometro_start="fetchEvento()"
-            ></cronometro>
+            ></cronometro-global>
         </div>
         <div class="col">
           <div class="titulo-evento">
@@ -35,11 +35,11 @@
 
 <script>
 import Vuex from 'vuex'
-import Cronometro from '../components/Cronometro.vue'
+import CronometroGlobal from '../components/CronometroGlobal.vue'
 export default {
   name: 'painelset-admin',
   components: {
-    Cronometro
+    CronometroGlobal
   },
   data () {
     return {
