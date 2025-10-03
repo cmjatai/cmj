@@ -43,8 +43,8 @@ export default {
       url: `${basePath}/${app}/${model}/${id}/`,
       method: 'GET'
     }),
-    getModelAction: (app, model, id, action) => axios({
-      url: `${basePath}/${app}/${model}/${id}/${action}/`,
+    getModelAction: (app, model, id, action, query_string = '') => axios({
+      url: `${basePath}/${app}/${model}/${id}/${action}/?${query_string}`,
       method: 'GET'
     }),
     getModelListAction: (app, model, action, page = 1) => axios({

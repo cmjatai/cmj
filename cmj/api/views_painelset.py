@@ -1,6 +1,7 @@
 import logging
 
 from django.apps.registry import apps
+from django.conf import settings
 
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
@@ -9,6 +10,9 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
+
+from pythonosc import udp_client
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +59,17 @@ class _IndividuoViewSet:
 
         return Response(result)
 
+    @action(detail=True, methods=['GET'])
+    def toggle_microfone(self, request, *args, **kwargs):
+        sound_status = request.GET.get('sound_status', 'on')
+        individuo = self.get_object()
+        if not settings.DEBUG:
+            ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
+            porta = 10023
+            client = udp_client.SimpleUDPClient(ip, porta)
+            client.send_message("/xremote", None)
+            client.send_message(f"/ch/{individuo.order:>02}/mix/on", 1 if sound_status == 'on' else 0)
+        return Response({'status': 'ok', 'sound_status': sound_status, 'individuo': individuo.id})
 
 @customize(Cronometro)
 class _CronometroViewSet:
