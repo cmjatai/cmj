@@ -1,6 +1,6 @@
 <template>
   <div :class="['cronometro-component', css_class]">
-    <div v-if="cronometro" :class="['card', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']">
+    <div v-if="cronometro" :class="['croncard', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']">
       <div class="inner">
         <div :class="['display-time', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']">
           {{ displayTime }}
@@ -282,9 +282,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
 .cronometro-component {
-  .card {
+  .croncard {
     display: flex;
     flex-direction: column;
     height: 100%;
@@ -292,10 +292,10 @@ export default {
     justify-content: center;
     background-color: #444;
     color: #fff;
-    border-radius: 8px;
+    // border-radius: 8px;
     padding: 5px 10px 3px;
+    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     .inner {
       line-height: 1;
       flex-direction: column;

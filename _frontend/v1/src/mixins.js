@@ -162,7 +162,7 @@ Vue.mixin({
                 t.fetchModelOrderedList(app, model, ordering, response.data.pagination.next_page)
               } else {
                 _.mapKeys(t.itens[`${model}_list`], function (obj, k) {
-                  if (!obj.vue_validate) {
+                  if (!t.nulls.includes(obj) && !obj.vue_validate) {
                     t.$delete(t.itens[`${model}_list`], obj.id)
                   }
                 })

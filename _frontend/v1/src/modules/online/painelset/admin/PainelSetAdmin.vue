@@ -1,7 +1,7 @@
 <template>
   <div class="painelset-admin">
-    <div class="container-fluid p-2">
-      <div class="row header mx-n2">
+    <div class="container-fluid">
+      <div class="row header">
         <div class="col-auto">
           <cronometro-global
             v-if="cronometro"
@@ -29,17 +29,27 @@
           </div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-7 container-individuos">
+          <individuo-list v-if="evento" :evento="evento"></individuo-list>
+        </div>
+        <div class="col-5 container-controls">
+          controles aqui
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import Vuex from 'vuex'
-import CronometroGlobal from '../components/CronometroGlobal.vue'
+import CronometroGlobal from '../components/cronometros/CronometroGlobal.vue'
+import IndividuoList from './IndividuoList.vue'
 export default {
   name: 'painelset-admin',
   components: {
-    CronometroGlobal
+    CronometroGlobal,
+    IndividuoList
   },
   data () {
     return {
@@ -117,9 +127,15 @@ export default {
 .painelset-admin {
   $px: 10px;
   line-height: 1;
+  .container-fluid {
+    padding: 0 $px;
+  }
   .row {
     align-items: stretch;
-    .col, .col-auto {
+    margin-left: -$px;
+    margin-right: -$px;
+    padding-top: $px;
+    div[class^=col] {
       padding-left: $px;
       padding-right: $px;
       &:not(:first-child) {
@@ -141,8 +157,8 @@ export default {
     align-items: center;
     justify-content: center;
     height: 100%;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    // border-radius: 8px;
+    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: #fff;
     color: #333;
     font-size: 1.1em;
@@ -158,8 +174,8 @@ export default {
     text-align: center;
     height: 100%;
     padding: 5px 10px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    // border-radius: 8px;
+    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     background-color: #fff;
     color: #333;
     font-size: 0.8em;
