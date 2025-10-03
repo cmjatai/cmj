@@ -2,7 +2,7 @@ import logging
 
 from django.apps.registry import apps
 
-from cmj.api.serializers_painelset import CronometroSerializer, EventoSerializer
+from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
 from cmj.painelset.models import Cronometro, Evento, Individuo
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
@@ -25,11 +25,17 @@ class _EventoViewSet:
     serializer_class = EventoSerializer
     @action(detail=True, methods=['GET'])
     def cronometro(self, request, pk=None):
+        print('Acessando cronômetro do evento:', pk)
         evento = self.get_object()
-        cronometro = evento.get_or_create_unique_cronometro()
+        cronometro, created = evento.get_or_create_unique_cronometro()
         if cronometro:
-            serializer = CronometroSerializer(cronometro)
-            return Response(serializer.data)
+            if not evento.start_real and cronometro.started_at and not cronometro.finished_at:
+                evento.start_real = cronometro.started_at
+                evento.save(update_fields=['start_real'])
+            if not evento.end_real and cronometro.finished_at:
+                evento.end_real = cronometro.finished_at
+                evento.save(update_fields=['end_real'])
+            return Response(CronometroTreeSerializer(cronometro).data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
 
 @customize(Individuo)

@@ -8,6 +8,8 @@
             :cronometro_id="cronometro.id"
             css_class_controls="hover"
             css_class="cronometro-global"
+            :controls="['start', 'pause', 'resume', 'toggleDisplay']"
+            @cronometro_start="fetchEvento()"
             ></cronometro>
         </div>
         <div class="col">
@@ -17,11 +19,12 @@
         </div>
         <div class="col-auto">
           <div class="evento-datahora">
+            {{ datahora_prevista_real[0] }}
             <div class="evento-data">
-              {{ evento && evento.start_previsto ? (new Date(evento.start_previsto)).toLocaleDateString() : 'Data não definida' }}
+               {{ datahora_prevista_real[1] }}
             </div>
             <div class="evento-hora">
-              {{ evento && evento.start_previsto ? (new Date(evento.start_previsto)).toLocaleTimeString() : 'Hora não definida' }}
+              {{ datahora_prevista_real[2] }}
             </div>
           </div>
         </div>
@@ -44,7 +47,18 @@ export default {
       cronometro: null
     }
   },
-
+  computed: {
+    datahora_prevista_real: function () {
+      if (this.evento && !this.evento.start_real) {
+        const dt = new Date(this.evento.start_previsto)
+        return ['Início previsto', dt.toLocaleDateString(), dt.toLocaleTimeString()]
+      } else if (this.evento && this.evento.start_real) {
+        const dt = new Date(this.evento.start_real)
+        return ['Início real', dt.toLocaleDateString(), dt.toLocaleTimeString()]
+      }
+      return ['Data e hora não definidas', '', '']
+    }
+  },
   mounted: function () {
     this.fetchEvento()
   },
@@ -52,6 +66,18 @@ export default {
     ...Vuex.mapActions([
       'getObject'
     ]),
+    refreshEvento () {
+      const t = this
+      t
+        .refreshState({
+          app: 'painelset',
+          model: 'evento',
+          id: t.evento.id
+        })
+        .then((evento) => {
+          t.evento = evento
+        })
+    },
     fetchEvento () {
       const t = this
       const eventoId = this.$route.params.id
@@ -66,21 +92,18 @@ export default {
         })
         .then(evento => {
           t.evento = evento
-          if (t.evento && t.evento.cronometro) {
-            t.cronometro = t.evento.cronometro
-          } else {
-            t.utils.getModelAction(
-              'painelset',
-              'evento',
-              eventoId,
-              'cronometro'
-            ).then(cronometro => {
-              t.cronometro = cronometro.data
-              t.evento.cronometro = cronometro.data
-            }).catch(err => {
-              console.error('Erro ao buscar o cronometro do evento', err)
-            })
-          }
+          t.utils.getModelAction(
+            'painelset',
+            'evento',
+            eventoId,
+            'cronometro'
+          ).then(cronometro => {
+            t.cronometro = cronometro.data
+            t.evento.cronometro = cronometro.data
+            t.refreshEvento()
+          }).catch(err => {
+            console.error('Erro ao buscar o cronometro do evento', err)
+          })
         })
         .catch(err => {
           console.error('Erro ao buscar o evento', err)
@@ -104,6 +127,12 @@ export default {
       }
       &:not(:last-child) {
         padding-right: $px / 2;
+      }
+    }
+    &.header {
+      .col-auto {
+        display: flex;
+        align-items: stretch;
       }
     }
   }
@@ -147,15 +176,8 @@ export default {
     &.cronometro-global {
       font-size: 1.6em;
       font-weight: bold;
-      .box {
-        background-color: #444;
-        color: #fff;
-        border-radius: 8px;
-        padding: 5px 10px 3px;
-        text-align: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      .card {
         .inner {
-          height: 100%;
         }
       }
     }

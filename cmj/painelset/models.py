@@ -85,6 +85,13 @@ class Cronometro(models.Model):
         return not self.children.exists()
 
     @property
+    def last_paused_time(self):
+        """Calcula o tempo desde a última pausa"""
+        if self.state == CronometroState.PAUSED and self.paused_at:
+            return timezone.now() - self.paused_at
+        return timedelta()
+
+    @property
     def elapsed_time(self):
         """Calcula tempo decorrido"""
         if self.state == CronometroState.STOPPED:
@@ -101,7 +108,8 @@ class Cronometro(models.Model):
     def remaining_time(self):
         """Calcula tempo restante"""
         elapsed = self.elapsed_time
-        return max(timedelta(), self.duration - elapsed)
+        #return max(timedelta(), self.duration - elapsed)
+        return self.duration - elapsed
 
 class CronometroEvent(models.Model):
     """Modelo para registrar eventos de cronômetros - Observer Pattern"""
@@ -169,7 +177,7 @@ class Evento(models.Model):
             cronometro.duration = self.duration
             cronometro.save()
 
-        return cronometro
+        return cronometro, created
 
 class ParteEvento(models.Model):
     """Modelo para representar uma Parte de um Evento, que possui um tempo específico."""
