@@ -9,7 +9,9 @@
             css_class_controls="hover"
             css_class="cronometro-global"
             :controls="['start', 'pause', 'resume', 'toggleDisplay']"
-            @cronometro_start="fetchEvento()"
+            @cronometro_start="startEvento()"
+            @cronometro_pause="pauseEvento()"
+            @cronometro_resume="resumeEvento()"
             ></cronometro-global>
         </div>
         <div class="col">
@@ -31,7 +33,7 @@
       </div>
       <div class="row">
         <div class="col-7 container-individuos">
-          <individuo-list v-if="evento" :evento="evento"></individuo-list>
+          <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'"></individuo-list>
         </div>
         <div class="col-5 container-controls">
           controles aqui
@@ -118,6 +120,16 @@ export default {
         .catch(err => {
           console.error('Erro ao buscar o evento', err)
         })
+    },
+    resumeEvento () {
+      this.$refs.individuoList.sound_status = 1
+    },
+    startEvento () {
+      this.fetchEvento()
+      this.$refs.individuoList.sound_status = 1
+    },
+    pauseEvento () {
+      this.$refs.individuoList.sound_status = 0
     }
   }
 }

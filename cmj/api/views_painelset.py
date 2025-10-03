@@ -42,6 +42,25 @@ class _EventoViewSet:
             return Response(CronometroTreeSerializer(cronometro).data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    @action(detail=True, methods=['GET'])
+    def toggle_microfones(self, request, *args, **kwargs):
+        sound_status = request.GET.get('sound_status', 'on')
+        evento = self.get_object()
+        print(f'Toggle microfones do evento {evento} para {sound_status}')
+
+        if not settings.DEBUG:
+            ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
+            porta = 10023
+            client = udp_client.SimpleUDPClient(ip, porta)
+            client.send_message("/xremote", None)
+
+        for individuo in evento.individuos.all():
+            print(f'  Toggle microfone {individuo} para {sound_status}')
+            if not settings.DEBUG:
+                client.send_message(f"/ch/{evento.order:>02}/mix/on", 1 if sound_status == 'on' else 0)
+
+        return Response({'status': 'ok', 'sound_status': sound_status, 'evento': evento.id})
+
 @customize(Individuo)
 class _IndividuoViewSet:
 
@@ -63,6 +82,7 @@ class _IndividuoViewSet:
     def toggle_microfone(self, request, *args, **kwargs):
         sound_status = request.GET.get('sound_status', 'on')
         individuo = self.get_object()
+        print(f'Toggle microfone {individuo} para {sound_status}')
         if not settings.DEBUG:
             ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
             porta = 10023
