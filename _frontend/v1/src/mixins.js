@@ -128,7 +128,7 @@ Vue.mixin({
             // Emite um evento pelo barramento parelelo global.
             // O componente que estiver ouvindo esse barramento será informado que um
             // evento ws-message ocorreu. Será chamada o method on_ws_message
-            // console.log(performance.now(), 'ws-message-exec', data)
+            console.log(performance.now(), 'ws-message-exec', data)
             EventBus.$emit('ws-message', data.message)
             // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
           })
@@ -137,12 +137,12 @@ Vue.mixin({
           })
       })
     },
-    fetchModelOrderedList (app = null, model = null, ordering = null, page = 1, func = null) {
+    fetchModelOrderedList (app = null, model = null, ordering = null, page = 1, query_string = '', func = null) {
       if (page === null || model === null || ordering === null) {
         return
       }
       const t = this
-      return t.utils.getModelOrderedList(app, model, ordering, page)
+      return t.utils.getModelOrderedList(app, model, ordering, page, query_string)
         .then((response) => {
           t.init = true
           _.each(response.data.results, (value, idx) => {
@@ -159,7 +159,7 @@ Vue.mixin({
           t.$nextTick()
             .then(function () {
               if (response.data.pagination.next_page !== null) {
-                t.fetchModelOrderedList(app, model, ordering, response.data.pagination.next_page)
+                t.fetchModelOrderedList(app, model, ordering, response.data.pagination.next_page, query_string)
               } else {
                 _.mapKeys(t.itens[`${model}_list`], function (obj, k) {
                   if (!t.nulls.includes(obj) && !obj.vue_validate) {

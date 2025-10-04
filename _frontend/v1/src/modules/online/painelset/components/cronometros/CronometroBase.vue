@@ -167,6 +167,12 @@ export default {
           this.getCronometro()
           this.countInterval = 0
         }
+        this.refreshState({
+          app: 'painelset',
+          model: 'cronometro',
+          id: this.cronometro_id,
+          value: { ...this.cronometro }
+        })
       }, 1000)
     },
     handleWebSocketMessageLocal (message) {
