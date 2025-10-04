@@ -215,13 +215,14 @@ Autoria:
 @app.task(queue='cq_core', bind=True)
 def signed_files_extraction(self, app_label, model_name, pk):
 
-    logger.debug(
+    if settings.DEBUG:
+        logger.debug(
         f'START signed_files_extraction_post_save_signal {timezone.localtime()}')
 
     task_signed_files_extraction_function(app_label, model_name, pk)
-
-    logger.debug(
-        f'END signed_files_extraction_post_save_signal {timezone.localtime()}')
+    if settings.DEBUG:
+        logger.debug(
+            f'END signed_files_extraction_post_save_signal {timezone.localtime()}')
 
 
 def task_signed_files_extraction_function(app_label, model_name, pk):

@@ -173,7 +173,7 @@ class Evento(models.Model):
                 'duration': self.duration
             }
         )
-        if not created:
+        if not created and cronometro.duration != self.duration:
             cronometro.duration = self.duration
             cronometro.save()
 
@@ -208,15 +208,6 @@ class RoleChoices(models.TextChoices):
 
 class IndividuoManager(models.Manager):
 
-    def reordene(self, exclude_pk=None):
-        individuos = self.get_queryset()
-        if exclude_pk:
-            individuos = list(individuos.exclude(pk=exclude_pk))
-
-        for sr, i in enumerate(individuos, 1):
-            i.order = sr
-            i.save()
-
     def reset_ordem(self):
         individuos = self.get_queryset()
         individuos = sorted(list(individuos), key=lambda x: (RoleChoices.names.index(x.role), x.name))
@@ -226,21 +217,24 @@ class IndividuoManager(models.Manager):
             i.save()
 
     def reposicione(self, pk, idx):
-        individuos = self.reordene(exclude_pk=pk)
+        individuo = self.get_queryset().filter(pk=pk).first()
+        if not individuo:
+            return
+        evento = individuo.evento
+        if not evento:
+            return
+        individuos = list(evento.individuos.all().order_by('order'))
+        if individuo not in individuos:
+            return
 
-        self.get_queryset(
-        ).filter(
-            order__gte=idx
-        ).update(
-            order=models.F('order') + 1
-        )
+        individuos.remove(individuo)
+        individuos.insert(idx-1, individuo)
 
-        self.get_queryset(
-        ).filter(
-            pk=pk
-        ).update(
-            order=idx
-        )
+        for sr, i in enumerate(individuos, 1):
+            if i.order != sr:
+                i.order = sr
+                i.save()
+        return individuo
 
 
 class Individuo(models.Model):
@@ -266,6 +260,10 @@ class Individuo(models.Model):
         related_query_name='individuos',
         verbose_name="Cronômetro do Individuo",
         help_text="Cronômetro associado ao Individuo")
+
+    sound_status = models.BooleanField(default=False, help_text="Indica se o som está ativo para este indivíduo")
+
+    com_a_palavra = models.BooleanField(default=False, help_text="Indica se o indivíduo está com a palavra")
 
     class Meta:
         ordering = ['order']

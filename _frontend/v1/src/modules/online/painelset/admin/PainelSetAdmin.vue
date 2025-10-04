@@ -44,7 +44,6 @@
 </template>
 
 <script>
-import Vuex from 'vuex'
 import CronometroGlobal from '../components/cronometros/CronometroGlobal.vue'
 import IndividuoList from './IndividuoList.vue'
 export default {
@@ -55,6 +54,12 @@ export default {
   },
   data () {
     return {
+      app: [
+        'painelset'
+      ],
+      model: [
+        'evento'
+      ],
       evento: null,
       cronometro: null
     }
@@ -71,62 +76,68 @@ export default {
       return ['Data e hora não definidas', '', '']
     }
   },
+  beforeDestroy: function () {
+    try {
+      this.$options.sockets.onmessage = null
+      this.$disconnect()
+      console.log('WebSocket timerefresh disconnected')
+    } catch (e) {
+      console.log(e) // Logs the error
+    }
+  },
   mounted: function () {
-    this.fetchEvento()
+    try {
+      this.$options.sockets.onmessage = this.handleWebSocketMessageTimeRefresh
+      this.ws_reconnect()
+    } catch (e) {
+      console.log(e) // Logs the error
+    }
+    this.$nextTick(() => {
+      this.fetch(
+        {
+          app: 'painelset',
+          model: 'evento',
+          id: Number(this.$route.params.id)
+        }
+      )
+    })
   },
   methods: {
-    ...Vuex.mapActions([
-      'getObject'
-    ]),
-    refreshEvento () {
+    fetch (metadata) {
       const t = this
-      t
-        .refreshState({
-          app: 'painelset',
-          model: 'evento',
-          id: t.evento.id
-        })
-        .then((evento) => {
-          t.evento = evento
-        })
-    },
-    fetchEvento () {
-      const t = this
-      const eventoId = this.$route.params.id
-      if (!eventoId) {
-        return
+      if (t.evento) {
+        console.log('WebSocket message received:', metadata)
       }
-      t
-        .getObject({
-          app: 'painelset',
-          model: 'evento',
-          id: eventoId
-        })
-        .then(evento => {
-          t.evento = evento
-          t.utils.getModelAction(
-            'painelset',
-            'evento',
-            eventoId,
-            'cronometro'
-          ).then(cronometro => {
-            t.cronometro = cronometro.data
-            t.evento.cronometro = cronometro.data
-            t.refreshEvento()
-          }).catch(err => {
-            console.error('Erro ao buscar o cronometro do evento', err)
+      if (!t.evento || metadata.id === t.evento.id) {
+        t
+          .refreshState(metadata)
+          .then((obj) => {
+            t.evento = obj
+            t
+              .refreshState({
+                app: 'painelset',
+                model: 'cronometro',
+                id: obj.cronometro
+              })
+              .then((cronometro) => { t.cronometro = cronometro })
           })
-        })
-        .catch(err => {
-          console.error('Erro ao buscar o evento', err)
-        })
+          .catch((err) => {
+            console.error('Erro ao atualizar o evento', err)
+          })
+      }
     },
     resumeEvento () {
       this.$refs.individuoList.sound_status = 1
     },
     startEvento () {
-      this.fetchEvento()
       this.$refs.individuoList.sound_status = 1
+      this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
+        .then(response => {
+          this.cronometro = response.data
+        })
+        .catch(error => {
+          console.error('start error', error)
+        })
     },
     pauseEvento () {
       this.$refs.individuoList.sound_status = 0

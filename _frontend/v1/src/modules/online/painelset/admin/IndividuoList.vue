@@ -16,10 +16,11 @@
     </div>
     <individuo-base
       v-for="individuo in individuos"
-      :key="`individuo-${individuo.id}`"
+      :key="`individuo-${individuo.id}-${individuo.order}`"
       :ref="`individuo-${individuo.id}`"
       :individuo_id="individuo.id"
-      :individuo="individuo"/>
+      :individuo="individuo"
+      @individuo-com-a-palavra="individuoComAPalavra($event)"/>
   </div>
 </template>
 <script>
@@ -37,6 +38,8 @@ export default {
   },
   data () {
     return {
+      app: ['painelset'],
+      model: ['individuo'],
       init: false,
       sound_status: 0,
       itens: {
@@ -47,21 +50,32 @@ export default {
   mounted () {
     console.log('IndividuoList mounted', this.evento)
     const t = this
-    t.fetchModelOrderedList('painelset', 'individuo', 'order')
+    t.fetch()
   },
   computed: {
-    individuos: function () {
-      return _.orderBy(
-        this.itens.individuo_list,
-        ['order', 'name'],
-        ['asc', 'asc']
-      )
+    individuos: {
+      get () {
+        return _.orderBy(this.itens.individuo_list, ['order', 'name'], ['asc', 'asc'])
+      }
     }
   },
   watch: {
+    'itens.individuo_list': function (newVal, oldVal) {
+      // se todos os individuos estiverem com microfone ativo, seta o status geral como ativo
+      if (newVal && Object.keys(newVal).length > 0) {
+        const all_on = Object.values(newVal).every(individuo => individuo.sound_status === true)
+        // setar o status sem disparar o watcher
+        this.sound_status = all_on ? 1 : 0
+      } else {
+        this.sound_status = 0
+      }
+    },
     sound_status: function (newVal, oldVal) {
       console.log('sound_status mudou', newVal, oldVal)
       this.individuos.forEach(individuo => {
+        if (this.nulls.includes(individuo) || !this.$refs[`individuo-${individuo.id}`] || this.$refs[`individuo-${individuo.id}`].length === 0) {
+          return
+        }
         this.$refs[`individuo-${individuo.id}`][0].sound_status = newVal
         this.$refs[`individuo-${individuo.id}`][0].send_individual_updates = false
       })
@@ -77,6 +91,40 @@ export default {
     }
   },
   methods: {
+    individuoComAPalavra (individuo_id) {
+      console.log('individuoComAPalavra', individuo_id)
+      this.itens.individuo_list = Object.fromEntries(
+        Object.entries(this.itens.individuo_list).map(([key, value]) => [
+          key,
+          {
+            ...value,
+            com_a_palavra: value.id === individuo_id
+          }
+        ])
+      )
+      this.$refs[`individuo-${individuo_id}`][0].sound_status = 1
+    },
+    fetch (metadata) {
+      if (metadata && metadata.action === 'post_delete' && metadata.model === 'individuo') {
+        this.$delete(this.itens['individuo_list'], metadata.id)
+        return
+      }
+      if (metadata === undefined) {
+        // Busca a lista completa de Individuos para este Evento
+        this.fetchModelOrderedList('painelset', 'individuo', 'order', 1, `&evento=${this.evento.id}`)
+        return
+      }
+      const t = this
+      t.refreshState(metadata)
+        .then(obj => {
+          if (obj.evento === t.evento.id) {
+            t.$set(t.itens['individuo_list'], metadata.id, obj)
+          } else {
+            // Se o indivíduo não pertence mais a este evento, remove-o da lista
+            t.$delete(t.itens['individuo_list'], metadata.id)
+          }
+        })
+    }
   }
 }
 </script>

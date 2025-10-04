@@ -28,7 +28,7 @@ cronometro_manager = CronometroManager()
 class _EventoViewSet:
     serializer_class = EventoSerializer
     @action(detail=True, methods=['GET'])
-    def cronometro(self, request, pk=None):
+    def start(self, request, pk=None):
         print('Acessando cronômetro do evento:', pk)
         evento = self.get_object()
         cronometro, created = evento.get_or_create_unique_cronometro()
@@ -56,6 +56,10 @@ class _EventoViewSet:
 
         for individuo in evento.individuos.all():
             print(f'  Toggle microfone {individuo} para {sound_status}')
+            individuo.sound_status = sound_status == 'on'
+            individuo.com_a_palavra = sound_status == 'on' and individuo.com_a_palavra
+            update_fields = ['sound_status', 'com_a_palavra']
+            individuo.save(update_fields=update_fields)
             if not settings.DEBUG:
                 client.send_message(f"/ch/{evento.order:>02}/mix/on", 1 if sound_status == 'on' else 0)
 
@@ -81,7 +85,28 @@ class _IndividuoViewSet:
     @action(detail=True, methods=['GET'])
     def toggle_microfone(self, request, *args, **kwargs):
         sound_status = request.GET.get('sound_status', 'on')
+        com_a_palavra = request.GET.get('com_a_palavra', '0')
+        print('com_a_palavra', com_a_palavra)
+        if com_a_palavra not in ['0', '1']:
+            com_a_palavra = '0'
         individuo = self.get_object()
+
+        if com_a_palavra == '1':
+            # Remover com_a_palavra de todos os outros individuos do evento
+            individuo.evento.individuos.exclude(id=individuo.id).update(com_a_palavra=False)
+
+            if individuo.evento.individuos.filter(sound_status=True).exclude(id=individuo.id).count() == 1:
+                # Se houver apenas mais um individuo com som ligado, desligar o som dele
+                outro = individuo.evento.individuos.filter(sound_status=True).exclude(id=individuo.id).first()
+                if outro:
+                    outro.sound_status = False
+                    outro.com_a_palavra = False
+                    outro.save(update_fields=['sound_status', 'com_a_palavra'])
+
+        individuo.sound_status = True if sound_status == 'on' else False
+        individuo.com_a_palavra = True if com_a_palavra == '1' else False
+        individuo.save(update_fields=['sound_status', 'com_a_palavra'])
+
         print(f'Toggle microfone {individuo} para {sound_status}')
         if not settings.DEBUG:
             ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa

@@ -60,6 +60,11 @@ export default {
       form,
       progress
     ),
+    patchModelAction: (app, model, id, action, form, progress = {}) => axios.patch(
+      `${basePath}/${app}/${model}/${id}/${action}/`,
+      form,
+      progress
+    ),
     deleteModel: (app, model, id) => axios.delete(
       `${basePath}/${app}/${model}/${id}/`
     ),

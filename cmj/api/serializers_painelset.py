@@ -56,13 +56,13 @@ class CronometroEventSerializer(SaplSerializerMixin):
 class EventoSerializer(SaplSerializerMixin):
     """Serializer para o modelo Evento"""
 
-    #cronometro = serializers.SerializerMethodField()
+    cronometro = serializers.SerializerMethodField()
 
     class Meta(SaplSerializerMixin.Meta):
         model = Evento
 
-    """def get_cronometro(self, obj):
-        cronometro = obj.cronometro.first()
-        if cronometro:
-            return CronometroSerializer(cronometro).data
-        return None"""
+    def get_cronometro(self, obj):
+        cronometro, created = obj.get_or_create_unique_cronometro()
+        #if cronometro:
+        #    return CronometroSerializer(cronometro).data
+        return cronometro.id
