@@ -74,18 +74,9 @@ Vue.mixin({
     ws_endpoint (ws) {
       return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + (ws !== undefined ? ws : this.ws)
     },
-    ws_reconnect (ws = null) {
+    ws_reconnect () {
       this.$disconnect()
-      if (ws !== null || this.ws !== undefined) {
-        this.$connect(this.ws_endpoint(ws !== null ? ws : this.ws))
-      } else {
-        try {
-          const wsslot = this.$slots.main[0].child.ws
-          this.$connect(this.ws_endpoint(wsslot))
-        } catch (e) {
-          this.$connect()
-        }
-      }
+      this.$connect()
     },
     on_ws_message (data) {
       let _this = this
@@ -127,9 +118,6 @@ Vue.mixin({
           console.log(performance.now(), 'ws-message-exec', data)
           EventBus.$emit('ws-message', data.message)
           // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-        })
-        .catch(err => {
-          console.error('Erro ao atualizar o estado da aplicação', err)
         })
     },
     handleWebSocketMessageTimeRefresh_deprecated (event) {
