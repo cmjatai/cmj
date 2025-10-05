@@ -22,6 +22,11 @@ class CronometroConsumer(AsyncWebsocketConsumer):
         self.cronometro_group_name = None
         self.cronometro_manager = CronometroManager()
 
+    # async def estou_vivo(self):
+    #     while True:
+    #         print(f'Estou vivo {self.cronometro_group_name} {timezone.now()}')
+    #         await asyncio.sleep(5)  # Envia a cada 5 segundos
+
     async def connect(self):
         # Pegar ID do cronômetro da URL
         self.cronometro_id = self.scope['url_route']['kwargs']['cronometro_id']
@@ -35,6 +40,7 @@ class CronometroConsumer(AsyncWebsocketConsumer):
         )
 
         await self.accept()
+        # asyncio.create_task(self.estou_vivo())
 
         # Enviar estado inicial do cronômetro
 

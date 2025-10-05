@@ -98,13 +98,14 @@ export default {
     }
   },
   mounted: function () {
-    console.log('Cronometro mounted, connecting to WebSocket:', this.ws)
+    // console.log('Cronometro mounted, connecting to WebSocket:', this.ws)
     this.ws_client_cronometro()
   },
   beforeDestroy: function () {
     if (this.wsSocket) {
       console.log('Cronometro beforeDestroy, closing WebSocket')
       this.wsSocket.close()
+      this.wsSocket = null
     }
     if (this.idInterval) {
       workerTimer.clearInterval(this.idInterval)
@@ -128,16 +129,22 @@ export default {
       }
       // conexão particular utilizando o WebSocket nativo
       t.wsSocket = new WebSocket(this.ws_endpoint())
-      t.wsSocket.onopen = () => {
-        console.log('WebSocket conectado:', this.ws)
-      }
       t.wsSocket.onmessage = this.handleWebSocketMessageLocal
+      t.wsSocket.onopen = () => {
+        // console.log('WebSocket conectado:', this.ws)
+      }
       t.wsSocket.onclose = () => {
         console.log('WebSocket desconectado...')
+        // tenta reconectar em 5 segundos
+        setTimeout(() => {
+          if (t.wsSocket) {
+            t.ws_client_cronometro()
+          }
+        }, 5000)
       }
       t.wsSocket.onerror = (error) => {
         console.error('Erro no WebSocket:', error)
-        t.wsSocket.close()
+        t.ws_client_cronometro()
       }
       t.wsSocket.onpagehide = () => {
         console.log('WebSocket página oculta, fechando conexão')
@@ -176,7 +183,7 @@ export default {
       }, 1000)
     },
     handleWebSocketMessageLocal (message) {
-      console.log('Mensagem recebida do WebSocket:')
+      // console.log('CRONÔMETRO: Mensagem recebida do WebSocket.')
       const data = JSON.parse(message.data)
       if (
         data.type === 'command_result' &&
@@ -185,7 +192,7 @@ export default {
       ) {
         this.cronometro = { ...this.cronometro, ...data.result.cronometro }
         this.$emit(`cronometro_${data.command}`, this.cronometro)
-        console.log('command:', data.command, 'cronometro:', this.cronometro)
+        // console.log('command:', data.command, 'cronometro:', this.cronometro)
         if (data.command === 'start') {
           this.display = 'elapsed'
           console.log('Cronômetro iniciado:', data)
@@ -199,7 +206,7 @@ export default {
           this.display = 'elapsed'
           console.log('Cronômetro retomado:', data)
         } else if (data.command === 'get') {
-          console.log('Estado do cronômetro atualizado:', data)
+          // console.log('Estado do cronômetro atualizado:', data)
         }
         this.runInterval()
       }
