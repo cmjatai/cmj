@@ -37,6 +37,9 @@
 </template>
 
 <script>
+
+import workerTimer from '@/timer/worker-timer'
+
 import PortalcmjConnect from '@/components/auth/PortalcmjConnect'
 import SideRight from './fragments/SideRight'
 import SideLeft from './fragments/SideLeft'
@@ -57,7 +60,9 @@ export default {
   },
   data () {
     return {
-      fullscreen: false
+      fullscreen: false,
+      count_time: 0,
+      id_interval: 0
     }
   },
   watch: {
@@ -78,20 +83,63 @@ export default {
       'sideright_visivel'
     ])
   },
-  methods: {
-    diminuirFonte () {
-      $('.base-layout .main').css('font-size', '-=1')
-    },
-    aumentarFonte () {
-      $('.base-layout .main').css('font-size', '+=1')
-    }
-  },
   // implementar redirect de vue-router se a url for /online para /online/sessao
   beforeRouteEnter (to, from, next) {
     if (to.path === '/online' || to.path === '/online/') {
       next('/online/sessao')
     } else {
       next()
+    }
+  },
+  beforeDestroy: function () {
+    try {
+      this.$options.sockets.onmessage = null
+      this.$disconnect()
+      console.log('WebSocket timerefresh disconnected')
+    } catch (e) {
+      console.log(e) // Logs the error
+    }
+  },
+  mounted: function () {
+    try {
+      this.$options.sockets.onmessage = this.handleWebSocketMessageTimeRefresh
+      this.ws_reconnect()
+    } catch (e) {
+      console.log(e) // Logs the error
+    }
+  },
+  methods: {
+    diminuirFonte () {
+      $('.base-layout .main').css('font-size', '-=1')
+    },
+    aumentarFonte () {
+      $('.base-layout .main').css('font-size', '+=1')
+    },
+    ws_monitor_connection () {
+      // console.log('scroll')
+      let t = this
+      if (t.count_time === 0) {
+        t.count_time += 1
+        if (t.id_interval !== 0) {
+          workerTimer.clearInterval(t.id_interval)
+        }
+        t.id_interval = workerTimer.setInterval(() => {
+          // console.log(t.count_time, new Date())
+          t.count_time += 1
+          if (t.count_time > 60) {
+            t.ws_monitor_connection()
+          }
+        }, 5000)
+      } else if (t.count_time > 12) {
+        workerTimer.clearInterval(t.id_interval)
+        t.id_interval = 0
+        // console.log('reconnect')
+        t.count_time = 0
+        t.ws_reconnect()
+        t.ws_monitor_connection()
+      } else {
+        t.count_time = 0
+      }
     }
   }
 }

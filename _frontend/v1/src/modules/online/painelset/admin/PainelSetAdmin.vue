@@ -76,22 +76,7 @@ export default {
       return ['Data e hora não definidas', '', '']
     }
   },
-  beforeDestroy: function () {
-    try {
-      this.$options.sockets.onmessage = null
-      this.$disconnect()
-      console.log('WebSocket timerefresh disconnected')
-    } catch (e) {
-      console.log(e) // Logs the error
-    }
-  },
   mounted: function () {
-    try {
-      this.$options.sockets.onmessage = this.handleWebSocketMessageTimeRefresh
-      this.ws_reconnect()
-    } catch (e) {
-      console.log(e) // Logs the error
-    }
     this.$nextTick(() => {
       this.fetch(
         {

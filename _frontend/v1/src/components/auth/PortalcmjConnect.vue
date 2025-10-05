@@ -60,9 +60,6 @@ export default {
       ]
     }
   },
-  beforeDestroy: function () {
-    this.$disconnect()
-  },
   computed: {
   },
   methods: {

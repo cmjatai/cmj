@@ -37,16 +37,7 @@ export default {
   mounted: function () {
     this.setSideleftVisivel(true)
     this.setSiderightVisivel(false)
-    try {
-      this.$options.sockets.onmessage = this.handleWebSocketMessageTimeRefresh
-      this.ws_reconnect()
-    } catch (e) {
-      console.log(e) // Logs the error
-    }
     this.initCache()
-  },
-  beforeDestroy: function () {
-    this.$disconnect()
   },
   methods: {
     ...Vuex.mapActions([
