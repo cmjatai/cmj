@@ -9,6 +9,7 @@ Evento:
 Individuo:
   {% trans 'Dados Gerais' %}:
   - name role order
+  - microfone_sempre_ativo
   {% trans 'Evento' %}:
   - evento
   {% trans 'Parlamentar' %}:

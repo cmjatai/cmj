@@ -98,11 +98,13 @@ class CronometroConsumer(AsyncWebsocketConsumer):
                     'command': command,
                     'result': result
                 }))"""
-                await self.channel_layer.group_send(self.cronometro_group_name, {
-                    'type': 'command_result',
-                    'command': command,
-                    'result': result
-                })
+                await self.channel_layer.group_send(
+                    self.cronometro_group_name, {
+                        'type': 'command_result',
+                        'command': command,
+                        'result': result
+                    }
+                )
 
         except json.JSONDecodeError:
             await self.send(text_data=json.dumps({

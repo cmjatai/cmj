@@ -122,6 +122,23 @@ Vue.mixin({
       let data = JSON.parse(event.data)
       // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
       // console.log(performance.now(), 'ws-message', data)
+      this
+        .$nextTick(() => {
+          console.log(performance.now(), 'ws-message-exec', data)
+          EventBus.$emit('ws-message', data.message)
+          // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
+        })
+        .catch(err => {
+          console.error('Erro ao atualizar o estado da aplicação', err)
+        })
+    },
+    handleWebSocketMessageTimeRefresh_deprecated (event) {
+      /**
+       * Define um ouvinte para o socket implementado por VueNativeSock
+       */
+      let data = JSON.parse(event.data)
+      // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
+      // console.log(performance.now(), 'ws-message', data)
       this.$nextTick(() => {
         this.refreshState(data.message)
           .then(value => {

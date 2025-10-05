@@ -261,9 +261,11 @@ class Individuo(models.Model):
         verbose_name="Cronômetro do Individuo",
         help_text="Cronômetro associado ao Individuo")
 
-    sound_status = models.BooleanField(default=False, help_text="Indica se o som está ativo para este indivíduo")
+    status_microfone = models.BooleanField(default=False, help_text="Indica se o microfone está ativo para este indivíduo")
+    microfone_sempre_ativo = models.BooleanField(default=False, help_text="Indica se o microfone deste indivíduo deve estar sempre ativo")
 
     com_a_palavra = models.BooleanField(default=False, help_text="Indica se o indivíduo está com a palavra")
+
 
     class Meta:
         ordering = ['order']
