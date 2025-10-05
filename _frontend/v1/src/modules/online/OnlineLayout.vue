@@ -23,6 +23,11 @@
 
     <template slot="sideleft" :sideleft_visivel="sideleft_visivel">
       <side-left></side-left>
+      <div :class="['ws-status', ws_status]" :title="ws_status === 'connected' ? 'Conexão ativa' : 'Sem conexão com o servidor. Tentando reconectar...'">
+        <div class="inner">
+          <i :class="ws_status === 'connected' ? 'fas fa-wifi' : 'fas fa-exclamation-triangle'"></i>
+        </div>
+      </div>
     </template>
 
     <template slot="sideright" :sideright_visivel="sideright_visivel">
@@ -62,7 +67,8 @@ export default {
     return {
       fullscreen: false,
       count_time: 0,
-      id_interval: 0
+      id_interval: 0,
+      ws_status: 'disconnected' // connected, disconnected
     }
   },
   watch: {
@@ -102,8 +108,14 @@ export default {
   },
   mounted: function () {
     try {
-      this.$options.sockets.onmessage = this.handleWebSocketMessageTimeRefresh
-      this.ws_reconnect()
+      const t = this
+      t.$options.sockets.onmessage = t.handleWebSocketMessageTimeRefresh
+      t.$options.sockets.onopen = function () {
+        t.ws_status = 'connected'
+      }
+      t.$options.sockets.onclose = function () {
+        t.ws_status = 'disconnected'
+      }
     } catch (e) {
       console.log(e) // Logs the error
     }
@@ -125,12 +137,18 @@ export default {
         }
         t.id_interval = workerTimer.setInterval(() => {
           // console.log(t.count_time, new Date())
+          if (t.ws_status === 'disconnected') {
+            // console.log('reconnect')
+            t.count_time = 11
+            t.ws_monitor_connection()
+            return
+          }
           t.count_time += 1
-          if (t.count_time > 60) {
+          if (t.count_time > 60) { // 5 minutos
             t.ws_monitor_connection()
           }
-        }, 5000)
-      } else if (t.count_time > 12) {
+        }, 6000)
+      } else if (t.count_time > 10) {
         workerTimer.clearInterval(t.id_interval)
         t.id_interval = 0
         // console.log('reconnect')
@@ -146,6 +164,26 @@ export default {
 </script>
 
 <style lang="scss">
+.ws-status {
+  color: white;
+  //text-align: center;
+  font-size: 0.75rem;
+  z-index: 10;
+  .inner {
+    display: inline-block;
+    padding: 3px;
+  }
+  &.connected {
+    .inner {
+      background-color: rgba(green, 0.7);
+    }
+  }
+  &.disconnected {
+    .inner {
+      background-color: rgba(red, 0.7);
+    }
+  }
+}
 .header-right {
   display: grid;
   align-items: stretch;
