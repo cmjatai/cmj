@@ -194,6 +194,9 @@ export default {
     grid-column-start: 1;
     grid-column-end: 2;
     border-right: 1px #ddd solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
 
   .main {

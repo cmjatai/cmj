@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100 h-100 d-flex flex-column align-items-start inner inner-sideleft">
+  <div class="w-100 d-flex flex-column align-items-start inner inner-sideleft">
     <router-link :to="{ name: item.route }" v-for="(item, key) in links_filter" :key="key+1" @click.native="selectRoute(item)" :class="[isSelected(item), isClicked(item)]" @mouseover.native="mouseover(item)" @mouseleave.native="mouseleave(item)">
       <span class="hover-circle icon">
         <i v-if="item.icon" :class="item.icon"></i>
