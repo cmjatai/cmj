@@ -44,9 +44,9 @@ class _EventoViewSet:
 
     @action(detail=True, methods=['GET'])
     def toggle_microfones(self, request, *args, **kwargs):
-        sound_status = request.GET.get('sound_status', 'on')
+        status_microfone = request.GET.get('status_microfone', 'on')
         evento = self.get_object()
-        print(f'Toggle microfones do evento {evento} para {sound_status}')
+        print(f'Toggle microfones do evento {evento} para {status_microfone}')
 
         if not settings.DEBUG:
             ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
@@ -55,15 +55,15 @@ class _EventoViewSet:
             client.send_message("/xremote", None)
 
         for individuo in evento.individuos.all():
-            print(f'  Toggle microfone {individuo} para {sound_status}')
-            individuo.sound_status = sound_status == 'on'
-            individuo.com_a_palavra = sound_status == 'on' and individuo.com_a_palavra
-            update_fields = ['sound_status', 'com_a_palavra']
+            print(f'  Toggle microfone {individuo} para {status_microfone}')
+            individuo.status_microfone = status_microfone == 'on'
+            individuo.com_a_palavra = status_microfone == 'on' and individuo.com_a_palavra
+            update_fields = ['status_microfone', 'com_a_palavra']
             individuo.save(update_fields=update_fields)
             if not settings.DEBUG:
-                client.send_message(f"/ch/{evento.order:>02}/mix/on", 1 if sound_status == 'on' else 0)
+                client.send_message(f"/ch/{evento.order:>02}/mix/on", 1 if status_microfone == 'on' else 0)
 
-        return Response({'status': 'ok', 'sound_status': sound_status, 'evento': evento.id})
+        return Response({'status': 'ok', 'status_microfone': status_microfone, 'evento': evento.id})
 
 @customize(Individuo)
 class _IndividuoViewSet:
@@ -84,37 +84,94 @@ class _IndividuoViewSet:
 
     @action(detail=True, methods=['GET'])
     def toggle_microfone(self, request, *args, **kwargs):
-        sound_status = request.GET.get('sound_status', 'on')
+
+        individuo = self.get_object()
+        mic_old = {'order': individuo.order, 'status_microfone': 'on' if individuo.status_microfone else 'off'}
+        # obter status_microfone e com_a_palavra de todos os individuos do evento
+        #microfones_do_evento = list(individuo.evento.individuos.values('order', 'status_microfone'))
+
+        print(f'Toggle microfone {individuo.id} - {individuo}: status_microfone {individuo.status_microfone}, com_a_palavra={individuo.com_a_palavra}')
+        status_microfone = request.GET.get('status_microfone', 'on')
         com_a_palavra = request.GET.get('com_a_palavra', '0')
-        print('com_a_palavra', com_a_palavra)
+        print(f'  Para: status_microfone={status_microfone}, com_a_palavra={com_a_palavra}')
+
         if com_a_palavra not in ['0', '1']:
             com_a_palavra = '0'
-        individuo = self.get_object()
+        if status_microfone not in ['on', 'off']:
+            status_microfone = 'off'
 
-        if com_a_palavra == '1':
-            # Remover com_a_palavra de todos os outros individuos do evento
-            individuo.evento.individuos.exclude(id=individuo.id).update(com_a_palavra=False)
+        if individuo.microfone_sempre_ativo:
+            mic_old = {}
+            if com_a_palavra == '1':
+                # Remover com_a_palavra de todos os outros individuos do evento
+                ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
+                for ind in ind_com_a_palavra:
+                    ind.com_a_palavra = False
+                    ind.save(update_fields=['com_a_palavra'])
 
-            if individuo.evento.individuos.filter(sound_status=True).exclude(id=individuo.id).count() == 1:
-                # Se houver apenas mais um individuo com som ligado, desligar o som dele
-                outro = individuo.evento.individuos.filter(sound_status=True).exclude(id=individuo.id).first()
-                if outro:
-                    outro.sound_status = False
-                    outro.com_a_palavra = False
-                    outro.save(update_fields=['sound_status', 'com_a_palavra'])
+                individuo.status_microfone = True
+                individuo.com_a_palavra = True
+                individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+                logger.debug(f'  Indivíduo {individuo} tem microfone sempre ativo. Forçando status_microfone=on e com_a_palavra=1')
+            else:
+                individuo.status_microfone = True
+                individuo.com_a_palavra = False
+                individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+                logger.debug(f'  Indivíduo {individuo} tem microfone sempre ativo. Forçando status_microfone=on e com_a_palavra=0')
 
-        individuo.sound_status = True if sound_status == 'on' else False
-        individuo.com_a_palavra = True if com_a_palavra == '1' else False
-        individuo.save(update_fields=['sound_status', 'com_a_palavra'])
+        else:
+            if com_a_palavra == '1':
+                # Remover com_a_palavra de todos os outros individuos do evento
+                ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
+                for ind in ind_com_a_palavra:
+                    ind.com_a_palavra = False
+                    ind.save(update_fields=['com_a_palavra'])
 
-        print(f'Toggle microfone {individuo} para {sound_status}')
-        if not settings.DEBUG:
-            ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
-            porta = 10023
-            client = udp_client.SimpleUDPClient(ip, porta)
-            client.send_message("/xremote", None)
-            client.send_message(f"/ch/{individuo.order:>02}/mix/on", 1 if sound_status == 'on' else 0)
-        return Response({'status': 'ok', 'sound_status': sound_status, 'individuo': individuo.id})
+                ind_mic_ligado = individuo.evento.individuos.filter(
+                    status_microfone=True, microfone_sempre_ativo=False
+                    ).exclude(id=individuo.id)
+                if ind_mic_ligado.count() == 1:
+                    # Se houver apenas mais um individuo com microfone ligado, desligar o microfone dele se ele não tiver microfone sempre ativo
+                    outro = ind_mic_ligado.first()
+                    if outro:
+                        outro.status_microfone = False
+                        outro.com_a_palavra = False
+                        outro.save(update_fields=['status_microfone', 'com_a_palavra'])
+            individuo.status_microfone = True if status_microfone == 'on' else False
+            individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
+            individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+
+        # obter status_microfone e com_a_palavra de todos os individuos do evento
+        microfones_do_evento_depois = list(individuo.evento.individuos.values('order', 'status_microfone'))
+        #logger.debug(f'  Microfones do evento antes: {list(microfones_do_evento)}')
+        #logger.debug(f'  Microfones do evento depois: {list(microfones_do_evento_depois)}')
+
+        # Enviar comando OSC para a mesa de som dos microfones que mudaram de estado
+        #microfones_mudaram = []
+        #for antes, depois in zip(microfones_do_evento, microfones_do_evento_depois):
+        #    if antes['status_microfone'] != depois['status_microfone']:
+        #        microfones_mudaram.append(depois)
+        #        logger.debug(f'  Microfone {antes["order"]} mudou : {antes["status_microfone"]} -> {depois["status_microfone"]}')
+
+        mic = {'order': individuo.order, 'status_microfone': 'on' if individuo.status_microfone else 'off'}
+        if mic != mic_old:
+            logger.debug(f'Enviando comando OSC para o microfone {mic["order"]}: status_microfone={mic["status_microfone"]}')
+            if not settings.DEBUG:
+                ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
+                porta = 10023
+                client = udp_client.SimpleUDPClient(ip, porta)
+                client.send_message("/xremote", None)
+                client.send_message(f"/ch/{mic['order']:>02}/mix/on", 1 if mic["status_microfone"] == 'on' else 0)
+
+        #for mic in microfones_mudaram:
+        #    logger.debug(f'  Enviando comando OSC para o microfone {mic["order"]}: status_microfone={mic["status_microfone"]}')
+        #    if not settings.DEBUG:
+
+        return Response(
+            {'status': 'ok',
+             'status_microfone': status_microfone,
+             'individuo': individuo.id
+             })
 
 @customize(Cronometro)
 class _CronometroViewSet:

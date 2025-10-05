@@ -1,7 +1,7 @@
 <template>
-  <div :class="['individuo-base', sound_status === 0 ? 'muted' : '', individuo && individuo.com_a_palavra ? 'com-a-palavra' : '']">
+  <div :class="['individuo-base', status_microfone === 0 ? 'muted' : '', individuo && individuo.com_a_palavra ? 'com-a-palavra' : (individuo.microfone_sempre_ativo ? 'always-on' : 'active')]">
     <div class="inner">
-      <div class="inner-individuo" @click="$emit('individuo-com-a-palavra', individuo_id)">
+      <div class="inner-individuo" @click="clickIndividuo($event)">
         <div class="avatar">
           <img v-if="fotografiaParlamentarUrl" :src="fotografiaParlamentarUrl" alt="Foto do parlamentar"/>
           <i v-else class="fas fa-user-circle fa-2x"></i>
@@ -14,10 +14,10 @@
         <button
           v-if="individuo"
           class="btn-fone"
-          :title="sound_status === 0 ? 'Ativar microfone' : 'Desativar microfone'"
-           @click="sound_status = sound_status === 0 ? 1 : 0; $emit('toggle-microfone', individuo.id, sound_status)"
+          :title="status_microfone === 0 ? 'Ativar microfone' : 'Desativar microfone'"
+           @click="status_microfone = status_microfone === 0 ? 1 : 0; $emit('toggle-microfone', individuo.id, status_microfone)"
         >
-          <i :class="sound_status === 0 ? 'fas fa-2x fa-microphone-slash' : 'fas fa-2x fa-microphone'"></i>
+          <i :class="status_microfone === 0 ? 'fas fa-2x fa-microphone-slash' : 'fas fa-2x fa-microphone'"></i>
         </button>
         <button
           v-if="false && individuo"
@@ -47,7 +47,9 @@ export default {
   data () {
     return {
       init: false,
-      sound_status: this.individuo && this.individuo.sound_status ? 1 : 0,
+      status_microfone: this.individuo && this.individuo.status_microfone ? 1 : 0,
+      com_a_palavra: this.individuo && this.individuo.com_a_palavra,
+      // To avoid infinite loop when changing status_microfone from prop change and watcher on status_microfone
       send_individual_updates: true
     }
   },
@@ -61,26 +63,63 @@ export default {
   },
   watch: {
     individuo: function (newVal, oldVal) {
+      console.log(this.individuo_id, 'individuo mudou', newVal, oldVal)
       if (newVal && oldVal) {
-        if (newVal.sound_status !== oldVal.sound_status) {
-          this.sound_status = newVal.sound_status ? 1 : 0
+        if (newVal.status_microfone !== oldVal.status_microfone) {
+          this.status_microfone = newVal.status_microfone ? 1 : 0
+        }
+        if (newVal.com_a_palavra !== oldVal.com_a_palavra) {
+          this.com_a_palavra = newVal.com_a_palavra
         }
       }
     },
-    sound_status: function (newVal, oldVal) {
-      console.log('sound_status mudou', newVal, oldVal)
+    com_a_palavra: function (newVal, oldVal) {
+      console.log(this.individuo_id, 'com_a_palavra mudou', newVal, oldVal)
       if (!this.send_individual_updates) {
         this.send_individual_updates = true
         console.log('send_individual_updates is false, not sending update')
         return
       }
-      this.utils.getModelAction('painelset', 'individuo', this.individuo_id, 'toggle_microfone', `&sound_status=${newVal ? 'on' : 'off'}&com_a_palavra=${this.individuo && this.individuo.com_a_palavra && newVal ? 1 : 0}`)
+      this.utils.getModelAction(
+        'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
+        `&status_microfone=${this.status_microfone ? 'on' : 'off'}&com_a_palavra=${newVal ? 1 : 0}`)
         .then(response => {
           console.log('toggle_microfone response', response)
         })
         .catch(error => {
           console.error('toggle_microfone error', error)
         })
+    },
+    status_microfone: function (newVal, oldVal) {
+      console.log(this.individuo_id, 'status_microfone mudou', newVal, oldVal)
+      if (!this.send_individual_updates) {
+        this.send_individual_updates = true
+        console.log('send_individual_updates is false, not sending update')
+        return
+      }
+      if (this.individuo && this.individuo.microfone_sempre_ativo && newVal === 0) {
+        console.log('individuo.microfone_sempre_ativo is true, not allowing to turn off microphone')
+        this.status_microfone = 1
+        return
+      }
+      this.utils.getModelAction(
+        'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
+        `&status_microfone=${newVal ? 'on' : 'off'}&com_a_palavra=${this.individuo && this.individuo.com_a_palavra && newVal ? 1 : 0}`)
+        .then(response => {
+          console.log('toggle_microfone response', response)
+        })
+        .catch(error => {
+          console.error('toggle_microfone error', error)
+        })
+    }
+  },
+  methods: {
+    clickIndividuo: function (event) {
+      if (!this.individuo) {
+        return
+      }
+      console.log(event)
+      this.$emit('toggle-com-a-palavra', this.individuo.id)
     }
   }
 }
@@ -167,9 +206,16 @@ export default {
       font-weight: bold;
     }
     .inner-individuo {
-      cursor: default;
       font-size: 1.2em;
       border-color: transparent;
+    }
+  }
+  &.always-on:not(.muted):not(.com-a-palavra) {
+    .inner-individuo, .controls {
+      background: #7ee57e;
+      opacity: 1 !important;
+    }
+    .inner-individuo {
     }
   }
 }

@@ -127,10 +127,10 @@ export default {
       }
     },
     resumeEvento () {
-      this.$refs.individuoList.sound_status = 1
+      this.$refs.individuoList.status_microfone = 1
     },
     startEvento () {
-      this.$refs.individuoList.sound_status = 1
+      this.$refs.individuoList.status_microfone = 1
       this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
         .then(response => {
           this.cronometro = response.data
@@ -140,7 +140,7 @@ export default {
         })
     },
     pauseEvento () {
-      this.$refs.individuoList.sound_status = 0
+      this.$refs.individuoList.status_microfone = 0
     }
   }
 }
