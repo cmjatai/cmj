@@ -118,6 +118,7 @@ export default {
       this.$refs.individuoList.status_microfone = 1
       this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
         .then(response => {
+          console.log('start response', response)
           this.cronometro = response.data
         })
         .catch(error => {

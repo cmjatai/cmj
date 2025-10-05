@@ -1,7 +1,7 @@
 <template>
   <div :class="['individuo-base', status_microfone === 0 ? 'muted' : '', individuo && individuo.com_a_palavra ? 'com-a-palavra' : (individuo.microfone_sempre_ativo ? 'always-on' : 'active')]">
     <div class="inner">
-      <div class="inner-individuo" @click="clickIndividuo($event)">
+      <div class="inner-individuo" @dblclick="dblclickIndividuo($event)">
         <div class="avatar">
           <img v-if="fotografiaParlamentarUrl" :src="fotografiaParlamentarUrl" alt="Foto do parlamentar"/>
           <i v-else class="fas fa-user-circle fa-2x"></i>
@@ -84,10 +84,10 @@ export default {
         'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
         `&status_microfone=${this.status_microfone ? 'on' : 'off'}&com_a_palavra=${newVal ? 1 : 0}`)
         .then(response => {
-          console.log('toggle_microfone response', response)
+          console.log(this.individuo_id, 'com_a_palavra, toggle_microfone response', response)
         })
         .catch(error => {
-          console.error('toggle_microfone error', error)
+          console.error(this.individuo_id, 'com_a_palavra, toggle_microfone error', error)
         })
     },
     status_microfone: function (newVal, oldVal) {
@@ -106,15 +106,15 @@ export default {
         'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
         `&status_microfone=${newVal ? 'on' : 'off'}&com_a_palavra=${this.individuo && this.individuo.com_a_palavra && newVal ? 1 : 0}`)
         .then(response => {
-          console.log('toggle_microfone response', response)
+          console.log(this.individuo_id, 'com_a_palavra, toggle_microfone response', response)
         })
         .catch(error => {
-          console.error('toggle_microfone error', error)
+          console.error(this.individuo_id, 'com_a_palavra, toggle_microfone error', error)
         })
     }
   },
   methods: {
-    clickIndividuo: function (event) {
+    dblclickIndividuo: function (event) {
       if (!this.individuo) {
         return
       }

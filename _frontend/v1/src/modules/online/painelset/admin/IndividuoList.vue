@@ -71,7 +71,7 @@ export default {
       }
     },
     status_microfone: function (newVal, oldVal) {
-      console.log('status_microfone mudou', newVal, oldVal)
+      console.log('status_microfone global mudou para', newVal, 'de', oldVal)
       this.individuos.forEach(individuo => {
         if (this.nulls.includes(individuo) || !this.$refs[`individuo-${individuo.id}`] || this.$refs[`individuo-${individuo.id}`].length === 0) {
           return
@@ -122,7 +122,16 @@ export default {
       }
       if (metadata === undefined) {
         // Busca a lista completa de Individuos para este Evento
-        this.fetchModelOrderedList('painelset', 'individuo', 'order', 1, `&evento=${this.evento.id}`)
+        this
+          .fetchModelOrderedList('painelset', 'individuo', 'order', 1, `&evento=${this.evento.id}`,
+            (value) => {
+              this.refreshState({
+                app: 'painelset',
+                model: 'individuo',
+                id: value.id,
+                value: value
+              })
+            })
         return
       }
       const t = this
