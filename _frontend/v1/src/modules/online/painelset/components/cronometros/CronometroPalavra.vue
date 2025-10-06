@@ -103,13 +103,14 @@ export default {
           margin-top: 1.5em;
           .btn {
             justify-content: center;
-            padding: 5px 0;
+            padding: 0.5em 0;
             font-size: 1em;
             box-shadow: 0px 0px 10px #000;
+            font-weight: bold;
           }
           .btn-outline-dark {
             color: white;
-            border-color: #555;
+            border-color: #444;
             background-image: linear-gradient(to bottom, #444, #333);
             &:hover {
               background-color: #444;

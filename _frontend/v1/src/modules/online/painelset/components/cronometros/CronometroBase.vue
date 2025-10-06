@@ -87,7 +87,7 @@ export default {
     },
     display_size: {
       type: String,
-      default: '2em' // Tamanho padrão da fonte
+      default: '1.5em' // Tamanho padrão da fonte
     },
     auto_start: {
       type: Boolean,
@@ -444,7 +444,7 @@ export default {
       justify-content: stretch;
       align-content: stretch;
       .inner-rodape {
-        font-size: 1em;
+        font-size: 0.8em;
         text-align: center;
         font-style: italic;
       }

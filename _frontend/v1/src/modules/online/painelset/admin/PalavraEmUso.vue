@@ -153,8 +153,8 @@ export default {
     padding: 2em 1em;
     .avatar {
       opacity: 1 !important;
-      width: 96px;
-      height: 96px;
+      width: 6em;
+      height: 6em;
       img {
         box-shadow: 0px 0px 30px #444;
       }
