@@ -231,13 +231,17 @@ export default {
     }
   }
   &.com-a-palavra {
-    border: 2px solid #0364d3;
     border-left: 0;
     border-right: 0;
     .inner-individuo, .controls {
-      background: #57bbe9;
+      background: linear-gradient(to right, #0364d3, #0253a8);
       opacity: 1 !important;
       font-weight: bold;
+      color: white;
+      .fa-microphone {
+        color: white;
+        opacity: 1;
+      }
     }
     .inner-individuo {
       font-size: 1.2em;

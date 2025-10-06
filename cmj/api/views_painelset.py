@@ -117,16 +117,18 @@ class _IndividuoViewSet:
                 ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
                 for ind in ind_com_a_palavra:
                     ind.com_a_palavra = False
+                    cron, created = ind.get_or_create_unique_cronometro()
+                    cronometro_manager.stop_cronometro(cron.id)
                     ind.save(update_fields=['com_a_palavra'])
 
                 individuo.status_microfone = True
                 individuo.com_a_palavra = True
-                individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+                #individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
                 logger.debug(f'  Indivíduo {individuo} tem microfone sempre ativo. Forçando status_microfone=on e com_a_palavra=1')
             else:
                 individuo.status_microfone = True
                 individuo.com_a_palavra = False
-                individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+                #individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
                 logger.debug(f'  Indivíduo {individuo} tem microfone sempre ativo. Forçando status_microfone=on e com_a_palavra=0')
 
         else:
@@ -154,13 +156,13 @@ class _IndividuoViewSet:
 
             individuo.status_microfone = True if status_microfone == 'on' else False
             individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
-            individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+        individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+        cron, created = individuo.get_or_create_unique_cronometro()
+        if individuo.com_a_palavra:
+            cronometro_manager.start_cronometro(cron.id, duration=default_timer)
+        else:
+            cronometro_manager.stop_cronometro(cron.id)
 
-            cron, created = individuo.get_or_create_unique_cronometro()
-            if individuo.com_a_palavra:
-                cronometro_manager.start_cronometro(cron.id, duration=default_timer)
-            else:
-                cronometro_manager.stop_cronometro(cron.id)
 
         # obter status_microfone e com_a_palavra de todos os individuos do evento
         microfones_do_evento_depois = list(individuo.evento.individuos.values('order', 'status_microfone'))
