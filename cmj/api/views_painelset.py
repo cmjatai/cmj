@@ -1,3 +1,4 @@
+from datetime import timedelta
 import logging
 
 from django.apps.registry import apps
@@ -96,6 +97,12 @@ class _IndividuoViewSet:
         print(f'Toggle microfone {individuo.id} - {individuo}: status_microfone {individuo.status_microfone}, com_a_palavra={individuo.com_a_palavra}')
         status_microfone = request.GET.get('status_microfone', 'on')
         com_a_palavra = request.GET.get('com_a_palavra', '0')
+        default_timer = request.GET.get('default_timer', '300')  # em segundos
+        try:
+            default_timer = timedelta(seconds=int(default_timer))
+        except ValueError:
+            default_timer = timedelta(seconds=300)
+
         print(f'  Para: status_microfone={status_microfone}, com_a_palavra={com_a_palavra}')
 
         if com_a_palavra not in ['0', '1']:
@@ -128,9 +135,9 @@ class _IndividuoViewSet:
                 ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
                 for ind in ind_com_a_palavra:
                     ind.com_a_palavra = False
-                    ind.save(update_fields=['com_a_palavra'])
                     cron, created = ind.get_or_create_unique_cronometro()
                     cronometro_manager.stop_cronometro(cron.id)
+                    ind.save(update_fields=['com_a_palavra'])
 
                 ind_mic_ligado = individuo.evento.individuos.filter(
                     status_microfone=True, microfone_sempre_ativo=False
@@ -141,17 +148,18 @@ class _IndividuoViewSet:
                     if outro:
                         outro.status_microfone = False
                         outro.com_a_palavra = False
+                        outro.duration = default_timer
                         outro.save(update_fields=['status_microfone', 'com_a_palavra'])
+
 
             individuo.status_microfone = True if status_microfone == 'on' else False
             individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
             individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
 
+            cron, created = individuo.get_or_create_unique_cronometro()
             if individuo.com_a_palavra:
-                cron, created = individuo.get_or_create_unique_cronometro()
-                cronometro_manager.start_cronometro(cron.id)
+                cronometro_manager.start_cronometro(cron.id, duration=default_timer)
             else:
-                cron, created = individuo.get_or_create_unique_cronometro()
                 cronometro_manager.stop_cronometro(cron.id)
 
         # obter status_microfone e com_a_palavra de todos os individuos do evento

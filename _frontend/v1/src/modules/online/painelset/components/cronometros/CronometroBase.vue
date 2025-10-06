@@ -36,6 +36,12 @@
           <a class="btn btn-outline-dark" @click.stop="stopCronometro" v-if="['running', 'paused'].includes(cronometro.state) && controls.includes('stop')">
             <i class="fa fa-stop" aria-hidden="true"></i>
           </a>
+          <a class="btn btn-outline-dark btn-negative" @click.stop="addTime(-60)" title="Reduzir 1 minuto" v-if="controls.includes('add1m')">
+            -1m
+          </a>
+          <a class="btn btn-outline-dark btn-negative" @click.stop="addTime(-30)" title="Reduzir 30 segundos" v-if="controls.includes('add1m')">
+            -30s
+          </a>
           <a class="btn btn-outline-dark" @click.stop="addTime(30)" title="Adicionar 30 segundos" v-if="controls.includes('add30s')">
             +30s
           </a>

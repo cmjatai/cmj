@@ -42,6 +42,11 @@ export default {
       type: Object,
       required: false,
       default: null
+    },
+    default_timer: {
+      type: Number,
+      required: false,
+      default: 300 // seconds
     }
   },
   data () {
@@ -97,7 +102,7 @@ export default {
       }
       this.utils.getModelAction(
         'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
-        `&status_microfone=${this.status_microfone ? 'on' : 'off'}&com_a_palavra=${newVal ? 1 : 0}`)
+        `&status_microfone=${this.status_microfone ? 'on' : 'off'}&com_a_palavra=${newVal ? 1 : 0}&default_timer=${this.default_timer}`)
         .then(response => {
           console.log(this.individuo_id, 'com_a_palavra, toggle_microfone response', response)
         })
@@ -119,7 +124,7 @@ export default {
       }
       this.utils.getModelAction(
         'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
-        `&status_microfone=${newVal ? 'on' : 'off'}&com_a_palavra=${this.individuo && this.individuo.com_a_palavra && newVal ? 1 : 0}`)
+        `&status_microfone=${newVal ? 'on' : 'off'}&com_a_palavra=${this.individuo && this.individuo.com_a_palavra && newVal ? 1 : 0}&default_timer=${this.default_timer}`)
         .then(response => {
           console.log(this.individuo_id, 'com_a_palavra, toggle_microfone response', response)
         })
