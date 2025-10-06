@@ -74,7 +74,7 @@ export default {
   watch: {
     fullscreen (newVal) {
       if (newVal) {
-        document.documentElement.requestFullscreen()
+        document.getElementsByClassName('painelset-module')[0].requestFullscreen()
       } else {
         if (document.fullscreenElement) {
           document.exitFullscreen()
@@ -116,6 +116,11 @@ export default {
       t.$options.sockets.onclose = function () {
         t.ws_status = 'disconnected'
       }
+      document.addEventListener('fullscreenchange', (event) => {
+        if (!document.fullscreenElement) {
+          t.fullscreen = false
+        }
+      })
     } catch (e) {
       console.log(e) // Logs the error
     }
