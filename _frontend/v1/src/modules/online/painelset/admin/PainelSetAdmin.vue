@@ -2,18 +2,6 @@
   <div class="painelset-admin">
     <div class="container-grid">
       <div class="row header">
-        <div class="col-auto">
-          <cronometro-global
-            v-if="cronometro"
-            :cronometro_id="cronometro.id"
-            css_class_controls="hover"
-            css_class="cronometro-global"
-            :controls="['start', 'pause', 'resume', 'toggleDisplay']"
-            @cronometro_start="startEvento()"
-            @cronometro_pause="pauseEvento()"
-            @cronometro_resume="resumeEvento()"
-            ></cronometro-global>
-        </div>
         <div class="col">
           <div class="titulo-evento">
             {{ evento ? evento.name : 'Carregando evento...' }}
@@ -29,6 +17,18 @@
               {{ datahora_prevista_real[2] }}
             </div>
           </div>
+        </div>
+        <div class="col-auto">
+          <cronometro-global
+            v-if="cronometro"
+            :cronometro_id="cronometro.id"
+            css_class_controls="hover"
+            css_class="cronometro-global"
+            :controls="['start', 'pause', 'resume', 'toggleDisplay']"
+            @cronometro_start="startEvento()"
+            @cronometro_pause="pauseEvento()"
+            @cronometro_resume="resumeEvento()"
+            ></cronometro-global>
         </div>
       </div>
       <div class="row">
