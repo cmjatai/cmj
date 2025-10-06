@@ -32,10 +32,10 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-5 container-individuos">
+        <div class="col-4 container-individuos">
           <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'"></individuo-list>
         </div>
-        <div class="col-7 container-controls">
+        <div class="col-8 container-controls">
           <palavra-em-uso></palavra-em-uso>
         </div>
       </div>

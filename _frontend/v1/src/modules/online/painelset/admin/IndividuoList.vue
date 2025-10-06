@@ -11,7 +11,18 @@
           <i :class="status_microfone === 0 ? 'fas fa-2x fa-microphone-slash' : 'fas fa-2x fa-microphone'"></i>
         </button>
         </div>
-        <div class="inner-individuo py-2">{{ individuos.length }} Canais neste evento.</div>
+        <div class="inner-individuo py-2">{{ individuos.length }} CANAIS NESTE EVENTO</div>
+        <div class="inner-individuo">
+          <div class="default-timer">
+            <button class="btn btn-link">
+              <i class="fas fa-2x fa-arrow-down" @click="default_timer > 60 ? default_timer -= 60 : default_timer = 60"></i>
+            </button>
+            Tempo Padrão: {{ (default_timer / 60).toFixed(0) }} min
+            <button class="btn btn-link">
+              <i class="fas fa-2x fa-arrow-up" @click="default_timer < 600 ? default_timer += 60 : default_timer = 600"></i>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
     <individuo-base :style="{flex: `0 0 ${100 / (individuos.length + 1)}%`}"
@@ -20,6 +31,7 @@
       :ref="`individuo-${individuo.id}`"
       :individuo_id="individuo.id"
       :individuo="individuo"
+      :default_timer="default_timer"
       @toggle-com-a-palavra="toggleComAPalavra($event)"/>
   </div>
 </template>
@@ -42,6 +54,7 @@ export default {
       model: ['individuo'],
       init: false,
       status_microfone: 0,
+      default_timer: 300, // segundos
       itens: {
         individuo_list: {}
       }
@@ -63,9 +76,9 @@ export default {
     'itens.individuo_list': function (newVal, oldVal) {
       // se todos os individuos estiverem com microfone ativo, seta o status geral como ativo
       if (newVal && Object.keys(newVal).length > 0) {
-        const all_on = Object.values(newVal).every(individuo => individuo.status_microfone === true)
+        // const all_on = Object.values(newVal).every(individuo => individuo.status_microfone === true)
         // setar o status sem disparar o watcher
-        this.status_microfone = all_on ? 1 : 0
+        this.status_microfone = 1
       } else {
         this.status_microfone = 0
       }
@@ -170,15 +183,33 @@ export default {
   overflow: hidden;
   .individuo-base:first-child {
     border-bottom: 1px solid #fff;
+    font-size: 0.7em;
     .inner-individuo, .controls {
       border-right: 0;
       font-weight: bold;
       opacity: 1 !important;
+      text-align: center;
     }
     .inner-individuo {
       border-left: 1px solid white;
       cursor: default;
+      justify-content: center;
       font-size: 1.2em;
+      .default-timer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        gap: 0.5em;
+        .btn {
+          padding: 0 0.5em;
+          color: #0004;
+          text-decoration: none;
+          &:hover {
+            color: #000;
+          }
+        }
+      }
     }
   }
 }

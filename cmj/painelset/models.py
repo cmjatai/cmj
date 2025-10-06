@@ -272,7 +272,6 @@ class Individuo(models.Model, CronometroMixin):
 
     com_a_palavra = models.BooleanField(default=False, help_text="Indica se o indivíduo está com a palavra")
 
-
     class Meta:
         ordering = ['order']
     unique_together = [

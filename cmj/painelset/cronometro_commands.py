@@ -12,9 +12,10 @@ class CronometroCommand(ABC):
     Command Pattern: Interface base para comandos de cronômetro
     """
 
-    def __init__(self, cronometro_id):
+    def __init__(self, cronometro_id, duration=None):
         self.cronometro_id = cronometro_id
         self.cronometro = None
+        self.duration = duration
 
     def execute(self):
         """Executa o comando"""
@@ -41,6 +42,8 @@ class StartCronometroCommand(CronometroCommand):
         self.cronometro.state = CronometroState.RUNNING
         self.cronometro.started_at = timezone.now()
         self.cronometro.accumulated_time = timedelta()
+        if self.duration:
+            self.cronometro.duration = self.duration
         self.cronometro.save()
 
         # Criar evento

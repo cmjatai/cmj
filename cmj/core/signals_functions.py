@@ -18,6 +18,7 @@ from cmj.context_processors import site_url
 from cmj.core import tasks
 from cmj.core.models import AuditLog, OcrMyPDF, Bi
 from cmj.loa.models import ScrapRecord, DespesaPaga
+from cmj.painelset.models import Cronometro
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
 from cmj.videos.models import VideoParte, PullExec
@@ -49,6 +50,7 @@ def auditlog_signal_function(sender, **kwargs):
         ScrapRecord,      # Extração Automática das Despesas e Receitas
         DespesaPaga,
         AnaliseSimilaridade,  # Análise de Similaridade
+        Cronometro,  # Cronometro é um processo automático que possui seu próprio log
     ):
         return
 

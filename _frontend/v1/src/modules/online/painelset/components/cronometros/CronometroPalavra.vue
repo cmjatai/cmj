@@ -112,9 +112,21 @@ export default {
             color: white;
             border-color: #444;
             background-image: linear-gradient(to bottom, #444, #333);
+            flex: 1 2 auto;
             &:hover {
               background-color: #444;
               border-color: #777
+            }
+            &.btn-negative {
+              background-image: linear-gradient(to bottom, #552222, #442222);
+              flex: 0 1 0%;
+              padding-left: 0.5em;
+              padding-right: 0.5em;
+              border-color: #662222;
+              &:hover {
+                background-color: #662222;
+                border-color: #aa4444;
+              }
             }
           }
         }
