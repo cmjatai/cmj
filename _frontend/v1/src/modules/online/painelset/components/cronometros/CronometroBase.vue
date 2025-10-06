@@ -370,24 +370,29 @@ export default {
         console.log('entrou aqui 2', cronometro, timeKey, alternativeKey)
         return '00:00'
       } */
+      const negative = totalSeconds < 0 ? '-' : ''
       if (totalSeconds < 0) {
         totalSeconds = totalSeconds * -1
       }
       const hours = Math.floor(totalSeconds / 3600)
       const minutes = Math.floor((totalSeconds % 3600) / 60)
       const seconds = totalSeconds % 60
+      let r = ''
       if (this.display_format === 'hh:mm:ss') {
-        return [hours, minutes, seconds]
+        r = [hours, minutes, seconds]
           .map(v => v < 10 ? '0' + v : v)
           .join(':') // "HH:MM:SS"
       } else if (this.display_format === 'mm:ss') {
-        return [minutes + hours * 60, seconds]
+        r = [minutes + hours * 60, seconds]
           .map(v => v < 10 ? '0' + v : v)
           .join(':') // "MM:SS"
       } else if (this.display_format === 'ss') {
-        return (seconds + minutes * 60 + hours * 3600).toString() // "SS"
+        r = (seconds + minutes * 60 + hours * 3600).toString() // "SS"
       }
-      return '00:00:00'
+      if (negative) {
+        r = negative + r
+      }
+      return r || '00:00:00'
     }
   },
   computed: {
@@ -420,6 +425,7 @@ export default {
 
 <style lang="scss">
 .cronometro-component {
+  z-index: 1;
   .croncard {
     display: flex;
     flex-direction: column;
@@ -464,7 +470,7 @@ export default {
       }
       &.remaining { /* tempo restante */
         &.running {
-          color: rgb(255, 57, 245);  /* verde se em execução */
+          color: #ff0;  /* verde se em execução */
           &.exceeded {
             color: #f00; /* vermelho se em execução e excedeu o tempo */
           }
