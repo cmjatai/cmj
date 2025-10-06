@@ -121,7 +121,7 @@ export default {
               background-image: linear-gradient(to bottom, #552222, #442222);
               flex: 0 1 0%;
               padding-left: 0.5em;
-              padding-right: 0.5em;
+              padding-right: 0.8em;
               border-color: #662222;
               &:hover {
                 background-color: #662222;

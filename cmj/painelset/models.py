@@ -17,9 +17,9 @@ class CronometroState(models.TextChoices):
 
 class CronometroMixin:
 
-    def get_or_create_unique_cronometro(self):
+    def get_or_create_unique_cronometro(self, duration=None):
         """Obtém ou cria um cronômetro único associado ao modelo que o chamou este método."""
-        duration = getattr(self, 'duration', timedelta())
+        duration_owner = getattr(self, 'duration', timedelta())
         cronometro, created = Cronometro.objects.get_or_create(
             content_type=ContentType.objects.get_for_model(self),
             object_id=self.id,
@@ -28,8 +28,8 @@ class CronometroMixin:
                 'duration': duration,
             }
         )
-        if not created and hasattr(self, 'duration') and cronometro.duration != duration:
-            cronometro.duration = duration
+        if not created and hasattr(self, 'duration') and cronometro.duration != duration_owner:
+            cronometro.duration = duration or duration_owner
             cronometro.save()
 
         return cronometro, created

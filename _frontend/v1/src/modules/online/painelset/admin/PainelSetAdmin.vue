@@ -188,8 +188,8 @@ export default {
     height: 100%;
     // border-radius: 8px;
     // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: #fff;
-    color: #333;
+    background-color: #444;
+    color: #eee;
     font-size: 1.1em;
     font-weight: bold;
     line-height: 1;
@@ -205,8 +205,8 @@ export default {
     padding: 5px 10px;
     // border-radius: 8px;
     // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: #fff;
-    color: #333;
+    background-color: #444;
+    color: #eee;
     font-size: 0.8em;
     font-weight: bold;
     line-height: 1;

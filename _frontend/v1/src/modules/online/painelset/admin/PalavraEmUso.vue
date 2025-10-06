@@ -126,6 +126,7 @@ export default {
     .name {
       background-color: #444;
       white-space: nowrap;
+      margin: 0.5em 1em 0 0.5em;
       padding: 7px 14px 5px;
       min-width: 20%;
       display: inline-block;
