@@ -4,7 +4,8 @@ import {
   SET_NIVEL_DETALHE,
   SET_NIVEL_DETALHE_VISIVEL,
   SET_SIDELEFT_VISIVEL,
-  SET_SIDERIGHT_VISIVEL
+  SET_SIDERIGHT_VISIVEL,
+  SET_INDIVIDUO_COM_A_PALAVRA
 } from './mutation-types'
 
 import Resources from '@/resources'
@@ -31,6 +32,20 @@ const mutations = {
       state.cache[data.app][data.model] = {}
     }
     state.cache[data.app][data.model][data.value !== undefined ? data.value.id : data.id] = data.value
+
+    if (data.value && data.value.hasOwnProperty('com_a_palavra')) {
+      if (data.value.com_a_palavra) {
+        state.individuo_com_a_palavra = data.value
+        return
+      }
+      const individuos = state.cache['painelset'] && state.cache['painelset']['individuo'] ? state.cache['painelset']['individuo'] : {}
+      for (const key in individuos) {
+        if (individuos[key].com_a_palavra) {
+          return
+        }
+      }
+      state.individuo_com_a_palavra = null
+    }
   },
 
   [SET_NIVEL_DETALHE] (state, nivel) {
@@ -47,6 +62,10 @@ const mutations = {
 
   [SET_SIDERIGHT_VISIVEL] (state, visivel) {
     state.sideright_visivel = visivel
+  },
+
+  [SET_INDIVIDUO_COM_A_PALAVRA] (state, individuo) {
+    state.individuo_com_a_palavra = individuo
   }
 }
 
@@ -55,7 +74,8 @@ const state = {
   nivel_detalhe: 1,
   nivel_detalhe_visivel: false,
   sideleft_visivel: true,
-  sideright_visivel: true
+  sideright_visivel: true,
+  individuo_com_a_palavra: null
 }
 
 const getters = {
@@ -85,6 +105,9 @@ const getters = {
       return null
     }
     return state.cache[metadata.app][metadata.model]
+  },
+  getIndividuoComPalavra: (state) => {
+    return state.individuo_com_a_palavra
   }
 }
 

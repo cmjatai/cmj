@@ -14,7 +14,7 @@
         <div class="inner-individuo py-2">{{ individuos.length }} Canais neste evento.</div>
       </div>
     </div>
-    <individuo-base
+    <individuo-base :style="{flex: `0 0 ${100 / (individuos.length + 1)}%`}"
       v-for="individuo in individuos"
       :key="`individuo-${individuo.id}-${individuo.order}`"
       :ref="`individuo-${individuo.id}`"
@@ -160,6 +160,14 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  height: 100%;
+  justify-content: stretch;
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  overflow: hidden;
   .individuo-base:first-child {
     border-bottom: 1px solid #fff;
     .inner-individuo, .controls {

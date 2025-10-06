@@ -1,6 +1,6 @@
 <template>
   <div class="painelset-admin">
-    <div class="container-fluid">
+    <div class="container-grid">
       <div class="row header">
         <div class="col-auto">
           <cronometro-global
@@ -32,11 +32,11 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-7 container-individuos">
+        <div class="col-5 container-individuos">
           <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'"></individuo-list>
         </div>
-        <div class="col-5 container-controls">
-          controles aqui
+        <div class="col-7 container-controls">
+          <palavra-em-uso></palavra-em-uso>
         </div>
       </div>
     </div>
@@ -46,11 +46,13 @@
 <script>
 import CronometroGlobal from '../components/cronometros/CronometroGlobal.vue'
 import IndividuoList from './IndividuoList.vue'
+import PalavraEmUso from './PalavraEmUso.vue'
 export default {
   name: 'painelset-admin',
   components: {
     CronometroGlobal,
-    IndividuoList
+    IndividuoList,
+    PalavraEmUso
   },
   data () {
     return {
@@ -134,17 +136,35 @@ export default {
 
 <style lang="scss">
 .painelset-admin {
-  $px: 10px;
+  $px: 0px;
   line-height: 1;
-  .container-fluid {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  // background-color: #222;
+  .container-grid {
     padding: 0 $px;
+    height: 100%;
   }
   .row {
     align-items: stretch;
     margin-left: -$px;
     margin-right: -$px;
     padding-top: $px;
+    &:first-child {
+      height: 3.4em;
+    }
+    &:last-child {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      top: 3.4em;
+    }
     div[class^=col] {
+      position: relative;
       padding-left: $px;
       padding-right: $px;
       &:not(:first-child) {
@@ -195,16 +215,6 @@ export default {
     }
     .evento-hora {
       font-size: 1.1em;
-    }
-  }
-  .cronometro-component {
-    &.cronometro-global {
-      font-size: 1.6em;
-      font-weight: bold;
-      .card {
-        .inner {
-        }
-      }
     }
   }
 }

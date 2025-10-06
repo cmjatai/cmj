@@ -3,7 +3,7 @@ import logging
 from django.apps.registry import apps
 from django.conf import settings
 
-from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer
+from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer, IndividuoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
 from cmj.painelset.models import Cronometro, Evento, Individuo
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
@@ -67,6 +67,7 @@ class _EventoViewSet:
 
 @customize(Individuo)
 class _IndividuoViewSet:
+    serializer_class = IndividuoSerializer
 
     @action(detail=True, methods=['POST'])
     def change_position(self, request, *args, **kwargs):
@@ -84,6 +85,8 @@ class _IndividuoViewSet:
 
     @action(detail=True, methods=['GET'])
     def toggle_microfone(self, request, *args, **kwargs):
+
+        cronometro_manager = CronometroManager()
 
         individuo = self.get_object()
         mic_old = {'order': individuo.order, 'status_microfone': 'on' if individuo.status_microfone else 'off'}
@@ -126,6 +129,8 @@ class _IndividuoViewSet:
                 for ind in ind_com_a_palavra:
                     ind.com_a_palavra = False
                     ind.save(update_fields=['com_a_palavra'])
+                    cron, created = ind.get_or_create_unique_cronometro()
+                    cronometro_manager.stop_cronometro(cron.id)
 
                 ind_mic_ligado = individuo.evento.individuos.filter(
                     status_microfone=True, microfone_sempre_ativo=False
@@ -137,9 +142,17 @@ class _IndividuoViewSet:
                         outro.status_microfone = False
                         outro.com_a_palavra = False
                         outro.save(update_fields=['status_microfone', 'com_a_palavra'])
+
             individuo.status_microfone = True if status_microfone == 'on' else False
             individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
             individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+
+            if individuo.com_a_palavra:
+                cron, created = individuo.get_or_create_unique_cronometro()
+                cronometro_manager.start_cronometro(cron.id)
+            else:
+                cron, created = individuo.get_or_create_unique_cronometro()
+                cronometro_manager.stop_cronometro(cron.id)
 
         # obter status_microfone e com_a_palavra de todos os individuos do evento
         microfones_do_evento_depois = list(individuo.evento.individuos.values('order', 'status_microfone'))

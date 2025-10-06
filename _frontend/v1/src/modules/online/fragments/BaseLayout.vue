@@ -203,6 +203,7 @@ export default {
     grid-column-start: 2;
     grid-column-end: 4;
     overflow: auto;
+    position: relative;
   }
 
   .sideright {

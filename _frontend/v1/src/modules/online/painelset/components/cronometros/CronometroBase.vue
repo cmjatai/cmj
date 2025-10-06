@@ -1,8 +1,9 @@
 <template>
   <div :class="['cronometro-component', css_class]">
     <div v-if="cronometro" :class="['croncard', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']">
-      <div class="inner">
-        <div :class="['display-time', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']">
+      <div class="inner" @click="getCronometro">
+        <div :class="['display-time', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']"
+          :style="{ fontSize: display_size }">
           {{ displayTime }}
         </div>
         <div class="inner-rodape">
@@ -35,29 +36,23 @@
           <a class="btn btn-outline-dark" @click.stop="stopCronometro" v-if="['running', 'paused'].includes(cronometro.state) && controls.includes('stop')">
             <i class="fa fa-stop" aria-hidden="true"></i>
           </a>
+          <a class="btn btn-outline-dark" @click.stop="addTime(30)" title="Adicionar 30 segundos" v-if="controls.includes('add30s')">
+            +30s
+          </a>
+          <a class="btn btn-outline-dark" @click.stop="addTime(60)" title="Adicionar 1 minuto" v-if="controls.includes('add1m')">
+            +1m
+          </a>
+          <a class="btn btn-outline-dark" @click.stop="addTime(180)" title="Adicionar 3 minutos" v-if="controls.includes('add3m')">
+            +3m
+          </a>
+          <a class="btn btn-outline-dark" @click.stop="addTime(300)" title="Adicionar 5 minutos" v-if="controls.includes('add5m')">
+            +5m
+          </a>
         </div>
       </div>
     </div>
     <div v-else>
       <p>Carregando cronômetro...</p>
-    </div>
-    <div v-if="cronometro && debug_verbose">
-      <br><br>
-      <hr>
-      <h3>{{ cronometro.name }}</h3>
-      <p>Estado: {{ cronometro.state }}</p>
-      <p>Duração: {{ cronometro.duration }}</p>
-      <p>Tempo Decorrido: {{ elapsedTime }}</p>
-      <p>Tempo Restante: {{ remainingTime }}</p>
-      <p>Iniciado em: {{ cronometro.started_at }}</p>
-      <p>Pausado em: {{ cronometro.paused_at }}</p>
-      <p>Finalizado em: {{ cronometro.finished_at }}</p>
-      <p>Número de Cronômetros Filhos: {{ cronometro.children_count }}</p>
-      <hr>
-      <button @click="startCronometro" :disabled="cronometro.state === 'running'">Iniciar</button>
-      <button @click="pauseCronometro" :disabled="cronometro.state !== 'running'">Pausar</button>
-      <button @click="resumeCronometro" :disabled="cronometro.state !== 'paused'">Retomar</button>
-      <button @click="stopCronometro" :disabled="cronometro.state === 'stopped'">Parar</button>
     </div>
   </div>
 </template>
@@ -79,21 +74,58 @@ export default {
       type: String,
       default: ''
     },
+    display_initial: {
+      type: String,
+      default: 'elapsed', // 'elapsed', 'remaining', 'last_paused'
+      validator: function (value) {
+        return ['elapsed', 'remaining', 'last_paused'].includes(value)
+      }
+    },
+    display_format: {
+      type: String,
+      default: 'hh:mm:ss' // Formato padrão de exibição
+    },
+    display_size: {
+      type: String,
+      default: '2em' // Tamanho padrão da fonte
+    },
+    auto_start: {
+      type: Boolean,
+      default: false // Iniciar automaticamente ao montar
+    },
+    auto_stop: {
+      type: Boolean,
+      default: false // Parar automaticamente ao destruir
+    },
     controls: {
       type: Array,
-      default: () => ['start', 'pause', 'resume', 'stop', 'toggleDisplay']
+      default: () => [
+        'start',
+        'pause',
+        'resume',
+        'stop',
+        'add30s',
+        'add1m',
+        'add3m',
+        'add5m',
+        'toggleDisplay'
+      ] // Controles padrão
     }
   },
   data () {
     return {
+      id: this.cronometro_id,
       ws: `/ws/cronometro/${this.cronometro_id}/`,
+      app: 'painelset',
+      model: 'cronometro',
       wsSocket: null,
       cronometro: null,
       idInterval: null,
       syncInterval: 30, // sincroniza o cronômetro a cada 30 segundos
       countInterval: 0,
       debug_verbose: false,
-      display: 'elapsed', // 'elapsed', 'remaining', 'last_paused'
+      wait_destroy: false,
+      display: this.display_initial, // 'elapsed', 'remaining', 'last_paused'
       modesDisplay: ['elapsed', 'remaining', 'last_paused'] // modos disponíveis
     }
   },
@@ -101,15 +133,28 @@ export default {
     // console.log('Cronometro mounted, connecting to WebSocket:', this.ws)
     this.ws_client_cronometro()
   },
+  watch: {
+    cronometro_id: function (newVal, oldVal) {
+      if (!this.nulls.includes(oldVal) && newVal !== oldVal && newVal > 0 && newVal !== this.id) {
+        console.log('cronometrobase mudou de', oldVal, 'para', newVal)
+        this.id = newVal
+        this.ws = `/ws/cronometro/${this.cronometro_id}/`
+        if (this.wsSocket) {
+          this.wsSocket.close()
+          this.wsSocket = null
+        }
+        this.cronometro = null
+        this.ws_client_cronometro()
+      }
+    }
+  },
   beforeDestroy: function () {
     if (this.wsSocket) {
       console.log('Cronometro beforeDestroy, closing WebSocket')
       this.wsSocket.close()
       this.wsSocket = null
     }
-    if (this.idInterval) {
-      workerTimer.clearInterval(this.idInterval)
-    }
+    this.stopInterval()
   },
   methods: {
     toogleDisplay () {
@@ -135,15 +180,11 @@ export default {
       }
       t.wsSocket.onclose = () => {
         console.log('WebSocket desconectado...')
-        // tenta reconectar em 5 segundos
-        setTimeout(() => {
-          if (t.wsSocket) {
-            t.ws_client_cronometro()
-          }
-        }, 5000)
+        t.wsSocket = null
       }
       t.wsSocket.onerror = (error) => {
         console.error('Erro no WebSocket:', error)
+        t.wsSocket = null
         t.ws_client_cronometro()
       }
       t.wsSocket.onpagehide = () => {
@@ -156,29 +197,50 @@ export default {
       }
       return t.wsSocket
     },
-    runInterval () {
+    fetch (metadata) {
+      const t = this
+      setTimeout(() => {
+        console.log('WebSocket message received:', metadata)
+        t.getCronometro()
+      }, 100)
+    },
+    stopInterval () {
       if (this.idInterval) {
+        this.wait_destroy = true
+        workerTimer.clearInterval(this.idInterval)
+        this.idInterval = null
+      }
+    },
+    runInterval () {
+      const t = this
+      if (t.idInterval) {
         workerTimer.clearInterval(this.idInterval)
       }
       // Atualiza o cronômetro a cada segundo se estiver em execução
-      this.idInterval = workerTimer.setInterval(() => {
-        if (this.cronometro && this.cronometro.state === 'running') {
-          this.cronometro.elapsed_time = this.cronometro.elapsed_time + 1
-          this.cronometro.remaining_time = this.cronometro.remaining_time - 1
-          this.cronometro.accumulated_time = this.cronometro.accumulated_time + 1
-        } else if (this.cronometro && this.cronometro.state === 'paused') {
-          this.cronometro.last_paused_time = this.cronometro.last_paused_time + 1
+      t.idInterval = workerTimer.setInterval(() => {
+        if (t.wait_destroy) {
+          t.stopInterval()
+          return
         }
-        this.countInterval += 1
-        if (this.countInterval >= this.syncInterval) {
-          this.getCronometro()
-          this.countInterval = 0
+        if (t.cronometro && t.cronometro.state === 'running') {
+          t.cronometro.elapsed_time = t.cronometro.elapsed_time + 1
+          t.cronometro.remaining_time = t.cronometro.remaining_time - 1
+          t.cronometro.accumulated_time = t.cronometro.accumulated_time + 1
+        } else if (t.cronometro && t.cronometro.state === 'paused') {
+          t.cronometro.last_paused_time = t.cronometro.last_paused_time + 1
         }
-        this.refreshState({
+        t.countInterval += 1
+        if (t.countInterval >= t.syncInterval) {
+          setTimeout(() => {
+            t.getCronometro()
+          }, 1000)
+          t.countInterval = 0
+        }
+        t.refreshState({
           app: 'painelset',
           model: 'cronometro',
-          id: this.cronometro_id,
-          value: { ...this.cronometro }
+          id: t.cronometro_id,
+          value: { ...t.cronometro }
         })
       }, 1000)
     },
@@ -194,7 +256,7 @@ export default {
         this.$emit(`cronometro_${data.command}`, this.cronometro)
         // console.log('command:', data.command, 'cronometro:', this.cronometro)
         if (data.command === 'start') {
-          this.display = 'elapsed'
+          this.display = this.display_initial
           console.log('Cronômetro iniciado:', data)
         } else if (data.command === 'pause') {
           this.display = 'last_paused'
@@ -203,7 +265,7 @@ export default {
           this.display = 'elapsed'
           console.log('Cronômetro parado:', data)
         } else if (data.command === 'resume') {
-          this.display = 'elapsed'
+          this.display = this.display_initial
           console.log('Cronômetro retomado:', data)
         } else if (data.command === 'get') {
           // console.log('Estado do cronômetro atualizado:', data)
@@ -211,60 +273,121 @@ export default {
         this.runInterval()
       }
     },
+    addTime (seconds) {
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'add_time',
+          cronometro_id: this.cronometro.id,
+          seconds: seconds
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando add_time:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
+    },
     startCronometro () {
-      this.wsSocket.send(JSON.stringify({
-        command: 'start',
-        cronometro_id: this.cronometro.id
-      }))
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'start',
+          cronometro_id: this.cronometro.id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando start:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     pauseCronometro () {
-      this.wsSocket.send(JSON.stringify({
-        command: 'pause',
-        cronometro_id: this.cronometro.id
-      }))
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'pause',
+          cronometro_id: this.cronometro.id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando pause:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     resumeCronometro () {
-      this.wsSocket.send(JSON.stringify({
-        command: 'resume',
-        cronometro_id: this.cronometro.id
-      }))
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'resume',
+          cronometro_id: this.cronometro.id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando resume:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     stopCronometro () {
-      this.wsSocket.send(JSON.stringify({
-        command: 'stop',
-        cronometro_id: this.cronometro.id
-      }))
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'stop',
+          cronometro_id: this.cronometro.id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando stop:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     getCronometro () {
-      // qual o estado atual do cronometro no servidor?
-      this.wsSocket.send(JSON.stringify({
-        command: 'get',
-        cronometro_id: this.cronometro_id
-      }))
+      console.log(this.cronometro_id, 'Buscando estado atual do cronômetro no servidor...')
+      try {
+        if (!this.wsSocket) {
+          this.ws_client_cronometro()
+        } else {
+          this.wsSocket.send(JSON.stringify({
+            command: 'get',
+            cronometro_id: this.cronometro_id
+          }))
+        }
+      } catch (error) {
+        console.error('Erro ao enviar comando get:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     secondsToTime: function (cronometro, timeKey, alternativeKey) {
+      /* if (cronometro.id === 47) {
+        console.log('entrou aqui 0', cronometro, timeKey, alternativeKey)
+      }
       if (
         !cronometro ||
         (this.nulls.includes(cronometro[timeKey]) && alternativeKey === undefined) ||
         (alternativeKey !== undefined && this.nulls.includes(cronometro[alternativeKey]))
       ) {
-        return '00:00:00'
-      }
+        console.log('entrou aqui 1', cronometro, timeKey, alternativeKey)
+        return '00:00'
+      } */
       let totalSeconds = Math.round(
-        cronometro[timeKey] || cronometro[alternativeKey]
+        cronometro[timeKey] || cronometro[alternativeKey] || 0
       )
-      if (this.nulls.includes(totalSeconds)) {
-        return '00:00:00'
-      }
+      /* if (this.nulls.includes(totalSeconds)) {
+        console.log('entrou aqui 2', cronometro, timeKey, alternativeKey)
+        return '00:00'
+      } */
       if (totalSeconds < 0) {
         totalSeconds = totalSeconds * -1
       }
       const hours = Math.floor(totalSeconds / 3600)
       const minutes = Math.floor((totalSeconds % 3600) / 60)
       const seconds = totalSeconds % 60
-      return [hours, minutes, seconds]
-        .map(v => v < 10 ? '0' + v : v)
-        .join(':') // "HH:MM:SS"
+      if (this.display_format === 'hh:mm:ss') {
+        return [hours, minutes, seconds]
+          .map(v => v < 10 ? '0' + v : v)
+          .join(':') // "HH:MM:SS"
+      } else if (this.display_format === 'mm:ss') {
+        return [minutes + hours * 60, seconds]
+          .map(v => v < 10 ? '0' + v : v)
+          .join(':') // "MM:SS"
+      } else if (this.display_format === 'ss') {
+        return (seconds + minutes * 60 + hours * 3600).toString() // "SS"
+      }
+      return '00:00:00'
     }
   },
   computed: {
@@ -315,12 +438,13 @@ export default {
       justify-content: stretch;
       align-content: stretch;
       .inner-rodape {
-        font-size: 0.5em;
+        font-size: 1em;
         text-align: center;
         font-style: italic;
       }
     }
     .display-time {
+      font-weight: bold;
       &.elapsed { /* tempo decorrido */
         &.running {
           color: #0f0;  /* verde se em execução */
