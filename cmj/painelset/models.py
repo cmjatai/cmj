@@ -1,4 +1,5 @@
 from enum import unique
+import time
 from django.db import models
 from django.utils import timezone
 from datetime import timedelta
@@ -13,6 +14,26 @@ class CronometroState(models.TextChoices):
     RUNNING = 'running', 'Executando'
     PAUSED = 'paused', 'Pausado'
     FINISHED = 'finished', 'Finalizado'
+
+class CronometroMixin:
+
+    def get_or_create_unique_cronometro(self):
+        """Obtém ou cria um cronômetro único associado ao modelo que o chamou este método."""
+        duration = getattr(self, 'duration', timedelta())
+        cronometro, created = Cronometro.objects.get_or_create(
+            content_type=ContentType.objects.get_for_model(self),
+            object_id=self.id,
+            defaults={
+                'name': f'Cronômetro do {self._meta.verbose_name}: {self.name}',
+                'duration': duration,
+            }
+        )
+        if not created and hasattr(self, 'duration') and cronometro.duration != duration:
+            cronometro.duration = duration
+            cronometro.save()
+
+        return cronometro, created
+
 
 class Cronometro(models.Model):
     """
@@ -120,6 +141,7 @@ class CronometroEvent(models.Model):
         ('stopped', 'Parado'),
         ('finished', 'Finalizado'),
         ('reset', 'Resetado'),
+        ('time_added', 'Tempo Adicionado'),
     ]
 
     cronometro = models.ForeignKey(Cronometro, on_delete=models.CASCADE, related_name='events')
@@ -136,7 +158,7 @@ class CronometroEvent(models.Model):
         ordering = ['-timestamp']
 
 
-class Evento(models.Model):
+class Evento(models.Model, CronometroMixin):
     """Modelo para representar um Evento que é a representação de uma reunião que possui tempo global, partes menores e pontos que representam indivíduos."""
     name = models.CharField(max_length=100, verbose_name="Nome do Evento", unique=True)
     description = models.TextField(blank=True, verbose_name="Descrição do Evento")
@@ -162,22 +184,6 @@ class Evento(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_or_create_unique_cronometro(self):
-        """Obtém ou cria um cronômetro único associado ao evento"""
-        cronometro, created = Cronometro.objects.get_or_create(
-            content_type=ContentType.objects.get_for_model(self),
-            object_id=self.id,
-            defaults={
-                'name': f'Cronômetro do Evento: {self.name}',
-                'duration': self.duration
-            }
-        )
-        if not created and cronometro.duration != self.duration:
-            cronometro.duration = self.duration
-            cronometro.save()
-
-        return cronometro, created
 
 class ParteEvento(models.Model):
     """Modelo para representar uma Parte de um Evento, que possui um tempo específico."""
@@ -237,7 +243,7 @@ class IndividuoManager(models.Manager):
         return individuo
 
 
-class Individuo(models.Model):
+class Individuo(models.Model, CronometroMixin):
     objects = IndividuoManager()
 
     """Modelo para representar um Individuo no Painel SET, que representa um indivíduo ou tópico."""

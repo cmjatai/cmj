@@ -61,6 +61,16 @@ export default {
       return null
     }
   },
+  mounted () {
+    console.log(this.individuo_id, 'IndividuoBase mounted', this.individuo)
+    const t = this
+    t.init = true
+    this.refreshState({
+      app: 'painelset',
+      model: 'cronometro',
+      id: this.individuo.cronometro
+    })
+  },
   watch: {
     individuo: function (newVal, oldVal) {
       console.log(this.individuo_id, 'individuo mudou', newVal, oldVal)
@@ -72,6 +82,11 @@ export default {
           this.com_a_palavra = newVal.com_a_palavra
         }
       }
+      this.refreshState({
+        app: 'painelset',
+        model: 'cronometro',
+        id: this.individuo.cronometro
+      })
     },
     com_a_palavra: function (newVal, oldVal) {
       console.log(this.individuo_id, 'com_a_palavra mudou', newVal, oldVal)
@@ -126,6 +141,9 @@ export default {
 </script>
 <style lang="scss">
 .individuo-base {
+  display: flex;
+  align-self: stretch;
+  justify-content: stretch;
   border-bottom: 1px solid white;
   &:last-child {
   border-bottom: 0px;
@@ -134,6 +152,7 @@ export default {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
+    width: 100%;
   }
   .inner-individuo, .controls {
     display: flex;

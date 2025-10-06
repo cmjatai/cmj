@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from cmj.painelset.models import Cronometro, CronometroEvent, Evento
+from cmj.painelset.models import Cronometro, CronometroEvent, Evento, Individuo
 from sapl.api.serializers import SaplSerializerMixin
 
 class SecondDurationField(serializers.Field):
@@ -53,16 +53,27 @@ class CronometroEventSerializer(SaplSerializerMixin):
         model = CronometroEvent
         fields = ['id', 'cronometro', 'event_type', 'timestamp', 'triggered_by_child']
 
-class EventoSerializer(SaplSerializerMixin):
+class BaseCronometroSerializer(SaplSerializerMixin):
     """Serializer para o modelo Evento"""
 
     cronometro = serializers.SerializerMethodField()
-
-    class Meta(SaplSerializerMixin.Meta):
-        model = Evento
 
     def get_cronometro(self, obj):
         cronometro, created = obj.get_or_create_unique_cronometro()
         #if cronometro:
         #    return CronometroSerializer(cronometro).data
         return cronometro.id
+
+class EventoSerializer(BaseCronometroSerializer):
+    """Serializer para o modelo Evento"""
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = Evento
+        fields = '__all__'
+
+class IndividuoSerializer(BaseCronometroSerializer):
+    """Serializer para o modelo Individuo"""
+
+    class Meta(SaplSerializerMixin.Meta):
+        model = Individuo
+        fields = '__all__'

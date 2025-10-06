@@ -121,6 +121,29 @@ class StopCronometroCommand(CronometroCommand):
 
         return {"success": True, "message": "Cronômetro parado"}
 
+class AddTimeCronometroCommand(CronometroCommand):
+    """Comando para adicionar tempo a um cronômetro"""
+
+    def __init__(self, cronometro_id, seconds):
+        super().__init__(cronometro_id)
+        self.seconds = seconds
+
+    def _execute_command(self):
+        if self.cronometro.state == CronometroState.FINISHED:
+            return {"error": "Não é possível adicionar tempo a um cronômetro finalizado"}
+
+        self.cronometro.duration += timedelta(seconds=self.seconds)
+        self.cronometro.save()
+
+        # Criar evento
+        CronometroEvent.objects.create(
+            cronometro=self.cronometro,
+            event_type='time_added',
+            details={'seconds_added': self.seconds}
+        )
+
+        return {"success": True, "message": f"{self.seconds} segundos adicionados ao cronômetro"}
+
 class FinishCronometroCommand(CronometroCommand):
     """Comando para finalizar cronômetro (quando tempo acaba)"""
 

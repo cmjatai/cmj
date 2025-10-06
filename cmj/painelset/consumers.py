@@ -97,6 +97,12 @@ class CronometroConsumer(AsyncWebsocketConsumer):
                     self.cronometro_manager.get_cronometro_data
                 )(cronometro_id)
 
+            elif command == 'add_time':
+                seconds = data.get('seconds', 0)
+                result = await database_sync_to_async(
+                    self.cronometro_manager.add_time
+                )(cronometro_id, seconds)
+
             # Enviar resultado de volta
             if result:
                 """await self.send(text_data=json.dumps({

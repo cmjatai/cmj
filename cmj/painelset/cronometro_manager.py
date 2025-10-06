@@ -5,7 +5,7 @@ from datetime import timedelta
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer
 from .models import Cronometro, CronometroState
 from .cronometro_commands import (
-    StartCronometroCommand, PauseCronometroCommand,
+    AddTimeCronometroCommand, StartCronometroCommand, PauseCronometroCommand,
     ResumeCronometroCommand, StopCronometroCommand, FinishCronometroCommand
 )
 
@@ -89,6 +89,15 @@ class CronometroManager:
 
         if result.get('success'):
             self.notify_observers(command.cronometro, 'stopped')
+
+        return result
+
+    def add_time(self, cronometro_id, seconds):
+        command = AddTimeCronometroCommand(cronometro_id, seconds)
+        result = command.execute()
+
+        if result.get('success'):
+            self.notify_observers(command.cronometro, 'time_added')
 
         return result
 

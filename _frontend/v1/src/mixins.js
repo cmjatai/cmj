@@ -85,6 +85,10 @@ Vue.mixin({
         return
       }
 
+      if (this.id !== undefined && this.id !== null && data.id !== this.id) {
+        return
+      }
+
       if (_this.model === undefined) {
         if (Array.isArray(_this.app)) {
           if (_.indexOf(_this.app, data.app) !== -1) {
