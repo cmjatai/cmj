@@ -119,10 +119,11 @@ export default {
             }
             &.btn-negative {
               background-image: linear-gradient(to bottom, #552222, #442222);
-              flex: 0 1 0%;
+              flex: 0 1 0;
               padding-left: 0.5em;
-              padding-right: 0.8em;
+              padding-right: 0.9em;
               border-color: #662222;
+              border-left: 0;
               &:hover {
                 background-color: #662222;
                 border-color: #aa4444;
