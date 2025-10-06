@@ -1,6 +1,6 @@
 <template>
   <div class="individuo-list">
-    <div :class="['individuo-base', 'manager', status_microfone === 0 ? 'muted' : '']">
+    <div :class="['individuo-base', 'manager', status_microfone === 0 ? 'muted' : '']" :style="{flex: `0 0 ${100 / (individuos.length + 1)}%`}">
       <div class="inner">
         <div class="controls">
           <button

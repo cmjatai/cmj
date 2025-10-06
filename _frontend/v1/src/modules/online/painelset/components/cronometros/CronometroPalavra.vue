@@ -100,11 +100,12 @@ export default {
         width: 100%;
         .btn-group {
           width: 100%;
-          margin-top: 10px;
+          margin-top: 1.5em;
           .btn {
             justify-content: center;
             padding: 5px 0;
             font-size: 1em;
+            box-shadow: 0px 0px 10px #000;
           }
           .btn-outline-dark {
             color: white;

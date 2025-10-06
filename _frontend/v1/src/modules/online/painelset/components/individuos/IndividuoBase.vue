@@ -4,7 +4,7 @@
       <div class="inner-individuo" @dblclick="dblclickIndividuo($event)">
         <div class="avatar">
           <img v-if="fotografiaParlamentarUrl" :src="fotografiaParlamentarUrl" alt="Foto do parlamentar"/>
-          <i v-else class="fas fa-user-circle fa-2x"></i>
+          <i v-else class="fas fa-user"></i>
         </div>
         <div class="name">
           {{ individuo ? individuo.name : 'Carregando indivíduo...' }}
@@ -145,6 +145,7 @@ export default {
   align-self: stretch;
   justify-content: stretch;
   border-bottom: 1px solid white;
+  position: relative;
   &:last-child {
   border-bottom: 0px;
   }
@@ -153,19 +154,26 @@ export default {
     align-items: stretch;
     justify-content: space-between;
     width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
   }
   .inner-individuo, .controls {
     display: flex;
     background: #ddffdd;
     align-items: stretch;
     flex: 1 1 auto;
-    padding: 5px 10px;
+    padding: 0;
   }
   .avatar {
+    border-radius: 0;
     img {
-      width: 2em;
-      height: 2em;
-      object-fit: cover;
+      border-radius: 0;
+      height: 100%;
+    }
+    i {
+      margin: 0 10px 0 20px;
+      font-size: 2em;
     }
   }
   .inner-individuo {
