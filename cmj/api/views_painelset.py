@@ -209,7 +209,7 @@ class _IndividuoViewSet:
                     cronAparteante, created = aparteante.get_or_create_unique_cronometro()
                     aparteante.save()
                     cronometro_manager.stop_cronometro(cronAparteante.id)
-                    
+
                 cronometro_manager.stop_cronometro(cronAparteado.id)
 
 

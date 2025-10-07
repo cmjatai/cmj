@@ -144,7 +144,7 @@ export default {
       this.sendUpdate(
         'toggle_microfone',
         [
-          `status_microfone=${this.status_microfone ? 'on' : 'off'}`,
+          `status_microfone=${this.status_microfone || !this.com_a_palavra ? 'on' : 'off'}`,
           `default_timer=${this.default_timer}`,
           `com_a_palavra=${!this.com_a_palavra ? 1 : 0}`
         ]
