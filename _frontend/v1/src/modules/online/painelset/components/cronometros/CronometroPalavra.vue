@@ -10,19 +10,8 @@
       :display_format="'mm:ss'"
       :display_size="'4em'"
       :auto_start="true"
-      :controls="[
-        'start',
-        'pause',
-        'resume',
-        'stop',
-        'add30s',
-        'add1m',
-        'add3m',
-        'add5m',
-        'toggleDisplay'
-        ]"
+      :controls="controls"
     ></cronometro-base>
-
   </div>
 </template>
 <script>
@@ -37,6 +26,23 @@ export default {
     cronometro_id: {
       type: Number,
       required: true
+    },
+    controls: {
+      type: Array,
+      required: false,
+      default: function () {
+        return [
+          'start',
+          'pause',
+          'resume',
+          'stop',
+          'add30s',
+          'add1m',
+          'add3m',
+          'add5m',
+          'toggleDisplay'
+        ]
+      }
     }
   },
   data () {
@@ -76,12 +82,15 @@ export default {
         .btn-group {
           width: 100%;
           margin-top: 1.5em;
+
           .btn {
             justify-content: center;
             padding: 0.5em 0;
             font-size: 1em;
-            box-shadow: 0px 0px 10px #000;
             font-weight: bold;
+            &:hover {
+              box-shadow: 0px 0px 10px #000;
+            }
           }
           .btn-outline-dark {
             color: white;
@@ -93,12 +102,11 @@ export default {
               border-color: #777
             }
             &.btn-negative {
-              background-image: linear-gradient(to bottom, #552222, #442222);
+              background-image: linear-gradient(to bottom, #772222, #442222);
               flex: 0 1 0;
-              padding-left: 0.5em;
-              padding-right: 0.9em;
-              border-color: #662222;
-              border-left: 0;
+              padding-left: 1em;
+              padding-right: 1.3em;
+              border-color: #772222;
               &:hover {
                 background-color: #662222;
                 border-color: #aa4444;

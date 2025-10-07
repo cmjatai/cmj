@@ -7,7 +7,7 @@
           <button
           class="btn-fone"
           title="Ativar/Desativar Todos os Microfones"
-          @click="status_microfone ? 1 : 0"
+          @click="toggleAllMicrofones()"
         >
           <i :class="status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
         </button>
@@ -75,12 +75,39 @@ export default {
       }
     }
   },
+  watch: {
+    init: function (newVal, oldVal) {
+      // verifica se todos indivíduos estão com microfone ligado
+      let all_on = Object.values(this.itens.individuo_list).every(
+        individuo => individuo.status_microfone === true)
+      this.status_microfone = all_on
+    }
+  },
   mounted () {
     console.log('IndividuoList mounted', this.evento)
     const t = this
     t.fetch()
   },
   methods: {
+    toggleAllMicrofones () {
+      const t = this
+      t.status_microfone = !t.status_microfone
+      const query_params = [
+        `status_microfone=${t.status_microfone ? 'on' : 'off'}`
+      ]
+      t
+        .utils.getModelAction(
+          'painelset', 'evento', this.evento.id, 'toggle_microfones',
+          query_params.join('&')
+        )
+        .then(response => {
+          console.log(this.evento, 'toggle_microfones', response)
+        })
+        .catch(error => {
+          console.error(this.evento.id, 'toggle_microfones', error)
+          this.sendMessage({ alert: 'error', message: 'Erro ao atualizar Microfones: ' + error.response.data, time: 5 })
+        })
+    },
     fetch (metadata) {
       const t = this
       if (metadata && metadata.action === 'post_delete' && metadata.model === 'individuo') {

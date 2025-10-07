@@ -25,6 +25,13 @@
             :key="`cronometro-com-a-palavra-${individuo.cronometro}`"
             :ref="`cronometro-com-a-palavra-${individuo.cronometro}`"
             :cronometro_id="individuo.cronometro"
+            :controls="[
+              'toggleDisplay',
+              'pause',
+              'resume',
+              'add30s',
+              'add1m'
+        ]"
             ></cronometro-palavra>
         </div>
       </div>
@@ -104,12 +111,15 @@ export default {
   .individuo-aparteante {
     display: flex;
     flex-direction: column;
-    margin-left: 6em;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-left: 5em;
     .inner-individuo {
       display: flex;
       flex-direction: row;
       align-items: stretch;
-      justify-content: space-between;
+      justify-content: flex-start;
+      width: auto;
     }
     .individuo-header {
       text-align: left;
@@ -126,7 +136,7 @@ export default {
       }
     }
     .individuo {
-      flex: 1 1 0%;
+      flex: 1 1 auto;
     }
     .divide {
       width: 1px;
@@ -134,9 +144,24 @@ export default {
       margin: 0;
     }
     .cronometro {
-      flex: 1 1 100%;
-      padding: 2em;
+      flex: 1 1 auto;
+      padding: 1em;
       font-size: 0.8em;
+    }
+    .croncard {
+      justify-content: center;
+      gap: 1em;
+    }
+    .controls {
+      &.visible {
+        .btn-group {
+          margin: 0;
+          width: auto;
+          .btn {
+            padding: 0.3em 0.7em 0.2em 0.7em;
+          }
+        }
+      }
     }
     .individuo {
       display: flex;

@@ -152,8 +152,7 @@ export default {
     }
     .cronometro {
       flex: 1 1 100%;
-      padding: 1em 1em 1.5em;
-
+      padding: 1em 1em 3em;
     }
     .individuo {
       display: flex;
