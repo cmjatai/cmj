@@ -6,10 +6,11 @@ from django.conf import settings
 
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer, IndividuoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
-from cmj.painelset.models import Cronometro, Evento, Individuo
+from cmj.painelset.models import Cronometro, CronometroState, Evento, Individuo
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework import viewsets, status
 
 from pythonosc import udp_client
@@ -84,6 +85,88 @@ class _IndividuoViewSet:
 
         return Response(result)
 
+
+    @action(detail=True, methods=['GET'])
+    def force_stop_cronometro(self, request, *args, **kwargs):
+        cronometro_manager = CronometroManager()
+        individuo = self.get_object()
+        print(f'Forçando stop do cronometro do indivíduo {individuo}: status_microfone {individuo.status_microfone}, com_a_palavra={individuo.com_a_palavra}')
+        cron, created = individuo.get_or_create_unique_cronometro()
+        if cron.state != CronometroState.STOPPED:
+            cronometro_manager.stop_cronometro(cron.id)
+        return Response(
+            {'status': 'ok',
+             'individuo': individuo.id
+            }
+        )
+
+    @action(detail=True, methods=['GET'])
+    def toggle_aparteante(self, request, *args, **kwargs):
+        cronometro_manager = CronometroManager()
+        individuoAparteante = self.get_object()
+
+        aparteante_status = request.GET.get('aparteante_status', '0')
+        if aparteante_status not in ['0', '1']:
+            aparteante_status = '0'
+        aparteante_status = aparteante_status == '1'
+
+        default_timer = request.GET.get('default_timer', '60')  # em segundos
+        try:
+            default_timer = timedelta(seconds=int(default_timer))
+        except ValueError:
+            default_timer = timedelta(seconds=60)
+
+        print(f'Toggle aparteante {individuoAparteante}: status_microfone {individuoAparteante.status_microfone}, com_a_palavra={individuoAparteante.com_a_palavra}')
+
+        individuoComPalavra = individuoAparteante.evento.individuos.filter(com_a_palavra=True).first()
+
+        if not individuoComPalavra:
+            raise DRFValidationError('A palavra não está sendo utilizada. Não é possível fazer aparte.')
+        else:
+
+            antigoAparteante = individuoComPalavra.aparteante
+
+            if individuoComPalavra.id == individuoAparteante.id:
+                # Ele mesmo está com a palavra, nada a fazer
+                print(f'  Indivíduo {individuoAparteante} já está com a palavra, nada a fazer')
+                return Response(
+                    {'status': 'ok',
+                     'individuo': individuoAparteante.id
+                     })
+            else:
+                cronAparteante, created = individuoAparteante.get_or_create_unique_cronometro()
+                cronAparteado, created = individuoComPalavra.get_or_create_unique_cronometro()
+
+                if not aparteante_status:
+                    # Ele não está com a palavra, e quer desligar o aparteante
+                    print(f'  Indivíduo {individuoAparteante} não está com a palavra, e quer se desligar do aparteante. Desligando aparte.')
+                    individuoComPalavra.aparteante = None
+                    individuoComPalavra.save(update_fields=['aparteante'])
+                    individuoAparteante.save()
+                    cronometro_manager.stop_cronometro(cronAparteante.id)
+                else:
+                    # Ele não está com a palavra, mas outro indivíduo está
+                    print(f'  Indivíduo {individuoAparteante} não está com a palavra, mas o indivíduo {individuoComPalavra} está. Permitindo aparte.')
+                    cronometro_manager.start_cronometro(cronAparteante.id, cronAparteado.id, duration=default_timer)
+                    individuoComPalavra.aparteante = individuoAparteante
+                    individuoComPalavra.save(update_fields=['aparteante'])
+                    individuoAparteante.save()
+
+                    # Iniciar cronômetro do aparteante não é necessário, pois ele é CronometroPalavra chama ele como auto_start
+                    # cronometro_manager.start_cronometro(cronAparteante.id, cronAparteado.id, duration=default_timer)
+
+                    if antigoAparteante:
+                        antigoAparteante.refresh_from_db()
+                        cron, created = antigoAparteante.get_or_create_unique_cronometro()
+                        antigoAparteante.save()
+                        cronometro_manager.stop_cronometro(cron.id)
+
+        return Response(
+            {'status': 'ok',
+             'individuo': individuoAparteante.id
+             })
+
+
     @action(detail=True, methods=['GET'])
     def toggle_microfone(self, request, *args, **kwargs):
 
@@ -110,57 +193,54 @@ class _IndividuoViewSet:
         if status_microfone not in ['on', 'off']:
             status_microfone = 'off'
 
-        if individuo.microfone_sempre_ativo:
-            mic_old = {}
-            if com_a_palavra == '1':
-                # Remover com_a_palavra de todos os outros individuos do evento
-                ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
-                for ind in ind_com_a_palavra:
-                    ind.com_a_palavra = False
-                    cron, created = ind.get_or_create_unique_cronometro()
-                    cronometro_manager.stop_cronometro(cron.id)
-                    ind.save(update_fields=['com_a_palavra'])
+        if com_a_palavra == '1':
+            # Remover com_a_palavra de todos os outros individuos do evento
+            ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
+            for ind in ind_com_a_palavra:
+                cronAparteado, created = ind.get_or_create_unique_cronometro()
 
-                individuo.status_microfone = True
-                individuo.com_a_palavra = True
-                #individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
-                logger.debug(f'  Indivíduo {individuo} tem microfone sempre ativo. Forçando status_microfone=on e com_a_palavra=1')
-            else:
-                individuo.status_microfone = True
-                individuo.com_a_palavra = False
-                #individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
-                logger.debug(f'  Indivíduo {individuo} tem microfone sempre ativo. Forçando status_microfone=on e com_a_palavra=0')
+                aparteante = ind.aparteante
 
-        else:
-            if com_a_palavra == '1':
-                # Remover com_a_palavra de todos os outros individuos do evento
-                ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
-                for ind in ind_com_a_palavra:
-                    ind.com_a_palavra = False
-                    cron, created = ind.get_or_create_unique_cronometro()
-                    cronometro_manager.stop_cronometro(cron.id)
-                    ind.save(update_fields=['com_a_palavra'])
+                ind.aparteante = None
+                ind.com_a_palavra = False
+                ind.save()
 
-                ind_mic_ligado = individuo.evento.individuos.filter(
-                    status_microfone=True, microfone_sempre_ativo=False
-                    ).exclude(id=individuo.id)
-                if ind_mic_ligado.count() == 1:
-                    # Se houver apenas mais um individuo com microfone ligado, desligar o microfone dele se ele não tiver microfone sempre ativo
-                    outro = ind_mic_ligado.first()
-                    if outro:
-                        outro.status_microfone = False
-                        outro.com_a_palavra = False
-                        outro.duration = default_timer
-                        outro.save(update_fields=['status_microfone', 'com_a_palavra'])
+                if aparteante:
+                    cronAparteante, created = aparteante.get_or_create_unique_cronometro()
+                    aparteante.save()
+                    cronometro_manager.stop_cronometro(cronAparteante.id)
+                    
+                cronometro_manager.stop_cronometro(cronAparteado.id)
 
 
-            individuo.status_microfone = True if status_microfone == 'on' else False
-            individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
-        individuo.save(update_fields=['status_microfone', 'com_a_palavra'])
+            # Se houver apenas mais um individuo com microfone ligado, desligar o microfone dele se ele não tiver microfone sempre ativo
+            ind_mic_ligado = individuo.evento.individuos.filter(
+                status_microfone=True,
+                microfone_sempre_ativo=False
+                ).exclude(id=individuo.id)
+            if ind_mic_ligado.count() == 1:
+                outro = ind_mic_ligado.first()
+                if outro:
+                    outro.status_microfone = False
+                    outro.com_a_palavra = False
+                    outro.save()
+
+        individuo.status_microfone = True if status_microfone == 'on' else False
+        individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
+
+        aparteante = individuo.aparteante
+        if not individuo.com_a_palavra and aparteante:
+            individuo.aparteante = None
+            aparteante.save()
+            cron, created = aparteante.get_or_create_unique_cronometro()
+            cronometro_manager.stop_cronometro(cron.id)
+
         cron, created = individuo.get_or_create_unique_cronometro()
         if individuo.com_a_palavra:
             cronometro_manager.start_cronometro(cron.id, duration=default_timer)
+            individuo.save()
         else:
+            individuo.save()
             cronometro_manager.stop_cronometro(cron.id)
 
 

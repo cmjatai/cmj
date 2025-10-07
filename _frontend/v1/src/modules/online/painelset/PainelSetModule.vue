@@ -1,5 +1,5 @@
 <template>
-  <div class="painelset-module">
+  <div class="painelset-module online-module">
     <div v-if="$route.name === 'painelset_list_link'" class="painelset-module-header">
       <ul class="p-2">
         <li v-for="evento in itensEventos" :key="evento.id">

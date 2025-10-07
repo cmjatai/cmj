@@ -33,10 +33,10 @@
       </div>
       <div class="row">
         <div class="col-4 container-individuos">
-          <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'"></individuo-list>
+          <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'" @onload="onIndividuoListLoad()"></individuo-list>
         </div>
         <div class="col-8 container-controls">
-          <palavra-em-uso></palavra-em-uso>
+          <palavra-em-uso v-if="individuoListLoaded"></palavra-em-uso>
         </div>
       </div>
     </div>
@@ -63,7 +63,8 @@ export default {
         'evento'
       ],
       evento: null,
-      cronometro: null
+      cronometro: null,
+      individuoListLoaded: false
     }
   },
   computed: {
@@ -90,6 +91,9 @@ export default {
     })
   },
   methods: {
+    onIndividuoListLoad: function () {
+      this.individuoListLoaded = true
+    },
     fetch (metadata) {
       const t = this
       if (t.evento) {

@@ -1,4 +1,4 @@
-from enum import unique
+
 import time
 from django.db import models
 from django.utils import timezone
@@ -20,14 +20,22 @@ class CronometroMixin:
     def get_or_create_unique_cronometro(self, duration=None):
         """Obtém ou cria um cronômetro único associado ao modelo que o chamou este método."""
         duration_owner = getattr(self, 'duration', timedelta())
-        cronometro, created = Cronometro.objects.get_or_create(
-            content_type=ContentType.objects.get_for_model(self),
-            object_id=self.id,
-            defaults={
-                'name': f'Cronômetro do {self._meta.verbose_name}: {self.name}',
-                'duration': duration,
-            }
-        )
+        try:
+            cronometro, created = Cronometro.objects.get_or_create(
+                content_type=ContentType.objects.get_for_model(self),
+                object_id=self.id,
+                defaults={
+                    'name': f'Cronômetro do {self._meta.verbose_name}: {self.name}',
+                    'duration': duration,
+                }
+            )
+        except:
+            cronometro, created = Cronometro.objects.get_or_create(
+                content_type=ContentType.objects.get_for_model(self),
+                object_id=self.id,
+                name = f'Cronômetro do {self._meta.verbose_name}: {self.name}',
+                duration = duration_owner
+            )
         if not created and hasattr(self, 'duration') and cronometro.duration != duration_owner:
             cronometro.duration = duration or duration_owner
             cronometro.save()
@@ -131,6 +139,10 @@ class Cronometro(models.Model):
         elapsed = self.elapsed_time
         #return max(timedelta(), self.duration - elapsed)
         return self.duration - elapsed
+
+    def ws_serialize(self):
+        from cmj.api.serializers_painelset import CronometroSerializer
+        return CronometroSerializer(self).data
 
 class CronometroEvent(models.Model):
     """Modelo para registrar eventos de cronômetros - Observer Pattern"""
@@ -272,6 +284,13 @@ class Individuo(models.Model, CronometroMixin):
 
     com_a_palavra = models.BooleanField(default=False, help_text="Indica se o indivíduo está com a palavra")
 
+    aparteante = models.OneToOneField(
+        'self',
+        blank=True, null=True, default=None,
+        related_name='aparteado',
+        on_delete=models.SET_NULL
+    )
+
     class Meta:
         ordering = ['order']
     unique_together = [
@@ -280,3 +299,7 @@ class Individuo(models.Model, CronometroMixin):
 
     def __str__(self):
         return f"{self.name} ({self.role})"
+
+    def ws_serialize(self):
+        from cmj.api.serializers_painelset import IndividuoSerializer
+        return IndividuoSerializer(self).data

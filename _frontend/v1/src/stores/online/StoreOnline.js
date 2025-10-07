@@ -150,6 +150,18 @@ const actions = {
         resolve()
       })
     }
+    if (metadata.hasOwnProperty('instance')) {
+      return new Promise((resolve, reject) => {
+        let meta = {
+          app: metadata.app,
+          model: metadata.model,
+          value: metadata.instance,
+          id: metadata.instance.id
+        }
+        commit(STATE_UPDATE, meta)
+        resolve(metadata.instance)
+      })
+    }
 
     const utils = Resources.Utils
     const resource = metadata.func === undefined ? utils.getModel : metadata.func

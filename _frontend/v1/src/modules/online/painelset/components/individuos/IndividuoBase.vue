@@ -1,26 +1,30 @@
 <template>
-  <div :class="['individuo-base', status_microfone === 0 ? 'muted' : '', individuo && individuo.com_a_palavra ? 'com-a-palavra' : (individuo.microfone_sempre_ativo ? 'always-on' : 'active')]">
+  <div :class="[
+    'individuo-base', status_microfone ? '' :  'muted',
+    com_a_palavra ? 'com-a-palavra' : (microfone_sempre_ativo ? 'always-on' : 'active'),
+    aparteante ? 'aparteante' : ''
+    ]">
     <div class="inner">
-      <div class="inner-individuo" @dblclick="dblclickIndividuo($event)">
+      <div class="inner-individuo" @dblclick.stop="dblclickIndividuo($event)" @click.prevent="clickIndividuo($event)">
         <div class="avatar">
           <img v-if="fotografiaParlamentarUrl" :src="fotografiaParlamentarUrl" alt="Foto do parlamentar"/>
           <i v-else class="fas fa-user"></i>
         </div>
         <div class="name">
-          {{ individuo ? individuo.name : 'Carregando indivíduo...' }}
+          {{ instance ? instance.name : 'Carregando indivíduo...' }}
         </div>
       </div>
       <div class="controls">
         <button
-          v-if="individuo"
+          v-if="instance"
           class="btn-fone"
-          :title="status_microfone === 0 ? 'Ativar microfone' : 'Desativar microfone'"
-           @click="status_microfone = status_microfone === 0 ? 1 : 0; $emit('toggle-microfone', individuo.id, status_microfone)"
+          :title="status_microfone ? 'Ativar microfone' : 'Desativar microfone'"
+           @click="toggleMicrofone()"
         >
-          <i :class="status_microfone === 0 ? 'fas fa-2x fa-microphone-slash' : 'fas fa-2x fa-microphone'"></i>
+          <i :class="status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
         </button>
         <button
-          v-if="false && individuo"
+          v-if="false && instance"
           class="btn-control"
         >
           <i class="fas fa-cog"></i>
@@ -30,7 +34,7 @@
   </div>
 </template>
 <script>
-
+import Vuex from 'vuex'
 export default {
   name: 'individuo-base',
   props: {
@@ -47,99 +51,138 @@ export default {
       type: Number,
       required: false,
       default: 300 // seconds
+    },
+    default_timer_aparteante: {
+      type: Number,
+      required: false,
+      default: 60 // seconds
     }
   },
   data () {
     return {
+      id: this.individuo_id,
+      instance: null,
+      app: 'painelset',
+      model: 'individuo',
       init: false,
-      status_microfone: this.individuo && this.individuo.status_microfone ? 1 : 0,
-      com_a_palavra: this.individuo && this.individuo.com_a_palavra,
-      // To avoid infinite loop when changing status_microfone from prop change and watcher on status_microfone
-      send_individual_updates: true
+      send_individual_updates: true,
+      click_timeout: null
     }
   },
   computed: {
+    ...Vuex.mapGetters([
+      'getIndividuoComPalavra'
+    ]),
+    status_microfone: function () {
+      return this.instance && this.instance.status_microfone
+    },
+    microfone_sempre_ativo: function () {
+      return this.instance && this.instance.microfone_sempre_ativo
+    },
+    com_a_palavra: function () {
+      return this.instance && this.instance.com_a_palavra
+    },
+    aparteante: function () {
+      return this.instance && this.instance.aparteado
+    },
     fotografiaParlamentarUrl: function () {
-      if (this.individuo && this.individuo.parlamentar) {
-        return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
+      if (this.instance && this.instance.parlamentar) {
+        return '/api/parlamentares/parlamentar/' + this.instance.parlamentar + '/fotografia.c96.png'
       }
-      return null
+      return ''
     }
   },
   mounted () {
-    console.log(this.individuo_id, 'IndividuoBase mounted', this.individuo)
+    console.log('Individuo Base mounted', this.individuo_id)
     const t = this
     t.init = true
-    this.refreshState({
-      app: 'painelset',
-      model: 'cronometro',
-      id: this.individuo.cronometro
+    t.$nextTick(() => {
+      if (t.individuo) {
+        t.instance = t.individuo
+        if (t.instance && !t.instance.com_a_palavra && !t.instance.aparteado) {
+          t.utils.getModelAction(t.app, t.model, t.individuo_id, 'force_stop_cronometro')
+        }
+      } else {
+        t.fetch()
+      }
     })
   },
-  watch: {
-    individuo: function (newVal, oldVal) {
-      console.log(this.individuo_id, 'individuo mudou', newVal, oldVal)
-      if (newVal && oldVal) {
-        if (newVal.status_microfone !== oldVal.status_microfone) {
-          this.status_microfone = newVal.status_microfone ? 1 : 0
-        }
-        if (newVal.com_a_palavra !== oldVal.com_a_palavra) {
-          this.com_a_palavra = newVal.com_a_palavra
-        }
-      }
-      this.refreshState({
-        app: 'painelset',
-        model: 'cronometro',
-        id: this.individuo.cronometro
-      })
-    },
-    com_a_palavra: function (newVal, oldVal) {
-      console.log(this.individuo_id, 'com_a_palavra mudou', newVal, oldVal)
-      if (!this.send_individual_updates) {
-        this.send_individual_updates = true
-        console.log('send_individual_updates is false, not sending update')
-        return
-      }
-      this.utils.getModelAction(
-        'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
-        `&status_microfone=${this.status_microfone ? 'on' : 'off'}&com_a_palavra=${newVal ? 1 : 0}&default_timer=${this.default_timer}`)
-        .then(response => {
-          console.log(this.individuo_id, 'com_a_palavra, toggle_microfone response', response)
-        })
-        .catch(error => {
-          console.error(this.individuo_id, 'com_a_palavra, toggle_microfone error', error)
-        })
-    },
-    status_microfone: function (newVal, oldVal) {
-      console.log(this.individuo_id, 'status_microfone mudou', newVal, oldVal)
-      if (!this.send_individual_updates) {
-        this.send_individual_updates = true
-        console.log('send_individual_updates is false, not sending update')
-        return
-      }
-      if (this.individuo && this.individuo.microfone_sempre_ativo && newVal === 0) {
-        console.log('individuo.microfone_sempre_ativo is true, not allowing to turn off microphone')
-        this.status_microfone = 1
-        return
-      }
-      this.utils.getModelAction(
-        'painelset', 'individuo', this.individuo_id, 'toggle_microfone',
-        `&status_microfone=${newVal ? 'on' : 'off'}&com_a_palavra=${this.individuo && this.individuo.com_a_palavra && newVal ? 1 : 0}&default_timer=${this.default_timer}`)
-        .then(response => {
-          console.log(this.individuo_id, 'com_a_palavra, toggle_microfone response', response)
-        })
-        .catch(error => {
-          console.error(this.individuo_id, 'com_a_palavra, toggle_microfone error', error)
-        })
-    }
-  },
   methods: {
+    toggleMicrofone: function () {
+      this.sendUpdate(
+        'toggle_microfone',
+        [
+          `status_microfone=${!this.status_microfone ? 'on' : 'off'}`,
+          `default_timer=${this.default_timer}`,
+          `com_a_palavra=${this.com_a_palavra ? 1 : 0}`
+        ]
+      )
+    },
+    clickIndividuo: function (event) {
+      const t = this
+      clearTimeout(t.click_timeout)
+      t.click_timeout = setTimeout(() => {
+        if (t.instance.com_a_palavra || !t.getIndividuoComPalavra) {
+          if (t.instance === t.getIndividuoComPalavra) {
+            t.sendMessage({ alert: 'error', message: 'A palavra já está sendo utilizada por este indivíduo.', time: 7 })
+            return
+          }
+          this.sendMessage({ alert: 'error', message: 'A palavra não está sendo utilizada. Não é possível fazer aparte.', time: 7 })
+          return
+        }
+        t.sendUpdate(
+          'toggle_aparteante',
+          [
+            `aparteante_status=${!t.aparteante ? 1 : 0}`,
+            `default_timer=${t.default_timer_aparteante || 60}`
+          ]
+        )
+      }, 600)
+    },
     dblclickIndividuo: function (event) {
-      if (!this.individuo) {
+      clearTimeout(this.click_timeout)
+      this.sendUpdate(
+        'toggle_microfone',
+        [
+          `status_microfone=${this.status_microfone ? 'on' : 'off'}`,
+          `default_timer=${this.default_timer}`,
+          `com_a_palavra=${!this.com_a_palavra ? 1 : 0}`
+        ]
+      )
+    },
+    sendUpdate (action, query_params) {
+      return this
+        .utils.getModelAction(
+          'painelset', 'individuo', this.individuo_id, action,
+          query_params.join('&')
+        )
+        .then(response => {
+          console.log(this.individuo_id, action, response)
+        })
+        .catch(error => {
+          console.error(this.individuo_id, action, error)
+          this.sendMessage({ alert: 'error', message: 'Erro ao atualizar indivíduo: ' + error.response.data, time: 5 })
+        })
+    },
+    fetch (metadata) {
+      const t = this
+      if (!metadata &&
+        metadata.hasOwnProperty('action') &&
+        metadata.action === 'post_delete' &&
+        metadata.model === 'individuo') {
+        t.instance = null
         return
       }
-      console.log(event)
-      this.$emit('toggle-com-a-palavra', this.individuo.id)
+      if (metadata.hasOwnProperty('instance') && metadata.instance && metadata.instance.id === t.individuo_id) {
+        t.instance = metadata.instance
+      }
+      t
+        .refreshState(metadata)
+        .then((individuo) => {
+          if (individuo && individuo.id === t.individuo_id) {
+            t.instance = individuo
+          }
+        })
     }
   }
 }
@@ -248,12 +291,27 @@ export default {
       border-color: transparent;
     }
   }
-  &.always-on:not(.muted):not(.com-a-palavra) {
+  &.aparteante {
+    margin-left: 10%;
+    .inner-individuo, .controls {
+      background: linear-gradient(to right, #d3a103, #a87f02);
+      opacity: 1 !important;
+      font-weight: bold;
+      color: black;
+      .fa-microphone {
+        color: black;
+        opacity: 1;
+      }
+    }
+    .inner-individuo {
+      font-size: 1.2em;
+      border-color: transparent;
+    }
+  }
+  &.always-on:not(.muted):not(.com-a-palavra):not(.aparteante) {
     .inner-individuo, .controls {
       background: #7ee57e;
       opacity: 1 !important;
-    }
-    .inner-individuo {
     }
   }
 }

@@ -43,6 +43,11 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
     async def time_refresh_message(self, event):
         message = event['message']
 
+        u = self.scope.get('user')
+        # You can add here any permission check you want
+        if u.is_anonymous:
+            del message['instance']
+
         # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': message

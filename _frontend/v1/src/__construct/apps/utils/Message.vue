@@ -32,11 +32,11 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .container-messages {
   position: fixed;
   bottom: 20px;
   right: 0px;
-  z-index: 10000;
+  z-index: 100000;
 }
 </style>

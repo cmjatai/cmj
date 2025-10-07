@@ -12,17 +12,23 @@ class CronometroCommand(ABC):
     Command Pattern: Interface base para comandos de cronômetro
     """
 
-    def __init__(self, cronometro_id, duration=None):
+    def __init__(self, cronometro_id, parent_id=None, duration=None):
         self.cronometro_id = cronometro_id
         self.cronometro = None
         self.duration = duration
+        self.parent_id = parent_id
+        self.parent = None
 
     def execute(self):
         """Executa o comando"""
         try:
             self.cronometro = Cronometro.objects.get(id=self.cronometro_id)
+            if self.parent_id:
+                self.parent = Cronometro.objects.get(id=self.parent_id)
             result = self._execute_command()
             result['cronometro'] = CronometroTreeSerializer(self.cronometro).data
+            if self.parent:
+                result['parent'] = CronometroTreeSerializer(self.cronometro.parent).data
             return result
         except Cronometro.DoesNotExist:
             return {"error": "Cronômetro não encontrado"}
@@ -42,6 +48,10 @@ class StartCronometroCommand(CronometroCommand):
         self.cronometro.state = CronometroState.RUNNING
         self.cronometro.started_at = timezone.now()
         self.cronometro.accumulated_time = timedelta()
+
+        if self.parent_id != self.cronometro.id:
+            self.cronometro.parent = self.parent or self.cronometro.parent
+
         if self.duration:
             self.cronometro.duration = self.duration
         self.cronometro.save()
@@ -51,6 +61,12 @@ class StartCronometroCommand(CronometroCommand):
             cronometro=self.cronometro,
             event_type='started'
         )
+
+        if self.cronometro.parent:
+            # Chain of Responsibility: propagar efeitos para cronômetro pai
+            from .cronometro_chain import CronometroEventChain
+            chain = CronometroEventChain()
+            chain.handle_cronometro_started(self.cronometro)
 
         return {"success": True, "message": "Cronômetro iniciado"}
 
@@ -106,9 +122,11 @@ class StopCronometroCommand(CronometroCommand):
             return {"error": "Cronômetro já está parado"}
 
         # Parar cronômetros filhos primeiro
-        for child in self.cronometro.get_children():
+        for child in list(self.cronometro.get_children()):
             if child.state in [CronometroState.RUNNING, CronometroState.PAUSED]:
                 StopCronometroCommand(child.id).execute()
+            child.parent = None
+            child.save()
 
         self.cronometro.state = CronometroState.STOPPED
         self.cronometro.started_at = None

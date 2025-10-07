@@ -41,10 +41,6 @@ export default {
   },
   data () {
     return {
-      app: 'painelset',
-      model: 'cronometro',
-      cronometro: null,
-      id: this.cronometro_id
     }
   },
   mounted () {
@@ -56,27 +52,6 @@ export default {
     console.log('CronometroPalavra beforeDestroy', this.cronometro_id)
   },
   methods: {
-    fetch (metadata) {
-      setTimeout(() => {
-        this._fetch(metadata)
-      }, 100)
-    },
-    _fetch (metadata) {
-      const t = this
-      metadata = metadata || {
-        app: t.app,
-        model: t.model,
-        id: t.cronometro_id
-      }
-      t
-        .refreshState(metadata)
-        .then((cronometro) => {
-          t.cronometro = cronometro
-        })
-        .catch((error) => {
-          console.error('Erro ao buscar cronômetro', error)
-        })
-    }
   }
 }
 </script>
