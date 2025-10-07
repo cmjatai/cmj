@@ -25,26 +25,26 @@ class CronometroSerializer(SaplSerializerMixin):
     duration = SecondDurationField()
     last_paused_time = SecondDurationField()
     accumulated_time = SecondDurationField()
-    children_count = serializers.SerializerMethodField()
+    #children_count = serializers.SerializerMethodField()
 
     class Meta(SaplSerializerMixin.Meta):
         model = Cronometro
         fields = '__all__'
         read_only_fields = ['started_at', 'paused_at', 'finished_at']
 
-    def get_children_count(self, obj):
-        return obj.children.count()
+    #def get_children_count(self, obj):
+    #    return obj.children.count()
 
 class CronometroTreeSerializer(CronometroSerializer):
     """Serializer recursivo para árvore de cronômetros"""
-    children = serializers.SerializerMethodField()
+    #children = serializers.SerializerMethodField()
 
     class Meta(SaplSerializerMixin.Meta):
         model = Cronometro
 
-    def get_children(self, obj):
-        children = obj.get_children()
-        return CronometroTreeSerializer(children, many=True).data
+    #def get_children(self, obj):
+    #    children = obj.get_children()
+    #    return CronometroTreeSerializer(children, many=True).data
 
 
 class CronometroEventSerializer(SaplSerializerMixin):
@@ -73,6 +73,8 @@ class EventoSerializer(BaseCronometroSerializer):
 
 class IndividuoSerializer(BaseCronometroSerializer):
     """Serializer para o modelo Individuo"""
+
+    aparteado = serializers.PrimaryKeyRelatedField(read_only=True)
 
     class Meta(SaplSerializerMixin.Meta):
         model = Individuo

@@ -126,6 +126,7 @@ export default {
       model: 'cronometro',
       wsSocket: null,
       cronometro: null,
+      instance: null,
       idInterval: null,
       syncInterval: 30, // sincroniza o cronômetro a cada 30 segundos
       countInterval: 0,
@@ -136,8 +137,11 @@ export default {
     }
   },
   mounted: function () {
-    // console.log('Cronometro mounted, connecting to WebSocket:', this.ws)
-    this.ws_client_cronometro()
+    console.log('Cronometro mounted, connecting to WebSocket:', this.ws, this.auto_start)
+    this.$nextTick(() => {
+      this.ws_client_cronometro()
+      this.runInterval()
+    })
   },
   watch: {
     cronometro_id: function (newVal, oldVal) {
@@ -151,6 +155,7 @@ export default {
         }
         this.cronometro = null
         this.ws_client_cronometro()
+        this.runInterval()
       }
     }
   },
@@ -183,6 +188,11 @@ export default {
       t.wsSocket.onmessage = this.handleWebSocketMessageLocal
       t.wsSocket.onopen = () => {
         // console.log('WebSocket conectado:', this.ws)
+        if (t.auto_start) {
+          t.startCronometro()
+        } else {
+          t.getCronometro()
+        }
       }
       t.wsSocket.onclose = () => {
         console.log('WebSocket desconectado...')
@@ -205,10 +215,20 @@ export default {
     },
     fetch (metadata) {
       const t = this
-      setTimeout(() => {
-        console.log('WebSocket message received:', metadata)
-        t.getCronometro()
-      }, 100)
+      if (metadata && metadata.hasOwnProperty('instance') && metadata.instance) {
+        t.instance = metadata.instance
+        t.cronometro = { ...t.cronometro, ...metadata.instance }
+      }
+      t.refreshState(metadata)
+        .then(obj => {
+          if (obj.id === t.cronometro_id) {
+            t.instance = obj
+            t.cronometro = { ...t.cronometro, ...obj }
+          } else {
+            t.instance = null
+            t.cronometro = null
+          }
+        })
     },
     stopInterval () {
       if (this.idInterval) {
@@ -258,7 +278,8 @@ export default {
         data.result && data.result.cronometro &&
         data.result.cronometro.id === this.cronometro_id
       ) {
-        this.cronometro = { ...this.cronometro, ...data.result.cronometro }
+        this.instance = data.result.cronometro
+        this.cronometro = this.instance
         this.$emit(`cronometro_${data.command}`, this.cronometro)
         // console.log('command:', data.command, 'cronometro:', this.cronometro)
         if (data.command === 'start') {
@@ -296,7 +317,7 @@ export default {
       try {
         this.wsSocket.send(JSON.stringify({
           command: 'start',
-          cronometro_id: this.cronometro.id
+          cronometro_id: this.cronometro_id
         }))
       } catch (error) {
         console.error('Erro ao enviar comando start:', error)

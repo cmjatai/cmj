@@ -55,7 +55,7 @@ def auditlog_signal_function(sender, **kwargs):
         return
 
     if settings.DEBUG:
-        logger.debug(f'START auditlog_post_signal {timezone.localtime()}')
+        logger.debug(f'START')
     u = None
     stack = ''
     for i in inspect.stack():
@@ -99,7 +99,7 @@ def auditlog_signal_function(sender, **kwargs):
         al.save()
 
         if settings.DEBUG:
-            logger.debug(f'END auditlog_post_signal {timezone.localtime()}')
+            logger.debug(f'END')
 
     except Exception as e:
         logger.error('Error saving auditing log object')
@@ -267,17 +267,22 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
         not inst._meta.app_config is None and \
         (
             inst._meta.app_config.name in settings.SAPL_APPS or
-            inst._meta.app_config.name in (
-                'cmj.painelset'
+            inst._meta.label in (
+                'painelset.Individuo',
+                'painelset.Cronometro',
             )
         ):
 
         if settings.DEBUG:
-            logger.debug(f'START timerefresh_post_signal {timezone.localtime()}')
+            logger.debug(f'start: {inst.id} {inst._meta.app_label}.{inst._meta.model_name}')
 
         try:
             if hasattr(inst, 'ws_sync') and not inst.ws_sync():
                 return
+
+            inst_serialize = None
+            if hasattr(inst, 'ws_serialize'):
+                inst_serialize = inst.ws_serialize()
 
             channel_layer = get_channel_layer()
 
@@ -289,7 +294,8 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                         'id': inst.id,
                         'app': inst._meta.app_label,
                         'model': inst._meta.model_name,
-                        'created': created
+                        'created': created,
+                        'instance': inst_serialize,
                     }
                 }
             )
@@ -300,7 +306,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                            "CHANNEL_LAYERS"))
 
         if settings.DEBUG:
-            logger.debug(f'END timerefresh_post_signal {timezone.localtime()}')
+            logger.debug(f'end..: {inst.id} {inst._meta.app_label}.{inst._meta.model_name}')
 
 
 def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs):

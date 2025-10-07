@@ -1,5 +1,5 @@
 <template>
-  <div class="sessaoplenaria-module">
+  <div class="sessaoplenaria-module online-module">
     <router-view></router-view>
   </div>
 </template>
@@ -84,4 +84,8 @@ export default {
 </script>
 
 <style lang="scss">
+.sessaoplenaria-module {
+  background-color: rgba($color: #f0f0f0, $alpha: 1);
+  background-image: url("~@/assets/img/bg.png");
+}
 </style>

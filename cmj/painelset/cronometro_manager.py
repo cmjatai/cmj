@@ -52,9 +52,9 @@ class CronometroManager:
         self.notify_observers(cronometro, 'created')
         return {"success": True, "cronometro_id": cronometro.id}
 
-    def start_cronometro(self, cronometro_id, duration=None):
+    def start_cronometro(self, cronometro_id, parent_id=None, duration=None):
         """Inicia um cronômetro usando Command Pattern"""
-        command = StartCronometroCommand(cronometro_id, duration=duration)
+        command = StartCronometroCommand(cronometro_id, parent_id=parent_id, duration=duration)
         result = command.execute()
 
         if result.get('success'):

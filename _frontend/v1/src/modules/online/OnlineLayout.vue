@@ -74,7 +74,7 @@ export default {
   watch: {
     fullscreen (newVal) {
       if (newVal) {
-        document.getElementsByClassName('painelset-module')[0].requestFullscreen()
+        document.getElementsByClassName('online-module')[0].parentElement.requestFullscreen()
       } else {
         if (document.fullscreenElement) {
           document.exitFullscreen()

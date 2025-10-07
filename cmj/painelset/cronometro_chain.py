@@ -1,5 +1,7 @@
 
 from abc import ABC, abstractmethod
+
+from cmj.api.serializers_painelset import CronometroTreeSerializer
 from .models import Cronometro, CronometroState, CronometroEvent
 
 class CronometroEventHandler(ABC):
@@ -26,7 +28,9 @@ class PauseParentHandler(CronometroEventHandler):
     """Handler para pausar cronômetro pai quando filho iniciar"""
 
     def handle(self, cronometro, event_data=None):
-        if cronometro.parent and cronometro.pause_parent_on_start:
+        if cronometro.parent and \
+            cronometro.pause_parent_on_start and \
+            event_data and event_data.get('event') == 'started':
             # Importação local para evitar circular import
             from .cronometro_commands import PauseCronometroCommand
 
@@ -39,6 +43,23 @@ class PauseParentHandler(CronometroEventHandler):
                     event_type='paused',
                     triggered_by_child=cronometro
                 )
+        return super().handle(cronometro, event_data)
+
+class ResumeHandler(CronometroEventHandler):
+
+    def handle(self, cronometro, event_data=None):
+        if event_data and event_data.get('event') == 'resumed':
+            if cronometro and cronometro.state == CronometroState.PAUSED:
+                from .cronometro_commands import ResumeCronometroCommand
+
+                result = ResumeCronometroCommand(cronometro).execute()
+
+                if result.get('success'):
+                    CronometroEvent.objects.create(
+                        cronometro=cronometro,
+                        event_type='resumed',
+                        triggered_by_child=None
+                    )
 
         # Continuar cadeia
         return super().handle(cronometro, event_data)
@@ -57,11 +78,11 @@ class NotificationHandler(CronometroEventHandler):
         async_to_sync(channel_layer.group_send)(
             f"cronometro_{cronometro.id}",
             {
-                "type": "cronometro_update",
-                "cronometro_id": str(cronometro.id),
-                "state": cronometro.state,
-                "elapsed_time": cronometro.elapsed_time.total_seconds(),
-                "remaining_time": cronometro.remaining_time.total_seconds(),
+                "type": "command_result",
+                "command": 'get',
+                "result": {
+                    'cronometro': CronometroTreeSerializer(cronometro).data
+                }
             }
         )
 
@@ -70,10 +91,11 @@ class NotificationHandler(CronometroEventHandler):
             async_to_sync(channel_layer.group_send)(
                 f"cronometro_{cronometro.parent.id}",
                 {
-                    "type": "child_cronometro_update",
-                    "child_cronometro_id": str(cronometro.id),
-                    "parent_cronometro_id": str(cronometro.parent.id),
-                    "state": cronometro.state,
+                    "type": "command_result",
+                    "command": 'get',
+                    "result": {
+                        'cronometro':CronometroTreeSerializer(cronometro.parent).data
+                    }
                 }
             )
 
@@ -91,16 +113,26 @@ class CronometroEventChain:
     def _build_chain(self):
         """Constrói a cadeia de handlers"""
         pause_parent = PauseParentHandler()
+        resume = ResumeHandler()
         notification = NotificationHandler()
 
         # Configura a ordem da cadeia
-        pause_parent.set_next(notification)
+        pause_parent.set_next(resume)
+        resume.set_next(notification)
 
         return pause_parent
 
     def handle_cronometro_finished(self, cronometro):
         """Processa eventos quando um cronômetro termina"""
         return self.chain.handle(cronometro, {"event": "finished"})
+
+    def handle_cronometro_resumed(self, cronometro):
+        """Processa eventos quando um cronômetro é retomado"""
+        return self.chain.handle(cronometro, {"event": "resumed"})
+
+    def handle_cronometro_started(self, cronometro):
+        """Processa eventos quando um cronômetro é iniciado"""
+        return self.chain.handle(cronometro, {"event": "started"})
 
     def handle_cronometro_stopped(self, cronometro):
         """Processa eventos quando um cronômetro é parado"""
