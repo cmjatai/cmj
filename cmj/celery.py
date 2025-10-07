@@ -23,12 +23,12 @@ def debug_task(self):
 from celery.schedules import crontab
 
 app.conf.beat_schedule = {
-    'check-finished-timers': {
-        'task': 'cmj.panelset.tasks.check_finished_timers',
+    'check-finished-cronometros': {
+        'task': 'cmj.painelset.tasks.check_finished_cronometros',
         'schedule': 1.0,  # A cada segundo
     },
-    'cleanup-old-events': {
-        'task': 'cmj.panelset.tasks.cleanup_old_events',
-        'schedule': crontab(hour=2, minute=0),  # Diariamente às 2h
-    },
+    #'cleanup-old-events': {
+    #    'task': 'cmj.painelset.tasks.cleanup_old_events',
+    #    'schedule': crontab(hour=2, minute=0),  # Diariamente às 2h
+    #},
 }

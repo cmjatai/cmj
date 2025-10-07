@@ -56,6 +56,10 @@ class StartCronometroCommand(CronometroCommand):
             self.cronometro.duration = self.duration
         self.cronometro.save()
 
+        #if self.cronometro.parent and self.cronometro.pause_parent_on_start:
+        #    if self.cronometro.parent.state == CronometroState.RUNNING:
+        #        PauseCronometroCommand(self.cronometro.parent.id).execute()
+
         # Criar evento
         CronometroEvent.objects.create(
             cronometro=self.cronometro,

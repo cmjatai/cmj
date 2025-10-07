@@ -9,7 +9,7 @@
       :display_initial="'remaining'"
       :display_format="'mm:ss'"
       :display_size="'4em'"
-      :auto_start="true"
+      :auto_start="auto_start"
       :controls="controls"
     ></cronometro-base>
   </div>
@@ -47,12 +47,16 @@ export default {
   },
   data () {
     return {
+      auto_start: true
     }
   },
   mounted () {
     console.log('CronometroPalavra mounted', this.cronometro_id)
-    // const t = this
+    const t = this
     // t.fetch()
+    t.$nextTick(() => {
+      t.auto_start = false
+    })
   },
   beforeDestroy () {
     console.log('CronometroPalavra beforeDestroy', this.cronometro_id)
