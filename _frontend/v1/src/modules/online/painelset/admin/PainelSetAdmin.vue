@@ -33,7 +33,7 @@
       </div>
       <div class="row">
         <div class="col-4 container-individuos">
-          <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'" @onload="onIndividuoListLoad()"></individuo-list>
+          <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'" @onload="onIndividuoListLoad()" :pause_parent_on_start="cronometro && cronometro.pause_parent_on_start"></individuo-list>
         </div>
         <div class="col-8 container-controls">
           <palavra-em-uso v-if="individuoListLoaded"></palavra-em-uso>
@@ -118,10 +118,8 @@ export default {
       }
     },
     resumeEvento () {
-      this.$refs.individuoList.status_microfone = 1
     },
     startEvento () {
-      this.$refs.individuoList.status_microfone = 1
       this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
         .then(response => {
           console.log('start response', response)

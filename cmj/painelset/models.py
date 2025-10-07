@@ -49,7 +49,7 @@ class Cronometro(models.Model):
     Pode ter cronômetros filhos e um cronômetro pai
     """
     #id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=1024)
 
     # Composite Pattern: self-referencing para hierarquia
     parent = models.ForeignKey('self', on_delete=models.CASCADE,
@@ -172,7 +172,7 @@ class CronometroEvent(models.Model):
 
 class Evento(models.Model, CronometroMixin):
     """Modelo para representar um Evento que é a representação de uma reunião que possui tempo global, partes menores e pontos que representam indivíduos."""
-    name = models.CharField(max_length=100, verbose_name="Nome do Evento", unique=True)
+    name = models.CharField(max_length=256, verbose_name="Nome do Evento", unique=True)
     description = models.TextField(blank=True, verbose_name="Descrição do Evento")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data de Criação")
 
@@ -259,7 +259,7 @@ class Individuo(models.Model, CronometroMixin):
     objects = IndividuoManager()
 
     """Modelo para representar um Individuo no Painel SET, que representa um indivíduo ou tópico."""
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=1024)
     role = models.CharField(
         max_length=100, blank=True, help_text="Função ou papel do indivíduo",
         choices=RoleChoices.choices

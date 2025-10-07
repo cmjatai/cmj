@@ -67,6 +67,28 @@ class _EventoViewSet:
 
         return Response({'status': 'ok', 'status_microfone': status_microfone, 'evento': evento.id})
 
+    @action(detail=True, methods=['GET'])
+    def pause_parent_on_aparte(self, request, *args, **kwargs):
+        pause_parent_on_aparte = request.GET.get('pause_parent_on_aparte', 'on')
+        evento = self.get_object()
+
+        cron, created = evento.get_or_create_unique_cronometro()
+        if cron:
+            cron.pause_parent_on_start = True if pause_parent_on_aparte == 'on' else False
+            cron.save(update_fields=['pause_parent_on_start'])
+
+        for individuo in evento.individuos.all():
+            cronometro, created = individuo.get_or_create_unique_cronometro()
+            cronometro.pause_parent_on_start = True if pause_parent_on_aparte == 'on' else False
+            cronometro.save(update_fields=['pause_parent_on_start'])
+
+        return Response(
+            {'status': 'ok',
+             'evento': evento.id,
+             'pause_parent_on_aparte': cronometro.pause_parent_on_start
+            })
+
+
 @customize(Individuo)
 class _IndividuoViewSet:
     serializer_class = IndividuoSerializer
@@ -158,6 +180,8 @@ class _IndividuoViewSet:
                     if antigoAparteante:
                         antigoAparteante.refresh_from_db()
                         cron, created = antigoAparteante.get_or_create_unique_cronometro()
+                        cron.parent = None
+                        cron.save()
                         antigoAparteante.save()
                         cronometro_manager.stop_cronometro(cron.id)
 

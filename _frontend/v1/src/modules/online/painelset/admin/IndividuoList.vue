@@ -24,6 +24,14 @@
             </button>
           </div>
         </div>
+        <div class="inner-individuo">
+          <input
+            type="checkbox"
+            id="pause_parent_on_aparte"
+            v-model="pause_parent_on_aparte"
+            title="Pausar o Cronômetro de quem está com a palavra quando alguém solicitar aparte"
+          />
+        </div>
       </div>
     </div>
     <individuo-base :style="{flex: `0 0 ${100 / (individuos.length + 1)}%`}"
@@ -48,6 +56,11 @@ export default {
     evento: {
       type: Object,
       required: true
+    },
+    pause_parent_on_start: {
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   components: {
@@ -59,6 +72,7 @@ export default {
       model: ['individuo'],
       init: false,
       status_microfone: false,
+      pause_parent_on_aparte: this.pause_parent_on_start,
       default_timer: 300, // segundos
       itens: {
         individuo_list: {}
@@ -81,6 +95,27 @@ export default {
       let all_on = Object.values(this.itens.individuo_list).every(
         individuo => individuo.status_microfone === true)
       this.status_microfone = all_on
+    },
+    pause_parent_on_start: function (newVal, oldVal) {
+      this.pause_parent_on_aparte = newVal
+    },
+    pause_parent_on_aparte: function (newVal, oldVal) {
+      const t = this
+      const query_params = [
+        `pause_parent_on_aparte=${newVal ? 'on' : 'off'}`
+      ]
+      t
+        .utils.getModelAction(
+          'painelset', 'evento', this.evento.id, 'pause_parent_on_aparte',
+          query_params.join('&')
+        )
+        .then(response => {
+          console.log(this.evento, 'pause_parent_on_aparte', response)
+        })
+        .catch(error => {
+          console.error(this.evento.id, 'pause_parent_on_aparte', error)
+          this.sendMessage({ alert: 'error', message: 'Erro ao atualizar Configurar Pausa: ' + error.response.data, time: 5 })
+        })
     }
   },
   mounted () {

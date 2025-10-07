@@ -101,6 +101,14 @@ class CronometroManager:
 
         return result
 
+    def check_zero_timer(self):
+        running_cronometros = Cronometro.objects.filter(state=CronometroState.RUNNING)
+        zero_time_cronometros = []
+        for cronometro in running_cronometros:
+            if cronometro.remaining_time <= timedelta():
+                zero_time_cronometros.append(cronometro)
+        return zero_time_cronometros, running_cronometros
+
     def check_finished_cronometros(self):
         """
         Verifica cronômetros que podem ter terminado

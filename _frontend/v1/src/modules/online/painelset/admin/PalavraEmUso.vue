@@ -20,6 +20,10 @@
         </div>
         <div class="divide"></div>
         <div class="cronometro">
+          <div class="icon-status-microfone">
+            <i v-if="instance && instance.status_microfone" class="fas fa-microphone"></i>
+            <i v-else class="fas fa-microphone-slash"></i>
+          </div>
           <cronometro-palavra
             :key="`cronometro-com-a-palavra-${instance.cronometro}`"
             :ref="`cronometro-com-a-palavra-${instance.cronometro}`"
@@ -153,6 +157,22 @@ export default {
     .cronometro {
       flex: 1 1 100%;
       padding: 1em 1em 3em;
+      position: relative;
+      .icon-status-microfone {
+        position: absolute;
+        top: 0.5em;
+        left: 1em;
+        font-size: 3em;
+        color: #ccc;
+        i {
+          &.fa-microphone {
+            color: #4c4;
+          }
+          &.fa-microphone-slash {
+            color: #dd1010;
+          }
+        }
+      }
     }
     .individuo {
       display: flex;

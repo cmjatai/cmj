@@ -217,13 +217,15 @@ export default {
       const t = this
       if (metadata && metadata.hasOwnProperty('instance') && metadata.instance) {
         t.instance = metadata.instance
-        t.cronometro = { ...t.cronometro, ...metadata.instance }
+        t.cronometro = metadata.instance
+        t.countInterval = t.syncInterval // força a sincronização na próxima iteração
       }
       t.refreshState(metadata)
         .then(obj => {
           if (obj.id === t.cronometro_id) {
             t.instance = obj
-            t.cronometro = { ...t.cronometro, ...obj }
+            t.cronometro = obj
+            console.log(obj.state, obj.name)
           } else {
             t.instance = null
             t.cronometro = null
@@ -248,6 +250,12 @@ export default {
           t.stopInterval()
           return
         }
+        t.countInterval += 1
+        if (t.countInterval >= t.syncInterval) {
+          t.countInterval = 0
+          t.getCronometro()
+          return
+        }
         if (t.cronometro && t.cronometro.state === 'running') {
           t.cronometro.elapsed_time = t.cronometro.elapsed_time + 1
           t.cronometro.remaining_time = t.cronometro.remaining_time - 1
@@ -255,19 +263,6 @@ export default {
         } else if (t.cronometro && t.cronometro.state === 'paused') {
           t.cronometro.last_paused_time = t.cronometro.last_paused_time + 1
         }
-        t.countInterval += 1
-        if (t.countInterval >= t.syncInterval) {
-          setTimeout(() => {
-            t.getCronometro()
-          }, 1000)
-          t.countInterval = 0
-        }
-        t.refreshState({
-          app: 'painelset',
-          model: 'cronometro',
-          id: t.cronometro_id,
-          value: { ...t.cronometro }
-        })
       }, 1000)
     },
     handleWebSocketMessageLocal (message) {
