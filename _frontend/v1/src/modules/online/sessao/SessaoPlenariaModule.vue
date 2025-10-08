@@ -87,5 +87,6 @@ export default {
 .sessaoplenaria-module {
   background-color: rgba($color: #f0f0f0, $alpha: 1);
   background-image: url("~@/assets/img/bg.png");
+  user-select: none;
 }
 </style>

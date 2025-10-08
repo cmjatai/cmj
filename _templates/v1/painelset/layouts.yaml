@@ -8,7 +8,7 @@ Evento:
   - description
 Individuo:
   {% trans 'Dados Gerais' %}:
-  - name role order
+  - name role order canal
   - microfone_sempre_ativo
   {% trans 'Evento' %}:
   - evento

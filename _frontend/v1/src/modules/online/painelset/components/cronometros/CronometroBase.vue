@@ -133,7 +133,8 @@ export default {
       debug_verbose: false,
       wait_destroy: false,
       display: this.display_initial, // 'elapsed', 'remaining', 'last_paused'
-      modesDisplay: ['elapsed', 'remaining', 'last_paused'] // modos disponíveis
+      modesDisplay: ['elapsed', 'remaining', 'last_paused'], // modos disponíveis
+      timerInterval: 1500
     }
   },
   mounted: function () {

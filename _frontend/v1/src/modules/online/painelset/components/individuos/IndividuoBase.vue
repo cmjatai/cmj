@@ -12,6 +12,7 @@
         </div>
         <div class="name">
           {{ instance ? instance.name : 'Carregando indivíduo...' }}
+          <small>{{ instance ? `(${instance.canal})` : '' }}</small>
         </div>
       </div>
       <div class="controls">
@@ -231,6 +232,9 @@ export default {
     border-right: 1px solid white;
     .name {
       flex: 1 1 100%;
+      small {
+        opacity: 0.5;
+      }
     }
   }
 
