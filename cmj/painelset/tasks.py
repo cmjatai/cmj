@@ -16,10 +16,12 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
+ip = "10.3.163.123"  # Substitua pelo endereço IP da sua mesa
 porta = 10023
 client = None
 corte_religar = -5  # segundos para considerar corte de tempo
+
+SEND_MESSAGE_MICROPHONE = False
 
 def check_finished_cronometros_function():
     global client
@@ -36,7 +38,7 @@ def check_finished_cronometros_function():
                 continue
             remaining_time = cronometro.remaining_time
 
-            if not client and not settings.DEBUG:
+            if not client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
                 client = udp_client.SimpleUDPClient(ip, porta)
                 client.send_message("/xremote", None)
 
@@ -46,15 +48,15 @@ def check_finished_cronometros_function():
                 logger.info(f"Microfone religado para o cronômetro {cronometro.name} (ID: {cronometro.id})")
                 individuo.status_microfone = True
                 individuo.save()
-                if client and not settings.DEBUG:
-                    client.send_message(f"/ch/{individuo.order:>02}/mix/on", 1 )
+                if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
+                    client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 )
 
             elif timedelta(seconds=corte_religar) < remaining_time < timedelta() and individuo.status_microfone:
                 logger.info(f"Corte de microfone detectado no cronômetro {cronometro.name} (ID: {cronometro.id})")
                 individuo.status_microfone = False
                 individuo.save()
-                if client and not settings.DEBUG:
-                    client.send_message(f"/ch/{individuo.order:>02}/mix/on", 0)
+                if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
+                    client.send_message(f"/ch/{individuo.channel_display}/mix/on", 0)
 
     return len(zero_time_cronometros)
 

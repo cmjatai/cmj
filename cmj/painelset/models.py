@@ -265,6 +265,7 @@ class Individuo(models.Model, CronometroMixin):
         choices=RoleChoices.choices
     )
     order = models.PositiveIntegerField(help_text="Ordem do indivíduo no Evento", default=0)
+    canal = models.PositiveIntegerField(help_text="Canal do indivíduo no Evento", default=0)
 
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, verbose_name="Evento",
                                    related_name='individuos', help_text="Evento ao qual este indivíduo pertence")
@@ -291,6 +292,7 @@ class Individuo(models.Model, CronometroMixin):
         on_delete=models.SET_NULL
     )
 
+
     class Meta:
         ordering = ['order']
     unique_together = [
@@ -303,3 +305,9 @@ class Individuo(models.Model, CronometroMixin):
     def ws_serialize(self):
         from cmj.api.serializers_painelset import IndividuoSerializer
         return IndividuoSerializer(self).data
+
+    @property
+    def channel_display(self):
+        if self.canal == 0:
+            return f'{self.order:>02}'
+        return f'{self.canal:>02}'

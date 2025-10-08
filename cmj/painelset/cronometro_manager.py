@@ -1,9 +1,9 @@
 
 from django.utils import timezone
 from datetime import timedelta
-
+from django.contrib.contenttypes.models import ContentType
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer
-from .models import Cronometro, CronometroState
+from .models import Cronometro, CronometroState, Individuo
 from .cronometro_commands import (
     AddTimeCronometroCommand, StartCronometroCommand, PauseCronometroCommand,
     ResumeCronometroCommand, StopCronometroCommand, FinishCronometroCommand
@@ -102,7 +102,10 @@ class CronometroManager:
         return result
 
     def check_zero_timer(self):
-        running_cronometros = Cronometro.objects.filter(state=CronometroState.RUNNING)
+        running_cronometros = Cronometro.objects.filter(
+            state=CronometroState.RUNNING,
+            content_type=ContentType.objects.get_for_model(Individuo)
+            )
         zero_time_cronometros = []
         for cronometro in running_cronometros:
             if cronometro.remaining_time <= timedelta():

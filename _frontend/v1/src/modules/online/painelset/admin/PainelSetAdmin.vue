@@ -74,7 +74,7 @@ export default {
         return ['Início previsto', dt.toLocaleDateString(), dt.toLocaleTimeString()]
       } else if (this.evento && this.evento.start_real) {
         const dt = new Date(this.evento.start_real)
-        return ['Início real', dt.toLocaleDateString(), dt.toLocaleTimeString()]
+        return ['Iniciado em', dt.toLocaleDateString(), dt.toLocaleTimeString()]
       }
       return ['Data e hora não definidas', '', '']
     }

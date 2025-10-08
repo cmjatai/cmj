@@ -3,6 +3,7 @@ import logging
 
 from django.apps.registry import apps
 from django.conf import settings
+from traitlets import default
 
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer, IndividuoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
@@ -15,6 +16,7 @@ from rest_framework import viewsets, status
 
 from pythonosc import udp_client
 
+from cmj.painelset.tasks import SEND_MESSAGE_MICROPHONE
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +52,8 @@ class _EventoViewSet:
         evento = self.get_object()
         print(f'Toggle microfones do evento {evento} para {status_microfone}')
 
-        if not settings.DEBUG:
-            ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
+        if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
+            ip = "10.3.163.123"  # Substitua pelo endereço IP da sua mesa
             porta = 10023
             client = udp_client.SimpleUDPClient(ip, porta)
             client.send_message("/xremote", None)
@@ -62,8 +64,8 @@ class _EventoViewSet:
             individuo.com_a_palavra = status_microfone == 'on' and individuo.com_a_palavra
             update_fields = ['status_microfone', 'com_a_palavra']
             individuo.save(update_fields=update_fields)
-            if not settings.DEBUG:
-                client.send_message(f"/ch/{evento.order:>02}/mix/on", 1 if status_microfone == 'on' else 0)
+            if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
+                client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 if status_microfone == 'on' else 0)
 
         return Response({'status': 'ok', 'status_microfone': status_microfone, 'evento': evento.id})
 
@@ -134,11 +136,15 @@ class _IndividuoViewSet:
 
         default_timer = request.GET.get('default_timer', '60')  # em segundos
         try:
-            default_timer = timedelta(seconds=int(default_timer))
+            default_timer = int(default_timer)
+            default_timer = timedelta(
+                seconds=default_timer,
+                microseconds=300_000
+            )
         except ValueError:
-            default_timer = timedelta(seconds=60)
+            default_timer = timedelta(seconds=60, microseconds=300_000)
 
-        print(f'Toggle aparteante {individuoAparteante}: status_microfone {individuoAparteante.status_microfone}, com_a_palavra={individuoAparteante.com_a_palavra}')
+        print(f'timer: {default_timer} Toggle aparteante {individuoAparteante}: status_microfone {individuoAparteante.status_microfone}, com_a_palavra={individuoAparteante.com_a_palavra}')
 
         individuoComPalavra = individuoAparteante.evento.individuos.filter(com_a_palavra=True).first()
 
@@ -197,7 +203,7 @@ class _IndividuoViewSet:
         cronometro_manager = CronometroManager()
 
         individuo = self.get_object()
-        mic_old = {'order': individuo.order, 'status_microfone': 'on' if individuo.status_microfone else 'off'}
+        mic_old = {'order': individuo.channel_display, 'status_microfone': 'on' if individuo.status_microfone else 'off'}
         # obter status_microfone e com_a_palavra de todos os individuos do evento
         #microfones_do_evento = list(individuo.evento.individuos.values('order', 'status_microfone'))
 
@@ -206,11 +212,16 @@ class _IndividuoViewSet:
         com_a_palavra = request.GET.get('com_a_palavra', '0')
         default_timer = request.GET.get('default_timer', '300')  # em segundos
         try:
-            default_timer = timedelta(seconds=int(default_timer))
+            default_timer = int(default_timer)
+            micro = default_timer * 1_000
+            default_timer = timedelta(
+                seconds=default_timer,
+                microseconds=micro
+            )
         except ValueError:
-            default_timer = timedelta(seconds=300)
+            default_timer = timedelta(seconds=300, microseconds=300_000)
 
-        print(f'  Para: status_microfone={status_microfone}, com_a_palavra={com_a_palavra}')
+        print(f'  timer: {default_timer}: status_microfone={status_microfone}, com_a_palavra={com_a_palavra}')
 
         if com_a_palavra not in ['0', '1']:
             com_a_palavra = '0'
@@ -280,15 +291,15 @@ class _IndividuoViewSet:
         #        microfones_mudaram.append(depois)
         #        logger.debug(f'  Microfone {antes["order"]} mudou : {antes["status_microfone"]} -> {depois["status_microfone"]}')
 
-        mic = {'order': individuo.order, 'status_microfone': 'on' if individuo.status_microfone else 'off'}
+        mic = {'order': individuo.channel_display, 'status_microfone': 'on' if individuo.status_microfone else 'off'}
         if mic != mic_old:
             logger.debug(f'Enviando comando OSC para o microfone {mic["order"]}: status_microfone={mic["status_microfone"]}')
-            if not settings.DEBUG:
-                ip = "10.3.163.49"  # Substitua pelo endereço IP da sua mesa
+            if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
+                ip = "10.3.163.123"  # Substitua pelo endereço IP da sua mesa
                 porta = 10023
                 client = udp_client.SimpleUDPClient(ip, porta)
                 client.send_message("/xremote", None)
-                client.send_message(f"/ch/{mic['order']:>02}/mix/on", 1 if mic["status_microfone"] == 'on' else 0)
+                client.send_message(f"/ch/{mic['order']}/mix/on", 1 if mic["status_microfone"] == 'on' else 0)
 
         #for mic in microfones_mudaram:
         #    logger.debug(f'  Enviando comando OSC para o microfone {mic["order"]}: status_microfone={mic["status_microfone"]}')
