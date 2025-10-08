@@ -60,6 +60,8 @@ class EventoForm(forms.ModelForm):
             'description',
             'duration',
             'start_previsto',
+            'ips_mesas',
+            'comunicar_com_mesas',
             ]
 
     def __init__(self, *args, **kwargs):
@@ -73,6 +75,8 @@ class EventoForm(forms.ModelForm):
             ('partes', 3),
             ('tribunas', 3),
             ('individuos_extras', 3),
+            ('comunicar_com_mesas', 3),
+            ('ips_mesas', 9),
             ('description', 12),
         ])
 

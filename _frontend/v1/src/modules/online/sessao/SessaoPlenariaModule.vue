@@ -1,13 +1,18 @@
 <template>
   <div class="sessaoplenaria-module online-module">
     <router-view></router-view>
+    <popover-palavra></popover-palavra>
   </div>
 </template>
 
 <script>
 import Vuex from 'vuex'
+import PopoverPalavra from '../painelset/widgets/popovers/PopoverPalavra.vue'
 export default {
   name: 'sessaoplenaria-module',
+  components: {
+    PopoverPalavra
+  },
   data () {
     return {
       ws: '/ws/time-refresh/',

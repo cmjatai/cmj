@@ -3,13 +3,13 @@ Evento:
   {% trans 'Dados Básicos' %}:
   - name:7 duration start_previsto:3
   {% trans 'Demais Dados' %}:
-  - individuos parts
+  - individuos parts ips_mesas comunicar_com_mesas
   {% trans 'Descrição' %}:
   - description
 Individuo:
   {% trans 'Dados Gerais' %}:
   - name role order canal
-  - microfone_sempre_ativo
+  - microfone_sempre_ativo ips_mesas
   {% trans 'Evento' %}:
   - evento
   {% trans 'Parlamentar' %}:

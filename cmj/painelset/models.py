@@ -1,8 +1,8 @@
 
-import time
+from datetime import timedelta
 from django.db import models
 from django.utils import timezone
-from datetime import timedelta
+from django.core.validators import RegexValidator
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
 
@@ -183,6 +183,20 @@ class Evento(models.Model, CronometroMixin):
 
     duration = models.DurationField(help_text="Duração total planejada do evento", verbose_name="Duração do Evento")
 
+    ips_mesas = models.CharField(
+        max_length=256, blank=True, default='',
+        help_text="IPs das mesas associadas a este indivíduo, separados por vírgula",
+       validators=[
+           RegexValidator(
+               regex=r'^(\d{1,3}(\.\d{1,3}){3})*(\s(\d{1,3}(\.\d{1,3}){3}))*$',
+               message="IP inválido. Formato esperado: xxx.xxx.xxx.xxx (separados por espaço para múltiplos IPs).",
+               code='invalid_ip'
+           )
+       ]
+    )
+    comunicar_com_mesas = models.BooleanField(default=False, verbose_name="Comunicar com Mesas", help_text="Comunicar com mesas via OSC?")
+
+
     cronometro = GenericRelation(
         Cronometro,
         related_query_name='eventos',
@@ -265,7 +279,20 @@ class Individuo(models.Model, CronometroMixin):
         choices=RoleChoices.choices
     )
     order = models.PositiveIntegerField(help_text="Ordem do indivíduo no Evento", default=0)
+
     canal = models.PositiveIntegerField(help_text="Canal do indivíduo no Evento", default=0)
+
+    ips_mesas = models.CharField(
+        max_length=256, blank=True, default='',
+        help_text="IPs das mesas associadas a este indivíduo, separados por vírgula",
+       validators=[
+           RegexValidator(
+               regex=r'^(\d{1,3}(\.\d{1,3}){3})*(\s(\d{1,3}(\.\d{1,3}){3}))*$',
+               message="IP inválido. Formato esperado: xxx.xxx.xxx.xxx (separados por espaço para múltiplos IPs).",
+               code='invalid_ip'
+           )
+       ]
+    )
 
     evento = models.ForeignKey(Evento, on_delete=models.CASCADE, verbose_name="Evento",
                                    related_name='individuos', help_text="Evento ao qual este indivíduo pertence")
@@ -291,7 +318,6 @@ class Individuo(models.Model, CronometroMixin):
         related_name='aparteado',
         on_delete=models.SET_NULL
     )
-
 
     class Meta:
         ordering = ['order']

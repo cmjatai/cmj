@@ -2,6 +2,7 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
+from sapl.api.permissions import portalcmj_rpp
 
 class TimeRefreshConsumer(AsyncWebsocketConsumer):
 
@@ -41,11 +42,29 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
 
     # Receive message from room group
     async def time_refresh_message(self, event):
+
         message = event['message']
+        app = message.get('app')
+        model = message.get('model')
 
         u = self.scope.get('user')
-        # You can add here any permission check you want
-        if u.is_anonymous:
+
+        key = f"{app}:{model}"
+        perms_publicas = portalcmj_rpp.get(key, set())
+
+        perm_detail = f"{app}.detail_{model}"
+        perm_view = f"{app}.view_{model}"
+
+        if u.is_anonymous and not perms_publicas:
+            detail_perm = False
+        elif u.is_anonymous:
+            detail_perm = perm_detail in perms_publicas or perm_view in perms_publicas
+        elif not u.is_superuser:
+            detail_perm = u.has_perm(perm_detail) or u.has_perm(perm_view)
+        else:
+            detail_perm = True
+
+        if not detail_perm:
             del message['instance']
 
         # Send message to WebSocket

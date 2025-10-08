@@ -1,3 +1,4 @@
+from pydoc import cli
 from cmj.celery import app as cmj_celery_app
 
 # cronometro_app/tasks.py - Tarefas assíncronas com Celery
@@ -18,7 +19,7 @@ logger = get_task_logger(__name__)
 
 ip = "10.3.163.123"  # Substitua pelo endereço IP da sua mesa
 porta = 10023
-client = None
+clients = {}
 corte_religar = -5  # segundos para considerar corte de tempo
 
 SEND_MESSAGE_MICROPHONE = False
@@ -34,29 +35,67 @@ def check_finished_cronometros_function():
 
         for cronometro in zero_time_cronometros:
             individuo = cronometro.vinculo
+            evento = individuo.evento if individuo else None
+
+            if not evento.comunicar_com_mesas:
+                continue
+
+             # Pular se o indivíduo não existir ou se o microfone for sempre ativo
+
             if not individuo or individuo.microfone_sempre_ativo:
                 continue
-            remaining_time = cronometro.remaining_time
 
-            if not client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
-                client = udp_client.SimpleUDPClient(ip, porta)
-                client.send_message("/xremote", None)
+            if not individuo.ips_mesas:
+                if not evento.ips_mesas:
+                    continue
+                else:
+                    ips = [ip.strip() for ip in evento.ips_mesas.split(' ') if ip.strip()]
+            else:
+                ips = [ip.strip() for ip in individuo.ips_mesas.split(' ') if ip.strip()]
+
+            for ip in ips:
+                if ip not in clients and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
+                    clients[ip] = {
+                        'client': udp_client.SimpleUDPClient(ip, porta),
+                        'last_used': timezone.now()
+                    }
+
+            remaining_time = cronometro.remaining_time
 
             logger.info(f"Cronometro {cronometro.name} (ID: {cronometro.id}) tempo encerrado")
 
-            if remaining_time < timedelta(seconds=corte_religar) and not individuo.status_microfone:
-                logger.info(f"Microfone religado para o cronômetro {cronometro.name} (ID: {cronometro.id})")
-                individuo.status_microfone = True
-                individuo.save()
-                if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
-                    client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 )
+            for ip in ips:
+                client_info = clients.get(ip)
 
-            elif timedelta(seconds=corte_religar) < remaining_time < timedelta() and individuo.status_microfone:
-                logger.info(f"Corte de microfone detectado no cronômetro {cronometro.name} (ID: {cronometro.id})")
-                individuo.status_microfone = False
-                individuo.save()
-                if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
-                    client.send_message(f"/ch/{individuo.channel_display}/mix/on", 0)
+                if not client_info:
+                    continue
+
+                client = client_info['client']
+
+                try:
+                    if 'last_used' in client_info and (timezone.now() - client_info['last_used']) > timedelta(seconds=7):
+                        logger.info(f"Enviando comando /xremote para {ip} por inatividade")
+                        client.send_message("/xremote", None)
+
+                    if remaining_time < timedelta(seconds=corte_religar) and not individuo.status_microfone:
+                        logger.info(f"Microfone religado para o cronômetro {cronometro.name} (ID: {cronometro.id})")
+                        individuo.status_microfone = True
+                        individuo.save()
+                        if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
+                            client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 )
+                            client_info['last_used'] = timezone.now()
+
+                    elif timedelta(seconds=corte_religar) < remaining_time < timedelta() and individuo.status_microfone:
+                        logger.info(f"Corte de microfone detectado no cronômetro {cronometro.name} (ID: {cronometro.id})")
+                        individuo.status_microfone = False
+                        individuo.save()
+                        if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
+                            client.send_message(f"/ch/{individuo.channel_display}/mix/on", 0)
+                            client_info['last_used'] = timezone.now()
+
+                except Exception as e:
+                    logger.error(f"Erro ao enviar mensagem OSC para {ip}: {e}")
+                    del clients[ip]
 
     return len(zero_time_cronometros)
 
