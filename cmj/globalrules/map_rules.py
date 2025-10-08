@@ -15,7 +15,7 @@ from cmj.core.models import Trecho, Municipio, AreaTrabalho,\
     Distrito, Logradouro, ImpressoEnderecamento, Notificacao
 from cmj.diarios.models import DiarioOficial, TipoDeDiario,\
     VinculoDocDiarioOficial
-from cmj.globalrules import (RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
+from cmj.globalrules import (GROUP_PAINELSET_OPERADOR, RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SOCIAL_USERS,
                              GROUP_SAAP_WORKSPACE_OPER_CONTATOS,
                              menu_contatos, menu_dados_auxiliares,
@@ -41,6 +41,8 @@ from cmj.loa.models import Entidade, Loa, LoaParlamentar, EmendaLoa, EmendaLoaPa
     Acao, Natureza, Agrupamento, AgrupamentoEmendaLoa,\
     AgrupamentoRegistroContabil
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
+from cmj.painelset.models import Cronometro, Individuo
+from cmj.painelset.views import EventoCrud
 from cmj.sigad.models import Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
 from sapl.rules import SAPL_GROUP_GERAL
@@ -255,6 +257,15 @@ rules_arq_group_operador = {
     ]
 }
 
+rules_painelset_group_operador = {
+    'group': GROUP_PAINELSET_OPERADOR,
+    'rules': [
+        (Cronometro, __base__, __perms_publicas__),
+        (Individuo, __base__, __perms_publicas__),
+        (Evento, __base__, __perms_publicas__),
+    ]
+}
+
 
 """
 rules_group_geral = {
@@ -315,6 +326,8 @@ rules_patterns = [
     rules_loa_group_operador,
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,
+
+    rules_painelset_group_operador,
 
     # rules_group_geral
 ]
