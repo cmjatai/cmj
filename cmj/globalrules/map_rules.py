@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 
-from cmj.agenda.models import Evento
+from cmj.agenda.models import Evento as AgendaEvento
 from cmj.arq.models import Draft, DraftMidia, ArqClasse, ArqDoc
 from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
     TelefonePerfil, LocalTrabalhoPerfil, DependentePerfil, OperadoraTelefonia,\
@@ -41,8 +41,7 @@ from cmj.loa.models import Entidade, Loa, LoaParlamentar, EmendaLoa, EmendaLoaPa
     Acao, Natureza, Agrupamento, AgrupamentoEmendaLoa,\
     AgrupamentoRegistroContabil
 from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
-from cmj.painelset.models import Cronometro, Individuo
-from cmj.painelset.views import EventoCrud
+from cmj.painelset.models import Cronometro, Individuo, Evento
 from cmj.sigad.models import Classe, Documento, Midia
 from sapl.parlamentares.models import Partido
 from sapl.rules import SAPL_GROUP_GERAL
@@ -183,7 +182,7 @@ rules_agenda_group_workspace = {
         (get_user_model(), [
             menu_dados_auxiliares,
             menu_agenda], set()),
-        (Evento, __base__, set())
+        (AgendaEvento, __base__, set())
     ]
 }
 
