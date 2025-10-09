@@ -3,7 +3,7 @@ if (workbox) {
   workbox.core.setCacheNameDetails({ prefix: 'frontend' })
   self.__precacheManifest = [{
     url: '/offline/',
-    revision: '000007'
+    revision: '000008'
   }].concat(self.__precacheManifest || [])
 
   workbox.precaching.precacheAndRoute(self.__precacheManifest, {})

@@ -5,9 +5,6 @@ import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 
-from cmj.api.serializers_painelset import CronometroSerializer
-from .models import Cronometro
-from .cronometro_manager import CronometroManager
 from django.utils import timezone
 
 class CronometroConsumer(AsyncWebsocketConsumer):
@@ -17,9 +14,12 @@ class CronometroConsumer(AsyncWebsocketConsumer):
     """
 
     def __init__(self, *args, **kwargs):
+        from cmj.painelset.cronometro_manager import CronometroManager
+
         super().__init__(*args, **kwargs)
         self.cronometro_id = None
         self.cronometro_group_name = None
+
         self.cronometro_manager = CronometroManager()
 
     # async def estou_vivo(self):

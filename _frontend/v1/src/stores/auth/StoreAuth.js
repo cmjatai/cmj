@@ -43,7 +43,6 @@ const actions = {
   hasPermission: ({ commit }, url) => {
     const utils = Resources.Utils
     const hasPermission = utils.hasPermission
-
     let fetch = function () {
       return hasPermission(url)
         .then(response => {

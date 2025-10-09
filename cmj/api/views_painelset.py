@@ -12,6 +12,7 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.permissions import BasePermission
 from rest_framework import viewsets, status
 
 from pythonosc import udp_client
@@ -28,10 +29,15 @@ ApiViewSetConstrutor.build_class(
 
 cronometro_manager = CronometroManager()
 
+class EventoChangePermission(BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_authenticated and request.user.has_perm('painelset.change_evento')
+
 @customize(Evento)
 class _EventoViewSet:
     serializer_class = EventoSerializer
-    @action(detail=True, methods=['GET'])
+
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def start(self, request, pk=None):
         print('Acessando cronômetro do evento:', pk)
         evento = self.get_object()
@@ -46,7 +52,7 @@ class _EventoViewSet:
             return Response(CronometroTreeSerializer(cronometro).data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def toggle_microfones(self, request, *args, **kwargs):
         status_microfone = request.GET.get('status_microfone', 'on')
         evento = self.get_object()
@@ -69,7 +75,7 @@ class _EventoViewSet:
 
         return Response({'status': 'ok', 'status_microfone': status_microfone, 'evento': evento.id})
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def pause_parent_on_aparte(self, request, *args, **kwargs):
         pause_parent_on_aparte = request.GET.get('pause_parent_on_aparte', 'on')
         evento = self.get_object()
@@ -110,7 +116,7 @@ class _IndividuoViewSet:
         return Response(result)
 
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def force_stop_cronometro(self, request, *args, **kwargs):
         cronometro_manager = CronometroManager()
         individuo = self.get_object()
@@ -124,7 +130,7 @@ class _IndividuoViewSet:
             }
         )
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def toggle_aparteante(self, request, *args, **kwargs):
         cronometro_manager = CronometroManager()
         individuoAparteante = self.get_object()
@@ -197,7 +203,7 @@ class _IndividuoViewSet:
              })
 
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def toggle_microfone(self, request, *args, **kwargs):
 
         cronometro_manager = CronometroManager()

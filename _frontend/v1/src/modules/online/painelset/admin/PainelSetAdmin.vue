@@ -81,13 +81,20 @@ export default {
   },
   mounted: function () {
     this.$nextTick(() => {
-      this.fetch(
-        {
-          app: 'painelset',
-          model: 'evento',
-          id: Number(this.$route.params.id)
-        }
-      )
+      this.utils.hasPermission('painelset.change_evento')
+        .then(hasPermission => {
+          this.fetch(
+            {
+              app: 'painelset',
+              model: 'evento',
+              id: Number(this.$route.params.id)
+            }
+          )
+        })
+        .catch(() => {
+          this.$router.push({ name: 'online_index_link' })
+          this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página.', time: 5 })
+        })
     })
   },
   methods: {
