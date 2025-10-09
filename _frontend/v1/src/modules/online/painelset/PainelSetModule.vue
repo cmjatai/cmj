@@ -41,7 +41,7 @@ export default {
     const t = this
     t.setSideleftVisivel(true)
     t.setSiderightVisivel(false)
-    t
+    t.utils
       .hasPermission('painelset.change_evento')
       .then(hasPermission => {
         t.fetchModelOrderedList('painelset', 'evento', '-start_real,-start_previsto')

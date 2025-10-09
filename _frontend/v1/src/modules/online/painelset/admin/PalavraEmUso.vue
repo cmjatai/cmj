@@ -112,88 +112,89 @@ export default {
 }
 </script>
 <style lang="scss">
-.palavraemuso-component {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #222;
-  display: flex;
-  flex-direction: column;
-  .individuo-com-a-palavra {
+@media screen and (min-width: 992px) {
+  .palavraemuso-component {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #222;
     display: flex;
     flex-direction: column;
-    .inner-individuo {
-      display: flex;
-      flex-direction: row;
-      align-items: stretch;
-      justify-content: space-between;
-    }
-    .individuo-header {
-      font-weight: bold;
-      text-align: left;
-      font-size: 1.2em;
-      color: #fff;
-      width: 100%;
-      .name {
-        background-color: #444;
-        white-space: nowrap;
-        margin: 0.5em 1em 0 0.5em;
-        padding: 7px 14px 6px;
-        min-width: 20%;
-        display: inline-block;
-        text-align: center;
-      }
-    }
-    .individuo {
-      flex: 1 1 0%;
-    }
-    .divide {
-      width: 1px;
-      background-color: #888;
-      margin: 0;
-    }
-    .cronometro {
-      flex: 1 1 100%;
-      padding: 1em 1em 3em;
-      position: relative;
-      .icon-status-microfone {
-        position: absolute;
-        top: 0.5em;
-        left: 1em;
-        font-size: 3em;
-        color: #ccc;
-        i {
-          &.fa-microphone {
-            color: #4c4;
-          }
-          &.fa-microphone-slash {
-            color: #dd1010;
-          }
-        }
-      }
-    }
-    .individuo {
+    .individuo-com-a-palavra {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2em 1em;
-      .avatar {
-        opacity: 1 !important;
-        width: 6em;
-        height: 6em;
-        img {
-          box-shadow: 0px 0px 30px #444;
+      .inner-individuo {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+      }
+      .individuo-header {
+        font-weight: bold;
+        text-align: left;
+        font-size: 1.2em;
+        color: #fff;
+        width: 100%;
+        .name {
+          background-color: #444;
+          white-space: nowrap;
+          margin: 0.5em 1em 0 0.5em;
+          padding: 7px 14px 6px;
+          min-width: 20%;
+          display: inline-block;
+          text-align: center;
         }
-        i {
+      }
+      .individuo {
+        flex: 1 1 0%;
+      }
+      .divide {
+        width: 1px;
+        background-color: #888;
+        margin: 0;
+      }
+      .cronometro {
+        flex: 1 1 100%;
+        padding: 1em 1em 3em;
+        position: relative;
+        .icon-status-microfone {
+          position: absolute;
+          top: 0.5em;
+          left: 1em;
+          font-size: 3em;
           color: #ccc;
-          font-size: 4em;
+          i {
+            &.fa-microphone {
+              color: #4c4;
+            }
+            &.fa-microphone-slash {
+              color: #dd1010;
+            }
+          }
+        }
+      }
+      .individuo {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2em 1em;
+        .avatar {
+          opacity: 1 !important;
+          width: 6em;
+          height: 6em;
+          img {
+            box-shadow: 0px 0px 30px #444;
+          }
+          i {
+            color: #ccc;
+            font-size: 4em;
+          }
         }
       }
     }
   }
 }
-
 </style>

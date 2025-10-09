@@ -183,44 +183,46 @@ export default {
 }
 </script>
 <style lang="scss">
-.individuo-list {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  height: 100%;
-  justify-content: stretch;
-  position:absolute;
-  top:0;
-  left:0;
-  right:0;
-  bottom:0;
-  overflow: hidden;
-  .individuo-base:first-child {
-    border-bottom: 1px solid #fff;
-    font-size: 0.7em;
-    .inner-individuo, .controls {
-      border-right: 0;
-      font-weight: bold;
-      opacity: 1 !important;
-      text-align: center;
-    }
-    .inner-individuo {
-      border-left: 1px solid white;
-      cursor: default;
-      justify-content: center;
-      font-size: 1.2em;
-      .default-timer {
-        display: flex;
-        align-items: center;
+@media screen and (min-width: 992px) {
+  .individuo-list {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    height: 100%;
+    justify-content: stretch;
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    bottom:0;
+    overflow: hidden;
+    .individuo-base:first-child {
+      border-bottom: 1px solid #fff;
+      font-size: 0.7em;
+      .inner-individuo, .controls {
+        border-right: 0;
+        font-weight: bold;
+        opacity: 1 !important;
+        text-align: center;
+      }
+      .inner-individuo {
+        border-left: 1px solid white;
+        cursor: default;
         justify-content: center;
-        width: 100%;
-        gap: 0.5em;
-        .btn {
-          padding: 0 0.5em;
-          color: #0004;
-          text-decoration: none;
-          &:hover {
-            color: #000;
+        font-size: 1.2em;
+        .default-timer {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+          gap: 0.5em;
+          .btn {
+            padding: 0 0.5em;
+            color: #0004;
+            text-decoration: none;
+            &:hover {
+              color: #000;
+            }
           }
         }
       }

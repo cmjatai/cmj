@@ -66,54 +66,56 @@ export default {
 }
 </script>
 <style lang="scss">
-.cronometro-palavra {
-  height: 100%;
-  .cronometro-component {
-    &.cron-palavra {
-      color: white;
-      height: 100%;
-    }
-    .croncard {
-      background-color: #222;
-      height: 100%;
-      justify-content: space-between;
-      padding: 0;
-    }
-    .controls {
-      &.visible {
-        visibility: visible !important;
-        width: 100%;
-        .btn-group {
+@media screen and (min-width: 992px) {
+  .cronometro-palavra {
+    height: 100%;
+    .cronometro-component {
+      &.cron-palavra {
+        color: white;
+        height: 100%;
+      }
+      .croncard {
+        background-color: #222;
+        height: 100%;
+        justify-content: space-between;
+        padding: 0;
+      }
+      .controls {
+        &.visible {
+          visibility: visible !important;
           width: 100%;
-          margin-top: 1.5em;
+          .btn-group {
+            width: 100%;
+            margin-top: 1.5em;
 
-          .btn {
-            justify-content: center;
-            padding: 0.5em 0;
-            font-size: 1em;
-            font-weight: bold;
-            &:hover {
-              box-shadow: 0px 0px 10px #000;
-            }
-          }
-          .btn-outline-dark {
-            color: white;
-            border-color: #444;
-            background-image: linear-gradient(to bottom, #444, #333);
-            flex: 1 2 auto;
-            &:hover {
-              background-color: #444;
-              border-color: #777
-            }
-            &.btn-negative {
-              background-image: linear-gradient(to bottom, #772222, #442222);
-              flex: 0 1 0;
-              padding-left: 1em;
-              padding-right: 1.3em;
-              border-color: #772222;
+            .btn {
+              justify-content: center;
+              padding: 0.5em 0;
+              font-size: 1em;
+              font-weight: bold;
               &:hover {
-                background-color: #662222;
-                border-color: #aa4444;
+                box-shadow: 0px 0px 10px #000;
+              }
+            }
+            .btn-outline-dark {
+              color: white;
+              border-color: #444;
+              background-image: linear-gradient(to bottom, #444, #333);
+              flex: 1 2 auto;
+              &:hover {
+                background-color: #444;
+                border-color: #777
+              }
+              &.btn-negative {
+                background-image: linear-gradient(to bottom, #772222, #442222);
+                flex: 0 1 0;
+                padding-left: 1em;
+                padding-right: 1.3em;
+                border-color: #772222;
+                &:hover {
+                  background-color: #662222;
+                  border-color: #aa4444;
+                }
               }
             }
           }
