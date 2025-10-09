@@ -337,3 +337,13 @@ class Individuo(models.Model, CronometroMixin):
         if self.canal == 0:
             return f'{self.order:>02}'
         return f'{self.canal:>02}'
+
+    @property
+    def ips(self):
+        """Retorna a lista de IPs associados ao indivíduo"""
+        ips = self.ips_mesas
+        if not ips.strip():
+            ips = self.evento.ips_mesas
+        if not ips.strip():
+            return []
+        return [ip.strip() for ip in ips.split() if ip.strip()]
