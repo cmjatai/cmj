@@ -144,86 +144,88 @@ export default {
 </script>
 
 <style lang="scss">
-.painelset-admin {
-  $px: 0px;
-  line-height: 1;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  // background-color: #222;
-  .container-grid {
-    padding: 0 $px;
-    height: 100%;
-  }
-  .row {
-    align-items: stretch;
-    margin-left: -$px;
-    margin-right: -$px;
-    padding-top: $px;
-    &:first-child {
-      height: 3.4em;
-    }
-    &:last-child {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      top: 3.4em;
-    }
-    div[class^=col] {
-      position: relative;
-      padding-left: $px;
-      padding-right: $px;
-      &:not(:first-child) {
-        padding-left: $px / 2;
-      }
-      &:not(:last-child) {
-        padding-right: $px / 2;
-      }
-    }
-    &.header {
-      .col-auto {
-        display: flex;
-        align-items: stretch;
-      }
-    }
-  }
-  .titulo-evento {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    // border-radius: 8px;
-    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: #444;
-    color: #eee;
-    font-size: 1.1em;
-    font-weight: bold;
+@media screen and (min-width: 992px) {
+  .painelset-admin {
+    $px: 0px;
     line-height: 1;
-    padding: 5px 10px;
-  }
-  .evento-datahora {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: 100%;
-    padding: 5px 10px;
-    // border-radius: 8px;
-    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    background-color: #444;
-    color: #eee;
-    font-size: 0.8em;
-    font-weight: bold;
-    line-height: 1;
-    .evento-data {
-      font-size: 1.2em;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    // background-color: #222;
+    .container-grid {
+      padding: 0 $px;
+      height: 100%;
     }
-    .evento-hora {
+    .row {
+      align-items: stretch;
+      margin-left: -$px;
+      margin-right: -$px;
+      padding-top: $px;
+      &:first-child {
+        height: 3.4em;
+      }
+      &:last-child {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 3.4em;
+      }
+      div[class^=col] {
+        position: relative;
+        padding-left: $px;
+        padding-right: $px;
+        &:not(:first-child) {
+          padding-left: $px / 2;
+        }
+        &:not(:last-child) {
+          padding-right: $px / 2;
+        }
+      }
+      &.header {
+        .col-auto {
+          display: flex;
+          align-items: stretch;
+        }
+      }
+    }
+    .titulo-evento {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      // border-radius: 8px;
+      // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background-color: #444;
+      color: #eee;
       font-size: 1.1em;
+      font-weight: bold;
+      line-height: 1;
+      padding: 5px 10px;
+    }
+    .evento-datahora {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      height: 100%;
+      padding: 5px 10px;
+      // border-radius: 8px;
+      // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background-color: #444;
+      color: #eee;
+      font-size: 0.8em;
+      font-weight: bold;
+      line-height: 1;
+      .evento-data {
+        font-size: 1.2em;
+      }
+      .evento-hora {
+        font-size: 1.1em;
+      }
     }
   }
 }

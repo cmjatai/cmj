@@ -172,17 +172,18 @@
     {% block login_container %}
     {% endblock%}
 
-    <div vw class="disabled">
-      <div vw-access-button class="active"></div>
-      <div vw-plugin-wrapper>
-        <div class="vw-plugin-top-wrapper"></div>
-      </div>
-    </div>
 
     {% include 'base_footer.html' %}
 
 
   {% endblock root_body %}
+  
+  <div vw class="disabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
 
   {% block foot_js %}
 

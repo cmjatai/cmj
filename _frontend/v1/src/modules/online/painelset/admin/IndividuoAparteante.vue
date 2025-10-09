@@ -111,98 +111,99 @@ export default {
 }
 </script>
 <style lang="scss">
-.individuo-aparteante-component {
-  .individuo-aparteante {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
-    margin-left: 5em;
-    .inner-individuo {
-      display: flex;
-      flex-direction: row;
-      align-items: stretch;
-      justify-content: flex-start;
-      width: auto;
-    }
-    .individuo-header {
-      text-align: left;
-      font-size: 1.2em;
-      color: #bb0;
-      width: 100%;
-      .name {
-        background-color: #444;
-        white-space: nowrap;
-        margin: 0;
-        padding: 7px 14px 6px;
-        text-align: left;
-        display: inline-block;
-      }
-    }
-    .individuo {
-      flex: 1 1 auto;
-    }
-    .divide {
-      width: 1px;
-      background-color: #888;
-      margin: 0;
-    }
-    .cronometro {
-      flex: 1 1 auto;
-      padding: 1em;
-      font-size: 0.8em;
-      position: relative;
-      .icon-status-microfone {
-        position: absolute;
-        top: 0.5em;
-        left: 0.5em;
-        font-size: 2em;
-        color: #ccc;
-        i {
-          &.fa-microphone {
-            color: #4c4;
-          }
-          &.fa-microphone-slash {
-            color: #c44;
-          }
-        }
-      }
-    }
-    .croncard {
-      justify-content: center;
-      gap: 1em;
-    }
-    .controls {
-      &.visible {
-        .btn-group {
-          margin: 0;
-          width: auto;
-          .btn {
-            padding: 0.3em 0.7em 0.2em 0.7em;
-          }
-        }
-      }
-    }
-    .individuo {
+@media screen and (min-width: 992px) {
+  .individuo-aparteante-component {
+    .individuo-aparteante {
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 2em 1em;
-      .avatar {
-        opacity: 1 !important;
-        width: 5em;
-        height: 5em;
-        img {
-          box-shadow: 0px 0px 30px #444;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-left: 5em;
+      .inner-individuo {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: flex-start;
+        width: auto;
+      }
+      .individuo-header {
+        text-align: left;
+        font-size: 1.2em;
+        color: #bb0;
+        width: 100%;
+        .name {
+          background-color: #444;
+          white-space: nowrap;
+          margin: 0;
+          padding: 7px 14px 6px;
+          text-align: left;
+          display: inline-block;
         }
-        i {
+      }
+      .individuo {
+        flex: 1 1 auto;
+      }
+      .divide {
+        width: 1px;
+        background-color: #888;
+        margin: 0;
+      }
+      .cronometro {
+        flex: 1 1 auto;
+        padding: 1em;
+        font-size: 0.8em;
+        position: relative;
+        .icon-status-microfone {
+          position: absolute;
+          top: 0.5em;
+          left: 0.5em;
+          font-size: 2em;
           color: #ccc;
-          font-size: 4em;
+          i {
+            &.fa-microphone {
+              color: #4c4;
+            }
+            &.fa-microphone-slash {
+              color: #c44;
+            }
+          }
+        }
+      }
+      .croncard {
+        justify-content: center;
+        gap: 1em;
+      }
+      .controls {
+        &.visible {
+          .btn-group {
+            margin: 0;
+            width: auto;
+            .btn {
+              padding: 0.3em 0.7em 0.2em 0.7em;
+            }
+          }
+        }
+      }
+      .individuo {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 2em 1em;
+        .avatar {
+          opacity: 1 !important;
+          width: 5em;
+          height: 5em;
+          img {
+            box-shadow: 0px 0px 30px #444;
+          }
+          i {
+            color: #ccc;
+            font-size: 4em;
+          }
         }
       }
     }
   }
 }
-
 </style>

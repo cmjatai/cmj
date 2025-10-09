@@ -189,133 +189,137 @@ export default {
 }
 </script>
 <style lang="scss">
-.individuo-base {
-  display: flex;
-  align-self: stretch;
-  justify-content: stretch;
-  border-bottom: 1px solid white;
-  position: relative;
-  &:last-child {
-  border-bottom: 0px;
-  }
-  .inner {
+
+@media screen and (min-width: 992px) {
+
+  .individuo-base {
     display: flex;
-    align-items: stretch;
-    justify-content: space-between;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    position: absolute;
-  }
-  .inner-individuo, .controls {
-    display: flex;
-    background: #ddffdd;
-    align-items: stretch;
-    flex: 1 1 auto;
-    padding: 0;
-  }
-  .avatar {
-    border-radius: 0;
-    img {
-      border-radius: 0;
+    align-self: stretch;
+    justify-content: stretch;
+    border-bottom: 1px solid white;
+    position: relative;
+    &:last-child {
+    border-bottom: 0px;
+    }
+    .inner {
+      display: flex;
+      align-items: stretch;
+      justify-content: space-between;
+      width: 100%;
       height: 100%;
+      overflow: hidden;
+      position: absolute;
     }
-    i {
-      margin: 0 10px 0 20px;
-      font-size: 2em;
+    .inner-individuo, .controls {
+      display: flex;
+      background: #ddffdd;
+      align-items: stretch;
+      flex: 1 1 auto;
+      padding: 0;
     }
-  }
-  .inner-individuo {
-    cursor: pointer;
-    align-items: center;
-    gap: 10px;
-    border-right: 1px solid white;
-    .name {
-      flex: 1 1 100%;
-      small {
-        opacity: 0.5;
+    .avatar {
+      border-radius: 0;
+      img {
+        border-radius: 0;
+        height: 100%;
+      }
+      i {
+        margin: 0 10px 0 20px;
+        font-size: 2em;
       }
     }
-  }
-
-  .controls {
-    flex: 0 1 0;
-  }
-  .btn-fone, .btn-control {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 5em;
-    font-size: 0.7rem;
-    border: 0;
-    background: transparent;
-  }
-  .btn-control {
-    width: auto;
-  }
-  .fa-microphone {
-    color: green;
-    opacity: 0.6;
-  }
-  .fa-microphone-slash {
-    opacity: 0.4;
-  }
-  &:hover {
-    .inner-individuo, .controls {
-      background: #bbffbb;
+    .inner-individuo {
+      cursor: pointer;
+      align-items: center;
+      gap: 10px;
+      border-right: 1px solid white;
+      .name {
+        flex: 1 1 100%;
+        small {
+          opacity: 0.5;
+        }
+      }
     }
-  }
-  &.muted {
-    .inner-individuo, .controls {
-      background: #ffdddd;
-      opacity: 0.8;
+
+    .controls {
+      flex: 0 1 0;
+    }
+    .btn-fone, .btn-control {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 5em;
+      font-size: 0.7rem;
+      border: 0;
+      background: transparent;
+    }
+    .btn-control {
+      width: auto;
+    }
+    .fa-microphone {
+      color: green;
+      opacity: 0.6;
+    }
+    .fa-microphone-slash {
+      opacity: 0.4;
     }
     &:hover {
       .inner-individuo, .controls {
-        background: #ffcccc;
-        opacity: 1;
+        background: #bbffbb;
       }
     }
-  }
-  &.com-a-palavra {
-    border-left: 0;
-    border-right: 0;
-    .inner-individuo, .controls {
-      background: linear-gradient(to right, #0364d3, #0253a8);
-      opacity: 1 !important;
-      font-weight: bold;
-      color: white;
-      .fa-microphone {
+    &.muted {
+      .inner-individuo, .controls {
+        background: #ffdddd;
+        opacity: 0.8;
+      }
+      &:hover {
+        .inner-individuo, .controls {
+          background: #ffcccc;
+          opacity: 1;
+        }
+      }
+    }
+    &.com-a-palavra {
+      border-left: 0;
+      border-right: 0;
+      .inner-individuo, .controls {
+        background: linear-gradient(to right, #0364d3, #0253a8);
+        opacity: 1 !important;
+        font-weight: bold;
         color: white;
-        opacity: 1;
+        .fa-microphone {
+          color: white;
+          opacity: 1;
+        }
+      }
+      .inner-individuo {
+        font-size: 1.2em;
+        border-color: transparent;
       }
     }
-    .inner-individuo {
-      font-size: 1.2em;
-      border-color: transparent;
-    }
-  }
-  &.aparteante {
-    margin-left: 10%;
-    .inner-individuo, .controls {
-      background: linear-gradient(to right, #d3a103, #a87f02);
-      opacity: 1 !important;
-      font-weight: bold;
-      color: black;
-      .fa-microphone {
+    &.aparteante {
+      margin-left: 10%;
+      .inner-individuo, .controls {
+        background: linear-gradient(to right, #d3a103, #a87f02);
+        opacity: 1 !important;
+        font-weight: bold;
         color: black;
-        opacity: 1;
+        .fa-microphone {
+          color: black;
+          opacity: 1;
+        }
+      }
+      .inner-individuo {
+        font-size: 1.2em;
+        border-color: transparent;
       }
     }
-    .inner-individuo {
-      font-size: 1.2em;
-      border-color: transparent;
-    }
-  }
-  &.always-on:not(.muted):not(.com-a-palavra):not(.aparteante) {
-    .inner-individuo, .controls {
-      background: #7ee57e;
-      opacity: 1 !important;
+    &.always-on:not(.muted):not(.com-a-palavra):not(.aparteante) {
+      .inner-individuo, .controls {
+        background: #7ee57e;
+        opacity: 1 !important;
+      }
     }
   }
 }
