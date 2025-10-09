@@ -2,11 +2,14 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 
-from sapl.api.permissions import portalcmj_rpp
 
 class TimeRefreshConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
+
+        from sapl.api.permissions import portalcmj_rpp
+        self.portalcmj_rpp = portalcmj_rpp
+
         #print('Conectando ao TimeRefreshConsumer')
         self.room_name = 'time_refresh_channel'
         self.room_group_name = 'group_%s' % self.room_name
@@ -50,7 +53,7 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
         u = self.scope.get('user')
 
         key = f"{app}:{model}"
-        perms_publicas = portalcmj_rpp.get(key, set())
+        perms_publicas = self.portalcmj_rpp.get(key, set())
 
         perm_detail = f"{app}.detail_{model}"
         perm_view = f"{app}.view_{model}"

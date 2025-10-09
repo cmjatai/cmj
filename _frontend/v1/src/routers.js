@@ -51,6 +51,7 @@ export const routes = [
   {
     path: '/online/',
     component: () => import('@/modules/online/OnlineLayout'),
+    name: 'online_index_link',
     children: [
       {
         path: 'sessao', // list

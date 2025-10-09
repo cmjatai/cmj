@@ -65,7 +65,7 @@ export default {
           icon: 'fas fa-columns',
           route: 'painelset_list_link',
           texto: 'Painéis',
-          permission: 'painelset.list_evento',
+          permission: 'painelset.change_evento',
           hasPermission: false
         }
       ]

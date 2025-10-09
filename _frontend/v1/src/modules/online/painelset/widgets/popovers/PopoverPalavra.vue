@@ -1,12 +1,13 @@
 <template>
   <div class="popover-palavra"
     v-if="individuos"
-    @touchstart="touching = true"
-    @touchmove="touching ? movePopover($event) : null"
-    @touchend="touching = false"
-    @mouseup="touching = false"
-    @mousemove="touching ? movePopover($event) : null"
-    @mousedown="touching = true">
+      @touchstart="touching = true"
+      @touchmove="movePopover($event)"
+      @touchend="touching = false"
+      @mouseup="touching = false"
+      @mousemove="movePopover($event)"
+      @mousedown="touching = true"
+    >
     <div :class="['popover-individuo', individuo.com_a_palavra ? 'com_a_palavra': 'aparteante']" v-for="individuo in individuos" :key="`popover-individuo-${individuo.id}`">
       <div class="popover-header">
         <div class="arrow"></div>
@@ -60,6 +61,7 @@ export default {
         'cronometro'
       ],
       touching: false,
+      moving: false,
       individuo_com_a_palavra: null,
       cronometro_com_a_palavra: null,
       individuo_aparteante: null,
@@ -116,14 +118,21 @@ export default {
         })
     },
     movePopover (event) {
+      event.preventDefault()
+      if (!this.touching) return
       console.log('movePopover', event)
       const popover = event.target.closest('.popover-palavra')
       const offsetX = 20
       const offsetY = 20
-      const touches = event.hasOwnProperty('touches') ? event.touches || event.originalEvent.touches : null
-      if (touches && touches.length) {
-        event = touches[0]
+
+      let touches = event.touches
+      if (touches !== undefined) {
+        touches = event.touches || event.originalEvent.touches
+        if (touches && touches.length) {
+          event = touches[0]
+        }
       }
+
       let right = window.innerWidth - event.clientX - offsetX - popover.offsetWidth / 2
       let bottom = window.innerHeight - event.clientY - offsetY - popover.offsetHeight / 2
 
@@ -145,6 +154,7 @@ export default {
 
 <style lang="scss">
 .popover-palavra {
+  user-select: none;
   position: fixed;
   bottom: 20px;
   right: 20px;

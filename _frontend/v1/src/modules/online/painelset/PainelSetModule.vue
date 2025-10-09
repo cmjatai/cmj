@@ -41,7 +41,11 @@ export default {
     const t = this
     t.setSideleftVisivel(true)
     t.setSiderightVisivel(false)
-    t.fetchModelOrderedList('painelset', 'evento', '-start_real,-start_previsto')
+    t
+      .hasPermission('painelset.change_evento')
+      .then(hasPermission => {
+        t.fetchModelOrderedList('painelset', 'evento', '-start_real,-start_previsto')
+      })
   },
   methods: {
     ...Vuex.mapActions([
