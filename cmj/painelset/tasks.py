@@ -28,11 +28,12 @@ def check_finished_cronometros_function():
     zero_time_cronometros, running_cronometros = cronometro_manager.check_zero_timer()
 
     if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
+        remove_ips = []
         for ip, client_info in clients.items():
             client = client_info['client']
             if 'last_send' in client_info and (timezone.now() - client_info['last_send']) > timedelta(seconds=300):
                 logger.info(f"Removendo cliente OSC {client._address}:{client._port} por inatividade")
-                del clients[ip]
+                remove_ips.append(ip)
             elif 'last_ping' in client_info and (timezone.now() - client_info['last_ping']) > timedelta(seconds=7):
                 try:
                     logger.debug(f"Enviando comando /xremote para {client._address}:{client._port} por inatividade")
@@ -40,7 +41,14 @@ def check_finished_cronometros_function():
                     client_info['last_ping'] = timezone.now()
                 except Exception as e:
                     logger.error(f"Erro ao enviar mensagem OSC para {client._address}:{client._port}: {e}")
-                    del clients[ip]
+                    remove_ips.append(ip)
+
+        for ip in remove_ips:
+            try:
+                clients[ip]['client'].close()
+            except:
+                pass
+            del clients[ip]
 
     if zero_time_cronometros:
 
