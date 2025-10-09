@@ -58,20 +58,32 @@ class _EventoViewSet:
         evento = self.get_object()
         print(f'Toggle microfones do evento {evento} para {status_microfone}')
 
-        if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
-            ip = "10.3.163.123"  # Substitua pelo endereço IP da sua mesa
-            porta = 10023
-            client = udp_client.SimpleUDPClient(ip, porta)
-            client.send_message("/xremote", None)
-
         for individuo in evento.individuos.all():
             print(f'  Toggle microfone {individuo} para {status_microfone}')
             individuo.status_microfone = status_microfone == 'on'
             individuo.com_a_palavra = status_microfone == 'on' and individuo.com_a_palavra
             update_fields = ['status_microfone', 'com_a_palavra']
             individuo.save(update_fields=update_fields)
-            if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
-                client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 if status_microfone == 'on' else 0)
+
+        if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
+            clients = {}
+            for individuo in evento.individuos.all():
+                ips_mesas = individuo.ips
+                for ip in ips_mesas:
+                    if ip not in clients:
+                        try:
+                            porta = 10023
+                            client = udp_client.SimpleUDPClient(ip, porta)
+                            client.send_message("/xremote", None)
+                            clients[ip] = client
+                        except Exception as e:
+                            logger.error(f'Erro ao criar cliente OSC para o IP {ip}: {e}')
+
+            for individuo in evento.individuos.all():
+                for ip in individuo.ips:
+                    client = clients.get(ip)
+                    if client:
+                        client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 if status_microfone == 'on' else 0)
 
         return Response({'status': 'ok', 'status_microfone': status_microfone, 'evento': evento.id})
 
@@ -301,11 +313,15 @@ class _IndividuoViewSet:
         if mic != mic_old:
             logger.debug(f'Enviando comando OSC para o microfone {mic["order"]}: status_microfone={mic["status_microfone"]}')
             if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
-                ip = "10.3.163.123"  # Substitua pelo endereço IP da sua mesa
-                porta = 10023
-                client = udp_client.SimpleUDPClient(ip, porta)
-                client.send_message("/xremote", None)
-                client.send_message(f"/ch/{mic['order']}/mix/on", 1 if mic["status_microfone"] == 'on' else 0)
+                ips_mesas = individuo.ips
+                for ip in ips_mesas:
+                    try:
+                        porta = 10023
+                        client = udp_client.SimpleUDPClient(ip, porta)
+                        client.send_message("/xremote", None)
+                        client.send_message(f"/ch/{mic['order']}/mix/on", 1 if mic["status_microfone"] == 'on' else 0)
+                    except Exception as e:
+                        logger.error(f'Erro ao enviar comando OSC para o microfone {mic["order"]} no IP {ip}: {e}')
 
         #for mic in microfones_mudaram:
         #    logger.debug(f'  Enviando comando OSC para o microfone {mic["order"]}: status_microfone={mic["status_microfone"]}')
