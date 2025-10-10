@@ -204,4 +204,47 @@ export default {
     }
   }
 }
+@media screen and (max-width: 991.98px) {
+  .individuo-aparteante-component {
+    .individuo-aparteante {
+      border-top: 1px solid #888;
+      margin-top: 1em;
+      align-items: flex-end;
+      margin-left: 0;
+      .individuo-header {
+        .name {
+          display: flex;
+          flex-direction: column;
+          text-align: right;
+          font-size: 1em;
+          padding: 5px 10px 4px;
+          margin: 0.5em 0.5em 0 0.5em;
+          strong {
+            display: inline-block;
+            width: 100%;
+          }
+        }
+      }
+      .inner-individuo {
+        flex-direction: column;
+      }
+      .cronometro {
+        padding: 0.5em;
+        .icon-status-microfone {
+          font-size: 2em;
+          top: 0.3em;
+          left: 0.5em;
+        }
+      }
+      .individuo {
+        padding: 0.5em;
+        .avatar {
+          i {
+            font-size: 3em;
+          }
+        }
+      }
+    }
+  }
+}
 </style>

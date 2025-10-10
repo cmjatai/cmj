@@ -114,8 +114,8 @@ export default {
 <style lang="scss">
 .palavraemuso-component {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: 2em;
+  width: 66.67%;
   right: 0;
   bottom: 0;
   background-color: #222;
@@ -190,6 +190,49 @@ export default {
         i {
           color: #ccc;
           font-size: 4em;
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 991.98px) {
+  .palavraemuso-component {
+    .individuo-com-a-palavra {
+      .divide {
+        width: 0;
+      }
+      .inner-individuo {
+        flex-direction: column;
+      }
+      .individuo-header {
+        .name {
+          font-size: 1em;
+          padding: 5px 10px 4px;
+          margin: 0.5em 0.5em 0 0.5em;
+        }
+      }
+      .cronometro {
+        padding: 1em 1em 1.5em;
+        .icon-status-microfone {
+          font-size: 2em;
+          top: 0.3em;
+          left: 0.5em;
+        }
+      }
+      .individuo {
+        padding: 0.5em;
+        .avatar {
+          i {
+            font-size: 3em;
+          }
+        }
+      }
+    }
+    .croncard {
+      .btn-group {
+        flex-wrap: wrap;
+        .btn-add3m, .btn-add5m, .btn-stop,  .btn-toggle {
+          display: none;
         }
       }
     }

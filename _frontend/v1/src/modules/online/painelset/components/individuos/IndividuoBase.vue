@@ -319,4 +319,14 @@ export default {
     }
   }
 }
+@media screen and (max-width: 991.98px) {
+  .individuo-base {
+
+    .inner-individuo {
+      .name {
+        display: none;
+      }
+    }
+  }
+}
 </style>

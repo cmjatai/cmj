@@ -5,17 +5,9 @@
         <div class="col">
           <div class="titulo-evento">
             {{ evento ? evento.name : 'Carregando evento...' }}
-          </div>
-        </div>
-        <div class="col-auto">
-          <div class="evento-datahora">
-            {{ datahora_prevista_real[0] }}
-            <div class="evento-data">
-               {{ datahora_prevista_real[1] }}
-            </div>
-            <div class="evento-hora">
-              {{ datahora_prevista_real[2] }}
-            </div>
+            <small>
+              {{ datahora_prevista_real[0] }} - {{ datahora_prevista_real[1] }} {{ datahora_prevista_real[2] }}
+            </small>
           </div>
         </div>
         <div class="col-auto">
@@ -125,6 +117,8 @@ export default {
       }
     },
     resumeEvento () {
+      this.$refs.individuoList.status_microfone = 0
+      this.$refs.individuoList.toggleAllMicrofones()
     },
     startEvento () {
       this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
@@ -137,7 +131,8 @@ export default {
         })
     },
     pauseEvento () {
-      this.$refs.individuoList.status_microfone = 0
+      this.$refs.individuoList.status_microfone = 1
+      this.$refs.individuoList.toggleAllMicrofones()
     }
   }
 }
@@ -152,12 +147,13 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  // background-color: #222;
+  background-color: #222;
   .container-grid {
     padding: 0 $px;
     height: 100%;
   }
   .row {
+    position: relative;
     align-items: stretch;
     margin-left: -$px;
     margin-right: -$px;
@@ -173,7 +169,7 @@ export default {
       top: 3.4em;
     }
     div[class^=col] {
-      position: relative;
+      position: static;
       padding-left: $px;
       padding-right: $px;
       &:not(:first-child) {
@@ -192,8 +188,9 @@ export default {
   }
   .titulo-evento {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    flex-direction: column;
     height: 100%;
     // border-radius: 8px;
     // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -224,6 +221,21 @@ export default {
     }
     .evento-hora {
       font-size: 1.1em;
+    }
+  }
+}
+@media screen and (max-width: 991.98px) {
+.painelset-admin {
+  .titulo-evento {
+      font-size: 1em;
+      padding: 5px 5px;
+    }
+  }
+  .cronometro-global {
+    display: flex;
+    height: 3.4em;
+    .croncard {
+      padding: 0;
     }
   }
 }
