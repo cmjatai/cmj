@@ -50,6 +50,7 @@ const syncStore = {
     }
   },
   actions: {
+
     initWebSocket ({ commit, dispatch, state }) {
       if (state.wsManager) {
         return
@@ -72,6 +73,7 @@ const syncStore = {
       })
       commit('SET_WS_MANAGER', wsManager)
     },
+
     handleSyncMessage ({ commit, state }, data) {
       const { app, model, action, instance, timestamp } = data
       const uri = `${app}_${model}`

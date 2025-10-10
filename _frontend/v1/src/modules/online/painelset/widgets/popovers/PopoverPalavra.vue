@@ -91,35 +91,25 @@ export default {
       return null
     },
     movePopover (event) {
-      event.preventDefault()
       if (!this.touching) return
-      console.log('movePopover', event)
-      const popover = event.target.closest('.popover-palavra')
-      const offsetX = 20
-      const offsetY = 20
 
-      let touches = event.touches
-      if (touches !== undefined) {
-        touches = event.touches || event.originalEvent.touches
-        if (touches && touches.length) {
-          event = touches[0]
-        }
-      }
+      const popover = this.$el
+      const rect = popover.getBoundingClientRect()
 
-      let right = window.innerWidth - event.clientX - offsetX - popover.offsetWidth / 2
-      let bottom = window.innerHeight - event.clientY - offsetY - popover.offsetHeight / 2
+      // Get pointer position (mouse or touch)
+      const clientX = event.touches ? event.touches[0].clientX : event.clientX
+      const clientY = event.touches ? event.touches[0].clientY : event.clientY
 
-      if (right < -popover.offsetWidth / 2) right = -popover.offsetWidth / 2
-      if (bottom < -popover.offsetHeight / 2) bottom = -popover.offsetHeight / 2
-      if (right + popover.offsetWidth > window.innerWidth) {
-        right = window.innerWidth - popover.offsetWidth
-      }
-      if (bottom + popover.offsetHeight > window.innerHeight) {
-        bottom = window.innerHeight - popover.offsetHeight
-      }
+      // Calculate new position (center popover on cursor)
+      const newRight = window.innerWidth - clientX - rect.width / 2
+      const newBottom = window.innerHeight - clientY - rect.height / 2
 
-      popover.style.right = `${right}px`
-      popover.style.bottom = `${bottom}px`
+      // Constrain to viewport
+      const constrainedRight = Math.max(0, Math.min(newRight, window.innerWidth - rect.width))
+      const constrainedBottom = Math.max(0, Math.min(newBottom, window.innerHeight - rect.height))
+
+      popover.style.right = `${constrainedRight}px`
+      popover.style.bottom = `${constrainedBottom}px`
     }
   }
 }
