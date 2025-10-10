@@ -1,6 +1,7 @@
 <template>
   <div :class="[
     'individuo-base', status_microfone ? '' :  'muted',
+    instance && instance.parlamentar ? 'parlamentar' : '',
     com_a_palavra ? 'com-a-palavra' : (microfone_sempre_ativo ? 'always-on' : 'active'),
     aparteante ? 'aparteante' : ''
     ]">
@@ -321,8 +322,20 @@ export default {
 }
 @media screen and (max-width: 991.98px) {
   .individuo-base {
-
     .inner-individuo {
+      gap: 0;
+    }
+    &:not(.parlamentar) {
+      i {
+        margin: 0;
+        padding: 0 5px;
+      }
+    }
+    &.parlamentar {
+      .avatar {
+        width: 100%;
+        text-align: center;
+      }
       .name {
         display: none;
       }
