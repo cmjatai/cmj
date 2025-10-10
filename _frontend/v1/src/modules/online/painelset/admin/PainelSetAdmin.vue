@@ -226,6 +226,11 @@ export default {
 }
 @media screen and (max-width: 991.98px) {
 .painelset-admin {
+  .row {
+    div[class^=col] {
+      position: relative;
+    }
+  }
   .titulo-evento {
       font-size: 1em;
       padding: 5px 5px;

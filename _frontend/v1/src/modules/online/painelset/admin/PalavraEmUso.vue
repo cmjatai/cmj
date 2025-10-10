@@ -114,13 +114,14 @@ export default {
 <style lang="scss">
 .palavraemuso-component {
   position: absolute;
-  top: 2em;
   width: 66.67%;
+  top: 0;
   right: 0;
   bottom: 0;
   background-color: #222;
   display: flex;
   flex-direction: column;
+  z-index: 0;
   .individuo-com-a-palavra {
     display: flex;
     flex-direction: column;
@@ -197,6 +198,8 @@ export default {
 }
 @media screen and (max-width: 991.98px) {
   .palavraemuso-component {
+    width: 100%;
+    top: 2.1em;
     .individuo-com-a-palavra {
       .divide {
         width: 0;

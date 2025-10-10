@@ -448,7 +448,7 @@ export default {
 
 <style lang="scss">
 .cronometro-component {
-  z-index: 1;
+  z-index: 2;
   .croncard {
     display: flex;
     flex-direction: column;
@@ -524,7 +524,7 @@ export default {
     }
     &:hover .controls.hover {
       display: block;
-      z-index: 1;
+      z-index: 2;
     }
   }
 }

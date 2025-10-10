@@ -1,7 +1,7 @@
 <template>
   <div class="individuo-list">
     <div :class="['individuo-base', 'manager',
-      status_microfone ? '' : 'muted']" :style="{flex: `0 0 ${100 / (individuos.length + 1)}%;`}">
+      status_microfone ? '' : 'muted']">
       <div class="inner">
         <div class="controls">
           <button
@@ -195,7 +195,8 @@ export default {
   left:0;
   bottom:0;
   overflow: hidden;
-  .individuo-base:first-child {
+  .individuo-base.manager{
+    flex: 0 0 3em;
     border-bottom: 1px solid #fff;
     font-size: 0.7em;
     .inner-individuo, .controls {
@@ -229,19 +230,14 @@ export default {
 }
 @media screen and (max-width: 991.98px) {
   .individuo-list {
+    width: 100%;
     overflow: visible;
     background-color: #222;
     .individuo-base {
-
-      .inner-individuo {
-        .name {
-          display: none;
-        }
-      }
       &.manager {
         position: static;
         height: 3em;
-        z-index: 0;
+        z-index: 1;
         .inner {
           position: absolute;
           overflow: visible;
@@ -250,11 +246,7 @@ export default {
           right: 0;
           height: 3em;
           width: calc(100vw - 48px);
-          z-index: 1;
-        }
-        .inner-individuo {
-          input {
-          }
+          z-index: 0;
         }
       }
     }
