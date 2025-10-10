@@ -119,7 +119,7 @@ Vue.mixin({
       // console.log(performance.now(), 'ws-message', data)
       this
         .$nextTick(() => {
-          console.log(performance.now(), 'ws-message-exec', data)
+          // console.log(performance.now(), 'ws-message-exec', data)
           EventBus.$emit('ws-message', data.message)
           // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
         })

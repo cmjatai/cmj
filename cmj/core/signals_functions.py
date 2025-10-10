@@ -287,6 +287,19 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
             channel_layer = get_channel_layer()
 
             async_to_sync(channel_layer.group_send)(
+                "group_sync_channel", {
+                    "type": "sync",
+                    'action': action,
+                    'id': inst.id,
+                    'app': inst._meta.app_label,
+                    'model': inst._meta.model_name,
+                    'created': created,
+                    'instance': inst_serialize,
+                    'timestamp': timezone.now().timestamp()
+                }
+            )
+
+            async_to_sync(channel_layer.group_send)(
                 "group_time_refresh_channel", {
                     "type": "time_refresh.message",
                     'message': {
@@ -295,19 +308,16 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                         'app': inst._meta.app_label,
                         'model': inst._meta.model_name,
                         'created': created,
-                        'instance': inst_serialize,
+                        'instance': inst_serialize
                     }
                 }
             )
+
         except Exception as e:
             logger.error(_("Erro na comunicação com o backend do redis. "
                            "Certifique se possuir um servidor de redis "
                            "ativo funcionando como configurado em "
                            "CHANNEL_LAYERS"))
-
-        if settings.DEBUG:
-            logger.debug(f'end..: {inst.id} {inst._meta.app_label}.{inst._meta.model_name}')
-
 
 def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs):
 

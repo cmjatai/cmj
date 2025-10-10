@@ -39,8 +39,15 @@ export default {
   },
   mounted: function () {
     const t = this
+
+    this.registerModels({
+      app: 'painelset',
+      models: ['evento', 'cronometro', 'individuo']
+    })
+
     t.setSideleftVisivel(true)
     t.setSiderightVisivel(false)
+
     t.utils
       .hasPermission('painelset.change_evento')
       .then(hasPermission => {
@@ -51,6 +58,9 @@ export default {
     ...Vuex.mapActions([
       'setSideleftVisivel',
       'setSiderightVisivel'
+    ]),
+    ...Vuex.mapActions('store__sync', [
+      'registerModels'
     ]),
     open (eventoId) {
       if (eventoId) {
