@@ -1,6 +1,7 @@
+import Worker from './timer.worker.js'
 class TimerWorkerService {
   constructor () {
-    this.worker = new Worker('/timer.worker.js')
+    this.worker = new Worker()
     this.callbacks = new Map()
 
     this.worker.onmessage = (e) => {
