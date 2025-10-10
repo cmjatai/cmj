@@ -447,86 +447,83 @@ export default {
 </script>
 
 <style lang="scss">
-@media screen and (min-width: 992px) {
-
-  .cronometro-component {
-    z-index: 1;
-    .croncard {
-      display: flex;
+.cronometro-component {
+  z-index: 1;
+  .croncard {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    background-color: #444;
+    color: #fff;
+    // border-radius: 8px;
+    padding: 5px 10px 3px;
+    // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    .inner {
+      line-height: 1;
       flex-direction: column;
-      height: 100%;
-      align-items: center;
-      justify-content: center;
-      background-color: #444;
-      color: #fff;
-      // border-radius: 8px;
-      padding: 5px 10px 3px;
-      // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      .inner {
-        line-height: 1;
-        flex-direction: column;
-        justify-content: stretch;
-        align-content: stretch;
-        .inner-rodape {
-          font-size: 0.8em;
-          text-align: center;
-          font-style: italic;
-        }
+      justify-content: stretch;
+      align-content: stretch;
+      .inner-rodape {
+        font-size: 0.8em;
+        text-align: center;
+        font-style: italic;
       }
-      .display-time {
-        font-weight: bold;
-        &.elapsed { /* tempo decorrido */
-          &.running {
-            color: #0f0;  /* verde se em execução */
-            &.exceeded {
-              color: #ffa500; /* laranja se em execução e excedeu o tempo */
-            }
-          }
-          &.paused {
-            color: #ff0;  /* amarelo se pausado */
-            &.exceeded {
-              color: #ffa500; /* laranja se pausado e excedeu o tempo */
-            }
-          }
-          &.stopped {
-            color: #ccc;  /* cinza claro se parado */
+    }
+    .display-time {
+      font-weight: bold;
+      &.elapsed { /* tempo decorrido */
+        &.running {
+          color: #0f0;  /* verde se em execução */
+          &.exceeded {
+            color: #ffa500; /* laranja se em execução e excedeu o tempo */
           }
         }
-        &.remaining { /* tempo restante */
-          &.running {
-            color: #ff0;  /* verde se em execução */
-            &.exceeded {
-              color: #f00; /* vermelho se em execução e excedeu o tempo */
-            }
-          }
-          &.paused {
-            color: #ff0;  /* amarelo se pausado */
-            &.exceeded {
-              color: #f00; /* vermelho se pausado e excedeu o tempo */
-            }
-          }
-        }
-        &.last_paused { /* último tempo pausado */
-          &.paused {
-            color: #ff0;  /* amarelo se pausado */
+        &.paused {
+          color: #ff0;  /* amarelo se pausado */
+          &.exceeded {
+            color: #ffa500; /* laranja se pausado e excedeu o tempo */
           }
         }
         &.stopped {
           color: #ccc;  /* cinza claro se parado */
         }
       }
-      .controls {
-        z-index: 1;
-        &.hover {
-          position: absolute;
-          top: 100%;
-          display: none;
+      &.remaining { /* tempo restante */
+        &.running {
+          color: #ff0;  /* verde se em execução */
+          &.exceeded {
+            color: #f00; /* vermelho se em execução e excedeu o tempo */
+          }
+        }
+        &.paused {
+          color: #ff0;  /* amarelo se pausado */
+          &.exceeded {
+            color: #f00; /* vermelho se pausado e excedeu o tempo */
+          }
         }
       }
-      &:hover .controls.hover {
-        display: block;
+      &.last_paused { /* último tempo pausado */
+        &.paused {
+          color: #ff0;  /* amarelo se pausado */
+        }
       }
+      &.stopped {
+        color: #ccc;  /* cinza claro se parado */
+      }
+    }
+    .controls {
+      z-index: 1;
+      &.hover {
+        position: absolute;
+        top: 100%;
+        display: none;
+      }
+    }
+    &:hover .controls.hover {
+      display: block;
     }
   }
 }
