@@ -44,6 +44,7 @@
   </div>
 </template>
 <script>
+import { mapState } from 'vuex'
 import CronometroBase from '../../components/cronometros/CronometroBase.vue'
 
 export default {
@@ -53,22 +54,24 @@ export default {
   },
   data () {
     return {
-      app: [
-        'painelset'
-      ],
-      model: [
-        'individuo',
-        'cronometro'
-      ],
       touching: false,
-      moving: false,
-      individuo_com_a_palavra: null,
-      cronometro_com_a_palavra: null,
-      individuo_aparteante: null,
-      cronometro_aparteante: null
+      moving: false
     }
   },
   computed: {
+    ...mapState('store__sync', ['data_cache']),
+    individuo_com_a_palavra: function () {
+      if (this.data_cache?.painelset_individuo) {
+        return Object.values(this.data_cache.painelset_individuo).find(i => i.com_a_palavra)
+      }
+      return null
+    },
+    individuo_aparteante: function () {
+      if (this.data_cache?.painelset_individuo) {
+        return Object.values(this.data_cache.painelset_individuo).find(i => i.aparteado)
+      }
+      return null
+    },
     individuos: function () {
       const individuos = []
       if (this.individuo_aparteante) {
@@ -86,36 +89,6 @@ export default {
         return '/api/parlamentares/parlamentar/' + parlamentar + '/fotografia.c96.png'
       }
       return null
-    },
-    fetch (metadata) {
-      const t = this
-      return t
-        .refreshState(metadata)
-        .then((obj) => {
-          if (metadata.model === 'individuo') {
-            if (obj && obj.com_a_palavra) {
-              if (obj.aparteado !== t.individuo_aparteante?.id) {
-                t.individuo_aparteante = null
-              }
-              t.individuo_com_a_palavra = obj
-              return obj
-            }
-            if (obj && obj.aparteado) {
-              t.individuo_aparteante = obj
-            }
-            if (obj && !obj.com_a_palavra && !obj.aparteado && t.individuo_com_a_palavra?.id === obj.id) {
-              t.individuo_com_a_palavra = null
-            }
-            if (obj && !obj.com_a_palavra && !obj.aparteado && t.individuo_aparteante?.id === obj.id) {
-              t.individuo_aparteante = null
-            }
-          }
-          return obj
-        })
-        .catch((err) => {
-          console.error('Erro ao atualizar o estado', err)
-          throw err
-        })
     },
     movePopover (event) {
       event.preventDefault()
