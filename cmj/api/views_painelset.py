@@ -294,7 +294,11 @@ class _IndividuoViewSet:
             individuo.save()
         else:
             individuo.save()
-            cronometro_manager.stop_cronometro(cron.id)
+            if hasattr(individuo, 'aparteado') and individuo.aparteado:
+                # Ele é um aparteante, não parar o cronômetro
+                cronometro_manager.pause_cronometro(cron.id)
+            else:
+                cronometro_manager.stop_cronometro(cron.id)
 
 
         # obter status_microfone e com_a_palavra de todos os individuos do evento

@@ -21,37 +21,37 @@
       </div>
       <div :class="['controls', css_class_controls]" v-if="css_class_controls">
         <div class="btn-group btn-group-sm" role="group" aria-label="First group">
-          <a class="btn btn-outline-dark" @click.stop="toogleDisplay" title="Alternar exibição" v-if="controls.includes('toggleDisplay')">
+          <a class="btn btn-outline-dark btn-toggle" @click.stop="toogleDisplay" title="Alternar exibição" v-if="controls.includes('toggleDisplay')">
             <i class="fa fa-exchange-alt" aria-hidden="true"></i>
           </a>
-          <a class="btn btn-outline-dark" @click.stop="startCronometro" v-if="cronometro.state === 'stopped' && controls.includes('start')">
+          <a class="btn btn-outline-dark btn-start" @click.stop="startCronometro" v-if="cronometro.state === 'stopped' && controls.includes('start')">
             <i class="fa fa-play" aria-hidden="true"></i>
           </a>
-          <a class="btn btn-outline-dark" @click.stop="pauseCronometro" v-if="cronometro.state === 'running' && controls.includes('pause')">
+          <a class="btn btn-outline-dark btn-pause" @click.stop="pauseCronometro" v-if="cronometro.state === 'running' && controls.includes('pause')">
             <i class="fa fa-pause" aria-hidden="true"></i>
           </a>
-          <a class="btn btn-outline-dark" @click.stop="resumeCronometro" v-if="cronometro.state === 'paused' && controls.includes('resume')">
+          <a class="btn btn-outline-dark btn-resume" @click.stop="resumeCronometro" v-if="cronometro.state === 'paused' && controls.includes('resume')">
             <i class="fa fa-play" aria-hidden="true"></i>
           </a>
-          <a class="btn btn-outline-dark" @click.stop="stopCronometro" v-if="['running', 'paused'].includes(cronometro.state) && controls.includes('stop')">
+          <a class="btn btn-outline-dark btn-stop" @click.stop="stopCronometro" v-if="['running', 'paused'].includes(cronometro.state) && controls.includes('stop')">
             <i class="fa fa-stop" aria-hidden="true"></i>
           </a>
-          <a class="btn btn-outline-dark btn-negative" @click.stop="addTime(-60)" title="Reduzir 1 minuto" v-if="controls.includes('add1m')">
+          <a class="btn btn-outline-dark btn-negative btn-add1m" @click.stop="addTime(-60)" title="Reduzir 1 minuto" v-if="controls.includes('add1m')">
             -1m
           </a>
-          <a class="btn btn-outline-dark btn-negative" @click.stop="addTime(-30)" title="Reduzir 30 segundos" v-if="controls.includes('add1m')">
+          <a class="btn btn-outline-dark btn-negative btn-add30s" @click.stop="addTime(-30)" title="Reduzir 30 segundos" v-if="controls.includes('add30s')">
             -30s
           </a>
-          <a class="btn btn-outline-dark" @click.stop="addTime(30)" title="Adicionar 30 segundos" v-if="controls.includes('add30s')">
+          <a class="btn btn-outline-dark btn-add30s" @click.stop="addTime(30)" title="Adicionar 30 segundos" v-if="controls.includes('add30s')">
             +30s
           </a>
-          <a class="btn btn-outline-dark" @click.stop="addTime(60)" title="Adicionar 1 minuto" v-if="controls.includes('add1m')">
+          <a class="btn btn-outline-dark btn-add1m" @click.stop="addTime(60)" title="Adicionar 1 minuto" v-if="controls.includes('add1m')">
             +1m
           </a>
-          <a class="btn btn-outline-dark" @click.stop="addTime(180)" title="Adicionar 3 minutos" v-if="controls.includes('add3m')">
+          <a class="btn btn-outline-dark btn-add3m" @click.stop="addTime(180)" title="Adicionar 3 minutos" v-if="controls.includes('add3m')">
             +3m
           </a>
-          <a class="btn btn-outline-dark" @click.stop="addTime(300)" title="Adicionar 5 minutos" v-if="controls.includes('add5m')">
+          <a class="btn btn-outline-dark btn-add5m" @click.stop="addTime(300)" title="Adicionar 5 minutos" v-if="controls.includes('add5m')">
             +5m
           </a>
         </div>
@@ -515,7 +515,7 @@ export default {
       }
     }
     .controls {
-      z-index: 1;
+      z-index: 2;
       &.hover {
         position: absolute;
         top: 100%;
@@ -524,6 +524,7 @@ export default {
     }
     &:hover .controls.hover {
       display: block;
+      z-index: 1;
     }
   }
 }

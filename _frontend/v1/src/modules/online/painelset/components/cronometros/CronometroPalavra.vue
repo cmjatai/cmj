@@ -122,4 +122,19 @@ export default {
     }
   }
 }
+@media screen and (max-width: 991.98px) {
+  .cronometro-palavra {
+    .cronometro-component {
+      .controls.visible {
+        .btn-group {
+          .btn-outline-dark {
+            &.btn-negative {
+              padding: 0.3em 0.5em 0 0.2em;
+            }
+          }
+        }
+      }
+    }
+  }
+}
 </style>

@@ -1,7 +1,7 @@
 <template>
   <div class="individuo-list">
     <div :class="['individuo-base', 'manager',
-      status_microfone ? '' : 'muted']" :style="{flex: `0 0 ${100 / (individuos.length + 1)}%`}">
+      status_microfone ? '' : 'muted']" :style="{flex: `0 0 ${100 / (individuos.length + 1)}%;`}">
       <div class="inner">
         <div class="controls">
           <button
@@ -12,15 +12,15 @@
           <i :class="status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
         </button>
         </div>
-        <div class="inner-individuo py-2">{{ individuos.length }} CANAIS NESTE EVENTO</div>
+        <div class="inner-individuo py-2">{{ individuos.length }} CANAIS</div>
         <div class="inner-individuo">
           <div class="default-timer">
             <button class="btn btn-link">
-              <i class="fas fa-2x fa-arrow-down" @click="default_timer > 60 ? default_timer -= 60 : default_timer = 60"></i>
+              <i class="fas fa-arrow-down" @click="default_timer > 60 ? default_timer -= 60 : default_timer = 60"></i>
             </button>
             Tempo Padrão: {{ (default_timer / 60).toFixed(0) }} min
             <button class="btn btn-link">
-              <i class="fas fa-2x fa-arrow-up" @click="default_timer < 600 ? default_timer += 60 : default_timer = 600"></i>
+              <i class="fas fa-arrow-up" @click="default_timer < 600 ? default_timer += 60 : default_timer = 600"></i>
             </button>
           </div>
         </div>
@@ -188,11 +188,11 @@ export default {
   flex-direction: column;
   align-items: stretch;
   height: 100%;
+  width: 33.33%;
   justify-content: stretch;
   position:absolute;
   top:0;
   left:0;
-  right:0;
   bottom:0;
   overflow: hidden;
   .individuo-base:first-child {
@@ -221,6 +221,39 @@ export default {
           text-decoration: none;
           &:hover {
             color: #000;
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 991.98px) {
+  .individuo-list {
+    overflow: visible;
+    background-color: #222;
+    .individuo-base {
+
+      .inner-individuo {
+        .name {
+          display: none;
+        }
+      }
+      &.manager {
+        position: static;
+        height: 3em;
+        z-index: 0;
+        .inner {
+          position: absolute;
+          overflow: visible;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 3em;
+          width: calc(100vw - 48px);
+          z-index: 1;
+        }
+        .inner-individuo {
+          input {
           }
         }
       }
