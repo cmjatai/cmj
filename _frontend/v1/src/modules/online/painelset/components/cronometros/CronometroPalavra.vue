@@ -52,11 +52,7 @@ export default {
   },
   mounted () {
     console.log('CronometroPalavra mounted', this.cronometro_id)
-    const t = this
     // t.fetch()
-    t.$nextTick(() => {
-      t.auto_start = false
-    })
   },
   beforeDestroy () {
     console.log('CronometroPalavra beforeDestroy', this.cronometro_id)
