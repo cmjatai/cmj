@@ -7,7 +7,6 @@
 
 <script>
 import Message from '@/components/utils/message/Message'
-import Vuex from 'vuex'
 export default {
   name: 'app',
   components: {
@@ -15,14 +14,6 @@ export default {
   },
   created: function () {
     this.loginStatus()
-  },
-  mounted: function () {
-    this.initWebSocket()
-  },
-  methods: {
-    ...Vuex.mapActions('store__sync', [
-      'initWebSocket'
-    ])
   }
 }
 </script>

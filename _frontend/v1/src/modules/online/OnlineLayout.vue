@@ -109,6 +109,9 @@ export default {
   mounted: function () {
     try {
       const t = this
+
+      this.initWebSocket()
+
       t.$options.sockets.onmessage = t.handleWebSocketMessageTimeRefresh
       t.$options.sockets.onopen = function () {
         t.ws_status = 'connected'
@@ -126,6 +129,9 @@ export default {
     }
   },
   methods: {
+    ...Vuex.mapActions('store__sync', [
+      'initWebSocket'
+    ]),
     diminuirFonte () {
       $('.base-layout .main').css('font-size', '-=1')
     },
