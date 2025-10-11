@@ -190,6 +190,7 @@ class _IndividuoViewSet:
                     individuoComPalavra.save(update_fields=['aparteante'])
                     individuoAparteante.save()
                     cronometro_manager.stop_cronometro(cronAparteante.id)
+                    cronometro_manager.resume_cronometro(cronAparteado.id)
                 else:
                     # Ele não está com a palavra, mas outro indivíduo está
                     print(f'  Indivíduo {individuoAparteante} não está com a palavra, mas o indivíduo {individuoComPalavra} está. Permitindo aparte.')
