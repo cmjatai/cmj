@@ -1,7 +1,7 @@
 <template>
   <div :class="['cronometro-component', css_class]">
     <div v-if="cronometro" :class="['croncard', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']">
-      <div class="inner">
+      <div class="inner" @click="getCronometro">
         <div :class="['display-time', display, cronometro.state, cronometro.remaining_time < 0 ? 'exceeded' : '']"
           :style="{ fontSize: display_size }">
           {{ displayTime }}
@@ -63,9 +63,10 @@
   </div>
 </template>
 <script>
-import Vuex from 'vuex'
+import workerTimer from '@/timer/worker-timer'
+
 export default {
-  name: 'cronometro-base',
+  name: 'cronometro-base-old',
   props: {
     cronometro_id: {
       type: Number,
@@ -119,15 +120,55 @@ export default {
   },
   data () {
     return {
+      id: this.cronometro_id,
+      ws: `/ws/cronometro/${this.cronometro_id}/`,
+      app: 'painelset',
+      model: 'cronometro',
+      wsSocket: null,
+      cronometro: null,
+      instance: null,
+      idInterval: null,
+      syncInterval: 30, // sincroniza o cronômetro a cada 30 segundos
+      countInterval: 0,
+      debug_verbose: false,
+      wait_destroy: false,
       display: this.display_initial, // 'elapsed', 'remaining', 'last_paused'
       modesDisplay: ['elapsed', 'remaining', 'last_paused'], // modos disponíveis
       timerInterval: 1500
     }
   },
   mounted: function () {
+    console.log('Cronometro mounted, connecting to WebSocket:', this.ws, this.auto_start)
+    this.$nextTick(() => {
+      this.ws_client_cronometro()
+      this.runInterval()
+    })
+  },
+  watch: {
+    cronometro_id: function (newVal, oldVal) {
+      if (!this.nulls.includes(oldVal) && newVal !== oldVal && newVal > 0 && newVal !== this.id) {
+        console.log('cronometrobase mudou de', oldVal, 'para', newVal)
+        this.id = newVal
+        this.ws = `/ws/cronometro/${this.cronometro_id}/`
+        if (this.wsSocket) {
+          this.wsSocket.close()
+          this.wsSocket = null
+        }
+        this.cronometro = null
+        this.ws_client_cronometro()
+        this.runInterval()
+      }
+    }
+  },
+  beforeDestroy: function () {
+    if (this.wsSocket) {
+      console.log('Cronometro beforeDestroy, closing WebSocket')
+      this.wsSocket.close()
+      this.wsSocket = null
+    }
+    this.stopInterval()
   },
   methods: {
-    ...Vuex.mapActions('store__sync', ['sendSyncMessage']),
     toogleDisplay () {
       const currentIndex = this.modesDisplay.indexOf(this.display)
       const nextIndex = (currentIndex + 1) % this.modesDisplay.length
@@ -137,6 +178,93 @@ export default {
         display = 'elapsed' // volta para o início
       }
       this.display = display
+    },
+    ws_client_cronometro () {
+      const t = this
+      if (t.wsSocket) {
+        t.wsSocket.close()
+      }
+      // conexão particular utilizando o WebSocket nativo
+      t.wsSocket = new WebSocket(this.ws_endpoint())
+      t.wsSocket.onmessage = this.handleWebSocketMessageLocal
+      t.wsSocket.onopen = () => {
+        // console.log('WebSocket conectado:', this.ws)
+        if (t.auto_start) {
+          t.startCronometro()
+        } else {
+          t.getCronometro()
+        }
+      }
+      t.wsSocket.onclose = () => {
+        console.log('WebSocket desconectado...')
+        t.wsSocket = null
+      }
+      t.wsSocket.onerror = (error) => {
+        console.error('Erro no WebSocket:', error)
+        t.wsSocket = null
+        t.ws_client_cronometro()
+      }
+      t.wsSocket.onpagehide = () => {
+        console.log('WebSocket página oculta, fechando conexão')
+        t.wsSocket.close()
+      }
+      t.wsSocket.onpageshow = () => {
+        console.log('WebSocket página visível, reconectando')
+        t.ws_client_cronometro()
+      }
+      return t.wsSocket
+    },
+    fetch (metadata) {
+      const t = this
+      if (metadata && metadata.hasOwnProperty('instance') && metadata.instance) {
+        t.instance = metadata.instance
+        t.cronometro = metadata.instance
+        t.countInterval = t.syncInterval // força a sincronização na próxima iteração
+      }
+      t.refreshState(metadata)
+        .then(obj => {
+          if (obj.id === t.cronometro_id) {
+            t.instance = obj
+            t.cronometro = obj
+            console.log(obj.state, obj.name)
+          } else {
+            t.instance = null
+            t.cronometro = null
+          }
+        })
+    },
+    stopInterval () {
+      if (this.idInterval) {
+        this.wait_destroy = true
+        workerTimer.clearInterval(this.idInterval)
+        this.idInterval = null
+      }
+    },
+    runInterval () {
+      const t = this
+      if (t.idInterval) {
+        workerTimer.clearInterval(this.idInterval)
+      }
+      // Atualiza o cronômetro a cada segundo se estiver em execução
+      t.idInterval = workerTimer.setInterval(() => {
+        if (t.wait_destroy) {
+          t.stopInterval()
+          return
+        }
+        t.countInterval += 1
+        if (t.countInterval >= t.syncInterval) {
+          t.countInterval = 0
+          t.getCronometro()
+          return
+        }
+        if (t.cronometro && t.cronometro.state === 'running') {
+          t.cronometro.elapsed_time = t.cronometro.elapsed_time + 1
+          t.cronometro.remaining_time = t.cronometro.remaining_time - 1
+          t.cronometro.accumulated_time = t.cronometro.accumulated_time + 1
+        } else if (t.cronometro && t.cronometro.state === 'paused') {
+          t.cronometro.last_paused_time = t.cronometro.last_paused_time + 1
+        }
+      }, 1000)
     },
     handleWebSocketMessageLocal (message) {
       // console.log('CRONÔMETRO: Mensagem recebida do WebSocket.')
@@ -169,60 +297,82 @@ export default {
       }
     },
     addTime (seconds) {
-      this.sendSyncMessage({
-        type: 'command',
-        command: 'add_time',
-        app: 'painelset',
-        model: 'cronometro',
-        params: {
-          id: this.cronometro_id,
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'add_time',
+          cronometro_id: this.cronometro.id,
           seconds: seconds
-        }
-      })
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando add_time:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     startCronometro () {
-      this.sendSyncMessage({
-        type: 'command',
-        command: 'start',
-        app: 'painelset',
-        model: 'cronometro',
-        params: {
-          id: this.cronometro_id
-        }
-      })
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'start',
+          cronometro_id: this.cronometro_id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando start:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     pauseCronometro () {
-      this.sendSyncMessage({
-        type: 'command',
-        command: 'pause',
-        app: 'painelset',
-        model: 'cronometro',
-        params: {
-          id: this.cronometro_id
-        }
-      })
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'pause',
+          cronometro_id: this.cronometro.id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando pause:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     resumeCronometro () {
-      this.sendSyncMessage({
-        type: 'command',
-        command: 'resume',
-        app: 'painelset',
-        model: 'cronometro',
-        params: {
-          id: this.cronometro_id
-        }
-      })
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'resume',
+          cronometro_id: this.cronometro.id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando resume:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     stopCronometro () {
-      this.sendSyncMessage({
-        type: 'command',
-        command: 'stop',
-        app: 'painelset',
-        model: 'cronometro',
-        params: {
-          id: this.cronometro_id
+      try {
+        this.wsSocket.send(JSON.stringify({
+          command: 'stop',
+          cronometro_id: this.cronometro.id
+        }))
+      } catch (error) {
+        console.error('Erro ao enviar comando stop:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
+    },
+    getCronometro () {
+      console.log(this.cronometro_id, 'Buscando estado atual do cronômetro no servidor...')
+      try {
+        if (!this.wsSocket) {
+          this.ws_client_cronometro()
+        } else {
+          this.wsSocket.send(JSON.stringify({
+            command: 'get',
+            cronometro_id: this.cronometro_id
+          }))
         }
-      })
+      } catch (error) {
+        console.error('Erro ao enviar comando get:', error)
+        this.wsSocket = null
+        this.ws_client_cronometro()
+      }
     },
     secondsToTime: function (cronometro, timeKey, alternativeKey) {
       /* if (cronometro.id === 47) {
@@ -269,13 +419,6 @@ export default {
     }
   },
   computed: {
-    ...Vuex.mapState('store__sync', ['data_cache']),
-    cronometro: function () {
-      if (this.data_cache?.painelset_cronometro) {
-        return Object.values(this.data_cache.painelset_cronometro).find(i => i.id === this.cronometro_id)
-      }
-      return null
-    },
     displayTime: function () {
       if (this.display === 'elapsed') {
         return this.elapsedTime

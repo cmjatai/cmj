@@ -19,7 +19,7 @@
           <div class="info">
             <div class="name">{{ individuo.nome }}</div>
             <div class="timer mt-1" v-if="individuo.cronometro">
-              <cronometro-base
+              <cronometro-base-old
                 :cronometro_id="individuo.cronometro"
                 :key="`cronometro-popover-${individuo.cronometro}`"
                 :ref="`cronometro-popover-${individuo.cronometro}`"
@@ -29,7 +29,7 @@
                 :display_format="'mm:ss'"
                 :display_size="'2em'"
                 :controls="[]"
-              ></cronometro-base>
+              ></cronometro-base-old>
             </div>
           </div>
           <div class="foto me-2"
@@ -45,12 +45,12 @@
 </template>
 <script>
 import { mapState } from 'vuex'
-import CronometroBase from '../../components/cronometros/CronometroBase.vue'
+import CronometroBaseOld from '../../components/cronometros/CronometroBaseOld.vue'
 
 export default {
   name: 'popover-palavra',
   components: {
-    CronometroBase
+    CronometroBaseOld
   },
   data () {
     return {

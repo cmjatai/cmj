@@ -6,7 +6,7 @@ class WebSocketManager {
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 10
     this.reconnectInterval = 1000
-    this.heartbeatInterval = 60000
+    this.heartbeatInterval = 5000
     this.heartbeatTimer = null
     this.listeners = new Map()
 
@@ -29,21 +29,21 @@ class WebSocketManager {
       // Responder pings automaticamente
       if (data.type === 'ping') {
         const now = Date.now() / 1000
-        this.send({ type: 'pong', timestamp: now })
+        this.send({ type: 'pong', timestamp_client: now })
         return
       } else if (data.type === 'pong') {
-        let now = Date.now() / 1000 // em segundos
-        now = {
-          now,
-          'Client timestamp': data.client_timestamp,
-          'Server timestamp': data.timestamp,
-          'Latency up': data.timestamp - data.client_timestamp,
-          'Latency down': now - data.timestamp,
-          'Latency': (data.timestamp - data.client_timestamp) + (now.now - data.timestamp)
+        let pong_now = performance.now() // Date.now() / 1000 // em segundos
+        const now = {
+          type: 'pong',
+          // pong: pong_now,
+          // ping: data.ping_now,
+          timestamp_client: data.timestamp_client,
+          timestamp_server: data.timestamp_server,
+          // latency: pong_now - data.ping_now,
+          server_time_diff: data.timestamp_server - data.timestamp_client - (pong_now - data.ping_now) / 1000
         }
-        console.log(now)
-        console.log('Pong recebido do servidor:', now)
-        this.emit('message', data)
+        // console.log('Pong recebido do servidor:', now)
+        this.emit('message', now)
         return
       }
       this.emit('message', data)
@@ -79,7 +79,7 @@ class WebSocketManager {
     this.heartbeatTimer = setInterval(() => {
       if (this.ws.readyState === WebSocket.OPEN) {
         const now = Date.now() / 1000
-        this.send({ type: 'ping', timestamp: now })
+        this.send({ type: 'ping', timestamp_client: now, ping_now: performance.now() })
       }
     }, this.heartbeatInterval)
   }

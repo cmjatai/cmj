@@ -2,7 +2,9 @@ import json
 import time
 
 from channels.generic.websocket import AsyncWebsocketConsumer
+from click import command
 from django.utils import timezone
+from channels.db import database_sync_to_async
 
 
 class TimeRefreshConsumer(AsyncWebsocketConsumer):
@@ -36,13 +38,13 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
         jdata = json.loads(text_data)
 
         type_msg = jdata.get('type', '')
-        timestamp = jdata.get('timestamp', '')
+        timestamp = jdata.get('timestamp_client', '')
 
         if type_msg == 'ping' and timestamp:
             await self.send(text_data=json.dumps({
                 'type': 'pong',
-                'timestamp': time.time(), # timezone.now().timestamp(),
-                'client_timestamp': timestamp
+                'timestamp_server': time.time() + 40, # timezone.now().timestamp(),
+                'timestamp_client': timestamp
             }))
 
     # Receive message from room group
@@ -79,13 +81,20 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
 
 class SyncConsumer(AsyncWebsocketConsumer):
 
+    def __init__(self, *args, **kwargs):
+        from cmj.painelset.cronometro_manager import CronometroManager
+        from sapl.api.permissions import portalcmj_rpp
+
+        super().__init__(*args, **kwargs)
+
+        self.portalcmj_rpp = portalcmj_rpp
+        self.cronometro_manager = CronometroManager()
+
     async def connect(self):
         #print('Conectando ao SyncConsumer')
         self.room_name = 'sync_channel'
         self.room_group_name = 'group_%s' % self.room_name
 
-        from sapl.api.permissions import portalcmj_rpp
-        self.portalcmj_rpp = portalcmj_rpp
 
         # Join room group
         await self.channel_layer.group_add(
@@ -107,15 +116,82 @@ class SyncConsumer(AsyncWebsocketConsumer):
         jdata = json.loads(text_data)
 
         type_msg = jdata.get('type', '')
-        timestamp = jdata.get('timestamp', '')
 
-        if type_msg == 'ping' and timestamp:
+        if type_msg == 'ping':
+            timestamp = jdata.get('timestamp_client', '')
+            ping_now = jdata.get('ping_now', '')
             await self.send(text_data=json.dumps({
                 'type': 'pong',
-                'timestamp':  time.time(), #timezone.now().timestamp(),
-                'client_timestamp': timestamp
+                'timestamp_server': time.time(), # timezone.now().timestamp(),
+                'timestamp_client': timestamp,
+                'ping_now': ping_now
             }))
+            return
 
+        if type_msg == 'command':
+            command = jdata.get('command', '')
+            app = jdata.get('app', '')
+            model = jdata.get('model', '')
+            params = jdata.get('params', {})
+            user = self.scope.get('user')
+
+            if app == 'painelset' and model == 'cronometro':
+
+                if not command:
+                    await self.send(text_data=json.dumps({
+                        'type': 'command_result',
+                        'command': command,
+                        'error': 'Comando não especificado'
+                    }))
+                    return
+
+                if not user.has_perm('painelset.change_cronometro'):
+                    await self.send(text_data=json.dumps({
+                        'type': 'command_result',
+                        'command': command,
+                        'error': 'Usuário não autenticado'
+                    }))
+                    return
+
+                if command in ['start', 'pause', 'resume', 'stop', 'add_time']:
+                    cronometro_id = params.get('id')
+                    seconds = params.get('seconds', 0)
+                    if not cronometro_id:
+                        await self.send(text_data=json.dumps({
+                            'type': 'command_result',
+                            'command': command,
+                            'error': 'ID do cronômetro não especificado'
+                        }))
+                        return
+
+                    cronometro_manager = getattr(self.cronometro_manager, f'{command}_cronometro', None)
+                    if not cronometro_manager:
+                        await self.send(text_data=json.dumps({
+                            'type': 'command_result',
+                            'command': command,
+                            'error': f'Comando inválido: {command}'
+                        }))
+                        return
+
+                    result = await database_sync_to_async(
+                        cronometro_manager
+                    )(cronometro_id, seconds=seconds if command == 'add_time' else None)
+
+                    #await self.send(text_data=json.dumps({
+                    #    'type': 'command_result',
+                    #    'command': command,
+                    #    'result': result
+                    #}))
+
+                cronometro_manager = getattr(self.cronometro_manager, f'{command}_cronometro', None)
+
+    async def command_result(self, event):
+        """Enviar resultado do comando para o cliente"""
+        await self.send(text_data=json.dumps({
+            'type': 'command_result',
+            'command': event['command'],
+            'result': event['result']
+        }))
 
     # Receive message from room group
     async def sync(self, event):
