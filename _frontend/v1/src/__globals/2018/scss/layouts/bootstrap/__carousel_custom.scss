@@ -45,11 +45,11 @@
       margin-top: 11px;
 
       &.active {
-        background-color: $color_text_title;
+        background-color: $bg_color_thematic;
       }
 
       &:hover {
-        background-color: rgba($color_text_title, 0.7);
+        background-color: rgba($bg_color_thematic, 0.7);
       }
     }
 
