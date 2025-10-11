@@ -52,7 +52,7 @@ class CronometroManager:
         self.notify_observers(cronometro, 'created')
         return {"success": True, "cronometro_id": cronometro.id}
 
-    def start_cronometro(self, cronometro_id, parent_id=None, duration=None):
+    def start_cronometro(self, cronometro_id, parent_id=None, duration=None, **kwargs):
         """Inicia um cronômetro usando Command Pattern"""
         command = StartCronometroCommand(cronometro_id, parent_id=parent_id, duration=duration)
         result = command.execute()
@@ -62,7 +62,7 @@ class CronometroManager:
 
         return result
 
-    def pause_cronometro(self, cronometro_id):
+    def pause_cronometro(self, cronometro_id, **kwargs):
         """Pausa um cronômetro"""
         command = PauseCronometroCommand(cronometro_id)
         result = command.execute()
@@ -72,7 +72,7 @@ class CronometroManager:
 
         return result
 
-    def resume_cronometro(self, cronometro_id):
+    def resume_cronometro(self, cronometro_id, **kwargs):
         """Retoma um cronômetro pausado"""
         command = ResumeCronometroCommand(cronometro_id)
         result = command.execute()
@@ -82,7 +82,7 @@ class CronometroManager:
 
         return result
 
-    def stop_cronometro(self, cronometro_id):
+    def stop_cronometro(self, cronometro_id, **kwargs):
         """Para um cronômetro"""
         command = StopCronometroCommand(cronometro_id)
         result = command.execute()
@@ -92,7 +92,7 @@ class CronometroManager:
 
         return result
 
-    def add_time(self, cronometro_id, seconds):
+    def add_time(self, cronometro_id, seconds=0, **kwargs):
         command = AddTimeCronometroCommand(cronometro_id, seconds)
         result = command.execute()
 

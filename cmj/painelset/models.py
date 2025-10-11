@@ -140,6 +140,15 @@ class Cronometro(models.Model):
         #return max(timedelta(), self.duration - elapsed)
         return self.duration - elapsed
 
+    @property
+    def started_time(self):
+        """Retorna o timestamp de início"""
+        return self.started_at.timestamp() if self.started_at else None
+    @property
+    def paused_time(self):
+        """Retorna o timestamp de pausa"""
+        return self.paused_at.timestamp() if self.paused_at else None
+
     def ws_serialize(self):
         from cmj.api.serializers_painelset import CronometroSerializer
         return CronometroSerializer(self).data

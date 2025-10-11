@@ -25,6 +25,8 @@ class CronometroSerializer(SaplSerializerMixin):
     duration = SecondDurationField()
     last_paused_time = SecondDurationField()
     accumulated_time = SecondDurationField()
+    started_time = serializers.FloatField(read_only=True)
+    paused_time = serializers.FloatField(read_only=True)
     #children_count = serializers.SerializerMethodField()
 
     class Meta(SaplSerializerMixin.Meta):

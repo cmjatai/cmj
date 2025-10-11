@@ -19,9 +19,7 @@ const syncStore = {
       state.wsConnected = status
     },
     SET_LAST_SERVER_SYNC (state, timestamp) {
-      if (state.lastServerSync === null || timestamp > state.lastServerSync) {
-        state.lastServerSync = timestamp
-      }
+      state.lastServerSync = timestamp
     },
     UPDATE_MODEL (state, app_models) {
       if (!state.models[app_models.app]) {
@@ -68,21 +66,31 @@ const syncStore = {
           dispatch('handleSyncMessage', data)
         } else if (data.type === 'pong') {
           // atualizar lastServerSync com o timestamp do servidor
-          commit('SET_LAST_SERVER_SYNC', data.timestamp)
+          commit('SET_LAST_SERVER_SYNC', data)
         }
       })
       commit('SET_WS_MANAGER', wsManager)
     },
-
-    handleSyncMessage ({ commit, state }, data) {
+    sendSyncMessage ({ state }, message) {
+      if (state.wsManager && state.wsConnected) {
+        state.wsManager.send(message)
+      } else {
+        console.warn('WebSocket não conectado. Mensagem não enviada:', message)
+      }
+    },
+    handleSyncMessage ({ commit, dispatch }, data) {
       const { app, model, action, instance, timestamp } = data
       const uri = `${app}_${model}`
       const inst = { ...(instance || {}), timestamp_frontend: timestamp }
       if (action === 'post_delete') {
         commit('DELETE_DATA_CACHE', { key: uri, value: inst })
       } else {
-        commit('SET_LAST_SERVER_SYNC', timestamp)
         commit('UPDATE_DATA_CACHE', { key: uri, value: inst })
+
+        // Iniciar cronometro local se for painelset_cronometro e state for 'running'
+        if (uri === 'painelset_cronometro' && (inst.state === 'running' || inst.state === 'paused')) {
+          dispatch('startLocalCronometro', inst.id)
+        }
       }
     },
     registerModels ({ commit }, app_models) {
@@ -93,7 +101,34 @@ const syncStore = {
     },
     stopTimer ({ state }, timerId) {
       TimerWorkerService.stopTimer(timerId)
+    },
+    startLocalCronometro ({ state, commit }, cronometroId) {
+      TimerWorkerService.startTimer(cronometroId, (timestamp) => {
+        // console.log('TIMER', cronometroId, timestamp)
+        const cronometro = state.data_cache.painelset_cronometro[cronometroId]
+        const lastServerSync = state.lastServerSync
+        const server_time_diff = lastServerSync ? lastServerSync.server_time_diff : 0
+        // Atualizar cronometro localmente
+        if (cronometro && cronometro.state === 'running') {
+          const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
+          cronometro.elapsed_time = elapsed_time
+          const remaining_time = cronometro.duration - elapsed_time
+          cronometro.remaining_time = remaining_time > 0 ? remaining_time : 0
+          commit('UPDATE_DATA_CACHE', { key: 'painelset_cronometro', value: cronometro })
+        } else if (cronometro && cronometro.state === 'paused') {
+          const last_paused_time = (timestamp / 1000) - cronometro.paused_time + server_time_diff + cronometro.accumulated_time
+          cronometro.last_paused_time = last_paused_time
+          commit('UPDATE_DATA_CACHE', { key: 'painelset_cronometro', value: cronometro })
+        } else {
+          // Parar timer se cronometro não estiver mais 'running' ou 'paused'
+          TimerWorkerService.stopTimer(cronometroId)
+        }
+      }, 500)
+    },
+    stopLocalCronometro ({ state }, cronometroId) {
+      TimerWorkerService.stopTimer(cronometroId)
     }
+
   }
 }
 
