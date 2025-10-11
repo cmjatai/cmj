@@ -138,36 +138,6 @@ export default {
       }
       this.display = display
     },
-    handleWebSocketMessageLocal (message) {
-      // console.log('CRONÔMETRO: Mensagem recebida do WebSocket.')
-      const data = JSON.parse(message.data)
-      if (
-        data.type === 'command_result' &&
-        data.result && data.result.cronometro &&
-        data.result.cronometro.id === this.cronometro_id
-      ) {
-        this.instance = data.result.cronometro
-        this.cronometro = this.instance
-        this.$emit(`cronometro_${data.command}`, this.cronometro)
-        // console.log('command:', data.command, 'cronometro:', this.cronometro)
-        if (data.command === 'start') {
-          this.display = this.display_initial
-          console.log('Cronômetro iniciado:', data)
-        } else if (data.command === 'pause') {
-          this.display = 'last_paused'
-          console.log('Cronômetro pausado:', data)
-        } else if (data.command === 'stop') {
-          this.display = 'elapsed'
-          console.log('Cronômetro parado:', data)
-        } else if (data.command === 'resume') {
-          this.display = this.display_initial
-          console.log('Cronômetro retomado:', data)
-        } else if (data.command === 'get') {
-          // console.log('Estado do cronômetro atualizado:', data)
-        }
-        this.runInterval()
-      }
-    },
     addTime (seconds) {
       this.sendSyncMessage({
         type: 'command',
@@ -190,6 +160,7 @@ export default {
           id: this.cronometro_id
         }
       })
+      this.display = this.display_initial
     },
     pauseCronometro () {
       this.sendSyncMessage({
@@ -201,6 +172,7 @@ export default {
           id: this.cronometro_id
         }
       })
+      this.display = 'last_paused'
     },
     resumeCronometro () {
       this.sendSyncMessage({
@@ -212,6 +184,7 @@ export default {
           id: this.cronometro_id
         }
       })
+      this.display = this.display_initial
     },
     stopCronometro () {
       this.sendSyncMessage({
@@ -223,6 +196,7 @@ export default {
           id: this.cronometro_id
         }
       })
+      this.display = 'elapsed'
     },
     secondsToTime: function (cronometro, timeKey, alternativeKey) {
       /* if (cronometro.id === 47) {

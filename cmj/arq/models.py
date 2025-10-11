@@ -9,9 +9,9 @@ import shutil
 from unipath import Path
 
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.fields.json import JSONField
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE
-from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from cmj.mixins import CmjAuditoriaModelMixin, CommonMixin

@@ -164,8 +164,8 @@ class SyncConsumer(AsyncWebsocketConsumer):
                         }))
                         return
 
-                    cronometro_manager = getattr(self.cronometro_manager, f'{command}_cronometro', None)
-                    if not cronometro_manager:
+                    command_manager = getattr(self.cronometro_manager, f'{command}_cronometro', None)
+                    if not command_manager:
                         await self.send(text_data=json.dumps({
                             'type': 'command_result',
                             'command': command,
@@ -174,7 +174,7 @@ class SyncConsumer(AsyncWebsocketConsumer):
                         return
 
                     result = await database_sync_to_async(
-                        cronometro_manager
+                        command_manager
                     )(cronometro_id, seconds=seconds if command == 'add_time' else None)
 
                     #await self.send(text_data=json.dumps({
@@ -183,7 +183,6 @@ class SyncConsumer(AsyncWebsocketConsumer):
                     #    'result': result
                     #}))
 
-                cronometro_manager = getattr(self.cronometro_manager, f'{command}_cronometro', None)
 
     async def command_result(self, event):
         """Enviar resultado do comando para o cliente"""

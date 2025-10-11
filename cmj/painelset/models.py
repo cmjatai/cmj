@@ -5,6 +5,10 @@ from django.utils import timezone
 from django.core.validators import RegexValidator
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericRelation
+from django.utils.translation import gettext_lazy as _
+
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.fields.json import JSONField
 
 from sapl.utils import SaplGenericForeignKey
 
@@ -172,6 +176,10 @@ class CronometroEvent(models.Model):
                                           null=True, blank=True,
                                           related_name='triggered_events',
                                           help_text="Cronômetro filho que causou este evento")
+
+    metadata = JSONField(
+        verbose_name=_('Metadados'),
+        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     class Meta:
         verbose_name = "Evento de Cronômetro"

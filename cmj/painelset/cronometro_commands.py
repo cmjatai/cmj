@@ -164,7 +164,11 @@ class AddTimeCronometroCommand(CronometroCommand):
         CronometroEvent.objects.create(
             cronometro=self.cronometro,
             event_type='time_added',
-            details={'seconds_added': self.seconds}
+            metadata={
+                'extra_fields': {
+                    'seconds_added': self.seconds
+                }
+            }
         )
 
         return {"success": True, "message": f"{self.seconds} segundos adicionados ao cronômetro"}

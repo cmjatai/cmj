@@ -270,6 +270,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
             inst._meta.label in (
                 'painelset.Individuo',
                 'painelset.Cronometro',
+                'painelset.CronometroEvent'
             )
         ):
 
@@ -286,32 +287,38 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
 
             channel_layer = get_channel_layer()
 
-            async_to_sync(channel_layer.group_send)(
-                "group_sync_channel", {
-                    "type": "sync",
-                    'action': action,
-                    'id': inst.id,
-                    'app': inst._meta.app_label,
-                    'model': inst._meta.model_name,
-                    'created': created,
-                    'instance': inst_serialize,
-                    'timestamp': timezone.now().timestamp()
-                }
-            )
-
-            async_to_sync(channel_layer.group_send)(
-                "group_time_refresh_channel", {
-                    "type": "time_refresh.message",
-                    'message': {
+            if inst._meta.label in (
+                'painelset.Individuo',
+                'painelset.Cronometro',
+                'painelset.CronometroEvent'
+            ):
+                async_to_sync(channel_layer.group_send)(
+                    "group_sync_channel", {
+                        "type": "sync",
                         'action': action,
                         'id': inst.id,
                         'app': inst._meta.app_label,
                         'model': inst._meta.model_name,
                         'created': created,
-                        'instance': inst_serialize
+                        'instance': inst_serialize,
+                        'timestamp': timezone.now().timestamp()
                     }
-                }
-            )
+                )
+            else:
+                # deprecated canal, manter para compatibilidade, coverter para group_sync_channel
+                async_to_sync(channel_layer.group_send)(
+                    "group_time_refresh_channel", {
+                        "type": "time_refresh.message",
+                        'message': {
+                            'action': action,
+                            'id': inst.id,
+                            'app': inst._meta.app_label,
+                            'model': inst._meta.model_name,
+                            'created': created,
+                            'instance': inst_serialize
+                        }
+                    }
+                )
 
         except Exception as e:
             logger.error(_("Erro na comunicação com o backend do redis. "

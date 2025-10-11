@@ -112,8 +112,7 @@ const syncStore = {
         if (cronometro && cronometro.state === 'running') {
           const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
-          const remaining_time = cronometro.duration - elapsed_time
-          cronometro.remaining_time = remaining_time > 0 ? remaining_time : 0
+          cronometro.remaining_time = cronometro.duration - elapsed_time
           commit('UPDATE_DATA_CACHE', { key: 'painelset_cronometro', value: cronometro })
         } else if (cronometro && cronometro.state === 'paused') {
           const last_paused_time = (timestamp / 1000) - cronometro.paused_time + server_time_diff + cronometro.accumulated_time
