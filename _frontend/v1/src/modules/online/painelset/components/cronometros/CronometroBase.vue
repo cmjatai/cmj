@@ -161,6 +161,7 @@ export default {
         }
       })
       this.display = this.display_initial
+      this.$emit('cronometro_start')
     },
     pauseCronometro () {
       this.sendSyncMessage({
@@ -173,6 +174,7 @@ export default {
         }
       })
       this.display = 'last_paused'
+      this.$emit('cronometro_pause')
     },
     resumeCronometro () {
       this.sendSyncMessage({
@@ -185,6 +187,7 @@ export default {
         }
       })
       this.display = this.display_initial
+      this.$emit('cronometro_resume')
     },
     stopCronometro () {
       this.sendSyncMessage({

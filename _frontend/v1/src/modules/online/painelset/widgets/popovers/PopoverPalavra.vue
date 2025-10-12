@@ -19,7 +19,7 @@
           <div class="info">
             <div class="name">{{ individuo.nome }}</div>
             <div class="timer mt-1" v-if="individuo.cronometro">
-              <cronometro-base-old
+              <cronometro-base
                 :cronometro_id="individuo.cronometro"
                 :key="`cronometro-popover-${individuo.cronometro}`"
                 :ref="`cronometro-popover-${individuo.cronometro}`"
@@ -29,7 +29,7 @@
                 :display_format="'mm:ss'"
                 :display_size="'2em'"
                 :controls="[]"
-              ></cronometro-base-old>
+              ></cronometro-base>
             </div>
           </div>
           <div class="foto me-2"
@@ -44,12 +44,12 @@
   </div>
 </template>
 <script>
-import CronometroBaseOld from '../../components/cronometros/CronometroBaseOld.vue'
+import CronometroBase from '../../components/cronometros/CronometroBase.vue'
 
 export default {
   name: 'popover-palavra',
   components: {
-    CronometroBaseOld
+    CronometroBase
   },
   data () {
     return {
@@ -81,6 +81,12 @@ export default {
       return individuos
     }
   },
+  mounted () {
+    this.registerModels({
+      app: 'painelset',
+      models: ['individuo', 'cronometro']
+    })
+  },
   methods: {
     fotografiaParlamentarUrl (parlamentar) {
       if (parlamentar) {
@@ -93,6 +99,18 @@ export default {
 
       const popover = this.$el
       const rect = popover.getBoundingClientRect()
+
+      // se for touch, detectar dois toques e alterar fontSize de acordo com a distancia.
+      if (event.touches && event.touches.length > 1) {
+        event.preventDefault() // prevent scrolling
+        const distance = Math.hypot(
+          event.touches[0].clientX - event.touches[1].clientX,
+          event.touches[0].clientY - event.touches[1].clientY
+        )
+        const newFontSize = Math.min(Math.max(distance / 10, 10), 100) // constrain between 10px and 60px
+        popover.style.fontSize = `${newFontSize}px`
+        return
+      }
 
       // Get pointer position (mouse or touch)
       const clientX = event.touches ? event.touches[0].clientX : event.clientX

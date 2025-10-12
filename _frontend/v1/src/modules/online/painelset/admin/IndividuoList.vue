@@ -126,11 +126,12 @@ export default {
     })
   },
   methods: {
-    toggleAllMicrofones () {
+    toggleAllMicrofones (inclui_microfone_sempre_ativo = true) {
       const t = this
       t.status_microfone = !t.status_microfone
       const query_params = [
-        `status_microfone=${t.status_microfone ? 'on' : 'off'}`
+        `status_microfone=${t.status_microfone ? 'on' : 'off'}`,
+        `inclui_microfone_sempre_ativo=${inclui_microfone_sempre_ativo ? 'on' : 'off'}`
       ]
       t
         .utils.getModelAction(

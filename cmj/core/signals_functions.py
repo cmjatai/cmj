@@ -55,8 +55,8 @@ def auditlog_signal_function(sender, **kwargs):
     ):
         return
 
-    if settings.DEBUG:
-        logger.debug(f'START')
+    #if settings.DEBUG:
+    #    logger.debug(f'START')
     u = None
     stack = ''
     for i in inspect.stack():
@@ -99,8 +99,8 @@ def auditlog_signal_function(sender, **kwargs):
 
         al.save()
 
-        if settings.DEBUG:
-            logger.debug(f'END')
+        #if settings.DEBUG:
+        #    logger.debug(f'END')
 
     except Exception as e:
         logger.error('Error saving auditing log object')
@@ -178,8 +178,8 @@ def redesocial_post_function(sender, instance, **kwargs):
     if hasattr(instance, 'parent') and instance.parent:
         return
 
-    if settings.DEBUG:
-        logger.debug(f'START redesocial_post_signal {timezone.localtime()}')
+    #if settings.DEBUG:
+    #    logger.debug(f'START redesocial_post_signal {timezone.localtime()}')
 
     running = {
         'MateriaLegislativa': {

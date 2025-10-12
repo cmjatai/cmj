@@ -11,7 +11,7 @@
           </div>
         </div>
         <div class="col-auto">
-          <cronometro-global
+          <cronometro-base
             v-if="cronometro"
             :cronometro_id="cronometro.id"
             css_class_controls="hover"
@@ -20,15 +20,15 @@
             @cronometro_start="startEvento()"
             @cronometro_pause="pauseEvento()"
             @cronometro_resume="resumeEvento()"
-            ></cronometro-global>
+            ></cronometro-base>
         </div>
       </div>
       <div class="row">
         <div class="col-4 container-individuos">
-          <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'" @onload="onIndividuoListLoad()" :pause_parent_on_start="cronometro && cronometro.pause_parent_on_start"></individuo-list>
+          <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'" :pause_parent_on_start="cronometro && cronometro.pause_parent_on_start"></individuo-list>
         </div>
         <div class="col-8 container-controls">
-          <palavra-em-uso v-if="individuoListLoaded"></palavra-em-uso>
+          <palavra-em-uso v-if="evento" :evento="evento" :ref="'palavraEmUso'"></palavra-em-uso>
         </div>
       </div>
     </div>
@@ -36,20 +36,19 @@
 </template>
 
 <script>
-import CronometroGlobal from '../components/cronometros/CronometroGlobal.vue'
+import CronometroBase from '../components/cronometros/CronometroBase.vue'
 import IndividuoList from './IndividuoList.vue'
 import PalavraEmUso from './PalavraEmUso.vue'
 export default {
   name: 'painelset-admin',
   components: {
-    CronometroGlobal,
+    CronometroBase,
     IndividuoList,
     PalavraEmUso
   },
   data () {
     return {
-      evento_id: Number(this.$route.params.id),
-      individuoListLoaded: false
+      evento_id: Number(this.$route.params.id)
     }
   },
   computed: {
@@ -87,9 +86,6 @@ export default {
     })
   },
   methods: {
-    onIndividuoListLoad: function () {
-      this.individuoListLoaded = true
-    },
     resumeEvento () {
       this.$refs.individuoList.status_microfone = 0
       this.$refs.individuoList.toggleAllMicrofones()
@@ -98,7 +94,6 @@ export default {
       this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
         .then(response => {
           console.log('start response', response)
-          this.cronometro = response.data
         })
         .catch(error => {
           console.error('start error', error)
@@ -106,7 +101,7 @@ export default {
     },
     pauseEvento () {
       this.$refs.individuoList.status_microfone = 1
-      this.$refs.individuoList.toggleAllMicrofones()
+      this.$refs.individuoList.toggleAllMicrofones(false)
     }
   }
 }

@@ -1,5 +1,6 @@
 from datetime import timedelta
 import logging
+from time import sleep
 
 from django.apps.registry import apps
 from django.conf import settings
@@ -13,7 +14,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.permissions import BasePermission
-from rest_framework import viewsets, status
+from rest_framework import status
 
 from pythonosc import udp_client
 
@@ -41,6 +42,7 @@ class _EventoViewSet:
     def start(self, request, pk=None):
         print('Acessando cronômetro do evento:', pk)
         evento = self.get_object()
+        sleep(2)
         cronometro, created = evento.get_or_create_unique_cronometro()
         if cronometro:
             if not evento.start_real and cronometro.started_at and not cronometro.finished_at:
@@ -49,21 +51,34 @@ class _EventoViewSet:
             if not evento.end_real and cronometro.finished_at:
                 evento.end_real = cronometro.finished_at
                 evento.save(update_fields=['end_real'])
+
             return Response(CronometroTreeSerializer(cronometro).data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
 
     @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def toggle_microfones(self, request, *args, **kwargs):
         status_microfone = request.GET.get('status_microfone', 'on')
+        inclui_microfone_sempre_ativo = request.GET.get('inclui_microfone_sempre_ativo', 'off')
+        if inclui_microfone_sempre_ativo not in ['on', 'off']:
+            inclui_microfone_sempre_ativo = 'off'
+        if status_microfone not in ['on', 'off']:
+            status_microfone = 'off'
         evento = self.get_object()
         print(f'Toggle microfones do evento {evento} para {status_microfone}')
 
         for individuo in evento.individuos.all():
+            if individuo.microfone_sempre_ativo and inclui_microfone_sempre_ativo == 'off':
+                print(f'  Individuo {individuo} tem microfone sempre ativo, pulando')
+                continue
             print(f'  Toggle microfone {individuo} para {status_microfone}')
             individuo.status_microfone = status_microfone == 'on'
-            individuo.com_a_palavra = status_microfone == 'on' and individuo.com_a_palavra
-            update_fields = ['status_microfone', 'com_a_palavra']
+            individuo.com_a_palavra = False
+            individuo.aparteante = None
+            update_fields = ['status_microfone', 'com_a_palavra', 'aparteante']
             individuo.save(update_fields=update_fields)
+            if status_microfone == 'off':
+                cron, created = individuo.get_or_create_unique_cronometro()
+                cronometro_manager.stop_cronometro(cron.id)
 
         if SEND_MESSAGE_MICROPHONE or not settings.DEBUG:
             clients = {}
@@ -170,8 +185,6 @@ class _IndividuoViewSet:
             raise DRFValidationError('A palavra não está sendo utilizada. Não é possível fazer aparte.')
         else:
 
-            antigoAparteante = individuoComPalavra.aparteante
-
             if individuoComPalavra.id == individuoAparteante.id:
                 # Ele mesmo está com a palavra, nada a fazer
                 print(f'  Indivíduo {individuoAparteante} já está com a palavra, nada a fazer')
@@ -180,6 +193,17 @@ class _IndividuoViewSet:
                      'individuo': individuoAparteante.id
                      })
             else:
+                antigoAparteante = individuoComPalavra.aparteante
+
+                if antigoAparteante:
+                    individuoComPalavra.aparteante = None
+                    individuoComPalavra.save(update_fields=['aparteante'])
+                    cron, created = antigoAparteante.get_or_create_unique_cronometro()
+                    cron.parent = None
+                    cron.save()
+                    antigoAparteante.save()
+                    cronometro_manager.stop_cronometro(cron.id)
+
                 cronAparteante, created = individuoAparteante.get_or_create_unique_cronometro()
                 cronAparteado, created = individuoComPalavra.get_or_create_unique_cronometro()
 
@@ -202,19 +226,10 @@ class _IndividuoViewSet:
                     # Iniciar cronômetro do aparteante não é necessário, pois ele é CronometroPalavra chama ele como auto_start
                     # cronometro_manager.start_cronometro(cronAparteante.id, cronAparteado.id, duration=default_timer)
 
-                    if antigoAparteante:
-                        antigoAparteante.refresh_from_db()
-                        cron, created = antigoAparteante.get_or_create_unique_cronometro()
-                        cron.parent = None
-                        cron.save()
-                        antigoAparteante.save()
-                        cronometro_manager.stop_cronometro(cron.id)
-
         return Response(
             {'status': 'ok',
              'individuo': individuoAparteante.id
              })
-
 
     @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def toggle_microfone(self, request, *args, **kwargs):
@@ -291,8 +306,8 @@ class _IndividuoViewSet:
 
         cron, created = individuo.get_or_create_unique_cronometro()
         if individuo.com_a_palavra:
-            cronometro_manager.start_cronometro(cron.id, duration=default_timer)
             individuo.save()
+            cronometro_manager.start_cronometro(cron.id, duration=default_timer)
         else:
             individuo.save()
             if hasattr(individuo, 'aparteado') and individuo.aparteado:

@@ -177,7 +177,7 @@ const syncStore = {
           // Parar timer se cronometro não estiver mais 'running' ou 'paused'
           TimerWorkerService.stopTimer(cronometroId)
         }
-      }, 1000)
+      }, 500)
     },
     stopLocalCronometro ({ state }, cronometroId) {
       TimerWorkerService.stopTimer(cronometroId)

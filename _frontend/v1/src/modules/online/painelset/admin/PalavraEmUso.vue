@@ -1,13 +1,13 @@
 <template>
   <div class="palavraemuso-component">
     <div :class="['individuo-com-a-palavra', ]"
-      v-if="instance"
-      :key="`individuo-com-a-palavra-${instance.id}`"
-      :ref="`individuo-com-a-palavra-${instance.id}`">
+      v-if="individuo"
+      :key="`individuo-com-a-palavra-${individuo.id}`"
+      :ref="`individuo-com-a-palavra-${individuo.id}`">
       <div class="inner-individuo">
         <div class="individuo-header">
           <div class="name">
-            {{ instance ? instance.name : 'Carregando indivíduo...' }}
+            {{ individuo ? individuo.name : 'Carregando indivíduo...' }}
           </div>
         </div>
       </div>
@@ -21,28 +21,27 @@
         <div class="divide"></div>
         <div class="cronometro">
           <div class="icon-status-microfone">
-            <i v-if="instance && instance.status_microfone" class="fas fa-microphone"></i>
+            <i v-if="individuo && individuo.status_microfone" class="fas fa-microphone"></i>
             <i v-else class="fas fa-microphone-slash"></i>
           </div>
           <cronometro-palavra
-            :key="`cronometro-com-a-palavra-${instance.cronometro}`"
-            :ref="`cronometro-com-a-palavra-${instance.cronometro}`"
-            :cronometro_id="instance.cronometro"
+            :key="`cronometro-com-a-palavra-${individuo.cronometro}`"
+            :ref="`cronometro-com-a-palavra-${individuo.cronometro}`"
+            :cronometro_id="individuo.cronometro"
             ></cronometro-palavra>
         </div>
       </div>
     </div>
     <individuo-aparteante
-      v-if="instance && instance.aparteante"
-      :individuo_id="instance.aparteante"
-      :key="`individuo-aparteante-${instance.aparteante}`"
-      :ref="`individuo-aparteante-${instance.aparteante}`"
+      v-if="individuo && individuo.aparteante"
+      :individuo_id="individuo.aparteante"
+      :key="`individuo-aparteante-${individuo.aparteante}`"
+      :ref="`individuo-aparteante-${individuo.aparteante}`"
       ></individuo-aparteante>
   </div>
 </template>
 <script>
-import Vuex from 'vuex'
-import CronometroPalavra from '../components/cronometros/CronometroPalavra.vue'
+import CronometroPalavra from './CronometroPalavra.vue'
 import IndividuoAparteante from './IndividuoAparteante.vue'
 export default {
   name: 'palavra-em-uso',
@@ -50,63 +49,30 @@ export default {
     CronometroPalavra,
     IndividuoAparteante
   },
+  props: {
+    evento: {
+      type: Object,
+      required: true
+    }
+  },
   data () {
     return {
-      init: false,
-      app: 'painelset',
-      model: 'individuo',
-      instance: null,
-      id: null
     }
   },
   computed: {
-    ...Vuex.mapGetters([
-      'getIndividuoComPalavra'
-    ]),
+    individuo: {
+      get () {
+        if (this.evento && this.data_cache?.painelset_individuo) {
+          return Object.values(this.data_cache.painelset_individuo).find(i => i.com_a_palavra && i.evento === this.evento.id) || null
+        }
+        return null
+      }
+    },
     fotografiaParlamentarUrl: function () {
-      if (this.instance && this.instance.parlamentar) {
-        return '/api/parlamentares/parlamentar/' + this.instance.parlamentar + '/fotografia.c96.png'
+      if (this.individuo && this.individuo.parlamentar) {
+        return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
       }
       return null
-    }
-  },
-  watch: {
-    getIndividuoComPalavra: function (newVal, oldVal) {
-      if (newVal !== oldVal) {
-        console.log('getIndividuoComPalavra mudou', newVal, oldVal)
-        this.instance = newVal
-        this.initCronometro = !newVal
-      }
-    }
-  },
-  mounted () {
-    console.log('PalavraEmUso mounted')
-    const t = this
-    t.init = true
-    t.$nextTick(() => {
-      t.instance = t.getIndividuoComPalavra
-      if (t.instance) {
-        t.id = t.instance.id
-      }
-    })
-  },
-  methods: {
-    fetch (metadata) {
-      const t = this
-      if (metadata && metadata.hasOwnProperty('instance') && metadata.instance && metadata.instance.com_a_palavra) {
-        t.instance = metadata.instance
-      } else {
-        t.instance = t.getIndividuoComPalavra
-      }
-      this
-        .refreshState(metadata)
-        .then((instance) => {
-          if (instance && instance.com_a_palavra) {
-            this.instance = instance
-          } else if (instance && this.instance && instance.id === this.instance.id && !instance.com_a_palavra) {
-            this.instance = null
-          }
-        })
     }
   }
 }

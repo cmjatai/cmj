@@ -1,9 +1,10 @@
 <template>
   <div :class="[
-    'individuo-base', status_microfone ? '' :  'muted',
+    'individuo-base',
+    individuo && individuo.status_microfone ? '' :  'muted',
     individuo && individuo.parlamentar ? 'parlamentar' : '',
-    com_a_palavra ? 'com-a-palavra' : (microfone_sempre_ativo ? 'always-on' : 'active'),
-    aparteante ? 'aparteante' : ''
+    individuo && individuo.com_a_palavra ? 'com-a-palavra' : (individuo && individuo.microfone_sempre_ativo ? 'always-on' : 'active'),
+    individuo && individuo.aparteado ? 'aparteante' : ''
     ]">
     <div class="inner">
       <div class="inner-individuo" @dblclick.stop="dblclickIndividuo($event)" @click.prevent="clickIndividuo($event)">
@@ -20,10 +21,10 @@
         <button
           v-if="individuo"
           class="btn-fone"
-          :title="status_microfone ? 'Ativar microfone' : 'Desativar microfone'"
+          :title="individuo && individuo.status_microfone ? 'Ativar microfone' : 'Desativar microfone'"
            @click="toggleMicrofone()"
         >
-          <i :class="status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
+          <i :class="individuo && individuo.status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
         </button>
         <button
           v-if="false && individuo"
@@ -74,20 +75,8 @@ export default {
       }
       return null
     },
-    status_microfone: function () {
-      return this.individuo && this.individuo.status_microfone
-    },
-    microfone_sempre_ativo: function () {
-      return this.individuo && this.individuo.microfone_sempre_ativo
-    },
-    com_a_palavra: function () {
-      return this.individuo && this.individuo.com_a_palavra
-    },
-    aparteante: function () {
-      return this.individuo && this.individuo.aparteado
-    },
     fotografiaParlamentarUrl: function () {
-      if (this.individuo && this.individuo.parlamentar) {
+      if (this.individuo?.parlamentar) {
         return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
       }
       return ''
@@ -101,9 +90,9 @@ export default {
       this.sendUpdate(
         'toggle_microfone',
         [
-          `status_microfone=${!this.status_microfone ? 'on' : 'off'}`,
+          `status_microfone=${!this.individuo?.status_microfone ? 'on' : 'off'}`,
           `default_timer=${this.default_timer}`,
-          `com_a_palavra=${this.com_a_palavra ? 1 : 0}`
+          `com_a_palavra=${this.individuo?.com_a_palavra ? 1 : 0}`
         ]
       )
     },
@@ -111,7 +100,7 @@ export default {
       const t = this
       clearTimeout(t.click_timeout)
       t.click_timeout = setTimeout(() => {
-        if (t.individuo.com_a_palavra || !t.individuoComPalavra) {
+        if (t.individuo?.com_a_palavra || !t.individuoComPalavra) {
           if (t.individuo === t.individuoComPalavra) {
             t.sendMessage({ alert: 'error', message: 'A palavra já está sendo utilizada por este indivíduo.', time: 7 })
             return
@@ -122,7 +111,7 @@ export default {
         t.sendUpdate(
           'toggle_aparteante',
           [
-            `aparteante_status=${!t.aparteante ? 1 : 0}`,
+            `aparteante_status=${!t.individuo.aparteado ? 1 : 0}`,
             `default_timer=${t.default_timer_aparteante || 60}`
           ]
         )
@@ -133,9 +122,9 @@ export default {
       this.sendUpdate(
         'toggle_microfone',
         [
-          `status_microfone=${this.status_microfone || !this.com_a_palavra ? 'on' : 'off'}`,
+          `status_microfone=${this.individuo?.status_microfone || !this.individuo?.com_a_palavra ? 'on' : 'off'}`,
           `default_timer=${this.default_timer}`,
-          `com_a_palavra=${!this.com_a_palavra ? 1 : 0}`
+          `com_a_palavra=${!this.individuo?.com_a_palavra ? 1 : 0}`
         ]
       )
     },

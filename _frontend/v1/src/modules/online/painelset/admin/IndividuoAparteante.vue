@@ -1,7 +1,7 @@
 <template>
   <div class="individuo-aparteante-component">
     <div :class="['individuo-aparteante', ]"
-      v-if="individuo && initCronometro"
+      v-if="individuo"
       :key="`individuo-aparteante-${individuo.id}`"
       :ref="`individuo-aparteante-${individuo.id}`">
       <div class="inner-individuo">
@@ -35,7 +35,7 @@
               'resume',
               'add30s',
               'add1m'
-        ]"
+            ]"
             ></cronometro-palavra>
         </div>
       </div>
@@ -44,8 +44,7 @@
   </div>
 </template>
 <script>
-import Vuex from 'vuex'
-import CronometroPalavra from '../components/cronometros/CronometroPalavra.vue'
+import CronometroPalavra from './CronometroPalavra.vue'
 export default {
   name: 'individuo-aparteante',
   components: {
@@ -60,52 +59,22 @@ export default {
   },
   data () {
     return {
-      id: this.individuo_id,
-      init: false,
-      app: 'painelset',
-      model: 'individuo',
-      individuo: null,
-      initCronometro: false
     }
   },
   computed: {
-    ...Vuex.mapGetters([
-      'getIndividuoComPalavra'
-    ]),
+    individuo: {
+      get () {
+        if (this.individuo_id && this.data_cache?.painelset_individuo) {
+          return this.data_cache.painelset_individuo[this.individuo_id] || null
+        }
+        return null
+      }
+    },
     fotografiaParlamentarUrl: function () {
       if (this.individuo && this.individuo.parlamentar) {
         return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
       }
       return null
-    }
-  },
-  mounted () {
-    console.log('Individuo Aparteante mounted')
-    const t = this
-    t.init = true
-    t.fetch({
-      app: t.app,
-      model: t.model,
-      id: t.id
-    })
-  },
-  methods: {
-    fetch (metadata) {
-      setTimeout(() => {
-        this._fetch(metadata)
-      }, 100)
-    },
-    _fetch (metadata) {
-      this
-        .refreshState(metadata)
-        .then((individuo) => {
-          if (individuo) {
-            this.individuo = individuo
-            this.initCronometro = true
-          } else if (individuo && this.individuo && individuo.id === this.individuo.id && !individuo.com_a_palavra) {
-            this.individuo = null
-          }
-        })
     }
   }
 }
