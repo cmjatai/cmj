@@ -39,17 +39,12 @@
       :key="`individuo-${individuo.id}-${individuo.order}`"
       :ref="`individuo-${individuo.id}`"
       :individuo_id="individuo.id"
-      :individuo="individuo"
       :default_timer="default_timer"
-      @toggle-com-a-palavra="toggleComAPalavra($event)"
-      @select-to-aparte="selectToAparte($event)"
-      @refreshOldAparteante="refreshOldAparteante($event)"
     />
   </div>
 </template>
 <script>
 import IndividuoBase from '../components/individuos/IndividuoBase.vue'
-import Vuex from 'vuex'
 export default {
   name: 'individuo-list',
   props: {
@@ -68,33 +63,37 @@ export default {
   },
   data () {
     return {
-      app: ['painelset'],
-      model: ['individuo'],
       init: false,
       status_microfone: false,
       pause_parent_on_aparte: this.pause_parent_on_start,
-      default_timer: 300, // segundos
-      itens: {
-        individuo_list: {}
-      }
+      default_timer: 300 // segundos
     }
   },
   computed: {
-    ...Vuex.mapGetters([
-      'getIndividuoComPalavra'
-    ]),
     individuos: {
       get () {
-        return _.orderBy(this.itens.individuo_list, ['order', 'name'], ['asc', 'asc'])
+        if (this.data_cache?.painelset_individuo) {
+          return _.orderBy(
+            _.filter(
+              Object.values(this.data_cache.painelset_individuo),
+              { evento: this.evento.id }
+            ),
+            ['order'],
+            ['asc']
+          )
+        }
+        return []
       }
     }
   },
   watch: {
-    init: function (newVal, oldVal) {
-      // verifica se todos indivíduos estão com microfone ligado
-      let all_on = Object.values(this.itens.individuo_list).every(
-        individuo => individuo.status_microfone === true)
-      this.status_microfone = all_on
+    individuos: {
+      handler (newVal, oldVal) {
+        // verifica se todos indivíduos estão com microfone ligado
+        this.status_microfone = this.individuos.every(
+          individuo => individuo.status_microfone === true)
+      },
+      deep: true
     },
     pause_parent_on_start: function (newVal, oldVal) {
       this.pause_parent_on_aparte = newVal
@@ -120,8 +119,11 @@ export default {
   },
   mounted () {
     console.log('IndividuoList mounted', this.evento)
-    const t = this
-    t.fetch()
+    this.fetchSync({
+      app: 'painelset',
+      model: 'individuo',
+      params: { evento: this.evento.id }
+    })
   },
   methods: {
     toggleAllMicrofones () {
@@ -141,42 +143,6 @@ export default {
         .catch(error => {
           console.error(this.evento.id, 'toggle_microfones', error)
           this.sendMessage({ alert: 'error', message: 'Erro ao atualizar Microfones: ' + error.response.data, time: 5 })
-        })
-    },
-    fetch (metadata) {
-      const t = this
-      if (metadata && metadata.action === 'post_delete' && metadata.model === 'individuo') {
-        t.$delete(this.itens['individuo_list'], metadata.id)
-        return
-      }
-      if (metadata === undefined) {
-        // Busca a lista completa de Individuos para este Evento
-        t
-          .fetchModelOrderedList('painelset', 'individuo', 'order', 1, `&evento=${this.evento.id}`,
-            (value) => {
-              t.refreshState({
-                app: 'painelset',
-                model: 'individuo',
-                id: value.id,
-                value: value
-              })
-            })
-          .then(list => {
-            setTimeout(() => {
-              t.init = true
-              t.$emit('onload')
-            }, 500)
-          })
-        return
-      }
-      t.refreshState(metadata)
-        .then(obj => {
-          if (obj.evento === t.evento.id) {
-            t.$set(t.itens['individuo_list'], metadata.id, obj)
-          } else {
-            // Se o indivíduo não pertence mais a este evento, remove-o da lista
-            t.$delete(t.itens['individuo_list'], metadata.id)
-          }
         })
     }
   }

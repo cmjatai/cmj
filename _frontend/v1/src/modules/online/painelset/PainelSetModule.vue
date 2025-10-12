@@ -33,7 +33,7 @@ export default {
         if (this.data_cache?.painelset_evento) {
           return _.orderBy(Object.values(this.data_cache.painelset_evento), ['start_real', 'start_previsto'], ['desc', 'desc'])
         }
-        return null
+        return []
       }
     }
   },

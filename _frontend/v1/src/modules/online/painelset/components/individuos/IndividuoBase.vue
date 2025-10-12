@@ -1,7 +1,7 @@
 <template>
   <div :class="[
     'individuo-base', status_microfone ? '' :  'muted',
-    instance && instance.parlamentar ? 'parlamentar' : '',
+    individuo && individuo.parlamentar ? 'parlamentar' : '',
     com_a_palavra ? 'com-a-palavra' : (microfone_sempre_ativo ? 'always-on' : 'active'),
     aparteante ? 'aparteante' : ''
     ]">
@@ -12,13 +12,13 @@
           <i v-else class="fas fa-user"></i>
         </div>
         <div class="name">
-          {{ instance ? instance.name : 'Carregando indivíduo...' }}
-          <small>{{ instance ? `(${instance.canal})` : '' }}</small>
+          {{ individuo ? individuo.name : 'Carregando indivíduo...' }}
+          <small>{{ individuo ? `(${individuo.canal})` : '' }}</small>
         </div>
       </div>
       <div class="controls">
         <button
-          v-if="instance"
+          v-if="individuo"
           class="btn-fone"
           :title="status_microfone ? 'Ativar microfone' : 'Desativar microfone'"
            @click="toggleMicrofone()"
@@ -26,7 +26,7 @@
           <i :class="status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
         </button>
         <button
-          v-if="false && instance"
+          v-if="false && individuo"
           class="btn-control"
         >
           <i class="fas fa-cog"></i>
@@ -36,18 +36,12 @@
   </div>
 </template>
 <script>
-import Vuex from 'vuex'
 export default {
   name: 'individuo-base',
   props: {
     individuo_id: {
       type: Number,
       required: true
-    },
-    individuo: {
-      type: Object,
-      required: false,
-      default: null
     },
     default_timer: {
       type: Number,
@@ -62,52 +56,45 @@ export default {
   },
   data () {
     return {
-      id: this.individuo_id,
-      instance: null,
-      app: 'painelset',
-      model: 'individuo',
-      init: false,
-      send_individual_updates: true,
       click_timeout: null
     }
   },
   computed: {
-    ...Vuex.mapGetters([
-      'getIndividuoComPalavra'
-    ]),
+    individuoComPalavra: {
+      get () {
+        if (this.data_cache?.painelset_individuo) {
+          return Object.values(this.data_cache.painelset_individuo).find(i => i.com_a_palavra && i.evento === this.individuo.evento) || null
+        }
+        return null
+      }
+    },
+    individuo: function () {
+      if (this.data_cache?.painelset_individuo && this.individuo_id) {
+        return this.data_cache.painelset_individuo[this.individuo_id] || null
+      }
+      return null
+    },
     status_microfone: function () {
-      return this.instance && this.instance.status_microfone
+      return this.individuo && this.individuo.status_microfone
     },
     microfone_sempre_ativo: function () {
-      return this.instance && this.instance.microfone_sempre_ativo
+      return this.individuo && this.individuo.microfone_sempre_ativo
     },
     com_a_palavra: function () {
-      return this.instance && this.instance.com_a_palavra
+      return this.individuo && this.individuo.com_a_palavra
     },
     aparteante: function () {
-      return this.instance && this.instance.aparteado
+      return this.individuo && this.individuo.aparteado
     },
     fotografiaParlamentarUrl: function () {
-      if (this.instance && this.instance.parlamentar) {
-        return '/api/parlamentares/parlamentar/' + this.instance.parlamentar + '/fotografia.c96.png'
+      if (this.individuo && this.individuo.parlamentar) {
+        return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
       }
       return ''
     }
   },
   mounted () {
     console.log('Individuo Base mounted', this.individuo_id)
-    const t = this
-    t.init = true
-    t.$nextTick(() => {
-      if (t.individuo) {
-        t.instance = t.individuo
-        if (t.instance && !t.instance.com_a_palavra && !t.instance.aparteado) {
-          t.utils.getModelAction(t.app, t.model, t.individuo_id, 'force_stop_cronometro')
-        }
-      } else {
-        t.fetch()
-      }
-    })
   },
   methods: {
     toggleMicrofone: function () {
@@ -124,8 +111,8 @@ export default {
       const t = this
       clearTimeout(t.click_timeout)
       t.click_timeout = setTimeout(() => {
-        if (t.instance.com_a_palavra || !t.getIndividuoComPalavra) {
-          if (t.instance === t.getIndividuoComPalavra) {
+        if (t.individuo.com_a_palavra || !t.individuoComPalavra) {
+          if (t.individuo === t.individuoComPalavra) {
             t.sendMessage({ alert: 'error', message: 'A palavra já está sendo utilizada por este indivíduo.', time: 7 })
             return
           }
@@ -164,26 +151,6 @@ export default {
         .catch(error => {
           console.error(this.individuo_id, action, error)
           this.sendMessage({ alert: 'error', message: 'Erro ao atualizar indivíduo: ' + error.response.data, time: 5 })
-        })
-    },
-    fetch (metadata) {
-      const t = this
-      if (!metadata &&
-        metadata.hasOwnProperty('action') &&
-        metadata.action === 'post_delete' &&
-        metadata.model === 'individuo') {
-        t.instance = null
-        return
-      }
-      if (metadata.hasOwnProperty('instance') && metadata.instance && metadata.instance.id === t.individuo_id) {
-        t.instance = metadata.instance
-      }
-      t
-        .refreshState(metadata)
-        .then((individuo) => {
-          if (individuo && individuo.id === t.individuo_id) {
-            t.instance = individuo
-          }
         })
     }
   }
