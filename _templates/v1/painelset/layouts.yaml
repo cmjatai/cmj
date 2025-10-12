@@ -3,7 +3,8 @@ Evento:
   {% trans 'Dados Básicos' %}:
   - name:7 duration start_previsto:3
   {% trans 'Demais Dados' %}:
-  - individuos parts ips_mesas comunicar_com_mesas
+  - comunicar_com_mesas:4 ips_mesas
+  - individuos
   {% trans 'Descrição' %}:
   - description
 Individuo:
@@ -14,6 +15,3 @@ Individuo:
   - evento
   {% trans 'Parlamentar' %}:
   - parlamentar
-ParteEvento:
-  {% trans 'Dados Gerais' %}:
-  - name duration order

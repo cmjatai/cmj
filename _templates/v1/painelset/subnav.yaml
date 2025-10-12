@@ -1,7 +1,5 @@
 {% load i18n common_tags %}
 - title: {% trans 'Evento' %}
   url: cmj.painelset:evento_detail
-- title: {% trans 'Partes de Evento' %}
-  url: cmj.painelset:parteevento_list
 - title: {% trans 'Indivíduos' %}
   url: cmj.painelset:individuo_list

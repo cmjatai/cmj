@@ -214,7 +214,6 @@ class Evento(models.Model, CronometroMixin):
     )
     comunicar_com_mesas = models.BooleanField(default=False, verbose_name="Comunicar com Mesas", help_text="Comunicar com mesas via OSC?")
 
-
     cronometro = GenericRelation(
         Cronometro,
         related_query_name='eventos',
@@ -228,28 +227,6 @@ class Evento(models.Model, CronometroMixin):
 
     def __str__(self):
         return self.name
-
-class ParteEvento(models.Model):
-    """Modelo para representar uma Parte de um Evento, que possui um tempo específico."""
-    name = models.CharField(max_length=100)
-    duration = models.DurationField(help_text="Duração planejada da parte")
-    order = models.PositiveIntegerField(help_text="Ordem da parte no Evento", default=0)
-
-    evento = models.ForeignKey(Evento, on_delete=models.CASCADE,
-                                   related_name='parts', help_text="Evento ao qual esta parte pertence")
-
-    cronometro = GenericRelation(
-        Cronometro,
-        related_query_name='eventos',
-        verbose_name="Cronômetro da Parte do Evento",
-        help_text="Cronômetro associado à Parte do Evento")
-
-    class Meta:
-
-        ordering = ['order']
-
-    def __str__(self):
-        return f"{self.name} ({self.duration})"
 
 class RoleChoices(models.TextChoices):
     PARLAMENTAR = 'PARLAMENTAR', 'Parlamentar'

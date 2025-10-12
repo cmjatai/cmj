@@ -14,8 +14,7 @@ urlpatterns = [
         r'^painelset',
         include(
             views.EventoCrud.get_urls() +
-            views.IndividuoCrud.get_urls() +
-            views.ParteEventoCrud.get_urls()
+            views.IndividuoCrud.get_urls()
         )
     )
 ]

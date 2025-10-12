@@ -19,15 +19,6 @@ class EventoForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'hora_hms'}),
         )
 
-    partes = forms.IntegerField(
-        label=_("Número de partes"),
-        required=True,
-        initial=1,
-        min_value=1,
-        max_value=5,
-        help_text=_("Número de partes que este evento terá"),
-        )
-
     individuos_extras = forms.IntegerField(
         label=_("Número de indivíduos extras"),
         required=True,
@@ -71,10 +62,9 @@ class EventoForm(forms.ModelForm):
             ('name', 6),
             ('start_previsto', 3),
             ('duration', 3),
-            ('vincular_parlamentares', 3),
-            ('partes', 3),
-            ('tribunas', 3),
-            ('individuos_extras', 3),
+            ('vincular_parlamentares', 4),
+            ('tribunas', 4),
+            ('individuos_extras', 4),
             ('comunicar_com_mesas', 3),
             ('ips_mesas', 9),
             ('description', 12),
@@ -101,18 +91,6 @@ class EventoForm(forms.ModelForm):
         individuos_extras = self.cleaned_data.get('individuos_extras')
         tribunas = self.cleaned_data.get('tribunas')
         vincular_parlamentares = self.cleaned_data.get('vincular_parlamentares')
-
-        if partes:
-            for i in range(1, partes + 1):
-                parte, created = evento.parts.get_or_create(
-                    order=i,
-                    defaults={
-                        'name': f'Parte {i}',
-                        'duration': duration / partes,
-                        }
-                    )
-                if created:
-                    parte.save()
 
         if vincular_parlamentares:
             parlamentares = Parlamentar.objects.filter(ativo=True).order_by('nome_parlamentar')

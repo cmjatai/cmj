@@ -2,7 +2,7 @@
 from ast import In
 from django.utils.translation import gettext_lazy as _
 from cmj.painelset.forms import EventoForm
-from cmj.painelset.models import Evento, Individuo, ParteEvento
+from cmj.painelset.models import Evento, Individuo
 from sapl.crud.base import Crud, MasterDetailCrud
 
 
@@ -29,7 +29,3 @@ class IndividuoCrud(MasterDetailCrud):
             return '<a href="{}" pk="{}">{}</a>'.format(
                 url, obj.id, obj.name), ''
 
-
-class ParteEventoCrud(MasterDetailCrud):
-    model = ParteEvento
-    parent_field = 'evento'
