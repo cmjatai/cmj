@@ -100,7 +100,7 @@ class MateriaLegislativaSerializer(SaplSerializerMixin):
 
     class Meta:
         model = MateriaLegislativa
-        fields = '__all__'
+        exclude = ['similaridades']
 
     def get_anexadas(self, obj):
         return obj.anexadas.materias_anexadas().values_list('id', flat=True)

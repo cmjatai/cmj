@@ -2,6 +2,7 @@ from datetime import datetime, date, timedelta
 import inspect
 import json
 import logging
+import time
 
 from asgiref.sync import async_to_sync
 from asn1crypto import cms
@@ -288,10 +289,16 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
             channel_layer = get_channel_layer()
 
             if inst._meta.label in (
+                'painelset.Evento',
                 'painelset.Individuo',
                 'painelset.Cronometro',
                 'painelset.CronometroEvent'
             ):
+                #if not inst_serialize:
+                #    inst_serialize = json.loads(
+                #        serializers.serialize("json", (inst, )))[0]['fields']
+                #    inst_serialize['id'] = inst.id
+
                 async_to_sync(channel_layer.group_send)(
                     "group_sync_channel", {
                         "type": "sync",
@@ -301,7 +308,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                         'model': inst._meta.model_name,
                         'created': created,
                         'instance': inst_serialize,
-                        'timestamp': timezone.now().timestamp()
+                        'timestamp': time.time()
                     }
                 )
             else:

@@ -187,6 +187,7 @@ class CronometroEvent(models.Model):
         ordering = ['-timestamp']
 
 
+
 class Evento(models.Model, CronometroMixin):
     """Modelo para representar um Evento que é a representação de uma reunião que possui tempo global, partes menores e pontos que representam indivíduos."""
     name = models.CharField(max_length=256, verbose_name="Nome do Evento", unique=True)

@@ -2,7 +2,7 @@
   <div class="painelset-module online-module">
     <div v-if="$route.name === 'painelset_list_link'" class="painelset-module-header">
       <ul class="p-2">
-        <li v-for="evento in itensEventos" :key="evento.id">
+        <li v-for="evento in eventos" :key="evento.id">
           <a :href="evento.link_detail_backend" target="_blank">
             {{ evento.id }} - {{ evento.name }}<br>
             Data e Hora Prevista: {{ evento.start_previsto }}<br>
@@ -25,15 +25,17 @@ export default {
   name: 'painelset-module',
   data () {
     return {
-      itens: {
-        evento_list: {}
-      }
     }
   },
   computed: {
-    itensEventos: {
+    ...Vuex.mapState('store__sync', ['data_cache']),
+
+    eventos: {
       get () {
-        return _.orderBy(this.itens.evento_list, ['start_real', 'start_previsto'], ['desc', 'desc'])
+        if (this.data_cache?.painelset_evento) {
+          return _.orderBy(Object.values(this.data_cache.painelset_evento), ['start_real', 'start_previsto'], ['desc', 'desc'])
+        }
+        return null
       }
     }
   },
@@ -51,7 +53,14 @@ export default {
     t.utils
       .hasPermission('painelset.change_evento')
       .then(hasPermission => {
-        t.fetchModelOrderedList('painelset', 'evento', '-start_real,-start_previsto')
+        // t.fetchModelOrderedList('painelset', 'evento', '-start_real,-start_previsto')
+        if (hasPermission) {
+          t.fetchSync({
+            app: 'painelset',
+            model: 'evento',
+            params: { o: '-start_real,-start_previsto' }
+          })
+        }
       })
   },
   methods: {
@@ -60,6 +69,7 @@ export default {
       'setSiderightVisivel'
     ]),
     ...Vuex.mapActions('store__sync', [
+      'fetchSync',
       'registerModels'
     ]),
     open (eventoId) {

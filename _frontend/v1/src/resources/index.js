@@ -75,7 +75,10 @@ export default {
     postModel: (app, model, form) => axios.post(
       `${basePath}/${app}/${model}/`,
       form
-    )
-
+    ),
+    fetch: (m) => axios({
+      url: `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}${m.query_string ? '?' : ''}${m.query_string ? m.query_string : ''}`,
+      method: 'GET'
+    })
   }
 }

@@ -1,5 +1,7 @@
 import WebSocketManager from '@/sync/ws/WebSocketManager'
 import TimerWorkerService from '@/sync/timer/TimerWorkerService'
+import Resources from '@/resources'
+
 import Vue from 'vue'
 
 const syncStore = {
@@ -35,12 +37,20 @@ const syncStore = {
       }
     },
     UPDATE_DATA_CACHE (state, { key, value }) {
-      const oldValue = state.data_cache[key] ? state.data_cache[key][value.id] : null
-      if (oldValue && oldValue.timestamp_frontend && value.timestamp_frontend) {
-        if (value.timestamp_frontend <= oldValue.timestamp_frontend) {
-          return
+      if (value.timestamp_frontend) {
+        const oldValue = state.data_cache[key] ? state.data_cache[key][value.id] : null
+        if (oldValue && oldValue.timestamp_frontend && value.timestamp_frontend) {
+          if (value.timestamp_frontend <= oldValue.timestamp_frontend) {
+            return
+          }
         }
       }
+      if (!state.data_cache[key]) {
+        Vue.set(state.data_cache, key, {})
+      }
+      Vue.set(state.data_cache[key], value.id, value)
+    },
+    UPDATE_DATA_CACHE_CRONOMETRO (state, { key, value }) {
       if (!state.data_cache[key]) {
         Vue.set(state.data_cache, key, {})
       }
@@ -53,6 +63,7 @@ const syncStore = {
       if (state.wsManager) {
         return
       }
+
       const wsManager = new WebSocketManager()
 
       wsManager.on('connected', () => {
@@ -71,6 +82,7 @@ const syncStore = {
       })
       commit('SET_WS_MANAGER', wsManager)
     },
+
     sendSyncMessage ({ state }, message) {
       if (state.wsManager && state.wsConnected) {
         state.wsManager.send(message)
@@ -78,14 +90,32 @@ const syncStore = {
         console.warn('WebSocket não conectado. Mensagem não enviada:', message)
       }
     },
-    handleSyncMessage ({ commit, dispatch }, data) {
-      const { app, model, action, instance, timestamp } = data
+
+    handleSyncMessage ({ commit, dispatch, state }, data) {
+      const { app, model, id, action, instance, timestamp } = data
+      // so processar se o modelo estiver registrado
+      if (!state.models[app] || !state.models[app][model]) {
+        return
+      }
+
       const uri = `${app}_${model}`
       const inst = { ...(instance || {}), timestamp_frontend: timestamp }
       if (action === 'post_delete') {
         commit('DELETE_DATA_CACHE', { key: uri, value: inst })
       } else {
-        commit('UPDATE_DATA_CACHE', { key: uri, value: inst })
+        if (!inst.id) {
+          // Se instance não tem id, testa se esse id está no cache
+          if (id && state.data_cache[uri] && state.data_cache[uri][id]) {
+            // timestamp_frontend do cache é menor que o do servidor?
+            if (state.data_cache[uri][id].timestamp_frontend < timestamp) {
+              dispatch('fetchSync', { app, model, id })
+            }
+          } else {
+            dispatch('fetchSync', { app, model, id })
+          }
+        } else {
+          commit('UPDATE_DATA_CACHE', { key: uri, value: inst })
+        }
 
         // Iniciar cronometro local se for painelset_cronometro e state for 'running'
         if (uri === 'painelset_cronometro' && (inst.state === 'running' || inst.state === 'paused')) {
@@ -93,6 +123,31 @@ const syncStore = {
         }
       }
     },
+    async fetchSync ({ commit, dispatch }, { app, model, id, action, params }) {
+      const _fetch = Resources.Utils.fetch
+      const metadata = { app, model }
+      if (id) { metadata.id = id }
+      if (action) { metadata.action = action }
+      if (params) { metadata.query_string = new URLSearchParams(params).toString() }
+      try {
+        await _fetch(
+          metadata
+        ).then((response) => {
+          _.each(response.data.results ? response.data.results : [response.data], (value, idx) => {
+            const uri = `${app}_${model}`
+            const inst = { ...value, timestamp_frontend: 0 }
+            commit('UPDATE_DATA_CACHE', { key: uri, value: inst })
+          })
+          if (response.data.pagination && response.data.pagination.next_page) {
+            dispatch('fetchSync', { app, model, id, action, params: { ...params, page: response.data.pagination.next_page } })
+          }
+        })
+      } catch (error) {
+        console.error('Error fetching data:', error)
+        throw error
+      }
+    },
+
     registerModels ({ commit }, app_models) {
       commit('UPDATE_MODEL', app_models)
     },
@@ -113,21 +168,20 @@ const syncStore = {
           const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
           cronometro.remaining_time = cronometro.duration - elapsed_time
-          commit('UPDATE_DATA_CACHE', { key: 'painelset_cronometro', value: cronometro })
+          commit('UPDATE_DATA_CACHE_CRONOMETRO', { key: 'painelset_cronometro', value: cronometro })
         } else if (cronometro && cronometro.state === 'paused') {
           const last_paused_time = (timestamp / 1000) - cronometro.paused_time + server_time_diff + cronometro.accumulated_time
           cronometro.last_paused_time = last_paused_time
-          commit('UPDATE_DATA_CACHE', { key: 'painelset_cronometro', value: cronometro })
+          commit('UPDATE_DATA_CACHE_CRONOMETRO', { key: 'painelset_cronometro', value: cronometro })
         } else {
           // Parar timer se cronometro não estiver mais 'running' ou 'paused'
           TimerWorkerService.stopTimer(cronometroId)
         }
-      }, 500)
+      }, 1000)
     },
     stopLocalCronometro ({ state }, cronometroId) {
       TimerWorkerService.stopTimer(cronometroId)
     }
-
   }
 }
 
