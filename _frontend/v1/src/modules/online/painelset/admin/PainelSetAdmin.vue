@@ -48,18 +48,17 @@ export default {
   },
   data () {
     return {
-      app: [
-        'painelset'
-      ],
-      model: [
-        'evento'
-      ],
-      evento: null,
-      cronometro: null,
+      evento_id: Number(this.$route.params.id),
       individuoListLoaded: false
     }
   },
   computed: {
+    evento: function () {
+      return this.data_cache['painelset_evento'] ? this.data_cache['painelset_evento'][this.evento_id] : null
+    },
+    cronometro: function () {
+      return this.evento && this.evento.cronometro ? this.data_cache['painelset_cronometro'] ? this.data_cache['painelset_cronometro'][this.evento.cronometro] : null : null
+    },
     datahora_prevista_real: function () {
       if (this.evento && !this.evento.start_real) {
         const dt = new Date(this.evento.start_previsto)
@@ -75,13 +74,11 @@ export default {
     this.$nextTick(() => {
       this.utils.hasPermission('painelset.change_evento')
         .then(hasPermission => {
-          this.fetch(
-            {
-              app: 'painelset',
-              model: 'evento',
-              id: Number(this.$route.params.id)
-            }
-          )
+          this.fetchSync({
+            app: 'painelset',
+            model: 'cronometro',
+            id: this.evento?.cronometro
+          })
         })
         .catch(() => {
           this.$router.push({ name: 'online_index_link' })
@@ -92,29 +89,6 @@ export default {
   methods: {
     onIndividuoListLoad: function () {
       this.individuoListLoaded = true
-    },
-    fetch (metadata) {
-      const t = this
-      if (t.evento) {
-        console.log('WebSocket message received:', metadata)
-      }
-      if (!t.evento || metadata.id === t.evento.id) {
-        t
-          .refreshState(metadata)
-          .then((obj) => {
-            t.evento = obj
-            t
-              .refreshState({
-                app: 'painelset',
-                model: 'cronometro',
-                id: obj.cronometro
-              })
-              .then((cronometro) => { t.cronometro = cronometro })
-          })
-          .catch((err) => {
-            console.error('Erro ao atualizar o evento', err)
-          })
-      }
     },
     resumeEvento () {
       this.$refs.individuoList.status_microfone = 0

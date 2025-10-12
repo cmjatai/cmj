@@ -44,7 +44,6 @@
   </div>
 </template>
 <script>
-import { mapState } from 'vuex'
 import CronometroBaseOld from '../../components/cronometros/CronometroBaseOld.vue'
 
 export default {
@@ -59,7 +58,6 @@ export default {
     }
   },
   computed: {
-    ...mapState('store__sync', ['data_cache']),
     individuo_com_a_palavra: function () {
       if (this.data_cache?.painelset_individuo) {
         return Object.values(this.data_cache.painelset_individuo).find(i => i.com_a_palavra)

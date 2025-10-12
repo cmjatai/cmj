@@ -9,6 +9,7 @@ Vue.use(Vuex)
 Vue.mixin({
 
   computed: {
+    ...Vuex.mapState('store__sync', ['data_cache']),
     ...Vuex.mapGetters([
       'getCache',
       'cache',
@@ -27,6 +28,10 @@ Vue.mixin({
     }
   },
   methods: {
+    ...Vuex.mapActions('store__sync', [
+      'fetchSync',
+      'registerModels'
+    ]),
     ...Vuex.mapActions([
       'sendMessage',
       'refreshState',

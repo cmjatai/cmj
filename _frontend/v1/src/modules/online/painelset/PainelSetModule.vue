@@ -28,8 +28,6 @@ export default {
     }
   },
   computed: {
-    ...Vuex.mapState('store__sync', ['data_cache']),
-
     eventos: {
       get () {
         if (this.data_cache?.painelset_evento) {
@@ -67,10 +65,6 @@ export default {
     ...Vuex.mapActions([
       'setSideleftVisivel',
       'setSiderightVisivel'
-    ]),
-    ...Vuex.mapActions('store__sync', [
-      'fetchSync',
-      'registerModels'
     ]),
     open (eventoId) {
       if (eventoId) {

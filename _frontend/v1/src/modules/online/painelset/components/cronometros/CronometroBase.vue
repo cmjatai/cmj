@@ -243,7 +243,6 @@ export default {
     }
   },
   computed: {
-    ...Vuex.mapState('store__sync', ['data_cache']),
     cronometro: function () {
       if (this.data_cache?.painelset_cronometro) {
         return Object.values(this.data_cache.painelset_cronometro).find(i => i.id === this.cronometro_id)
