@@ -1,10 +1,11 @@
 from datetime import timedelta
 import logging
 from time import sleep
+import time
 
 from django.apps.registry import apps
 from django.conf import settings
-from traitlets import default
+from django.utils import formats
 
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer, IndividuoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
@@ -15,7 +16,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.permissions import BasePermission
 from rest_framework import status
-
+from django.utils import timezone
 from pythonosc import udp_client
 
 from cmj.painelset.tasks import SEND_MESSAGE_MICROPHONE
@@ -40,10 +41,10 @@ class _EventoViewSet:
 
     @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def start(self, request, pk=None):
-        logger.debug('Acessando cronômetro do evento:', pk)
+        logger.debug(f'Acessando cronômetro do evento: {pk}')
         evento = self.get_object()
-        sleep(2)
         cronometro, created = evento.get_or_create_unique_cronometro()
+        sleep(1)
         if cronometro:
             if not evento.start_real and cronometro.started_at and not cronometro.finished_at:
                 evento.start_real = cronometro.started_at
@@ -54,6 +55,60 @@ class _EventoViewSet:
 
             return Response(CronometroTreeSerializer(cronometro).data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    def finish(self, request, pk=None):
+        logger.debug(f'Finalizando Evento: {pk}')
+        evento = self.get_object()
+        cronometro, created = evento.get_or_create_unique_cronometro()
+        if cronometro:
+            cronometro_manager.stop_cronometro(cronometro.id)
+            cronometro_manager.finish_cronometro(cronometro.id)
+            cronometro.refresh_from_db()
+            if not evento.end_real and cronometro.finished_at:
+                evento.end_real = cronometro.finished_at
+                evento.save(update_fields=['end_real'])
+
+            for ind in evento.individuos.all():
+                cron, created = ind.get_or_create_unique_cronometro()
+                if cron and cron.state != CronometroState.STOPPED:
+                    cronometro_manager.stop_cronometro(cron.id)
+                    cronometro_manager.finish_cronometro(cron.id)
+                ind.status_microfone = False
+                ind.com_a_palavra = False
+                ind.aparteante = None
+                ind.save(update_fields=['status_microfone', 'com_a_palavra', 'aparteante'])
+
+            return Response(EventoSerializer(evento).data)
+        return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    def copy(self, request, *args, **kwargs):
+        evento_copiado = self.get_object()
+        if not evento_copiado.end_real:
+            return Response({'error': 'Evento não finalizado. Só é possível copiar eventos finalizados.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        evento = Evento.objects.create(
+            name=f'{evento_copiado.name}',
+            start_previsto=timezone.now(),
+            start_real=None,
+            end_real=None,
+            duration=evento_copiado.duration,
+            ips_mesas=evento_copiado.ips_mesas,
+            comunicar_com_mesas=evento_copiado.comunicar_com_mesas,
+            description=f'Copia gerada a partir do evento {evento_copiado.name} '
+            f'de {formats.date_format(timezone.localtime(evento_copiado.start_real), "d/m/Y - H:i")}',
+        )
+
+        for individuo in evento_copiado.individuos.all():
+            individuo.pk = None
+            individuo.evento = evento
+            individuo.status_microfone = False
+            individuo.com_a_palavra = False
+            individuo.aparteante = None
+            individuo.save()
+
+        return Response(EventoSerializer(evento).data, status=status.HTTP_201_CREATED)
 
     @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
     def toggle_microfones(self, request, *args, **kwargs):

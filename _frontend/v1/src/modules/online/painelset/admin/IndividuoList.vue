@@ -84,6 +84,18 @@ export default {
         }
         return []
       }
+    },
+    cronometros () {
+      if (this.data_cache?.painelset_individuo) {
+        const cronometros = []
+        for (const individuo of Object.values(this.data_cache.painelset_individuo)) {
+          if (individuo.evento === this.evento.id && individuo.cronometro) {
+            cronometros.push(this.data_cache.painelset_cronometro[individuo.cronometro])
+          }
+        }
+        return cronometros
+      }
+      return []
     }
   },
   watch: {
@@ -100,6 +112,11 @@ export default {
     },
     pause_parent_on_aparte: function (newVal, oldVal) {
       const t = this
+      if (t.cronometros && t.cronometros.length > 0) {
+        if (t.cronometros[0] && t.cronometros[0].pause_parent_on_start === newVal) {
+          return
+        }
+      }
       const query_params = [
         `pause_parent_on_aparte=${newVal ? 'on' : 'off'}`
       ]

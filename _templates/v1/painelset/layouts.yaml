@@ -1,8 +1,9 @@
 {% load i18n %}
 Evento:
   {% trans 'Dados Básicos' %}:
-  - name:7 duration start_previsto:3
+  - name:6 duration start_previsto:3
   {% trans 'Demais Dados' %}:
+  - start_real end_real
   - comunicar_com_mesas:4 ips_mesas
   - individuos
   {% trans 'Descrição' %}:

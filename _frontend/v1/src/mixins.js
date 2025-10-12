@@ -33,6 +33,10 @@ Vue.mixin({
       'registerModels'
     ]),
     ...Vuex.mapActions([
+      'setSideleftVisivel',
+      'setSiderightVisivel'
+    ]),
+    ...Vuex.mapActions([
       'sendMessage',
       'refreshState',
       'getObject',

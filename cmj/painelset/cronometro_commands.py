@@ -177,8 +177,8 @@ class FinishCronometroCommand(CronometroCommand):
     """Comando para finalizar cronômetro (quando tempo acaba)"""
 
     def _execute_command(self):
-        if self.cronometro.state != CronometroState.RUNNING:
-            return {"error": "Cronômetro não está em execução"}
+        if self.cronometro.state == CronometroState.FINISHED:
+            return {"error": "Cronômetro já está finalizado"}
 
         self.cronometro.state = CronometroState.FINISHED
         self.cronometro.finished_at = timezone.now()

@@ -71,13 +71,13 @@ export const routes = [
         ]
       },
       { path: 'painelset', // list
-        name: 'painelset_list_link',
+        name: '',
         component: () => import('@/modules/online/painelset/PainelSetModule.vue'),
         children: [
           {
-            path: ':id/',
-            name: 'painelset_detail_link',
-            component: () => import('@/modules/online/painelset/PainelSetDetail.vue')
+            path: '',
+            name: 'painelset_evento_list_link',
+            component: () => import('@/modules/online/painelset/PainelSetEventoList.vue')
           },
           {
             path: ':id/admin',

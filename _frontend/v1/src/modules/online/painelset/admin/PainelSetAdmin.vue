@@ -32,6 +32,16 @@
         </div>
       </div>
     </div>
+    <div class="disabled" v-if="cronometro && cronometro.state !== 'running'">
+      <div class="overlay-paused">
+        <div class="text-paused">
+          <div v-if="cronometro && cronometro.state === 'paused'">
+            EVENTO EM SUSPENSÃO
+          </div>
+          <div v-else-if="cronometro && cronometro.state === 'stopped'">EVENTO NÃO INICIADO</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -48,7 +58,20 @@ export default {
   },
   data () {
     return {
-      evento_id: Number(this.$route.params.id)
+      evento_id: Number(this.$route.params.id),
+      finished: false
+    }
+  },
+  watch: {
+    'evento': {
+      handler (newVal) {
+        if (!this.finished && newVal && newVal.end_real) {
+          this.finished = true
+          this.sendMessage({ alert: 'danger', message: 'Evento já finalizado. Você pode copiá-lo para gerar um novo evento.', time: 10 })
+          this.$router.push({ name: 'painelset_evento_list_link' })
+        }
+      },
+      immediate: true
     }
   },
   computed: {
@@ -73,6 +96,11 @@ export default {
     this.$nextTick(() => {
       this.utils.hasPermission('painelset.change_evento')
         .then(hasPermission => {
+          this.fetchSync({
+            app: 'painelset',
+            model: 'evento',
+            id: this.evento_id
+          })
           this.fetchSync({
             app: 'painelset',
             model: 'cronometro',
@@ -192,24 +220,52 @@ export default {
       font-size: 1.1em;
     }
   }
-}
-@media screen and (max-width: 991.98px) {
-.painelset-admin {
-  .row {
-    div[class^=col] {
-      position: relative;
+
+  .disabled {
+    // pointer-events: none;
+  }
+  .overlay-paused {
+    position: absolute;
+    top: 5.4em;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    .text-paused {
+      color: #fff;
+      font-size: 4em;
+      font-weight: bold;
+      text-shadow: 0 0 50px rgba(120, 6, 6, 0.7);
+      text-align: center;
     }
   }
-  .titulo-evento {
+}
+@media screen and (max-width: 991.98px) {
+  .painelset-admin {
+    .row {
+      div[class^=col] {
+        position: relative;
+      }
+    }
+    .titulo-evento {
       font-size: 1em;
       padding: 5px 5px;
     }
-  }
-  .cronometro-global {
-    display: flex;
-    height: 3.4em;
-    .croncard {
-      padding: 0;
+    .cronometro-global {
+      display: flex;
+      height: 3.4em;
+      .croncard {
+        padding: 0;
+      }
+    }
+    .overlay-paused {
+      .text-paused {
+        font-size: 3em;
+      }
     }
   }
 }

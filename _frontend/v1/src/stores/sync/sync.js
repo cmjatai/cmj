@@ -33,6 +33,11 @@ const syncStore = {
     },
     DELETE_DATA_CACHE (state, { key, value }) {
       if (state.data_cache[key] && state.data_cache[key][value.id]) {
+        // const copy = { ...state.data_cache[key] }
+        // delete copy[value.id]
+        // Vue.set(state.data_cache, key, copy)
+        //
+        // state.data_cache[key] = state.data_cache[key]
         Vue.delete(state.data_cache[key], value.id)
       }
     },
@@ -101,6 +106,7 @@ const syncStore = {
       const uri = `${app}_${model}`
       const inst = { ...(instance || {}), timestamp_frontend: timestamp }
       if (action === 'post_delete') {
+        inst.id = inst.id || id
         commit('DELETE_DATA_CACHE', { key: uri, value: inst })
       } else {
         if (!inst.id) {
@@ -123,31 +129,25 @@ const syncStore = {
         }
       }
     },
-    async fetchSync ({ commit, dispatch }, { app, model, id, action, params }) {
+    async fetchSync ({ commit, dispatch }, { app, model, id, action, params, only_first_page = false }) {
       const _fetch = Resources.Utils.fetch
       const metadata = { app, model }
       if (id) { metadata.id = id }
       if (action) { metadata.action = action }
       if (params) { metadata.query_string = new URLSearchParams(params).toString() }
-      try {
-        await _fetch(
-          metadata
-        ).then((response) => {
-          _.each(response.data.results ? response.data.results : [response.data], (value, idx) => {
-            const uri = `${app}_${model}`
-            const inst = { ...value, timestamp_frontend: 0 }
-            commit('UPDATE_DATA_CACHE', { key: uri, value: inst })
-          })
-          if (response.data.pagination && response.data.pagination.next_page) {
-            dispatch('fetchSync', { app, model, id, action, params: { ...params, page: response.data.pagination.next_page } })
-          }
+      return _fetch(
+        metadata
+      ).then((response) => {
+        const uri = `${app}_${model}`
+        _.each(response.data.results ? response.data.results : [response.data], (value, idx) => {
+          const inst = { ...value, timestamp_frontend: 0 }
+          commit('UPDATE_DATA_CACHE', { key: uri, value: inst })
         })
-      } catch (error) {
-        console.error('Error fetching data:', error)
-        throw error
-      }
+        if (!only_first_page && response.data.pagination && response.data.pagination.next_page) {
+          dispatch('fetchSync', { app, model, id, action, params: { ...params, page: response.data.pagination.next_page } })
+        }
+      })
     },
-
     registerModels ({ commit }, app_models) {
       commit('UPDATE_MODEL', app_models)
     },
@@ -170,7 +170,7 @@ const syncStore = {
           cronometro.remaining_time = cronometro.duration - elapsed_time
           commit('UPDATE_DATA_CACHE_CRONOMETRO', { key: 'painelset_cronometro', value: cronometro })
         } else if (cronometro && cronometro.state === 'paused') {
-          const last_paused_time = (timestamp / 1000) - cronometro.paused_time + server_time_diff + cronometro.accumulated_time
+          const last_paused_time = (timestamp / 1000) - cronometro.paused_time + server_time_diff
           cronometro.last_paused_time = last_paused_time
           commit('UPDATE_DATA_CACHE_CRONOMETRO', { key: 'painelset_cronometro', value: cronometro })
         } else {

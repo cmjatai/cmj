@@ -92,6 +92,16 @@ class CronometroManager:
 
         return result
 
+    def finish_cronometro(self, cronometro_id, **kwargs):
+        """Finaliza um cronômetro"""
+        command = FinishCronometroCommand(cronometro_id)
+        result = command.execute()
+
+        if result.get('success'):
+            self.notify_observers(command.cronometro, 'finished')
+
+        return result
+
     def add_time_cronometro(self, cronometro_id, seconds=0, **kwargs):
         command = AddTimeCronometroCommand(cronometro_id, seconds)
         result = command.execute()

@@ -269,6 +269,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
         (
             inst._meta.app_config.name in settings.SAPL_APPS or
             inst._meta.label in (
+                'painelset.Evento',
                 'painelset.Individuo',
                 'painelset.Cronometro',
                 'painelset.CronometroEvent'

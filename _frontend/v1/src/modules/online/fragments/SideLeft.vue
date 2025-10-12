@@ -63,7 +63,7 @@ export default {
         },
         {
           icon: 'fas fa-columns',
-          route: 'painelset_list_link',
+          route: 'painelset_evento_list_link',
           texto: 'Painéis',
           permission: 'painelset.change_evento',
           hasPermission: false

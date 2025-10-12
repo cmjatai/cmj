@@ -73,7 +73,6 @@ class EventoForm(forms.ModelForm):
         evento = self.instance
         if evento and evento.pk:
             self.fields['duration'].initial = evento.duration
-            self.fields['partes'].initial = evento.parts.count()
             self.fields['individuos_extras'].initial = evento.individuos.filter(parlamentar__isnull=True, role=RoleChoices.INDIVIDUO).count()
             self.fields['tribunas'].initial = evento.individuos.filter(role=RoleChoices.TRIBUNA).count()
             self.fields['vincular_parlamentares'].initial = evento.individuos.filter(parlamentar__isnull=False).exists()
@@ -87,7 +86,6 @@ class EventoForm(forms.ModelForm):
         evento = super().save(commit=commit)
 
         duration = self.cleaned_data.get('duration')
-        partes = self.cleaned_data.get('partes')
         individuos_extras = self.cleaned_data.get('individuos_extras')
         tribunas = self.cleaned_data.get('tribunas')
         vincular_parlamentares = self.cleaned_data.get('vincular_parlamentares')
