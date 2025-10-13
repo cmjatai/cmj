@@ -4,6 +4,6 @@ from . import consumers
 
 websocket_urlpatterns = [
     re_path(r'^ws/time-refresh/$', consumers.TimeRefreshConsumer.as_asgi()),
-    re_path(r'^ws/sync/$', consumers.SyncConsumer.as_asgi()),
+    re_path(r'^ws/sync/$', consumers.SyncRefreshConsumer.as_asgi()),
 
 ]

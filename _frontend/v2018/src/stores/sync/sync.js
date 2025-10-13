@@ -78,11 +78,11 @@ const syncStore = {
         commit('SET_WS_CONNECTED', false)
       })
       wsManager.on('message', (data) => {
-        if (data.type === 'sync') {
-          dispatch('handleSyncMessage', data)
+        if (data.type === 'sync_refresh.message') {
+          dispatch('handleSyncMessage', data.message)
         } else if (data.type === 'pong') {
           // atualizar lastServerSync com o timestamp do servidor
-          commit('SET_LAST_SERVER_SYNC', data)
+          commit('SET_LAST_SERVER_SYNC', data.message)
         }
       })
       commit('SET_WS_MANAGER', wsManager)

@@ -6,7 +6,7 @@ class WebSocketManager {
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 10
     this.reconnectInterval = 1000
-    this.heartbeatInterval = 5000
+    this.heartbeatInterval = 60000
     this.heartbeatTimer = null
     this.listeners = new Map()
 
@@ -35,12 +35,12 @@ class WebSocketManager {
         let pong_now = performance.now() // Date.now() / 1000 // em segundos
         const now = {
           type: 'pong',
-          // pong: pong_now,
-          // ping: data.ping_now,
-          timestamp_client: data.timestamp_client,
-          timestamp_server: data.timestamp_server,
+          pong: pong_now,
+          ping: data.message.ping_now,
+          timestamp_client: data.message.timestamp_client,
+          timestamp_server: data.message.timestamp_server,
           // latency: pong_now - data.ping_now,
-          server_time_diff: data.timestamp_server - data.timestamp_client - (pong_now - data.ping_now) / 1000
+          server_time_diff: data.message.timestamp_server - data.message.timestamp_client - (pong_now - data.message.ping_now) / 1000
         }
         // console.log('Pong recebido do servidor:', now)
         this.emit('message', now)

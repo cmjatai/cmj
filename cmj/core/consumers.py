@@ -43,7 +43,7 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
         if type_msg == 'ping' and timestamp:
             await self.send(text_data=json.dumps({
                 'type': 'pong',
-                'timestamp_server': time.time() + 40, # timezone.now().timestamp(),
+                'timestamp_server': time.time(), # timezone.now().timestamp(),
                 'timestamp_client': timestamp
             }))
 
@@ -79,7 +79,7 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
             'message': message
         }))
 
-class SyncConsumer(AsyncWebsocketConsumer):
+class SyncRefreshConsumer(AsyncWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
         from cmj.painelset.cronometro_manager import CronometroManager
@@ -92,9 +92,8 @@ class SyncConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         #print('Conectando ao SyncConsumer')
-        self.room_name = 'sync_channel'
+        self.room_name = 'sync_refresh_channel'
         self.room_group_name = 'group_%s' % self.room_name
-
 
         # Join room group
         await self.channel_layer.group_add(
@@ -122,9 +121,11 @@ class SyncConsumer(AsyncWebsocketConsumer):
             ping_now = jdata.get('ping_now', '')
             await self.send(text_data=json.dumps({
                 'type': 'pong',
-                'timestamp_server': time.time(), # timezone.now().timestamp(),
-                'timestamp_client': timestamp,
-                'ping_now': ping_now
+                'message': {
+                    'timestamp_server': time.time(), # timezone.now().timestamp(),
+                    'timestamp_client': timestamp,
+                    'ping_now': ping_now
+                }
             }))
             return
 
@@ -193,9 +194,9 @@ class SyncConsumer(AsyncWebsocketConsumer):
         }))
 
     # Receive message from room group
-    async def sync(self, event):
+    async def sync_refresh_message(self, event):
 
-        message = event
+        message = event['message']
         app = message.get('app')
         model = message.get('model')
 
@@ -220,4 +221,4 @@ class SyncConsumer(AsyncWebsocketConsumer):
             del message['instance']
 
         # Send message to WebSocket
-        await self.send(text_data=json.dumps(message))
+        await self.send(text_data=json.dumps(event))

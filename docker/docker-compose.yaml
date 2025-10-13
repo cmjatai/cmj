@@ -3,7 +3,7 @@ services:
   cmjredis:
     image: redis:alpine
     container_name: cmjredis
-    restart: always
+    restart: always #restart: unless-stopped
     labels:
        NAME: "cmjredis"
     volumes:
