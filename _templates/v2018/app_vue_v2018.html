@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load common_cmj_tags %}
+{% load render_bundle from webpack_loader %}
+
+{% block webpack_loader_css %}
+    {% render_chunk_vendors 'css' 'DEFAULT' %}
+    {% render_bundle  'app' 'css' 'DEFAULT' %}
+{% endblock webpack_loader_css %}
+
+{% block root_body %}
+<div id="app"></div>
+{% endblock %}
+
+{% block webpack_loader_js %}
+    {% render_chunk_vendors 'js' 'DEFAULT' %}
+    {% render_bundle  'app' 'js' 'DEFAULT' %}
+{% endblock webpack_loader_js %}

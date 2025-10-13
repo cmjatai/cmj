@@ -1,1 +1,0 @@
-export const STATE_DATA_CONNECT = 'STATE_DATA_CONNECT'

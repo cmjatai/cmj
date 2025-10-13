@@ -29,9 +29,9 @@ dotenv.config({
 })
 
 let HOST_NAME = 'localhost'
-HOST_NAME = '192.168.15.9'
+// HOST_NAME = '192.168.15.9'
 // HOST_NAME = '10.42.0.1'
-// HOST_NAME = '10.3.163.21'
+HOST_NAME = '10.3.163.21'
 // HOST_NAME = '10.3.162.151'
 // HOST_NAME = '168.228.184.70'
 
@@ -47,25 +47,6 @@ module.exports = {
         path: '.',
         filename: `./${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
       }])
-
-    config.plugin('copy').use(CopyPlugin, [
-      [
-        {
-          from: path.join(__dirname, '/node_modules/tinymce/skins'),
-          to: 'js/skins/[path][name].[ext]'
-        },
-        {
-          from: path.join(__dirname, '/public'),
-          to: '[path][name].[ext]'
-        }
-      ]
-    ])
-
-    config.plugin('MomentLocalesPlugin').use(MomentLocalesPlugin, [
-      {
-        localesToKeep: ['pt-BR']
-      }
-    ])
 
     if (process.env.NODE_ENV === 'production') {
       config
@@ -85,20 +66,6 @@ module.exports = {
     } else {
       config.devtool('#eval-source-map')
     }
-
-    config.module
-      .rule('worker')
-      .test(/\.worker\.js$/)
-      .use('worker-loader')
-        .loader('worker-loader')
-        .options({
-          inline: 'fallback'
-        })
-        .end()
-    config.module
-      .rule('js')
-      .exclude
-        .add(/\.worker\.js$/);
 
     config.module
       .rule('images')
@@ -164,22 +131,6 @@ module.exports = {
 
         return args
       }) */
-
-    config.entry('construct')
-      .add('./src/__construct/main.js')
-      .end()
-
-    config.entry('compilacao')
-      .add('./src/__apps/compilacao/main.js')
-      .end()
-
-      config.entry('painel')
-      .add('./src/__apps/painel/main.js')
-      .end()
-
-      config.entry('loa')
-      .add('./src/__apps/loa/main.js')
-      .end()
 
 
     /*

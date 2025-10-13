@@ -150,7 +150,7 @@ const actions = {
         resolve()
       })
     }
-    if (metadata.hasOwnProperty('instance')) {
+    if (metadata.hasOwnProperty('instance') && metadata.instance !== undefined && metadata.instance !== null) {
       return new Promise((resolve, reject) => {
         let meta = {
           app: metadata.app,

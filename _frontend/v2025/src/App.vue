@@ -1,19 +1,15 @@
 <template>
-  <div id="app">
+  <div id="app">v2025
     <router-view></router-view>
-    <message></message>
   </div>
 </template>
 
 <script>
-import Message from '@/components/utils/message/Message'
 export default {
   name: 'app',
   components: {
-    Message
   },
   created: function () {
-    this.loginStatus()
   }
 }
 </script>

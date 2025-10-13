@@ -119,7 +119,7 @@ Vue.mixin({
         }
       }
     },
-    handleWebSocketMessageTimeRefresh (event) {
+    handleWebSocketMessageTimeRefresh_error (event) {
       /**
        * Define um ouvinte para o socket implementado por VueNativeSock
        */
@@ -133,7 +133,7 @@ Vue.mixin({
           // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
         })
     },
-    handleWebSocketMessageTimeRefresh_deprecated (event) {
+    handleWebSocketMessageTimeRefresh (event) {
       /**
        * Define um ouvinte para o socket implementado por VueNativeSock
        */

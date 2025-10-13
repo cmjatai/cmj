@@ -2,7 +2,7 @@ from django.urls.conf import re_path, include
 
 from cmj.arq import views
 from cmj.arq.views_search import ArqSearchView
-from cmj.core.views import app_vue_view
+from cmj.core.views import app_vue_view_v2018
 
 from .apps import AppConfig
 
@@ -53,6 +53,6 @@ urlpatterns = [
     re_path(r'^arqadmin/', include(urlpatterns_arq)),
 
     re_path(r'^arq/(?P<slug>[^.]*)$',
-        app_vue_view, name='app_vue_arq_view_url'),
+        app_vue_view_v2018, name='app_vue_arq_view_url'),
 
 ]

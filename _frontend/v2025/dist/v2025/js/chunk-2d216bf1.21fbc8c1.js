@@ -1,2 +1,0 @@
-(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d216bf1"],{c47a:function(n,t,u){"use strict";u.r(t);var e=function(){var n=this,t=n._self._c;return t("div",[t("router-view")],1)},o=[],a={name:"loa-layout",methods:{},mounted:function(){}},c=a,l=u("2877"),i=Object(l["a"])(c,e,o,!1,null,null,null);t["default"]=i.exports}}]);
-//# sourceMappingURL=chunk-2d216bf1.21fbc8c1.js.map
