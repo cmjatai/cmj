@@ -51,34 +51,46 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
     # Receive message from room group
     async def time_refresh_message(self, event):
 
-        message = event['message']
-        app = message.get('app')
-        model = message.get('model')
+        try:
 
-        u = self.scope.get('user')
+            message = event['message']
+            app = message.get('app')
+            model = message.get('model')
 
-        key = f"{app}:{model}"
-        perms_publicas = self.portalcmj_rpp.get(key, set())
+            u = self.scope.get('user')
 
-        perm_detail = f"{app}.detail_{model}"
-        perm_view = f"{app}.view_{model}"
+            key = f"{app}:{model}"
+            perms_publicas = self.portalcmj_rpp.get(key, set())
 
-        if u.is_anonymous and not perms_publicas:
-            detail_perm = False
-        elif u.is_anonymous:
-            detail_perm = perm_detail in perms_publicas or perm_view in perms_publicas
-        elif not u.is_superuser:
-            detail_perm = u.has_perm(perm_detail) or u.has_perm(perm_view)
-        else:
-            detail_perm = True
+            perm_detail = f"{app}.detail_{model}"
+            perm_view = f"{app}.view_{model}"
 
-        if not detail_perm:
-            del message['instance']
+            if u.is_anonymous and not perms_publicas:
+                detail_perm = False
+            elif u.is_anonymous:
+                detail_perm = perm_detail in perms_publicas or perm_view in perms_publicas
+            elif not u.is_superuser:
+                detail_perm = u.has_perm(perm_detail) or u.has_perm(perm_view)
+            else:
+                detail_perm = True
 
-        # Send message to WebSocket
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+            try:
+                if not detail_perm:
+                    del message['instance']
+            except KeyError:
+                pass
+
+            # Send message to WebSocket
+            await self.send(text_data=json.dumps({
+                'message': message
+            }))
+            
+        except Exception as e:
+            logger.error(f"Erro ao processar time_refresh_message no TimeRefreshConsumer: {e}")
+            await self.send(text_data=json.dumps({
+                'type': 'error',
+                'error': str(e)
+            }))
 
 class SyncRefreshConsumer(AsyncWebsocketConsumer):
 
@@ -231,12 +243,15 @@ class SyncRefreshConsumer(AsyncWebsocketConsumer):
             else:
                 detail_perm = True
 
-            if not detail_perm:
-                del message['instance']
+            try:
+                if not detail_perm:
+                    del message['instance']
+            except KeyError:
+                pass
 
             # Send message to WebSocket
             await self.send(text_data=json.dumps(event))
-            
+
         except Exception as e:
             logger.error(f"Erro ao processar sync_refresh_message no SyncRefreshConsumer: {e}")
             await self.send(text_data=json.dumps({
