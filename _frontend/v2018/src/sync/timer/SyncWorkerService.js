@@ -1,4 +1,4 @@
-import Worker from './timer.worker.js'
+import Worker from './sync.worker.js'
 class TimerWorkerService {
   constructor () {
     this.worker = new Worker()

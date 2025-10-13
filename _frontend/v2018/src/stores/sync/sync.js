@@ -1,5 +1,5 @@
 import WebSocketManager from '@/sync/ws/WebSocketManager'
-import TimerWorkerService from '@/sync/timer/TimerWorkerService'
+import TimerWorkerService from '@/sync/timer/SyncWorkerService'
 import Resources from '@/resources'
 
 import Vue from 'vue'
@@ -82,7 +82,7 @@ const syncStore = {
           dispatch('handleSyncMessage', data.message)
         } else if (data.type === 'pong') {
           // atualizar lastServerSync com o timestamp do servidor
-          commit('SET_LAST_SERVER_SYNC', data.message)
+          commit('SET_LAST_SERVER_SYNC', data)
         }
       })
       commit('SET_WS_MANAGER', wsManager)
@@ -165,6 +165,7 @@ const syncStore = {
         const server_time_diff = lastServerSync ? lastServerSync.server_time_diff : 0
         // Atualizar cronometro localmente
         if (cronometro && cronometro.state === 'running') {
+          console.log('TIMER RUNNING', cronometroId, timestamp / 1000, cronometro.started_time, server_time_diff)
           const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
           cronometro.remaining_time = cronometro.duration - elapsed_time
