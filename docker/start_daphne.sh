@@ -21,8 +21,8 @@ test -d $RUNDIR || mkdir -p $RUNDIR
 exec daphne \
     -u $SOCKFILE ${DJANGO_ASGI_MODULE}:application \
     --access-log /var/cmjatai/cmj/logs/daphne_access.log \
-    --ping-interval 120 --ping-timeout 300 \
-    --websocket_timeout -1 --websocket_connect_timeout -1
-    -v2
+    --ping-interval 30 --ping-timeout 120 \
+    --websocket_timeout 7200 --websocket_connect_timeout 120 \
+    --verbosity 2
 
 

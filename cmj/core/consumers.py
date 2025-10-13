@@ -5,7 +5,8 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from click import command
 from django.utils import timezone
 from channels.db import database_sync_to_async
-
+import logging
+logger = logging.getLogger(__name__)
 
 class TimeRefreshConsumer(AsyncWebsocketConsumer):
 
@@ -104,11 +105,13 @@ class SyncRefreshConsumer(AsyncWebsocketConsumer):
         await self.accept()
 
     async def disconnect(self, close_code):
-        #print('Desconectando do SyncConsumer')
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        try:
+            await self.channel_layer.group_discard(
+                self.room_group_name,
+                self.channel_name
+            )
+        except Exception as e:
+            logger.error(f"Erro ao desconectar do SyncRefreshConsumer: {e}")
 
     # Receive message from WebSocket
     async def receive(self, text_data):
