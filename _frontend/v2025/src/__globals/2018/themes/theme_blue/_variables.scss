@@ -1,0 +1,144 @@
+$color_primary: #114d81; //006556
+$color_new_primary: #114d81; //114d81
+
+$color_text_brand: white;
+$color_text_brand_hover: #fff;
+
+$color_text_menu: #9DFF00; // 9DFF00 ffFF99
+
+$bg_color_thematic: $color_primary; 
+$text_color_thematic: #fff;
+$border_width_thematic: 1px;
+
+$border_color_thematic: #9DFF00;
+$border_color_thematic: darken($border_color_thematic, 30);
+
+
+$color_border_menu_hover: rgba(231, 233, 240, 0.3);
+
+$color_text: #114d81;
+$color_text_reverse: #fff;
+
+$color_main_bg: #ffffff; //(255, 255, 255, 0.5);
+
+$color_container_bg: #eceef5; // f0efe7
+$color_container_border: darken(#f0efe7, 5);
+
+$color_text_link: #015fb1;
+
+$color_text_title: #0539a9;
+$color_text_descricao: #007969;
+
+$color_border_input: #aecfec;
+
+// ----------------------------------
+$bg_color_table_base: #eceef5;
+
+
+
+
+$url_bg_png: url(~@/assets/img/bg.png);
+
+$hover_background_05p: rgba(0, 0, 0, 0.05);
+$hover_background_10p: rgba(0, 0, 0, 0.1);
+$hover_background_20p: rgba(0, 0, 0, 0.2);
+$hover_background_50p: rgba(0, 0, 0, 0.5);
+$hover_background_10pw: rgba(205, 255, 200, 0.1);
+$hover_background_20pw: rgba(205, 255, 200, .2);
+
+// variaveis wrapper ########################################
+$width-wrapper-lg: 320px !default;
+$width-wrapper-sm: 135px !default;
+$width-wrapper-xs: 80px !default;
+
+$width-wrapper-closed: 36px !default;
+
+// variaveis bootstrap ########################################
+//$grid-gutter-width: 20px !default;
+
+$menu-height: 40px !default;
+$padding-menu-top: 5px !default;
+
+$icon-font-path: "../bootstrap/fonts/" !default;
+
+
+
+// variaveis portalCMJ ########################################
+
+// models
+$color_documentoadministrativo: #00c0ee;
+$color_parlamentar: #004c40;
+$color_sessaoplenaria: #f39c12;
+$color_materialegislativa: #f56954;
+$color_diariooficial: #85144b;
+$color_comissao: #f012be;
+$color_transparencia: #932ab6;
+$color_normajuridica: #00a65a;
+$color_documentoacessorio:#010ca5;
+$color_dispositivo: #9507a8;
+$color_tramitacao: #b80303;
+
+$color_noticias: #794c05;
+
+$color_actions: #16407c;
+$color_actions_border: #CCC;
+$color_buttons: #2980B9;
+
+
+
+// variaveis bootstrap ########################################
+$font-size-base: 1rem !default;
+
+// variaveis grid bootstrap ########################################
+
+
+$grid-breakpoints: (xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px) !default;
+
+//$container-max-widths: (xl: 1140px) !default;
+
+$container-max-widths: (
+  sm: 100%,
+  md: 100%,
+  lg: 100%,
+  xl: 1140px,
+  xxl: 1350px) !default;
+
+$zindex-dropdown: 1000 !default;
+$zindex-sticky: 1020 !default;
+$zindex-fixed: 1030 !default;
+$zindex-modal-backdrop: 1040 !default;
+$zindex-modal: 1050 !default;
+$zindex-popover: 1060 !default;
+$zindex-tooltip: 1070 !default;
+
+$zindex-notify: 1500 !default;
+$zindex-path-direction: 2000 !default;
+$zindex-footer: 2100 !default;
+
+$zindex-pagination: 2125 !default;
+
+$zindex-navbar-menu: 2150 !default;
+
+$zindex-sidebar: 2500 !default;
+
+$zindex-navbar-topo: 2600 !default;
+
+$zindex-sidebar-desktop: 2700 !default;
+
+$zindex-google-search: 3000 !default;
+
+$zindex-apps: 4000 !default;
+
+$zindex-selectbox: 3000 !default;
+
+$zindex-galeria: 5000 !default;
+$zindex-galeria-fixed: 9000 !default;
+$zindex-message: 10000 !default;
+
+$zindex-popup: 99999 !default;
+

@@ -397,10 +397,10 @@ def settings_key_filter(var_name):
 
 
 @register.simple_tag
-def render_chunk_vendors(extension=None):
+def render_chunk_vendors(extension=None, config='DEFAULT'):
     try:
         tags = utils.get_as_tags(
-            'chunk-vendors', extension=extension, config='DEFAULT', attrs='')
+            'chunk-vendors', extension=extension, config=config, attrs='')
         return mark_safe('\n'.join(tags))
     except:
         return ''

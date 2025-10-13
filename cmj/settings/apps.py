@@ -4,7 +4,7 @@ from unipath import Path
 
 config = AutoConfig()
 DEBUG = config('DEBUG', default=False, cast=bool)
-FRONTEND_VERSION = config('FRONTEND_VERSION', default='v1', cast=str)
+FRONTEND_VERSION = config('FRONTEND_VERSION', default='v2018', cast=str)
 
 PYTHON_VERSION = sys.version_info[0:3]
 PYTHON_VERSION_MIN_FOR_JWT = 3, 7, 0

@@ -1,0 +1,342 @@
+.container-videos {
+  //margin: 0;
+  //padding: 0;
+
+  .video-list,
+  .sessao-list {
+
+    .card-image,
+    .inner-imagem {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+
+      .duration {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        font-size: 0.8rem;
+        line-height: 1.3;
+        padding: 1px 4px 0;
+        color: white;
+        background-color: #000f;
+        border-radius: 3px;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      a {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center 50%;
+
+        text-align: center;
+        display: flex;
+
+        justify-content: center;
+        align-items: center;
+
+        .fa-play {
+          color: #f5f5f5aa;
+          border: .15em solid rgba(white, 0.3);
+          border-radius: 50%;
+          padding: 0.85rem 0 0 0.2rem;
+          width: 3rem;
+          height: 3rem;
+          font-size: 1.1rem;
+        }
+
+        &::after {
+          content: "";
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          background-color: #0005;
+
+        }
+
+        &:hover {
+          .fa-play {
+            color: #f5f5f5ff;
+            border: .15rem solid rgba(white, 1);
+          }
+
+          &::after {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+
+  .video-list {
+    margin: 50px 5%;
+
+    .statistics {
+      font-size: 0.9rem;
+      color: #777;
+      display: block;
+      text-align: left;
+    }
+
+    .live,
+    .upcoming {
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+      font-size: 1rem;
+      border: 1px solid black;
+      padding: 2px;
+    }
+
+    .live {
+      border-color: red;
+      color: red;
+    }
+
+    .upcoming {
+      border-color: blue;
+      color: blue;
+    }
+
+    .upcoming-time {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 0.9rem;
+      display: block;
+      color: blue;
+    }
+
+    .item {
+      padding: 5px 5px 15px;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .inner-text {
+      a {
+        font-weight: 700;
+        display: inline-block;
+        padding: 10px 0 5px;
+        color: #212529;
+      }
+
+      .titulo-upcoming,
+      .titulo-live {
+        line-height: 1.3;
+        font-weight: bold;
+        font-family: Graduate;
+        font-variant: small-caps;
+      }
+    }
+  }
+
+  .sessao-list {
+    .card {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .item {
+      margin-bottom: 2em;
+    }
+  }
+
+  &.pagina-inicial {
+    background: darken($color_main_bg, 10%) $url_bg_png;
+    ///min-height: 90vh;
+    //margin: 1em 0 0;
+    padding: 15px 0;
+
+    .title-container-noticias {
+      padding: 0 1em;
+      margin-bottom: 1.1em;
+    }
+
+    .video-list {
+      margin: 0 1em;
+
+      .item {
+        padding-top: 0;
+        padding-bottom: 0;
+        margin: 0;
+      }
+    }
+  }
+
+  &.portlet-aovivo {
+    background: darken($color_main_bg, 10%) $url_bg_png;
+    padding: 1rem 0 1rem;
+    //min-height: 70vmin;
+    //min-height: calc(100vh - 100px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    //.container {
+    //  width: 80%;
+    //}
+
+    .title-container-noticias {
+      margin-bottom: 1rem;
+      color: #c00;
+      border-color: #c00;
+      padding-bottom: 2px;
+      font-size: 1em;
+    }
+
+    .video-list {
+      background: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 7.5px;
+    }
+
+    .item {
+      padding: 7.5px;
+      margin: 0;
+      font-size: 0.7rem;
+      flex: 0 0 25%;
+
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: stretch;
+    }
+
+    .inner {
+      flex: 0 0 100%;
+
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      justify-content: stretch;
+
+    }
+
+    .inner-imagem {
+      padding: 0;
+      width: auto;
+      flex: 0 0 40%;
+    }
+
+    .inner-text {
+      display: flex;
+      flex-direction: column;
+      align-items: top;
+      justify-content: left;
+      padding-left: 10px;
+
+      .titulo {
+        padding: 0;
+      }
+
+      br {
+        display: none;
+      }
+    }
+
+    .statistics {
+      overflow: hidden;
+      //flex: 0 0 2em;
+      font-size: 0.6rem;
+    }
+
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+
+  .container-videos {
+    &.portlet-aovivo {
+      .container {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991.98px) {
+  .container-videos {
+    &.pagina-inicial {
+      margin-left: 0;
+      margin-right: 0;
+
+      .video-list {
+        margin: 0 0.5em;
+
+        .item {
+          padding-bottom: 15px;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px) {
+  .container-videos {
+    .video-list {
+      margin: 50px -15px;
+
+      .item {
+        padding: 0px 0px 15px;
+        margin-bottom: 5px;
+      }
+
+      .inner-text {
+        line-height: 1.2;
+        padding: 0 10px;
+
+        .titulo {
+          padding-top: 5px;
+        }
+      }
+    }
+
+    &.pagina-inicial {
+
+      //background: transparent;
+      .item {
+        padding: 5px;
+        margin-bottom: 5px;
+      }
+
+    }
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+  .container-videos {
+    &.portlet-aovivo {
+      //padding: 1px 5px 1rem;
+      //min-height: 0;
+    }
+
+    &.pagina-inicial {
+      padding: 0.4em 0 0 0;
+
+      .video-list {
+        margin: 0;
+      }
+
+      .title-container-noticias {
+        padding: 0 0.5em;
+        margin-bottom: 0.5em;
+      }
+
+      .item {
+        padding: 0.5em;
+        margin-bottom: 5px;
+      }
+
+      .upcoming-time {
+        padding-top: 3px;
+      }
+    }
+  }
+}

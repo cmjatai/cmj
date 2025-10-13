@@ -27,21 +27,36 @@ services:
       - "127.0.0.1:9983:9983"
     networks:
       - cmj-net
-  cmjfront:
+  cmjfront2018:
     build:
-      context: ../_frontend/v1/
-      dockerfile: ../../docker/DockerfileFrontDev
+      context: ../_frontend/v2018/
+      dockerfile: ../../docker/DockerfileFront2018Dev
     #command: yarn build
     restart: no
-    container_name: cmjfront
+    container_name: cmjfront2018
     labels:
-       NAME: "cmjfront"
+       NAME: "cmjfront2018"
     volumes:
       - ../:/var/cmjatai/cmj
     networks:
       - cmj-net
     ports:
       - "8080:8080"
+  cmjfront2025:
+    build:
+      context: ../_frontend/v2025/
+      dockerfile: ../../docker/DockerfileFront2025Dev
+    #command: yarn build
+    restart: no
+    container_name: cmjfront2025
+    labels:
+       NAME: "cmjfront2025"
+    volumes:
+      - ../:/var/cmjatai/cmj
+    networks:
+      - cmj-net
+    ports:
+      - "8081:8081"
   cmj:
     build:
       context: ../
@@ -62,8 +77,8 @@ services:
       - ../:/var/cmjatai/cmj
     depends_on:
       - cmjredis
-      - cmjfront
-      #- cmjfront4
+      - cmjfront2018
+      - cmjfront2025
       - cmjsolr
     ports:
       - "9099:9000"
