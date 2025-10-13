@@ -37,7 +37,7 @@ HOST_NAME = '192.168.15.9'
 
 module.exports = {
   runtimeCompiler: true,
-  publicPath: process.env.NODE_ENV === 'production' ? '/static' : `http://${HOST_NAME}:8081/`,
+  publicPath: process.env.NODE_ENV === 'production' ? '/static/v2025' : `http://${HOST_NAME}:8081/`,
   outputDir: 'dist/v2025',
 
   chainWebpack: config => {
