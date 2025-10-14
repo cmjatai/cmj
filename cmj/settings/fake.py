@@ -17,6 +17,6 @@ DJANGO_VITE_DEV_MODE = False
 DJANGO_VITE = {
     'default': {
         'dev_mode': DJANGO_VITE_DEV_MODE,
-        'manifest_path': DJANGO_VITE_ASSETS_PATH / '.vite' / 'manifest.json',
+        'manifest_path': DJANGO_VITE_ASSETS_PATH.child('.vite').child('manifest.json'),
     }
 }
