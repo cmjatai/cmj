@@ -70,8 +70,16 @@ if settings.DEBUG:
                 time_refresh_log_test, name='time_refresh_log_test_index'),
     ]
 
+vue_urlpatterns = [
+    re_path(r'^online/',
+            app_vue_view_v2018, name='app_vue_view_v2018_url'),
 
-urlpatterns = user_urlpatterns + [
+    re_path(r'^2025/',
+            app_vue_view_v2025, name='app_vue_view_v2025_url'),
+]
+
+
+urlpatterns = vue_urlpatterns + user_urlpatterns + [
 
     re_path(r'^media/(?P<path>.*)$',
             MediaPublicView.as_view(), name='mediapublic_view'),
@@ -104,14 +112,6 @@ urlpatterns = user_urlpatterns + [
     re_path(r'^sistema/core/tipologradouro',
             include(TipoLogradouroCrud.get_urls())),
     re_path(r'^sistema/core/logradouro', include(LogradouroCrud.get_urls())),
-
-
-    re_path(r'^online/',
-            app_vue_view_v2018, name='app_vue_view_v2018_url'),
-
-    re_path(r'^2025/',
-            app_vue_view_v2025, name='app_vue_view_v2025_url'),
-
 
     re_path(r'^sistema/core/trecho', include(TrechoCrud.get_urls())),
 

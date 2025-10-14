@@ -1,0 +1,257 @@
+{% load i18n static menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+<!DOCTYPE html>
+<!--[if IE 8]> <html class="no-js lt-ie9" lang="pt-br"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
+<!--<![endif]-->
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="reply-to" content="manager@jatai.go.leg.br">
+    <meta name="theme-color" content="#114d81">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% if head_title %}{{head_title}}{% else %}PortalCMJ - Câmara de Jataí{% endif %}{% endblock %} - {% block head_title_sufix %}{% if head_title_sufix %}{{head_title_sufix}}{% else %}Portal da Câmara Municipal de Jataí - Estado de Goiás{% endif %}{% endblock head_title_sufix %}</title>
+    <meta name="description" content="{% block meta_description %}{% if meta_description %}{{meta_description}}{% else %}PortalCMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.{% endif %}{% endblock meta_description %}">
+    {% block meta_tags %}
+      {% include "base_meta_tags.html" %}
+    {% endblock %}
+    {% block head_content %}
+    {% endblock %}
+    {% block webpack_loader_css %}
+      {% render_chunk_vendors 'css' %}
+      {% render_bundle  'app' 'css' %}
+    {% endblock webpack_loader_css %}
+    {% block widgets_form_css %}{% endblock widgets_form_css %}
+  </head>
+  <body class="{% block body_class %}{% endblock body_class %}">
+  {% block root_body %}
+    {% include "popups.html" %}
+    <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
+
+      {% block base_header_block %}
+        {% include 'base_accessibility.html' %}
+        {% include 'base_header.html' %}
+      {% endblock base_header_block %}
+
+      {% block global_container %}
+        {% block navigation %}
+          <nav class="navbar navbar-menu navbar-expand-lg navbar-dark">
+            <div class="container{{fluid}}">
+              <div class="navbar-collapse collapse" id="navbar-menu">
+
+                <ul class="navbar-nav" id="menu_content">
+
+                  {% sigad_navbar 'list_in_menu' %}
+
+                  {% if user.is_superuser %}
+                    {% navbar 'navbar2/navbar_superuser.yaml' %}
+                  {% elif not user.is_anonymous and not user.is_only_socialuser %}
+                    {% navbar 'navbar2/navbar_restrict.yaml' %}
+                  {% endif %}
+                </ul>
+
+                {% include "base_menu_right.html" %}
+
+                {% if user.is_anonymous %}
+                  <ul class="navbar-nav justify-content-end">
+                    <li>
+                      <a  class="menu-intranet"  href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false" title="{% trans 'Acessar' %}"><i class="fas fa-sign-in-alt"></i>&nbsp;</a>
+                      <ul class="dropdown-menu">
+
+                        <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+
+                        <li class="text-right">
+                          <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                          <ul class="dropdown-menu">
+                            <li class="text-right"><a href="https://webmail-seguro.com.br/jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                            <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                            <li class="text-right"><a href="https://cmjatai.1doc.com.br">{% trans "1Doc" %}</a></li>
+                            <li class="text-right"><a href="https://cmjatai.1doc.com.br/b.php?pg=o/wp">Central de Atendimento</a></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                  </ul>
+                {% endif %}
+              </div>
+            </div>
+          </nav>
+        {% endblock navigation %}
+
+        {% block canais_diretos %}
+          {% include "base_sidebar.html" %}
+        {% endblock canais_diretos%}
+
+        {# Banner #}
+        {% block banner %}
+          {% include "base_banner.html" %}
+        {% endblock banner %}
+
+        {# Breadcrumb #}
+        {% block breadcrumb %}
+          {% breadcrumb %}
+        {% endblock %}
+
+        {# Header #}
+        {% block second_header %}
+          <header class="masthead">
+            <div class="container{{fluid}}">
+                {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
+            </div>
+          </header>
+        {% endblock second_header %}
+
+        <main id="content" class="content page__row screen-lg">
+          {% block content_container %}
+            <div class="{% block main_container_class %}container{{fluid}}{{path}} container-box{% endblock %}">
+              {% block base_functions %}{% endblock %}
+              {% block base_container_header %}
+                {% block base_header %}
+                  <div class="clearfix">
+                    {% block title %}
+                      <h1 class="page-header {{bg_title}}">
+                        {% if title %}
+                          {{ title|safe|linebreaksbr }}
+                        {% elif view.title %}
+                          {{ view.title|safe|linebreaksbr }}
+                        {% elif object %}
+                          {{ object|safe|linebreaksbr }}
+                        {% endif %}
+                      </h1>
+                    {% endblock %}
+                  </div>
+                {% endblock base_header %}
+              {% endblock base_container_header %}
+
+              {% block base_workspace %}
+                {% if view.is_contained %}
+                  <div class="box-area-trabalho">
+                    {% for at in areatrabalho %}
+                      <a>{{at.nome}}</a>
+                    {% endfor %}
+                  </div>
+                {% endif %}
+              {% endblock base_workspace %}
+
+              {% block subtitle %}
+                  {% if subtitle and '<' not in subtitle %}
+                    <h2 class="page-header p-0 px-4">
+                      <small><small>
+                        <em>{{ subtitle }}</em>
+                      </small></small>
+                    </h2>
+                  {% elif subtitle %}
+                    {{ subtitle|safe }}
+                  {% endif %}
+              {% endblock %}
+
+              {# Feedback messages #}
+              {% for message in messages %}
+                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible" role="alert">
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                  {{ message|safe }}
+                </div>
+              {% endfor %}
+
+              {% block appvue_content %}
+                <div id="app"></div>
+              {% endblock appvue_content %}
+
+              {% block base_content %}{% endblock %}
+            </div>
+
+            {% block cmj_extra_content %}{% endblock %}
+
+          {% endblock content_container %}
+        </main>
+      {% endblock global_container %}
+    </div>
+
+    {% block login_container %}
+    {% endblock%}
+
+
+    {% include 'base_footer.html' %}
+
+
+  {% endblock root_body %}
+
+  <div vw class="disabled">
+    <div vw-access-button class="active"></div>
+    <div vw-plugin-wrapper>
+      <div class="vw-plugin-top-wrapper"></div>
+    </div>
+  </div>
+
+  {% block foot_js %}
+
+    {% block webpack_loader_js %}
+      {% render_chunk_vendors 'js' %}
+      {% render_bundle  'app' 'js' %}
+    {% endblock webpack_loader_js %}
+
+    {% block extra_js %}{% endblock %}
+
+  {% endblock foot_js %}
+
+  {% block widgets_form_js %}{% endblock widgets_form_js %}
+
+
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>
+    $(function () {
+      new window.VLibras.Widget('https://vlibras.gov.br/app');
+    })
+  </script>
+
+  {% if not DEBUG and not perms.materia and not perms.norma and not perms.sessao %}
+
+    {% comment %}
+    <script>
+      window.fbAsyncInit = function () {
+        FB.init({
+          appId      : '{% settings_key_tag 'SOCIAL_AUTH_FACEBOOK_KEY' %}',
+          cookie     : true,
+          xfbml      : true,
+          version    : 'v6.0'
+        });
+
+        FB.AppEvents.logPageView();
+
+        FB.getLoginStatus(function(response) {
+            //// console.log(response);
+          });
+        };
+
+        (function (d, s, id){
+          var js, fjs = d.getElementsByTagName(s)[0];
+          if (d.getElementById(id)) {return;}
+          js = d.createElement(s); js.id = id;
+          js.src = "https://connect.facebook.net/pt_BR/sdk.js";
+          fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+    </script>
+    {% endcomment %}
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0E9S41BRSL"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-0E9S41BRSL');
+    </script>
+
+    {% comment %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'UA-2431536-7');
+    {% endcomment %}
+  {% endif %}
+  </body>
+</html>
+

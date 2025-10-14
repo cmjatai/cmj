@@ -11,6 +11,7 @@ PROJECT_DIR = Path(__file__).ancestor(3)
 
 
 def front_version():
+    return ['_templates/v2025', '_templates/v2018']
     if FRONTEND_VERSION == 'v2018':
         return ['_templates/v2018',]
     elif FRONTEND_VERSION == 'v2025':
