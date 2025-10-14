@@ -44,7 +44,7 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
         if type_msg == 'ping' and timestamp:
             await self.send(text_data=json.dumps({
                 'type': 'pong',
-                'timestamp_server': time.time(), # timezone.now().timestamp(),
+                'timestamp_server': time.time() * 1000,
                 'timestamp_client': timestamp
             }))
 
@@ -84,7 +84,7 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
             await self.send(text_data=json.dumps({
                 'message': message
             }))
-            
+
         except Exception as e:
             logger.error(f"Erro ao processar time_refresh_message no TimeRefreshConsumer: {e}")
             await self.send(text_data=json.dumps({
@@ -139,7 +139,7 @@ class SyncRefreshConsumer(AsyncWebsocketConsumer):
                 await self.send(text_data=json.dumps({
                     'type': 'pong',
                     'message': {
-                        'timestamp_server': time.time(), # timezone.now().timestamp(),
+                        'timestamp_server': time.time() * 1000,
                         'timestamp_client': timestamp,
                         'ping_now': ping_now
                     }

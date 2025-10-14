@@ -295,7 +295,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                 'app': inst._meta.app_label,
                 'model': inst._meta.model_name,
                 'created': created,
-                'timestamp': time.time(),
+                'timestamp': time.time() * 1000,
                 'instance': None
             }
             if inst_serialize:

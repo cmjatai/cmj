@@ -5,21 +5,31 @@ const Error404 = () => import('~@/views/Error404.vue')
 
 export const routes = [
   {
-    path: '/wstest/',
-    name: 'index_link',
-    component: WsTest,
-    children: [
-    ]
-  },
-  {
-    path: '/:pathMatch(.*)',
-    name: 'error_404',
-    component: Error404,
+    path: '/v2025/',
+    name: 'home',
     meta: {
-      title: '404 - Not Found',
-      description: 'Page not found',
+      title: 'Home',
+      description: 'Home page',
     },
-  },
+    children: [
+      {
+        path: '/wstest/',
+        name: 'index_link',
+        component: WsTest,
+        children: [
+        ]
+      },
+      {
+        path: '/:pathMatch(.*)',
+        name: 'error_404',
+        component: Error404,
+        meta: {
+          title: '404 - Not Found',
+          description: 'Page not found',
+        },
+      },
+    ]
+  }
 ]
 
 const router = createRouter({

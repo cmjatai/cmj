@@ -78,13 +78,17 @@ export default defineConfig(({command, mode}) => {
       },
     },
     publicDir: resolve(INPUT_DIR, 'assets'),
+    worker: {
+      format: 'es',
+      plugins: [],
+    },
     build: {
       outDir: resolve(OUTPUT_DIR),
       assetsDir: '',
       manifest: true,
       emptyOutDir: true,
       copyPublicDir: true,
-      target: 'es2015',
+      target: 'esnext',
       rollupOptions: {
         input: {
           main: resolve(INPUT_DIR, 'main.js'),

@@ -41,6 +41,9 @@
   <div id="cmj">aqui v2025
     <cmj-app>
       {% block root_body %}
+        {% block main_content %}
+          <router-view></router-view>
+        {% endblock main_content %}
         {% block footer_content %}
           <footer>
             <div class="container footer">

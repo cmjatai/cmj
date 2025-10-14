@@ -6,7 +6,7 @@ class WebSocketManager {
     this.reconnectAttempts = 0
     this.maxReconnectAttempts = 10
     this.reconnectInterval = 1000
-    this.heartbeatInterval = 5000
+    this.heartbeatInterval = 30000
     this.heartbeatTimer = null
     this.listeners = new Map()
 
@@ -28,11 +28,11 @@ class WebSocketManager {
 
       // Responder pings automaticamente
       if (data.type === 'ping') {
-        const now = Date.now() / 1000
+        const now = Date.now()
         this.send({ type: 'pong', timestamp_client: now })
         return
       } else if (data.type === 'pong') {
-        let pong_now = performance.now() // Date.now() / 1000 // em segundos
+        let pong_now = performance.now()
         const now = {
           type: 'pong',
           pong: pong_now,
@@ -41,7 +41,7 @@ class WebSocketManager {
           timestamp_server: data.message.timestamp_server,
           // latency: pong_now - data.ping_now,
           server_time_diff: (
-            data.message.timestamp_server - data.message.timestamp_client) - (pong_now - data.message.ping_now) / 1000
+            data.message.timestamp_server - data.message.timestamp_client) - (pong_now - data.message.ping_now)
         }
         // console.log('Pong recebido do servidor:', now)
         this.emit('message', now)
@@ -79,7 +79,7 @@ class WebSocketManager {
   startHeartbeat () {
     this.heartbeatTimer = setInterval(() => {
       if (this.ws.readyState === WebSocket.OPEN) {
-        const now = Date.now() / 1000
+        const now = Date.now()
         this.send({ type: 'ping', timestamp_client: now, ping_now: performance.now() })
       }
     }, this.heartbeatInterval)

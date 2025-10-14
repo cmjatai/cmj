@@ -1,8 +1,8 @@
 <template>
   <div class="http-404">
     <img
-      src="/imgs/logo_emendamais.svg"
-      alt="Logo Emenda"
+      src="/brasao/brasao_256.png"
+      alt="Logo CMJ"
       class="img-fluid"
     >
     <div class="error-container">
