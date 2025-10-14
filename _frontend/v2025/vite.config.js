@@ -38,7 +38,7 @@ export default defineConfig(({command, mode}) => {
 
   // eslint-disable-next-line
   const BASE_DIR = '.'
-  const OUTPUT_DIR = './dist'
+  const OUTPUT_DIR = './dist/v2025'
   const INPUT_DIR = './src'
 
   return {

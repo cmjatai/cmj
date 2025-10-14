@@ -124,6 +124,7 @@ STATICFILES_DIRS = [
     PROJECT_DIR.child('_frontend', FRONTEND_VERSION, 'dist'),
     DJANGO_VITE_ASSETS_PATH,
 ]
+
 if DEBUG:
     STATICFILES_DIRS += [
         PROJECT_DIR.child('_frontend', 'v2025', 'src', 'assets'),
