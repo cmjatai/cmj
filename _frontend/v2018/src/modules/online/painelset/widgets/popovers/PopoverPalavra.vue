@@ -45,7 +45,7 @@
 </template>
 <script>
 import CronometroBase from '../../components/cronometros/CronometroBase.vue'
-
+import Vuex from 'vuex'
 export default {
   name: 'popover-palavra',
   components: {
@@ -55,6 +55,27 @@ export default {
     return {
       touching: false,
       moving: false
+    }
+  },
+  watch: {
+    wsConnected: {
+      immediate: true,
+      handler (newVal) {
+        if (newVal) {
+          // WebSocket connected
+        } else {
+          // WebSocket disconnected
+          this.$nextTick(() => {
+            this.invalidateCacheModels({
+              app: 'painelset',
+              models: [
+                'individuo',
+                'cronometro'
+              ]
+            })
+          })
+        }
+      }
     }
   },
   computed: {
@@ -88,6 +109,9 @@ export default {
     })
   },
   methods: {
+    ...Vuex.mapActions('store__sync', [
+      'invalidateCacheModels'
+    ]),
     fotografiaParlamentarUrl (parlamentar) {
       if (parlamentar) {
         return '/api/parlamentares/parlamentar/' + parlamentar + '/fotografia.c96.png'

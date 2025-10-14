@@ -129,6 +129,7 @@ const syncStore = {
         }
       }
     },
+
     async fetchSync ({ commit, dispatch }, { app, model, id, action, params, only_first_page = false }) {
       const _fetch = Resources.Utils.fetch
       const metadata = { app, model }
@@ -148,9 +149,46 @@ const syncStore = {
         }
       })
     },
+
+    // Ações de sincronização
+
+    // Sincroniza um item específico
+    syncItem ({ dispatch }, { app, model, id }) {
+      dispatch('fetchSync', { app, model, id })
+    },
+
+    // Invalidações de cache
+
+    // força a remoção do cache de um item de um modelo específico
+    invalidateCacheItem ({ commit, state }, { app, model, id }) {
+      const uri = `${app}_${model}`
+      if (state.data_cache[uri] && state.data_cache[uri][id]) {
+        const inst = state.data_cache[uri][id]
+        commit('DELETE_DATA_CACHE', { key: uri, value: inst })
+      }
+    },
+
+    // força a remoção do cache de um modelo específico
+    invalidateCacheModels ({ commit, state }, { app, models }) {
+      models.forEach(model => {
+        const uri = `${app}_${model}`
+        if (state.data_cache[uri]) {
+          Vue.set(state.data_cache, uri, {})
+        }
+      })
+    },
+
+    // força a remoção do cache de todos os modelos
+    invalidateCacheAll ({ commit, state }) {
+      Vue.set(state, 'data_cache', {})
+    },
+
+    // Register models to listen for sync messages
     registerModels ({ commit }, app_models) {
       commit('UPDATE_MODEL', app_models)
     },
+
+    // Timer actions
     startTimer ({ state }, { timerId, callback, interval }) {
       TimerWorkerService.startTimer(timerId, callback, interval)
     },
@@ -165,7 +203,7 @@ const syncStore = {
         const server_time_diff = lastServerSync ? lastServerSync.server_time_diff : 0
         // Atualizar cronometro localmente
         if (cronometro && cronometro.state === 'running') {
-          console.log('TIMER RUNNING', cronometroId, timestamp / 1000, cronometro.started_time, server_time_diff)
+          // console.log('TIMER RUNNING', cronometroId, timestamp / 1000, cronometro.started_time, server_time_diff)
           const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
           cronometro.remaining_time = cronometro.duration - elapsed_time

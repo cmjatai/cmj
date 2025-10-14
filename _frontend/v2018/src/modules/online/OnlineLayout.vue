@@ -23,9 +23,16 @@
 
     <template slot="sideleft" :sideleft_visivel="sideleft_visivel">
       <side-left></side-left>
-      <div :class="['ws-status', ws_status]" :title="ws_status === 'connected' ? 'Conexão ativa' : 'Sem conexão com o servidor. Tentando reconectar...'">
-        <div class="inner">
-          <i :class="ws_status === 'connected' ? 'fas fa-wifi' : 'fas fa-exclamation-triangle'"></i>
+      <div class="d-flex">
+        <div :class="['ws-status', ws_status]" :title="ws_status === 'connected' ? 'Conexão ativa' : 'Sem conexão com o servidor. Tentando reconectar...'">
+          <div class="inner">
+            <i :class="ws_status === 'connected' ? 'fas fa-wifi' : 'fas fa-exclamation-triangle'"></i>
+          </div>
+        </div>
+        <div :class="['ws-status', wsConnected ? 'connected' : 'disconnected']" :title="wsConnected ? 'Conexão ativa' : 'Sem conexão com o servidor. Tentando reconectar...'">
+          <div class="inner">
+            <i :class="wsConnected ? 'fas fa-wifi' : 'fas fa-exclamation-triangle'"></i>
+          </div>
         </div>
       </div>
     </template>

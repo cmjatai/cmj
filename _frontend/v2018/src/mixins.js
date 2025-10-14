@@ -9,7 +9,7 @@ Vue.use(Vuex)
 Vue.mixin({
 
   computed: {
-    ...Vuex.mapState('store__sync', ['data_cache']),
+    ...Vuex.mapState('store__sync', ['data_cache', 'wsConnected']),
     ...Vuex.mapGetters([
       'getCache',
       'cache',

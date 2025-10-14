@@ -289,44 +289,36 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
 
             channel_layer = get_channel_layer()
 
+            message = {
+                'action': action,
+                'id': inst.id,
+                'app': inst._meta.app_label,
+                'model': inst._meta.model_name,
+                'created': created,
+                'timestamp': time.time(),
+                'instance': None
+            }
+            if inst_serialize:
+                message['instance'] = inst_serialize
+
             if inst._meta.label in (
                 'painelset.Evento',
                 'painelset.Individuo',
                 'painelset.Cronometro',
                 'painelset.CronometroEvent'
             ):
-                #if not inst_serialize:
-                #    inst_serialize = json.loads(
-                #        serializers.serialize("json", (inst, )))[0]['fields']
-                #    inst_serialize['id'] = inst.id
-
                 async_to_sync(channel_layer.group_send)(
                     "group_sync_refresh_channel", {
                         "type": "sync_refresh.message",
-                        'message': {
-                            'action': action,
-                            'id': inst.id,
-                            'app': inst._meta.app_label,
-                            'model': inst._meta.model_name,
-                            'created': created,
-                            'instance': inst_serialize,
-                            'timestamp': time.time()
-                        }
+                        'message': message
                     }
                 )
             else:
-                # deprecated canal, manter para compatibilidade, coverter para group_sync_channel
+                # deprecated canal, manter para compatibilidade, converter para group_sync_refresh_channel
                 async_to_sync(channel_layer.group_send)(
                     "group_time_refresh_channel", {
                         "type": "time_refresh.message",
-                        'message': {
-                            'action': action,
-                            'id': inst.id,
-                            'app': inst._meta.app_label,
-                            'model': inst._meta.model_name,
-                            'created': created,
-                            'instance': inst_serialize
-                        }
+                        'message': message
                     }
                 )
 
