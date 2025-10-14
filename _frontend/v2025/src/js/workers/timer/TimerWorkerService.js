@@ -4,7 +4,7 @@ class TimerWorkerService {
     /* @vite-ignore */
     const url = window.location.hostname === 'localhost'
       ? 'http://localhost:9098/static/js/workers/timer/timer.worker.js?t=' + Date.now()
-      : new URL('@/assets/js/workers/timer/timer.worker.js?t=' + Date.now(), import.meta.url).href
+      : new URL('/static/v2025/js/workers/timer/timer.worker.js?t=' + Date.now(), import.meta.url).href
     console.debug('TimerWorkerService url', url)
     this.worker = new Worker(url, { type: 'module' })
     this.callbacks = new Map()

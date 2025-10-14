@@ -23,6 +23,8 @@ import {BootstrapVueNextResolver} from 'bootstrap-vue-next'
 
 import {resolve} from 'path'
 
+import fs from 'fs'
+
 export default defineConfig(({command, mode}) => {
   // eslint-disable-next-line
   console.log(`configuring vite with command: ${command}, mode: ${mode}`);
@@ -58,6 +60,31 @@ export default defineConfig(({command, mode}) => {
           }),
         ],
       }),
+      {
+        name: 'postbuild-commands',
+        closeBundle: () => {
+          // eslint-disable-next-line
+          console.log('Vite build finished!');
+          // You can add more post-build commands here if needed
+          const path = './dist/v2025/.vite/manifest.json';
+          const manifest = JSON.parse(fs.readFileSync(path).toString());
+          Object.keys(manifest).forEach(key => {
+            if (manifest[key].file) {
+              manifest[key].file = 'v2025/' + manifest[key].file;
+            }
+            if (manifest[key].css) {
+              manifest[key].css = manifest[key].css.map(cssFile => 'v2025/' + cssFile);
+            }
+            if (manifest[key].assets) {
+              manifest[key].assets = manifest[key].assets.map(assetFile => 'v2025/' + assetFile);
+            }
+          });
+          // eslint-disable-next-line
+          console.log('Adjusted manifest:', manifest);
+          // Write the updated manifest back to the file
+          fs.writeFileSync(path, JSON.stringify(manifest, null, 2));
+        }
+      }
     ],
     resolve: {
       extensions: ['.js', '.json', '.vue',],
@@ -67,7 +94,7 @@ export default defineConfig(({command, mode}) => {
       },
     },
     root: resolve(INPUT_DIR),
-    base: '/static/',
+    base: '/static/v2025/',
     server: {
       host: '0.0.0.0',
       port: 5173,
