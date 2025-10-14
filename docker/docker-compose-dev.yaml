@@ -56,7 +56,7 @@ services:
     networks:
       - cmj-net
     ports:
-      - "8081:8081"
+      - "5173:5173"
   cmj:
     build:
       context: ../

@@ -1,0 +1,43 @@
+
+.OrcamentoCrud {
+  &.DetailView {
+    .form-control-static {
+      text-align: center;
+
+    }
+    div[class*="rcl"] {
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+    div[class*="valor"] {
+      font-weight: bold;
+      font-size: 1.1rem;
+      line-height: 1.2;
+      * {
+        display: block;
+      }
+      hr {
+        height: 0;
+        margin: .2rem 0
+      }
+      em {
+        font-weight: 100;
+        font-size: 0.7rem;
+      }
+    }
+    .orcamento_parlamentar_set, .orcamento_bancada_set {
+      text-align: left;
+      padding: 0;
+    }
+  }
+}
+
+.DespesaCrud {
+  &.DetailView {
+    .valor {
+      font-weight: bold;
+      font-size: 1.2rem;
+      text-align: center;
+    }
+  }
+}

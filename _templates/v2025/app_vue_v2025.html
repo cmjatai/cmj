@@ -1,17 +1,1 @@
 {% extends "base_v2025.html" %}
-{% load common_cmj_tags %}
-{% load render_bundle from webpack_loader %}
-
-{% block webpack_loader_css %}
-    {% render_chunk_vendors 'css' 'V2025' %}
-    {% render_bundle  'app' 'css' 'V2025' %}
-{% endblock webpack_loader_css %}
-
-{% block root_body %}
-<div id="app"></div>
-{% endblock %}
-
-{% block webpack_loader_js %}
-    {% render_chunk_vendors 'js' 'V2025' %}
-    {% render_bundle  'app' 'js' 'V2025' %}
-{% endblock webpack_loader_js %}

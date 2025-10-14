@@ -23,11 +23,13 @@ INSTALLED_APPS = (
     'django.contrib.postgres',
     'django_extensions',
     'django.forms',
+    'django_vite',
 
     'social_django',
 
     'crispy_forms',
     'crispy_bootstrap4',
+    'crispy_bootstrap5',
 
     'easy_thumbnails',
     'image_cropping',

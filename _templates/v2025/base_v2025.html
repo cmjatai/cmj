@@ -1,257 +1,113 @@
-{% load i18n static menus common_cmj_tags cropping %}
-{% load webpack_static from webpack_loader %}
 <!DOCTYPE html>
-<!--[if IE 8]> <html class="no-js lt-ie9" lang="pt-br"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
-<!--<![endif]-->
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=utf-8">
-    <meta name="reply-to" content="manager@jatai.go.leg.br">
-    <meta name="theme-color" content="#114d81">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% if user|notificacoes_unread_count %}({{user|notificacoes_unread_count}}) {% endif %}{% block head_title %}{% if head_title %}{{head_title}}{% else %}PortalCMJ - Câmara de Jataí{% endif %}{% endblock %} - {% block head_title_sufix %}{% if head_title_sufix %}{{head_title_sufix}}{% else %}Portal da Câmara Municipal de Jataí - Estado de Goiás{% endif %}{% endblock head_title_sufix %}</title>
-    <meta name="description" content="{% block meta_description %}{% if meta_description %}{{meta_description}}{% else %}PortalCMJ - Fonte de informações a respeito dos atos do poder legislativo do município de Jataí, na microrregião Sudoeste do Estado de Goiás.{% endif %}{% endblock meta_description %}">
-    {% block meta_tags %}
-      {% include "base_meta_tags.html" %}
-    {% endblock %}
-    {% block head_content %}
-    {% endblock %}
-    {% block webpack_loader_css %}
-      {% render_chunk_vendors 'css' %}
-      {% render_bundle  'app' 'css' %}
-    {% endblock webpack_loader_css %}
-    {% block widgets_form_css %}{% endblock widgets_form_css %}
-  </head>
-  <body class="{% block body_class %}{% endblock body_class %}">
-  {% block root_body %}
-    {% include "popups.html" %}
-    <div class="page fadein" id="{% block id_wrapper %}wrapper{% endblock %}">
+{% load i18n static django_vite %}
+<html class="{% block html_class %}{% endblock %}" lang="pt-br" data-bs-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#114d81">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  <title>PortalCMJ</title>
+  {% vite_hmr_client %}
+  {% vite_asset 'main.js' %}
 
-      {% block base_header_block %}
-        {% include 'base_accessibility.html' %}
-        {% include 'base_header.html' %}
-      {% endblock base_header_block %}
+  {% block json_content %}{% endblock json_content %}
 
-      {% block global_container %}
-        {% block navigation %}
-          <nav class="navbar navbar-menu navbar-expand-lg navbar-dark">
-            <div class="container{{fluid}}">
-              <div class="navbar-collapse collapse" id="navbar-menu">
+</head>
 
-                <ul class="navbar-nav" id="menu_content">
+<body class="{% block body_class %}{% endblock body_class %}">
+    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+    <symbol id="bootstrap" viewBox="0 0 118 94">
+      <path fill="currentColor" fill-rule="evenodd" d="M24.509 0c-6.733 0-11.715 5.893-11.492 12.284.214 6.14-.064 14.092-2.066 20.577C8.943 39.365 5.547 43.485 0 44.014v5.972c5.547.529 8.943 4.649 10.951 11.153 2.002 6.485 2.28 14.437 2.066 20.577C12.794 88.106 17.776 94 24.51 94H93.5c6.733 0 11.714-5.893 11.491-12.284-.214-6.14.064-14.092 2.066-20.577 2.009-6.504 5.396-10.624 10.943-11.153v-5.972c-5.547-.529-8.934-4.649-10.943-11.153-2.002-6.484-2.28-14.437-2.066-20.577C105.214 5.894 100.233 0 93.5 0H24.508zM80 57.863C80 66.663 73.436 72 62.543 72H44a2 2 0 0 1-2-2V24a2 2 0 0 1 2-2h18.437c9.083 0 15.044 4.92 15.044 12.474 0 5.302-4.01 10.049-9.119 10.88v.277C75.317 46.394 80 51.21 80 57.863M60.521 28.34H49.948v14.934h8.905c6.884 0 10.68-2.772 10.68-7.727 0-4.643-3.264-7.207-9.012-7.207M49.948 49.2v16.458H60.91c7.167 0 10.964-2.876 10.964-8.281s-3.903-8.178-11.425-8.178H49.948z" clip-rule="evenodd"/>
+    </symbol>
+    <symbol id="check2" viewBox="0 0 16 16">
+      <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0"/>
+    </symbol>
+    <symbol id="circle-half" viewBox="0 0 16 16">
+      <path d="M8 15A7 7 0 1 0 8 1zm0 1A8 8 0 1 1 8 0a8 8 0 0 1 0 16"/>
+    </symbol>
+    <symbol id="moon-stars-fill" viewBox="0 0 16 16">
+      <path d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278"/>
+      <path d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z"/>
+    </symbol>
+    <symbol id="sun-fill" viewBox="0 0 16 16">
+      <path d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8M8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0m0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13m8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5M3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8m10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0m-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0m9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707M4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708"/>
+    </symbol>
+    <symbol id="svg-perfil" viewBox="0 0 73.2575 73.2575">
+      <path  fill="currentColor" d="M36.6288 0c10.1146,0 19.2719,4.09998 25.9003,10.7285 6.62848,6.62835 10.7285,15.7857 10.7285,25.9003 0,10.1146 -4.09998,19.2718 -10.7285,25.9003 -6.62835,6.62848 -15.7857,10.7285 -25.9003,10.7285 -10.1146,0 -19.2719,-4.09998 -25.9003,-10.7285 -6.62848,-6.62848 -10.7285,-15.7857 -10.7285,-25.9003 0,-10.1146 4.09998,-19.2719 10.7285,-25.9003 6.62835,-6.62848 15.7857,-10.7285 25.9003,-10.7285zm23.8739 12.7549c-6.10949,-6.10962 -14.5505,-9.8887 -23.8739,-9.8887 -9.32339,0 -17.7644,3.77908 -23.8739,9.8887 -6.10962,6.10949 -9.8887,14.5505 -9.8887,23.8739 0,9.32339 3.77908,17.7642 9.8887,23.8739 6.10949,6.10962 14.5505,9.8887 23.8739,9.8887 9.32339,0 17.7644,-3.77908 23.8739,-9.8887 6.10962,-6.10962 9.8887,-14.5505 9.8887,-23.8739 0,-9.32339 -3.77908,-17.7644 -9.8887,-23.8739z"/>
+      <path  fill="currentColor" d="M65.2946 55.4283c-2.98914,4.18772 -6.8737,7.69126 -11.373,10.2347l-34.5858 0c-4.49942,-2.5434 -8.38357,-6.04734 -11.373,-10.2347 2.45281,-5.90435 7.89097,-10.7794 14.9469,-13.5693 3.72722,3.07878 8.50705,4.92851 13.719,4.92851 5.2119,0 9.99174,-1.84973 13.719,-4.92851 7.05595,2.78996 12.4941,7.66499 14.9469,13.5693z"/>
+      <path  fill="currentColor" d="M36.6288 6.3895c9.20993,0 16.676,7.46608 16.676,16.676 0,9.20993 -7.46608,16.676 -16.676,16.676 -9.20993,0 -16.676,-7.46608 -16.676,-16.676 0,-9.20993 7.46608,-16.676 16.676,-16.676z"/>
+    </symbol>
+  </svg>
+  <div id="cmj">aqui v2025
+    <cmj-app>
+      {% block root_body %}
+        {% block footer_content %}
+          <footer>
+            <div class="container footer">
+              <div class="row">
+                <div class="col-12 d-flex justify-content-between">
+                  <div class="d-flex align-items-center dropup color-modes">
+                    <button class="btn btn-link px-0 text-decoration-none dropdown-toggle d-flex align-items-center"
+                            id="bd-theme"
+                            type="button"
+                            aria-expanded="false"
+                            data-bs-toggle="dropdown"
+                            data-bs-display="static">
+                      <span id="bd-theme-text">
+                        <svg class="bi theme-icon theme-icon-active"><use href="#circle-half"></use></svg>
+                      </span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme" style="--bs-dropdown-min-width: 8rem;">
+                      <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
+                          <svg class="bi me-2 opacity-50 theme-icon"><use href="#sun-fill"></use></svg>
+                          Light
+                          <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
+                          <svg class="bi me-2 opacity-50 theme-icon"><use href="#moon-stars-fill"></use></svg>
+                          Dark
+                          <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto">
+                          <svg class="bi me-2 opacity-50 theme-icon"><use href="#circle-half"></use></svg>
+                          Auto
+                          <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
 
-                  {% sigad_navbar 'list_in_menu' %}
+                {% if casa_legislativa %}
+                  <div class="footer-casa-legislativa align-items-start justify-content-between pt-3">
+                    <img class="img-brasao" src="{{casa_legislativa.brasao.url}}" alt="">
 
-                  {% if user.is_superuser %}
-                    {% navbar 'navbar2/navbar_superuser.yaml' %}
-                  {% elif not user.is_anonymous and not user.is_only_socialuser %}
-                    {% navbar 'navbar2/navbar_restrict.yaml' %}
-                  {% endif %}
-                </ul>
-
-                {% include "base_menu_right.html" %}
-
-                {% if user.is_anonymous %}
-                  <ul class="navbar-nav justify-content-end">
-                    <li>
-                      <a  class="menu-intranet"  href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false" title="{% trans 'Acessar' %}"><i class="fas fa-sign-in-alt"></i>&nbsp;</a>
-                      <ul class="dropdown-menu">
-
-                        <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
-
-                        <li class="text-right">
-                          <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
-                          <ul class="dropdown-menu">
-                            <li class="text-right"><a href="https://webmail-seguro.com.br/jatai.go.leg.br">{% trans "Webmail" %}</a></li>
-                            <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
-                            <li class="text-right"><a href="https://cmjatai.1doc.com.br">{% trans "1Doc" %}</a></li>
-                            <li class="text-right"><a href="https://cmjatai.1doc.com.br/b.php?pg=o/wp">Central de Atendimento</a></li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                  </ul>
+                    <div class="d-flex flex-column align-items-center">
+                      <h3>{{casa_legislativa.nome}}</h3>
+                      <h6>{{casa_legislativa.endereco}} - CEP: {{casa_legislativa.cep}}</h6>
+                    </div>
+                    <div class="d-flex flex-column align-items-center">
+                      <h6>Telefone: {{casa_legislativa.telefone}}</h6>
+                      <h6>e-mail: <a href="mailto:{{casa_legislativa.email}}">{{casa_legislativa.email}}</a></h6>
+                      <h6>Site: <a href="{{casa_legislativa.site}}" target="_blank">{{casa_legislativa.site}}</a></h6>
+                    </div>
+                  </div>
                 {% endif %}
+
               </div>
             </div>
-          </nav>
-        {% endblock navigation %}
-
-        {% block canais_diretos %}
-          {% include "base_sidebar.html" %}
-        {% endblock canais_diretos%}
-
-        {# Banner #}
-        {% block banner %}
-          {% include "base_banner.html" %}
-        {% endblock banner %}
-
-        {# Breadcrumb #}
-        {% block breadcrumb %}
-          {% breadcrumb %}
-        {% endblock %}
-
-        {# Header #}
-        {% block second_header %}
-          <header class="masthead">
-            <div class="container{{fluid}}">
-                {% block sections_nav %}{% subnav %}{% endblock sections_nav %}
-            </div>
-          </header>
-        {% endblock second_header %}
-
-        <main id="content" class="content page__row screen-lg">
-          {% block content_container %}
-            <div class="{% block main_container_class %}container{{fluid}}{{path}} container-box{% endblock %}">
-              {% block base_functions %}{% endblock %}
-              {% block base_container_header %}
-                {% block base_header %}
-                  <div class="clearfix">
-                    {% block title %}
-                      <h1 class="page-header {{bg_title}}">
-                        {% if title %}
-                          {{ title|safe|linebreaksbr }}
-                        {% elif view.title %}
-                          {{ view.title|safe|linebreaksbr }}
-                        {% elif object %}
-                          {{ object|safe|linebreaksbr }}
-                        {% endif %}
-                      </h1>
-                    {% endblock %}
-                  </div>
-                {% endblock base_header %}
-              {% endblock base_container_header %}
-
-              {% block base_workspace %}
-                {% if view.is_contained %}
-                  <div class="box-area-trabalho">
-                    {% for at in areatrabalho %}
-                      <a>{{at.nome}}</a>
-                    {% endfor %}
-                  </div>
-                {% endif %}
-              {% endblock base_workspace %}
-
-              {% block subtitle %}
-                  {% if subtitle and '<' not in subtitle %}
-                    <h2 class="page-header p-0 px-4">
-                      <small><small>
-                        <em>{{ subtitle }}</em>
-                      </small></small>
-                    </h2>
-                  {% elif subtitle %}
-                    {{ subtitle|safe }}
-                  {% endif %}
-              {% endblock %}
-
-              {# Feedback messages #}
-              {% for message in messages %}
-                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible" role="alert">
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                  {{ message|safe }}
-                </div>
-              {% endfor %}
-
-              {% block appvue_content %}
-                <div id="app"></div>
-              {% endblock appvue_content %}
-
-              {% block base_content %}{% endblock %}
-            </div>
-
-            {% block cmj_extra_content %}{% endblock %}
-
-          {% endblock content_container %}
-        </main>
-      {% endblock global_container %}
-    </div>
-
-    {% block login_container %}
-    {% endblock%}
-
-
-    {% include 'base_footer.html' %}
-
-
-  {% endblock root_body %}
-
-  <div vw class="disabled">
-    <div vw-access-button class="active"></div>
-    <div vw-plugin-wrapper>
-      <div class="vw-plugin-top-wrapper"></div>
-    </div>
+          </footer>
+        {% endblock footer_content %}
+      {% endblock root_body %}
+    </cmj-app>
   </div>
+  {% block extra_js %}
+  {% endblock %}
+</body>
 
-  {% block foot_js %}
-
-    {% block webpack_loader_js %}
-      {% render_chunk_vendors 'js' %}
-      {% render_bundle  'app' 'js' %}
-    {% endblock webpack_loader_js %}
-
-    {% block extra_js %}{% endblock %}
-
-  {% endblock foot_js %}
-
-  {% block widgets_form_js %}{% endblock widgets_form_js %}
-
-
-  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-  <script>
-    $(function () {
-      new window.VLibras.Widget('https://vlibras.gov.br/app');
-    })
-  </script>
-
-  {% if not DEBUG and not perms.materia and not perms.norma and not perms.sessao %}
-
-    {% comment %}
-    <script>
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId      : '{% settings_key_tag 'SOCIAL_AUTH_FACEBOOK_KEY' %}',
-          cookie     : true,
-          xfbml      : true,
-          version    : 'v6.0'
-        });
-
-        FB.AppEvents.logPageView();
-
-        FB.getLoginStatus(function(response) {
-            //// console.log(response);
-          });
-        };
-
-        (function (d, s, id){
-          var js, fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) {return;}
-          js = d.createElement(s); js.id = id;
-          js.src = "https://connect.facebook.net/pt_BR/sdk.js";
-          fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
-    {% endcomment %}
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0E9S41BRSL"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-0E9S41BRSL');
-    </script>
-
-    {% comment %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-2431536-7');
-    {% endcomment %}
-  {% endif %}
-  </body>
 </html>
-

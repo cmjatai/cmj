@@ -1,4 +1,4 @@
-FROM node:16.20.2-bookworm
+FROM node:20.18.0-bookworm
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
@@ -16,7 +16,7 @@ USER cmj
 
 WORKDIR ${HOME}
 
-EXPOSE 8081/tcp
+EXPOSE 5173/tcp
 
 VOLUME ["/var/cmjatai/cmj"]
 

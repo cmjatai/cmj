@@ -103,19 +103,38 @@ if DEBUG and not WEBPACK_LOADER['V2025']['STATS_FILE'].exists():
     WEBPACK_LOADER['V2025']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2025.child(
         f'webpack-stats.json')
 
-STATICFILES_DIRS = (
-    PROJECT_DIR.child('sapl').child('static'),
-    PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION).child('dist'),
-    PROJECT_DIR.child('_frontend').child('v2025').child('dist'),
-)
+DJANGO_VITE_ASSETS_PATH = PROJECT_DIR.child('_frontend', 'v2025', 'dist')
+DJANGO_VITE_DEV_MODE = config('DJANGO_VITE_DEV_MODE', default=True, cast=bool)
+DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
+DJANGO_VITE = {
+    'default': {
+        'dev_mode': DJANGO_VITE_DEV_MODE,
+        'manifest_path': (
+            DJANGO_VITE_ASSETS_PATH if DJANGO_VITE_DEV_MODE else STATIC_ROOT
+        ).child('v2025', '.vite', 'manifest.json'),
+    }
+}
+
+STATICFILES_DIRS = [
+    PROJECT_DIR.child('sapl', 'static'),
+    PROJECT_DIR.child('_frontend', FRONTEND_VERSION, 'dist'),
+    DJANGO_VITE_ASSETS_PATH,
+]
+if DEBUG:
+    STATICFILES_DIRS += [
+        PROJECT_DIR.child('_frontend', 'v2025', 'src', 'assets'),
+    ]
 
 # apenas para debug - na produção nginx deve entregar sw
 PWA_SERVICE_WORKER_PATH = PROJECT_DIR.child(
-    '_frontend').child(FRONTEND_VERSION).child('dist').child('v2018').child('service-worker.js')
+    '_frontend', FRONTEND_VERSION, 'dist', 'v2018', 'service-worker.js')
 PWA_MANIFEST_PATH = PROJECT_DIR.child(
-    '_frontend').child(FRONTEND_VERSION).child('dist').child('v2018').child('manifest.json')
+    '_frontend', FRONTEND_VERSION, 'dist', 'v2018', 'manifest.json')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
+
+
+

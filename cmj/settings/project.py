@@ -161,7 +161,6 @@ CACHES = {
     # }
 }
 
-
 APPEND_SLASH = False
 
 if DEBUG_TOOLBAR_ACTIVE:

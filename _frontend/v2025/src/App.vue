@@ -1,19 +1,7 @@
 <template>
-  <div id="app">v2025
-    <router-view></router-view>
-  </div>
+  <slot />
+  <DisplayMessage />
 </template>
-
-<script>
-export default {
-  name: 'app',
-  components: {
-  },
-  created: function () {
-  }
-}
+<script setup>
+import DisplayMessage from '~@/components/utils/message/DisplayMessage.vue'
 </script>
-
-<style lang="scss">
-
-</style>
