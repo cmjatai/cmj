@@ -41,7 +41,7 @@ ADD sapl        /var/cmjatai/cmj/sapl
 COPY cmj/.env $HOME/cmj/
 COPY key_cert.pfx $HOME
 COPY manage.py $HOME
-RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake
+RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake --no-default-ignore
 RUN rm -rf /var/cmjatai/cmj/db.sqlite3
 
 COPY docker/start.sh $HOME
