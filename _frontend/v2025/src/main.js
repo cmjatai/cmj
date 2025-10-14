@@ -42,9 +42,9 @@ const app = createApp({
     const wsTimeRefresh = useWsTimeRefresh(ws_url)
     wsTimeRefresh.connect()
 
-    const ws_url_sync = protocol + window.location.host + '/ws/sync/'
-    const wsSync = useWsTimeRefresh(ws_url_sync)
-    wsSync.connect()
+    // const ws_url_sync = protocol + window.location.host + '/ws/sync/'
+    // const wsSync = useWsTimeRefresh(ws_url_sync)
+    // wsSync.connect()
 
     onMounted(() => {
       // Enable this to test the time refresh
@@ -56,13 +56,13 @@ const app = createApp({
             timestamp_client: Date.now(),
           }
         )
-        wsSync.send(
+        /* wsSync.send(
           {
             type: 'ping',
             message:'Sync refresh requested',
             timestamp_client: Date.now(),
           }
-        )
+        ) */
       }, 3000)
     })
   },

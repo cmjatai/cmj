@@ -33,7 +33,8 @@ DEBUG_TOOLBAR_ACTIVE = config('DEBUG_TOOLBAR_ACTIVE', default=False, cast=bool)
 FOLDER_DEBUG_CONTAINER = Path(
     config('FOLDER_DEBUG_CONTAINER', default=__file__, cast=str))
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['localhost:5173', '*']
+
 #SITE_URL = 'http://localhost'
 SITE_URL = config('SITE_URL', default='https://www.jatai.go.leg.br', cast=str)
 CSRF_TRUSTED_ORIGINS = [

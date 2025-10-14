@@ -40,7 +40,7 @@ export function useWsTimeRefresh(url, options = {}) {
         isConnected.value = true
         error.value = null
         reconnectAttempts = 0
-        console.log('WebSocket connected to', url)
+        console.debug('WebSocket connected to', url)
       }
 
       socket.value.onmessage = (event) => {

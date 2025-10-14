@@ -30,9 +30,9 @@
     "markdown-it-task-lists": "^2.1.1",
     "markdown-it-toc-done-right": "^4.2.0",
     "pinia": "^3.0.3",
-    "vue": "^3.5.16",
-    "vue-json-pretty": "^2.4.0",
-    "vue-router": "^4.5.1"
+    "vue": "^3.5.22",
+    "vue-json-pretty": "^2.5.0",
+    "vue-router": "^4.6.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

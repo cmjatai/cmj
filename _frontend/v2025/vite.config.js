@@ -89,6 +89,12 @@ export default defineConfig(({command, mode}) => {
       emptyOutDir: true,
       copyPublicDir: true,
       target: 'esnext',
+      minify: 'esbuild',
+      esbuild: {
+        pure: mode === 'production' ? ['console.log'] : []
+      },
+      sourcemap: mode === 'production' ? false : true,
+
       rollupOptions: {
         input: {
           main: resolve(INPUT_DIR, 'main.js'),

@@ -104,14 +104,18 @@ if DEBUG and not WEBPACK_LOADER['V2025']['STATS_FILE'].exists():
         f'webpack-stats.json')
 
 DJANGO_VITE_ASSETS_PATH = PROJECT_DIR.child('_frontend', 'v2025', 'dist')
-DJANGO_VITE_DEV_MODE = config('DJANGO_VITE_DEV_MODE', default=True, cast=bool)
+
+DJANGO_VITE_DEV_MODE = config('DJANGO_VITE_DEV_MODE', default=False, cast=bool)
 DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
+
 DJANGO_VITE = {
     'default': {
         'dev_mode': DJANGO_VITE_DEV_MODE,
         'manifest_path': (
-            DJANGO_VITE_ASSETS_PATH if DJANGO_VITE_DEV_MODE else STATIC_ROOT
-        ).child('v2025', '.vite', 'manifest.json'),
+            DJANGO_VITE_ASSETS_PATH.child('.vite', 'manifest.json')
+                if not DJANGO_VITE_DEV_MODE and DEBUG else
+                    STATIC_ROOT.child('v2025', '.vite', 'manifest.json')
+        )
     }
 }
 
@@ -135,6 +139,4 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
-
-
 

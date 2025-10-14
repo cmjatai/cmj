@@ -125,9 +125,9 @@ const sendJData = (jdata) => {
 //   newVal => {
 //     try {
 //       state.data = JSON.parse(newVal);
-//       //console.log('state val');
+//       //console.debug('state val');
 //     } catch {
-//       // console.log('JSON ERROR');
+//       // console.debug('JSON ERROR');
 //     }
 //   },
 // );

@@ -1,0 +1,23 @@
+{
+  "main.js": {
+    "file": "main-BASJIj1Q.js",
+    "name": "main",
+    "src": "main.js",
+    "isEntry": true,
+    "dynamicImports": [
+      "views/WsTest.vue"
+    ],
+    "css": [
+      "main-BqIkHWWP.css"
+    ]
+  },
+  "views/WsTest.vue": {
+    "file": "WsTest-tZqNxRE6.js",
+    "name": "WsTest",
+    "src": "views/WsTest.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.js"
+    ]
+  }
+}
