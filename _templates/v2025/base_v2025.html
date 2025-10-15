@@ -38,72 +38,48 @@
       <path  fill="currentColor" d="M36.6288 6.3895c9.20993,0 16.676,7.46608 16.676,16.676 0,9.20993 -7.46608,16.676 -16.676,16.676 -9.20993,0 -16.676,-7.46608 -16.676,-16.676 0,-9.20993 7.46608,-16.676 16.676,-16.676z"/>
     </symbol>
   </svg>
-  <div id="cmj">aqui v2025
+  <div id="cmj">
     <cmj-app>
-      <cmj-alert>teste</cmj-alert>
       {% block root_body %}
         {% block main_content %}
           <router-view></router-view>
         {% endblock main_content %}
         {% block footer_content %}
           <footer>
-            <div class="container footer">
-              <div class="row">
-                <div class="col-12 d-flex justify-content-between">
-                  <div class="d-flex align-items-center dropup color-modes">
-                    <button class="btn btn-link px-0 text-decoration-none dropdown-toggle d-flex align-items-center"
-                            id="bd-theme"
-                            type="button"
-                            aria-expanded="false"
-                            data-bs-toggle="dropdown"
-                            data-bs-display="static">
-                      <span id="bd-theme-text">
-                        <svg class="bi theme-icon theme-icon-active"><use href="#circle-half"></use></svg>
-                      </span>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="bd-theme" style="--bs-dropdown-min-width: 8rem;">
-                      <li>
-                        <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
-                          <svg class="bi me-2 opacity-50 theme-icon"><use href="#sun-fill"></use></svg>
-                          Light
-                          <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
-                          <svg class="bi me-2 opacity-50 theme-icon"><use href="#moon-stars-fill"></use></svg>
-                          Dark
-                          <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
-                        </button>
-                      </li>
-                      <li>
-                        <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto">
-                          <svg class="bi me-2 opacity-50 theme-icon"><use href="#circle-half"></use></svg>
-                          Auto
-                          <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-
-                {% if casa_legislativa %}
-                  <div class="footer-casa-legislativa align-items-start justify-content-between pt-3">
-                    <img class="img-brasao" src="{{casa_legislativa.brasao.url}}" alt="">
-
-                    <div class="d-flex flex-column align-items-center">
-                      <h3>{{casa_legislativa.nome}}</h3>
-                      <h6>{{casa_legislativa.endereco}} - CEP: {{casa_legislativa.cep}}</h6>
-                    </div>
-                    <div class="d-flex flex-column align-items-center">
-                      <h6>Telefone: {{casa_legislativa.telefone}}</h6>
-                      <h6>e-mail: <a href="mailto:{{casa_legislativa.email}}">{{casa_legislativa.email}}</a></h6>
-                      <h6>Site: <a href="{{casa_legislativa.site}}" target="_blank">{{casa_legislativa.site}}</a></h6>
-                    </div>
-                  </div>
-                {% endif %}
-
-              </div>
+            <div class="btn-group dropup">
+              <button class="btn btn-link px-0 text-decoration-none dropdown-toggle d-flex align-items-center"
+                      id="bd-theme"
+                      type="button"
+                      aria-expanded="false"
+                      data-bs-toggle="dropdown"
+                      data-bs-display="static">
+                <span id="bd-theme-text">
+                  <svg class="bi theme-icon theme-icon-active"><use href="#circle-half"></use></svg>
+                </span>
+              </button>
+              <ul class="dropdown-menu mx-2" aria-labelledby="bd-theme">
+                <li>
+                  <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light">
+                    <svg class="bi me-2 opacity-50 theme-icon"><use href="#sun-fill"></use></svg>
+                    Light
+                    <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="dark">
+                    <svg class="bi me-2 opacity-50 theme-icon"><use href="#moon-stars-fill"></use></svg>
+                    Dark
+                    <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
+                  </button>
+                </li>
+                <li>
+                  <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="auto">
+                    <svg class="bi me-2 opacity-50 theme-icon"><use href="#circle-half"></use></svg>
+                    Auto
+                    <svg class="bi ms-auto d-none theme-icon"><use href="#check2"></use></svg>
+                  </button>
+                </li>
+              </ul>
             </div>
           </footer>
         {% endblock footer_content %}
