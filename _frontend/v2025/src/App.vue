@@ -1,7 +1,9 @@
 <template>
   <slot />
   <DisplayMessage />
-  syncStore.state: {{ syncStore.data_cache.painelset_cronometro }} <br />
+  syncStore.state: {{ syncStore.data_cache.painelset_cronometro }} <br>
+  404 component test:
+  <cmj-error-404 />
 </template>
 <script setup>
 import DisplayMessage from '~@/modules/messages/components/DisplayMessage'

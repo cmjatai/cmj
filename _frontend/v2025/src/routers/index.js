@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import Error404 from '~@/views/Error404.vue'
 
 const WsTest = () => import('~@/views/WsTest.vue')
-const Error404 = () => import('~@/views/Error404.vue')
 
 export const routes = [
   {

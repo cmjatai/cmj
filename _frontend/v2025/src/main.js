@@ -21,7 +21,7 @@ import { createPinia } from 'pinia'
 import router from './routers'
 
 import EventBus from './utils/EventBus'
-import rootComponents from './rootComponents'
+import registerComponents from './registerComponents'
 import { useWsTimeRefresh } from './composables/WsTimeRefresh'
 
 document.querySelectorAll('[data-bs-toggle="popover"]')
@@ -33,7 +33,7 @@ axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 const app = createApp({
-  components: rootComponents,
+  components: registerComponents.rootComponents,
   setup() {
 
     const protocol = (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
@@ -67,6 +67,10 @@ const app = createApp({
     })
   },
   delimiters: ['[[', ']]'],
+})
+
+Object.keys(registerComponents.globalComponents).forEach(name => {
+  app.component(name, registerComponents.globalComponents[name])
 })
 
 // EventBus para comunicação entre componentes via Composite API
