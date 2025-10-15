@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import TimerWorkerService from "~@/utils/timer/TimerWorkerService"
 import WebSocketManager from "~@/utils/ws/WebSocketManager"
+import Resources from "~@/utils/resources"
 
 export const useSyncStore = defineStore("syncStore", {
   state: () => ({
@@ -16,7 +17,7 @@ export const useSyncStore = defineStore("syncStore", {
   },
   actions: {
     // Define your actions here
-    initialize(wsUrl) {
+    initialize() {
       if (this.wsManager) {
         this.wsManager.stopHeartbeat()
       }
@@ -70,7 +71,7 @@ export const useSyncStore = defineStore("syncStore", {
         metadata
       ).then((response) => {
         const uri = `${app}_${model}`
-        _.each(response.data.results ? response.data.results : [response.data], (value, idx) => {
+        _.each(response.data.results ? response.data.results : [response.data], (value) => {
           const inst = { ...value, timestamp_frontend: 0 }
           this.UPDATE_DATA_CACHE({ key: uri, value: inst })
         })

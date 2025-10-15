@@ -1,29 +1,14 @@
 import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue'
-
-import inject from "@rollup/plugin-inject";
-
-// https://demo.viewflow.io/dashboard/oilngas/
-
-/*import { viteStaticCopy } from 'vite-plugin-static-copy';
-#viteStaticCopy({targets: copyTargets})],
-const copyTargets = [
-  {
-    src: [
-      `node_modules/shepherd.js/dist/js/shepherd.min.js`,
-      `node_modules/shepherd.js/dist/js/shepherd.min.js.map`,
-      `node_modules/js-cookie/dist/js.cookie.min.js`
-    ],
-    dest: '../../../demo/static/demo/js/',
-  },*/
-
-
-import Components from 'unplugin-vue-components/vite'
 import {BootstrapVueNextResolver} from 'bootstrap-vue-next'
-
 import {resolve} from 'path'
-
+import Components from 'unplugin-vue-components/vite'
 import fs from 'fs'
+import inject from "@rollup/plugin-inject";
+import vue from '@vitejs/plugin-vue'
+import eslint from '@nabla/vite-plugin-eslint';
+
+const eslintPlugin = eslint();
+console.log('ESLint Plugin loaded:', eslintPlugin);
 
 export default defineConfig(({command, mode}) => {
   // eslint-disable-next-line
@@ -51,7 +36,9 @@ export default defineConfig(({command, mode}) => {
         jQuery: 'jquery',
         '_': 'lodash',
         include: ['src/**/*.js', 'src/**/*.vue'],
+        exclude: 'src/routers/**'
       }),
+      eslintPlugin,
       Components({
         resolvers: [
           BootstrapVueNextResolver({
@@ -142,3 +129,18 @@ export default defineConfig(({command, mode}) => {
     },
   }
 })
+
+// https://demo.viewflow.io/dashboard/oilngas/
+
+/*import { viteStaticCopy } from 'vite-plugin-static-copy';
+#viteStaticCopy({targets: copyTargets})],
+const copyTargets = [
+  {
+    src: [
+      `node_modules/shepherd.js/dist/js/shepherd.min.js`,
+      `node_modules/shepherd.js/dist/js/shepherd.min.js.map`,
+      `node_modules/js-cookie/dist/js.cookie.min.js`
+    ],
+    dest: '../../../demo/static/demo/js/',
+  },*/
+

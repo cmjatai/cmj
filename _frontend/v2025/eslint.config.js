@@ -18,6 +18,9 @@ export default defineConfig([
         EventBus: 'readonly',
         bootstrap: 'readonly',
         // createBootstrap: 'readonly',
+        $: 'readonly',
+        jQuery: 'readonly',
+        _: 'readonly',
        }
     },
   },
@@ -27,9 +30,10 @@ export default defineConfig([
   },
 
   js.configs.recommended,
+
   skipFormatting,
 
-  ...pluginVue.configs['flat/strongly-recommended'],
+  ...pluginVue.configs['vue/strongly-recommended'],
 
   {
     rules: {

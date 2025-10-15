@@ -53,7 +53,7 @@ export default {
         this.clearTimers();
       }
     },
-    timeout(newValue) {
+    timeout() {
       if (this.enabled) {
         this.clearTimers();
         this.startTimer();
