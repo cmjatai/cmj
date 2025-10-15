@@ -1,6 +1,6 @@
 {
   "main.js": {
-    "file": "v2025/main-BJl5fMGq.js",
+    "file": "v2025/main-DpE2Ucjv.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
@@ -12,7 +12,7 @@
     ]
   },
   "views/WsTest.vue": {
-    "file": "v2025/WsTest-BCGtgZ5S.js",
+    "file": "v2025/WsTest-BEo_AXQY.js",
     "name": "WsTest",
     "src": "views/WsTest.vue",
     "isDynamicEntry": true,
