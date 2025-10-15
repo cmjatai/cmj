@@ -12,17 +12,17 @@ import * as bootstrap from 'bootstrap'
 
 import axios from 'axios'
 
-import './js/utils'
+import './utils'
 
 import { onMounted, createApp } from 'vue'
 import {createBootstrap} from 'bootstrap-vue-next'
 
 import { createPinia } from 'pinia'
-import router from './js/routers'
+import router from './routers'
 
-import EventBus from './js/EventBus'
+import EventBus from './utils/EventBus'
 import rootComponents from './rootComponents'
-import { useWsTimeRefresh } from './js/composables/WsTimeRefresh'
+import { useWsTimeRefresh } from './composables/WsTimeRefresh'
 
 document.querySelectorAll('[data-bs-toggle="popover"]')
   .forEach(popover => {

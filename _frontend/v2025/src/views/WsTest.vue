@@ -13,7 +13,7 @@
 
 <script setup>
 import { ref, onMounted, inject } from 'vue'
-import { useMessageStore } from '~@/js/stores/MessageStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
 
 // Injected dependency
 const bus = inject('EventBus')

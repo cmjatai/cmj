@@ -1,6 +1,6 @@
 import { defineStore } from "pinia"
-import TimerWorkerService from "../workers/timer/TimerWorkerService"
-import WebSocketManager from "../ws/WebSocketManager"
+import TimerWorkerService from "~@/utils/timer/TimerWorkerService"
+import WebSocketManager from "~@/utils/ws/WebSocketManager"
 
 export const useSyncStore = defineStore("syncStore", {
   state: () => ({

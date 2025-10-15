@@ -1,18 +1,32 @@
 {
   "main.js": {
-    "file": "v2025/main-DpE2Ucjv.js",
+    "file": "v2025/main-pM_nH7aU.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
     "dynamicImports": [
-      "views/WsTest.vue"
+      "views/WsTest.vue",
+      "views/Error404.vue",
+      "views/Error404.vue"
     ],
     "css": [
-      "v2025/main-BbS4A0BO.css"
+      "v2025/main-CMStnI-t.css"
+    ]
+  },
+  "views/Error404.vue": {
+    "file": "v2025/Error404-Yb1Vmt6a.js",
+    "name": "Error404",
+    "src": "views/Error404.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.js"
+    ],
+    "css": [
+      "v2025/Error404-CMxScCzn.css"
     ]
   },
   "views/WsTest.vue": {
-    "file": "v2025/WsTest-BEo_AXQY.js",
+    "file": "v2025/WsTest-CKb1T29_.js",
     "name": "WsTest",
     "src": "views/WsTest.vue",
     "isDynamicEntry": true,

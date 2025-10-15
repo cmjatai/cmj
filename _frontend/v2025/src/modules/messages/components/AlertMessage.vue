@@ -17,7 +17,7 @@
 <script setup>
 import { defineProps, onMounted } from 'vue'
 
-import { useMessageStore } from '~@/js/stores/MessageStore'
+import { useMessageStore } from '../store/MessageStore'
 const messageStore = useMessageStore()
 
 const props = defineProps({

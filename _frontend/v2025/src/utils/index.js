@@ -5,7 +5,7 @@ window.$ = $
 window.jQuery = $
 
 import './colormodes'
-import './scrollHeader'
+import './scrollheader'
 // import './image_cropping'
 
 (() => {
@@ -100,6 +100,4 @@ import './scrollHeader'
   })
 
 })()
-
-
 

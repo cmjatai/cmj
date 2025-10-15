@@ -10,8 +10,8 @@
 </template>
 
 <script setup>
-  import { useMessageStore } from '~@/js/stores/MessageStore';
-  import AlertMessage from './AlertMessage.vue';
+  import { useMessageStore } from '../store/MessageStore'
+  import AlertMessage from './AlertMessage'
 
   const messageStore = useMessageStore()
 </script>

@@ -1,10 +1,10 @@
-import Error404 from "./views/Error404.vue"
-import Alert from "./components/utils/message/Alert.vue"
-import App from './App.vue';
-import JsonViewer from "./components/utils/JsonViewer.vue";
-import RefreshPage from "./components/utils/RefreshPage.vue";
+
+import Alert from '~@/components/atoms/Alert.vue'
+import App from './App.vue'
+import RefreshPage from '~@/components/atoms/RefreshPage.vue'
 
 // cmj = PortalCMJ Frontend
+const Error404 = () => import('~@/views/Error404.vue')
 
 const rootComponents = {
     'cmj-app': App,
