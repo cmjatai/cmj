@@ -1,6 +1,6 @@
 {
   "main.js": {
-    "file": "v2025/main-pM_nH7aU.js",
+    "file": "v2025/main-f_atOXSg.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
@@ -10,11 +10,11 @@
       "views/Error404.vue"
     ],
     "css": [
-      "v2025/main-CMStnI-t.css"
+      "v2025/main-Bh_ZEOac.css"
     ]
   },
   "views/Error404.vue": {
-    "file": "v2025/Error404-Yb1Vmt6a.js",
+    "file": "v2025/Error404-CtalojLU.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
@@ -26,7 +26,7 @@
     ]
   },
   "views/WsTest.vue": {
-    "file": "v2025/WsTest-CKb1T29_.js",
+    "file": "v2025/WsTest-B1z2mrpE.js",
     "name": "WsTest",
     "src": "views/WsTest.vue",
     "isDynamicEntry": true,

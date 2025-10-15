@@ -87,11 +87,6 @@ WEBPACK_LOADER = {
         'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': 'dist/v2018/',
         'STATS_FILE': PROJECT_DIR_FRONTEND_2018.child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
-    },
-    'V2025': {
-        'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'dist/v2025/',
-        'STATS_FILE': PROJECT_DIR_FRONTEND_2025.child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
     }
 }
 
@@ -99,11 +94,7 @@ if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2018.child(
         f'webpack-stats.json')
 
-if DEBUG and not WEBPACK_LOADER['V2025']['STATS_FILE'].exists():
-    WEBPACK_LOADER['V2025']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2025.child(
-        f'webpack-stats.json')
-
-DJANGO_VITE_ASSETS_PATH = PROJECT_DIR.child('_frontend', 'v2025', 'dist')
+DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2025.child('dist')
 
 DJANGO_VITE_DEV_MODE = config('DJANGO_VITE_DEV_MODE', default=False, cast=bool)
 DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
@@ -112,7 +103,7 @@ DJANGO_VITE = {
     'default': {
         'dev_mode': DJANGO_VITE_DEV_MODE,
         'manifest_path': (
-            DJANGO_VITE_ASSETS_PATH.child('.vite', 'manifest.json')
+            DJANGO_VITE_ASSETS_PATH.child('v2025', '.vite', 'manifest.json')
                 if not DJANGO_VITE_DEV_MODE and DEBUG else
                     STATIC_ROOT.child('v2025', '.vite', 'manifest.json')
         )

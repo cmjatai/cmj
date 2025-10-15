@@ -10,7 +10,6 @@ const rootComponents = {
     'cmj-app': App,
     'cmj-alert': Alert,
     'cmj-error-404': Error404,
-    'cmj-json-viewer': JsonViewer,
     'cmj-refresh-page': RefreshPage,
   }
 
