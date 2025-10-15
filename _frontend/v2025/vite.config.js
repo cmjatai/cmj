@@ -49,6 +49,7 @@ export default defineConfig(({command, mode}) => {
         $: 'jquery',
         jQuery: 'jquery',
         '_': 'lodash',
+        include: ['src/**/*.js', 'src/**/*.vue'],
       }),
       vue(),
       Components({
@@ -64,8 +65,8 @@ export default defineConfig(({command, mode}) => {
         name: 'postbuild-commands',
         closeBundle: () => {
           // eslint-disable-next-line
-          console.log('Vite build finished!');
-          // You can add more post-build commands here if needed
+          if (command !== 'build') return;
+          console.log('Vite build finished!', mode === 'production' ? 'production mode' : 'development mode');
           const path = './dist/v2025/.vite/manifest.json';
           const manifest = JSON.parse(fs.readFileSync(path).toString());
           Object.keys(manifest).forEach(key => {
@@ -94,7 +95,7 @@ export default defineConfig(({command, mode}) => {
       },
     },
     root: resolve(INPUT_DIR),
-    base: '/static/v2025/',
+    base: '/static/',
     server: {
       host: '0.0.0.0',
       port: 5173,
@@ -105,10 +106,10 @@ export default defineConfig(({command, mode}) => {
       },
     },
     publicDir: resolve(INPUT_DIR, 'assets'),
-    worker: {
+    /* worker: {
       format: 'es',
       plugins: [],
-    },
+    }, */
     build: {
       outDir: resolve(OUTPUT_DIR),
       assetsDir: '',

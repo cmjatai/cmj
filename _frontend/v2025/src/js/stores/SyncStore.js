@@ -160,7 +160,6 @@ export const useSyncStore = defineStore("syncStore", {
 
     // Timer functions for cronometro
     startLocalCronometro(id) {
-      console.debug('START LOCAL CRONOMETRO', id)
       TimerWorkerService.startTimer(id, (timestamp) => {
         // console.debug('TIMER', cronometroId, timestamp)
         const cronometro = this.data_cache.painelset_cronometro[id]
@@ -168,7 +167,7 @@ export const useSyncStore = defineStore("syncStore", {
         const server_time_diff = lastServerSync ? lastServerSync.server_time_diff : 0
         // Atualizar cronometro localmente
         if (cronometro && cronometro.state === 'running') {
-          console.debug('TIMER RUNNING', id, timestamp / 1000, cronometro.started_time, server_time_diff)
+          // console.debug('TIMER RUNNING', id, timestamp / 1000, cronometro.started_time, server_time_diff)
           const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
           cronometro.remaining_time = cronometro.duration - elapsed_time
