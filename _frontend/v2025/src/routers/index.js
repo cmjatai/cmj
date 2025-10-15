@@ -1,7 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Error404 from '~@/views/Error404.vue'
-
-const WsTest = () => import('~@/views/WsTest.vue')
 
 export const routes = [
   {
@@ -15,14 +12,14 @@ export const routes = [
       {
         path: '/wstest/',
         name: 'index_link',
-        component: WsTest,
+        component: () => import('~@/views/WsTest.vue'),
         children: [
         ]
       },
       {
         path: '/:pathMatch(.*)',
         name: 'error_404',
-        component: Error404,
+        component: () => import('~@/views/Error404.vue'),
         meta: {
           title: '404 - Not Found',
           description: 'Page not found',
