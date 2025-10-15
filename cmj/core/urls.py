@@ -74,7 +74,7 @@ vue_urlpatterns = [
     re_path(r'^online/',
             app_vue_view_v2018, name='app_vue_view_v2018_url'),
 
-    re_path(r'^v2025/',
+    re_path(r'^painel/',
             app_vue_view_v2025, name='app_vue_view_v2025_url'),
 ]
 

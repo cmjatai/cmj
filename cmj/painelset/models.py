@@ -343,3 +343,151 @@ class Individuo(models.Model, CronometroMixin):
         if not ips.strip():
             return []
         return [ip.strip() for ip in ips.split() if ip.strip()]
+
+
+class Widget(models.Model):
+    """Modelo para armazenar configurações de widgets no painel SET."""
+    name = models.CharField(max_length=256, unique=True, help_text="Nome único do widget")
+
+    vue_component = models.CharField(
+        max_length=256, help_text="Nome do componente Vue.js associado ao widget",
+        unique=True,
+        validators=[
+            RegexValidator(
+                regex=r'^[a-z][a-z0-9_]*$',
+                message="Nome do componente inválido. Deve começar com uma letra minúscula e conter apenas letras, números e underscores.",
+                code='invalid_component_name'
+            )
+        ]
+    )
+
+    styles = JSONField(
+        verbose_name=_('Estilos'),
+        help_text="Configuração de estilos do widget em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
+    config = JSONField(
+        verbose_name=_('Configuração'),
+        help_text="Configuração específica do widget em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
+    parent = models.ForeignKey('self', on_delete=models.CASCADE,
+                              null=True, blank=True, related_name='children',
+                              help_text="Widget pai para hierarquia")
+
+    class Meta:
+        verbose_name = "Widget"
+        verbose_name_plural = "Widgets"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class Visao(models.Model):
+    """Modelo para armazenar visões do painel SET, que são coleções de widgets."""
+    name = models.CharField(max_length=256, unique=True, help_text="Nome único da visão")
+    description = models.TextField(blank=True, help_text="Descrição da visão")
+
+    widgets = models.ManyToManyField(
+        Widget, related_name='visoes', blank=True,
+        help_text="Widgets associados a esta visão",
+        through='VisaoWidget',
+        through_fields=('visao', 'widget'),
+
+    )
+
+    class Meta:
+        verbose_name = "Visão"
+        verbose_name_plural = "Visões"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class VisaoWidget(models.Model):
+    """Modelo intermediário para associar widgets a visões com configuração adicional."""
+    widget = models.ForeignKey(Widget, on_delete=models.CASCADE, help_text="Widget associado")
+    visao = models.ForeignKey(Visao, on_delete=models.CASCADE, help_text="Visão associada")
+
+    position = models.PositiveIntegerField(help_text="Posição do widget na visão", default=0)
+    visible = models.BooleanField(default=True, help_text="Indica se o widget está visível na visão")
+    config = JSONField(
+        verbose_name=_('Configuração Específica'),
+        help_text="Configuração específica do widget nesta visão em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+    styles = JSONField(
+        verbose_name=_('Estilos Específicos'),
+        help_text="Estilos específicos do widget nesta visão em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
+    class Meta:
+        verbose_name = "Widget da Visão"
+        verbose_name_plural = "Widgets das Visões"
+        ordering = ['position']
+        unique_together = [
+            ('widget', 'visao',)
+        ]
+
+    def __str__(self):
+        return f"{self.widget.name} na visão {self.visao.name}"
+
+
+class Painel(models.Model):
+    """Modelo para representar um painel que pode exibir visões."""
+    name = models.CharField(max_length=256, unique=True, help_text="Nome único do painel")
+    description = models.TextField(blank=True, help_text="Descrição do painel")
+
+    evento = models.ForeignKey(
+        Evento, on_delete=models.CASCADE, verbose_name="Evento",
+        blank=True, null=True, related_name='painels', help_text="Evento ao qual este painel pertence")
+
+    sessao = models.ForeignKey(
+        'sessao.SessaoPlenaria', on_delete=models.SET_NULL, verbose_name="Sessão Plenária Associada",
+        blank=True, null=True, related_name='painels', help_text="Sessão ao qual este painel pertence")
+
+    visoes = models.ManyToManyField(
+        Visao, related_name='painels', blank=True,
+        help_text="Visões associadas a este painel",
+        through='PainelVisao',
+        through_fields=('painel', 'visao'),
+    )
+
+    class Meta:
+        verbose_name = "Painel"
+        verbose_name_plural = "Painéis"
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
+class PainelVisao(models.Model):
+    """Modelo intermediário para associar visões a painéis com configuração adicional."""
+    painel = models.ForeignKey(Painel, on_delete=models.CASCADE, help_text="Painel associado")
+    visao = models.ForeignKey(Visao, on_delete=models.CASCADE, help_text="Visão associada")
+
+    position = models.PositiveIntegerField(help_text="Posição da visão no painel", default=0)
+
+    active = models.BooleanField(default=True, help_text="Indica se a visão está ativa no painel")
+
+    config = JSONField(
+        verbose_name=_('Configuração Específica'),
+        help_text="Configuração específica da visão neste painel em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+    styles = JSONField(
+        verbose_name=_('Estilos Específicos'),
+        help_text="Estilos específicos da visão neste painel em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
+    class Meta:
+        verbose_name = "Visão do Painel"
+        verbose_name_plural = "Visões dos Painéis"
+        ordering = ['position']
+        unique_together = [
+            ('painel', 'visao',)
+        ]
+
+    def __str__(self):
+        return f"{self.visao.name} no painel {self.painel.name}"

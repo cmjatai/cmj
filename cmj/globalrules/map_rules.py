@@ -1,20 +1,15 @@
 from django.contrib.auth import get_user_model
-
-from cmj.agenda.models import Evento as AgendaEvento
-from cmj.arq.models import Draft, DraftMidia, ArqClasse, ArqDoc
-from cmj.cerimonial.models import Perfil, EnderecoPerfil, EmailPerfil,\
-    TelefonePerfil, LocalTrabalhoPerfil, DependentePerfil, OperadoraTelefonia,\
-    NivelInstrucao, EstadoCivil, Contato, FiliacaoPartidaria, Dependente,\
-    LocalTrabalho, Telefone, Email, Endereco, GrupoDeContatos, ProcessoContato,\
-    Processo, AssuntoProcesso, TipoTelefone, TipoEmail, Parentesco,\
-    PronomeTratamento, TipoAutoridade, TipoEndereco, TipoLocalTrabalho,\
-    StatusProcesso, ClassificacaoProcesso, TopicoProcesso, Visita, Visitante, \
-    AnexoProcesso
-from cmj.core.models import Trecho, Municipio, AreaTrabalho,\
-    OperadorAreaTrabalho, Cep, RegiaoMunicipal, Bairro, TipoLogradouro,\
-    Distrito, Logradouro, ImpressoEnderecamento, Notificacao
-from cmj.diarios.models import DiarioOficial, TipoDeDiario,\
-    VinculoDocDiarioOficial
+from cmj import loa
+from cmj.agenda import models as agenda_models
+from cmj.arq import models as arq_models
+from cmj.diarios import models as diarios_models
+from cmj.loa import models as loa_models
+from cmj.ouvidoria import models as ouvidoria_models
+from cmj.painelset import models as painelset_models
+from cmj.sigad import models as sigad_models
+from cmj.cerimonial import models as cerimonial_models
+from cmj.core import models as core_models
+from sapl.parlamentares import models as parlamentares_models
 from cmj.globalrules import (GROUP_PAINELSET_OPERADOR, RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SOCIAL_USERS,
                              GROUP_SAAP_WORKSPACE_OPER_CONTATOS,
@@ -35,15 +30,7 @@ from cmj.globalrules import (GROUP_PAINELSET_OPERADOR, RP_ADD, RP_CHANGE, RP_DEL
                              GROUP_LOA_OPERADOR,
                              GROUP_SAAP_WORKSPACE_OPER_RECEPCAO, menu_recepcao,
                              GROUP_DRAFT_OPERADOR, GROUP_ARQ_OPERADOR)
-from cmj.loa.models import Entidade, Loa, LoaParlamentar, EmendaLoa, EmendaLoaParlamentar,\
-    OficioAjusteLoa, RegistroAjusteLoa, DespesaConsulta, Orgao,\
-    UnidadeOrcamentaria, EmendaLoaRegistroContabil, Funcao, SubFuncao, Programa,\
-    Acao, Natureza, Agrupamento, AgrupamentoEmendaLoa,\
-    AgrupamentoRegistroContabil
-from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
-from cmj.painelset.models import Cronometro, Individuo, Evento
-from cmj.sigad.models import Classe, Documento, Midia
-from sapl.parlamentares.models import Partido
+
 from sapl.rules import SAPL_GROUP_GERAL
 from sapl.rules.map_rules import __base__
 
@@ -57,12 +44,12 @@ __perms_publicas__ = {RP_LIST, RP_DETAIL}
 rules_group_social_users = {
     'group': GROUP_SOCIAL_USERS,
     'rules': [
-        (Perfil, __base__, set()),
-        (EnderecoPerfil, __base__, set()),
-        (EmailPerfil, __base__, set()),
-        (TelefonePerfil, __base__, set()),
-        (LocalTrabalhoPerfil, __base__, set()),
-        (DependentePerfil, __base__, set()),
+        (cerimonial_models.Perfil, __base__, set()),
+        (cerimonial_models.EnderecoPerfil, __base__, set()),
+        (cerimonial_models.EmailPerfil, __base__, set()),
+        (cerimonial_models.TelefonePerfil, __base__, set()),
+        (cerimonial_models.LocalTrabalhoPerfil, __base__, set()),
+        (cerimonial_models.DependentePerfil, __base__, set()),
     ]
 }
 
@@ -74,30 +61,30 @@ rules_group_admin = {
             menu_tabelas_auxiliares,
             menu_administracao,
         ], set()),
-        (Municipio, __base__, set()),
-        (AreaTrabalho, __base__, set()),
-        (OperadorAreaTrabalho, __base__, set()),
-        (Cep, __base__, set()),
-        (RegiaoMunicipal, __base__, set()),
-        (Bairro, __base__, set()),
-        (TipoLogradouro, __base__, set()),
-        (Distrito, __base__, set()),
-        (Logradouro, __base__, set()),
-        (Trecho, __base__, set()),
-        (ImpressoEnderecamento, __base__, set()),
-        (TipoTelefone, __base__, set()),
-        (TipoEndereco, __base__, set()),
-        (TipoEmail, __base__, set()),
-        (Parentesco, __base__, set()),
-        (EstadoCivil, __base__, set()),
-        (PronomeTratamento, __base__, set()),
-        (TipoAutoridade, __base__, set()),
-        (TipoLocalTrabalho, __base__, set()),
-        (NivelInstrucao, __base__, set()),
-        (OperadoraTelefonia, __base__, set()),
-        (StatusProcesso, __base__, set()),
-        (ClassificacaoProcesso, __base__, set()),
-        (TopicoProcesso, __base__, set()),
+        (core_models.Municipio, __base__, set()),
+        (core_models.AreaTrabalho, __base__, set()),
+        (core_models.OperadorAreaTrabalho, __base__, set()),
+        (core_models.Cep, __base__, set()),
+        (core_models.RegiaoMunicipal, __base__, set()),
+        (core_models.Bairro, __base__, set()),
+        (core_models.TipoLogradouro, __base__, set()),
+        (core_models.Distrito, __base__, set()),
+        (core_models.Logradouro, __base__, set()),
+        (core_models.Trecho, __base__, set()),
+        (core_models.ImpressoEnderecamento, __base__, set()),
+        (cerimonial_models.TipoTelefone, __base__, set()),
+        (cerimonial_models.TipoEndereco, __base__, set()),
+        (cerimonial_models.TipoEmail, __base__, set()),
+        (cerimonial_models.Parentesco, __base__, set()),
+        (cerimonial_models.EstadoCivil, __base__, set()),
+        (cerimonial_models.PronomeTratamento, __base__, set()),
+        (cerimonial_models.TipoAutoridade, __base__, set()),
+        (cerimonial_models.TipoLocalTrabalho, __base__, set()),
+        (cerimonial_models.NivelInstrucao, __base__, set()),
+        (cerimonial_models.OperadoraTelefonia, __base__, set()),
+        (cerimonial_models.StatusProcesso, __base__, set()),
+        (cerimonial_models.ClassificacaoProcesso, __base__, set()),
+        (cerimonial_models.TopicoProcesso, __base__, set()),
 
     ]
 }
@@ -116,21 +103,21 @@ rules_saap_group_workspace_oper_contatos = {
             menu_contatos,
             menu_dados_auxiliares,
             menu_relatorios], set()),
-        (Trecho, [RP_LIST, RP_DETAIL], set()),
-        (OperadoraTelefonia, [RP_LIST, RP_DETAIL], set()),
-        (NivelInstrucao, [RP_LIST, RP_DETAIL], set()),
-        (EstadoCivil, [RP_LIST, RP_DETAIL], set()),
-        (Partido, [RP_LIST, RP_DETAIL], set()),
-        (Contato, __base__ + [
+        (core_models.Trecho, [RP_LIST, RP_DETAIL], set()),
+        (cerimonial_models.OperadoraTelefonia, [RP_LIST, RP_DETAIL], set()),
+        (cerimonial_models.NivelInstrucao, [RP_LIST, RP_DETAIL], set()),
+        (cerimonial_models.EstadoCivil, [RP_LIST, RP_DETAIL], set()),
+        (parlamentares_models.Partido, [RP_LIST, RP_DETAIL], set()),
+        (cerimonial_models.Contato, __base__ + [
             'print_impressoenderecamento',
             'print_rel_contato_agrupado_por_processo',
             'print_rel_contato_agrupado_por_grupo'], set()),
-        (Endereco, __base__, set()),
-        (Email, __base__, set()),
-        (Telefone, __base__, set()),
-        (LocalTrabalho, __base__, set()),
-        (Dependente, __base__, set()),
-        (FiliacaoPartidaria, __base__, set()),
+        (cerimonial_models.Endereco, __base__, set()),
+        (cerimonial_models.Email, __base__, set()),
+        (cerimonial_models.Telefone, __base__, set()),
+        (cerimonial_models.LocalTrabalho, __base__, set()),
+        (cerimonial_models.Dependente, __base__, set()),
+        (cerimonial_models.FiliacaoPartidaria, __base__, set()),
     ]
 }
 
@@ -141,8 +128,8 @@ rules_saap_group_workspace_oper_grupo_contatos = {
         (get_user_model(), [
             menu_contatos,
             menu_grupocontatos, ], set()),
-        (GrupoDeContatos, __base__, set()),
-        (Contato, [RP_LIST, RP_DETAIL, ], set()),
+        (cerimonial_models.GrupoDeContatos, __base__, set()),
+        (cerimonial_models.Contato, [RP_LIST, RP_DETAIL, ], set()),
     ]
 }
 
@@ -151,8 +138,8 @@ rules_saap_group_workspace_oper_recepcao = {
     'rules': [
         (get_user_model(), [
             menu_recepcao, ], set()),
-        (Visita, [RP_LIST, RP_DETAIL, RP_ADD, ], set()),
-        (Visitante, [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, ], set()),
+        (cerimonial_models.Visita, [RP_LIST, RP_DETAIL, RP_ADD, ], set()),
+        (cerimonial_models.Visitante, [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, ], set()),
     ]
 }
 
@@ -163,10 +150,10 @@ rules_saap_group_workspace_oper_processos = {
             menu_processos,
             menu_dados_auxiliares,
             menu_relatorios], set()),
-        (AssuntoProcesso, __base__, set()),
-        (AnexoProcesso, __base__, set()),
-        (Processo, __base__, set()),
-        (ProcessoContato, __base__, set()),
+        (cerimonial_models.AssuntoProcesso, __base__, set()),
+        (cerimonial_models.AnexoProcesso, __base__, set()),
+        (cerimonial_models.Processo, __base__, set()),
+        (cerimonial_models.ProcessoContato, __base__, set()),
     ]
 }
 
@@ -182,7 +169,7 @@ rules_agenda_group_workspace = {
         (get_user_model(), [
             menu_dados_auxiliares,
             menu_agenda], set()),
-        (AgendaEvento, __base__, set())
+        (agenda_models.Evento, __base__, set())
     ]
 }
 
@@ -190,40 +177,40 @@ rules_agenda_group_workspace = {
 rules_diarios_group_operador = {
     'group': GROUP_DIARIOS_OPERADOR,
     'rules': [
-        (DiarioOficial, __base__, __perms_publicas__),
-        (VinculoDocDiarioOficial, __base__, __perms_publicas__)
+        (diarios_models.DiarioOficial, __base__, __perms_publicas__),
+        (diarios_models.VinculoDocDiarioOficial, __base__, __perms_publicas__)
     ]
 }
 
 rules_loa_group_operador = {
     'group': GROUP_LOA_OPERADOR,
     'rules': [
-        (Loa, __base__, set()),
-        (LoaParlamentar, __base__, __perms_publicas__),
-        (EmendaLoa, __base__ + ['emendaloa_full_editor'], __perms_publicas__),
-        (EmendaLoaParlamentar, __base__, __perms_publicas__),
-        (OficioAjusteLoa, __base__, __perms_publicas__),
-        (RegistroAjusteLoa, __base__, __perms_publicas__),
+        (loa_models.Loa, __base__, set()),
+        (loa_models.LoaParlamentar, __base__, __perms_publicas__),
+        (loa_models.EmendaLoa, __base__ + ['emendaloa_full_editor'], __perms_publicas__),
+        (loa_models.EmendaLoaParlamentar, __base__, __perms_publicas__),
+        (loa_models.OficioAjusteLoa, __base__, __perms_publicas__),
+        (loa_models.RegistroAjusteLoa, __base__, __perms_publicas__),
 
-        (Entidade, __base__, __perms_publicas__),
+        (loa_models.Entidade, __base__, __perms_publicas__),
 
-        (DespesaConsulta, __base__, __perms_publicas__),
+        (loa_models.DespesaConsulta, __base__, __perms_publicas__),
 
-        (Orgao, __base__, __perms_publicas__),
-        (UnidadeOrcamentaria, __base__, __perms_publicas__),
-        (Funcao, __base__, __perms_publicas__),
-        (SubFuncao, __base__, __perms_publicas__),
-        (Programa, __base__, __perms_publicas__),
-        (Acao, __base__, __perms_publicas__),
-        (Natureza, __base__, __perms_publicas__),
-        (EmendaLoaRegistroContabil, __base__ +
+        (loa_models.Orgao, __base__, __perms_publicas__),
+        (loa_models.UnidadeOrcamentaria, __base__, __perms_publicas__),
+        (loa_models.Funcao, __base__, __perms_publicas__),
+        (loa_models.SubFuncao, __base__, __perms_publicas__),
+        (loa_models.Programa, __base__, __perms_publicas__),
+        (loa_models.Acao, __base__, __perms_publicas__),
+        (loa_models.Natureza, __base__, __perms_publicas__),
+        (loa_models.EmendaLoaRegistroContabil, __base__ +
          ['emendaloa_full_editor'], __perms_publicas__),
 
-        (Agrupamento, __base__ +
+        (loa_models.Agrupamento, __base__ +
          ['emendaloa_full_editor'], __perms_publicas__),
-        (AgrupamentoEmendaLoa, __base__ +
+        (loa_models.AgrupamentoEmendaLoa, __base__ +
          ['emendaloa_full_editor'], __perms_publicas__),
-        (AgrupamentoRegistroContabil, __base__ +
+        (loa_models.AgrupamentoRegistroContabil, __base__ +
          ['emendaloa_full_editor'], __perms_publicas__),
 
     ]
@@ -232,8 +219,8 @@ rules_loa_group_operador = {
 rules_draft_group_operador = {
     'group': GROUP_DRAFT_OPERADOR,
     'rules': [
-        (Draft, __base__, set()),
-        (DraftMidia, __base__, set()),
+        (arq_models.Draft, __base__, set()),
+        (arq_models.DraftMidia, __base__, set()),
     ]
 }
 
@@ -241,16 +228,16 @@ rules_draft_group_operador = {
 rules_arq_group_operador = {
     'group': GROUP_ARQ_OPERADOR,
     'rules': [
-        (Draft, __base__ + [
+        (arq_models.Draft, __base__ + [
             'view_draft',
         ], set()),
-        (DraftMidia, __base__ + [
+        (arq_models.DraftMidia, __base__ + [
             'view_draftmidia',
         ], set()),
-        (ArqClasse, __base__ + [
+        (arq_models.ArqClasse, __base__ + [
             'view_arqclasse',
         ], set()),
-        (ArqDoc, __base__ + [
+        (arq_models.ArqDoc, __base__ + [
             'view_arqdoc',
         ], set()),
     ]
@@ -259,9 +246,14 @@ rules_arq_group_operador = {
 rules_painelset_group_operador = {
     'group': GROUP_PAINELSET_OPERADOR,
     'rules': [
-        (Cronometro, __base__, __perms_publicas__),
-        (Individuo, __base__, __perms_publicas__),
-        (Evento, __base__, __perms_publicas__),
+        (painelset_models.Cronometro, __base__, __perms_publicas__),
+        (painelset_models.Individuo, __base__, __perms_publicas__),
+        (painelset_models.Evento, __base__, __perms_publicas__),
+        (painelset_models.Painel, __base__, __perms_publicas__),
+        (painelset_models.PainelVisao, __base__, __perms_publicas__),
+        (painelset_models.Visao, __base__, __perms_publicas__),
+        (painelset_models.VisaoWidget, __base__, __perms_publicas__),
+        (painelset_models.Widget, __base__, __perms_publicas__),
     ]
 }
 
@@ -285,13 +277,13 @@ rules_sigad_view_status_restritos = {
     'group': GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
     'rules': [
         (get_user_model(), ['menu_dados_auxiliares'], set()),
-        (Midia, [RP_DETAIL], set()),
-        (Classe, [
+        (sigad_models.Midia, [RP_DETAIL], set()),
+        (sigad_models.Classe, [
             'view_pathclasse',
             'view_subclasse',
         ], set()),
 
-        (Documento, [
+        (sigad_models.Documento, [
             'view_documento_show'
         ], set())]
 }
@@ -300,9 +292,9 @@ rules_ouvidoria_visualizacao_respostas = {
     'group': GROUP_OUVIDORIA_VISUALIZACAO_RESPOSTAS,
     'rules': [
 
-        (Solicitacao, [RP_LIST, RP_DETAIL], set()),
-        (Notificacao, ['popup_notificacao'], set()),
-        (MensagemSolicitacao, [RP_DETAIL], set())
+        (ouvidoria_models.Solicitacao, [RP_LIST, RP_DETAIL], set()),
+        (core_models.Notificacao, ['popup_notificacao'], set()),
+        (ouvidoria_models.MensagemSolicitacao, [RP_DETAIL], set())
     ]
 }
 
