@@ -3,25 +3,23 @@ import {BootstrapVueNextResolver} from 'bootstrap-vue-next'
 import {resolve} from 'path'
 import Components from 'unplugin-vue-components/vite'
 import fs from 'fs'
-import inject from "@rollup/plugin-inject";
+import inject from "@rollup/plugin-inject"
 import vue from '@vitejs/plugin-vue'
-import eslint from '@nabla/vite-plugin-eslint';
+import eslintPlugin from '@nabla/vite-plugin-eslint'
 
-const eslintPlugin = eslint();
-console.log('ESLint Plugin loaded:', eslintPlugin);
 
 export default defineConfig(({command, mode}) => {
   // eslint-disable-next-line
-  console.log(`configuring vite with command: ${command}, mode: ${mode}`);
+  console.log(`configuring vite with command: ${command}, mode: ${mode}`)
   // suppress eslint warning that process isn't defined (it is)
   // eslint-disable-next-line
-  const cwd = process.cwd();
+  const cwd = process.cwd()
   // eslint-disable-next-line
-  console.log(`loading envs from ${cwd} ...`);
+  console.log(`loading envs from ${cwd} ...`)
 
-  const env = {...loadEnv(mode, cwd, 'VITE_')};
+  const env = {...loadEnv(mode, cwd, 'VITE_')}
   // eslint-disable-next-line
-  console.log(`loaded env: ${JSON.stringify(env)}`);
+  console.log(`loaded env: ${JSON.stringify(env)}`)
 
   // eslint-disable-next-line
   const BASE_DIR = '.'
@@ -38,15 +36,24 @@ export default defineConfig(({command, mode}) => {
         include: ['src/**/*.js', 'src/**/*.vue'],
         exclude: 'src/routers/**'
       }),
-      eslintPlugin,
+      eslintPlugin({
+        // include: ['src/**/*.js', 'src/**/*.vue'],
+        exclude: ['node_modules/**', 'dist/**', 'dist-ssr/**', 'coverage/**'],
+        cache: false,
+        failOnWarning: false,
+        failOnError: true,
+        // fix: true,
+        emitWarning: true,
+        emitError: true,
+      }),
       Components({
         resolvers: [
           BootstrapVueNextResolver({
             aliases: {
               //BInput: 'BFormInput',
-            },
-          }),
-        ],
+            }
+          })
+        ]
       }),
       {
         name: 'postbuild-commands',

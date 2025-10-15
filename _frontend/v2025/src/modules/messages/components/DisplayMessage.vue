@@ -1,10 +1,10 @@
 <template>
   <div class="display-message">
     <AlertMessage
-      :message="message"
       v-for="message in messageStore.getMessages"
-      :key="message.id"
       :id="`alert-${message.id}`"
+      :key="message.id"
+      :message="message"
     />
   </div>
 </template>

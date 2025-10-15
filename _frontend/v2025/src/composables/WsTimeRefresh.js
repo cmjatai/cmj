@@ -133,6 +133,6 @@ export function useWsTimeRefresh(url, options = {}) {
     error,
     connect,
     disconnect,
-    send,
+    send
   }
 }

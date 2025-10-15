@@ -1,9 +1,9 @@
-import { defineStore } from "pinia"
-import TimerWorkerService from "~@/utils/timer/TimerWorkerService"
-import WebSocketManager from "~@/utils/ws/WebSocketManager"
-import Resources from "~@/utils/resources"
+import { defineStore } from 'pinia'
+import TimerWorkerService from '~@/utils/timer/TimerWorkerService'
+import WebSocketManager from '~@/utils/ws/WebSocketManager'
+import Resources from '~@/utils/resources'
 
-export const useSyncStore = defineStore("syncStore", {
+export const useSyncStore = defineStore('syncStore', {
   state: () => ({
     // Define your state properties here
     wsManager: null,
@@ -186,5 +186,5 @@ export const useSyncStore = defineStore("syncStore", {
     stopLocalCronometro(id) {
       TimerWorkerService.stopTimer(id)
     }
-  },
+  }
 })

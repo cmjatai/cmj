@@ -38,8 +38,4 @@ onMounted(() => {
     }, props.message.timeout)
   }
 })
-
-
-
-
 </script>

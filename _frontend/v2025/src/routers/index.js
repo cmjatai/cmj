@@ -6,7 +6,7 @@ export const routes = [
     name: 'home',
     meta: {
       title: 'Home',
-      description: 'Home page',
+      description: 'Home page'
     },
     children: [
       {
@@ -22,16 +22,16 @@ export const routes = [
         component: () => import('~@/views/Error404.vue'),
         meta: {
           title: '404 - Not Found',
-          description: 'Page not found',
-        },
-      },
+          description: 'Page not found'
+        }
+      }
     ]
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(),
-  routes,
+  routes
 })
 
 export default router

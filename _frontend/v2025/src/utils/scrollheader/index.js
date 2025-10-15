@@ -21,10 +21,10 @@
       }
 
       // Verifica imediatamente ao carregar a página
-      checkScroll();
+      checkScroll()
 
       // Adiciona o evento de scroll
-      window.addEventListener('scroll', checkScroll);
+      window.addEventListener('scroll', checkScroll)
     }, 2000)
   })
 })()

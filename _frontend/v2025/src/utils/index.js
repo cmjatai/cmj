@@ -92,12 +92,10 @@ import './scrollheader'
     return unescape(theCookie.substring(ind + cookieName.length + 2, ind1))
   }
 
-
   window.addEventListener('DOMContentLoaded', () => {
 
     window.refreshMask()
 
   })
-
 })()
 

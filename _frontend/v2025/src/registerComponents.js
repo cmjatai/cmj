@@ -1,6 +1,6 @@
 
 import App from './App.vue'
-import { defineAsyncComponent } from "vue"
+import { defineAsyncComponent } from 'vue'
 
 // cmj = PortalCMJ Frontend
 
@@ -14,9 +14,8 @@ const globalComponents = {
   // Para ser utilizado em qualquer componente Vue sem necessidade de importação.
   // O colocado em globalComponents não precisa ser colocado em rootComponents.
   'cmj-refresh-page': defineAsyncComponent(() => import('~@/components/atoms/RefreshPage.vue')),
-  'cmj-alert': defineAsyncComponent(() => import('~@/components/atoms/Alert.vue')),
+  'cmj-alert': defineAsyncComponent(() => import('~@/components/atoms/Alert.vue'))
 }
-
 
 export default {
   rootComponents,

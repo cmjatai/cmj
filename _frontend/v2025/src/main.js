@@ -33,9 +33,9 @@ axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 const app = createApp({
+  delimiters: ['[[', ']]'],
   components: registerComponents.rootComponents,
   setup() {
-
     const protocol = (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
     const ws_url = protocol + window.location.host + '/ws/time-refresh/'
 
@@ -53,7 +53,7 @@ const app = createApp({
           {
             type: 'ping',
             message:'Time refresh requested',
-            timestamp_client: Date.now(),
+            timestamp_client: Date.now()
           }
         )
         /* wsSync.send(
@@ -65,8 +65,7 @@ const app = createApp({
         ) */
       }, 3000)
     })
-  },
-  delimiters: ['[[', ']]'],
+  }
 })
 
 Object.keys(registerComponents.globalComponents).forEach(name => {
