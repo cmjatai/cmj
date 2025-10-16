@@ -39,13 +39,13 @@ class TimeRefreshConsumer(AsyncWebsocketConsumer):
         jdata = json.loads(text_data)
 
         type_msg = jdata.get('type', '')
-        timestamp = jdata.get('timestamp_client', '')
 
-        if type_msg == 'ping' and timestamp:
+        if type_msg == 'ping':
+            ping_now = jdata.get('ping_now', 0)
             await self.send(text_data=json.dumps({
                 'type': 'pong',
                 'timestamp_server': time.time() * 1000,
-                'timestamp_client': timestamp
+                'ping_now': ping_now
             }))
 
     # Receive message from room group
@@ -134,13 +134,11 @@ class SyncRefreshConsumer(AsyncWebsocketConsumer):
             type_msg = jdata.get('type', '')
 
             if type_msg == 'ping':
-                timestamp = jdata.get('timestamp_client', '')
                 ping_now = jdata.get('ping_now', '')
                 await self.send(text_data=json.dumps({
                     'type': 'pong',
                     'message': {
                         'timestamp_server': time.time() * 1000,
-                        'timestamp_client': timestamp,
                         'ping_now': ping_now
                     }
                 }))
