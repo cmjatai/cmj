@@ -4,11 +4,10 @@ import inspect
 import logging
 import re
 
-from django.apps.config import AppConfig
-from django.apps.registry import apps
 from django.conf import settings
 from django.db.models.base import ModelBase
 from django.db.models.fields import TextField, CharField
+from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields.files import FileField
 from django.db.models.fields.json import JSONField
 from django.template.defaultfilters import capfirst
@@ -21,9 +20,10 @@ from django_filters.rest_framework.backends import DjangoFilterBackend
 from django_filters.utils import resolve_field, get_all_model_fields
 from rest_framework import serializers as rest_serializers
 from rest_framework.response import Response
-from rest_framework.routers import DefaultRouter, SimpleRouter
+from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.viewsets import ModelViewSet
+from django_filters.fields import ModelMultipleChoiceField
 import django_filters
 
 
@@ -65,6 +65,19 @@ class SplitStringCharFilter(django_filters.CharFilter):
         for v in values:
             qs = self.get_method(qs)(**{lookup: v})
         return qs
+
+
+class M2MFilter(django_filters.ModelMultipleChoiceFilter):
+
+    class M2MFieldFormField(ModelMultipleChoiceField):
+        def clean(self, value):
+            values = list(map(lambda x: x.replace(' ', '').split(','), value))
+            values = [v for subvalues in values for v in subvalues]
+            cleaned_values = tuple(super().clean(values))
+            return (cleaned_values,) if cleaned_values else cleaned_values
+
+    field_class = M2MFieldFormField
+    distinct = True
 
 
 class ApiFilterSetMixin(FilterSet):
@@ -119,7 +132,7 @@ class ApiFilterSetMixin(FilterSet):
                 f = model._meta.get_field(f_str)
 
                 if f.many_to_many:
-                    fields[f_str] = ['exact']
+                    fields[f_str] = ['exact', 'in', ]
                     continue
 
                 fields[f_str] = ['exact']
@@ -137,10 +150,11 @@ class ApiFilterSetMixin(FilterSet):
                         if hasattr(lv, 'get_lookups'):
                             r += get_keys_lookups(lv.get_lookups(), sflk)
 
-                        if hasattr(lv, 'output_field') and hasattr(lv, 'output_field.get_lookups'):
-                            r.append(f'{sflk}{"__" if sflk else ""}range')
+                        if hasattr(lv, 'output_field'):
+                            if hasattr(lv.output_field, 'get_lookups'):
+                                r.append(f'{sflk}{"__" if sflk else ""}range')
 
-                            r += get_keys_lookups(lv.output_field.class_lookups, sflk)
+                                r += get_keys_lookups(lv.output_field.class_lookups, sflk)
 
                     return r
 
@@ -174,6 +188,18 @@ class ApiFilterSetMixin(FilterSet):
         if filter_class is not None:
             return filter_class(**default)
         return None
+
+    @classmethod
+    def get_filters(cls):
+        return super().get_filters()
+
+    @classmethod
+    def filter_for_lookup(cls, field, lookup_type):
+        f, p = super().filter_for_lookup(field, lookup_type)
+
+        if lookup_type == 'in' and isinstance(field, ManyToManyField):
+            return M2MFilter, p
+        return f, p
 
 
 class BusinessRulesNotImplementedMixin:
