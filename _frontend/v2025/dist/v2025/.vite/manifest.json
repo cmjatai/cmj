@@ -1,6 +1,6 @@
 {
   "components/atoms/Alert.vue": {
-    "file": "v2025/Alert-C60P2ZOG.js",
+    "file": "v2025/Alert-6OHr4mzu.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
@@ -9,7 +9,7 @@
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v2025/RefreshPage-CfqpK7br.js",
+    "file": "v2025/RefreshPage-C99vb3Dh.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
@@ -17,30 +17,54 @@
       "main.js"
     ],
     "css": [
-      "v2025/RefreshPage-DdIuC7Tw.css"
+      "v2025/RefreshPage-B_wMuza3.css"
     ]
   },
   "main.js": {
-    "file": "v2025/main-BonTicIH.js",
+    "file": "v2025/main-BGOdaWSg.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
     "dynamicImports": [
-      "views/WsTest.vue",
+      "modules/painelset/Painel.vue",
+      "modules/painelset/PainelVisao.vue",
+      "views/Error404.vue",
+      "views/Error404.vue",
       "components/atoms/RefreshPage.vue",
       "components/atoms/Alert.vue"
     ],
     "css": [
-      "v2025/main-ogw5-bo8.css"
+      "v2025/main-B_dRvVnj.css"
     ]
   },
-  "views/WsTest.vue": {
-    "file": "v2025/WsTest-CJR4zSEu.js",
-    "name": "WsTest",
-    "src": "views/WsTest.vue",
+  "modules/painelset/Painel.vue": {
+    "file": "v2025/Painel-C5GssJ5K.js",
+    "name": "Painel",
+    "src": "modules/painelset/Painel.vue",
     "isDynamicEntry": true,
     "imports": [
       "main.js"
+    ]
+  },
+  "modules/painelset/PainelVisao.vue": {
+    "file": "v2025/PainelVisao-BU51wreJ.js",
+    "name": "PainelVisao",
+    "src": "modules/painelset/PainelVisao.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.js"
+    ]
+  },
+  "views/Error404.vue": {
+    "file": "v2025/Error404-BFmXCMvQ.js",
+    "name": "Error404",
+    "src": "views/Error404.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.js"
+    ],
+    "css": [
+      "v2025/Error404-CMxScCzn.css"
     ]
   }
 }

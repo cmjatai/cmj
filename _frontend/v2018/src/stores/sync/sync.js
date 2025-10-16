@@ -204,12 +204,12 @@ const syncStore = {
         // Atualizar cronometro localmente
         if (cronometro && cronometro.state === 'running') {
           // console.log('TIMER RUNNING', cronometroId, timestamp / 1000, cronometro.started_time, server_time_diff)
-          const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
+          const elapsed_time = ((timestamp + server_time_diff) / 1000) - cronometro.started_time + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
           cronometro.remaining_time = cronometro.duration - elapsed_time
           commit('UPDATE_DATA_CACHE_CRONOMETRO', { key: 'painelset_cronometro', value: cronometro })
         } else if (cronometro && cronometro.state === 'paused') {
-          const last_paused_time = (timestamp / 1000) - cronometro.paused_time + server_time_diff
+          const last_paused_time = ((timestamp + server_time_diff) / 1000) - cronometro.paused_time
           cronometro.last_paused_time = last_paused_time
           commit('UPDATE_DATA_CACHE_CRONOMETRO', { key: 'painelset_cronometro', value: cronometro })
         } else {

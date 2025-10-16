@@ -19,7 +19,7 @@ export const useSyncStore = defineStore('syncStore', {
     // Define your actions here
     initialize() {
       if (this.wsManager) {
-        this.wsManager.stopHeartbeat()
+        return
       }
       this.wsManager = new WebSocketManager()
       this.wsManager.on('open', () => {
@@ -66,7 +66,12 @@ export const useSyncStore = defineStore('syncStore', {
       const metadata = { app, model }
       if (id) { metadata.id = id }
       if (action) { metadata.action = action }
-      if (params) { metadata.query_string = new URLSearchParams(params).toString() }
+      if (params) {
+        if (!params.o) {
+          params.o = 'id'
+        }
+        metadata.query_string = new URLSearchParams(params).toString()
+      }
       return _fetch(
         metadata
       ).then((response) => {
@@ -76,8 +81,9 @@ export const useSyncStore = defineStore('syncStore', {
           this.UPDATE_DATA_CACHE({ key: uri, value: inst })
         })
         if (!only_first_page && response.data.pagination && response.data.pagination.next_page) {
-          this.fetchSync({ app, model, id, action, params: { ...params, page: response.data.pagination.next_page } })
+          return this.fetchSync({ app, model, id, action, params: { ...params, page: response.data.pagination.next_page } })
         }
+        return response
       })
     },
 
@@ -169,12 +175,12 @@ export const useSyncStore = defineStore('syncStore', {
         // Atualizar cronometro localmente
         if (cronometro && cronometro.state === 'running') {
           // console.debug('TIMER RUNNING', id, timestamp / 1000, cronometro.started_time, server_time_diff)
-          const elapsed_time = (timestamp / 1000) - cronometro.started_time + server_time_diff + cronometro.accumulated_time
+          const elapsed_time = ((timestamp + server_time_diff) / 1000) - cronometro.started_time + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
           cronometro.remaining_time = cronometro.duration - elapsed_time
           this.UPDATE_DATA_CACHE_CRONOMETRO({ key: 'painelset_cronometro', value: cronometro })
         } else if (cronometro && cronometro.state === 'paused') {
-          const last_paused_time = (timestamp / 1000) - cronometro.paused_time + server_time_diff
+          const last_paused_time = ((timestamp + server_time_diff) / 1000) - cronometro.paused_time
           cronometro.last_paused_time = last_paused_time
           this.UPDATE_DATA_CACHE_CRONOMETRO({ key: 'painelset_cronometro', value: cronometro })
         } else {

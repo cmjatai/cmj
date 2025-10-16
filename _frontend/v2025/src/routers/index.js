@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 export const routes = [
   {
-    path: '/v2025/',
+    path: '/',
     name: 'home',
     meta: {
       title: 'Home',
@@ -10,14 +10,27 @@ export const routes = [
     },
     children: [
       {
-        path: '/wstest/',
-        name: 'index_link',
-        component: () => import('~@/views/WsTest.vue'),
+        path: 'painel/:painel_id',
+        name: 'painelset_painel_view',
+        component: () => import('~@/modules/painelset/Painel.vue'),
+        meta: {
+          title: '404 - Not Found',
+          description: 'Page not found'
+        },
         children: [
+          {
+            path: 'visao/:painelvisao_id?',
+            name: 'painelset_painel_visao_view',
+            component: () => import('~@/modules/painelset/PainelVisao.vue'),
+            meta: {
+              title: 'Visão',
+              description: 'Visão do painel'
+            }
+          }
         ]
       },
       {
-        path: '/:pathMatch(.*)',
+        path: 'painel/:pathMatch(.*)',
         name: 'error_404',
         component: () => import('~@/views/Error404.vue'),
         meta: {
