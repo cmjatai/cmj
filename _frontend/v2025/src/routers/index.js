@@ -10,34 +10,45 @@ export const routes = [
     },
     children: [
       {
-        path: 'painel/:painel_id',
-        name: 'painelset_painel_view',
-        component: () => import('~@/modules/painelset/Painel.vue'),
+        path: 'painelset',
+        name: 'painelset_module_view',
+        component: () => import('~@/modules/painelset/PainelSetModule.vue'),
         meta: {
-          title: '404 - Not Found',
-          description: 'Page not found'
+          title: 'Painelset Module',
+          description: 'Home of Painelset Module'
         },
         children: [
           {
-            path: 'visao/:painelvisao_id?',
-            name: 'painelset_painel_visao_view',
-            component: () => import('~@/modules/painelset/PainelVisao.vue'),
+            path: 'painel/:painel_id?',
+            name: 'painelset_painel_view',
+            component: () => import('~@/modules/painelset/painel/Painel.vue'),
             meta: {
-              title: 'Visão',
-              description: 'Visão do painel'
+              title: 'Painel View',
+              description: 'View of the painel'
+            },
+            children: [
+              {
+                path: 'visao/:painelvisao_id?',
+                name: 'painelset_painel_visao_view',
+                component: () => import('~@/modules/painelset/painel/PainelVisao.vue'),
+                meta: {
+                  title: 'Visão',
+                  description: 'Visão do painel'
+                }
+              }
+            ]
+          },
+          {
+            path: ':pathMatch(.*)',
+            name: 'painelset_error_404',
+            component: () => import('~@/views/Error404.vue'),
+            meta: {
+              title: '404 - Not Found',
+              description: 'Page not found'
             }
           }
         ]
       },
-      {
-        path: 'painel/:pathMatch(.*)',
-        name: 'error_404',
-        component: () => import('~@/views/Error404.vue'),
-        meta: {
-          title: '404 - Not Found',
-          description: 'Page not found'
-        }
-      }
     ]
   }
 ]

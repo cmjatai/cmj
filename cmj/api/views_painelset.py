@@ -9,7 +9,7 @@ from django.utils import formats
 
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer, IndividuoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
-from cmj.painelset.models import Cronometro, CronometroState, Evento, Individuo
+from cmj.painelset.models import Cronometro, CronometroState, Evento, Individuo, PainelVisao
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -449,3 +449,12 @@ class _CronometroViewSet:
         if tree_data:
             return Response(tree_data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+@customize(PainelVisao)
+class _PainelVisaoSet:
+    @action(detail=True, methods=['patch'])
+    def activate(self, request, pk=None):
+        painel_visao = self.get_object()
+        painel_visao.activate()
+        return Response({'status': 'ok', 'painel_visao': painel_visao.id})

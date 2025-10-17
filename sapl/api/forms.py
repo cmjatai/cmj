@@ -15,7 +15,7 @@ from sapl.sessao.models import SessaoPlenaria
 from sapl.utils import generic_relations_for_model
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__) 
 
 
 class SaplFilterSetMixin(ApiFilterSetMixin):

@@ -491,3 +491,9 @@ class PainelVisao(models.Model):
 
     def __str__(self):
         return f"{self.visao.name} no painel {self.painel.name}"
+
+    def activate(self):
+        """Ativa esta visão no painel, desativando as outras."""
+        PainelVisao.objects.filter(painel=self.painel).update(active=False)
+        self.active = True
+        self.save()

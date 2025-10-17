@@ -1,10 +1,16 @@
 
 from ast import In
+from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 from cmj.painelset.forms import EventoForm
 from cmj.painelset.models import Evento, Individuo
 from sapl.crud.base import Crud, MasterDetailCrud
 from django.utils import timezone, formats
+
+
+def app_vue_painel(request, slug=None):
+    return render(request, 'painelset/app_vue_painel.html')
+
 
 class EventoCrud(Crud):
     model = Evento

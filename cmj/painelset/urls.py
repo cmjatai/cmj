@@ -16,5 +16,7 @@ urlpatterns = [
             views.EventoCrud.get_urls() +
             views.IndividuoCrud.get_urls()
         )
-    )
+    ),
+    re_path(r'^painelset/painel',
+        views.app_vue_painel, name='app_vue_painel_url'),
 ]

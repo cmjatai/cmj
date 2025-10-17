@@ -9,6 +9,12 @@ export default {
     fetch: (m) => axios({
       url: `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}${m.query_string ? '?' : ''}${m.query_string ? m.query_string : ''}`,
       method: 'GET'
-    })
+    }),
+    patchModelAction: (m) => axios.patch(
+      `${basePath}/${m.app}/${m.model}/${m.id}/${m.action}/`,
+      m.form || {},
+      m.progress || {}
+    )
   }
 }
+// app, model, id, action, form, progress = {}

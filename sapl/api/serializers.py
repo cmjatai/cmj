@@ -22,7 +22,7 @@ class SaplSerializerMixin(serializers.ModelSerializer):
     link_detail_backend = SerializerMethodField()
 
     class Meta:
-        fields = '__all__'
+        fields = '__all__' 
 
     def get_link_detail_backend(self, obj) -> str:
         try:
