@@ -447,7 +447,8 @@ class customize(object):
                 ApiViewSetConstrutor._built_sets[
                     self.model._meta.app_config][self.model]
         ):
-            pass
+            constructor = ApiViewSetConstrutor
+
 
         if hasattr(_ApiViewSet, 'build'):
             _ApiViewSet = _ApiViewSet.build()

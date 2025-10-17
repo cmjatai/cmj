@@ -408,15 +408,21 @@ class Visao(models.Model):
 
 class VisaoWidget(models.Model):
     """Modelo intermediário para associar widgets a visões com configuração adicional."""
+
+    name = models.CharField(max_length=256, blank=True, help_text="Nome do Widget na Visão Associada")
+    description = models.TextField(blank=True, help_text="Descrição do Widget na Visão Associada")
+
     widget = models.ForeignKey(Widget, on_delete=models.CASCADE, help_text="Widget associado")
     visao = models.ForeignKey(Visao, on_delete=models.CASCADE, help_text="Visão associada")
 
     position = models.PositiveIntegerField(help_text="Posição do widget na visão", default=0)
     visible = models.BooleanField(default=True, help_text="Indica se o widget está visível na visão")
+
     config = JSONField(
         verbose_name=_('Configuração Específica'),
         help_text="Configuração específica do widget nesta visão em formato JSON",
         blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
     styles = JSONField(
         verbose_name=_('Estilos Específicos'),
         help_text="Estilos específicos do widget nesta visão em formato JSON",
@@ -454,6 +460,15 @@ class Painel(models.Model):
         through_fields=('painel', 'visao'),
     )
 
+    config = JSONField(
+        verbose_name=_('Configuração Específica'),
+        help_text="Configuração específica da visão neste painel em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+    styles = JSONField(
+        verbose_name=_('Estilos Específicos'),
+        help_text="Estilos específicos da visão neste painel em formato JSON",
+        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+
     class Meta:
         verbose_name = "Painel"
         verbose_name_plural = "Painéis"
@@ -462,11 +477,28 @@ class Painel(models.Model):
     def __str__(self):
         return self.name
 
+    @property
+    def painelvisao_ativo_id(self):
+        """Retorna a visão ativa do painel, se houver."""
+        painelvisao_ativo = self.painelvisao_set.filter(active=True).values_list(flat=True).first()
+        if painelvisao_ativo:
+            return painelvisao_ativo
+        return None
+
+    def ws_serialize(self):
+        from drfautoapi.drfautoapi import ApiViewSetConstrutor
+        PainelSerializer = ApiViewSetConstrutor._built_sets[
+            self._meta.app_config][self._meta.model].serializer_class
+        return PainelSerializer(self).data
 
 class PainelVisao(models.Model):
     """Modelo intermediário para associar visões a painéis com configuração adicional."""
-    painel = models.ForeignKey(Painel, on_delete=models.CASCADE, help_text="Painel associado")
-    visao = models.ForeignKey(Visao, on_delete=models.CASCADE, help_text="Visão associada")
+
+    name = models.CharField(max_length=256, blank=True, help_text="Nome da Visão no Painel Associado")
+    description = models.TextField(blank=True, help_text="Descrição da visão no Painel Associado")
+
+    painel = models.ForeignKey(Painel, on_delete=models.CASCADE, help_text="Painel associado", related_name="painelvisao_set")
+    visao = models.ForeignKey(Visao, on_delete=models.CASCADE, help_text="Visão associada", related_name="painelvisao_set")
 
     position = models.PositiveIntegerField(help_text="Posição da visão no painel", default=0)
 

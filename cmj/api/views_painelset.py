@@ -9,17 +9,19 @@ from django.utils import formats
 
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer, IndividuoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
-from cmj.painelset.models import Cronometro, CronometroState, Evento, Individuo, PainelVisao
+from cmj.painelset.models import Cronometro, CronometroState, Evento, Individuo, Painel, PainelVisao
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.permissions import BasePermission
+from rest_framework import serializers
 from rest_framework import status
 from django.utils import timezone
 from pythonosc import udp_client
 
 from cmj.painelset.tasks import SEND_MESSAGE_MICROPHONE
+from sapl.api.serializers import SaplSerializerMixin
 
 logger = logging.getLogger(__name__)
 
@@ -452,9 +454,19 @@ class _CronometroViewSet:
 
 
 @customize(PainelVisao)
-class _PainelVisaoSet:
+class _PainelVisaoViewSet:
     @action(detail=True, methods=['patch'])
     def activate(self, request, pk=None):
         painel_visao = self.get_object()
         painel_visao.activate()
         return Response({'status': 'ok', 'painel_visao': painel_visao.id})
+
+@customize(Painel)
+class _PainelViewSet:
+    @classmethod
+    def build(cls, **kwargs):
+        class PainelSerializer(cls.serializer_class):
+            painelvisao_ativo_id = serializers.IntegerField(read_only=True)
+
+        cls.serializer_class = PainelSerializer
+        return cls

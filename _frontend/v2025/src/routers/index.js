@@ -19,24 +19,13 @@ export const routes = [
         },
         children: [
           {
-            path: 'painel/:painel_id?',
+            path: 'painel/:painelId?',
             name: 'painelset_painel_view',
             component: () => import('~@/modules/painelset/painel/Painel.vue'),
             meta: {
               title: 'Painel View',
               description: 'View of the painel'
-            },
-            children: [
-              {
-                path: 'visao/:painelvisao_id?',
-                name: 'painelset_painel_visao_view',
-                component: () => import('~@/modules/painelset/painel/PainelVisao.vue'),
-                meta: {
-                  title: 'Visão',
-                  description: 'Visão do painel'
-                }
-              }
-            ]
+            }
           },
           {
             path: ':pathMatch(.*)',
