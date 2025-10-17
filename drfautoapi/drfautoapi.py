@@ -13,6 +13,7 @@ from django.db.models.fields.json import JSONField
 from django.template.defaultfilters import capfirst
 from django.urls.conf import path
 from django.utils.translation import gettext_lazy as _
+import django_filters
 from django_filters.constants import ALL_FIELDS, EMPTY_VALUES
 from django_filters.filters import CharFilter
 from django_filters.filterset import FilterSet
@@ -24,7 +25,6 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.viewsets import ModelViewSet
 from django_filters.fields import ModelMultipleChoiceField
-import django_filters
 
 
 logger = logging.getLogger(__name__)
@@ -71,6 +71,8 @@ class M2MFilter(django_filters.ModelMultipleChoiceFilter):
 
     class M2MFieldFormField(ModelMultipleChoiceField):
         def clean(self, value):
+            if value in EMPTY_VALUES:
+                return None
             values = list(map(lambda x: x.replace(' ', '').split(','), value))
             values = [v for subvalues in values for v in subvalues]
             cleaned_values = tuple(super().clean(values))
@@ -132,7 +134,7 @@ class ApiFilterSetMixin(FilterSet):
                 f = model._meta.get_field(f_str)
 
                 if f.many_to_many:
-                    fields[f_str] = ['exact', 'in', ]
+                    fields[f_str] = ['exact', 'in']
                     continue
 
                 fields[f_str] = ['exact']
@@ -188,10 +190,6 @@ class ApiFilterSetMixin(FilterSet):
         if filter_class is not None:
             return filter_class(**default)
         return None
-
-    @classmethod
-    def get_filters(cls):
-        return super().get_filters()
 
     @classmethod
     def filter_for_lookup(cls, field, lookup_type):
