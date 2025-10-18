@@ -1,7 +1,7 @@
 <template>
   <div
     class="painelset-painel"
-    :style="painel?.styles.container || {}"
+    :style="painel?.styles.component || {}"
   >
     <div
       v-if="painel?.config?.displayTitle"
@@ -11,14 +11,14 @@
       {{ painel?.name }}
     </div>
     <div
-      v-if="painelVisaoSelected"
+      v-if="visaoSelected"
       class="inner-painelset-painel"
       :style="painel?.styles.inner || {}"
     >
-      <PainelVisao
-        :key="`painelvisao-${painelVisaoSelected.id}`"
+      <VisaoDePainel
+        :key="`visaodepainel-${visaoSelected.id}`"
         :painel-id="painelId"
-        :painelvisao-selected="painelVisaoSelected"
+        :visaodepainel-selected="visaoSelected"
       />
       <div class="actions">
         <div
@@ -26,9 +26,9 @@
           role="group"
           aria-label="Visões do Painel">
           <button
-            v-for="(pv, index) in painelVisaoList"
+            v-for="(pv, index) in visaoList"
             :key="`${pv.id}_${index}`"
-            :class="{ active: pv.id === painelVisaoSelected }"
+            :class="{ active: pv.id === visaoSelected }"
             class="btn btn-primary"
             @click="trocarVisao(pv.id)"
           >
@@ -43,7 +43,7 @@
       &nbsp;
       <button @click="visaoAtiva()">Visao Ativa</button>
       <br><br>
-      <button v-for="(pv, index) in painelVisaoList" :key="index" @click="ativarVisao(pv.id)">Ativar {{ pv.id }}</button>
+      <button v-for="(pv, index) in visaoList" :key="index" @click="ativarVisao(pv.id)">Ativar {{ pv.id }}</button>
       <br><br>
     </div>
   </div>
@@ -54,7 +54,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { ref, defineProps, computed, watch } from 'vue'
 import Resource from '~@/utils/resources'
 
-import PainelVisao from './PainelVisao.vue'
+import VisaoDePainel from './VisaoDePainel.vue'
 
 const syncStore = useSyncStore()
 const router = useRouter()
@@ -62,7 +62,8 @@ const route = useRoute()
 
 syncStore.registerModels('painelset', [
   'painel',
-  'painelvisao',
+  'visaodepainel',
+  'widget',
   'evento'
 ])
 
@@ -88,15 +89,15 @@ const painel = computed(() => {
   return syncStore.data_cache.painelset_painel?.[painelId.value] || null
 })
 
-const painelVisaoList = computed(() => {
+const visaoList = computed(() => {
   return _.orderBy(
-    _.filter(syncStore.data_cache.painelset_painelvisao, { painel: painelId.value } ) || [],
+    _.filter(syncStore.data_cache.painelset_visaodepainel, { painel: painelId.value } ) || [],
     ['position'],
     ['asc']
   )
 })
 
-const painelVisaoSelected = ref(null)
+const visaoSelected = ref(null)
 
 watch(
   () => props.painelId,
@@ -112,29 +113,29 @@ watch(
   () => painelId.value,
   (newPainelId) => {
     if (newPainelId) {
-      syncPainelVisaoList(newPainelId)
+      syncVisaoList(newPainelId)
     }
   }
 )
 
-const syncPainelVisaoList = async (painelId) => {
-  await syncStore
+const syncVisaoList = async (painelId) => {
+  syncStore
     .fetchSync({
       app: 'painelset',
-      model: 'painelvisao',
+      model: 'visaodepainel',
       params: {
         painel: painelId
       }
     })
     .then((response) => {
       if (response && response.data.results.length > 0) {
-        const painelVisaoAtivo = response.data.results.find(
+        const visaoAtiva = response.data.results.find(
           (pv) => pv.active === true
         )
-        if (painelVisaoAtivo) {
-          painelVisaoSelected.value = painelVisaoAtivo.id
+        if (visaoAtiva) {
+          visaoSelected.value = visaoAtiva.id
         } else {
-          painelVisaoSelected.value = response.data.results[0].id
+          visaoSelected.value = response.data.results[0].id
         }
       }
     })
@@ -149,7 +150,7 @@ const syncPainel = async () => {
         id: painelId.value
       })
       .then(() => {
-        syncPainelVisaoList(painelId.value)
+        syncVisaoList(painelId.value)
       })
       .catch((error) => {
         // router push to 404
@@ -203,67 +204,82 @@ const syncPainel = async () => {
 }
 
 const trocarVisao = (id) => {
-  painelVisaoSelected.value = id
+  visaoSelected.value = id
 }
 
 const ativarVisao = (id) => {
   Resource.Utils.patchModelAction({
     app: 'painelset',
-    model: 'painelvisao',
+    model: 'visaodepainel',
     id: id,
     action: 'activate',
     form: {}
   })
     .then(() => {
-      painelVisaoSelected.value = painel.value.painelvisao_ativo_id
-      syncPainelVisaoList(painelId.value)
+      visaoSelected.value = painel.value.visaodepainel_ativo_id
+      syncVisaoList(painelId.value)
     })
     .catch((error) => {
-      console.error('Error activating painelvisao:', error)
+      console.error('Error activating visaodepainel:', error)
     })
 }
 
 const visaoAtiva = () => {
-  painelVisaoSelected.value = painel.value.painelvisao_ativo_id
+  visaoSelected.value = painel.value.visaodepainel_ativo_id
 }
 
 syncPainel()
 
 </script>
 <style lang="scss" scoped>
+
 .painelset-painel {
-  overflow: hidden;
   display: flex;
-  height: 100%;
   flex-direction: column;
-  justify-content: stretch;
+  flex: 1 1 100%;
   .inner-painelset-painel {
-    position: relative;
     display: flex;
-    justify-content: stretch;
+    flex-direction: column;
     flex: 1 1 100%;
-    overflow: hidden;
     & > .actions {
       position: absolute;
-      left: 0px;
+      z-index: 10000;
       bottom: 0px;
       right: 0px;
       line-height: 1;
       text-align: right;
+      height: 5px;
+      overflow: hidden;
       .btn {
         font-size: 1em;
         padding: 0.6em;
         line-height: 1;
         border-radius: 0;
-        opacity: 0.2;
+        opacity: 1;
       }
       &:hover {
+        height: auto;
         .btn {
+          height: auto;
           opacity: 1;
           zoom: 2;
         }
       }
     }
+  }
+}
+
+.painelset-painelold {
+  overflow: hidden;
+  display: none;
+  height: 100%;
+  flex-direction: column;
+  .inner-painelset-painel {
+    position: relative;
+    display: flex;
+    flex: 1 1 100%;
+    overflow: hidden;
+
   }
 }
 </style>

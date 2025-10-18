@@ -14,7 +14,8 @@ const globalComponents = {
   // Para ser utilizado em qualquer componente Vue sem necessidade de importação.
   // O colocado em globalComponents não precisa ser colocado em rootComponents.
   'cmj-refresh-page': defineAsyncComponent(() => import('~@/components/atoms/RefreshPage.vue')),
-  'cmj-alert': defineAsyncComponent(() => import('~@/components/atoms/Alert.vue'))
+  'cmj-alert': defineAsyncComponent(() => import('~@/components/atoms/Alert.vue')),
+  'WidgetChild1': defineAsyncComponent(() => import('~@/modules/painelset/widgets/WidgetChild1.vue'))
 }
 
 export default {

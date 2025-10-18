@@ -250,10 +250,8 @@ rules_painelset_group_operador = {
         (painelset_models.Individuo, __base__, __perms_publicas__),
         (painelset_models.Evento, __base__, __perms_publicas__),
         (painelset_models.Painel, __base__, __perms_publicas__),
-        (painelset_models.PainelVisao, __base__, __perms_publicas__),
-        (painelset_models.Visao, __base__, __perms_publicas__),
-        (painelset_models.VisaoWidget, __base__, __perms_publicas__),
         (painelset_models.Widget, __base__, __perms_publicas__),
+        (painelset_models.VisaoDePainel, __base__, __perms_publicas__),
     ]
 }
 

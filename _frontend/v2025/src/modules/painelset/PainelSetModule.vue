@@ -15,8 +15,14 @@
     left: 30px;
     right: 30px;
     display: flex;
+    flex-direction: column;
+    * {
+      user-select: none;
+    }
     .inner-painelset {
-      position: relative;
+      display: flex;
+      flex: 1 1 100%;
+      flex-direction: column;
     }
   }
 </style>

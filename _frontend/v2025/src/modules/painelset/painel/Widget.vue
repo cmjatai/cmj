@@ -1,0 +1,432 @@
+<template>
+  <div
+    ref="painelsetWidget"
+    :key="`painelset-widget-${widgetSelected?.id}`"
+    :class="['painelset-widget', coordsChange.editmode ? 'editmode' : '']"
+    :style="{ ...(widgetSelected?.styles.component || {}), ...styleCoords }"
+    @mousedown.stop="onMouseDown($event)"
+  >
+    <div
+      v-if="widgetSelected?.config?.displayTitle"
+      class="widget-titulo"
+      :style="widgetSelected?.styles.title || {}"
+    >
+      {{ widgetSelected?.name }}
+    </div>
+    <div
+      v-if="widgetSelected?.vue_component"
+      class="inner-widget"
+      :style="widgetSelected?.styles.inner || {}"
+    >
+      <component
+        :is="widgetSelected?.vue_component"
+        :painel-id="painelId"
+        :widget-selected="widgetSelected?.id"
+      />
+    </div>
+    <div
+      v-if="!widgetSelected?.vue_component"
+      class="inner-widget inner-children"
+    >
+      <Widget
+        v-for="(widget, index) in childList"
+        :key="`widget-${widget.id}-${index}`"
+        :painel-id="painelId"
+        :widget-selected="widget.id"
+      />
+    </div>
+    <div
+      class="resize-handle top-left"
+      @mousedown="onMouseDownResize($event, 'top-left')"
+    />
+    <div
+      class="resize-handle top-right"
+      @mousedown="onMouseDownResize($event, 'top-right')"
+    />
+    <div
+      class="resize-handle bottom-left"
+      @mousedown="onMouseDownResize($event, 'bottom-left')"
+
+    />
+    <div
+      class="resize-handle bottom-right"
+      @mousedown="onMouseDownResize($event, 'bottom-right')"
+    />
+    <div
+      class="resize-handle center-center"
+      @mousedown="onMouseDownResize($event, 'center-center')"
+    />
+  </div>
+</template>
+<script setup>
+import { useSyncStore } from '~@/stores/SyncStore'
+import { computed, ref, inject } from 'vue'
+import Resource from '~@/utils/resources'
+
+const syncStore = useSyncStore()
+
+const EventBus = inject('EventBus')
+
+const props = defineProps({
+  painelId: {
+    type: Number,
+    default: 0
+  },
+  widgetSelected: {
+    type: Number,
+    default: 0
+  }
+})
+
+const painelsetWidget = ref(null)
+
+const coordsChange = ref({
+  x: 0,
+  y: 0,
+  w: 100,
+  h: 100,
+  mouseResizeEnter: false,
+  editmode: false
+})
+
+EventBus.on('closeEditMode', (sender) => {
+  if (sender === props.widgetSelected) {
+    return
+  }
+  coordsChange.value.editmode = false
+})
+
+const widgetSelected = computed(() => {
+  return syncStore.data_cache.painelset_widget?.[props.widgetSelected] || null
+})
+
+const styleCoords = computed(() => {
+  if (!widgetSelected.value || !widgetSelected.value.config?.coords) {
+    return {}
+  }
+  const styles = {}
+  const coords = widgetSelected.value.config.coords
+  if (coords.x !== undefined) {
+    styles.left = `${coords.x}%`
+  }
+  if (coords.y !== undefined) {
+    styles.top = `${coords.y}%`
+  }
+  if (coords.w !== undefined) {
+    styles.right = `${(coords.w + coords.x) > 100 ? 0 : 100 - (coords.w + coords.x)}%`
+  }
+  if (coords.h !== undefined) {
+    styles.bottom = `${(coords.h + coords.y) > 100 ? 0 : 100 - (coords.h + coords.y)}%`
+  }
+  return styles
+})
+
+const childList = computed(() => {
+  return _.orderBy(
+    _.filter(syncStore.data_cache.painelset_widget, { parent: props.widgetSelected } ) || [],
+    ['position'],
+    ['asc']
+  )
+})
+
+const syncChildList = async () => {
+  syncStore
+    .fetchSync({
+      app: 'painelset',
+      model: 'widget',
+      filters: {
+        parent: props.widgetSelected
+      }
+    })
+    .then((response) => {
+      if (response && response.data.results.length > 0) {
+        // Process the fetched widgets
+      }
+    })
+}
+
+syncChildList()
+
+/* Helpers for resizing and moving widgets */
+
+const validLocalCoords = (localCoords) => {
+  if (!localCoords) {
+    return false
+  }
+  if (localCoords.x === undefined ||
+      localCoords.y === undefined ||
+      localCoords.w === undefined ||
+      localCoords.h === undefined ||
+      localCoords.x === null ||
+      localCoords.y === null ||
+      localCoords.w === null ||
+      localCoords.h === null
+  ) {
+    return false
+  }
+  if (localCoords.w > 5 && localCoords.w <= 100 &&
+      localCoords.h > 5 && localCoords.h <= 100 &&
+      localCoords.x >= 0 && localCoords.x <= 100 &&
+      localCoords.y >= 0 && localCoords.y <= 100 &&
+      (localCoords.x + localCoords.w) <= 100 &&
+      (localCoords.y + localCoords.h) <= 100
+  ) {
+    return true
+  }
+  return false
+}
+
+const patchWidgetCoords = (localCoords) => {
+  if (!validLocalCoords(localCoords)) {
+    console.error('Invalid widget coordinates, aborting update')
+    return
+  }
+  Resource.Utils.patchModel({
+    app: 'painelset',
+    model: 'widget',
+    id: widgetSelected.value.id,
+    form: {
+      config: {
+        ...widgetSelected.value.config,
+        coords: {
+          ...widgetSelected.value.config.coords,
+          x: localCoords.x,
+          y: localCoords.y,
+          w: localCoords.w,
+          h: localCoords.h
+        }
+      }
+    }
+  }).then((response) => {
+    console.log(response.data)
+    /* coordsChange.value.h = response.data.config.coords.h
+    coordsChange.value.w = response.data.config.coords.w
+    coordsChange.value.x = response.data.config.coords.x
+    coordsChange.value.y = response.data.config.coords.y */
+    console.log('Widget coordinates updated successfully')
+  }).catch((error) => {
+    console.error('Error updating widget coordinates:', error)
+  })
+}
+
+const onMouseDown = (event) => {
+  event.preventDefault()
+  if (coordsChange.value.mouseResizeEnter) {
+    return
+  }
+  coordsChange.value.editmode = !coordsChange.value.editmode
+  EventBus.emit('closeEditMode', props.widgetSelected)
+}
+
+const onMouseDownResize = (event, direction) => {
+  coordsChange.value.mouseResizeEnter = true
+  event.preventDefault()
+  if (!coordsChange.value.editmode) {
+    return
+  }
+
+  const currentTarget = event.currentTarget.parentElement
+  const widgetRect = currentTarget.getBoundingClientRect()
+  const widgetParentRect = currentTarget.parentElement.getBoundingClientRect()
+
+  const localCoords = { ...coordsChange.value }
+
+  console.log('Mouse move detected:', event.clientX, event.clientY, widgetRect)
+
+  const onMouseMove = (e) => {
+    let newWidthPercent = 0
+    let newHeightPercent = 0
+
+    if (direction === 'top-left') {
+      const newWidth = e.clientX - widgetRect.left
+      const newHeight = e.clientY - widgetRect.top
+      newWidthPercent = Math.round((newWidth / widgetParentRect.width) * 100)
+      newHeightPercent = Math.round((newHeight / widgetParentRect.height) * 100)
+
+      localCoords.w = widgetSelected.value.config.coords.w - newWidthPercent
+      localCoords.h = widgetSelected.value.config.coords.h - newHeightPercent
+      localCoords.x = widgetSelected.value.config.coords.x + newWidthPercent
+      localCoords.y = widgetSelected.value.config.coords.y + newHeightPercent
+
+    } else if (direction === 'top-right') {
+      const newWidth = e.clientX - widgetRect.right
+      const newHeight = e.clientY - widgetRect.top
+      newWidthPercent = Math.round((newWidth / widgetParentRect.width) * 100)
+      newHeightPercent = Math.round((newHeight / widgetParentRect.height) * 100)
+
+      localCoords.w = widgetSelected.value.config.coords.w + newWidthPercent
+      localCoords.h = widgetSelected.value.config.coords.h - newHeightPercent
+      localCoords.x = widgetSelected.value.config.coords.x
+      localCoords.y = widgetSelected.value.config.coords.y + newHeightPercent
+
+    } else if (direction === 'bottom-right') {
+      const newWidth = e.clientX - widgetRect.right
+      const newHeight = e.clientY - widgetRect.bottom
+      newWidthPercent = Math.round((newWidth / widgetParentRect.width) * 100)
+      newHeightPercent = Math.round((newHeight / widgetParentRect.height) * 100)
+
+      localCoords.w = widgetSelected.value.config.coords.w + newWidthPercent
+      localCoords.h = widgetSelected.value.config.coords.h + newHeightPercent
+      localCoords.x = widgetSelected.value.config.coords.x
+      localCoords.y = widgetSelected.value.config.coords.y
+
+    } else if (direction === 'bottom-left') {
+      const newWidth = e.clientX - widgetRect.left
+      const newHeight = e.clientY - widgetRect.bottom
+      newWidthPercent = Math.round((newWidth / widgetParentRect.width) * 100)
+      newHeightPercent = Math.round((newHeight / widgetParentRect.height) * 100)
+
+      localCoords.w = widgetSelected.value.config.coords.w - newWidthPercent
+      localCoords.h = widgetSelected.value.config.coords.h + newHeightPercent
+      localCoords.x = widgetSelected.value.config.coords.x + newWidthPercent
+      localCoords.y = widgetSelected.value.config.coords.y
+
+    } else if (direction === 'center-center') {
+      const deltaX = e.clientX - widgetRect.left - (widgetRect.width / 2)
+      const deltaY = e.clientY - widgetRect.top - (widgetRect.height / 2)
+      newWidthPercent = Math.round((deltaX / widgetParentRect.width) * 100)
+      newHeightPercent = Math.round((deltaY / widgetParentRect.height) * 100)
+      console.debug('Resizing widget...', deltaX, deltaY, direction, newWidthPercent, newHeightPercent, localCoords)
+
+      localCoords.w = widgetSelected.value.config.coords.w
+      localCoords.h = widgetSelected.value.config.coords.h
+      localCoords.x = widgetSelected.value.config.coords.x + newWidthPercent
+      localCoords.y = widgetSelected.value.config.coords.y + newHeightPercent
+    }
+
+    console.debug('Resizing widget...', e.clientX, e.clientY, direction, newWidthPercent, newHeightPercent, localCoords)
+
+    if (validLocalCoords(localCoords)) {
+      coordsChange.value.w = localCoords.w
+      coordsChange.value.h = localCoords.h
+      coordsChange.value.x = localCoords.x
+      coordsChange.value.y = localCoords.y
+
+      currentTarget.style.right = `${100 - (localCoords.w + localCoords.x)}%`
+      currentTarget.style.bottom = `${100 - (localCoords.h + localCoords.y)}%`
+      currentTarget.style.left = `${localCoords.x}%`
+      currentTarget.style.top = `${localCoords.y}%`
+    } else {
+      console.warn('Invalid coordinates during resize, ignoring update')
+    }
+  }
+  console.log('Starting resize operation')
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', (e) => {
+    window.removeEventListener('mouseup', this)
+    window.removeEventListener('mousemove', onMouseMove)
+    e.preventDefault()
+    if (!coordsChange.value.mouseResizeEnter) {
+      return
+    }
+    coordsChange.value.mouseResizeEnter = false
+    patchWidgetCoords({
+      x: coordsChange.value.x,
+      y: coordsChange.value.y,
+      w: coordsChange.value.w,
+      h: coordsChange.value.h
+    })
+    console.log('Resize operation ended')
+  })
+}
+</script>
+
+<style lang="scss" scoped>
+  .painelset-widget {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 100%;
+    z-index: 1;
+    overflow: hidden;
+    .inner-widget {
+      position: relative;
+      display: flex;
+      overflow: hidden;
+      flex-direction: column;
+      flex: 1 1 100%;
+      z-index: 1;
+    }
+    & > .resize-handle {
+      display: none;
+    }
+    &.editmode {
+      border: 1px dashed #ddd;
+      z-index: 1000;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        height: 100%;
+        background-color: #fff5;
+        font-size: 0.8em;
+        z-index: 0;
+      }
+      &.darkmode::after {
+        background-color: #0005;
+      }
+      &.lightmode::after {
+        background-color: #fff5;
+      }
+
+      & > .resize-handle {
+        position: absolute;
+        display: block;
+        width: 10px;
+        height: 10px;
+        background-color: #fff;
+        z-index: 1001;
+        &.top-left {
+          top: -1px;
+          left: -1px;
+          cursor: nw-resize;
+        }
+        &.top-right {
+          top: -1px;
+          right: -1px;
+          cursor: ne-resize;
+        }
+        &.bottom-left {
+          bottom: -1px;
+          left: -1px;
+          cursor: sw-resize;
+        }
+        &.bottom-right {
+          bottom: -1px;
+          right: -1px;
+          cursor: se-resize;
+        }
+        &.center-center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 25px;
+            height: 25px;
+            background-color: transparent;
+            cursor: move;
+
+            &::before,
+            &::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 25px;
+            height: 5px;
+            background-color: #fff;
+            }
+
+            &::before {
+            transform: translate(-50%, -50%) rotate(45deg);
+            }
+
+            &::after {
+            transform: translate(-50%, -50%) rotate(-45deg);
+            }
+        }
+      }
+    }
+  }
+</style>

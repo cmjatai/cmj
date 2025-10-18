@@ -14,6 +14,11 @@ export default {
       `${basePath}/${m.app}/${m.model}/${m.id}/${m.action}/`,
       m.form || {},
       m.progress || {}
+    ),
+    patchModel: (m) => axios.patch(
+      `${basePath}/${m.app}/${m.model}/${m.id}/`,
+      m.form || {},
+      m.progress || {}
     )
   }
 }
