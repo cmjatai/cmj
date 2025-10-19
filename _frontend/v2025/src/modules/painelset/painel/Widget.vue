@@ -36,29 +36,41 @@
       />
     </div>
     <div
-      class="resize-handle top-left"
-      @mousedown="onMouseDownResize($event, 'top-left')"
-    />
-    <div
-      class="resize-handle top-right"
-      @mousedown="onMouseDownResize($event, 'top-right')"
-    />
-    <div
-      class="resize-handle bottom-left"
-      @mousedown="onMouseDownResize($event, 'bottom-left')"
-
-    />
-    <div
-      class="resize-handle bottom-right"
-      @mousedown="onMouseDownResize($event, 'bottom-right')"
-    />
-    <div
-      class="resize-handle center-center"
-      @mousedown="onMouseDownResize($event, 'center-center')"
-    />
+      v-if="coordsChange.editmode"
+      class="manager"
+    >
+      <div class="toolbar">
+        <button
+          class="btn btn-sm btn-dark"
+          @click.stop="modalEditorOpened = true"
+        >
+        </button>
+      </div>
+      <div
+        class="resize-handle top-left"
+        @mousedown="onMouseDownResize($event, 'top-left')"
+      />
+      <div
+        class="resize-handle top-right"
+        @mousedown="onMouseDownResize($event, 'top-right')"
+      />
+      <div
+        class="resize-handle bottom-left"
+        @mousedown="onMouseDownResize($event, 'bottom-left')"
+      />
+      <div
+        class="resize-handle bottom-right"
+        @mousedown="onMouseDownResize($event, 'bottom-right')"
+      />
+      <div
+        class="resize-handle center-center"
+        @mousedown="onMouseDownResize($event, 'center-center')"
+      />
+    </div>
   </div>
 </template>
 <script setup>
+
 import { useSyncStore } from '~@/stores/SyncStore'
 import { computed, ref, inject } from 'vue'
 import Resource from '~@/utils/resources'
@@ -225,7 +237,9 @@ const onMouseDownResize = (event, direction) => {
     return
   }
 
-  const currentTarget = event.currentTarget.parentElement
+  // .resize-handle é o currentTarget, parent é .manager, parent é o widget em si
+  // const currentTarget = event.currentTarget.parentElement.parentElement
+  const currentTarget = painelsetWidget.value
   const widgetRect = currentTarget.getBoundingClientRect()
   const widgetParentRect = currentTarget.parentElement.getBoundingClientRect()
 
@@ -371,62 +385,73 @@ const onMouseDownResize = (event, direction) => {
         background-color: #fff5;
       }
 
-      & > .resize-handle {
-        position: absolute;
+      & > .manager {
         display: block;
-        width: 10px;
-        height: 10px;
-        background-color: #fff;
-        z-index: 1001;
-        &.top-left {
-          top: -1px;
-          left: -1px;
-          cursor: nw-resize;
-        }
-        &.top-right {
-          top: -1px;
-          right: -1px;
-          cursor: ne-resize;
-        }
-        &.bottom-left {
-          bottom: -1px;
-          left: -1px;
-          cursor: sw-resize;
-        }
-        &.bottom-right {
-          bottom: -1px;
-          right: -1px;
-          cursor: se-resize;
-        }
-        &.center-center {
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 25px;
-            height: 25px;
-            background-color: transparent;
-            cursor: move;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1;
 
-            &::before,
-            &::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 25px;
-            height: 5px;
-            background-color: #fff;
-            }
+        & > .resize-handle {
+          position: absolute;
+          display: block;
+          width: 10px;
+          height: 10px;
+          background-color: #fff;
+          z-index: 1001;
+          &.top-left {
+            top: -1px;
+            left: -1px;
+            cursor: nw-resize;
+          }
+          &.top-right {
+            top: -1px;
+            right: -1px;
+            cursor: ne-resize;
+          }
+          &.bottom-left {
+            bottom: -1px;
+            left: -1px;
+            cursor: sw-resize;
+          }
+          &.bottom-right {
+            bottom: -1px;
+            right: -1px;
+            cursor: se-resize;
+          }
+          &.center-center {
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 25px;
+              height: 25px;
+              background-color: transparent;
+              cursor: move;
 
-            &::before {
-            transform: translate(-50%, -50%) rotate(45deg);
-            }
+              &::before,
+              &::after {
+              content: '';
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              width: 25px;
+              height: 5px;
+              background-color: #fff;
+              }
 
-            &::after {
-            transform: translate(-50%, -50%) rotate(-45deg);
-            }
+              &::before {
+              transform: translate(-50%, -50%) rotate(45deg);
+              }
+
+              &::after {
+              transform: translate(-50%, -50%) rotate(-45deg);
+              }
+          }
         }
       }
+
     }
   }
 </style>

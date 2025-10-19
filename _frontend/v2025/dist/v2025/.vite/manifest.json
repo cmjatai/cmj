@@ -1,6 +1,6 @@
 {
   "components/atoms/Alert.vue": {
-    "file": "v2025/Alert-6OHr4mzu.js",
+    "file": "v2025/Alert-C7Szls09.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
@@ -9,7 +9,7 @@
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v2025/RefreshPage-C99vb3Dh.js",
+    "file": "v2025/RefreshPage-DtXxVTAx.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
@@ -21,42 +21,61 @@
     ]
   },
   "main.js": {
-    "file": "v2025/main-BGOdaWSg.js",
+    "file": "v2025/main-Dpw8hoc1.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
     "dynamicImports": [
-      "modules/painelset/Painel.vue",
-      "modules/painelset/PainelVisao.vue",
+      "modules/painelset/PainelSetModule.vue",
+      "modules/painelset/painel/Painel.vue",
       "views/Error404.vue",
       "views/Error404.vue",
       "components/atoms/RefreshPage.vue",
-      "components/atoms/Alert.vue"
+      "components/atoms/Alert.vue",
+      "modules/painelset/widgets/WidgetChild1.vue"
     ],
     "css": [
-      "v2025/main-B_dRvVnj.css"
+      "v2025/main-BkUYcfHN.css"
     ]
   },
-  "modules/painelset/Painel.vue": {
-    "file": "v2025/Painel-C5GssJ5K.js",
+  "modules/painelset/PainelSetModule.vue": {
+    "file": "v2025/PainelSetModule-CN47TWKX.js",
+    "name": "PainelSetModule",
+    "src": "modules/painelset/PainelSetModule.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "main.js"
+    ],
+    "css": [
+      "v2025/PainelSetModule-DAwiXEZ2.css"
+    ]
+  },
+  "modules/painelset/painel/Painel.vue": {
+    "file": "v2025/Painel-D_jIz1PA.js",
     "name": "Painel",
-    "src": "modules/painelset/Painel.vue",
+    "src": "modules/painelset/painel/Painel.vue",
     "isDynamicEntry": true,
     "imports": [
       "main.js"
+    ],
+    "css": [
+      "v2025/Painel-BayKyALZ.css"
     ]
   },
-  "modules/painelset/PainelVisao.vue": {
-    "file": "v2025/PainelVisao-BU51wreJ.js",
-    "name": "PainelVisao",
-    "src": "modules/painelset/PainelVisao.vue",
+  "modules/painelset/widgets/WidgetChild1.vue": {
+    "file": "v2025/WidgetChild1-C8i4HqzW.js",
+    "name": "WidgetChild1",
+    "src": "modules/painelset/widgets/WidgetChild1.vue",
     "isDynamicEntry": true,
     "imports": [
       "main.js"
+    ],
+    "css": [
+      "v2025/WidgetChild1-zue6zMJ6.css"
     ]
   },
   "views/Error404.vue": {
-    "file": "v2025/Error404-BFmXCMvQ.js",
+    "file": "v2025/Error404-Bym75Wx_.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
