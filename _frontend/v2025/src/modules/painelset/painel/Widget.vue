@@ -43,8 +43,7 @@
         <button
           class="btn btn-sm btn-dark"
           @click.stop="modalEditorOpened = true"
-        >
-        </button>
+        />
       </div>
       <div
         class="resize-handle top-left"
@@ -210,12 +209,12 @@ const patchWidgetCoords = (localCoords) => {
       }
     }
   }).then((response) => {
-    console.log(response.data)
+    console.debug(response.data)
     /* coordsChange.value.h = response.data.config.coords.h
     coordsChange.value.w = response.data.config.coords.w
     coordsChange.value.x = response.data.config.coords.x
     coordsChange.value.y = response.data.config.coords.y */
-    console.log('Widget coordinates updated successfully')
+    console.debug('Widget coordinates updated successfully')
   }).catch((error) => {
     console.error('Error updating widget coordinates:', error)
   })
@@ -245,7 +244,7 @@ const onMouseDownResize = (event, direction) => {
 
   const localCoords = { ...coordsChange.value }
 
-  console.log('Mouse move detected:', event.clientX, event.clientY, widgetRect)
+  console.debug('Mouse move detected:', event.clientX, event.clientY, widgetRect)
 
   const onMouseMove = (e) => {
     let newWidthPercent = 0
@@ -324,7 +323,7 @@ const onMouseDownResize = (event, direction) => {
       console.warn('Invalid coordinates during resize, ignoring update')
     }
   }
-  console.log('Starting resize operation')
+  console.debug('Starting resize operation')
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', (e) => {
     window.removeEventListener('mouseup', this)
@@ -340,7 +339,7 @@ const onMouseDownResize = (event, direction) => {
       w: coordsChange.value.w,
       h: coordsChange.value.h
     })
-    console.log('Resize operation ended')
+    console.debug('Resize operation ended')
   })
 }
 </script>

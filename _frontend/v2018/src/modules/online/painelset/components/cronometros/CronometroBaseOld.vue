@@ -138,7 +138,7 @@ export default {
     }
   },
   mounted: function () {
-    console.log('Cronometro mounted, connecting to WebSocket:', this.ws, this.auto_start)
+    console.debug('Cronometro mounted, connecting to WebSocket:', this.ws, this.auto_start)
     this.$nextTick(() => {
       this.ws_client_cronometro()
       this.runInterval()
@@ -147,7 +147,7 @@ export default {
   watch: {
     cronometro_id: function (newVal, oldVal) {
       if (!this.nulls.includes(oldVal) && newVal !== oldVal && newVal > 0 && newVal !== this.id) {
-        console.log('cronometrobase mudou de', oldVal, 'para', newVal)
+        console.debug('cronometrobase mudou de', oldVal, 'para', newVal)
         this.id = newVal
         this.ws = `/ws/cronometro/${this.cronometro_id}/`
         if (this.wsSocket) {
@@ -162,7 +162,7 @@ export default {
   },
   beforeDestroy: function () {
     if (this.wsSocket) {
-      console.log('Cronometro beforeDestroy, closing WebSocket')
+      console.debug('Cronometro beforeDestroy, closing WebSocket')
       this.wsSocket.close()
       this.wsSocket = null
     }
@@ -188,7 +188,7 @@ export default {
       t.wsSocket = new WebSocket(this.ws_endpoint())
       t.wsSocket.onmessage = this.handleWebSocketMessageLocal
       t.wsSocket.onopen = () => {
-        // console.log('WebSocket conectado:', this.ws)
+        // console.debug('WebSocket conectado:', this.ws)
         if (t.auto_start) {
           t.startCronometro()
         } else {
@@ -196,7 +196,7 @@ export default {
         }
       }
       t.wsSocket.onclose = () => {
-        console.log('WebSocket desconectado...')
+        console.debug('WebSocket desconectado...')
         t.wsSocket = null
       }
       t.wsSocket.onerror = (error) => {
@@ -205,11 +205,11 @@ export default {
         t.ws_client_cronometro()
       }
       t.wsSocket.onpagehide = () => {
-        console.log('WebSocket página oculta, fechando conexão')
+        console.debug('WebSocket página oculta, fechando conexão')
         t.wsSocket.close()
       }
       t.wsSocket.onpageshow = () => {
-        console.log('WebSocket página visível, reconectando')
+        console.debug('WebSocket página visível, reconectando')
         t.ws_client_cronometro()
       }
       return t.wsSocket
@@ -226,7 +226,7 @@ export default {
           if (obj.id === t.cronometro_id) {
             t.instance = obj
             t.cronometro = obj
-            console.log(obj.state, obj.name)
+            console.debug(obj.state, obj.name)
           } else {
             t.instance = null
             t.cronometro = null
@@ -267,7 +267,7 @@ export default {
       }, 1000)
     },
     handleWebSocketMessageLocal (message) {
-      // console.log('CRONÔMETRO: Mensagem recebida do WebSocket.')
+      // console.debug('CRONÔMETRO: Mensagem recebida do WebSocket.')
       const data = JSON.parse(message.data)
       if (
         data.type === 'command_result' &&
@@ -277,21 +277,21 @@ export default {
         this.instance = data.result.cronometro
         this.cronometro = this.instance
         this.$emit(`cronometro_${data.command}`, this.cronometro)
-        // console.log('command:', data.command, 'cronometro:', this.cronometro)
+        // console.debug('command:', data.command, 'cronometro:', this.cronometro)
         if (data.command === 'start') {
           this.display = this.display_initial
-          console.log('Cronômetro iniciado:', data)
+          console.debug('Cronômetro iniciado:', data)
         } else if (data.command === 'pause') {
           this.display = 'last_paused'
-          console.log('Cronômetro pausado:', data)
+          console.debug('Cronômetro pausado:', data)
         } else if (data.command === 'stop') {
           this.display = 'elapsed'
-          console.log('Cronômetro parado:', data)
+          console.debug('Cronômetro parado:', data)
         } else if (data.command === 'resume') {
           this.display = this.display_initial
-          console.log('Cronômetro retomado:', data)
+          console.debug('Cronômetro retomado:', data)
         } else if (data.command === 'get') {
-          // console.log('Estado do cronômetro atualizado:', data)
+          // console.debug('Estado do cronômetro atualizado:', data)
         }
         this.runInterval()
       }
@@ -358,7 +358,7 @@ export default {
       }
     },
     getCronometro () {
-      console.log(this.cronometro_id, 'Buscando estado atual do cronômetro no servidor...')
+      console.debug(this.cronometro_id, 'Buscando estado atual do cronômetro no servidor...')
       try {
         if (!this.wsSocket) {
           this.ws_client_cronometro()
@@ -376,21 +376,21 @@ export default {
     },
     secondsToTime: function (cronometro, timeKey, alternativeKey) {
       /* if (cronometro.id === 47) {
-        console.log('entrou aqui 0', cronometro, timeKey, alternativeKey)
+        console.debug('entrou aqui 0', cronometro, timeKey, alternativeKey)
       }
       if (
         !cronometro ||
         (this.nulls.includes(cronometro[timeKey]) && alternativeKey === undefined) ||
         (alternativeKey !== undefined && this.nulls.includes(cronometro[alternativeKey]))
       ) {
-        console.log('entrou aqui 1', cronometro, timeKey, alternativeKey)
+        console.debug('entrou aqui 1', cronometro, timeKey, alternativeKey)
         return '00:00'
       } */
       let totalSeconds = Math.round(
         cronometro[timeKey] || cronometro[alternativeKey] || 0
       )
       /* if (this.nulls.includes(totalSeconds)) {
-        console.log('entrou aqui 2', cronometro, timeKey, alternativeKey)
+        console.debug('entrou aqui 2', cronometro, timeKey, alternativeKey)
         return '00:00'
       } */
       const negative = totalSeconds < 0 ? '-' : ''

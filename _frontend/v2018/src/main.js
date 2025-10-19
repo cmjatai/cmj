@@ -101,16 +101,16 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/service-worker.js')
       .then(registration => {
-        // console.log('SW registered: ', registration)
+        // console.debug('SW registered: ', registration)
       })
       .catch(registrationError => {
-        // console.log('SW registration failed: ', registrationError)
+        // console.debug('SW registration failed: ', registrationError)
       })
 
     // From a page:
     /* navigator.storage.requestPersistent().then((granted) => {
       if (granted) {
-        // console.log('Hurrah, your data is here to stay!')
+        // console.debug('Hurrah, your data is here to stay!')
       }
     }); */
 
@@ -118,14 +118,14 @@ if ('serviceWorker' in navigator) {
       //First, see if we already have it
       navigator.storage.persisted().then(persistent => {
         if(persistent) {
-          // console.log('already granted');
+          // console.debug('already granted');
         } else {
-          // console.log('not already granted, lets ask for it');
+          // console.debug('not already granted, lets ask for it');
           navigator.storage.persist().then(granted => {
             if (granted) {
-              // console.log("persisted storage granted ftw");
+              // console.debug("persisted storage granted ftw");
             } else {
-              // console.log("sad face");
+              // console.debug("sad face");
             }
           });
         }
@@ -135,8 +135,8 @@ if ('serviceWorker' in navigator) {
     //what the heck
     if(navigator.storage && navigator.storage.estimate) {
       navigator.storage.estimate().then(result => {
-        // console.log(result);
-        // console.log('Percent used '+(result.usage/result.quota).toFixed(2));
+        // console.debug(result);
+        // console.debug('Percent used '+(result.usage/result.quota).toFixed(2));
       });
     } */
   })

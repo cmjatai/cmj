@@ -203,21 +203,21 @@ export default {
     },
     secondsToTime: function (cronometro, timeKey, alternativeKey) {
       /* if (cronometro.id === 47) {
-        console.log('entrou aqui 0', cronometro, timeKey, alternativeKey)
+        console.debug('entrou aqui 0', cronometro, timeKey, alternativeKey)
       }
       if (
         !cronometro ||
         (this.nulls.includes(cronometro[timeKey]) && alternativeKey === undefined) ||
         (alternativeKey !== undefined && this.nulls.includes(cronometro[alternativeKey]))
       ) {
-        console.log('entrou aqui 1', cronometro, timeKey, alternativeKey)
+        console.debug('entrou aqui 1', cronometro, timeKey, alternativeKey)
         return '00:00'
       } */
       let totalSeconds = Math.round(
         cronometro[timeKey] || cronometro[alternativeKey] || 0
       )
       /* if (this.nulls.includes(totalSeconds)) {
-        console.log('entrou aqui 2', cronometro, timeKey, alternativeKey)
+        console.debug('entrou aqui 2', cronometro, timeKey, alternativeKey)
         return '00:00'
       } */
       const negative = totalSeconds < 0 ? '-' : ''

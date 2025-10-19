@@ -83,7 +83,7 @@ export default {
     }
   },
   mounted () {
-    console.log('Individuo Base mounted', this.individuo_id)
+    console.debug('Individuo Base mounted', this.individuo_id)
   },
   methods: {
     toggleMicrofone: function () {
@@ -135,7 +135,7 @@ export default {
           query_params.join('&')
         )
         .then(response => {
-          console.log(this.individuo_id, action, response)
+          console.debug(this.individuo_id, action, response)
         })
         .catch(error => {
           console.error(this.individuo_id, action, error)

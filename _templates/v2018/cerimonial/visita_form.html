@@ -40,7 +40,7 @@
       let img_select = document.querySelector('#img_select')
 
       input_doc.addEventListener('keyup', function(e) {
-        //console.log(e.target.value)
+        //console.debug(e.target.value)
         const json_data = {
           documento__icontains: e.target.value
           // get_all: true
@@ -179,8 +179,8 @@
 
         })
         .catch(function (err) {
-          console.log(err)
-          console.log('Não há permissões para acessar a webcam')
+          console.debug(err)
+          console.debug('Não há permissões para acessar a webcam')
         })
       })
 

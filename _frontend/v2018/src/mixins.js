@@ -125,10 +125,10 @@ Vue.mixin({
        */
       let data = JSON.parse(event.data)
       // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-      // console.log(performance.now(), 'ws-message', data)
+      // console.debug(performance.now(), 'ws-message', data)
       this
         .$nextTick(() => {
-          // console.log(performance.now(), 'ws-message-exec', data)
+          // console.debug(performance.now(), 'ws-message-exec', data)
           EventBus.$emit('ws-message', data.message)
           // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
         })
@@ -139,14 +139,14 @@ Vue.mixin({
        */
       let data = JSON.parse(event.data)
       // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-      // console.log(performance.now(), 'ws-message', data)
+      // console.debug(performance.now(), 'ws-message', data)
       this.$nextTick(() => {
         this.refreshState(data.message)
           .then(value => {
             // Emite um evento pelo barramento parelelo global.
             // O componente que estiver ouvindo esse barramento será informado que um
             // evento ws-message ocorreu. Será chamada o method on_ws_message
-            console.log(performance.now(), 'ws-message-exec', data)
+            console.debug(performance.now(), 'ws-message-exec', data)
             EventBus.$emit('ws-message', data.message)
             // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
           })

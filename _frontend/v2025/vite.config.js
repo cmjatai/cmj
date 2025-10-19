@@ -10,16 +10,16 @@ import eslintPlugin from '@nabla/vite-plugin-eslint'
 
 export default defineConfig(({command, mode}) => {
   // eslint-disable-next-line
-  console.log(`configuring vite with command: ${command}, mode: ${mode}`)
+  console.debug(`configuring vite with command: ${command}, mode: ${mode}`)
   // suppress eslint warning that process isn't defined (it is)
   // eslint-disable-next-line
   const cwd = process.cwd()
   // eslint-disable-next-line
-  console.log(`loading envs from ${cwd} ...`)
+  console.debug(`loading envs from ${cwd} ...`)
 
   const env = {...loadEnv(mode, cwd, 'VITE_')}
   // eslint-disable-next-line
-  console.log(`loaded env: ${JSON.stringify(env)}`)
+  console.debug(`loaded env: ${JSON.stringify(env)}`)
 
   // eslint-disable-next-line
   const BASE_DIR = '.'
@@ -60,7 +60,7 @@ export default defineConfig(({command, mode}) => {
         closeBundle: () => {
           // eslint-disable-next-line
           if (command !== 'build') return;
-          console.log('Vite build finished!', mode === 'production' ? 'production mode' : 'development mode');
+          console.debug('Vite build finished!', mode === 'production' ? 'production mode' : 'development mode');
           const path = './dist/v2025/.vite/manifest.json';
           const manifest = JSON.parse(fs.readFileSync(path).toString());
           Object.keys(manifest).forEach(key => {
@@ -75,7 +75,7 @@ export default defineConfig(({command, mode}) => {
             }
           });
           // eslint-disable-next-line
-          console.log('Adjusted manifest:', manifest);
+          console.debug('Adjusted manifest:', manifest);
           // Write the updated manifest back to the file
           fs.writeFileSync(path, JSON.stringify(manifest, null, 2));
         }
@@ -89,7 +89,7 @@ export default defineConfig(({command, mode}) => {
       },
     },
     root: resolve(INPUT_DIR),
-    base: '/static/',
+    base: '/static/v2025/',
     server: {
       host: '0.0.0.0',
       port: 5173,
@@ -113,7 +113,7 @@ export default defineConfig(({command, mode}) => {
       target: 'esnext',
       minify: 'esbuild',
       esbuild: {
-        pure: mode === 'production' ? ['console.log'] : []
+        pure: mode === 'production' ? ['console.debug'] : []
       },
       sourcemap: mode === 'production' ? false : true,
 

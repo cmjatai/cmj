@@ -458,11 +458,11 @@
                   $("#resultado_votacao_div").hide();
                   $("#mat_em_votacao").text("Matéria em Leitura");
                 }
-                console.log(data["tipo_resultado"], data['tipo_votacao']);
+                console.debug(data["tipo_resultado"], data['tipo_votacao']);
                 $("#resultado_votacao").text(data["tipo_resultado"]);
 
                 var resultado_votacao_upper = $("#resultado_votacao").text().toUpperCase();
-                console.log(resultado_votacao_upper, data['tipo_resultado']);
+                console.debug(resultado_votacao_upper, data['tipo_resultado']);
                 if (resultado_votacao_upper.search("APROV") != -1){
                   $("#resultado_votacao").css("color", "#7CFC00");
                   $("#mat_em_votacao").text("Matéria Votada");

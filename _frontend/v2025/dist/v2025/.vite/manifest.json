@@ -1,6 +1,6 @@
 {
   "components/atoms/Alert.vue": {
-    "file": "v2025/Alert-C7Szls09.js",
+    "file": "v2025/Alert-DTO4ZvRt.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
@@ -9,7 +9,7 @@
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v2025/RefreshPage-DtXxVTAx.js",
+    "file": "v2025/RefreshPage-CM4kFy3X.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
@@ -21,7 +21,7 @@
     ]
   },
   "main.js": {
-    "file": "v2025/main-Dpw8hoc1.js",
+    "file": "v2025/main-DxdtGib7.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
@@ -39,7 +39,7 @@
     ]
   },
   "modules/painelset/PainelSetModule.vue": {
-    "file": "v2025/PainelSetModule-CN47TWKX.js",
+    "file": "v2025/PainelSetModule-BclkHAaN.js",
     "name": "PainelSetModule",
     "src": "modules/painelset/PainelSetModule.vue",
     "isDynamicEntry": true,
@@ -51,7 +51,7 @@
     ]
   },
   "modules/painelset/painel/Painel.vue": {
-    "file": "v2025/Painel-D_jIz1PA.js",
+    "file": "v2025/Painel-tTY63Tms.js",
     "name": "Painel",
     "src": "modules/painelset/painel/Painel.vue",
     "isDynamicEntry": true,
@@ -59,11 +59,11 @@
       "main.js"
     ],
     "css": [
-      "v2025/Painel-BayKyALZ.css"
+      "v2025/Painel-DaaDplt5.css"
     ]
   },
   "modules/painelset/widgets/WidgetChild1.vue": {
-    "file": "v2025/WidgetChild1-C8i4HqzW.js",
+    "file": "v2025/WidgetChild1-D_QPvgdv.js",
     "name": "WidgetChild1",
     "src": "modules/painelset/widgets/WidgetChild1.vue",
     "isDynamicEntry": true,
@@ -75,7 +75,7 @@
     ]
   },
   "views/Error404.vue": {
-    "file": "v2025/Error404-Bym75Wx_.js",
+    "file": "v2025/Error404-BTrBiUUA.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,

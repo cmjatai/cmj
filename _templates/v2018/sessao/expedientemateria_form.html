@@ -48,7 +48,7 @@
                 $('#id_tramitacao_select').find('option').remove()
                 $('#id_tramitacao_select').append('<option value="-1">Selecione uma opção..</option>');
                 for (const property in data) {
-                    console.log(tramitacao_salvo + "===" + property)
+                    console.debug(tramitacao_salvo + "===" + property)
                     const option = $(`<option value="${property}">${data[property].data_tramitacao} - ${data[property].status}</option>`)
                     option[0].data = data[property]
                     $('#id_tramitacao_select').append(option)
