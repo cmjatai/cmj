@@ -72,7 +72,7 @@ export default {
       }).then((response) => {
         t.$refs.draftSelect.fetchModel()
       }).catch((error) => {
-        console.log(error)
+        console.debug(error)
       })
     },
     uploadedFiles (response) {

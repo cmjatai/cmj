@@ -8,23 +8,24 @@ import '~@/scss/styles.scss'
 // Import all of Bootstrap's JS
 
 import * as bootstrap from 'bootstrap'
+import {createBootstrap} from 'bootstrap-vue-next'
+
 // import 'bootstrap-icons/font/bootstrap-icons.scss'
 
 import axios from 'axios'
 
 import './utils'
 
-// import { library } from '@fortawesome/fontawesome-svg-core'
+import { library } from '@fortawesome/fontawesome-svg-core'
 
 /* import all the icons in Free Solid, Free Regular, and Brands styles */
-// import { fas } from '@fortawesome/free-solid-svg-icons'
-//  import { far } from '@fortawesome/free-regular-svg-icons'
-// import { fab } from '@fortawesome/free-brands-svg-icons'
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
 
-// library.add(fas, far, fab)
+library.add(fas, far, fab)
 
 import { onMounted, createApp } from 'vue'
-import {createBootstrap} from 'bootstrap-vue-next'
 
 import { createPinia } from 'pinia'
 import router from './routers'

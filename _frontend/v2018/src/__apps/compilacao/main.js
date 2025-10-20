@@ -25,7 +25,7 @@ $(document).ready(function () {
           0
         )
       } catch (err) {
-        // console.log(err)
+        // console.debug(err)
       }
     }
   }, 100)

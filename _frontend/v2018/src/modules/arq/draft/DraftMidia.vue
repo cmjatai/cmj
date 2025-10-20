@@ -93,10 +93,10 @@ export default {
           .then((response) => {
             const estagio_execucao = response.data.metadata.ocrmypdf.pdfa
             if (estagio_execucao >= 10 && estagio_execucao <= 20) {
-              console.log('timeoutUpdate novamente')
+              console.debug('timeoutUpdate novamente')
               t.timeoutUpdate()
             } else {
-              console.log('timeoutUpdate Fim')
+              console.debug('timeoutUpdate Fim')
               t.$emit('updateElement', response.data)
             }
           })
@@ -154,7 +154,7 @@ export default {
         .then((response) => {
           t.data = (new Date()).getTime()
           // t.$set(t, 'elemento', response.data)
-          // console.log(response)
+          // console.debug(response)
           t.$emit('updateElement', response.data)
         })
         .catch((error) => {

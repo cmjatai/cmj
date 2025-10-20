@@ -126,7 +126,7 @@ export default {
           query_params.join('&')
         )
         .then(response => {
-          console.log(this.evento, 'pause_parent_on_aparte', response)
+          console.debug(this.evento, 'pause_parent_on_aparte', response)
         })
         .catch(error => {
           console.error(this.evento.id, 'pause_parent_on_aparte', error)
@@ -135,7 +135,7 @@ export default {
     }
   },
   mounted () {
-    console.log('IndividuoList mounted', this.evento)
+    console.debug('IndividuoList mounted', this.evento)
     this.fetchSync({
       app: 'painelset',
       model: 'individuo',
@@ -156,7 +156,7 @@ export default {
           query_params.join('&')
         )
         .then(response => {
-          console.log(this.evento, 'toggle_microfones', response)
+          console.debug(this.evento, 'toggle_microfones', response)
         })
         .catch(error => {
           console.error(this.evento.id, 'toggle_microfones', error)

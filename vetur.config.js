@@ -1,5 +1,5 @@
 module.exports = {
   projects: [
-    '_frontend/v1'
+    '_frontend/v2025'
   ]
 }

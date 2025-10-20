@@ -113,7 +113,7 @@ export default {
   },
   methods: {
     handleClick (evt, item, legend) {
-      // console.log(evt, item, legend)
+      // console.debug(evt, item, legend)
     }
   },
   mounted: function () {

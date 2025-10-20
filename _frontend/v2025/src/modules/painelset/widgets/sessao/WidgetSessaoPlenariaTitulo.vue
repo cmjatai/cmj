@@ -1,8 +1,8 @@
 <template>
   <div
-    class="widget-child-1"
+    class="widget-sessao-plenaria-titulo"
   >
-    {{sessaoPlenaria?.__str__}}
+    {{ sessaoPlenaria?.__str__ }}
   </div>
 </template>
 <script setup>
@@ -45,12 +45,7 @@ syncSessaoPlenaria()
 
 </script>
 <style lang="scss" scoped>
-  .widget-child-1 {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+  .widget-sessao-plenaria-titulo {
     display: flex;
     align-items: center;
     justify-content: center;

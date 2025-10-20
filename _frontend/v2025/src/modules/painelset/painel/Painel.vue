@@ -1,7 +1,9 @@
 <template>
   <div
+    ref="painelsetPainel"
     class="painelset-painel"
     :style="painel?.styles.component || {}"
+    @mousemove="movingSobrePainel($event)"
   >
     <div
       v-if="painel?.config?.displayTitle"
@@ -24,7 +26,8 @@
         <div
           class="btn-group btn-group-sm"
           role="group"
-          aria-label="Visões do Painel">
+          aria-label="Visões do Painel"
+        >
           <button
             v-for="(pv, index) in visaoList"
             :key="`${pv.id}_${index}`"
@@ -41,9 +44,17 @@
     <div v-if="false">
       <br><br>
       &nbsp;
-      <button @click="visaoAtiva()">Visao Ativa</button>
+      <button @click="visaoAtiva()">
+        Visao Ativa
+      </button>
       <br><br>
-      <button v-for="(pv, index) in visaoList" :key="index" @click="ativarVisao(pv.id)">Ativar {{ pv.id }}</button>
+      <button
+        v-for="(pv, index) in visaoList"
+        :key="index"
+        @click="ativarVisao(pv.id)"
+      >
+        Ativar {{ pv.id }}
+      </button>
       <br><br>
     </div>
   </div>
@@ -81,6 +92,38 @@ const props = defineProps({
     default: '0'
   }
 })
+
+const painelsetPainel = ref(null)
+const initMovingSobrePainel = ref(false)
+const idTimerMovingSobrePainel = ref(null)
+
+const movingSobrePainel = (event) => {
+  if (initMovingSobrePainel.value === false) {
+    initMovingSobrePainel.value = true
+
+      _.each(painelsetPainel.value.getElementsByClassName('painelset-widget'), (element) => {
+        element.classList.add('localize')
+      })
+
+    if (idTimerMovingSobrePainel.value) {
+      clearTimeout(idTimerMovingSobrePainel.value)
+    }
+    idTimerMovingSobrePainel.value = setTimeout(() => {
+      initMovingSobrePainel.value = false
+      _.each(painelsetPainel.value.getElementsByClassName('painelset-widget'), (element) => {
+        element.classList.remove('localize')
+      })
+    }, 2000)
+  } else {
+    clearTimeout(idTimerMovingSobrePainel.value)
+    idTimerMovingSobrePainel.value = setTimeout(() => {
+      initMovingSobrePainel.value = false
+      _.each(painelsetPainel.value.getElementsByClassName('painelset-widget'), (element) => {
+        element.classList.remove('localize')
+      })
+    }, 2000)
+  }
+}
 
 const routePainelId = ref(Number(route.params.painelId) || 0)
 const painelId = ref(Number(props.painelId) || routePainelId.value || 0 )

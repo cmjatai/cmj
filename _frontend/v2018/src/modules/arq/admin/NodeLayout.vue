@@ -75,7 +75,7 @@ export default {
       const t = this
       t.node_params = nv.params.node
       t.nodechild_params = nv.params.nodechild
-      // console.log(nv)
+      // console.debug(nv)
       t.$nextTick()
         .then(function () {
           t.openIfInArrayOfIds()

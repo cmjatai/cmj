@@ -1,1 +1,0 @@
-import{_ as o,c as s,a as t,b as a,r as c,o as n}from"./main-DxdtGib7.js";const r={},_={class:"painelset-module"},d={class:"inner-painelset"};function i(l,p){const e=c("router-view");return n(),s("div",_,[t("div",d,[a(e)])])}const m=o(r,[["render",i],["__scopeId","data-v-f237d2ea"]]);export{m as default};

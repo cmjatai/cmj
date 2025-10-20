@@ -108,9 +108,9 @@ export default {
     try {
       this.$options.sockets.onmessage = null
       this.$disconnect()
-      console.log('WebSocket timerefresh disconnected')
+      console.debug('WebSocket timerefresh disconnected')
     } catch (e) {
-      console.log(e) // Logs the error
+      console.debug(e) // Logs the error
     }
   },
   mounted: function () {
@@ -132,7 +132,7 @@ export default {
         }
       })
     } catch (e) {
-      console.log(e) // Logs the error
+      console.debug(e) // Logs the error
     }
   },
   methods: {
@@ -146,7 +146,7 @@ export default {
       $('.base-layout .main').css('font-size', '+=1')
     },
     ws_monitor_connection () {
-      // console.log('scroll')
+      // console.debug('scroll')
       let t = this
       if (t.count_time === 0) {
         t.count_time += 1
@@ -154,9 +154,9 @@ export default {
           workerTimer.clearInterval(t.id_interval)
         }
         t.id_interval = workerTimer.setInterval(() => {
-          // console.log(t.count_time, new Date())
+          // console.debug(t.count_time, new Date())
           if (t.ws_status === 'disconnected') {
-            // console.log('reconnect')
+            // console.debug('reconnect')
             t.count_time = 11
             t.ws_monitor_connection()
             return
@@ -169,7 +169,7 @@ export default {
       } else if (t.count_time > 10) {
         workerTimer.clearInterval(t.id_interval)
         t.id_interval = 0
-        // console.log('reconnect')
+        // console.debug('reconnect')
         t.count_time = 0
         t.ws_reconnect()
         t.ws_monitor_connection()

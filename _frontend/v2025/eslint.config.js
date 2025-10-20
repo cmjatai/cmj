@@ -33,7 +33,7 @@ export default defineConfig([
 
   skipFormatting,
 
-  ...pluginVue.configs['flat/recommended'],
+  ...pluginVue.configs['flat/strongly-recommended'],
 
   {
     rules: {

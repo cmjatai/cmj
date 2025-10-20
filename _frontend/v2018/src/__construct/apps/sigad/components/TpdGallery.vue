@@ -194,7 +194,7 @@ export default {
         this.dragleave = null
         this.side = 0
       } else {
-        // console.log('ondragleave: tpdgallery', el, side)
+        // console.debug('ondragleave: tpdgallery', el, side)
         this.dragleave = el
         this.side = side
       }

@@ -17,7 +17,7 @@ class WebSocketManager {
     this.ws = new WebSocket(this.url)
 
     this.ws.onopen = () => {
-      console.log('WebSocket conectado')
+      console.debug('WebSocket conectado')
       this.reconnectAttempts = 0
       if (this.ws.readyState === WebSocket.OPEN) {
         this.send({ type: 'ping', ping_now: performance.now() })
@@ -42,7 +42,7 @@ class WebSocketManager {
           timestamp_server: data.message.timestamp_server,
           server_time_diff: (Date.now() - data.message.timestamp_server) - (pong_now - data.message.ping_now) / 2
         }
-        // console.log('Pong recebido do servidor:', now)
+        // console.debug('Pong recebido do servidor:', now)
         this.emit('message', now)
         return
       }
@@ -50,7 +50,7 @@ class WebSocketManager {
     }
 
     this.ws.onclose = (e) => {
-      console.log('WebSocket desconectado', e)
+      console.debug('WebSocket desconectado', e)
       this.stopHeartbeat()
       this.emit('disconnected')
       this.handleReconnect()
@@ -69,7 +69,7 @@ class WebSocketManager {
         this.reconnectInterval * Math.pow(2, this.reconnectAttempts)
 
       setTimeout(() => {
-        console.log(`Tentativa de reconexão ${this.reconnectAttempts}`)
+        console.debug(`Tentativa de reconexão ${this.reconnectAttempts}`)
         this.connect()
       }, delay)
     }

@@ -4,7 +4,7 @@
     :key="`painelset-widget-${widgetSelected?.id}`"
     :class="['painelset-widget', coordsChange.editmode ? 'editmode' : '']"
     :style="{ ...(widgetSelected?.styles.component || {}), ...styleCoords }"
-    @mousedown.stop="onMouseDown($event)"
+    @mousedown.stop.prevent="onMouseDown($event)"
   >
     <div
       v-if="widgetSelected?.config?.displayTitle"
@@ -39,12 +39,14 @@
       v-if="coordsChange.editmode"
       class="manager"
     >
-      <div class="toolbar">
+      <!-- div class="toolbar">
         <button
           class="btn btn-sm btn-dark"
-          @click.stop="modalEditorOpened = true"
-        />
-      </div>
+          @mousedown.stop="modalEditor($event)"
+        >
+          <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />
+        </button>
+      </!-->
       <div
         class="resize-handle top-left"
         @mousedown="onMouseDownResize($event, 'top-left')"
@@ -66,13 +68,40 @@
         @mousedown="onMouseDownResize($event, 'center-center')"
       />
     </div>
+
+    <Teleport to="#widget-editor">
+      <WidgetEditor
+        v-if="coordsChange.editmode"
+        :painel-id="painelId"
+        :widget-selected="widgetSelected?.id"
+      />
+    </Teleport>
+
+    <!-- Teleport to="body">
+      <Modal
+        :show="widgetEditorOpened"
+        @close="widgetEditorOpened = false"
+      >
+        <template #header>
+          Edição do Widget: {{ widgetSelected?.name }}
+        </template>
+        <template #body>
+          <WidgetEditor
+            :painel-id="painelId"
+            :widget-selected="widgetSelected?.id"
+          />
+        </template>
+      </Modal>
+    </!-->
   </div>
 </template>
+
 <script setup>
 
 import { useSyncStore } from '~@/stores/SyncStore'
 import { computed, ref, inject } from 'vue'
 import Resource from '~@/utils/resources'
+import WidgetEditor from './WidgetEditor.vue'
 
 const syncStore = useSyncStore()
 
@@ -90,6 +119,8 @@ const props = defineProps({
 })
 
 const painelsetWidget = ref(null)
+
+const widgetEditorOpened = ref(false)
 
 const coordsChange = ref({
   x: 0,
@@ -158,6 +189,12 @@ const syncChildList = async () => {
 
 syncChildList()
 
+/* Edição do widget */
+const modalEditor = () => {
+  console.debug('Opening widget editor modal for widget:', widgetSelected.value)
+  widgetEditorOpened.value = !widgetEditorOpened.value
+}
+
 /* Helpers for resizing and moving widgets */
 
 const validLocalCoords = (localCoords) => {
@@ -209,12 +246,12 @@ const patchWidgetCoords = (localCoords) => {
       }
     }
   }).then((response) => {
-    console.debug(response.data)
+    console.log(response.data)
     /* coordsChange.value.h = response.data.config.coords.h
     coordsChange.value.w = response.data.config.coords.w
     coordsChange.value.x = response.data.config.coords.x
     coordsChange.value.y = response.data.config.coords.y */
-    console.debug('Widget coordinates updated successfully')
+    console.log('Widget coordinates updated successfully')
   }).catch((error) => {
     console.error('Error updating widget coordinates:', error)
   })
@@ -244,7 +281,7 @@ const onMouseDownResize = (event, direction) => {
 
   const localCoords = { ...coordsChange.value }
 
-  console.debug('Mouse move detected:', event.clientX, event.clientY, widgetRect)
+  console.log('Mouse move detected:', event.clientX, event.clientY, widgetRect)
 
   const onMouseMove = (e) => {
     let newWidthPercent = 0
@@ -323,7 +360,7 @@ const onMouseDownResize = (event, direction) => {
       console.warn('Invalid coordinates during resize, ignoring update')
     }
   }
-  console.debug('Starting resize operation')
+  console.log('Starting resize operation')
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', (e) => {
     window.removeEventListener('mouseup', this)
@@ -339,7 +376,7 @@ const onMouseDownResize = (event, direction) => {
       w: coordsChange.value.w,
       h: coordsChange.value.h
     })
-    console.debug('Resize operation ended')
+    console.log('Resize operation ended')
   })
 }
 </script>
@@ -352,9 +389,12 @@ const onMouseDownResize = (event, direction) => {
     flex: 1 1 100%;
     z-index: 1;
     overflow: hidden;
+    background-color: var(--bs-body-bg);
+    border: 0;
     .inner-widget {
       position: relative;
       display: flex;
+      justify-content: center;
       overflow: hidden;
       flex-direction: column;
       flex: 1 1 100%;
@@ -363,27 +403,30 @@ const onMouseDownResize = (event, direction) => {
     & > .resize-handle {
       display: none;
     }
+    &.localize {
+      border: 2px dashed red ;
+    }
     &.editmode {
-      border: 1px dashed #ddd;
-      z-index: 1000;
-      &::after {
+      border: 2px dashed yellow;
+      z-index: 10;
+      &::before {
         content: '';
         position: absolute;
         top: 0px;
         left: 0px;
         width: 100%;
         height: 100%;
-        background-color: #fff5;
         font-size: 0.8em;
-        z-index: 0;
+        // linear gradient diagonal stripes
+        background-image: repeating-linear-gradient(
+          45deg,
+          rgba(0, 0, 0, 0.2),
+          rgba(0, 0, 0, 0.2) 10px,
+          rgba(0, 0, 0, 0.25) 10px,
+          rgba(0, 0, 0, 0.25) 25px
+        );
+        z-index: -1;
       }
-      &.darkmode::after {
-        background-color: #0005;
-      }
-      &.lightmode::after {
-        background-color: #fff5;
-      }
-
       & > .manager {
         display: block;
         position: absolute;
@@ -392,6 +435,13 @@ const onMouseDownResize = (event, direction) => {
         right: 0;
         bottom: 0;
         z-index: 1;
+
+        & > .toolbar {
+          position: absolute;
+          bottom: 10px;
+          right: 10px;
+          z-index: 1002;
+        }
 
         & > .resize-handle {
           position: absolute;
@@ -450,7 +500,7 @@ const onMouseDownResize = (event, direction) => {
           }
         }
       }
-
     }
+
   }
 </style>

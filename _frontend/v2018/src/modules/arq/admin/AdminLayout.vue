@@ -101,7 +101,7 @@ export default {
     } else {
       sizes = [35, 65]
     }
-    console.log(sizes[0] + sizes[1])
+    console.debug(sizes[0] + sizes[1])
     Split(['#col-classes', '#col-docs'], {
       minSize: 350,
       sizes: sizes,

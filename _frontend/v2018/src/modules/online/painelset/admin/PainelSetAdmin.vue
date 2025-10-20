@@ -121,7 +121,7 @@ export default {
     startEvento () {
       this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
         .then(response => {
-          console.log('start response', response)
+          console.debug('start response', response)
         })
         .catch(error => {
           console.error('start error', error)

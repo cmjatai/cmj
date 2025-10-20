@@ -197,13 +197,13 @@ const syncStore = {
     },
     startLocalCronometro ({ state, commit }, cronometroId) {
       TimerWorkerService.startTimer(cronometroId, (timestamp) => {
-        // console.log('TIMER', cronometroId, timestamp)
+        // console.debug('TIMER', cronometroId, timestamp)
         const cronometro = state.data_cache.painelset_cronometro[cronometroId]
         const lastServerSync = state.lastServerSync
         const server_time_diff = lastServerSync ? lastServerSync.server_time_diff : 0
         // Atualizar cronometro localmente
         if (cronometro && cronometro.state === 'running') {
-          // console.log('TIMER RUNNING', cronometroId, timestamp / 1000, cronometro.started_time, server_time_diff)
+          // console.debug('TIMER RUNNING', cronometroId, timestamp / 1000, cronometro.started_time, server_time_diff)
           const elapsed_time = ((timestamp - server_time_diff) / 1000) - cronometro.started_time + cronometro.accumulated_time
           cronometro.elapsed_time = elapsed_time
           cronometro.remaining_time = cronometro.duration - elapsed_time

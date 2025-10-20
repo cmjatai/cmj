@@ -194,7 +194,7 @@ export default {
         .catch((response) => this.danger())
     },
     getDocumento (id) {
-      // console.log('get:', id)
+      // console.debug('get:', id)
       let t = this
       this.mode = 'INIT'
       return this.$nextTick()
@@ -241,7 +241,7 @@ export default {
     let t = this
     if (t.child) {
       t.elemento = t.child
-      // console.log(t.elemento.tipo)
+      // console.debug(t.elemento.tipo)
       t.$nextTick()
         .then(function () {
           t.mode = 'UPDATE'

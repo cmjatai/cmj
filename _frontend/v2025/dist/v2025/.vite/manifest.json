@@ -1,30 +1,49 @@
 {
+  "_vendor-BmiiKGVm.js": {
+    "file": "v2025/vendor-BmiiKGVm.js",
+    "name": "vendor"
+  },
+  "_vendor_fortawesome-Dp93uEGA.js": {
+    "file": "v2025/vendor_fortawesome-Dp93uEGA.js",
+    "name": "vendor_fortawesome",
+    "imports": [
+      "_vendor-BmiiKGVm.js"
+    ]
+  },
   "components/atoms/Alert.vue": {
-    "file": "v2025/Alert-DTO4ZvRt.js",
+    "file": "v2025/Alert-CG8OkyWu.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
     "imports": [
-      "main.js"
+      "_vendor-BmiiKGVm.js",
+      "main.js",
+      "_vendor_fortawesome-Dp93uEGA.js"
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v2025/RefreshPage-CM4kFy3X.js",
+    "file": "v2025/RefreshPage-DWw7eKfc.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
     "imports": [
-      "main.js"
+      "_vendor-BmiiKGVm.js",
+      "main.js",
+      "_vendor_fortawesome-Dp93uEGA.js"
     ],
     "css": [
       "v2025/RefreshPage-B_wMuza3.css"
     ]
   },
   "main.js": {
-    "file": "v2025/main-DxdtGib7.js",
+    "file": "v2025/main-C2HhTtQq.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
+    "imports": [
+      "_vendor-BmiiKGVm.js",
+      "_vendor_fortawesome-Dp93uEGA.js"
+    ],
     "dynamicImports": [
       "modules/painelset/PainelSetModule.vue",
       "modules/painelset/painel/Painel.vue",
@@ -39,48 +58,56 @@
     ]
   },
   "modules/painelset/PainelSetModule.vue": {
-    "file": "v2025/PainelSetModule-BclkHAaN.js",
+    "file": "v2025/PainelSetModule-BpHEnxD8.js",
     "name": "PainelSetModule",
     "src": "modules/painelset/PainelSetModule.vue",
     "isDynamicEntry": true,
     "imports": [
-      "main.js"
+      "_vendor-BmiiKGVm.js",
+      "main.js",
+      "_vendor_fortawesome-Dp93uEGA.js"
     ],
     "css": [
       "v2025/PainelSetModule-DAwiXEZ2.css"
     ]
   },
   "modules/painelset/painel/Painel.vue": {
-    "file": "v2025/Painel-tTY63Tms.js",
+    "file": "v2025/Painel-t65SIjY6.js",
     "name": "Painel",
     "src": "modules/painelset/painel/Painel.vue",
     "isDynamicEntry": true,
     "imports": [
-      "main.js"
+      "_vendor-BmiiKGVm.js",
+      "main.js",
+      "_vendor_fortawesome-Dp93uEGA.js"
     ],
     "css": [
-      "v2025/Painel-DaaDplt5.css"
+      "v2025/Painel-sxPUmU_I.css"
     ]
   },
   "modules/painelset/widgets/WidgetChild1.vue": {
-    "file": "v2025/WidgetChild1-D_QPvgdv.js",
+    "file": "v2025/WidgetChild1-C8jFEkpv.js",
     "name": "WidgetChild1",
     "src": "modules/painelset/widgets/WidgetChild1.vue",
     "isDynamicEntry": true,
     "imports": [
-      "main.js"
+      "_vendor-BmiiKGVm.js",
+      "main.js",
+      "_vendor_fortawesome-Dp93uEGA.js"
     ],
     "css": [
       "v2025/WidgetChild1-zue6zMJ6.css"
     ]
   },
   "views/Error404.vue": {
-    "file": "v2025/Error404-BTrBiUUA.js",
+    "file": "v2025/Error404-UoN1J9Z_.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
     "imports": [
-      "main.js"
+      "_vendor-BmiiKGVm.js",
+      "main.js",
+      "_vendor_fortawesome-Dp93uEGA.js"
     ],
     "css": [
       "v2025/Error404-CMxScCzn.css"

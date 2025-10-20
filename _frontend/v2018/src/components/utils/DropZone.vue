@@ -39,7 +39,7 @@ export default {
       if (files.length === 0) {
         return
       }
-      // console.log(files)
+      // console.debug(files)
       this.sendFiles(files)
     },
     sendFiles (files) {
@@ -73,7 +73,7 @@ export default {
       if (ev === undefined) {
         return
       }
-      // console.log('Drop')
+      // console.debug('Drop')
       ev.preventDefault()
 
       var dt = ev.dataTransfer
@@ -91,12 +91,12 @@ export default {
       }
     },
     dragover_handler (ev) {
-      // console.log('dragOver')
+      // console.debug('dragOver')
       // Prevent default select and drag behavior
       ev.preventDefault()
     },
     dragend_handler (ev) {
-      // console.log('dragEnd')
+      // console.debug('dragEnd')
       // Remove all of the drag data
       let dt = ev.dataTransfer
       if (dt.items) {

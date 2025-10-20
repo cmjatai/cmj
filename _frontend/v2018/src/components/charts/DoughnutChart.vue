@@ -76,7 +76,7 @@ export default {
           padding: 15
         },
         onHover: (a) => {
-          // console.log(a)
+          // console.debug(a)
         },
         plugins: {
           title: {
@@ -123,7 +123,7 @@ export default {
   },
   methods: {
     handleClick (evt, item, legend) {
-      // console.log(evt, item, legend)
+      // console.debug(evt, item, legend)
     },
     handleHover (evt, item, legend) {
       legend.chart.data.datasets[0].backgroundColor.forEach((color, index, colors) => {

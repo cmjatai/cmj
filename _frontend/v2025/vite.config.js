@@ -89,7 +89,7 @@ export default defineConfig(({command, mode}) => {
       },
     },
     root: resolve(INPUT_DIR),
-    base: '/static/v2025/',
+    base: mode === 'production' ? '/static/v2025/' :  '/static/',
     server: {
       host: '0.0.0.0',
       port: 5173,
@@ -123,12 +123,21 @@ export default defineConfig(({command, mode}) => {
         },
         output: {
           chunkFileNames: undefined,
-          /*manualChunks(id) {
+          manualChunks(id) {
+            console.log('manualChunks processing id:', id);
+            if (id.includes('fortawesome')) {
+              return 'vendor_fortawesome'
+            }
+            if (id.includes('node_modules')) {
+              return 'vendor'
+            }
+          }
+            /* expansivo
             if (id.includes('node_modules')) {
               return id.toString().split('node_modules/')[1].split('/')[0].toString();
             }
           },
-
+          /*
           manualChunks: {
             'group1': [
               './_frontend/src/components/utils/message/Alert.vue',

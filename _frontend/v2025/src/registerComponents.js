@@ -1,7 +1,7 @@
 
 import App from './App.vue'
 import { defineAsyncComponent } from 'vue'
-// import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 // cmj = PortalCMJ Frontend
 
@@ -12,7 +12,7 @@ const rootComponents = {
 }
 
 const globalComponents = {
-  // FontAwesomeIcon,
+  FontAwesomeIcon,
 
   // Para ser utilizado em qualquer componente Vue sem necessidade de importação.
   // O colocado em globalComponents não precisa ser colocado em rootComponents.
@@ -20,7 +20,7 @@ const globalComponents = {
   'cmj-alert': defineAsyncComponent(() => import('~@/components/atoms/Alert.vue')),
 
 
-  'WidgetChild1': defineAsyncComponent(() => import('~@/modules/painelset/widgets/WidgetChild1.vue'))
+  'WidgetSessaoPlenariaTitulo': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoPlenariaTitulo.vue'))
 
 }
 

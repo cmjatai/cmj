@@ -508,7 +508,7 @@ export default {
       for (let x = 0; x < n; x++) {
         let hex = `${rgb2hex(...hsl2rgb(hue, Math.max(0.8, Math.random()), 0.4))}`
         delta = Math.random() * 30 + (hue < 150 ? 50 : 25)
-        // console.log('Delta', delta, 'Hue:', hue)
+        // console.debug('Delta', delta, 'Hue:', hue)
         hue = (hue + delta) % 360
         colors.push(`${hex}${alpha}`)
       }
@@ -525,7 +525,7 @@ export default {
         let color = 'hsl( ' + hue + ', 100%, 40%)'
 
         delta = Math.random() * 30 + (hue < 150 ? 50 : 25)
-        // console.log('Delta', delta, 'Hue:', hue)
+        // console.debug('Delta', delta, 'Hue:', hue)
         hue = (hue + delta) % 360
         colors.push(color)
       }

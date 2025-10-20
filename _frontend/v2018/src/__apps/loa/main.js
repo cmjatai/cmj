@@ -410,7 +410,7 @@ window.AppLOA = function () {
     })
     add_registro.click((event) => {
       let pk_despesa = add_registro[0].data
-      console.log(pk_despesa)
+      console.debug(pk_despesa)
       let formData = {}
       formData.emendaloa = pk
       formData.despesa = pk_despesa
@@ -686,7 +686,7 @@ window.AppLOA = function () {
     })
     add_registro.click((event) => {
       let pk_despesa = add_registro[0].data
-      console.log(pk_despesa)
+      console.debug(pk_despesa)
       let formData = {}
       formData.agrupamento = pk
       formData.despesa = pk_despesa
@@ -981,7 +981,7 @@ window.AppLOA = function () {
           // preview.src = `${urlBase}/view/?page=1&u=${Date.now()}`
         })
         .catch((event) => {
-          // console.log(event)
+          // console.debug(event)
         })
     })
     form.trigger('change')

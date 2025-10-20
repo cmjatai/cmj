@@ -447,11 +447,11 @@ class Widget(models.Model):
 
     vue_component = models.CharField(
         max_length=256, help_text="Nome do componente Vue.js associado ao widget",
-        unique=True,
+        blank=True,
         validators=[
             RegexValidator(
-                regex=r'^[a-z][a-z0-9_]*$',
-                message="Nome do componente inválido. Deve começar com uma letra minúscula e conter apenas letras, números e underscores.",
+                regex=r'^[A-Z][A-Za-z0-9_]*$',
+                message="Nome do componente inválido. Deve começar com uma letra maiúscula e conter apenas letras, números e underscores.",
                 code='invalid_component_name'
             )
         ]

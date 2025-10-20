@@ -116,7 +116,7 @@ export default {
       this.mouseover = false
     },
     dragend (ev) {
-      // console.log('dragend: TpdFile', ev)
+      // console.debug('dragend: TpdFile', ev)
       if (this.dragged) {
         this.$emit('ondragend', this.elemento)
       }
@@ -125,32 +125,32 @@ export default {
       this.draggedover = 0
     },
     dragenter (ev) {
-      // console.log('dragenter: TpdFile', ev)
+      // console.debug('dragenter: TpdFile', ev)
       if (this.dragged) {
         this.draggedleave = false // não deve ser atribuido true em caso contrário
       }
     },
     dragleave (ev) {
-      // console.log('dragleave: TpdFile', ev)
+      // console.debug('dragleave: TpdFile', ev)
       this.$emit('ondragleave', this.elemento, this.draggedover)
       this.draggedleave = this.dragged
       this.draggedover = 0
     },
     dragover (ev) {
-      // console.log('dragover: TpdFile', ev)
+      // console.debug('dragover: TpdFile', ev)
       if (!this.dragged) {
         this.draggedover = ev.offsetX - ev.target.offsetWidth / 2
       }
     },
     dragstart (ev) {
-      // console.log('dragstart: TpdFile', ev)
+      // console.debug('dragstart: TpdFile', ev)
       this.dragged = true
     },
     dragexit (ev) {
-      // console.log('dragexit: TpdFile', ev)
+      // console.debug('dragexit: TpdFile', ev)
     },
     drop (ev) {
-      // console.log('drop: TpdFile', ev)
+      // console.debug('drop: TpdFile', ev)
     },
     rotateLeft: function () {
       let t = this
