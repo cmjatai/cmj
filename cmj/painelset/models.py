@@ -388,13 +388,47 @@ class Painel(models.Model):
             self._meta.app_config][self._meta.model].serializer_class
         return PainelSerializer(self).data
 
+    def copy(self, evento=None, sessao=None):
+        """Copia deste painel para novo evento e sessão, ou nenhum deles, incluindo suas visões e widgets."""
+        novo_painel = Painel.objects.create(
+            name=f"{self.name} (Cópia)",
+            description=self.description,
+            evento=evento,
+            sessao=sessao,
+            config=self.config,
+            styles=self.styles
+        )
+        for visao in self.visoes.all():
+            nova_visao = VisaoDePainel.objects.create(
+                name=visao.name,
+                description=visao.description,
+                painel=novo_painel,
+                position=visao.position,
+                active=visao.active,
+                config=visao.config,
+                styles=visao.styles
+            )
+
+            map_widgets = {}
+            for widget in visao.widgets.all():
+                widget_copiado = widget.id
+                widget.pk = None
+                widget.visao = nova_visao
+                widget.save()
+                map_widgets[widget_copiado] = widget.id
+
+            for widget in nova_visao.widgets.all():
+                if widget.parent_id in map_widgets:
+                    widget.parent_id = map_widgets[widget.parent_id]
+                    widget.save()
+
 class VisaoDePainel(models.Model):
     """Modelo intermediário para associar visões a painéis com configuração adicional."""
 
     name = models.CharField(max_length=256, blank=True, help_text="Nome da Visão no Painel Associado")
     description = models.TextField(blank=True, help_text="Descrição da visão no Painel Associado")
 
-    painel = models.ForeignKey(Painel, on_delete=models.CASCADE, help_text="Painel associado", related_name="visao_de_painel_set")
+    painel = models.ForeignKey(Painel, on_delete=models.CASCADE, help_text="Painel associado", related_name="visoes")
 
     position = models.PositiveIntegerField(help_text="Posição da visão no painel", default=0)
 
@@ -423,14 +457,13 @@ class VisaoDePainel(models.Model):
         self.active = True
         self.save()
 
-
 class Widget(models.Model):
     """Modelo intermediário para associar widgets a visões com configuração adicional."""
 
     name = models.CharField(max_length=256, blank=True, help_text="Nome do Widget na Visão Associada")
     description = models.TextField(blank=True, help_text="Descrição do Widget na Visão Associada")
 
-    visao = models.ForeignKey(VisaoDePainel, on_delete=models.CASCADE, help_text="Visão associada")
+    visao = models.ForeignKey(VisaoDePainel, on_delete=models.CASCADE, help_text="Visão associada", related_name="widgets")
 
     position = models.PositiveIntegerField(help_text="Posição do widget na visão", default=0)
     visible = models.BooleanField(default=True, help_text="Indica se o widget está visível na visão")

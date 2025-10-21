@@ -1,11 +1,12 @@
 from datetime import timedelta
 import logging
-from time import sleep
 import time
+from time import sleep
 
 from django.apps.registry import apps
 from django.conf import settings
 from django.utils import formats
+from django.db import transaction
 
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer, EventoSerializer, IndividuoSerializer
 from cmj.painelset.cronometro_manager import CronometroManager
@@ -89,25 +90,29 @@ class _EventoViewSet:
         if not evento_copiado.end_real:
             return Response({'error': 'Evento não finalizado. Só é possível copiar eventos finalizados.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        evento = Evento.objects.create(
-            name=f'{evento_copiado.name}',
-            start_previsto=timezone.now(),
-            start_real=None,
-            end_real=None,
-            duration=evento_copiado.duration,
-            ips_mesas=evento_copiado.ips_mesas,
-            comunicar_com_mesas=evento_copiado.comunicar_com_mesas,
-            description=f'Copia gerada a partir do evento {evento_copiado.name} '
-            f'de {formats.date_format(timezone.localtime(evento_copiado.start_real), "d/m/Y - H:i")}',
-        )
+        with transaction.atomic():
+            evento = Evento.objects.create(
+                name=f'{evento_copiado.name}',
+                start_previsto=timezone.now(),
+                start_real=None,
+                end_real=None,
+                duration=evento_copiado.duration,
+                ips_mesas=evento_copiado.ips_mesas,
+                comunicar_com_mesas=evento_copiado.comunicar_com_mesas,
+                description=f'Copia gerada a partir do evento {evento_copiado.name} '
+                f'de {formats.date_format(timezone.localtime(evento_copiado.start_real), "d/m/Y - H:i")}',
+            )
 
-        for individuo in evento_copiado.individuos.all():
-            individuo.pk = None
-            individuo.evento = evento
-            individuo.status_microfone = False
-            individuo.com_a_palavra = False
-            individuo.aparteante = None
-            individuo.save()
+            for individuo in evento_copiado.individuos.all():
+                individuo.pk = None
+                individuo.evento = evento
+                individuo.status_microfone = False
+                individuo.com_a_palavra = False
+                individuo.aparteante = None
+                individuo.save()
+
+            for painel in evento_copiado.painels.all():
+                painel.copy(evento=evento, sessao=None)
 
         return Response(EventoSerializer(evento).data, status=status.HTTP_201_CREATED)
 
