@@ -274,9 +274,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                 'painelset.Cronometro',
                 'painelset.CronometroEvent',
                 'painelset.Painel',
-                'painelset.PainelVisao',
-                'painelset.Visao',
-                'painelset.VisaoWidget',
+                'painelset.VisaoDePainel',
                 'painelset.Widget',
             )
         ):
@@ -312,9 +310,7 @@ def send_signal_for_websocket_time_refresh(inst, **kwargs):
                 'painelset.Cronometro',
                 'painelset.CronometroEvent',
                 'painelset.Painel',
-                'painelset.PainelVisao',
-                'painelset.Visao',
-                'painelset.VisaoWidget',
+                'painelset.VisaoDePainel',
                 'painelset.Widget',
             ):
                 async_to_sync(channel_layer.group_send)(

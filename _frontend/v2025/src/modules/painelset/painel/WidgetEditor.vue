@@ -4,22 +4,32 @@
     :key="`painelset-widget-editor-${widgetSelected?.id}`"
     class="painelset-widget-editor"
   >
-    <form action="" @change="changeForm($event)">
+    <form
+      action=""
+      @change="changeForm($event)"
+    >
       <fieldset>
         <legend>Configurações do Widget</legend>
         <div class="container">
           <div class="row py-2">
             <div class="col-3 py-2">
               <div class="form-group">
-                <div id="div_id_display_title" class="custom-control custom-checkbox">
+                <div
+                  id="div_id_display_title"
+                  class="custom-control custom-checkbox"
+                >
                   <input
                     type="checkbox"
                     name="display_title"
                     class="checkboxinput custom-control-input"
                     aria-describedby="id_display_title_helptext"
                     v-model="widgetSelected.config.displayTitle"
-                    id="id_display_title">&nbsp;
-                  <label for="id_display_title" class="custom-control-label">
+                    id="id_display_title"
+                  >&nbsp;
+                  <label
+                    for="id_display_title"
+                    class="custom-control-label"
+                  >
                     Mostrar título do widget?
                   </label><br>
                   <small
@@ -31,8 +41,14 @@
                 </div>
               </div>
             </div>
-            <div class="col-3" v-if="childList.length === 0">
-              <label for="widget-vue-component" class="form-label">Componente Vue</label>
+            <div
+              class="col-3"
+              v-if="childList.length === 0"
+            >
+              <label
+                for="widget-vue-component"
+                class="form-label"
+              >Componente Vue</label>
               <select
                 class="form-select"
                 v-model="widgetSelected.vue_component"
@@ -48,14 +64,28 @@
               </select>
             </div>
             <div class="col-6">
-              <label for="widget-name" class="form-label">Título do Widget</label>
-              <input type="text" class="form-control" v-model="widgetSelected.name" placeholder="Título do Widget"/>
+              <label
+                for="widget-name"
+                class="form-label"
+              >Título do Widget</label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="widgetSelected.name"
+                placeholder="Título do Widget"
+              >
             </div>
           </div>
           <div class="row py-2">
             <div class="col-6">
-              <div id="div_id_config" class="form-group">
-                <label for="widget-config" class="form-label">Configurações do Widget (JSON)</label>
+              <div
+                id="div_id_config"
+                class="form-group"
+              >
+                <label
+                  for="widget-config"
+                  class="form-label"
+                >Configurações do Widget (JSON)</label>
                 <div>
                   <textarea
                     id="widget-config"
@@ -63,22 +93,28 @@
                     class="form-control"
                     v-model="jsonValues.config"
                     placeholder="Configurações do Widget em JSON"
-                    rows="10"
+                    rows="15"
                     @blur="changeJsonValues"
                   />
                 </div>
               </div>
             </div>
             <div class="col-6">
-              <div id="div_id_styles" class="form-group">
-                <label for="widget-styles" class="form-label">Estilos do Widget (JSON)</label>
+              <div
+                id="div_id_styles"
+                class="form-group"
+              >
+                <label
+                  for="widget-styles"
+                  class="form-label"
+                >Estilos do Widget (JSON)</label>
                 <div>
                   <textarea
                     name="styles"
                     id="widget-styles"
                     class="form-control"
                     v-model="jsonValues.styles"
-                    rows="10"
+                    rows="15"
                     placeholder="Estilos do Widget em JSON"
                     @blur="changeJsonValues"
                   />
@@ -90,8 +126,14 @@
         <div class="container">
           <div class="row">
             <div class="col-12">
-              <div id="div_id_description" class="form-group">
-                <label for="id_description" class="form-label">Descrição do Widget</label>
+              <div
+                id="div_id_description"
+                class="form-group"
+              >
+                <label
+                  for="id_description"
+                  class="form-label"
+                >Descrição do Widget</label>
                 <div>
                   <textarea
                     id="id_description"
@@ -106,6 +148,28 @@
             </div>
           </div>
         </div>
+        <div class="container actions pt-3">
+          <div class="row">
+            <div class="col-12">
+              <div class="btn-group">
+                <button
+                  class="btn btn-secondary"
+                  @click.stop.prevent="closeEditor($event)"
+                  title="Fechar Editor de Widget"
+                >
+                  <FontAwesomeIcon :icon="['fas', 'times']" />
+                </button>
+                <button
+                  class="btn btn-sm btn-danger"
+                  @mousedown.stop.prevent="false"
+                  @click.stop.prevent="onDeleteWidget($event)"
+                >
+                  <FontAwesomeIcon :icon="'fa-solid fa-trash-can'" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </fieldset>
     </form>
   </div>
@@ -113,7 +177,7 @@
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
 import { useMessageStore } from '../../messages/store/MessageStore'
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, inject } from 'vue'
 
 import Resource from '~@/utils/resources'
 
@@ -121,6 +185,8 @@ const painelsetWidgetEditor = ref(null)
 
 const syncStore = useSyncStore()
 const messageStore = useMessageStore()
+
+const EventBus = inject('EventBus')
 
 const props = defineProps({
   painelId: {
@@ -135,7 +201,9 @@ const props = defineProps({
 
 const vueComponentsChoice = ref({
   '': 'Nenhum componente selecionado',
-  'WidgetSessaoPlenariaTitulo': 'WidgetSessaoPlenariaTitulo - Título da Sessão Plenária vinculada ao Painel'
+  'WidgetSessaoPlenariaTitulo': 'WidgetSessaoPlenariaTitulo - Título da Sessão Plenária vinculada ao Painel',
+  'WidgetCronometroEvento': 'WidgetCronometroEvento - Cronômetro do Evento vinculado ao Painel',
+  'WidgetCronometroPalavra': 'WidgetCronometroPalavra - Cronômetro da Palavra vinculada ao Painel'
 })
 
 const widgetSelected = computed(() => {
@@ -172,6 +240,13 @@ const jsonValues = ref({
   config: jsonConfig.value,
   styles: jsonStyles.value
 })
+
+// Function to handle
+
+const closeEditor = (event) => {
+  EventBus.emit('painelset:editorarea:close')
+  EventBus.emit('painelset:editorarea:resize', 0)
+}
 
 const changeJsonValues = () => {
   if (!widgetSelected.value) {
@@ -221,6 +296,11 @@ const patchModel = async (modelData) => {
       id: widgetSelected.value.id,
       form: modelData
     })
+    messageStore.addMessage({
+      type: 'info',
+      text: 'Widget atualizado.',
+      timeout: 2000
+    })
     console.log('WidgetEditor.vue: patchModel updated successfully.')
   } catch (error) {
     messageStore.addMessage({
@@ -242,6 +322,24 @@ watch(
   }
 )
 
+const onDeleteWidget = (event) => {
+  if (!widgetSelected.value) {
+    return
+  }
+  if (!confirm(`Confirma a exclusão do Widget: ${widgetSelected.value.name} ?`)) {
+    return
+  }
+  Resource.Utils.deleteModel({
+    app: 'painelset',
+    model: 'widget',
+    id: widgetSelected.value.id
+  }).then(() => {
+    console.log('Widget deleted successfully')
+    EventBus.emit('painelset:editorarea:close', 'force')
+  }).catch((error) => {
+    console.error('Error deleting widget:', error)
+  })
+}
 </script>
 
 <style lang="scss" scoped>

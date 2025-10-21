@@ -39,3 +39,8 @@ onMounted(() => {
   }
 })
 </script>
+<style scoped>
+  .alert {
+    margin: 1em;
+  }
+</style>

@@ -19,6 +19,14 @@ export default {
       `${basePath}/${m.app}/${m.model}/${m.id}/`,
       m.form || {},
       m.progress || {}
+    ),
+    createModel: (m) => axios.post(
+      `${basePath}/${m.app}/${m.model}/`,
+      m.form || {},
+      m.progress || {}
+    ),
+    deleteModel: (m) => axios.delete(
+      `${basePath}/${m.app}/${m.model}/${m.id}/`
     )
   }
 }

@@ -1,1 +1,0 @@
-import{f as o,k as t,q as s,C as a,g as n}from"./vendor-BmiiKGVm.js";import{_ as r}from"./main-C2HhTtQq.js";import"./vendor_fortawesome-Dp93uEGA.js";const c={},_={class:"painelset-module"},i={class:"inner-painelset"};function d(l,p){const e=a("router-view");return n(),o("div",_,[t("div",i,[s(e)])])}const v=r(c,[["render",d],["__scopeId","data-v-f237d2ea"]]);export{v as default};

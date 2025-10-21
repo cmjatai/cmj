@@ -1,10 +1,12 @@
 <template>
   <div
+    :id="`id-painelset-widget-${widgetSelected?.id}`"
     ref="painelsetWidget"
     :key="`painelset-widget-${widgetSelected?.id}`"
-    :class="['painelset-widget', coordsChange.editmode ? 'editmode' : '']"
+    :class="['painelset-widget', editmode ? 'editmode' : '']"
     :style="{ ...(widgetSelected?.styles.component || {}), ...styleCoords }"
     @mousedown.stop.prevent="onMouseDown($event)"
+    @click.stop.prevent="false"
   >
     <div
       v-if="widgetSelected?.config?.displayTitle"
@@ -36,17 +38,46 @@
       />
     </div>
     <div
-      v-if="coordsChange.editmode"
+      v-if="editmode"
       class="manager"
     >
-      <!-- div class="toolbar">
-        <button
-          class="btn btn-sm btn-dark"
-          @mousedown.stop="modalEditor($event)"
-        >
-          <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />
-        </button>
-      </!-->
+      <div class="position">
+        {{ widgetSelected?.position }}
+      </div>
+      <div class="toolbar">
+        <div class="btn-group ">
+          <button
+            class="btn btn-sm btn-danger"
+            @mousedown.stop.prevent="false"
+            @click.stop.prevent="onDeleteWidget($event)"
+          >
+            <FontAwesomeIcon :icon="'fa-solid fa-trash-can'" />
+          </button>
+          <button
+            class="btn btn-sm btn-secondary"
+            @mousedown.stop.prevent="false"
+            @click.stop.prevent="onDuplicateWidget($event)"
+          >
+            <FontAwesomeIcon :icon="'fa-solid fa-clone'" />
+          </button>
+          <button
+            class="btn btn-sm btn-primary"
+            @mousedown.stop.prevent="false"
+            @click.stop.prevent="addWidget($event)"
+          >
+            <FontAwesomeIcon :icon="'fa-solid fa-plus'" />
+          </button>
+        </div>
+        <div class="btn-group right">
+          <button
+            class="btn btn-sm btn-dark"
+            @mousedown.stop.prevent="false"
+            @click.stop.prevent="openEditor($event)"
+          >
+            <FontAwesomeIcon icon="fa-solid fa-pen-to-square" />
+          </button>
+        </div>
+      </div>
       <div
         class="resize-handle top-left"
         @mousedown="onMouseDownResize($event, 'top-left')"
@@ -69,9 +100,12 @@
       />
     </div>
 
-    <Teleport to="#widget-editor">
+    <Teleport
+      v-if="widgetEditorOpened && editorActived"
+      to="#painelset-editorarea"
+      :disabled="!editorActived"
+    >
       <WidgetEditor
-        v-if="coordsChange.editmode"
         :painel-id="painelId"
         :widget-selected="widgetSelected?.id"
       />
@@ -97,9 +131,10 @@
 </template>
 
 <script setup>
-
 import { useSyncStore } from '~@/stores/SyncStore'
-import { computed, ref, inject } from 'vue'
+import { activeTeleportId } from '~@/stores/teleportStore'
+
+import { computed, ref, inject, watch, nextTick } from 'vue'
 import Resource from '~@/utils/resources'
 import WidgetEditor from './WidgetEditor.vue'
 
@@ -118,6 +153,7 @@ const props = defineProps({
   }
 })
 
+const editmode = ref(false)
 const painelsetWidget = ref(null)
 
 const widgetEditorOpened = ref(false)
@@ -127,15 +163,11 @@ const coordsChange = ref({
   y: 0,
   w: 100,
   h: 100,
-  mouseResizeEnter: false,
-  editmode: false
+  mouseResizeEnter: false
 })
 
-EventBus.on('closeEditMode', (sender) => {
-  if (sender === props.widgetSelected) {
-    return
-  }
-  coordsChange.value.editmode = false
+const editorActived = computed(() => {
+  return painelsetWidget.value && activeTeleportId.value === painelsetWidget.value.id
 })
 
 const widgetSelected = computed(() => {
@@ -189,10 +221,130 @@ const syncChildList = async () => {
 
 syncChildList()
 
+EventBus.on('painelset:editorarea:close', (sender=null) => {
+  if (sender && sender === 'force') {
+    editmode.value = false
+    widgetEditorOpened.value = false
+    activeTeleportId.value = null
+    return
+  }
+  if (sender && painelsetWidget.value && sender === painelsetWidget.value.id) {
+    return
+  }
+  if (editmode.value) {
+    return
+  }
+  editmode.value = false
+  widgetEditorOpened.value = false
+  activeTeleportId.value = null
+})
+
+watch(
+  () => widgetEditorOpened.value,
+  (newEditMode) => {
+    if (newEditMode) {
+      EventBus.emit('painelset:editorarea:close', painelsetWidget.value.id)
+      nextTick(() => {
+        activeTeleportId.value = painelsetWidget.value.id
+      })
+    } else {
+      activeTeleportId.value = null
+    }
+  }
+)
 /* Edição do widget */
-const modalEditor = () => {
+
+const openEditor = () => {
   console.debug('Opening widget editor modal for widget:', widgetSelected.value)
   widgetEditorOpened.value = !widgetEditorOpened.value
+}
+
+const onDeleteWidget = () => {
+  if (!widgetSelected.value) {
+    return
+  }
+  if (!confirm(`Confirma a exclusão do Widget: ${widgetSelected.value.name} e todos seus SubWidgets?`)) {
+    return
+  }
+  Resource.Utils.deleteModel({
+    app: 'painelset',
+    model: 'widget',
+    id: widgetSelected.value.id
+  }).then(() => {
+    console.log('Widget deleted successfully')
+  }).catch((error) => {
+    console.error('Error deleting widget:', error)
+  })
+}
+const onDuplicateWidget = () => {
+  if (!widgetSelected.value) {
+    return
+  }
+
+  const newConfig = {
+    ...widgetSelected.value.config,
+    coords: {
+      ...widgetSelected.value.config.coords,
+      x: 10,
+      y: 10
+    }
+  }
+
+  const newWidgetData = {
+    ...widgetSelected.value,
+    id: undefined,
+    name: `${widgetSelected.value.name} (Cópia)`,
+    position: childList.value.length + 1,
+    config: newConfig
+  }
+
+  Resource.Utils.createModel({
+    app: 'painelset',
+    model: 'widget',
+    form: newWidgetData
+  }).then((response) => {
+    console.log('Widget duplicated successfully:', response.data)
+  }).catch((error) => {
+    console.error('Error duplicating widget:', error)
+  })
+}
+
+const addWidget = () => {
+  if (!widgetSelected.value) {
+    return
+  }
+
+  const defaultChildWidgetData = {
+    name: `Novo Widget`,
+    parent: widgetSelected.value.id,
+    visao: widgetSelected.value.visao,
+    position: childList.value.length + 1,
+    vue_component: '',
+    config: {
+      coords: {
+        x: 10,
+        y: 10,
+        w: 30,
+        h: 30
+      },
+      displayTitle: true
+    },
+    styles: {
+      component: {},
+      title: {},
+      inner: {}
+    }
+  }
+
+  Resource.Utils.createModel({
+    app: 'painelset',
+    model: 'widget',
+    form: defaultChildWidgetData
+  }).then((response) => {
+    console.log('Default child widget created successfully:', response.data)
+  }).catch((error) => {
+    console.error('Error creating default child widget:', error)
+  })
 }
 
 /* Helpers for resizing and moving widgets */
@@ -262,14 +414,19 @@ const onMouseDown = (event) => {
   if (coordsChange.value.mouseResizeEnter) {
     return
   }
-  coordsChange.value.editmode = !coordsChange.value.editmode
-  EventBus.emit('closeEditMode', props.widgetSelected)
+  editmode.value = !editmode.value
+  if (!editmode.value) {
+    widgetEditorOpened.value = false
+  }
+  console.log('Activating painel editor teleport for Widget:', props.widgetSelected)
+
+  EventBus.emit('painelset:editorarea:close', painelsetWidget.value.id)
 }
 
 const onMouseDownResize = (event, direction) => {
   coordsChange.value.mouseResizeEnter = true
   event.preventDefault()
-  if (!coordsChange.value.editmode) {
+  if (!editmode.value) {
     return
   }
 
@@ -389,7 +546,6 @@ const onMouseDownResize = (event, direction) => {
     flex: 1 1 100%;
     z-index: 1;
     overflow: hidden;
-    background-color: var(--bs-body-bg);
     border: 0;
     .inner-widget {
       position: relative;
@@ -436,10 +592,30 @@ const onMouseDownResize = (event, direction) => {
         bottom: 0;
         z-index: 1;
 
+        .position {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          background-color: rgba(0, 0, 0, 1);
+          color: #fff;
+          opacity: 0.2;
+          padding: 2px 15px;
+          font-size: 20pt;
+          border-radius: 3px;
+          z-index: 10003;
+          &:hover {
+            opacity: 1;
+          }
+        }
+
         & > .toolbar {
           position: absolute;
+          left: 10px;
           bottom: 10px;
           right: 10px;
+          display: flex;
+          justify-content: flex-end;
+          gap: 5px;
           z-index: 1002;
         }
 
@@ -481,13 +657,14 @@ const onMouseDownResize = (event, direction) => {
 
               &::before,
               &::after {
-              content: '';
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              width: 25px;
-              height: 5px;
-              background-color: #fff;
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 25px;
+                height: 5px;
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
               }
 
               &::before {

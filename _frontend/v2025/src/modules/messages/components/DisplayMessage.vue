@@ -22,6 +22,5 @@
     bottom: 0;
     right: 0;
     z-index: 1000;
-    padding: 1em 2em;
   }
 </style>

@@ -1,6 +1,8 @@
 <template>
   <div
+    :id="`id-painelset-painel-${painelId}`"
     ref="painelsetPainel"
+    :key="`painelset-painel-${painelId}`"
     class="painelset-painel"
     :style="painel?.styles.component || {}"
     @mousemove="movingSobrePainel($event)"
@@ -22,24 +24,42 @@
         :painel-id="painelId"
         :visaodepainel-selected="visaoSelected"
       />
-      <div class="actions">
-        <div
-          class="btn-group btn-group-sm"
-          role="group"
-          aria-label="Visões do Painel"
+    </div>
+    <div class="painel-empty" v-else>
+      <p>Não há visões de painel configuradas para este painel.</p>
+      <p>Utilize o botao de adição na tela de configurações para adicionar a primeira visão do painel.</p>
+    </div>
+    <div
+      class="actions"
+      @click.stop="editmode = !editmode"
+    >
+      <div
+        class="btn-group btn-group-sm"
+        role="group"
+        aria-label="Visões do Painel"
+      >
+        <button
+          v-for="(pv, index) in visaoList"
+          :key="`${pv.id}_${index}`"
+          :class="{ active: pv.id === visaoSelected }"
+          class="btn btn-primary"
+          @click.stop.prevent="trocarVisao(pv.id)"
         >
-          <button
-            v-for="(pv, index) in visaoList"
-            :key="`${pv.id}_${index}`"
-            :class="{ active: pv.id === visaoSelected }"
-            class="btn btn-primary"
-            @click="trocarVisao(pv.id)"
-          >
-            {{ pv.position }}
-          </button>
-        </div>
+          {{ pv.position }}
+        </button>
       </div>
     </div>
+
+    <Teleport
+      v-if="editmode && editorActived"
+      to="#painelset-editorarea"
+      :disabled="!editorActived"
+    >
+      <PainelEditor
+        :painel-id="painelId"
+        :painel-selected="painelId"
+      />
+    </Teleport>
 
     <div v-if="false">
       <br><br>
@@ -51,7 +71,7 @@
       <button
         v-for="(pv, index) in visaoList"
         :key="index"
-        @click="ativarVisao(pv.id)"
+        @click.stop.prevent="ativarVisao(pv.id)"
       >
         Ativar {{ pv.id }}
       </button>
@@ -61,11 +81,14 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
+import { activeTeleportId } from '~@/stores/teleportStore'
+
 import { useRouter, useRoute } from 'vue-router'
-import { ref, defineProps, computed, watch } from 'vue'
+import { ref, defineProps, computed, watch, inject, nextTick, onMounted } from 'vue'
 import Resource from '~@/utils/resources'
 
 import VisaoDePainel from './VisaoDePainel.vue'
+import PainelEditor from './PainelEditor.vue'
 
 const syncStore = useSyncStore()
 const router = useRouter()
@@ -75,7 +98,9 @@ syncStore.registerModels('painelset', [
   'painel',
   'visaodepainel',
   'widget',
-  'evento'
+  'evento',
+  'individuo',
+  'cronometro'
 ])
 
 syncStore.registerModels('sessao', [
@@ -93,17 +118,115 @@ const props = defineProps({
   }
 })
 
+const EventBus = inject('EventBus')
+
+const editmode = ref(false)
 const painelsetPainel = ref(null)
 const initMovingSobrePainel = ref(false)
 const idTimerMovingSobrePainel = ref(null)
+const visaoSelected = ref(null)
+
+const routePainelId = ref(Number(route.params.painelId) || 0)
+const painelId = ref(Number(props.painelId) || routePainelId.value || 0 )
+
+const painel = computed(() => {
+  return syncStore.data_cache.painelset_painel?.[painelId.value] || null
+})
+
+const visaoList = computed(() => {
+  return _.orderBy(
+    _.filter(syncStore.data_cache.painelset_visaodepainel, { painel: painelId.value } ) || [],
+    ['position'],
+    ['asc']
+  )
+})
+
+const editorActived = computed(() => {
+  return activeTeleportId.value === painelsetPainel.value.id || visaoList.value.length === 0
+})
+
+EventBus.on('painelset:editorarea:close', (sender=null) => {
+
+  if (visaoList.value.length > 0) {
+    activeTeleportId.value = null
+    editmode.value = true
+    return
+  }
+  if (sender && sender === 'force') {
+    editmode.value = false
+    activeTeleportId.value = null
+    return
+  }
+  if (sender && painelsetPainel.value && sender ===  painelsetPainel.value.id) {
+    return
+  }
+  activeTeleportId.value = null
+  editmode.value = false
+})
+
+watch(
+  () => editmode.value,
+  (newEditMode) => {
+    if (newEditMode) {
+      EventBus.emit('painelset:editorarea:close', painelsetPainel.value.id)
+      nextTick(() => {
+        activeTeleportId.value = painelsetPainel.value.id
+      })
+    }
+    if (visaoList.value.length === 0) {
+      activeTeleportId.value = painelsetPainel.value.id
+      editmode.value = true
+    return
+  }
+  }
+)
+
+watch(
+  () => props.painelId,
+  (newPainelId) => {
+    if (newPainelId !== painelId.value) {
+      painelId.value = newPainelId
+      syncPainel()
+    }
+  }
+)
+
+watch(
+  () => painelId.value,
+  (newPainelId) => {
+    if (newPainelId) {
+      syncVisaoList(newPainelId)
+    }
+  }
+)
+
+watch(
+  () => visaoList.value,
+  (newVisaoList) => {
+    if (newVisaoList.length > 0) {
+      if (!visaoSelected.value || !newVisaoList.find(v => v.id === visaoSelected.value)) {
+        const visaoAtiva = newVisaoList.find(
+          (pv) => pv.active === true
+        )
+        if (visaoAtiva) {
+          visaoSelected.value = visaoAtiva.id
+        } else {
+          visaoSelected.value = newVisaoList[0].id
+        }
+      }
+    } else {
+      visaoSelected.value = null
+    }
+  }
+)
 
 const movingSobrePainel = (event) => {
   if (initMovingSobrePainel.value === false) {
     initMovingSobrePainel.value = true
 
-      _.each(painelsetPainel.value.getElementsByClassName('painelset-widget'), (element) => {
-        element.classList.add('localize')
-      })
+    _.each(painelsetPainel.value.getElementsByClassName('painelset-widget'), (element) => {
+      element.classList.add('localize')
+    })
 
     if (idTimerMovingSobrePainel.value) {
       clearTimeout(idTimerMovingSobrePainel.value)
@@ -124,42 +247,6 @@ const movingSobrePainel = (event) => {
     }, 2000)
   }
 }
-
-const routePainelId = ref(Number(route.params.painelId) || 0)
-const painelId = ref(Number(props.painelId) || routePainelId.value || 0 )
-
-const painel = computed(() => {
-  return syncStore.data_cache.painelset_painel?.[painelId.value] || null
-})
-
-const visaoList = computed(() => {
-  return _.orderBy(
-    _.filter(syncStore.data_cache.painelset_visaodepainel, { painel: painelId.value } ) || [],
-    ['position'],
-    ['asc']
-  )
-})
-
-const visaoSelected = ref(null)
-
-watch(
-  () => props.painelId,
-  (newPainelId) => {
-    if (newPainelId !== painelId.value) {
-      painelId.value = newPainelId
-      syncPainel()
-    }
-  }
-)
-
-watch(
-  () => painelId.value,
-  (newPainelId) => {
-    if (newPainelId) {
-      syncVisaoList(newPainelId)
-    }
-  }
-)
 
 const syncVisaoList = async (painelId) => {
   syncStore
@@ -192,7 +279,23 @@ const syncPainel = async () => {
         model: 'painel',
         id: painelId.value
       })
-      .then(() => {
+      .then((response) => {
+        if (response.data.sessao) {
+          syncStore
+            .fetchSync({
+              app: 'sessao',
+              model: 'sessaoplenaria',
+              id: response.data.sessao
+            })
+          }
+        if (response.data.evento) {
+          syncStore
+            .fetchSync({
+              app: 'painelset',
+              model: 'evento',
+              id: response.data.evento
+            })
+        }
         syncVisaoList(painelId.value)
       })
       .catch((error) => {
@@ -234,6 +337,7 @@ const syncPainel = async () => {
               console.error('Error fetching painel for evento:', error)
               router.push({ name: 'painelset_error_404', params: { pathMatch: 'error' } })
             })
+
         } else {
           router.push({ name: 'painelset_error_404', params: { pathMatch: 'error' } })
         }
@@ -247,7 +351,10 @@ const syncPainel = async () => {
 }
 
 const trocarVisao = (id) => {
-  visaoSelected.value = id
+  EventBus.emit('painelset:editorarea:close')
+  nextTick(() => {
+    visaoSelected.value = id
+  })
 }
 
 const ativarVisao = (id) => {
@@ -271,7 +378,17 @@ const visaoAtiva = () => {
   visaoSelected.value = painel.value.visaodepainel_ativo_id
 }
 
-syncPainel()
+onMounted(() => {
+  // Initial sync when component is mounted
+  syncPainel()
+
+  setTimeout(() => {
+    if (visaoList.value.length === 0) {
+      editmode.value = true
+      activeTeleportId.value = painelsetPainel.value.id
+    }
+  }, 1000)
+})
 
 </script>
 <style lang="scss" scoped>
@@ -284,45 +401,39 @@ syncPainel()
     display: flex;
     flex-direction: column;
     flex: 1 1 100%;
-    & > .actions {
-      position: absolute;
-      z-index: 10000;
-      bottom: 0px;
-      right: 0px;
+  }
+  & > .painel-empty {
+    flex: 1 1 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    font-size: 1.2em;
+    text-align: center;
+    padding: 2em;
+  }
+  & > .actions {
+    line-height: 1;
+    text-align: right;
+    height: 0.5em;
+    overflow: hidden;
+    .btn {
+      font-size: 1em;
+      padding: 0.6em;
       line-height: 1;
-      text-align: right;
-      height: 5px;
-      overflow: hidden;
+      border-radius: 0;
+      opacity: 1;
+    }
+    &:hover {
+      height: auto;
       .btn {
-        font-size: 1em;
-        padding: 0.6em;
-        line-height: 1;
-        border-radius: 0;
-        opacity: 1;
-      }
-      &:hover {
         height: auto;
-        .btn {
-          height: auto;
-          opacity: 1;
-          zoom: 2;
-        }
+        opacity: 1;
+        zoom: 2;
       }
     }
   }
 }
 
-.painelset-painelold {
-  overflow: hidden;
-  display: none;
-  height: 100%;
-  flex-direction: column;
-  .inner-painelset-painel {
-    position: relative;
-    display: flex;
-    flex: 1 1 100%;
-    overflow: hidden;
-
-  }
-}
 </style>
