@@ -23,10 +23,10 @@
       </div>
       <div class="col-auto">
         <div class="btn-group">
-          <a href="#" @click.prevent="finish($event)" v-if="evento.start_real && !evento.end_real" class="btn btn-danger" title="Encerrar Evento"><i class="fas fa-stop-circle"></i></a>
-          <a href="#" @click.prevent="edit($event)" v-if="!evento.end_real" class="btn btn-secondary" title="Editar Evento"><i class="fas fa-edit"></i></a>
-          <a href="#" @click.prevent="copy($event)" v-if="evento.end_real" class="btn btn-success" title="Duplicar Evento"><i class="fas fa-copy"></i></a>
-          <a href="#" @click.prevent="admin($event)" v-if="!evento.end_real" class="btn btn-primary" title="Execução do Evento"><i class="fas fa-toolbox"></i></a>
+          <a href="#" @click.prevent="finish($event)" v-if="hasPermission && evento.start_real && !evento.end_real" class="btn btn-danger" title="Encerrar Evento"><i class="fas fa-stop-circle"></i></a>
+          <a href="#" @click.prevent="edit($event)" v-if="hasPermission && !evento.end_real" class="btn btn-secondary" title="Editar Evento"><i class="fas fa-edit"></i></a>
+          <a href="#" @click.prevent="copy($event)" v-if="hasPermission && evento.end_real" class="btn btn-success" title="Duplicar Evento"><i class="fas fa-copy"></i></a>
+          <a href="#" @click.prevent="admin($event)" v-if="hasPermission && !evento.end_real" class="btn btn-primary" title="Execução do Evento"><i class="fas fa-toolbox"></i></a>
         </div>
       </div>
     </div>
@@ -45,37 +45,40 @@ export default {
   data () {
     return {
       sessao_cache: {},
-      paineis: {}
+      paineis: {},
+      hasPermission: false
     }
   },
   computed: {
   },
   mounted: function () {
     const t = this
+
     t.utils
       .hasPermission('painelset.change_evento')
       .then(hasPermission => {
-        // t.fetchModelOrderedList('painelset', 'evento', '-start_real,-start_previsto')
         if (hasPermission) {
-          t.utils.fetch({
-            app: 'painelset',
-            model: 'painel',
-            query_string: `evento=${t.evento.id}`
-          })
-            .then((rp) => {
-              t.paineis = rp.data.results
-              rp.data.results.forEach(painel => {
-                this.utils.fetch({
-                  app: 'sessao',
-                  model: 'sessaoplenaria',
-                  id: painel.sessao
-                })
-                  .then(r => {
-                    t.$set(t.sessao_cache, painel.id, r.data)
-                  })
-              })
-            })
+          t.hasPermission = true
         }
+      })
+
+    t.utils.fetch({
+      app: 'painelset',
+      model: 'painel',
+      query_string: `evento=${t.evento.id}`
+    })
+      .then((rp) => {
+        t.paineis = rp.data.results
+        rp.data.results.forEach(painel => {
+          this.utils.fetch({
+            app: 'sessao',
+            model: 'sessaoplenaria',
+            id: painel.sessao
+          })
+            .then(r => {
+              t.$set(t.sessao_cache, painel.id, r.data)
+            })
+        })
       })
   },
   methods: {
@@ -133,6 +136,9 @@ export default {
 
 <style lang="scss">
 .painelset-evento-list-item {
+  &:hover {
+    background-color: #f0f0f0;
+  }
 
   .container {
     margin-top: 20px;

@@ -42,8 +42,7 @@ Vue.mixin({
       'getObject',
       'loginPortalCMJ',
       'logoutPortalCMJ',
-      'loginStatus',
-      'hasPermission'
+      'loginStatus'
     ]),
     nivel (value, teste_local) {
       return this.nivel_detalhe >= value && teste_local ? '' : 'd-none'

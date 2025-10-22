@@ -161,7 +161,9 @@ class SyncRefreshConsumer(AsyncWebsocketConsumer):
                         }))
                         return
 
-                    if not user.has_perm('painelset.change_cronometro'):
+                    if not database_sync_to_async(
+                        user.has_perm
+                    )('painelset.change_cronometro'):
                         await self.send(text_data=json.dumps({
                             'type': 'command_result',
                             'command': command,
@@ -237,7 +239,10 @@ class SyncRefreshConsumer(AsyncWebsocketConsumer):
             elif u.is_anonymous:
                 detail_perm = perm_detail in perms_publicas or perm_view in perms_publicas
             elif not u.is_superuser:
-                detail_perm = u.has_perm(perm_detail) or u.has_perm(perm_view)
+                detail_perm = database_sync_to_async(
+                    u.has_perm)(perm_detail) or database_sync_to_async(
+                        u.has_perm(perm_view)
+                )
             else:
                 detail_perm = True
 

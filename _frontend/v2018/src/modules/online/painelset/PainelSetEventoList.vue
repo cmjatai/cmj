@@ -37,17 +37,11 @@ export default {
   },
   mounted: function () {
     const t = this
-    t.utils
-      .hasPermission('painelset.change_evento')
-      .then(hasPermission => {
-        if (hasPermission) {
-          t.fetchSync({
-            app: 'painelset',
-            model: 'evento',
-            params: { o: '-start_real,-start_previsto' }
-          })
-        }
-      })
+    t.fetchSync({
+      app: 'painelset',
+      model: 'evento',
+      params: { o: '-start_real,-start_previsto' }
+    })
   }
 }
 </script>
