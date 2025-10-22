@@ -1,5 +1,5 @@
 <template>
-  <div class="row painelset-evento-list-item">
+  <div :class="['row', 'painelset-evento-list-item', { 'evento-finalizado': evento && evento.end_real }]" >
       <div class="col">
         <h3 class="text-blue">{{ evento.name }}</h3>
         <strong>
@@ -136,6 +136,13 @@ export default {
 
 <style lang="scss">
 .painelset-evento-list-item {
+  &.evento-finalizado {
+    background-color: #e0e0e0;
+    color: #777;
+    h3, a:not(.btn) {
+      color: #999 !important;
+    }
+  }
   &:hover {
     background-color: #f0f0f0;
   }

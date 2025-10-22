@@ -346,7 +346,7 @@ class Individuo(models.Model, CronometroMixin):
 
 class Painel(models.Model):
     """Modelo para representar um painel que pode exibir visões."""
-    name = models.CharField(max_length=256, unique=True, help_text="Nome único do painel")
+    name = models.CharField(max_length=256, help_text="Nome único do painel")
     description = models.TextField(blank=True, help_text="Descrição do painel")
 
     evento = models.ForeignKey(
@@ -391,7 +391,7 @@ class Painel(models.Model):
     def copy(self, evento=None, sessao=None):
         """Copia deste painel para novo evento e sessão, ou nenhum deles, incluindo suas visões e widgets."""
         novo_painel = Painel.objects.create(
-            name=f"{self.name} (Cópia)",
+            name=f"{self.name}",
             description=self.description,
             evento=evento,
             sessao=sessao,

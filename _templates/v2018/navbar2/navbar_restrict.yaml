@@ -35,4 +35,8 @@
   check_permission: protocoloadm.list_documentoadministrativo
 {% endif %}
 
+- title: {% trans 'Controle de Paineis e Eventos' %}
+  url: /online/painelset/
+  check_permission: painelset.add_evento
+
 

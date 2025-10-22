@@ -11,6 +11,10 @@
   url: sapl.materia:proposicao_list
   check_permission: materia.add_proposicao
 
+- title: {% trans 'Controle de Paineis e Eventos' %}
+  url: cmj.painelset:evento_list
+  check_permission: painelset.add_evento
+
 {% yaml_render "navbar/restrict/navbar_arq.yaml" 0 %}
 
 {% yaml_render "navbar/restrict/navbar_saap.yaml" 0 %}
