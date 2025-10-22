@@ -31,7 +31,7 @@
     </div>
     <div
       class="actions"
-      @click.stop="editmode = !editmode"
+      @click.stop.prevent="editmode = !editmode"
     >
       <div
         class="btn-group btn-group-sm"
@@ -80,17 +80,23 @@
   </div>
 </template>
 <script setup>
+// 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { activeTeleportId } from '~@/stores/teleportStore'
+import { useAuthStore } from '~@/stores/AuthStore'
+import { activeTeleportId } from '~@/stores/TeleportStore'
 
 import { useRouter, useRoute } from 'vue-router'
 import { ref, defineProps, computed, watch, inject, nextTick, onMounted } from 'vue'
+
 import Resource from '~@/utils/resources'
 
 import VisaoDePainel from './VisaoDePainel.vue'
 import PainelEditor from './PainelEditor.vue'
 
+// 2. Composables
+const EventBus = inject('EventBus')
 const syncStore = useSyncStore()
+const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 
@@ -103,14 +109,7 @@ syncStore.registerModels('painelset', [
   'cronometro'
 ])
 
-syncStore.registerModels('sessao', [
-  'sessaoplenaria'
-])
-
-syncStore.registerModels('materia', [
-  'materialegislativa'
-])
-
+// 3. Props & Emits
 const props = defineProps({
   painelId: {
     type: String,
@@ -118,8 +117,7 @@ const props = defineProps({
   }
 })
 
-const EventBus = inject('EventBus')
-
+// 4. State & Refs
 const editmode = ref(false)
 const painelsetPainel = ref(null)
 const initMovingSobrePainel = ref(false)
@@ -129,10 +127,10 @@ const visaoSelected = ref(null)
 const routePainelId = ref(Number(route.params.painelId) || 0)
 const painelId = ref(Number(props.painelId) || routePainelId.value || 0 )
 
+// 5. Computed Properties
 const painel = computed(() => {
   return syncStore.data_cache.painelset_painel?.[painelId.value] || null
 })
-
 const visaoList = computed(() => {
   return _.orderBy(
     _.filter(syncStore.data_cache.painelset_visaodepainel, { painel: painelId.value } ) || [],
@@ -140,33 +138,17 @@ const visaoList = computed(() => {
     ['asc']
   )
 })
-
 const editorActived = computed(() => {
   return activeTeleportId.value === painelsetPainel.value.id || visaoList.value.length === 0
 })
 
-EventBus.on('painelset:editorarea:close', (sender=null) => {
-
-  if (visaoList.value.length > 0) {
-    activeTeleportId.value = null
-    editmode.value = true
-    return
-  }
-  if (sender && sender === 'force') {
-    editmode.value = false
-    activeTeleportId.value = null
-    return
-  }
-  if (sender && painelsetPainel.value && sender ===  painelsetPainel.value.id) {
-    return
-  }
-  activeTeleportId.value = null
-  editmode.value = false
-})
-
+// 6. Watchers
 watch(
   () => editmode.value,
   (newEditMode) => {
+    if (!onChangePermission()) {
+      return
+    }
     if (newEditMode) {
       EventBus.emit('painelset:editorarea:close', painelsetPainel.value.id)
       nextTick(() => {
@@ -176,11 +158,10 @@ watch(
     if (visaoList.value.length === 0) {
       activeTeleportId.value = painelsetPainel.value.id
       editmode.value = true
-    return
-  }
+      return
+    }
   }
 )
-
 watch(
   () => props.painelId,
   (newPainelId) => {
@@ -190,7 +171,6 @@ watch(
     }
   }
 )
-
 watch(
   () => painelId.value,
   (newPainelId) => {
@@ -199,7 +179,6 @@ watch(
     }
   }
 )
-
 watch(
   () => visaoList.value,
   (newVisaoList) => {
@@ -220,7 +199,32 @@ watch(
   }
 )
 
-const movingSobrePainel = (event) => {
+// 7. Events & Lifecycle Hooks
+EventBus.on('painelset:editorarea:close', (sender=null) => {
+  if (!onChangePermission()) {
+    return
+  }
+  if (visaoList.value.length > 0) {
+    activeTeleportId.value = null
+    editmode.value = true
+    return
+  }
+  if (sender && sender === 'force') {
+    editmode.value = false
+    activeTeleportId.value = null
+    return
+  }
+  if (sender && painelsetPainel.value && sender ===  painelsetPainel.value.id) {
+    return
+  }
+  activeTeleportId.value = null
+  editmode.value = false
+})
+
+const movingSobrePainel = () => {
+  if (!authStore.isAuthenticated) {
+    return
+  }
   if (initMovingSobrePainel.value === false) {
     initMovingSobrePainel.value = true
 
@@ -246,29 +250,6 @@ const movingSobrePainel = (event) => {
       })
     }, 2000)
   }
-}
-
-const syncVisaoList = async (painelId) => {
-  syncStore
-    .fetchSync({
-      app: 'painelset',
-      model: 'visaodepainel',
-      params: {
-        painel: painelId
-      }
-    })
-    .then((response) => {
-      if (response && response.data.results.length > 0) {
-        const visaoAtiva = response.data.results.find(
-          (pv) => pv.active === true
-        )
-        if (visaoAtiva) {
-          visaoSelected.value = visaoAtiva.id
-        } else {
-          visaoSelected.value = response.data.results[0].id
-        }
-      }
-    })
 }
 
 const syncPainel = async () => {
@@ -378,6 +359,13 @@ const visaoAtiva = () => {
   visaoSelected.value = painel.value.visaodepainel_ativo_id
 }
 
+const onChangePermission = () => {
+  if (!authStore.isAuthenticated) {
+    return false
+  }
+  return authStore.hasPermission('painelset.change_painel')
+}
+
 onMounted(() => {
   // Initial sync when component is mounted
   syncPainel()
@@ -389,6 +377,30 @@ onMounted(() => {
     }
   }, 1000)
 })
+
+// 8. Functions
+const syncVisaoList = async (painelId) => {
+  syncStore
+    .fetchSync({
+      app: 'painelset',
+      model: 'visaodepainel',
+      params: {
+        painel: painelId
+      }
+    })
+    .then((response) => {
+      if (response && response.data.results.length > 0) {
+        const visaoAtiva = response.data.results.find(
+          (pv) => pv.active === true
+        )
+        if (visaoAtiva) {
+          visaoSelected.value = visaoAtiva.id
+        } else {
+          visaoSelected.value = response.data.results[0].id
+        }
+      }
+    })
+}
 
 </script>
 <style lang="scss" scoped>

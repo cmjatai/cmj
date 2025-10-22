@@ -18,11 +18,19 @@ export default {
     logout: () => axios.delete(
       `${basePath}/auth/session`
     ),
-    hasPermission: (permission) => axios({
-      url: `${basePath}/auth/session/?perm=${permission}`,
-      method: 'OPTIONS',
-      withCredentials: true
-    }),
+    hasPermission: (permission) => {
+      return axios({
+        url: `${basePath}/auth/session/?perm=${permission}`,
+        method: 'OPTIONS',
+        withCredentials: true
+      })
+        .then(response => {
+          return response.data.status === 'ok'
+        })
+        .catch(() => {
+          return false
+        })
+    },
     getVersion: () => axios({
       url: `${basePath}/version`,
       method: 'GET'

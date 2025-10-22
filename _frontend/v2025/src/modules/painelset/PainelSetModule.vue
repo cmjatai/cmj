@@ -11,16 +11,22 @@
   </div>
 </template>
 <script setup>
-import { activeTeleportId } from '~@/stores/teleportStore'
+// 1. Imports
 
+import { activeTeleportId } from '~@/stores/TeleportStore'
 import { ref, watch, inject } from 'vue'
 
-const painelsetEditorarea = ref(null)
-
+// 2. Composables
 const EventBus = inject('EventBus')
 
-const lastResizeWidth = ref('45%')
+// 3. Props & Emits
 
+// 4. State & Refs
+const painelsetEditorarea = ref(null)
+const lastResizeWidth = ref('45%')
+// 5. Computed Properties
+
+// 6. Watchers
 watch(
   () => activeTeleportId.value,
   (newTeleportId) => {
@@ -28,10 +34,11 @@ watch(
   }
 )
 
+// 7. Events & Lifecycle Hooks
 EventBus.on('painelset:editorarea:resize', (newWidth) => {
   painelsetEditorarea.value.style.flex = `0 0 ${newWidth}`
   if (['0', 0, '0%', '0px', '0em'].includes(newWidth)) {
-   EventBus.emit('painelset:editorarea:close', 'force')
+    EventBus.emit('painelset:editorarea:close', 'force')
   }
 })
 
@@ -60,7 +67,7 @@ const initMoving = (event) => {
   document.addEventListener('mouseup', onMouseUp)
 }
 
-
+// 8. Functions
 
 </script>
 <style lang="scss" scoped>

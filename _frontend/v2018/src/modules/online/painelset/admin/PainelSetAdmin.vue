@@ -96,6 +96,11 @@ export default {
     this.$nextTick(() => {
       this.utils.hasPermission('painelset.change_evento')
         .then(hasPermission => {
+          if (!hasPermission) {
+            this.$router.push({ name: 'online_index_link' })
+            this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página.', time: 5 })
+            return
+          }
           this.fetchSync({
             app: 'painelset',
             model: 'evento',
@@ -226,8 +231,8 @@ export default {
   }
   .overlay-paused {
     position: absolute;
-    top: 5.4em;
-    left: 0;
+    top: 5.42em;
+    left: 33.333%;
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);

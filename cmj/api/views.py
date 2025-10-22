@@ -34,9 +34,13 @@ class AppVersionView(APIView):
         if request.user.is_authenticated:
             #token = Token.objects.filter(user=request.user).first()
             #    'token': token.key,
+            content['is_authenticated'] = True
+            content['permissions'] = sorted(request.user.get_all_permissions())
+
             user = {
                 'username': request.user.username,
                 'fullname': request.user.get_full_name(),
+
                 'avatar': get_static('img/perfil.jpg') if not request.user.avatar else
                 get_backend().get_thumbnail_url(
                     request.user.avatar,
@@ -80,9 +84,16 @@ class AppSessionAuthView(ObtainAuthToken):
         perm = request.GET.get('perm', None)
         if perm:
             if not request.user.has_perm(perm):
-                raise PermissionDenied(
-                    _('Usuário não possui permissão: %s') % perm)
+                return Response({'status': 'fail', 'detail': _('Usuário não possui permissão: %s') % perm})
             return Response({'status': 'ok', 'detail': _('Usuário possui permissão: %s') % perm})
+        return super().options(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return Response({
+                'permissions': sorted(request.user.get_all_permissions()),
+                'detail': _('Usuário autenticado'),
+            })
         return super().options(request, *args, **kwargs)
 
 

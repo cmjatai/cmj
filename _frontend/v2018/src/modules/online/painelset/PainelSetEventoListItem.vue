@@ -57,9 +57,10 @@ export default {
     t.utils
       .hasPermission('painelset.change_evento')
       .then(hasPermission => {
-        if (hasPermission) {
-          t.hasPermission = true
-        }
+        t.hasPermission = hasPermission
+      })
+      .catch(() => {
+        t.hasPermission = false
       })
 
     t.utils.fetch({

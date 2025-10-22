@@ -137,7 +137,7 @@ const actions = {
       })
   },
   refreshState: ({ commit }, metadata) => {
-    if (metadata.hasOwnProperty('value')) {
+    if (metadata && metadata.hasOwnProperty('value')) {
       return new Promise((resolve, reject) => {
         commit(STATE_UPDATE, metadata)
         resolve()

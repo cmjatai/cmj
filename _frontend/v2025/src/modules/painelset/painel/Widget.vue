@@ -133,13 +133,15 @@
 
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { activeTeleportId } from '~@/stores/teleportStore'
+import { useAuthStore } from '~@/stores/AuthStore'
+import { activeTeleportId } from '~@/stores/TeleportStore'
 
 import { computed, ref, inject, watch, nextTick } from 'vue'
 import Resource from '~@/utils/resources'
 import WidgetEditor from './WidgetEditor.vue'
 
 const syncStore = useSyncStore()
+const authStore = useAuthStore()
 
 const EventBus = inject('EventBus')
 
@@ -223,6 +225,9 @@ const syncChildList = async () => {
 syncChildList()
 
 EventBus.on('painelset:editorarea:close', (sender=null) => {
+  if (!onChangePermission()) {
+    return
+  }
   if (sender && sender === 'force') {
     editmode.value = false
     widgetEditorOpened.value = false
@@ -243,6 +248,9 @@ EventBus.on('painelset:editorarea:close', (sender=null) => {
 watch(
   () => widgetEditorOpened.value,
   (newEditMode) => {
+    if (!onChangePermission()) {
+      return
+    }
     if (newEditMode) {
       EventBus.emit('painelset:editorarea:close', painelsetWidget.value.id)
       nextTick(() => {
@@ -253,6 +261,13 @@ watch(
     }
   }
 )
+
+const onChangePermission = () => {
+  if (!authStore.isAuthenticated) {
+    return false
+  }
+  return authStore.hasPermission('painelset.change_widget')
+}
 
 const onComponent = ((event) => {
   console.debug('Received oncomponent event:')
@@ -431,6 +446,9 @@ const patchWidgetCoords = (localCoords) => {
 const onMouseDown = (event) => {
   event.preventDefault()
   if (coordsChange.value.mouseResizeEnter) {
+    return
+  }
+  if (!onChangePermission()) {
     return
   }
   editmode.value = !editmode.value

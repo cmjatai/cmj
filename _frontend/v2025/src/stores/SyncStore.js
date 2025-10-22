@@ -70,7 +70,7 @@ export const useSyncStore = defineStore('syncStore', {
         if (!params.o) {
           params.o = 'id'
         }
-        metadata.query_string = new URLSearchParams(params).toString()
+        metadata.params = params
       }
       return _fetch(
         metadata

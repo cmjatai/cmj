@@ -18,11 +18,16 @@ const getters = {
   user: (state) => {
     return state.data_connect.hasOwnProperty('user') ? state.data_connect.user : null
   },
-  is_authenticated: (state) => {
+  isAuthenticated: (state) => {
     return state.data_connect.is_authenticated
   },
-  is_votante: (state) => {
+  isVotante: (state) => {
     return state.data_connect.hasOwnProperty('votante')
+  },
+  hasPermission: (state) => {
+    return (perm) => {
+      return state.data_connect?.permissions_cache?.includes(perm)
+    }
   }
 }
 

@@ -11,6 +11,10 @@ import { computed } from 'vue'
 
 const syncStore = useSyncStore()
 
+syncStore.registerModels('sessao', [
+  'sessaoplenaria'
+])
+
 const props = defineProps({
   painelId: {
     type: Number,

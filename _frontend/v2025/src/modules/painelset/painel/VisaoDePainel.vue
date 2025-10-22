@@ -25,7 +25,10 @@
         :widget-selected="widget.id"
       />
     </div>
-    <div v-if="widgetList.length === 0" class="visao-empty">
+    <div
+      v-if="widgetList.length === 0"
+      class="visao-empty"
+    >
       <p>Não há widgets configurados para esta visão.</p>
       <p>Utilize o botao de adição na tela de configurações para adicionar o primeiro widget à visão.</p>
     </div>
@@ -39,12 +42,12 @@
         :visao-selected="visaodepainelSelected"
       />
     </Teleport>
-
   </div>
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { activeTeleportId } from '~@/stores/teleportStore'
+import { useAuthStore } from '~@/stores/AuthStore'
+import { activeTeleportId } from '~@/stores/TeleportStore'
 
 import { ref, defineProps, computed, watch, inject, nextTick } from 'vue'
 
@@ -52,6 +55,7 @@ import Widget from './Widget.vue'
 import VisaoEditor from './VisaoEditor.vue'
 
 const syncStore = useSyncStore()
+const authStore = useAuthStore()
 
 const props = defineProps({
   painelId: {
@@ -73,6 +77,9 @@ const editorActived = computed(() => {
 })
 
 EventBus.on('painelset:editorarea:close', (sender=null) => {
+    if (!onChangePermission()) {
+      return
+    }
   if (sender && sender === 'force') {
     editmode.value = false
     activeTeleportId.value = null
@@ -89,6 +96,9 @@ EventBus.on('painelset:editorarea:close', (sender=null) => {
 watch(
   () => editmode.value,
   (newEditMode) => {
+    if (!onChangePermission()) {
+      return
+    }
     if (newEditMode) {
       EventBus.emit('painelset:editorarea:close', painelsetVisaodepainel.value.id)
       nextTick(() => {
@@ -100,6 +110,14 @@ watch(
     }
   }
 )
+
+const onChangePermission = () => {
+  if (!authStore.isAuthenticated) {
+    return false
+  }
+  return authStore.hasPermission('painelset.change_visaodepainel')
+}
+
 const visaoDePainelSelected = computed(() => {
   return syncStore.data_cache.painelset_visaodepainel?.[props.visaodepainelSelected] || null
 })
