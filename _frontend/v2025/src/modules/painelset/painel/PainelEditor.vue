@@ -35,6 +35,24 @@
               <label for="painel-name" class="form-label">Título do Painel</label>
               <input type="text" class="form-control" v-model="painelSelected.name" placeholder="Título do Painel"/>
             </div>
+            <div class="col-6">
+              <label for="painel-sessao" class="form-label">Sessão Plenária Associada</label>
+              <select
+                id="painel-sessao"
+                name="sessao_plenaria"
+                class="form-select"
+                v-model="painelSelected.sessao"
+              >
+                <option :value="null">-- Nenhuma --</option>
+                <option
+                  v-for="sessao in sessaoList"
+                  :key="`sessao-option-${sessao.id}`"
+                  :value="sessao.id"
+                >
+                  {{ sessao.__str__ }} ({{ sessao.data_inicio }} - {{ sessao.data_fim || '' }})
+                </option>
+              </select>
+            </div>
           </div>
           <div class="row py-2">
             <div class="col-6">
@@ -90,7 +108,7 @@
             </div>
           </div>
         </div>
-         <div class="container actions pt-3">
+        <div class="container actions pt-3">
           <div class="row">
             <div class="col-12">
               <div class="btn-group">
@@ -109,7 +127,6 @@
                 >
                   <FontAwesomeIcon :icon="'fa-solid fa-plus'" />
                 </button>
-
               </div>
             </div>
           </div>
@@ -121,7 +138,7 @@
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
 import { useMessageStore } from '../../messages/store/MessageStore'
-import { computed, ref, watch, inject } from 'vue'
+import { computed, ref, watch, inject, onMounted } from 'vue'
 
 import Resource from '~@/utils/resources'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
@@ -169,6 +186,21 @@ const jsonStyles = computed(() => {
 const jsonValues = ref({
   config: jsonConfig.value,
   styles: jsonStyles.value
+})
+
+const sessaoList = computed(() => {
+  return _.orderBy(syncStore.data_cache.sessao_sessaoplenaria || [], ['data_inicio'], ['desc'])
+})
+
+onMounted(() => {
+  syncStore.fetchSync({
+    app: 'sessao',
+    model: 'sessaoplenaria',
+    params: {
+      o: '-data_inicio'
+    },
+    only_first_page: true
+  })
 })
 
 const changeJsonValues = () => {

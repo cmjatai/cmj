@@ -49,11 +49,13 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { computed } from 'vue'
+import { computed, watch, defineEmits } from 'vue'
 
 import WidgetCronometroBase from './WidgetCronometroBase.vue'
 
 const syncStore = useSyncStore()
+
+const emit = defineEmits(['oncomponent'])
 
 const props = defineProps({
   painelId: {
@@ -107,12 +109,22 @@ const syncIndividuos = async () => {
 }
 syncIndividuos()
 
+watch(individuo_com_a_palavra, (newVal) => {
+  emit('oncomponent', {
+    type: 'extra_styles',
+    extra_styles: {
+      'opacity': newVal ? '1.0' : '0'
+    }
+  })
+})
+
 </script>
 <style lang="scss" scoped>
   .widget-cronometro-palavra {
     display: flex;
     height: 100%;
     flex-direction: column;
+    line-height: 1;
 
     .inner-aparteante, .inner-com-a-palavra {
       display: flex;
@@ -127,6 +139,7 @@ syncIndividuos()
       flex: 0 0 45%;
       justify-content: center;
       margin-left: 10%;
+      gap: 0.3em;
       // margin-top: -0.6em;
     }
 
@@ -152,18 +165,24 @@ syncIndividuos()
       background-color: #ccc;
       border-radius: 50%;
     }
+    .inner-cronometro-com-a-palavra {
+      display: flex;
+      flex-direction: column;
+    }
     .inner-cronometro-aparteante {
-      font-size: 0.7em;
+      font-size: 0.75em;
       margin-left: 0.3em;
+      display: flex;
+      flex-direction: column;
     }
     .foto-aparteante {
     }
 
     .name_individuo {
-      display: none;
-      font-size: 0.2em;
+      display: inline-block;
+      font-size: 0.15em;
       font-weight: bold;
-      text-align: center;
+      text-align: left;
     }
   }
 

@@ -4,7 +4,7 @@
     ref="painelsetWidget"
     :key="`painelset-widget-${widgetSelected?.id}`"
     :class="['painelset-widget', editmode ? 'editmode' : '']"
-    :style="{ ...(widgetSelected?.styles.component || {}), ...styleCoords }"
+    :style="{ ...(widgetSelected?.styles.component || {}), ...styleDinamic, ...extra_styles }"
     @mousedown.stop.prevent="onMouseDown($event)"
     @click.stop.prevent="false"
   >
@@ -24,6 +24,7 @@
         :is="widgetSelected?.vue_component"
         :painel-id="painelId"
         :widget-selected="widgetSelected?.id"
+        @oncomponent="onComponent"
       />
     </div>
     <div
@@ -157,7 +158,7 @@ const editmode = ref(false)
 const painelsetWidget = ref(null)
 
 const widgetEditorOpened = ref(false)
-
+const extra_styles = ref({})
 const coordsChange = ref({
   x: 0,
   y: 0,
@@ -174,7 +175,7 @@ const widgetSelected = computed(() => {
   return syncStore.data_cache.painelset_widget?.[props.widgetSelected] || null
 })
 
-const styleCoords = computed(() => {
+const styleDinamic = computed(() => {
   if (!widgetSelected.value || !widgetSelected.value.config?.coords) {
     return {}
   }
@@ -252,6 +253,24 @@ watch(
     }
   }
 )
+
+const onComponent = ((event) => {
+  console.debug('Received oncomponent event:')
+  if (!event || !event.type) {
+    console.warn('Invalid oncomponent event received, missing type')
+    return
+  }
+  if (event.type === 'extra_styles') {
+    if (!event.extra_styles) {
+      console.warn('Invalid extra_styles event, missing extra_styles data')
+      return
+    }
+    const newStyles = {
+      ...event.extra_styles
+    }
+    extra_styles.value = newStyles
+  }
+})
 /* Edição do widget */
 
 const openEditor = () => {

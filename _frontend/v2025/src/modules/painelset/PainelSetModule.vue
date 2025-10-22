@@ -60,6 +60,8 @@ const initMoving = (event) => {
   document.addEventListener('mouseup', onMouseUp)
 }
 
+
+
 </script>
 <style lang="scss" scoped>
   .painelset-module {

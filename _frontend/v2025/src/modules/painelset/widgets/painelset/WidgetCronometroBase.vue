@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="['widget-cronometro-base', display]"
+    :class="['widget-cronometro-base', display, fases]"
   >
     {{ displayTime }}
   </div>
@@ -42,6 +42,22 @@ const display = ref(props.displayInitial)
 const cronometro = computed(() => {
   return syncStore.data_cache.painelset_cronometro
     ?.[props.cronometroId] || null
+})
+
+const fases = computed(() => {
+  // menor que zero retorna texto s0, menor que 10s retorna texto s10, menor que 30s retorna texto s30
+  if (!cronometro.value) {
+    return ''
+  }
+  if (cronometro.value.remaining_time < 0) {
+    return 's00'
+  } else if (cronometro.value.remaining_time <= 10) {
+    return 's10'
+  } else if (cronometro.value.remaining_time <= 30) {
+    return 's30'
+  } else {
+    return ''
+  }
 })
 
 const syncCronometro = async () => {
@@ -110,9 +126,36 @@ const displayTime = computed(() => {
 
 </script>
 <style lang="scss" scoped>
+@keyframes pulse {
+    0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 orange;
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+    100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 orange;
+    }
+}
   .widget-cronometro-base {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 1s ease;
+    &.s00 {
+      color: red;
+      transform: scale(1.3);
+    }
+    &.s10 {
+      color: orange;
+      // pulse animation
+      animation: pulse 1s infinite;
+    }
+    &.s30 {
+      color: yellow;
+    }
   }
 </style>

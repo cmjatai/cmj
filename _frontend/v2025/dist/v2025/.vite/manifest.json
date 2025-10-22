@@ -1,18 +1,18 @@
 {
-  "_WidgetCronometroBase-Caa15eiH.css": {
-    "file": "v2025/WidgetCronometroBase-Caa15eiH.css",
-    "src": "_WidgetCronometroBase-Caa15eiH.css"
-  },
-  "_WidgetCronometroBase-DBLBwf-F.js": {
-    "file": "v2025/WidgetCronometroBase-DBLBwf-F.js",
+  "_WidgetCronometroBase-DIRFih2i.js": {
+    "file": "v2025/WidgetCronometroBase-DIRFih2i.js",
     "name": "WidgetCronometroBase",
     "imports": [
       "_vendor-Dip3oSWq.js",
       "main.js"
     ],
     "css": [
-      "v2025/WidgetCronometroBase-Caa15eiH.css"
+      "v2025/WidgetCronometroBase-kNrN91XO.css"
     ]
+  },
+  "_WidgetCronometroBase-kNrN91XO.css": {
+    "file": "v2025/WidgetCronometroBase-kNrN91XO.css",
+    "src": "_WidgetCronometroBase-kNrN91XO.css"
   },
   "_teleportStore-BGjNhIeB.js": {
     "file": "v2025/teleportStore-BGjNhIeB.js",
@@ -33,7 +33,7 @@
     ]
   },
   "components/atoms/Alert.vue": {
-    "file": "v2025/Alert-Bjz5Cpwg.js",
+    "file": "v2025/Alert-Csl_Bke-.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
@@ -44,7 +44,7 @@
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v2025/RefreshPage-BDJLy4lZ.js",
+    "file": "v2025/RefreshPage-CUkNI1Ed.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
@@ -58,7 +58,7 @@
     ]
   },
   "main.js": {
-    "file": "v2025/main-DBh7efuO.js",
+    "file": "v2025/main-DatShM9x.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
@@ -82,7 +82,7 @@
     ]
   },
   "modules/painelset/PainelSetModule.vue": {
-    "file": "v2025/PainelSetModule-A-aWPxJf.js",
+    "file": "v2025/PainelSetModule-FboW8Uam.js",
     "name": "PainelSetModule",
     "src": "modules/painelset/PainelSetModule.vue",
     "isDynamicEntry": true,
@@ -93,11 +93,11 @@
       "_vendor_fortawesome-C15cwA3p.js"
     ],
     "css": [
-      "v2025/PainelSetModule-CW1rIBOO.css"
+      "v2025/PainelSetModule-XXh0wYX6.css"
     ]
   },
   "modules/painelset/painel/Painel.vue": {
-    "file": "v2025/Painel-DSYxyyvr.js",
+    "file": "v2025/Painel-CAqpSP8q.js",
     "name": "Painel",
     "src": "modules/painelset/painel/Painel.vue",
     "isDynamicEntry": true,
@@ -108,18 +108,18 @@
       "_vendor_fortawesome-C15cwA3p.js"
     ],
     "css": [
-      "v2025/Painel-DPuzBZul.css"
+      "v2025/Painel-D4tboXBS.css"
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue": {
-    "file": "v2025/WidgetCronometroEvento-yq69YMkl.js",
+    "file": "v2025/WidgetCronometroEvento-BK1OYqpg.js",
     "name": "WidgetCronometroEvento",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-Dip3oSWq.js",
       "main.js",
-      "_WidgetCronometroBase-DBLBwf-F.js",
+      "_WidgetCronometroBase-DIRFih2i.js",
       "_vendor_fortawesome-C15cwA3p.js"
     ],
     "css": [
@@ -127,22 +127,22 @@
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue": {
-    "file": "v2025/WidgetCronometroPalavra-Png09BbU.js",
+    "file": "v2025/WidgetCronometroPalavra-sXmssN1H.js",
     "name": "WidgetCronometroPalavra",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-Dip3oSWq.js",
       "main.js",
-      "_WidgetCronometroBase-DBLBwf-F.js",
+      "_WidgetCronometroBase-DIRFih2i.js",
       "_vendor_fortawesome-C15cwA3p.js"
     ],
     "css": [
-      "v2025/WidgetCronometroPalavra-DW2TvZwC.css"
+      "v2025/WidgetCronometroPalavra-Dz0tWZHf.css"
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoPlenariaTitulo.vue": {
-    "file": "v2025/WidgetSessaoPlenariaTitulo-C25H20n9.js",
+    "file": "v2025/WidgetSessaoPlenariaTitulo-lYjYZpgP.js",
     "name": "WidgetSessaoPlenariaTitulo",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoPlenariaTitulo.vue",
     "isDynamicEntry": true,
@@ -156,7 +156,7 @@
     ]
   },
   "views/Error404.vue": {
-    "file": "v2025/Error404-BBj4R9-E.js",
+    "file": "v2025/Error404-B2VfJwbs.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
