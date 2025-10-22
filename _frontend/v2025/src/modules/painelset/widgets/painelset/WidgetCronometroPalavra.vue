@@ -6,15 +6,16 @@
       <div
         class="foto foto-com-a-palavra" v-if="individuo_com_a_palavra?.parlamentar"
         :style="`background-image: url(${fotografiaParlamentarUrl(individuo_com_a_palavra?.parlamentar)})`"
-      />
+      >
+        <div class="name_individuo">
+          <small>Com a Palavra: </small><br>
+          <strong>{{ individuo_com_a_palavra?.name }}</strong>
+        </div>
+      </div>
       <div class="foto foto-individuo" v-if="!individuo_com_a_palavra?.parlamentar">
         <FontAwesomeIcon icon="user" size="1x" />
       </div>
       <div class="inner-cronometro-com-a-palavra">
-        <div class="name_individuo">
-          <span>Com a Palavra: </span><br>
-          <span>{{ individuo_com_a_palavra?.name }}</span>
-        </div>
         <WidgetCronometroBase
           v-if="individuo_com_a_palavra?.cronometro"
           :painel-id="painelId"
@@ -25,16 +26,17 @@
         />
       </div>
     </div>
-    <div class="inner-aparteante">
+    <div class="inner-aparteante" v-if="individuo_aparteante">
       <div
         class="foto foto-aparteante"
         :style="`background-image: url(${fotografiaParlamentarUrl(individuo_aparteante?.parlamentar)})`"
-      />
-      <div class="inner-cronometro-aparteante">
+        >
         <div class="name_individuo">
-          <span>Em Aparte: </span><br>
-          <span>{{ individuo_aparteante?.name }}</span>
+          <small>Em Aparte: </small><br>
+          <strong>{{ individuo_aparteante?.name }}</strong>
         </div>
+      </div>
+      <div class="inner-cronometro-aparteante">
         <WidgetCronometroBase
           v-if="individuo_aparteante?.cronometro"
           :painel-id="painelId"
@@ -154,6 +156,9 @@ watch(individuo_com_a_palavra, (newVal) => {
       background-position: center;
       background-repeat: no-repeat;
       border-radius: 50%;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
     }
     .foto-individuo {
       height: 100%;
@@ -168,21 +173,39 @@ watch(individuo_com_a_palavra, (newVal) => {
     .inner-cronometro-com-a-palavra {
       display: flex;
       flex-direction: column;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 100%;
     }
     .inner-cronometro-aparteante {
       font-size: 0.75em;
-      margin-left: 0.3em;
       display: flex;
       flex-direction: column;
+      justify-content: space-around;
+      align-items: flex-end;
+      height: 100%;
+
     }
     .foto-aparteante {
+      margin-right: 0.2em;
     }
 
     .name_individuo {
       display: inline-block;
-      font-size: 0.15em;
-      font-weight: bold;
+      font-size: 0.12em;
       text-align: left;
+      padding: 0em 0.4em 0.3em;
+      white-space: nowrap;
+      background-color: #ffffffef;
+      color:#444;
+      border-radius: 0.3em;
+      small {
+        color: #999;
+        font-size: 0.7em;
+      }
+      strong {
+        font-size: 1em;
+      }
     }
   }
 
