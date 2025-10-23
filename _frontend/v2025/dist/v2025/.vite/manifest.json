@@ -1,9 +1,16 @@
 {
-  "_WidgetCronometroBase-CZYbhwro.js": {
-    "file": "v2025/WidgetCronometroBase-CZYbhwro.js",
+  "_TeleportStore-BZE0PeMz.js": {
+    "file": "v2025/TeleportStore-BZE0PeMz.js",
+    "name": "TeleportStore",
+    "imports": [
+      "_vendor-oGbRXWXa.js"
+    ]
+  },
+  "_WidgetCronometroBase-BWNuEOYm.js": {
+    "file": "v2025/WidgetCronometroBase-BWNuEOYm.js",
     "name": "WidgetCronometroBase",
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js"
     ],
     "css": [
@@ -14,57 +21,50 @@
     "file": "v2025/WidgetCronometroBase-kNrN91XO.css",
     "src": "_WidgetCronometroBase-kNrN91XO.css"
   },
-  "_teleportStore-BGjNhIeB.js": {
-    "file": "v2025/teleportStore-BGjNhIeB.js",
-    "name": "teleportStore",
-    "imports": [
-      "_vendor-Dip3oSWq.js"
-    ]
-  },
-  "_vendor-Dip3oSWq.js": {
-    "file": "v2025/vendor-Dip3oSWq.js",
+  "_vendor-oGbRXWXa.js": {
+    "file": "v2025/vendor-oGbRXWXa.js",
     "name": "vendor"
   },
-  "_vendor_fortawesome-C15cwA3p.js": {
-    "file": "v2025/vendor_fortawesome-C15cwA3p.js",
+  "_vendor_fortawesome-Dto-hSUx.js": {
+    "file": "v2025/vendor_fortawesome-Dto-hSUx.js",
     "name": "vendor_fortawesome",
     "imports": [
-      "_vendor-Dip3oSWq.js"
+      "_vendor-oGbRXWXa.js"
     ]
   },
   "components/atoms/Alert.vue": {
-    "file": "v2025/Alert-DHhTCH2g.js",
+    "file": "v2025/Alert-C-P94it2.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_vendor_fortawesome-Dto-hSUx.js"
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v2025/RefreshPage-DpEdqmMq.js",
+    "file": "v2025/RefreshPage-rStTg7O_.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "css": [
       "v2025/RefreshPage-B_wMuza3.css"
     ]
   },
   "main.js": {
-    "file": "v2025/main-DpOHiXMo.js",
+    "file": "v2025/main-DXRBByPr.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_vendor-oGbRXWXa.js",
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "dynamicImports": [
       "modules/painelset/PainelSetModule.vue",
@@ -82,88 +82,88 @@
     ]
   },
   "modules/painelset/PainelSetModule.vue": {
-    "file": "v2025/PainelSetModule-xGpwV7eW.js",
+    "file": "v2025/PainelSetModule-CMQ7wE4-.js",
     "name": "PainelSetModule",
     "src": "modules/painelset/PainelSetModule.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
-      "_teleportStore-BGjNhIeB.js",
+      "_vendor-oGbRXWXa.js",
+      "_TeleportStore-BZE0PeMz.js",
       "main.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "css": [
-      "v2025/PainelSetModule-XXh0wYX6.css"
+      "v2025/PainelSetModule-BqARfgvH.css"
     ]
   },
   "modules/painelset/painel/Painel.vue": {
-    "file": "v2025/Painel-zEV8foL3.js",
+    "file": "v2025/Painel-CCwL5K2p.js",
     "name": "Painel",
     "src": "modules/painelset/painel/Painel.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js",
-      "_teleportStore-BGjNhIeB.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_TeleportStore-BZE0PeMz.js",
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "css": [
-      "v2025/Painel-D4tboXBS.css"
+      "v2025/Painel-E-Fd80Tc.css"
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue": {
-    "file": "v2025/WidgetCronometroEvento-DltZKIZs.js",
+    "file": "v2025/WidgetCronometroEvento-DcVoig7n.js",
     "name": "WidgetCronometroEvento",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js",
-      "_WidgetCronometroBase-CZYbhwro.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_WidgetCronometroBase-BWNuEOYm.js",
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "css": [
       "v2025/WidgetCronometroEvento-D_hNK2nh.css"
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue": {
-    "file": "v2025/WidgetCronometroPalavra-CY66scRe.js",
+    "file": "v2025/WidgetCronometroPalavra-Cwvj9NXT.js",
     "name": "WidgetCronometroPalavra",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js",
-      "_WidgetCronometroBase-CZYbhwro.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_WidgetCronometroBase-BWNuEOYm.js",
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "css": [
-      "v2025/WidgetCronometroPalavra-CeAq3vEP.css"
+      "v2025/WidgetCronometroPalavra-UoTIGtIU.css"
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoPlenariaTitulo.vue": {
-    "file": "v2025/WidgetSessaoPlenariaTitulo-B9HKkcYT.js",
+    "file": "v2025/WidgetSessaoPlenariaTitulo-DZOw6qVQ.js",
     "name": "WidgetSessaoPlenariaTitulo",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoPlenariaTitulo.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "css": [
-      "v2025/WidgetSessaoPlenariaTitulo-BhiCT9m2.css"
+      "v2025/WidgetSessaoPlenariaTitulo-BkY2QXNb.css"
     ]
   },
   "views/Error404.vue": {
-    "file": "v2025/Error404-BXCKgt3z.js",
+    "file": "v2025/Error404-CNeWmijg.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-Dip3oSWq.js",
+      "_vendor-oGbRXWXa.js",
       "main.js",
-      "_vendor_fortawesome-C15cwA3p.js"
+      "_vendor_fortawesome-Dto-hSUx.js"
     ],
     "css": [
       "v2025/Error404-CMxScCzn.css"
