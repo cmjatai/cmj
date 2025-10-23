@@ -6,7 +6,7 @@
     <div
       id="painelset-editorarea"
       ref="painelsetEditorarea"
-      @mousedown="initMoving($event)"
+      @mousedown.stop.prevent="initMoving($event)"
     />
   </div>
 </template>
@@ -46,8 +46,6 @@ const initMoving = (event) => {
   if (event.layerX > 3) {
     return
   }
-  event.preventDefault()
-  event.stopPropagation()
   console.log(event)
   const startX = event.clientX
   const startWidth = painelsetEditorarea.value.offsetWidth

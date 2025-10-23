@@ -92,14 +92,18 @@ const evento = computed(() => {
 
 const individuo_com_a_palavra = computed(() => {
   if (syncStore.data_cache?.painelset_individuo) {
-    return Object.values(syncStore.data_cache.painelset_individuo).find(i => i.com_a_palavra) || null
+    return Object.values(syncStore.data_cache.painelset_individuo).find(
+      i => i.com_a_palavra && i.evento === evento.value?.id
+    ) || null
   }
   return null
 })
 
 const individuo_aparteante = computed(() => {
   if (syncStore.data_cache?.painelset_individuo) {
-    return Object.values(syncStore.data_cache.painelset_individuo).find(i => i.aparteado > 0) || null
+    return Object.values(syncStore.data_cache.painelset_individuo).find(
+      i => i.aparteado > 0 && i.evento === evento.value?.id
+    ) || null
   }
   return null
 })
