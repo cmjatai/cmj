@@ -336,7 +336,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
         #                   <b>Processo:</b> %s </br>
 
         action_signs = ''
-        if user.is_superuser:
+        if user.is_superuser and obj.materia.protocolo_gr.exists():
             url_prot_mostrar = reverse('sapl.protocoloadm:protocolo_homologar',
                     kwargs={'pk': obj.materia.protocolo_gr.first().pk})
 
@@ -810,7 +810,7 @@ def recuperar_tramitacao(request):
                                                  numero=numero).first()
         if not materia:
             raise ObjectDoesNotExist
-        
+
         tramitacao = {}
         for obj in materia.tramitacao_set.all():
             tramitacao[obj.id] = {
