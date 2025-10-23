@@ -16,7 +16,9 @@
           <ul>
             <li v-for="painel in paineis" :key="`painel-${painel.id}`">
               <a :href="`/painelset/painel/${painel.id}`" target="_blank">{{ painel.name }}</a><br>
-              &nbsp;&nbsp;- Sessão: {{ sessao_cache[painel.id]?.__str__ }}
+              <span v-if="sessao_cache[painel.id]">
+                &nbsp;&nbsp;- Sessão: <a :href="`${sessao_cache[painel.id]?.link_detail_backend}`" target="_blank">{{ sessao_cache[painel.id]?.__str__ }}</a>
+              </span>
             </li>
           </ul>
         </div>
@@ -71,6 +73,9 @@ export default {
       .then((rp) => {
         t.paineis = rp.data.results
         rp.data.results.forEach(painel => {
+          if (painel.sessao == null) {
+            return
+          }
           this.utils.fetch({
             app: 'sessao',
             model: 'sessaoplenaria',
