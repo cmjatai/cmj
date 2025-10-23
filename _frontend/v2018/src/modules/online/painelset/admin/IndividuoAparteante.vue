@@ -21,22 +21,22 @@
         </div>
         <div class="divide"></div>
         <div class="cronometro" >
-          <div class="icon-status-microfone">
-            <i v-if="individuo && individuo.status_microfone" class="fas fa-microphone"></i>
-            <i v-else class="fas fa-microphone-slash"></i>
-          </div>
           <cronometro-palavra
-            :key="`cronometro-com-a-palavra-${individuo.cronometro}`"
-            :ref="`cronometro-com-a-palavra-${individuo.cronometro}`"
-            :cronometro_id="individuo.cronometro"
-            :controls="[
-              'toggleDisplay',
-              'pause',
-              'resume',
-              'add30s',
-              'add1m'
-            ]"
+          :key="`cronometro-com-a-palavra-${individuo.cronometro}`"
+          :ref="`cronometro-com-a-palavra-${individuo.cronometro}`"
+          :cronometro_id="individuo.cronometro"
+          :controls="[
+            'toggleDisplay',
+            'pause',
+            'resume',
+            'add30s',
+            'add1m'
+          ]"
             ></cronometro-palavra>
+            <div class="icon-status-microfone" @click="toggleMicrofone">
+              <i v-if="individuo && individuo.status_microfone" class="fas fa-microphone"></i>
+              <i v-else class="fas fa-microphone-slash"></i>
+            </div>
         </div>
       </div>
     </div>
@@ -44,6 +44,7 @@
   </div>
 </template>
 <script>
+import { EventBus } from '@/event-bus'
 import CronometroPalavra from './CronometroPalavra.vue'
 export default {
   name: 'individuo-aparteante',
@@ -75,6 +76,11 @@ export default {
         return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
       }
       return null
+    }
+  },
+  methods: {
+    toggleMicrofone: function () {
+      EventBus.$emit('toggle-microfone-individuo', this.individuo.id)
     }
   }
 }
@@ -124,7 +130,8 @@ export default {
       .icon-status-microfone {
         position: absolute;
         top: 0.5em;
-        left: 0.5em;
+        right: 0.5em;
+        cursor: pointer;
         font-size: 2em;
         color: #ccc;
         i {
@@ -196,13 +203,14 @@ export default {
       }
       .inner-individuo {
         flex-direction: column;
+          min-width: 70%;
       }
       .cronometro {
         padding: 0.5em;
         .icon-status-microfone {
           font-size: 2em;
           top: 0.3em;
-          left: 0.5em;
+          right: 0.5em;
         }
       }
       .individuo {

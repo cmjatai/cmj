@@ -356,7 +356,8 @@ class _IndividuoViewSet:
                     outro.save()
 
         individuo.status_microfone = True if status_microfone == 'on' else False
-        individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
+        #individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
+        individuo.com_a_palavra = True if com_a_palavra == '1' else False
 
         aparteante = individuo.aparteante
         if not individuo.com_a_palavra and aparteante:
@@ -366,13 +367,24 @@ class _IndividuoViewSet:
             cronometro_manager.stop_cronometro(cron.id)
 
         cron, created = individuo.get_or_create_unique_cronometro()
+        individuo.save()
         if individuo.com_a_palavra:
-            individuo.save()
-            cronometro_manager.start_cronometro(cron.id, duration=default_timer)
+            if individuo.status_microfone:
+                if cron.state == CronometroState.PAUSED:
+                    cronometro_manager.resume_cronometro(cron.id)
+                else:
+                    cronometro_manager.start_cronometro(cron.id, duration=default_timer)
+            else:
+                cronometro_manager.pause_cronometro(cron.id)
         else:
-            individuo.save()
             if hasattr(individuo, 'aparteado') and individuo.aparteado:
-                # Ele é um aparteante, não parar o cronômetro
+                if individuo.status_microfone:
+                    if cron.state == CronometroState.PAUSED:
+                        cronometro_manager.resume_cronometro(cron.id)
+                    else:
+                        cronometro_manager.start_cronometro(cron.id, duration=default_timer)
+                else:
+                    cronometro_manager.pause_cronometro(cron.id)
                 cronometro_manager.pause_cronometro(cron.id)
             else:
                 cronometro_manager.stop_cronometro(cron.id)

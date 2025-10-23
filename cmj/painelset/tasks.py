@@ -20,7 +20,7 @@ logger = get_task_logger(__name__)
 porta = 10023
 clients = {}
 
-SEND_MESSAGE_MICROPHONE = False
+SEND_MESSAGE_MICROPHONE = True
 
 def check_finished_cronometros_function():
     global client
@@ -57,7 +57,7 @@ def check_finished_cronometros_function():
         for cronometro in zero_time_cronometros:
             individuo = cronometro.vinculo
             evento = individuo.evento if individuo else None
-            corte_religar = individuo.tempo_de_corte_microfone.total_seconds() if individuo else 5
+            corte_religar = individuo.tempo_de_corte_microfone.total_seconds() if individuo else 10
             corte_religar = min(0, -1 * corte_religar)  # Tornar negativo
 
             if not evento.comunicar_com_mesas:
@@ -89,20 +89,30 @@ def check_finished_cronometros_function():
                 client = client_info['client']
 
                 try:
-                    if remaining_time < timedelta(seconds=corte_religar) and not individuo.status_microfone:
+                    if timedelta(seconds=corte_religar-3) < remaining_time < timedelta(seconds=corte_religar):
                         logger.debug(f"Microfone religado para o cronômetro {cronometro.name} (ID: {cronometro.id})")
-                        individuo.status_microfone = True
-                        individuo.save()
-                        if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
-                            client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 )
-                            client_info['last_send'] = timezone.now()
+                        if not individuo.status_microfone:
+                            individuo.status_microfone = True
+                            individuo.auto_corte_microfone = False
+                            individuo.save()
+                        if individuo.status_microfone:
+                            if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
+                                #client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 )
+                                client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 )
+                                client_info['last_send'] = timezone.now()
+                                client_info['last_ping'] = timezone.now()
 
-                    elif timedelta(seconds=corte_religar) < remaining_time < timedelta() and individuo.status_microfone:
+                    elif timedelta(seconds=corte_religar) < remaining_time < timedelta():
                         logger.debug(f"Corte de microfone detectado no cronômetro {cronometro.name} (ID: {cronometro.id})")
-                        individuo.status_microfone = False
-                        individuo.save()
-                        if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
-                            client.send_message(f"/ch/{individuo.channel_display}/mix/on", 0)
+                        if individuo.status_microfone and not individuo.auto_corte_microfone:
+                            individuo.status_microfone = False
+                            individuo.auto_corte_microfone = True
+                            individuo.save()
+
+                        if not individuo.status_microfone and individuo.auto_corte_microfone:
+                            if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
+                                client_info['last_ping'] = timezone.now()
+                                client.send_message(f"/ch/{individuo.channel_display}/mix/on", 0)
 
 
                 except Exception as e:

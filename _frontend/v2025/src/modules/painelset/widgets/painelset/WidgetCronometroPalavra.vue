@@ -14,6 +14,10 @@
       </div>
       <div class="foto foto-individuo" v-if="!individuo_com_a_palavra?.parlamentar">
         <FontAwesomeIcon icon="user" size="1x" />
+        <div class="name_individuo">
+          <small>Com a Palavra: </small><br>
+          <strong>{{ individuo_com_a_palavra?.name }}</strong>
+        </div>
       </div>
       <div class="inner-cronometro-com-a-palavra">
         <WidgetCronometroBase
@@ -28,9 +32,16 @@
     </div>
     <div class="inner-aparteante" v-if="individuo_aparteante">
       <div
-        class="foto foto-aparteante"
+        class="foto foto-aparteante" v-if="individuo_aparteante?.parlamentar"
         :style="`background-image: url(${fotografiaParlamentarUrl(individuo_aparteante?.parlamentar)})`"
-        >
+      >
+        <div class="name_individuo">
+          <small>Em Aparte: </small><br>
+          <strong>{{ individuo_aparteante?.name }}</strong>
+        </div>
+      </div>
+      <div class="foto foto-individuo" v-if="!individuo_aparteante?.parlamentar">
+        <FontAwesomeIcon icon="user" size="1x" />
         <div class="name_individuo">
           <small>Em Aparte: </small><br>
           <strong>{{ individuo_aparteante?.name }}</strong>
@@ -122,91 +133,89 @@ watch(individuo_com_a_palavra, (newVal) => {
 
 </script>
 <style lang="scss" scoped>
-  .widget-cronometro-palavra {
+
+.widget-cronometro-palavra {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  line-height: 1;
+
+  .inner-aparteante, .inner-com-a-palavra {
+    position: absolute;
+    overflow: hidden;
+    left: 0;
+    right: 0;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1em;
+  }
+
+  .inner-com-a-palavra {
+    top: 2%;
+    bottom: 50%;
+  }
+  .inner-aparteante {
+    top: 55%;
+    bottom: 2%;
+    gap: 0.5em;
+    margin-left: 1em;
+  }
+  .foto-com-a-palavra, .foto-aparteante {
+    position: relative;
     height: 100%;
-    flex-direction: column;
-    line-height: 1;
+    aspect-ratio: 1 / 1;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 50%;
+  }
 
-    .inner-aparteante, .inner-com-a-palavra {
-      display: flex;
-      align-items: center;
+  .foto-individuo {
+    position: relative;
+    height: 100%;
+    width: auto;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ccc;
+    border-radius: 50%;
+  }
+  .name_individuo {
+    position: absolute;
+    font-size: 0.17em;
+    bottom: 0;
+    background-color: #ffffffef;
+    color:#444;
+    border-radius: 0.3em;
+    padding: 0em 0.4em 0.1em;
+    white-space: nowrap;
+    left: 50%;
+    transform: translateX(-50%);
+    strong {
+      font-size: 1em;
+      text-align: center;
+      display: block;
     }
-
-    .inner-com-a-palavra {
-      flex: 0 0 55%;
-      justify-content: space-evenly;
-    }
-    .inner-aparteante {
-      flex: 0 0 45%;
-      justify-content: center;
-      margin-left: 10%;
-      gap: 0.3em;
-      // margin-top: -0.6em;
-    }
-
-    .widget-cronometro-base {
-      flex: 0 0 0%;
-    }
-    .foto-com-a-palavra, .foto-aparteante {
-      height: 100%;
-      width: auto;
-      aspect-ratio: 1 / 1;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      border-radius: 50%;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-    }
-    .foto-individuo {
-      height: 100%;
-      width: auto;
-      aspect-ratio: 1 / 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background-color: #ccc;
-      border-radius: 50%;
-    }
-    .inner-cronometro-com-a-palavra {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: flex-end;
-      height: 100%;
-    }
-    .inner-cronometro-aparteante {
-      font-size: 0.75em;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-      align-items: flex-end;
-      height: 100%;
-
-    }
-    .foto-aparteante {
-      margin-right: 0.2em;
-    }
-
-    .name_individuo {
-      display: inline-block;
-      font-size: 0.12em;
-      text-align: left;
-      padding: 0em 0.4em 0.3em;
-      white-space: nowrap;
-      background-color: #ffffffef;
-      color:#444;
-      border-radius: 0.3em;
-      small {
-        color: #999;
-        font-size: 0.7em;
-      }
-      strong {
-        font-size: 1em;
-      }
+    small {
+      color: #999;
+      font-size: 0.7em;
     }
   }
+  .inner-aparteante {
+    font-size: 0.8em;
+    .name_individuo {
+      font-size: 0.15em;
+    }
+  }
+  .inner-cronometro-aparteante {
+    font-size: 0.8em;
+    color: yellow;
+  }
+}
 
 </style>

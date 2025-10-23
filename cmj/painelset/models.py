@@ -303,6 +303,8 @@ class Individuo(models.Model, CronometroMixin):
         help_text="Cronômetro associado ao Individuo")
 
     status_microfone = models.BooleanField(default=False, help_text="Indica se o microfone está ativo para este indivíduo")
+    auto_corte_microfone = models.BooleanField(default=False, help_text="Indica se o microfone foi cortado automaticamente")
+
     microfone_sempre_ativo = models.BooleanField(default=False, help_text="Indica se o microfone deste indivíduo deve estar sempre ativo")
     tempo_de_corte_microfone = models.DurationField(default=timedelta(seconds=5), help_text="Duração do corte de microfone após o tempo do cronômetro zerar")
 

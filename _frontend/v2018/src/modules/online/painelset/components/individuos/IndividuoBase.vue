@@ -37,6 +37,8 @@
   </div>
 </template>
 <script>
+import { EventBus } from '@/event-bus'
+
 export default {
   name: 'individuo-base',
   props: {
@@ -84,6 +86,11 @@ export default {
   },
   mounted () {
     console.debug('Individuo Base mounted', this.individuo_id)
+    EventBus.$on('toggle-microfone-individuo', (individuo_id) => {
+      if (individuo_id === this.individuo_id) {
+        this.toggleMicrofone()
+      }
+    })
   },
   methods: {
     toggleMicrofone: function () {
