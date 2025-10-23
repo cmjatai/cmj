@@ -64,7 +64,7 @@ export default {
         {
           icon: 'fas fa-columns',
           route: 'painelset_evento_list_link',
-          texto: 'Painéis'
+          texto: 'Eventos e Painéis'
         }
       ]
     }

@@ -1,7 +1,7 @@
 <template>
   <div class="painelset-evento-list">
     <div class="header">
-      <h1>Eventos</h1>
+      <h1>Eventos e Painéis Eletrônicos</h1>
     </div>
     <div class="container">
       <painel-set-evento-list-item
