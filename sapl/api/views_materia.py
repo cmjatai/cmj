@@ -1,4 +1,3 @@
-
 from django.apps.registry import apps
 from django.db.models import Q
 from django.utils.text import slugify
@@ -146,6 +145,13 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
     def desanexadas(self, request, *args, **kwargs):
         self.queryset = self.get_object().anexadas.materias_desanexadas()
         return self.list(request, *args, **kwargs)
+
+    def last_modified_func(self, request, *args, **kwargs):
+        for backend in list(self.filter_backends):
+            queryset = backend().filter_queryset(request, self.queryset, self)
+
+        timestamp = queryset.order_by('-data_ultima_atualizacao').values_list('data_ultima_atualizacao', flat=True).first()
+        return timestamp
 
 
 @customize(TipoMateriaLegislativa)

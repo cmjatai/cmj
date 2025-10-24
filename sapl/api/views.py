@@ -6,7 +6,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.views.decorators.http import condition as django_condition
 
+from cmj.core.models import AuditLog
 from drfautoapi.drfautoapi import ApiViewSetConstrutor
 
 logger = logging.getLogger(__name__)
@@ -20,8 +22,72 @@ def recria_token(request, pk):
 
     return Response({"message": "Token recriado com sucesso!", "token": token.key})
 
+class LastModifiedDecorator:
+    def __init__(self):
+        pass
+
+    def __call__(self, cls):
+
+        original_dispatch = cls.dispatch
+        self.model = cls.queryset.model
+
+        def wrapped_dispatch(view, request, *args, **kwargs):
+            drf_request = request
+            wsgi_request = view.initialize_request(request, *args, **kwargs)
+
+            last_modified_func = self.last_modified_func if not hasattr(view, 'last_modified_func') else view.last_modified_func
+
+            def patched_viewset_method(*_args, **_kwargs):
+                return original_dispatch(view, drf_request, *_args, **_kwargs)
+
+            django_decorator = django_condition(last_modified_func=last_modified_func)
+            decorated_viewset_method = django_decorator(patched_viewset_method)
+            return decorated_viewset_method(wsgi_request, *args, view=view, **kwargs)
+
+        cls.dispatch = wrapped_dispatch
+        return cls
+
+    def last_modified_func(self, request, *args, **kwargs):
+        """ - Método padrão para obter o last_modified baseado no AuditLog
+            - Pode ser sobrescrito na customização do ViewSet caso necessário
+            - Existe um exemplo de sobrescrita em sapl/api/views_materia.py
+        """
+        try:
+            if 'pk' in kwargs:
+                obj_id = kwargs['pk']
+                last_log = AuditLog.objects.filter(
+                    model_name=self.model._meta.model_name,
+                    object_id=obj_id
+                ).order_by('-timestamp').values_list('timestamp', flat=True).first()
+            else:
+                view = kwargs.get('view', None)
+                if view:
+                    for backend in list(view.filter_backends):
+                        queryset = backend().filter_queryset(request, view.queryset, view)
+                    if queryset.exists():
+                        last_log = AuditLog.objects.filter(
+                            model_name=self.model._meta.model_name,
+                            object_id__in=queryset.values_list('pk', flat=True)
+                        ).order_by('-timestamp').values_list('timestamp', flat=True).first()
+                    else:
+                        last_log = None
+                else:
+                    last_log = AuditLog.objects.filter(
+                        model_name=self.model._meta.model_name,
+                        object_id__in=self.model.objects.values_list('pk', flat=True)
+                    ).order_by('-timestamp').values_list('timestamp', flat=True).first()
+
+            if last_log:
+                return last_log
+
+        except Exception as e:
+            logger.error(f"Erro ao obter last_modified: {e}")
+
+        return None
 
 SaplApiViewSetConstrutor = ApiViewSetConstrutor
+SaplApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
+
 SaplApiViewSetConstrutor.import_modules([
     'sapl.api.views_audiencia',
     'sapl.api.views_base',
