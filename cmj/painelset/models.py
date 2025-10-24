@@ -326,6 +326,12 @@ class Individuo(models.Model, CronometroMixin):
     def __str__(self):
         return f"{self.name} ({self.role})"
 
+    def save(self, *args, **kwargs):
+        if not self.pk and self.order == 0:
+            max_order = Individuo.objects.filter(evento=self.evento).aggregate(models.Max('order'))['order__max']
+            self.order = (max_order or 0) + 1
+        super().save(*args, **kwargs)
+
     def ws_serialize(self):
         from cmj.api.serializers_painelset import IndividuoSerializer
         return IndividuoSerializer(self).data

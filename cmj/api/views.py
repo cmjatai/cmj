@@ -18,6 +18,7 @@ from cmj.core.models import Bi
 from cmj.sigad.models import Documento, VersaoDeMidia, Midia,\
     ReferenciaEntreDocumentos
 from drfautoapi.drfautoapi import ApiViewSetConstrutor
+from sapl.api.views import LastModifiedDecorator
 
 
 class AppVersionView(APIView):
@@ -98,6 +99,7 @@ class AppSessionAuthView(ObtainAuthToken):
 
 
 CmjApiViewSetConstrutor = ApiViewSetConstrutor
+CmjApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
 CmjApiViewSetConstrutor.import_modules([
     'cmj.api.views_core',
     'cmj.api.views_agenda',

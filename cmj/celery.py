@@ -20,7 +20,7 @@ def debug_task(self):
     print(f"Request: {self.request!r}")
 
 # Configuração de tarefas periódicas
-from celery.schedules import crontab
+#from celery.schedules import crontab
 
 app.conf.beat_schedule = {
     'check-finished-cronometros': {

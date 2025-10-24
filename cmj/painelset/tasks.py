@@ -1,6 +1,3 @@
-from pydoc import cli
-from cmj.celery import app as cmj_celery_app
-
 # cronometro_app/tasks.py - Tarefas assíncronas com Celery
 from datetime import timedelta
 from celery import shared_task
@@ -10,7 +7,8 @@ import logging
 from django.conf import settings
 from django.utils import timezone
 from pythonosc import udp_client
-#from cmj.celery import app as cmj_celery_app
+from cmj.celery import app as cmj_celery_app
+
 
 #logger = logging.getLogger(__name__)
 from celery.utils.log import get_task_logger
@@ -21,6 +19,21 @@ porta = 10023
 clients = {}
 
 SEND_MESSAGE_MICROPHONE = True
+
+
+@cmj_celery_app.task(queue='cq_base', bind=True)
+def task_cancel_auto_corte_microfone(self, individuo_id):
+    """Cancelar o auto corte de microfone após religar manualmente"""
+    from .models import Individuo
+    try:
+        individuo = Individuo.objects.get(id=individuo_id)
+        if individuo.auto_corte_microfone:
+            individuo.auto_corte_microfone = False
+            individuo.save()
+            logger.info(f"Auto corte de microfone cancelado para {individuo}")
+    except Individuo.DoesNotExist:
+        logger.error(f"Individuo com ID {individuo_id} não encontrado para cancelar auto corte de microfone")
+
 
 def check_finished_cronometros_function():
     global client
@@ -89,12 +102,11 @@ def check_finished_cronometros_function():
                 client = client_info['client']
 
                 try:
-                    if timedelta(seconds=corte_religar-3) < remaining_time < timedelta(seconds=corte_religar):
+                    if timedelta(seconds=int(corte_religar*(1.5))) < remaining_time < timedelta(seconds=corte_religar):
                         logger.debug(f"Microfone religado para o cronômetro {cronometro.name} (ID: {cronometro.id})")
-                        if not individuo.status_microfone:
-                            individuo.status_microfone = True
-                            individuo.auto_corte_microfone = False
-                            individuo.save()
+                        individuo.status_microfone = True
+                        individuo.auto_corte_microfone = False
+                        individuo.save()
                         if individuo.status_microfone:
                             if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
                                 #client.send_message(f"/ch/{individuo.channel_display}/mix/on", 1 )
@@ -102,12 +114,16 @@ def check_finished_cronometros_function():
                                 client_info['last_send'] = timezone.now()
                                 client_info['last_ping'] = timezone.now()
 
-                    elif timedelta(seconds=corte_religar) < remaining_time < timedelta():
+                    elif timedelta(seconds=corte_religar) < remaining_time < timedelta(seconds=2):
                         logger.debug(f"Corte de microfone detectado no cronômetro {cronometro.name} (ID: {cronometro.id})")
                         if individuo.status_microfone and not individuo.auto_corte_microfone:
                             individuo.status_microfone = False
                             individuo.auto_corte_microfone = True
                             individuo.save()
+
+                            task_cancel_auto_corte_microfone.apply_async(
+                                args=[individuo.id],
+                                countdown=-1 * corte_religar)
 
                         if not individuo.status_microfone and individuo.auto_corte_microfone:
                             if client and (SEND_MESSAGE_MICROPHONE or not settings.DEBUG):
@@ -124,6 +140,7 @@ def check_finished_cronometros_function():
 @shared_task
 def check_finished_cronometros():
     check_finished_cronometros_function()
+
 @shared_task
 def cleanup_old_events():
     """

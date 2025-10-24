@@ -133,6 +133,7 @@ class _EventoViewSet:
                 continue
             logger.debug(f'  Toggle microfone {individuo} para {status_microfone}')
             individuo.status_microfone = status_microfone == 'on'
+            individuo.auto_corte_microfone = False
             individuo.com_a_palavra = False
             individuo.aparteante = None
             update_fields = ['status_microfone', 'com_a_palavra', 'aparteante']
@@ -308,7 +309,7 @@ class _IndividuoViewSet:
         default_timer = request.GET.get('default_timer', '300')  # em segundos
         try:
             default_timer = int(default_timer)
-            micro = default_timer * 1_000
+            micro = min(default_timer * 1_000, 300_000)
             default_timer = timedelta(
                 seconds=default_timer,
                 microseconds=micro
@@ -331,6 +332,7 @@ class _IndividuoViewSet:
 
                 aparteante = ind.aparteante
 
+                ind.auto_corte_microfone = False
                 ind.aparteante = None
                 ind.com_a_palavra = False
                 ind.save()
@@ -353,6 +355,7 @@ class _IndividuoViewSet:
                 if outro:
                     outro.status_microfone = False
                     outro.com_a_palavra = False
+                    outro.auto_corte_microfone = False
                     outro.save()
 
         individuo.status_microfone = True if status_microfone == 'on' else False
@@ -385,7 +388,6 @@ class _IndividuoViewSet:
                         cronometro_manager.start_cronometro(cron.id, duration=default_timer)
                 else:
                     cronometro_manager.pause_cronometro(cron.id)
-                cronometro_manager.pause_cronometro(cron.id)
             else:
                 cronometro_manager.stop_cronometro(cron.id)
 
