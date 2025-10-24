@@ -99,7 +99,7 @@ class AppSessionAuthView(ObtainAuthToken):
 
 
 CmjApiViewSetConstrutor = ApiViewSetConstrutor
-CmjApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
+#CmjApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
 CmjApiViewSetConstrutor.import_modules([
     'cmj.api.views_core',
     'cmj.api.views_agenda',

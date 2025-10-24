@@ -25,8 +25,11 @@ const getters = {
     return state.data_connect.hasOwnProperty('votante')
   },
   hasPermission: (state) => {
-    return (perm) => {
-      return state.data_connect?.permissions_cache?.includes(perm)
+    return async (perm) => {
+      if (!state.data_connect?.initialized) {
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      }
+      return state.data_connect?.permissions?.includes(perm)
     }
   }
 }
@@ -39,6 +42,7 @@ const actions = {
     let fetch = function () {
       return getVersion()
         .then(response => {
+          response.data.initialized = true
           commit(STATE_DATA_CONNECT, response.data)
           return response.data
         })
@@ -55,6 +59,7 @@ const actions = {
         .then(response => {
           return getVersion()
             .then(resp_version => {
+              response.data.initialized = true
               commit(STATE_DATA_CONNECT, resp_version.data)
               return resp_version.data
             })
@@ -72,6 +77,7 @@ const actions = {
         .then(response => {
           return getVersion()
             .then(resp_version => {
+              response.data.initialized = true
               commit(STATE_DATA_CONNECT, resp_version.data)
               return resp_version.data
             })

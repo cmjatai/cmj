@@ -38,7 +38,7 @@ class LastModifiedDecorator:
             last_modified_func = self.last_modified_func if not hasattr(view, 'last_modified_func') else view.last_modified_func
 
             def patched_viewset_method(*_args, **_kwargs):
-                return original_dispatch(view, drf_request, *_args, **_kwargs)
+                return original_dispatch(view, drf_request, *args, **kwargs)
 
             django_decorator = django_condition(last_modified_func=last_modified_func)
             decorated_viewset_method = django_decorator(patched_viewset_method)
@@ -86,7 +86,7 @@ class LastModifiedDecorator:
         return None
 
 SaplApiViewSetConstrutor = ApiViewSetConstrutor
-SaplApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
+#SaplApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
 
 SaplApiViewSetConstrutor.import_modules([
     'sapl.api.views_audiencia',

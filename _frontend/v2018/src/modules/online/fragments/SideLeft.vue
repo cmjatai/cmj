@@ -102,13 +102,7 @@ export default {
       t.selected = ''
       t.links.forEach((item, key) => {
         if (item.permission !== undefined) {
-          t.utils.hasPermission(item.permission)
-            .then((hasPermission) => {
-              t.links[key].hasPermission = hasPermission
-            })
-            .catch(() => {
-              t.links[key].hasPermission = false
-            })
+          t.links[key].hasPermission = t.hasPermission(item.permission)
         }
       })
     },

@@ -25,10 +25,10 @@
       </div>
       <div class="col-auto">
         <div class="btn-group">
-          <a href="#" @click.prevent="finish($event)" v-if="hasPermission && evento.start_real && !evento.end_real" class="btn btn-danger" title="Encerrar Evento"><i class="fas fa-stop-circle"></i></a>
-          <a href="#" @click.prevent="edit($event)" v-if="hasPermission && !evento.end_real" class="btn btn-secondary" title="Editar Evento"><i class="fas fa-edit"></i></a>
-          <a href="#" @click.prevent="copy($event)" v-if="hasPermission && evento.end_real" class="btn btn-success" title="Duplicar Evento"><i class="fas fa-copy"></i></a>
-          <a href="#" @click.prevent="admin($event)" v-if="hasPermission && !evento.end_real" class="btn btn-primary" title="Execução do Evento"><i class="fas fa-toolbox"></i></a>
+          <a href="#" @click.prevent="finish($event)" v-if="has_perm && evento.start_real && !evento.end_real" class="btn btn-danger" title="Encerrar Evento"><i class="fas fa-stop-circle"></i></a>
+          <a href="#" @click.prevent="edit($event)" v-if="has_perm && !evento.end_real" class="btn btn-secondary" title="Editar Evento"><i class="fas fa-edit"></i></a>
+          <a href="#" @click.prevent="copy($event)" v-if="has_perm && evento.end_real" class="btn btn-success" title="Duplicar Evento"><i class="fas fa-copy"></i></a>
+          <a href="#" @click.prevent="admin($event)" v-if="has_perm && !evento.end_real" class="btn btn-primary" title="Execução do Evento"><i class="fas fa-toolbox"></i></a>
         </div>
       </div>
     </div>
@@ -48,7 +48,7 @@ export default {
     return {
       sessao_cache: {},
       paineis: {},
-      hasPermission: false
+      has_perm: false
     }
   },
   computed: {
@@ -56,14 +56,7 @@ export default {
   mounted: function () {
     const t = this
 
-    t.utils
-      .hasPermission('painelset.change_evento')
-      .then(hasPermission => {
-        t.hasPermission = hasPermission
-      })
-      .catch(() => {
-        t.hasPermission = false
-      })
+    t.has_perm = t.hasPermission('painelset.change_evento')
 
     t.utils.fetch({
       app: 'painelset',

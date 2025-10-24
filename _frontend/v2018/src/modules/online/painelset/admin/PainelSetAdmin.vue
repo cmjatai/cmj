@@ -70,6 +70,13 @@ export default {
           this.sendMessage({ alert: 'danger', message: 'Evento já finalizado. Você pode copiá-lo para gerar um novo evento.', time: 10 })
           this.$router.push({ name: 'painelset_evento_list_link' })
         }
+        if (newVal && newVal.cronometro) {
+          return this.fetchSync({
+            app: 'painelset',
+            model: 'cronometro',
+            id: newVal.cronometro
+          })
+        }
       },
       immediate: true
     }
@@ -94,28 +101,16 @@ export default {
   },
   mounted: function () {
     this.$nextTick(() => {
-      this.utils.hasPermission('painelset.change_evento')
-        .then(hasPermission => {
-          if (!hasPermission) {
-            this.$router.push({ name: 'online_index_link' })
-            this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página.', time: 5 })
-            return
-          }
-          this.fetchSync({
-            app: 'painelset',
-            model: 'evento',
-            id: this.evento_id
-          })
-          this.fetchSync({
-            app: 'painelset',
-            model: 'cronometro',
-            id: this.evento?.cronometro
-          })
+      if (this.hasPermission('painelset.change_evento')) {
+        this.fetchSync({
+          app: 'painelset',
+          model: 'evento',
+          id: this.evento_id
         })
-        .catch(() => {
-          this.$router.push({ name: 'online_index_link' })
-          this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página.', time: 5 })
-        })
+      } else {
+        this.$router.push({ name: 'online_index_link' })
+        this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página.', time: 5 })
+      }
     })
   },
   methods: {

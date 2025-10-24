@@ -143,6 +143,10 @@ const syncStore = {
         _.each(response.data.results ? response.data.results : [response.data], (value, idx) => {
           const inst = { ...value, timestamp_frontend: 0 }
           commit('UPDATE_DATA_CACHE', { key: uri, value: inst })
+
+          if (id && uri === 'painelset_cronometro' && (inst.state === 'running' || inst.state === 'paused')) {
+            dispatch('startLocalCronometro', inst.id)
+          }
         })
         if (!only_first_page && response.data.pagination && response.data.pagination.next_page) {
           dispatch('fetchSync', { app, model, id, action, params: { ...params, page: response.data.pagination.next_page } })
