@@ -86,7 +86,7 @@ class LastModifiedDecorator:
         return None
 
 SaplApiViewSetConstrutor = ApiViewSetConstrutor
-#SaplApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
+SaplApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
 
 SaplApiViewSetConstrutor.import_modules([
     'sapl.api.views_audiencia',

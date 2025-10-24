@@ -369,6 +369,7 @@ class ApiViewSetConstrutor:
                         if not hasattr(_meta_filterset, 'model'):
                             model = _model
 
+                @cls.LastModifiedDecorator()
                 class ModelApiViewSet(ApiViewSetConstrutor.ApiViewSet):
                     queryset = _model.objects.all()
                     filterset_class = ApiFilterSet
