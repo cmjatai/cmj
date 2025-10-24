@@ -4,7 +4,6 @@ from django.http.response import Http404
 from rest_framework.negotiation import DefaultContentNegotiation
 from rest_framework.renderers import BaseRenderer
 
-
 class DrfautoapiNegotiation(DefaultContentNegotiation):
 
     def filter_renderers(self, renderers, format):
@@ -24,7 +23,7 @@ class FilesRenderer(BaseRenderer):
 
 class JpegRenderer(FilesRenderer):
     media_type = 'image/jpeg'
-    format = r'[a-zA-Z0-9]*\.?(jpeg|jpg)' 
+    format = r'[a-zA-Z0-9]*\.?(jpeg|jpg)'
 
 class JpgRenderer(FilesRenderer):
     media_type = 'image/jpg'

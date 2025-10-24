@@ -233,12 +233,24 @@ class DrfautoapiRouter(DefaultRouter):
         return urls
 
 
-class ApiViewSetConstrutor():
+class ApiViewSetConstrutor:
 
     _built_sets = {}
 
     class ApiViewSet(ModelViewSet):
         filter_backends = (DjangoFilterBackend,)
+
+    class LastModifiedDecorator(object):
+        def __init__(self):
+            pass
+        def __call__(self, cls):
+            return cls
+
+    @classmethod
+    def last_modified_method(cls, klass):
+        cls.LastModifiedDecorator = klass
+        return cls
+
 
     @classmethod
     def get_viewset_for_model(cls, model):
@@ -357,6 +369,7 @@ class ApiViewSetConstrutor():
                         if not hasattr(_meta_filterset, 'model'):
                             model = _model
 
+                @cls.LastModifiedDecorator()
                 class ModelApiViewSet(ApiViewSetConstrutor.ApiViewSet):
                     queryset = _model.objects.all()
                     filterset_class = ApiFilterSet
