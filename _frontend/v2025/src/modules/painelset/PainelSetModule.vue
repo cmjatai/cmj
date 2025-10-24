@@ -6,7 +6,7 @@
     <div
       id="painelset-editorarea"
       ref="painelsetEditorarea"
-      @mousedown.stop.prevent="initMoving($event)"
+      @mousedown="initMoving($event)"
     />
   </div>
 </template>
@@ -46,7 +46,11 @@ const initMoving = (event) => {
   if (event.layerX > 3) {
     return
   }
+  event.preventDefault()
+  event.stopPropagation()
+
   console.log(event)
+
   const startX = event.clientX
   const startWidth = painelsetEditorarea.value.offsetWidth
 
@@ -85,6 +89,7 @@ const initMoving = (event) => {
       display: flex;
       flex: 1 1 100%;
       flex-direction: column;
+      z-index: 1;
     }
     #painelset-editorarea:not(:empty) {
       flex: 0 0 45%;

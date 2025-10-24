@@ -189,7 +189,7 @@ const jsonValues = ref({
 })
 
 const sessaoList = computed(() => {
-  return _.orderBy(syncStore.data_cache.sessao_sessaoplenaria || [], ['data_inicio'], ['desc'])
+  return _.orderBy(syncStore.data_cache?.sessao_sessaoplenaria || [], ['data_inicio'], ['desc'])
 })
 
 onMounted(() => {

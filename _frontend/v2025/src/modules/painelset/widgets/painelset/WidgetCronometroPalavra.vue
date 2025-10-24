@@ -135,6 +135,13 @@ watch(individuo_com_a_palavra, (newVal) => {
   })
 })
 
+emit('oncomponent', {
+  type: 'extra_styles',
+  extra_styles: {
+    'opacity': '0'
+  }
+})
+
 </script>
 <style lang="scss" scoped>
 

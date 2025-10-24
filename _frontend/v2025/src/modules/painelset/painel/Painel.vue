@@ -375,7 +375,7 @@ onMounted(() => {
       editmode.value = true
       activeTeleportId.value = painelsetPainel.value.id
     }
-  }, 1000)
+  }, 1500)
 })
 
 // 8. Functions

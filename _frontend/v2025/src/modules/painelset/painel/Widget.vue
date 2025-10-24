@@ -112,22 +112,24 @@
       />
     </Teleport>
 
-    <!-- Teleport to="body">
-      <Modal
+    <div v-if="false">
+      <!-- Teleport to="body">
+        <Modal
         :show="widgetEditorOpened"
         @close="widgetEditorOpened = false"
-      >
+        >
         <template #header>
           Edição do Widget: {{ widgetSelected?.name }}
         </template>
         <template #body>
           <WidgetEditor
-            :painel-id="painelId"
-            :widget-selected="widgetSelected?.id"
+          :painel-id="painelId"
+          :widget-selected="widgetSelected?.id"
           />
         </template>
       </Modal>
-    </!-->
+      </!-->
+    </div>
   </div>
 </template>
 

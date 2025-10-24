@@ -5,7 +5,7 @@
     :key="`painelset-visaodepainel${visaodepainelSelected}`"
     class="painelset-visaodepainel"
     :style="visaoDePainelSelected?.styles.component || {}"
-    @click.stop="editmode = !editmode"
+    @mousedown.stop="editmode = !editmode"
   >
     <div
       v-if="visaoDePainelSelected?.config?.displayTitle"
