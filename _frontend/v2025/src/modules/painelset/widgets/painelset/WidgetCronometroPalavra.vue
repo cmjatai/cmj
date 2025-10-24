@@ -1,8 +1,13 @@
 <template>
   <div
+    :id="`id-widget-cronometro-palavra-${widgetSelected}`"
+    ref="widgetCronometroPalavra"
+    :key="`widget-cronometro-palavra-${widgetSelected}`"
     class="widget-cronometro-palavra"
   >
-    <div class="inner-com-a-palavra" v-if="individuo_com_a_palavra">
+    <div class="inner-com-a-palavra" v-if="individuo_com_a_palavra"
+      @resize="onResize($event)"
+    >
       <div
         class="foto foto-com-a-palavra" v-if="individuo_com_a_palavra?.parlamentar"
         :style="`background-image: url(${fotografiaParlamentarUrl(individuo_com_a_palavra?.parlamentar)})`"
@@ -62,7 +67,7 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { computed, watch, defineEmits } from 'vue'
+import { ref, computed, watch, defineEmits } from 'vue'
 
 import WidgetCronometroBase from './WidgetCronometroBase.vue'
 
@@ -78,8 +83,14 @@ const props = defineProps({
   widgetSelected: {
     type: Number,
     default: 0
+  },
+  coordsChange: {
+    type: Object,
+    default: () => ({})
   }
 })
+// 4. State & Refs
+const widgetCronometroPalavra = ref(null)
 
 const painel = computed(() => {
   return syncStore.data_cache.painelset_painel?.[props.painelId] || null
@@ -126,6 +137,7 @@ const syncIndividuos = async () => {
 }
 syncIndividuos()
 
+// 6. Watchers
 watch(individuo_com_a_palavra, (newVal) => {
   emit('oncomponent', {
     type: 'extra_styles',
@@ -135,6 +147,7 @@ watch(individuo_com_a_palavra, (newVal) => {
   })
 })
 
+// 7. Events & Lifecycle Hooks
 emit('oncomponent', {
   type: 'extra_styles',
   extra_styles: {

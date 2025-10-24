@@ -24,6 +24,7 @@
         :is="widgetSelected?.vue_component"
         :painel-id="painelId"
         :widget-selected="widgetSelected?.id"
+        :coords-change="coordsChange"
         @oncomponent="onComponent"
       />
     </div>
@@ -351,7 +352,7 @@ const addWidget = () => {
   }
 
   const defaultChildWidgetData = {
-    name: `Novo Widget`,
+    name: 'Novo Widget',
     parent: widgetSelected.value.id,
     visao: widgetSelected.value.visao,
     position: childList.value.length + 1,
