@@ -10,7 +10,11 @@ from django.utils.translation import gettext_lazy as _
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.fields.json import JSONField
 
+from sapl.parlamentares.models import foto_upload_path
 from sapl.utils import SaplGenericForeignKey
+from sapl.utils import PortalImageCropField
+from image_cropping.fields import ImageRatioField
+
 
 class CronometroState(models.TextChoices):
     """Estados possíveis de um cronômetro"""
@@ -317,6 +321,13 @@ class Individuo(models.Model, CronometroMixin):
         on_delete=models.SET_NULL
     )
 
+    fotografia = PortalImageCropField(
+        verbose_name=_('Fotografia'), upload_to=foto_upload_path, null=True, blank=True)  # validators=[restringe_tipos_de_arquivo_img],
+    fotografia_cropping = ImageRatioField(
+        'fotografia', '128x128', verbose_name=_('Avatar'), size_warning=True,
+        help_text=_('A configuração do Avatar '
+                    'é possível após a atualização da fotografia.'))
+
     class Meta:
         ordering = ['order']
     unique_together = [
@@ -326,11 +337,30 @@ class Individuo(models.Model, CronometroMixin):
     def __str__(self):
         return f"{self.name} ({self.role})"
 
-    def save(self, *args, **kwargs):
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
         if not self.pk and self.order == 0:
             max_order = Individuo.objects.filter(evento=self.evento).aggregate(models.Max('order'))['order__max']
             self.order = (max_order or 0) + 1
-        super().save(*args, **kwargs)
+
+        if not self.pk:
+            fotografia = None
+            if self.fotografia:
+                fotografia = self.fotografia
+                self.fotografia = None
+
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+
+            self.fotografia = fotografia
+
+        return models.Model.save(self, force_insert=force_insert,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
 
     def ws_serialize(self):
         from cmj.api.serializers_painelset import IndividuoSerializer

@@ -2,7 +2,7 @@
 from ast import In
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
-from cmj.painelset.forms import EventoForm
+from cmj.painelset.forms import EventoForm, IndividuoForm
 from cmj.painelset.models import Evento, Individuo
 from sapl.crud.base import Crud, MasterDetailCrud
 from django.utils import timezone, formats
@@ -53,8 +53,19 @@ class IndividuoCrud(MasterDetailCrud):
 
     class ListView(MasterDetailCrud.ListView):
         paginate_by = 100
+        layout_key = 'IndividuoUpdate'
 
         def hook_name(self, obj, default, url):
             return '<a href="{}" pk="{}">{}</a>'.format(
                 url, obj.id, obj.name), ''
 
+    class CreateView(MasterDetailCrud.CreateView):
+        layout_key = 'IndividuoCreate'
+        form_class = IndividuoForm
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        layout_key = 'IndividuoUpdate'
+        form_class = IndividuoForm
+        
+    class DetailView(MasterDetailCrud.DetailView):
+        layout_key = 'IndividuoUpdate'

@@ -5,22 +5,28 @@
     :key="`widget-cronometro-palavra-${widgetSelected}`"
     class="widget-cronometro-palavra"
   >
-    <div class="inner-com-a-palavra" v-if="individuo_com_a_palavra"
-      @resize="onResize($event)"
+    <div
+      class="inner-com-a-palavra"
+      v-if="individuo_com_a_palavra"
     >
       <div
-        class="foto foto-com-a-palavra" v-if="individuo_com_a_palavra?.parlamentar"
-        :style="`background-image: url(${fotografiaParlamentarUrl(individuo_com_a_palavra?.parlamentar)})`"
+        class="foto foto-com-a-palavra"
+        v-if="individuo_com_a_palavra?.parlamentar || individuo_com_a_palavra?.fotografia"
+        :style="`background-image: url(${individuo_com_a_palavra?.fotografia ? fotografiaIndividuoUrl(individuo_com_a_palavra?.id) : fotografiaParlamentarUrl(individuo_com_a_palavra?.parlamentar) } )`"
       >
         <div class="name_individuo">
-          <small>Com a Palavra: </small><br>
           <strong>{{ individuo_com_a_palavra?.name }}</strong>
         </div>
       </div>
-      <div class="foto foto-individuo" v-if="!individuo_com_a_palavra?.parlamentar">
-        <FontAwesomeIcon icon="user" size="1x" />
+      <div
+        class="foto foto-individuo"
+        v-if="!individuo_com_a_palavra?.parlamentar && !individuo_com_a_palavra?.fotografia"
+      >
+        <FontAwesomeIcon
+          icon="user"
+          size="1x"
+        />
         <div class="name_individuo">
-          <small>Com a Palavra: </small><br>
           <strong>{{ individuo_com_a_palavra?.name }}</strong>
         </div>
       </div>
@@ -35,20 +41,28 @@
         />
       </div>
     </div>
-    <div class="inner-aparteante" v-if="individuo_aparteante">
+    <div
+      class="inner-aparteante"
+      v-if="individuo_aparteante"
+    >
       <div
-        class="foto foto-aparteante" v-if="individuo_aparteante?.parlamentar"
-        :style="`background-image: url(${fotografiaParlamentarUrl(individuo_aparteante?.parlamentar)})`"
+        class="foto foto-aparteante"
+        v-if="individuo_aparteante?.parlamentar || individuo_aparteante?.fotografia"
+        :style="`background-image: url(${individuo_aparteante?.fotografia ? fotografiaIndividuoUrl(individuo_aparteante?.id) : fotografiaParlamentarUrl(individuo_aparteante?.parlamentar) } )`"
       >
         <div class="name_individuo">
-          <small>Em Aparte: </small><br>
           <strong>{{ individuo_aparteante?.name }}</strong>
         </div>
       </div>
-      <div class="foto foto-individuo" v-if="!individuo_aparteante?.parlamentar">
-        <FontAwesomeIcon icon="user" size="1x" />
+      <div
+        class="foto foto-individuo"
+        v-if="!individuo_aparteante?.parlamentar && !individuo_aparteante?.fotografia"
+      >
+        <FontAwesomeIcon
+          icon="user"
+          size="1x"
+        />
         <div class="name_individuo">
-          <small>Em Aparte: </small><br>
           <strong>{{ individuo_aparteante?.name }}</strong>
         </div>
       </div>
@@ -122,6 +136,13 @@ const individuo_aparteante = computed(() => {
 const fotografiaParlamentarUrl = (parlamentar) => {
   if (parlamentar) {
     return '/api/parlamentares/parlamentar/' + parlamentar + '/fotografia.c1024.png'
+  }
+  return null
+}
+
+const fotografiaIndividuoUrl = (individuo) => {
+  if (individuo) {
+    return '/api/painelset/individuo/' + individuo + '/fotografia.c1024.png'
   }
   return null
 }
@@ -211,15 +232,16 @@ emit('oncomponent', {
   }
   .name_individuo {
     position: absolute;
-    font-size: 0.17em;
-    bottom: 0;
-    background-color: #ffffffef;
-    color:#444;
-    border-radius: 0.3em;
-    padding: 0em 0.4em 0.1em;
+    font-size: 0.38em;
+    bottom: 0em;
+    background-color: #444;
+    color:#bbb;
+    border-radius: 0.4em;
+    padding: 0.1em 0.4em;
     white-space: nowrap;
     left: 50%;
     transform: translateX(-50%);
+
     strong {
       font-size: 1em;
       text-align: center;
@@ -231,9 +253,9 @@ emit('oncomponent', {
     }
   }
   .inner-aparteante {
-    font-size: 0.8em;
+    font-size: 0.9em;
     .name_individuo {
-      font-size: 0.15em;
+      font-size: 0.3em;
     }
   }
   .inner-cronometro-aparteante {

@@ -377,7 +377,7 @@ class Parlamentar(models.Model):
         db_index=True,
         default=False,
         choices=YES_NO_CHOICES,
-        verbose_name=_('Ativo na Casa?'))
+        verbose_name=_('Ativo na Casa?')) 
     equipe = models.TextField(
         blank=True, verbose_name=_('Equipe do Parlamentar'), default='')
     biografia = models.TextField(

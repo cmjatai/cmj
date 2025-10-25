@@ -22,6 +22,7 @@ from django.utils import timezone
 from pythonosc import udp_client
 
 from cmj.painelset.tasks import SEND_MESSAGE_MICROPHONE
+from sapl.api.mixins import ResponseFileMixin
 
 logger = logging.getLogger(__name__)
 
@@ -187,8 +188,12 @@ class _EventoViewSet:
 
 
 @customize(Individuo)
-class _IndividuoViewSet:
+class _IndividuoViewSet(ResponseFileMixin):
     serializer_class = IndividuoSerializer
+
+    @action(detail = True)
+    def fotografia(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
 
     @action(detail=True, methods=['POST'])
     def change_position(self, request, *args, **kwargs):

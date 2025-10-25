@@ -5,6 +5,7 @@ from cmj.painelset.models import Cronometro, Evento, Individuo, RoleChoices
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Fieldset
 from django.utils.translation import gettext_lazy as _
+from image_cropping.widgets import get_attrs
 
 from sapl.crispy_layout_mixin import SaplFormLayout, SaplFormHelper, to_row
 from sapl.parlamentares.models import Parlamentar
@@ -119,3 +120,30 @@ class EventoForm(forms.ModelForm):
         evento.individuos.reset_ordem()
 
         return evento
+
+class IndividuoForm(forms.ModelForm):
+
+    class Meta:
+        model = Individuo
+        fields = [
+            'name',
+            'role',
+            'order',
+            'canal',
+            'microfone_sempre_ativo',
+            'ips_mesas',
+            'fotografia',
+            'fotografia_cropping',
+            'evento',
+            'parlamentar',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        fotografia = self.fields['fotografia'].widget
+        fotografia.attrs.update(
+            get_attrs(self.instance.fotografia, 'fotografia')
+        )
+        if 'class' in fotografia.attrs:
+            fotografia.attrs.pop('class')
