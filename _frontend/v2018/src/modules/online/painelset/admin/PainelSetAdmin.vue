@@ -24,10 +24,10 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-4 container-individuos">
+        <div class="col-5 container-individuos">
           <individuo-list v-if="evento" :evento="evento" :ref="'individuoList'" :pause_parent_on_start="cronometro && cronometro.pause_parent_on_start"></individuo-list>
         </div>
-        <div class="col-8 container-controls">
+        <div class="col-7 container-controls">
           <palavra-em-uso v-if="evento" :evento="evento" :ref="'palavraEmUso'"></palavra-em-uso>
         </div>
       </div>
@@ -227,7 +227,7 @@ export default {
   .overlay-paused {
     position: absolute;
     top: 5.42em;
-    left: 33.333%;
+    left: 41.6667%;
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.5);

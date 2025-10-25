@@ -134,7 +134,6 @@ class IndividuoForm(forms.ModelForm):
             'ips_mesas',
             'fotografia',
             'fotografia_cropping',
-            'evento',
             'parlamentar',
         ]
 

@@ -7,9 +7,9 @@
     individuo && individuo.aparteado ? 'aparteante' : ''
     ]">
     <div class="inner">
-      <div class="inner-individuo" @dblclick.stop="dblclickIndividuo($event)" @click.prevent="clickIndividuo($event)">
+      <div :class="['inner-individuo', fotografiaUrl ? '' : 'no-photo']" @click="clickIndividuo($event)" @dblclick="dblclickIndividuo($event)">
         <div class="avatar">
-          <img v-if="fotografiaParlamentarUrl" :src="fotografiaParlamentarUrl" alt="Foto do parlamentar"/>
+          <img v-if="fotografiaUrl" :src="fotografiaUrl" alt="Foto do individuo"/>
           <i v-else class="fas fa-user"></i>
         </div>
         <div class="name">
@@ -20,15 +20,21 @@
       <div class="controls">
         <button
           v-if="individuo"
-          class="btn-fone"
-          :title="individuo && individuo.status_microfone ? 'Ativar microfone' : 'Desativar microfone'"
+          class="btn-action btn-fone"
+          :title="individuo && !individuo.status_microfone ? 'Ativar microfone' : 'Desativar microfone'"
            @click="toggleMicrofone()"
         >
           <i :class="individuo && individuo.status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
         </button>
+        <button class="btn-action btn-aparte" @click.prevent="clickIndividuo($event)" title="Solicitar aparte">
+          <i class="fas fa-hand-rock"></i>
+        </button>
+        <button class="btn-action btn-palavra" @click.stop="dblclickIndividuo($event)" title="Solicitar a palavra">
+          <i class="fas fa-hand-paper"></i>
+        </button>
         <button
           v-if="false && individuo"
-          class="btn-control"
+          class="btn-action btn-manage"
         >
           <i class="fas fa-cog"></i>
         </button>
@@ -77,8 +83,10 @@ export default {
       }
       return null
     },
-    fotografiaParlamentarUrl: function () {
-      if (this.individuo?.parlamentar) {
+    fotografiaUrl: function () {
+      if (this.individuo?.fotografia) {
+        return '/api/painelset/individuo/' + this.individuo.id + '/fotografia.c96.png'
+      } else if (this.individuo?.parlamentar) {
         return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
       }
       return ''
@@ -166,6 +174,7 @@ export default {
     display: flex;
     align-items: stretch;
     justify-content: space-between;
+    flex-direction: row-reverse;
     width: 100%;
     height: 100%;
     overflow: hidden;
@@ -193,9 +202,9 @@ export default {
     cursor: pointer;
     align-items: center;
     gap: 10px;
-    border-right: 1px solid white;
     .name {
       flex: 1 1 100%;
+      font-size: 1.4em;
       small {
         opacity: 0.5;
       }
@@ -204,18 +213,29 @@ export default {
 
   .controls {
     flex: 0 1 0;
+    flex-direction: row-reverse;
+    .btn-action {
+      border: 0;
+      border-right: 1px solid #fffa;
+      width: 5em;
+      background: transparent;
+      font-size: 1.1em;
+      color: #fff
+    }
+    .btn-palavra {
+      background-color: #0364d3;
+    }
+    .btn-aparte {
+      background-color: #d3a103;
+    }
+    .btn-manage {
+      width: auto;
+    }
   }
-  .btn-fone, .btn-control {
+  .btn-fone-old, .btn-control-old {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 5em;
-    font-size: 0.7rem;
-    border: 0;
-    background: transparent;
-  }
-  .btn-control {
-    width: auto;
   }
   .fa-microphone {
     color: green;
@@ -253,6 +273,9 @@ export default {
         color: white;
         opacity: 1;
       }
+      .btn-palavra {
+        color: #78b2f5;
+      }
     }
     .inner-individuo {
       font-size: 1.2em;
@@ -260,15 +283,16 @@ export default {
     }
   }
   &.aparteante {
-    margin-left: 10%;
     .inner-individuo, .controls {
       background: linear-gradient(to right, #d3a103, #a87f02);
       opacity: 1 !important;
       font-weight: bold;
-      color: black;
       .fa-microphone {
-        color: black;
+        color: #5e4800;
         opacity: 1;
+      }
+      .btn-aparte {
+        color: #5e4800;
       }
     }
     .inner-individuo {
@@ -288,19 +312,29 @@ export default {
     .inner-individuo {
       gap: 0;
     }
-    &:not(.parlamentar) {
-      i {
-        margin: 0;
-        padding: 0 5px;
+    .name {
+      display: none;
+    }
+    .controls {
+      .btn-action {
+        width: 2.7em;
+        font-size: 1em;
+      }
+      .fa-microphone, .fa-microphone-slash {
+        font-size: 1.5em;
       }
     }
-    &.parlamentar {
-      .avatar {
-        width: 100%;
-        text-align: center;
-      }
-      .name {
+    .avatar {
+      .fa-user {
+        font-size: 1em;
+        margin: 0;
         display: none;
+      }
+    }
+    .no-photo {
+      .name {
+        display: block;
+        font-size: 0.9em;
       }
     }
   }

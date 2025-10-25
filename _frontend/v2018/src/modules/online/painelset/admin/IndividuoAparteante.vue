@@ -15,7 +15,7 @@
       <div class="inner-individuo">
         <div class="individuo">
           <div class="avatar">
-            <img v-if="fotografiaParlamentarUrl" :src="fotografiaParlamentarUrl" alt="Foto do parlamentar"/>
+            <img v-if="fotografiaUrl" :src="fotografiaUrl" alt="Foto do parlamentar"/>
             <i v-else class="fas fa-user-circle fa-2x"></i>
           </div>
         </div>
@@ -71,11 +71,13 @@ export default {
         return null
       }
     },
-    fotografiaParlamentarUrl: function () {
-      if (this.individuo && this.individuo.parlamentar) {
+    fotografiaUrl: function () {
+      if (this.individuo?.fotografia) {
+        return '/api/painelset/individuo/' + this.individuo.id + '/fotografia.c96.png'
+      } else if (this.individuo?.parlamentar) {
         return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
       }
-      return null
+      return ''
     }
   },
   methods: {

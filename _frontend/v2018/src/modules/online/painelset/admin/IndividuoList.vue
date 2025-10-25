@@ -5,7 +5,7 @@
       <div class="inner">
         <div class="controls">
           <button
-          class="btn-fone"
+          class="btn-action btn-fone"
           title="Ativar/Desativar Todos os Microfones"
           @click="toggleAllMicrofones()"
         >
@@ -34,13 +34,16 @@
         </div>
       </div>
     </div>
-    <individuo-base :style="{flex: `0 0 ${100 / (individuos.length + 1)}%`}"
+    <div class="individuos">
+
+      <individuo-base
       v-for="individuo in individuos"
       :key="`individuo-${individuo.id}-${individuo.order}`"
       :ref="`individuo-${individuo.id}`"
       :individuo_id="individuo.id"
       :default_timer="default_timer"
-    />
+      />
+    </div>
   </div>
 </template>
 <script>
@@ -172,14 +175,27 @@ export default {
   flex-direction: column;
   align-items: stretch;
   height: 100%;
-  width: 33.33%;
+  width: 41.6667%;
   justify-content: stretch;
   position:absolute;
   top:0;
   left:0;
   bottom:0;
   overflow: hidden;
-  .individuo-base.manager{
+  .individuos {
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    //justify-content: space-between;
+    top: 2.1em;
+    bottom: 0;
+    width: 100%;
+    flex-wrap: wrap;
+    .individuo-base {
+      flex: 0 0 100%;
+    }
+  }
+  .individuo-base.manager {
     flex: 0 0 3em;
     border-bottom: 1px solid #fff;
     font-size: 0.7em;

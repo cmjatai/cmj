@@ -15,8 +15,6 @@ IndividuoCreate:
   - microfone_sempre_ativo ips_mesas
   {% trans 'Fotografia' %}:
   - fotografia
-  {% trans 'Evento' %}:
-  - evento
   {% trans 'Parlamentar' %}:
   - parlamentar
 
@@ -26,7 +24,5 @@ IndividuoUpdate:
   - microfone_sempre_ativo ips_mesas
   {% trans 'Fotografia' %}:
   - fotografia fotografia_cropping
-  {% trans 'Evento' %}:
-  - evento
   {% trans 'Parlamentar' %}:
   - parlamentar
