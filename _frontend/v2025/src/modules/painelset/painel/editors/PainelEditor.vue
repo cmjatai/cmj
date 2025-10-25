@@ -57,32 +57,32 @@
           <div class="row py-2">
             <div class="col-6">
               <div id="div_id_config" class="form-group">
-                <label for="painel-config" class="form-label">Configurações do Painel (JSON)</label>
+                <label for="painel-config" class="form-label">Configurações do Painel (YAML)</label>
                 <div>
                   <textarea
                     id="painel-config"
                     name="config"
                     class="form-control"
-                    v-model="jsonValues.config"
-                    placeholder="Configurações do Painel em JSON"
+                    v-model="yamlValues.config"
+                    placeholder="Configurações do Painel em YAML"
                     rows="15"
-                    @blur="changeJsonValues"
+                    @blur="changeYamlValues"
                   />
                 </div>
               </div>
             </div>
             <div class="col-6">
               <div id="div_id_styles" class="form-group">
-                <label for="painel-styles" class="form-label">Estilos do Painel (JSON)</label>
+                <label for="painel-styles" class="form-label">Estilos do Painel (YAML)</label>
                 <div>
                   <textarea
                     name="styles"
                     id="painel-styles"
                     class="form-control"
-                    v-model="jsonValues.styles"
+                    v-model="yamlValues.styles"
                     rows="15"
-                    placeholder="Estilos do Painel em JSON"
-                    @blur="changeJsonValues"
+                    placeholder="Estilos do Painel em YAML"
+                    @blur="changeYamlValues"
                   />
                 </div>
               </div>
@@ -137,11 +137,11 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { useMessageStore } from '../../messages/store/MessageStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
 import { computed, ref, watch, inject, onMounted } from 'vue'
+import YAML from 'js-yaml'
 
 import Resource from '~@/utils/resources'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 const painelsetPainelEditor = ref(null)
 
@@ -165,27 +165,27 @@ const painelSelected = computed(() => {
   return syncStore.data_cache.painelset_painel?.[props.painelSelected] || null
 })
 
-const jsonConfig = computed(() => {
+const yamlConfig = computed(() => {
   if (!painelSelected.value || !painelSelected.value.config) {
     return ''
   }
-  return JSON.stringify(painelSelected.value.config, null, 2)
+  return YAML.dump(painelSelected.value.config)
 })
 
-const jsonStyles = computed(() => {
+const yamlStyles = computed(() => {
   if (!painelSelected.value || !painelSelected.value.styles) {
     return ''
   }
-  return JSON.stringify({
+  return YAML.dump({
     component: painelSelected.value.styles.component || {},
-    title: painelSelected.value.styles.title || {},
+    title: painelSelected.value.styles.title || {display: 'flex'},
     inner: painelSelected.value.styles.inner || {}
-  }, null, 2)
+  })
 })
 
-const jsonValues = ref({
-  config: jsonConfig.value,
-  styles: jsonStyles.value
+const yamlValues = ref({
+  config: yamlConfig.value,
+  styles: yamlStyles.value
 })
 
 const sessaoList = computed(() => {
@@ -203,17 +203,17 @@ onMounted(() => {
   })
 })
 
-const changeJsonValues = () => {
+const changeYamlValues = () => {
   if (!painelSelected.value) {
     return
   }
   try {
-    const parsedConfig = JSON.parse(jsonValues.value.config)
-    const parsedStyles = JSON.parse(jsonValues.value.styles)
+    const parsedConfig = yamlValues.value.config ? YAML.load(yamlValues.value.config) : {}
+    const parsedStyles = yamlValues.value.styles ? YAML.load(yamlValues.value.styles) : {}
     painelSelected.value.styles = parsedStyles
     painelSelected.value.config = parsedConfig
-    jsonValues.value.config = JSON.stringify(parsedConfig, null, 2)
-    jsonValues.value.styles = JSON.stringify(parsedStyles, null, 2)
+    yamlValues.value.config = YAML.dump(parsedConfig)
+    yamlValues.value.styles = YAML.dump(parsedStyles)
     patchModel({
       config: parsedConfig,
       styles: parsedStyles
@@ -221,12 +221,12 @@ const changeJsonValues = () => {
   } catch (e) {
     messageStore.addMessage({
       type: 'danger',
-      text: `Erro ao atualizar os campos JSON: ${e.message}`,
+      text: `Erro ao atualizar os campos YAML: ${e.message}`,
       timeout: 10000
     })
-    console.error('Erro ao atualizar os campos JSON:', e)
-    jsonValues.value.config = jsonConfig.value
-    jsonValues.value.styles = jsonStyles.value
+    console.error('Erro ao atualizar os campos YAML:', e)
+    yamlValues.value.config = yamlConfig.value
+    yamlValues.value.styles = yamlStyles.value
   }
 }
 
@@ -268,8 +268,8 @@ watch(
   () => painelSelected.value,
   (newVal) => {
     if (newVal) {
-      jsonValues.value.config = jsonConfig.value
-      jsonValues.value.styles = jsonStyles.value
+      yamlValues.value.config = yamlConfig.value
+      yamlValues.value.styles = yamlStyles.value
     }
   }
 )

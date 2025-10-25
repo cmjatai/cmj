@@ -9,7 +9,6 @@
     @click.stop.prevent="false"
   >
     <div
-      v-if="widgetSelected?.config?.displayTitle"
       class="widget-titulo"
       :style="widgetSelected?.styles.title || {}"
     >
@@ -141,7 +140,7 @@ import { activeTeleportId } from '~@/stores/TeleportStore'
 
 import { computed, ref, inject, watch, nextTick } from 'vue'
 import Resource from '~@/utils/resources'
-import WidgetEditor from './WidgetEditor.vue'
+import WidgetEditor from './editors/WidgetEditor.vue'
 
 const syncStore = useSyncStore()
 const authStore = useAuthStore()

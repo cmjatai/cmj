@@ -3,69 +3,69 @@
     ref="painelsetVisaoEditor"
     :key="`painelset-visaodepainel-editor-${visaoSelected?.id}`"
     class="painelset-visaodepainel-editor"
-
   >
-    <form action="" @change="changeForm($event)">
+    <form
+      action=""
+      @change="changeForm($event)"
+    >
       <fieldset>
         <legend>Configurações da Visão do Painel</legend>
         <div class="container">
           <div class="row py-2">
-            <div class="col-3 py-2">
-              <div class="form-group">
-                <div id="div_id_display_title" class="custom-control custom-checkbox">
-                  <input
-                    type="checkbox"
-                    name="display_title"
-                    class="checkboxinput custom-control-input"
-                    aria-describedby="id_display_title_helptext"
-                    v-model="visaoSelected.config.displayTitle"
-                    id="id_display_title">&nbsp;
-                  <label for="id_display_title" class="custom-control-label">
-                    Mostrar título do painel?
-                  </label><br>
-                  <small
-                    id="hint_id_display_title"
-                    class="form-text text-muted"
-                  >
-                    Ativa/Desativa exibição do título
-                  </small>
-                </div>
-              </div>
-            </div>
             <div class="col-6">
-              <label for="painel-name" class="form-label">Título da Visão do Painel</label>
-              <input type="text" class="form-control" v-model="visaoSelected.name" placeholder="Título da Visão do Painel"/>
+              <label
+                for="painel-name"
+                class="form-label"
+              >Título da Visão do Painel</label>
+              <input
+                type="text"
+                class="form-control"
+                v-model="visaoSelected.name"
+                placeholder="Título da Visão do Painel"
+              >
             </div>
           </div>
           <div class="row py-2">
             <div class="col-6">
-              <div id="div_id_config" class="form-group">
-                <label for="painel-config" class="form-label">Configurações da Visão do Painel (JSON)</label>
+              <div
+                id="div_id_config"
+                class="form-group"
+              >
+                <label
+                  for="painel-config"
+                  class="form-label"
+                >Configurações da Visão do Painel (YAML)</label>
                 <div>
                   <textarea
                     id="painel-config"
                     name="config"
                     class="form-control"
-                    v-model="jsonValues.config"
-                    placeholder="Configurações da Visão do Painel em JSON"
+                    v-model="yamlValues.config"
+                    placeholder="Configurações da Visão do Painel em YAML"
                     rows="15"
-                    @blur="changeJsonValues"
+                    @blur="changeYamlValues"
                   />
                 </div>
               </div>
             </div>
             <div class="col-6">
-              <div id="div_id_styles" class="form-group">
-                <label for="painel-styles" class="form-label">Estilos da Visão do Painel (JSON)</label>
+              <div
+                id="div_id_styles"
+                class="form-group"
+              >
+                <label
+                  for="painel-styles"
+                  class="form-label"
+                >Estilos da Visão do Painel (YAML)</label>
                 <div>
                   <textarea
                     name="styles"
                     id="painel-styles"
                     class="form-control"
-                    v-model="jsonValues.styles"
+                    v-model="yamlValues.styles"
                     rows="15"
-                    placeholder="Estilos da Visão do Painel em JSON"
-                    @blur="changeJsonValues"
+                    placeholder="Estilos da Visão do Painel em YAML"
+                    @blur="changeYamlValues"
                   />
                 </div>
               </div>
@@ -75,8 +75,14 @@
         <div class="container">
           <div class="row">
             <div class="col-12">
-              <div id="div_id_description" class="form-group">
-                <label for="id_description" class="form-label">Descrição do Painel</label>
+              <div
+                id="div_id_description"
+                class="form-group"
+              >
+                <label
+                  for="id_description"
+                  class="form-label"
+                >Descrição do Painel</label>
                 <div>
                   <textarea
                     id="id_description"
@@ -94,7 +100,6 @@
         <div class="container actions pt-3">
           <div class="row">
             <div class="col-12 d-flex gap-2">
-
               <div class="btn-group">
                 <button
                   class="btn btn-secondary"
@@ -132,9 +137,10 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { useMessageStore } from '../../messages/store/MessageStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
 import { computed, ref, watch, inject } from 'vue'
 
+import YAML from 'js-yaml'
 import Resource from '~@/utils/resources'
 
 const EventBus = inject('EventBus')
@@ -159,40 +165,40 @@ const visaoSelected = computed(() => {
   return syncStore.data_cache.painelset_visaodepainel?.[props.visaoSelected] || null
 })
 
-const jsonConfig = computed(() => {
+const yamlConfig = computed(() => {
   if (!visaoSelected.value || !visaoSelected.value.config) {
     return ''
   }
-  return JSON.stringify(visaoSelected.value.config, null, 2)
+  return YAML.dump(visaoSelected.value.config)
 })
 
-const jsonStyles = computed(() => {
+const yamlStyles = computed(() => {
   if (!visaoSelected.value || !visaoSelected.value.styles) {
     return ''
   }
-  return JSON.stringify({
+  return YAML.dump({
     component: visaoSelected.value.styles.component || {},
-    title: visaoSelected.value.styles.title || {},
+    title: visaoSelected.value.styles.title || {display: 'flex'},
     inner: visaoSelected.value.styles.inner || {}
-  }, null, 2)
+  })
 })
 
-const jsonValues = ref({
-  config: jsonConfig.value,
-  styles: jsonStyles.value
+const yamlValues = ref({
+  config: yamlConfig.value,
+  styles: yamlStyles.value
 })
 
-const changeJsonValues = () => {
+const changeYamlValues = () => {
   if (!visaoSelected.value) {
     return
   }
   try {
-    const parsedConfig = JSON.parse(jsonValues.value.config)
-    const parsedStyles = JSON.parse(jsonValues.value.styles)
+    const parsedConfig = yamlValues.value.config ? YAML.load(yamlValues.value.config) : {}
+    const parsedStyles = yamlValues.value.styles ? YAML.load(yamlValues.value.styles) : {}
     visaoSelected.value.styles = parsedStyles
     visaoSelected.value.config = parsedConfig
-    jsonValues.value.config = JSON.stringify(parsedConfig, null, 2)
-    jsonValues.value.styles = JSON.stringify(parsedStyles, null, 2)
+    yamlValues.value.config = YAML.dump(parsedConfig)
+    yamlValues.value.styles = YAML.dump(parsedStyles)
     patchModel({
       config: parsedConfig,
       styles: parsedStyles
@@ -200,12 +206,12 @@ const changeJsonValues = () => {
   } catch (e) {
     messageStore.addMessage({
       type: 'danger',
-      text: `Erro ao atualizar os campos JSON: ${e.message}`,
+      text: `Erro ao atualizar os campos YAML: ${e.message}`,
       timeout: 10000
     })
-    console.error('Erro ao atualizar os campos JSON:', e)
-    jsonValues.value.config = jsonConfig.value
-    jsonValues.value.styles = jsonStyles.value
+    console.error('Erro ao atualizar os campos YAML:', e)
+    yamlValues.value.config = yamlConfig.value
+    yamlValues.value.styles = yamlStyles.value
   }
 }
 
@@ -247,8 +253,8 @@ watch(
   () => visaoSelected.value,
   (newVal) => {
     if (newVal) {
-      jsonValues.value.config = jsonConfig.value
-      jsonValues.value.styles = jsonStyles.value
+      yamlValues.value.config = yamlConfig.value
+      yamlValues.value.styles = yamlStyles.value
     }
   }
 )
@@ -293,7 +299,7 @@ const addWidget = () => {
   }
 
   const defaultChildWidgetData = {
-    name: `Novo Widget`,
+    name: 'Novo Widget',
     parent: null,
     visao: visaoSelected.value.id,
     position: syncStore.data_cache.painelset_widget

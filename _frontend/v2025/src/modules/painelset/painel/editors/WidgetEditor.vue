@@ -12,35 +12,6 @@
         <legend>Configurações do Widget</legend>
         <div class="container">
           <div class="row py-2">
-            <div class="col-3 py-2">
-              <div class="form-group">
-                <div
-                  id="div_id_display_title"
-                  class="custom-control custom-checkbox"
-                >
-                  <input
-                    type="checkbox"
-                    name="display_title"
-                    class="checkboxinput custom-control-input"
-                    aria-describedby="id_display_title_helptext"
-                    v-model="widgetSelected.config.displayTitle"
-                    id="id_display_title"
-                  >&nbsp;
-                  <label
-                    for="id_display_title"
-                    class="custom-control-label"
-                  >
-                    Mostrar título do widget?
-                  </label><br>
-                  <small
-                    id="hint_id_display_title"
-                    class="form-text text-muted"
-                  >
-                    Ativa/Desativa exibição do título
-                  </small>
-                </div>
-              </div>
-            </div>
             <div
               class="col-3"
               v-if="childList.length === 0"
@@ -85,16 +56,16 @@
                 <label
                   for="widget-config"
                   class="form-label"
-                >Configurações do Widget (JSON)</label>
+                >Configurações do Widget (YAML)</label>
                 <div>
                   <textarea
                     id="widget-config"
                     name="config"
                     class="form-control"
-                    v-model="jsonValues.config"
-                    placeholder="Configurações do Widget em JSON"
+                    v-model="yamlValues.config"
+                    placeholder="Configurações do Widget em YAML"
                     rows="15"
-                    @blur="changeJsonValues"
+                    @blur="changeYamlValues"
                   />
                 </div>
               </div>
@@ -107,16 +78,16 @@
                 <label
                   for="widget-styles"
                   class="form-label"
-                >Estilos do Widget (JSON)</label>
+                >Estilos do Widget (YAML)</label>
                 <div>
                   <textarea
                     name="styles"
                     id="widget-styles"
                     class="form-control"
-                    v-model="jsonValues.styles"
+                    v-model="yamlValues.styles"
                     rows="15"
-                    placeholder="Estilos do Widget em JSON"
-                    @blur="changeJsonValues"
+                    placeholder="Estilos do Widget em YAML"
+                    @blur="changeYamlValues"
                   />
                 </div>
               </div>
@@ -176,9 +147,10 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { useMessageStore } from '../../messages/store/MessageStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
 import { computed, ref, watch, inject } from 'vue'
 
+import YAML from 'js-yaml'
 import Resource from '~@/utils/resources'
 
 const painelsetWidgetEditor = ref(null)
@@ -218,27 +190,27 @@ const childList = computed(() => {
   )
 })
 
-const jsonConfig = computed(() => {
+const yamlConfig = computed(() => {
   if (!widgetSelected.value || !widgetSelected.value.config) {
     return ''
   }
-  return JSON.stringify(widgetSelected.value.config, null, 2)
+  return YAML.dump(widgetSelected.value.config)
 })
 
-const jsonStyles = computed(() => {
+const yamlStyles = computed(() => {
   if (!widgetSelected.value || !widgetSelected.value.styles) {
     return ''
   }
-  return JSON.stringify({
+  return YAML.dump({
     component: widgetSelected.value.styles.component || {},
-    title: widgetSelected.value.styles.title || {},
+    title: widgetSelected.value.styles.title || {display: 'flex'},
     inner: widgetSelected.value.styles.inner || {}
-  }, null, 2)
+  })
 })
 
-const jsonValues = ref({
-  config: jsonConfig.value,
-  styles: jsonStyles.value
+const yamlValues = ref({
+  config: yamlConfig.value,
+  styles: yamlStyles.value
 })
 
 // Function to handle
@@ -248,17 +220,17 @@ const closeEditor = (event) => {
   EventBus.emit('painelset:editorarea:resize', 0)
 }
 
-const changeJsonValues = () => {
+const changeYamlValues = () => {
   if (!widgetSelected.value) {
     return
   }
   try {
-    const parsedConfig = JSON.parse(jsonValues.value.config)
-    const parsedStyles = JSON.parse(jsonValues.value.styles)
+    const parsedConfig = yamlValues.value.config ? YAML.load(yamlValues.value.config) : {}
+    const parsedStyles = yamlValues.value.styles ? YAML.load(yamlValues.value.styles) : {}
     widgetSelected.value.styles = parsedStyles
     widgetSelected.value.config = parsedConfig
-    jsonValues.value.config = JSON.stringify(parsedConfig, null, 2)
-    jsonValues.value.styles = JSON.stringify(parsedStyles, null, 2)
+    yamlValues.value.config = YAML.dump(parsedConfig)
+    yamlValues.value.styles = YAML.dump(parsedStyles)
     patchModel({
       config: parsedConfig,
       styles: parsedStyles
@@ -266,12 +238,12 @@ const changeJsonValues = () => {
   } catch (e) {
     messageStore.addMessage({
       type: 'danger',
-      text: `Erro ao atualizar os campos JSON: ${e.message}`,
+      text: `Erro ao atualizar os campos YAML: ${e.message}`,
       timeout: 10000
     })
-    console.error('Erro ao atualizar os campos JSON:', e)
-    jsonValues.value.config = jsonConfig.value
-    jsonValues.value.styles = jsonStyles.value
+    console.error('Erro ao atualizar os campos YAML:', e)
+    yamlValues.value.config = yamlConfig.value
+    yamlValues.value.styles = yamlStyles.value
   }
 }
 
@@ -316,8 +288,8 @@ watch(
   () => widgetSelected.value,
   (newVal) => {
     if (newVal) {
-      jsonValues.value.config = jsonConfig.value
-      jsonValues.value.styles = jsonStyles.value
+      yamlValues.value.config = yamlConfig.value
+      yamlValues.value.styles = yamlStyles.value
     }
   }
 )

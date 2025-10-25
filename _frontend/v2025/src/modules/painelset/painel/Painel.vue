@@ -8,7 +8,6 @@
     @mousemove="movingSobrePainel($event)"
   >
     <div
-      v-if="painel?.config?.displayTitle"
       class="painel-titulo"
       :style="painel?.styles.title || {}"
     >
@@ -111,7 +110,7 @@ import { ref, defineProps, computed, watch, inject, nextTick, onMounted } from '
 import Resource from '~@/utils/resources'
 
 import VisaoDePainel from './VisaoDePainel.vue'
-import PainelEditor from './PainelEditor.vue'
+import PainelEditor from './editors/PainelEditor.vue'
 
 // 2. Composables
 const EventBus = inject('EventBus')

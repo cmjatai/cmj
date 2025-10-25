@@ -8,7 +8,6 @@
     @mousedown.stop="editmode = !editmode"
   >
     <div
-      v-if="visaoDePainelSelected?.config?.displayTitle"
       class="visaodepainel-titulo"
       :style="visaoDePainelSelected?.styles.title || {}"
     >
@@ -52,7 +51,7 @@ import { activeTeleportId } from '~@/stores/TeleportStore'
 import { ref, defineProps, computed, watch, inject, nextTick } from 'vue'
 
 import Widget from './Widget.vue'
-import VisaoEditor from './VisaoEditor.vue'
+import VisaoEditor from './editors/VisaoEditor.vue'
 
 const syncStore = useSyncStore()
 const authStore = useAuthStore()

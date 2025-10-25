@@ -25,6 +25,7 @@
     "bootstrap-vue-next": "^0.40.6",
     "jquery": "^3.7.1",
     "jquery-mask-plugin": "^1.14.16",
+    "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",
     "markdown-it": "^14.1.0",
     "markdown-it-abbr": "^2.0.0",
