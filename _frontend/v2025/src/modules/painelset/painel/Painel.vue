@@ -4,7 +4,7 @@
     ref="painelsetPainel"
     :key="`painelset-painel-${painelId}`"
     class="painelset-painel"
-    :style="painel?.styles.component || {}"
+    :style="{...painel?.styles.component || {}, fontSize: `${zoomFont}em`}"
     @mousemove="movingSobrePainel($event)"
   >
     <div
@@ -33,6 +33,26 @@
       class="actions"
       @click.stop.prevent="editmode = !editmode"
     >
+      <div
+        class="btn-group btn-group-sm"
+        role="group"
+        aria-label="Zoom da fonte"
+        :title="`Zoom aplicado aos elementos textuais: ${(zoomFont*100).toFixed(0)}%`"
+      >
+        <button class="btn btn-link">{{ (zoomFont * 100).toFixed(0) }}%</button>
+        <button class="btn btn-link btn-zoom-out" @click.stop.prevent="zoomFontChange(-0.1)">
+          &lt;&lt;
+        </button>
+        <button class="btn btn-link btn-zoom-out" @click.stop.prevent="zoomFontChange(-0.01)">
+          &lt;
+        </button>
+        <button class="btn btn-link btn-zoom-in" @click.stop.prevent="zoomFontChange(0.01)">
+          &gt;
+        </button>
+        <button class="btn btn-link btn-zoom-in" @click.stop.prevent="zoomFontChange(0.1)">
+          &gt;&gt;
+        </button>
+      </div>
       <div
         class="btn-group btn-group-sm"
         role="group"
@@ -114,6 +134,10 @@ const props = defineProps({
   painelId: {
     type: String,
     default: '0'
+  },
+  zoomFontProp: {
+    type: Number,
+    default: 1
   }
 })
 
@@ -123,6 +147,7 @@ const painelsetPainel = ref(null)
 const initMovingSobrePainel = ref(false)
 const idTimerMovingSobrePainel = ref(null)
 const visaoSelected = ref(null)
+const zoomFont = ref(props.zoomFontProp)
 
 const routePainelId = ref(Number(route.params.painelId) || 0)
 const painelId = ref(Number(props.painelId) || routePainelId.value || 0 )
@@ -220,6 +245,14 @@ EventBus.on('painelset:editorarea:close', (sender=null) => {
   activeTeleportId.value = null
   editmode.value = false
 })
+
+const zoomFontChange = (delta) => {
+  if (delta > 0) {
+    zoomFont.value = Math.min(3, zoomFont.value + delta)
+  } else {
+    zoomFont.value = Math.max(0.1, zoomFont.value + delta)
+  }
+}
 
 const movingSobrePainel = () => {
   if (!authStore.isAuthenticated) {
@@ -427,22 +460,28 @@ const syncVisaoList = async (painelId) => {
   }
   & > .actions {
     line-height: 1;
-    text-align: right;
-    height: 0.5em;
+    height: 4px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
     overflow: hidden;
     .btn {
-      font-size: 1em;
+      font-size: 16px;
       padding: 0.6em;
       line-height: 1;
       border-radius: 0;
       opacity: 1;
+      text-decoration: none;
+    }
+    .btn-zoom-in, .btn-zoom-out {
+      color: #fff;
+      transform: rotate(-90deg);
     }
     &:hover {
       height: auto;
       .btn {
         height: auto;
         opacity: 1;
-        zoom: 2;
       }
     }
   }

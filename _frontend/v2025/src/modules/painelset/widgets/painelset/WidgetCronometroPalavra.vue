@@ -232,7 +232,7 @@ emit('oncomponent', {
   }
   .name_individuo {
     position: absolute;
-    font-size: 0.38em;
+    font-size: 0.3em;
     bottom: 0em;
     background-color: #444;
     color:#bbb;
@@ -255,7 +255,7 @@ emit('oncomponent', {
   .inner-aparteante {
     font-size: 0.9em;
     .name_individuo {
-      font-size: 0.3em;
+      font-size: 0.25em;
     }
   }
   .inner-cronometro-aparteante {

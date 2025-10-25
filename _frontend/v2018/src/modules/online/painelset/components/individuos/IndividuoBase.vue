@@ -182,10 +182,15 @@ export default {
   }
   .inner-individuo, .controls {
     display: flex;
-    background: #ddffdd;
+    background-color: #ddffdd;
     align-items: stretch;
     flex: 1 1 auto;
     padding: 0;
+  }
+  &:not(.parlamentar):not(.manager):not(.muted) {
+    .inner-individuo {
+      background-color: #eee;
+    }
   }
   .avatar {
     border-radius: 0;
