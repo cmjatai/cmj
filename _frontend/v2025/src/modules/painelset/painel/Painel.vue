@@ -128,6 +128,10 @@ syncStore.registerModels('painelset', [
   'cronometro'
 ])
 
+syncStore.registerModels('sessao', [
+  'sessaoplenaria'
+])
+
 // 3. Props & Emits
 const props = defineProps({
   painelId: {

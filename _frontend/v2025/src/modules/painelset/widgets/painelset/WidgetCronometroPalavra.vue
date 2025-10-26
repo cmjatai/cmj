@@ -12,7 +12,7 @@
       <div
         class="foto foto-com-a-palavra"
         v-if="individuo_com_a_palavra?.parlamentar || individuo_com_a_palavra?.fotografia"
-        :style="`background-image: url(${individuo_com_a_palavra?.fotografia ? fotografiaIndividuoUrl(individuo_com_a_palavra?.id) : fotografiaParlamentarUrl(individuo_com_a_palavra?.parlamentar) } )`"
+        :style="`background-image: url(${fotografiaUrl(individuo_com_a_palavra)})`"
       >
         <div class="name_individuo">
           <strong>{{ individuo_com_a_palavra?.name }}</strong>
@@ -48,7 +48,7 @@
       <div
         class="foto foto-aparteante"
         v-if="individuo_aparteante?.parlamentar || individuo_aparteante?.fotografia"
-        :style="`background-image: url(${individuo_aparteante?.fotografia ? fotografiaIndividuoUrl(individuo_aparteante?.id) : fotografiaParlamentarUrl(individuo_aparteante?.parlamentar) } )`"
+        :style="`background-image: url(${fotografiaUrl(individuo_aparteante)})`"
       >
         <div class="name_individuo">
           <strong>{{ individuo_aparteante?.name }}</strong>
@@ -135,16 +135,11 @@ const individuo_aparteante = computed(() => {
   return null
 })
 
-const fotografiaParlamentarUrl = (parlamentar) => {
-  if (parlamentar) {
-    return '/api/parlamentares/parlamentar/' + parlamentar + '/fotografia.c1024.png'
-  }
-  return null
-}
-
-const fotografiaIndividuoUrl = (individuo) => {
-  if (individuo) {
-    return '/api/painelset/individuo/' + individuo + '/fotografia.c1024.png'
+const fotografiaUrl = (individuo) => {
+  if (individuo?.fotografia) {
+    return '/api/painelset/individuo/' + individuo.id + '/fotografia.c1024.png'
+  } else if (individuo?.parlamentar) {
+    return '/api/parlamentares/parlamentar/' + individuo.parlamentar + '/fotografia.c1024.png'
   }
   return null
 }

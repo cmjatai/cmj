@@ -16,7 +16,7 @@
           <div class="inner-col">
             <div class="label">Data de Início:</div>
             <div class="data-inicio">
-              {{ sessaoPlenaria?.data_inicio }}
+              {{ reverseDateString(sessaoPlenaria?.data_inicio) }}
             </div>
           </div>
         </div>
@@ -27,7 +27,7 @@
           <div class="inner-col">
             <div class="label">Data de Término:</div>
             <div class="data-fim">
-              {{ sessaoPlenaria?.data_fim || 'Em andamento' }}
+              {{ reverseDateString(sessaoPlenaria?.data_fim) || 'Em andamento' }}
             </div>
           </div>
         </div>
@@ -79,7 +79,6 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 </template>
@@ -88,10 +87,6 @@ import { useSyncStore } from '~@/stores/SyncStore'
 import { computed } from 'vue'
 
 const syncStore = useSyncStore()
-
-syncStore.registerModels('sessao', [
-  'sessaoplenaria'
-])
 
 const props = defineProps({
   painelId: {
@@ -128,18 +123,8 @@ const strSplitted = computed(() => {
   return str
 })
 
-const syncSessaoPlenaria = async () => {
-  if (painel.value?.sessao) {
-    await syncStore.fetchSync({
-      app: 'sessao',
-      model: 'sessaoplenaria',
-      id: painel.value.sessao
-    })
-  }
-}
-
-if (!sessaoPlenaria.value) {
-  syncSessaoPlenaria()
+const reverseDateString = (str) => {
+  return str.split('-').reverse().join('/')
 }
 
 </script>
