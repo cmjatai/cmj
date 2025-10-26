@@ -32,9 +32,9 @@
       <p>Utilize o botao de adição na tela de configurações para adicionar o primeiro widget à visão.</p>
     </div>
     <Teleport
-      v-if="editmode && editorActived"
+      v-if="editmode"
       to="#painelset-editorarea"
-      :disabled="!editorActived"
+      :disabled="!editmode"
     >
       <VisaoEditor
         :painel-id="painelId"
@@ -64,51 +64,16 @@ const props = defineProps({
   visaodepainelSelected: {
     type: Number,
     default: 0
+  },
+  editmodeVisao: {
+    type: Boolean,
+    default: false
   }
 })
 
 const EventBus = inject('EventBus')
-const editmode = ref(false)
+const editmode = ref(props.editmodeVisao)
 const painelsetVisaodepainel = ref(null)
-
-const editorActived = computed(() => {
-  return activeTeleportId.value === painelsetVisaodepainel.value.id
-})
-
-EventBus.on('painelset:editorarea:close', (sender=null) => {
-    if (!onChangePermission()) {
-      return
-    }
-  if (sender && sender === 'force') {
-    editmode.value = false
-    activeTeleportId.value = null
-    return
-  }
-
-  if (sender && painelsetVisaodepainel.value && sender ===  painelsetVisaodepainel.value.id) {
-    return
-  }
-  activeTeleportId.value = null
-  editmode.value = false
-})
-
-watch(
-  () => editmode.value,
-  (newEditMode) => {
-    if (!onChangePermission()) {
-      return
-    }
-    if (newEditMode) {
-      EventBus.emit('painelset:editorarea:close', painelsetVisaodepainel.value.id)
-      nextTick(() => {
-        activeTeleportId.value = painelsetVisaodepainel.value.id
-      })
-
-    } else {
-      activeTeleportId.value = null
-    }
-  }
-)
 
 const onChangePermission = () => {
   if (!authStore.isAuthenticated) {
@@ -131,6 +96,15 @@ const widgetList = computed(() => {
     ['asc']
   )
 })
+watch(
+  () => props.editmodeVisao,
+  (newEditMode) => {
+    editmode.value = newEditMode
+    if (newEditMode) {
+      activeTeleportId.value = painelsetVisaodepainel.value.id
+    }
+  }
+)
 
 const syncWidgetList = async () => {
   syncStore

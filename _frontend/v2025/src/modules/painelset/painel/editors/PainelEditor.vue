@@ -252,12 +252,11 @@ watch(
   }
 )
 
-const closeEditor = (event) => {
+const closeEditor = () => {
   EventBus.emit('painelset:editorarea:close')
-  EventBus.emit('painelset:editorarea:resize', 0)
 }
 
-const onAddVisaodepainel = (event) => {
+const onAddVisaodepainel = () => {
   if (!painelSelected.value) {
     return
   }

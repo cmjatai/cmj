@@ -120,9 +120,9 @@
     </div>
 
     <Teleport
-      v-if="widgetEditorOpened && editorActived"
+      v-if="widgetEditorOpened"
       to="#painelset-editorarea"
-      :disabled="!editorActived"
+      :disabled="!widgetEditorOpened"
     >
       <WidgetEditor
         :painel-id="painelId"
@@ -189,10 +189,6 @@ const coordsChange = ref({
   mouseResizeEnter: false
 })
 
-const editorActived = computed(() => {
-  return painelsetWidget.value && activeTeleportId.value === painelsetWidget.value.id
-})
-
 const widgetSelected = computed(() => {
   return syncStore.data_cache.painelset_widget?.[props.widgetSelected] || null
 })
@@ -244,43 +240,18 @@ const syncChildList = async () => {
 
 syncChildList()
 
-EventBus.on('painelset:editorarea:close', (sender=null) => {
-  if (!onChangePermission()) {
-    return
-  }
-  if (sender && sender === 'force') {
-    editmode.value = false
-    widgetEditorOpened.value = false
-    activeTeleportId.value = null
-    return
-  }
-  if (sender && painelsetWidget.value && sender === painelsetWidget.value.id) {
-    return
-  }
-  if (editmode.value) {
-    return
-  }
-  editmode.value = false
+EventBus.on('painelset:editorarea:close', () => {
   widgetEditorOpened.value = false
   activeTeleportId.value = null
 })
 
-watch(
-  () => widgetEditorOpened.value,
-  (newEditMode) => {
-    if (!onChangePermission()) {
-      return
-    }
-    if (newEditMode) {
-      EventBus.emit('painelset:editorarea:close', painelsetWidget.value.id)
-      nextTick(() => {
-        activeTeleportId.value = painelsetWidget.value.id
-      })
-    } else {
-      activeTeleportId.value = null
-    }
-  }
-)
+const openEditor = () => {
+  console.debug('Opening widget editor modal for widget:', widgetSelected.value)
+  EventBus.emit('painelset:editorarea:close')
+  widgetEditorOpened.value = true
+  activeTeleportId.value = widgetSelected.value.id
+}
+
 
 const onChangePermission = () => {
   if (!authStore.isAuthenticated) {
@@ -307,11 +278,6 @@ const onComponent = ((event) => {
   }
 })
 /* Edição do widget */
-
-const openEditor = () => {
-  console.debug('Opening widget editor modal for widget:', widgetSelected.value)
-  widgetEditorOpened.value = !widgetEditorOpened.value
-}
 
 const onDeleteWidget = () => {
   if (!widgetSelected.value) {
@@ -499,7 +465,7 @@ const onMouseDown = (event) => {
   }
   console.log('Activating painel editor teleport for Widget:', props.widgetSelected)
 
-  EventBus.emit('painelset:editorarea:close', painelsetWidget.value.id)
+  // EventBus.emit('painelset:editorarea:close', painelsetWidget.value.id)
 }
 
 const onMouseDownResize = (event, direction) => {

@@ -22,16 +22,14 @@
         :key="`visaodepainel-${visaoSelected.id}`"
         :painel-id="painelId"
         :visaodepainel-selected="visaoSelected"
+        :editmode-visao="editmodeVisao"
       />
     </div>
     <div class="painel-empty" v-else>
       <p>Não há visões de painel configuradas para este painel.</p>
       <p>Utilize o botao de adição na tela de configurações para adicionar a primeira visão do painel.</p>
     </div>
-    <div
-      class="actions"
-      @click.stop.prevent="editmode = !editmode"
-    >
+    <div class="actions">
       <div
         class="btn-group btn-group-sm"
         role="group"
@@ -40,39 +38,86 @@
       >
         <button class="btn btn-link">{{ (zoomFont * 100).toFixed(0) }}%</button>
         <button class="btn btn-link btn-zoom-out" @click.stop.prevent="zoomFontChange(-0.1)">
-          &lt;&lt;
+          <FontAwesomeIcon
+            :icon="'fa-solid fa-angles-down'"
+          />
         </button>
         <button class="btn btn-link btn-zoom-out" @click.stop.prevent="zoomFontChange(-0.01)">
-          &lt;
+          <FontAwesomeIcon
+            :icon="'fa-solid fa-angle-down'"
+          />
         </button>
         <button class="btn btn-link btn-zoom-in" @click.stop.prevent="zoomFontChange(0.01)">
-          &gt;
+          <FontAwesomeIcon
+            :icon="'fa-solid fa-angle-up'"
+          />
         </button>
         <button class="btn btn-link btn-zoom-in" @click.stop.prevent="zoomFontChange(0.1)">
-          &gt;&gt;
+          <FontAwesomeIcon
+            :icon="'fa-solid fa-angles-up'"
+          />
         </button>
-      </div>
-      <div
-        class="btn-group btn-group-sm"
-        role="group"
-        aria-label="Visões do Painel"
-      >
-        <button
-          v-for="(pv, index) in visaoList"
-          :key="`${pv.id}_${index}`"
-          :class="{ active: pv.id === visaoSelected }"
-          class="btn btn-primary"
-          @click.stop.prevent="trocarVisao(pv.id)"
+        <div
+          v-if="onChangePermission()"
+          class="btn-group"
+          role="group"
+          aria-label="Visões do Painel"
         >
-          {{ pv.position }}
-        </button>
+          <button
+            class="btn btn-link btn-editmode"
+            @click.stop.prevent="clickEditMode($event)"
+            :title="editmode ? 'Sair do modo de edição' : 'Entrar no modo de edição'"
+            :class="{ active: editmode }"
+          >
+            <FontAwesomeIcon
+              :icon="'fa-solid fa-pen-to-square'"
+              size="1x"
+            />
+          </button>
+        </div>
+      </div>
+      <div class="toolbar">
+        <div
+          class="btn-group"
+          role="group"
+          aria-label="Visões do Painel"
+        >
+          <div
+            v-if="onChangePermission()"
+            class="btn-group"
+            role="group"
+            aria-label="Visões do Painel"
+          >
+            <button
+              class="btn btn-link btn-editmode"
+              @click.stop.prevent="clickEditModeVisao($event)"
+              :title="editmodeVisao ? 'Sair do modo de edição' : 'Entrar no modo de edição'"
+              :class="{ active: editmodeVisao }"
+            >
+              <FontAwesomeIcon
+                :icon="'fa-solid fa-pen-to-square'"
+                size="1x"
+              />
+            </button>
+          </div>
+          <button
+            v-for="(pv, index) in visaoList"
+            :key="`${pv.id}_${index}`"
+            :class="{ active: pv.id === visaoSelected }"
+            class="btn btn-primary"
+            @mousedown.stop.prevent="false"
+            @click.stop.prevent="trocarVisao(pv.id)"
+          >
+            {{ pv.position }}
+          </button>
+        </div>
       </div>
     </div>
 
     <Teleport
-      v-if="editmode && editorActived"
+      v-if="editmode"
       to="#painelset-editorarea"
-      :disabled="!editorActived"
+      :disabled="!editmode"
     >
       <PainelEditor
         :painel-id="painelId"
@@ -146,6 +191,8 @@ const props = defineProps({
 
 // 4. State & Refs
 const editmode = ref(false)
+const editmodeVisao = ref(false)
+
 const painelsetPainel = ref(null)
 const initMovingSobrePainel = ref(false)
 const idTimerMovingSobrePainel = ref(null)
@@ -166,30 +213,8 @@ const visaoList = computed(() => {
     ['asc']
   )
 })
-const editorActived = computed(() => {
-  return activeTeleportId.value === painelsetPainel.value.id || visaoList.value.length === 0
-})
 
 // 6. Watchers
-watch(
-  () => editmode.value,
-  (newEditMode) => {
-    if (!onChangePermission()) {
-      return
-    }
-    if (newEditMode) {
-      EventBus.emit('painelset:editorarea:close', painelsetPainel.value.id)
-      nextTick(() => {
-        activeTeleportId.value = painelsetPainel.value.id
-      })
-    }
-    if (visaoList.value.length === 0) {
-      activeTeleportId.value = painelsetPainel.value.id
-      editmode.value = true
-      return
-    }
-  }
-)
 watch(
   () => props.painelId,
   (newPainelId) => {
@@ -230,27 +255,6 @@ watch(
 )
 
 // 7. Events & Lifecycle Hooks
-EventBus.on('painelset:editorarea:close', (sender=null) => {
-  if (!onChangePermission()) {
-    return
-  }
-  if (visaoList.value.length > 0) {
-    activeTeleportId.value = null
-    editmode.value = true
-    return
-  }
-  if (sender && sender === 'force') {
-    editmode.value = false
-    activeTeleportId.value = null
-    return
-  }
-  if (sender && painelsetPainel.value && sender ===  painelsetPainel.value.id) {
-    return
-  }
-  activeTeleportId.value = null
-  editmode.value = false
-})
-
 const zoomFontChange = (delta) => {
   if (delta > 0) {
     zoomFont.value = Math.min(3, zoomFont.value + delta)
@@ -370,7 +374,6 @@ const syncPainel = async () => {
 }
 
 const trocarVisao = (id) => {
-  EventBus.emit('painelset:editorarea:close')
   nextTick(() => {
     visaoSelected.value = id
   })
@@ -410,11 +413,35 @@ onMounted(() => {
 
   setTimeout(() => {
     if (visaoList.value.length === 0) {
-      editmode.value = true
-      activeTeleportId.value = painelsetPainel.value.id
+      clickEditMode()
     }
   }, 1500)
 })
+
+EventBus.on('painelset:editorarea:close', () => {
+  editmode.value = false
+  editmodeVisao.value = false
+  activeTeleportId.value = null
+})
+
+const clickEditMode = () => {
+  if (!onChangePermission()) {
+    return
+  }
+  EventBus.emit('painelset:editorarea:close')
+  editmode.value = true
+  editmodeVisao.value = false
+  activeTeleportId.value = painelsetPainel.value.id
+}
+
+const clickEditModeVisao = () => {
+  if (!onChangePermission()) {
+    return
+  }
+  EventBus.emit('painelset:editorarea:close')
+  editmode.value = false
+  editmodeVisao.value = true
+}
 
 // 8. Functions
 const syncVisaoList = async (painelId) => {
@@ -479,8 +506,7 @@ const syncVisaoList = async (painelId) => {
       text-decoration: none;
     }
     .btn-zoom-in, .btn-zoom-out {
-      color: #fff;
-      transform: rotate(-90deg);
+      // transform: rotate(-90deg);
     }
     &:hover {
       height: auto;

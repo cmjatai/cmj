@@ -260,8 +260,8 @@ watch(
 )
 
 const closeEditor = (event) => {
-  EventBus.emit('painelset:editorarea:close')
-  EventBus.emit('painelset:editorarea:resize', 0)
+  EventBus.emit('painelset:editorarea:close', visaoSelected.value.id)
+  // EventBus.emit('painelset:editorarea:resize', 0)
 }
 const onDeleteVisaodepainel = () => {
   if (!visaoSelected.value) {
@@ -281,7 +281,7 @@ const onDeleteVisaodepainel = () => {
       text: 'Visão do Painel excluído com sucesso.',
       timeout: 5000
     })
-    EventBus.emit('painelset:editorarea:close', 'force')
+    // EventBus.emit('painelset:editorarea:close', 'force')
   })
   .catch((error) => {
     messageStore.addMessage({

@@ -124,7 +124,7 @@ const strSplitted = computed(() => {
 })
 
 const reverseDateString = (str) => {
-  return str.split('-').reverse().join('/')
+  return str?.split('-').reverse().join('/')
 }
 
 </script>

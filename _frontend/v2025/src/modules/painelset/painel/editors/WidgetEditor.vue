@@ -218,7 +218,7 @@ const yamlValues = ref({
 
 const closeEditor = (event) => {
   EventBus.emit('painelset:editorarea:close')
-  EventBus.emit('painelset:editorarea:resize', 0)
+  // EventBus.emit('painelset:editorarea:resize', 0)
 }
 
 const changeYamlValues = () => {
@@ -308,7 +308,7 @@ const onDeleteWidget = (event) => {
     id: widgetSelected.value.id
   }).then(() => {
     console.log('Widget deleted successfully')
-    EventBus.emit('painelset:editorarea:close', 'force')
+    // EventBus.emit('painelset:editorarea:close', 'force')
   }).catch((error) => {
     console.error('Error deleting widget:', error)
   })
