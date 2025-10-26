@@ -263,7 +263,6 @@ class ApiViewSetConstrutor:
         cls.LastModifiedDecorator = klass
         return cls
 
-
     @classmethod
     def get_viewset_for_model(cls, model):
         return cls._built_sets[model._meta.app_config][model]
@@ -381,7 +380,7 @@ class ApiViewSetConstrutor:
                         if not hasattr(_meta_filterset, 'model'):
                             model = _model
 
-                #@cls.LastModifiedDecorator()
+                @cls.LastModifiedDecorator()
                 class ModelApiViewSet(ApiViewSetConstrutor.ApiViewSet):
                     queryset = _model.objects.all()
                     filterset_class = ApiFilterSet

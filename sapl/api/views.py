@@ -64,6 +64,7 @@ class LastModifiedDecorator:
                 if view:
                     for backend in list(view.filter_backends):
                         queryset = backend().filter_queryset(request, view.queryset, view)
+
                     if queryset.exists():
                         last_log = AuditLog.objects.filter(
                             model_name=self.model._meta.model_name,
