@@ -207,20 +207,22 @@ watch(
   () => visaoList.value,
   (newVisaoList) => {
     if (newVisaoList.length > 0) {
-      if (!visaoSelected.value || !newVisaoList.find(v => v.id === visaoSelected.value)) {
-        const visaoAtiva = newVisaoList.find(
-          (pv) => pv.active === true
-        )
-        if (visaoAtiva) {
-          visaoSelected.value = visaoAtiva.id
-        } else {
-          visaoSelected.value = newVisaoList[0].id
-        }
+      const visaoAtiva = newVisaoList.find(
+        (pv) => pv.active === true
+      )
+      if (visaoAtiva) {
+        visaoSelected.value = visaoAtiva.id
+      } else {
+        visaoSelected.value = newVisaoList[0].id
       }
     } else {
       visaoSelected.value = null
     }
-  }
+  },
+  {
+    immediate: true,
+    deep: true
+   }
 )
 
 // 7. Events & Lifecycle Hooks

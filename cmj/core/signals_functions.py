@@ -23,7 +23,7 @@ from cmj.painelset.models import Cronometro
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
 from cmj.videos.models import VideoParte, PullExec
-from sapl.materia.models import AnaliseSimilaridade
+from sapl.materia.models import AnaliseSimilaridade, Proposicao
 
 
 logger = logging.getLogger(__name__)
@@ -259,81 +259,6 @@ def send_mail(subject, email_template_name, context, from_email, to_email):
     email_message.send()
 
 
-def send_signal_for_websocket_time_refresh(inst, **kwargs):
-
-    action = 'post_save' if 'created' in kwargs else 'post_delete'
-    created = kwargs.get('created', False)
-
-    if hasattr(inst, '_meta') and \
-        not inst._meta.app_config is None and \
-        (
-            inst._meta.app_config.name in settings.SAPL_APPS or
-            inst._meta.label in (
-                'painelset.Evento',
-                'painelset.Individuo',
-                'painelset.Cronometro',
-                'painelset.CronometroEvent',
-                'painelset.Painel',
-                'painelset.VisaoDePainel',
-                'painelset.Widget',
-            )
-        ):
-
-        if settings.DEBUG:
-            logger.debug(f'start: {inst.id} {inst._meta.app_label}.{inst._meta.model_name}')
-
-        try:
-            if hasattr(inst, 'ws_sync') and not inst.ws_sync():
-                return
-
-            inst_serialize = None
-            if hasattr(inst, 'ws_serialize'):
-                inst_serialize = inst.ws_serialize()
-
-            channel_layer = get_channel_layer()
-
-            message = {
-                'action': action,
-                'id': inst.id,
-                'app': inst._meta.app_label,
-                'model': inst._meta.model_name,
-                'created': created,
-                'timestamp': time.time() * 1000,
-                'instance': None
-            }
-            if inst_serialize:
-                message['instance'] = inst_serialize
-
-            if inst._meta.label in (
-                'painelset.Evento',
-                'painelset.Individuo',
-                'painelset.Cronometro',
-                'painelset.CronometroEvent',
-                'painelset.Painel',
-                'painelset.VisaoDePainel',
-                'painelset.Widget',
-            ):
-                async_to_sync(channel_layer.group_send)(
-                    "group_sync_refresh_channel", {
-                        "type": "sync_refresh.message",
-                        'message': message
-                    }
-                )
-            else:
-                # deprecated canal, manter para compatibilidade, converter para group_sync_refresh_channel
-                async_to_sync(channel_layer.group_send)(
-                    "group_time_refresh_channel", {
-                        "type": "time_refresh.message",
-                        'message': message
-                    }
-                )
-
-        except Exception as e:
-            logger.error(_("Erro na comunicação com o backend do redis. "
-                           "Certifique se possuir um servidor de redis "
-                           "ativo funcionando como configurado em "
-                           "CHANNEL_LAYERS"))
-
 def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs):
 
     if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
@@ -353,3 +278,42 @@ def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs
         )
     else:
         tasks.task_signed_files_extraction_function(*params_tasks)
+
+
+def signed_files_extraction_pre_save_signal_function(sender, instance, **kwargs):
+
+    if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
+        return
+
+    if sender == Proposicao:
+        # TODO: melhorar o tratamento de reinício de extração
+        if instance.data_envio:
+            return
+
+    metadata = instance.metadata
+    for fn in instance.FIELDFILE_NAME:  # fn -> field_name
+        ff = getattr(instance, fn)  # ff -> file_field
+
+        if metadata and 'signs' in metadata and \
+                        fn in metadata['signs'] and\
+                        metadata['signs'][fn]:
+            metadata['signs'][fn] = {}
+
+        if not ff:
+            continue
+
+        try:
+            meta_signs = {"running_extraction": True}
+
+            if not metadata:
+                metadata = {'signs': {}}
+
+            if 'signs' not in metadata:
+                metadata['signs'] = {}
+
+            metadata['signs'][fn] = meta_signs
+        except Exception as e:
+            # print(e)
+            pass
+
+    instance.metadata = metadata

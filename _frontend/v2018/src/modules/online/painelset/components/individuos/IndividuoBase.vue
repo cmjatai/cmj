@@ -275,11 +275,13 @@ export default {
       font-weight: bold;
       color: white;
       .fa-microphone {
-        color: white;
+        color: #ff0;
         opacity: 1;
+        font-size: 3em;
       }
       .btn-palavra {
-        color: #78b2f5;
+        color: #000;
+        background: #0005;
       }
     }
     .inner-individuo {
@@ -293,11 +295,13 @@ export default {
       opacity: 1 !important;
       font-weight: bold;
       .fa-microphone {
-        color: #5e4800;
+        color: #ff0;
         opacity: 1;
+        font-size: 3em;
       }
       .btn-aparte {
-        color: #5e4800;
+        color: #000;
+        background: #0004;
       }
     }
     .inner-individuo {

@@ -81,11 +81,13 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
+import { useAuthStore } from '~@/stores/AuthStore'
 import { ref, computed, watch, defineEmits } from 'vue'
 
 import WidgetCronometroBase from './WidgetCronometroBase.vue'
 
 const syncStore = useSyncStore()
+const authStore = useAuthStore()
 
 const emit = defineEmits(['oncomponent'])
 
@@ -172,7 +174,7 @@ watch(individuo_com_a_palavra, (newVal) => {
 emit('oncomponent', {
   type: 'extra_styles',
   extra_styles: {
-    'opacity': '0'
+    'opacity': authStore.hasPermission('painelset.change_widget') ? '1' : '0'
   }
 })
 

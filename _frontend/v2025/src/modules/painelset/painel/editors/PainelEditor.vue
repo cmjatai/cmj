@@ -9,28 +9,6 @@
         <legend>Configurações do Painel</legend>
         <div class="container">
           <div class="row py-2">
-            <div class="col-3 py-2">
-              <div class="form-group">
-                <div id="div_id_display_title" class="custom-control custom-checkbox">
-                  <input
-                    type="checkbox"
-                    name="display_title"
-                    class="checkboxinput custom-control-input"
-                    aria-describedby="id_display_title_helptext"
-                    v-model="painelSelected.config.displayTitle"
-                    id="id_display_title">&nbsp;
-                  <label for="id_display_title" class="custom-control-label">
-                    Mostrar título do painel?
-                  </label><br>
-                  <small
-                    id="hint_id_display_title"
-                    class="form-text text-muted"
-                  >
-                    Ativa/Desativa exibição do título
-                  </small>
-                </div>
-              </div>
-            </div>
             <div class="col-6">
               <label for="painel-name" class="form-label">Título do Painel</label>
               <input type="text" class="form-control" v-model="painelSelected.name" placeholder="Título do Painel"/>
@@ -293,9 +271,12 @@ const onAddVisaodepainel = (event) => {
       : 1,
     active: true,
     config: {
-      displayTitle: true
     },
-    styles: {}
+    styles: {
+      component: {},
+      title: {display: 'flex'},
+      inner: {}
+    }
   }
   Resource.Utils.createModel({
     app: 'painelset',

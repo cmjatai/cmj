@@ -48,6 +48,24 @@
       <div class="toolbar">
         <div class="btn-group ">
           <button
+            class="btn btn-secondary btn-move-backward"
+            @mousedown.stop.prevent="false"
+            @click.stop.prevent="updatePosition($event, -1)"
+            title="Mover uma camada para trás"
+          >
+            <FontAwesomeIcon :icon="'fa-solid fa-arrow-down-1-9'" />
+          </button>
+          <button
+            class="btn btn-secondary btn-move-forward"
+            @mousedown.stop.prevent="false"
+            @click.stop.prevent="updatePosition($event, 1)"
+            title="Mover uma camada para frente"
+          >
+            <FontAwesomeIcon :icon="'fa-solid fa-arrow-up-1-9'" />
+          </button>
+        </div>
+        <div class="btn-group ">
+          <button
             class="btn btn-sm btn-danger"
             @mousedown.stop.prevent="false"
             @click.stop.prevent="onDeleteWidget($event)"
@@ -312,6 +330,7 @@ const onDeleteWidget = () => {
     console.error('Error deleting widget:', error)
   })
 }
+
 const onDuplicateWidget = () => {
   if (!widgetSelected.value) {
     return
@@ -410,6 +429,27 @@ const validLocalCoords = (localCoords) => {
     return true
   }
   return false
+}
+const updatePosition = (event, delta) => {
+  if (!widgetSelected.value) {
+    return
+  }
+  const newPosition = widgetSelected.value.position + delta
+  if (newPosition < 1) {
+    return
+  }
+  Resource.Utils.patchModel({
+    app: 'painelset',
+    model: 'widget',
+    id: widgetSelected.value.id,
+    form: {
+      position: newPosition
+    }
+  }).then((response) => {
+    console.log('Widget position updated successfully:', response.data)
+  }).catch((error) => {
+    console.error('Error updating widget position:', error)
+  })
 }
 
 const patchWidgetCoords = (localCoords) => {

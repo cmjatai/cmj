@@ -1,6 +1,8 @@
 # cronometro_app/tasks.py - Tarefas assíncronas com Celery
 from datetime import timedelta
 from celery import shared_task
+
+from cmj.painelset.tasks_function import task_refresh_states_from_visaodepainel_function
 from .cronometro_manager import CronometroManager
 from .models import Cronometro, CronometroState
 import logging
@@ -140,6 +142,10 @@ def check_finished_cronometros_function():
 @shared_task
 def check_finished_cronometros():
     check_finished_cronometros_function()
+
+@cmj_celery_app.task(queue='cq_base', bind=True)
+def task_refresh_states_from_visaodepainel(self, *args, **kwargs):
+    task_refresh_states_from_visaodepainel_function(*args, **kwargs)
 
 @shared_task
 def cleanup_old_events():

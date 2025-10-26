@@ -37,11 +37,20 @@ const props = defineProps({
   }
 })
 
-const display = ref(props.displayInitial)
-
 const cronometro = computed(() => {
   return syncStore.data_cache.painelset_cronometro
     ?.[props.cronometroId] || null
+})
+
+const display = computed(() => {
+  if (!cronometro.value) {
+    return props.displayInitial
+  }
+  if (cronometro.value.state === 'running') {
+    return props.displayInitial
+  } else {
+    return 'last_paused'
+  }
 })
 
 const fases = computed(() => {

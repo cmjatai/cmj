@@ -13,7 +13,7 @@
         <div class="container">
           <div class="row py-2">
             <div
-              class="col-3"
+              class="col-6"
               v-if="childList.length === 0"
             >
               <label
@@ -173,9 +173,10 @@ const props = defineProps({
 
 const vueComponentsChoice = ref({
   '': 'Nenhum componente selecionado',
-  'WidgetSessaoPlenariaTitulo': 'WidgetSessaoPlenariaTitulo - Título da Sessão Plenária vinculada ao Painel',
+  'WidgetSessaoPlenariaStatus': 'WidgetSessaoPlenariaStatus - Título da Sessão Plenária vinculada ao Painel',
   'WidgetCronometroEvento': 'WidgetCronometroEvento - Cronômetro do Evento vinculado ao Painel',
-  'WidgetCronometroPalavra': 'WidgetCronometroPalavra - Cronômetro da Palavra vinculada ao Painel'
+  'WidgetCronometroPalavra': 'WidgetCronometroPalavra - Cronômetro da Palavra vinculada ao Painel',
+  'WidgetStatusEventoSessao': 'WidgetStatusEventoSessao - Status da Sessão e do Evento vinculados ao Painel'
 })
 
 const widgetSelected = computed(() => {

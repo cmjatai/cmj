@@ -20,9 +20,11 @@ const globalComponents = {
   'cmj-alert': defineAsyncComponent(() => import('~@/components/atoms/Alert.vue')),
 
 
-  'WidgetSessaoPlenariaTitulo': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoPlenariaTitulo.vue')),
+  'WidgetSessaoPlenariaStatus': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoPlenariaStatus.vue')),
+
   'WidgetCronometroEvento': defineAsyncComponent(() => import('~@/modules/painelset/widgets/painelset/WidgetCronometroEvento.vue')),
-  'WidgetCronometroPalavra': defineAsyncComponent(() => import('~@/modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue'))
+  'WidgetCronometroPalavra': defineAsyncComponent(() => import('~@/modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue')),
+  'WidgetStatusEventoSessao': defineAsyncComponent(() => import('~@/modules/painelset/widgets/painelset/WidgetStatusEventoSessao.vue'))
 
 }
 

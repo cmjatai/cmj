@@ -112,7 +112,7 @@ class _EventoViewSet:
                 individuo.aparteante = None
                 individuo.save()
 
-            for painel in evento_copiado.painels.all():
+            for painel in evento_copiado.paineis.all():
                 painel.copy(evento=evento, sessao=None)
 
         return Response(EventoSerializer(evento).data, status=status.HTTP_201_CREATED)

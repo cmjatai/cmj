@@ -313,12 +313,11 @@ const addWidget = () => {
         y: 10,
         w: 30,
         h: 30
-      },
-      displayTitle: true
+      }
     },
     styles: {
       component: {},
-      title: {},
+      title: {display: 'flex'},
       inner: {}
     }
   }

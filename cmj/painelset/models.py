@@ -389,11 +389,11 @@ class Painel(models.Model):
 
     evento = models.ForeignKey(
         Evento, on_delete=models.CASCADE, verbose_name="Evento",
-        blank=True, null=True, related_name='painels', help_text="Evento ao qual este painel pertence")
+        blank=True, null=True, related_name='paineis', help_text="Evento ao qual este painel pertence")
 
     sessao = models.ForeignKey(
         'sessao.SessaoPlenaria', on_delete=models.SET_NULL, verbose_name="Sessão Plenária Associada",
-        blank=True, null=True, related_name='painels', help_text="Sessão ao qual este painel pertence")
+        blank=True, null=True, related_name='paineis', help_text="Sessão ao qual este painel pertence")
 
     config = JSONField(
         verbose_name=_('Configuração Específica'),
@@ -415,7 +415,7 @@ class Painel(models.Model):
     @property
     def visao_ativa(self):
         """Retorna a visão ativa do painel, se houver."""
-        visao_ativa = self.visaodepainel_set.filter(active=True).values_list(flat=True).first()
+        visao_ativa = self.visoes.filter(active=True).values_list(flat=True).first()
         if visao_ativa:
             return visao_ativa
         return None
