@@ -7,27 +7,23 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 from cmj.painelset import tasks, tasks_function
-
+import re
 
 logger = logging.getLogger(__name__)
 
+regex_labels_permitidos = [
+    r'^painelset',
+    r'^sessao',
+    r'^parlamentares',
+]
+regex_labels_permitidos = [re.compile(label) for label in regex_labels_permitidos]
 
 def send_signal_for_websocket_sync_refresh(inst, **kwargs):
 
     action = 'post_save' if 'created' in kwargs else 'post_delete'
     created = kwargs.get('created', False)
 
-    if inst._meta.label in (
-        'painelset.Evento',
-        'painelset.Individuo',
-        'painelset.Cronometro',
-        'painelset.CronometroEvent',
-        'painelset.Painel',
-        'painelset.VisaoDePainel',
-        'painelset.Widget',
-        'sessao.SessaoPlenaria',
-    ):
-
+    if any(regex.match(inst._meta.label) for regex in regex_labels_permitidos):
         if settings.DEBUG:
             logger.debug(f'start: {inst.id} {inst._meta.app_label}.{inst._meta.model_name}')
 

@@ -5,7 +5,6 @@
     :key="`painelset-visaodepainel${visaodepainelSelected}`"
     class="painelset-visaodepainel"
     :style="visaoDePainelSelected?.styles.component || {}"
-    @mousedown.stop="editmode = !editmode"
   >
     <div
       class="visaodepainel-titulo"
@@ -116,9 +115,6 @@ const syncWidgetList = async () => {
       }
     })
     .then((response) => {
-      if (response && response.data.results.length > 0) {
-        // Process the fetched widgets
-      }
     })
 }
 

@@ -281,7 +281,7 @@ const onDeleteVisaodepainel = () => {
       text: 'Visão do Painel excluído com sucesso.',
       timeout: 5000
     })
-    // EventBus.emit('painelset:editorarea:close', 'force')
+    EventBus.emit('painelset:editorarea:close')
   })
   .catch((error) => {
     messageStore.addMessage({

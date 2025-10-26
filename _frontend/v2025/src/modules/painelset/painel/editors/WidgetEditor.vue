@@ -173,7 +173,10 @@ const props = defineProps({
 
 const vueComponentsChoice = ref({
   '': 'Nenhum componente selecionado',
+
   'WidgetSessaoPlenariaStatus': 'WidgetSessaoPlenariaStatus - Título da Sessão Plenária vinculada ao Painel',
+  'WidgetSessaoRegistroPresenca': 'WidgetSessaoRegistroPresenca - Registro de Presença da Sessão Plenária vinculada ao Painel',
+
   'WidgetCronometroEvento': 'WidgetCronometroEvento - Cronômetro do Evento vinculado ao Painel',
   'WidgetCronometroPalavra': 'WidgetCronometroPalavra - Cronômetro da Palavra vinculada ao Painel',
   'WidgetStatusEventoSessao': 'WidgetStatusEventoSessao - Status da Sessão e do Evento vinculados ao Painel'

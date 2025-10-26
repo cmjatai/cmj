@@ -124,23 +124,6 @@
         :painel-selected="painelId"
       />
     </Teleport>
-
-    <div v-if="false">
-      <br><br>
-      &nbsp;
-      <button @click="visaoAtiva()">
-        Visao Ativa
-      </button>
-      <br><br>
-      <button
-        v-for="(pv, index) in visaoList"
-        :key="index"
-        @click.stop.prevent="ativarVisao(pv.id)"
-      >
-        Ativar {{ pv.id }}
-      </button>
-      <br><br>
-    </div>
   </div>
 </template>
 <script setup>
@@ -236,11 +219,17 @@ watch(
   () => visaoList.value,
   (newVisaoList) => {
     if (newVisaoList.length > 0) {
-      const visaoAtiva = newVisaoList.find(
+      if (activeTeleportId.value !== null) {
+        if (!newVisaoList.find((pv) => pv.id === visaoSelected.value?.id)) {
+          visaoSelected.value = newVisaoList[0].id
+        }
+        return
+      }
+      const visaoAtivaLocal = newVisaoList.find(
         (pv) => pv.active === true
       )
-      if (visaoAtiva) {
-        visaoSelected.value = visaoAtiva.id
+      if (visaoAtivaLocal) {
+        visaoSelected.value = visaoAtivaLocal.id
       } else {
         visaoSelected.value = newVisaoList[0].id
       }
@@ -302,21 +291,21 @@ const syncPainel = async () => {
         model: 'painel',
         id: painelId.value
       })
-      .then((response) => {
-        if (response.data.sessao) {
+      .then((data_cache_painel) => {
+        if (data_cache_painel[painelId.value].sessao) {
           syncStore
             .fetchSync({
               app: 'sessao',
               model: 'sessaoplenaria',
-              id: response.data.sessao
+              id: data_cache_painel[painelId.value].sessao
             })
           }
-        if (response.data.evento) {
+        if (data_cache_painel[painelId.value].evento) {
           syncStore
             .fetchSync({
               app: 'painelset',
               model: 'evento',
-              id: response.data.evento
+              id: data_cache_painel[painelId.value].evento
             })
         }
         syncVisaoList(painelId.value)
@@ -336,9 +325,14 @@ const syncPainel = async () => {
           start_real__isnull: false
         }
       })
-      .then((response) => {
-        if (response && response.data.results.length > 0) {
-          const evento = response.data.results[0]
+      .then((data_cache_evento) => {
+        const listaEvento = _.orderBy(
+          Object.values(data_cache_evento || {}), ['start_real'], ['asc']
+        ).filter(
+          (ev) => ev.end_real === null
+        )
+        if (listaEvento && listaEvento.length > 0) {
+          const evento = listaEvento[0]
           syncStore
             .fetchSync({
               app: 'painelset',
@@ -347,9 +341,12 @@ const syncPainel = async () => {
                 evento: evento.id
               }
             })
-            .then((painelResponse) => {
-              if (painelResponse && painelResponse.data.results.length > 0) {
-                const firstPainel = painelResponse.data.results[0]
+            .then((data_cache_painel) => {
+              const listaPainel = _.orderBy(
+                Object.values(data_cache_painel || {}), ['position'], ['asc']
+              )
+              if (listaPainel && listaPainel.length > 0) {
+                const firstPainel = listaPainel[0]
                 painelId.value = firstPainel.id
               } else {
                 router.push({ name: 'painelset_error_404', params: { pathMatch: 'error' } })
@@ -379,24 +376,10 @@ const trocarVisao = (id) => {
   })
 }
 
-const ativarVisao = (id) => {
-  Resource.Utils.patchModelAction({
-    app: 'painelset',
-    model: 'visaodepainel',
-    id: id,
-    action: 'activate',
-    form: {}
-  })
-    .then(() => {
-      visaoSelected.value = painel.value.visaodepainel_ativo_id
-      syncVisaoList(painelId.value)
-    })
-    .catch((error) => {
-      console.error('Error activating visaodepainel:', error)
-    })
-}
-
 const visaoAtiva = () => {
+  if (activeTeleportId.value !== null) {
+    return
+  }
   visaoSelected.value = painel.value.visaodepainel_ativo_id
 }
 
@@ -453,15 +436,18 @@ const syncVisaoList = async (painelId) => {
         painel: painelId
       }
     })
-    .then((response) => {
-      if (response && response.data.results.length > 0) {
-        const visaoAtiva = response.data.results.find(
-          (pv) => pv.active === true
-        )
+    .then((data_cache_visao) => {
+      const listaVisao = _.orderBy(
+        Object.values(data_cache_visao || {}), ['position'], ['asc']
+      ).find(
+        (pv) => pv.active === true
+      )
+      if (listaVisao && listaVisao.length > 0) {
+        const visaoAtiva = listaVisao
         if (visaoAtiva) {
           visaoSelected.value = visaoAtiva.id
         } else {
-          visaoSelected.value = response.data.results[0].id
+          visaoSelected.value = listaVisao[0].id
         }
       }
     })

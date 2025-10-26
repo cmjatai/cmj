@@ -85,6 +85,7 @@ class M2MFilter(django_filters.ModelMultipleChoiceFilter):
 class ApiFilterSetMixin(FilterSet):
 
     o = CharFilter(method='filter_o')
+    id__in = CharFilter(method='filter_id__in')
 
     class Meta:
         fields = '__all__'
@@ -108,6 +109,18 @@ class ApiFilterSetMixin(FilterSet):
                 },
             },
         }
+
+    def filter_id__in(self, queryset, name, value):
+        try:
+            ids = list(
+                map(
+                    lambda x: int(x.strip()),
+                    value.split(',')
+                )
+            )
+            return queryset.filter(id__in=ids)
+        except:
+            return queryset
 
     def filter_o(self, queryset, name, value):
         try:
@@ -175,7 +188,6 @@ class ApiFilterSetMixin(FilterSet):
     def filter_for_field(cls, f, name, lookup_expr='exact'):
         # Redefine método estático para ignorar filtro para
         # fields que não possuam lookup_expr informado
-
         f, lookup_type = resolve_field(f, lookup_expr)
 
         default = {

@@ -63,6 +63,10 @@ export const useSyncStore = defineStore('syncStore', {
     },
     async fetchSync ({ app, model, id, action, params, only_first_page = false }) {
       const _fetch = Resources.Utils.fetch
+      if (!this.models[app] || !this.models[app][model]) {
+        //faz auto registro do modelo
+        this.registerModels(app, [model])
+      }
       const metadata = { app, model }
       if (id) { metadata.id = id }
       if (action) { metadata.action = action }
@@ -71,6 +75,11 @@ export const useSyncStore = defineStore('syncStore', {
           params.o = 'id'
         }
         metadata.params = params
+        Object.keys(params).forEach((key) => {
+          if (Array.isArray(params[key])) {
+            metadata.params[key] = params[key].join(',')
+          }
+        })
       }
       return _fetch(
         metadata
@@ -83,7 +92,7 @@ export const useSyncStore = defineStore('syncStore', {
         if (!only_first_page && response.data.pagination && response.data.pagination.next_page) {
           return this.fetchSync({ app, model, id, action, params: { ...params, page: response.data.pagination.next_page } })
         }
-        return response
+        return this.data_cache[uri]
       })
     },
 

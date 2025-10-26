@@ -232,9 +232,7 @@ const syncChildList = async () => {
       }
     })
     .then((response) => {
-      if (response && response.data.results.length > 0) {
-        // Process the fetched widgets
-      }
+      // Process the fetched widgets
     })
 }
 
