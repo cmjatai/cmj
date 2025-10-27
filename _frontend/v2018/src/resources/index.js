@@ -93,9 +93,9 @@ export default {
       `${basePath}/${app}/${model}/`,
       form
     ),
-    fetch: (m) => axios({
+    fetch: (m, method = 'GET') => axios({
       url: `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}${m.query_string ? '?' : ''}${m.query_string ? m.query_string : ''}`,
-      method: 'GET'
+      method: method
     })
   }
 }

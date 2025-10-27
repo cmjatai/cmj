@@ -98,7 +98,8 @@ export default {
             app: 'painelset',
             model: 'evento',
             id: this.evento.id,
-            action: 'copy'
+            action: 'copy',
+            method: 'PATCH'
           })
           .then(() => {
             this.sendMessage({ alert: 'success', message: 'Evento copiado com sucesso.', time: 5 })
@@ -114,7 +115,8 @@ export default {
           app: 'painelset',
           model: 'evento',
           id: this.evento.id,
-          action: 'finish'
+          action: 'finish',
+          method: 'PATCH'
         })
       }
     },

@@ -130,14 +130,22 @@ const syncStore = {
       }
     },
 
-    async fetchSync ({ commit, dispatch }, { app, model, id, action, params, only_first_page = false }) {
+    async fetchSync ({ commit, dispatch }, {
+      app,
+      model,
+      id,
+      action,
+      params,
+      only_first_page = false,
+      method = 'GET'
+    }) {
       const _fetch = Resources.Utils.fetch
       const metadata = { app, model }
       if (id) { metadata.id = id }
       if (action) { metadata.action = action }
       if (params) { metadata.query_string = new URLSearchParams(params).toString() }
       return _fetch(
-        metadata
+        metadata, method
       ).then((response) => {
         const uri = `${app}_${model}`
         _.each(response.data.results ? response.data.results : [response.data], (value, idx) => {
