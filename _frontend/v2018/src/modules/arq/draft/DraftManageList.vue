@@ -24,7 +24,7 @@
               PDF -><br>PDF/A-2b
             </span>
           </a>
-          <a class="btn btn-primary ml-2" :href="`/api/arq/draft/${draftselected.id}/zipfile/`" target="_blank" rel="noopener noreferrer" title="Baixar todos os arquivos individualmente dentro de um arquivo compactado.">
+          <a class="btn btn-primary ml-2" :href="`/api/arq/draft/${draftselected.id}/zipfile/?t=${Date.now()}`" target="_blank" rel="noopener noreferrer" title="Baixar todos os arquivos individualmente dentro de um arquivo compactado.">
             <i class="fas fa-file-archive"></i>
           </a>
           <a class="btn btn-primary ml-2" @click="clickUnir" title="Unir PDFs do Draft em apenas um PDF">

@@ -30,8 +30,8 @@
         id_dm = event.target.querySelector('input').value
       }
 
-      img_preview_arqdoc_create.src = `/api/arq/draftmidia/${id_dm}/arquivo/?page=1&dpi=300`
-      link_open_draftmidia.href = `/api/arq/draftmidia/${id_dm}/arquivo/`
+      img_preview_arqdoc_create.src = `/api/arq/draftmidia/${id_dm}/arquivo/?page=1&dpi=300&t=${Date.now()}`
+      link_open_draftmidia.href = `/api/arq/draftmidia/${id_dm}/arquivo/?t=${Date.now()}`
     })
   })
 </script>

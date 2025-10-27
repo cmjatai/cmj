@@ -25,6 +25,9 @@ import '@fortawesome/fontawesome-free/css/all.css'
 
 // require('font-awesome/font-awesome.css')
 
+axios.defaults.headers.get['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+axios.defaults.headers.get['Pragma'] = 'no-cache' // Suporte para navegadores mais antigos
+axios.defaults.headers.get['Expires'] = '0' // Expira imediatamente
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 

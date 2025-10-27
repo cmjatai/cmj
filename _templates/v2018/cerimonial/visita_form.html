@@ -42,7 +42,8 @@
       input_doc.addEventListener('keyup', function(e) {
         //console.debug(e.target.value)
         const json_data = {
-          documento__icontains: e.target.value
+          documento__icontains: e.target.value,
+              t: Date.now()
           // get_all: true
         }
         $.get('/api/cerimonial/visitante/', json_data, function (data) {
@@ -101,7 +102,8 @@
             const json_data_ultimas_visitas = {
               visitante: item.id,
               o: '-created',
-              page_size: 10
+              page_size: 10,
+              t: Date.now()
               // get_all: true
             }
             $.get('/api/cerimonial/visita/', json_data_ultimas_visitas, function (data) {
