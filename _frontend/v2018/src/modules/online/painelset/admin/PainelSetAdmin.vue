@@ -119,7 +119,7 @@ export default {
       this.$refs.individuoList.toggleAllMicrofones()
     },
     startEvento () {
-      this.utils.getModelAction('painelset', 'evento', this.evento.id, 'start')
+      this.utils.patchModelAction('painelset', 'evento', this.evento.id, 'start')
         .then(response => {
           console.debug('start response', response)
         })

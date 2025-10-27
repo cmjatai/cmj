@@ -42,7 +42,7 @@ class EventoChangePermission(BasePermission):
 class _EventoViewSet:
     serializer_class = EventoSerializer
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def start(self, request, pk=None):
         logger.debug(f'Acessando cronômetro do evento: {pk}')
         evento = self.get_object()
@@ -59,7 +59,7 @@ class _EventoViewSet:
             return Response(CronometroTreeSerializer(cronometro).data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def finish(self, request, pk=None):
         logger.debug(f'Finalizando Evento: {pk}')
         evento = self.get_object()
@@ -85,7 +85,7 @@ class _EventoViewSet:
             return Response(EventoSerializer(evento).data)
         return Response({'error': 'Cronometro not found'}, status=status.HTTP_404_NOT_FOUND)
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def copy(self, request, *args, **kwargs):
         evento_copiado = self.get_object()
         if not evento_copiado.end_real:
@@ -117,10 +117,10 @@ class _EventoViewSet:
 
         return Response(EventoSerializer(evento).data, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def toggle_microfones(self, request, *args, **kwargs):
-        status_microfone = request.GET.get('status_microfone', 'on')
-        inclui_microfone_sempre_ativo = request.GET.get('inclui_microfone_sempre_ativo', 'off')
+        status_microfone = request.data.get('status_microfone', 'on')
+        inclui_microfone_sempre_ativo = request.data.get('inclui_microfone_sempre_ativo', 'off')
         if inclui_microfone_sempre_ativo not in ['on', 'off']:
             inclui_microfone_sempre_ativo = 'off'
         if status_microfone not in ['on', 'off']:
@@ -165,9 +165,9 @@ class _EventoViewSet:
 
         return Response({'status': 'ok', 'status_microfone': status_microfone, 'evento': evento.id})
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def pause_parent_on_aparte(self, request, *args, **kwargs):
-        pause_parent_on_aparte = request.GET.get('pause_parent_on_aparte', 'on')
+        pause_parent_on_aparte = request.data.get('pause_parent_on_aparte', 'on')
         evento = self.get_object()
 
         cron, created = evento.get_or_create_unique_cronometro()
@@ -210,7 +210,7 @@ class _IndividuoViewSet(ResponseFileMixin):
         return Response(result)
 
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def force_stop_cronometro(self, request, *args, **kwargs):
         cronometro_manager = CronometroManager()
         individuo = self.get_object()
@@ -224,17 +224,17 @@ class _IndividuoViewSet(ResponseFileMixin):
             }
         )
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def toggle_aparteante(self, request, *args, **kwargs):
         cronometro_manager = CronometroManager()
         individuoAparteante = self.get_object()
 
-        aparteante_status = request.GET.get('aparteante_status', '0')
+        aparteante_status = request.data.get('aparteante_status', '0')
         if aparteante_status not in ['0', '1']:
             aparteante_status = '0'
         aparteante_status = aparteante_status == '1'
 
-        default_timer = request.GET.get('default_timer', '60')  # em segundos
+        default_timer = request.data.get('default_timer', '60')  # em segundos
         try:
             default_timer = int(default_timer)
             default_timer = timedelta(
@@ -298,7 +298,7 @@ class _IndividuoViewSet(ResponseFileMixin):
              'individuo': individuoAparteante.id
              })
 
-    @action(detail=True, methods=['GET'], permission_classes=[EventoChangePermission])
+    @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def toggle_microfone(self, request, *args, **kwargs):
 
         cronometro_manager = CronometroManager()
@@ -309,9 +309,9 @@ class _IndividuoViewSet(ResponseFileMixin):
         #microfones_do_evento = list(individuo.evento.individuos.values('order', 'status_microfone'))
 
         logger.debug(f'Toggle microfone {individuo.id} - {individuo}: status_microfone {individuo.status_microfone}, com_a_palavra={individuo.com_a_palavra}')
-        status_microfone = request.GET.get('status_microfone', 'on')
-        com_a_palavra = request.GET.get('com_a_palavra', '0')
-        default_timer = request.GET.get('default_timer', '300')  # em segundos
+        status_microfone = request.data.get('status_microfone', 'on')
+        com_a_palavra = request.data.get('com_a_palavra', '0')
+        default_timer = request.data.get('default_timer', '300')  # em segundos
         try:
             default_timer = int(default_timer)
             micro = min(default_timer * 1_000, 300_000)
@@ -484,8 +484,10 @@ class _VisaoDePainelViewSet:
         visao.activate()
         return Response({'status': 'ok', 'visao': visao.id})
 
+
 @customize(Painel)
 class _PainelViewSet:
+
     @classmethod
     def build(cls, **kwargs):
         class PainelSerializer(cls.serializer_class):

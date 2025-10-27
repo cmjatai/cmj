@@ -120,13 +120,13 @@ export default {
           return
         }
       }
-      const query_params = [
-        `pause_parent_on_aparte=${newVal ? 'on' : 'off'}`
-      ]
+      const query_params = {
+        pause_parent_on_aparte: newVal ? 'on' : 'off'
+      }
       t
-        .utils.getModelAction(
+        .utils.patchModelAction(
           'painelset', 'evento', this.evento.id, 'pause_parent_on_aparte',
-          query_params.join('&')
+          query_params
         )
         .then(response => {
           console.debug(this.evento, 'pause_parent_on_aparte', response)
@@ -149,14 +149,14 @@ export default {
     toggleAllMicrofones (inclui_microfone_sempre_ativo = true) {
       const t = this
       t.status_microfone = !t.status_microfone
-      const query_params = [
-        `status_microfone=${t.status_microfone ? 'on' : 'off'}`,
-        `inclui_microfone_sempre_ativo=${inclui_microfone_sempre_ativo ? 'on' : 'off'}`
-      ]
+      const query_params = {
+        status_microfone: t.status_microfone ? 'on' : 'off',
+        inclui_microfone_sempre_ativo: inclui_microfone_sempre_ativo ? 'on' : 'off'
+      }
       t
-        .utils.getModelAction(
+        .utils.patchModelAction(
           'painelset', 'evento', this.evento.id, 'toggle_microfones',
-          query_params.join('&')
+          query_params
         )
         .then(response => {
           console.debug(this.evento, 'toggle_microfones', response)

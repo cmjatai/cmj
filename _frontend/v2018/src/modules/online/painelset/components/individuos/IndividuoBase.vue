@@ -104,11 +104,11 @@ export default {
     toggleMicrofone: function () {
       this.sendUpdate(
         'toggle_microfone',
-        [
-          `status_microfone=${!this.individuo?.status_microfone ? 'on' : 'off'}`,
-          `default_timer=${this.default_timer}`,
-          `com_a_palavra=${this.individuo?.com_a_palavra ? 1 : 0}`
-        ]
+        {
+          status_microfone: !this.individuo?.status_microfone ? 'on' : 'off',
+          default_timer: this.default_timer,
+          com_a_palavra: this.individuo?.com_a_palavra ? 1 : 0
+        }
       )
     },
     clickIndividuo: function (event) {
@@ -125,10 +125,10 @@ export default {
         }
         t.sendUpdate(
           'toggle_aparteante',
-          [
-            `aparteante_status=${!t.individuo.aparteado ? 1 : 0}`,
-            `default_timer=${t.default_timer_aparteante || 60}`
-          ]
+          {
+            aparteante_status: !t.individuo.aparteado ? 1 : 0,
+            default_timer: t.default_timer_aparteante || 60
+          }
         )
       }, 600)
     },
@@ -136,18 +136,18 @@ export default {
       clearTimeout(this.click_timeout)
       this.sendUpdate(
         'toggle_microfone',
-        [
-          `status_microfone=${this.individuo?.status_microfone || !this.individuo?.com_a_palavra ? 'on' : 'off'}`,
-          `default_timer=${this.default_timer}`,
-          `com_a_palavra=${!this.individuo?.com_a_palavra ? 1 : 0}`
-        ]
+        {
+          status_microfone: this.individuo?.status_microfone || !this.individuo?.com_a_palavra ? 'on' : 'off',
+          default_timer: this.default_timer,
+          com_a_palavra: !this.individuo?.com_a_palavra ? 1 : 0
+        }
       )
     },
     sendUpdate (action, query_params) {
       return this
-        .utils.getModelAction(
+        .utils.patchModelAction(
           'painelset', 'individuo', this.individuo_id, action,
-          query_params.join('&')
+          query_params
         )
         .then(response => {
           console.debug(this.individuo_id, action, response)
