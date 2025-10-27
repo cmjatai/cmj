@@ -84,7 +84,7 @@ export default {
   methods: {
     clickUnir () {
       const t = this
-      t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'unirmidias'
+      t.utils.patchModelAction('arq', 'draft', this.draftselected.id, 'unirmidias'
       ).then((response) => {
         this.fetchMidias(this.draftselected)
       }).catch((error) => {
@@ -95,7 +95,7 @@ export default {
     },
     clickSupendeConversao () {
       const t = this
-      t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'cancela_pdf2pdfa'
+      t.utils.patchModelAction('arq', 'draft', this.draftselected.id, 'cancela_pdf2pdfa'
       ).then((response) => {
         this.fetchMidias(this.draftselected)
       }).catch((error) => {
@@ -106,7 +106,7 @@ export default {
     },
     clickPdf2Pdfa () {
       const t = this
-      t.utils.getModelAction('arq', 'draft', this.draftselected.id, 'pdf2pdfa'
+      t.utils.patchModelAction('arq', 'draft', this.draftselected.id, 'pdf2pdfa'
       ).then((response) => {
         this.fetchMidias(this.draftselected)
       }).catch((error) => {

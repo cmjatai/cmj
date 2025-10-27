@@ -229,12 +229,12 @@ class _IndividuoViewSet(ResponseFileMixin):
         cronometro_manager = CronometroManager()
         individuoAparteante = self.get_object()
 
-        aparteante_status = request.data.get('aparteante_status', '0')
-        if aparteante_status not in ['0', '1']:
-            aparteante_status = '0'
-        aparteante_status = aparteante_status == '1'
+        aparteante_status = request.data.get('aparteante_status', 0)
+        if aparteante_status not in [0, 1]:
+            aparteante_status = 0
+        aparteante_status = aparteante_status == 1
 
-        default_timer = request.data.get('default_timer', '60')  # em segundos
+        default_timer = request.data.get('default_timer', 60)  # em segundos
         try:
             default_timer = int(default_timer)
             default_timer = timedelta(
@@ -310,8 +310,8 @@ class _IndividuoViewSet(ResponseFileMixin):
 
         logger.debug(f'Toggle microfone {individuo.id} - {individuo}: status_microfone {individuo.status_microfone}, com_a_palavra={individuo.com_a_palavra}')
         status_microfone = request.data.get('status_microfone', 'on')
-        com_a_palavra = request.data.get('com_a_palavra', '0')
-        default_timer = request.data.get('default_timer', '300')  # em segundos
+        com_a_palavra = request.data.get('com_a_palavra', 0)
+        default_timer = request.data.get('default_timer', 300)  # em segundos
         try:
             default_timer = int(default_timer)
             micro = min(default_timer * 1_000, 300_000)
@@ -324,12 +324,12 @@ class _IndividuoViewSet(ResponseFileMixin):
 
         logger.debug(f'  timer: {default_timer}: status_microfone={status_microfone}, com_a_palavra={com_a_palavra}')
 
-        if com_a_palavra not in ['0', '1']:
-            com_a_palavra = '0'
+        if com_a_palavra not in [0, 1, '0', '1']:
+            com_a_palavra = 0
         if status_microfone not in ['on', 'off']:
             status_microfone = 'off'
 
-        if com_a_palavra == '1':
+        if com_a_palavra == 1:
             # Remover com_a_palavra de todos os outros individuos do evento
             ind_com_a_palavra = individuo.evento.individuos.filter(com_a_palavra=True).exclude(id=individuo.id)
             for ind in ind_com_a_palavra:
@@ -364,8 +364,8 @@ class _IndividuoViewSet(ResponseFileMixin):
                     outro.save()
 
         individuo.status_microfone = True if status_microfone == 'on' else False
-        #individuo.com_a_palavra = True if com_a_palavra == '1' and individuo.status_microfone else False
-        individuo.com_a_palavra = True if com_a_palavra == '1' else False
+        #individuo.com_a_palavra = True if com_a_palavra == 1 and individuo.status_microfone else False
+        individuo.com_a_palavra = True if com_a_palavra == 1 else False
 
         aparteante = individuo.aparteante
         if not individuo.com_a_palavra and aparteante:

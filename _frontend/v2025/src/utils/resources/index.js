@@ -1,9 +1,18 @@
 import axios from 'axios'
 const basePath = '/api'
 
+// TODO: refatorar para aproveitar cache e LastModified
+// Configuração global para todas as requisições GET
+axios.defaults.headers.get['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+axios.defaults.headers.get['Pragma'] = 'no-cache' // Suporte para navegadores mais antigos
+axios.defaults.headers.get['Expires'] = '0' // Expira imediatamente
+
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
+/* headers: {
+  'Cache-Control': 'no-cache, no-store, must-revalidate'
+} */
 export default {
   Utils: {
     login: (username, password) => axios.post(

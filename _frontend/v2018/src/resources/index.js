@@ -1,9 +1,18 @@
 import axios from 'axios'
 const basePath = '/api'
 
+// TODO: refatorar para aproveitar cache e LastModified
+// Configuração global para todas as requisições GET
+axios.defaults.headers.get['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+axios.defaults.headers.get['Pragma'] = 'no-cache' // Suporte para navegadores mais antigos
+axios.defaults.headers.get['Expires'] = '0' // Expira imediatamente
+
 axios.defaults.xsrfCookieName = 'csrftoken'
 axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
+/* headers: {
+  'Cache-Control': 'no-cache, no-store, must-revalidate'
+} */
 export default {
   Utils: {
     login: (username, password) => axios.post(
@@ -55,9 +64,9 @@ export default {
       url: `${basePath}/${app}/${model}/${action}/?page=${page}`,
       method: 'GET'
     }),
-    getByMetadata: (m, query_string = '') => axios({
+    getByMetadata: (m, query_string = '', method = 'GET') => axios({
       url: `${basePath}/${m.app}/${m.model}/${m.id}${m.id !== '' ? '/' : ''}${m.action}${m.action !== '' ? '/' : ''}${query_string !== '' ? '?' : ''}${query_string}`,
-      method: 'GET'
+      method: method
     }),
     postModelAction: (app, model, id, action, form, progress = {}) => axios.post(
       `${basePath}/${app}/${model}/${id}/${action}/`,

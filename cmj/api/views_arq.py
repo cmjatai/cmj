@@ -254,7 +254,7 @@ class _Draft:
 
         return response
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['PATCH'])
     def unirmidias(self, request, *args, **kwargs):
 
         try:
@@ -310,7 +310,7 @@ class _Draft:
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['PATCH'])
     def cancela_pdf2pdfa(self, request, *args, **kwargs):
 
         try:
@@ -329,7 +329,7 @@ class _Draft:
         serializer = self.get_serializer(draft)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=['PATCH'])
     def pdf2pdfa(self, request, *args, **kwargs):
 
         try:
@@ -385,7 +385,7 @@ class _DraftMidia(ResponseFileMixin):
     def arquivo(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
 
-    @action(detail=True)
+    @action(detail=True, methods=['PATCH'])
     def decompor(self, request, *args, **kwargs):
         dm_atual = self.get_queryset().filter(pk=kwargs['pk']).first()
         dm_new = deepcopy(dm_atual)
@@ -439,24 +439,24 @@ class _DraftMidia(ResponseFileMixin):
         return Response(serializer.data)
 
 
-    @action(detail=True)
+    @action(detail=True, methods=['PATCH'])
     def pdf2pdfa_rapida(self, request, *args, **kwargs):
         return self.pdf2pdfa(request, task_name='pdf2pdfa_rapida', *args, **kwargs)
 
-    @action(detail=True)
+    @action(detail=True, methods=['PATCH'])
     def pdf2pdfa_basica(self, request, *args, **kwargs):
         return self.pdf2pdfa(request, task_name='pdf2pdfa_basica', *args, **kwargs)
 
-    @action(detail=True)
+    @action(detail=True, methods=['PATCH'])
     def pdf2pdfa_forcada(self, request, *args, **kwargs):
         return self.pdf2pdfa(request, task_name='pdf2pdfa_forcada', *args, **kwargs)
 
-    @action(detail=True)
+    @action(detail=True, methods=['PATCH'])
     def pdf2pdfa_compacta(self, request, *args, **kwargs):
         return self.pdf2pdfa(request, task_name='pdf2pdfa_compacta', *args, **kwargs)
 
 
-    @action(detail=True)
+    @action(detail=True, methods=['PATCH'])
     def pdf2pdfa(self, request, task_name='pdf2pdfa_basica', *args, **kwargs):
         dm = self.get_queryset().filter(pk=kwargs['pk']).first()
         dm.metadata['ocrmypdf'] = {'pdfa': DraftMidia.METADATA_PDFA_AGND}
@@ -482,7 +482,7 @@ class _DraftMidia(ResponseFileMixin):
         serializer = self.get_serializer(dm)
         return Response(serializer.data)
 
-    @action(detail=True)
+    @action(detail=True, methods=['PATCH'])
     def rotate(self, request, *args, **kwargs):
         dm = self.get_queryset().filter(pk=kwargs['pk']).first()
         p = int(request.GET.get('page', 1)) - 1

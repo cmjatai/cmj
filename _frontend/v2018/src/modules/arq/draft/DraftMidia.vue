@@ -129,7 +129,7 @@ export default {
     },
     clickDraftmidiaAction (action) {
       const t = this
-      t.utils.getModelAction('arq', 'draftmidia', t.elemento.id, action)
+      t.utils.patchModelAction('arq', 'draftmidia', t.elemento.id, action)
         .then((response) => {
           t.data = (new Date()).getTime()
           t.nocache = (new Date()).getTime()
@@ -150,7 +150,7 @@ export default {
         app: 'arq',
         model: 'draftmidia',
         id: t.elemento.id
-      }, `page=${t.page}&angulo=${angulo}`)
+      }, `page=${t.page}&angulo=${angulo}`, 'PATCH')
         .then((response) => {
           t.data = (new Date()).getTime()
           // t.$set(t, 'elemento', response.data)

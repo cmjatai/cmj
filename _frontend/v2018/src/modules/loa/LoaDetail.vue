@@ -574,7 +574,7 @@ export default {
             })
         })
         .then(() => {
-          t.utils.getModelAction('loa', 'loa', t.loa.id, 'despesas_executadas')
+          t.utils.patchModelAction('loa', 'loa', t.loa.id, 'despesas_executadas')
             .then((response) => {
               t.data_exec = response.data
               let cor = t.barchart_colors // t.build_colors(response.data.anos.length, 'a0')
