@@ -15,14 +15,15 @@
                    tipo : tipo_selecionado,
                    data_relativa : $("#id_data_relativa").val(),
                    o: 'nome',
-                   get_all: true
+                   get_all: true,
+                    t: Date.now()
                 }
                 $.getJSON("{% url 'sapl.api:base_autor-possiveis' %}", json_data, function(data){
                   if (data) {
                       if (data.length > 1) {
                         $("#id_autor").append("<option>-----</option>");
                       }
-                      $.each(results, function(idx, obj) {
+                      $.each(data, function(idx, obj) {
                           $("#id_autor")
                             .append($("<option></option>")
                             .attr("value", obj.id)

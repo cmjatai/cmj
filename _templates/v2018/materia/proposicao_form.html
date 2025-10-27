@@ -47,6 +47,7 @@
               'tipo'   : $("select[name=tipo_materia]").val(),
               'ano'    : $("input[name=ano_materia]").val(),
               'numero' : $("input[name=numero_materia]").val(),
+              't'      : Date.now()
         }
         if (formData.tipo === '' || formData.ano === '' || formData.numero === '') {
           $("#vinculo_proposicao").removeClass('hidden');
@@ -75,6 +76,7 @@
         var formData = {
               'ano'    : $("input[name=vinculo_ano]").val(),
               'numero_proposicao' : $("input[name=vinculo_numero]").val(),
+              't'      : Date.now()
         }
         if (formData.ano === '' || formData.numero_proposicao === '') {
           $("#vinculo_materia").removeClass('hidden');

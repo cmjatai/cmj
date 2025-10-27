@@ -30,6 +30,7 @@
           'tipo'   : $("select[name=tipo_materia]").val(),
           'ano'    : $("input[name=ano_materia]").val(),
           'numero' : $("input[name=numero_materia]").val(),
+          't'      : Date.now()
     }
     if (formData.tipo == '' || formData.ano == '' || formData.numero == '')
       return;
@@ -58,6 +59,7 @@
           'tipo'   : $("select[name=tipo_anexador]").val(),
           'ano'    : $("input[name=ano_anexador]").val(),
           'numero' : $("input[name=numero_anexador]").val(),
+          't'      : Date.now()
     }
     if (formData.tipo == '' || formData.ano == '' || formData.numero == '')
       return;

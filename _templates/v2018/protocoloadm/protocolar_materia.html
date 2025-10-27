@@ -60,7 +60,8 @@
                 var json_data = {
                    tipo : tipo_selecionado,
                    o: 'nome',
-                   get_all: true
+                   get_all: true,
+                    t: Date.now()
                 }
                 $.getJSON("{% url 'sapl.api:base_autor-possiveis' %}", json_data, function(data){
                   if (data) {

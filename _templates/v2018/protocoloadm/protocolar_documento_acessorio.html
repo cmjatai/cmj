@@ -26,6 +26,7 @@
               'tipo'   : $("select[name=tipo_materia]").val(),
               'ano'    : $("input[name=ano_materia]").val(),
               'numero' : $("input[name=numero_materia]").val(),
+              't'      : Date.now()
         }
         if (formData.tipo == '' || formData.ano == '' || formData.numero == '') {
           $("#vinculo_proposicao").removeClass('hidden');
