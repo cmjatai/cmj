@@ -23,9 +23,6 @@ def recria_token(request, pk):
     return Response({"message": "Token recriado com sucesso!", "token": token.key})
 
 class LastModifiedDecorator:
-    def __init__(self):
-        pass
-
     def __call__(self, cls):
 
         original_dispatch = cls.dispatch
@@ -87,7 +84,7 @@ class LastModifiedDecorator:
         return None
 
 SaplApiViewSetConstrutor = ApiViewSetConstrutor
-SaplApiViewSetConstrutor.last_modified_method(LastModifiedDecorator)
+SaplApiViewSetConstrutor.last_modified_class(LastModifiedDecorator)
 
 SaplApiViewSetConstrutor.import_modules([
     'sapl.api.views_audiencia',

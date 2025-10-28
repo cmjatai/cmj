@@ -121,7 +121,8 @@ export default {
     return {
       display: this.display_initial, // 'elapsed', 'remaining', 'last_paused'
       modesDisplay: ['elapsed', 'remaining', 'last_paused'], // modos disponíveis
-      timerInterval: 1500
+      timerInterval: 1500,
+      controlsDisplay: this.controls
     }
   },
   mounted: function () {

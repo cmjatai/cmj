@@ -263,7 +263,7 @@ class ApiViewSetConstrutor:
             return cls
 
     @classmethod
-    def last_modified_method(cls, klass):
+    def last_modified_class(cls, klass):
         cls.LastModifiedDecorator = klass
         return cls
 
@@ -516,10 +516,16 @@ class DrfAutoApiSerializerMixin(ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
 
+        if not hasattr(self.root, 'drf_expand_fields'):
+            self.root.drf_expand_fields = self.get_control_fields('expand')
+            self.root.drf_include_fields = self.get_control_fields('include')
+            self.root.drf_exclude_fields = self.get_control_fields('exclude')
+            if not (self.root.drf_expand_fields or self.root.drf_include_fields or self.root.drf_exclude_fields):
+                return fields
         model = self.Meta.model
-        expand_fields = self.get_control_fields('expand')
-        include_fields = self.get_control_fields('include')
-        exclude_fields = self.get_control_fields('exclude')
+        expand_fields = self.root.drf_expand_fields
+        include_fields = self.root.drf_include_fields
+        exclude_fields = self.root.drf_exclude_fields
 
         expand_all = ['all'] in expand_fields
 
@@ -562,7 +568,6 @@ class DrfAutoApiSerializerMixin(ModelSerializer):
                 fields = OrderedDict(
                     [(k, v) for k, v in fields.items() if k not in excls]
                 )
-
 
         fields_with_relations = {f.name: f.related_model for f in model._meta.get_fields()
                                   if f.is_relation and f.name in fields}

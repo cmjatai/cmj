@@ -16,7 +16,7 @@
             :cronometro_id="cronometro.id"
             css_class_controls="hover"
             css_class="cronometro-global"
-            :controls="['start', 'pause', 'resume', 'toggleDisplay']"
+            :controls="['start', 'pause', 'resume', 'toggleDisplay'] "
             @cronometro_start="startEvento()"
             @cronometro_pause="pauseEvento()"
             @cronometro_resume="resumeEvento()"
