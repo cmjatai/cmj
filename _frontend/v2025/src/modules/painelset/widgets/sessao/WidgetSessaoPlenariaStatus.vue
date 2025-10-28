@@ -118,7 +118,11 @@ const strSplitted = computed(() => {
   }
   const regex = /(\d{4})/g
   let str = sessaoPlenaria.value.__str__
+  console.log('str', str)
   const match = regex.exec(str)
+  if (!match) {
+    return str
+  }
   str = `<span>${str.substring(0, match.index + 4)}</span><span>${str.substring(match.index + 5)}</span>`
   return str
 })
