@@ -536,8 +536,12 @@ class DrfAutoApiSerializerMixin(ModelSerializer):
         sources = parents(self)
         sources = list(filter(lambda x: x, sources))
 
-        expand_fields = [e[len(sources)] for e in expand_fields if len(e) > len(sources)
-                         and e[0:len(sources)] == sources]
+        if expand_fields:
+            exps = []
+            for exp in expand_fields:
+                if len(exp) > len(sources) and exp[0:len(sources)] == sources:
+                    exps.extend(exp[len(sources)].split(','))
+            expand_fields = exps
 
         if include_fields:
             incls = []
