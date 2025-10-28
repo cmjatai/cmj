@@ -508,7 +508,7 @@ class DrfAutoApiSerializerMixin(ModelSerializer):
             param = request.query_params.get(control_field, '')
             # Split por vírgula e remove espaços em branco, depois crie tuplas de campos separados por ponto
             # refatore:
-            param = [e.strip() for e in param.split(',') if e.strip()]
+            param = [e.strip() for e in param.split(';') if e.strip()]
             param = [e.split('.') for e in param]
             return param
         return []
@@ -543,7 +543,7 @@ class DrfAutoApiSerializerMixin(ModelSerializer):
             incls = []
             for inf in include_fields:
                 if len(inf) - 1 == len(sources) and inf[:-1] == sources:
-                    incls.extend(inf[-1].split(';'))
+                    incls.extend(inf[-1].split(','))
             if incls:
                 fields = OrderedDict(
                     [(k, v) for k, v in fields.items() if k in incls]
@@ -553,7 +553,7 @@ class DrfAutoApiSerializerMixin(ModelSerializer):
             excls = []
             for inf in exclude_fields:
                 if len(inf) - 1 == len(sources) and inf[:-1] == sources:
-                    excls.extend(inf[-1].split(';'))
+                    excls.extend(inf[-1].split(','))
             if excls:
                 fields = OrderedDict(
                     [(k, v) for k, v in fields.items() if k not in excls]
