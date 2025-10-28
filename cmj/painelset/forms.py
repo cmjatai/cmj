@@ -104,7 +104,7 @@ class EventoForm(forms.ModelForm):
         qs_tribunas = Individuo.objects.filter(role=RoleChoices.TRIBUNA, evento=evento)
         for i in range(qs_tribunas.count() + 1, tribunas + 1):
             individuo, created = Individuo.objects.get_or_create(
-                name=f'Tribuna {i}',
+                name=f'Tribuna {i:>02}',
                 role=RoleChoices.TRIBUNA,
                 evento=evento,
             )
@@ -112,7 +112,7 @@ class EventoForm(forms.ModelForm):
         qs_individuos_extras = Individuo.objects.filter(role=RoleChoices.INDIVIDUO, evento=evento)
         for i in range(qs_individuos_extras.count() + 1, individuos_extras + 1):
             individuo, created = Individuo.objects.get_or_create(
-                name=f'Indivíduo {i}',
+                name=f'Indivíduo {i:>02}',
                 role=RoleChoices.INDIVIDUO,
                 evento=evento,
             )

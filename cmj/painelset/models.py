@@ -330,9 +330,6 @@ class Individuo(models.Model, CronometroMixin):
 
     class Meta:
         ordering = ['order']
-    unique_together = [
-        ('evento', 'parlamentar', 'role', 'name',)
-    ]
 
     def __str__(self):
         return f"{self.name} ({self.role})"
@@ -357,7 +354,7 @@ class Individuo(models.Model, CronometroMixin):
 
             self.fotografia = fotografia
 
-        return models.Model.save(self, force_insert=force_insert,
+        return models.Model.save(self, force_insert=False,
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
