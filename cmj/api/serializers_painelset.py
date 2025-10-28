@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from cmj.painelset.models import Cronometro, CronometroEvent, Evento, Individuo
-from sapl.api.serializers import SaplSerializerMixin
+from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
 
 class SecondDurationField(serializers.Field):
     """Campo personalizado para serializar duração em segundos"""
@@ -18,7 +18,7 @@ class SecondDurationField(serializers.Field):
         except (ValueError, TypeError):
             raise serializers.ValidationError("Duração inválida. Deve ser um número inteiro de segundos.")
 
-class CronometroSerializer(SaplSerializerMixin):
+class CronometroSerializer(DrfAutoApiSerializerMixin):
     """Serializer para cronômetros"""
     remaining_time = SecondDurationField()
     elapsed_time = SecondDurationField()
@@ -29,7 +29,7 @@ class CronometroSerializer(SaplSerializerMixin):
     paused_time = serializers.FloatField(read_only=True)
     #children_count = serializers.SerializerMethodField()
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = Cronometro
         fields = '__all__'
         read_only_fields = ['started_at', 'paused_at', 'finished_at']
@@ -41,7 +41,7 @@ class CronometroTreeSerializer(CronometroSerializer):
     """Serializer recursivo para árvore de cronômetros"""
     #children = serializers.SerializerMethodField()
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = Cronometro
 
     #def get_children(self, obj):
@@ -49,13 +49,13 @@ class CronometroTreeSerializer(CronometroSerializer):
     #    return CronometroTreeSerializer(children, many=True).data
 
 
-class CronometroEventSerializer(SaplSerializerMixin):
+class CronometroEventSerializer(DrfAutoApiSerializerMixin):
     """Serializer para eventos de cronômetros"""
     class Meta:
         model = CronometroEvent
         fields = ['id', 'cronometro', 'event_type', 'timestamp', 'triggered_by_child']
 
-class BaseCronometroSerializer(SaplSerializerMixin):
+class BaseCronometroSerializer(DrfAutoApiSerializerMixin):
     """Serializer para o modelo Evento"""
 
     cronometro = serializers.SerializerMethodField()
@@ -69,7 +69,7 @@ class BaseCronometroSerializer(SaplSerializerMixin):
 class EventoSerializer(BaseCronometroSerializer):
     """Serializer para o modelo Evento"""
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = Evento
         fields = '__all__'
 
@@ -78,6 +78,6 @@ class IndividuoSerializer(BaseCronometroSerializer):
 
     aparteado = serializers.PrimaryKeyRelatedField(read_only=True)
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = Individuo
         fields = '__all__'

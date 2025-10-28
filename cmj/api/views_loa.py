@@ -40,7 +40,7 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize,\
     wrapper_queryset_response_for_drf_action
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
-from sapl.api.serializers import SaplSerializerMixin
+from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
 from sapl.parlamentares.models import Parlamentar
 
 
@@ -615,7 +615,7 @@ class _OficioAjusteLoaViewSet(ResponseFileMixin):
         return self.response_file(request, *args, **kwargs)
 
 
-class EmendaLoaSearchSerializer(SaplSerializerMixin):
+class EmendaLoaSearchSerializer(DrfAutoApiSerializerMixin):
 
     str_valor = SerializerMethodField()
     str_parlamentares = SerializerMethodField()
@@ -625,7 +625,7 @@ class EmendaLoaSearchSerializer(SaplSerializerMixin):
 
     str_fase = SerializerMethodField()
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = EmendaLoa
 
     def get_finalidade(self, obj):
@@ -646,10 +646,10 @@ class EmendaLoaSearchSerializer(SaplSerializerMixin):
         return r
 
 
-class EmendaLoaSerializer(SaplSerializerMixin):
+class EmendaLoaSerializer(DrfAutoApiSerializerMixin):
 
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = EmendaLoa
 
     def validate_valor(self, obj, *args, **kwargs):
@@ -974,12 +974,12 @@ class _EmendaLoaViewSet:
         return self.list(request, *args, **kwargs)
 
 
-class DespesaConsultaSerializer(SaplSerializerMixin):
+class DespesaConsultaSerializer(DrfAutoApiSerializerMixin):
 
     str_valor = SerializerMethodField()
     str_saldo = SerializerMethodField()
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = DespesaConsulta
 
     def get_str_valor(self, obj):
@@ -1030,7 +1030,7 @@ class _DespesaConsulta:
         return self.list(request, *args, **kwargs)
 
 
-class EmendaLoaRegistroContabilSerializer(SaplSerializerMixin):
+class EmendaLoaRegistroContabilSerializer(DrfAutoApiSerializerMixin):
 
     class RegexLocalField(CharField):
         def __init__(self, regex, **kwargs):
@@ -1352,7 +1352,7 @@ class _Agrupamento:
         )
 
 
-class AgrupamentoRegistroContabilSerializer(SaplSerializerMixin):
+class AgrupamentoRegistroContabilSerializer(DrfAutoApiSerializerMixin):
 
     class RegexLocalField(CharField):
         def __init__(self, regex, **kwargs):

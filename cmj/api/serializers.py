@@ -17,7 +17,7 @@ from cmj.arq.models import DraftMidia, ArqClasse, ArqDoc
 from cmj.core.models import Bi
 from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
     DOC_TEMPLATES_CHOICE, CMSMixin
-from sapl.api.serializers import SaplSerializerMixin
+from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
 
 
 class ChoiceSerializer(serializers.Serializer):
@@ -292,7 +292,7 @@ class DocumentoUserAnonymousSerializer(DocumentoSerializer):
         exclude = ('old_json', 'old_path', 'owner')
 
 
-class DraftMidiaSerializer(SaplSerializerMixin):
+class DraftMidiaSerializer(DrfAutoApiSerializerMixin):
     arquivo_size = serializers.SerializerMethodField()
 
     def get_arquivo_size(self, obj):
@@ -305,11 +305,11 @@ class DraftMidiaSerializer(SaplSerializerMixin):
         except Exception as e:
             return 0
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = DraftMidia
 
 
-class ArqClasseSerializer(SaplSerializerMixin):
+class ArqClasseSerializer(DrfAutoApiSerializerMixin):
 
     parents = serializers.SerializerMethodField()
     conta = serializers.SerializerMethodField()
@@ -325,11 +325,11 @@ class ArqClasseSerializer(SaplSerializerMixin):
     def get_count_childs(self, obj):
         return obj.childs.count()
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = ArqClasse
 
 
-class ArqDocSerializer(SaplSerializerMixin):
+class ArqDocSerializer(DrfAutoApiSerializerMixin):
 
     def get_link_detail_backend(self, obj) -> str:
         try:
@@ -341,5 +341,5 @@ class ArqDocSerializer(SaplSerializerMixin):
         except:
             return ''
 
-    class Meta(SaplSerializerMixin.Meta):
+    class Meta(DrfAutoApiSerializerMixin.Meta):
         model = ArqDoc

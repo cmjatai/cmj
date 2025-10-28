@@ -1,9 +1,11 @@
 from collections import OrderedDict
+from functools import cached_property
 import importlib
 import inspect
 import logging
 import re
 
+from django.apps import apps
 from django.conf import settings
 from django.db.models.base import ModelBase
 from django.db.models.fields import TextField, CharField
@@ -11,6 +13,7 @@ from django.db.models.fields.related import ManyToManyField
 from django.db.models.fields.files import FileField
 from django.db.models.fields.json import JSONField
 from django.template.defaultfilters import capfirst
+from django.urls import reverse
 from django.urls.conf import path
 from django.utils.translation import gettext_lazy as _
 import django_filters
@@ -25,8 +28,9 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.urlpatterns import format_suffix_patterns
 from rest_framework.viewsets import ModelViewSet
 from django_filters.fields import ModelMultipleChoiceField
-
-
+from rest_framework.serializers import SerializerMethodField, ModelSerializer
+from django.contrib.auth import get_user_model
+from rest_framework.relations import ManyRelatedField
 logger = logging.getLogger(__name__)
 
 
@@ -380,6 +384,9 @@ class ApiViewSetConstrutor:
                         if not hasattr(_meta_filterset, 'model'):
                             model = _model
 
+                ApiSerializer.__name__ = serializer_name
+                ApiFilterSet.__name__ = filter_name
+
                 @cls.LastModifiedDecorator()
                 class ModelApiViewSet(ApiViewSetConstrutor.ApiViewSet):
                     queryset = _model.objects.all()
@@ -481,4 +488,131 @@ class customize(object):
             self.model._meta.app_config][self.model] = _ApiViewSet
         return _ApiViewSet
 
+
+
+class DrfAutoApiSerializerMixin(ModelSerializer):
+    __str__ = SerializerMethodField()
+    # metadata = SerializerMethodField()
+    link_detail_backend = SerializerMethodField()
+
+    class Meta:
+        fields = '__all__'
+
+    @cached_property
+    def user_model(self):
+        return get_user_model()
+
+    def get_control_fields(self, control_field='expand'):
+        request = self.context.get('request', None)
+        if request:
+            param = request.query_params.get(control_field, '')
+            # Split por vírgula e remove espaços em branco, depois crie tuplas de campos separados por ponto
+            # refatore:
+            param = [e.strip() for e in param.split(',') if e.strip()]
+            param = [e.split('.') for e in param]
+            return param
+        return []
+
+    def get_fields(self):
+        fields = super().get_fields()
+
+        model = self.Meta.model
+        expand_fields = self.get_control_fields('expand')
+        include_fields = self.get_control_fields('include')
+        exclude_fields = self.get_control_fields('exclude')
+
+        expand_all = ['all'] in expand_fields
+
+        if expand_all:
+            request = self.context.get('request', None)
+            user = getattr(request, 'user', None)
+            expand_all = user and user.is_superuser
+
+        def parents(nd):
+            if not nd:
+                return []
+            return parents(nd.parent) + [nd.field_name]
+
+        sources = parents(self)
+        sources = list(filter(lambda x: x, sources))
+
+        expand_fields = [e[len(sources)] for e in expand_fields if len(e) > len(sources)
+                         and e[0:len(sources)] == sources]
+
+        if include_fields:
+            incls = []
+            for inf in include_fields:
+                if len(inf) - 1 == len(sources) and inf[:-1] == sources:
+                    incls.extend(inf[-1].split(';'))
+            if incls:
+                fields = OrderedDict(
+                    [(k, v) for k, v in fields.items() if k in incls]
+                )
+
+        if exclude_fields:
+            excls = []
+            for inf in exclude_fields:
+                if len(inf) - 1 == len(sources) and inf[:-1] == sources:
+                    excls.extend(inf[-1].split(';'))
+            if excls:
+                fields = OrderedDict(
+                    [(k, v) for k, v in fields.items() if k not in excls]
+                )
+
+
+        fields_with_relations = {f.name: f.related_model for f in model._meta.get_fields()
+                                  if f.is_relation and f.name in fields}
+
+        set_fields_with_relations = set(fields_with_relations.keys())
+        set_expand_fields = set(expand_fields)
+        set_fields_serialized = set(
+            map(
+                lambda kv: kv[0],
+                filter(
+                    lambda kv: not isinstance(kv[1], rest_serializers.SerializerMethodField),
+                    fields.items()
+                )
+            )
+        )
+
+        expand_fields = set_fields_with_relations.intersection(set_fields_serialized)
+
+        if not expand_all:
+            expand_fields = expand_fields.intersection(set_expand_fields)
+
+        # remove o User model da expansão automática
+        if self.user_model in fields_with_relations.values():
+            expand_fields = [f for f in expand_fields
+                             if fields_with_relations[f] != self.user_model]
+
+        if not expand_fields:
+            return fields
+
+        for field_name in expand_fields:
+            field = fields[field_name]
+
+            model = fields_with_relations[field_name]
+            if model:
+                try:
+                    serializer_class = ApiViewSetConstrutor.get_viewset_for_model(model).serializer_class
+                    if hasattr(field, 'many') and field.many or isinstance(field, ManyRelatedField):
+                        serializer_class = serializer_class(many=True, context=self.context)
+                    else:
+                        serializer_class = serializer_class(context=self.context)
+
+                    fields.update({field_name: serializer_class})
+                except Exception as e:
+                    logger.error(f'Erro ao expandir campo {field_name} do model {model}: {e}')
+
+        return fields
+
+    def get_link_detail_backend(self, obj) -> str:
+        try:
+            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
+                           kwargs={'pk': obj.pk})
+        except:
+            return ''
+
+    def get___str__(self, obj) -> str:
+        return str(obj)
 

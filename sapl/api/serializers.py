@@ -1,3 +1,4 @@
+from hmac import new
 import logging
 
 from django.conf import settings
@@ -14,38 +15,7 @@ from sapl.base.models import Autor, CasaLegislativa, Metadata
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar, Mandato, Legislatura
 from sapl.sessao.models import OrdemDia, SessaoPlenaria
-
-
-class SaplSerializerMixin(serializers.ModelSerializer):
-    __str__ = SerializerMethodField()
-    # metadata = SerializerMethodField()
-    link_detail_backend = SerializerMethodField()
-
-    class Meta:
-        fields = '__all__' 
-
-    def get_link_detail_backend(self, obj) -> str:
-        try:
-            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
-                           kwargs={'pk': obj.pk})
-        except:
-            return ''
-
-    def get___str__(self, obj) -> str:
-        return str(obj)
-
-    """def get_metadata(self, obj) -> dict:
-        try:
-            metadata = Metadata.objects.get(
-                content_type=ContentType.objects.get_for_model(
-                    obj._meta.model),
-                object_id=obj.id
-            ).metadata
-        except:
-            metadata = {}
-        finally:
-            return metadata"""
-
+from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
 
 class ChoiceSerializer(serializers.Serializer):
     value = serializers.SerializerMethodField()
@@ -74,7 +44,7 @@ class ModelChoiceObjectRelatedField(serializers.RelatedField):
         return ModelChoiceSerializer(value).data
 
 
-class AutorSerializer(SaplSerializerMixin):
+class AutorSerializer(DrfAutoApiSerializerMixin):
 
     autor_related = ModelChoiceObjectRelatedField(read_only=True)
 
@@ -83,7 +53,7 @@ class AutorSerializer(SaplSerializerMixin):
         fields = '__all__'
 
 
-class CasaLegislativaSerializer(SaplSerializerMixin):
+class CasaLegislativaSerializer(DrfAutoApiSerializerMixin):
     version = serializers.SerializerMethodField()
 
     def get_version(self, obj):
@@ -94,7 +64,7 @@ class CasaLegislativaSerializer(SaplSerializerMixin):
         fields = '__all__'
 
 
-class MateriaLegislativaSerializer(SaplSerializerMixin):
+class MateriaLegislativaSerializer(DrfAutoApiSerializerMixin):
     anexadas = serializers.SerializerMethodField()
     desanexadas = serializers.SerializerMethodField()
 
@@ -109,7 +79,7 @@ class MateriaLegislativaSerializer(SaplSerializerMixin):
         return obj.anexadas.materias_desanexadas().values_list('id', flat=True)
 
 
-class ParlamentarSerializerPublic(SaplSerializerMixin):
+class ParlamentarSerializerPublic(DrfAutoApiSerializerMixin):
 
     class Meta:
         model = Parlamentar
@@ -119,7 +89,7 @@ class ParlamentarSerializerPublic(SaplSerializerMixin):
                    "telefone_residencia", "titulo_eleitor", "fax_residencia"]
 
 
-class ParlamentarSerializerVerbose(SaplSerializerMixin):
+class ParlamentarSerializerVerbose(DrfAutoApiSerializerMixin):
     titular = serializers.SerializerMethodField('check_titular')
     partido = serializers.SerializerMethodField('check_partido')
     fotografia_cropped = serializers.SerializerMethodField('crop_fotografia')
