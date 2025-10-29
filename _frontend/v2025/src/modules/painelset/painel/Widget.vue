@@ -156,7 +156,7 @@ import { useSyncStore } from '~@/stores/SyncStore'
 import { useAuthStore } from '~@/stores/AuthStore'
 import { activeTeleportId } from '~@/stores/TeleportStore'
 
-import { computed, ref, inject, watch, nextTick } from 'vue'
+import { computed, ref, inject } from 'vue'
 import Resource from '~@/utils/resources'
 import WidgetEditor from './editors/WidgetEditor.vue'
 
@@ -231,7 +231,7 @@ const syncChildList = async () => {
         parent: props.widgetSelected
       }
     })
-    .then((response) => {
+    .then(() => {
       // Process the fetched widgets
     })
 }
@@ -249,7 +249,6 @@ const openEditor = () => {
   widgetEditorOpened.value = true
   activeTeleportId.value = widgetSelected.value.id
 }
-
 
 const onChangePermission = () => {
   if (!authStore.isAuthenticated) {
@@ -460,6 +459,7 @@ const onMouseDown = (event) => {
   editmode.value = !editmode.value
   if (!editmode.value) {
     widgetEditorOpened.value = false
+    EventBus.emit('painelset:editorarea:close')
   }
   console.log('Activating painel editor teleport for Widget:', props.widgetSelected)
 

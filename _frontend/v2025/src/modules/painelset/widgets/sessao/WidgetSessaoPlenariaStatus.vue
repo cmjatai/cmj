@@ -7,7 +7,7 @@
       v-if="props.showFields.includes('__str__')"
       v-html="strSplitted"
     />
-    <div class="container" v-if="props.showFields.length > 1 && sessaoPlenaria">
+    <div class="container-fluid" v-if="props.showFields.length > 1 && sessaoPlenaria">
       <div class="row">
         <div
           class="col-6"
@@ -142,7 +142,7 @@ const reverseDateString = (str) => {
       display: flex;
       flex-direction: column;
     }
-    .container {
+    .container-fluid {
       padding-top: 1em;
     }
     .inner-col {
