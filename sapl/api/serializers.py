@@ -15,7 +15,7 @@ from sapl.base.models import Autor, CasaLegislativa, Metadata
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar, Mandato, Legislatura
 from sapl.sessao.models import OrdemDia, SessaoPlenaria
-from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
+from cmj.api.serializers import CmjSerializerMixin
 
 class ChoiceSerializer(serializers.Serializer):
     value = serializers.SerializerMethodField()
@@ -44,7 +44,7 @@ class ModelChoiceObjectRelatedField(serializers.RelatedField):
         return ModelChoiceSerializer(value).data
 
 
-class AutorSerializer(DrfAutoApiSerializerMixin):
+class AutorSerializer(CmjSerializerMixin):
 
     autor_related = ModelChoiceObjectRelatedField(read_only=True)
 
@@ -53,7 +53,7 @@ class AutorSerializer(DrfAutoApiSerializerMixin):
         fields = '__all__'
 
 
-class CasaLegislativaSerializer(DrfAutoApiSerializerMixin):
+class CasaLegislativaSerializer(CmjSerializerMixin):
     version = serializers.SerializerMethodField()
 
     def get_version(self, obj):
@@ -64,7 +64,7 @@ class CasaLegislativaSerializer(DrfAutoApiSerializerMixin):
         fields = '__all__'
 
 
-class MateriaLegislativaSerializer(DrfAutoApiSerializerMixin):
+class MateriaLegislativaSerializer(CmjSerializerMixin):
     anexadas = serializers.SerializerMethodField()
     desanexadas = serializers.SerializerMethodField()
 
@@ -79,7 +79,7 @@ class MateriaLegislativaSerializer(DrfAutoApiSerializerMixin):
         return obj.anexadas.materias_desanexadas().values_list('id', flat=True)
 
 
-class ParlamentarSerializerPublic(DrfAutoApiSerializerMixin):
+class ParlamentarSerializerPublic(CmjSerializerMixin):
 
     class Meta:
         model = Parlamentar
@@ -89,7 +89,7 @@ class ParlamentarSerializerPublic(DrfAutoApiSerializerMixin):
                    "telefone_residencia", "titulo_eleitor", "fax_residencia"]
 
 
-class ParlamentarSerializerVerbose(DrfAutoApiSerializerMixin):
+class ParlamentarSerializerVerbose(CmjSerializerMixin):
     titular = serializers.SerializerMethodField('check_titular')
     partido = serializers.SerializerMethodField('check_partido')
     fotografia_cropped = serializers.SerializerMethodField('crop_fotografia')

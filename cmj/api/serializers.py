@@ -20,6 +20,20 @@ from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
 from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
 
 
+class CmjSerializerMixin(DrfAutoApiSerializerMixin):
+    link_detail_backend = serializers.SerializerMethodField()
+
+    class Meta(DrfAutoApiSerializerMixin.Meta):
+        fields = '__all__'
+
+    def get_link_detail_backend(self, obj) -> str:
+        try:
+            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
+                           kwargs={'pk': obj.pk})
+        except:
+            return ''
+
+
 class ChoiceSerializer(serializers.Serializer):
     value = serializers.SerializerMethodField()
     text = serializers.SerializerMethodField()
@@ -292,7 +306,7 @@ class DocumentoUserAnonymousSerializer(DocumentoSerializer):
         exclude = ('old_json', 'old_path', 'owner')
 
 
-class DraftMidiaSerializer(DrfAutoApiSerializerMixin):
+class DraftMidiaSerializer(CmjSerializerMixin):
     arquivo_size = serializers.SerializerMethodField()
 
     def get_arquivo_size(self, obj):
@@ -309,7 +323,7 @@ class DraftMidiaSerializer(DrfAutoApiSerializerMixin):
         model = DraftMidia
 
 
-class ArqClasseSerializer(DrfAutoApiSerializerMixin):
+class ArqClasseSerializer(CmjSerializerMixin):
 
     parents = serializers.SerializerMethodField()
     conta = serializers.SerializerMethodField()
@@ -329,7 +343,7 @@ class ArqClasseSerializer(DrfAutoApiSerializerMixin):
         model = ArqClasse
 
 
-class ArqDocSerializer(DrfAutoApiSerializerMixin):
+class ArqDocSerializer(CmjSerializerMixin):
 
     def get_link_detail_backend(self, obj) -> str:
         try:

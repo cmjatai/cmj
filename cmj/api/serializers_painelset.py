@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 from cmj.painelset.models import Cronometro, CronometroEvent, Evento, Individuo
-from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
+from cmj.api.serializers import CmjSerializerMixin
 
 class SecondDurationField(serializers.Field):
     """Campo personalizado para serializar duração em segundos"""
@@ -18,7 +18,7 @@ class SecondDurationField(serializers.Field):
         except (ValueError, TypeError):
             raise serializers.ValidationError("Duração inválida. Deve ser um número inteiro de segundos.")
 
-class CronometroSerializer(DrfAutoApiSerializerMixin):
+class CronometroSerializer(CmjSerializerMixin):
     """Serializer para cronômetros"""
     remaining_time = SecondDurationField()
     elapsed_time = SecondDurationField()
@@ -49,13 +49,13 @@ class CronometroTreeSerializer(CronometroSerializer):
     #    return CronometroTreeSerializer(children, many=True).data
 
 
-class CronometroEventSerializer(DrfAutoApiSerializerMixin):
+class CronometroEventSerializer(CmjSerializerMixin):
     """Serializer para eventos de cronômetros"""
     class Meta:
         model = CronometroEvent
         fields = ['id', 'cronometro', 'event_type', 'timestamp', 'triggered_by_child']
 
-class BaseCronometroSerializer(DrfAutoApiSerializerMixin):
+class BaseCronometroSerializer(CmjSerializerMixin):
     """Serializer para o modelo Evento"""
 
     cronometro = serializers.SerializerMethodField()
