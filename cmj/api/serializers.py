@@ -319,7 +319,7 @@ class DraftMidiaSerializer(CmjSerializerMixin):
         except Exception as e:
             return 0
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = DraftMidia
 
 
@@ -339,7 +339,7 @@ class ArqClasseSerializer(CmjSerializerMixin):
     def get_count_childs(self, obj):
         return obj.childs.count()
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = ArqClasse
 
 
@@ -355,5 +355,5 @@ class ArqDocSerializer(CmjSerializerMixin):
         except:
             return ''
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = ArqDoc

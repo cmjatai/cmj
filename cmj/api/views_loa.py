@@ -625,7 +625,7 @@ class EmendaLoaSearchSerializer(CmjSerializerMixin):
 
     str_fase = SerializerMethodField()
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
 
     def get_finalidade(self, obj):
@@ -649,7 +649,7 @@ class EmendaLoaSearchSerializer(CmjSerializerMixin):
 class EmendaLoaSerializer(CmjSerializerMixin):
 
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
 
     def validate_valor(self, obj, *args, **kwargs):
@@ -979,7 +979,7 @@ class DespesaConsultaSerializer(CmjSerializerMixin):
     str_valor = SerializerMethodField()
     str_saldo = SerializerMethodField()
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = DespesaConsulta
 
     def get_str_valor(self, obj):

@@ -29,7 +29,7 @@ class CronometroSerializer(CmjSerializerMixin):
     paused_time = serializers.FloatField(read_only=True)
     #children_count = serializers.SerializerMethodField()
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = Cronometro
         fields = '__all__'
         read_only_fields = ['started_at', 'paused_at', 'finished_at']
@@ -41,7 +41,7 @@ class CronometroTreeSerializer(CronometroSerializer):
     """Serializer recursivo para árvore de cronômetros"""
     #children = serializers.SerializerMethodField()
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = Cronometro
 
     #def get_children(self, obj):
@@ -69,7 +69,7 @@ class BaseCronometroSerializer(CmjSerializerMixin):
 class EventoSerializer(BaseCronometroSerializer):
     """Serializer para o modelo Evento"""
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = Evento
         fields = '__all__'
 
@@ -78,6 +78,6 @@ class IndividuoSerializer(BaseCronometroSerializer):
 
     aparteado = serializers.PrimaryKeyRelatedField(read_only=True)
 
-    class Meta(DrfAutoApiSerializerMixin.Meta):
+    class Meta(CmjSerializerMixin.Meta):
         model = Individuo
         fields = '__all__'

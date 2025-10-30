@@ -39,7 +39,7 @@ REST_FRAMEWORK = {
 DRFAUTOAPI = {
     'DEFAULT_SERIALIZER_MODULE': 'sapl.api.serializers',
     'DEFAULT_FILTER_MODULE': 'sapl.api.forms',
-    'GLOBAL_SERIALIZER_MIXIN': 'sapl.api.serializers.DrfAutoApiSerializerMixin',
+    'GLOBAL_SERIALIZER_MIXIN': 'sapl.api.serializers.CmjSerializerMixin',
     'GLOBAL_FILTERSET_MIXIN': 'sapl.api.forms.SaplFilterSetMixin'
 }
 
