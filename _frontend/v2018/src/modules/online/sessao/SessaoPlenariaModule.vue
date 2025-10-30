@@ -90,7 +90,7 @@ export default {
 
 <style lang="scss">
 .sessaoplenaria-module {
-  background-color: rgba($color: #f0f0f0, $alpha: 1);
+  background-color: #f0f0f0;
   background-image: url("~@/assets/img/bg.png");
   user-select: none;
 }

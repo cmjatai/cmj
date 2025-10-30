@@ -1,17 +1,25 @@
 <template>
   <div class="popover-palavra"
     v-if="individuos"
-      @touchstart="touching = true"
-      @touchmove="movePopover($event)"
-      @touchend="touching = false"
-      @mouseup="touching = false"
-      @mousemove="movePopover($event)"
-      @mousedown="touching = true"
+    @touchstart="touching = true"
+    @touchmove="movePopover($event)"
+    @touchend="touching = false"
+    @mouseup="touching = false"
+    @mousemove="movePopover($event)"
+    @mousedown="touching = true"
     >
     <div :class="['popover-individuo', individuo.com_a_palavra ? 'com_a_palavra': 'aparteante']" v-for="individuo in individuos" :key="`popover-individuo-${individuo.id}`">
       <div class="popover-header">
         <div class="arrow"></div>
-        <h3 class="popover-title" v-if="individuo.com_a_palavra">Com a palavra</h3>
+        <h3
+          class="popover-title"
+          v-if="individuo.com_a_palavra"
+        >
+          <i class="fas fa-expand-alt"></i>
+          <span>
+            Com a palavra
+          </span>
+        </h3>
         <h3 class="popover-title" v-if="individuo.aparteado">Em aparte</h3>
       </div>
       <div class="popover-body">
@@ -33,8 +41,8 @@
             </div>
           </div>
           <div class="foto me-2"
-            v-if="individuo.parlamentar"
-            :style="{ backgroundImage: 'url(' + fotografiaParlamentarUrl(individuo.parlamentar) + ')' }"></div>
+            v-if="fotografiaUrl(individuo)"
+            :style="{ backgroundImage: 'url(' + fotografiaUrl(individuo) + ')' }"></div>
           <div class="foto me-2" v-else>
             <i class="fas fa-user"></i>
           </div>
@@ -112,9 +120,11 @@ export default {
     ...Vuex.mapActions('store__sync', [
       'invalidateCacheModels'
     ]),
-    fotografiaParlamentarUrl (parlamentar) {
-      if (parlamentar) {
-        return '/api/parlamentares/parlamentar/' + parlamentar + '/fotografia.c96.png'
+    fotografiaUrl (individuo) {
+      if (individuo.parlamentar) {
+        return '/api/parlamentares/parlamentar/' + individuo.parlamentar + '/fotografia.c96.png'
+      } else if (individuo.fotografia) {
+        return '/api/painelset/individuo/' + individuo.id + '/fotografia.c96.png'
       }
       return null
     },
@@ -159,11 +169,11 @@ export default {
 .popover-palavra {
   user-select: none;
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 1em;
+  right: 1em ;
   z-index: 1050;
   width: auto;
-  opacity: 0.4;
+  opacity: 0.95;
   text-align: right;
   &:hover {
     opacity: 1.0;
@@ -190,6 +200,12 @@ export default {
       margin: 0;
       font-size: 1.1em;
       font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5em;
+      i {
+        transform: rotate(90deg);
+      }
     }
   }
   .popover-body {
@@ -210,7 +226,7 @@ export default {
     overflow: hidden;
     &.aparteante {
       margin-bottom: 1px;
-      zoom: 0.7;
+      zoom: 0.8;
       display: inline-block;
       margin-right: 0.6em;
       .popover-body {
