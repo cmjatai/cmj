@@ -91,6 +91,33 @@ class Command(BaseCommand):
         #replicar um documento acessorio
         from django.core.files.base import File
 
+        d = DocumentoAcessorio.objects.get(pk=3873)
+        path = d.arquivo.original_path
+        for m in MateriaLegislativa.objects.filter(
+            tipo_id=27, ano=2024,
+            numero__in=list({
+                140, 128, 126, 124, 115, 111, 110, 109, 105, 104, 103,
+
+                99, 98, 96, 95, 87, 86, 85, 84, 82,
+                67, 107, 80, 114, 55, 106, 102, 83, 72, 71, 68, 64, 118, 73, 69, 62,
+                15, 122, 121, 119, 108, 94, 93, 92, 88, 61, 60, 57, 54, 53, 52, 51, 50, 49,
+                48, 47, 46, 45, 44, 42, 41, 40, 39, 38, 37, 27, 17, 10, 6, 5, 2,
+                36, 33, 31, 30, 29, 28, 26, 25, 24, 23, 22, 21, 20, 19, 18, 16, 14,
+                13, 11, 9, 8, 7, 4, 3, 143, 125, 78, 77, 58,79, 74, 12, 113, 66, 63, 43,
+                81, 65, 76, 75
+            })
+        ).order_by('numero'):
+            f = open(path, 'rb')
+            f = File(f)
+            d.id = None
+            d.arquivo = None
+            d.materia = m
+            d.save()
+            d.arquivo.save(path.split('/')[-1], f)
+            d.save()
+
+        return
+
         d = DocumentoAcessorio.objects.get(pk=3759)
         path = d.arquivo.original_path
         for m in MateriaLegislativa.objects.filter(

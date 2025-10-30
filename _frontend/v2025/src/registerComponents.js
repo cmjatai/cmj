@@ -19,6 +19,8 @@ const globalComponents = {
   'cmj-refresh-page': defineAsyncComponent(() => import('~@/components/atoms/RefreshPage.vue')),
   'cmj-alert': defineAsyncComponent(() => import('~@/components/atoms/Alert.vue')),
 
+  'WidgetHtmlCode': defineAsyncComponent(() => import('~@/modules/painelset/widgets/utils/WidgetHtmlCode.vue')),
+  'WidgetYoutubeEmbed': defineAsyncComponent(() => import('~@/modules/painelset/widgets/utils/WidgetYoutubeEmbed.vue')),
 
   'WidgetSessaoPlenariaStatus': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoPlenariaStatus.vue')),
   'WidgetSessaoRegistroPresenca': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoRegistroPresenca.vue')),

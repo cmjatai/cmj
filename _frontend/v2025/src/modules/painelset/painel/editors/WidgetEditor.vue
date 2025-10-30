@@ -179,7 +179,10 @@ const vueComponentsChoice = ref({
 
   'WidgetCronometroEvento': 'WidgetCronometroEvento - Cronômetro do Evento vinculado ao Painel',
   'WidgetCronometroPalavra': 'WidgetCronometroPalavra - Cronômetro da Palavra vinculada ao Painel',
-  'WidgetStatusEventoSessao': 'WidgetStatusEventoSessao - Status da Sessão e do Evento vinculados ao Painel'
+  'WidgetStatusEventoSessao': 'WidgetStatusEventoSessao - Status da Sessão e do Evento vinculados ao Painel',
+
+  'WidgetHtmlCode': 'WidgetHtmlCode - Código HTML personalizado',
+  'WidgetYoutubeEmbed': 'WidgetYoutubeEmbed - Iframe do YouTube personalizado'
 })
 
 const widgetSelected = computed(() => {

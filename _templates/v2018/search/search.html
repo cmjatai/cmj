@@ -135,7 +135,7 @@
                   <a href="{% url 'sapl.materia:documentoacessorio_detail' result.object.pk %}">{{ result.object }}</a>
                   <br><small>Matéria legislativa vinculada: <strong>{{result.object.materia}} </strong></small>
                   <br><strong>Data:</strong> {{result.object.data}}
-                  <div class="text-ementa">{{ result.object.ementa }}</div>
+                  <div class="text-ementa">{{ result.object.ementa|safe }}</div>
 
                 {% elif result.model_name == 'documentoadministrativo' %}
 

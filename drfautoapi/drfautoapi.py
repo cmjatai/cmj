@@ -126,6 +126,7 @@ class ApiFilterSetMixin(FilterSet):
             return queryset
 
     def filter_o(self, queryset, name, value):
+
         try:
             return queryset.order_by(
                 *map(str.strip, value.split(',')))
@@ -532,12 +533,15 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
         - A expansão de campos relacionados ForeignKey e OneToOne é suportada.
         - A expansão de campos relacionados ManyToMany é suportada.
         - A expansão de campos relacionados reversos (related_name) não é suportada, mas pode ser implementada manualmente no serializer customizado, ou vir a ser implementada no futuro.
+        - A expansão de campos relacionados genéricos (GenericForeignKey) não é suportada.
+        - **selection_related e prefetch_related** não são aplicados automaticamente, podendo ser implementados manualmente na viewset customizada, ou vir a ser implementados no futuro.
     """
 
     __str__ = rest_serializers.SerializerMethodField()
 
     class Meta:
         fields = '__all__'
+        max_expand_depth = 5
 
     def get___str__(self, obj) -> str:
         return str(obj)
@@ -588,6 +592,9 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
         if expand_fields:
             exps = []
             for exp in expand_fields:
+                max_expanded_depth = getattr(self.Meta, 'max_expand_depth', 5)
+                if max_expanded_depth and len(exp) > max_expanded_depth:
+                    exp = exp[0:max(0,max_expanded_depth)]
                 if len(exp) > len(sources) and exp[0:len(sources)] == sources:
                     exps.extend(exp[len(sources)].split(','))
             expand_fields = exps
