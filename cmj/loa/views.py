@@ -18,9 +18,9 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
 from cmj.core.models import AuditLog
-from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm,\
+from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, PrestacaoContaLoaForm, PrestacaoContaRegistroForm,\
     RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
-from cmj.loa.models import Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa,\
+from cmj.loa.models import Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
 from cmj.utils_report import make_pdf
@@ -1359,6 +1359,34 @@ class EmendaLoaCrud(MasterDetailCrud):
                 </div>
                 '''
 
+        def hook_prestacaocontaregistro_set(self, emendaloa, verbose_name='', field_display=''):
+            if not emendaloa.materia:
+                return '', ''
+
+            pcs = []
+
+            for pc in emendaloa.prestacaocontaregistro_set.all():
+                pc_url = reverse_lazy(
+                    'cmj.loa:prestacaocontaloa_detail',
+                    kwargs={'pk': pc.prestacao_conta.id}
+                )
+                pcs.append(
+                    f'''<li>
+                        <span class="badge badge-secondary p-2">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
+                        <span class="badge badge-secondary p-2">{pc.situacao}</span>
+                        <a href="{ pc_url}" class="d-inline-block p-2 font-weight-bold">
+                        {pc.prestacao_conta}
+                        </a>
+                        <span class="text-gray d-block">{pc.detalhamento}</span>
+                    </li>'''
+                )
+
+            return 'Registros de Prestação de Contas', f'''
+                <ul>
+                    {"".join(pcs)}
+                </ul>
+                '''
+
         def hook_parlamentares(self, emendaloa, verbose_name='', field_display=''):
             pls = []
 
@@ -1450,8 +1478,9 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
     frontend = OficioAjusteLoa._meta.app_label
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        ordered_list = False
         list_field_names = [
-            'registroajusteloa_set'
+            'registros'
         ]
 
     class CreateView(MasterDetailCrud.CreateView):
@@ -1474,13 +1503,10 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
         ordering = 'epigrafe'
         paginate_by = 25
 
-        def get_queryset(self):
-            return MasterDetailCrud.ListView.get_queryset(self)
-
-        def hook_header_registroajusteloa_set(self):
+        def hook_header_registros(self):
             return 'Registros de Ajuste Técnico'
 
-        def hook_registroajusteloa_set(self, obj, field_display='', url=''):
+        def hook_registros(self, obj, field_display='', url=''):
             ajustes = []
 
             url = reverse_lazy(
@@ -1493,7 +1519,23 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
             parlamentares = ' - '.join(map(lambda x: str(x), obj.parlamentares.all()))
             ajustes.append(f'<h4><strong>Parlamentares:</strong> {parlamentares}</h4>')
 
-            for ajuste in obj.registroajusteloa_set.all():
+            registros = obj.registroajusteloa_set.all()
+
+            registros_positivos = []
+            registros_negativos = []
+            registros_zero = []
+
+            for r in registros:
+                if r.soma_valor > Decimal('0.00'):
+                    registros_positivos.append(r)
+                elif r.soma_valor < Decimal('0.00'):
+                    registros_negativos.append(r)
+                else:
+                    registros_zero.append(r)
+
+            registros = list(registros_positivos) + list(registros_negativos) + list(registros_zero)
+
+            for ajuste in registros:
                 url = reverse_lazy(
                     'cmj.loa:registroajusteloa_detail',
                     kwargs={'pk': ajuste.id})
@@ -1564,6 +1606,7 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
     frontend = RegistroAjusteLoa._meta.app_label
 
     class DetailView(MasterDetailCrud.DetailView):
+
         layout_key = 'RegistroAjusteLoaDetail'
 
         @property
@@ -1584,6 +1627,31 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
         def hook_oficio_ajuste_loa(self, obj, verbose_name='', field_display=''):
             field_display = f'<a href="{obj.oficio_ajuste_loa.arquivo.url}">{obj.oficio_ajuste_loa.epigrafe}</a>'
             return verbose_name, field_display
+
+        def hook_prestacaocontaregistro_set(self, obj, verbose_name='', field_display=''):
+            pcs = []
+
+            for pc in obj.prestacaocontaregistro_set.all():
+                pc_url = reverse_lazy(
+                    'cmj.loa:prestacaocontaloa_detail',
+                    kwargs={'pk': pc.prestacao_conta.id}
+                )
+                pcs.append(
+                    f'''<li>
+                        <span class="badge badge-secondary p-2">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
+                        <span class="badge badge-secondary p-2">{pc.situacao}</span>
+                        <a href="{ pc_url}" class="d-inline-block p-2 font-weight-bold">
+                        {pc.prestacao_conta}
+                        </a>
+                        <span class="text-gray d-block">{pc.detalhamento}</span>
+                    </li>'''
+                )
+
+            return verbose_name, f'''
+                <ul>
+                    {"".join(pcs)}
+                </ul>
+                '''
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = RegistroAjusteLoaForm
@@ -1627,6 +1695,154 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
                 kwargs={'pk': self.object.oficio_ajuste_loa.id})
 
 
+class PrestacaoContaRegistroCrud(MasterDetailCrud):
+    model = PrestacaoContaRegistro
+    parent_field = 'prestacao_conta__loa'
+    public = [RP_LIST, RP_DETAIL]
+    frontend = PrestacaoContaRegistro._meta.app_label
+    link_return_to_parent_field = True
+    ListView = None  # Disable ListView
+
+    class BaseMixin(MasterDetailCrud.BaseMixin):
+
+        @property
+        def cancel_url(self):
+            if self.object:
+                return self.detail_url
+            return reverse_lazy(
+                'cmj.loa:prestacaocontaloa_detail',
+                kwargs={'pk': self.kwargs['pk']})
+
+    class CreateView(MasterDetailCrud.CreateView):
+        form_class = PrestacaoContaRegistroForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['loa'] = PrestacaoContaLoa.objects.get(
+                pk=self.kwargs['pk']).loa
+            return initial
+
+        def get_success_url(self):
+            return reverse_lazy(
+                'cmj.loa:prestacaocontaloa_detail',
+                kwargs={'pk': self.object.prestacao_conta.id})
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = PrestacaoContaRegistroForm
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial['loa'] = self.object.loa
+            return initial
+
+        def get_success_url(self):
+            return reverse_lazy(
+                'cmj.loa:prestacaocontaloa_detail',
+                kwargs={'pk': self.object.prestacao_conta.id})
+
+
+    class DetailView(MasterDetailCrud.DetailView):
+        layout_key = 'PrestacaoContaRegistroDetail'
+
+    class DeleteView(MasterDetailCrud.DeleteView):
+
+        def get_success_url(self):
+            return reverse_lazy(
+                'cmj.loa:registroajusteloa_detail',
+                kwargs={'pk': self.object.registro_ajuste.id})
+
+
+
+class PrestacaoContaLoaCrud(MasterDetailCrud):
+    model = PrestacaoContaLoa
+    parent_field = 'loa'
+    model_set = 'prestacaocontaregistro_set'
+    public = [RP_LIST, RP_DETAIL]
+    frontend = PrestacaoContaLoa._meta.app_label
+
+    class CreateView(MasterDetailCrud.CreateView):
+
+        def get_success_url(self):
+            return self.update_url
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        layout_key = 'PrestacaoContaLoaUpdate'
+        form_class = PrestacaoContaLoaForm
+
+    class DetailView(MasterDetailCrud.DetailView):
+        layout_key = 'PrestacaoContaLoaDetail'
+        template_name = 'loa/prestacaocontaloa_detail.html'
+
+        @property
+        def list_field_names_set(self):
+            return 'situacao', 'emendaloa_registro_ajuste', 'descricao', 'detalhamento'
+
+        def hook_header_descricao(self):
+            return 'Descrição do Item da Prestação de Contas'
+
+        def hook_descricao(self, obj, verbose_name='', field_display=''):
+            descricao = []
+            if obj.emendaloa:
+                descricao.append(f'{obj.emendaloa}')
+            if obj.registro_ajuste:
+                descricao.append(f'{obj.registro_ajuste.descricao}')
+            return verbose_name, '<br>'.join(descricao)
+
+
+        def hook_header_emendaloa_registro_ajuste(self):
+            return 'Emenda Impositiva / Registro de Ajuste Técnico'
+
+        def hook_emendaloa_registro_ajuste(self, obj, verbose_name='', field_display=''):
+            links = []
+
+            if obj.emendaloa:
+                url_emenda = reverse_lazy(
+                    'cmj.loa:emendaloa_detail',
+                    kwargs={'pk': obj.emendaloa.id})
+                links.append(f'''
+                    <a href="{url_emenda}">
+                        {obj.emendaloa.materia.epigrafe_short}
+                    </a>
+                ''')
+
+            if obj.registro_ajuste:
+                url_ajuste = reverse_lazy(
+                    'cmj.loa:registroajusteloa_detail',
+                    kwargs={'pk': obj.registro_ajuste.id})
+                links.append(f'''
+                    <a href="{url_ajuste}">
+                        {obj.registro_ajuste.oficio_ajuste_loa.epigrafe}
+                    </a>
+                ''')
+
+            return verbose_name, '<br>'.join(links)
+
+        def hook_arquivoprestacaocontaloa_set(self, obj, verbose_name='', field_display=''):
+            arquivos = []
+
+            qs_arquivos = obj.arquivoprestacaocontaloa_set.order_by('-id')
+            for arquivo in qs_arquivos:
+                arq_template = f'''
+                    <a href="{arquivo.arquivo.url}">
+                        <i class="far fa-2x fa-file-pdf"></i>
+                        {arquivo.descricao}
+                    </a>
+                '''
+                arquivos.append(
+                    f'<tr><td>{arq_template}</td></tr>'
+                )
+
+            return 'Arquivos da Prestação de Contas', f'''
+                <div class="container-table m-0 mx-n3">
+                    <table class="table table-form table-bordered table-hover w-100">
+                        {"".join(arquivos)}
+                    </table>
+                </div>
+                '''
+
+
+
+
 class EntidadeCrud(CrudAux):
     model = Entidade
     public = [RP_LIST, RP_DETAIL]
@@ -1656,5 +1872,3 @@ class EntidadeCrud(CrudAux):
 
     class ListView(CrudAux.ListView):
         ordering = ('-ativo', 'nome_fantasia')
-
-

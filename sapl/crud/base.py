@@ -821,32 +821,52 @@ class CrudDetailView(PermissionRequiredContainerCrudMixin,
             args=args)
 
     def _as_row(self, obj):
-        try:
+        row = []
+        for i, name in enumerate(self.list_field_names_set):
+            r = None
             try:
-                r = []
-                for i, name in enumerate(self.list_field_names_set):
-                    c = self.get_column(name, '', obj=obj).get('text', '')
-                    r.append(
-                        (
-                            c,
-                            self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,)) if not i else None
-                        )
-                    )
-                return r
+                c = self.get_column(name, '', obj=obj).get('text', '')
+                r = (
+                    c,
+                    self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,)) if not i else None
+                )
             except Exception as e:
-                return [(
-                    get_field_display(obj, name)[1],
-                    self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,))
-                    if i == 0 else None)
-                    for i, name in enumerate(self.list_field_names_set)]
-        except Exception as e:
-            username = self.request.user.username
-            self.logger.error("user=" + username + ". " + str(e))
-            return [(
-                getattr(obj, name),
-                self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,))
-                if i == 0 else None)
-                for i, name in enumerate(self.list_field_names_set)]
+                pass
+
+            if not r:
+                try:
+                    r = (
+                        get_field_display(obj, name)[1],
+                        self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,))
+                        if i == 0 else None
+                    )
+                except Exception as e:
+                    pass
+
+            if not r:
+                try:
+                    r = (
+                        getattr(obj, name),
+                        self.resolve_model_set_url(ACTION_DETAIL, args=(obj.id,))
+                        if i == 0 else None
+                    )
+                except Exception as e:
+                    pass
+
+            if not r:
+                try:
+                    hook = 'hook_{}'.format(name)
+                    if hasattr(self, hook):
+                        c, url = getattr(self, hook)(obj, '', None)
+                        r = (str(c), url)
+                except Exception as e:
+                    pass
+
+            if r is not None:
+                row.append(r)
+
+        return row
+
 
     def get_object(self, queryset=None):
         if hasattr(self, 'object'):

@@ -131,6 +131,14 @@
       <br>
     </small>
     <div class="clearfix"></div>
+    {% if object.emendaloa %}
+      <div>
+        <strong>Emenda Impositiva o Orçamento Impositivo:</strong><br>
+        Acesse: <a href="{% url 'cmj.loa:emendaloa_detail' object.emendaloa.id %}">
+          {{ object.emendaloa }}
+        </a>
+      </div>
+    {% endif %}
   </div>
 
   {% if object.url_video %}
@@ -161,7 +169,6 @@
   <div class="container">
     {{ block.super }}
   </div>
-
 
   {% if object.assuntos.exists %}
 

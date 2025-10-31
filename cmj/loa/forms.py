@@ -25,7 +25,7 @@ from numpy import full
 import yaml
 
 from cmj import loa
-from cmj.loa.models import Despesa, DespesaConsulta, EmendaLoaRegistroContabil, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, \
+from cmj.loa.models import ArquivoPrestacaoContaLoa, Despesa, DespesaConsulta, EmendaLoaRegistroContabil, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
     Agrupamento, quantize
 from cmj.utils import normalize, DecimalField
@@ -1151,3 +1151,130 @@ class EmendaLoaFilterSet(FilterSet):
         else:
             self.form.fields['fase'].choices = EmendaLoa.FASE_CHOICE[:5]
         self.form.fields['tipo'].choices = EmendaLoa.TIPOEMENDALOA_CHOICE
+
+class PrestacaoContaLoaForm(ModelForm):
+
+    arquivos_cadastrados = forms.ModelMultipleChoiceField(
+        label='Arquivos da Prestação de Contas',
+        queryset=ArquivoPrestacaoContaLoa.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text='Desmarque para excluir arquivos vinculados à prestação de contas.'
+    )
+
+    arquivos = forms.FileField(
+        required=False,
+        label=_('Arquivos para Upload')
+    )
+
+    data_envio = forms.DateField(
+        label='Data de Envio',
+        required=True
+    )
+
+    class Meta:
+        model = PrestacaoContaLoa
+        fields = [
+            'data_envio',
+            'epigrafe',
+            'arquivos',
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.pk:
+            self.fields['arquivos_cadastrados'].queryset = ArquivoPrestacaoContaLoa.objects.filter(
+                prestacao_conta=self.instance
+            )
+            self.fields['arquivos_cadastrados'].initial = self.fields['arquivos_cadastrados'].queryset
+        else:
+            self.fields['arquivos_cadastrados'].queryset = ArquivoPrestacaoContaLoa.objects.none()
+
+
+        self.fields['arquivos'].widget.attrs.update(
+            {'multiple': 'multiple'})
+
+    def save(self, commit = ...):
+        inst = super().save(commit)
+
+        if 'arquivos' in self.files:
+            for f in self.files.getlist('arquivos'):
+                a = ArquivoPrestacaoContaLoa()
+                a.prestacao_conta = inst
+                a.arquivo = f
+                a.descricao = f.name
+                a.save()
+
+        # remove arquivos não selecionados
+        if inst.pk:
+            arquivos_selecionados = self.cleaned_data.get('arquivos_cadastrados')
+            for a in inst.arquivoprestacaocontaloa_set.all():
+                if a not in arquivos_selecionados:
+                    a.delete()
+
+        return inst
+
+class PrestacaoContaRegistroForm(ModelForm):
+
+    registro_ajuste = forms.ModelChoiceField(
+        queryset=RegistroAjusteLoa.objects.all(),
+        label='Registro de Ajuste Técnico',
+        required=False,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker',
+                'data-live-search': 'true',
+                'data-header': 'Registros Técnicos Cadastrados',
+                'data-dropup-auto': 'false'
+            }
+        )
+    )
+
+    emendaloa = forms.ModelChoiceField(
+        queryset=EmendaLoa.objects.all(),
+        label='Emendas da LOA',
+        required=False,
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker',
+                'data-live-search': 'true',
+                'data-header': 'Emendas Cadastradas',
+                'data-dropup-auto': 'false'
+            }
+        )
+    )
+
+    class Meta:
+        model = PrestacaoContaRegistro
+        fields = [
+            'registro_ajuste',
+            'situacao',
+            'emendaloa',
+            'detalhamento',
+        ]
+    def __init__(self, *args, **kwargs):
+        loa = kwargs['initial'].pop('loa')
+        super().__init__(*args, **kwargs)
+
+        self.fields['emendaloa'].queryset = EmendaLoa.objects.filter(loa=loa)
+        self.fields['registro_ajuste'].queryset = RegistroAjusteLoa.objects.filter(
+            oficio_ajuste_loa__loa=loa)
+
+        self.fields['emendaloa'].choices = [('', '---------')] + [
+            (e.pk, f'{e.materia.epigrafe_short if e.materia else ""} - {str(e.unidade)} - {str(e)[:100]}') for e in self.fields['emendaloa'].queryset
+        ]
+
+        self.fields['registro_ajuste'].choices = [('', '---------')] + [
+            (r.pk, f'{r.oficio_ajuste_loa.epigrafe if r.oficio_ajuste_loa else ""} - {r.str_valor} - {str(r.descricao)[:100]}') for r in self.fields['registro_ajuste'].queryset
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if not cleaned_data.get('registro_ajuste') and not cleaned_data.get('emendaloa'):
+            raise ValidationError(
+                'Você deve selecionar um Registro de Ajuste Técnico ou uma Emenda da LOA para vincular ao registro da prestação de contas.'
+            )
+
+        return cleaned_data

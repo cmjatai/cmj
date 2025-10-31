@@ -1,0 +1,18 @@
+{% extends "crud/detail_detail.html" %}
+{% load i18n %}
+
+{% block detail_content %}
+    {{ block.super }}
+
+    {% if user.is_authenticated and perms.loa.add_prestacaocontaregistro %}
+    <div class="context-actions justify-content-end clearfix m-0">
+      <div class="actions btn-group m-0" role="group">
+          <a href="{{ view.detail_set_create_url}}" class="btn btn-primary">
+          Adicionar Registro de Prestação de Contas
+          </a>
+      </div>
+    </div>
+  {% endif %}
+
+
+{% endblock detail_content %}

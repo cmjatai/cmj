@@ -17,3 +17,5 @@
 {% endif %}
 - title: {% trans 'Ajustes Técnicos' %}
   url: oficioajusteloa_list
+- title: {% trans 'Prestação de Contas' %}
+  url: prestacaocontaloa_list

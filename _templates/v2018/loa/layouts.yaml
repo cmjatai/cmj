@@ -62,12 +62,39 @@ EmendaLoaDetail:
       col-md-12:
       - registroajusteloa_set
       - documentos_acessorios
+      - prestacaocontaregistro_set
 {% if perms.emendas.change_emendaloa %}
     {% trans 'Registro de Alterações' %}:
       col-md-12:
       - auditlog
 {% endif %}
 
+PrestacaoContaLoa:
+  {% trans 'Dados Gerais' %}:
+  - epigrafe data_envio:4
+
+PrestacaoContaLoaDetail:
+  {% trans 'Dados Gerais' %}:
+  - data_envio:4 epigrafe
+  - arquivoprestacaocontaloa_set
+
+PrestacaoContaLoaUpdate:
+  {% trans 'Dados Gerais' %}:
+  - data_envio:4 epigrafe
+  - arquivos_cadastrados
+  - arquivos
+
+PrestacaoContaRegistro:
+  {% trans 'Registro de Prestação de Conta' %}:
+  - registro_ajuste situacao:4
+  - emendaloa
+  - detalhamento
+
+PrestacaoContaRegistroDetail:
+  {% trans 'Registro de Prestação de Conta' %}:
+  - registro_ajuste situacao:4
+  - emendaloa
+  - detalhamento
 
 OficioAjusteLoa:
   {% trans 'Dados Gerais' %}:
@@ -75,16 +102,17 @@ OficioAjusteLoa:
   - arquivo
 
 RegistroAjusteLoa:
-  {% trans 'Dados Gerais' %}:
+  {% trans 'Registro de Ajuste do Ofício' %}:
   - tipo:2 emendaloa:7
   - parlamentares__valor
   - descricao
 
 RegistroAjusteLoaDetail:
-  {% trans 'Dados Gerais' %}:
+  {% trans 'Registro de Ajuste do Ofício' %}:
   - tipo:2 emendaloa
-  - oficio_ajuste_loa
-  - registroajusteloaparlamentar_set:5 descricao
+  - oficio_ajuste_loa registroajusteloaparlamentar_set:5
+  - descricao
+  - prestacaocontaregistro_set
 
 AgrupamentoCreate:
   {% trans 'Agrupamento' %}:

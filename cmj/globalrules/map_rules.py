@@ -213,6 +213,10 @@ rules_loa_group_operador = {
         (loa_models.AgrupamentoRegistroContabil, __base__ +
          ['emendaloa_full_editor'], __perms_publicas__),
 
+        (loa_models.PrestacaoContaLoa, __base__, __perms_publicas__),
+        (loa_models.ArquivoPrestacaoContaLoa, __base__, __perms_publicas__),
+        (loa_models.PrestacaoContaRegistro, __base__, __perms_publicas__),
+
     ]
 }
 
