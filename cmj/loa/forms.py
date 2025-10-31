@@ -1,4 +1,5 @@
 from decimal import Decimal, ROUND_DOWN, ROUND_HALF_DOWN
+from hmac import new
 import logging
 import re
 
@@ -1198,6 +1199,7 @@ class PrestacaoContaLoaForm(ModelForm):
     def save(self, commit = ...):
         inst = super().save(commit)
 
+        new_files = []
         if 'arquivos' in self.files:
             for f in self.files.getlist('arquivos'):
                 a = ArquivoPrestacaoContaLoa()
@@ -1205,11 +1207,12 @@ class PrestacaoContaLoaForm(ModelForm):
                 a.arquivo = f
                 a.descricao = f.name
                 a.save()
+                new_files.append(a.id)
 
         # remove arquivos não selecionados
         if inst.pk:
             arquivos_selecionados = self.cleaned_data.get('arquivos_cadastrados')
-            for a in inst.arquivoprestacaocontaloa_set.all():
+            for a in inst.arquivoprestacaocontaloa_set.exclude(id__in=new_files):
                 if a not in arquivos_selecionados:
                     a.delete()
 
