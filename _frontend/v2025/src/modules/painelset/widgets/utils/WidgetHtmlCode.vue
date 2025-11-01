@@ -18,7 +18,7 @@ const props = defineProps({
   widgetSelected: {
     type: Number,
     default: 0
-  },
+  }
 })
 
 const widgetSelected = computed(() => {

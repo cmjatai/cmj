@@ -1,30 +1,64 @@
 <template>
   <div
-    class="widget-registro-presenca"
+    class="widget-registro-presenca-e-votacao"
   >
-    <h3>Registro de Presença da Sessão Plenária: {{ sessaoPlenaria?.__str__ }}</h3>
-    <p>Aqui será exibido o widget de registro de presença para a sessão plenária associada ao painel.</p>
-    <div>
+    <div class="inner">
       <div
         :key="`integrante-${integrante.id}`"
         v-for="integrante in integrantesDaMesa"
         class="integrante-mesa"
       >
-        {{ integrante.parlamentar }} ({{ integrante.cargo }})
+        <div
+          class="foto"
+          :style="`background-image: url(${strFotografiaUrl(integrante.id)})`"
+        />
+        <div class="nome">
+          {{ integrante.parlamentar }} <small>({{ integrante.cargo }})</small>
+        </div>
+        <div
+          class="votacao"
+          v-if="displayVotacao"
+        >
+          <span class="sim">SIM</span>
+        </div>
       </div>
       <div
         :key="`parlamentar-presente-${parlamentar.id}`"
         v-for="parlamentar in parlamentaresAtivosPresentes"
         class="parlamentar-presente"
       >
-        {{ parlamentar.__str__ }}
+        <div
+          class="foto"
+          :style="`background-image: url(${strFotografiaUrl(parlamentar.id)})`"
+        />
+        <div class="nome">
+          {{ parlamentar.__str__ }}
+        </div>
+        <div
+          class="votacao"
+          v-if="displayVotacao"
+        >
+          <span class="sim">SIM</span>
+        </div>
       </div>
       <div
         :key="`parlamentar-ausente-${parlamentar.id}`"
         v-for="parlamentar in parlamentaresAtivosAusentes"
         class="parlamentar-ausente"
       >
-        {{ parlamentar.__str__ }}
+        <div
+          class="foto"
+          :style="`background-image: url(${strFotografiaUrl(parlamentar.id)})`"
+        />
+        <div class="nome">
+          {{ parlamentar.__str__ }}
+        </div>
+        <div
+          class="votacao"
+          v-if="displayVotacao"
+        >
+          <span class="nao">NÃO</span>
+        </div>
       </div>
     </div>
   </div>
@@ -43,6 +77,14 @@ const props = defineProps({
   widgetSelected: {
     type: Number,
     default: 0
+  },
+  displayVotacao: {
+    type: Boolean,
+    default: true
+  },
+  displayAusentes: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -89,7 +131,7 @@ const parlamentaresAtivosPresentes = computed(() => {
   const parlamentares = presencas.map(presenca => {
     return syncStore.data_cache.parlamentares_parlamentar?.[presenca.parlamentar] || null
   }).filter(p => p !== null && integrantesDaMesa.value.every(im => im.id !== p.id)) // filtra para não incluir integrantes da mesa
-  return parlamentares
+  return _.orderBy(parlamentares, ['nome_parlamentar'], ['asc'])
 })
 // computed para parlamentares ativos e ausentes na sessão plenária
 const parlamentaresAtivosAusentes = computed(() => {
@@ -102,10 +144,14 @@ const parlamentaresAtivosAusentes = computed(() => {
   )
   const idsPresentes = presencas.map(presenca => presenca.parlamentar)
   const parlamentares = Object.values(syncStore.data_cache.parlamentares_parlamentar || {}).filter(
-    p => p.ativo && !idsPresentes.includes(p.id)
+    p => p.ativo && !idsPresentes.includes(p.id) && integrantesDaMesa.value.every(im => im.id !== p.id) && props.displayAusentes
   )
-  return parlamentares
+  return _.orderBy(parlamentares, ['nome_parlamentar'], ['asc'])
 })
+
+const strFotografiaUrl = (id) => {
+  return `/api/parlamentares/parlamentar/${id}/fotografia.c128.png`
+}
 
 const syncInit = async () => {
   syncStore.fetchSync({
@@ -155,6 +201,94 @@ syncInit()
 
 </script>
 <style lang="scss" scoped>
-  .widget-registro-presenca {
+  .widget-registro-presenca-e-votacao {
+    width: 100%;
+    height: 100%;
+    .inner {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      flex-direction: column;
+      justify-content: stretch;
+    }
+    .integrante-mesa,
+    .parlamentar-presente,
+    .parlamentar-ausente {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5em;
+      padding-right: 0.3em;
+      .foto {
+        height: 100%;
+        aspect-ratio: 1 / 1;
+        background-size: auto 100%;
+      }
+      .nome {
+        text-align: left;
+        flex: 1 1 auto;
+        overflow: hidden;
+        line-height: 1;
+        small {
+          font-weight: normal;
+          font-size: 0.8em;
+          font-style: italic;
+        }
+      }
+      .votacao {
+        font-size: 1em;
+        font-weight: bold;
+        text-shadow: 1px 1px 3px #000;
+        line-height: 1;
+        span {
+          padding: 0.2em;
+          display: inline-block;
+          color: #fff;
+          border-radius: 0.15em;
+          min-width: 4em;
+          text-align: center;
+          box-shadow: 1px 1px 2px #0006;
+        }
+        .sim {
+          background-color: #0f0;
+        }
+        .nao {
+          background-color: red;
+        }
+        .abstencao {
+          background-color: orange;
+        }
+        .nao-votou {
+          background-color: gray;
+        }
+      }
+    }
+    .integrante-mesa {
+      &:nth-child(odd) {
+        background-color: #00448880;
+      }
+      &:nth-child(even) {
+        background-color: #00448870;
+      }
+    }
+    .parlamentar-presente {
+      // odd even background
+      &:nth-child(odd) {
+        background-color: #00550080;
+      }
+      &:nth-child(even) {
+        background-color: #00550070;
+      }
+    }
+    .parlamentar-ausente {
+      // odd even background
+      &:nth-child(odd) {
+        background-color: #55000080;
+      }
+      &:nth-child(even) {
+        background-color: #55000070;
+      }
+    }
   }
 </style>

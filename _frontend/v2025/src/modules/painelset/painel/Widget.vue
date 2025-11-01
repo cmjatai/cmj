@@ -23,7 +23,6 @@
         :is="widgetSelected?.vue_component"
         :painel-id="painelId"
         :widget-selected="widgetSelected?.id"
-        :coords-change="coordsChange"
         @oncomponent="onComponent"
       />
     </div>
