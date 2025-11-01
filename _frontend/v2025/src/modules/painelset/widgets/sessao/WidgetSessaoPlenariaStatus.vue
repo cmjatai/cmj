@@ -10,7 +10,7 @@
     <div class="container-fluid" v-if="props.showFields.length > 1 && sessaoPlenaria">
       <div class="row">
         <div
-          class="col-6"
+          :class="`col-${props.cols}`"
           v-if="props.showFields.includes('data_inicio')"
         >
           <div class="inner-col">
@@ -21,7 +21,7 @@
           </div>
         </div>
         <div
-          class="col-6"
+          :class="`col-${props.cols}`"
           v-if="props.showFields.includes('data_fim')"
         >
           <div class="inner-col">
@@ -32,7 +32,7 @@
           </div>
         </div>
         <div
-          class="col-6"
+          :class="`col-${props.cols}`"
           v-if="props.showFields.includes('hora_inicio')"
         >
           <div class="inner-col">
@@ -43,7 +43,7 @@
           </div>
         </div>
         <div
-          class="col-6"
+          :class="`col-${props.cols}`"
           v-if="props.showFields.includes('hora_fim')"
         >
           <div class="inner-col">
@@ -57,7 +57,7 @@
 
       <div class="row">
         <div
-          class="col-6"
+          :class="`col-${props.cols}`"
           v-if="props.showFields.includes('iniciada')"
         >
           <div class="inner-col">
@@ -68,7 +68,7 @@
           </div>
         </div>
         <div
-          class="col-6"
+          :class="`col-${props.cols}`"
           v-if="props.showFields.includes('finalizada')"
         >
           <div class="inner-col">
@@ -100,6 +100,10 @@ const props = defineProps({
   showFields: {
     type: Array,
     default: () => ['__str__']
+  },
+  cols: {
+    type: Number,
+    default: 6
   }
 })
 
@@ -150,7 +154,7 @@ const reverseDateString = (str) => {
       align-items: center;
       justify-content: center;
       gap: 0.5em;
-      font-size: 0.7em;
+      font-size: 0.9em;
     }
   }
 </style>

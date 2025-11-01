@@ -2,7 +2,7 @@
   <div
     class="widget-iframe"
   >
-    <iframe
+    <iframe v-if="srcIframeUrl"
       :width="props.width"
       :height="props.height"
       :src="srcIframeUrl"
@@ -10,7 +10,7 @@
       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
       referrerpolicy="strict-origin-when-cross-origin"
       allowfullscreen
-    />
+    ></iframe>
   </div>
 </template>
 <script setup>
@@ -45,17 +45,27 @@ const props = defineProps({
 const widgetSelected = computed(() => {
   return syncStore.data_cache.painelset_widget?.[props.widgetSelected] || null
 })
+const painel = computed(() => {
+  return syncStore.data_cache.painelset_painel?.[props.painelId] || null
+})
+const evento = computed(() => {
+  return syncStore.data_cache.painelset_evento
+    ?.[painel.value?.evento] || null
+})
 
 const srcIframeUrl = computed(() => {
   const paramsWidget = new URLSearchParams()
-  _.each(widgetSelected.value?.config?.params || {}, (value, key) => {
+  _.each(widgetSelected.value?.config?.youtube?.params || {}, (value, key) => {
     paramsWidget.append(key, value)
   })
-  if (!widgetSelected.value?.config?.params.autoplay) {
+  if (!widgetSelected.value?.config?.youtube?.params.autoplay) {
     paramsWidget.append('autoplay', props.autoplay.toString())
   }
-  const videoId = widgetSelected.value?.description.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1]
-  return videoId ? `https://www.youtube.com/embed/${videoId}?${paramsWidget.toString()}` : (widgetSelected.value?.description || '')
+  let videoId = evento.value?.youtube_id || widgetSelected.value?.config?.youtube?.id || ''
+  videoId = videoId ? `https://www.youtube.com/embed/${videoId}?${paramsWidget.toString()}` : ''
+  console.log('videoId', videoId)
+  return videoId
+
 })
 
 </script>

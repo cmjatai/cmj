@@ -54,6 +54,7 @@ class EventoForm(forms.ModelForm):
             'start_previsto',
             'ips_mesas',
             'comunicar_com_mesas',
+            'youtube_id',
             ]
 
     def __init__(self, *args, **kwargs):
@@ -66,8 +67,9 @@ class EventoForm(forms.ModelForm):
             ('vincular_parlamentares', 4),
             ('tribunas', 4),
             ('individuos_extras', 4),
-            ('comunicar_com_mesas', 3),
-            ('ips_mesas', 9),
+            ('comunicar_com_mesas', 4),
+            ('ips_mesas', 4),
+            ('youtube_id', 4),
             ('description', 12),
         ])
 
@@ -117,7 +119,7 @@ class EventoForm(forms.ModelForm):
                 evento=evento,
             )
 
-        evento.individuos.reset_ordem()
+        #evento.individuos.reset_ordem()
 
         return evento
 

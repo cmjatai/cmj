@@ -104,7 +104,7 @@
             v-for="(pv, index) in visaoList"
             :key="`${pv.id}_${index}`"
             :class="{ active: pv.id === visaoSelected }"
-            class="btn btn-primary"
+            class="btn btn-secondary"
             @mousedown.stop.prevent="false"
             @click.stop.prevent="trocarVisao(pv.id)"
           >
@@ -147,18 +147,6 @@ const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 
-syncStore.registerModels('painelset', [
-  'painel',
-  'visaodepainel',
-  'widget',
-  'evento',
-  'individuo',
-  'cronometro'
-])
-
-syncStore.registerModels('sessao', [
-  'sessaoplenaria'
-])
 
 // 3. Props & Emits
 const props = defineProps({

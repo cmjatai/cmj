@@ -2,18 +2,15 @@
   <div
     class="widget-status-evento-sessao"
   >
-
     <WidgetSessaoPlenariaStatus
       :painel-id="painelId"
       :widget-selected="widgetSelected"
+      :cols="12"
       :show-fields="[
         '__str__',
         'data_inicio',
         'hora_inicio',
-        'data_fim',
-        'hora_fim',
-        'iniciada',
-        'finalizada'
+        'iniciada'
       ]"
     />
 
@@ -72,8 +69,11 @@ const cronometro = computed(() => {
     .cronometro-evento-sessao {
       color: yellow;
       margin-top: 0.5em;
-      font-size: 2em;
+      font-size: 2.7em;
       font-weight: bold;
+      .widget-cronometro-base {
+        font-size: 1.4em;
+      }
     }
   }
 </style>

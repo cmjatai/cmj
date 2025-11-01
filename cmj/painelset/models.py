@@ -1,5 +1,6 @@
 
 from datetime import timedelta
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
@@ -9,7 +10,9 @@ from django.utils.translation import gettext_lazy as _
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.fields.json import JSONField
+import yaml
 
+from sapl.base.templatetags.common_tags import youtube_id
 from sapl.parlamentares.models import foto_upload_path
 from sapl.utils import SaplGenericForeignKey
 from sapl.utils import PortalImageCropField
@@ -204,6 +207,18 @@ class Evento(models.Model, CronometroMixin):
     end_real = models.DateTimeField(null=True, blank=True, verbose_name="Data e hora Real de Término")
 
     duration = models.DurationField(help_text="Duração total planejada do evento", verbose_name="Duração do Evento")
+
+    youtube_id = models.CharField(
+        max_length=256, blank=True, default='',
+        help_text="ID do vídeo do YouTube associado ao evento (para exibição no painel)",
+        validators=[
+            RegexValidator(
+                regex=r'^[a-zA-Z0-9_-]{11}$',
+                message="ID do YouTube inválido. Deve conter 11 caracteres alfanuméricos, hífens ou underscores.",
+                code='invalid_youtube_id'
+            )
+        ]
+    )
 
     ips_mesas = models.CharField(
         max_length=256, blank=True, default='',
@@ -457,6 +472,53 @@ class Painel(models.Model):
                     widget.parent_id = map_widgets[widget.parent_id]
                     widget.save()
 
+    def reset_to_defaults(self, id='painel_default_sessao_plenaria'):
+        """Reseta o painel para a configuração padrão, removendo visões e widgets atuais."""
+
+        fixture_file = settings.BASE_DIR.child('painelset', 'fixtures', 'painelset_defaults.yaml')
+
+        painelset_set = {}
+        with open(fixture_file, 'r') as file:
+            painelset_set = yaml.safe_load(file)
+
+        for painel_data in painelset_set:
+
+            if painel_data.get('painel', None) != id:
+                continue
+
+            painel = self
+            painel.name = painel_data['name']
+            painel.description = painel_data['description']
+            painel.config = painel_data.get('config', {})
+            painel.styles = painel_data.get('styles', {})
+            painel.save()
+            painel.visoes.all().delete()
+
+            for visao_data in painel_data.get('visoes', []):
+                visao = VisaoDePainel.objects.create(
+                    painel=painel,
+                    name=visao_data['name'],
+                    active=False,
+                    description=visao_data['description'],
+                    config=visao_data.get('config', {}),
+                    styles=visao_data.get('styles', {})
+                )
+                painel.visoes.add(visao)
+
+                for widget_data in visao_data.get('widgets', []):
+                    widget = Widget.objects.create(
+                        visao=visao,
+                        name=widget_data['name'],
+                        description=widget_data['description'],
+                        vue_component=widget_data.get('vue_component', ''),
+                        config=widget_data.get('config', {}),
+                        styles=widget_data.get('styles', {})
+                    )
+                    visao.widgets.add(widget)
+            visao.active = True
+            visao.save()
+
+
 class VisaoDePainel(models.Model):
     """Modelo intermediário para associar visões a painéis com configuração adicional."""
 
@@ -467,7 +529,7 @@ class VisaoDePainel(models.Model):
 
     position = models.PositiveIntegerField(help_text="Posição da visão no painel", default=0)
 
-    active = models.BooleanField(default=True, help_text="Indica se a visão está ativa no painel")
+    active = models.BooleanField(default=False, help_text="Indica se a visão está ativa no painel")
 
     config = JSONField(
         verbose_name=_('Configuração Específica'),
@@ -491,6 +553,18 @@ class VisaoDePainel(models.Model):
         VisaoDePainel.objects.filter(painel=self.painel).update(active=False)
         self.active = True
         self.save()
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.position == 0:
+            max_position = VisaoDePainel.objects.filter(painel=self.painel).aggregate(models.Max('position'))['position__max']
+            self.position = (max_position or 0) + 1
+
+        return super().save(force_insert=force_insert,
+                            force_update=force_update,
+                            using=using,
+                            update_fields=update_fields)
 
 class Widget(models.Model):
     """Modelo intermediário para associar widgets a visões com configuração adicional."""

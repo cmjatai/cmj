@@ -115,12 +115,12 @@ const secondsToTime = (timeKey, alternativeKey) => {
   if (negative) {
     r = negative + r
   }
-  return r || '00:00:00'
+  return r || '00:00'
 }
 
 const displayTime = computed(() => {
   if (!cronometro.value) {
-    return '00:00:00'
+    return '00:00'
   }
   if (display.value === 'elapsed') {
     return secondsToTime(cronometro.value.elapsed_time)
@@ -129,7 +129,7 @@ const displayTime = computed(() => {
   } else if (display.value === 'last_paused') {
     return secondsToTime(cronometro.value.last_paused_time)
   } else {
-    return '00:00:00'
+    return '00:00'
   }
 })
 

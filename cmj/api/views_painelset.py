@@ -23,6 +23,7 @@ from pythonosc import udp_client
 
 from cmj.painelset.tasks import SEND_MESSAGE_MICROPHONE
 from sapl.api.mixins import ResponseFileMixin
+from sapl.base.templatetags.common_tags import youtube_id
 
 logger = logging.getLogger(__name__)
 
@@ -99,6 +100,7 @@ class _EventoViewSet:
                 end_real=None,
                 duration=evento_copiado.duration,
                 ips_mesas=evento_copiado.ips_mesas,
+                youtube_id='',
                 comunicar_com_mesas=evento_copiado.comunicar_com_mesas,
                 description=f'Copia gerada a partir do evento {evento_copiado.name} '
                 f'de {formats.date_format(timezone.localtime(evento_copiado.start_real), "d/m/Y - H:i")}',
@@ -495,3 +497,9 @@ class _PainelViewSet:
 
         cls.serializer_class = PainelSerializer
         return cls
+
+    @action(detail=True, methods=['patch'])
+    def reset_to_defaults(self, request, pk=None):
+        painel = self.get_object()
+        painel.reset_to_defaults()
+        return Response({'status': 'ok', 'painel': painel.id})

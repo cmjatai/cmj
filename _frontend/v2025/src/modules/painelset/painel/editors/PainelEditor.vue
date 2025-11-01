@@ -97,6 +97,17 @@
                 >
                   <FontAwesomeIcon :icon="['fas', 'times']" />
                 </button>
+              </div>
+              <div class="btn-group ms-2">
+                <button
+                  class="btn btn-warning"
+                  @click.stop.prevent="resetToDefaults()"
+                  title="Resetar Painel para Configuração Padrão"
+                >
+                  <FontAwesomeIcon :icon="'fa-solid fa-rotate-left'" />
+                </button>
+              </div>
+              <div class="btn-group ms-2">
                 <button
                   class="btn btn-sm btn-primary"
                   @mousedown.stop.prevent="false"
@@ -251,6 +262,31 @@ watch(
     }
   }
 )
+const resetToDefaults = async () => {
+  if (!painelSelected.value) {
+    return
+  }
+  try {
+    await Resource.Utils.patchModelAction({
+      app: 'painelset',
+      model: 'painel',
+      id: painelSelected.value.id,
+      action: 'reset_to_defaults'
+    })
+    messageStore.addMessage({
+      type: 'info',
+      text: 'Painel resetado para configuração padrão.',
+      timeout: 2000
+    })
+  } catch (error) {
+    messageStore.addMessage({
+      type: 'danger',
+      text: 'Erro ao resetar o Painel para configuração padrão.',
+      timeout: 5000
+    })
+    console.error('Erro ao resetar o Painel para configuração padrão:', error)
+  }
+}
 
 const closeEditor = () => {
   EventBus.emit('painelset:editorarea:close')
