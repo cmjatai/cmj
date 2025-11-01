@@ -13,6 +13,13 @@
 
 
 ### VISÃO 1 ###################################################################
+# config.activates, activate tem a função de "se" para ativar a visão de acordo com condições.
+# Pode haver múltiplos activate em uma visão, funcionam como OR, ou seja, ao menos um deve ser satisfeito para ativar a visão.
+# Dentro de cada activate, as condições funcionam como AND, ou seja, todas as condições devem ser satisfeitas para ativar a visão.
+# As condições são baseadas nos lookups do django, incluíndo as apps e os models, ou seja, painelset__individuo__com_a_palavra refere-se ao campo com_a_palavra do model individuo da app painelset.
+# Adicionar um lookup contraditório em um activate (ex: painelset__individuo__com_a_palavra: true e painelset__individuo__com_a_palavra: false) faz com que o activate nunca seja satisfeito, desativando a visão.
+# Eventos e Sessões associadas ao painel são injetadas automaticamente no filtro de ativação de visão ao nível do Model do lookup acima, e não ao nível dos fields, se estes forem FKs ou M2M.
+# Os activates e a ativação e desativação das visões são tratados na tarefa assíncrona task_refresh_states_from_visaodepainel, ativada pelo signals_sync_refresh.
     - visao:
       name: Visão de Cronômetro da Palavra Ativo
       description: Exibe o cronômetro da palavra ativa.
@@ -99,10 +106,10 @@
       description: Exibe o status da sessão quando ela ainda não foi iniciada ou foi suspensa.
 
       config:
-        activates: # Ativa esta visão quando a sessão plenária não foi iniciada ou o cronômetro está pausado
-          - activate:
+        activates:
+          - activate: # ativa a visão quando o cronômetro do evento está pausado
               - painelset__evento__cronometro__state: 'paused'
-          - activate:
+          - activate: # ativa a visão quando a sessão plenária não foi iniciada
               - sessao__sessaoplenaria__iniciada: false
 
       styles:
@@ -160,7 +167,7 @@
           description: Exibe o status da sessão plenária.
           config:
             coords:
-              h: 35
+              h: 30
               w: 65
               x: 35
               y: 0
@@ -183,10 +190,10 @@
                 autoplay: 1
                 mute: 0
             coords:
-              h: 62
+              h: 69
               w: 63
               x: 36
-              y: 36
+              y: 30
           styles:
             component: {}
             title:
