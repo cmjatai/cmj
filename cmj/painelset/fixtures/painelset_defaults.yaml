@@ -143,6 +143,39 @@
               display: none
             inner: {}
 
+### Visão 98 ###################################################################
+    - visao:
+      name: Visão dev
+      description: Visão para desenvolvimento e testes.
+      config:
+        activates:
+          - activate:
+              - painelset__evento__cronometro__state: 'running'
+      styles:
+        component: {}
+        title:
+          display: none
+        inner: {}
+      widgets:
+        - vue_component: WidgetHtmlCode
+          name: Widget de Teste HTML
+          description: |
+            <div style="color: #0f0; font-size: 3em; text-align: center; font-weight: bold;">
+              Visão de Desenvolvimento Ativa
+            </div>
+          config:
+            coords:
+              h: 15
+              w: 100
+              x: 0
+              y: 0
+          styles:
+            component:
+              background-color: '#000d'
+            title:
+              display: none
+            inner: {}
+
 ### VISÃO 99 ###################################################################
     - visao: ### Visão padrão para YouTube Live - Visão sem activate deve existir apenas uma e ser a última ###
       name: Visão Youtube Live
@@ -150,6 +183,8 @@
 
       config:
         activates: # Player mostrado quando nenhuma outra visão está ativa
+          - activate:
+              - painelset__
 
       styles:
         component:
@@ -199,3 +234,5 @@
             title:
               display: none
             inner: {}
+
+

@@ -109,7 +109,7 @@
               </div>
               <div class="btn-group ms-2">
                 <button
-                  class="btn btn-sm btn-primary"
+                  class="btn btn-primary"
                   @mousedown.stop.prevent="false"
                   @click.stop.prevent="onAddVisaodepainel($event)"
                   title="Adicionar Visão do Painel"

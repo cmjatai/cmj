@@ -7,7 +7,6 @@ from cmj.painelset.models import Evento
 
 logger = get_task_logger(__name__)
 
-
 def task_refresh_states_from_visaodepainel_function(*args, **kwargs):
     """avaliar visao de painel com base nas chains do campo config de cada visao de painel"""
     # todos os eventos não finalizados
@@ -32,33 +31,38 @@ def task_refresh_states_from_visaodepainel_function(*args, **kwargs):
                     for key, conditions in activate.items():
                         if key != 'activate' or not conditions:
                             continue
-                        for condition in conditions:
-                            filter_maps = {}
-                            for lookup, value in condition.items():
-                                app_label, model_name, field_name = lookup.split('__', 2)
-                                filter_maps.setdefault((app_label, model_name), {})[field_name] = value
+                        try:
+                            for condition in conditions:
+                                filter_maps = {}
+                                for lookup, value in condition.items():
+                                    app_label, model_name, field_name = lookup.split('__', 2)
+                                    filter_maps.setdefault((app_label, model_name), {})[field_name] = value
 
-                            for (app_label, model_name), filter_fields in filter_maps.items():
-                                Model = apps.get_model(app_label, model_name)
-                                fields_relations = dict([
-                                    (field.name, field.related_model)
-                                    for field in Model._meta.get_fields()
-                                    if field.is_relation and hasattr(field, 'related_model')
-                                ])
-                                for field_name, related_model in fields_relations.items():
-                                    if related_model == Evento:
-                                        filter_fields[field_name] = evento
-                                    elif related_model == painel._meta.model:
-                                        filter_fields[field_name] = painel
-                                    elif related_model == visao._meta.model:
-                                        filter_fields[field_name] = visao
-                                    elif related_model == painel.sessao._meta.model:
-                                        filter_fields[field_name] = sessao_associada_ao_painel
-                                qs = Model.objects.filter(**filter_fields)
+                                for (app_label, model_name), filter_fields in filter_maps.items():
+                                    Model = apps.get_model(app_label, model_name)
+                                    fields_relations = dict([
+                                        (field.name, field.related_model)
+                                        for field in Model._meta.get_fields()
+                                        if field.is_relation and hasattr(field, 'related_model')
+                                    ])
+                                    for field_name, related_model in fields_relations.items():
+                                        if related_model == Evento:
+                                            filter_fields[field_name] = evento
+                                        elif related_model == painel._meta.model:
+                                            filter_fields[field_name] = painel
+                                        elif related_model == visao._meta.model:
+                                            filter_fields[field_name] = visao
+                                        elif related_model == painel.sessao._meta.model:
+                                            filter_fields[field_name] = sessao_associada_ao_painel
+                                    qs = Model.objects.filter(**filter_fields)
 
-                                filter_match.append(qs.exists())
+                                    filter_match.append(qs.exists())
                             if not all(filter_match):
                                 break
+                        except Exception as e:
+                            logger.error(f'Erro ao avaliar condição de ativação da visão de painel {visao.id}: {e}')
+                            filter_match.append(False)
+
                         if not all(filter_match):
                             break
 
