@@ -147,7 +147,7 @@ const reverseDateString = (str) => {
       flex-direction: column;
     }
     .container-fluid {
-      padding-top: 1em;
+      padding-top: 0.6em;
     }
     .inner-col {
       display: flex;

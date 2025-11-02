@@ -5,16 +5,19 @@
     <WidgetSessaoPlenariaStatus
       :painel-id="painelId"
       :widget-selected="widgetSelected"
-      :cols="12"
+      :cols="widgetContainer?.config.displayCols || 12"
       :show-fields="[
-        '__str__',
-        'data_inicio',
-        'hora_inicio',
-        'iniciada'
+        widgetContainer?.config.displayTitulo ? '__str__' : null,
+        widgetContainer?.config.displayDataInicio ? 'data_inicio' : null,
+        widgetContainer?.config.displayHoraInicio ? 'hora_inicio' : null,
+        widgetContainer?.config.displayIniciada ? 'iniciada' : null
       ]"
     />
 
-    <div class="cronometro-evento-sessao">
+    <div
+      v-if="widgetContainer?.config.displayCronometro"
+      class="cronometro-evento-sessao"
+    >
       <div v-if="cronometro?.state === 'paused'">Sessão Suspensa</div>
       <WidgetCronometroBase
         v-if="evento?.cronometro"
@@ -43,6 +46,9 @@ const props = defineProps({
     type: Number,
     default: 0
   }
+})
+const widgetContainer = computed(() => {
+  return syncStore.data_cache.painelset_widget?.[props.widgetSelected] || null
 })
 
 const painel = computed(() => {

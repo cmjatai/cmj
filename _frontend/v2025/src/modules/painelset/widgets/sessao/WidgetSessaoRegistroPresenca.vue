@@ -17,7 +17,7 @@
         </div>
         <div
           class="votacao"
-          v-if="displayVotacao"
+          v-if="widgetContainer?.config.displayVotacao"
         >
           <span class="sim">SIM</span>
         </div>
@@ -32,32 +32,47 @@
           :style="`background-image: url(${strFotografiaUrl(parlamentar.id)})`"
         />
         <div class="nome">
-          {{ parlamentar.__str__ }}
+          {{ parlamentar.__str__ }} <small>&nbsp;</small>
         </div>
         <div
           class="votacao"
-          v-if="displayVotacao"
+          v-if="widgetContainer?.config.displayVotacao"
         >
           <span class="sim">SIM</span>
         </div>
       </div>
-      <div
-        :key="`parlamentar-ausente-${parlamentar.id}`"
-        v-for="parlamentar in parlamentaresAtivosAusentes"
-        class="parlamentar-ausente"
-      >
+      <template v-if="widgetContainer?.config.displayAusentes">
         <div
-          class="foto"
-          :style="`background-image: url(${strFotografiaUrl(parlamentar.id)})`"
-        />
-        <div class="nome">
-          {{ parlamentar.__str__ }}
-        </div>
-        <div
-          class="votacao"
-          v-if="displayVotacao"
+          :key="`parlamentar-ausente-${parlamentar.id}`"
+          v-for="parlamentar in parlamentaresAtivosAusentes"
+          class="parlamentar-ausente"
         >
-          <span class="nao">NÃO</span>
+          <div
+            class="foto"
+            :style="`background-image: url(${strFotografiaUrl(parlamentar.id)})`"
+          />
+          <div class="nome">
+            {{ parlamentar.__str__ }}<small>&nbsp;</small>
+          </div>
+          <div
+            class="votacao"
+            v-if="widgetContainer?.config.displayVotacao"
+          >
+            <span class="nao">NÃO</span>
+          </div>
+        </div>
+      </template>
+      <div class="quorum">
+        <div class="inner-quorum">
+          <div class="ausentes-label">
+            <template v-if="parlamentaresAtivosAusentes.length > 0">
+              {{ parlamentaresAtivosAusentes.length }} Ausentes
+            </template>
+          </div>
+          <div class="quorum-label">
+            Quórum
+            <span class="quorum-value">{{ quorum }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -77,15 +92,11 @@ const props = defineProps({
   widgetSelected: {
     type: Number,
     default: 0
-  },
-  displayVotacao: {
-    type: Boolean,
-    default: true
-  },
-  displayAusentes: {
-    type: Boolean,
-    default: false
   }
+})
+
+const widgetContainer = computed(() => {
+  return syncStore.data_cache.painelset_widget?.[props.widgetSelected] || null
 })
 
 const painel = computed(() => {
@@ -144,9 +155,13 @@ const parlamentaresAtivosAusentes = computed(() => {
   )
   const idsPresentes = presencas.map(presenca => presenca.parlamentar)
   const parlamentares = Object.values(syncStore.data_cache.parlamentares_parlamentar || {}).filter(
-    p => p.ativo && !idsPresentes.includes(p.id) && integrantesDaMesa.value.every(im => im.id !== p.id) && props.displayAusentes
+    p => p.ativo && !idsPresentes.includes(p.id) && integrantesDaMesa.value.every(im => im.id !== p.id)
   )
   return _.orderBy(parlamentares, ['nome_parlamentar'], ['asc'])
+})
+
+const quorum = computed(() => {
+  return integrantesDaMesa.value.length + parlamentaresAtivosPresentes.value.length
 })
 
 const strFotografiaUrl = (id) => {
@@ -213,7 +228,8 @@ syncInit()
     }
     .integrante-mesa,
     .parlamentar-presente,
-    .parlamentar-ausente {
+    .parlamentar-ausente,
+    .quorum {
       flex: 1 1 auto;
       display: flex;
       align-items: center;
@@ -234,6 +250,9 @@ syncInit()
           font-weight: normal;
           font-size: 0.8em;
           font-style: italic;
+          display: block;
+          margin-left: 0.2em;
+          color: #aaa;
         }
       }
       .votacao {
@@ -283,6 +302,8 @@ syncInit()
     }
     .parlamentar-ausente {
       // odd even background
+      zoom: 0.7;
+      color: #aaa;
       &:nth-child(odd) {
         background-color: #55000080;
       }
@@ -290,5 +311,39 @@ syncInit()
         background-color: #55000070;
       }
     }
+    .quorum {
+      flex: 0 0 auto;
+      display: flex;
+      padding: 0.3em;
+      background-color: #222;
+      border-top: 2px solid #555;
+      .inner-quorum {
+        flex: 0 0 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .ausentes-label {
+        font-size: 1.1em;
+        font-weight: bold;
+        color: #f00;
+      }
+      .quorum-label {
+        font-size: 1.4em;
+        font-weight: bold;
+        color: #0f0;
+        background-color: #000;
+        border-radius: 0.2em;
+        padding: 0.1em 0.5em;
+        display: flex;
+        align-items: center;
+        .quorum-value {
+          margin-left: 0.5em;
+          font-size: 1.4em;
+          color: #fff;
+        }
+      }
+    }
+
   }
 </style>

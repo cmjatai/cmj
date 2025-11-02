@@ -127,6 +127,11 @@
           name: Status da Sessão Plenária
           description: Exibe o status da sessão plenária.
           config:
+            displayTitulo: true # default é false
+            displayDataInicio: true # default é false
+            displayHoraInicio: true # default é false
+            displayIniciada: true # default é false
+            displayCronometro: true # default é false
             coords:
               h: 100
               w: 100
@@ -142,6 +147,79 @@
             title:
               display: none
             inner: {}
+
+### Visão 3 ###################################################################
+# sessão em andamento, sem indivíduo com a palavra, cronômetro do evento rodando
+    - visao:
+      name: Visão de Sessão em Andamento
+      description: Exibe o status da sessão quando está em andamento, sem indivíduo com a palavra.
+
+      config:
+        activates:
+          - activate:
+              - painelset__evento__cronometro__state: 'running' # ativa a visão quando o cronômetro do evento está rodando
+              - painelset__individuo__com_a_palavra: false # ativa a visão quando não há indivíduo com a palavra
+
+      styles:
+        component:
+          background-size: 67% auto
+          background-image: url(/static/v2018/brasao/brasao_1024.png)
+          background-repeat: no-repeat
+          background-position: right 50%
+        title:
+          display: none
+        inner:
+          background-color: '#000e'
+
+
+      widgets:
+        - vue_component: WidgetStatusEventoSessao
+          name: Status da Sessão Plenária
+          description: Exibe o status da sessão plenária.
+          config:
+            displayCols: 6 # default é 12
+            displayTitulo: true # default é false
+            displayDataInicio: true # default é false
+            displayHoraInicio: true # default é false
+            coords:
+              h: 12
+              w: 67
+              x: 33
+              y: 0
+          styles:
+            component:
+              font-size: 2em
+              text-align: center
+              font-weight: bold
+              line-height: 1
+              color: '#0f0'
+            title:
+              display: none
+            inner: {}
+
+        - vue_component: WidgetSessaoRegistroPresenca
+          name: Registro de Presença dos Parlamentares
+          description: Exibe o registro de presença dos parlamentares na sessão.
+          config:
+            displayVotacao: true # default é false
+            displayAusentes: false # default é false
+            coords:
+              h: 100
+              w: 33
+              x: 0
+              y: 0
+          styles:
+            component:
+              background-color: '#000d'
+              font-size: 1.8em
+              text-align: center
+              font-weight: bold
+              line-height: 1
+            title:
+              display: none
+            inner: {}
+
+
 
 ### Visão 98 ###################################################################
     - visao:
