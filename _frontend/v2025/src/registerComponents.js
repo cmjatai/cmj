@@ -24,6 +24,7 @@ const globalComponents = {
 
   'WidgetSessaoPlenariaStatus': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoPlenariaStatus.vue')),
   'WidgetSessaoRegistroPresenca': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoRegistroPresenca.vue')),
+  'WidgetSessaoItemEmPauta': defineAsyncComponent(() => import('~@/modules/painelset/widgets/sessao/WidgetSessaoItemEmPauta.vue')),
 
   'WidgetCronometroEvento': defineAsyncComponent(() => import('~@/modules/painelset/widgets/painelset/WidgetCronometroEvento.vue')),
   'WidgetCronometroPalavra': defineAsyncComponent(() => import('~@/modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue')),

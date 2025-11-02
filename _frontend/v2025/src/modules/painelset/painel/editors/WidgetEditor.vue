@@ -176,6 +176,7 @@ const vueComponentsChoice = ref({
 
   'WidgetSessaoPlenariaStatus': 'WidgetSessaoPlenariaStatus - Título da Sessão Plenária vinculada ao Painel',
   'WidgetSessaoRegistroPresenca': 'WidgetSessaoRegistroPresenca - Registro de Presença da Sessão Plenária vinculada ao Painel',
+  'WidgetSessaoItemEmPauta': 'WidgetSessaoItemEmPauta - Item em Pauta da Sessão Plenária vinculada ao Painel',
 
   'WidgetCronometroEvento': 'WidgetCronometroEvento - Cronômetro do Evento vinculado ao Painel',
   'WidgetCronometroPalavra': 'WidgetCronometroPalavra - Cronômetro da Palavra vinculada ao Painel',

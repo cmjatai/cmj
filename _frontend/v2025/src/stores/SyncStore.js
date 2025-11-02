@@ -47,6 +47,8 @@ export const useSyncStore = defineStore('syncStore', {
       }
       this.data_cache[key][value.id] = value
     },
+
+
     UPDATE_DATA_CACHE ({ key, value }) {
       if (value.timestamp_frontend) {
         const oldValue = this.data_cache[key] ? this.data_cache[key][value.id] : null
@@ -56,16 +58,40 @@ export const useSyncStore = defineStore('syncStore', {
           }
         }
       }
+      if (value.__label__) {
+        const objsInValue = Object.keys(value).filter(key => {
+          return typeof value[key] === 'object' && value[key] !== null
+        })
+        objsInValue.forEach(objKey => {
+          let nestedKey = value[objKey].__label__
+          if (!nestedKey) {
+            return
+          }
+          nestedKey = nestedKey.replace('.', '_')
+          this.UPDATE_DATA_CACHE({ key: nestedKey, value: value[objKey] })
+        })
+      } else {
+        value.__label__ = key
+      }
       if (!this.data_cache[key]) {
         this.data_cache[key] = {}
       }
       this.data_cache[key][value.id] = value
     },
-    async fetchSync ({ app, model, id, action, params, only_first_page = false }) {
+
+    async fetchSync ({ app, model, id, action, params, only_first_page = false, force_fetch = true}) {
       const _fetch = Resources.Utils.fetch
       if (!this.models[app] || !this.models[app][model]) {
         //faz auto registro do modelo
         this.registerModels(app, [model])
+      }
+      if (!force_fetch) {
+        const uri = `${app}_${model}`
+        if (id && this.data_cache[uri] && this.data_cache[uri][id]) {
+          return this.data_cache[uri][id]
+        } else if (!id && this.data_cache[uri]) {
+          return Object.values(this.data_cache[uri])
+        }
       }
       const metadata = { app, model }
       if (id) { metadata.id = id }

@@ -138,7 +138,7 @@ def verifica_presenca(request, model, spk, is_leitura=False):
         if is_leitura:
             text = 'Leitura não pode ser feita sem presenças'
         else:
-            text = 'Votação não pode ser aberta sem presenças'
+            text = 'Discussão/Votação não pode ser aberta sem presenças'
 
         logger.error("user={}. {} (sessao_plenaria_id={}).".format(
             username, text, spk))
@@ -213,11 +213,37 @@ def abrir_votacao(request, pk, spk):
         raise Http404()
 
     materia_votacao = model.objects.get(id=pk)
+
+    if 'discussao_aberta' in request.GET:
+        discussao_aberta = request.GET['discussao_aberta'].lower() == 'true'
+
+        # garantir que nenhuma outra está aberta para discussão dentro da sessão
+        materias_em_discussao = model.objects.filter(discussao_aberta=True, sessao_plenaria_id=spk)
+
+        for m in materias_em_discussao:
+            m.discussao_aberta = False
+            m.save()
+
+        validacoes = verifica_presenca(request, presenca_model, spk) and \
+            verifica_votacoes_abertas(request) and \
+            verifica_sessao_iniciada(request, spk)
+        if discussao_aberta and validacoes:
+            materia_votacao.discussao_aberta = discussao_aberta
+            materia_votacao.save()
+
+        success_url = reverse('sapl.sessao:' + redirect_url, kwargs={'pk': spk})
+        if validacoes:
+            query_params = "#id{}".format(materia_votacao.materia.id)
+            success_url += query_params
+        return HttpResponseRedirect(success_url)
+
     is_leitura = materia_votacao.tipo_votacao == 4
     if (verifica_presenca(request, presenca_model, spk, is_leitura) and
         verifica_votacoes_abertas(request) and
             verifica_sessao_iniciada(request, spk, is_leitura)):
+
         materia_votacao.votacao_aberta = True
+        materia_votacao.discussao_aberta = False
 
         if 'pedido_prazo' in request.GET:
             materia_votacao.votacao_aberta_pedido_prazo = True
@@ -441,32 +467,55 @@ def customize_link_materia(context, pk, has_permission, user=None):
                                 class="btn btn-primary"
                                 role="button">Abrir para Leitura</a>'''
                     else:
-                        pre_votacao = 'Matéria não votada'
+                        pre_votacao = '<div class="text-nowrap text-center p-2">{}</div>'
+                        if obj.discussao_aberta:
+                            if prazo_registrado.exists():
+                                url_pre_votacao = item_sessao_url(
+                                    obj, sufixo='edit')
+                                pre_votacao = pre_votacao.format(
+                                    '<a href="%s">%s</a>' % (
+                                        url_pre_votacao,
+                                        prazo_registrado.last().tipo_resultado_votacao)
+                                )
+                            else:
+                                pre_votacao = pre_votacao.format('Matéria não votada')
+                                pre_votacao = f'''
+                                    {pre_votacao}
+                                    <a href="{url}&discussao_aberta=false"
+                                        class="btn btn-primary w-100 m-1 justify-content-center"
+                                        role="button">Fechar Discussão</a>
+                                    <a href="{url}&pedido_prazo"
+                                        class="btn btn-sm btn-warning w-100 m-1 justify-content-center"
+                                        role="button">Abrir Votação de<br>Pedido de Adiamento</a>
+                                    '''
 
-                        if prazo_registrado.exists():
-                            url_pre_votacao = item_sessao_url(
-                                obj, sufixo='edit')
-                            pre_votacao = '<a href="%s">%s</a>' % (
-                                url_pre_votacao,
-                                prazo_registrado.last().tipo_resultado_votacao)
+                            btns_abrir = f'''{pre_votacao}
+                                <a href="{url}"
+                                class="btn btn-primary w-100 m-1 justify-content-center"
+                                role="button">Abrir Votação</a>'''
                         else:
-                            pre_votacao = 'Matéria não votada'
-                            pre_votacao = f'''
-                                            <a href="{url}&pedido_prazo"
-                                            class="btn btn-sm btn-warning w-100"
-                                            role="button">Abrir Votação de<br>Pedido de Adiamento</a>
-                                            <br />
-                                            {pre_votacao}
-                                            '''
 
-                        btns_abrir = f'''{pre_votacao}
-                                           <br />
-                                            <a href="{url}"
-                                            class="btn btn-primary w-100"
-                                            role="button">Abrir Votação</a>'''
+                            if prazo_registrado.exists():
+                                url_pre_votacao = item_sessao_url(
+                                    obj, sufixo='edit')
+                                pre_votacao = pre_votacao.format(
+                                    '<a href="%s">%s</a>' % (
+                                        url_pre_votacao,
+                                        prazo_registrado.last().tipo_resultado_votacao)
+                                )
+                            else:
+                                pre_votacao = pre_votacao.format('Matéria não votada')
+                            btns_abrir = f'''
+                                {pre_votacao}
+                                <a href="{url}&discussao_aberta=true"
+                                class="btn btn-primary w-100 m-1 justify-content-center"
+                                role="button">Abrir Discussão</a>
+                            '''
+
+
                     resultado = btns_abrir
-                else:
 
+                else:
                     if prazo_registrado.exists():
                         resultado = f'{prazo_registrado.last().tipo_resultado_votacao}'
                     else:

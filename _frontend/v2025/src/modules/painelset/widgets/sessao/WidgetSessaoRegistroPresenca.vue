@@ -32,7 +32,7 @@
           :style="`background-image: url(${strFotografiaUrl(parlamentar.id)})`"
         />
         <div class="nome">
-          {{ parlamentar.__str__ }} <small>&nbsp;</small>
+          {{ parlamentar.__str__ }}
         </div>
         <div
           class="votacao"
@@ -246,13 +246,14 @@ syncInit()
         flex: 1 1 auto;
         overflow: hidden;
         line-height: 1;
+        color: #bbb;
         small {
           font-weight: normal;
           font-size: 0.8em;
           font-style: italic;
           display: block;
           margin-left: 0.2em;
-          color: #aaa;
+          color: #999;
         }
       }
       .votacao {
@@ -302,13 +303,16 @@ syncInit()
     }
     .parlamentar-ausente {
       // odd even background
-      zoom: 0.7;
-      color: #aaa;
+      zoom: 0.5;
+      color: #999;
+      .foto {
+        filter: grayscale(100%) brightness(70%);
+      }
       &:nth-child(odd) {
-        background-color: #55000080;
+        background-color: #55555580;
       }
       &:nth-child(even) {
-        background-color: #55000070;
+        background-color: #55555570;
       }
     }
     .quorum {

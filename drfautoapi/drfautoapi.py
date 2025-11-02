@@ -538,6 +538,7 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
     """
 
     __str__ = rest_serializers.SerializerMethodField()
+    __label__ = rest_serializers.SerializerMethodField()
 
     class Meta:
         fields = '__all__'
@@ -545,6 +546,8 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
 
     def get___str__(self, obj) -> str:
         return str(obj)
+    def get___label__(self, obj) -> str:
+        return obj._meta.label_lower
 
     @cached_property
     def user_model(self):

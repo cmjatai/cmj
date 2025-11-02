@@ -153,13 +153,13 @@
     - visao:
       name: Visão de Sessão em Andamento
       description: Exibe o status da sessão quando está em andamento, sem indivíduo com a palavra.
-
+# ----------------------------------------------
       config:
         activates:
           - activate:
               - painelset__evento__cronometro__state: 'running' # ativa a visão quando o cronômetro do evento está rodando
               - painelset__individuo__com_a_palavra: false # ativa a visão quando não há indivíduo com a palavra
-
+# ----------------------------------------------
       styles:
         component:
           background-size: 67% auto
@@ -170,8 +170,7 @@
           display: none
         inner:
           background-color: '#000e'
-
-
+# ----------------------------------------------
       widgets:
         - vue_component: WidgetStatusEventoSessao
           name: Status da Sessão Plenária
@@ -188,15 +187,16 @@
               y: 0
           styles:
             component:
+              color: '#0f0'
               font-size: 2em
               text-align: center
               font-weight: bold
               line-height: 1
-              color: '#0f0'
             title:
               display: none
-            inner: {}
-
+            inner:
+              background-color: '#020'
+# ----------------------------------------------
         - vue_component: WidgetSessaoRegistroPresenca
           name: Registro de Presença dos Parlamentares
           description: Exibe o registro de presença dos parlamentares na sessão.
@@ -218,7 +218,24 @@
             title:
               display: none
             inner: {}
-
+# ----------------------------------------------
+        - vue_component: WidgetSessaoItemEmPauta
+          name: Item em Pauta da Sessão Plenária
+          description: Exibe o item atualmente em pauta na sessão plenária.
+          config:
+            coords:
+              h: 41
+              w: 63
+              x: 35
+              y: 15
+          styles:
+            component: {}
+            title:
+              display: none
+            inner:
+              color: white
+              font-size: 1.1em
+              background-color: '#00bfff55'
 
 
 ### Visão 98 ###################################################################
