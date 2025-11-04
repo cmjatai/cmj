@@ -3032,14 +3032,16 @@ def fechar_votacao_materia(materia):
         rv_last = rv_list.last()
 
         VotoParlamentar.objects.filter(ordem=materia).delete()
-        rv_last.delete()
+        if rv_last:
+            rv_last.delete()
 
     elif type(materia) == ExpedienteMateria:
         rv_list = RegistroVotacao.objects.filter(expediente=materia)
         rv_last = rv_list.last()
 
         VotoParlamentar.objects.filter(expediente=materia).delete()
-        rv_last.delete()
+        if rv_last:
+            rv_last.delete()
 
     rv_first = rv_list.first()
 

@@ -23,30 +23,44 @@
     }
   {% endif %}
 
-  $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia]").change(function(event) {
+  $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia], input[name=materia_numero_protocolo]").change(function(event) {
     var url = '{% url 'sapl.api:materia_materialegislativa-list'%}'
 
     var formData = {
-          'tipo'   : $("select[name=tipo_materia]").val(),
-          'ano'    : $("input[name=ano_materia]").val(),
-          'numero' : $("input[name=numero_materia]").val(),
-          't'      : Date.now()
+      'tipo'   : $("select[name=tipo_materia]").val(),
+      'ano'    : $("input[name=ano_materia]").val(),
+      'numero' : $("input[name=numero_materia]").val(),
+      't'      : Date.now(),
+      'o'      : 'id'
     }
+
+    var materia_numero_protocolo = $("input[name=materia_numero_protocolo]").val();
+    if (materia_numero_protocolo){
+      formData['numero_protocolo'] = materia_numero_protocolo;
+    }
+
     if (formData.tipo == '' || formData.ano == '' || formData.numero == '')
       return;
     $.get(url, formData).done(function(data) {
-      if (data.pagination.total_entries == 1) {
-        $(".ementa_materia strong").html(data.results[0].__str__);
-        $(".ementa_materia span").html(data.results[0].ementa);
+      $(".ementa_materia").html('');
+      if (data.pagination.total_entries > 0) {
+        // cria um div para cada materia encontrada
+        for (i=0; i < data.results.length; i++){
+          var materia = data.results[i];
+          var div = $("<div class='materia pt-2'></div>");
+          div.append(`<strong>${materia.__str__} - Protocolo: ${materia.numero_protocolo}</strong>`);
+          var data_apresentacao = new Date(materia.data_apresentacao);
+          div.append(`<strong>- Data de Apresentação: ${data_apresentacao.toLocaleDateString()}</strong><br>`);
+          div.append(`<span>${materia.ementa}</span>`);
+          $(".ementa_materia").append(div);
+        }
         $(".ementa_materia").removeClass('hidden').removeClass('alert-danger').addClass('alert-info');
       }
       else {
         $(".ementa_materia strong").html('Atenção!');
         $(".ementa_materia span").html('Matéria não localizada...');
         $(".ementa_materia").removeClass('hidden').removeClass('alert-info').addClass('alert-danger');
-
       }
-
     });
   });
   $("select[name=tipo_materia]").trigger('change');

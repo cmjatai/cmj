@@ -774,6 +774,7 @@ class VotoParlamentar(models.Model):
         verbose_name = _('Registro de Votação de Parlamentar')
         verbose_name_plural = _('Registros de Votações de Parlamentares')
         ordering = ['id']
+        unique_together = ['votacao', 'parlamentar', 'ordem', 'expediente']
 
     def __str__(self):
         return _('Votação: %(votacao)s - Parlamentar: %(parlamentar)s') % {
