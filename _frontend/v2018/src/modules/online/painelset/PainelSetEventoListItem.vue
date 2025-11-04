@@ -35,7 +35,7 @@
                   {{ painel.name }}
                   <small v-if="painel.principal"><i class="fas fa-star"></i></small>
                 </a><br>
-                <button class="btn btn-link mr-2 text-danger" title="Adicionar novo painel ao evento" @click="deletePainel(painel.id)">
+                <button class="btn btn-link mr-2 text-danger" title="Remover Painel do Evento" @click="deletePainel(painel.id)">
                   <i class="fas fa-minus-circle"></i>
                 </button>
               </div>
@@ -52,7 +52,13 @@
                   name="sessao_plenaria"
                   v-if="!evento.end_real"
                   v-model="painel.sessao"
-                  @change="utils.patchModel('painelset', 'painel', painel.id, {sessao: painel.sessao })"
+                  @change="
+                    utils.patchModel(
+                      'painelset', 'painel', painel.id, {sessao: painel.sessao }
+                    ).then(() => {
+                      refresh()
+                    })
+                  "
                 >
                   <option :value="null">-- Nenhuma --</option>
                   <option

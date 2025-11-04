@@ -303,7 +303,7 @@ const syncPainel = async () => {
               model: 'sessaoplenaria',
               id: data_cache_painel[painelId.value].sessao
             })
-          }
+        }
         if (data_cache_painel[painelId.value].evento) {
           syncStore
             .fetchSync({
@@ -342,7 +342,8 @@ const syncPainel = async () => {
               app: 'painelset',
               model: 'painel',
               params: {
-                evento: evento.id
+                evento: evento.id,
+                principal: true
               }
             })
             .then((data_cache_painel) => {

@@ -57,7 +57,9 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
 
 
             if not inst._meta.label in (
+                    'painelset.Painel',
                     'painelset.VisaoDePainel',
+                    'painelset.Widget',
                     'painelset.Cronometro',
                     'painelset.CronometroEvent',
                 ):

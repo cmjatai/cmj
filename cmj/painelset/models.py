@@ -556,7 +556,7 @@ class VisaoDePainel(models.Model):
     class Meta:
         verbose_name = "Visão do Painel"
         verbose_name_plural = "Visões dos Painéis"
-        ordering = ['position']
+        ordering = ['position', 'id']
 
     def __str__(self):
         return f"{self.name} no painel {self.painel.name}"
