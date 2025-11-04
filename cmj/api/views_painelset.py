@@ -188,6 +188,13 @@ class _EventoViewSet:
              'pause_parent_on_aparte': cronometro.pause_parent_on_start
             })
 
+    @action(detail=True, methods=['patch'])
+    def reset_to_defaults(self, request, pk=None):
+        evento = self.get_object()
+        evento.reset_to_defaults()
+        return Response({'status': 'ok', 'evento': evento.id})
+
+
 
 @customize(Individuo)
 class _IndividuoViewSet(ResponseFileMixin):
@@ -497,9 +504,3 @@ class _PainelViewSet:
 
         cls.serializer_class = PainelSerializer
         return cls
-
-    @action(detail=True, methods=['patch'])
-    def reset_to_defaults(self, request, pk=None):
-        painel = self.get_object()
-        painel.reset_to_defaults()
-        return Response({'status': 'ok', 'painel': painel.id})

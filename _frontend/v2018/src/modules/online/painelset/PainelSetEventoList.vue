@@ -42,6 +42,19 @@ export default {
       model: 'evento',
       params: { o: '-start_real,-start_previsto' }
     })
+    t.registerModels({
+      app: 'sessao',
+      models: ['sessaoplenaria']
+    })
+
+    t.fetchSync({
+      app: 'sessao',
+      model: 'sessaoplenaria',
+      params: {
+        o: '-data_inicio'
+      },
+      only_first_page: true
+    })
   }
 }
 </script>

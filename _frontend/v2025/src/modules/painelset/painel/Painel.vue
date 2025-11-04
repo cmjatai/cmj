@@ -196,6 +196,22 @@ watch(
   }
 )
 watch(
+  () => painel.value?.sessao,
+  (newSessao) => {
+    if (newSessao) {
+      syncStore
+        .fetchSync({
+          app: 'sessao',
+          model: 'sessaoplenaria',
+          id: newSessao
+        })
+    }
+  },
+  {
+    immediate: true
+  }
+)
+watch(
   () => painelId.value,
   (newPainelId) => {
     if (newPainelId) {

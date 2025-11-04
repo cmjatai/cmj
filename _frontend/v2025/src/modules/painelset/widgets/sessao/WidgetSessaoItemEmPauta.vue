@@ -34,10 +34,10 @@
         </div>
         <div
           :class="['inner-votacao', tipoResultadoVotacao?.natureza || '']"
-          v-else-if="registroVotacao && ultimoItemSessaoMostrado?.tipo_votacao === 1"
+          v-else-if="registroVotacao"
         >
           <div class="label" v-if="tipoResultadoVotacao.nome !== 'Pedido de Vista'">
-            VOTAÇÃO SIMBÓLICA <span v-html="tipoResultadoVotacao.nome"></span>
+            VOTAÇÃO {{ tipo_votacao[ultimoItemSessaoMostrado?.tipo_votacao]}} - <span v-html="tipoResultadoVotacao.nome"></span>
           </div>
           <div class="label" v-else>MATÉRIA COM PEDIDO DE VISTA</div>
           <div :class="['results', tipoResultadoVotacao?.natureza || '']" v-if="tipoResultadoVotacao.nome !== 'Pedido de Vista'">
@@ -176,8 +176,8 @@ const registroLeitura = computed(() => {
 
   return Object.values(registros).find(
     (registro) =>
-      (registro.expediente === itemSessao.value?.id ||
-      registro.ordem === itemSessao.value?.id) &&
+      (registro.expediente === ultimoItemSessaoMostrado.value?.id ||
+      registro.ordem === ultimoItemSessaoMostrado.value?.id) &&
       (registro.materia === ultimaMateriaMostrada.value?.id ||
       registro.materia.id === ultimaMateriaMostrada.value?.id)
   ) || null
@@ -241,6 +241,12 @@ watch(
         app: 'sessao',
         model: 'registroleitura',
         force_fetch: false // se registroleitura já está no registro de models, os registros de leitura já estão sendo monitorados pelo SyncStore
+      })
+      syncStore.fetchSync({
+        params,
+        app: 'sessao',
+        model: 'votoparlamentar',
+        force_fetch: false // se votoparlamentar já está no registro de models, os votos parlamentares já estão sendo monitorados pelo SyncStore
       })
     } else {
       if (ultimoItemSessaoMostrado.value) {

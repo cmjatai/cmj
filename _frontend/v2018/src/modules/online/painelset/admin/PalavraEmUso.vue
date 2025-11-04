@@ -92,7 +92,7 @@ export default {
   width: 58.3337%;
   top: 0;
   right: 0;
-  bottom: 0;
+  bottom: 2em;
   background-color: #222;
   display: flex;
   flex-direction: column;

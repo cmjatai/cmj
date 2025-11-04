@@ -353,6 +353,7 @@ export default {
       &.hover {
         position: absolute;
         top: 100%;
+        margin-top: -3px;
         display: none;
       }
     }

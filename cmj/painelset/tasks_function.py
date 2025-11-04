@@ -13,6 +13,8 @@ def task_refresh_states_from_visaodepainel_function(*args, **kwargs):
 
     for evento in Evento.objects.filter(end_real__isnull=True):
         for painel in evento.paineis.all():
+            if not painel.auto_select_visoes:
+                continue
             visoes = painel.visoes.all()
             sessao_associada_ao_painel = painel.sessao
             visao_ja_ativada = False

@@ -29,6 +29,7 @@
         </div>
         <div class="col-7 container-controls">
           <palavra-em-uso v-if="evento" :evento="evento" :ref="'palavraEmUso'"></palavra-em-uso>
+          <visoes-control v-if="evento" :evento="evento" :ref="'visoesControl'"></visoes-control>
         </div>
       </div>
     </div>
@@ -49,12 +50,14 @@
 import CronometroBase from '../components/cronometros/CronometroBase.vue'
 import IndividuoList from './IndividuoList.vue'
 import PalavraEmUso from './PalavraEmUso.vue'
+import VisoesControl from './VisoesControl.vue'
 export default {
   name: 'painelset-admin',
   components: {
     CronometroBase,
     IndividuoList,
-    PalavraEmUso
+    PalavraEmUso,
+    VisoesControl
   },
   data () {
     return {
@@ -229,7 +232,7 @@ export default {
     top: 5.42em;
     left: 41.6667%;
     right: 0;
-    bottom: 0;
+    bottom: 3.5em;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;

@@ -35,7 +35,6 @@
       </div>
     </div>
     <div class="individuos">
-
       <individuo-base
       v-for="individuo in individuos"
       :key="`individuo-${individuo.id}-${individuo.order}`"

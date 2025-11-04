@@ -38,6 +38,7 @@
           :cronometro-id="individuo_com_a_palavra?.cronometro"
           display-initial="remaining"
           display-format="mm:ss"
+          :display-permitidos="['elapsed', 'remaining']"
         />
       </div>
     </div>
@@ -74,6 +75,7 @@
           :cronometro-id="individuo_aparteante?.cronometro"
           display-initial="remaining"
           display-format="mm:ss"
+          :display-permitidos="['elapsed', 'remaining']"
         />
       </div>
     </div>
@@ -229,7 +231,7 @@ emit('oncomponent', {
   }
   .name_individuo {
     position: absolute;
-    font-size: 0.3em;
+    font-size: 0.25em;
     bottom: 0em;
     background-color: #444;
     color:#bbb;

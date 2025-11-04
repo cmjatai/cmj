@@ -1,14 +1,16 @@
 
+from functools import partial
 from django.apps.registry import apps
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from cmj.utils import get_client_ip
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, \
     customize, wrapper_queryset_response_for_drf_action
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.serializers import ChoiceSerializer,\
     SessaoPlenariaECidadaniaSerializer
-from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao, OrdemDia
+from sapl.sessao.models import SessaoPlenaria, ExpedienteSessao, OrdemDia, VotoParlamentar
 from sapl.utils import choice_anos_com_sessaoplenaria
 
 
@@ -61,3 +63,13 @@ class _SessaoPlenariaViewSet(ResponseFileMixin):
     def ecidadania_list(self, request, *args, **kwargs):
         self.serializer_class = SessaoPlenariaECidadaniaSerializer
         return self.list(request, *args, **kwargs)
+
+@customize(VotoParlamentar)
+class _VotoParlamentarViewSet:
+
+    def get_serializer(self, *args, **kwargs):
+        if hasattr(self.request, '_request') and self.request._request.method in ['POST', 'PUT', 'PATCH']:
+            data = kwargs.get('data', None)
+            data['ip'] = get_client_ip(self.request)
+            kwargs['data'] = data
+        return super().get_serializer(*args, **kwargs)

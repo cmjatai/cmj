@@ -3,7 +3,12 @@
     <div :class="['empty-list', materia.id === undefined ? '' : 'd-none']">
       Carregando Matéria...
     </div>
-    <voto-parlamentar v-if="votacaoAberta && user && user.votante"></voto-parlamentar>
+
+    <voto-parlamentar
+      v-if="votacaoAberta && user && user.votante"
+      :item="item"
+      :type="type"
+      ></voto-parlamentar>
 
     <div class="status-votacao">
       <div class="votos" v-if="registro && !votacaoAberta && item.tipo_votacao != 4">
@@ -467,6 +472,7 @@ export default {
     font-weight: bold;
     color: #fff;
     line-height: 1;
+    z-index: 1;
 
     & > div  {
       background-color: #e6bc02;

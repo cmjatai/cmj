@@ -247,6 +247,61 @@ class Evento(models.Model, CronometroMixin):
     def __str__(self):
         return self.name
 
+    def reset_to_defaults(self):
+        """Reseta os paineis do evento para a configuração padrão, removendo visões e widgets atuais."""
+
+        fixture_file = settings.BASE_DIR.child('painelset', 'fixtures', 'painelset_defaults.yaml')
+
+        self.paineis.all().delete()
+
+        painelset_set = {}
+        try:
+            with open(fixture_file, 'r') as file:
+                painelset_set = yaml.safe_load(file)
+        except Exception as e:
+            print(f"Erro ao carregar fixture de paineis padrão: {e}")
+            return
+
+        painelset_set = painelset_set.get('paineis', [])
+
+        for painel_data in painelset_set:
+
+            if not painel_data.get('painel', None):
+                continue
+
+            painel = Painel()
+            painel.evento = self
+            painel.name = painel_data['name']
+            painel.description = painel_data['description']
+            painel.principal = painel_data.get('principal', False)
+            painel.config = painel_data.get('config', {})
+            painel.styles = painel_data.get('styles', {})
+            painel.save()
+
+            for visao_data in painel_data.get('visoes', []):
+                visao = VisaoDePainel.objects.create(
+                    painel=painel,
+                    name=visao_data['name'],
+                    active=False,
+                    description=visao_data['description'],
+                    config=visao_data.get('config', {}),
+                    styles=visao_data.get('styles', {})
+                )
+                painel.visoes.add(visao)
+
+                for widget_data in visao_data.get('widgets', []):
+                    widget = Widget.objects.create(
+                        visao=visao,
+                        name=widget_data['name'],
+                        description=widget_data['description'],
+                        vue_component=widget_data.get('vue_component', ''),
+                        config=widget_data.get('config', {}),
+                        styles=widget_data.get('styles', {})
+                    )
+                    visao.widgets.add(widget)
+            visao.active = True
+            visao.save()
+
 class RoleChoices(models.TextChoices):
     PARLAMENTAR = 'PARLAMENTAR', 'Parlamentar'
     TRIBUNA = 'TRIBUNA', 'Tribuna'
@@ -399,6 +454,9 @@ class Painel(models.Model):
     name = models.CharField(max_length=256, help_text="Nome único do painel")
     description = models.TextField(blank=True, help_text="Descrição do painel")
 
+    principal = models.BooleanField(default=False, help_text="Indica se este painel é o principal")
+    auto_select_visoes = models.BooleanField(default=True, help_text="Selecionar automaticamente visões com base no contexto do evento")
+
     evento = models.ForeignKey(
         Evento, on_delete=models.CASCADE, verbose_name="Evento",
         blank=True, null=True, related_name='paineis', help_text="Evento ao qual este painel pertence")
@@ -443,6 +501,7 @@ class Painel(models.Model):
         novo_painel = Painel.objects.create(
             name=f"{self.name}",
             description=self.description,
+            principal=self.principal,
             evento=evento,
             sessao=sessao,
             config=self.config,
@@ -471,52 +530,6 @@ class Painel(models.Model):
                 if widget.parent_id in map_widgets:
                     widget.parent_id = map_widgets[widget.parent_id]
                     widget.save()
-
-    def reset_to_defaults(self, id='painel_default_sessao_plenaria'):
-        """Reseta o painel para a configuração padrão, removendo visões e widgets atuais."""
-
-        fixture_file = settings.BASE_DIR.child('painelset', 'fixtures', 'painelset_defaults.yaml')
-
-        painelset_set = {}
-        with open(fixture_file, 'r') as file:
-            painelset_set = yaml.safe_load(file)
-
-        for painel_data in painelset_set:
-
-            if painel_data.get('painel', None) != id:
-                continue
-
-            painel = self
-            painel.name = painel_data['name']
-            painel.description = painel_data['description']
-            painel.config = painel_data.get('config', {})
-            painel.styles = painel_data.get('styles', {})
-            painel.save()
-            painel.visoes.all().delete()
-
-            for visao_data in painel_data.get('visoes', []):
-                visao = VisaoDePainel.objects.create(
-                    painel=painel,
-                    name=visao_data['name'],
-                    active=False,
-                    description=visao_data['description'],
-                    config=visao_data.get('config', {}),
-                    styles=visao_data.get('styles', {})
-                )
-                painel.visoes.add(visao)
-
-                for widget_data in visao_data.get('widgets', []):
-                    widget = Widget.objects.create(
-                        visao=visao,
-                        name=widget_data['name'],
-                        description=widget_data['description'],
-                        vue_component=widget_data.get('vue_component', ''),
-                        config=widget_data.get('config', {}),
-                        styles=widget_data.get('styles', {})
-                    )
-                    visao.widgets.add(widget)
-            visao.active = True
-            visao.save()
 
 
 class VisaoDePainel(models.Model):
@@ -550,7 +563,10 @@ class VisaoDePainel(models.Model):
 
     def activate(self):
         """Ativa esta visão no painel, desativando as outras."""
-        VisaoDePainel.objects.filter(painel=self.painel).update(active=False)
+        for vp in VisaoDePainel.objects.filter(painel=self.painel):
+            if vp.active and vp != self:
+                vp.active = False
+                vp.save()
         self.active = True
         self.save()
 

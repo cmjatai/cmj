@@ -19,7 +19,9 @@
           class="votacao"
           v-if="widgetContainer?.config.displayVotacao"
         >
-          <span class="sim">SIM</span>
+          <span :class="tipo_voto[votosParlamentares[integrante.id]?.voto]?.[0]">
+            {{ tipo_voto[votosParlamentares[integrante.id]?.voto]?.[1] }}
+          </span>
         </div>
       </div>
       <div
@@ -38,7 +40,9 @@
           class="votacao"
           v-if="widgetContainer?.config.displayVotacao"
         >
-          <span class="sim">SIM</span>
+          <span :class="tipo_voto[votosParlamentares[parlamentar.id]?.voto]?.[0]">
+            {{ tipo_voto[votosParlamentares[parlamentar.id]?.voto]?.[1] }}
+          </span>
         </div>
       </div>
       <template v-if="widgetContainer?.config.displayAusentes">
@@ -58,7 +62,9 @@
             class="votacao"
             v-if="widgetContainer?.config.displayVotacao"
           >
-            <span class="nao">NÃO</span>
+            <span :class="tipo_voto[votosParlamentares[parlamentar.id]?.voto]?.[0]">
+              {{ tipo_voto[votosParlamentares[parlamentar.id]?.voto]?.[1] }}
+            </span>
           </div>
         </div>
       </template>
@@ -80,7 +86,7 @@
 </template>
 <script setup>
 import { useSyncStore } from '~@/stores/SyncStore'
-import { computed } from 'vue'
+import { computed, watch, ref } from 'vue'
 
 const syncStore = useSyncStore()
 
@@ -93,6 +99,41 @@ const props = defineProps({
     type: Number,
     default: 0
   }
+})
+const tipo_voto = {
+  'Sim': ['sim', 'SIM'],
+  'Não': ['nao', 'NÃO'],
+  'Abstenção': ['abst', 'ABSTENÇÃO'],
+  'NV': ['nv', 'NÃO VOTOU']
+}
+
+const ultimoItemSessaoMostrado = ref(null)
+
+const itemSessaoComVotacaoAberta = computed(() => {
+  return Object.values(
+    syncStore.data_cache.sessao_ordemdia || {}
+  ).find(om => om.sessao_plenaria === painel.value?.sessao && (
+    om.discussao_aberta === true || om.votacao_aberta === true || om.votacao_aberta_pedido_prazo === true
+  )) ||
+  Object.values(
+    syncStore.data_cache.sessao_expedientemateria || {}
+  ).find(om => om.sessao_plenaria === painel.value?.sessao && (
+    om.discussao_aberta === true || om.votacao_aberta === true || om.votacao_aberta_pedido_prazo === true)) || null
+})
+
+const votosParlamentares = computed(() => {
+  if (!ultimoItemSessaoMostrado.value) {
+    return []
+  }
+  const votos = Object.values(syncStore.data_cache.sessao_votoparlamentar || {}).filter(
+    voto => (voto.ordem === ultimoItemSessaoMostrado.value.id && ultimoItemSessaoMostrado.value.__label__ === 'sessao.ordemdia') ||
+    (voto.expediente === ultimoItemSessaoMostrado.value.id && ultimoItemSessaoMostrado.value.__label__ === 'sessao.expedientemateria')
+  )
+  const votosObj = {}
+  votos.forEach(voto => {
+    votosObj[voto.parlamentar] = voto
+  })
+  return votosObj
 })
 
 const widgetContainer = computed(() => {
@@ -163,6 +204,28 @@ const parlamentaresAtivosAusentes = computed(() => {
 const quorum = computed(() => {
   return integrantesDaMesa.value.length + parlamentaresAtivosPresentes.value.length
 })
+
+watch(
+  () => itemSessaoComVotacaoAberta.value,
+  (newVal) => {
+    if (newVal) {
+      ultimoItemSessaoMostrado.value = newVal
+      // Se houver uma votação aberta, buscar os registros de votação
+      const params = {}
+      if (newVal.__label__ === 'sessao.ordemdia') {
+        params.ordem = newVal.id
+      } else if (newVal.__label__ === 'sessao.expedientemateria') {
+        params.expediente = newVal.id
+      }
+      syncStore.fetchSync({
+        params,
+        app: 'sessao',
+        model: 'votoparlamentar'
+      })
+    }
+  },
+  { immediate: true }
+)
 
 const strFotografiaUrl = (id) => {
   return `/api/parlamentares/parlamentar/${id}/fotografia.c128.png`
@@ -266,9 +329,11 @@ syncInit()
           display: inline-block;
           color: #fff;
           border-radius: 0.15em;
-          min-width: 4em;
           text-align: center;
           box-shadow: 1px 1px 2px #0006;
+          &:not(:empty) {
+            min-width: 3em;
+          }
         }
         .sim {
           background-color: #0f0;
@@ -276,7 +341,7 @@ syncInit()
         .nao {
           background-color: red;
         }
-        .abstencao {
+        .abst {
           background-color: orange;
         }
         .nao-votou {

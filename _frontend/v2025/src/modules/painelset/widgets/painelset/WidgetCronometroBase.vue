@@ -34,6 +34,10 @@ const props = defineProps({
   cronometroId: {
     type: Number,
     required: true
+  },
+  displayPermitidos: {
+    type: Array,
+    default: () => ['elapsed', 'remaining', 'last_paused']
   }
 })
 
@@ -49,7 +53,13 @@ const display = computed(() => {
   if (cronometro.value.state === 'running') {
     return props.displayInitial
   } else {
-    return 'last_paused'
+    if (props.displayPermitidos.includes('last_paused')) {
+      return 'last_paused'
+    } else if (props.displayPermitidos.includes('remaining')) {
+      return 'remaining'
+    } else {
+      return 'elapsed'
+    }
   }
 })
 

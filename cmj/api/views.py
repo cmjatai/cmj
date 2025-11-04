@@ -39,6 +39,7 @@ class AppVersionView(APIView):
             content['permissions'] = sorted(request.user.get_all_permissions())
 
             user = {
+                'id': request.user.id,
                 'username': request.user.username,
                 'fullname': request.user.get_full_name(),
 

@@ -61,7 +61,7 @@ const srcIframeUrl = computed(() => {
   if (!widgetSelected.value?.config?.youtube?.params.autoplay) {
     paramsWidget.append('autoplay', props.autoplay.toString())
   }
-  let videoId = evento.value?.youtube_id || widgetSelected.value?.config?.youtube?.id || ''
+  let videoId = widgetSelected.value?.config?.youtube?.id || evento.value?.youtube_id ||  ''
   videoId = videoId ? `https://www.youtube.com/embed/${videoId}?${paramsWidget.toString()}` : ''
   console.log('videoId', videoId)
   return videoId

@@ -9,11 +9,22 @@
         <legend>Configurações do Painel</legend>
         <div class="container">
           <div class="row py-2">
-            <div class="col-6">
+            <div class="col-3">
+              <label for="principal" class="form-check-label">Painel Principal</label>
+              <br>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                v-model="painelSelected.principal"
+                name="principal"
+                id="principal"
+              />
+            </div>
+            <div class="col-4">
               <label for="painel-name" class="form-label">Título do Painel</label>
               <input type="text" class="form-control" v-model="painelSelected.name" placeholder="Título do Painel"/>
             </div>
-            <div class="col-6">
+            <div class="col-5">
               <label for="painel-sessao" class="form-label">Sessão Plenária Associada</label>
               <select
                 id="painel-sessao"
@@ -96,15 +107,6 @@
                   title="Fechar Editor do Painel"
                 >
                   <FontAwesomeIcon :icon="['fas', 'times']" />
-                </button>
-              </div>
-              <div class="btn-group ms-2">
-                <button
-                  class="btn btn-warning"
-                  @click.stop.prevent="resetToDefaults()"
-                  title="Resetar Painel para Configuração Padrão"
-                >
-                  <FontAwesomeIcon :icon="'fa-solid fa-rotate-left'" />
                 </button>
               </div>
               <div class="btn-group ms-2">
@@ -262,31 +264,6 @@ watch(
     }
   }
 )
-const resetToDefaults = async () => {
-  if (!painelSelected.value) {
-    return
-  }
-  try {
-    await Resource.Utils.patchModelAction({
-      app: 'painelset',
-      model: 'painel',
-      id: painelSelected.value.id,
-      action: 'reset_to_defaults'
-    })
-    messageStore.addMessage({
-      type: 'info',
-      text: 'Painel resetado para configuração padrão.',
-      timeout: 2000
-    })
-  } catch (error) {
-    messageStore.addMessage({
-      type: 'danger',
-      text: 'Erro ao resetar o Painel para configuração padrão.',
-      timeout: 5000
-    })
-    console.error('Erro ao resetar o Painel para configuração padrão:', error)
-  }
-}
 
 const closeEditor = () => {
   EventBus.emit('painelset:editorarea:close')

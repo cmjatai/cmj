@@ -1365,6 +1365,10 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
                                           label=Protocolo._meta.
                                           get_field('numero').verbose_name)
 
+    materia_numero_protocolo = forms.IntegerField(required=False,
+                                          label=Protocolo._meta.
+                                          get_field('numero').verbose_name)
+
     tipo_materia = forms.ModelChoiceField(
         label=TipoMateriaLegislativa._meta.verbose_name,
         required=False,
@@ -1435,6 +1439,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             'tipo_materia',
             'numero_materia',
             'ano_materia',
+            'materia_numero_protocolo',
             'visibilidade',
             'workspace'
         ]
@@ -1518,19 +1523,27 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             raise ValidationError("O arquivo Texto Integral deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
                                   .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (texto_integral.size / 1024) / 1024))
 
-        tm, am, nm = (cleaned_data.get('tipo_materia', ''),
+        tm, am, nm, mtp = (cleaned_data.get('tipo_materia', ''),
                       cleaned_data.get('ano_materia', ''),
-                      cleaned_data.get('numero_materia', ''))
+                      cleaned_data.get('numero_materia', ''),
+                      cleaned_data.get('materia_numero_protocolo', ''))
 
         if tm and am and nm:
             try:
                 self.logger.debug("Tentando obter objeto MateriaLegislativa (tipo_id={}, ano={}, numero={})."
                                   .format(tm, am, nm))
-                materia_de_vinculo = MateriaLegislativa.objects.get(
-                    tipo_id=tm,
-                    ano=am,
-                    numero=nm
-                )
+                params = {
+                    'tipo_id': tm,
+                    'ano': am,
+                    'numero': nm
+                }
+                if mtp:
+                    params['numero_protocolo'] = mtp
+                materia_de_vinculo = MateriaLegislativa.objects.filter(
+                    **params
+                ).order_by('-id').first()
+                if not materia_de_vinculo:
+                    raise ObjectDoesNotExist()
             except ObjectDoesNotExist:
                 self.logger.error("Objeto MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) não existe!"
                                   .format(tm, am, nm))
@@ -1634,7 +1647,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             [('texto_integral', 12)])
 
         row5_5 = to_row(
-            [('tipo_materia', 6), ('numero_materia', 3), ('ano_materia', 3)])
+            [('tipo_materia', 5), ('numero_materia', 3), ('ano_materia', 2), ('materia_numero_protocolo', 2)])
 
         row6 = to_row(
             [('numero_externo', 4), ('dias_prazo', 6), ('data_fim_prazo', 2)])
@@ -1687,6 +1700,7 @@ class DocumentoAdministrativoForm(FileFieldCheckMixin, ModelForm):
             self.fields['tipo_materia'].initial = inst.materia.tipo
             self.fields['numero_materia'].initial = inst.materia.numero
             self.fields['ano_materia'].initial = inst.materia.ano
+            self.fields['materia_numero_protocolo'].initial = inst.materia.numero_protocolo
 
         if inst and inst.pk:
             anexador = inst.documento_anexado_set.first()
