@@ -14,7 +14,6 @@
       </div>
       <div class="col-auto">
         <div class="btn-group">
-          <a href="#" @click.prevent="resetToDefaults($event)" v-if="has_perm && !evento.end_real" class="btn btn-warning" title="Resetar Paineis para Padrão"><i class="fas fa-undo-alt"></i></a>
           <a href="#" @click.prevent="finish($event)" v-if="has_perm && evento.start_real && !evento.end_real" class="btn btn-danger" title="Encerrar Evento"><i class="fas fa-stop-circle"></i></a>
           <a href="#" @click.prevent="edit($event)" v-if="has_perm && !evento.end_real" class="btn btn-secondary" title="Editar Evento"><i class="fas fa-edit"></i></a>
           <a href="#" @click.prevent="copy($event)" v-if="has_perm && evento.end_real" class="btn btn-success" title="Duplicar Evento"><i class="fas fa-copy"></i></a>
@@ -25,9 +24,17 @@
         <div class="paineis pt-2">
           <strong>Painéis:</strong>
           <i class="fas fa-info-circle" title="Clique no nome do painel para abrir em uma nova aba."></i>
-          <button class="btn btn-link" title="Adicionar novo painel ao evento" @click="createPainel($event)">
-            <i class="fas fa-plus-circle"></i>
-          </button>
+          <div class="btn-group btn-group-sm float-right" v-if="has_perm">
+              <a :href="`/api/painelset/evento/${evento.id}/export/`" class="btn btn-info" title="Exportar Paineis do Evento em YAML">
+                <i class="fas fa-file-download"></i>
+              </a>
+              <button @click.prevent="resetToDefaults($event)" v-if="!evento.end_real" class="btn btn-warning" title="Resetar Paineis para Padrão">
+                <i class="fas fa-undo-alt"></i>
+              </button>
+              <button class="btn btn-primary" title="Adicionar novo painel ao evento" @click="createPainel($event)">
+                <i class="fas fa-plus-circle"></i>
+              </button>
+          </div>
           <ul>
             <li v-for="painel in paineis" :key="`painel-${painel.id}`" class="py-2">
               <div class="d-flex w-100 align-items-center">
@@ -35,41 +42,44 @@
                   {{ painel.name }}
                   <small v-if="painel.principal"><i class="fas fa-star"></i></small>
                 </a><br>
-                <button class="btn btn-link mr-2 text-danger" title="Remover Painel do Evento" @click="deletePainel(painel.id)">
+                <button v-if="has_perm" class="btn btn-link mr-2 text-danger" title="Remover Painel do Evento" @click="deletePainel(painel.id)">
                   <i class="fas fa-minus-circle"></i>
                 </button>
               </div>
-              <span  class="sessao_list">
-                <span>
+              <div class="sessao_list">
+                <span class="text-nowrap">
                   &nbsp;&nbsp;- Sessão Vinculada:
                 </span>
                 <a
                   v-if="sessao_cache[painel.id]" :href="`${sessao_cache[painel.id]?.link_detail_backend}`" target="_blank">
                   <i class="fas fa-external-link-alt"></i>
+                  <span v-if="!has_perm"> {{ sessao_cache[painel.id]?.__str__ }}</span>
                 </a>
-                <select
-                  id="painel-sessao"
-                  name="sessao_plenaria"
-                  v-if="!evento.end_real"
-                  v-model="painel.sessao"
-                  @change="
-                    utils.patchModel(
-                      'painelset', 'painel', painel.id, {sessao: painel.sessao }
-                    ).then(() => {
-                      refresh()
-                    })
-                  "
-                >
-                  <option :value="null">-- Nenhuma --</option>
-                  <option
+                <div class="d-inline-block" v-if="has_perm">
+                  <select class="form-control form-control-sm"
+                    id="painel-sessao"
+                    name="sessao_plenaria"
+                    v-if="!evento.end_real"
+                    v-model="painel.sessao"
+                    @change="
+                      utils.patchModel(
+                        'painelset', 'painel', painel.id, {sessao: painel.sessao }
+                      ).then(() => {
+                        refresh()
+                      })
+                      "
+                  >
+                    <option :value="null">-- Nenhuma --</option>
+                    <option
                     v-for="sessao in sessaoList"
                     :key="`sessao-option-${sessao.id}`"
                     :value="sessao.id"
-                  >
+                    >
                     {{ sessao.__str__ }} ({{ sessao.data_inicio }} - {{ sessao.data_fim || '' }})
-                  </option>
-                </select>
-              </span>
+                    </option>
+                  </select>
+                </div>
+              </div>
             </li>
           </ul>
         </div>
@@ -90,18 +100,19 @@ export default {
   data () {
     return {
       sessao_cache: {},
-      paineis: {},
-      has_perm: false
+      paineis: {}
     }
   },
   computed: {
     sessaoList: function () {
       return _.orderBy(this.data_cache?.sessao_sessaoplenaria || [], ['data_inicio'], ['desc'])
+    },
+    has_perm: function () {
+      return this.hasPermission('painelset.change_evento')
     }
   },
   mounted: function () {
     const t = this
-    t.has_perm = t.hasPermission('painelset.change_evento')
     t.refresh()
   },
   methods: {
@@ -258,6 +269,8 @@ export default {
   .sessao_list {
     display: flex;
     gap: 0.7em;
+    align-items: center;
+    padding-right: 0.5em;
   }
 
   .row {

@@ -38,3 +38,7 @@ class PngRenderer(FilesRenderer):
 class PDFRenderer(FilesRenderer):
     media_type = 'application/pdf'
     format = 'pdf'
+
+class YamlRenderer(FilesRenderer):
+    media_type = 'application/x-yaml'
+    format = 'yaml'

@@ -25,11 +25,8 @@ const getters = {
     return state.data_connect.hasOwnProperty('votante')
   },
   hasPermission: (state) => {
-    return async (perm) => {
-      if (!state.data_connect?.initialized) {
-        await new Promise(resolve => setTimeout(resolve, 2000))
-      }
-      return state.data_connect?.permissions?.includes(perm)
+    return (perm) => {
+      return state.data_connect?.permissions?.includes(perm) === true
     }
   }
 }

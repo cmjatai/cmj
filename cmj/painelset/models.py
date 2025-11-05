@@ -266,9 +266,6 @@ class Evento(models.Model, CronometroMixin):
 
         for painel_data in painelset_set:
 
-            if not painel_data.get('painel', None):
-                continue
-
             painel = Painel()
             painel.evento = self
             painel.name = painel_data['name']
@@ -301,6 +298,48 @@ class Evento(models.Model, CronometroMixin):
                     visao.widgets.add(widget)
             visao.active = True
             visao.save()
+
+    def yaml_export(self):
+        """Exporta a configuração dos painéis, visões e widgets do evento para YAML."""
+        painelset_export = {
+            'paineis': []
+        }
+
+        for painel in self.paineis.all():
+            painel_data = {
+                'name': painel.name,
+                'description': painel.description,
+                'principal': painel.principal,
+                'config': painel.config,
+                'styles': painel.styles,
+                'visoes': []
+            }
+
+            for visao in painel.visoes.all():
+                visao_data = {
+                    'name': visao.name,
+                    'description': visao.description,
+                    'config': visao.config,
+                    'styles': visao.styles,
+                    'widgets': []
+                }
+
+                for widget in visao.widgets.all():
+                    widget_data = {
+                        'name': widget.name,
+                        'description': widget.description,
+                        'vue_component': widget.vue_component,
+                        'config': widget.config,
+                        'styles': widget.styles
+                    }
+                    visao_data['widgets'].append(widget_data)
+
+                painel_data['visoes'].append(visao_data)
+
+            painelset_export['paineis'].append(painel_data)
+
+        return yaml.dump(painelset_export, sort_keys=False, allow_unicode=True)
+
 
 class RoleChoices(models.TextChoices):
     PARLAMENTAR = 'PARLAMENTAR', 'Parlamentar'

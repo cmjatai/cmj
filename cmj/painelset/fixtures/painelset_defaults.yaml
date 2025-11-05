@@ -1,572 +1,527 @@
 paineis:
-  - painel: painel_para_tvcmj
-    name: Painel Com Visão Única do Cronômetro da Palavra
-    description: Painelset para exibir apenas o cronômetro da palavra ativa, otimizado para TVs do CMJ.
-    principal: false
-    config: {}
+- painel: painel_para_tvcmj
+  name: Painel Com Visão Única do Cronômetro da Palavra
+  description: Painelset para exibir apenas o cronômetro da palavra ativa, otimizado
+    para TVs do CMJ.
+  principal: false
+  config: {}
+  styles:
+    inner: {}
+    title:
+      display: none
+    component:
+      color: '#fff'
+      background-color: '#00b140'
+  visoes:
+  - name: Visão de Cronômetro da Palavra Ativo
+    description: Exibe o cronômetro da palavra ativa.
+    config:
+      activates:
+      - activate:
+          painelset__individuo__com_a_palavra:
+            value: true
+            func_exec:
+              exists: true
     styles:
-      component:
-        color: '#fff'
-        background-color: '#00b140' # verde chroma key
+      inner: {}
       title:
         display: none
-      inner: {}
-    visoes:
-      - visao:
-        name: Visão de Cronômetro da Palavra Ativo
-        description: Exibe o cronômetro da palavra ativa.
-        config:
-          activates:
-            - activate:
-                painelset__individuo__com_a_palavra:
-                  value: true
-                  func_exec:
-                    exists: true
-
-        styles:
-          component: {}
-          title:
-            display: none
-          inner: {}
-        widgets:
-          - vue_component: WidgetCronometroPalavra
-            name: Cronômetro da Palavra
-            description: Exibe o cronômetro da palavra.
-            config:
-              coords:
-                h: 100
-                w: 100
-                x: 0
-                y: 0
-            styles:
-              component: {}
-              title:
-                display: none
-              inner:
-                font-size: 15em
-                font-weight: bold
-
-# config.activates, activate tem a função de "se" para ativar a visão de acordo com condições.
-# Pode haver múltiplos activate em uma visão, funcionam como OR, ou seja, ao menos um deve ser satisfeito para ativar a visão.
-# Dentro de cada activate, as condições funcionam como AND, ou seja, todas as condições devem ser satisfeitas para ativar a visão.
-# As condições são baseadas nos lookups do django, incluíndo as apps e os models, ou seja, painelset__individuo__com_a_palavra refere-se ao campo com_a_palavra do model individuo da app painelset.
-# Adicionar um lookup contraditório em um activate (ex: painelset__individuo__com_a_palavra: true e painelset__individuo__com_a_palavra: false) faz com que o activate nunca seja satisfeito, desativando a visão.
-# Eventos e Sessões associadas ao painel são injetadas automaticamente no filtro de ativação de visão ao nível do Model do lookup acima, e não ao nível dos fields, se estes forem FKs ou M2M.
-# Os activates e a ativação e desativação das visões são tratados na tarefa assíncrona task_refresh_states_from_visaodepainel, ativada pelo signals_sync_refresh.
-
-  - painel: painel_default_sessao_plenaria
-    name: Painel Principal de Sessão Plenária
-    description: Painelset para exibir informações da sessão plenária, incluindo status e cronômetro da palavra.
-    principal: true
-    config: {}
+      component: {}
+    widgets:
+    - name: Cronômetro da Palavra
+      description: Exibe o cronômetro da palavra.
+      vue_component: WidgetCronometroPalavra
+      config:
+        coords:
+          h: 100
+          w: 100
+          x: 0
+          y: 0
+      styles:
+        inner:
+          font-size: 15em
+          font-weight: bold
+        title:
+          display: none
+        component: {}
+- painel: painel_default_sessao_plenaria
+  name: Painel Principal de Sessão Plenária
+  description: Painelset para exibir informações da sessão plenária, incluindo status
+    e cronômetro da palavra.
+  principal: true
+  config: {}
+  styles:
+    inner: {}
+    title:
+      display: none
+    component:
+      color: '#fff'
+      background-color: '#000'
+  visoes:
+  - name: Visão de sessão não iniciada ou, iniciada mas suspensa
+    description: Exibe o status da sessão quando ela ainda não foi iniciada ou foi
+      suspensa.
+    config:
+      activates:
+      - activate:
+          painelset__evento__cronometro__state:
+            value: paused
+            func_exec:
+              exists: true
+      - activate:
+          sessao__sessaoplenaria__iniciada:
+            value: false
+            func_exec:
+              exists: true
     styles:
-      component:
-        color: '#fff'
-        background-color: '#000'
+      inner: {}
       title:
         display: none
+      component:
+        background-size: auto 90%
+        background-image: url(/static/v2018/brasao/brasao_1024.png)
+        background-repeat: no-repeat
+        background-position: center 50%
+    widgets:
+    - name: Status da Sessão Plenária
+      description: Exibe o status da sessão plenária.
+      vue_component: WidgetStatusEventoSessao
+      config:
+        coords:
+          h: 100
+          w: 100
+          x: 0
+          y: 0
+        displayTitulo: true
+        displayIniciada: true
+        displayCronometro: true
+        displayDataInicio: true
+        displayHoraInicio: true
+      styles:
+        inner: {}
+        title:
+          display: none
+        component:
+          font-size: 3.5em
+          text-align: center
+          font-weight: bold
+          line-height: 1.2
+          background-color: '#000d'
+  - name: Visão de Sessão em Andamento
+    description: Exibe o status da sessão quando está em andamento, sem indivíduo
+      com a palavra.
+    config:
+      activates:
+      - activate:
+          painelset__individuo__com_a_palavra:
+            value: true
+            func_exec:
+              exists: false
+          painelset__evento__cronometro__state:
+            value: running
+            func_exec:
+              exists: true
+    styles:
+      inner:
+        background-color: '#000e'
+      title:
+        display: none
+      component:
+        background-size: 67% auto
+        background-image: url(/static/v2018/brasao/brasao_1024.png)
+        background-repeat: no-repeat
+        background-position: right 50%
+    widgets:
+    - name: Item em Pauta da Sessão Plenária
+      description: Exibe o item atualmente em pauta na sessão plenária.
+      vue_component: WidgetSessaoItemEmPauta
+      config:
+        coords:
+          h: 86
+          w: 74
+          x: 26
+          y: 14
+      styles:
+        inner:
+          color: white
+          font-size: 1em
+        title:
+          display: none
+        component: {}
+    - name: Status da Sessão Plenária
+      description: Exibe o status da sessão plenária.
+      vue_component: WidgetStatusEventoSessao
+      config:
+        coords:
+          h: 14
+          w: 74
+          x: 26
+          y: 0
+        displayCols: 6
+        displayTitulo: true
+        displayDataInicio: true
+        displayHoraInicio: true
+      styles:
+        inner:
+          background-color: '#020'
+        title:
+          display: none
+        component:
+          color: '#0f0'
+          font-size: 2em
+          text-align: center
+          font-weight: bold
+          line-height: 1
+    - name: Registro de Presença dos Parlamentares
+      description: Exibe o registro de presença dos parlamentares na sessão.
+      vue_component: WidgetSessaoRegistroPresenca
+      config:
+        coords:
+          h: 100
+          w: 26
+          x: 0
+          y: 0
+        displayVotacao: true
+        displayAusentes: true
+      styles:
+        inner: {}
+        title:
+          display: none
+        component:
+          font-size: 1.8em
+          text-align: center
+          font-weight: bold
+          line-height: 1
+          background-color: '#000d'
+  - name: Visão de Sessão em Andamento, com cronometro palavra
+    description: Exibe o status da sessão quando está em andamento, com indivíduo
+      com a palavra.
+    config:
+      activates:
+      - activate:
+          sessao__ordemdia__discussao_aberta:
+            value: true
+            func_exec:
+              exists: true
+          painelset__individuo__com_a_palavra:
+            value: true
+            func_exec:
+              exists: true
+          painelset__evento__cronometro__state:
+            value: running
+            func_exec:
+              exists: true
+      - activate:
+          painelset__individuo__com_a_palavra:
+            value: true
+            func_exec:
+              exists: true
+          painelset__evento__cronometro__state:
+            value: running
+            func_exec:
+              exists: true
+          sessao__expedientemateria__discussao_aberta:
+            value: true
+            func_exec:
+              exists: true
+      - activate:
+          painelset__individuo__com_a_palavra:
+            value: true
+            func_exec:
+              exists: true
+          painelset__evento__cronometro__state:
+            value: running
+            func_exec:
+              exists: true
+          sessao__expedientemateria__votacao_aberta:
+            value: true
+            func_exec:
+              exists: true
+    styles:
+      inner:
+        background-color: '#000e'
+      title:
+        display: none
+      component:
+        background-size: 67% auto
+        background-image: url(/static/v2018/brasao/brasao_1024.png)
+        background-repeat: no-repeat
+        background-position: right 50%
+    widgets:
+    - name: Status da Sessão Plenária
+      description: Exibe o status da sessão plenária.
+      vue_component: WidgetStatusEventoSessao
+      config:
+        coords:
+          h: 14
+          w: 74
+          x: 26
+          y: 0
+        displayCols: 6
+        displayTitulo: true
+        displayDataInicio: true
+        displayHoraInicio: true
+      styles:
+        inner:
+          background-color: '#020'
+        title:
+          display: none
+        component:
+          color: '#0f0'
+          font-size: 2em
+          text-align: center
+          font-weight: bold
+          line-height: 1
+    - name: Registro de Presença dos Parlamentares
+      description: Exibe o registro de presença dos parlamentares na sessão.
+      vue_component: WidgetSessaoRegistroPresenca
+      config:
+        coords:
+          h: 100
+          w: 26
+          x: 0
+          y: 0
+        displayVotacao: true
+        displayAusentes: true
+      styles:
+        inner: {}
+        title:
+          display: none
+        component:
+          font-size: 1.8em
+          text-align: center
+          font-weight: bold
+          line-height: 1
+          background-color: '#000d'
+    - name: Item em Pauta da Sessão Plenária
+      description: Exibe o item atualmente em pauta na sessão plenária.
+      vue_component: WidgetSessaoItemEmPauta
+      config:
+        coords:
+          h: 86
+          w: 74
+          x: 26
+          y: 14
+      styles:
+        inner:
+          color: white
+          font-size: 1em
+        title:
+          display: none
+        component: {}
+    - name: Cronômetro da Palavra
+      description: Exibe o cronômetro da palavra.
+      vue_component: WidgetCronometroPalavra
+      config:
+        coords:
+          h: 40
+          w: 58
+          x: 42
+          y: 51
+      styles:
+        inner:
+          font-size: 7em
+          font-weight: bold
+        title:
+          display: none
+        component: {}
+  - name: Visão de Cronômetro da Palavra Ativo
+    description: Exibe o cronômetro da palavra ativa.
+    config:
+      activates:
+      - activate:
+          painelset__individuo__com_a_palavra:
+            value: true
+            func_exec:
+              exists: true
+    styles:
       inner: {}
-    visoes:
-
-### VISÃO 1 ###################################################################
-      - visao:
-        name: Visão de sessão não iniciada ou, iniciada mas suspensa
-        description: Exibe o status da sessão quando ela ainda não foi iniciada ou foi suspensa.
-
-        config:
-          activates:
-            - activate: # ativa a visão quando o cronômetro do evento está pausado
-                painelset__evento__cronometro__state:
-                  value: paused
-                  func_exec:
-                    exists: true
-            - activate: # ativa a visão quando a sessão plenária não foi iniciada
-                sessao__sessaoplenaria__iniciada:
-                  value: false
-                  func_exec:
-                    exists: true
-
-        styles:
-          component:
-            background-size: auto 90%
-            background-image: url(/static/v2018/brasao/brasao_1024.png)
-            background-repeat: no-repeat
-            background-position: center 50%
-          title:
-            display: none
-          inner: {}
-
-        widgets:
-          - vue_component: WidgetStatusEventoSessao
-            name: Status da Sessão Plenária
-            description: Exibe o status da sessão plenária.
-            config:
-              displayTitulo: true # default é false
-              displayDataInicio: true # default é false
-              displayHoraInicio: true # default é false
-              displayIniciada: true # default é false
-              displayCronometro: true # default é false
-              coords:
-                h: 100
-                w: 100
-                x: 0
-                'y': 0
-            styles:
-              component:
-                background-color: '#000d'
-                font-size: 3.5em
-                text-align: center
-                font-weight: bold
-                line-height: 1.2
-              title:
-                display: none
-              inner: {}
-
-### Visão 2 ###################################################################
-# sessão em andamento, sem indivíduo com a palavra, cronômetro do evento rodando
-      - visao:
-        name: Visão de Sessão em Andamento
-        description: Exibe o status da sessão quando está em andamento, sem indivíduo com a palavra.
-# ----------------------------------------------
-        config:
-          activates:
-            - activate:
-                painelset__evento__cronometro__state:
-                  value: running
-                  func_exec:
-                    exists: true
-                painelset__individuo__com_a_palavra:
-                  value: true
-                  func_exec:
-                    exists: false
-
-# ----------------------------------------------
-        styles:
-          component:
-            background-size: 67% auto
-            background-image: url(/static/v2018/brasao/brasao_1024.png)
-            background-repeat: no-repeat
-            background-position: right 50%
-          title:
-            display: none
-          inner:
-            background-color: '#000e'
-# ----------------------------------------------
-        widgets:
-          - vue_component: WidgetStatusEventoSessao
-            name: Status da Sessão Plenária
-            description: Exibe o status da sessão plenária.
-            config:
-              displayCols: 6 # default é 12
-              displayTitulo: true # default é false
-              displayDataInicio: true # default é false
-              displayHoraInicio: true # default é false
-              coords:
-                h: 14
-                w: 67
-                x: 33
-                y: 0
-            styles:
-              component:
-                color: '#0f0'
-                font-size: 2em
-                text-align: center
-                font-weight: bold
-                line-height: 1
-              title:
-                display: none
-              inner:
-                background-color: '#020'
-# ----------------------------------------------
-          - vue_component: WidgetSessaoRegistroPresenca
-            name: Registro de Presença dos Parlamentares
-            description: Exibe o registro de presença dos parlamentares na sessão.
-            config:
-              displayVotacao: true # default é false
-              displayAusentes: true # default é false
-              coords:
-                h: 100
-                w: 33
-                x: 0
-                y: 0
-            styles:
-              component:
-                background-color: '#000d'
-                font-size: 1.8em
-                text-align: center
-                font-weight: bold
-                line-height: 1
-              title:
-                display: none
-              inner: {}
-# ----------------------------------------------
-          - vue_component: WidgetSessaoItemEmPauta
-            name: Item em Pauta da Sessão Plenária
-            description: Exibe o item atualmente em pauta na sessão plenária.
-            config:
-              coords:
-                h: 86
-                w: 67
-                x: 33
-                y: 14
-            styles:
-              component: {}
-              title:
-                display: none
-              inner:
-                color: white
-                font-size: 1em
-
-### Visão 3 ###################################################################
-# sessão em andamento, com indivíduo com a palavra, cronômetro do evento rodando
-      - visao:
-        name: Visão de Sessão em Andamento, com cronometro palavra
-        description: Exibe o status da sessão quando está em andamento, com indivíduo com a palavra.
-# ----------------------------------------------
-        config:
-          activates:
-            - activate:
-                painelset__evento__cronometro__state:
-                  value: running
-                  func_exec:
-                    exists: true
-                painelset__individuo__com_a_palavra:
-                  value: true
-                  func_exec:
-                    exists: true
-                sessao__ordemdia__discussao_aberta:
-                  value: true
-                  func_exec:
-                    exists: true
-            - activate:
-                painelset__evento__cronometro__state:
-                  value: running
-                  func_exec:
-                    exists: true
-                painelset__individuo__com_a_palavra:
-                  value: true
-                  func_exec:
-                    exists: true
-                sessao__expedientemateria__discussao_aberta:
-                  value: true
-                  func_exec:
-                    exists: true
-            - activate:
-                painelset__evento__cronometro__state:
-                  value: running
-                  func_exec:
-                    exists: true
-                painelset__individuo__com_a_palavra:
-                  value: true
-                  func_exec:
-                    exists: true
-                sessao__expedientemateria__votacao_aberta:
-                  value: true
-                  func_exec:
-                    exists: true
-
-# ----------------------------------------------
-        styles:
-          component:
-            background-size: 67% auto
-            background-image: url(/static/v2018/brasao/brasao_1024.png)
-            background-repeat: no-repeat
-            background-position: right 50%
-          title:
-            display: none
-          inner:
-            background-color: '#000e'
-# ----------------------------------------------
-        widgets:
-          - vue_component: WidgetStatusEventoSessao
-            name: Status da Sessão Plenária
-            description: Exibe o status da sessão plenária.
-            config:
-              displayCols: 6 # default é 12
-              displayTitulo: true # default é false
-              displayDataInicio: true # default é false
-              displayHoraInicio: true # default é false
-              coords:
-                h: 14
-                w: 67
-                x: 33
-                y: 0
-            styles:
-              component:
-                color: '#0f0'
-                font-size: 2em
-                text-align: center
-                font-weight: bold
-                line-height: 1
-              title:
-                display: none
-              inner:
-                background-color: '#020'
-# ----------------------------------------------
-          - vue_component: WidgetSessaoRegistroPresenca
-            name: Registro de Presença dos Parlamentares
-            description: Exibe o registro de presença dos parlamentares na sessão.
-            config:
-              displayVotacao: true # default é false
-              displayAusentes: true # default é false
-              coords:
-                h: 100
-                w: 33
-                x: 0
-                y: 0
-            styles:
-              component:
-                background-color: '#000d'
-                font-size: 1.8em
-                text-align: center
-                font-weight: bold
-                line-height: 1
-              title:
-                display: none
-              inner: {}
-# ----------------------------------------------
-          - vue_component: WidgetSessaoItemEmPauta
-            name: Item em Pauta da Sessão Plenária
-            description: Exibe o item atualmente em pauta na sessão plenária.
-            config:
-              coords:
-                h: 86
-                w: 67
-                x: 33
-                y: 14
-            styles:
-              component: {}
-              title:
-                display: none
-              inner:
-                color: white
-                font-size: 1em
-
-          - vue_component: WidgetCronometroPalavra
-            name: Cronômetro da Palavra
-            description: Exibe o cronômetro da palavra.
-            config:
-              coords:
-                h: 30
-                w: 42
-                x: 58
-                y: 63
-            styles:
-              component: {}
-              title:
-                display: none
-              inner:
-                font-size: 7em
-                font-weight: bold
-
-
-### Visão 97 ###################################################################
-#    - visao:
-#      name: Visão dev
-#      description: Visão para desenvolvimento e testes.
-#      config:
-#        activates:
-#          - activate:
-#              - painelset__evento__cronometro__state: 'stoped' # ativa a visão quando o cronômetro do evento está parado
-#      styles:
-#        component: {}
-#        title:
-#          display: none
-#        inner: {}
-#      widgets:
-#        - vue_component: WidgetHtmlCode
-#          name: Widget de Teste HTML
-#          description: |
-#            <div style="color: #0f0; font-size: 3em; text-align: center; font-weight: bold;">
-#              Visão de Desenvolvimento Ativa
-#            </div>
-#          config:
-#            coords:
-#              h: 15
-#              w: 100
-#              x: 0
-#              y: 0
-#          styles:
-#            component:
-#              background-color: '#000d'
-#            title:
-#              display: none
-#            inner: {}
-
-### VISÃO 98 ###################################################################
-# sessão em andamento, com indivíduo com a palavra, cronômetro do evento rodando
-# sem nenhuma outra visão mais específica ativa
-      - visao:
-        name: Visão de Cronômetro da Palavra Ativo
-        description: Exibe o cronômetro da palavra ativa.
-        config:
-          activates: # Ativa esta visão quando há um indivíduo com a palavra
-            - activate:
-                painelset__individuo__com_a_palavra:
-                  value: true
-                  func_exec:
-                    exists: true
-        styles:
-          component:
-            background-size: auto 90%
-            background-image: url(/static/v2018/brasao/brasao_1024.png)
-            background-repeat: no-repeat
-            background-position: center bottom
-          title:
-            display: none
-          inner: {}
-
-        widgets:
-          - vue_component: WidgetSessaoPlenariaStatus
-            name: Titulo e Status da Sessão Plenária
-            description: Exibe o status da sessão plenária.
-            config:
-              coords:
-                h: 8
-                w: 87
-                x: 0
-                y: 0
-            styles:
-              component:
-                color: '#0f0'
-                background-color: '#111511'
-                border-bottom: '1px solid #040'
-              title:
-                display: none
-              inner:
-                font-size: 1.8em
-                text-align: center
-                line-height: 1.1
-
-          - vue_component: WidgetCronometroEvento
-            name: Tempo de Sessão
-            description: Exibe o cronômetro do evento da sessão plenária.
-            config:
-              coords:
-                h: 8
-                w: 13
-                x: 87
-                y: 0
-            styles:
-              component:
-                color: '#0f0'
-                background-color: '#111511'
-                border-bottom: '1px solid #040'
-              title: {}
-              inner:
-                font-size: 2.5em
-                text-align: center
-                font-weight: bold
-
-          - vue_component: WidgetCronometroPalavra
-            name: Cronômetro da Palavra
-            description: Exibe o cronômetro da palavra.
-            config:
-              coords:
-                h: 92
-                w: 100
-                x: 0
-                y: 8
-            styles:
-              component:
-                backgroundColor: '#000d'
-              title:
-                display: none
-              inner:
-                font-size: 15em
-                font-weight: bold
-
-### VISÃO 99 ###################################################################
-      - visao: ### Visão padrão para YouTube Live - Visão sem activate deve existir apenas uma e ser a última ###
-        name: Visão Youtube Live
-        description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
-
-        config:
-          activates: # Player mostrado quando nenhuma outra visão está ativa
-            - activate:
-                painelset__evento__cronometro__state:
-                  value: 'stopped'
-                  func_exec:
-                    exists: true
-        styles:
-          component:
-            background-size: auto 45%
-            background-image: url(/static/v2018/brasao/brasao_1024.png)
-            background-repeat: no-repeat
-            background-position: 4% 4%
-          title:
-            display: none
-          inner: {}
-
-        widgets:
-          - vue_component: WidgetSessaoPlenariaStatus
-            name: Titulo e Status da Sessão Plenária
-            description: Exibe o status da sessão plenária.
-            config:
-              coords:
-                h: 17
-                w: 65
-                x: 35
-                y: 0
-            styles:
-              component:
-                color: '#0f0'
-              title:
-                display: none
-              inner:
-                font-size: 2.2em
-                text-align: center
-
-          - vue_component: WidgetYoutubeEmbed
-            name: YouTube Live Embed
-            description: Exibe o vídeo incorporado do YouTube.
-            config:
-              youtube:
-                id: '' #9S3LDlH_2MI
-                params:
-                  autoplay: 1
-                  mute: 1
-              coords:
-                h: 61
-                w: 60
-                x: 39
-                y: 38
-            styles:
-              component: {}
-              title:
-                display: none
-              inner: {}
-
-          - vue_component: WidgetCronometroEvento
-            name: Cronômetro do Evento
-            description: Exibe o cronômetro do evento.
-            config:
-              coords:
-                h: 25
-                w: 65
-                x: 35
-                y: 13
-            styles:
-              component: {}
-              title:
-                display: none
-              inner:
-                font-size: 5em
-                font-weight: bold
-
-          - vue_component: WidgetCronometroPalavra
-            name: Cronômetro da Palavra
-            description: Exibe o cronômetro da palavra.
-            config:
-              coords:
-                h: 50
-                w: 39
-                x: 0
-                y: 49
-            styles:
-              component: {}
-              title:
-                display: none
-              inner:
-                font-size: 6em
-                font-weight: bold
+      title:
+        display: none
+      component:
+        background-size: auto 90%
+        background-image: url(/static/v2018/brasao/brasao_1024.png)
+        background-repeat: no-repeat
+        background-position: center bottom
+    widgets:
+    - name: Titulo e Status da Sessão Plenária
+      description: Exibe o status da sessão plenária.
+      vue_component: WidgetSessaoPlenariaStatus
+      config:
+        coords:
+          h: 8
+          w: 87
+          x: 0
+          y: 0
+      styles:
+        inner:
+          font-size: 1.8em
+          text-align: center
+          line-height: 1.1
+        title:
+          display: none
+        component:
+          color: '#0f0'
+          border-bottom: '1px solid #040'
+          background-color: '#111511'
+    - name: Tempo de Sessão
+      description: Exibe o cronômetro do evento da sessão plenária.
+      vue_component: WidgetCronometroEvento
+      config:
+        coords:
+          h: 8
+          w: 13
+          x: 87
+          y: 0
+      styles:
+        inner:
+          font-size: 2.5em
+          text-align: center
+          font-weight: bold
+        title: {}
+        component:
+          color: '#0f0'
+          border-bottom: '1px solid #040'
+          background-color: '#111511'
+    - name: Cronômetro da Palavra
+      description: Exibe o cronômetro da palavra.
+      vue_component: WidgetCronometroPalavra
+      config:
+        coords:
+          h: 92
+          w: 100
+          x: 0
+          y: 8
+      styles:
+        inner:
+          font-size: 15em
+          font-weight: bold
+        title:
+          display: none
+        component:
+          backgroundColor: '#000d'
+  - name: Visão Youtube Live
+    description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
+    config:
+      activates:
+      - activate:
+          painelset__evento__cronometro__state:
+            value: stopped
+            func_exec:
+              exists: true
+    styles:
+      inner: {}
+      title:
+        display: none
+      component:
+        background-size: auto 45%
+        background-image: url(/static/v2018/brasao/brasao_1024.png)
+        background-repeat: no-repeat
+        background-position: 3% 25%
+    widgets:
+    - name: YouTube Live Embed
+      description: Exibe o vídeo incorporado do YouTube.
+      vue_component: WidgetYoutubeEmbed
+      config:
+        coords:
+          h: 61
+          w: 60
+          x: 39
+          y: 38
+        youtube:
+          id: ''
+          params:
+            rel: 0
+            mute: 1
+            autoplay: 1
+      styles:
+        inner: {}
+        title:
+          display: none
+        component: {}
+    - name: Cronômetro da Palavra
+      description: Exibe o cronômetro da palavra.
+      vue_component: WidgetCronometroPalavra
+      config:
+        coords:
+          h: 50
+          w: 39
+          x: 0
+          y: 49
+      styles:
+        inner:
+          font-size: 6em
+          font-weight: bold
+        title:
+          display: none
+        component: {}
+    - name: Titulo e Status da Sessão Plenária
+      description: Exibe o status da sessão plenária.
+      vue_component: WidgetSessaoPlenariaStatus
+      config:
+        coords:
+          h: 13
+          w: 100
+          x: 0
+          y: 0
+      styles:
+        inner:
+          font-size: 3em
+          text-align: center
+          font-weight: bold
+          line-height: 1.4
+        title:
+          display: none
+        component:
+          color: '#0f0'
+    - name: Cronômetro do Evento
+      description: Exibe o cronômetro do evento.
+      vue_component: WidgetCronometroEvento
+      config:
+        coords:
+          h: 21
+          w: 61
+          x: 39
+          y: 13
+      styles:
+        inner:
+          font-size: 5em
+          font-weight: bold
+        title:
+          display: none
+        component: {}
+  - name: Visão Youtube Live 100%
+    description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
+    config:
+      activates:
+      - activate:
+          painelset__evento__cronometro__state:
+            value: stopped
+            func_exec:
+              exists: true
+    styles:
+      inner: {}
+      title:
+        display: none
+      component: {}
+    widgets:
+    - name: YouTube Live Embed
+      description: Exibe o vídeo incorporado do YouTube.
+      vue_component: WidgetYoutubeEmbed
+      config:
+        coords:
+          h: 100
+          w: 100
+          x: 0
+          y: 0
+        youtube:
+          id: ''
+          params:
+            rel: 0
+            mute: 1
+            autoplay: 1
+      styles:
+        inner: {}
+        title:
+          display: none
+        component: {}

@@ -12,6 +12,7 @@ REST_FRAMEWORK = {
         "drfautoapi.PngRenderer",
         "drfautoapi.JpgRenderer",
         "drfautoapi.JpegRenderer",
+        "drfautoapi.YamlRenderer",
     ),
     "DEFAULT_CONTENT_NEGOTIATION_CLASS": "drfautoapi.DrfautoapiNegotiation",
     "DEFAULT_PERMISSION_CLASSES": (

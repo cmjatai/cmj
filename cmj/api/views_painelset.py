@@ -24,6 +24,7 @@ from pythonosc import udp_client
 from cmj.painelset.tasks import SEND_MESSAGE_MICROPHONE
 from sapl.api.mixins import ResponseFileMixin
 from sapl.base.templatetags.common_tags import youtube_id
+from django.http import HttpResponse
 
 logger = logging.getLogger(__name__)
 
@@ -42,6 +43,14 @@ class EventoChangePermission(BasePermission):
 @customize(Evento)
 class _EventoViewSet:
     serializer_class = EventoSerializer
+
+    @action(detail=True, methods=['GET'])
+    def export(self, request, pk=None, format='yaml'):
+        evento = self.get_object()
+        yaml_string = evento.yaml_export()
+        response = HttpResponse(yaml_string, content_type='text/yaml; charset=utf-8')
+        response['Content-Disposition'] = f'attachment; filename="evento_{evento.id}_export.yaml"'
+        return response
 
     @action(detail=True, methods=['PATCH'], permission_classes=[EventoChangePermission])
     def start(self, request, pk=None):
