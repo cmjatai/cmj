@@ -26,7 +26,7 @@
           :ref="`cronometro-com-a-palavra-${individuo.cronometro}`"
           :cronometro_id="individuo.cronometro"
           :controls="[
-            'toggleDisplay',
+            // 'toggleDisplay',
             'pause',
             'resume',
             'add30s',
@@ -127,14 +127,14 @@ export default {
     .cronometro {
       flex: 1 1 auto;
       padding: 1em;
-      font-size: 0.8em;
+      font-size: 0.9em;
       position: relative;
       .icon-status-microfone {
         position: absolute;
-        top: 0.5em;
+        top: 0em;
         right: 0.5em;
         cursor: pointer;
-        font-size: 2em;
+        font-size: 4em;
         color: #ccc;
         i {
           &.fa-microphone {
@@ -156,7 +156,7 @@ export default {
           margin: 0;
           width: auto;
           .btn {
-            padding: 0.3em 0.7em 0.2em 0.7em;
+            padding: 0.5em 1.5em 0.6em 1.5em;
           }
         }
       }
@@ -182,11 +182,69 @@ export default {
     }
   }
 }
+@media screen and (max-width: 1399.98px) {
+  .individuo-aparteante-component {
+    .individuo-aparteante {
+      margin-left: 4em;
+      .cronometro {
+        padding: 0.5em;
+        font-size: 0.8em;
+        .icon-status-microfone {
+          right: 0.5em;
+          font-size: 4em;
+        }
+      }
+      .croncard {
+        justify-content: center;
+        gap: 1em;
+      }
+      .controls {
+        &.visible {
+          .btn-group {
+            .btn {
+              padding: 0.4em 1em 0.4em 1em;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 1199.98px) {
+
+.individuo-aparteante-component {
+  .individuo-aparteante {
+    margin-left: 2em;
+    .cronometro {
+      font-size: 0.9em;
+      .icon-status-microfone {
+        font-size: 3.5em;
+      }
+    }
+    .croncard {
+      justify-content: center;
+      gap: 1em;
+    }
+    .controls {
+      &.visible {
+        .btn-group {
+          margin: 0;
+          width: auto;
+          .btn {
+            font-size: 1.7em;
+            padding: 0.6em;
+          }
+        }
+      }
+    }
+  }
+}
+}
 @media screen and (max-width: 991.98px) {
   .individuo-aparteante-component {
     .individuo-aparteante {
       border-top: 1px solid #888;
-      margin-top: 1em;
+      margin-top: 0em;
       align-items: flex-end;
       margin-left: 0;
       .individuo-header {

@@ -19,13 +19,16 @@
       :style="painel?.styles.inner || {}"
     >
       <VisaoDePainel
-        :key="`visaodepainel-${visaoSelected.id}`"
+        :key="`visaodepainel-${visaoSelected}`"
         :painel-id="painelId"
         :visaodepainel-selected="visaoSelected"
         :editmode-visao="editmodeVisao"
       />
     </div>
-    <div class="painel-empty" v-else>
+    <div
+      class="painel-empty"
+      v-else
+    >
       <p>Não há visões de painel configuradas para este painel.</p>
       <p>Utilize o botao de adição na tela de configurações para adicionar a primeira visão do painel.</p>
     </div>
@@ -36,23 +39,37 @@
         aria-label="Zoom da fonte"
         :title="`Zoom aplicado aos elementos textuais: ${(zoomFont*100).toFixed(0)}%`"
       >
-        <button class="btn btn-link">{{ (zoomFont * 100).toFixed(0) }}%</button>
-        <button class="btn btn-link btn-zoom-out" @click.stop.prevent="zoomFontChange(-0.1)">
+        <button class="btn btn-link">
+          {{ (zoomFont * 100).toFixed(0) }}%
+        </button>
+        <button
+          class="btn btn-link btn-zoom-out"
+          @click.stop.prevent="zoomFontChange(-0.1)"
+        >
           <FontAwesomeIcon
             :icon="'fa-solid fa-angles-down'"
           />
         </button>
-        <button class="btn btn-link btn-zoom-out" @click.stop.prevent="zoomFontChange(-0.01)">
+        <button
+          class="btn btn-link btn-zoom-out"
+          @click.stop.prevent="zoomFontChange(-0.01)"
+        >
           <FontAwesomeIcon
             :icon="'fa-solid fa-angle-down'"
           />
         </button>
-        <button class="btn btn-link btn-zoom-in" @click.stop.prevent="zoomFontChange(0.01)">
+        <button
+          class="btn btn-link btn-zoom-in"
+          @click.stop.prevent="zoomFontChange(0.01)"
+        >
           <FontAwesomeIcon
             :icon="'fa-solid fa-angle-up'"
           />
         </button>
-        <button class="btn btn-link btn-zoom-in" @click.stop.prevent="zoomFontChange(0.1)">
+        <button
+          class="btn btn-link btn-zoom-in"
+          @click.stop.prevent="zoomFontChange(0.1)"
+        >
           <FontAwesomeIcon
             :icon="'fa-solid fa-angles-up'"
           />
@@ -147,7 +164,6 @@ const authStore = useAuthStore()
 const router = useRouter()
 const route = useRoute()
 
-
 // 3. Props & Emits
 const props = defineProps({
   painelId: {
@@ -224,9 +240,6 @@ watch(
   (newVisaoList) => {
     if (newVisaoList.length > 0) {
       if (activeTeleportId.value !== null) {
-        if (!newVisaoList.find((pv) => pv.id === visaoSelected.value?.id)) {
-          visaoSelected.value = newVisaoList[0].id
-        }
         return
       }
       const visaoAtivaLocal = newVisaoList.find(
@@ -235,7 +248,7 @@ watch(
       if (visaoAtivaLocal) {
         visaoSelected.value = visaoAtivaLocal.id
       } else {
-        visaoSelected.value = newVisaoList[0].id
+        // visaoSelected.value = newVisaoList[0].id
       }
     } else {
       visaoSelected.value = null
@@ -379,13 +392,6 @@ const trocarVisao = (id) => {
   nextTick(() => {
     visaoSelected.value = id
   })
-}
-
-const visaoAtiva = () => {
-  if (activeTeleportId.value !== null) {
-    return
-  }
-  visaoSelected.value = painel.value.visaodepainel_ativo_id
 }
 
 const onChangePermission = () => {

@@ -63,13 +63,16 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
                     'painelset.Cronometro',
                     'painelset.CronometroEvent',
                 ):
-                if not settings.DEBUG or (
-                    settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR
-                ):
-                    countdown = 0 if hasattr(inst, 'com_a_palavra') and inst.com_a_palavra else 3
-                    tasks.task_refresh_states_from_visaodepainel.apply_async(countdown=countdown)
-                else:
-                    tasks_function.task_refresh_states_from_visaodepainel_function()
+                try:
+                    if not settings.DEBUG or (
+                        settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR
+                    ):
+                        countdown = 0 #if hasattr(inst, 'com_a_palavra') and inst.com_a_palavra else 3
+                        tasks.task_refresh_states_from_visaodepainel.apply_async(countdown=countdown)
+                    else:
+                        tasks_function.task_refresh_states_from_visaodepainel_function()
+                except Exception as e:
+                    logger.error(_("Erro ao agendar atualização dos estados dos painéis. {}").format(e))
 
         except Exception as e:
             logger.error(_("Erro na comunicação com o backend do redis. "

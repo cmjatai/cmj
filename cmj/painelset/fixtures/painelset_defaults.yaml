@@ -1,5 +1,5 @@
 paineis:
-- painel: painel_para_tvcmj
+- painel: painel-71-painel-com-visao-unica-do-cronometro-da-palavra
   name: Painel Com Visão Única do Cronômetro da Palavra
   description: Painelset para exibir apenas o cronômetro da palavra ativa, otimizado
     para TVs do CMJ.
@@ -13,7 +13,8 @@ paineis:
       color: '#fff'
       background-color: '#00b140'
   visoes:
-  - name: Visão de Cronômetro da Palavra Ativo
+  - visao: visao-199-visao-de-cronometro-da-palavra-ativo
+    name: Visão de Cronômetro da Palavra Ativo
     description: Exibe o cronômetro da palavra ativa.
     config:
       activates:
@@ -28,7 +29,9 @@ paineis:
         display: none
       component: {}
     widgets:
-    - name: Cronômetro da Palavra
+    - widget: widget-539
+      parent: null
+      name: Cronômetro da Palavra
       description: Exibe o cronômetro da palavra.
       vue_component: WidgetCronometroPalavra
       config:
@@ -44,7 +47,7 @@ paineis:
         title:
           display: none
         component: {}
-- painel: painel_default_sessao_plenaria
+- painel: painel-72-painel-principal-de-sessao-plenaria
   name: Painel Principal de Sessão Plenária
   description: Painelset para exibir informações da sessão plenária, incluindo status
     e cronômetro da palavra.
@@ -58,7 +61,8 @@ paineis:
       color: '#fff'
       background-color: '#000'
   visoes:
-  - name: Visão de sessão não iniciada ou, iniciada mas suspensa
+  - visao: visao-200-visao-de-sessao-nao-iniciada-ou-iniciada-mas-suspensa
+    name: Visão de sessão não iniciada ou, iniciada mas suspensa
     description: Exibe o status da sessão quando ela ainda não foi iniciada ou foi
       suspensa.
     config:
@@ -83,7 +87,9 @@ paineis:
         background-repeat: no-repeat
         background-position: center 50%
     widgets:
-    - name: Status da Sessão Plenária
+    - widget: widget-540
+      parent: null
+      name: Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
       vue_component: WidgetStatusEventoSessao
       config:
@@ -107,7 +113,8 @@ paineis:
           font-weight: bold
           line-height: 1.2
           background-color: '#000d'
-  - name: Visão de Sessão em Andamento
+  - visao: visao-201-visao-de-sessao-em-andamento
+    name: Visão de Sessão em Andamento
     description: Exibe o status da sessão quando está em andamento, sem indivíduo
       com a palavra.
     config:
@@ -132,23 +139,32 @@ paineis:
         background-repeat: no-repeat
         background-position: right 50%
     widgets:
-    - name: Item em Pauta da Sessão Plenária
-      description: Exibe o item atualmente em pauta na sessão plenária.
-      vue_component: WidgetSessaoItemEmPauta
+    - widget: widget-542
+      parent: null
+      name: Registro de Presença dos Parlamentares
+      description: Exibe o registro de presença dos parlamentares na sessão.
+      vue_component: WidgetSessaoRegistroPresenca
       config:
         coords:
-          h: 86
-          w: 74
-          x: 26
-          y: 14
+          h: 100
+          w: 26
+          x: 0
+          y: 0
+        displayVotacao: true
+        displayAusentes: true
       styles:
-        inner:
-          color: white
-          font-size: 1em
+        inner: {}
         title:
           display: none
-        component: {}
-    - name: Status da Sessão Plenária
+        component:
+          font-size: 1.8em
+          text-align: center
+          font-weight: bold
+          line-height: 1
+          background-color: '#000d'
+    - widget: widget-543
+      parent: null
+      name: Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
       vue_component: WidgetStatusEventoSessao
       config:
@@ -172,28 +188,26 @@ paineis:
           text-align: center
           font-weight: bold
           line-height: 1
-    - name: Registro de Presença dos Parlamentares
-      description: Exibe o registro de presença dos parlamentares na sessão.
-      vue_component: WidgetSessaoRegistroPresenca
+    - widget: widget-541
+      parent: null
+      name: Item em Pauta da Sessão Plenária
+      description: Exibe o item atualmente em pauta na sessão plenária.
+      vue_component: WidgetSessaoItemEmPauta
       config:
         coords:
-          h: 100
-          w: 26
-          x: 0
-          y: 0
-        displayVotacao: true
-        displayAusentes: true
+          h: 86
+          w: 74
+          x: 26
+          y: 14
       styles:
-        inner: {}
+        inner:
+          color: white
+          font-size: 1.3em
         title:
           display: none
-        component:
-          font-size: 1.8em
-          text-align: center
-          font-weight: bold
-          line-height: 1
-          background-color: '#000d'
-  - name: Visão de Sessão em Andamento, com cronometro palavra
+        component: {}
+  - visao: visao-202-visao-de-sessao-em-andamento-com-cronometro-palavra
+    name: Visão de Sessão em Andamento, com cronometro palavra
     description: Exibe o status da sessão quando está em andamento, com indivíduo
       com a palavra.
     config:
@@ -248,14 +262,16 @@ paineis:
         background-repeat: no-repeat
         background-position: right 50%
     widgets:
-    - name: Status da Sessão Plenária
+    - widget: widget-547
+      parent: null
+      name: Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
       vue_component: WidgetStatusEventoSessao
       config:
         coords:
           h: 14
-          w: 74
-          x: 26
+          w: 73
+          x: 27
           y: 0
         displayCols: 6
         displayTitulo: true
@@ -267,18 +283,38 @@ paineis:
         title:
           display: none
         component:
-          color: '#0f0'
+          color: '#fff'
           font-size: 2em
           text-align: center
           font-weight: bold
           line-height: 1
-    - name: Registro de Presença dos Parlamentares
+    - widget: widget-545
+      parent: null
+      name: Item em Pauta da Sessão Plenária
+      description: Exibe o item atualmente em pauta na sessão plenária.
+      vue_component: WidgetSessaoItemEmPauta
+      config:
+        coords:
+          h: 86
+          w: 73
+          x: 27
+          y: 14
+      styles:
+        inner:
+          color: white
+          font-size: 1em
+        title:
+          display: none
+        component: {}
+    - widget: widget-544
+      parent: null
+      name: Registro de Presença dos Parlamentares
       description: Exibe o registro de presença dos parlamentares na sessão.
       vue_component: WidgetSessaoRegistroPresenca
       config:
         coords:
           h: 100
-          w: 26
+          w: 27
           x: 0
           y: 0
         displayVotacao: true
@@ -293,39 +329,30 @@ paineis:
           font-weight: bold
           line-height: 1
           background-color: '#000d'
-    - name: Item em Pauta da Sessão Plenária
-      description: Exibe o item atualmente em pauta na sessão plenária.
-      vue_component: WidgetSessaoItemEmPauta
-      config:
-        coords:
-          h: 86
-          w: 74
-          x: 26
-          y: 14
-      styles:
-        inner:
-          color: white
-          font-size: 1em
-        title:
-          display: none
-        component: {}
-    - name: Cronômetro da Palavra
-      description: Exibe o cronômetro da palavra.
+    - widget: widget-560
+      parent: widget-545
+      name: Novo Widget
+      description: ''
       vue_component: WidgetCronometroPalavra
       config:
         coords:
-          h: 40
-          w: 58
-          x: 42
-          y: 51
+          h: 82
+          w: 90
+          x: 10
+          y: 11
       styles:
         inner:
-          font-size: 7em
+          border: '10px solid #aaaa'
+          font-size: 10em
+          box-shadow: '1px 5px 0.3em #aaae'
           font-weight: bold
+          background-color: '#001722dd'
         title:
           display: none
-        component: {}
-  - name: Visão de Cronômetro da Palavra Ativo
+        component:
+          padding: 3em
+  - visao: visao-203-visao-de-cronometro-da-palavra-ativo
+    name: Visão de Cronômetro da Palavra Ativo
     description: Exibe o cronômetro da palavra ativa.
     config:
       activates:
@@ -344,7 +371,9 @@ paineis:
         background-repeat: no-repeat
         background-position: center bottom
     widgets:
-    - name: Titulo e Status da Sessão Plenária
+    - widget: widget-548
+      parent: null
+      name: Titulo e Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
       vue_component: WidgetSessaoPlenariaStatus
       config:
@@ -364,7 +393,9 @@ paineis:
           color: '#0f0'
           border-bottom: '1px solid #040'
           background-color: '#111511'
-    - name: Tempo de Sessão
+    - widget: widget-549
+      parent: null
+      name: Tempo de Sessão
       description: Exibe o cronômetro do evento da sessão plenária.
       vue_component: WidgetCronometroEvento
       config:
@@ -383,7 +414,9 @@ paineis:
           color: '#0f0'
           border-bottom: '1px solid #040'
           background-color: '#111511'
-    - name: Cronômetro da Palavra
+    - widget: widget-550
+      parent: null
+      name: Cronômetro da Palavra
       description: Exibe o cronômetro da palavra.
       vue_component: WidgetCronometroPalavra
       config:
@@ -400,7 +433,8 @@ paineis:
           display: none
         component:
           backgroundColor: '#000d'
-  - name: Visão Youtube Live
+  - visao: visao-204-visao-youtube-live-com-cronometro-de-uso-da-palavra
+    name: Visão Youtube Live com crônometro de uso da palavra
     description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
     config:
       activates:
@@ -410,24 +444,27 @@ paineis:
             func_exec:
               exists: true
     styles:
-      inner: {}
+      inner:
+        background-color: '#0005'
       title:
         display: none
       component:
-        background-size: auto 45%
+        background-size: auto 30%
         background-image: url(/static/v2018/brasao/brasao_1024.png)
         background-repeat: no-repeat
-        background-position: 3% 25%
+        background-position: 13% 95%
     widgets:
-    - name: YouTube Live Embed
+    - widget: widget-554
+      parent: null
+      name: YouTube Live Embed
       description: Exibe o vídeo incorporado do YouTube.
       vue_component: WidgetYoutubeEmbed
       config:
         coords:
-          h: 61
-          w: 60
-          x: 39
-          y: 38
+          h: 59
+          w: 59
+          x: 41
+          y: 41
         youtube:
           id: ''
           params:
@@ -439,23 +476,9 @@ paineis:
         title:
           display: none
         component: {}
-    - name: Cronômetro da Palavra
-      description: Exibe o cronômetro da palavra.
-      vue_component: WidgetCronometroPalavra
-      config:
-        coords:
-          h: 50
-          w: 39
-          x: 0
-          y: 49
-      styles:
-        inner:
-          font-size: 6em
-          font-weight: bold
-        title:
-          display: none
-        component: {}
-    - name: Titulo e Status da Sessão Plenária
+    - widget: widget-551
+      parent: null
+      name: Titulo e Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
       vue_component: WidgetSessaoPlenariaStatus
       config:
@@ -469,28 +492,56 @@ paineis:
           font-size: 3em
           text-align: center
           font-weight: bold
-          line-height: 1.4
+          line-height: 1.3
         title:
           display: none
         component:
-          color: '#0f0'
-    - name: Cronômetro do Evento
+          color: '#ff0'
+    - widget: widget-552
+      parent: null
+      name: TEMPO DE SESSÃO
       description: Exibe o cronômetro do evento.
       vue_component: WidgetCronometroEvento
       config:
         coords:
-          h: 21
-          w: 61
-          x: 39
-          y: 13
+          h: 17
+          w: 28
+          x: 68
+          y: 17
       styles:
         inner:
-          font-size: 5em
+          font-size: 6em
+          font-weight: bold
+        title:
+          color: '#0f0'
+          display: flex
+          font-size: 2em
+          font-weight: bold
+        component:
+          border: '1px solid #777'
+          padding: 1em
+          border-radius: 1em
+          background-color: '#222'
+    - widget: widget-553
+      parent: null
+      name: Cronômetro da Palavra
+      description: Exibe o cronômetro da palavra.
+      vue_component: WidgetCronometroPalavra
+      config:
+        coords:
+          h: 51
+          w: 42
+          x: 0
+          y: 10
+      styles:
+        inner:
+          font-size: 7em
           font-weight: bold
         title:
           display: none
         component: {}
-  - name: Visão Youtube Live 100%
+  - visao: visao-205-visao-youtube-live-100
+    name: Visão Youtube Live 100%
     description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
     config:
       activates:
@@ -505,7 +556,9 @@ paineis:
         display: none
       component: {}
     widgets:
-    - name: YouTube Live Embed
+    - widget: widget-555
+      parent: null
+      name: YouTube Live Embed
       description: Exibe o vídeo incorporado do YouTube.
       vue_component: WidgetYoutubeEmbed
       config:

@@ -31,15 +31,15 @@ export default {
       required: false,
       default: function () {
         return [
-          'start',
+          // 'start',
           'pause',
           'resume',
-          'stop',
+          // 'stop',
           'add30s',
           'add1m',
           'add3m',
-          'add5m',
-          'toggleDisplay'
+          'add5m'
+          // 'toggleDisplay'
         ]
       }
     }
@@ -74,8 +74,8 @@ export default {
 
           .btn {
             justify-content: center;
-            padding: 0.5em 0;
-            font-size: 1em;
+            padding: 1em 0;
+            font-size: 2.5em;
             font-weight: bold;
             &:hover {
               box-shadow: 0px 0px 10px #000;
@@ -84,17 +84,28 @@ export default {
           .btn-outline-dark {
             color: white;
             border-color: #444;
-            background-image: linear-gradient(to bottom, #444, #333);
+            background-image: linear-gradient(to bottom, #177708, #0c4e01);
             flex: 1 2 auto;
             &:hover {
               background-color: #444;
               border-color: #777
             }
+            &.btn-pause {
+              background-image: linear-gradient(to top, #9c4700, #9a7504);
+              flex: 0 1 0;
+              padding-left: 0.5em;
+              padding-right: 0.5em;
+              border-color: #777717;
+              &:hover {
+                background-color: #666616;
+                border-color: #aaaa44;
+              }
+            }
             &.btn-negative {
               background-image: linear-gradient(to bottom, #772222, #442222);
               flex: 0 1 0;
-              padding-left: 1em;
-              padding-right: 1.3em;
+              padding-left: 0.5em;
+              padding-right: 0.5em;
               border-color: #772222;
               &:hover {
                 background-color: #662222;
@@ -107,14 +118,72 @@ export default {
     }
   }
 }
+@media screen and (max-width: 1399.98px) {
+  .cronometro-palavra {
+    .cronometro-component {
+      .controls {
+        &.visible {
+          .btn-group {
+            .btn {
+              padding: 0.5em 0;
+              font-size: 2em;
+            }
+            .btn-outline-dark {
+              &.btn-pause {
+                padding-left: 0.2em;
+                padding-right: 0.2em;
+              }
+              &.btn-negative {
+                padding-left: 0.3em;
+                padding-right: 0.3em;
+                font-size: 1.5em;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 @media screen and (max-width: 991.98px) {
   .cronometro-palavra {
     .cronometro-component {
-      .controls.visible {
-        .btn-group {
-          .btn-outline-dark {
-            &.btn-negative {
-              padding: 0.3em 0.5em 0 0.2em;
+      .controls {
+        &.visible {
+          .btn-group {
+            margin-top: 0.3em;
+            .btn {
+              padding: 0.3em 0;
+              font-size: 2em;
+            }
+            .btn-outline-dark {
+              &.btn-negative {
+                padding: 0.3em 0.5em 0 0.2em;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+@media screen and (max-width: 575.98px) {
+  .cronometro-palavra {
+    font-size: 0.5em;
+    .cronometro-component {
+      .controls {
+        &.visible {
+          .btn-group {
+            margin-top: 1em;
+            .btn {
+              padding: 0.5em 0;
+              font-size: 1.7em;
+            }
+            .btn-outline-dark {
+              &.btn-pause {
+                padding-left: 0.5em;
+                padding-right: 0.5em;
+              }
             }
           }
         }

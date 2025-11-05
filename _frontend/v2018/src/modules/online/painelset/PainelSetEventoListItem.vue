@@ -25,7 +25,7 @@
           <strong>Painéis:</strong>
           <i class="fas fa-info-circle" title="Clique no nome do painel para abrir em uma nova aba."></i>
           <div class="btn-group btn-group-sm float-right" v-if="has_perm">
-              <a :href="`/api/painelset/evento/${evento.id}/export/`" class="btn btn-info" title="Exportar Paineis do Evento em YAML">
+              <a :href="`/api/painelset/evento/${evento.id}/export.yaml?t=${Date.now()}`" class="btn btn-info" title="Exportar Paineis do Evento em YAML">
                 <i class="fas fa-file-download"></i>
               </a>
               <button @click.prevent="resetToDefaults($event)" v-if="!evento.end_real" class="btn btn-warning" title="Resetar Paineis para Padrão">

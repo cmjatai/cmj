@@ -10,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.fields.json import JSONField
+from django.utils.text import slugify
 import yaml
 
 from sapl.base.templatetags.common_tags import youtube_id
@@ -286,6 +287,7 @@ class Evento(models.Model, CronometroMixin):
                 )
                 painel.visoes.add(visao)
 
+                widget_map = {}
                 for widget_data in visao_data.get('widgets', []):
                     widget = Widget.objects.create(
                         visao=visao,
@@ -295,7 +297,16 @@ class Evento(models.Model, CronometroMixin):
                         config=widget_data.get('config', {}),
                         styles=widget_data.get('styles', {})
                     )
+                    widget_map[widget_data.get('widget')] = widget
                     visao.widgets.add(widget)
+
+                for widget_data in visao_data.get('widgets', []):
+                    widget = widget_map.get(widget_data.get('widget'))
+                    parent_ref = widget_data.get('parent')
+                    if parent_ref and parent_ref in widget_map:
+                        widget.parent = widget_map[parent_ref]
+                        widget.save()
+
             visao.active = True
             visao.save()
 
@@ -307,6 +318,7 @@ class Evento(models.Model, CronometroMixin):
 
         for painel in self.paineis.all():
             painel_data = {
+                'painel': f'painel-{painel.id}-{slugify(painel.name)}',
                 'name': painel.name,
                 'description': painel.description,
                 'principal': painel.principal,
@@ -317,6 +329,7 @@ class Evento(models.Model, CronometroMixin):
 
             for visao in painel.visoes.all():
                 visao_data = {
+                    'visao': f'visao-{visao.id}-{slugify(visao.name)}',
                     'name': visao.name,
                     'description': visao.description,
                     'config': visao.config,
@@ -326,6 +339,8 @@ class Evento(models.Model, CronometroMixin):
 
                 for widget in visao.widgets.all():
                     widget_data = {
+                        'widget': f'widget-{widget.id}',
+                        'parent': f'widget-{widget.parent_id}' if widget.parent_id else None,
                         'name': widget.name,
                         'description': widget.description,
                         'vue_component': widget.vue_component,
@@ -620,6 +635,13 @@ class VisaoDePainel(models.Model):
                             force_update=force_update,
                             using=using,
                             update_fields=update_fields)
+
+    def ws_serialize(self):
+        from drfautoapi.drfautoapi import ApiViewSetConstrutor
+        VisaoDePainelSerializer = ApiViewSetConstrutor._built_sets[
+            self._meta.app_config][self._meta.model].serializer_class
+
+        return VisaoDePainelSerializer(self).data
 
 class Widget(models.Model):
     """Modelo intermediário para associar widgets a visões com configuração adicional."""

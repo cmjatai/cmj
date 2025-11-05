@@ -174,7 +174,7 @@ export default {
   flex-direction: column;
   align-items: stretch;
   height: 100%;
-  width: 41.6667%;
+  width: 37%;
   justify-content: stretch;
   position:absolute;
   top:0;
@@ -216,7 +216,7 @@ export default {
         width: 100%;
         gap: 0.5em;
         .btn {
-          padding: 0 0.5em;
+          padding: 0 0.25em;
           color: #0004;
           text-decoration: none;
           &:hover {

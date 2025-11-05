@@ -199,8 +199,8 @@ export default {
       height: 100%;
     }
     i {
-      margin: 0 10px 0 20px;
-      font-size: 2em;
+      margin: 0 0.5em 0 1em;
+      font-size: 1.5em;
     }
   }
   .inner-individuo {
@@ -209,7 +209,7 @@ export default {
     gap: 10px;
     .name {
       flex: 1 1 100%;
-      font-size: 1.4em;
+      font-size: 1.3em;
       small {
         opacity: 0.5;
       }
@@ -222,7 +222,7 @@ export default {
     .btn-action {
       border: 0;
       border-right: 1px solid #fffa;
-      width: 5em;
+      width: 4.5em;
       background: transparent;
       font-size: 1.1em;
       color: #fff

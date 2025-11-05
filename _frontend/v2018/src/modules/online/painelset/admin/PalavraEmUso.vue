@@ -89,7 +89,7 @@ export default {
 <style lang="scss">
 .palavraemuso-component {
   position: absolute;
-  width: 58.3337%;
+  width: 63%;
   top: 0;
   right: 0;
   bottom: 2em;
@@ -191,7 +191,7 @@ export default {
         }
       }
       .cronometro {
-        padding: 1em 1em 1.5em;
+        padding: 1em 1em 1em;
         .icon-status-microfone {
           font-size: 2em;
           top: 0.3em;

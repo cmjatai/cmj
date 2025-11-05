@@ -144,7 +144,7 @@ export default {
 <style lang="scss">
 .painelset-visoes-control {
   position: absolute;
-  left: 41.6667%;
+  left: 37%;
   right: 0;
   bottom: 0em;
   background-color: #222;

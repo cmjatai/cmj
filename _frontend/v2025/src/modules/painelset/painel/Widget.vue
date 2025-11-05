@@ -27,7 +27,6 @@
       />
     </div>
     <div
-      v-if="!widgetSelected?.vue_component"
       class="inner-widget inner-children"
     >
       <Widget
@@ -343,8 +342,7 @@ const addWidget = () => {
         y: 10,
         w: 30,
         h: 30
-      },
-      displayTitle: true
+      }
     },
     styles: {
       component: {},
@@ -597,6 +595,18 @@ const onMouseDownResize = (event, direction) => {
       flex-direction: column;
       flex: 1 1 100%;
       z-index: 1;
+    }
+    .inner-children {
+      display: none;
+      &:not(:empty) {
+        position: absolute;
+        display: flex;
+        top: 1px;
+        left: 1px;
+        right: 1px;
+        bottom: 1px;
+        z-index: 1;
+      }
     }
     & > .resize-handle {
       display: none;

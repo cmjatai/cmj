@@ -139,9 +139,9 @@ const individuo_aparteante = computed(() => {
 
 const fotografiaUrl = (individuo) => {
   if (individuo?.fotografia) {
-    return '/api/painelset/individuo/' + individuo.id + '/fotografia.c1024.png'
+    return '/api/painelset/individuo/' + individuo.id + '/fotografia.c256.png'
   } else if (individuo?.parlamentar) {
-    return '/api/parlamentares/parlamentar/' + individuo.parlamentar + '/fotografia.c1024.png'
+    return '/api/parlamentares/parlamentar/' + individuo.parlamentar + '/fotografia.c256.png'
   }
   return null
 }
