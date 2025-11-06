@@ -2481,11 +2481,13 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             try:
                 self.logger.debug("Tentando obter objeto MateriaLegislativa (tipo_id={}, ano={}, numero={})."
                                   .format(tm, am, nm))
-                materia_de_vinculo = MateriaLegislativa.objects.get(
+                materia_de_vinculo = MateriaLegislativa.objects.filter(
                     tipo_id=tm,
                     ano=am,
                     numero=nm
-                )
+                ).order_by('-id').first()
+                if not materia_de_vinculo:
+                    raise ObjectDoesNotExist
             except ObjectDoesNotExist:
                 self.logger.error("Objeto MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) não existe!"
                                   .format(tm, am, nm))
