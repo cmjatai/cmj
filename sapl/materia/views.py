@@ -179,8 +179,9 @@ def tipos_autores_materias(user=None, restricao_regimental=True):
 
             tipo_correspondente = p.tipo.tipo_conteudo_related
 
-            coletivo = tipo_correspondente.limite_minimo_coletivo and m.autores.count(
-            ) >= tipo_correspondente.limite_minimo_coletivo
+            len_signs = len(p.metadata.get('signs', {}).get('texto_original', {}).get('signs', []))
+
+            coletivo = tipo_correspondente.limite_minimo_coletivo and len_signs >= tipo_correspondente.limite_minimo_coletivo
 
             if tipo_correspondente not in r:
                 r[tipo_correspondente] = {}
