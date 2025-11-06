@@ -15,7 +15,7 @@ Vue.mixin({
       'cache',
       'nivel_detalhe',
       'user',
-      'hasPermission'
+      'permissions'
     ])
   },
   data () {

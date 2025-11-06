@@ -270,8 +270,8 @@ paineis:
       config:
         coords:
           h: 14
-          w: 73
-          x: 27
+          w: 74
+          x: 26
           y: 0
         displayCols: 6
         displayTitulo: true
@@ -296,8 +296,8 @@ paineis:
       config:
         coords:
           h: 86
-          w: 73
-          x: 27
+          w: 74
+          x: 26
           y: 14
       styles:
         inner:
@@ -314,7 +314,7 @@ paineis:
       config:
         coords:
           h: 100
-          w: 27
+          w: 26
           x: 0
           y: 0
         displayVotacao: true
@@ -437,6 +437,7 @@ paineis:
     name: Visão Youtube Live com crônometro de uso da palavra
     description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
     config:
+      only_manual_activation: true
       activates:
       - activate:
           painelset__evento__cronometro__state:
@@ -540,10 +541,12 @@ paineis:
         title:
           display: none
         component: {}
+
   - visao: visao-205-visao-youtube-live-100
     name: Visão Youtube Live 100%
     description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
     config:
+      only_manual_activation: true
       activates:
       - activate:
           painelset__evento__cronometro__state:

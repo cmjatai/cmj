@@ -24,10 +24,8 @@ const getters = {
   isVotante: (state) => {
     return state.data_connect.hasOwnProperty('votante')
   },
-  hasPermission: (state) => {
-    return (perm) => {
-      return state.data_connect?.permissions?.includes(perm) === true
-    }
+  permissions: (state) => {
+    return state.data_connect?.permissions || []
   }
 }
 

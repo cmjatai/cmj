@@ -103,8 +103,8 @@ export default {
     }
   },
   mounted: function () {
-    this.$nextTick(() => {
-      if (this.hasPermission('painelset.change_evento')) {
+    setTimeout(() => {
+      if (this.permissions.includes('painelset.change_evento')) {
         this.fetchSync({
           app: 'painelset',
           model: 'evento',
@@ -112,9 +112,9 @@ export default {
         })
       } else {
         this.$router.push({ name: 'online_index_link' })
-        this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página.', time: 5 })
+        this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página. aqui 2', time: 5 })
       }
-    })
+    }, 1000)
   },
   methods: {
     resumeEvento () {

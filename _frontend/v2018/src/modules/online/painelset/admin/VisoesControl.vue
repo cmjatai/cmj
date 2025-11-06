@@ -9,7 +9,7 @@
           { youtube_id: evento.youtube_id }
         )"/>
     </div>
-    <div class="inner-visoes">
+    <div class="inner" v-if="painel">
       <div class="checkbox-auto-select-visoes">
         <input
           type="checkbox"
@@ -25,15 +25,26 @@
           "
         >
       </div>
-      <div class="lista-visoes btn-group">
-        <a
-          v-for="visao in visoes" :key="`visao-control-${visao.id}`"
-          :class="['btn btn-secondary', visao.active ? 'active' : '']"
-          :title="visao.name"
-          @click="manualActiveVisao(visao.id)"
-        >
-          {{ visao.position }}
-        </a>
+      <div class="inner-visoes">
+        <div class="title-visao-ativa">
+          <div v-if="visoes.length > 0">
+            <span v-for="visao in visoes" :key="`visao-ativa-${visao.id}`">
+              <span v-if="visao.active"><i class="fas fa-check-circle"></i>
+                {{ visao.name }}
+              </span>
+            </span>
+          </div>
+        </div>
+        <div class="lista-visoes btn-group">
+          <a
+            v-for="visao in visoes" :key="`visao-control-${visao.id}`"
+            :class="['btn btn-secondary', visao.active ? 'active' : '', visao.config.only_manual_activation ? 'btn-warning' : '']"
+            :title="visao.name"
+            @click="manualActiveVisao(visao.id)"
+            >
+            {{ visao.position }}
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -107,7 +118,7 @@ export default {
   },
   mounted: function () {
     this.$nextTick(() => {
-      if (this.hasPermission('painelset.change_evento')) {
+      if (this.permissions.includes('painelset.change_evento')) {
         this.registerModels({
           app: 'painelset',
           models: ['evento', 'painel', 'visaodepainel']
@@ -119,7 +130,7 @@ export default {
         })
       } else {
         this.$router.push({ name: 'online_index_link' })
-        this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página.', time: 5 })
+        this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página. aqui1', time: 5 })
       }
     })
   },
@@ -152,7 +163,9 @@ export default {
   flex-direction: column;
   justify-content: flex-end;
   align-items: center;
-  .inner-visoes {
+  color: white;
+
+  .inner {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -171,6 +184,16 @@ export default {
       width: 100%;
     }
   }
+  .inner-visoes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .title-visao-ativa {
+    min-height: 1.5em;
+    text-align: center;
+    margin-top: 1em;
+  }
 
   .lista-visoes {
     display: flex;
@@ -179,6 +202,9 @@ export default {
     .btn {
       padding-left: 2em;
       padding-right: 2em;
+      &:not(:last-child) {
+        margin-right: 2px;
+      }
     }
   }
 }

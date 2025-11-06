@@ -24,11 +24,11 @@
         <div class="paineis pt-2">
           <strong>Painéis:</strong>
           <i class="fas fa-info-circle" title="Clique no nome do painel para abrir em uma nova aba."></i>
-          <div class="btn-group btn-group-sm float-right" v-if="has_perm">
+          <div class="btn-group btn-group-sm d-inline-flex pl-1 mb-n2" v-if="has_perm && !evento.end_real" >
               <a :href="`/api/painelset/evento/${evento.id}/export.yaml?t=${Date.now()}`" class="btn btn-info" title="Exportar Paineis do Evento em YAML">
                 <i class="fas fa-file-download"></i>
               </a>
-              <button @click.prevent="resetToDefaults($event)" v-if="!evento.end_real" class="btn btn-warning" title="Resetar Paineis para Padrão">
+              <button @click.prevent="resetToDefaults($event)" class="btn btn-warning" title="Resetar Paineis para Padrão">
                 <i class="fas fa-undo-alt"></i>
               </button>
               <button class="btn btn-primary" title="Adicionar novo painel ao evento" @click="createPainel($event)">
@@ -40,7 +40,7 @@
               <div class="d-flex w-100 align-items-center">
                 <a :href="`/painelset/painel/${painel.id}`" target="_blank">
                   {{ painel.name }}
-                  <small v-if="painel.principal"><i class="fas fa-star"></i></small>
+                  <small v-if="painel.principal" title="Painel Principal"><i class="fas fa-star"></i></small>
                 </a><br>
                 <button v-if="has_perm" class="btn btn-link mr-2 text-danger" title="Remover Painel do Evento" @click="deletePainel(painel.id)">
                   <i class="fas fa-minus-circle"></i>
@@ -108,7 +108,7 @@ export default {
       return _.orderBy(this.data_cache?.sessao_sessaoplenaria || [], ['data_inicio'], ['desc'])
     },
     has_perm: function () {
-      return this.hasPermission('painelset.change_evento')
+      return this.permissions.includes('painelset.change_evento')
     }
   },
   mounted: function () {
