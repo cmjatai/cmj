@@ -7,6 +7,14 @@
 @import 'header';
 @import 'footer';
 
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px var(--bs-border-color) inset !important;
+    -webkit-text-fill-color: var(--bs-body-color) !important; /* Optional: Change text color */
+}
+
 a {
   text-decoration: none;
 }
@@ -34,6 +42,48 @@ a {
     }
   }
 }
+
+
+@keyframes keyframe_rotate {
+  10% {
+    transform: rotate(135deg);
+  }
+  30% {
+    transform: rotate(855deg);
+  }
+  35% {
+    transform: scale(3) rotate(855deg);
+  }
+  40% {
+    transform: scale(1) rotate(855deg);
+  }
+  60% {
+    transform: rotate(135deg);
+  }
+  100% {
+    transform: rotate(135deg);
+  }
+}
+.animation-rotate {
+  transform: rotate(135deg);
+  animation: keyframe_rotate 7s ease-in-out infinite;
+}
+
+.avatar {
+  opacity: 0.75;
+  img {
+    border: 0px solid transparent;
+    border-radius: 50%;
+    width: 100%;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+
+
 
 // ######### Dark Mode #########
 @include color-mode(dark) {

@@ -18,6 +18,7 @@
     </template>
 
     <template #header-right>
+      <portal-cmj-connect></portal-cmj-connect>
     </template>
 
     <template #sideleft>
@@ -35,6 +36,7 @@
 </template>
 
 <script setup>
+import PortalCmjConnect from '~@/components/PortalCmjConnect.vue'
 import RootLayout from './RootLayout.vue'
 import SideLeft from './SideLeft.vue'
 import Brand from './Brand.vue'

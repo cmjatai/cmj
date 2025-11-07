@@ -27,7 +27,6 @@
 
     <main class="main">
       <slot name="main"></slot>
-      <div v-for="n in 1000" :key="n">Linha {{ n }}</div>
     </main>
 
     <div class="sideright">
@@ -88,6 +87,7 @@ header {
   // background-color: #ddd;
   .header-left, .header-right {
     width: 3em;
+    height: 3em;
   }
   .header-left {
     height: 100%;

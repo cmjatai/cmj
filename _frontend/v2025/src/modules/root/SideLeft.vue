@@ -6,7 +6,9 @@
     aria-labelledby="menuSideLeftLabel"
   >
     <div class="offcanvas-header">
-      <h5 id="menuSideLeftLabel">Menu</h5>
+      <h5 id="menuSideLeftLabel">
+        Menu
+      </h5>
       <button
         type="button"
         class="btn-close"
@@ -16,27 +18,57 @@
     </div>
     <div class="offcanvas-body">
       <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <i class="bi bi-house"></i> <span class="sidebar-label">Home</span>
-          </a>
+        <li
+          class="nav-item"
+          v-for="link in linksAtivos"
+          :key="link.texto"
+        >
+          <router-link :to="{ name: link.route }" class="nav-link">
+            <b-img
+              v-if="link.image"
+              :src="link.image"
+              fluid
+              rounded="0"
+              class="me-2"
+            />
+            <i
+              v-else-if="link.icon"
+              :class="link.icon + ' me-2'"
+            />
+          </router-link>
         </li>
-        <!-- Outras opções -->
       </ul>
     </div>
   </div>
-  <div id="sidebar" class="sidebar d-none d-lg-flex flex-column collapsed">
+  <div
+    ref="sidebar"
+    class="sidebar d-none d-lg-flex flex-column collapsed"
+  >
     <ul class="nav flex-column">
-      <li id="toggleSidebar" class="nav-item toggle-btn">
+      <li
+        ref="toggleSidebar"
+        class="nav-item toggle-btn"
+      >
         <span class="nav-link">☰</span>
       </li>
-      <li class="nav-item">
-        <a class="nav-link" href="#">
-          <i class="bi bi-house"></i> <span class="sidebar-label">Sessão Plenária</span>
-        </a>
-        <a class="nav-link" href="#">
-          <i class="bi bi-house"></i> <span class="sidebar-label">Eventos e Paineis</span>
-        </a>
+      <li
+        class="nav-item"
+        v-for="link in linksAtivos"
+        :key="link.texto"
+      >
+        <router-link :to="{ name: link.route }" class="nav-link">
+          <b-img
+            v-if="link.image"
+            :src="link.image"
+            fluid
+            rounded="0"
+            class="me-2"
+          />
+          <i
+            v-else-if="link.icon"
+            :class="link.icon + ' me-2'"
+          />
+        </router-link>
       </li>
       <!-- Outras opções -->
     </ul>
@@ -44,30 +76,77 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-
-onMounted(() => {
-  // converter para evento vue
-  const sidebar = document.getElementById('sidebar')
-  const toggleBtn = document.getElementById('toggleSidebar')
-  toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed')
-  })
-})
-
 // 1. Imports
+import { onMounted, ref, computed } from 'vue'
 
 // 2. Composables
 
 // 3. Props & Emits
 
 // 4. State & Refs
+const sidebar = ref(null)
+const toggleSidebar = ref(null)
+const links = ref([
+  {
+    image: '/static/imgs/icon_mesa_diretora.png',
+    route: '',
+    texto: 'Mesa Diretora'
+  },
+  {
+    image: '/static/imgs/icon_comissoes.png',
+    route: '',
+    texto: 'Comissões'
+  },
+  {
+    image: '/static/imgs/icon_parlamentares.png',
+    route: '',
+    texto: 'Parlamentares'
+  },
+  {
+    image: '/static/imgs/icon_pautas.png',
+    route: '',
+    texto: 'Pautas'
+  },
+  {
+    image: '/static/imgs/icon_plenarias.png',
+    route: 'sessao_module_view',
+    texto: 'Sessões Plenárias'
+  },
+  {
+    image: '/static/imgs/icon_materia_legislativa.png',
+    route: '',
+    texto: 'Matérias Legislativas'
+  },
+  {
+    image: '/static/imgs/icon_normas_juridicas.png',
+    route: '',
+    texto: 'Normas Jurídicas'
+  },
+  {
+    image: '/static/imgs/icon_relatorios.png',
+    route: '',
+    texto: 'Relatórios'
+  },
+  {
+    icon: 'fas fa-columns',
+    route: '',
+    texto: 'Eventos e Painéis'
+  }
+])
 
 // 5. Computed Properties
+const linksAtivos = computed(() => {
+  return links.value.filter(link => link.route !== '')
+})
 
 // 6. Watchers
 
 // 7. Events & Lifecycle Hooks
+onMounted(() => {
+  toggleSidebar.value.addEventListener('click', () => {
+    sidebar.value.classList.toggle('collapsed')
+  })
+})
 
 // 8. Functions
 </script>

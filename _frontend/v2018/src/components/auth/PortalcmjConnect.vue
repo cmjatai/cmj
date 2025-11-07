@@ -105,7 +105,6 @@ export default {
           // t.sendMessage({ alert: 'danger', message: error.response.data.non_field_errors[0], time: 10 })
         })
     }
-
   }
 }
 </script>

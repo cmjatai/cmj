@@ -14,7 +14,15 @@ export const routes = [
         name: 'app_vue_v2025',
         component: () => import('~@/modules/root/RootPage.vue'),
         children: [
-
+          {
+            path: 'sessao',
+            name: 'sessao_module_view',
+            component: () => import('~@/modules/sessao/SessaoPlenariaModule.vue'),
+            meta: {
+              title: 'Sessão Module',
+              description: 'Home of Sessão Module'
+            }
+          }
         ]
       },
       {
