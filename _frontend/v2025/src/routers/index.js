@@ -10,6 +10,14 @@ export const routes = [
     },
     children: [
       {
+        path: 'v2025',
+        name: 'app_vue_v2025',
+        component: () => import('~@/modules/root/RootPage.vue'),
+        children: [
+
+        ]
+      },
+      {
         path: 'painelset',
         name: 'painelset_module_view',
         component: () => import('~@/modules/painelset/PainelSetModule.vue'),

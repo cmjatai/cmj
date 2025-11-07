@@ -19,4 +19,7 @@ urlpatterns = [
     ),
     re_path(r'^painelset/painel',
         views.app_vue_painel, name='app_vue_painel_url'),
+
+    re_path(r'^v2025',
+        views.app_vue_v2025, name='app_vue_v2025_url'),
 ]

@@ -73,6 +73,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 @import "~@/scss/variables";
 
 .body-base-layout {

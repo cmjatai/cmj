@@ -22,7 +22,7 @@
     "axios": "^1.12.2",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
-    "bootstrap-vue-next": "^0.40.6",
+    "bootstrap-vue-next": "^0.40.7",
     "jquery": "^3.7.1",
     "jquery-mask-plugin": "^1.14.16",
     "js-yaml": "^4.1.0",

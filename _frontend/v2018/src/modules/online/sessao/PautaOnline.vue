@@ -66,7 +66,11 @@ export default {
 
     itensDaOrdemDia: {
       get () {
-        return _.orderBy(this.itens.ordemdia_list, 'numero_ordem')
+        return _.orderBy(
+          _.filter(
+            this.itens.ordemdia_list,
+            (item) => item.parent === null
+          ), 'numero_ordem')
       }
     },
     itensDoExpediente: {
@@ -152,7 +156,7 @@ export default {
     fetchList (page = null, model = null) {
       const t = this
 
-      let query_string = `&sessao_plenaria=${this.sessao.id}&parent__isnull=True`
+      let query_string = `&sessao_plenaria=${this.sessao.id}`
 
       t.utils.getModelOrderedList('sessao', model, 'numero_ordem', page === null ? 1 : page, query_string)
         .then((response) => {

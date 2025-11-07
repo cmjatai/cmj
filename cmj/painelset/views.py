@@ -1,5 +1,4 @@
 
-from ast import In
 from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _
 from cmj.painelset.forms import EventoForm, IndividuoForm
@@ -10,6 +9,9 @@ from django.utils import timezone, formats
 
 def app_vue_painel(request, slug=None):
     return render(request, 'painelset/app_vue_painel.html')
+
+def app_vue_v2025(request, slug=None):
+    return render(request, 'app_vue_v2025.html')
 
 
 class EventoCrud(Crud):
@@ -66,6 +68,6 @@ class IndividuoCrud(MasterDetailCrud):
     class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = 'IndividuoUpdate'
         form_class = IndividuoForm
-        
+
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'IndividuoUpdate'
