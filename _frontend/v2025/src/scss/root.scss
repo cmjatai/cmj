@@ -1,0 +1,13 @@
+@import 'bootstrap/scss/root';
+
+:root,
+[data-bs-theme="light"] {
+ --nav-bg-hover-color: #e9ecef;
+ --nav-text-hover-color: #fff;
+}
+
+:root,
+[data-bs-theme="dark"] {
+ --nav-bg-hover-color: #495057;
+ --nav-text-hover-color: #ffffff;
+}

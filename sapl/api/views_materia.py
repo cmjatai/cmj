@@ -150,7 +150,7 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
         for backend in list(self.filter_backends):
             queryset = backend().filter_queryset(request, self.queryset, self)
 
-        timestamp = queryset.order_by('-data_ultima_atualizacao').values_list('data_ultima_atualizacao', flat=True).first()
+        timestamp = queryset.order_by('-data_ultima_atualizacao').values_list('data_ultima_atualizacao', flat=True)[:1].first()
         return timestamp
 
 

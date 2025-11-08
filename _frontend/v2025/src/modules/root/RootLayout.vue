@@ -72,7 +72,7 @@ body {
   grid-template-areas:
     "header header header"
     "sideleft main sideright";
-  grid-template-rows: 3em 1fr;
+  grid-template-rows: auto 1fr;
   grid-template-columns: 0 1fr auto;
 }
 
@@ -82,12 +82,10 @@ header {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--bs-border-color-translucent);
-  // background-color: var(--bs-body-bg);
-  z-index: 1000;
-  // background-color: #ddd;
   .header-left, .header-right {
     width: 3em;
     height: 3em;
+    z-index: 1;
   }
   .header-left {
     height: 100%;
@@ -104,11 +102,20 @@ header {
   .header-main {
     flex-grow: 2;
     display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+  .header-detail {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5em;
     height: 100%;
-    .brand {
-      height: 100%;
-      display: flex;
-      width: 100%;
+    margin-top: -0.5em;
+    padding-right: 0.5em;
+    .accessibility {
+      .btn {
+        padding: 0 0.7em;
+      }
     }
   }
 }
@@ -123,9 +130,19 @@ aside {
   grid-area: sideleft;
 }
 
+@media screen and (min-width: 480px) {
+  .root-layout {
+    .header-main {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+}
 @media screen and (min-width: 992px) {
   .root-layout {
     grid-template-columns: 3em 1fr auto;
+    
   }
 }
 </style>

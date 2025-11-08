@@ -127,7 +127,7 @@ const clickToggle = () => {
 
     &.expand {
       position: fixed;
-      width: 30em;
+      width: 18em;
       height: auto;
       left: auto;
       top: 0;

@@ -50,35 +50,35 @@ const app = createApp({
   delimiters: ['[[', ']]'],
   components: registerComponents.rootComponents,
   setup() {
-    const protocol = (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
-    const ws_url = protocol + window.location.host + '/ws/time-refresh/'
+    // const protocol = (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
+    // const ws_url = protocol + window.location.host + '/ws/time-refresh/'
 
-    const wsTimeRefresh = useWsTimeRefresh(ws_url)
-    wsTimeRefresh.connect()
+    // const wsTimeRefresh = useWsTimeRefresh(ws_url)
+    // wsTimeRefresh.connect()
 
     // const ws_url_sync = protocol + window.location.host + '/ws/sync/'
     // const wsSync = useWsTimeRefresh(ws_url_sync)
     // wsSync.connect()
 
-    onMounted(() => {
+    /*onMounted(() => {
       // Enable this to test the time refresh
       setTimeout(() => {
-        wsTimeRefresh.send(
+         wsTimeRefresh.send(
           {
             type: 'ping',
             message:'Time refresh requested',
             timestamp_client: Date.now()
           }
         )
-        /* wsSync.send(
+        wsSync.send(
           {
             type: 'ping',
             message:'Sync refresh requested',
             timestamp_client: Date.now(),
           }
-        ) */
+        )
       }, 3000)
-    })
+    })*/
   }
 })
 

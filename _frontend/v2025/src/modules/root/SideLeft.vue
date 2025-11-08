@@ -3,6 +3,7 @@
     class="offcanvas offcanvas-start d-lg-none"
     tabindex="-1"
     id="menuSideLeft"
+
     aria-labelledby="menuSideLeftLabel"
   >
     <div class="offcanvas-header">
@@ -23,18 +24,24 @@
           v-for="link in linksAtivos"
           :key="link.texto"
         >
-          <router-link :to="{ name: link.route }" class="nav-link">
+          <router-link
+            :to="{ name: link.route }"
+            class="nav-link"
+            @click="$bvOffcanvas.hide('menuSideLeft')"
+            >
             <b-img
               v-if="link.image"
               :src="link.image"
               fluid
               rounded="0"
-              class="me-2"
+              class=""
             />
-            <i
+            <FontAwesomeIcon
               v-else-if="link.icon"
-              :class="link.icon + ' me-2'"
+              :icon="link.icon"
+              class=""
             />
+            <span>{{ link.texto }}</span>
           </router-link>
         </li>
       </ul>
@@ -47,9 +54,9 @@
     <ul class="nav flex-column">
       <li
         ref="toggleSidebar"
-        class="nav-item toggle-btn"
+        class="nav-item"
       >
-        <span class="nav-link">☰</span>
+        <span class="toggle-btn">☰</span>
       </li>
       <li
         class="nav-item"
@@ -62,12 +69,14 @@
             :src="link.image"
             fluid
             rounded="0"
-            class="me-2"
+            class=""
           />
-          <i
+          <FontAwesomeIcon
             v-else-if="link.icon"
-            :class="link.icon + ' me-2'"
+            :icon="link.icon"
+            class=""
           />
+          <span class="sidebar-label">{{ link.texto }}</span>
         </router-link>
       </li>
       <!-- Outras opções -->
@@ -87,6 +96,11 @@ import { onMounted, ref, computed } from 'vue'
 const sidebar = ref(null)
 const toggleSidebar = ref(null)
 const links = ref([
+  {
+    icon: 'home',
+    route: 'app_vue_v2025',
+    texto: 'Início'
+  },
   {
     image: '/static/imgs/icon_mesa_diretora.png',
     route: '',
@@ -154,32 +168,60 @@ onMounted(() => {
   .sidebar {
     position: fixed;
     transition: all 0.2s;
+    background-color: var(--bs-body-bg);
     border-right: 1px solid var(--bs-border-color-translucent);
     z-index: 1020;
     bottom: 0;
     top: 3em;
-    width: 15em;
-    background-color: var(--bs-body-bg);
-    justify-content: flex-start;
-    align-items: flex-start;
+
     .toggle-btn {
-      text-align: center;
       cursor: pointer;
+      padding: 0.5em;
+      display: block;
+      &:hover {
+        background-color: var(--nav-bg-hover-color);
+        color: var(--nav-text-hover-color);
+      }
     }
-  }
-  .sidebar.collapsed {
-    width: 3em;
-  }
-  .sidebar.collapsed .sidebar-label {
-    font-size: 0em;
-  }
-  .sidebar-label {
-    transition: all 0.2s;
-    font-size: 1em;
-  }
-  .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 0.5em;
+
+    .nav-item {
+      text-align: center;
+    }
+
+    .nav-link {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      height: 2em;
+
+      img {
+        padding: 0.5em;
+        width: 3em;
+      }
+
+      svg {
+        width: 3em;
+      }
+
+      &:hover {
+        background-color: var(--nav-bg-hover-color);
+        color: var(--nav-text-hover-color);
+      }
+    }
+
+    &.collapsed {
+      width: 3em;
+      .sidebar-label {
+        font-size: 0em;
+      }
+    }
+
+    .sidebar-label {
+      transition: all 0.2s;
+      font-size: 1em;
+      padding-right: 1em;
+    }
   }
 </style>

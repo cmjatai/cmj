@@ -54,6 +54,15 @@ export const routes = [
           }
         ]
       },
+      {
+        path: ':pathMatch(.*)',
+        name: 'error_404',
+        component: () => import('~@/views/Error404.vue'),
+        meta: {
+          title: '404 - Not Found',
+          description: 'Page not found'
+        }
+      }
     ]
   }
 ]

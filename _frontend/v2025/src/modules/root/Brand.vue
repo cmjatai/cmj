@@ -1,7 +1,7 @@
 <template>
   <div class="inner-brand">
     <a class="link-logo" href="/">
-      <img :src="casa.logotipo !== undefined ? casa.logotipo : '~@/assets/img/brasao_transp.gif'"/>
+      <img :src="casa.logotipo !== undefined ? casa.logotipo : '/static/imgs/brasao_transp.gif'"/>
     </a>
     <a class="link-nome" href="/">
       <span class="title-brand">
@@ -38,9 +38,10 @@ onMounted(() => {
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  font-size: 0.8em;
   gap: 0.5em;
   img {
-    height: 3em;
+    height: 2em;
     padding: 0.2em;
   }
   .link-logo {
@@ -48,6 +49,16 @@ onMounted(() => {
   }
   .link-nome {
     flex: 1 0 0;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .inner-brand {
+    font-size: 1em;
+    img {
+      height: 3em;
+      margin: 0 0 0 0.5em;
+    }
   }
 }
 

@@ -55,7 +55,7 @@ class LastModifiedDecorator:
                 last_log = AuditLog.objects.filter(
                     model_name=self.model._meta.model_name,
                     object_id=obj_id
-                ).order_by('-timestamp').values_list('timestamp', flat=True).first()
+                ).order_by('-timestamp').values_list('timestamp', flat=True)[:1].first()
             else:
                 view = kwargs.get('view', None)
                 if view:
@@ -66,14 +66,14 @@ class LastModifiedDecorator:
                         last_log = AuditLog.objects.filter(
                             model_name=self.model._meta.model_name,
                             object_id__in=queryset.values_list('pk', flat=True)
-                        ).order_by('-timestamp').values_list('timestamp', flat=True).first()
+                        ).order_by('-timestamp').values_list('timestamp', flat=True)[:1].first()
                     else:
                         last_log = None
                 else:
                     last_log = AuditLog.objects.filter(
                         model_name=self.model._meta.model_name,
                         object_id__in=self.model.objects.values_list('pk', flat=True)
-                    ).order_by('-timestamp').values_list('timestamp', flat=True).first()
+                    ).order_by('-timestamp').values_list('timestamp', flat=True)[:1].first()
 
             if last_log:
                 return last_log
