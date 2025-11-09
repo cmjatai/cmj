@@ -21,7 +21,19 @@ export const routes = [
             meta: {
               title: 'Sessão Module',
               description: 'Home of Sessão Module'
-            }
+            },
+            children: [
+              {
+                path: '',
+                name: 'sessao_plenaria_list_link',
+                component: () => import('~@/modules/sessao/SessaoPlenariaList.vue')
+              },
+              {
+                path: ':id',
+                name: 'sessao_plenaria_view_link',
+                component: () => import('~@/modules/sessao/SessaoPlenariaView.vue')
+              }
+            ]
           }
         ]
       },

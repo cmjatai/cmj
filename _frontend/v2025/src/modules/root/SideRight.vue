@@ -16,11 +16,9 @@ side right
 </script>
 <style lang="scss" scoped>
 .side-right {
-  position: fixed;
-  top: 3em;
-  right: 0;
+  position: absolute;
+  top: 0;
   bottom: 0;
-  width: 3em;
   background-color: var(--bs-body-bg);
   border-left: 1px solid var(--bs-border-color-translucent);
   // box-shadow: -10px 0 20px var(--bs-body-bg);

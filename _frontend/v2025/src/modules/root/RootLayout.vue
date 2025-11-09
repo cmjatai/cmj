@@ -18,7 +18,6 @@
       <div class="header-right">
         <slot name="header-right"></slot>
       </div>
-
     </header>
 
     <aside class="sideleft">
@@ -73,7 +72,7 @@ body {
     "header header header"
     "sideleft main sideright";
   grid-template-rows: auto 1fr;
-  grid-template-columns: 0 1fr auto;
+  grid-template-columns: 0 1fr 0;
 }
 
 header {
@@ -82,6 +81,7 @@ header {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--bs-border-color-translucent);
+  z-index: 2;
   .header-left, .header-right {
     width: 3em;
     height: 3em;
@@ -128,6 +128,11 @@ main {
 
 aside {
   grid-area: sideleft;
+  position: relative;
+}
+.sideright {
+  grid-area: sideright;
+  position: relative;
 }
 
 @media screen and (min-width: 480px) {
@@ -141,8 +146,7 @@ aside {
 }
 @media screen and (min-width: 992px) {
   .root-layout {
-    grid-template-columns: 3em 1fr auto;
-    
+    grid-template-columns: 3em 1fr 3em;
   }
 }
 </style>

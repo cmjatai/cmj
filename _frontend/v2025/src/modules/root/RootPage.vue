@@ -24,7 +24,7 @@
       >
         <a
           href="#"
-          class="btn btn-primary"
+          class="btn btn-secondary"
           @click.prevent="clickFullscreen"
           :title="fullscreen ? 'Sair do modo tela cheia' : 'Entrar no modo tela cheia'"
         >
@@ -37,11 +37,11 @@
         aria-label="Second group"
       >
         <a
-          class="btn btn-primary"
+          class="btn btn-secondary"
           @click="diminuirFonte"
         >a</a>
         <a
-          class="btn btn-primary"
+          class="btn btn-secondary"
           @click="aumentarFonte"
         >A</a>
       </div>
@@ -71,7 +71,7 @@ import RootLayout from './RootLayout.vue'
 import SideLeft from './SideLeft.vue'
 import SideRight from './SideRight.vue'
 import Brand from './Brand.vue'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 // 1. Imports
 
 // 2. Composables

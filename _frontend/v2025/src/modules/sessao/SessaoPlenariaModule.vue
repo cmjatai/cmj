@@ -1,8 +1,6 @@
 <template>
-  <div class="sessaoplenaria-module online-module">
-    sessao plenaria module
+  <div class="sessaoplenaria-module">
     <router-view></router-view>
-    <popover-palavra></popover-palavra>
   </div>
 </template>
 
@@ -14,56 +12,14 @@ const syncStore = useSyncStore()
 
 const fetchInitialData = async () => {
 
-  // Fetch Legislatura
-  syncStore.fetchSync({
-    app: 'parlamentares',
-    model: 'legislatura',
-    params: {
-      page_size: 100
-    }
-  })
-  syncStore.fetchSync({
-    app: 'parlamentares',
-    model: 'sessaolegislativa',
-    params: {
-      page_size: 100
-    }
-  })
+  syncStore.syncModels([
+    // { app: 'parlamentares', models: ['legislatura', 'sessaolegislativa'] },
+    { app: 'parlamentares', models: ['parlamentar'], params: { ativo: 'True' } },
+    { app: 'base', models: ['autor'] },
+    { app: 'materia', models: ['tipomaterialegislativa'] },
+    { app: 'sessao', models: ['tiposessaoplenaria'] }
+  ], { page_size: 100 })
 
-  // Fetch Parlamentares Ativos
-  syncStore.fetchSync({
-    app: 'parlamentares',
-    model: 'parlamentar',
-    params: {
-      page_size: 100,
-      ativo: 'True'
-    }
-  })
-
-  // Fetch Autores
-  syncStore.fetchSync({
-    app: 'base',
-    model: 'autor',
-    params: {
-      page_size: 100
-    }
-  })
-
-  syncStore.fetchSync({
-    app: 'materia',
-    model: 'tipomaterialegislativa',
-    params: {
-      page_size: 100
-    }
-  })
-
-  syncStore.fetchSync({
-    app: 'sessao',
-    model: 'tiposessaoplenaria',
-    params: {
-      page_size: 100
-    }
-  })
 }
 
 onMounted(() => {

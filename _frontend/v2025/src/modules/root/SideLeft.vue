@@ -27,7 +27,7 @@
           <router-link
             :to="{ name: link.route }"
             class="nav-link"
-            @click="$bvOffcanvas.hide('menuSideLeft')"
+            @click="closeOffCanvas('#menuSideLeft')"
             >
             <b-img
               v-if="link.image"
@@ -87,7 +87,7 @@
 <script setup>
 // 1. Imports
 import { onMounted, ref, computed } from 'vue'
-
+import * as bootstrap from 'bootstrap'
 // 2. Composables
 
 // 3. Props & Emits
@@ -123,7 +123,7 @@ const links = ref([
   },
   {
     image: '/static/imgs/icon_plenarias.png',
-    route: 'sessao_module_view',
+    route: 'sessao_plenaria_list_link',
     texto: 'Sessões Plenárias'
   },
   {
@@ -163,17 +163,21 @@ onMounted(() => {
 })
 
 // 8. Functions
+const closeOffCanvas = (selector) => {
+    const offcanvasElement = document.getElementById(selector.replace('#', ''))
+    const offcanvasInstance = bootstrap.Offcanvas.getOrCreateInstance(offcanvasElement)
+    offcanvasInstance.hide()
+}
 </script>
 <style lang="scss">
   .sidebar {
     position: fixed;
+    top: 3em;
     transition: all 0.2s;
     background-color: var(--bs-body-bg);
     border-right: 1px solid var(--bs-border-color-translucent);
-    z-index: 1020;
     bottom: 0;
-    top: 3em;
-
+    z-index: 1;
     .toggle-btn {
       cursor: pointer;
       padding: 0.5em;
@@ -195,6 +199,7 @@ onMounted(() => {
       align-items: center;
       justify-content: flex-start;
       height: 2em;
+      white-space: nowrap;
 
       img {
         padding: 0.5em;

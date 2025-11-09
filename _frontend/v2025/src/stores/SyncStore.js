@@ -79,6 +79,34 @@ export const useSyncStore = defineStore('syncStore', {
       this.data_cache[key][value.id] = value
     },
 
+    // Timer functions for cronometro
+    startLocalCronometro(id) {
+      TimerWorkerService.startTimer(id, (timestamp) => {
+        // console.debug('TIMER', cronometroId, timestamp)
+        const cronometro = this.data_cache.painelset_cronometro[id]
+        const lastServerSync = this.lastServerSync
+        const server_time_diff = lastServerSync ? lastServerSync.server_time_diff : 0
+        // Atualizar cronometro localmente
+        if (cronometro && cronometro.state === 'running') {
+          // console.debug('TIMER RUNNING', id, timestamp / 1000, cronometro.started_time, server_time_diff)
+          const elapsed_time = ((timestamp - server_time_diff) / 1000) - cronometro.started_time + cronometro.accumulated_time
+          cronometro.elapsed_time = elapsed_time
+          cronometro.remaining_time = cronometro.duration - elapsed_time
+          this.UPDATE_DATA_CACHE_CRONOMETRO({ key: 'painelset_cronometro', value: cronometro })
+        } else if (cronometro && cronometro.state === 'paused') {
+          const last_paused_time = ((timestamp - server_time_diff) / 1000) - cronometro.paused_time
+          cronometro.last_paused_time = last_paused_time
+          this.UPDATE_DATA_CACHE_CRONOMETRO({ key: 'painelset_cronometro', value: cronometro })
+        } else {
+          // Parar timer se cronometro não estiver mais 'running' ou 'paused'
+          TimerWorkerService.stopTimer(id)
+        }
+      }, 500)
+    },
+    stopLocalCronometro(id) {
+      TimerWorkerService.stopTimer(id)
+    },
+    // Fetch data from API and update cache
     async fetchSync ({ app, model, id, action, params, only_first_page = false, force_fetch = true}) {
       const _fetch = Resources.Utils.fetch
       if (!this.models[app] || !this.models[app][model]) {
@@ -90,7 +118,7 @@ export const useSyncStore = defineStore('syncStore', {
         if (id && this.data_cache[uri] && this.data_cache[uri][id]) {
           return this.data_cache[uri][id]
         } else if (!id && this.data_cache[uri]) {
-          return Object.values(this.data_cache[uri])
+          return this.data_cache[uri]
         }
       }
       const metadata = { app, model }
@@ -190,6 +218,8 @@ export const useSyncStore = defineStore('syncStore', {
     },
 
     registerModels(app, models) {
+      // o registro é para controlar quais modelos são "sincronizáveis" via WebSocket
+      // fetchSync auto registra os modelos ao buscar dados
       if (!this.models[app]) {
         this.models[app] = {}
       }
@@ -199,33 +229,17 @@ export const useSyncStore = defineStore('syncStore', {
         }
       })
     },
-
-    // Timer functions for cronometro
-    startLocalCronometro(id) {
-      TimerWorkerService.startTimer(id, (timestamp) => {
-        // console.debug('TIMER', cronometroId, timestamp)
-        const cronometro = this.data_cache.painelset_cronometro[id]
-        const lastServerSync = this.lastServerSync
-        const server_time_diff = lastServerSync ? lastServerSync.server_time_diff : 0
-        // Atualizar cronometro localmente
-        if (cronometro && cronometro.state === 'running') {
-          // console.debug('TIMER RUNNING', id, timestamp / 1000, cronometro.started_time, server_time_diff)
-          const elapsed_time = ((timestamp - server_time_diff) / 1000) - cronometro.started_time + cronometro.accumulated_time
-          cronometro.elapsed_time = elapsed_time
-          cronometro.remaining_time = cronometro.duration - elapsed_time
-          this.UPDATE_DATA_CACHE_CRONOMETRO({ key: 'painelset_cronometro', value: cronometro })
-        } else if (cronometro && cronometro.state === 'paused') {
-          const last_paused_time = ((timestamp - server_time_diff) / 1000) - cronometro.paused_time
-          cronometro.last_paused_time = last_paused_time
-          this.UPDATE_DATA_CACHE_CRONOMETRO({ key: 'painelset_cronometro', value: cronometro })
-        } else {
-          // Parar timer se cronometro não estiver mais 'running' ou 'paused'
-          TimerWorkerService.stopTimer(id)
-        }
-      }, 500)
-    },
-    stopLocalCronometro(id) {
-      TimerWorkerService.stopTimer(id)
+    syncModels(apps_models_params, global_params = {}, force_fetch = true) {
+      apps_models_params.forEach(({app, models, params}) => {
+        models.forEach(model => {
+          this.fetchSync({
+            app: app,
+            model: model,
+            params: { ...params || {}, ...global_params },
+            force_fetch
+          })
+        })
+      })
     }
   }
 })
