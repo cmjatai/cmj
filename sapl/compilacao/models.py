@@ -1138,21 +1138,21 @@ class UrlizeReferencia(SearchMixin):
 
                     except:
                         pass
-                    ta = TextoArticulado.objects.filter(
+                    tas = TextoArticulado.objects.filter(
                         numero=f'{chave_list[10]}{chave_list[12]}',
                         ano=ano,
                         privacidade=0
                     ).exclude(
                         original__isnull=False
-                    ).first()
+                    )
+                    for ta in tas:
+                        if chave_list[0].lower() in str(ta.content_object).lower():
+                            url = reverse('sapl.compilacao:ta_text',
+                                        kwargs={'ta_id': ta.id})
+                            urlize_referencia.url = url
+                            urlize_referencia.save()
+                            texto = join(texto, chave_natural, urlize_referencia)
 
-                    if not ta:
-                        continue
-                    url = reverse('sapl.compilacao:ta_text',
-                                  kwargs={'ta_id': ta.id})
-                    ur.url = url
-                    ur.save()
-                    texto = join(texto, chave_natural, ur)
             except:
                 pass
 

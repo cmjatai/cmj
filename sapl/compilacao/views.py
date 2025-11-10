@@ -131,6 +131,8 @@ class UrlizeReferenciaCrud(CrudAux):
             return super().post(request, *args, **kwargs)
 
         def form_valid(self, form):
+
+
             try:
                 r = super().form_valid(form)
             except IntegrityError as e:
@@ -139,12 +141,13 @@ class UrlizeReferenciaCrud(CrudAux):
                         'Chave já existe.'))
                 return self.form_invalid(form)
 
-            urlize = form.instance
+            urlize = getattr(form, 'instance', None)
+            if not urlize:
+                return r
 
             UrlizeReferencia.objects.filter(
                 url__exact=urlize.url
             ).update(citacao=urlize.citacao)
-
 
             ds = Dispositivo.objects.filter(texto__icontains=urlize.chave)
             ds = ds.order_by('ta_id')
@@ -1075,6 +1078,7 @@ class TextView(CompMixin, ListView):
             self.template_name = 'compilacao/text_list__print_version.html'
         if 'embedded' in request.GET:
             self.template_name = 'compilacao/text_list__embedded.html'
+            return ListView.get(self, request, *args, **kwargs)
 
         sign = self.kwargs.get('sign', '')
 
