@@ -53,7 +53,7 @@
           {% for prop in list %}
 
             {% if forloop.counter > pagina|paginacao_limite_inferior and forloop.counter <= pagina|paginacao_limite_superior %}
-              <tr>
+              <tr style="{% if forloop.first %}background-color: #cfc{% else %}background-color: #ffc{% endif %}">
                 <td>
                    <a href="{% url 'sapl.materia:proposicao_detail' prop.pk %}">{{ prop.data_envio|localtime|date:"d/m/Y H:i:s" }}</a>
                 </td>

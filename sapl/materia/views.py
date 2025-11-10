@@ -631,7 +631,7 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
         return Proposicao.objects.filter(
             data_envio__isnull=False,
             data_recebimento__isnull=True,
-            data_devolucao__isnull=True)
+            data_devolucao__isnull=True).order_by('data_envio')
 
     def get_context_data(self, **kwargs):
         context = super(ProposicaoPendente, self).get_context_data(**kwargs)
@@ -639,7 +639,7 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
         context['object_list'] = Proposicao.objects.filter(
             data_envio__isnull=False,
             data_recebimento__isnull=True,
-            data_devolucao__isnull=True)
+            data_devolucao__isnull=True).order_by('data_envio')
 
         paginator = context['paginator']
         page_obj = context['page_obj']
