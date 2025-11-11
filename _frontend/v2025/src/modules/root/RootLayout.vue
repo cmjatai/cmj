@@ -81,7 +81,7 @@ header {
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--bs-border-color-translucent);
-  z-index: 2;
+  z-index: 3;
   .header-left, .header-right {
     width: 3em;
     height: 3em;

@@ -37,6 +37,8 @@ const titulo = computed(() => {
 
   let base = `${sessao.numero}ª ${tipo.nome}`
 
+  // acesso direto ao objeto tipo que foram
+  // baixados via resource e não está ligado ao syncStore
   if (tipo.tipo_numeracao === 1) { base += ` da ${data_inicio.getDate() > 15 ? 2 : 1}ª Quinzena do mês de ${month_text(data_inicio.getMonth())}` }
 
   if (tipo.tipo_numeracao === 2) { base += ` do mês de ${month_text(data_inicio.getMonth())}` }
@@ -48,14 +50,16 @@ const titulo = computed(() => {
 
 const subtitulo = computed(() => {
   let sessao = props.sessao
+  // acesso direto ao objeto legislatura e sessao_legislativa que foram
+  // baixados via resource e não está ligado ao syncStore
   return `${sessao.sessao_legislativa.numero}ª Sessão Legislativa da
               ${sessao.legislatura.numero}ª Legislatura`
 })
 
 const date_text = computed(() => {
   let sessao = props.sessao
-  let data_inicio = new Date(sessao.data_inicio)
-   return `${data_inicio.getDate()} de
+  let data_inicio = new Date(`${sessao.data_inicio}T${sessao.hora_inicio}`)
+  return `${data_inicio.getDate()} de
               ${month_text(data_inicio.getMonth())} de
               ${data_inicio.getFullYear()} – ${sessao.hora_inicio}`
 })

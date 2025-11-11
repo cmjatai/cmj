@@ -126,7 +126,7 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
     def ultima_tramitacao(self, request, *args, **kwargs):
 
         materia = self.get_object()
-        if not materia.tramitacao_set.exists():
+        if not materia.tramitacao_set.exists(): 
             return Response({})
 
         ultima_tramitacao = materia.tramitacao_set.first()

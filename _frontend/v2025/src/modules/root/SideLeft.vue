@@ -174,10 +174,10 @@ const closeOffCanvas = (selector) => {
     position: fixed;
     top: 3em;
     transition: all 0.2s;
-    background-color: var(--bs-body-bg);
+    background-color: var(--cmj-background-color);
     border-right: 1px solid var(--bs-border-color-translucent);
     bottom: 0;
-    z-index: 1;
+    z-index: 2;
     .toggle-btn {
       cursor: pointer;
       padding: 0.5em;

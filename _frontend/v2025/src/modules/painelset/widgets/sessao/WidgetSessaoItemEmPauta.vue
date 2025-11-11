@@ -225,9 +225,9 @@ watch(
     if (newVal) {
       ultimoItemSessaoMostrado.value = newVal
       let params = {page_size: 100}
-      if (newVal.__label__ === 'sessao.expedientemateria') {
+      if (newVal.__label__ === 'sessao_expedientemateria') {
         params.expediente = newVal.id
-      } else if (newVal.__label__ === 'sessao.ordemdia') {
+      } else if (newVal.__label__ === 'sessao_ordemdia') {
         params.ordem = newVal.id
       }
       syncStore.fetchSync({

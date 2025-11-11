@@ -1,6 +1,6 @@
 <template>
   <div class="side-right">
-side right
+.
   </div>
 </template>
 
@@ -19,7 +19,9 @@ side right
   position: absolute;
   top: 0;
   bottom: 0;
-  background-color: var(--bs-body-bg);
+  width: 100%;
+  text-align: center;
+  background-color: var(--cmj-background-color);
   border-left: 1px solid var(--bs-border-color-translucent);
   // box-shadow: -10px 0 20px var(--bs-body-bg);
 }

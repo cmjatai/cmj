@@ -109,6 +109,11 @@ DJANGO_VITE = {
         )
     }
 }
+#if DEBUG:
+#    DJANGO_VITE['default'].update({
+#        'dev_server_host': config('DJANGO_VITE_DEV_SERVER_HOST', default='localhost', cast=str),
+#    })
+
 
 STATICFILES_DIRS = [
     PROJECT_DIR.child('sapl', 'static'),

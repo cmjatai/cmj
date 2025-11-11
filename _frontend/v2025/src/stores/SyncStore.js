@@ -67,8 +67,40 @@ export const useSyncStore = defineStore('syncStore', {
           if (!nestedKey) {
             return
           }
-          nestedKey = nestedKey.replace('.', '_')
+          // nestedKey = nestedKey.replace('.', '_')
+          const app_model = nestedKey.split('_')
+          const app = app_model[0]
+          const model = app_model[1]
+          if (!this.models[app] || !this.models[app][model]) {
+            //faz auto registro do modelo
+            this.registerModels(app, [model])
+          }
+          this.registerModels(app, [model])
           this.UPDATE_DATA_CACHE({ key: nestedKey, value: value[objKey] })
+          value[objKey] = value[objKey].id
+        })
+        const arrayObjsInValue = Object.keys(value).filter(key => {
+          return Array.isArray(value[key]) && value[key].length > 0 && typeof value[key][0] === 'object' && value[key][0] !== null && value[key][0].__label__
+        })
+        arrayObjsInValue.forEach(arrayKey => {
+          const newArray = []
+          value[arrayKey].forEach(item => {
+            let nestedKey = item.__label__
+            if (!nestedKey) {
+              return
+            }
+            // nestedKey = nestedKey.replace('.', '_')
+            const app_model = nestedKey.split('_')
+            const app = app_model[0]
+            const model = app_model[1]
+            if (!this.models[app] || !this.models[app][model]) {
+              //faz auto registro do modelo
+              this.registerModels(app, [model])
+            }
+            this.UPDATE_DATA_CACHE({ key: nestedKey, value: item })
+            newArray.push(item.id)
+          })
+          value[arrayKey] = newArray
         })
       } else {
         value.__label__ = key
@@ -106,6 +138,7 @@ export const useSyncStore = defineStore('syncStore', {
     stopLocalCronometro(id) {
       TimerWorkerService.stopTimer(id)
     },
+
     // Fetch data from API and update cache
     async fetchSync ({ app, model, id, action, params, only_first_page = false, force_fetch = true}) {
       const _fetch = Resources.Utils.fetch
@@ -135,12 +168,15 @@ export const useSyncStore = defineStore('syncStore', {
           }
         })
       }
+      // timestamp_frontend evita sobrescrever dados mais recentes no cache que podem ter sido atualizados via WebSocket
+      const timestamp_frontend = Date.now()
       return _fetch(
         metadata
       ).then((response) => {
         const uri = `${app}_${model}`
-        _.each(response.data.results ? response.data.results : [response.data], (value) => {
-          const inst = { ...value, timestamp_frontend: 0 }
+        const results = response.data.results ? response.data.results : (Array.isArray(response.data) ? response.data : [response.data])
+        _.each(results, (value) => {
+          const inst = { ...value, timestamp_frontend: timestamp_frontend }
           this.UPDATE_DATA_CACHE({ key: uri, value: inst })
         })
         if (!only_first_page && response.data.pagination && response.data.pagination.next_page) {
@@ -195,13 +231,35 @@ export const useSyncStore = defineStore('syncStore', {
           models.forEach(model => {
             if (this.models[app] && this.models[app][model]) {
               const key = `${app}_${model}`
-              this.data_cache[key] = {}
+              // para todo objeto em data_cache[key], setar o atributo
+              // timestamp_frontend para -1, forçando fetch na próxima vez que for requisitado
+              if (this.data_cache[key]) {
+                Object.keys(this.data_cache[key]).forEach(id => {
+                  this.data_cache[key][id].timestamp_frontend = -1
+                })
+              }
             }
           })
         })
-        return
       }
     },
+
+    cleanInvalidatedDataCache(app, model) {
+      if (!this.models[app] || !this.models[app][model]) {
+        return
+      }
+      const key = `${app}_${model}`
+      // para todo objeto em data_cache[key], com o atributo
+      // timestamp_frontend igual a -1, deletar o objeto do cache
+      if (this.data_cache[key]) {
+        Object.keys(this.data_cache[key]).forEach(id => {
+          if (this.data_cache[key][id].timestamp_frontend === -1) {
+            delete this.data_cache[key][id]
+          }
+        })
+      }
+    },
+
     invalidateCacheItems(app, model, ids) {
       if (!this.models[app] || !this.models[app][model]) {
         return
@@ -225,19 +283,23 @@ export const useSyncStore = defineStore('syncStore', {
       }
       models.forEach(model => {
         if (!this.models[app][model]) {
-          this.models[app][model] = true
+          this.models[app][model] = Date.now()
         }
       })
     },
     syncModels(apps_models_params, global_params = {}, force_fetch = true) {
       apps_models_params.forEach(({app, models, params}) => {
         models.forEach(model => {
-          this.fetchSync({
-            app: app,
-            model: model,
-            params: { ...params || {}, ...global_params },
-            force_fetch
-          })
+          this
+            .fetchSync({
+              app: app,
+              model: model,
+              params: { ...params || {}, ...global_params },
+              force_fetch
+            })
+            .then(() => {
+              this.cleanInvalidatedDataCache(app, model)
+            })
         })
       })
     }

@@ -120,6 +120,6 @@ const aumentarFonte = () => {
 </script>
 <style lang="scss">
 .root-layout {
-
+  background-color: var(--cmj-background-color);
 }
 </style>

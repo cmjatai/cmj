@@ -1493,6 +1493,11 @@ class MateriaEmTramitacao(models.Model):
         MateriaLegislativa, on_delete=models.DO_NOTHING)
     tramitacao = models.ForeignKey(Tramitacao, on_delete=models.DO_NOTHING)
 
+    em_tramitacao = models.BooleanField(
+        verbose_name=_('Em Tramitação ?'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
     unidade_tramitacao_atual = models.ForeignKey(
         UnidadeTramitacao,
         null=True,

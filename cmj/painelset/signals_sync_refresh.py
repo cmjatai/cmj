@@ -15,6 +15,9 @@ regex_labels_permitidos = [
     r'^painelset',
     r'^sessao',
     r'^parlamentares',
+    r'^materia',
+    r'^base',
+    r'^norma',
 ]
 regex_labels_permitidos = [re.compile(label) for label in regex_labels_permitidos]
 
@@ -31,6 +34,8 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
             if hasattr(inst, 'ws_sync') and not inst.ws_sync():
                 return
 
+            from drfautoapi.drfautoapi import ApiViewSetConstrutor
+
             inst_serialize = None
             if hasattr(inst, 'ws_serialize'):
                 inst_serialize = inst.ws_serialize()
@@ -46,6 +51,10 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
             }
             if inst_serialize:
                 message['instance'] = inst_serialize
+            else:
+                message['instance'] = ApiViewSetConstrutor.get_viewset_for_model(
+                    inst._meta.model
+                ).serializer_class(inst).data
 
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
@@ -54,7 +63,6 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
                     'message': message
                 }
             )
-
 
             if not inst._meta.label in (
                     'painelset.Painel',

@@ -50,7 +50,7 @@ class WebSocketManager {
     }
 
     this.ws.onclose = (e) => {
-      console.log('WebSocket desconectado', e)
+      console.log('WebSocket desconectado')
       this.stopHeartbeat()
       this.emit('disconnected')
       this.handleReconnect()

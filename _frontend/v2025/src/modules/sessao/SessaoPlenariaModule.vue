@@ -1,22 +1,37 @@
 <template>
   <div class="sessaoplenaria-module">
-    <router-view></router-view>
+    <router-view />
+    <div
+      id="modalCmj"
+      ref="modalCmj"
+    />
   </div>
 </template>
 
 <script setup>
+
 import { useSyncStore } from '~@/stores/SyncStore'
-import { onMounted } from 'vue'
+import { watch, ref, onMounted } from 'vue'
 
 const syncStore = useSyncStore()
 
+const modalCmj = ref(null)
+
 const fetchInitialData = async () => {
+  syncStore.registerModels('materia', [
+    'tramitacao', // não há fetch direto, mas pode chegar atualizações via websocket
+    'documentoacessorio'
+  ])
+  syncStore.registerModels('norma', [
+    'normajuridica', // não há fetch direto, mas pode chegar atualizações via websocket
+    'legislacaocitada'
+  ])
 
   syncStore.syncModels([
     // { app: 'parlamentares', models: ['legislatura', 'sessaolegislativa'] },
-    { app: 'parlamentares', models: ['parlamentar'], params: { ativo: 'True' } },
-    { app: 'base', models: ['autor'] },
-    { app: 'materia', models: ['tipomaterialegislativa'] },
+    // { app: 'base', models: ['autor'] },
+    // { app: 'parlamentares', models: ['parlamentar'], params: { ativo: 'True' } },
+    { app: 'materia', models: ['statustramitacao'] },
     { app: 'sessao', models: ['tiposessaoplenaria'] }
   ], { page_size: 100 })
 
@@ -29,4 +44,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss">
+.sessaoplenaria-module {
+  // line-height: 1.2;
+}
 </style>

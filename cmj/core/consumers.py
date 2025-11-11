@@ -222,7 +222,7 @@ class SyncRefreshConsumer(AsyncWebsocketConsumer):
     async def sync_refresh_message(self, event):
 
         try:
-
+            logger.info('passou sync_refresh_message')
             message = event['message']
             app = message.get('app')
             model = message.get('model')

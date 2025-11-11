@@ -126,8 +126,8 @@ const votosParlamentares = computed(() => {
     return []
   }
   const votos = Object.values(syncStore.data_cache.sessao_votoparlamentar || {}).filter(
-    voto => (voto.ordem === ultimoItemSessaoMostrado.value.id && ultimoItemSessaoMostrado.value.__label__ === 'sessao.ordemdia') ||
-    (voto.expediente === ultimoItemSessaoMostrado.value.id && ultimoItemSessaoMostrado.value.__label__ === 'sessao.expedientemateria')
+    voto => (voto.ordem === ultimoItemSessaoMostrado.value.id && ultimoItemSessaoMostrado.value.__label__ === 'sessao_ordemdia') ||
+    (voto.expediente === ultimoItemSessaoMostrado.value.id && ultimoItemSessaoMostrado.value.__label__ === 'sessao_expedientemateria')
   )
   const votosObj = {}
   votos.forEach(voto => {
@@ -212,9 +212,9 @@ watch(
       ultimoItemSessaoMostrado.value = newVal
       // Se houver uma votação aberta, buscar os registros de votação
       const params = {}
-      if (newVal.__label__ === 'sessao.ordemdia') {
+      if (newVal.__label__ === 'sessao_ordemdia') {
         params.ordem = newVal.id
-      } else if (newVal.__label__ === 'sessao.expedientemateria') {
+      } else if (newVal.__label__ === 'sessao_expedientemateria') {
         params.expediente = newVal.id
       }
       syncStore.fetchSync({

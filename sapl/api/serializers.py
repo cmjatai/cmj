@@ -11,8 +11,9 @@ from image_cropping.utils import get_backend
 from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 
+from sapl.api.views import SaplApiViewSetConstrutor
 from sapl.base.models import Autor, CasaLegislativa, Metadata
-from sapl.materia.models import MateriaLegislativa
+from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.parlamentares.models import Parlamentar, Mandato, Legislatura
 from sapl.sessao.models import OrdemDia, SessaoPlenaria
 from cmj.api.serializers import CmjSerializerMixin
@@ -67,6 +68,7 @@ class CasaLegislativaSerializer(CmjSerializerMixin):
 class MateriaLegislativaSerializer(CmjSerializerMixin):
     anexadas = serializers.SerializerMethodField()
     desanexadas = serializers.SerializerMethodField()
+    ultima_tramitacao = serializers.SerializerMethodField()
 
     class Meta:
         model = MateriaLegislativa
@@ -77,6 +79,18 @@ class MateriaLegislativaSerializer(CmjSerializerMixin):
 
     def get_desanexadas(self, obj):
         return obj.anexadas.materias_desanexadas().values_list('id', flat=True)
+
+    def get_ultima_tramitacao(self, obj):
+        if not obj.tramitacao_set.exists():
+            return None
+        #ultima_tramitacao = obj.tramitacao_set.values_list(
+        #    'id', flat=True)[:1].first()
+        ultima_tramitacao = obj.tramitacao_set.first()
+
+        serializer_class = SaplApiViewSetConstrutor.get_viewset_for_model(
+            Tramitacao).serializer_class(ultima_tramitacao)
+
+        return serializer_class.data
 
 
 class ParlamentarSerializerPublic(CmjSerializerMixin):

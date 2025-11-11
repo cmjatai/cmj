@@ -547,7 +547,7 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
     def get___str__(self, obj) -> str:
         return str(obj)
     def get___label__(self, obj) -> str:
-        return obj._meta.label_lower
+        return obj._meta.db_table
 
     @cached_property
     def user_model(self):

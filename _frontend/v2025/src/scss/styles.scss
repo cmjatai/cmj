@@ -18,6 +18,7 @@ input:-webkit-autofill:active {
 
 a {
   text-decoration: none;
+  color: #044079;
 }
 
 .bi.theme-icon {
@@ -25,6 +26,11 @@ a {
   height: 1em;
   fill: currentcolor;
 }
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
 
 .color-modes {
   .dropdown-menu {
