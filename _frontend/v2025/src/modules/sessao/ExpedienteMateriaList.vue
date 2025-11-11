@@ -73,6 +73,7 @@ const rotateAndEmitResync = () => {
     padding: 0.2em 0.5em;
     strong {
       font-size: 1.1em;
+      color: var(--bs-primary);
     }
   }
   .resync-icon-expmateria {
@@ -104,7 +105,7 @@ const rotateAndEmitResync = () => {
       margin: 1em;
       padding: 1em;
       strong {
-        font-size: 1.4em;
+        font-size: 2em;
       }
     }
   }

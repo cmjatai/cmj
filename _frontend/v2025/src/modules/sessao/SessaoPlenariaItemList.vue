@@ -3,9 +3,9 @@
     :class="'sessao-plenaria-item-list'"
     :to="{ name: 'sessao_plenaria_view_link', params: {id: sessao.id} }"
   >
-    <h3 class="tit">
+    <h4 class="tit">
       {{ titulo }}
-    </h3>
+    </h4>
     <div class="subtitulo">
       <span>{{ subtitulo }}</span><span class="separator"> – </span>
       <span>{{ date_text }}</span>
