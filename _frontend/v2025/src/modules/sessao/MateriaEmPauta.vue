@@ -1,5 +1,5 @@
 <template>
-  <div class="materia-em-pauta">
+  <div class="materia-em-pauta" :id="`mp-${item.__label__}-${item.id}`">
     <div class="materia-epigrafe">
       <a
         :href="materia.link_detail_backend"
@@ -57,8 +57,9 @@
 
     <div
       v-if="item && item.observacao"
+      @click="toggleRitoOpened()"
       :class="['rito-text', ritoOpened ? 'open' : 'closed']"
-      v-html="ritoOpened ? observacaoHtml : '... clique para ativar a visualização do rito.'"
+      v-html="ritoOpened ? observacaoHtml : 'Visualizar o Rito...'"
       />
 
     <div class="documentos-acessorios pt-2" v-if="documentosAcessorios.length > 0">
@@ -111,10 +112,11 @@
 import { useSyncStore } from '~@/stores/SyncStore'
 import { useAuthStore } from '~@/stores/AuthStore'
 import NormaSimpleModalView from '~@/components/NormaSimpleModalView.vue'
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, inject, computed, watch } from 'vue'
 
 const syncStore = useSyncStore()
 const authStore = useAuthStore()
+const EventBus = inject('EventBus')
 
 const emit = defineEmits(['resync'])
 
@@ -136,6 +138,27 @@ const props = defineProps({
 
 const modalLegisCitada = ref(null)
 const ritoOpened = ref(false)
+
+EventBus.on('rito-toggle', () => {
+  ritoOpened.value = !ritoOpened.value
+})
+const toggleRitoOpened = () => {
+  EventBus.emit('rito-toggle')
+  setTimeout(() => {
+  const preview = document.getElementById(`mp-${props.item.__label__}-${props.item.id}`)
+  const main = document.getElementsByClassName('main')[0]
+  let curtop = 0
+  let obj = preview
+  do {
+    curtop += obj.offsetTop
+    obj = obj.offsetParent
+  } while (obj && obj.tagName !== 'BODY')
+  main.scrollTo({
+    top: curtop - 120,
+    behavior: 'smooth'
+  })
+}, 100)
+}
 
 const observacaoHtml = computed(() => {
   return (props.item.observacao || '').replace(/\n/g, '<br/>')
