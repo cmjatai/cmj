@@ -1,6 +1,7 @@
 <template>
   <div class="sessaoplenaria-module">
     <router-view />
+    <PopoverPalavra />
     <div
       id="modalCmj"
       ref="modalCmj"
@@ -9,7 +10,7 @@
 </template>
 
 <script setup>
-
+import PopoverPalavra from '~@/modules/painelset/popovers/PopoverPalavra.vue'
 import { useSyncStore } from '~@/stores/SyncStore'
 import { ref, onMounted } from 'vue'
 

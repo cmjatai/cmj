@@ -1,7 +1,9 @@
 <template>
   <div
     :class="['widget-cronometro-base', display, fases]"
+    :style="displaySize ? { fontSize: displaySize } : {}"
   >
+
     {{ displayTime }}
   </div>
 </template>
@@ -38,6 +40,10 @@ const props = defineProps({
   displayPermitidos: {
     type: Array,
     default: () => ['elapsed', 'remaining', 'last_paused']
+  },
+  displaySize: {
+    type: String,
+    default: '1em' // Tamanho padrão de exibição
   }
 })
 
@@ -145,7 +151,26 @@ const displayTime = computed(() => {
 
 </script>
 <style lang="scss" scoped>
-@keyframes pulse {
+@keyframes pulses00 {
+    0% {
+        transform: scale(1);
+        color: #f00;
+    }
+    20% {
+        transform: scale(1.1);
+        color: #fff;
+        text-shadow: 1px 1px 0.5em #f00f;
+    }
+    25% {
+        transform: scale(1);
+        color: #f00;
+        text-shadow: 1px 1px 0em #0000;
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+@keyframes pulses10 {
     0% {
         transform: scale(0.9);
         box-shadow: 0 0 0 0 orange;
@@ -166,12 +191,12 @@ const displayTime = computed(() => {
     transition: all 1s ease;
     &.s00 {
       color: red;
-      transform: scale(1.3);
+      animation: pulses00 4s infinite;
     }
     &.s10 {
       color: orange;
       // pulse animation
-      animation: pulse 1s infinite;
+      animation: pulses10 1s infinite;
     }
     &.s30 {
       color: yellow;
