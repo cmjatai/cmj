@@ -2,7 +2,7 @@
 {% if column.verbose_name or column.text %}
   <div class="col-sm-{{ column.span }}">
     <div id="div_id_{{ column.id }}" class="form-group">
-      <p class="control-label">{{ column.verbose_name }}</p>
+      <p class="control-label">{{ column.verbose_name|safe }}</p>
       <div class="controls">
         {% if column.text|audio_url %}
           <div class="form-control-static">

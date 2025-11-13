@@ -1,0 +1,59 @@
+{% load i18n common_cmj_tags %}
+<div class="container-table">
+  <table class="table table-form table-bordered table-unidade-totalize">
+    {% for nome_unidade, values in unidades %}
+      {% if forloop.first %}
+        <thead>
+          <tr>
+            <th>Unidade</th>
+            <th>Valor para a Unidade (R$)</th>
+            <th>Parlamentares</th>
+            <th>Valor</th>
+          </tr>
+        </thead>
+      {% endif %}
+      {% if forloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
+        <td class="text-left" rowspan="{{ values.parlamentares|length }}">{{ nome_unidade }}</td>
+        <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_unidade }}</td>
+
+        {% for parlamentar in values.parlamentares %}
+          {% if not forloop.first %}
+            {% if forloop.parentloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
+          {% endif %}
+            <td class="text-left ">
+              <small>{{ parlamentar.nome_parlamentar }}</small>
+            </td>
+            <td class="text-right">
+              <small>{{ parlamentar.soma_valor }}</small>
+            </td>
+          </tr>
+        {% endfor %}
+      {% if forloop.last %}
+        <tr>
+          <td>Total Geral</td>
+          <td>
+            {{ soma_geral }}
+          </td>
+          <td></td>
+          <td></td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </table>
+</div>
+<style>
+  .table-unidade-totalize {
+    tr.tr-odd {
+      background-color: #e0e0e0 !important;
+      &:hover {
+        background-color: #e0e0e0 !important;
+      }
+    }
+    tr.tr-even {
+      background-color: #eeeeee !important;
+      &:hover {
+        background-color: #eeeeee !important;
+      }
+    }
+  }
+</style>

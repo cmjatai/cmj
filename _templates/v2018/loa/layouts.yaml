@@ -11,6 +11,9 @@ LoaDetail:
   - ano:2 materia_ou_norma
   - receita_corrente_liquida disp_total disp_saude disp_diversos
   - resumo_emendas_impositivas
+  - resumo_entidades
+  - resumo_unidades
+  
 LoaDetailATE2022:
   {% trans 'Dados Gerais da LOA' %}:
   - ano:3 materia_ou_norma

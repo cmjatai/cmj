@@ -552,6 +552,120 @@ class LoaCrud(Crud):
                 resumo_parlamentar[k]['impedimento_tecnico']
             '''
 
+        def hook_resumo_unidades(self, *args, **kwargs):
+            l = args[0]
+
+            soma_geral = Decimal('0.00')
+            unidades = {}
+            for el in EmendaLoa.objects.filter(
+                loa=l,
+                tipo__gt=0
+            ).values(
+                'unidade__especificacao',
+                'parlamentares__nome_parlamentar'
+            ).order_by(
+                'unidade__especificacao'
+            ).annotate(soma_valor=Sum('valor')):
+                if el['unidade__especificacao'] not in unidades:
+                    unidades[el['unidade__especificacao']] = {
+                        'parlamentares': [],
+                        'soma_unidade': Decimal('0.00'),
+                    }
+
+                unidades[el['unidade__especificacao']]['parlamentares'].append({
+                    'nome_parlamentar': el['parlamentares__nome_parlamentar'],
+                    'soma_valor': el['soma_valor'],
+                })
+
+                unidades[el['unidade__especificacao']]['soma_unidade'] += el['soma_valor']
+
+                soma_geral += el['soma_valor']
+
+
+            for k, v in unidades.items():
+                for el in v['parlamentares']:
+                    el['soma_valor'] = formats.number_format(
+                        el['soma_valor'],
+                        force_grouping=True
+                    )
+                v['soma_unidade'] = formats.number_format(
+                    v['soma_unidade'],
+                    force_grouping=True
+                )
+
+            soma_geral = formats.number_format(
+                soma_geral,
+                force_grouping=True
+            )
+
+            context = dict(
+                unidades=unidades.items(),
+                soma_geral=soma_geral,
+            )
+
+            template = loader.get_template('loa/emendaloa_totalize_unidade.html')
+            rendered = template.render(context, self.request)
+
+            return 'Resumo Por Unidades Orçamentárias <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>', rendered
+
+        def hook_resumo_entidades(self, *args, **kwargs):
+            l = args[0]
+
+            soma_geral = Decimal('0.00')
+            entidades = {}
+            for el in EmendaLoa.objects.filter(
+                loa=l,
+                tipo__gt=0
+            ).values(
+                'entidade__nome_fantasia',
+                'parlamentares__nome_parlamentar'
+            ).order_by(
+                'entidade__nome_fantasia'
+            ).annotate(soma_valor=Sum('valor')):
+                nom_entidade = el['entidade__nome_fantasia'] or 'Não Informada'
+                el['entidade__nome_fantasia'] = nom_entidade
+                if el['entidade__nome_fantasia'] not in entidades:
+                    entidades[el['entidade__nome_fantasia']] = {
+                        'parlamentares': [],
+                        'soma_entidade': Decimal('0.00'),
+                    }
+
+                entidades[el['entidade__nome_fantasia']]['parlamentares'].append({
+                    'nome_parlamentar': el['parlamentares__nome_parlamentar'],
+                    'soma_valor': el['soma_valor'],
+                })
+
+                entidades[el['entidade__nome_fantasia']]['soma_entidade'] += el['soma_valor']
+
+                soma_geral += el['soma_valor']
+
+
+            for k, v in entidades.items():
+                for el in v['parlamentares']:
+                    el['soma_valor'] = formats.number_format(
+                        el['soma_valor'],
+                        force_grouping=True
+                    )
+                v['soma_entidade'] = formats.number_format(
+                    v['soma_entidade'],
+                    force_grouping=True
+                )
+
+            soma_geral = formats.number_format(
+                soma_geral,
+                force_grouping=True
+            )
+
+            context = dict(
+                entidades=entidades.items(),
+                soma_geral=soma_geral,
+            )
+
+            template = loader.get_template('loa/emendaloa_totalize_entidade.html')
+            rendered = template.render(context, self.request)
+
+            return 'Resumo Por Entidades <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>', rendered
+
 class UnidadeOrcamentariaCrud(MasterDetailCrud):
     model = UnidadeOrcamentaria
     parent_field = 'loa'
