@@ -399,6 +399,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     finalidade = forms.CharField(
         label='Finalidade',
+        widget=forms.Textarea(attrs={'rows': 2}),
         required=True)
 
     indicacao = forms.CharField(

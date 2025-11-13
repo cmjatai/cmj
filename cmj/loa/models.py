@@ -2030,4 +2030,6 @@ class Entidade(models.Model):
         )
 
     def __str__(self):
-        return f'{self.nome_fantasia} - {self.tipo_entidade.descricao if self.tipo_entidade else ""} - {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'
+        nf = self.nome_fantasia
+        tipo = self.tipo_entidade.descricao if self.tipo_entidade else ''
+        return f'{nf}{" - " if tipo else " "}{tipo} - {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'

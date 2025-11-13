@@ -49,13 +49,13 @@ EmendaLoaDetail:
       - materia|fk_urlize_for_detail
       - entidade
       - indicacao
-      - finalidade
       col-md-4:
       - valor
       - valor_computado
       - parlamentares
       - owner
       col-md-12:
+      - finalidade
       - registrocontabil_set
   col-12 2:
     {% trans 'Documentos da Emenda Impositiva' %}:
