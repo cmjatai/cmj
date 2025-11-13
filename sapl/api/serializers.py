@@ -75,10 +75,10 @@ class MateriaLegislativaSerializer(CmjSerializerMixin):
         exclude = ['similaridades']
 
     def get_anexadas(self, obj):
-        return obj.anexadas.materias_anexadas().values_list('id', flat=True)
+        return list(obj.anexadas.materias_anexadas().values_list('id', flat=True))
 
     def get_desanexadas(self, obj):
-        return obj.anexadas.materias_desanexadas().values_list('id', flat=True)
+        return list(obj.anexadas.materias_desanexadas().values_list('id', flat=True))
 
     def get_ultima_tramitacao(self, obj):
         if not obj.tramitacao_set.exists():

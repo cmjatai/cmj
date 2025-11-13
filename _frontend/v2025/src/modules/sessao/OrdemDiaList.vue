@@ -11,7 +11,7 @@
     </div>
     <div class="ordemdia-content">
       <ItemDeSessao
-        :key="`ordemdia-${ordem.id}`"
+        :key="`is-${ordem.__label__}-${ordem.id}`"
         v-for="ordem in ordemDiaList"
         :item="ordem"
         :sessao="sessao"
@@ -24,7 +24,7 @@
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
 import { useAuthStore } from '~@/stores/AuthStore'
-import { ref, onMounted, computed } from 'vue'
+import { watch, computed } from 'vue'
 import ItemDeSessao from './ItemDeSessao.vue'
 
 const emit = defineEmits(['resync'])
@@ -41,7 +41,9 @@ const props = defineProps({
 
 const ordemDiaList = computed(() => {
   const allOrdemDias = syncStore.data_cache?.sessao_ordemdia || {}
-  const ordemDiasForSessao = Object.values(allOrdemDias).filter(
+  const ordemDiasForSessao = Object.values(
+    allOrdemDias
+  ).filter(
     ordemDia => ordemDia.sessao_plenaria === props.sessao?.id && ordemDia.parent === null
   )
   // ordena pelo campo 'numero_ordem' se existir
@@ -60,6 +62,13 @@ const rotateAndEmitResync = () => {
     }, 1000)
   }
 }
+
+watch(ordemDiaList, (newValue, oldValue) => {
+  // if (newValue && oldValue && newValue.length !== oldValue.length) {
+  //   rotateAndEmitResync()
+  // }
+  // rotateAndEmitResync()
+}, { immediate: true })
 
 </script>
 

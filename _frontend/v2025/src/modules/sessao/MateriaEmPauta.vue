@@ -1,5 +1,8 @@
 <template>
-  <div class="materia-em-pauta" :id="`mp-${item.__label__}-${item.id}`">
+  <div
+    :id="`mp-${item.__label__}-${item.id}`"
+    class="materia-em-pauta"
+  >
     <div class="materia-epigrafe">
       <a
         :href="materia.link_detail_backend"

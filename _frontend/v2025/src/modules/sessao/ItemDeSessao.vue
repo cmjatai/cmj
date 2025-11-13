@@ -1,8 +1,16 @@
 <template>
-  <div :class="['item-de-sessao', item.__label__, parent ? 'child-item' : 'parent-item']">
+  <div
+    :id="`is-${item.__label__}-${item.id}`"
+    :class="['item-de-sessao', item.__label__, parent ? 'child-item' : 'parent-item']">
     <div class="item-content">
+      <ControleDeVotacao
+        :key="`cv-${item.__label__}-${item.id}`"
+        :item="item"
+        :sessao="sessao"
+        @resync="emit('resync')"
+      />
       <MateriaEmPauta
-        :key="`materia-em-pauta-${item.materia}`"
+        :key="`mp-${item.__label__}-${item.id}`"
         :materia-id="item.materia"
         :item="item"
         :sessao="sessao"
@@ -18,7 +26,7 @@
       </div>
       <ItemDeSessao
         v-for="child in childs"
-        :key="`child-${child.id}`"
+        :key="`is-${child.__label__}-${child.id}`"
         :item="child"
         :parent="item"
         :sessao="sessao"
@@ -33,6 +41,7 @@ import { useSyncStore } from '~@/stores/SyncStore'
 import { useAuthStore } from '~@/stores/AuthStore'
 import ItemDeSessao from './ItemDeSessao.vue'
 import MateriaEmPauta from './MateriaEmPauta.vue'
+import ControleDeVotacao from './votacao/ControleDeVotacao.vue'
 import { ref, watch, computed } from 'vue'
 
 const syncStore = useSyncStore()

@@ -3,9 +3,9 @@
     :key="`sessao-plenaria-view-${sessaoId}`"
     class="sessao-plenaria-view"
   >
-    <small v-if="sessao">
+    <a class="sessao_link_manage" v-if="sessao" :href="sessao.link_detail_backend" target="_blank">
       {{ sessao.__str__ }}
-    </small>
+    </a>
     <div
       class="sessao-plenaria-content"
       v-if="sessao"
@@ -14,7 +14,6 @@
         v-if="textoAbertura.length > 0"
         @click="toggleRitoOpened"
         :class="['sessao-plenaria-textos', ritoOpened ? 'open' : 'closed']"
-
       >
         <div v-html="ritoOpened ? textoAbertura[0].conteudo : 'Visualizar o Rito...'" />
       </div>
@@ -53,8 +52,6 @@ import ExpedienteMateriaList from './ExpedienteMateriaList.vue'
 import OrdemDiaList from './OrdemDiaList.vue'
 
 const syncStore = useSyncStore()
-const authStore = useAuthStore()
-const router = useRouter()
 const route = useRoute()
 const EventBus = inject('EventBus')
 
@@ -74,7 +71,7 @@ onMounted(() => {
     }, force_fetch: true
   }).then(() => {
     // Sessão carregada
-    handleResync({force_fetch_materias: false})
+    handleResync(false)
   })
 })
 const textoAbertura = computed(() => {
@@ -102,7 +99,8 @@ const toggleRitoOpened = () => {
   EventBus.emit('rito-toggle')
 }
 
-const handleResync = ({force_fetch_materias = true}) => {
+
+const handleResync = (force_fetch_materias = true) => {
   syncStore.invalidateDataCache([
     'sessao'
   ], [
@@ -191,6 +189,36 @@ const handleResync = ({force_fetch_materias = true}) => {
           }
         })
       })
+      .then(() => {
+        return syncStore.fetchSync({
+          app: 'sessao',
+          model: 'registroleitura',
+          params: {
+            materia__in: Array.from(materiasDaSessao),
+            get_all: 'True'
+          }
+        })
+      })
+      .then(() => {
+        return syncStore.fetchSync({
+          app: 'sessao',
+          model: 'registrovotacao',
+          params: {
+            materia__in: Array.from(materiasDaSessao),
+            get_all: 'True',
+            expand: 'tipo_resultado_votacao'
+          }
+        })
+      })
+      .then(() => {
+        return syncStore.fetchSync({
+          app: 'sessao',
+          model: 'tiporesultadovotacao',
+          params: {
+            get_all: 'True'
+          }
+        })
+      })
     }
   })
 }
@@ -198,6 +226,17 @@ const handleResync = ({force_fetch_materias = true}) => {
 </script>
 <style lang="scss">
 .sessao-plenaria-view {
+  .sessao_link_manage {
+    display: block;
+    margin: 0.5em 0.5em 0;
+    font-weight: bold;
+    text-align: center;
+    font-size: 0.75em;
+    color: var(--bs-link-color);
+    &:hover {
+      color: var(--bs-link-hover-color);
+    }
+  }
   .sessao-plenaria-textos {
     position: relative;
     display: inline-block;
@@ -226,6 +265,13 @@ const handleResync = ({force_fetch_materias = true}) => {
         font-size: 0.8em;
         color: var(--bs-secondary);
       }
+    }
+  }
+}
+@media screen and (min-width: 768px) {
+  .sessao-plenaria-view {
+    .sessao_link_manage {
+      font-size: 1em;
     }
   }
 }

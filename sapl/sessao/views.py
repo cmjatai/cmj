@@ -2984,8 +2984,8 @@ class VotacaoView(SessaoPermissionMixin):
                     votacao.numero_votos_nao = int(request.POST['votos_nao'])
                     votacao.numero_abstencoes = int(request.POST['abstencoes'])
                     votacao.observacao = request.POST['observacao']
-                    votacao.materia_id = materia_id
-                    votacao.ordem_id = ordem_id
+                    votacao.materia_id = int(materia_id)
+                    votacao.ordem_id = int(ordem_id)
                     votacao.tipo_resultado_votacao = resultado
                     votacao.user = request.user
                     votacao.ip = get_client_ip(request)
@@ -3729,8 +3729,8 @@ class VotacaoExpedienteView(SessaoPermissionMixin):
                     votacao.numero_votos_nao = int(request.POST['votos_nao'])
                     votacao.numero_abstencoes = int(request.POST['abstencoes'])
                     votacao.observacao = request.POST['observacao']
-                    votacao.materia_id = materia_id
-                    votacao.expediente_id = expediente_id
+                    votacao.materia_id = int(materia_id)
+                    votacao.expediente_id = int(expediente_id)
                     votacao.tipo_resultado_votacao_id = int(
                         request.POST['resultado_votacao'])
                     votacao.user = request.user

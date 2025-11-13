@@ -11,7 +11,7 @@
     </div>
     <div class="expediente-materia-content">
       <ItemDeSessao
-        :key="`expmat-${expmat.id}`"
+        :key="`is-${expmat.__label__}-${expmat.id}`"
         v-for="expmat in expedienteMateriaList"
         :item="expmat"
         :sessao="sessao"

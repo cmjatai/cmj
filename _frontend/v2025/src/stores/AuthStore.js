@@ -7,10 +7,13 @@ export const useAuthStore = defineStore('authStore', {
   }),
   getters: {
     isAuthenticated: (state) => {
-      return state.data_connect.is_authenticated
+      return state.data_connect.is_authenticated || false
     },
     isVotante: (state) => {
-      return state.data_connect.hasOwnProperty('votante')
+      return state.data_connect?.user?.hasOwnProperty('votante') || false
+    },
+    permissions: (state) => {
+      return state.data_connect?.permissions || []
     },
     hasPermission: (state) => {
       return (perm) => {

@@ -91,6 +91,7 @@ const close = () => {
 }
 
 const clickToggle = () => {
+  authStore.loginStatus()
   is_expanded.value = !is_expanded.value
 }
 

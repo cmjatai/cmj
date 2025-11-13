@@ -49,12 +49,15 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
                 'timestamp': time.time() * 1000,
                 'instance': None
             }
-            if inst_serialize:
-                message['instance'] = inst_serialize
-            else:
-                message['instance'] = ApiViewSetConstrutor.get_viewset_for_model(
-                    inst._meta.model
-                ).serializer_class(inst).data
+            try:
+                if inst_serialize:
+                    message['instance'] = inst_serialize
+                else:
+                    message['instance'] = ApiViewSetConstrutor.get_viewset_for_model(
+                        inst._meta.model
+                    ).serializer_class(inst).data
+            except Exception as e:
+                logger.error(_("Erro ao serializar instância para sync_refresh: {}").format(e))
 
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
@@ -83,7 +86,4 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
                     logger.error(_("Erro ao agendar atualização dos estados dos painéis. {}").format(e))
 
         except Exception as e:
-            logger.error(_("Erro na comunicação com o backend do redis. "
-                           "Certifique se possuir um servidor de redis "
-                           "ativo funcionando como configurado em "
-                           "CHANNEL_LAYERS"))
+            logger.error(_("Erro signals_sync_refresh: {}").format(e))
