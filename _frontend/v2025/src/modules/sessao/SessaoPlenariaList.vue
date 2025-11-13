@@ -20,12 +20,9 @@
 <script setup>
 import SessaoPlenariaItemList from './SessaoPlenariaItemList'
 import SessaoPlenariaFilter from './SessaoPlenariaFilter'
-import { useSyncStore } from '~@/stores/SyncStore'
 import { ref, onMounted } from 'vue'
 
 import Resource from '~@/utils/resources'
-
-const syncStore = useSyncStore()
 
 const pagination = ref({})
 const sessoes = ref([])

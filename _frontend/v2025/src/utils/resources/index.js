@@ -65,7 +65,7 @@ export default {
       m.form || {},
       m.progress || {}
     ),
-    createModel: (m) => axios.post(
+    postModel: (m) => axios.post(
       `${basePath}/${m.app}/${m.model}/`,
       m.form || {},
       m.progress || {}

@@ -3,7 +3,12 @@
     :key="`sessao-plenaria-view-${sessaoId}`"
     class="sessao-plenaria-view"
   >
-    <a class="sessao_link_manage" v-if="sessao" :href="sessao.link_detail_backend" target="_blank">
+    <a
+      class="sessao_link_manage"
+      v-if="sessao"
+      :href="sessao.link_detail_backend"
+      target="_blank"
+    >
       {{ sessao.__str__ }}
     </a>
     <div
@@ -45,8 +50,7 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { useAuthStore } from '~@/stores/AuthStore'
-import { useRouter, useRoute } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { ref, onMounted, computed, inject } from 'vue'
 import ExpedienteMateriaList from './ExpedienteMateriaList.vue'
 import OrdemDiaList from './OrdemDiaList.vue'
@@ -99,7 +103,6 @@ const toggleRitoOpened = () => {
   EventBus.emit('rito-toggle')
 }
 
-
 const handleResync = (force_fetch_materias = true) => {
   syncStore.invalidateDataCache([
     'sessao'
@@ -138,6 +141,13 @@ const handleResync = (force_fetch_materias = true) => {
     })
   })
   .then(() => {
+    const ordemDiasIds = Object.values(syncStore.data_cache?.sessao_ordemdia || {}).filter(
+      od => od.sessao_plenaria === sessaoId.value
+    ).map(od => od.id)
+    const expedientesIds = Object.values(syncStore.data_cache?.sessao_expedientemateria || {}).filter(
+      em => em.sessao_plenaria === sessaoId.value
+    ).map(em => em.id)
+
     const materiasDaSessao = new Set()
     // Coleta IDs de matérias do expediente
     const allExpedientes = syncStore.data_cache?.sessao_expedientemateria || {}
@@ -215,6 +225,26 @@ const handleResync = (force_fetch_materias = true) => {
           app: 'sessao',
           model: 'tiporesultadovotacao',
           params: {
+            get_all: 'True'
+          }
+        })
+      })
+      .then(() => {
+        return syncStore.fetchSync({
+          app: 'sessao',
+          model: 'votoparlamentar',
+          params: {
+            ordem__in: Array.from(ordemDiasIds),
+            get_all: 'True'
+          }
+        })
+      })
+      .then(() => {
+        return syncStore.fetchSync({
+          app: 'sessao',
+          model: 'votoparlamentar',
+          params: {
+            expediente__in: Array.from(expedientesIds),
             get_all: 'True'
           }
         })

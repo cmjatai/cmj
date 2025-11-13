@@ -23,14 +23,12 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { useAuthStore } from '~@/stores/AuthStore'
-import { watch, computed } from 'vue'
+import { computed } from 'vue'
 import ItemDeSessao from './ItemDeSessao.vue'
 
 const emit = defineEmits(['resync'])
 
 const syncStore = useSyncStore()
-const authStore = useAuthStore()
 
 const props = defineProps({
   sessao: {
@@ -62,13 +60,6 @@ const rotateAndEmitResync = () => {
     }, 1000)
   }
 }
-
-watch(ordemDiaList, (newValue, oldValue) => {
-  // if (newValue && oldValue && newValue.length !== oldValue.length) {
-  //   rotateAndEmitResync()
-  // }
-  // rotateAndEmitResync()
-}, { immediate: true })
 
 </script>
 

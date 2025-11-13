@@ -38,14 +38,12 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { useAuthStore } from '~@/stores/AuthStore'
 import ItemDeSessao from './ItemDeSessao.vue'
 import MateriaEmPauta from './MateriaEmPauta.vue'
 import ControleDeVotacao from './votacao/ControleDeVotacao.vue'
-import { ref, watch, computed } from 'vue'
+import { computed } from 'vue'
 
 const syncStore = useSyncStore()
-const authStore = useAuthStore()
 
 const emit = defineEmits(['resync'])
 

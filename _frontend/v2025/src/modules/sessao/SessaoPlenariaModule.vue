@@ -11,7 +11,7 @@
 <script setup>
 
 import { useSyncStore } from '~@/stores/SyncStore'
-import { watch, ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 
 const syncStore = useSyncStore()
 

@@ -51,6 +51,7 @@
         v-else
       >
         <span v-if="item.resultado">{{ item.resultado }}</span>
+        <span v-else-if="item.tipo_votacao === 4 && item.votacao_aberta">Leitura em Andamento</span>
         <span v-else-if="registrosVotacao.length === 0">Tramitando</span>
       </div>
     </div>
@@ -107,7 +108,7 @@ const votacaoPedidoPrazoAberta = computed(() => {
 
 watch(votacaoAberta, (newValue, oldValue) => {
     if (!newValue && oldValue) {
-      // emit('resync')
+      emit('resync')
     }
   },
   { immediate: true }
@@ -122,7 +123,9 @@ const statusVotacao = (registro) => {
   } else if (props.item.resultado) {
     r = props.item.resultado
   }
-  if (votacaoAberta.value) {
+  if (discussaoAberta.value) {
+    tipo = 'result discussao-aberta'
+  } else if (votacaoAberta.value) {
     tipo = 'result votacao-aberta'
   } else if (r === 'Aprovado') {
     tipo = 'result result-aprovado'
@@ -165,7 +168,7 @@ const statusVotacao = (registro) => {
 
     & > div  {
       display: flex;
-      padding: 2px 10px 3px;
+      padding: 3px 10px 2px;
       align-items: center;
       white-space: nowrap;
       justify-content: center;
@@ -222,8 +225,19 @@ const statusVotacao = (registro) => {
     .result-rejeitado {
       background-color: red;
     }
+    .result-lida {
+      background-color: #808080;
+      opacity: 1;
+    }
     .votacao-aberta {
       background-color: #000;
+      opacity: 1;
+    }
+    .discussao-aberta {
+      background-color: #3cff00;
+      color: #000;
+      font-size: 1.2em;
+      opacity: 1;
     }
   }
 

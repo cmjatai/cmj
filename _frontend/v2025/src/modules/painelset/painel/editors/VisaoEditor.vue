@@ -322,7 +322,7 @@ const addWidget = () => {
     }
   }
 
-  Resource.Utils.createModel({
+  Resource.Utils.postModel({
     app: 'painelset',
     model: 'widget',
     form: defaultChildWidgetData

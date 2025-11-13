@@ -113,12 +113,10 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { useAuthStore } from '~@/stores/AuthStore'
 import NormaSimpleModalView from '~@/components/NormaSimpleModalView.vue'
 import { ref, inject, computed, watch } from 'vue'
 
 const syncStore = useSyncStore()
-const authStore = useAuthStore()
 const EventBus = inject('EventBus')
 
 const emit = defineEmits(['resync'])
@@ -148,19 +146,19 @@ EventBus.on('rito-toggle', () => {
 const toggleRitoOpened = () => {
   EventBus.emit('rito-toggle')
   setTimeout(() => {
-  const preview = document.getElementById(`mp-${props.item.__label__}-${props.item.id}`)
-  const main = document.getElementsByClassName('main')[0]
-  let curtop = 0
-  let obj = preview
-  do {
-    curtop += obj.offsetTop
-    obj = obj.offsetParent
-  } while (obj && obj.tagName !== 'BODY')
-  main.scrollTo({
-    top: curtop - 120,
-    behavior: 'smooth'
-  })
-}, 100)
+    const preview = document.getElementById(`mp-${props.item.__label__}-${props.item.id}`)
+    const main = document.getElementsByClassName('main')[0]
+    let curtop = 0
+    let obj = preview
+    do {
+      curtop += obj.offsetTop
+      obj = obj.offsetParent
+    } while (obj && obj.tagName !== 'BODY')
+    main.scrollTo({
+      top: curtop - 120,
+      behavior: 'smooth'
+    })
+  }, 100)
 }
 
 const observacaoHtml = computed(() => {
@@ -168,7 +166,7 @@ const observacaoHtml = computed(() => {
 })
 
 const materia = computed(() => {
-  return syncStore.data_cache?.materia_materialegislativa?.[props.materiaId] || { __str__: 'Matéria não encontrada' }
+  return syncStore.data_cache?.materia_materialegislativa?.[props.materiaId] || { __str__: 'Buscando Matéria Legislativa...' }
 })
 
 const tramitacao = computed(() => {
@@ -262,6 +260,12 @@ watch(modalLegisCitada, (newVal) => {
   //  modalLegisCitada.value = null
   //})
 })
+
+watch( materia, (newVal) => {
+  if (!newVal?.id) {
+    emit('resync')
+  }
+}, { immediate: true } )
 
 </script>
 <style lang="scss">

@@ -314,7 +314,7 @@ const onDuplicateWidget = () => {
     config: newConfig
   }
 
-  Resource.Utils.createModel({
+  Resource.Utils.postModel({
     app: 'painelset',
     model: 'widget',
     form: newWidgetData
@@ -351,7 +351,7 @@ const addWidget = () => {
     }
   }
 
-  Resource.Utils.createModel({
+  Resource.Utils.postModel({
     app: 'painelset',
     model: 'widget',
     form: defaultChildWidgetData

@@ -290,7 +290,7 @@ const onAddVisaodepainel = () => {
       inner: {}
     }
   }
-  Resource.Utils.createModel({
+  Resource.Utils.postModel({
     app: 'painelset',
     model: 'visaodepainel',
     form: newVisao

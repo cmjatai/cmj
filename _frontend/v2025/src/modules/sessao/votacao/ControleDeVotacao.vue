@@ -5,9 +5,16 @@
       'controle-de-votacao',
       item.__label__,
       votacaoAberta ? 'votacao-aberta' : 'votacao-fechada',
-      votacaoAberta && authStore.isVotante ? 'votante' : 'observador'
+      votacaoAberta && authStore.isVotante && item.tipo_votacao === 2 ? 'votante' : 'observador'
     ]"
   >
+    <VotoParlamentar
+      v-if="votacaoAberta && authStore.isVotante && item.tipo_votacao === 2"
+      :key="`vp-${item.__label__}-${item.id}`"
+      :item="item"
+      :sessao="sessao"
+      @resync="emit('resync')"
+    />
     <ProcessoVotacaoDisplay
       :key="`pvd-${item.__label__}-${item.id}`"
       :item="item"
@@ -17,13 +24,11 @@
   </div>
 </template>
 <script setup>
-// 1. Importações
-import { useSyncStore } from '~@/stores/SyncStore'
 import { useAuthStore } from '~@/stores/AuthStore'
-import { ref, watch, computed } from 'vue'
+import { computed } from 'vue'
 import ProcessoVotacaoDisplay from './ProcessoVotacaoDisplay.vue'
+import VotoParlamentar from './VotoParlamentar.vue'
 
-const syncStore = useSyncStore()
 const authStore = useAuthStore()
 
 const emit = defineEmits(['resync'])
@@ -44,7 +49,6 @@ const votacaoAberta = computed(() => {
     props.item.tipo_votacao !== 4
   )
 })
-
 
 </script>
 
