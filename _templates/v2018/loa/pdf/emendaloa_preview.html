@@ -74,7 +74,7 @@
     </small>
   {% endwith %}
 
-  <br><br>
+  <br>
   {% for erro in object.errors %}
     {% if forloop.first %}
       <ul class="errors">
@@ -173,12 +173,11 @@
     permanecem inalterados.
   </p>
 
-
   <p class="art">
     <span class="rotulo">Art {{ view.art }}º - </span>A presente emenda fará parte integrante do Projeto
     de Lei em referência.
   </p>
-<br>
+
 <p class="data">
   Câmara Municipal de Jataí, em
   {% if object.materia %}

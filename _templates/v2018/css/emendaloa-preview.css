@@ -41,7 +41,7 @@ section.blue {
 }
 
 .ementa {
-  margin: 1cm 0cm 1cm 6cm;
+  margin: 1cm 0cm 1cm 5cm;
 }
 .data {
   text-align: right;
@@ -63,7 +63,7 @@ h3, h4 {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding-top: 1in;
+  padding-top: 2cm;
   text-align: center;
   font-weight: bold;
   line-height: 1.15;
