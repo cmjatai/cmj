@@ -995,7 +995,7 @@ class IAQuotaManager(models.Manager):
             total=models.Sum('iaquotaslog_set__peso', filter=models.Q(iaquotaslog_set__data=hoje))
         ).filter(
             models.Q(total__isnull=True) | models.Q(total__lt=models.F('quota_diaria'))
-        ).order_by('-total', '-quota_diaria')
+        ).order_by('-id', '-total', '-quota_diaria')
 
 class IAQuota(models.Model):
 
