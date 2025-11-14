@@ -562,6 +562,7 @@ class LoaCrud(Crud):
                 tipo__gt=0
             ).values(
                 'unidade__especificacao',
+                'parlamentares__id',
                 'parlamentares__nome_parlamentar'
             ).order_by(
                 'unidade__especificacao'
@@ -573,6 +574,7 @@ class LoaCrud(Crud):
                     }
 
                 unidades[el['unidade__especificacao']]['parlamentares'].append({
+                    'id': el['parlamentares__id'],
                     'nome_parlamentar': el['parlamentares__nome_parlamentar'],
                     'soma_valor': el['soma_valor'],
                 })
@@ -601,6 +603,7 @@ class LoaCrud(Crud):
             context = dict(
                 unidades=unidades.items(),
                 soma_geral=soma_geral,
+                loa=l
             )
 
             template = loader.get_template('loa/emendaloa_totalize_unidade.html')
@@ -618,6 +621,7 @@ class LoaCrud(Crud):
                 tipo__gt=0
             ).values(
                 'entidade__nome_fantasia',
+                'parlamentares__id',
                 'parlamentares__nome_parlamentar'
             ).order_by(
                 'entidade__nome_fantasia'
@@ -631,6 +635,7 @@ class LoaCrud(Crud):
                     }
 
                 entidades[el['entidade__nome_fantasia']]['parlamentares'].append({
+                    'id': el['parlamentares__id'],
                     'nome_parlamentar': el['parlamentares__nome_parlamentar'],
                     'soma_valor': el['soma_valor'],
                 })
@@ -659,6 +664,7 @@ class LoaCrud(Crud):
             context = dict(
                 entidades=entidades.items(),
                 soma_geral=soma_geral,
+                loa=l
             )
 
             template = loader.get_template('loa/emendaloa_totalize_entidade.html')

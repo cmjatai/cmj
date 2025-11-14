@@ -13,7 +13,11 @@
         </thead>
       {% endif %}
       {% if forloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
-        <td class="text-left" rowspan="{{ values.parlamentares|length }}">{{ nome_entidade }}</td>
+        <td class="text-left" rowspan="{{ values.parlamentares|length }}">
+          <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?finalidade={{ nome_entidade }}">
+            {{ nome_entidade }}
+          </a>
+        </td>
         <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_entidade }}</td>
 
         {% for parlamentar in values.parlamentares %}
@@ -21,7 +25,9 @@
             {% if forloop.parentloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
           {% endif %}
             <td class="text-left ">
-              <small>{{ parlamentar.nome_parlamentar }}</small>
+              <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?parlamentares={{ parlamentar.id }}&finalidade={{ nome_entidade }}">
+                <small>{{ parlamentar.nome_parlamentar }}</small>
+              </a>
             </td>
             <td class="text-right">
               <small>{{ parlamentar.soma_valor }}</small>
