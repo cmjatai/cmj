@@ -51,7 +51,7 @@
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
 import { useRoute } from 'vue-router'
-import { ref, onMounted, computed, inject } from 'vue'
+import { ref, onMounted, computed, inject, nextTick } from 'vue'
 import ExpedienteMateriaList from './ExpedienteMateriaList.vue'
 import OrdemDiaList from './OrdemDiaList.vue'
 
@@ -118,29 +118,32 @@ const handleResync = (force_fetch_materias = true) => {
       get_all: 'True'
     }
   })
-  syncStore.fetchSync({
-    app: 'sessao',
-    model: 'expedientemateria',
-    params: {
-      sessao_plenaria: sessaoId.value,
-      expand: 'materia.autores.tipo;tramitacao',
-      exclude: 'materia.metadata',
-      get_all: 'True'
-    }
-  })
-  .then(() => {
-    return syncStore.fetchSync({
-      app: 'sessao',
-      model: 'ordemdia',
-      params: {
-        sessao_plenaria: sessaoId.value,
-        expand: 'materia.autores.tipo;tramitacao',
-        exclude: 'materia.metadata',
-        get_all: 'True'
-      }
-    })
-  })
-  .then(() => {
+
+  const fetchOrdemDiaAndExpediente = async () => {
+    return await Promise.all([
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'ordemdia',
+        params: {
+          sessao_plenaria: sessaoId.value,
+          expand: 'materia.autores.tipo;tramitacao',
+          exclude: 'materia.metadata',
+          get_all: 'True'
+        }
+      }),
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'expedientemateria',
+        params: {
+          sessao_plenaria: sessaoId.value,
+          expand: 'materia.autores.tipo;tramitacao',
+          exclude: 'materia.metadata',
+          get_all: 'True'
+        }
+      })
+    ])
+  }
+  fetchOrdemDiaAndExpediente().then(() => {
     const ordemDiasIds = Object.values(syncStore.data_cache?.sessao_ordemdia || {}).filter(
       od => od.sessao_plenaria === sessaoId.value
     ).map(od => od.id)
@@ -163,6 +166,7 @@ const handleResync = (force_fetch_materias = true) => {
         materiasDaSessao.add(ordem.materia)
       }
     })
+
     // Sincroniza matérias relacionadas
     if (materiasDaSessao.size > 0) {
       syncStore.fetchSync(
@@ -179,22 +183,9 @@ const handleResync = (force_fetch_materias = true) => {
       )
       .then(() => {
         return syncStore.fetchSync({
-          app: 'materia',
-          model: 'documentoacessorio',
+          app: 'sessao',
+          model: 'tiporesultadovotacao',
           params: {
-            materia__in: Array.from(materiasDaSessao),
-            exclude: 'metadata',
-            get_all: 'True'
-          }
-        })
-      })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'norma',
-          model: 'legislacaocitada',
-          params: {
-            materia__in: Array.from(materiasDaSessao),
-            exclude: 'metadata',
             get_all: 'True'
           }
         })
@@ -223,15 +214,6 @@ const handleResync = (force_fetch_materias = true) => {
       .then(() => {
         return syncStore.fetchSync({
           app: 'sessao',
-          model: 'tiporesultadovotacao',
-          params: {
-            get_all: 'True'
-          }
-        })
-      })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'sessao',
           model: 'votoparlamentar',
           params: {
             ordem__in: Array.from(ordemDiasIds),
@@ -245,6 +227,28 @@ const handleResync = (force_fetch_materias = true) => {
           model: 'votoparlamentar',
           params: {
             expediente__in: Array.from(expedientesIds),
+            get_all: 'True'
+          }
+        })
+      })
+      .then(() => {
+        return syncStore.fetchSync({
+          app: 'materia',
+          model: 'documentoacessorio',
+          params: {
+            materia__in: Array.from(materiasDaSessao),
+            exclude: 'metadata',
+            get_all: 'True'
+          }
+        })
+      })
+      .then(() => {
+        return syncStore.fetchSync({
+          app: 'norma',
+          model: 'legislacaocitada',
+          params: {
+            materia__in: Array.from(materiasDaSessao),
+            exclude: 'metadata',
             get_all: 'True'
           }
         })

@@ -53,7 +53,6 @@
 </script>
 <style lang="scss">
 body {
-  overflow: hidden;
 }
 .root-layout {
   user-select: none;
@@ -66,7 +65,6 @@ body {
   line-height: 1;
 
   display: grid;
-  position: fixed;
 
   grid-template-areas:
     "header header header"
@@ -79,7 +77,11 @@ header {
   grid-area: header;
   display: flex;
   align-items: center;
+  position: fixed;
+  left: 0;
+  right: 0;
   justify-content: space-between;
+  background-color: var(--cmj-background-color);
   border-bottom: 1px solid var(--bs-border-color-translucent);
   z-index: 3;
   .header-left, .header-right {
@@ -123,7 +125,7 @@ header {
 main {
   grid-area: main;
   // background-color: #eee;
-  overflow-y: auto;
+  margin-top: 3em;
 }
 
 aside {
