@@ -460,8 +460,8 @@ class EmendaLoa(models.Model):
         if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.unidade:
             erros.append('Emendas Impositivas devem ter Unidade Orçamentária.')
 
-        if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.entidade:
-            erros.append('Emendas Impositivas devem ter Entidade.')
+        #if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.entidade:
+        #    erros.append('Emendas Impositivas devem ter Entidade.')
 
         if self.tipo == self.SAUDE and self.unidade and self.unidade.area != UnidadeOrcamentaria.SAUDE_CHOICE:
             erros.append('Emendas Impositivas da Saúde devem ter Unidade Orçamentária classificadas como sendo da Área da Saúde.')

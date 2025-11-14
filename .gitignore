@@ -75,6 +75,7 @@ client_secrets.json
 .bak
 *~
 *.orig
+.java
 
 # Dev tools configuration files
 .idea/
