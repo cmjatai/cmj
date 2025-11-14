@@ -3,56 +3,69 @@
     :id="`pvd-${item.__label__}-${item.id}`"
     :class="['processo-votacao-display', item.__label__ ]"
   >
-    <template v-if="!votacaoAberta && !votacaoPedidoPrazoAberta">
-      <div
-        class="status-votacao"
-        v-for="registro in registrosVotacao"
-        :key="`rv-${registro.id}`"
+    <div class="display-controls">
+      <button
+        :id="`auto-rolagem-${item.__label__}-${item.id}`"
+        type="button"
+        :class="['btn-auto-rolagem', isAutoRolagem ? 'active' : '']"
+        @click="clickAutoRolagem"
       >
+        Autorolagem?
+        <font-awesome-icon icon="fa-solid fa-up-down" />
+      </button>
+    </div>
+    <div class="display-content">
+      <template v-if="!votacaoAberta && !votacaoPedidoPrazoAberta">
         <div
-          class="votos"
-          v-if="statusVotacao(registro) !== 'result-vista'"
+          class="status-votacao"
+          v-for="registro in registrosVotacao"
+          :key="`rv-${registro.id}`"
         >
           <div
-            class="voto-abs"
-            v-if="registro.numero_abstencoes"
+            class="votos"
+            v-if="statusVotacao(registro) !== 'result-vista'"
           >
-            <span class="valor">{{ registro.numero_abstencoes }}</span>
-            <span class="titulo">ABS</span>
+            <div
+              class="voto-abs"
+              v-if="registro.numero_abstencoes"
+            >
+              <span class="valor">{{ registro.numero_abstencoes }}</span>
+              <span class="titulo">ABS</span>
+            </div>
+            <div class="voto-nao">
+              <span class="valor">{{ registro.numero_votos_nao }}</span>
+              <span class="titulo">NÃO</span>
+            </div>
+            <div class="voto-sim">
+              <span class="valor">{{ registro.numero_votos_sim }}</span>
+              <span class="titulo">SIM</span>
+            </div>
           </div>
-          <div class="voto-nao">
-            <span class="valor">{{ registro.numero_votos_nao }}</span>
-            <span class="titulo">NÃO</span>
-          </div>
-          <div class="voto-sim">
-            <span class="valor">{{ registro.numero_votos_sim }}</span>
-            <span class="titulo">SIM</span>
+          <div :class="statusVotacao(registro)">
+            <span>{{ syncStore.data_cache?.sessao_tiporesultadovotacao?.[registro.tipo_resultado_votacao]?.nome }}</span>
           </div>
         </div>
-        <div :class="statusVotacao(registro)">
-          <span>{{ syncStore.data_cache?.sessao_tiporesultadovotacao?.[registro.tipo_resultado_votacao]?.nome }}</span>
+      </template>
+      <div
+        class="status-votacao"
+        v-if="votacaoAberta || discussaoAberta || votacaoPedidoPrazoAberta || registrosVotacao.length === 0"
+      >
+        <div
+          :class="statusVotacao(null)"
+          v-if="votacaoAberta || discussaoAberta || votacaoPedidoPrazoAberta"
+        >
+          <span v-if="votacaoPedidoPrazoAberta">VOTAÇÃO ABERTA PARA PEDIDO DE ADIAMENTO</span>
+          <span v-else-if="votacaoAberta">VOTAÇÃO ABERTA</span>
+          <span v-else-if="discussaoAberta">DISCUSSÃO ABERTA</span>
         </div>
-      </div>
-    </template>
-    <div
-      class="status-votacao"
-      v-if="votacaoAberta || discussaoAberta || votacaoPedidoPrazoAberta || registrosVotacao.length === 0"
-    >
-      <div
-        :class="statusVotacao(null)"
-        v-if="votacaoAberta || discussaoAberta || votacaoPedidoPrazoAberta"
-      >
-        <span v-if="votacaoPedidoPrazoAberta">VOTAÇÃO ABERTA PARA PEDIDO DE ADIAMENTO</span>
-        <span v-else-if="votacaoAberta">VOTAÇÃO ABERTA</span>
-        <span v-else-if="discussaoAberta">DISCUSSÃO ABERTA</span>
-      </div>
-      <div
-        :class="statusVotacao(null)"
-        v-else
-      >
-        <span v-if="item.resultado">{{ item.resultado }}</span>
-        <span v-else-if="item.tipo_votacao === 4 && item.votacao_aberta">Leitura em Andamento</span>
-        <span v-else-if="registrosVotacao.length === 0">Tramitando</span>
+        <div
+          :class="statusVotacao(null)"
+          v-else
+        >
+          <span v-if="item.resultado">{{ item.resultado }}</span>
+          <span v-else-if="item.tipo_votacao === 4 && item.votacao_aberta">Leitura em Andamento</span>
+          <span v-else-if="registrosVotacao.length === 0">Tramitando</span>
+        </div>
       </div>
     </div>
   </div>
@@ -60,11 +73,12 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { computed, watch } from 'vue'
+import { computed, watch, ref, inject } from 'vue'
 
 const syncStore = useSyncStore()
 
 const emit = defineEmits(['resync'])
+const EventBus = inject('EventBus')
 
 const props = defineProps({
   item: {
@@ -76,6 +90,38 @@ const props = defineProps({
     required: true
   }
 })
+
+const isAutoRolagem = ref(true)
+const clickAutoRolagem = () => {
+  isAutoRolagem.value = !isAutoRolagem.value
+  EventBus.emit('toggle-auto-rolagem', {
+    isState: isAutoRolagem.value
+  })
+}
+EventBus.on('toggle-auto-rolagem', (payload) => {
+  isAutoRolagem.value = payload.isState
+  runAutoRolagem()
+})
+
+const runAutoRolagem = () => {
+  if (!isAutoRolagem.value || !conditionalAutoRolagem.value) {
+    return
+  }
+  console.log('Executando auto rolagem para o item de sessão', props.item.__label__, props.item.id)
+  setTimeout(() => {
+    const preview = document.getElementById(`is-${props.item.__label__}-${props.item.id}`)
+    let curtop = 0
+    let obj = preview
+    do {
+      curtop += obj.offsetTop
+      obj = obj.offsetParent
+    } while (obj && obj.tagName !== 'BODY')
+    window.scrollTo({
+      top: curtop - 100,
+      behavior: 'smooth'
+    })
+  }, 100)
+}
 
 const registrosVotacao = computed(() => {
   const allRegistrosVotacao = syncStore.data_cache?.sessao_registrovotacao || {}
@@ -106,9 +152,25 @@ const votacaoPedidoPrazoAberta = computed(() => {
   )
 })
 
+const conditionalAutoRolagem = computed(() => {
+  return props.item.discussao_aberta || props.item.votacao_aberta || props.item.votacao_aberta_pedido_prazo
+})
+
 watch(votacaoAberta, (newValue, oldValue) => {
     if (!newValue && oldValue) {
       emit('resync')
+    }
+    if (newValue) {
+      runAutoRolagem()
+    }
+  },
+  { immediate: true }
+)
+
+watch(conditionalAutoRolagem, (newValue) => {
+    if (newValue) {
+      console.log('Auto rolagem ativada por mudança de estado de votação/discussão', newValue)
+      runAutoRolagem()
     }
   },
   { immediate: true }
@@ -150,9 +212,15 @@ const statusVotacao = (registro) => {
   right: 0em;
   top: 0em;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
+  align-items: flex-start;
+
+  .display-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+    line-height: 1;
+  }
 
   .status-votacao {
     display: flex;
@@ -247,6 +315,26 @@ const statusVotacao = (registro) => {
     }
     .votos {
       opacity: 1;
+    }
+  }
+
+  .display-controls {
+    display: flex;
+    gap: 0.5em;
+
+    .btn-auto-rolagem {
+      color: var(--bs-gray-500);
+      background-color: transparent;
+      border: none;
+      padding: 0.3em 0.5em;
+      font-size: 0.8em;
+      white-space: nowrap;
+      cursor: pointer;
+      &.active {
+        color: var(--bs-success);
+      }
+      &:hover {
+      }
     }
   }
 

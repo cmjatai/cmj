@@ -16,6 +16,11 @@
         :sessao="sessao"
         @resync="emit('resync')"
       />
+      <ItemDeSessaoControl
+        :key="`isc-${item.__label__}-${item.id}`"
+        :item="item"
+        :sessao="sessao"
+      />
     </div>
     <div class="childs">
       <div
@@ -41,6 +46,7 @@ import { useSyncStore } from '~@/stores/SyncStore'
 import ItemDeSessao from './ItemDeSessao.vue'
 import MateriaEmPauta from './MateriaEmPauta.vue'
 import ControleDeVotacao from './votacao/ControleDeVotacao.vue'
+import ItemDeSessaoControl from './control/ItemDeSessaoControl.vue'
 import { computed } from 'vue'
 
 const syncStore = useSyncStore()

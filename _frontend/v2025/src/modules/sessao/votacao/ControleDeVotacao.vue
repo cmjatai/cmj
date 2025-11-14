@@ -21,6 +21,7 @@
       :sessao="sessao"
       @resync="emit('resync')"
     />
+    
   </div>
 </template>
 <script setup>

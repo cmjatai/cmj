@@ -113,19 +113,19 @@ function sendVoto(tipoVoto) {
 
 onMounted(() => {
   setTimeout(() => {
-    const preview = document.getElementById(`mp-${props.item.__label__}-${props.item.id}`)
-    const main = document.getElementsByClassName('main')[0]
+    const preview = document.getElementById(`is-${props.item.__label__}-${props.item.id}`)
     let curtop = 0
     let obj = preview
     do {
       curtop += obj.offsetTop
       obj = obj.offsetParent
     } while (obj && obj.tagName !== 'BODY')
-    main.scrollTo({
-      top: curtop - 150,
+    window.scrollTo({
+      top: curtop - 100,
       behavior: 'smooth'
     })
-  }, 100)})
+  }, 100)
+})
 
 </script>
 <style lang="scss">

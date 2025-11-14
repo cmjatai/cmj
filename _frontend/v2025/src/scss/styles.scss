@@ -52,19 +52,19 @@ a {
 
 
 @keyframes keyframe_rotate {
-  10% {
+  3% {
     transform: rotate(135deg);
   }
-  30% {
+  10% {
     transform: rotate(855deg);
   }
-  35% {
+  12% {
     transform: scale(3) rotate(855deg);
   }
-  40% {
+  14% {
     transform: scale(1) rotate(855deg);
   }
-  60% {
+  18% {
     transform: rotate(135deg);
   }
   100% {
@@ -73,7 +73,7 @@ a {
 }
 .animation-rotate {
   transform: rotate(135deg);
-  animation: keyframe_rotate 7s ease-in-out infinite;
+  animation: keyframe_rotate 30s ease-in-out infinite;
 }
 
 .avatar {

@@ -622,7 +622,7 @@ class LoaCrud(Crud):
             ).order_by(
                 'entidade__nome_fantasia'
             ).annotate(soma_valor=Sum('valor')):
-                nom_entidade = el['entidade__nome_fantasia'] or 'Direcionado às Secretarias para ações gerais'
+                nom_entidade = el['entidade__nome_fantasia'] or 'Direcionado às Secretarias para ações especificadas nas Emendas Impositivas'
                 el['entidade__nome_fantasia'] = nom_entidade
                 if el['entidade__nome_fantasia'] not in entidades:
                     entidades[el['entidade__nome_fantasia']] = {

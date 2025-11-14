@@ -146,17 +146,16 @@ EventBus.on('rito-toggle', () => {
 const toggleRitoOpened = () => {
   EventBus.emit('rito-toggle')
   setTimeout(() => {
-    const preview = document.getElementById(`mp-${props.item.__label__}-${props.item.id}`)
-    const main = document.getElementsByClassName('main')[0]
+    const preview = document.getElementById(`is-${props.item.__label__}-${props.item.id}`)
     let curtop = 0
     let obj = preview
     do {
       curtop += obj.offsetTop
       obj = obj.offsetParent
     } while (obj && obj.tagName !== 'BODY')
-    main.scrollTo({
-      top: curtop - 120,
-      behavior: 'smooth'
+    window.scrollTo({
+      top: curtop - 100,
+      behavior: 'instant'
     })
   }, 100)
 }
@@ -360,6 +359,7 @@ watch( materia, (newVal) => {
     }
     .link-file {
       font-size: 1.8em;
+      margin-left: -0.5em;
       a {
         padding: 0.5em;
         display: inline-block;

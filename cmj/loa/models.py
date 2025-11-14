@@ -181,17 +181,40 @@ class Loa(models.Model):
                     lp.save()
             return self
 
+        parlamentares_ativos = {
+            p: list(
+                p.emendaloaparlamentar_set.filter(emendaloa__loa=self)
+            )
+                for p in Parlamentar.objects.filter(ativo=True)
+        }
+        parlamentares_ativos_com_emendas = {
+            p: emendas for p, emendas in parlamentares_ativos.items() if emendas
+        }
+        parlamentares_ativos_sem_emendas = {
+            p: emendas for p, emendas in parlamentares_ativos.items() if not emendas
+        }
 
-        parlamentares_ativos_sem_emendas = Parlamentar.objects.filter(
-            ativo=True, emendaloaparlamentar_set__isnull=True)
+        parlamentares_inativos_com_emendas = {
+            p: list(
+                p.emendaloaparlamentar_set.filter(emendaloa__loa=self)
+            )
+            for p in Parlamentar.objects.filter(
+                ativo=False,
+                emendaloaparlamentar_set__emendaloa__loa=self
+            ).distinct()
+        }
 
-        parlamentares_ativos_com_emendas = Parlamentar.objects.filter(
-            ativo=True).exclude(emendaloaparlamentar_set__isnull=True).distinct()
 
-        parlamentares_inativos_com_emendas = Parlamentar.objects.filter(
-            ativo=False).exclude(emendaloaparlamentar_set__isnull=True).distinct()
 
-        count_parlamentares_ativos = Decimal(parlamentares_ativos_com_emendas.count() + parlamentares_ativos_sem_emendas.count())
+        count_parlamentares_ativos = Decimal(len(parlamentares_ativos))
+        count_parlamentares_ativos_com_emendas = Decimal(len(parlamentares_ativos_com_emendas))
+        count_parlamentares_ativos_sem_emendas = Decimal(len(parlamentares_ativos_sem_emendas))
+
+        count_parlamentares_inativos_com_emendas = Decimal(len(parlamentares_inativos_com_emendas))
+
+        count_parlamentares_com_emendas = Decimal(
+            count_parlamentares_ativos_com_emendas + count_parlamentares_inativos_com_emendas
+        )
 
         disp_previa_total = quantize(self.rcl_previa * self.perc_disp_total / Decimal(100), rounding=ROUND_DOWN)
         disp_previa_saude = quantize(self.rcl_previa * self.perc_disp_saude / Decimal(100), rounding=ROUND_DOWN)
@@ -204,7 +227,7 @@ class Loa(models.Model):
         imp_inativos_saude = Decimal('0.00')
         imp_inativos_diversos = Decimal('0.00')
         for lp in lps:
-            if lp.parlamentar in parlamentares_inativos_com_emendas:
+            if lp.parlamentar in parlamentares_inativos_com_emendas.keys():
                 soma_imp_saude = lp.parlamentar.emendaloaparlamentar_set.filter(
                     emendaloa__loa = self,
                     emendaloa__fase = EmendaLoa.IMPEDIMENTO_TECNICO,
@@ -221,7 +244,7 @@ class Loa(models.Model):
                 dps = disp_previa_saude
                 dpd = disp_previa_diversos
                 set_values_for_lp(
-                    lp, dps + dpd, dps, dpd, parlamentares_ativos_com_emendas.count() + parlamentares_inativos_com_emendas.count()
+                    lp, dps + dpd, dps, dpd, count_parlamentares_com_emendas
                 )
                 lp.disp_total -= soma_imp_saude + soma_imp_diversos
                 lp.disp_saude -= soma_imp_saude
@@ -233,14 +256,14 @@ class Loa(models.Model):
 
 
         for lp in lps:
-            if lp.parlamentar in parlamentares_ativos_com_emendas:
+            if lp.parlamentar in parlamentares_ativos_com_emendas.keys():
                 set_values_for_lp(
                     lp, self.disp_total + imp_inativos_saude + imp_inativos_diversos,
                     self.disp_saude + imp_inativos_saude,
                     self.disp_diversos + imp_inativos_diversos,
                     count_parlamentares_ativos
                     )
-            elif lp.parlamentar in parlamentares_ativos_sem_emendas:
+            elif lp.parlamentar in parlamentares_ativos_sem_emendas.keys():
                 set_values_for_lp(
                     lp,
                     self.disp_total - disp_previa_total + imp_inativos_saude + imp_inativos_diversos,
