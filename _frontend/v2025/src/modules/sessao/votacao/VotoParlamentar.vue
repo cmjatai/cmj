@@ -4,9 +4,9 @@
     :class="['voto-parlamentar']"
   >
     <div class="inner-voto">
-      <a href="#" class="btn btn-lg btn-success" @click="sendVoto('Sim')">SIM</a>
-      <a href="#" class="btn btn-lg btn-danger" @click="sendVoto('Não')">NÃO</a>
-      <a href="#" class="btn btn-lg btn-warning" @click="sendVoto('Abstenção')">Abstenção</a>
+      <button type="button" class="btn btn-lg btn-success" @click="sendVoto('Sim')">SIM</button>
+      <button type="button" class="btn btn-lg btn-danger" @click="sendVoto('Não')">NÃO</button>
+      <button type="button" class="btn btn-lg btn-warning" @click="sendVoto('Abstenção')">Abstenção</button>
     </div>
     <div class="voto-result" v-if="voto">
       <div class="avatar">

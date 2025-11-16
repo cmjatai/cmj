@@ -12,9 +12,9 @@
           <small v-html="user.username"></small>
         </div>
       </div>
-      <div class="rodape" v-if="is_expanded" @click="close" >
+      <div class="rodape" v-if="is_expanded" @click="close" title="Desconectar usuário">
         Desconectar
-        <i :class="[`fas fa-sign-out-alt hover-circle`]" title="Desconectar usuário"></i>
+        <FontAwesomeIcon icon="sign-out-alt" />
       </div>
     </div>
     <div v-if="!user" :class="['portalcmj-login', is_expanded ? 'expand' : '']" @click.self="clickToggle">

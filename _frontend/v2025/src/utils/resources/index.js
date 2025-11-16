@@ -54,19 +54,18 @@ export default {
         method: 'GET'
       })
     },
-
-    patchModelAction: (m) => axios.patch(
-      `${basePath}/${m.app}/${m.model}/${m.id}/${m.action}/`,
+    patchModel: (m) => axios.patch(
+      `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}`,
       m.form || {},
       m.progress || {}
     ),
-    patchModel: (m) => axios.patch(
-      `${basePath}/${m.app}/${m.model}/${m.id}/`,
+    putModel: (m) => axios.put(
+      `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}`,
       m.form || {},
       m.progress || {}
     ),
     postModel: (m) => axios.post(
-      `${basePath}/${m.app}/${m.model}/`,
+      `${basePath}/${m.app}/${m.model}/${m.action ? m.action + '/' : ''}`,
       m.form || {},
       m.progress || {}
     ),

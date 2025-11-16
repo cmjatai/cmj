@@ -17,7 +17,11 @@ export const useAuthStore = defineStore('authStore', {
     },
     hasPermission: (state) => {
       return (perm) => {
-        return state.data_connect?.permissions?.includes(perm)
+
+        if (!state.data_connect.permissions) {
+          return false
+        }
+        return state.data_connect.permissions.includes(perm)
       }
     }
   },

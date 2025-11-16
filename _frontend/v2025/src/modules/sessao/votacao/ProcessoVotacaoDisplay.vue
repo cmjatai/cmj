@@ -3,7 +3,7 @@
     :id="`pvd-${item.__label__}-${item.id}`"
     :class="['processo-votacao-display', item.__label__ ]"
   >
-    <div class="display-controls">
+    <div class="display-controls" v-if="!userIsAdminSessao">
       <button
         :id="`auto-rolagem-${item.__label__}-${item.id}`"
         type="button"
@@ -73,9 +73,11 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
+import { useAuthStore } from '~@/stores/AuthStore'
 import { computed, watch, ref, inject } from 'vue'
 
 const syncStore = useSyncStore()
+const authStore = useAuthStore()
 
 const emit = defineEmits(['resync'])
 const EventBus = inject('EventBus')
@@ -93,6 +95,9 @@ const props = defineProps({
 
 const isAutoRolagem = ref(true)
 const clickAutoRolagem = () => {
+  if (userIsAdminSessao.value) {
+    return
+  }
   isAutoRolagem.value = !isAutoRolagem.value
   EventBus.emit('toggle-auto-rolagem', {
     isState: isAutoRolagem.value
@@ -103,7 +108,14 @@ EventBus.on('toggle-auto-rolagem', (payload) => {
   runAutoRolagem()
 })
 
+const userIsAdminSessao = computed(() => {
+  return authStore.hasPermission('sessao.add_sessaoplenaria')
+})
+
 const runAutoRolagem = () => {
+  if (userIsAdminSessao.value) {
+    return
+  }
   if (!isAutoRolagem.value || !conditionalAutoRolagem.value) {
     return
   }
@@ -169,7 +181,6 @@ watch(votacaoAberta, (newValue, oldValue) => {
 
 watch(conditionalAutoRolagem, (newValue) => {
     if (newValue) {
-      console.log('Auto rolagem ativada por mudança de estado de votação/discussão', newValue)
       runAutoRolagem()
     }
   },

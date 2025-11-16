@@ -62,7 +62,7 @@
       v-if="item && item.observacao"
       @click="toggleRitoOpened()"
       :class="['rito-text', ritoOpened ? 'open' : 'closed']"
-      v-html="ritoOpened ? observacaoHtml : 'Visualizar o Rito...'"
+      v-html="ritoOpened ? observacaoHtml : 'Visualizar o Roteiro...'"
       />
 
     <div class="documentos-acessorios pt-2" v-if="documentosAcessorios.length > 0">

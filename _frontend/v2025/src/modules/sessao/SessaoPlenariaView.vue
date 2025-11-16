@@ -20,7 +20,7 @@
         @click="toggleRitoOpened"
         :class="['sessao-plenaria-textos', ritoOpened ? 'open' : 'closed']"
       >
-        <div v-html="ritoOpened ? textoAbertura[0].conteudo : 'Visualizar o Rito...'" />
+        <div v-html="ritoOpened ? textoAbertura[0].conteudo : 'Visualizar o Roteiro...'" />
       </div>
       <ExpedienteMateriaList
         :sessao="sessao"
@@ -31,7 +31,7 @@
         @click="toggleRitoOpened"
         :class="['sessao-plenaria-textos', ritoOpened ? 'open' : 'closed']"
       >
-        <div v-html="ritoOpened ? textoTribuna[0].conteudo : 'Visualizar o Rito...'" />
+        <div v-html="ritoOpened ? textoTribuna[0].conteudo : 'Visualizar o Roteiro...'" />
       </div>
       <OrdemDiaList
         :sessao="sessao"
@@ -42,7 +42,7 @@
         @click="toggleRitoOpened"
         :class="['sessao-plenaria-textos', ritoOpened ? 'open' : 'closed']"
       >
-        <div v-html="ritoOpened ? textoFechamento[0].conteudo : 'Visualizar o Rito...'" />
+        <div v-html="ritoOpened ? textoFechamento[0].conteudo : 'Visualizar o Roteiro...'" />
       </div>
     </div>
   </div>

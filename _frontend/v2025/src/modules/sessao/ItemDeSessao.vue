@@ -2,7 +2,13 @@
   <div
     :id="`is-${item.__label__}-${item.id}`"
     :class="['item-de-sessao', item.__label__, parent ? 'child-item' : 'parent-item']">
-    <div class="item-content">
+    <div :class="['item-content', item.votacao_aberta && item.tipo_votacao === 2 ? 'votacao-nominal' : '']" >
+      <ItemDeSessaoAdmin
+        :key="`is-admin-${item.__label__}-${item.id}`"
+        :item="item"
+        :sessao="sessao"
+        @resync="emit('resync')"
+      />
       <ControleDeVotacao
         :key="`cv-${item.__label__}-${item.id}`"
         :item="item"
@@ -15,11 +21,6 @@
         :item="item"
         :sessao="sessao"
         @resync="emit('resync')"
-      />
-      <ItemDeSessaoControl
-        :key="`isc-${item.__label__}-${item.id}`"
-        :item="item"
-        :sessao="sessao"
       />
     </div>
     <div class="childs">
@@ -46,7 +47,7 @@ import { useSyncStore } from '~@/stores/SyncStore'
 import ItemDeSessao from './ItemDeSessao.vue'
 import MateriaEmPauta from './MateriaEmPauta.vue'
 import ControleDeVotacao from './votacao/ControleDeVotacao.vue'
-import ItemDeSessaoControl from './control/ItemDeSessaoControl.vue'
+import ItemDeSessaoAdmin from './admin/ItemDeSessaoAdmin.vue'
 import { computed } from 'vue'
 
 const syncStore = useSyncStore()
@@ -87,6 +88,22 @@ const childs = computed(() => {
   .item-content {
     position: relative;
     padding: 0.5em;
+    padding-bottom: 3em;
+    &.votacao-nominal {
+      min-height: 60vh;
+    }
+    .item-de-sessao-admin {
+      .btn {
+        opacity: 0.2;
+      }
+    }
+    &:hover .item-de-sessao-admin {
+
+      .btn {
+        opacity: 1;
+      }
+
+    }
   }
   &.sessao_expedientemateria {
     z-index: 1;
@@ -105,7 +122,7 @@ const childs = computed(() => {
       font-size: 170%;
       display: inline-block;
       line-height: 1;
-      z-index: 1;
+      z-index: 0;
     }
   }
   &.sessao_ordemdia {
