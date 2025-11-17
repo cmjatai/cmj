@@ -239,6 +239,15 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
     if settings.DEBUG:
         return
 
+    if 'www' not in settings.SITE_URL:
+        return
+
+    #restart = start_task(
+    #    'sapl.base.tasks.task_analise_similaridade_entre_materias',
+    #    task_analise_similaridade_entre_materias,
+    #    timezone.now() + timezone.timedelta(seconds=120)
+    #)
+
     only_materia_id = args[0] if args else None
     logger.info(f'Executando... only_materia_id={only_materia_id}')
 
