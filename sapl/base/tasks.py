@@ -232,6 +232,10 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
     if settings.DEBUG:
         return
+
+    if 'www' not in settings.SITE_URL:
+        return
+
     #restart = start_task(
     #    'sapl.base.tasks.task_analise_similaridade_entre_materias',
     #    task_analise_similaridade_entre_materias,
