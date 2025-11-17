@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-docker stop cmj
-docker cp $1 saplpostgres:/tmp/cmj.backup
+docker stop sapl
+docker cp $1 saplpostgres:/tmp/sapl.backup
 
 docker exec -it saplpostgres psql -hsapldb -Ucmj -dpostgres -c "DROP DATABASE IF EXISTS cmj;"
 docker exec -it saplpostgres psql -hsapldb -Ucmj -dpostgres -c "CREATE DATABASE cmj WITH OWNER = cmj ENCODING = 'UTF8' CONNECTION LIMIT = -1;"
