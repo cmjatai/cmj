@@ -225,8 +225,9 @@ const syncChildList = async () => {
     .fetchSync({
       app: 'painelset',
       model: 'widget',
-      filters: {
-        parent: props.widgetSelected
+      params: {
+        parent: props.widgetSelected,
+        get_all: 'True'
       }
     })
     .then(() => {

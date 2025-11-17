@@ -3,7 +3,10 @@
     :id="`pvd-${item.__label__}-${item.id}`"
     :class="['processo-votacao-display', item.__label__ ]"
   >
-    <div class="display-controls" v-if="!userIsAdminSessao">
+    <div
+      class="display-controls"
+      v-if="!userIsAdminSessao"
+    >
       <button
         :id="`auto-rolagem-${item.__label__}-${item.id}`"
         type="button"
@@ -108,6 +111,10 @@ EventBus.on('toggle-auto-rolagem', (payload) => {
   runAutoRolagem()
 })
 
+EventBus.on('disable-auto-rolagem', () => {
+  isAutoRolagem.value = false
+})
+
 const userIsAdminSessao = computed(() => {
   return authStore.hasPermission('sessao.add_sessaoplenaria')
 })
@@ -119,7 +126,7 @@ const runAutoRolagem = () => {
   if (!isAutoRolagem.value || !conditionalAutoRolagem.value) {
     return
   }
-  console.log('Executando auto rolagem para o item de sessão', props.item.__label__, props.item.id)
+  // console.log('Executando auto rolagem para o item de sessão', props.item.__label__, props.item.id)
   setTimeout(() => {
     const preview = document.getElementById(`is-${props.item.__label__}-${props.item.id}`)
     let curtop = 0

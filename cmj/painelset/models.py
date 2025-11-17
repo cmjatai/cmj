@@ -683,7 +683,7 @@ class Widget(models.Model):
     class Meta:
         verbose_name = "Widget da Visão"
         verbose_name_plural = "Widgets das Visões"
-        ordering = ['position']
+        ordering = ['position', 'id']
 
     def __str__(self):
         return f"{self.name} na visão {self.visao.name}"

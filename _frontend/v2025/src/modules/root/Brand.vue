@@ -27,8 +27,9 @@ onMounted(() => {
   syncStore.fetchSync({
     app: 'base',
     model: 'casalegislativa',
-    orderBy: 'id',
-    limit: 1
+    params: {
+      o: 'id'
+    }
   })
 })
 

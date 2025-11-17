@@ -12,94 +12,96 @@
         {{ materia.__str__ }}
       </a>
     </div>
-    <div class="materia-conteudo">
-      <div class="link-file">
-        <a
-          v-if="materia.texto_original"
-          :href="materia.texto_original"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <FontAwesomeIcon icon="file-lines" />
-        </a>
-      </div>
-      <div class="data-header">
-        <div class="detail-header">
-          <div class="protocolo-data">
-            <span class="protocolo">
-              Protocolo:
-              <strong>{{ materia.numero_protocolo }}</strong>
-            </span>
-            <span class="data">{{ data_apresentacao }}</span>
-          </div>
-          <div class="autoria">
-            <span
-              v-for="(autor, key) in autores"
-              :key="`au${key}`"
-            >{{ autor.nome }}</span>
-          </div>
-        </div>
-        <div
-          class="ementa"
-          v-html="materia.ementa"
-        />
-      </div>
-    </div>
-    <div class="tramitacao">
-      <div class="status">
-        <strong>Situação:</strong>&nbsp;
-        <span>
-          {{ tramitacao.status }}
-        </span>
-      </div>
-      <div class="ultima-acao">
-        <strong>Última Ação:</strong>&nbsp;
-        {{ tramitacao.texto }}
-      </div>
-    </div>
-
-    <div
-      v-if="item && item.observacao"
-      @click="toggleRitoOpened()"
-      :class="['rito-text', ritoOpened ? 'open' : 'closed']"
-      v-html="ritoOpened ? observacaoHtml : 'Visualizar o Roteiro...'"
-      />
-
-    <div class="documentos-acessorios pt-2" v-if="documentosAcessorios.length > 0">
-      <div class="title"><strong>Documentos Acessórios</strong></div>
-      <ul class="inner-docacess">
-        <li
-          v-for="doc in documentosAcessorios"
-          :key="`docacessorio-${doc.id}`"
-          class="doc-acessorio-item"
-        >
+    <div class="inner-materia">
+      <div class="materia-conteudo">
+        <div class="link-file">
           <a
-            :href="doc.arquivo"
+            v-if="materia.texto_original"
+            :href="materia.texto_original"
             target="_blank"
             rel="noopener noreferrer"
           >
-            {{ doc.__str__ }}
+            <FontAwesomeIcon icon="file-lines" />
           </a>
-        </li>
-      </ul>
-    </div>
-    <div class="legislacao-citada pt-2" v-if="legislacaoCitada.length > 0">
-      <div class="title"><strong>Legislação Citada</strong></div>
-      <ul class="inner-legcitada">
-        <li
-          v-for="leg in legislacaoCitada"
-          :key="`legcitada-${leg.id}`"
-          class="leg-citada-item"
-        >
-          <a
-            href="#"
-            @click.prevent="modalLegisCitada = leg"
-            :key="`legiscit${leg.id}`"
+        </div>
+        <div class="data-header">
+          <div class="detail-header">
+            <div class="protocolo-data">
+              <span class="protocolo">
+                Protocolo:
+                <strong>{{ materia.numero_protocolo }}</strong>
+              </span>
+              <span class="data">{{ data_apresentacao }}</span>
+            </div>
+            <div class="autoria">
+              <span
+                v-for="(autor, key) in autores"
+                :key="`au${key}`"
+              >{{ autor.nome }}</span>
+            </div>
+          </div>
+          <div
+            class="ementa"
+            v-html="materia.ementa"
+          />
+        </div>
+      </div>
+      <div class="tramitacao">
+        <div class="status">
+          <strong>Situação:</strong>&nbsp;
+          <span>
+            {{ tramitacao.status }}
+          </span>
+        </div>
+        <div class="ultima-acao">
+          <strong>Última Ação:</strong>&nbsp;
+          {{ tramitacao.texto }}
+        </div>
+      </div>
+
+      <div
+        v-if="item && item.observacao"
+        @click="toggleRitoOpened()"
+        :class="['rito-text', ritoOpened ? 'open' : 'closed']"
+        v-html="ritoOpened ? observacaoHtml : 'Visualizar o Roteiro...'"
+      />
+
+      <div class="documentos-acessorios pt-2" v-if="documentosAcessorios.length > 0">
+        <div class="title"><strong>Documentos Acessórios</strong></div>
+        <ul class="inner-docacess">
+          <li
+            v-for="doc in documentosAcessorios"
+            :key="`docacessorio-${doc.id}`"
+            class="doc-acessorio-item"
           >
-            {{ leg.__str__ }}
-          </a>
-        </li>
-      </ul>
+            <a
+              :href="doc.arquivo"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {{ doc.__str__ }}
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="legislacao-citada pt-2" v-if="legislacaoCitada.length > 0">
+        <div class="title"><strong>Legislação Citada</strong></div>
+        <ul class="inner-legcitada">
+          <li
+            v-for="leg in legislacaoCitada"
+            :key="`legcitada-${leg.id}`"
+            class="leg-citada-item"
+          >
+            <a
+              href="#"
+              @click.prevent="modalLegisCitada = leg"
+              :key="`legiscit${leg.id}`"
+            >
+              {{ leg.__str__ }}
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
     <Teleport v-if="modalLegisCitada" :to="`#modalCmj`">
       <NormaSimpleModalView

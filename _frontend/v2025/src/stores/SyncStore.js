@@ -158,9 +158,6 @@ export const useSyncStore = defineStore('syncStore', {
       if (id) { metadata.id = id }
       if (action) { metadata.action = action }
       if (params) {
-        if (!params.o) {
-          params.o = 'id'
-        }
         metadata.params = params
         Object.keys(params).forEach((key) => {
           if (Array.isArray(params[key])) {
@@ -168,6 +165,23 @@ export const useSyncStore = defineStore('syncStore', {
           }
         })
       }
+      if (!id) {
+        if (metadata.params === undefined) {
+          metadata.params = {
+            page: 1,
+            o: 'id'
+          }
+        }
+
+        if (metadata.params.page === undefined) {
+          metadata.params.page = 1
+        }
+
+        if (metadata.params.o === undefined) {
+          metadata.params.o = 'id'
+        }
+      }
+
       // timestamp_frontend evita sobrescrever dados mais recentes no cache que podem ter sido atualizados via WebSocket
       const timestamp_frontend = Date.now()
       return _fetch(

@@ -110,8 +110,9 @@ const syncWidgetList = async () => {
     .fetchSync({
       app: 'painelset',
       model: 'widget',
-      filters: {
-        visaodepainel: props.visaodepainelSelected
+      params: {
+        visao: props.visaodepainelSelected,
+        get_all: 'True'
       }
     })
     .then((response) => {

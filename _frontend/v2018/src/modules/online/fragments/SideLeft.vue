@@ -1,15 +1,25 @@
 <template>
   <div class="w-100 d-flex flex-column align-items-start inner inner-sideleft">
-    <router-link :to="{ name: item.route }" v-for="(item, key) in links_filter" :key="key+1" @click.native="selectRoute(item)" :class="[isSelected(item), isClicked(item)]" @mouseover.native="mouseover(item)" @mouseleave.native="mouseleave(item)">
-      <span class="hover-circle icon">
-        <i v-if="item.icon" :class="item.icon"></i>
-        <b-img v-else :src="item.image" fluid rounded="0" />
-      </span>
-      <span class="text-link">
-        {{item.texto}}
-      </span>
-    </router-link>
-
+    <template v-for="(item) in links_filter" >
+      <a :href="item.link" v-if="item.link" :key="item.texto">
+        <span class="hover-circle icon">
+          <i v-if="item.icon" :class="item.icon"></i>
+          <b-img v-else :src="item.image" fluid rounded="0" />
+        </span>
+        <span class="text-link">
+          {{item.texto}}
+        </span>
+      </a>
+      <router-link v-if="item.route" :key="item.route" :to="{ name: item.route }" @click.native="selectRoute(item)" :class="[isSelected(item), isClicked(item)]" @mouseover.native="mouseover(item)" @mouseleave.native="mouseleave(item)">
+        <span class="hover-circle icon">
+          <i v-if="item.icon" :class="item.icon"></i>
+          <b-img v-else :src="item.image" fluid rounded="0" />
+        </span>
+        <span class="text-link">
+          {{item.texto}}
+        </span>
+      </router-link>
+    </template>
   </div>
 </template>
 
@@ -43,7 +53,8 @@ export default {
         },
         {
           image: require('@/assets/img/icon_plenarias.png'),
-          route: 'sessao_list_link',
+          route: '',
+          link: '/v2025/sessao',
           texto: 'Sessões Plenárias'
         },
         {
@@ -71,7 +82,7 @@ export default {
   },
   computed: {
     links_filter: function () {
-      return this.links.filter(i => i.route !== '' && (i.permission === undefined || (i.hasPermission !== undefined && i.hasPermission)))
+      return this.links.filter(i => (i.route !== '' || (i.link && i.link !== '')) && (i.permission === undefined || (i.hasPermission !== undefined && i.hasPermission)))
     }
   },
   methods: {

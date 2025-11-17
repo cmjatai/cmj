@@ -28,7 +28,7 @@
             :to="{ name: link.route }"
             class="nav-link"
             @click="closeOffCanvas('#menuSideLeft')"
-            >
+          >
             <b-img
               v-if="link.image"
               :src="link.image"
@@ -63,7 +63,30 @@
         v-for="link in linksAtivos"
         :key="link.texto"
       >
-        <router-link :to="{ name: link.route }" class="nav-link">
+        <a
+          v-if="link.link"
+          :href="link.link"
+          class="nav-link"
+        >
+          <b-img
+            v-if="link.image"
+            :src="link.image"
+            fluid
+            rounded="0"
+            class=""
+          />
+          <FontAwesomeIcon
+            v-else-if="link.icon"
+            :icon="link.icon"
+            class=""
+          />
+          <span class="sidebar-label">{{ link.texto }}</span>
+        </a>
+        <router-link
+          v-else-if="link.route"
+          :to="{ name: link.route }"
+          class="nav-link"
+        >
           <b-img
             v-if="link.image"
             :src="link.image"
@@ -142,15 +165,16 @@ const links = ref([
     texto: 'Relatórios'
   },
   {
-    icon: 'fas fa-columns',
+    icon: 'columns',
     route: '',
+    link: '/online/painelset/',
     texto: 'Eventos e Painéis'
   }
 ])
 
 // 5. Computed Properties
 const linksAtivos = computed(() => {
-  return links.value.filter(link => link.route !== '')
+  return links.value.filter(link => link.route !== '' || link.link !== '')
 })
 
 // 6. Watchers

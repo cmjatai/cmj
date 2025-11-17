@@ -1,41 +1,43 @@
 <template>
   <div :class="['root-layout',]">
     <header>
-
       <div class="header-left d-lg-none">
-        <slot name="header-left"></slot>
+        <slot name="header-left" />
       </div>
 
       <div class="header-main">
         <div class="brand">
-          <slot name="brand"></slot>
+          <slot name="brand" />
         </div>
         <div class="header-detail">
-          <slot name="header-detail"></slot>
+          <slot name="header-detail" />
         </div>
       </div>
 
       <div class="header-right">
-        <slot name="header-right"></slot>
+        <slot name="header-right" />
       </div>
     </header>
 
     <aside class="sideleft">
-      <slot name="sideleft"></slot>
+      <slot name="sideleft" />
     </aside>
 
     <main class="main">
-      <slot name="main"></slot>
+      <slot name="main" />
     </main>
 
     <div class="sideright">
-      <slot name="sideright"></slot>
+      <slot name="sideright" />
     </div>
   </div>
 </template>
 
 <script setup>
 // 1. Imports
+import { onMounted, inject } from 'vue'
+
+const EventBus = inject('EventBus')
 
 // 2. Composables
 
@@ -48,6 +50,13 @@
 // 6. Watchers
 
 // 7. Events & Lifecycle Hooks
+onMounted(() => {
+  document.addEventListener('wheel', handleDisableAutoRolagem, { passive: true })
+  document.addEventListener('touchmove', handleDisableAutoRolagem, { passive: true })
+})
+const handleDisableAutoRolagem = (event) => {
+  EventBus.emit('disable-auto-rolagem')
+}
 
 // 8. Functions
 </script>

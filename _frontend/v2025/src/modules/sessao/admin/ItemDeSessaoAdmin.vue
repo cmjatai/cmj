@@ -11,7 +11,9 @@
         aria-label="Edição"
       >
         <a
-          :href="item.link_detail_backend"
+          :href="item.__label__ === 'sessao_ordemdia'
+            ? `/sessao/${item.sessao_plenaria}/ordemdia#id${item.materia}`
+            : `/sessao/${item.sessao_plenaria}/expedientemateria#id${item.materia}`"
           target="_blank"
           :class="['btn', `btn-outline-secondary`]"
         >

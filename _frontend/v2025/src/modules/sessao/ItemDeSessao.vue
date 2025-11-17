@@ -4,12 +4,13 @@
     :class="['item-de-sessao', item.__label__, parent ? 'child-item' : 'parent-item']"
   >
     <div
-      @click.self="userIsAdminSessao ? focusOnTop() : null"
+      @click.self="focusOnTop"
       :id="`item-content-${item.__label__}-${item.id}`"
       :class="[
         'item-content',
         item.votacao_aberta && item.tipo_votacao === 2 ? 'votacao-nominal' : '',
-        userIsAdminSessao ? 'item-admin' : ''
+        userIsAdminSessao ? 'item-admin' : '',
+        userIsAdminSessao && possuiRegistroVotacao.length > 0 ? `possui-registro-votacao-${possuiRegistroVotacao.length}` : ''
       ]"
     >
       <ItemDeSessaoAdmin
@@ -25,7 +26,7 @@
         @resync="emit('resync')"
       />
       <MateriaEmPauta
-        @click.self="userIsAdminSessao ? focusOnTop() : null"
+        @click.self="focusOnTop"
         :key="`mp-${item.__label__}-${item.id}`"
         :materia-id="item.materia"
         :item="item"
@@ -103,6 +104,13 @@ const focusOnTop = () => {
   }
 }
 
+const possuiRegistroVotacao = computed(() => {
+  const field = props.item.__label__ === 'sessao_ordemdia' ? 'ordem' : 'expediente'
+  return Object.values(syncStore.data_cache?.sessao_registrovotacao || {}).filter(
+    rv => rv[field] === props.item.id
+  )
+})
+
 </script>
 
 <style lang="scss">
@@ -127,14 +135,37 @@ const focusOnTop = () => {
     }
     &.item-admin {
       min-height: calc(70vh);
+      transition: all 0.3s ease;
+      &.possui-registro-votacao-1, &.possui-registro-votacao-2, &.possui-registro-votacao-3 {
+        background-color: #4bc56633;
+        min-height: auto;
+        zoom: 0.8;
+      }
+      &.possui-registro-votacao-2 {
+        zoom: 0.7;
+        .materia-em-pauta {
+          .inner-materia {
+            // display: none;
+          }
+        }
+      }
+      &.possui-registro-votacao-3 {
+        zoom: 0.333;
+      }
     }
   }
   &.sessao_expedientemateria {
     z-index: 1;
     background-color: var(--cmj-expmat-background-color);
-    .item-content {
+    & > .item-content {
+      min-height: auto;
+    }
+    &.item-admin {
       &:hover {
         background-color: var(--cmj-expmat-background-color-hover);
+        &.possui-registro-votacao {
+          background-color: #4bc56633;
+        }
       }
     }
     &::before {
@@ -155,6 +186,9 @@ const focusOnTop = () => {
     & > .item-content {
       &:hover {
         background-color: var(--cmj-ordemdia-background-color-hover);
+        &.possui-registro-votacao {
+          background-color: #4bc56633;
+        }
       }
     }
     &::before {
