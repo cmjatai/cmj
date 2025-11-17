@@ -3,24 +3,51 @@
     :id="`vp-${item.__label__}-${item.id}`"
     :class="['voto-parlamentar']"
   >
-    <div class="inner-voto">
-      <button type="button" class="btn btn-lg btn-success" @click="sendVoto('Sim')">SIM</button>
-      <button type="button" class="btn btn-lg btn-danger" @click="sendVoto('Não')">NÃO</button>
-      <button type="button" class="btn btn-lg btn-warning" @click="sendVoto('Abstenção')">Abstenção</button>
+    <div class="inner-title text-light m-4">
+      <span>{{ materia?.__str__ }}</span>
     </div>
-    <div class="voto-result" v-if="voto">
+    <div class="inner-voto">
+      <button
+        type="button"
+        class="btn btn-lg btn-success"
+        @click="sendVoto('Sim')"
+      >
+        SIM
+      </button>
+      <button
+        type="button"
+        class="btn btn-lg btn-danger"
+        @click="sendVoto('Não')"
+      >
+        NÃO
+      </button>
+      <button
+        type="button"
+        class="btn btn-lg btn-warning"
+        @click="sendVoto('Abstenção')"
+      >
+        Abstenção
+      </button>
+    </div>
+    <div
+      class="voto-result"
+      v-if="voto"
+    >
       <div class="avatar">
         <img
           :src="`/api/parlamentares/parlamentar/${authStore.data_connect.user.votante.parlamentar_id}/fotografia.c256.png`"
           :alt="authStore.data_connect.user.votante.nome_parlamentar"
           :title="authStore.data_connect.user.votante.nome_parlamentar"
-        />
+        >
       </div>
       <div class="voto-computado">
         Voto Computado: <strong>{{ voto.voto }}</strong>
       </div>
     </div>
-    <div class="voto-result" v-else>
+    <div
+      class="voto-result"
+      v-else
+    >
       Voto não Computado
     </div>
   </div>
@@ -44,6 +71,14 @@ const props = defineProps({
     type: Object,
     required: true
   }
+})
+
+const materia = computed(() => {
+  const materias = Object.values(
+    syncStore.data_cache?.materia_materialegislativa || {}).filter(
+    m => m.id === props.item.materia
+  )
+  return materias.length > 0 ? materias[0] : null
 })
 
 const voto = computed(() => {

@@ -181,77 +181,82 @@ const handleResync = (force_fetch_materias = true) => {
           force_fetch: force_fetch_materias
         }
       )
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'sessao',
-          model: 'tiporesultadovotacao',
-          params: {
-            get_all: 'True'
-          }
-        })
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'registroleitura',
+        params: {
+          materia__in: Array.from(materiasDaSessao),
+          get_all: 'True'
+        }
       })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'sessao',
-          model: 'registroleitura',
-          params: {
-            materia__in: Array.from(materiasDaSessao),
-            get_all: 'True'
-          }
-        })
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'registrovotacao',
+        params: {
+          materia__in: Array.from(materiasDaSessao),
+          get_all: 'True',
+          expand: 'tipo_resultado_votacao'
+        }
       })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'sessao',
-          model: 'registrovotacao',
-          params: {
-            materia__in: Array.from(materiasDaSessao),
-            get_all: 'True',
-            expand: 'tipo_resultado_votacao'
-          }
-        })
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'votoparlamentar',
+        params: {
+          ordem__in: Array.from(ordemDiasIds),
+          get_all: 'True'
+        }
       })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'sessao',
-          model: 'votoparlamentar',
-          params: {
-            ordem__in: Array.from(ordemDiasIds),
-            get_all: 'True'
-          }
-        })
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'votoparlamentar',
+        params: {
+          expediente__in: Array.from(expedientesIds),
+          get_all: 'True'
+        }
       })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'sessao',
-          model: 'votoparlamentar',
-          params: {
-            expediente__in: Array.from(expedientesIds),
-            get_all: 'True'
-          }
-        })
+      syncStore.fetchSync({
+        app: 'materia',
+        model: 'documentoacessorio',
+        params: {
+          materia__in: Array.from(materiasDaSessao),
+          exclude: 'metadata',
+          get_all: 'True'
+        }
       })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'materia',
-          model: 'documentoacessorio',
-          params: {
-            materia__in: Array.from(materiasDaSessao),
-            exclude: 'metadata',
-            get_all: 'True'
-          }
-        })
+      syncStore.fetchSync({
+        app: 'norma',
+        model: 'legislacaocitada',
+        params: {
+          materia__in: Array.from(materiasDaSessao),
+          exclude: 'metadata',
+          get_all: 'True'
+        }
       })
-      .then(() => {
-        return syncStore.fetchSync({
-          app: 'norma',
-          model: 'legislacaocitada',
-          params: {
-            materia__in: Array.from(materiasDaSessao),
-            exclude: 'metadata',
-            get_all: 'True'
-          }
-        })
+
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'tiporesultadovotacao',
+        params: {
+          get_all: 'True'
+        }
+      })
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'sessaoplenariapresenca',
+        params: {
+          get_all: 'True',
+          sessao_plenaria: sessaoId.value,
+          expand: 'parlamentar'
+        }
+      })
+      syncStore.fetchSync({
+        app: 'sessao',
+        model: 'presencaordemdia',
+        params: {
+          get_all: 'True',
+          sessao_plenaria: sessaoId.value,
+          expand: 'parlamentar'
+        }
       })
     }
   })

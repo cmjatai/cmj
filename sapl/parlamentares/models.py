@@ -377,7 +377,7 @@ class Parlamentar(models.Model):
         db_index=True,
         default=False,
         choices=YES_NO_CHOICES,
-        verbose_name=_('Ativo na Casa?')) 
+        verbose_name=_('Ativo na Casa?'))
     equipe = models.TextField(
         blank=True, verbose_name=_('Equipe do Parlamentar'), default='')
     biografia = models.TextField(
@@ -640,6 +640,8 @@ class CargoMesa(models.Model):
         max_length=50, verbose_name=_('Cargo na Mesa'))
     unico = models.BooleanField(
         choices=YES_NO_CHOICES, verbose_name=_('Cargo Único'), default=True)
+    presidente = models.BooleanField(
+        choices=YES_NO_CHOICES, verbose_name=_('Cargo de Presidente'), default=False)
 
     class Meta:
         verbose_name = _('Cargo na Mesa')

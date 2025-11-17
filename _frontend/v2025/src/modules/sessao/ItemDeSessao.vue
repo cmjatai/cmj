@@ -1,8 +1,17 @@
 <template>
   <div
     :id="`is-${item.__label__}-${item.id}`"
-    :class="['item-de-sessao', item.__label__, parent ? 'child-item' : 'parent-item']">
-    <div :class="['item-content', item.votacao_aberta && item.tipo_votacao === 2 ? 'votacao-nominal' : '']" >
+    :class="['item-de-sessao', item.__label__, parent ? 'child-item' : 'parent-item']"
+  >
+    <div
+      @click.self="userIsAdminSessao ? focusOnTop() : null"
+      :id="`item-content-${item.__label__}-${item.id}`"
+      :class="[
+        'item-content',
+        item.votacao_aberta && item.tipo_votacao === 2 ? 'votacao-nominal' : '',
+        userIsAdminSessao ? 'item-admin' : ''
+      ]"
+    >
       <ItemDeSessaoAdmin
         :key="`is-admin-${item.__label__}-${item.id}`"
         :item="item"
@@ -16,6 +25,7 @@
         @resync="emit('resync')"
       />
       <MateriaEmPauta
+        @click.self="userIsAdminSessao ? focusOnTop() : null"
         :key="`mp-${item.__label__}-${item.id}`"
         :materia-id="item.materia"
         :item="item"
@@ -44,6 +54,7 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
+import { useAuthStore } from '~@/stores/AuthStore'
 import ItemDeSessao from './ItemDeSessao.vue'
 import MateriaEmPauta from './MateriaEmPauta.vue'
 import ControleDeVotacao from './votacao/ControleDeVotacao.vue'
@@ -51,6 +62,7 @@ import ItemDeSessaoAdmin from './admin/ItemDeSessaoAdmin.vue'
 import { computed } from 'vue'
 
 const syncStore = useSyncStore()
+const authStore = useAuthStore()
 
 const emit = defineEmits(['resync'])
 
@@ -70,6 +82,10 @@ const props = defineProps({
   }
 })
 
+const userIsAdminSessao = computed(() => {
+  return authStore.hasPermission('sessao.add_sessaoplenaria')
+})
+
 const childs = computed(() => {
   const allItems = syncStore.data_cache?.[props.item.__label__] || {}
   const childItems = Object.values(allItems).filter(
@@ -80,11 +96,28 @@ const childs = computed(() => {
   return childItems
 })
 
+const focusOnTop = () => {
+  const element = document.getElementById(`item-content-${props.item.__label__}-${props.item.id}`)
+  if (element) {
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}
+
 </script>
 
 <style lang="scss">
 .item-de-sessao {
   position: relative;
+  .item-de-sessao-admin {
+    .btn {
+      opacity: 0.2;
+    }
+  }
+  &:hover .item-de-sessao-admin {
+    .btn {
+      opacity: 1;
+    }
+  }
   .item-content {
     position: relative;
     padding: 0.5em;
@@ -92,17 +125,8 @@ const childs = computed(() => {
     &.votacao-nominal {
       min-height: 60vh;
     }
-    .item-de-sessao-admin {
-      .btn {
-        opacity: 0.2;
-      }
-    }
-    &:hover .item-de-sessao-admin {
-
-      .btn {
-        opacity: 1;
-      }
-
+    &.item-admin {
+      min-height: calc(70vh);
     }
   }
   &.sessao_expedientemateria {

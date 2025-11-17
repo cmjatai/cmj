@@ -38,12 +38,8 @@ class AppVersionView(APIView):
             content['is_authenticated'] = True
             content['permissions'] = sorted(request.user.get_all_permissions())
 
-            user = {
-                'id': request.user.id,
-                'username': request.user.username,
-                'fullname': request.user.get_full_name(),
-
-                'avatar': get_static('img/perfil.jpg') if not request.user.avatar else
+            try:
+                avatar = get_static('img/perfil.jpg') if not request.user.avatar else \
                 get_backend().get_thumbnail_url(
                     request.user.avatar,
                     {
@@ -52,6 +48,15 @@ class AppVersionView(APIView):
                         'crop': True,
                         'detail': True,
                     })
+            except:
+                avatar = get_static('img/perfil.jpg')
+
+            user = {
+                'id': request.user.id,
+                'username': request.user.username,
+                'fullname': request.user.get_full_name(),
+
+                'avatar': avatar
 
             }
             votante = request.user.votante.first()
