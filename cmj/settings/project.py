@@ -74,18 +74,18 @@ DATABASES = {
 
 if DEBUG and FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
     host = DATABASES['default']['HOST']
-    DATABASES['default']['HOST'] = 'localhost' if host == 'cmjdb' else host
+    DATABASES['default']['HOST'] = 'localhost' if host == 'sapldb' else host
 
 PORTALCMJ_VERSION = 'master'
 
 
 USE_SOLR = True
-SOLR_URL = 'http://solr:solr@cmjsolr:8983'
+SOLR_URL = 'http://solr:solr@saplsolr:8983'
 SOLR_COLLECTION = 'portalcmj_cmj'
 HAYSTACK_SIGNAL_PROCESSOR = 'cmj.haystack.CelerySignalProcessor'
 CELERY_HAYSTACK_DEFAULT_TASK = 'celery_haystack.tasks.haystack_signal'
 
-REDIS_HOST = config('REDIS_HOST', cast=str, default='cmjredis')
+REDIS_HOST = config('REDIS_HOST', cast=str, default='saplredis')
 REDIS_PORT = config('REDIS_PORT', cast=int, default=6379)
 
 if DEBUG:
