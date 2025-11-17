@@ -481,7 +481,7 @@
       padding: 11px 10px 100px 10px;
       right: 12px;
       left: 12px;
-      display: none;
+      // display: none;
       .row {
         margin: -8px;
         .col-md {
@@ -548,14 +548,14 @@
         }
       }
     }
-    &:hover {
+    /*&:hover {
       .popup-sic {
         display: block;
         .inner {
           //z-index: 9000;
         }
       }
-    }
+    }*/
     .item-sic {
       position: relative;
       a {
@@ -614,7 +614,7 @@
   li {
     line-height: 1.35em;
   }
-  :hover {
+  /* &:hover {
     .link-e-sic {
       &::before {
         content: '';
@@ -628,7 +628,7 @@
         top: 100%;
       }
     }
-  }
+  } */
 }
 
 .dropdown-menu {
