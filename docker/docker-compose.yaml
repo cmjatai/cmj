@@ -39,8 +39,8 @@ services:
       PGDATA : /var/lib/postgresql/data/
     volumes:
       - sapldb_data:/var/lib/postgresql/data/
-    ports:
-      - "5432:5432"
+    #ports:
+    #  - "5432:5432"
     networks:
       - sapl-net
   sapl:
@@ -70,7 +70,7 @@ services:
     ports:
       - "8003:80"
     networks:
-      - cmj-net
+      - sapl-net
 networks:
   sapl-net:
     name: sapl-net
