@@ -1,70 +1,70 @@
 {
-  "_TeleportStore-DKF_Oftu.js": {
-    "file": "v2025/TeleportStore-DKF_Oftu.js",
+  "_TeleportStore-Bh1gAPJF.js": {
+    "file": "v2025/TeleportStore-Bh1gAPJF.js",
     "name": "TeleportStore",
     "imports": [
-      "_vendor-ErNexbHM.js"
-    ]
-  },
-  "_WidgetCronometroBase-BLeUgrjw.js": {
-    "file": "v2025/WidgetCronometroBase-BLeUgrjw.js",
-    "name": "WidgetCronometroBase",
-    "imports": [
-      "_vendor-ErNexbHM.js",
-      "main.js"
-    ],
-    "css": [
-      "v2025/WidgetCronometroBase-CQansepn.css"
+      "_vendor-DS7HDf1G.js"
     ]
   },
   "_WidgetCronometroBase-CQansepn.css": {
     "file": "v2025/WidgetCronometroBase-CQansepn.css",
     "src": "_WidgetCronometroBase-CQansepn.css"
   },
-  "_vendor-ErNexbHM.js": {
-    "file": "v2025/vendor-ErNexbHM.js",
+  "_WidgetCronometroBase-DyJMN8op.js": {
+    "file": "v2025/WidgetCronometroBase-DyJMN8op.js",
+    "name": "WidgetCronometroBase",
+    "imports": [
+      "_vendor-DS7HDf1G.js",
+      "main.js"
+    ],
+    "css": [
+      "v2025/WidgetCronometroBase-CQansepn.css"
+    ]
+  },
+  "_vendor-DS7HDf1G.js": {
+    "file": "v2025/vendor-DS7HDf1G.js",
     "name": "vendor"
   },
-  "_vendor_fortawesome-CwIs9nVh.js": {
-    "file": "v2025/vendor_fortawesome-CwIs9nVh.js",
+  "_vendor_fortawesome-DURsxqHa.js": {
+    "file": "v2025/vendor_fortawesome-DURsxqHa.js",
     "name": "vendor_fortawesome",
     "imports": [
-      "_vendor-ErNexbHM.js"
+      "_vendor-DS7HDf1G.js"
     ]
   },
   "components/atoms/Alert.vue": {
-    "file": "v2025/Alert-DDqwPyfe.js",
+    "file": "v2025/Alert-BM3OeBom.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v2025/RefreshPage-DDNK0UnO.js",
+    "file": "v2025/RefreshPage-s_eoNpu2.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/RefreshPage-B_wMuza3.css"
     ]
   },
   "main.js": {
-    "file": "v2025/main-BwcXmuav.js",
+    "file": "v2025/main-CRV0YJDP.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor-DS7HDf1G.js",
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "dynamicImports": [
       "modules/root/RootPage.vue",
@@ -88,223 +88,223 @@
       "modules/painelset/widgets/painelset/WidgetStatusEventoSessao.vue"
     ],
     "css": [
-      "v2025/main-CWZ9MUND.css"
+      "v2025/main-CDQKTF3l.css"
     ]
   },
   "modules/painelset/PainelSetModule.vue": {
-    "file": "v2025/PainelSetModule-B73ACkID.js",
+    "file": "v2025/PainelSetModule-CW-QZ7lC.js",
     "name": "PainelSetModule",
     "src": "modules/painelset/PainelSetModule.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
-      "_TeleportStore-DKF_Oftu.js",
+      "_vendor-DS7HDf1G.js",
+      "_TeleportStore-Bh1gAPJF.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/PainelSetModule-BxeZ6TqG.css"
     ]
   },
   "modules/painelset/painel/Painel.vue": {
-    "file": "v2025/Painel-CrB7E86e.js",
+    "file": "v2025/Painel-DoCUVI66.js",
     "name": "Painel",
     "src": "modules/painelset/painel/Painel.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_TeleportStore-DKF_Oftu.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_TeleportStore-Bh1gAPJF.js",
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/Painel-DkJv0J9u.css"
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue": {
-    "file": "v2025/WidgetCronometroEvento-uN1FLz94.js",
+    "file": "v2025/WidgetCronometroEvento-BG7GzKeg.js",
     "name": "WidgetCronometroEvento",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_WidgetCronometroBase-BLeUgrjw.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_WidgetCronometroBase-DyJMN8op.js",
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetCronometroEvento-D_hNK2nh.css"
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue": {
-    "file": "v2025/WidgetCronometroPalavra-CBnPipda.js",
+    "file": "v2025/WidgetCronometroPalavra-DfiOqXJZ.js",
     "name": "WidgetCronometroPalavra",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_WidgetCronometroBase-BLeUgrjw.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_WidgetCronometroBase-DyJMN8op.js",
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetCronometroPalavra-uC7uPw5i.css"
     ]
   },
   "modules/painelset/widgets/painelset/WidgetStatusEventoSessao.vue": {
-    "file": "v2025/WidgetStatusEventoSessao-DXyGokTc.js",
+    "file": "v2025/WidgetStatusEventoSessao-CEuBPuwC.js",
     "name": "WidgetStatusEventoSessao",
     "src": "modules/painelset/widgets/painelset/WidgetStatusEventoSessao.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_WidgetCronometroBase-BLeUgrjw.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_WidgetCronometroBase-DyJMN8op.js",
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetStatusEventoSessao-CxnUuUDJ.css"
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoItemEmPauta.vue": {
-    "file": "v2025/WidgetSessaoItemEmPauta-CykYVXBF.js",
+    "file": "v2025/WidgetSessaoItemEmPauta-CO5XpzEP.js",
     "name": "WidgetSessaoItemEmPauta",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoItemEmPauta.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetSessaoItemEmPauta-D6nYg6vo.css"
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoPlenariaStatus.vue": {
-    "file": "v2025/WidgetSessaoPlenariaStatus-ZdOZYVay.js",
+    "file": "v2025/WidgetSessaoPlenariaStatus-1LBECO6T.js",
     "name": "WidgetSessaoPlenariaStatus",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoPlenariaStatus.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetSessaoPlenariaStatus-CQvOD-Re.css"
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoRegistroPresenca.vue": {
-    "file": "v2025/WidgetSessaoRegistroPresenca-Cy8WZW1b.js",
+    "file": "v2025/WidgetSessaoRegistroPresenca-CMQR58By.js",
     "name": "WidgetSessaoRegistroPresenca",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoRegistroPresenca.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetSessaoRegistroPresenca-DlmhN3Wj.css"
     ]
   },
   "modules/painelset/widgets/utils/WidgetHtmlCode.vue": {
-    "file": "v2025/WidgetHtmlCode-DGCnU9Rs.js",
+    "file": "v2025/WidgetHtmlCode-DKuLYJf0.js",
     "name": "WidgetHtmlCode",
     "src": "modules/painelset/widgets/utils/WidgetHtmlCode.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetHtmlCode-C8Lp_3xD.css"
     ]
   },
   "modules/painelset/widgets/utils/WidgetYoutubeEmbed.vue": {
-    "file": "v2025/WidgetYoutubeEmbed-CazXfJuy.js",
+    "file": "v2025/WidgetYoutubeEmbed-CwbwlA2h.js",
     "name": "WidgetYoutubeEmbed",
     "src": "modules/painelset/widgets/utils/WidgetYoutubeEmbed.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/WidgetYoutubeEmbed-BENL6IfN.css"
     ]
   },
   "modules/root/RootPage.vue": {
-    "file": "v2025/RootPage-yVp6-mah.js",
+    "file": "v2025/RootPage-Ds51o6pH.js",
     "name": "RootPage",
     "src": "modules/root/RootPage.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
-      "v2025/RootPage-DMQAHdOt.css"
+      "v2025/RootPage-DE8bKbvp.css"
     ]
   },
   "modules/sessao/SessaoPlenariaList.vue": {
-    "file": "v2025/SessaoPlenariaList-Ct2_HGV-.js",
+    "file": "v2025/SessaoPlenariaList-B2sml4RM.js",
     "name": "SessaoPlenariaList",
     "src": "modules/sessao/SessaoPlenariaList.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
-      "v2025/SessaoPlenariaList-DqyLQ4cA.css"
+      "v2025/SessaoPlenariaList-BSekKtGz.css"
     ]
   },
   "modules/sessao/SessaoPlenariaModule.vue": {
-    "file": "v2025/SessaoPlenariaModule-Ch5D0tDC.js",
+    "file": "v2025/SessaoPlenariaModule-Cy7xS9-e.js",
     "name": "SessaoPlenariaModule",
     "src": "modules/sessao/SessaoPlenariaModule.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
-      "_WidgetCronometroBase-BLeUgrjw.js",
+      "_vendor-DS7HDf1G.js",
+      "_WidgetCronometroBase-DyJMN8op.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
       "v2025/SessaoPlenariaModule-C9D5G5DG.css"
     ]
   },
   "modules/sessao/SessaoPlenariaView.vue": {
-    "file": "v2025/SessaoPlenariaView-BK5NjwzJ.js",
+    "file": "v2025/SessaoPlenariaView-k5sNu-Oy.js",
     "name": "SessaoPlenariaView",
     "src": "modules/sessao/SessaoPlenariaView.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
-      "v2025/SessaoPlenariaView-DCrKv8j7.css"
+      "v2025/SessaoPlenariaView-DFEm_LJr.css"
     ]
   },
   "views/Error404.vue": {
-    "file": "v2025/Error404-ZAjLH9li.js",
+    "file": "v2025/Error404-DPmIOk_C.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ErNexbHM.js",
+      "_vendor-DS7HDf1G.js",
       "main.js",
-      "_vendor_fortawesome-CwIs9nVh.js"
+      "_vendor_fortawesome-DURsxqHa.js"
     ],
     "css": [
-      "v2025/Error404-CMxScCzn.css"
+      "v2025/Error404-C8N9Nvtx.css"
     ]
   }
 }
