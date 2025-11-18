@@ -15,11 +15,13 @@
       </div>
       <div class="protocolo-data-autoria">
         <div class="protocolo-data">
-          <span class="protocolo">
+          <div class="protocolo">
             Protocolo:
             <strong>{{ materia.numero_protocolo }}</strong>
-          </span>
-          <span class="data">{{ data_apresentacao }}</span>
+          </div>
+          <div class="data">
+            {{ data_apresentacao }}
+          </div>
         </div>
         <div class="autoria">
           <span
@@ -28,26 +30,21 @@
           >{{ autor.nome }}</span>
         </div>
       </div>
-      <div class="materia-conteudo">
-        <div class="link-file">
-          <a
-            v-if="materia.texto_original"
-            :href="materia.texto_original"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <FontAwesomeIcon icon="file-lines" />
-          </a>
-        </div>
-        <div class="data-header">
-          <div class="detail-header" />
-          <div
-            class="ementa"
-            v-html="materia.ementa"
-          />
-        </div>
+      <div class="link-file">
+        <a
+          v-if="materia.texto_original"
+          :href="materia.texto_original"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <FontAwesomeIcon icon="file-lines" />
+        </a>
       </div>
-      <div class="materia-tramitacao">
+      <div
+        class="ementa"
+        v-html="materia.ementa"
+      />
+      <div class="tramitacao">
         <div class="status">
           <strong>Situação:</strong>&nbsp;
           <span>
@@ -301,26 +298,27 @@ watch( materia, (newVal) => {
     .protocolo-data-autoria {
       display: flex;
       flex-direction: column;
+      line-height: 1.15;
 
       .protocolo-data {
+        display: flex;
         font-size: 0.9em;
+        align-items: center;
         color: var(--bs-secondary);
+        gap: 0.5em;
         .data {
-          margin-left: 1em;
-          padding-left: 1em;
           border-left: 1px solid #777;
+          padding: 0.2em 0 0 0.5em;
         }
       }
-
       .protocolo {
         color: var(--bs-code-color);
         white-space: nowrap;
       }
       .autoria {
         margin-left: 0.5em;
-        padding: 0.3em 0.6em;
-        line-height: 1.15;
-
+        padding: 0.2em 0 0 0.5em;
+        font-size: 0.9em;
         border-left: 1px solid #777;
         font-weight: bold;
         span:not(:last-child)::after {
@@ -329,32 +327,10 @@ watch( materia, (newVal) => {
         }
       }
     }
-
-  }
-}
-.materia-em-pauta__old {
-
-  .materia-conteudo {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-
-    .ementa {
-      font-size: 1.5em;
-      line-height: 1.3;
-      color: #299680;
-      text-align: left;
-    }
-
-    .protocolo-data {
-      display: flex;
-      flex-direction: row;
-      gap: 1em;
-
-    }
     .link-file {
-      font-size: 1.8em;
-      margin-left: -0.5em;
+      float: left;
+      font-size: 1.5em;
+      margin-left: -0.3em;
       a {
         padding: 0.5em;
         display: inline-block;
@@ -364,86 +340,87 @@ watch( materia, (newVal) => {
         }
       }
     }
-    .detail-header {
-      display: flex;
-      flex-direction: column;
-      font-size: 0.9em;
-
+    .ementa {
+      font-size: 1.2em;
+      line-height: 1.3;
+      color: #299680;
+      text-align: left;
     }
-  }
 
-  .rito-text {
-    position: relative;
-    display: inline-block;
-    margin: 0.5em 0;
-    padding: 1em;
-    background-color: var(--bs-body-bg);
-    color: var(--bs-secondary);
-    border: 1px solid var(--bs-border-color);
-    font-family: var(--bs-font-monospace);
-    // white-space: pre-wrap;
-    font-size: 0.9em;
-    p {
-      margin: 0;
-      padding: 0;
-    }
-    &.closed {
-      font-size: 80%;
-      padding: 0.5em 1em 0.5em 0.5em;
-      overflow: hidden;
-      cursor: pointer;
-      opacity: 0.8;
-      &::after {
-        content: " ▼";
+    .tramitacao {
+      line-height: 1.2;
+      margin-top: 0.5em;
+      position: relative;
+      padding: 0.5em 0 0 0;
+      color: var(--bs-secondary);
+      &::before {
+        content: " ";
         position: absolute;
-        bottom: 0.8em;
-        right: 0.5em;
-        font-size: 0.8em;
-        color: var(--bs-secondary);
+        top: 0;
+        border-top: 1px solid var(--bs-border-color-translucent);
+        width: 10em;
+        height: 1px;
       }
     }
-  }
-
-  .legislacao-citada, .documentos-acessorios {
-    .title {
-      color: var(--bs-primary);
+    .rito-text {
+      position: relative;
+      display: inline-block;
+      margin: 0.5em 0;
+      padding: 0.5em;
+      background-color: var(--bs-body-bg);
+      color: var(--bs-secondary);
+      border: 1px solid var(--bs-border-color);
+      font-family: var(--bs-font-monospace);
+      // white-space: pre-wrap;
+      font-size: 0.9em;
+      p {
+        margin: 0;
+        padding: 0;
+      }
+      &.closed {
+        font-size: 80%;
+        padding: 0.5em 1em 0.5em 0.5em;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.8;
+        &::after {
+          content: " ▼";
+          position: absolute;
+          bottom: 0.8em;
+          right: 0.5em;
+          font-size: 0.8em;
+          color: var(--bs-secondary);
+        }
+      }
     }
-    ul {
-      list-style-type: disc;
-      margin: 0
+    .legislacao-citada, .documentos-acessorios {
+      .title {
+        color: var(--bs-primary);
+      }
+      ul {
+        list-style-type: disc;
+        margin: 0
+      }
     }
-  }
-  .doc-acessorio-item, .leg-citada-item {
-    padding: 0.5em 0;
-  }
-
-  .tramitacao {
-    line-height: 1.15;
-    margin-top: 0.5em;
-    position: relative;
-    padding: 0.5em 0 0 0;
-    color: var(--bs-secondary);
-    &::before {
-      content: " ";
-      position: absolute;
-      top: 0;
-      border-top: 1px solid var(--bs-border-color-translucent);
-      width: 10em;
-      height: 1px;
+    .doc-acessorio-item, .leg-citada-item {
+      padding: 0.5em 0;
     }
   }
 }
+
 @media screen and (min-width: 768px) {
   .materia-em-pauta {
-    .materia-epigrafe {
-      font-size: 1.2em;
-    }
-    .materia-conteudo {
-      .data-header {
-        .detail-header {
-          flex-direction: row;
-          align-items: center;
-        }
+    .inner-materia {
+      .epigrafe {
+        font-size: 1.2em;
+      }
+      .protocolo-data-autoria {
+        flex-direction: row;
+        align-items: center;
+      }
+      .ementa {
+        font-size: 1.5em;
+        padding: 0.3em 0;
       }
     }
   }

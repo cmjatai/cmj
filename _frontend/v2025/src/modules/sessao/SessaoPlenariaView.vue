@@ -289,7 +289,6 @@ const handleResync = (force_fetch_materias = true) => {
     font-size: 0.8em;
     border: 0;
     * {
-      margin: 0;
       line-height: 1.3;
     }
     &.closed {
