@@ -284,7 +284,7 @@ const handleResync = (force_fetch_materias = true) => {
     background-color: var(--bs-body-bg);
     color: var(--bs-secondary);
     font-family: var(--bs-font-monospace);
-    white-space: pre-wrap;
+    // white-space: pre-wrap;
     line-height: 1.3;
     font-size: 0.8em;
     border: 0;

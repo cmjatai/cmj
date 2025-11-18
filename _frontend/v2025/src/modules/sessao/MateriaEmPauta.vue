@@ -3,16 +3,31 @@
     :id="`mp-${item.__label__}-${item.id}`"
     class="materia-em-pauta"
   >
-    <div class="materia-epigrafe">
-      <a
-        :href="materia.link_detail_backend"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {{ materia.__str__ }}
-      </a>
-    </div>
     <div class="inner-materia">
+      <div class="epigrafe">
+        <a
+          :href="materia.link_detail_backend"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ materia.__str__ }}
+        </a>
+      </div>
+      <div class="protocolo-data-autoria">
+        <div class="protocolo-data">
+          <span class="protocolo">
+            Protocolo:
+            <strong>{{ materia.numero_protocolo }}</strong>
+          </span>
+          <span class="data">{{ data_apresentacao }}</span>
+        </div>
+        <div class="autoria">
+          <span
+            v-for="(autor, key) in autores"
+            :key="`au${key}`"
+          >{{ autor.nome }}</span>
+        </div>
+      </div>
       <div class="materia-conteudo">
         <div class="link-file">
           <a
@@ -25,28 +40,14 @@
           </a>
         </div>
         <div class="data-header">
-          <div class="detail-header">
-            <div class="protocolo-data">
-              <span class="protocolo">
-                Protocolo:
-                <strong>{{ materia.numero_protocolo }}</strong>
-              </span>
-              <span class="data">{{ data_apresentacao }}</span>
-            </div>
-            <div class="autoria">
-              <span
-                v-for="(autor, key) in autores"
-                :key="`au${key}`"
-              >{{ autor.nome }}</span>
-            </div>
-          </div>
+          <div class="detail-header" />
           <div
             class="ementa"
             v-html="materia.ementa"
           />
         </div>
       </div>
-      <div class="tramitacao">
+      <div class="materia-tramitacao">
         <div class="status">
           <strong>Situação:</strong>&nbsp;
           <span>
@@ -66,8 +67,13 @@
         v-html="ritoOpened ? observacaoHtml : 'Visualizar o Roteiro...'"
       />
 
-      <div class="documentos-acessorios pt-2" v-if="documentosAcessorios.length > 0">
-        <div class="title"><strong>Documentos Acessórios</strong></div>
+      <div
+        class="documentos-acessorios pt-2"
+        v-if="documentosAcessorios.length > 0"
+      >
+        <div class="title">
+          <strong>Documentos Acessórios</strong>
+        </div>
         <ul class="inner-docacess">
           <li
             v-for="doc in documentosAcessorios"
@@ -84,8 +90,13 @@
           </li>
         </ul>
       </div>
-      <div class="legislacao-citada pt-2" v-if="legislacaoCitada.length > 0">
-        <div class="title"><strong>Legislação Citada</strong></div>
+      <div
+        class="legislacao-citada pt-2"
+        v-if="legislacaoCitada.length > 0"
+      >
+        <div class="title">
+          <strong>Legislação Citada</strong>
+        </div>
         <ul class="inner-legcitada">
           <li
             v-for="leg in legislacaoCitada"
@@ -103,7 +114,10 @@
         </ul>
       </div>
     </div>
-    <Teleport v-if="modalLegisCitada" :to="`#modalCmj`">
+    <Teleport
+      v-if="modalLegisCitada"
+      :to="`#modalCmj`"
+    >
       <NormaSimpleModalView
         :html-id="`modal-legis-citada-${modalLegisCitada.id}`"
         :norma-id="modalLegisCitada.norma"
@@ -272,6 +286,92 @@ watch( materia, (newVal) => {
 <style lang="scss">
 .materia-em-pauta {
 
+  .inner-materia {
+    .epigrafe {
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 0.8em;
+      align-items: flex-start;
+      a {
+        display: inline-block
+      }
+    }
+    .protocolo-data-autoria {
+      display: flex;
+      flex-direction: column;
+
+      .protocolo-data {
+        font-size: 0.9em;
+        color: var(--bs-secondary);
+        .data {
+          margin-left: 1em;
+          padding-left: 1em;
+          border-left: 1px solid #777;
+        }
+      }
+
+      .protocolo {
+        color: var(--bs-code-color);
+        white-space: nowrap;
+      }
+      .autoria {
+        margin-left: 0.5em;
+        padding: 0.3em 0.6em;
+        line-height: 1.15;
+
+        border-left: 1px solid #777;
+        font-weight: bold;
+        span:not(:last-child)::after {
+          content: "; ";
+          flex: auto;
+        }
+      }
+    }
+
+  }
+}
+.materia-em-pauta__old {
+
+  .materia-conteudo {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .ementa {
+      font-size: 1.5em;
+      line-height: 1.3;
+      color: #299680;
+      text-align: left;
+    }
+
+    .protocolo-data {
+      display: flex;
+      flex-direction: row;
+      gap: 1em;
+
+    }
+    .link-file {
+      font-size: 1.8em;
+      margin-left: -0.5em;
+      a {
+        padding: 0.5em;
+        display: inline-block;
+        color: var(--bs-link-color);
+        &:hover {
+          color: var(--bs-link-hover-color);
+        }
+      }
+    }
+    .detail-header {
+      display: flex;
+      flex-direction: column;
+      font-size: 0.9em;
+
+    }
+  }
+
   .rito-text {
     position: relative;
     display: inline-block;
@@ -282,7 +382,11 @@ watch( materia, (newVal) => {
     border: 1px solid var(--bs-border-color);
     font-family: var(--bs-font-monospace);
     // white-space: pre-wrap;
-    font-size: 90%;
+    font-size: 0.9em;
+    p {
+      margin: 0;
+      padding: 0;
+    }
     &.closed {
       font-size: 80%;
       padding: 0.5em 1em 0.5em 0.5em;
@@ -313,24 +417,6 @@ watch( materia, (newVal) => {
     padding: 0.5em 0;
   }
 
-  .materia-epigrafe {
-    display: flex;
-    flex-direction: column;
-    font-weight: bold;
-    text-decoration: none;
-    font-size: 1.3em;
-    align-items: flex-start;
-    a {
-      display: inline-block
-    }
-  }
-  .ementa {
-    // margin: 0 0 0.5em 0;
-    font-size: 1.5em;
-    line-height: 1.3;
-    color: #299680;
-    text-align: left;
-  }
   .tramitacao {
     line-height: 1.15;
     margin-top: 0.5em;
@@ -346,55 +432,13 @@ watch( materia, (newVal) => {
       height: 1px;
     }
   }
-  .materia-conteudo {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    .protocolo-data {
-      display: flex;
-      flex-direction: row;
-      gap: 1em;
-      .protocolo {
-        color: var(--bs-code-color);
-        white-space: nowrap;
-      }
-    }
-    .link-file {
-      font-size: 1.8em;
-      margin-left: -0.5em;
-      a {
-        padding: 0.5em;
-        display: inline-block;
-        color: var(--bs-link-color);
-        &:hover {
-          color: var(--bs-link-hover-color);
-        }
-      }
-    }
-    .detail-header {
-      display: flex;
-      flex-direction: column;
-      font-size: 0.9em;
-      .autoria {
-        margin-left: 0.5em;
-        padding: 0.3em 0.6em;
-        line-height: 1.15;
-
-        border-left: 1px solid #777;
-        font-weight: bold;
-        span:not(:last-child)::after {
-          content: "; ";
-          flex: auto;
-        }
-      }
-    }
-  }
 }
 @media screen and (min-width: 768px) {
   .materia-em-pauta {
+    .materia-epigrafe {
+      font-size: 1.2em;
+    }
     .materia-conteudo {
-      .link-file {
-      }
       .data-header {
         .detail-header {
           flex-direction: row;

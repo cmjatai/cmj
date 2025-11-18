@@ -18,7 +18,7 @@
             {{ nome_unidade }}
           </a>
         </td>
-        <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_unidade }}</td>
+        <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_unidade|decimal2str }}</td>
 
         {% for parlamentar in values.parlamentares %}
           {% if not forloop.first %}
@@ -30,7 +30,7 @@
               </a>
             </td>
             <td class="text-right">
-              <small>{{ parlamentar.soma_valor }}</small>
+              <small>{{ parlamentar.soma_valor|decimal2str }}</small>
             </td>
           </tr>
         {% endfor %}

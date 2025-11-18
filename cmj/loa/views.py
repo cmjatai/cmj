@@ -583,23 +583,6 @@ class LoaCrud(Crud):
 
                 soma_geral += el['soma_valor']
 
-
-            for k, v in unidades.items():
-                for el in v['parlamentares']:
-                    el['soma_valor'] = formats.number_format(
-                        el['soma_valor'],
-                        force_grouping=True
-                    )
-                v['soma_unidade'] = formats.number_format(
-                    v['soma_unidade'],
-                    force_grouping=True
-                )
-
-            soma_geral = formats.number_format(
-                soma_geral,
-                force_grouping=True
-            )
-
             context = dict(
                 unidades=unidades.items(),
                 soma_geral=soma_geral,
@@ -643,23 +626,6 @@ class LoaCrud(Crud):
                 entidades[el['entidade__nome_fantasia']]['soma_entidade'] += el['soma_valor']
 
                 soma_geral += el['soma_valor']
-
-
-            for k, v in entidades.items():
-                for el in v['parlamentares']:
-                    el['soma_valor'] = formats.number_format(
-                        el['soma_valor'],
-                        force_grouping=True
-                    )
-                v['soma_entidade'] = formats.number_format(
-                    v['soma_entidade'],
-                    force_grouping=True
-                )
-
-            soma_geral = formats.number_format(
-                soma_geral,
-                force_grouping=True
-            )
 
             context = dict(
                 entidades=entidades.items(),

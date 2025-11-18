@@ -14,11 +14,11 @@
       {% endif %}
       {% if forloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
         <td class="text-left" rowspan="{{ values.parlamentares|length }}">
-          <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?finalidade={{ nome_entidade }}">
+          <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?finalidade={{ nome_entidade }}" class="nome-entidade">
             {{ nome_entidade }}
           </a>
         </td>
-        <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_entidade }}</td>
+        <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_entidade|decimal2str }}</td>
 
         {% for parlamentar in values.parlamentares %}
           {% if not forloop.first %}
@@ -30,7 +30,7 @@
               </a>
             </td>
             <td class="text-right">
-              <small>{{ parlamentar.soma_valor }}</small>
+              <small>{{ parlamentar.soma_valor|decimal2str }}</small>
             </td>
           </tr>
         {% endfor %}
@@ -38,7 +38,7 @@
         <tr>
           <td>Total Geral</td>
           <td>
-            {{ soma_geral }}
+            {{ soma_geral|decimal2str }}
           </td>
           <td></td>
           <td></td>
@@ -59,6 +59,9 @@
       background-color: #eeeeee !important;
       &:hover {
         background-color: #eeeeee !important;
+      }
+      .nome-entidade {
+
       }
     }
   }

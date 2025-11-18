@@ -128,7 +128,7 @@ const possuiRegistroVotacao = computed(() => {
   }
   .item-content {
     position: relative;
-    padding: 2em 0.5em;
+    padding: 1.5em 0.5em;
     padding-bottom: 1.5em;
     &.votacao-nominal {
       min-height: 60vh;
