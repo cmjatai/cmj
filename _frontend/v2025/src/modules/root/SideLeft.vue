@@ -1,9 +1,8 @@
 <template>
   <div
-    class="offcanvas offcanvas-start d-lg-none"
+    class="offcanvas offcanvas-sidebar offcanvas-start d-lg-none"
     tabindex="-1"
     id="menuSideLeft"
-
     aria-labelledby="menuSideLeftLabel"
   >
     <div class="offcanvas-header">
@@ -24,7 +23,27 @@
           v-for="link in linksAtivos"
           :key="link.texto"
         >
+          <a
+            v-if="link.link"
+            :href="link.link"
+            class="nav-link"
+          >
+            <b-img
+              v-if="link.image"
+              :src="link.image"
+              fluid
+              rounded="0"
+              class=""
+            />
+            <FontAwesomeIcon
+              v-else-if="link.icon"
+              :icon="link.icon"
+              class=""
+            />
+            <span class="sidebar-label">{{ link.texto }}</span>
+          </a>
           <router-link
+            v-else-if="link.route"
             :to="{ name: link.route }"
             class="nav-link"
             @click="closeOffCanvas('#menuSideLeft')"
@@ -193,6 +212,7 @@ const closeOffCanvas = (selector) => {
     offcanvasInstance.hide()
 }
 </script>
+
 <style lang="scss">
   .sidebar {
     position: fixed;
@@ -202,6 +222,7 @@ const closeOffCanvas = (selector) => {
     border-right: 1px solid var(--bs-border-color-translucent);
     bottom: 0;
     z-index: 2;
+
     .toggle-btn {
       cursor: pointer;
       padding: 0.5em;
@@ -211,6 +232,12 @@ const closeOffCanvas = (selector) => {
         color: var(--nav-text-hover-color);
       }
     }
+  }
+
+  .offcanvas-sidebar {
+  }
+
+  .sidebar, .offcanvas-sidebar {
 
     .nav-item {
       text-align: center;

@@ -64,7 +64,17 @@
     </template>
   </root-layout>
 </template>
-
+<script>
+export default {
+  beforeRouteEnter (to, from, next) {
+    if (to.path === '/v2025' || to.path === '/v2025/') {
+      next('/v2025/sessao')
+    } else {
+      next()
+    }
+  }
+}
+</script>
 <script setup>
 import PortalCmjConnect from '~@/components/PortalCmjConnect.vue'
 import RootLayout from './RootLayout.vue'
@@ -89,6 +99,7 @@ document.addEventListener('fullscreenchange', () => {
 // 6. Watchers
 
 // 7. Events & Lifecycle Hooks
+
 const clickFullscreen = () => {
   fullscreen.value = !fullscreen.value
   if (fullscreen.value) {

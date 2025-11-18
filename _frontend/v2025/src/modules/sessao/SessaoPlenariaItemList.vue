@@ -101,6 +101,13 @@ const date_text = computed(() => {
     margin-bottom: 0px;
   }
 }
+
+[data-bs-theme="dark"] {
+  .sessao-plenaria-item-list {
+    color: var(--bs-link-color);
+  }
+}
+
 @media screen and (max-width: 1199px) {
   .sessao-plenaria-item-list {
     grid-template-columns: auto;

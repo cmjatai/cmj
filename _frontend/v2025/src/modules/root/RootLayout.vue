@@ -62,6 +62,7 @@ const handleDisableAutoRolagem = (event) => {
 </script>
 <style lang="scss">
 body {
+  overflow-x: hidden;
 }
 .root-layout {
   user-select: none;

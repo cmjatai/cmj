@@ -45,14 +45,11 @@ export default {
 </script>
 <style lang="scss">
 .widget-pagination {
-
   position: relative;
-  background-color: rgba(white, 0.2);
   border: 1px #dddddd solid;
   border-radius: 20px;
   cursor: pointer;
   &:hover {
-    background-color: rgba(white, 0.7);
   }
   .arrow {
     display: grid;
@@ -74,11 +71,13 @@ export default {
       z-index: 1;
       position: absolute;
       top: 100%;
+      margin-top: -3px;
       right: 20px;
       display: none;
       padding: 15px 15px 0;
       border: 1px #dddddd solid;
-      background-color: rgba($color: white, $alpha: 0.9);
+      background-color: var(--bs-body-bg);
+      border-color: var(--bs-border-color-translucent);
     }
     &:hover {
       .inner {
