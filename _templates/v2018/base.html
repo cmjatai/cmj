@@ -23,6 +23,16 @@
       {% endif %}
     {% endblock webpack_loader_css %}
     {% block widgets_form_css %}{% endblock widgets_form_css %}
+
+    <style>
+      *::before, *::after {
+        filter: grayscale(100%) contrast(100%);
+      }
+      nav {
+        filter: grayscale(100%);
+      }
+    </style>
+
   </head>
   <body class="{% block body_class %}{% endblock body_class %}">
   {% block root_body %}
