@@ -79,7 +79,15 @@
           </nav>
         {% endblock navigation %}
 
-        <div class="bg-danger text-center text-white">Instância de Homologação e Treinamento</div>
+        <h3 class="bg-danger text-center text-white m-0 p-0">
+          Instância de Homologação e Treinamento<br>
+          <strong>
+            NÃO UTILIZAR PARA FINS OFICIAIS
+          </strong><br>
+        </h3>
+        <a href="https://www.camara.jatai.go.leg.br" class="text-white text-center bg-black d-block p-2">
+          Acesse a versão oficial do Portal da Câmara Municipal de Jataí
+        </a>
 
         {% block canais_diretos %}
           {% include "base_sidebar.html" %}
@@ -207,53 +215,6 @@
       new window.VLibras.Widget('https://vlibras.gov.br/app');
     })
   </script>
-
-  {% if not DEBUG and not perms.materia and not perms.norma and not perms.sessao %}
-
-    {% comment %}
-    <script>
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId      : '{% settings_key_tag 'SOCIAL_AUTH_FACEBOOK_KEY' %}',
-          cookie     : true,
-          xfbml      : true,
-          version    : 'v6.0'
-        });
-
-        FB.AppEvents.logPageView();
-
-        FB.getLoginStatus(function(response) {
-            //// console.debug(response);
-          });
-        };
-
-        (function (d, s, id){
-          var js, fjs = d.getElementsByTagName(s)[0];
-          if (d.getElementById(id)) {return;}
-          js = d.createElement(s); js.id = id;
-          js.src = "https://connect.facebook.net/pt_BR/sdk.js";
-          fjs.parentNode.insertBefore(js, fjs);
-        }(document, 'script', 'facebook-jssdk'));
-    </script>
-    {% endcomment %}
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0E9S41BRSL"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-0E9S41BRSL');
-    </script>
-
-    {% comment %}
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-2431536-7"></script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-2431536-7');
-    {% endcomment %}
-  {% endif %}
   </body>
 </html>
 
