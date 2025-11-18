@@ -68,14 +68,14 @@ const rotateAndEmitResync = () => {
     background-color: var(--bs-body-bg);
     justify-content: space-between;
     margin: 0.5em;
-    padding: 0.2em 0.5em;
+    padding: 0.5em;
     strong {
       font-size: 1.1em;
       color: var(--bs-primary);
     }
   }
   .resync-icon-expmateria {
-    opacity: 0.3;
+    opacity: 0.5;
     transition: opacity 0.3s ease;
     &:hover {
       opacity: 1.0;

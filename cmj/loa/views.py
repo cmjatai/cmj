@@ -469,7 +469,7 @@ class LoaCrud(Crud):
             resumo_emendas_impositivas.sort(
                 key=lambda x: (
                     not x['loaparlamentar'].parlamentar.ativo,
-                    -x[10]['ja_destinado'],
+                    # -x[10]['ja_destinado'],
                     x['loaparlamentar'].parlamentar.nome_parlamentar
                 )
             )

@@ -128,8 +128,8 @@ const possuiRegistroVotacao = computed(() => {
   }
   .item-content {
     position: relative;
-    padding: 0.5em;
-    padding-bottom: 3em;
+    padding: 2em 0.5em;
+    padding-bottom: 1.5em;
     &.votacao-nominal {
       min-height: 60vh;
     }
@@ -224,7 +224,7 @@ const possuiRegistroVotacao = computed(() => {
       margin: 1em;
     }
     .item-content {
-      padding: 1em;
+      padding: 1.5em 1em;
     }
   }
 }

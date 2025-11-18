@@ -281,8 +281,8 @@ watch( materia, (newVal) => {
     color: var(--bs-secondary);
     border: 1px solid var(--bs-border-color);
     font-family: var(--bs-font-monospace);
-    white-space: pre-wrap;
-    line-height: 0.7;
+    // white-space: pre-wrap;
+    font-size: 90%;
     &.closed {
       font-size: 80%;
       padding: 0.5em 1em 0.5em 0.5em;

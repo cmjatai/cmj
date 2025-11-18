@@ -270,7 +270,7 @@ const handleResync = (force_fetch_materias = true) => {
     margin: 0.5em 0.5em 0;
     font-weight: bold;
     text-align: center;
-    font-size: 0.75em;
+    font-size: 0.66em;
     color: var(--bs-link-color);
     &:hover {
       color: var(--bs-link-hover-color);
@@ -279,20 +279,24 @@ const handleResync = (force_fetch_materias = true) => {
   .sessao-plenaria-textos {
     position: relative;
     display: inline-block;
-    margin: 1em 1em 0;
-    padding: 1em;
+    margin: 0.5em 0.5em 0;
+    padding: 0.5em;
     background-color: var(--bs-body-bg);
     color: var(--bs-secondary);
-    border: 1px solid var(--bs-border-color);
     font-family: var(--bs-font-monospace);
     white-space: pre-wrap;
-    line-height: 1.5;
-    p {
+    line-height: 1.3;
+    font-size: 0.8em;
+    border: 0;
+    * {
       margin: 0;
+      line-height: 1.3;
     }
     &.closed {
+      border: 1px solid var(--bs-border-color);
+      border-radius: 5px;
       font-size: 80%;
-      padding: 0.1em 1em 0.1em 0.5em;
+      padding: 0.2em 2em 0.1em 0.5em;
       overflow: hidden;
       cursor: pointer;
       opacity: 0.8;
@@ -311,6 +315,11 @@ const handleResync = (force_fetch_materias = true) => {
   .sessao-plenaria-view {
     .sessao_link_manage {
       font-size: 1em;
+    }
+    .sessao-plenaria-textos {
+      font-size: 1em;
+      margin: 1em 1em 0;
+      padding: 1em;
     }
   }
 }

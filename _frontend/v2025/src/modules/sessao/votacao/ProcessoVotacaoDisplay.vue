@@ -247,15 +247,17 @@ const statusVotacao = (registro) => {
     gap: 1px;
 
     right: 0;
-    font-weight: bold;
     color: #fff;
     line-height: 1;
     z-index: 1;
 
+    font-size: 0.7em;
+    font-weight: bold;
+
     & > div  {
       display: flex;
-      padding: 3px 10px 2px;
-      align-items: center;
+      padding: 3px 10px 4px;
+      align-items: stretch;
       white-space: nowrap;
       justify-content: center;
       gap: 1px;
@@ -359,7 +361,13 @@ const statusVotacao = (registro) => {
 }
 
 @media screen and (min-width: 768px) {
-  .resultado-votacao {
+  .processo-votacao-display {
+    .status-votacao {
+      font-size: 1em;
+      & > div  {
+        padding: 3px 10px 2px;
+      }
+    }
   }
 }
 </style>
