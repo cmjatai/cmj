@@ -106,7 +106,7 @@ body {
       z-index: 1;
     }
     .header-right {
-      width: 3em;
+      width: var(--height-header);
       height: var(--height-header);
       z-index: 1;
     }

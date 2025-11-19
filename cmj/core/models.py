@@ -1033,6 +1033,16 @@ class IAQuota(models.Model):
 
         return sum_log < self.quota_diaria
 
+    def remaining_quota(self):
+        """
+        Retorna a quota restante para hoje.
+        """
+        hoje = timezone.now().date()
+        sum_log = self.iaquotaslog_set.filter(data=hoje).aggregate(
+            total=models.Sum('peso'))['total'] or 0
+
+        return max(0, self.quota_diaria - sum_log)
+
     def create_log(self, peso=1):
         """
         Cria um log de utilização da quota.

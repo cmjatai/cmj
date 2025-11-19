@@ -103,7 +103,7 @@ const clickToggle = () => {
   height: var(--height-header);
   .portalcmj-connected {
     cursor: pointer;
-    border-left: 1px solid var(--bs-border-color-translucent);
+    // border-left: 1px solid var(--bs-border-color-translucent);
     width: var(--height-header);
     .avatar {
       width: 100%;
@@ -118,7 +118,7 @@ const clickToggle = () => {
   .portalcmj-login, .portalcmj-connected {
     cursor: pointer;
     // border-left: 1px solid var(--bs-border-color-translucent);
-    width: 3em;
+    width: var(--height-header);
     height: 100%;
     display: flex;
     align-items: center;
