@@ -17,8 +17,17 @@
         :sessao="sessao"
         @resync="emit('resync')"
       />
-      <div class="ordemdia empty alert alert-info" v-if="ordemDiaList.length === 0">
-        Nenhuma matéria cadastrada na ordem do dia.
+      <div
+        class="ordemdia empty alert alert-info"
+        v-if="ordemDiaOnloading"
+      >
+        Carregando matérias da ordem do dia...
+      </div>
+      <div
+        class="ordemdia empty alert alert-info"
+        v-else-if="!ordemDiaOnloading && ordemDiaList.length === 0"
+      >
+        Sem matérias na ordem do dia.
       </div>
     </div>
   </div>
@@ -26,18 +35,26 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import ItemDeSessao from './ItemDeSessao.vue'
 
 const emit = defineEmits(['resync'])
 
 const syncStore = useSyncStore()
 
+const EventBus = inject('EventBus')
+
 const props = defineProps({
   sessao: {
     type: Object,
     required: true
   }
+})
+
+const ordemDiaOnloading = ref(true)
+
+EventBus.on('ordemDiaOnLoad', () => {
+  ordemDiaOnloading.value = false
 })
 
 const ordemDiaList = computed(() => {

@@ -96,6 +96,7 @@ body {
     justify-content: space-between;
     background-color: var(--cmj-header-background-color);
     z-index: 3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     a, button {
       color: var(--bs-light);
       text-decoration: none;

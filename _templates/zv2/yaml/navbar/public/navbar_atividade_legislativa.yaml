@@ -12,7 +12,7 @@
   model: sessaoplenaria
   params: o=-data_inicio&year={% now 'Y' %}
 - title: {% trans 'Sessão OnLine' %}
-  url: /online/
+  url: /v2025/
 - title: {% trans 'Comissões'%}
   url: sapl.comissoes:comissao_list
 - title: ''

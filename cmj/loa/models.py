@@ -2054,4 +2054,4 @@ class Entidade(models.Model):
     def __str__(self):
         nf = self.nome_fantasia
         tipo = self.tipo_entidade.descricao if self.tipo_entidade else ''
-        return f'{nf} - {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'
+        return f'{nf}{"- CNES:" if self.cnes else ("- CNPJ:" if self.cpfcnpj else "")} {self.cnes or self.cpfcnpj or ""}'

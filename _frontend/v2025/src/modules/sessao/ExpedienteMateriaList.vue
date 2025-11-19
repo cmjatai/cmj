@@ -17,8 +17,17 @@
         :sessao="sessao"
         @resync="emit('resync')"
       />
-      <div class="expedientemateria empty alert alert-info" v-if="expedienteMateriaList.length === 0">
-        Nenhuma matéria cadastrada no grande expediente.
+      <div
+        class="expedientemateria empty alert alert-info"
+        v-if="expedienteMateriaOnloading"
+      >
+        Carregando matérias do grande expediente...
+      </div>
+      <div
+        class="expedientemateria empty alert alert-info"
+        v-if="!expedienteMateriaOnloading && expedienteMateriaList.length === 0"
+      >
+        Sem matérias no grande expediente.
       </div>
     </div>
   </div>
@@ -26,18 +35,26 @@
 <script setup>
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
-import { computed } from 'vue'
+import { ref, computed, inject } from 'vue'
 import ItemDeSessao from './ItemDeSessao.vue'
 
 const emit = defineEmits(['resync'])
 
 const syncStore = useSyncStore()
 
+const EventBus = inject('EventBus')
+
 const props = defineProps({
   sessao: {
     type: Object,
     required: true
   }
+})
+
+const expedienteMateriaOnloading = ref(true)
+
+EventBus.on('expMatOnLoad', () => {
+  expedienteMateriaOnloading.value = false
 })
 
 const expedienteMateriaList = computed(() => {

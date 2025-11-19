@@ -51,7 +51,7 @@
 // 1. Importações
 import { useSyncStore } from '~@/stores/SyncStore'
 import { useRoute } from 'vue-router'
-import { ref, onMounted, computed, inject, nextTick } from 'vue'
+import { ref, onMounted, computed, inject } from 'vue'
 import ExpedienteMateriaList from './ExpedienteMateriaList.vue'
 import OrdemDiaList from './OrdemDiaList.vue'
 
@@ -259,6 +259,8 @@ const handleResync = (force_fetch_materias = true) => {
         }
       })
     }
+    EventBus.emit('ordemDiaOnLoad')
+    EventBus.emit('expMatOnLoad')
   })
 }
 
