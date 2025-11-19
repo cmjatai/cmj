@@ -215,7 +215,7 @@ const statusVotacao = (registro) => {
     tipo = 'result result-vista'
   } else if (r === 'Prazo Regimental') {
     tipo = 'result result-prazo'
-  } else if (r === 'Matéria lida') {
+  } else if (r === 'Matéria Lida') {
     tipo = 'result result-lida'
   }
 

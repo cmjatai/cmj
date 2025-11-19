@@ -17,6 +17,9 @@
         :sessao="sessao"
         @resync="emit('resync')"
       />
+      <div class="expedientemateria empty alert alert-info" v-if="expedienteMateriaList.length === 0">
+        Nenhuma matéria cadastrada no grande expediente.
+      </div>
     </div>
   </div>
 </template>

@@ -374,7 +374,7 @@ class ChangeExpMatOrdemDiaMixin:
         item.votacao_aberta = False
         item.votacao_aberta_pedido_prazo = False
         item.discussao_aberta = False
-        item.resultado = 'Materia Lida'
+        item.resultado = 'Matéria Lida'
         item.save()
 
         return Response({'detail': 'Registro de leitura criado com sucesso.'})

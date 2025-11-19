@@ -510,7 +510,7 @@ def get_votos(response, materia, mostrar_voto):
             'numero_abstencoes': 0,
             'registro': True,
             'total_votos': 0,
-            'tipo_resultado': 'Matéria lida.',
+            'tipo_resultado': 'Matéria Lida.',
         })
     else:
         total = (registro.numero_votos_sim +

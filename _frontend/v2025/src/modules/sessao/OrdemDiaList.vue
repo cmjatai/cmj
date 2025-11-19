@@ -17,6 +17,9 @@
         :sessao="sessao"
         @resync="emit('resync')"
       />
+      <div class="ordemdia empty alert alert-info" v-if="ordemDiaList.length === 0">
+        Nenhuma matéria cadastrada na ordem do dia.
+      </div>
     </div>
   </div>
 </template>

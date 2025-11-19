@@ -537,7 +537,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
             if obj.tipo_votacao == LEITURA:
                 resultado = obj.registroleitura_set.filter(
                     materia_id=obj.materia_id).last()
-                resultado_descricao = "Matéria lida"
+                resultado_descricao = "Matéria Lida"
                 resultado_observacao = resultado.observacao
             else:
                 resultado = obj.registrovotacao_set.filter(
@@ -4858,7 +4858,7 @@ class AbstractLeituraView(FormView):
         else:
             model = OrdemDia
         ordem_expediente = model.objects.get(id=self.kwargs['oid'])
-        ordem_expediente.resultado = "Matéria lida"
+        ordem_expediente.resultado = "Matéria Lida"
         ordem_expediente.votacao_aberta = False
         ordem_expediente.votacao_aberta_pedido_prazo = False
         ordem_expediente.save()
