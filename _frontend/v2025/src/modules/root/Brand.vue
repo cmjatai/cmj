@@ -35,30 +35,44 @@ onMounted(() => {
 
 </script>
 <style lang="scss">
+
 .inner-brand {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  font-size: 0.8em;
-  gap: 0.5em;
+  gap: 0.1em;
   img {
-    height: 2em;
-    padding: 0.2em;
+    height: 1.8em;
+    margin-right: 0.5em;
   }
   .link-logo {
     flex: 0 0 0;
   }
   .link-nome {
     flex: 1 0 0;
+    font-size: 0.75em;
   }
 }
 
-@media screen and (min-width: 600px) {
+@media screen and (min-width: 480px) {
   .inner-brand {
-    font-size: 1em;
+    .link-nome {
+      font-size: 0.95em;
+    }
     img {
-      height: 3em;
-      margin: 0 0 0 0.5em;
+      height: 2em;
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .inner-brand {
+    .link-nome {
+      font-size: 1.3em;
+    }
+    img {
+      height: 2.5em;
+      margin: 0 0.7em;
     }
   }
 }

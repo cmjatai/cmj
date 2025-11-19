@@ -18,9 +18,9 @@
       </div>
     </div>
     <div v-if="!user" :class="['portalcmj-login', is_expanded ? 'expand' : '']" @click.self="clickToggle">
-      <div class="header" @click="clickToggle">
+      <a class="header" @click="clickToggle">
         <FontAwesomeIcon icon="sign-in-alt" class="hover-circle animation-rotate" v-if="!is_expanded" :title="'Autenticar-se PortalCMJ'"/>
-      </div>
+      </a>
       <div class="inner" v-if="is_expanded">
         <FontAwesomeIcon icon="times" class="fa-times hover-circle" @click="clickToggle" v-if="is_expanded" :title="'Fechar Janela de Autenticação'"/>
         <form class="inner-content" v-on:submit.prevent="submit">
@@ -100,11 +100,11 @@ const clickToggle = () => {
 <style lang="scss">
 .portalcmj-connect {
   position: relative;
-  height: 3em;
+  height: var(--height-header);
   .portalcmj-connected {
     cursor: pointer;
     border-left: 1px solid var(--bs-border-color-translucent);
-    width: 3em;
+    width: var(--height-header);
     .avatar {
       width: 100%;
       height: auto;
@@ -117,7 +117,7 @@ const clickToggle = () => {
   }
   .portalcmj-login, .portalcmj-connected {
     cursor: pointer;
-    border-left: 1px solid var(--bs-border-color-translucent);
+    // border-left: 1px solid var(--bs-border-color-translucent);
     width: 3em;
     height: 100%;
     display: flex;
@@ -126,7 +126,7 @@ const clickToggle = () => {
 
     &.expand {
       position: fixed;
-      width: 18em;
+      width: 21em;
       height: auto;
       left: auto;
       top: 0;
@@ -176,7 +176,6 @@ const clickToggle = () => {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-
     .header {
       display: flex;
       align-items: center;
@@ -198,7 +197,7 @@ const clickToggle = () => {
     .rodape {
       text-align: right;
       width: 100%;
-      padding: 0.5em;
+      padding: 1em;
       border-top: 1px solid var(--bs-border-color-translucent);
       cursor: pointer;
     }

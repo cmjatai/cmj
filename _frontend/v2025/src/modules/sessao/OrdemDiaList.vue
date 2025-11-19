@@ -65,11 +65,20 @@ const rotateAndEmitResync = () => {
 
 <style lang="scss">
 .ordemdia-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+
+  .ordemdia-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+  }
   & > .title {
     display: flex;
     background-color: var(--bs-body-bg);
     justify-content: space-between;
-    margin: 0.5em;
+    align-items: center;
     padding: 0.5em;
     strong {
       font-size: 1.1em;
@@ -101,8 +110,15 @@ const rotateAndEmitResync = () => {
 
 @media screen and (min-width: 768px) {
   .ordemdia-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+    .ordemdia-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+    }
     & > .title {
-      margin: 1em;
       padding: 1em;
       strong {
         font-size: 2em;

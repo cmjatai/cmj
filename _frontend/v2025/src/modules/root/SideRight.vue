@@ -73,15 +73,15 @@ const normasDeDestaque = computed(() => {
 })
 
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .side-right {
   position: absolute;
-  top: 3em;
+  top: var(--height-header);
   bottom: 0;
   width: 100%;
   text-align: center;
-  background-color: var(--cmj-background-color);
-  border-left: 1px solid var(--bs-border-color-translucent);
+  background-color: var(--cmj-sideright-bg);
+  // border-left: 1px solid var(--bs-border-color-translucent);
   // box-shadow: -10px 0 20px var(--bs-body-bg);
 
   .menu {
@@ -97,9 +97,9 @@ const normasDeDestaque = computed(() => {
         }
         ul {
           position: absolute;
-          top: 0;
+          top: 1em;
           right: 100%;
-          height: calc(100vh - 3em);
+          height: calc(100vh - 6em);
           z-index: 1;
           white-space: nowrap;
           display: none;

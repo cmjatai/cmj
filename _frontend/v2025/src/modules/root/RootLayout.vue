@@ -1,7 +1,7 @@
 <template>
   <div :class="['root-layout',]">
     <header>
-      <div class="header-left d-lg-none">
+      <div class="header-left d-md-none">
         <slot name="header-left" />
       </div>
 
@@ -61,10 +61,14 @@ const handleDisableAutoRolagem = (event) => {
 // 8. Functions
 </script>
 <style lang="scss">
+
 body {
   overflow-x: hidden;
+  --height-header: 3em;
+  --width-sidebar-collapsed: 3em;
 }
 .root-layout {
+
   user-select: none;
   top: 0;
   right: 0;
@@ -90,12 +94,20 @@ body {
     left: 0;
     right: 0;
     justify-content: space-between;
-    background-color: var(--cmj-background-color);
-    border-bottom: 1px solid var(--bs-border-color-translucent);
+    background-color: var(--cmj-header-background-color);
     z-index: 3;
-    .header-left, .header-right {
+    a, button {
+      color: var(--bs-light);
+      text-decoration: none;
+    }
+    .header-left {
+      width: 2.4em;
+      height: var(--height-header);
+      z-index: 1;
+    }
+    .header-right {
       width: 3em;
-      height: 3em;
+      height: var(--height-header);
       z-index: 1;
     }
     .header-left {
@@ -111,36 +123,44 @@ body {
       }
     }
     .header-main {
+      color: var(--bs-light);
       flex-grow: 2;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-    }
-    .header-detail {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.5em;
-      height: 100%;
-      margin-top: -0.5em;
-      padding-right: 0.5em;
-      .accessibility {
-        .btn {
-          padding: 0 0.7em;
+
+      .btn {
+        padding-top: 0;
+        padding-bottom: 0;
+        line-height: 1;
+      }
+      .header-detail {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5em;
+        height: 100%;
+        margin-top: -0.5em;
+        //padding-right: 0.5em;
+        .accessibility {
+          .btn {
+            padding: 0 0.7em;
+          }
         }
       }
     }
+
   }
 
   main {
     grid-area: main;
     // background-color: #eee;
-    margin-top: 3em;
+    margin-top: var(--height-header);
   }
 
   aside {
     grid-area: sideleft;
     position: relative;
-    display: none
+
   }
   .sideright {
     grid-area: sideright;
@@ -151,18 +171,30 @@ body {
 
 @media screen and (min-width: 480px) {
   .root-layout {
-    .header-main {
-      flex-direction: row;
-      align-items: center;
-      justify-content: space-between;
+    header {
+      .header-main {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+
+        .btn {
+          line-height: 1.5;
+        }
+        .header-detail {
+          margin-top: 0;
+        }
+      }
     }
   }
 }
 
 @media screen and (min-width: 768px) {
+  body {
+    --height-header: 4em;
+    --width-sidebar-collapsed: 4em;
+  }
   .root-layout {
-    grid-template-columns: 3em 1fr 3em;
-
+    grid-template-columns: var(--width-sidebar-collapsed) 1fr 3em;
     aside {
       display: flex;
     }

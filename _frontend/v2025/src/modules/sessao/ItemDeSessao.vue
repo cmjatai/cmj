@@ -204,12 +204,11 @@ const possuiRegistroVotacao = computed(() => {
     }
   }
   &.parent-item {
-    margin: 0.5em;
   }
   .childs {
     font-size: 0.8em;
     & > .title {
-      font-size: 1.8em;
+      font-size: 1.2em;
       display: inline-block;
       padding: 0.2em 1em;
       color: var(--bs-light);
@@ -221,7 +220,6 @@ const possuiRegistroVotacao = computed(() => {
 @media screen and (min-width: 768px) {
   .item-de-sessao {
     &.parent-item {
-      margin: 1em;
     }
     .item-content {
       padding: 1.5em 1em;

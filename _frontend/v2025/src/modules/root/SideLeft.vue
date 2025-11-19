@@ -216,10 +216,10 @@ const closeOffCanvas = (selector) => {
 <style lang="scss">
   .sidebar {
     position: fixed;
-    top: 3em;
+    top: var(--height-header);
     transition: all 0.2s;
     background-color: var(--cmj-background-color);
-    border-right: 1px solid var(--bs-border-color-translucent);
+    // border-right: 1px solid var(--bs-border-color-translucent);
     bottom: 0;
     z-index: 2;
 
@@ -249,16 +249,16 @@ const closeOffCanvas = (selector) => {
       display: flex;
       align-items: center;
       justify-content: flex-start;
-      height: 2em;
+      height: 2.5em;
       white-space: nowrap;
 
       img {
-        padding: 0.5em;
-        width: 3em;
+        padding: 0.8em;
+        width: var(--width-sidebar-collapsed);
       }
 
       svg {
-        width: 3em;
+        width: var(--width-sidebar-collapsed);
       }
 
       &:hover {
@@ -268,7 +268,7 @@ const closeOffCanvas = (selector) => {
     }
 
     &.collapsed {
-      width: 3em;
+      width: var(--width-sidebar-collapsed);
       .sidebar-label {
         font-size: 0em;
       }

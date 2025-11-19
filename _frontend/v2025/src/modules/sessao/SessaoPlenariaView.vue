@@ -267,7 +267,7 @@ const handleResync = (force_fetch_materias = true) => {
 .sessao-plenaria-view {
   .sessao_link_manage {
     display: block;
-    margin: 0.5em 0.5em 0;
+    padding: 1em;
     font-weight: bold;
     text-align: center;
     font-size: 0.66em;
@@ -276,10 +276,15 @@ const handleResync = (force_fetch_materias = true) => {
       color: var(--bs-link-hover-color);
     }
   }
+  .sessao-plenaria-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    margin: 0em 0.5em;
+  }
   .sessao-plenaria-textos {
     position: relative;
     display: inline-block;
-    margin: 0.5em 0.5em 0;
     padding: 0.5em;
     background-color: var(--bs-body-bg);
     color: var(--bs-secondary);
@@ -317,8 +322,14 @@ const handleResync = (force_fetch_materias = true) => {
     }
     .sessao-plenaria-textos {
       font-size: 1em;
-      margin: 1em 1em 0;
       padding: 1em;
+    }
+
+    .sessao-plenaria-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      margin: 0em;
     }
   }
 }
