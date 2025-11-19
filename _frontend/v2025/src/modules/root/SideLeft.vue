@@ -1,6 +1,6 @@
 <template>
   <div
-    class="offcanvas offcanvas-sidebar offcanvas-start d-lg-none"
+    class="offcanvas offcanvas-sidebar offcanvas-start d-md-none"
     tabindex="-1"
     id="menuSideLeft"
     aria-labelledby="menuSideLeftLabel"
@@ -68,7 +68,7 @@
   </div>
   <div
     ref="sidebar"
-    class="sidebar d-none d-lg-flex flex-column collapsed"
+    class="sidebar d-none d-md-flex flex-column collapsed"
   >
     <ul class="nav flex-column">
       <li

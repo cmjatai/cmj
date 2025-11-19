@@ -2043,7 +2043,6 @@ class Entidade(models.Model):
         verbose_name=_('Ativo'),
     )
 
-
     class Meta:
         verbose_name = _('Entidade')
         verbose_name_plural = _('Entidades')
@@ -2055,4 +2054,4 @@ class Entidade(models.Model):
     def __str__(self):
         nf = self.nome_fantasia
         tipo = self.tipo_entidade.descricao if self.tipo_entidade else ''
-        return f'{nf}{" - " if tipo else " "}{tipo} - {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'
+        return f'{nf} - {"CNES:" if self.cnes else "CNPJ:"} {self.cnes or self.cpfcnpj or "Sem Identificação"}'

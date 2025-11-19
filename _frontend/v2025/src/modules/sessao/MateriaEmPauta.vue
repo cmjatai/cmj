@@ -282,7 +282,6 @@ watch( materia, (newVal) => {
 </script>
 <style lang="scss">
 .materia-em-pauta {
-
   .inner-materia {
     .epigrafe {
       display: flex;
@@ -299,6 +298,7 @@ watch( materia, (newVal) => {
       display: flex;
       flex-direction: column;
       line-height: 1.15;
+      padding: 0.2em 0 0 0.5em;
 
       .protocolo-data {
         display: flex;
@@ -308,7 +308,7 @@ watch( materia, (newVal) => {
         gap: 0.5em;
         .data {
           border-left: 1px solid #777;
-          padding: 0.2em 0 0 0.5em;
+          padding-left: 0.5em;
         }
       }
       .protocolo {
@@ -336,20 +336,22 @@ watch( materia, (newVal) => {
         display: inline-block;
         color: var(--bs-link-color);
         &:hover {
-          color: var(--bs-link-hover-color);
+          background-color: var(--bs-link-hover-color);
+          color: white;
+          border-radius: 5px;
         }
       }
     }
     .ementa {
+      margin-top: 0.2em;
       font-size: 1.2em;
       line-height: 1.3;
       color: #299680;
-      text-align: left;
     }
 
     .tramitacao {
       line-height: 1.2;
-      margin-top: 0.5em;
+      margin-top: 0.6em;
       position: relative;
       padding: 0.5em 0 0 0;
       color: var(--bs-secondary);
@@ -399,11 +401,21 @@ watch( materia, (newVal) => {
       }
       ul {
         list-style-type: disc;
-        margin: 0
+        margin: 0;
+        font-size: 0.9em;
       }
     }
     .doc-acessorio-item, .leg-citada-item {
       padding: 0.5em 0;
+    }
+  }
+}
+[data-bs-theme="dark"] {
+  .materia-em-pauta {
+    .inner-materia {
+      .epigrafe {
+        color: #4bd2aa;
+      }
     }
   }
 }
