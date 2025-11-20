@@ -1,0 +1,2 @@
+(function(){let e=new Map;self.onmessage=function(t){const{type:a,timerId:s,interval:n}=t.data;if("START_TIMER"===a){e.has(s)&&clearInterval(e.get(s));const t=setInterval(()=>{self.postMessage({type:"TIMER_TICK",timerId:s,timestamp:Date.now()})},n||1e3);e.set(s,t)}"STOP_TIMER"===a&&e.has(s)&&(clearInterval(e.get(s)),e.delete(s))}})();
+//# sourceMappingURL=592.11c91034.js.map

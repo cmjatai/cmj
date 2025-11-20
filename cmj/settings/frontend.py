@@ -84,9 +84,6 @@ WEBPACK_LOADER = {
     }
 }
 
-if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
-    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2018.child(
-        f'webpack-stats.json')
 
 DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2025.child('dist')
 
@@ -118,7 +115,16 @@ else:
         PROJECT_DIR_FRONTEND_2018.child('dist', Fv2018),
         PROJECT_DIR_FRONTEND_2025.child('dist', Fv2025)
     ]
+
+if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
     
+    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2018.child(
+        f'webpack-stats.json')
+
+    STATICFILES_DIRS += [
+        PROJECT_DIR_FRONTEND_2018.child('dist', Fv2018)
+    ]
+
 # apenas para debug - na produção nginx deve entregar sw
 #PWA_SERVICE_WORKER_PATH = PROJECT_DIR.child(
 #    '_frontend', Fv2018, 'dist', Fv2018, 'service-worker.js')
