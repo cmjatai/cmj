@@ -75,7 +75,7 @@ export default {
     padding-right: 10px;
     display: block;
     // background-color:#f0f0f0;
-    // background-image: url("~@/assets/img/bg.png");
+    // background-image: url("~@/assets/v2018/img/bg.png");
   }
 }
 </style>

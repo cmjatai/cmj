@@ -3,7 +3,7 @@
     <div class="menu">
       <ul>
         <li>
-          <b-img @click="toogleNormaDestaque" src="@/assets/img/icon_normas_juridicas_destaque.png" fluid rounded="0" />
+          <b-img @click="toogleNormaDestaque" src="@/assets/v2018/img/icon_normas_juridicas_destaque.png" fluid rounded="0" />
           <ul class="list-group">
             <li class="list-group-item" v-for="item in itensNormasDeDestaque" :key="`srmd${item.id}`">
               <button

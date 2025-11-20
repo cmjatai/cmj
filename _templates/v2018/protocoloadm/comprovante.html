@@ -26,7 +26,7 @@
 			flex-grow: 2;
 		}
 		.box-assinatura-eletronica {
-			
+
 			text-align: left;
 			padding: 5px 10px;
 			border-radius: 5px;
@@ -86,7 +86,7 @@
 				<div class="row">
 					<div class="col-1">
 						<img height="90"
-								src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'img/logo.png' %}{% endif %}"
+								src="{% if logotipo %}{{ MEDIA_URL }}{{ logotipo }}{% else %}{% webpack_static 'v2018/img/logo.png' %}{% endif %}"
 								alt="Logotipo"
 								class="img-responsive visible-lg-inline-block vcenter">
 					</div>
@@ -111,10 +111,10 @@
 			</td>
 		</tr>
 		<tr> <td colspan="2" align="center"><b>COMPROVANTE DE PROTOCOLO</b><br>Autenticação: {{ autenticacao }}</td>
-		
+
 			<th>Emitido por</th>
 			<td>{{ request.user }}</td>
-		
+
 		</tr>
 
 
@@ -141,7 +141,7 @@
 								{% include 'core/sign_widget.html' %}
 							{% endwith %}
 						{% endif %}
-				
+
 				</td>
 			</tr>
 		{% else %}
@@ -150,7 +150,7 @@
 				<td>{{ protocolo.assunto_ementa }}</td>
 				<th>Interessado</th>
 				<td>{{ protocolo.interessado }}
-				
+
 					{% if protocolo.email and False%}
 						<small>
 							<br>Comprovante de protocolo enviado para:

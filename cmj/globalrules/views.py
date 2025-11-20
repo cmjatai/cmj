@@ -6,8 +6,14 @@ from django.shortcuts import render
 
 
 def service_worker(request):
-    response = HttpResponse(open(settings.PWA_SERVICE_WORKER_PATH).read(
-    ), content_type='application/javascript')
+    if settings.DEBUG:
+        sw_file = settings.PROJECT_DIR_FRONTEND_2018.child(
+            'src', 'assets', 'v2018', 'service-worker.js')
+    else:
+        sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
+    response = HttpResponse(open(sw_file).read())
+    response.headers['Content-Type'] = 'application/javascript'
+    response.headers['Service-Worker-Allowed'] = '/'
     return response
 
 

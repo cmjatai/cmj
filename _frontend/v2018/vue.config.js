@@ -29,9 +29,9 @@ dotenv.config({
 })
 
 let HOST_NAME = 'localhost'
-// HOST_NAME = '192.168.15.9'
+HOST_NAME = '192.168.15.9'
 // HOST_NAME = '10.42.0.1'
-HOST_NAME = '10.3.163.21'
+// HOST_NAME = '10.3.163.21'
 // HOST_NAME = '10.3.162.151'
 // HOST_NAME = '168.228.184.70'
 
@@ -49,16 +49,18 @@ module.exports = {
       }])
 
     config.plugin('copy').use(CopyPlugin, [
-      [
-        {
-          from: path.join(__dirname, '/node_modules/tinymce/skins'),
-          to: 'js/skins/[path][name].[ext]'
-        },
-        {
-          from: path.join(__dirname, '/public'),
-          to: '[path][name].[ext]'
-        }
-      ]
+      {
+        patterns: [
+          {
+            from: path.join(__dirname, '/node_modules/tinymce/skins'),
+            to: 'js/skins/[path][name].[ext]'
+          },
+          /* {
+            from: path.join(__dirname, '/public'),
+            to: '[path][name].[ext]'
+          } */
+        ]
+      }
     ])
 
     config.plugin('MomentLocalesPlugin').use(MomentLocalesPlugin, [
@@ -83,10 +85,10 @@ module.exports = {
       shell
         .rm('./dev-webpack-stats.json')
     } else {
-      config.devtool('#eval-source-map')
+      config.devtool('eval-source-map')
     }
 
-    config.module
+    /* config.module
       .rule('worker')
       .test(/\.worker\.js$/)
       .use('worker-loader')
@@ -94,19 +96,19 @@ module.exports = {
         .options({
           inline: 'fallback'
         })
-        .end()
-    config.module
+        .end() */
+
+    /* config.module
       .rule('js')
       .exclude
-        .add(/\.worker\.js$/);
+        .add(/\.worker\.js$/);*/
 
-    config.module
-      .rule('images')
+    /* config.module
+      .rule('scss')
       .use('url-loader')
       .loader('url-loader')
       .tap(options => {
-        options['limit'] = 8192
-      })
+      }) */
 
     // config.resolve.alias
     //  .set('__STATIC__', 'static')
@@ -130,21 +132,22 @@ module.exports = {
       })
 
     config.devServer
-      .public('')
-      .port(8080)
-      .hot(true)
+    .port(8080)
+    .hot(true)
+    .https(false)
+    .headers({
+      'Access-Control-Allow-Origin': '*'
+    })
+    /*
+    .public('')
       .watchOptions({
         poll: true
       })
       .watchContentBase(true)
-      .https(false)
-      .headers({
-        'Access-Control-Allow-Origin': '*'
-      })
       .contentBase([
         path.join(__dirname, 'public'),
         path.join(__dirname, 'src', 'assets')
-      ])
+      ]) */
 
     config
       .plugin('provide')
@@ -189,7 +192,7 @@ module.exports = {
       .end()  */
   },
 
-  pwa: {
+  /* pwa: {
     name: 'Portal CMJ',
     workboxPluginMode: 'InjectManifest',
     workboxOptions: {
@@ -197,5 +200,5 @@ module.exports = {
       swSrc: 'public/service-worker.js'
       // ...other Workbox options...
     }
-  }
+  } */
 }

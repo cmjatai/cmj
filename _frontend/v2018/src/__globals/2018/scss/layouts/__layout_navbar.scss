@@ -165,7 +165,7 @@
     height: 100%;
     opacity: 0.35;
     z-index: -1;
-    background: transparent url(~@/assets/img/bg_cmj_topo_menu_box_left.png)
+    background: transparent url(~@/assets/v2018/img/bg_cmj_topo_menu_box_left.png)
       no-repeat scroll left top;
     background-size: auto $navbar-brand-height * 4;
   }
@@ -176,7 +176,7 @@
       content: '';
       position: absolute;
       z-index: -1;
-      background-image: url(~@/assets/img/fundo_topo_compressed.jpg);
+      background-image: url(~@/assets/v2018/img/fundo_topo_compressed.jpg);
       background-position: center 40%;
       background-size: cover;
       background-repeat: no-repeat;
@@ -294,7 +294,7 @@
         background-repeat: no-repeat;
         background-size: $size_selo $size_selo;
         background-position: 0em 0em;
-        background-image: url(~@/assets/img/icon_transparencia_prata.png);
+        background-image: url(~@/assets/v2018/img/icon_transparencia_prata.png);
 
         top: -0.5em;
         right: -0.9em;
@@ -454,7 +454,7 @@
     background-color: #ffd976;
     padding-left: 45px;
     &::after {
-      background-image: url(~@/assets/img/logo_sic.png);
+      background-image: url(~@/assets/v2018/img/logo_sic.png);
     }
   }
   .link-radar {
@@ -467,7 +467,7 @@
     &::after {
       padding: 0px;
       margin: 5px 0;
-      background-image: url(~@/assets/img/logo_radar.png);
+      background-image: url(~@/assets/v2018/img/logo_radar.png);
       background-position: center;
       background-size: 95% auto;
     }

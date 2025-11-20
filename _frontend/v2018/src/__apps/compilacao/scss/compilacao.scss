@@ -1394,7 +1394,7 @@ a:link:after, a:visited:after {
               &::before {
                 z-index: 20;
                 position: absolute;
-                background: url(/static/img/icon_delete_white.png) no-repeat 50% 50%;
+                background: url(~@/assets/v2018/img/icon_delete_white.png) no-repeat 50% 50%;
                 content:"";
                 top: 0;
                 left: 0;
@@ -1416,7 +1416,7 @@ a:link:after, a:visited:after {
                 color: white;
               }
               &::before {
-                background: url(/static/img/icon_save_white.png) no-repeat 50% 50%;
+                background: url(~@/assets/v2018/img/icon_save_white.png) no-repeat 50% 50%;
               }
             }
             span {

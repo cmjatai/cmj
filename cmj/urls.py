@@ -68,8 +68,8 @@ urlpatterns_all = [
 
     re_path(r'^admin/', admin.site.urls),
 
-
     re_path(r'^message$', TemplateView.as_view(template_name='base.html')),
+
     re_path('', include('social_django.urls', namespace='social')),
 
     re_path(r'', include(cmj.globalrules.urls)),
@@ -98,8 +98,8 @@ urlpatterns_all = [
     re_path(r'', include(sapl.base.urls)),
 
     re_path(r'', include(sapl.redireciona_urls.urls)),
-    re_path("dash/", dashboard.urls),
 
+    re_path("dash/", dashboard.urls),
 ]
 
 admin.site.site_header = 'Cmj'

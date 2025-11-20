@@ -1,7 +1,7 @@
-import Worker from './sync.worker.js'
+// import Worker from './sync.worker.js'
 class TimerWorkerService {
   constructor () {
-    this.worker = new Worker()
+    this.worker = new Worker(new URL('./sync.worker.js', import.meta.url))
     this.callbacks = new Map()
 
     this.worker.onmessage = (e) => {

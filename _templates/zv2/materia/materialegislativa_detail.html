@@ -14,7 +14,7 @@
           background-image: url({% thumbnail object.autores.first.autor_related.capa 9000x9000 box=object.autores.first.autor_related.capa_cropping crop detail %});
       {% else %}
           background-color: red;
-          background-image: url({% webpack_static 'img/fundo_topo.jpg' %});
+          background-image: url({% webpack_static 'v2018/img/fundo_topo.jpg' %});
       {% endif %}
     }
   </style>

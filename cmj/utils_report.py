@@ -9,6 +9,8 @@ def make_pdf(base_url,
              header_css=''
              ):
 
+    #base_url = '.'
+
     html = HTML(base_url=base_url, string=main_template)
 
     main_doc = html.render(stylesheets=[])
