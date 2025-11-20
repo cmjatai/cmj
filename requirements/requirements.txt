@@ -54,7 +54,7 @@ rl-renderPM==4.0.3
 django-braces==1.14.0
 django-model-utils==4.0.0
 drf-spectacular==0.24.2
-django-webpack4-loader
+django-webpack-loader
 
 
 

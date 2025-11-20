@@ -81,6 +81,8 @@ WEBPACK_LOADER = {
         'CACHE': not DEBUG,
         'BUNDLE_DIR_NAME': f'dist/{Fv2018}/',
         'STATS_FILE': PROJECT_DIR_FRONTEND_2018.child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
     }
 }
 

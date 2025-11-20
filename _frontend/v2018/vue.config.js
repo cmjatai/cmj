@@ -23,6 +23,7 @@ class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
   }
 }
 
+
 const dotenv = require('dotenv')
 dotenv.config({
   path: '../../cmj/.env'
@@ -57,25 +58,19 @@ module.exports = {
 
   chainWebpack: config => {
 
-    let webpack
-    try {
-      webpack = require('./node_modules/@vue/cli-service/node_modules/webpack')
-    } catch (e) {
-      webpack = require('webpack')
-    }
-
     config.plugin('provide')
-      .use(webpack.ProvidePlugin, [{
+      .use(require('webpack').ProvidePlugin, [{
         $: 'jquery',
         jQuery: 'jquery',
         'window.jQuery': 'jquery',
         '_': 'lodash'
       }])
 
-    config.plugin('RelativeBundleTrackerPlugin')
-      .use(RelativeBundleTrackerPlugin, [{
+    config.plugin('BundleTrackerPlugin')
+      .use(BundleTrackerPlugin, [{
         path: '.',
-        filename: `./${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
+        relativePath: true,
+        filename: `${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
       }])
 
     config.plugin('copy').use(CopyPlugin, [

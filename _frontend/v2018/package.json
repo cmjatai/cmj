@@ -28,6 +28,7 @@
     "imports-loader": "^1.1.0",
     "jquery": "^3.5.1",
     "jquery-mask-plugin": "^1.14.16",
+    "jquery-ui": "^1.14.1",
     "jquery-ui-themes": "^1.12.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.20",
@@ -46,9 +47,7 @@
     "vue-resource": "^1.5.1",
     "vue-router": "^3.4.3",
     "vuex": "^3.5.1",
-    "vuex-router-sync": "^5.0.0",
-    "webpack": "^4.44.1",
-    "webpack-jquery-ui": "^2.0.1"
+    "vuex-router-sync": "^5.0.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^5.0.8",
@@ -57,13 +56,12 @@
     "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.1.0",
-    "compression-webpack-plugin": "^5.0.2",
-    "copy-webpack-plugin": "^6.4.1",
+    "compression-webpack-plugin": "^10.0.0",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^4.3.0",
     "eslint": "^7.20.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-friendly-formatter": "^4.0.1",
-    "eslint-loader": "4.0.2",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
@@ -72,11 +70,9 @@
     "pug": "^3.0.2",
     "pug-plain-loader": "^1.1.0",
     "sass": "^1.26.10",
-    "sass-loader": "^10.0.2",
+    "sass-loader": "^12.0.0",
     "shelljs": "^0.8.4",
-    "terser-webpack-plugin": "^1.2.3",
     "vue-template-compiler": "^2.7.16",
-    "webpack-bundle-tracker": "^0.4.3",
-    "webpack-cli": "^3.3.0"
+    "webpack-bundle-tracker": "^3.2.2"
   }
 }

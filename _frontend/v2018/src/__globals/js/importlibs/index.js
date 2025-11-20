@@ -4,9 +4,9 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import 'bootstrap'
 import 'bootstrap-select'
 
-import 'webpack-jquery-ui/dialog'
-import 'webpack-jquery-ui/sortable'
-import 'webpack-jquery-ui/datepicker'
+import 'jquery-ui/ui/widgets/dialog'
+import 'jquery-ui/ui/widgets/sortable'
+import 'jquery-ui/ui/widgets/datepicker'
 import 'jquery-ui/ui/i18n/datepicker-pt-BR'
 
 import 'jquery-ui-themes/themes/pepper-grinder/jquery-ui.min.css'

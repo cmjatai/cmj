@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkfrontend"]=self["webpackChunkfrontend"]||[]).push([[840],{7840:function(n,e,t){t.r(e),t.d(e,{default:function(){return a}});var u=function(){var n=this,e=n._self._c;return e("div",[e("router-view")],1)},r=[],l={name:"loa-layout",methods:{},mounted:function(){}},o=l,f=t(1656),s=(0,f.A)(o,u,r,!1,null,null,null),a=s.exports}}]);
+//# sourceMappingURL=840.362a9990.js.map

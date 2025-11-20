@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkfrontend"]=self["webpackChunkfrontend"]||[]).push([[739],{3739:function(n,e,t){t.r(e),t.d(e,{default:function(){return i}});var u=function(){var n=this,e=n._self._c;return e("div",[e("router-view")],1)},r=[],o={name:"arq-layout",methods:{},mounted:function(){this.removeAside()}},l=o,s=t(1656),f=(0,s.A)(l,u,r,!1,null,null,null),i=f.exports}}]);
+//# sourceMappingURL=739.973dc5f7.js.map
