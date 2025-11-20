@@ -39,6 +39,21 @@ module.exports = {
   runtimeCompiler: true,
   publicPath: process.env.NODE_ENV === 'production' ? '/static/v2018' : `http://${HOST_NAME}:8080/`,
   outputDir: 'dist/v2018',
+  devServer: {
+    headers: {
+      'Access-Control-Allow-Origin': '*'
+    },
+    hot: true,
+    https: false,
+    port: 8080,
+    // host: HOST_NAME,
+    allowedHosts: 'all',
+    static: {
+      directory: path.join(__dirname, 'src', 'assets'),
+      publicPath: '',
+      watch: true
+    }
+  },
 
   chainWebpack: config => {
 
@@ -85,7 +100,7 @@ module.exports = {
       shell
         .rm('./dev-webpack-stats.json')
     } else {
-      config.devtool('eval-source-map')
+      config.devtool('inline-source-map')
     }
 
     /* config.module
@@ -131,13 +146,6 @@ module.exports = {
         return options
       })
 
-    config.devServer
-    .port(8080)
-    .hot(true)
-    .https(false)
-    .headers({
-      'Access-Control-Allow-Origin': '*'
-    })
     /*
     .public('')
       .watchOptions({
