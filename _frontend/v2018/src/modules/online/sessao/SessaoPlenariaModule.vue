@@ -91,7 +91,7 @@ export default {
 <style lang="scss">
 .sessaoplenaria-module {
   background-color: #f0f0f0;
-  background-image: url("~@/assets/v2018/img/bg.png");
+  background-image: url("~@/assets/img/bg.png");
   user-select: none;
 }
 </style>

@@ -17,18 +17,18 @@
     z-index: 0;
   }
   &::before {
-    background-image: url(~@/assets/v2018/img/banners/bg_left.png);
+    background-image: url(~@/assets/img/banners/bg_left.png);
   }
 
   &::after {
-    background-image: url(~@/assets/v2018/img/banners/bg_right.png);
+    background-image: url(~@/assets/img/banners/bg_right.png);
     top: 0;
 
     background-position: top right;
   }
 
   .container {
-    background-image: url(~@/assets/v2018/img/banners/tema_seminario.png);
+    background-image: url(~@/assets/img/banners/tema_seminario.png);
     background-size: auto 5vh;
     background-repeat: no-repeat;
     background-position: 1vh 0.5vh;

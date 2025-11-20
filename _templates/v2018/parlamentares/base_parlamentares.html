@@ -35,7 +35,7 @@
               {% if parlamentar.fotografia %}
                   <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
               {% else %}
-                  <img src="{% webpack_static 'v2018/img/perfil.jpg' %}">
+                  <img src="{% webpack_static 'public/img/perfil.jpg' %}">
               {% endif %}
             </a>
           </div>

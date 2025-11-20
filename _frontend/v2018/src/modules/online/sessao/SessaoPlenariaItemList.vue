@@ -99,7 +99,7 @@ export default {
   display: grid;
   grid-template-columns: auto auto;
   align-items: center;
-  background-image: url("~@/assets/v2018/img/bg.png");
+  background-image: url("~@/assets/img/bg.png");
   border-bottom: 1px solid #ccc;
   padding: 1em;
   line-height: 1;

@@ -1,6 +1,6 @@
 <template>
   <a class="w-100 d-flex inner-brand" href="/">
-    <img :src="casa.logotipo !== undefined ? casa.logotipo : require('@/assets/v2018/img/brasao_transp.gif')"/>
+    <img :src="casa.logotipo !== undefined ? casa.logotipo : require('@/assets/img/brasao_transp.gif')"/>
     <h6 class="title-brand">
       {{casa.nome}}<br>
       <small>PortalCMJ</small>

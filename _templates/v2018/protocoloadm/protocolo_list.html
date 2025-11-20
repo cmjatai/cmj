@@ -18,7 +18,7 @@
 				</a>
 				&nbsp;&nbsp;-&nbsp;&nbsp;
 				<a href="{% url 'sapl.relatorios:relatorio_etiqueta_protocolo' p.numero p.ano %}">
-					<img src="{% webpack_static 'v2018/img/etiqueta.png' %}" alt="Etiqueta Individual">
+					<img src="{% webpack_static 'public/img/etiqueta.png' %}" alt="Etiqueta Individual">
 				</a></br>
 				<strong>Assunto:</strong> {{ p.assunto_ementa }}</br>
 				<strong>Data Protocolo:</strong> {{ p.data|date:"d/m/Y" }} - Horário: {{ p.timestamp|localtime|date:"H:m:s" }}</br>

@@ -105,24 +105,27 @@ STATICFILES_DIRS = [
     PROJECT_DIR.child('sapl', 'static'),
 ]
 
-if DEBUG:
+if not DEBUG:
     STATICFILES_DIRS += [
-        PROJECT_DIR_FRONTEND_2018.child('src', 'assets'),
-        PROJECT_DIR_FRONTEND_2025.child('src', 'assets')
-    ]
-else:
-    STATICFILES_DIRS += [
-        PROJECT_DIR_FRONTEND_2018.child('dist', Fv2018),
+        PROJECT_DIR_FRONTEND_2018.child('dist'),
         PROJECT_DIR_FRONTEND_2025.child('dist', Fv2025)
     ]
 
+
 if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
-    
+
     WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2018.child(
         f'webpack-stats.json')
 
     STATICFILES_DIRS += [
-        PROJECT_DIR_FRONTEND_2018.child('dist', Fv2018)
+        PROJECT_DIR_FRONTEND_2018.child('dist'),
+        PROJECT_DIR_FRONTEND_2025.child('src', 'assets')
+    ]
+
+elif DEBUG:
+    STATICFILES_DIRS += [
+        PROJECT_DIR_FRONTEND_2018.child('src', 'assets'),
+        PROJECT_DIR_FRONTEND_2025.child('src', 'assets')
     ]
 
 # apenas para debug - na produção nginx deve entregar sw

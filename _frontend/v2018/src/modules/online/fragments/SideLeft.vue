@@ -32,43 +32,43 @@ export default {
       clicked: '',
       links: [
         {
-          image: require('@/assets/v2018/img/icon_mesa_diretora.png'),
+          image: require('@/assets/img/icon_mesa_diretora.png'),
           route: '',
           texto: 'Mesa Diretora'
         },
         {
-          image: require('@/assets/v2018/img/icon_comissoes.png'),
+          image: require('@/assets/img/icon_comissoes.png'),
           route: '',
           texto: 'Comissões'
         },
         {
-          image: require('@/assets/v2018/img/icon_parlamentares.png'),
+          image: require('@/assets/img/icon_parlamentares.png'),
           route: '',
           texto: 'Parlamentares'
         },
         {
-          image: require('@/assets/v2018/img/icon_pautas.png'),
+          image: require('@/assets/img/icon_pautas.png'),
           route: '',
           texto: 'Pautas'
         },
         {
-          image: require('@/assets/v2018/img/icon_plenarias.png'),
+          image: require('@/assets/img/icon_plenarias.png'),
           route: '',
           link: '/v2025/sessao',
           texto: 'Sessões Plenárias'
         },
         {
-          image: require('@/assets/v2018/img/icon_materia_legislativa.png'),
+          image: require('@/assets/img/icon_materia_legislativa.png'),
           route: '',
           texto: 'Matérias Legislativas'
         },
         {
-          image: require('@/assets/v2018/img/icon_normas_juridicas.png'),
+          image: require('@/assets/img/icon_normas_juridicas.png'),
           route: '',
           texto: 'Normas Jurídicas'
         },
         {
-          image: require('@/assets/v2018/img/icon_relatorios.png'),
+          image: require('@/assets/img/icon_relatorios.png'),
           route: '',
           texto: 'Relatórios'
         },

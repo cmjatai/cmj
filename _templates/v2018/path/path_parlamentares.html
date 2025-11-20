@@ -74,7 +74,7 @@
                       {% if parlamentar.fotografia %}
                         <img src="{% thumbnail parlamentar.fotografia 1000x1000 box=parlamentar.fotografia_cropping crop detail %}">
                       {% else %}
-                          <img src="{% webpack_static 'v2018/img/perfil.jpg' %}">
+                          <img src="{% webpack_static 'public/img/perfil.jpg' %}">
                       {% endif %}
                       <span>{{parlamentar}}</span>
                       <small>{{parlamentar.cargo_mesa}}</small>
@@ -108,7 +108,7 @@
                     {% if parlamentar.fotografia %}
                         <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
                     {% else %}
-                        <img src="{% webpack_static 'v2018/img/perfil.jpg' %}">
+                        <img src="{% webpack_static 'public/img/perfil.jpg' %}">
                     {% endif %}
 
                     <span>{{parlamentar}}</span>
@@ -141,7 +141,7 @@
                   {% if parlamentar.fotografia %}
                       <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
                   {% else %}
-                      <img src="{% webpack_static 'v2018/img/perfil.jpg' %}">
+                      <img src="{% webpack_static 'public/img/perfil.jpg' %}">
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
@@ -164,7 +164,7 @@
                   {% if parlamentar.fotografia %}
                       <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
                   {% else %}
-                      <img src="{% webpack_static 'v2018/img/perfil.jpg' %}">
+                      <img src="{% webpack_static 'public/img/perfil.jpg' %}">
                   {% endif %}
                     <span>{{parlamentar}}</span>
                   </a>
@@ -205,7 +205,7 @@
                   {% if part.parlamentar.fotografia %}
                       <img src="{% cropped_thumbnail part.parlamentar "fotografia_cropping" %}">
                   {% else %}
-                      <img src="{% webpack_static 'v2018/img/perfil.jpg' %}">
+                      <img src="{% webpack_static 'public/img/perfil.jpg' %}">
                   {% endif %}
                     <span>{{part.parlamentar}}</span>
                     <small>{{part.cargo}}</small>

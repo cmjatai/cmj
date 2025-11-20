@@ -4,7 +4,7 @@
 
 {% block head_content %}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-  <script type="module" src="{% webpack_static 'v2018/js/dashboard_custom.js' %}"></script>
+  <script type="module" src="{% webpack_static 'public/js/dashboard_custom.js' %}"></script>
 {% endblock %}
 
 {% block main_container_class %}container container-path-parlamentar{% endblock main_container_class %}
@@ -36,7 +36,7 @@
               {% if object.parlamentar.fotografia %}
                   <img src="{% thumbnail object.parlamentar.fotografia 9000x9000 box=object.parlamentar.fotografia_cropping crop detail %}">
               {% else %}
-                  <img src="{% webpack_static 'v2018/img/perfil.jpg' %}">
+                  <img src="{% webpack_static 'public/img/perfil.jpg' %}">
               {% endif %}
             </a>
           </div>
