@@ -12,9 +12,7 @@ import VuexStore from './store'
 import axios from 'axios'
 
 import { sync } from 'vuex-router-sync'
-import { loadProgressBar } from 'axios-progress-bar'
 
-import 'axios-progress-bar/dist/nprogress.css'
 import 'vue-resize/dist/vue-resize.css'
 
 import 'popper.js'
@@ -54,8 +52,6 @@ Vue.use(VueNativeSock, (window.location.protocol === 'https:' ? 'wss://' : 'ws:/
   // reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
   // reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
 })
-
-loadProgressBar()
 
 Vue.config.productionTip = false
 

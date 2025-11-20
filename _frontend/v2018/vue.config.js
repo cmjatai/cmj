@@ -126,17 +126,7 @@ module.exports = {
     /* config.module
       .rule('js')
       .exclude
-        .add(/\.worker\.js$/);*/
-
-    /* config.module
-      .rule('scss')
-      .use('url-loader')
-      .loader('url-loader')
-      .tap(options => {
-      }) */
-
-    // config.resolve.alias
-    //  .set('__STATIC__', 'static')
+        .add(/\.worker\.js$/) */
 
     config.module
       .rule('vue')
