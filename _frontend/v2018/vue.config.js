@@ -78,11 +78,11 @@ module.exports = {
         patterns: [
           {
             from: path.join(__dirname, '/node_modules/tinymce/skins'),
-            to: 'js/skins/[path][name].[ext]'
+            to: 'js/skins/[path][name][ext]'
           },
           {
             from: path.join(__dirname, 'src', 'assets'),
-            to: 'public/[path][name].[ext]'
+            to: '[path][name][ext]'
           }
         ]
       }

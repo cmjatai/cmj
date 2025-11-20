@@ -21,7 +21,7 @@
 
 
   <strong>Protocolo: </strong>{{ protocolo.numero|stringformat:'06d' }}/{{ protocolo.ano }} -
-  <a href="{% url 'sapl.relatorios:relatorio_etiqueta_protocolo' protocolo.numero protocolo.ano %}"><img src="{% webpack_static 'public/img/etiqueta.png' %}" alt="Etiqueta Individual"></a></br>
+  <a href="{% url 'sapl.relatorios:relatorio_etiqueta_protocolo' protocolo.numero protocolo.ano %}"><img src="{% webpack_static '/img/etiqueta.png' %}" alt="Etiqueta Individual"></a></br>
 
   <strong>Assunto: </strong> {{ protocolo.assunto_ementa|default:"Não informado" }}</br>
   {% if protocolo.timestamp %}

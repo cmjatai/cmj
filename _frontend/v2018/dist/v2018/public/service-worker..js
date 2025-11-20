@@ -1,1 +1,0 @@
-workbox&&(workbox.core.setCacheNameDetails({prefix:"frontend"}),self.__precacheManifest=[{url:"/offline/",revision:"000009"}].concat(self.__precacheManifest||[]),workbox.precaching.precacheAndRoute(self.__precacheManifest,{}));
