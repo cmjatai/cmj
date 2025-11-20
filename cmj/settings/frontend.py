@@ -108,7 +108,7 @@ STATICFILES_DIRS = [
 if not DEBUG:
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child('dist'),
-        PROJECT_DIR_FRONTEND_2025.child('dist', Fv2025)
+        PROJECT_DIR_FRONTEND_2025.child('dist')
     ]
 
 
