@@ -23,6 +23,8 @@ import App from './App'
 
 import './mixins'
 
+import './registerServiceWorker'
+
 axios.defaults.headers.get['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 axios.defaults.headers.get['Pragma'] = 'no-cache' // Suporte para navegadores mais antigos
 axios.defaults.headers.get['Expires'] = '0' // Expira imediatamente

@@ -20,7 +20,7 @@
             ordering="codigo"
             ref="orgaoSelect"
             :required="false"
-            :extra_query="`&loa=${qs_loa}`"
+            :extra_query="`&loa=${qs_loa}&page_size=100`"
             ></model-select>
           Unidades Orçamentárias
           <model-select @change="value => despesa.unidadeselected=value"

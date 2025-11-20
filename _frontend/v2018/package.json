@@ -1,5 +1,5 @@
 {
-  "name": "frontend",
+  "name": "PortalCMJ-Frontend-v2018",
   "version": "2.1.0",
   "description": "CMJ Vue project",
   "author": "Leandro Roberto <leandroroberto.br@gmail.com>",
@@ -34,7 +34,7 @@
     "moment": "^2.29.4",
     "moment-locales-webpack-plugin": "^1.2.0",
     "popper.js": "^1.16.1",
-    "register-service-worker": "^1.7.1",
+    "register-service-worker": "^1.7.2",
     "split.js": "^1.6.5",
     "tinymce": "^7.7.2",
     "vue": "^2.7.16",
@@ -72,6 +72,9 @@
     "sass-loader": "^12.0.0",
     "shelljs": "^0.8.4",
     "vue-template-compiler": "^2.7.16",
-    "webpack-bundle-tracker": "^3.2.2"
+    "webpack-bundle-tracker": "^3.2.2",
+    "workbox-precaching": "^7.4.0",
+    "workbox-routing": "^7.4.0",
+    "workbox-strategies": "^7.4.0"
   }
 }

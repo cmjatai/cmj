@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkfrontend"]=self["webpackChunkfrontend"]||[]).push([[748],{8748:function(e,n,t){t.r(n),t.d(n,{default:function(){return d}});var u=function(){var e=this,n=e._self._c;return n("div",{staticClass:"painelset-detail"},[n("router-view")],1)},l=[],r={name:"painelset-detail",data(){return{}},mounted:function(){},methods:{}},a=r,s=t(1656),i=(0,s.A)(a,u,l,!1,null,null,null),d=i.exports}}]);
-//# sourceMappingURL=748.5dcd90c9.js.map

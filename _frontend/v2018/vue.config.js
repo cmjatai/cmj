@@ -66,6 +66,16 @@ module.exports = {
         '_': 'lodash'
       }])
 
+    if (process.env.NODE_ENV !== 'production') {
+      const { InjectManifest } = require('workbox-webpack-plugin')
+      config.plugin('workbox')
+        .use(InjectManifest, [{
+          swSrc: path.resolve(__dirname, 'src/service-worker.js'),
+          swDest: 'service-worker-dev.js',
+          exclude: [/\.map$/]
+        }])
+    }
+
     config.plugin('BundleTrackerPlugin')
       .use(BundleTrackerPlugin, [{
         path: '.',
@@ -169,14 +179,30 @@ module.exports = {
       .add('./src/main.js')
       .end()  */
   },
-
-  /* pwa: {
-    name: 'Portal CMJ',
+  pwa: {
+    name: 'PortalCMJ-Frontend-v2018',
+    themeColor: '#114d81',
+    msTileColor: '#114d81',
+    appleMobileWebAppCapable: 'yes',
+    appleMobileWebAppStatusBarStyle: 'black',
+    manifestOptions: {
+      id: 'br.leg.go.jatai.portalcmj',
+      start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:9098/`,
+      theme_color: '#114d81',
+      background_color: '#ffffff'
+    },
+    iconPaths: {
+      favicon32: 'img/icons/favicon-32x32.png',
+      favicon16: 'img/icons/favicon-16x16.png',
+      appleTouchIcon: 'img/icons/apple-touch-icon-152x152.png',
+      msTileImage: 'img/icons/mstile-150x150.png',
+      androidChromeIcon: 'img/icons/android-chrome-192x192.png',
+      androidChromeIcon512: 'img/icons/android-chrome-512x512.png'
+    },
     workboxPluginMode: 'InjectManifest',
     workboxOptions: {
-      // swSrc is required in InjectManifest mode.
-      swSrc: 'public/service-worker.js'
-      // ...other Workbox options...
+      swSrc: path.join(__dirname, 'src', 'service-worker.js'),
+      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 // 5 MB
     }
-  } */
+  }
 }

@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkfrontend"]=self["webpackChunkfrontend"]||[]).push([[256],{5256:function(n,e,t){t.r(e),t.d(e,{default:function(){return a}});var u=function(){var n=this,e=n._self._c;return e("div")},l=[],r={name:"loa-dash",methods:{},mounted:function(){}},f=r,o=t(81656),s=(0,o.A)(f,u,l,!1,null,null,null),a=s.exports}}]);
-//# sourceMappingURL=256-legacy.291fe26b.js.map
