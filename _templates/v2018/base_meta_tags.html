@@ -1,10 +1,10 @@
 {% load i18n static common_cmj_tags cropping%}
 {% load webpack_static from webpack_loader %}
 
-    <link rel="manifest" href="{% webpack_static '/manifest.json' %}">
+    <link rel="manifest" href="{% webpack_static 'manifest.json' %}">
     <link rel="canonical" href="{{site_url}}{{request.META.PATH_INFO}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
 
-    <link rel=icon href="{% webpack_static '/favicon.ico' %}" type="image/x-icon">
+    <link rel=icon href="{% webpack_static 'favicon.ico' %}" type="image/x-icon">
 
     <meta property="fb:app_id" content="150874375319738">
     <meta property="fb:admins" content="cmjatai">
