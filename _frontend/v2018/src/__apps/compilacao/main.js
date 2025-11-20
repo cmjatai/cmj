@@ -1,4 +1,4 @@
-// TODO: migrar compilacao para VueJs
+import '../../expose-global-jquery'
 
 import './scss/compilacao.scss'
 

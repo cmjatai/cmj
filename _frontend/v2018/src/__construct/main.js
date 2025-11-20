@@ -1,3 +1,4 @@
+import '../expose-global-jquery'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'

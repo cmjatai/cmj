@@ -32,9 +32,6 @@ import 'moment/locale/pt-br'
 // import './jquery_runner' // django app painel
 import './image_cropping'
 
-window.$ = $
-window.jQuery = $
-
 window.tinymce = tinymce
 window.moment = moment
 window.dateFormat = dateFormat

@@ -29,7 +29,7 @@ dotenv.config({
 })
 
 let HOST_NAME = 'localhost'
-HOST_NAME = '192.168.15.9'
+// HOST_NAME = '192.168.15.9'
 // HOST_NAME = '10.42.0.1'
 // HOST_NAME = '10.3.163.21'
 // HOST_NAME = '10.3.162.151'
@@ -46,7 +46,7 @@ module.exports = {
     hot: true,
     https: false,
     port: 8080,
-    // host: HOST_NAME,
+    host: HOST_NAME,
     allowedHosts: 'all',
     static: {
       directory: path.join(__dirname, 'src', 'assets'),
@@ -56,6 +56,21 @@ module.exports = {
   },
 
   chainWebpack: config => {
+
+    let webpack
+    try {
+      webpack = require('./node_modules/@vue/cli-service/node_modules/webpack')
+    } catch (e) {
+      webpack = require('webpack')
+    }
+
+    config.plugin('provide')
+      .use(webpack.ProvidePlugin, [{
+        $: 'jquery',
+        jQuery: 'jquery',
+        'window.jQuery': 'jquery',
+        '_': 'lodash'
+      }])
 
     config.plugin('RelativeBundleTrackerPlugin')
       .use(RelativeBundleTrackerPlugin, [{
@@ -145,36 +160,6 @@ module.exports = {
         }
         return options
       })
-
-    /*
-    .public('')
-      .watchOptions({
-        poll: true
-      })
-      .watchContentBase(true)
-      .contentBase([
-        path.join(__dirname, 'public'),
-        path.join(__dirname, 'src', 'assets')
-      ]) */
-
-    config
-      .plugin('provide')
-      .use(require('webpack/lib/ProvidePlugin'), [{
-        $: 'jquery',
-        jquery: 'jquery',
-        'window.jQuery': 'jquery',
-        jQuery: 'jquery',
-        _: 'lodash'
-      }])
-
-    /* config
-      .plugin('html')
-      .tap(args => {
-        args[0]['filename'] = '../../cmj/templates/index.test.html'
-        // console.log(args)
-
-        return args
-      }) */
 
     config.entry('construct')
       .add('./src/__construct/main.js')
