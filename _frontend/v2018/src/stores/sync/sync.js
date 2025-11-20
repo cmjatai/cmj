@@ -1,5 +1,5 @@
 import WebSocketManager from '@/sync/ws/WebSocketManager'
-import TimerWorkerService from '@/sync/timer/SyncWorkerService'
+// import TimerWorkerService from '@/sync/timer/SyncWorkerService'
 import Resources from '@/resources'
 
 import Vue from 'vue'
@@ -202,13 +202,13 @@ const syncStore = {
 
     // Timer actions
     startTimer ({ state }, { timerId, callback, interval }) {
-      TimerWorkerService.startTimer(timerId, callback, interval)
+      // TimerWorkerService.startTimer(timerId, callback, interval)
     },
     stopTimer ({ state }, timerId) {
-      TimerWorkerService.stopTimer(timerId)
+      // TimerWorkerService.stopTimer(timerId)
     },
     startLocalCronometro ({ state, commit }, cronometroId) {
-      TimerWorkerService.startTimer(cronometroId, (timestamp) => {
+      /* TimerWorkerService.startTimer(cronometroId, (timestamp) => {
         // console.debug('TIMER', cronometroId, timestamp)
         const cronometro = state.data_cache.painelset_cronometro[cronometroId]
         const lastServerSync = state.lastServerSync
@@ -226,12 +226,12 @@ const syncStore = {
           commit('UPDATE_DATA_CACHE_CRONOMETRO', { key: 'painelset_cronometro', value: cronometro })
         } else {
           // Parar timer se cronometro não estiver mais 'running' ou 'paused'
-          TimerWorkerService.stopTimer(cronometroId)
+          // TimerWorkerService.stopTimer(cronometroId)
         }
-      }, 500)
+      }, 500) */
     },
     stopLocalCronometro ({ state }, cronometroId) {
-      TimerWorkerService.stopTimer(cronometroId)
+      // TimerWorkerService.stopTimer(cronometroId)
     }
   }
 }

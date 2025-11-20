@@ -50,7 +50,7 @@
 
 <script>
 
-import workerTimer from '@/timer/worker-timer'
+// import workerTimer from '@/timer/worker-timer'
 
 import PortalcmjConnect from '@/components/auth/PortalcmjConnect'
 import SideRight from './fragments/SideRight'
@@ -151,9 +151,9 @@ export default {
       if (t.count_time === 0) {
         t.count_time += 1
         if (t.id_interval !== 0) {
-          workerTimer.clearInterval(t.id_interval)
+          clearInterval(t.id_interval)
         }
-        t.id_interval = workerTimer.setInterval(() => {
+        t.id_interval = setInterval(() => {
           // console.debug(t.count_time, new Date())
           if (t.ws_status === 'disconnected') {
             // console.debug('reconnect')
@@ -167,7 +167,7 @@ export default {
           }
         }, 6000)
       } else if (t.count_time > 10) {
-        workerTimer.clearInterval(t.id_interval)
+        clearInterval(t.id_interval)
         t.id_interval = 0
         // console.debug('reconnect')
         t.count_time = 0
