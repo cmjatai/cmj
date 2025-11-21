@@ -35,7 +35,9 @@ def service_worker_proxy(request):
                 response = requests.get(f'http://{host}:8080/service-worker.js', timeout=5)
                 response = HttpResponse(response.content)
             except Exception:
-                response = HttpResponse("/* Service Worker not found on dev server (port 8080) */")
+                sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
+                response = HttpResponse(open(sw_file).read())
+                
         except ImportError:
             response = HttpResponse("/* Requests library not found */")
     else:

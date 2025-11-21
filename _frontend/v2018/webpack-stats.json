@@ -183,15 +183,15 @@
       "path": "css/83.8fdd54d6.css.gz",
       "publicPath": "/static/v2018/css/83.8fdd54d6.css.gz"
     },
-    "css/app.a18ec2ad.css": {
-      "name": "css/app.a18ec2ad.css",
-      "path": "css/app.a18ec2ad.css",
-      "publicPath": "/static/v2018/css/app.a18ec2ad.css"
+    "css/app.82adf1db.css": {
+      "name": "css/app.82adf1db.css",
+      "path": "css/app.82adf1db.css",
+      "publicPath": "/static/v2018/css/app.82adf1db.css"
     },
-    "css/app.a18ec2ad.css.gz": {
-      "name": "css/app.a18ec2ad.css.gz",
-      "path": "css/app.a18ec2ad.css.gz",
-      "publicPath": "/static/v2018/css/app.a18ec2ad.css.gz"
+    "css/app.82adf1db.css.gz": {
+      "name": "css/app.82adf1db.css.gz",
+      "path": "css/app.82adf1db.css.gz",
+      "publicPath": "/static/v2018/css/app.82adf1db.css.gz"
     },
     "css/chunk-vendors.8c2fe9c9.css": {
       "name": "css/chunk-vendors.8c2fe9c9.css",
@@ -510,10 +510,10 @@
       "publicPath": "/static/v2018/img/foto_chao_camara_retrato.jpg",
       "sourceFilename": "src/assets/img/foto_chao_camara_retrato.jpg"
     },
-    "img/fundo_topo_compressed.200c2eea.jpg": {
-      "name": "img/fundo_topo_compressed.200c2eea.jpg",
-      "path": "img/fundo_topo_compressed.200c2eea.jpg",
-      "publicPath": "/static/v2018/img/fundo_topo_compressed.200c2eea.jpg",
+    "img/fundo_topo_compressed.59e5f002.jpg": {
+      "name": "img/fundo_topo_compressed.59e5f002.jpg",
+      "path": "img/fundo_topo_compressed.59e5f002.jpg",
+      "publicPath": "/static/v2018/img/fundo_topo_compressed.59e5f002.jpg",
       "sourceFilename": "src/assets/img/fundo_topo_compressed.jpg"
     },
     "img/fundo_topo_compressed.jpg": {
@@ -1259,15 +1259,15 @@
       "path": "js/840.1cffec22.js.gz",
       "publicPath": "/static/v2018/js/840.1cffec22.js.gz"
     },
-    "js/app.776f9271.js": {
-      "name": "js/app.776f9271.js",
-      "path": "js/app.776f9271.js",
-      "publicPath": "/static/v2018/js/app.776f9271.js"
+    "js/app.1dfdf5b9.js": {
+      "name": "js/app.1dfdf5b9.js",
+      "path": "js/app.1dfdf5b9.js",
+      "publicPath": "/static/v2018/js/app.1dfdf5b9.js"
     },
-    "js/app.776f9271.js.gz": {
-      "name": "js/app.776f9271.js.gz",
-      "path": "js/app.776f9271.js.gz",
-      "publicPath": "/static/v2018/js/app.776f9271.js.gz"
+    "js/app.1dfdf5b9.js.gz": {
+      "name": "js/app.1dfdf5b9.js.gz",
+      "path": "js/app.1dfdf5b9.js.gz",
+      "publicPath": "/static/v2018/js/app.1dfdf5b9.js.gz"
     },
     "js/chunk-vendors.83aef7c5.js": {
       "name": "js/chunk-vendors.83aef7c5.js",
@@ -2046,16 +2046,6 @@
       "path": "js/skins/ui/tinymce-5/skin.shadowdom.min.css.gz",
       "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.shadowdom.min.css.gz"
     },
-    "manifest.json": {
-      "name": "manifest.json",
-      "path": "manifest.json",
-      "publicPath": "/static/v2018/manifest.json"
-    },
-    "manifest.json.gz": {
-      "name": "manifest.json.gz",
-      "path": "manifest.json.gz",
-      "publicPath": "/static/v2018/manifest.json.gz"
-    },
     "robots.txt": {
       "name": "robots.txt",
       "path": "robots.txt",
@@ -2082,8 +2072,8 @@
     "app": [
       "css/chunk-vendors.8c2fe9c9.css",
       "js/chunk-vendors.83aef7c5.js",
-      "css/app.a18ec2ad.css",
-      "js/app.776f9271.js"
+      "css/app.82adf1db.css",
+      "js/app.1dfdf5b9.js"
     ],
     "compilacao": [
       "css/chunk-vendors.8c2fe9c9.css",

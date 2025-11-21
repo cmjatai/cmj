@@ -6,7 +6,6 @@ const shell = require('shelljs')
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin')
 const WebpackPwaManifest = require('webpack-pwa-manifest')
 const WorkboxPlugin = require('workbox-webpack-plugin')
 
@@ -161,7 +160,7 @@ module.exports = {
       .use(WorkboxPlugin.InjectManifest, [{
         swSrc: path.resolve(__dirname, 'src/service-worker.js'),
         swDest: 'service-worker.js',
-        exclude: [/\.map$/, /hot-update/],
+        exclude: [/\.map$/, /hot-update/, /manifest\.(json|js)$/],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
       }])
   },
