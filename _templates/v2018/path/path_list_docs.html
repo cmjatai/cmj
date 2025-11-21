@@ -76,7 +76,7 @@
               {% if parlamentar.fotografia %}
 
                 <a class="avatar" href="/{{ parlamentar.classe_set.first.absolute_slug }}">
-                  <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
+                  <img src="{% thumbnail parlamentar.fotografia 128x128 box=parlamentar.fotografia_cropping crop detail %}">
                 </a>
               {% endif %}
 

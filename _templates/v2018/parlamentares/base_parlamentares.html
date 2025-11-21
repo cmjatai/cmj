@@ -33,7 +33,7 @@
           <div class="col-3 col-sm-2 d-flex align-items-center">
             <a class="avatar" href="/{{ object.classe_set.first.absolute_slug }}">
               {% if parlamentar.fotografia %}
-                  <img src="{% thumbnail parlamentar.fotografia 9000x9000 box=parlamentar.fotografia_cropping crop detail %}">
+                  <img src="{% thumbnail parlamentar.fotografia 1024x1024 box=parlamentar.fotografia_cropping crop detail %}">
               {% else %}
                   <img src="{% webpack_static '/img/perfil.jpg' %}">
               {% endif %}
