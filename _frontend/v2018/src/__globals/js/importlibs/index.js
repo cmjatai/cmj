@@ -26,12 +26,8 @@ import 'jquery-mask-plugin'
 
 import dateFormat from 'dateformat'
 
-import * as moment from 'moment'
-import 'moment/locale/pt-br'
-
 // import './jquery_runner' // django app painel
 import './image_cropping'
 
 window.tinymce = tinymce
-window.moment = moment
 window.dateFormat = dateFormat

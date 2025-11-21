@@ -5,24 +5,9 @@ const shell = require('shelljs')
 
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin')
-const MomentLocalesPlugin = require('moment-locales-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
-
-class RelativeBundleTrackerPlugin extends BundleTrackerPlugin {
-  convertPathChunks (chunks) {
-    each(each(chunk => {
-      chunk.path = path.relative(this.options.path, chunk.path)
-    }))(chunks)
-  }
-  writeOutput (compiler, contents) {
-    if (contents.status === 'done') {
-      this.convertPathChunks(contents.chunks)
-    }
-    super.writeOutput(compiler, contents)
-  }
-}
-
+const { InjectManifest } = require('workbox-webpack-plugin')
 
 const dotenv = require('dotenv')
 dotenv.config({
@@ -35,8 +20,8 @@ HOST_NAME = '192.168.15.9'
 // HOST_NAME = '10.3.163.21'
 // HOST_NAME = '10.3.162.151'
 // HOST_NAME = '168.228.184.70'
-let PORT = '9098'
-PORT = '9099'
+let BACKENDPORT = '9098'
+BACKENDPORT = '9099'
 // PORT = '8080'
 
 module.exports = {
@@ -61,6 +46,18 @@ module.exports = {
 
   chainWebpack: config => {
 
+    config.entry('construct')
+      .add('./src/__construct/main.js')
+      .end()
+
+    config.entry('compilacao')
+      .add('./src/__apps/compilacao/main.js')
+      .end()
+
+    config.entry('loa')
+      .add('./src/__apps/loa/main.js')
+      .end()
+
     config.plugin('provide')
       .use(require('webpack').ProvidePlugin, [{
         $: 'jquery',
@@ -69,16 +66,6 @@ module.exports = {
         '_': 'lodash'
       }])
 
-    if (process.env.NODE_ENV !== 'production') {
-      const { InjectManifest } = require('workbox-webpack-plugin')
-      config.plugin('workbox')
-        .use(InjectManifest, [{
-          swSrc: path.resolve(__dirname, 'src/service-worker.js'),
-          swDest: 'service-worker-dev.js',
-          exclude: [/\.map$/]
-        }])
-    }
-
     config.plugin('BundleTrackerPlugin')
       .use(BundleTrackerPlugin, [{
         path: '.',
@@ -86,8 +73,8 @@ module.exports = {
         filename: `${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
       }])
 
-    config.plugin('copy').use(CopyPlugin, [
-      {
+    config.plugin('copy')
+      .use(CopyPlugin, [{
         patterns: [
           {
             from: path.join(__dirname, '/node_modules/tinymce/skins'),
@@ -98,51 +85,9 @@ module.exports = {
             to: '[path][name][ext]'
           }
         ]
-      }
-    ])
+      }])
 
-    config.plugin('MomentLocalesPlugin').use(MomentLocalesPlugin, [
-      {
-        localesToKeep: ['pt-BR']
-      }
-    ])
-
-    if (process.env.NODE_ENV === 'production') {
-      config
-        .optimization
-        .minimizer('terser')
-        .tap(args => {
-          args[0]['terserOptions']['compress']['drop_console'] = true
-          return args
-        })
-
-      config
-        .plugin('CompressionPlugin')
-        .use(CompressionPlugin, [{}])
-
-      shell
-        .rm('./dev-webpack-stats.json')
-    } else {
-      config.devtool('inline-source-map')
-    }
-
-    /* config.module
-      .rule('worker')
-      .test(/\.worker\.js$/)
-      .use('worker-loader')
-        .loader('worker-loader')
-        .options({
-          inline: 'fallback'
-        })
-        .end() */
-
-    /* config.module
-      .rule('js')
-      .exclude
-        .add(/\.worker\.js$/) */
-
-    config.module
-      .rule('vue')
+    config.module.rule('vue')
       .use('vue-loader')
       .loader('vue-loader')
       .tap(options => {
@@ -159,29 +104,36 @@ module.exports = {
         return options
       })
 
-    config.entry('construct')
-      .add('./src/__construct/main.js')
-      .end()
+    if (process.env.NODE_ENV !== 'production') {
+      config.devtool('inline-source-map')
 
-    config.entry('compilacao')
-      .add('./src/__apps/compilacao/main.js')
-      .end()
+      config.plugin('workbox')
+        .use(InjectManifest, [{
+          swSrc: path.resolve(__dirname, 'src/service-worker.js'),
+          swDest: 'service-worker-dev.js',
+          exclude: [/\.map$/]
+        }])
+    }
 
-      config.entry('painel')
-      .add('./src/__apps/painel/main.js')
-      .end()
+    if (process.env.NODE_ENV === 'production') {
+      config.devtool(false)
+      shell.rm('./dev-webpack-stats.json')
 
-      config.entry('loa')
-      .add('./src/__apps/loa/main.js')
-      .end()
+      config
+        .optimization
+        .minimizer('terser')
+        .tap(args => {
+          args[0]['terserOptions']['compress']['drop_console'] = true
+          return args
+        })
 
+      config
+        .plugin('CompressionPlugin')
+        .use(CompressionPlugin, [{}])
+    }
 
-    /*
-    config.entryPoints.delete('app')
-     config.entry('app')
-      .add('./src/main.js')
-      .end()  */
   },
+
   pwa: {
     name: 'PortalCMJ-Frontend-v2018',
     themeColor: '#114d81',
@@ -189,8 +141,8 @@ module.exports = {
     appleMobileWebAppCapable: 'yes',
     appleMobileWebAppStatusBarStyle: 'black',
     manifestOptions: {
-      id: 'br.leg.go.jatai.portalcmj',
-      start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${PORT}/`,
+      id: 'br.leg.go.jatai.portalcmj.v2018',
+      start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${BACKENDPORT}/`,
       theme_color: '#114d81',
       background_color: '#ffffff'
     },

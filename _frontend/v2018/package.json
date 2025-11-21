@@ -31,8 +31,6 @@
     "jquery-ui-themes": "^1.12.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.20",
-    "moment": "^2.29.4",
-    "moment-locales-webpack-plugin": "^1.2.0",
     "popper.js": "^1.16.1",
     "register-service-worker": "^1.7.2",
     "split.js": "^1.6.5",
@@ -46,7 +44,8 @@
     "vue-resource": "^1.5.1",
     "vue-router": "^3.4.3",
     "vuex": "^3.5.1",
-    "vuex-router-sync": "^5.0.0"
+    "vuex-router-sync": "^5.0.0",
+    "webpack": "^5.103.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^5.0.8",
