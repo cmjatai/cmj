@@ -1,3 +1,0 @@
-{% load i18n common_cmj_tags %}
-- title: {% trans 'Sobre o Portal' %}
-  url: /sobre-o-portal

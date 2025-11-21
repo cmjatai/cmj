@@ -50,7 +50,6 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
-    "@vue/cli-plugin-pwa": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-standard": "^4.0.0",
     "babel-eslint": "^10.1.0",
@@ -72,8 +71,10 @@
     "shelljs": "^0.8.4",
     "vue-template-compiler": "^2.7.16",
     "webpack-bundle-tracker": "^3.2.2",
+    "webpack-pwa-manifest": "^4.3.0",
     "workbox-precaching": "^7.4.0",
     "workbox-routing": "^7.4.0",
-    "workbox-strategies": "^7.4.0"
+    "workbox-strategies": "^7.4.0",
+    "workbox-webpack-plugin": "^7.4.0"
   }
 }

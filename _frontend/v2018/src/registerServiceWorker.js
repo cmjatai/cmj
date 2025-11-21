@@ -1,6 +1,6 @@
 import { register } from 'register-service-worker'
 
-const swFile = process.env.NODE_ENV === 'production' ? '/service-worker.js' : '/service-worker-dev.js'
+const swFile = process.env.NODE_ENV === 'production' ? '/service-worker.js' : '/service-worker.js'
 
 register(swFile, {
   registrationOptions: { scope: '/' },

@@ -5,9 +5,10 @@ const shell = require('shelljs')
 
 const BundleTrackerPlugin = require('webpack-bundle-tracker')
 const CompressionPlugin = require('compression-webpack-plugin')
-const TerserPlugin = require('terser-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
-const { InjectManifest } = require('workbox-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const WebpackPwaManifest = require('webpack-pwa-manifest')
+const WorkboxPlugin = require('workbox-webpack-plugin')
 
 const dotenv = require('dotenv')
 dotenv.config({
@@ -15,13 +16,13 @@ dotenv.config({
 })
 
 let HOST_NAME = 'localhost'
-HOST_NAME = '192.168.15.9'
+// HOST_NAME = '192.168.15.9'
 // HOST_NAME = '10.42.0.1'
 // HOST_NAME = '10.3.163.21'
 // HOST_NAME = '10.3.162.151'
 // HOST_NAME = '168.228.184.70'
 let BACKENDPORT = '9098'
-BACKENDPORT = '9099'
+// BACKENDPORT = '9099'
 // PORT = '8080'
 
 module.exports = {
@@ -106,13 +107,6 @@ module.exports = {
 
     if (process.env.NODE_ENV !== 'production') {
       config.devtool('inline-source-map')
-
-      config.plugin('workbox')
-        .use(InjectManifest, [{
-          swSrc: path.resolve(__dirname, 'src/service-worker.js'),
-          swDest: 'service-worker-dev.js',
-          exclude: [/\.map$/]
-        }])
     }
 
     if (process.env.NODE_ENV === 'production') {
@@ -120,44 +114,55 @@ module.exports = {
       shell.rm('./dev-webpack-stats.json')
 
       config
-        .optimization
-        .minimizer('terser')
-        .tap(args => {
-          args[0]['terserOptions']['compress']['drop_console'] = true
-          return args
-        })
+      .optimization
+      .minimizer('terser')
+      .tap(args => {
+        args[0]['terserOptions']['compress']['drop_console'] = true
+        return args
+      })
 
       config
-        .plugin('CompressionPlugin')
-        .use(CompressionPlugin, [{}])
+      .plugin('CompressionPlugin')
+      .use(CompressionPlugin, [{}])
     }
 
+    config.plugin('pwa-manifest')
+      .use(WebpackPwaManifest, [{
+        id: 'br.leg.go.jatai.portalcmj.v2018',
+        name: 'PortalCMJ',
+        short_name: 'PortalCMJ',
+        description: 'Portal da Câmara Municipal de Jataí - GO',
+        background_color: '#ffffff',
+        theme_color: '#114d81',
+        start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${BACKENDPORT}/`,
+        display: 'standalone',
+        orientation: 'omit',
+        fingerprints: false,
+        inject: true,
+        ios: {
+          'apple-mobile-web-app-title': 'PortalCMJ',
+          'apple-mobile-web-app-status-bar-style': 'black'
+        },
+        icons: [
+          {
+            src: path.resolve('src/assets/img/icons/android-chrome-192x192.png'),
+            sizes: [192],
+            destination: path.join('img', 'icons')
+          },
+          {
+            src: path.resolve('src/assets/img/icons/android-chrome-512x512.png'),
+            sizes: [512],
+            destination: path.join('img', 'icons')
+          }
+        ]
+      }])
+
+    config.plugin('workbox')
+      .use(WorkboxPlugin.InjectManifest, [{
+        swSrc: path.resolve(__dirname, 'src/service-worker.js'),
+        swDest: 'service-worker.js',
+        exclude: [/\.map$/, /hot-update/],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+      }])
   },
-
-  pwa: {
-    name: 'PortalCMJ',
-    themeColor: '#114d81',
-    msTileColor: '#114d81',
-    appleMobileWebAppCapable: 'yes',
-    appleMobileWebAppStatusBarStyle: 'black',
-    manifestOptions: {
-      id: 'br.leg.go.jatai.portalcmj.v2018',
-      start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${BACKENDPORT}/`,
-      theme_color: '#114d81',
-      background_color: '#ffffff'
-    },
-    iconPaths: {
-      favicon32: 'img/icons/favicon-32x32.png',
-      favicon16: 'img/icons/favicon-16x16.png',
-      appleTouchIcon: 'img/icons/apple-touch-icon-152x152.png',
-      msTileImage: 'img/icons/mstile-150x150.png',
-      androidChromeIcon: 'img/icons/android-chrome-192x192.png',
-      androidChromeIcon512: 'img/icons/android-chrome-512x512.png'
-    },
-    workboxPluginMode: 'InjectManifest',
-    workboxOptions: {
-      swSrc: path.join(__dirname, 'src', 'service-worker.js'),
-      maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 // 5 MB
-    }
-  }
 }
