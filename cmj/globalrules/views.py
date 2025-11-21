@@ -8,9 +8,11 @@ import requests
 
 def service_worker_proxy(request):
     if settings.DEBUG and 'dev' in request.path:
+        host, port = request.get_host().split(':')
+        host ='cmjfront2018' if port == '9099' else host
         try:
             try:
-                response = requests.get('http://localhost:8080/service-worker-dev.js', timeout=5)
+                response = requests.get(f'http://{host}:8080/service-worker-dev.js', timeout=5)
                 response = HttpResponse(response.content)
             except Exception:
                 response = HttpResponse("/* Service Worker not found on dev server (port 8080) */")

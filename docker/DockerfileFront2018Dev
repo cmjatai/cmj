@@ -1,4 +1,4 @@
-FROM node:16.20.2-bookworm
+FROM node:20.19.5-bookworm
 
 ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8

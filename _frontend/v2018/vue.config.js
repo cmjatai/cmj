@@ -30,11 +30,14 @@ dotenv.config({
 })
 
 let HOST_NAME = 'localhost'
-// HOST_NAME = '192.168.15.9'
+HOST_NAME = '192.168.15.9'
 // HOST_NAME = '10.42.0.1'
 // HOST_NAME = '10.3.163.21'
 // HOST_NAME = '10.3.162.151'
 // HOST_NAME = '168.228.184.70'
+let PORT = '9098'
+PORT = '9099'
+// PORT = '8080'
 
 module.exports = {
   runtimeCompiler: true,
@@ -47,7 +50,7 @@ module.exports = {
     hot: true,
     https: false,
     port: 8080,
-    host: HOST_NAME,
+    host: '0.0.0.0',
     allowedHosts: 'all',
     static: {
       directory: path.join(__dirname, 'src', 'assets'),
@@ -187,7 +190,7 @@ module.exports = {
     appleMobileWebAppStatusBarStyle: 'black',
     manifestOptions: {
       id: 'br.leg.go.jatai.portalcmj',
-      start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:9098/`,
+      start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${PORT}/`,
       theme_color: '#114d81',
       background_color: '#ffffff'
     },
