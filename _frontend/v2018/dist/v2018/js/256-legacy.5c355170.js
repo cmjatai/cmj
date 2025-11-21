@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkPortalCMJ_Frontend_v2018"]=self["webpackChunkPortalCMJ_Frontend_v2018"]||[]).push([[256],{5256:function(n,t,e){e.r(t),e.d(t,{default:function(){return c}});var u=function(){var n=this,t=n._self._c;return t("div")},l=[],r={name:"loa-dash",methods:{},mounted:function(){}},o=r,a=e(81656),s=(0,a.A)(o,u,l,!1,null,null,null),c=s.exports}}]);
-//# sourceMappingURL=256-legacy.5c355170.js.map

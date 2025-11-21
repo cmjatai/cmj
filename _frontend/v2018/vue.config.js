@@ -135,7 +135,7 @@ module.exports = {
   },
 
   pwa: {
-    name: 'PortalCMJ-Frontend-v2018',
+    name: 'PortalCMJ',
     themeColor: '#114d81',
     msTileColor: '#114d81',
     appleMobileWebAppCapable: 'yes',

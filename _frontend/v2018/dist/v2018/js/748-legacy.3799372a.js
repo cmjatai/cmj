@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunkPortalCMJ_Frontend_v2018"]=self["webpackChunkPortalCMJ_Frontend_v2018"]||[]).push([[748],{48748:function(t,n,e){e.r(n),e.d(n,{default:function(){return o}});var u=function(){var t=this,n=t._self._c;return n("div",{staticClass:"painelset-detail"},[n("router-view")],1)},l=[],r={name:"painelset-detail",data:function(){return{}},mounted:function(){},methods:{}},a=r,i=e(81656),s=(0,i.A)(a,u,l,!1,null,null,null),o=s.exports}}]);
-//# sourceMappingURL=748-legacy.3799372a.js.map
