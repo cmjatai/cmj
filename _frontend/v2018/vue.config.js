@@ -112,6 +112,23 @@ module.exports = {
       config.devtool(false)
       shell.rm('./dev-webpack-stats.json')
 
+      config.optimization.splitChunks({
+        chunks: 'all',
+        maxInitialRequests: Infinity,
+        minSize: 0,
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name(module) {
+              const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)
+              if (!packageName) return 'npm.unknown'
+
+              return `npm.${packageName[1].replace('@', '')}`
+            }
+          }
+        }
+      })
+
       config
       .optimization
       .minimizer('terser')
