@@ -55,7 +55,7 @@ onMounted(() => {
   document.addEventListener('touchmove', handleDisableAutoRolagem, { passive: true })
 })
 const handleDisableAutoRolagem = (event) => {
-  EventBus.emit('disable-auto-rolagem')
+  // EventBus.emit('disable-auto-rolagem')
 }
 
 // 8. Functions
