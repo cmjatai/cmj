@@ -8,11 +8,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
   <title>PortalCMJ</title>
-  <link rel="manifest" href="/v2025/manifest.json">
 
 
   {% vite_hmr_client %}
   {% vite_asset 'main.js' %}
+
+  <link rel="manifest" href="{% vite_asset_url 'manifest.json' %}">
 
   {% block head_content %}{% endblock head_content %}
 

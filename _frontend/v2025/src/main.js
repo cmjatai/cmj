@@ -100,11 +100,9 @@ app
 // Registro manual do Service Worker para controle total da URL
 if ('serviceWorker' in navigator) {
   // Define a URL baseada no modo (Dev ou Prod) conforme configurado no vite.config.js
-  const swUrl = import.meta.env.DEV
-    ? '/v2025/service-worker.js'
-    : '/static/v2025/service-worker.js'
+  const swUrl = '/v2025/service-worker.js'
 
-  navigator.serviceWorker.register(swUrl, { scope: '/v2025/' })
+  navigator.serviceWorker.register(swUrl, { scope: '/v2025/' , type: 'module' })
     .then((registration) => {
       console.log('Service Worker registrado com sucesso no escopo:', registration.scope)
     })

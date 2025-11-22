@@ -34,19 +34,14 @@ export default defineConfig(({command, mode}) => {
         registerType: 'autoUpdate',
         scope: '/v2025/',
         strategies: 'injectManifest',
-        srcDir: '',
-        filename: 'service-worker.js',
+        srcDir: path.resolve(__dirname, 'src'),
+        filename: 'sw.js',
         manifestFilename: 'manifest.json',
         devOptions: {
           enabled: true
         },
         includeAssets: ['favicon.ico', 'robots.txt', 'imgs/icons/apple-touch-icon.png'],
-        workbox: {
-          cleanupOutdatedCaches: true,
-        },
-        injectManifest: {
-          globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,gif,woff2}'],
-        },
+
         manifest: {
           id: 'br.leg.go.jatai.portalcmj.v2025',
           name: 'PortalCMJ 2025',

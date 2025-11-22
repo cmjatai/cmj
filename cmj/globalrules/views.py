@@ -30,28 +30,35 @@ def service_worker_proxy(request):
 
     if settings.DEBUG:
         if 'v2025' in request.path:
+            host, port = request.get_host().split(':')
+            host ='cmjfront2025' if port == '9099' else host
             try:
-                sw_file = settings.PROJECT_DIR_FRONTEND_2025.child('dist', 'v2025', 'service-worker.js')
-                response = HttpResponse(open(sw_file).read())
+                try:
+                    response = requests.get(f'http://{host}:5173/static/service-worker.js', timeout=5)
+                    response = HttpResponse(response.content)
+                except Exception:
+                    sw_file = settings.PROJECT_DIR_FRONTEND_2025.child('dist', 'v2025', 'service-worker.js')
+                    response = HttpResponse(open(sw_file).read())
+
             except ImportError:
                 response = HttpResponse("/* Requests library not found */")
-            response.headers['Content-Type'] = 'application/javascript'
+
             response.headers['Service-Worker-Allowed'] = '/v2025/'
-            return response
-
-        host, port = request.get_host().split(':')
-        host ='cmjfront2018' if port == '9099' else host
-        try:
+            
+        else:
+            host, port = request.get_host().split(':')
+            host ='cmjfront2018' if port == '9099' else host
             try:
-                response = requests.get(f'http://{host}:8080/service-worker.js', timeout=5)
-                response = HttpResponse(response.content)
-            except Exception:
-                sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
-                response = HttpResponse(open(sw_file).read())
-                response.headers['Service-Worker-Allowed'] = '/'
+                try:
+                    response = requests.get(f'http://{host}:8080/service-worker.js', timeout=5)
+                    response = HttpResponse(response.content)
+                except Exception:
+                    sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
+                    response = HttpResponse(open(sw_file).read())
+                    response.headers['Service-Worker-Allowed'] = '/'
 
-        except ImportError:
-            response = HttpResponse("/* Requests library not found */")
+            except ImportError:
+                response = HttpResponse("/* Requests library not found */")
     else:
         if 'v2025' in request.path:
             sw_file = settings.PROJECT_DIR_FRONTEND_2025.child('dist', 'v2025', 'service-worker.js')
