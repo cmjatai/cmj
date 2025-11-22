@@ -6,6 +6,7 @@ import fs from 'fs'
 import inject from "@rollup/plugin-inject"
 import vue from '@vitejs/plugin-vue'
 import eslintPlugin from '@nabla/vite-plugin-eslint'
+import { VitePWA } from 'vite-plugin-pwa'
 
 
 export default defineConfig(({command, mode}) => {
@@ -29,6 +30,44 @@ export default defineConfig(({command, mode}) => {
   return {
     plugins: [
       vue(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        injectRegister: null,
+        scope: '/v2025/',
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'service-worker.js',
+        manifestFilename: 'manifest.json',
+        devOptions: {
+          enabled: true
+        },
+        includeAssets: ['favicon.ico', 'robots.txt', 'imgs/icons/apple-touch-icon.png'],
+
+        manifest: {
+          id: 'br.leg.go.jatai.portalcmj.v2025',
+          name: 'PortalCMJ 2025',
+          short_name: 'PortalCMJ 2025',
+          description: 'Portal da Câmara Municipal de Jataí - GO',
+          background_color: '#ffffff',
+          theme_color: '#114d81',
+          start_url: '/v2025/',
+          scope: '/v2025/',
+          display: 'standalone',
+          orientation: 'any',
+          icons: [
+            {
+              src: 'img/icons/android-chrome-192x192.png',
+              sizes: '192x192',
+              type: 'image/png'
+            },
+            {
+              src: 'img/icons/android-chrome-512x512.png',
+              sizes: '512x512',
+              type: 'image/png'
+            }
+          ]
+        },
+      }),
       inject({   // => that should be first under plugins array
         $: 'jquery',
         jQuery: 'jquery',
@@ -94,6 +133,9 @@ export default defineConfig(({command, mode}) => {
       host: '0.0.0.0',
       port: 5173,
       open: false,
+      headers: {
+        'Service-Worker-Allowed': '/v2025/',
+      },
       watch: {
         usePolling: true,
         disableGlobbing: false,

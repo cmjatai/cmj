@@ -128,6 +128,11 @@ elif DEBUG:
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child('src', 'assets'),
         PROJECT_DIR_FRONTEND_2025.child('src', 'assets')
+        ]
+
+if DEBUG and not DJANGO_VITE_DEV_MODE:
+    STATICFILES_DIRS += [
+        PROJECT_DIR_FRONTEND_2025.child('dist')
     ]
 
 # apenas para debug - na produção nginx deve entregar sw

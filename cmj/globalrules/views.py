@@ -27,7 +27,18 @@ def service_worker_proxy_dev_old(request):
     return response
 
 def service_worker_proxy(request):
+
     if settings.DEBUG:
+        if 'v2025' in request.path:
+            try:
+                sw_file = settings.PROJECT_DIR_FRONTEND_2025.child('dist', 'v2025', 'service-worker.js')
+                response = HttpResponse(open(sw_file).read())
+            except ImportError:
+                response = HttpResponse("/* Requests library not found */")
+            response.headers['Content-Type'] = 'application/javascript'
+            response.headers['Service-Worker-Allowed'] = '/v2025/'
+            return response
+
         host, port = request.get_host().split(':')
         host ='cmjfront2018' if port == '9099' else host
         try:
@@ -37,15 +48,19 @@ def service_worker_proxy(request):
             except Exception:
                 sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
                 response = HttpResponse(open(sw_file).read())
-                
+                response.headers['Service-Worker-Allowed'] = '/'
+
         except ImportError:
             response = HttpResponse("/* Requests library not found */")
     else:
-        sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
+        if 'v2025' in request.path:
+            sw_file = settings.PROJECT_DIR_FRONTEND_2025.child('dist', 'v2025', 'service-worker.js')
+        else:
+            sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
         response = HttpResponse(open(sw_file).read())
+        response.headers['Service-Worker-Allowed'] = '/v2025/'
 
     response.headers['Content-Type'] = 'application/javascript'
-    response.headers['Service-Worker-Allowed'] = '/'
     return response
 
 
@@ -55,7 +70,7 @@ def offline(request):
 
 def manifest(request):
     try:
-        f = open(settings.PWA_MANIFEST_PATH).read()
+        f = open(settings.PROJECT_DIR_FRONTEND_2025.child('dist', 'v2025', 'manifest.json')).read()
         response = HttpResponse(f, content_type='application/json')
         return response
     except:

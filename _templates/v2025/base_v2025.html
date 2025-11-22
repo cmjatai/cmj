@@ -2,11 +2,15 @@
 {% load i18n static django_vite %}
 <html class="{% block html_class %}{% endblock %}" lang="pt-br" data-bs-theme="auto">
 <head>
+
   <meta charset="utf-8">
   <meta name="theme-color" content="#114d81">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
   <title>PortalCMJ</title>
+  <link rel="manifest" href="/v2025/manifest.json">
+
+
   {% vite_hmr_client %}
   {% vite_asset 'main.js' %}
 
