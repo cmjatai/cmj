@@ -42,15 +42,15 @@ services:
       - cmj-net
     ports:
       - "8080:8080"
-  cmjfront2025:
+  cmjfront2026:
     build:
-      context: ../_frontend/v2025/
-      dockerfile: ../../docker/DockerfileFront2025Dev
+      context: ../_frontend/v2026/
+      dockerfile: ../../docker/DockerfileFront2026Dev
     #command: yarn build
     restart: no
-    container_name: cmjfront2025
+    container_name: cmjfront2026
     labels:
-       NAME: "cmjfront2025"
+       NAME: "cmjfront2026"
     volumes:
       - ../:/var/cmjatai/cmj
     networks:
@@ -78,7 +78,7 @@ services:
     depends_on:
       - cmjredis
       - cmjfront2018
-      - cmjfront2025
+      - cmjfront2026
       - cmjsolr
     ports:
       - "9099:9000"

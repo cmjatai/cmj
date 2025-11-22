@@ -9,10 +9,10 @@ BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
 
 Fv2018 = 'v2018'
-Fv2025 = 'v2025'
+Fv2026 = 'v2026'
 
 def front_version():
-    return [f'_templates/{Fv2025}', f'_templates/{Fv2018}']
+    return [f'_templates/{Fv2026}', f'_templates/{Fv2018}']
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
@@ -61,7 +61,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
 
 PROJECT_DIR_FRONTEND_2018 = PROJECT_DIR.child('_frontend').child(Fv2018)
-PROJECT_DIR_FRONTEND_2025 = PROJECT_DIR.child('_frontend').child(Fv2025)
+PROJECT_DIR_FRONTEND_2026 = PROJECT_DIR.child('_frontend').child(Fv2026)
 
 FRONTEND_BRASAO_PATH = {
     '32': PROJECT_DIR_FRONTEND_2018.child('public').child('brasao').child('brasao_32.png'),
@@ -87,7 +87,7 @@ WEBPACK_LOADER = {
 }
 
 
-DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2025.child('dist')
+DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2026.child('dist')
 
 DJANGO_VITE_DEV_MODE = config('DJANGO_VITE_DEV_MODE', default=False, cast=bool)
 DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
@@ -95,7 +95,7 @@ DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
 DJANGO_VITE = {
     'default': {
         'dev_mode': DJANGO_VITE_DEV_MODE,
-        'manifest_path': DJANGO_VITE_ASSETS_PATH.child(Fv2025, '.vite', 'manifest.json')
+        'manifest_path': DJANGO_VITE_ASSETS_PATH.child(Fv2026, '.vite', 'manifest.json')
     }
 }
 
@@ -110,7 +110,7 @@ STATICFILES_DIRS = [
 if not DEBUG:
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child('dist'),
-        PROJECT_DIR_FRONTEND_2025.child('dist')
+        PROJECT_DIR_FRONTEND_2026.child('dist')
     ]
 
 
@@ -121,18 +121,18 @@ if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
 
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child('dist'),
-        PROJECT_DIR_FRONTEND_2025.child('src', 'assets')
+        PROJECT_DIR_FRONTEND_2026.child('src', 'assets')
     ]
 
 elif DEBUG:
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child('src', 'assets'),
-        PROJECT_DIR_FRONTEND_2025.child('src', 'assets')
+        PROJECT_DIR_FRONTEND_2026.child('src', 'assets')
         ]
 
 if DEBUG and not DJANGO_VITE_DEV_MODE:
     STATICFILES_DIRS += [
-        PROJECT_DIR_FRONTEND_2025.child('dist')
+        PROJECT_DIR_FRONTEND_2026.child('dist')
     ]
 
 # apenas para debug - na produção nginx deve entregar sw

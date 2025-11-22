@@ -18,14 +18,14 @@ DJANGO_VITE_DEV_MODE = False
 DJANGO_VITE = {
     'default': {
         'dev_mode': DJANGO_VITE_DEV_MODE,
-        'manifest_path': DJANGO_VITE_ASSETS_PATH.child(Fv2025, '.vite', 'manifest.json')
+        'manifest_path': DJANGO_VITE_ASSETS_PATH.child(Fv2026, '.vite', 'manifest.json')
     }
 }
 
 STATICFILES_DIRS = [
     PROJECT_DIR.child('sapl', 'static'),
     PROJECT_DIR_FRONTEND_2018.child('dist'),
-    PROJECT_DIR_FRONTEND_2025.child('dist')
+    PROJECT_DIR_FRONTEND_2026.child('dist')
 ]
 
 

@@ -20,7 +20,7 @@ registerRoute(
     console.debug('SW checking URL:', url.pathname)
     return url.pathname.startsWith('/api') ||
            url.pathname.startsWith('/admin') ||
-           url.pathname.startsWith('/v2025') ||
+           url.pathname.startsWith('/v2026') ||
            url.pathname.startsWith('/dash')
   },
   new NetworkOnly()

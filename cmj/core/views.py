@@ -80,8 +80,8 @@ def time_refresh_log_test(request):
 def app_vue_view_v2018(request, slug=None):
     return render(request, 'app_vue_v2018.html')
 
-def app_vue_view_v2025(request, slug=None):
-    return render(request, 'app_vue_v2025.html')
+def app_vue_view_v2026(request, slug=None):
+    return render(request, 'app_vue_v2026.html')
 
 class TrechoCrud(CrudAux):
     help_text = 'trecho'
