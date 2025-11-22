@@ -1,7 +1,7 @@
 {
-  "name": "PortalCMJ-Frontend-v2018",
-  "version": "2.1.0",
-  "description": "CMJ Vue project",
+  "name": "portalcmj-frontend",
+  "version": "2018.25.11.1",
+  "description": "CMJ Frontend Project",
   "author": "Leandro Roberto <leandroroberto.br@gmail.com>",
   "private": true,
   "scripts": {

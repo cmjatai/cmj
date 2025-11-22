@@ -1,7 +1,9 @@
 {
-  "name": "portalcmjfront",
-  "version": "0.1.0",
+  "name": "portalcmj-plenario-frontend",
+  "version": "2025.11.1",
   "type": "module",
+  "description": "CMJ Frontend Plenario Project",
+  "author": "Leandro Roberto <leandroroberto.br@gmail.com>",
   "engines": {
     "node": ">=24.0.0"
   },

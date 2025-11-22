@@ -154,7 +154,7 @@ module.exports = {
         display: 'standalone',
         orientation: 'omit',
         fingerprints: false,
-        inject: true,
+        inject: false,
         ios: {
           'apple-mobile-web-app-title': 'PortalCMJ',
           'apple-mobile-web-app-status-bar-style': 'black'
