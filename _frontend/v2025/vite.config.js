@@ -42,7 +42,7 @@ export default defineConfig(({command, mode}) => {
         filename: 'service-worker.js',
         manifestFilename: 'manifest.json',
         devOptions: {
-          enabled: true
+          enabled: false
         },
         includeAssets: ['favicon.ico', 'robots.txt',],
         workbox: {

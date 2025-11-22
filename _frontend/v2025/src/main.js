@@ -68,11 +68,10 @@ app
   .mount('#cmj')
 
 // Registro manual do Service Worker para controle total da URL
-if ('serviceWorker' in navigator) {
-  // Define a URL baseada no modo (Dev ou Prod) conforme configurado no vite.config.js
-  const swUrl = '/v2025/service-worker.js'
+console.debug('Environment Mode:', import.meta.env.MODE)
 
-  console.debug('Environment Mode:', import.meta.env.MODE)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  const swUrl = '/v2025/service-worker.js'
 
   navigator.serviceWorker.register(swUrl, { scope: '/v2025/' , type: 'module' })
     .then((registration) => {

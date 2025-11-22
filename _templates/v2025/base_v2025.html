@@ -12,13 +12,15 @@
   {% vite_hmr_client %}
   {% vite_asset 'main.js' %}
 
-  {% if DEBUG %}
-    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
-    <link rel="manifest" href="{% static 'manifest.json' %}">
-  {% else %}
+  {% if not DEBUG %}
     <link rel="icon" type="image/x-icon" href="{% static 'v2025/favicon.ico' %}">
     <link rel="manifest" href="{% static 'v2025/manifest.json' %}">
   {% endif %}
+
+  {% comment %}
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+  {% endcomment %}
 
 
   {% block head_content %}{% endblock head_content %}

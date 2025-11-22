@@ -142,43 +142,45 @@ module.exports = {
       .use(CompressionPlugin, [{}])
     }
 
-    config.plugin('pwa-manifest')
-      .use(WebpackPwaManifest, [{
-        id: 'br.leg.go.jatai.portalcmj.v2018',
-        name: 'PortalCMJ',
-        short_name: 'PortalCMJ',
-        description: 'Portal da Câmara Municipal de Jataí - GO',
-        background_color: '#ffffff',
-        theme_color: '#114d81',
-        start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${BACKENDPORT}/`,
-        display: 'standalone',
-        orientation: 'omit',
-        fingerprints: false,
-        inject: false,
-        ios: {
-          'apple-mobile-web-app-title': 'PortalCMJ',
-          'apple-mobile-web-app-status-bar-style': 'black'
-        },
-        icons: [
-          {
-            src: path.resolve('src/assets/img/icons/android-chrome-192x192.png'),
-            sizes: [192],
-            destination: path.join('img', 'icons')
+    if (process.env.NODE_ENV === 'production') {
+      config.plugin('pwa-manifest')
+        .use(WebpackPwaManifest, [{
+          id: 'br.leg.go.jatai.portalcmj.v2018',
+          name: 'PortalCMJ',
+          short_name: 'PortalCMJ',
+          description: 'Portal da Câmara Municipal de Jataí - GO',
+          background_color: '#ffffff',
+          theme_color: '#114d81',
+          start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${BACKENDPORT}/`,
+          display: 'standalone',
+          orientation: 'omit',
+          fingerprints: false,
+          inject: false,
+          ios: {
+            'apple-mobile-web-app-title': 'PortalCMJ',
+            'apple-mobile-web-app-status-bar-style': 'black'
           },
-          {
-            src: path.resolve('src/assets/img/icons/android-chrome-512x512.png'),
-            sizes: [512],
-            destination: path.join('img', 'icons')
-          }
-        ]
-      }])
+          icons: [
+            {
+              src: path.resolve('src/assets/img/icons/android-chrome-192x192.png'),
+              sizes: [192],
+              destination: path.join('img', 'icons')
+            },
+            {
+              src: path.resolve('src/assets/img/icons/android-chrome-512x512.png'),
+              sizes: [512],
+              destination: path.join('img', 'icons')
+            }
+          ]
+        }])
 
-    config.plugin('workbox')
-      .use(WorkboxPlugin.InjectManifest, [{
-        swSrc: path.resolve(__dirname, 'src/service-worker.js'),
-        swDest: 'service-worker.js',
-        exclude: [/\.map$/, /hot-update/, /manifest\.(json|js)$/],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
-      }])
+      config.plugin('workbox')
+        .use(WorkboxPlugin.InjectManifest, [{
+          swSrc: path.resolve(__dirname, 'src/service-worker.js'),
+          swDest: 'service-worker.js',
+          exclude: [/\.map$/, /hot-update/, /manifest\.(json|js)$/],
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+        }])
+    }
   },
 }

@@ -1,7 +1,10 @@
 {% load i18n static common_cmj_tags cropping%}
 {% load webpack_static from webpack_loader %}
 
-    <link rel="manifest" href="{% webpack_static 'manifest.json' %}">
+    {% if not DEBUG %}
+      <link rel="manifest" href="{% webpack_static 'manifest.json' %}">
+    {% endif %}
+
     <link rel="canonical" href="{{site_url}}{{request.META.PATH_INFO}}{% if request.META.QUERY_STRING %}?{{request.META.QUERY_STRING}}{% endif %}" />
 
     <link rel=icon href="{% webpack_static 'favicon.ico' %}" type="image/x-icon">
