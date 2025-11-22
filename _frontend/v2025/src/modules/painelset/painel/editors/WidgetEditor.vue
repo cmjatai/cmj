@@ -256,7 +256,7 @@ const changeYamlValues = () => {
 }
 
 const changeForm = (event) => {
-  console.log('WidgetEditor.vue: changeForm event:', event)
+  console.debug('WidgetEditor.vue: changeForm event:', event)
   const nnv = {...widgetSelected.value}
   delete nnv.id
 
@@ -281,7 +281,7 @@ const patchModel = async (modelData) => {
       text: 'Widget atualizado.',
       timeout: 2000
     })
-    console.log('WidgetEditor.vue: patchModel updated successfully.')
+    console.debug('WidgetEditor.vue: patchModel updated successfully.')
   } catch (error) {
     messageStore.addMessage({
       type: 'danger',
@@ -314,7 +314,7 @@ const onDeleteWidget = (event) => {
     model: 'widget',
     id: widgetSelected.value.id
   }).then(() => {
-    console.log('Widget deleted successfully')
+    console.debug('Widget deleted successfully')
     // EventBus.emit('painelset:editorarea:close', 'force')
   }).catch((error) => {
     console.error('Error deleting widget:', error)

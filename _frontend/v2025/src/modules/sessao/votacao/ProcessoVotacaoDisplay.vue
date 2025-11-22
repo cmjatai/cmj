@@ -126,7 +126,7 @@ const runAutoRolagem = () => {
   if (!isAutoRolagem.value || !conditionalAutoRolagem.value) {
     return
   }
-  // console.log('Executando auto rolagem para o item de sessão', props.item.__label__, props.item.id)
+  // console.debug('Executando auto rolagem para o item de sessão', props.item.__label__, props.item.id)
   setTimeout(() => {
     const preview = document.getElementById(`is-${props.item.__label__}-${props.item.id}`)
     let curtop = 0

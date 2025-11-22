@@ -1,18 +1,19 @@
-import { defineConfig, loadEnv } from 'vite'
-import {BootstrapVueNextResolver} from 'bootstrap-vue-next'
-import {resolve} from 'path'
-import Components from 'unplugin-vue-components/vite'
 import fs from 'fs'
-import inject from "@rollup/plugin-inject"
-import vue from '@vitejs/plugin-vue'
-import eslintPlugin from '@nabla/vite-plugin-eslint'
-import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
+import { defineConfig, loadEnv } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
+import vue from '@vitejs/plugin-vue'
+
+import inject from "@rollup/plugin-inject"
+import Components from 'unplugin-vue-components/vite'
+import eslintPlugin from '@nabla/vite-plugin-eslint'
+import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
+
 export default defineConfig(({command, mode}) => {
+
   // eslint-disable-next-line
   console.debug(`configuring vite with command: ${command}, mode: ${mode}`)
-  // suppress eslint warning that process isn't defined (it is)
   // eslint-disable-next-line
   const cwd = process.cwd()
   // eslint-disable-next-line
@@ -35,12 +36,12 @@ export default defineConfig(({command, mode}) => {
         scope: '/v2025/',
         strategies: 'injectManifest',
         srcDir: '',
-        filename: 'sw.js',
+        filename: 'service-worker.js',
         manifestFilename: 'manifest.json',
         devOptions: {
           enabled: true
         },
-        includeAssets: ['favicon.ico', 'robots.txt', 'imgs/icons/apple-touch-icon.png'],
+        includeAssets: ['favicon.ico', 'robots.txt',],
         workbox: {
           cleanupOutdatedCaches: true,
         },
@@ -61,12 +62,12 @@ export default defineConfig(({command, mode}) => {
           lang: 'pt-BR',
           icons: [
             {
-              src: 'imgs/icons/android-chrome-192x192.png',
+              src:  mode === 'production' ? '/static/v2025/imgs/icons/android-chrome-192x192.png' : 'imgs/icons/android-chrome-192x192.png',
               sizes: '192x192',
               type: 'image/png'
             },
             {
-              src: 'imgs/icons/android-chrome-512x512.png',
+              src:  mode === 'production' ? '/static/v2025/imgs/icons/android-chrome-512x512.png' : 'imgs/icons/android-chrome-512x512.png',
               sizes: '512x512',
               type: 'image/png'
             }
@@ -128,12 +129,14 @@ export default defineConfig(({command, mode}) => {
     resolve: {
       extensions: ['.js', '.json', '.vue',],
       alias: {
-        '~@': resolve(INPUT_DIR),
+        '~@': path.resolve(INPUT_DIR),
         'vue': 'vue/dist/vue.esm-bundler.js',
       },
     },
-    root: resolve(INPUT_DIR),
+
+    root: path.resolve(INPUT_DIR),
     base: mode === 'production' ? '/static/v2025/' :  '/static/',
+
     server: {
       host: '0.0.0.0',
       port: 5173,
@@ -146,13 +149,13 @@ export default defineConfig(({command, mode}) => {
         disableGlobbing: false,
       },
     },
-    publicDir: resolve(INPUT_DIR, 'assets'),
+    publicDir: path.resolve(INPUT_DIR, 'assets'),
     /* worker: {
       format: 'es',
       plugins: [],
     }, */
     build: {
-      outDir: resolve(OUTPUT_DIR),
+      outDir: path.resolve(OUTPUT_DIR),
       assetsDir: '',
       manifest: true,
       emptyOutDir: true,
@@ -166,12 +169,12 @@ export default defineConfig(({command, mode}) => {
 
       rollupOptions: {
         input: {
-          main: resolve(INPUT_DIR, 'main.js'),
+          main: path.resolve(INPUT_DIR, 'main.js'),
         },
         output: {
           chunkFileNames: undefined,
           manualChunks(id) {
-            console.log('manualChunks processing id:', id);
+            console.debug('manualChunks processing id:', id);
             if (id.includes('fortawesome')) {
               return 'vendor_fortawesome'
             }

@@ -27,7 +27,6 @@ RUN pip install -r /var/cmjatai/cmj/requirements.txt
 COPY requirements/ia-requirements.txt $HOME
 RUN pip install -r ia-requirements.txt
 
-
 ADD drfautoapi  /var/cmjatai/cmj/drfautoapi
 ADD fonts       /var/cmjatai/cmj/fonts
 ADD scripts     /var/cmjatai/cmj/scripts

@@ -287,7 +287,7 @@ const onDeleteWidget = () => {
     model: 'widget',
     id: widgetSelected.value.id
   }).then(() => {
-    console.log('Widget deleted successfully')
+    console.debug('Widget deleted successfully')
   }).catch((error) => {
     console.error('Error deleting widget:', error)
   })
@@ -320,7 +320,7 @@ const onDuplicateWidget = () => {
     model: 'widget',
     form: newWidgetData
   }).then((response) => {
-    console.log('Widget duplicated successfully:', response.data)
+    console.debug('Widget duplicated successfully:', response.data)
   }).catch((error) => {
     console.error('Error duplicating widget:', error)
   })
@@ -357,7 +357,7 @@ const addWidget = () => {
     model: 'widget',
     form: defaultChildWidgetData
   }).then((response) => {
-    console.log('Default child widget created successfully:', response.data)
+    console.debug('Default child widget created successfully:', response.data)
   }).catch((error) => {
     console.error('Error creating default child widget:', error)
   })
@@ -407,7 +407,7 @@ const updatePosition = (event, delta) => {
       position: newPosition
     }
   }).then((response) => {
-    console.log('Widget position updated successfully:', response.data)
+    console.debug('Widget position updated successfully:', response.data)
   }).catch((error) => {
     console.error('Error updating widget position:', error)
   })
@@ -435,12 +435,12 @@ const patchWidgetCoords = (localCoords) => {
       }
     }
   }).then((response) => {
-    console.log(response.data)
+    console.debug(response.data)
     /* coordsChange.value.h = response.data.config.coords.h
     coordsChange.value.w = response.data.config.coords.w
     coordsChange.value.x = response.data.config.coords.x
     coordsChange.value.y = response.data.config.coords.y */
-    console.log('Widget coordinates updated successfully')
+    console.debug('Widget coordinates updated successfully')
   }).catch((error) => {
     console.error('Error updating widget coordinates:', error)
   })
@@ -459,7 +459,7 @@ const onMouseDown = (event) => {
     widgetEditorOpened.value = false
     EventBus.emit('painelset:editorarea:close')
   }
-  console.log('Activating painel editor teleport for Widget:', props.widgetSelected)
+  console.debug('Activating painel editor teleport for Widget:', props.widgetSelected)
 
   // EventBus.emit('painelset:editorarea:close', painelsetWidget.value.id)
 }
@@ -479,7 +479,7 @@ const onMouseDownResize = (event, direction) => {
 
   const localCoords = { ...coordsChange.value }
 
-  console.log('Mouse move detected:', event.clientX, event.clientY, widgetRect)
+  console.debug('Mouse move detected:', event.clientX, event.clientY, widgetRect)
 
   const onMouseMove = (e) => {
     let newWidthPercent = 0
@@ -558,7 +558,7 @@ const onMouseDownResize = (event, direction) => {
       console.warn('Invalid coordinates during resize, ignoring update')
     }
   }
-  console.log('Starting resize operation')
+  console.debug('Starting resize operation')
   window.addEventListener('mousemove', onMouseMove)
   window.addEventListener('mouseup', (e) => {
     window.removeEventListener('mouseup', this)
@@ -574,7 +574,7 @@ const onMouseDownResize = (event, direction) => {
       w: coordsChange.value.w,
       h: coordsChange.value.h
     })
-    console.log('Resize operation ended')
+    console.debug('Resize operation ended')
   })
 }
 </script>

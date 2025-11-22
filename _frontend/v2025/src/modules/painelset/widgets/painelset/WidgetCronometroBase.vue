@@ -92,7 +92,7 @@ const syncCronometro = async () => {
     id: props.cronometroId
   })
   .then(() => {
-    console.log('Iniciando cronômetro localmente:', props.cronometroId)
+    console.debug('Iniciando cronômetro localmente:', props.cronometroId)
     syncStore.startLocalCronometro(props.cronometroId)
   })
 }

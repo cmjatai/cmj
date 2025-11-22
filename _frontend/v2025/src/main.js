@@ -25,14 +25,13 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 
 library.add(fas, far, fab)
 
-import { onMounted, createApp } from 'vue'
+import { createApp } from 'vue'
 
 import { createPinia } from 'pinia'
 import router from './routers'
 
 import EventBus from './utils/EventBus'
 import registerComponents from './registerComponents'
-import { useWsTimeRefresh } from './composables/WsTimeRefresh'
 
 document.querySelectorAll('[data-bs-toggle="popover"]')
   .forEach(popover => {
@@ -50,35 +49,6 @@ const app = createApp({
   delimiters: ['[[', ']]'],
   components: registerComponents.rootComponents,
   setup() {
-    // const protocol = (window.location.protocol === 'https:' ? 'wss://' : 'ws://')
-    // const ws_url = protocol + window.location.host + '/ws/time-refresh/'
-
-    // const wsTimeRefresh = useWsTimeRefresh(ws_url)
-    // wsTimeRefresh.connect()
-
-    // const ws_url_sync = protocol + window.location.host + '/ws/sync/'
-    // const wsSync = useWsTimeRefresh(ws_url_sync)
-    // wsSync.connect()
-
-    /*onMounted(() => {
-      // Enable this to test the time refresh
-      setTimeout(() => {
-         wsTimeRefresh.send(
-          {
-            type: 'ping',
-            message:'Time refresh requested',
-            timestamp_client: Date.now()
-          }
-        )
-        wsSync.send(
-          {
-            type: 'ping',
-            message:'Sync refresh requested',
-            timestamp_client: Date.now(),
-          }
-        )
-      }, 3000)
-    })*/
   }
 })
 
@@ -104,7 +74,7 @@ if ('serviceWorker' in navigator) {
 
   navigator.serviceWorker.register(swUrl, { scope: '/v2025/' , type: 'module' })
     .then((registration) => {
-      console.log('Service Worker registrado com sucesso no escopo:', registration.scope)
+      console.debug('Service Worker registrado com sucesso no escopo:', registration.scope)
     })
     .catch((error) => {
       console.error('Falha ao registrar o Service Worker:', error)

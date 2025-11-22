@@ -63,7 +63,7 @@ const srcIframeUrl = computed(() => {
   }
   let videoId = widgetSelected.value?.config?.youtube?.id || evento.value?.youtube_id ||  ''
   videoId = videoId ? `https://www.youtube.com/embed/${videoId}?${paramsWidget.toString()}` : ''
-  console.log('videoId', videoId)
+  console.debug('videoId', videoId)
   return videoId
 
 })

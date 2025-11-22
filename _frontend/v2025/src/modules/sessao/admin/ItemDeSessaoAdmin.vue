@@ -237,7 +237,7 @@ const toggleAction = async (action) => {
     action: 'toggle_state',
     id: props.item.id
   }).then((result) => {
-    console.log('Discussão alterada com sucesso', result)
+    console.debug('Discussão alterada com sucesso', result)
   }).catch((err) => {
     console.error('Erro ao alterar discussão', err)
   })
@@ -273,7 +273,7 @@ const actionRegistrar = async (metadata) => {
     action: metadata.action,
     form: metadata.form
   }).then((result) => {
-    console.log('Votação registrada com sucesso', result)
+    console.debug('Votação registrada com sucesso', result)
     actionsRunning.value = false
   }).catch((err) => {
     actionsRunning.value = false
@@ -295,7 +295,7 @@ const actionCancelarLeitura = async () => {
     id: props.item.id
   }).then((result) => {
     actionsRunning.value = false
-    console.log('Registro de leitura cancelado com sucesso', result)
+    console.debug('Registro de leitura cancelado com sucesso', result)
   }).catch((err) => {
     actionsRunning.value = false
     messageStore.addMessage({
@@ -317,7 +317,7 @@ const actionCancelarVotacao = async () => {
     id: props.item.id
   }).then((result) => {
     actionsRunning.value = false
-    console.log('Registro de votação cancelado com sucesso', result)
+    console.debug('Registro de votação cancelado com sucesso', result)
   }).catch((err) => {
     actionsRunning.value = false
     messageStore.addMessage({

@@ -31,7 +31,7 @@ const changeFilter = (form_filter) => {
   fetchSessaoPlenariaList(1, form_filter)
 }
 const currentPage = (value) => {
-  console.log('currentPage', value)
+  console.debug('currentPage', value)
   fetchSessaoPlenariaList(value)
 }
 

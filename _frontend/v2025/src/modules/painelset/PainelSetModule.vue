@@ -49,7 +49,7 @@ const initMoving = (event) => {
   event.preventDefault()
   event.stopPropagation()
 
-  console.log(event)
+  console.debug(event)
 
   const startX = event.clientX
   const startWidth = painelsetEditorarea.value.offsetWidth

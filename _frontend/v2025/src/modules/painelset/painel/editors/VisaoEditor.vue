@@ -216,7 +216,7 @@ const changeYamlValues = () => {
 }
 
 const changeForm = (event) => {
-  console.log('VisaoEditor.vue: changeForm event:', event)
+  console.debug('VisaoEditor.vue: changeForm event:', event)
   const nnv = {...visaoSelected.value}
   delete nnv.id
 
@@ -238,7 +238,7 @@ const patchModel = async (modelData) => {
       text: 'Visão do Painel atualizado.',
       timeout: 2000
     })
-    console.log('VisaoEditor.vue: patchModel updated successfully.')
+    console.debug('VisaoEditor.vue: patchModel updated successfully.')
   } catch (error) {
     messageStore.addMessage({
       type: 'danger',
@@ -327,7 +327,7 @@ const addWidget = () => {
     model: 'widget',
     form: defaultChildWidgetData
   }).then((response) => {
-    console.log('Default child widget created successfully:', response.data)
+    console.debug('Default child widget created successfully:', response.data)
   }).catch((error) => {
     console.error('Error creating default child widget:', error)
   })

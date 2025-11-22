@@ -222,7 +222,7 @@ const changeYamlValues = () => {
 }
 
 const changeForm = (event) => {
-  console.log('PainelEditor.vue: changeForm event:', event)
+  console.debug('PainelEditor.vue: changeForm event:', event)
   const nnv = {...painelSelected.value}
   delete nnv.id
 
@@ -244,7 +244,7 @@ const patchModel = async (modelData) => {
       text: 'Painel atualizado.',
       timeout: 2000
     })
-    console.log('PainelEditor.vue: patchModel updated successfully.')
+    console.debug('PainelEditor.vue: patchModel updated successfully.')
   } catch (error) {
     messageStore.addMessage({
       type: 'danger',

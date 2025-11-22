@@ -122,7 +122,7 @@ const strSplitted = computed(() => {
   }
   const regex = /(\d{4})/g
   let str = sessaoPlenaria.value.__str__
-  console.log('str', str)
+  console.debug('str', str)
   const match = regex.exec(str)
   if (!match) {
     return str

@@ -218,7 +218,7 @@ const tiposResultadoVotacao = computed(() => {
 
 const actionCancelarVotacao = () => {
   Object.values(votosParlamentares.value).forEach(voto => {
-    console.log('deletando voto', voto)
+    console.debug('deletando voto', voto)
     Resource.Utils.deleteModel({
       app: 'sessao',
       model: 'votoparlamentar',
