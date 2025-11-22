@@ -29,6 +29,9 @@ export default defineConfig(({command, mode}) => {
   const INPUT_DIR = './src'
 
   return {
+    esbuild: {
+      pure: mode === 'production' ? ['console.log', 'console.debug'] : [],
+    },
     plugins: [
       vue(),
       VitePWA({
@@ -162,9 +165,6 @@ export default defineConfig(({command, mode}) => {
       copyPublicDir: true,
       target: 'esnext',
       minify: 'esbuild',
-      esbuild: {
-        pure: mode === 'production' ? ['console.debug'] : []
-      },
       sourcemap: mode === 'production' ? false : true,
 
       rollupOptions: {
