@@ -72,6 +72,8 @@ if ('serviceWorker' in navigator) {
   // Define a URL baseada no modo (Dev ou Prod) conforme configurado no vite.config.js
   const swUrl = '/v2025/service-worker.js'
 
+  console.debug('Environment Mode:', import.meta.env.MODE)
+
   navigator.serviceWorker.register(swUrl, { scope: '/v2025/' , type: 'module' })
     .then((registration) => {
       console.debug('Service Worker registrado com sucesso no escopo:', registration.scope)

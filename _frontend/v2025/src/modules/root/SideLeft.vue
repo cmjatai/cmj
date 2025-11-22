@@ -164,7 +164,7 @@ const links = ref([
     texto: 'Pautas'
   },
   {
-    image: '/static/imgs/icon_plenarias.png',
+    image: import.meta.env.PROD ? '/static/v2025/imgs/icon_plenarias.png' : '/static/imgs/icon_plenarias.png',
     route: 'sessao_plenaria_list_link',
     texto: 'Sessões Plenárias'
   },

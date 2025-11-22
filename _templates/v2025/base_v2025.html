@@ -6,14 +6,15 @@
   <meta charset="utf-8">
   <meta name="theme-color" content="#114d81">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
   <title>PortalCMJ</title>
 
 
   {% vite_hmr_client %}
   {% vite_asset 'main.js' %}
 
-  <link rel="manifest" href="{% static 'v2025/manifest.json' %}">
+  <link rel="icon" type="image/x-icon" href="{% static 'v2025/favicon.ico' if not DEBUG else 'favicon.ico' %}">
+  <link rel="manifest" href="{% static 'v2025/manifest.json' if not DEBUG else 'manifest.json' %}">
+
 
   {% block head_content %}{% endblock head_content %}
 

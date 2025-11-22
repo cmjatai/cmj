@@ -1,9 +1,22 @@
 <template>
   <div class="inner-brand">
-    <a class="link-logo" href="/">
-      <img :src="casa.logotipo !== undefined ? casa.logotipo : '/static/imgs/brasao_transp.gif'"/>
+    <a
+      class="link-logo"
+      href="/"
+    >
+      <img
+        v-if="casa.logotipo !== undefined"
+        :src="casa.logotipo"
+      >
+      <img
+        v-else
+        src="/imgs/brasao_transp.gif"
+      >
     </a>
-    <a class="link-nome" href="/">
+    <a
+      class="link-nome"
+      href="/"
+    >
       <span class="title-brand">
         {{ casa.nome }}<br>
         <small>PortalCMJ</small>
