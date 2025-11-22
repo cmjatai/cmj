@@ -13,7 +13,7 @@
   {% vite_hmr_client %}
   {% vite_asset 'main.js' %}
 
-  <link rel="manifest" href="{% vite_asset_url 'manifest.json' %}">
+  <link rel="manifest" href="{% static 'manifest.json' %}">
 
   {% block head_content %}{% endblock head_content %}
 

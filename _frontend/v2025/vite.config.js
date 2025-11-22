@@ -35,7 +35,7 @@ export default defineConfig(({command, mode}) => {
         scope: '/v2025/',
         strategies: 'injectManifest',
         srcDir: '',
-        filename: 'service-worker.js',
+        filename: 'sw.js',
         manifestFilename: 'manifest.json',
         devOptions: {
           enabled: true

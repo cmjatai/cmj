@@ -44,7 +44,7 @@ def service_worker_proxy(request):
                 response = HttpResponse("/* Requests library not found */")
 
             response.headers['Service-Worker-Allowed'] = '/v2025/'
-            
+
         else:
             host, port = request.get_host().split(':')
             host ='cmjfront2018' if port == '9099' else host
@@ -62,10 +62,12 @@ def service_worker_proxy(request):
     else:
         if 'v2025' in request.path:
             sw_file = settings.PROJECT_DIR_FRONTEND_2025.child('dist', 'v2025', 'service-worker.js')
+            response = HttpResponse(open(sw_file).read())
+            response.headers['Service-Worker-Allowed'] = '/v2025/'
         else:
             sw_file = settings.PROJECT_DIR_FRONTEND_2018.child('dist', 'v2018', 'service-worker.js')
-        response = HttpResponse(open(sw_file).read())
-        response.headers['Service-Worker-Allowed'] = '/v2025/'
+            response = HttpResponse(open(sw_file).read())
+            response.headers['Service-Worker-Allowed'] = '/'
 
     response.headers['Content-Type'] = 'application/javascript'
     return response
