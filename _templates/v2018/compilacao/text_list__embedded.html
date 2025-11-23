@@ -4,10 +4,7 @@
 
 {% if embedded_cache %}
   {{ embedded_cache|safe }}
-
 {% else %}
-
-
 <div class="cp {% if object.is_revogado %}cp-revogado{% endif %}">
   {% if object_list %}
     <div class="clearfix">
@@ -17,7 +14,6 @@
       </div>
     </div>
   {% endif %}
-
   {% for key, values in view.get_vigencias.items %}
     {% if forloop.first %}
       <ul class="cp-linha-vigencias">
@@ -87,9 +83,6 @@
       <a class="btn btn-primary"  onclick="textoVigenteSemRevogados(this, false);" title="{% trans 'Texto Vigente Sem Dispositivos Revogados'%}">{% trans 'TVR'%}</a>
     </div>
   </div>
-
   {% include 'compilacao/text_list_bloco.html'%}
-
 </div>
-
 {% endif %}

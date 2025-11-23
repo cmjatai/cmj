@@ -23,7 +23,6 @@
     {% include 'compilacao/text_list__embedded.html'%}
   {% endif %}
 
-
   {% if object.content_object and object.content_object|meta_model_value:'label' == 'norma.NormaJuridica'%}
     {% with object.content_object as n %}
       {% include 'compilacao/normajuridica_widget_bottom.html' %}
