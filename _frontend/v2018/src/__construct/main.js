@@ -1,3 +1,4 @@
+import '../expose-global-jquery'
 import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
@@ -13,8 +14,6 @@ import VuexStore from './apps/store'
 import { routes } from './router-config'
 
 import axios from 'axios'
-import { loadProgressBar } from 'axios-progress-bar'
-import 'axios-progress-bar/dist/nprogress.css'
 
 // import VueFroala from 'vue-froala-wysiwyg'
 import 'vue-resize/dist/vue-resize.css'
@@ -40,8 +39,6 @@ Vue.use(BootstrapVue)
 Vue.config.productionTip = false
 
 // Vue.http.headers.common['Access-Control-Allow-Origin'] = '*'
-
-loadProgressBar()
 
 const store = new Vuex.Store(VuexStore)
 const router = new Router({

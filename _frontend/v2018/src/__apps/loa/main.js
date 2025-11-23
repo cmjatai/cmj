@@ -1,3 +1,4 @@
+import '../../expose-global-jquery'
 import './scss/loa.scss'
 import axios from 'axios'
 

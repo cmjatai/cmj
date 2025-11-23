@@ -1,0 +1,50 @@
+$color_logo_portalcmj_portalcmj: #5B9F91; // CMYK: 60, 5, 40, 20
+$color_logo_portalcmj_mais: #00A1D5; // CMYK: 100, 5, 5, 5
+$color_logo_portalcmj_plataforma: #7D7E7F; // CMYK: 5, 5, 5, 60
+
+$color_primary: $color_logo_portalcmj_portalcmj;
+$color_secondary: $color_logo_portalcmj_mais;
+
+$heightBrand: 3rem;
+$heightBrasao: 6rem;
+
+$utilities: () !default;
+
+$utilities: map-merge(
+  (
+    "min-viewport-height": (
+      property: min-height,
+      class: min-vh,
+      values: (
+        50: 50vh,
+        60: 60vh,
+        70: 70vh,
+        80: 80vh,
+        90: 90vh,
+        100: 100vh
+      )
+    ),
+    "avatar": (
+      property: height width,
+      class: avatar,
+      values: (
+        1: 1rem,
+        2: 2rem,
+        3: 3rem,
+        4: 4rem,
+        5: 5rem,
+        6: 6rem,
+        7: 7rem,
+        8: 8rem,
+        9: 9rem
+      )
+    ),
+  ),
+  $utilities
+);
+
+$grid-gutter-width: 2rem !default;
+
+$yellow:  #c99909 !default;
+
+$bootstrap-icons-font-dir: "/static/v2026/bootstrap-icons/font/fonts" !default;

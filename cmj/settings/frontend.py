@@ -4,18 +4,15 @@ from unipath import Path
 
 config = AutoConfig()
 DEBUG = config('DEBUG', default=False, cast=bool)
-FRONTEND_VERSION = config('FRONTEND_VERSION', default='v2018', cast=str)
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
 
+Fv2018 = 'v2018'
+Fv2026 = 'v2026'
 
 def front_version():
-    return ['_templates/v2025', '_templates/v2018']
-    if FRONTEND_VERSION == 'v2018':
-        return ['_templates/v2018',]
-    elif FRONTEND_VERSION == 'v2025':
-        return ['_templates/v2025', '_templates/v2018']
+    return [f'_templates/{Fv2026}', f'_templates/{Fv2018}']
 
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
@@ -63,11 +60,8 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 CRISPY_ALLOWED_TEMPLATE_PACKS = 'bootstrap4'
 CRISPY_FAIL_SILENTLY = not DEBUG
 
-STATIC_URL = '/static/'
-STATIC_ROOT = PROJECT_DIR.child("collected_static")
-
-PROJECT_DIR_FRONTEND_2018 = PROJECT_DIR.child('_frontend').child(FRONTEND_VERSION)
-PROJECT_DIR_FRONTEND_2025 = PROJECT_DIR.child('_frontend').child('v2025')
+PROJECT_DIR_FRONTEND_2018 = PROJECT_DIR.child('_frontend').child(Fv2018)
+PROJECT_DIR_FRONTEND_2026 = PROJECT_DIR.child('_frontend').child(Fv2026)
 
 FRONTEND_BRASAO_PATH = {
     '32': PROJECT_DIR_FRONTEND_2018.child('public').child('brasao').child('brasao_32.png'),
@@ -85,16 +79,15 @@ FRONTEND_ESCOLA_PATH = {
 WEBPACK_LOADER = {
     'DEFAULT': {
         'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'dist/v2018/',
+        'BUNDLE_DIR_NAME': f'dist/{Fv2018}/',
         'STATS_FILE': PROJECT_DIR_FRONTEND_2018.child(f'{"dev-" if DEBUG else ""}webpack-stats.json'),
+        'POLL_INTERVAL': 0.1,
+        'IGNORE': [r'.+\.hot-update.js', r'.+\.map'],
     }
 }
 
-if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
-    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2018.child(
-        f'webpack-stats.json')
 
-DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2025.child('dist')
+DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2026.child('dist')
 
 DJANGO_VITE_DEV_MODE = config('DJANGO_VITE_DEV_MODE', default=False, cast=bool)
 DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
@@ -102,35 +95,51 @@ DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
 DJANGO_VITE = {
     'default': {
         'dev_mode': DJANGO_VITE_DEV_MODE,
-        'manifest_path': (
-            DJANGO_VITE_ASSETS_PATH.child('v2025', '.vite', 'manifest.json')
-                if not DJANGO_VITE_DEV_MODE and DEBUG else
-                    STATIC_ROOT.child('v2025', '.vite', 'manifest.json')
-        )
+        'manifest_path': DJANGO_VITE_ASSETS_PATH.child(Fv2026, '.vite', 'manifest.json')
     }
 }
-#if DEBUG:
-#    DJANGO_VITE['default'].update({
-#        'dev_server_host': config('DJANGO_VITE_DEV_SERVER_HOST', default='localhost', cast=str),
-#    })
 
+STATIC_URL = '/static/'
+
+STATIC_ROOT = PROJECT_DIR.child("collected_static")
 
 STATICFILES_DIRS = [
     PROJECT_DIR.child('sapl', 'static'),
-    PROJECT_DIR.child('_frontend', FRONTEND_VERSION, 'dist'),
-    DJANGO_VITE_ASSETS_PATH,
 ]
 
-if DEBUG:
+if not DEBUG:
     STATICFILES_DIRS += [
-        PROJECT_DIR.child('_frontend', 'v2025', 'src', 'assets'),
+        PROJECT_DIR_FRONTEND_2018.child('dist'),
+        PROJECT_DIR_FRONTEND_2026.child('dist')
+    ]
+
+
+if DEBUG and not WEBPACK_LOADER['DEFAULT']['STATS_FILE'].exists():
+
+    WEBPACK_LOADER['DEFAULT']['STATS_FILE'] = PROJECT_DIR_FRONTEND_2018.child(
+        f'webpack-stats.json')
+
+    STATICFILES_DIRS += [
+        PROJECT_DIR_FRONTEND_2018.child('dist'),
+        PROJECT_DIR_FRONTEND_2026.child('src', 'assets')
+    ]
+
+elif DEBUG:
+    STATICFILES_DIRS += [
+        PROJECT_DIR_FRONTEND_2018.child('src', 'assets'),
+        PROJECT_DIR_FRONTEND_2026.child('src', 'assets')
+        ]
+
+if DEBUG and not DJANGO_VITE_DEV_MODE:
+    STATICFILES_DIRS += [
+        PROJECT_DIR_FRONTEND_2026.child('dist')
     ]
 
 # apenas para debug - na produção nginx deve entregar sw
-PWA_SERVICE_WORKER_PATH = PROJECT_DIR.child(
-    '_frontend', FRONTEND_VERSION, 'dist', 'v2018', 'service-worker.js')
-PWA_MANIFEST_PATH = PROJECT_DIR.child(
-    '_frontend', FRONTEND_VERSION, 'dist', 'v2018', 'manifest.json')
+#PWA_SERVICE_WORKER_PATH = PROJECT_DIR.child(
+#    '_frontend', Fv2018, 'dist', Fv2018, 'service-worker.js')
+#PWA_MANIFEST_PATH = PROJECT_DIR.child(
+#    '_frontend', Fv2018, 'dist', Fv2018, 'manifest.json')
 
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',

@@ -1,5 +1,7 @@
 {% load i18n static menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
+
 <!DOCTYPE html>
 <!--[if IE 8]> <html class="no-js lt-ie9" lang="pt-br"> <![endif]-->
 <!--[if gt IE 8]><!-->
@@ -18,7 +20,6 @@
     {% block head_content %}
     {% endblock %}
     {% block webpack_loader_css %}
-      {% render_chunk_vendors 'css' %}
       {% render_bundle  'app' 'css' %}
     {% endblock webpack_loader_css %}
     {% block widgets_form_css %}{% endblock widgets_form_css %}
@@ -188,7 +189,6 @@
   {% block foot_js %}
 
     {% block webpack_loader_js %}
-      {% render_chunk_vendors 'js' %}
       {% render_bundle  'app' 'js' %}
     {% endblock webpack_loader_js %}
 

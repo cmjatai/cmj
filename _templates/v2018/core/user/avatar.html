@@ -3,5 +3,5 @@
 {% if user_render.avatar %}
   <img class="avatar" src="{% cropped_thumbnail user_render 'cropping' %}">
 {% else %}
-  <img class="avatar" src="{% webpack_static 'img/perfil.jpg' %}" title="{{user_render}}">
+  <img class="avatar" src="{% webpack_static '/img/perfil.jpg' %}" title="{{user_render}}">
 {% endif %}

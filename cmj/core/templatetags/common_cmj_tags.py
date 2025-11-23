@@ -21,7 +21,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from num2words import num2words
 from webpack_loader import utils
-from webpack_loader.utils import _get_bundle
+from webpack_loader.utils import _get_bundle, get_files
 
 from cmj.videos.models import Video
 from sapl.base.models import AppConfig
@@ -353,7 +353,7 @@ def avatar_user(user_render=None):
         'user_render': user_render
     }
 
-
+"""
 def get_as_tags(bundle_name, extension=None, config='DEFAULT', attrs=''):
     '''
     Get a list of formatted <script> & <link> tags for the assets in the
@@ -365,7 +365,7 @@ def get_as_tags(bundle_name, extension=None, config='DEFAULT', attrs=''):
     :return: a list of formatted tags as strings
     '''
 
-    bundle = _get_bundle(bundle_name, extension, config)
+    bundle = get_files(bundle_name, extension, config)
     tags = []
     for chunk in bundle:
         if chunk['name'].endswith(('.js', '.js.gz')):
@@ -384,7 +384,7 @@ def render_bundle(bundle_name, extension=None, config='DEFAULT', attrs=''):
     tags = get_as_tags(bundle_name, extension=extension,
                        config=config, attrs=attrs)
     return mark_safe('\n'.join(tags))
-
+"""
 
 @register.simple_tag
 def settings_key_tag(var_name):

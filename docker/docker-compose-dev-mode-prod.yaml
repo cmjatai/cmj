@@ -58,7 +58,6 @@ networks:
     name: cmj-net
     driver: bridge
 volumes:
-  cmjdb_data:
   cmj_data:
   cmj_media:
   cmj_logs:

@@ -1,12 +1,12 @@
 <template>
   <div class="painelset-visoes-control">
     <div class="youtube_id">
-      <input type="text" v-model="evento.youtube_id" @change="
+      <input type="text" v-model="youtube_id" @change="
         utils.patchModel(
           'painelset',
           'evento',
           evento.id,
-          { youtube_id: evento.youtube_id }
+          { youtube_id: youtube_id }
         )"/>
     </div>
     <div class="inner" v-if="painel">
@@ -63,7 +63,8 @@ export default {
   },
   data () {
     return {
-      evento_id: Number(this.$route.params.id)
+      evento_id: Number(this.$route.params.id),
+      youtube_id: ''
     }
   },
   watch: {
@@ -75,6 +76,7 @@ export default {
           this.$router.push({ name: 'painelset_evento_list_link' })
         }
         if (newVal) {
+          this.youtube_id = newVal.youtube_id || ''
           this.fetchSync({
             app: 'painelset',
             model: 'painel',

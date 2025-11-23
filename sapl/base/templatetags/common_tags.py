@@ -373,14 +373,14 @@ def filiacao_intervalo_filter(parlamentar, date_range):
     return filiacao
 
 
-@register.simple_tag
+"""@register.simple_tag
 def render_chunk_vendors(extension=None):
     try:
         tags = utils.get_as_tags(
             'chunk-vendors', extension=extension, config='DEFAULT', attrs='')
         return mark_safe('\n'.join(tags))
     except:
-        return ''
+        return ''"""
 
 
 @register.filter(is_safe=True)

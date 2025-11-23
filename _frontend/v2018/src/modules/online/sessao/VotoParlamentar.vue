@@ -83,14 +83,14 @@ export default {
       if (t.voto) {
         this.utils.patchModel('sessao', 'votoparlamentar', t.voto.id, form)
           .then((response) => {
-            console.log(response.data)
+            console.debug(response.data)
           }).catch((error) => {
             console.debug(error)
           })
       } else {
         this.utils.postModel('sessao', 'votoparlamentar', form)
           .then((response) => {
-            console.log(response.data)
+            console.debug(response.data)
           }).catch((error) => {
             console.debug(error)
           })

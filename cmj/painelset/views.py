@@ -10,8 +10,8 @@ from django.utils import timezone, formats
 def app_vue_painel(request, slug=None):
     return render(request, 'painelset/app_vue_painel.html')
 
-def app_vue_v2025(request, slug=None):
-    return render(request, 'app_vue_v2025.html')
+def app_vue_v2026(request, slug=None):
+    return render(request, 'app_vue_v2026.html')
 
 
 class EventoCrud(Crud):

@@ -54,7 +54,7 @@ export default {
         {
           image: require('@/assets/img/icon_plenarias.png'),
           route: '',
-          link: '/v2025/sessao',
+          link: '/v2026/sessao',
           texto: 'Sessões Plenárias'
         },
         {

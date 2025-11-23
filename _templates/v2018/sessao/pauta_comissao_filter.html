@@ -50,7 +50,7 @@
               <a href="{% url 'sapl.sessao:pauta_comissao_detail' s.id %}"><strong>{{s}}</strong></br></a>
             </td>
             <td class="text-center">
-              <a href="{% url 'sapl.relatorios:relatorio_pauta_sessao' s.pk %}"><img height="30" width="30" src="{% webpack_static 'img/pdflogo.png' %}"></a>
+              <a href="{% url 'sapl.relatorios:relatorio_pauta_sessao' s.pk %}"><img height="30" width="30" src="{% webpack_static '/img/pdflogo.png' %}"></a>
             </td>
           </tr>
         {% endfor %}

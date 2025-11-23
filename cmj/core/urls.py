@@ -13,7 +13,7 @@ from cmj.core.views import CepCrud, RegiaoMunicipalCrud, DistritoCrud,\
     TrechoJsonSearchView, TrechoJsonView, AreaTrabalhoCrud,\
     OperadorAreaTrabalhoCrud, PartidoCrud, ImpressoEnderecamentoCrud,\
     NotificacaoRedirectView, chanel_index, chanel_room, time_refresh_log_test,\
-    app_vue_view_v2018, app_vue_view_v2025, template_render, CertidaoPublicacaoCrud, BiView, \
+    app_vue_view_v2018, app_vue_view_v2026, template_render, CertidaoPublicacaoCrud, BiView, \
     MediaPublicView, PesquisarAuditLogView
 from cmj.core.views_auth import CmjUserChangeView, CmjLoginView,\
     UserCrud, CmjPasswordResetView, CmjPasswordResetEncaminhadoView,\
@@ -74,8 +74,8 @@ vue_urlpatterns = [
     re_path(r'^online/',
             app_vue_view_v2018, name='app_vue_view_v2018_url'),
 
-    re_path(r'^v2025/',
-            app_vue_view_v2025, name='app_vue_view_v2025_url'),
+    re_path(r'^v2026/',
+            app_vue_view_v2026, name='app_vue_view_v2026_url'),
 ]
 
 

@@ -4,7 +4,7 @@
 
 {% block head_content %}
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.9/dist/chart.umd.min.js"></script>
-  <script type="module" src="{% webpack_static 'js/dashboard_custom.js' %}"></script>
+  <script type="module" src="{% webpack_static '/js/dashboard_custom.js' %}"></script>
 {% endblock %}
 
 {% block main_container_class %}container container-path-parlamentar{% endblock main_container_class %}
@@ -23,7 +23,7 @@
   {% endif %}
 
   <div class="path-capa {% if not object.parlamentar.capa  %}path-capa-semfoto{% endif %}">
-    <img src="{% thumbnail object.parlamentar.capa 9000x9000 box=object.parlamentar.capa_cropping crop detail %}">
+    <img src="{% thumbnail object.parlamentar.capa 1024x1024 box=object.parlamentar.capa_cropping crop detail %}">
   </div>
 
 
@@ -34,9 +34,9 @@
           <div class="col-3 col-sm-2 d-flex align-items-center">
             <a class="avatar" href="/{{ object.absolute_slug }}">
               {% if object.parlamentar.fotografia %}
-                  <img src="{% thumbnail object.parlamentar.fotografia 9000x9000 box=object.parlamentar.fotografia_cropping crop detail %}">
+                  <img src="{% thumbnail object.parlamentar.fotografia 1024x1024 box=object.parlamentar.fotografia_cropping crop detail %}">
               {% else %}
-                  <img src="{% webpack_static 'img/perfil.jpg' %}">
+                  <img src="{% webpack_static '/img/perfil.jpg' %}">
               {% endif %}
             </a>
           </div>

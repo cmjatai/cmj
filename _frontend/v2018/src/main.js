@@ -1,4 +1,4 @@
-
+import './expose-global-jquery'
 import './__globals'
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -12,9 +12,7 @@ import VuexStore from './store'
 import axios from 'axios'
 
 import { sync } from 'vuex-router-sync'
-import { loadProgressBar } from 'axios-progress-bar'
 
-import 'axios-progress-bar/dist/nprogress.css'
 import 'vue-resize/dist/vue-resize.css'
 
 import 'popper.js'
@@ -24,6 +22,8 @@ import { routes } from './routers'
 import App from './App'
 
 import './mixins'
+
+import './registerServiceWorker'
 
 axios.defaults.headers.get['Cache-Control'] = 'no-cache, no-store, must-revalidate'
 axios.defaults.headers.get['Pragma'] = 'no-cache' // Suporte para navegadores mais antigos
@@ -54,8 +54,6 @@ Vue.use(VueNativeSock, (window.location.protocol === 'https:' ? 'wss://' : 'ws:/
   // reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
   // reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
 })
-
-loadProgressBar()
 
 Vue.config.productionTip = false
 
@@ -99,48 +97,4 @@ Storage.prototype.delItemArrayOfIds = function (key, id) {
 }
 Storage.prototype.clearArrayOfIds = function (key) {
   this.removeItem(key)
-}
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(registration => {
-        // console.debug('SW registered: ', registration)
-      })
-      .catch(registrationError => {
-        // console.debug('SW registration failed: ', registrationError)
-      })
-
-    // From a page:
-    /* navigator.storage.requestPersistent().then((granted) => {
-      if (granted) {
-        // console.debug('Hurrah, your data is here to stay!')
-      }
-    }); */
-
-    /* if (navigator.storage && navigator.storage.persist) {
-      //First, see if we already have it
-      navigator.storage.persisted().then(persistent => {
-        if(persistent) {
-          // console.debug('already granted');
-        } else {
-          // console.debug('not already granted, lets ask for it');
-          navigator.storage.persist().then(granted => {
-            if (granted) {
-              // console.debug("persisted storage granted ftw");
-            } else {
-              // console.debug("sad face");
-            }
-          });
-        }
-      });
-    }
-
-    //what the heck
-    if(navigator.storage && navigator.storage.estimate) {
-      navigator.storage.estimate().then(result => {
-        // console.debug(result);
-        // console.debug('Percent used '+(result.usage/result.quota).toFixed(2));
-      });
-    } */
-  })
 }
