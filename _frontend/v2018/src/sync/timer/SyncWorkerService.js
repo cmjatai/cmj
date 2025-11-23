@@ -50,7 +50,6 @@ class TimerWorkerService {
       }
     }
 
-    // Processa fila de mensagens pendentes
     while (this.queue.length > 0) {
       const msg = this.queue.shift()
       this.worker.postMessage(msg)
