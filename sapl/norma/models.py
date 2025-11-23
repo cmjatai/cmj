@@ -210,12 +210,21 @@ class NormaJuridica(CommonMixin):
         ordering = ['-data', '-id']
 
     def get_normas_relacionadas(self):
-        principais = NormaRelacionada.objects.filter(
-            norma_principal=self.id).order_by('norma_principal__data',
-                                              'norma_relacionada__data')
-        relacionadas = NormaRelacionada.objects.filter(
-            norma_relacionada=self.id).order_by('norma_principal__data',
-                                                'norma_relacionada__data')
+        nrs = NormaRelacionada.objects.filter(
+            models.Q(norma_principal=self.id) |
+            models.Q(norma_relacionada=self.id)
+        ).select_related(
+            'tipo_vinculo',
+            'norma_principal__tipo',
+            'norma_relacionada__tipo',
+        ).order_by('norma_principal__data', 'norma_relacionada__data')
+        principais = []
+        relacionadas = []
+        for nr in nrs:
+            if nr.norma_principal_id == self.id:
+                principais.append(nr)
+            else:
+                relacionadas.append(nr)
         return (principais, relacionadas)
 
     def get_anexos_norma_juridica(self):

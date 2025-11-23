@@ -79,6 +79,21 @@ class CasaLegislativa(models.Model):
         return _('Casa Legislativa de %(municipio)s') % {
             'municipio': self.municipio}
 
+    @classmethod
+    def casa_cache(cls):
+        value = cache.get(f'portalcmj_casalegislativa') #if not settings.DEBUG else None
+        if not value is None:
+            return value
+
+        casa = cls.objects.first()
+
+        if not casa:
+            return None
+
+        cache.set(f'portalcmj_casalegislativa', casa, 600)
+
+        return casa
+
 
 class AppConfig(models.Model):
 
@@ -219,7 +234,7 @@ class AppConfig(models.Model):
 
     @classmethod
     def attr(cls, attr):
-        value = cache.get(f'portalcmj_{attr}') if not settings.DEBUG else None
+        value = cache.get(f'portalcmj_{attr}') #if not settings.DEBUG else None
         if not value is None:
             return value
 
@@ -230,8 +245,8 @@ class AppConfig(models.Model):
             config.save()
 
         value = getattr(config, attr)
-        if not settings.DEBUG:
-            cache.set(f'portalcmj_{attr}', value, 600)
+        #if not settings.DEBUG:
+        cache.set(f'portalcmj_{attr}', value, 600)
 
         return value
 

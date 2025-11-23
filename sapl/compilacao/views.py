@@ -1092,6 +1092,7 @@ class TextView(CompMixin, ListView):
             if self.object.is_cached(sign=sign):
                 context = ContextMixin.get_context_data(self, **kwargs)
                 context['object'] = self.object
+                context['normas_relacionadas'] = self.object.content_object.get_normas_relacionadas()
 
                 return self.render_to_response(context)
 
@@ -1127,6 +1128,7 @@ class TextView(CompMixin, ListView):
 
             html = response.render()
             embedded_cache = html.content
+            embedded_cache = b' '.join(embedded_cache.split())
 
             output = io.BytesIO(embedded_cache)
             media_cache_storage.save(

@@ -2,6 +2,7 @@
 #'reversion.middleware.RevisionMiddleware',
 MIDDLEWARE = (
     'cmj.middleware.DisabledMiddleware',
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
 

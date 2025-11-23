@@ -3,12 +3,12 @@ import logging
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from sapl.base.views import get_casalegislativa
+from sapl.base.models import CasaLegislativa
 from sapl.utils import mail_service_configured as mail_service_configured_utils
 
 
 def parliament_info(request):
-    casa = get_casalegislativa()
+    casa = CasaLegislativa.casa_cache()
     if casa:
         casa = casa.__dict__
         del casa['_state']

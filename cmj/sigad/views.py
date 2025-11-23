@@ -66,14 +66,14 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
         #context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
 
-        context['ultimos_videos'] = self.get_ultimos_videos()
+        #context['ultimos_videos'] = self.get_ultimos_videos()
 
         #context['docs_adms_pagina_inicial'] = self.get_docs_adms_pagina_inicial()
 
         return context
 
     def get_ultimos_videos(self):
-        docs = list(Documento.objects.qs_video_news()[:100])
+        docs = Documento.objects.qs_video_news()[:100].values('id', 'extra_data', 'titulo')
 
         r = []
 
@@ -85,37 +85,40 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         }
 
         for d in docs:
-            ed = d.extra_data
+            ed = d['extra_data']
             if 'snippet' in ed and \
                 'liveBroadcastContent' in ed['snippet'] and\
                     ed['snippet']['liveBroadcastContent'] == 'upcoming':
-                r.append(d)
-
-            if len(r) == 4:
-                return r
-
-        for d in docs:
-            ed = d.extra_data
-            if 'snippet' in ed and \
-                'liveBroadcastContent' in ed['snippet'] and\
-                    ed['snippet']['liveBroadcastContent'] in ('live', 'upcoming'):
-                continue
-
-            is_ipd = False
-            for ipd in inserir_programa_diario.keys():
-                if ipd in d.titulo.lower():
-                    is_ipd = True
-                    if inserir_programa_diario[ipd]:
-                        inserir_programa_diario[ipd] = False
-                        r.append(d)
-                        break
-
-            if not is_ipd:
-                r.append(d)
+                r.append(d['id'])
 
             if len(r) == 4:
                 break
 
+        if len(r) < 4:
+            for d in docs:
+                ed = d['extra_data']
+                if 'snippet' in ed and \
+                    'liveBroadcastContent' in ed['snippet'] and\
+                        ed['snippet']['liveBroadcastContent'] in ('live', 'upcoming'):
+                    continue
+
+                is_ipd = False
+                for ipd in inserir_programa_diario.keys():
+                    if ipd in d['titulo'].lower():
+                        is_ipd = True
+                        if inserir_programa_diario[ipd]:
+                            inserir_programa_diario[ipd] = False
+                            r.append(d['id'])
+                            break
+
+                if not is_ipd:
+                    r.append(d['id'])
+
+                if len(r) == 4:
+                    break
+
+        if len(r):
+            r = list(Documento.objects.filter(id__in=r).order_by('-public_date', '-created')[:4])
         return r
 
     def get_docs_adms_pagina_inicial(self):
@@ -214,6 +217,8 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             id__in=docs
         ).order_by(
             '-public_date'
+        ).prefetch_related(
+            'parlamentares',
         )
 
         return docs
@@ -527,12 +532,13 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
         referente = None
         try:
-            # verifica se o slug é uma classe
-            self.classe = Classe.objects.get(slug=slug)
+            # Verifica se é um documento
+            self.documento = Documento.objects.filter(slug=slug).select_related(
+                'classe', 'midia').get()
         except:
             try:
-                # Verifica se é um documento
-                self.documento = Documento.objects.get(slug=slug)
+                # verifica se o slug é uma classe
+                self.classe = Classe.objects.get(slug=slug)
             except:
                 try:
                     # verifica se é uma referência

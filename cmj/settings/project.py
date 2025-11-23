@@ -28,7 +28,6 @@ FONTS_DIR = Path(__file__).ancestor(3).child('fonts')
 
 SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
-DEBUG_TOOLBAR_ACTIVE = config('DEBUG_TOOLBAR_ACTIVE', default=False, cast=bool)
 
 FOLDER_DEBUG_CONTAINER = Path(
     config('FOLDER_DEBUG_CONTAINER', default=__file__, cast=str))
@@ -40,13 +39,11 @@ SITE_URL = config('SITE_URL', default='https://www.jatai.go.leg.br', cast=str)
 CSRF_TRUSTED_ORIGINS = [
     SITE_URL,
     'https://cmjatai.1doc.com.br'
-    ]
+]
+
 SESSION_COOKIE_SECURE = not DEBUG
 
 # https, colocar no nginx-> proxy_set_header X-Forwarded-Proto $scheme;
-# if DEBUG:
-#    SITE_URL = ''
-
 
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/?next='
@@ -152,8 +149,8 @@ CACHES = {
     #    'LOCATION': '/var/tmp/django_cache',
     # }
     'default': {
-        #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', #if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', #if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
+        #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
         'LOCATION': 'unique-snowflake',
     }
     # "default": {
@@ -164,13 +161,30 @@ CACHES = {
 
 APPEND_SLASH = False
 
-if DEBUG_TOOLBAR_ACTIVE:
-    INSTALLED_APPS += ('debug_toolbar',)
-    MIDDLEWARE = MIDDLEWARE + \
-        ('debug_toolbar.middleware.DebugToolbarMiddleware', )
-    INTERNAL_IPS = ('127.0.0.1',)
 
 if DEBUG:
     NOTEBOOK_ARGUMENTS = [
         '--notebook-dir', '__notebooks',
     ]
+
+DEBUG_TOOLBAR_ACTIVE = config('DEBUG_TOOLBAR_ACTIVE', default=False, cast=bool)
+DEBUG_TOOLBAR_INTERNAL_IPS = config('DEBUG_TOOLBAR_INTERNAL_IPS', default='127.0.0.1,localhost', cast=str).split(',')
+INTERNAL_IPS = DEBUG_TOOLBAR_INTERNAL_IPS
+
+SILKY_PYTHON_PROFILER = True
+SILKY_PYTHON_PROFILER_BINARY = True
+SILKY_AUTHENTICATION = True  # User must login
+SILKY_AUTHORISATION = True  # User must have permissions
+SILKY_PERMISSIONS = lambda user: user.is_superuser
+SILKY_META = True
+
+if DEBUG_TOOLBAR_ACTIVE:
+    INSTALLED_APPS += (
+        'debug_toolbar',
+        'silk',
+    )
+
+    MIDDLEWARE = MIDDLEWARE[:1] + (
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+        'silk.middleware.SilkyMiddleware' ,
+    ) + MIDDLEWARE[1:]

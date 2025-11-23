@@ -111,6 +111,10 @@ class BreadCrumbMiddleware:
     def process_template_response(self, request, response):
         try:
             context = response.context_data
+
+            if request.path.startswith('/api/') or not context:
+                return response
+
             return get_breadcrumb_classes(context, request, response)
         except:
             return response

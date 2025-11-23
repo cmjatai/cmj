@@ -1,7 +1,6 @@
 # -r test-requirements.txt
 
 #autopep8==2.3.1
-#django-debug-toolbar==4.4.6
 #pygraphviz==1.14
 
 pipdeptree==2.25.0

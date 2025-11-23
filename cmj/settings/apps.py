@@ -12,7 +12,6 @@ INSTALLED_APPS = (
     'daphne',
     'channels',
 
-    #'django_admin_bootstrapped',  # must come before django.contrib.admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -22,8 +21,6 @@ INSTALLED_APPS = (
     'django.contrib.postgres',
     'django_extensions',
     'django.forms',
-    'django_vite',
-
     'social_django',
 
     'crispy_forms',
@@ -33,30 +30,25 @@ INSTALLED_APPS = (
     'easy_thumbnails',
     'image_cropping',
 
-    'drf_spectacular',
     'rest_framework',
-
     'rest_framework.authtoken',
-    #'rest_framework_simplejwt' if PYTHON_VERSION >= PYTHON_VERSION_MIN_FOR_JWT else 'rest_framework.authtoken',
-
+    'drf_spectacular',
     'django_filters',
 
     'haystack',
     'django_celery_results',
     'celery_haystack',
     'django_celery_beat',
-
-
-    # 'whoosh',
-    # 'speedinfo',
-    # 'taggit',
-
-    'sapl',  # não retire, é necessário para os templates centralizados do sapl
 )
 
-INSTALLED_APPS = INSTALLED_APPS + ('webpack_loader', )
+INSTALLED_APPS += (
+    'webpack_loader',
+    'django_vite',
+    )
+
 
 SAPL_APPS = (
+    'sapl',  # não retire, é necessário para os templates centralizados do sapl
     'sapl.audiencia',
     'sapl.base',
     'sapl.crud',
@@ -97,7 +89,4 @@ RULES_APPS = (
     'cmj.globalrules',
 )
 BUSINESS_APPS = SAPL_APPS + CMJ_APPS + RULES_APPS
-INSTALLED_APPS = INSTALLED_APPS + BUSINESS_APPS
-
-# if DEBUG and 'debug_toolbar' not in INSTALLED_APPS:
-#    INSTALLED_APPS += ('debug_toolbar',)
+INSTALLED_APPS += BUSINESS_APPS
