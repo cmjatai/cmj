@@ -7,7 +7,6 @@ class TimerWorkerService {
   }
 
   init () {
-    // Código do worker inline para evitar problemas de build (Webpack/Babel) e CORS
     const workerCode = `
       let timers = new Map()
 
