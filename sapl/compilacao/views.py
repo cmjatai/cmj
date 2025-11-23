@@ -1128,7 +1128,6 @@ class TextView(CompMixin, ListView):
 
             html = response.render()
             embedded_cache = html.content
-
             embedded_cache = b' '.join(embedded_cache.split())
 
             output = io.BytesIO(embedded_cache)

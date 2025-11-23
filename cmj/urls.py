@@ -104,11 +104,9 @@ urlpatterns_all = [
 
 admin.site.site_header = 'PortalCMJ'
 
-urlpatterns_all += [
-    re_path('silk/', include('silk.urls', namespace='silk')),
-]
 if settings.DEBUG_TOOLBAR_ACTIVE:
     urlpatterns_all += [
+        re_path('silk/', include('silk.urls', namespace='silk')),
         re_path('__debug__/', include('debug_toolbar.urls')),
     ]
 

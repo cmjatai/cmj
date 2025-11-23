@@ -181,12 +181,10 @@ SILKY_META = True
 if DEBUG_TOOLBAR_ACTIVE:
     INSTALLED_APPS += (
         'debug_toolbar',
+        'silk',
     )
 
     MIDDLEWARE = MIDDLEWARE[:1] + (
         'debug_toolbar.middleware.DebugToolbarMiddleware',
+        'silk.middleware.SilkyMiddleware' ,
     ) + MIDDLEWARE[1:]
-
-INSTALLED_APPS += (
-    'silk',
-)
