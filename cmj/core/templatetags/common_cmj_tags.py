@@ -525,7 +525,7 @@ def sessaoplenarias_futuras(limite=0):
 
     # Se não estiver no cache, busca no banco de dados
     # e armazena no cache
-    # por 10 minutos (600 segundos)
+    # por 30 minutos (1800 segundos)
 
     hoje = timezone.localdate()
 
@@ -544,7 +544,7 @@ def sessaoplenarias_futuras(limite=0):
     sessoes_futuras = list(sessoes_da_semana) + list(sessoes_futuras)
     sessoes_futuras = sorted(sessoes_futuras, key=lambda x: x.data_inicio)
 
-    cache.set('portalcmj_sessoes_futuras', sessoes_futuras, 600)
+    cache.set('portalcmj_sessoes_futuras', sessoes_futuras, 1800)
 
     if limite > 0:
         sessoes_futuras = list(sessoes_futuras[:limite])

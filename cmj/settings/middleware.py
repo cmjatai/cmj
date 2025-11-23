@@ -2,6 +2,9 @@
 #'reversion.middleware.RevisionMiddleware',
 MIDDLEWARE = (
     'cmj.middleware.DisabledMiddleware',
+
+    'silk.middleware.SilkyMiddleware' ,
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
 

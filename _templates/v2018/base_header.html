@@ -1,16 +1,17 @@
 {% load i18n cache static menus common_cmj_tags cropping %}
 {% load webpack_static from webpack_loader %}
 
-
 <nav class="navbar navbar-topo navbar-expand-lg navbar-dark">
-    <div class="d-flex container{{fluid}} justify-content-between">
-      <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
+  <div class="d-flex container{{fluid}} justify-content-between">
+    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
 
-      <div id="rowlogo" class="d-flex align-items-center">
+    <div id="rowlogo" class="d-flex align-items-center">
+
+      {% cache 60 cache_transmissao_ao_vivo %}
         <div id="portallogo">
           <div>
             <a class="navbar-brand" href="{{site_url}}/">
@@ -30,153 +31,125 @@
           </div>
         </div>
 
-        {% cache 300 cache_transmissao_ao_vivo %}
-          <div>
-            {% if ""|transmissao_ao_vivo %}
-              <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
-                  <i class="fas fa-tv"></i> AoVivo
-              </a>
-            {% comment %}
-              {% else %}
-              <a class="btn bg-danger text-white p-0 px-1" href="/galerias/videos">
-                <i class="fas fa-tv"></i>TvCMJ
-              </a>
-            {% endcomment %}
-            {% endif %}
-          </div>
-        {% endcache %}
+        <div>
+          {% if ""|transmissao_ao_vivo %}
+            <a class="btn bg-danger text-white p-0 px-1" href="/tv-cmj/ao-vivo">
+                <i class="fas fa-tv"></i> AoVivo
+            </a>
+          {% endif %}
+        </div>
+      {% endcache %}
+    </div>
+    {% block button_toogle %}
+      <button type="button" class="navbar-toggler toggle-access" data-toggle="collapse" data-target="#navbar-access" aria-controls="navbar-access" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    {% endblock %}
+    <div class="navbar-collapse collapse " id="navbar-access">
+      <div class="d-flex w-100 flex-column justify-content-end">
+        <div class="row-1 container-notificacoes">
+          {% notificacoes_unread %}
+          {% block social_links %}
+            <div class="navbar-social-links justify-content-end">
+              <a href="/estatisticas" class="icon-estatisticas {% if not 1|sessaoplenarias_futuras %}animation-pulse{% endif %}"  title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
+              {% comment %}
+                <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
+              {% endcomment %}
+              <a href="/v2026/" class="icon-sessoes-online {% if 1|sessaoplenarias_futuras %}animation-pulse{% endif %}" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
+              <a class="instagram" href="https://www.instagram.com/cmjatai"><i class="fab fa-instagram" aria-hidden="true"><span>Instagram</span></i></a>
+              <a class="facebook" href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
+              <a class="x-twitter" href="https://x.com/cmjatai"><span>X</span></a>
+              <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
+              <a class="telegram" href="http://t.me/cmjatai"><span>Telegram</span></a>
+            </div>
+          {% endblock %}
 
-
-      </div>
-
-      {% block button_toogle %}
-        <button type="button" class="navbar-toggler toggle-access" data-toggle="collapse" data-target="#navbar-access" aria-controls="navbar-access" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-      {% endblock %}
-
-      <div class="navbar-collapse collapse " id="navbar-access">
-        <div class="d-flex w-100 flex-column justify-content-end">
-
-
-          <div class="row-1 container-notificacoes">
-
-            {% notificacoes_unread %}
-            {% block social_links %}
-              <div class="navbar-social-links justify-content-end">
-                <a href="/estatisticas" class="icon-estatisticas {% if not 1|sessaoplenarias_futuras %}animation-pulse{% endif %}"  title="Estatisticas de Dados do Portal"><i class="far fa-chart-bar"></i></a>
-                {% comment %}
-                  <a href="https://soundcloud.com/camara-de-jatai"><i class="fab fa-soundcloud" aria-hidden="true"></i><span>SoundCloud</span></i></a>
-                {% endcomment %}
-                <a href="/v2026/" class="icon-sessoes-online {% if 1|sessaoplenarias_futuras %}animation-pulse{% endif %}" title="Sessão Plenária Online - Atualização em tempo real"><span>Sessões Online</span></a>
-                <a class="instagram" href="https://www.instagram.com/cmjatai"><i class="fab fa-instagram" aria-hidden="true"><span>Instagram</span></i></a>
-                <a class="facebook" href="https://www.facebook.com/cmjatai"><i class="fab fa-facebook-f" aria-hidden="true"><span>Facebook</span></i></a>
-                <a class="x-twitter" href="https://x.com/cmjatai"><span>X</span></a>
-                <a class="youtube" href="https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD"><i class="fab fa-youtube" aria-hidden="true"><span>YouTube</span></i></a>
-                <a class="telegram" href="http://t.me/cmjatai"><span>Telegram</span></a>
-              </div>
-            {% endblock %}
-
-            {% if user and not user.is_anonymous %}
-              <ul class="navbar-nav justify-content-end">
-                <li class="dropdown nav-user">
-
-                  <a href="#">
-                    {% avatar_user user%}
-                  </a>
-
-                  {% notificacoes_unread %}
-
-                  <ul class="dropdown-menu">
-                    <li class=" text-right">
-
-                          <form class="m-0" action="{% url 'cmj.core:logout' %}" method="POST">
-                            {% csrf_token %}
-                            <button type="submit" class="dropdown-item text-white">
-                              <i class="fas fa-sign-out" aria-hidden="true"></i> Sair
-                            </button>
-                          </form>
-
-                    </li>
-                    <li  class="divider"></li>
-                    <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
-                    <li  class="divider"></li>
-                    {% if perms.ouvidoria and not user.is_superuser %}
-                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
-                    {% endif %}
-
-                    {% if not user.is_superuser %}
-                      <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
-                      <li class="divider"></li>
-                    {% endif %}
-
-                    <li class=" text-right">
-                      <a href="#linkMenu">{% trans "Intranet" %}<span class="caret"></span></a>
-                      <ul class="dropdown-menu">
-                        <li><a href="https://webmail-seguro.com.br/jatai.go.leg.br">{% trans "Webmail" %}</a></li>
-                        <li><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
-                        <li><a href="https://cmjatai.1doc.com.br">{% trans "1Doc" %}</a></li>
-                        <li><a href="https://cmjatai.1doc.com.br/b.php?pg=o/wp">Central de Atendimento</a></li>
-
-                      </ul>
-                    </li>
-                  </ul>
-                </li>
-                </ul>
-              {% endif %}
-          </div>
-          <div class="row-2 d-flex justify-content-end">
-
-            {% if request.path != '/arqadmin/pesquisa/' %}
-              <form class="form-search" method="get" action="{% url 'cmj.search:haystack_search'%}">
-                <div class="inner">
-                  <div class="item-form">
-                    <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request|search_value}}" autocomplete="off" />
-                  </div>
-                  <div class="item-form">
-                    <button class="button" type="submit"value="">
-                      <i class="fas fa-search"></i>
-                    </button>
-                  </div>
-                </div>
-              </form>
-            {% endif %}
-
-            {% if perms.sigad.add_documento %}
-              {% include 'base_header_transparencia.html' %}
-            {% else %}
-              {% cache 600 cache_acesso_informacao %}
-                {% include 'base_header_transparencia.html' %}
-              {% endcache %}
-            {% endif %}
-
-          </div>
-
-          {% if user.is_anonymous %}
-            <ul class="navbar-nav nav-login-mobile justify-content-end">
-              <li>
-                <a  class="menu-intranet"  href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false" title="{% trans 'Acessar' %}"><i class="fas fa-sign-in-alt"></i></a>
+          {% if user and not user.is_anonymous %}
+            <ul class="navbar-nav justify-content-end">
+              <li class="dropdown nav-user">
+                <a href="#">
+                  {% avatar_user user%}
+                </a>
+                {% notificacoes_unread %}
                 <ul class="dropdown-menu">
+                  <li class=" text-right">
+                    <form class="m-0" action="{% url 'cmj.core:logout' %}" method="POST">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item text-white">
+                        <i class="fas fa-sign-out" aria-hidden="true"></i> Sair
+                      </button>
+                    </form>
+                  </li>
+                  <li  class="divider"></li>
+                  <li class=" text-right"><a href="{% url 'cmj.core:cmj_user_change' %}">{{ user.get_full_name|default:user.email }} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Meu Perfil" %}</a></li>
+                  <li  class="divider"></li>
+                  {% if perms.ouvidoria and not user.is_superuser %}
+                    <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_manage_list' %}">{{user.areatrabalho_set.all.first.nome}} <i class="fa fa-hand-o-left" aria-hidden="true"></i> {% trans "Ouvidoria" %}</a></li>
+                  {% endif %}
 
-                  <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+                  {% if not user.is_superuser %}
+                    <li class=" text-right"><a href="{% url 'cmj.ouvidoria:solicitacao_list' %}">{% trans "Minhas Solicitações" %}</a></li>
+                    <li class="divider"></li>
+                  {% endif %}
 
                   <li class=" text-right">
-                    <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                    <a href="#linkMenu">{% trans "Intranet" %}<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                      <li class="text-right"><a href="https://webmail-seguro.com.br/jatai.go.leg.br">{% trans "Webmail" %}</a></li>
-                      <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
-                      <li class="text-right"><a href="https://cmjatai.1doc.com.br">{% trans "1Doc" %}</a></li>
-                      <li class="text-right"><a href="https://cmjatai.1doc.com.br/b.php?pg=o/wp">Central de Atendimento</a></li>
-
-
+                      <li><a href="https://webmail-seguro.com.br/jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                      <li><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                      <li><a href="https://cmjatai.1doc.com.br">{% trans "1Doc" %}</a></li>
+                      <li><a href="https://cmjatai.1doc.com.br/b.php?pg=o/wp">Central de Atendimento</a></li>
                     </ul>
                   </li>
-                </li>
+                </ul>
+              </li>
             </ul>
           {% endif %}
         </div>
+        <div class="row-2 d-flex justify-content-end">
+          {% if request.path != '/arqadmin/pesquisa/' %}
+            <form class="form-search" method="get" action="{% url 'cmj.search:haystack_search'%}">
+              <div class="inner">
+                <div class="item-form">
+                  <input type="search" name="q" placeholder="O que você procura?" class="textinput textInput form-control" id="id_q" value="{{request|search_value}}" autocomplete="off" />
+                </div>
+                <div class="item-form">
+                  <button class="button" type="submit"value="">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          {% endif %}
+          {% if perms.sigad.add_documento %}
+            {% include 'base_header_transparencia.html' %}
+          {% else %}
+            {% cache 1800 cache_acesso_informacao %}
+              {% include 'base_header_transparencia.html' %}
+            {% endcache %}
+          {% endif %}
+        </div>
+        {% if user.is_anonymous %}
+          <ul class="navbar-nav nav-login-mobile justify-content-end">
+            <li>
+              <a  class="menu-intranet"  href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false" title="{% trans 'Acessar' %}"><i class="fas fa-sign-in-alt"></i></a>
+              <ul class="dropdown-menu">
+                <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+                <li class=" text-right">
+                  <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                  <ul class="dropdown-menu">
+                    <li class="text-right"><a href="https://webmail-seguro.com.br/jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                    <li class="text-right"><a href="http://gestaopublica.camara.jatai.bsit-br.com.br">{% trans "Gestão Pública" %}</a></li>
+                    <li class="text-right"><a href="https://cmjatai.1doc.com.br">{% trans "1Doc" %}</a></li>
+                    <li class="text-right"><a href="https://cmjatai.1doc.com.br/b.php?pg=o/wp">Central de Atendimento</a></li>
+                  </ul>
+                </li>
+              </li>
+          </ul>
+        {% endif %}
       </div>
     </div>
+  </div>
 </nav>

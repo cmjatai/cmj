@@ -1242,17 +1242,17 @@ class Documento(ShortUrl, CMSMixin):
 
         p = self.parlamentares.first()
 
-        c = p.classe_set.first()
+        c = p.classe_set.values_list('slug', flat=True).first()
 
         if not c:
             return ''
 
-        return c.absolute_slug
+        return c
 
     def delete(self, using=None, keep_parents=False, user=None):
         # transfere  midia, caso exista, para ult rev de cada descendente
 
-        
+
 
         childs = self.childs.view_childs()
 

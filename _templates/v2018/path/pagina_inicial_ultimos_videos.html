@@ -1,23 +1,20 @@
 {% load i18n sigad_filters social_utils common_cmj_tags%}
-<div class="container-videos pagina-inicial">
-  <h2 class="title-container">
+<div class="container container-videos pagina-inicial p-0">
+  <h2 class="title-container ml-2 mb-2">
     TV Câmara
   </h2>
-
-  <div class="container p-0 m-0">
-    <div class="row video-list">
-      {% with "col-12 col-md-3 col-sm-6" as grid %}
-        {% for doc in ultimos_videos%}
-            {% include 'path/path_galeria_video_item.html' %}
-        {% endfor %}
-      {% endwith %}
-    </div>
-    <div class="text-right p-2">
+  <div class="row video-list p-2">
+    {% with "col-12 col-md-3 col-sm-6" as grid %}
+      {% for doc in view.get_ultimos_videos %}
+          {% include 'path/path_galeria_video_item.html' %}
+      {% endfor %}
+    {% endwith %}
+  </div>
+  <div class="text-right p-2">
+    <small>
       <small>
-        <small>
-          <a href="/galerias/videos">VEJA MAIS VÍDEOS ></a>
-        </small>
+        <a href="/galerias/videos">VEJA MAIS VÍDEOS ></a>
       </small>
-    </div>
+    </small>
   </div>
 </div>

@@ -100,21 +100,34 @@ def caixa_publicacao_popup(key, request):
                 excludes.append(pk)
 
         #classe = Classe.objects.get(slug='popup')
-        cp = CaixaPublicacao.objects.get(key=key, classe__slug='popup')
-        docs = cp.caixapublicacaorelationship_set.exclude(id__in=excludes).order_by('pk')
+        cp = CaixaPublicacao.objects.filter(
+            key=key, classe__slug='popup')
+        docs = cp.caixapublicacaorelationship_set.exclude(
+            id__in=excludes
+        ).order_by('pk')
 
         result = {'url_edit': 'cmj.sigad:caixapublicacao%s_update' % ('classe' if cp.classe_id else ''),
-                  'cp': cp, 'docs':
-                  list(
-                      map(lambda x: (
-                          x.documento,
-                          x.documento.nodes.filter(
-                              tipo=Documento.TPD_IMAGE).order_by('ordem').first(),
-                          x.id),
-                          docs
-                          ))
-                  }
+                  'cp': cp, 'docs': []}
 
+        if not docs.exists():
+            return result
+
+        docs = docs.select_related('documento')
+
+        result.update(
+            {
+                'docs': list(
+                    map(
+                        lambda x: (
+                            x.documento,
+                            x.documento.nodes.filter(tipo=Documento.TPD_IMAGE).order_by('ordem')[:1].first(),
+                            x.id
+                        ),
+                        docs
+                    )
+                )
+            }
+        )
         return result
     except:
         return None

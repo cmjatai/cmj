@@ -102,11 +102,15 @@ urlpatterns_all = [
     re_path("dash/", dashboard.urls),
 ]
 
-admin.site.site_header = 'Cmj'
+admin.site.site_header = 'PortalCMJ'
 
+urlpatterns_all += [
+    re_path('silk/', include('silk.urls', namespace='silk')),
+]
 if settings.DEBUG_TOOLBAR_ACTIVE:
-    import debug_toolbar
-    urlpatterns_all.append(re_path('__debug__/', include(debug_toolbar.urls)))
+    urlpatterns_all += [
+        re_path('__debug__/', include('debug_toolbar.urls')),
+    ]
 
 if settings.DEBUG:
     urlpatterns_all.append(

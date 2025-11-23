@@ -109,10 +109,6 @@ def filtra_url_materias_em_tramitacao(qr, qs, campo_url, local_ou_status):
     return qs.filter(em_tramitacao=True, id__in=id_materias)
 
 
-def get_casalegislativa():
-    return CasaLegislativa.objects.first()
-
-
 class ConfirmarEmailView(TemplateView):
     template_name = "email/confirma.html"
 
@@ -1854,7 +1850,7 @@ class CasaLegislativaCrud(CrudAux):
     class ListView(CrudAux.ListView):
 
         def get(self, request, *args, **kwargs):
-            casa = get_casalegislativa()
+            casa = CasaLegislativa.objects.first()
             if casa:
                 return HttpResponseRedirect(
                     reverse('sapl.base:casalegislativa_detail',
@@ -1959,7 +1955,7 @@ STATIC_LOGO = os.path.join(settings.STATIC_URL, 'img/logo.png')
 class LogotipoView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
-        casa = get_casalegislativa()
+        casa = CasaLegislativa.objects.first()
         logo = casa and casa.logotipo and casa.logotipo.name
         return os.path.join(settings.MEDIA_URL, logo) if logo else STATIC_LOGO
 
