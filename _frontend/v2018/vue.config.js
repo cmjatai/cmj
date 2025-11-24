@@ -9,10 +9,10 @@ const CopyPlugin = require('copy-webpack-plugin')
 const WebpackPwaManifest = require('webpack-pwa-manifest')
 const WorkboxPlugin = require('workbox-webpack-plugin')
 
-const dotenv = require('dotenv')
-dotenv.config({
-  path: '../../cmj/.env'
-})
+// const dotenv = require('dotenv')
+// dotenv.config({
+//   path: '../../cmj/.env'
+// })
 
 let HOST_NAME = 'localhost'
 // HOST_NAME = '192.168.15.9'
@@ -67,6 +67,7 @@ module.exports = {
         $: 'jquery',
         jQuery: 'jquery',
         'window.jQuery': 'jquery',
+        //'window.$': 'jquery',
         '_': 'lodash'
       }])
 
