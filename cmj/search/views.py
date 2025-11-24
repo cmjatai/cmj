@@ -190,14 +190,15 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
 
         return self.form_class(data, **kwargs)
 
-    def urls(self):
+    def view_actions(self):
         u = self.request.user
         return {
             'search_url': '?',
             'verbose_name': _('Materia Legislativa'),
             'create_url': '' if u.is_anonymous or
             not u.has_perm('materia.add_materialegislativa') else
-            reverse('sapl.materia:materialegislativa_create')
+            reverse('sapl.materia:materialegislativa_create'),
+            'tipos_autores_materias': self.tipo_autores_materias,
         }
 
     def get_context(self):
@@ -223,26 +224,28 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
         if 'page' in data:
             del data['page']
 
-        context['view'] = self.urls()
+        context['view'] = self.view_actions()
 
         qr = self.request.GET.copy()
         context['show_results'] = show_results_filter_set(qr)
         if not context['show_results']:
             del context['view']['search_url']
-
-            acesso_rapido_list = list(tipos_autores_materias(
-                None, restricao_regimental=False).items()
-            )
-
-            acesso_rapido_list.sort(
-                key=lambda tup: tup[0].sequencia_regimental)
-
-            context['tipos_autores_materias'] = acesso_rapido_list
+            #context['tipos_autores_materias'] = self.tipo_autores_materias()
 
         context['filter_url'] = (
             '&' + data.urlencode()) if len(data) > 0 else ''
 
         return context
+
+    def tipo_autores_materias(self):
+        acesso_rapido_list = list(tipos_autores_materias(
+            None, restricao_regimental=False).items()
+        )
+
+        acesso_rapido_list.sort(
+            key=lambda tup: tup[0].sequencia_regimental)
+
+        return acesso_rapido_list
 
     def render_to_pdf(self, context):
 
@@ -380,6 +383,11 @@ class NormaSearchView(AudigLogFilterMixin,  MultiFormatOutputMixin, SearchView, 
             del data['page']
 
         context['view'] = self.urls()
+
+        object_list = context['page'].object_list
+        NormaJuridica.objects.filter(
+            id__in=[obj.pk for obj in object_list]
+        ).select_related('tipo')
 
         qr = self.request.GET.copy()
         context['show_results'] = show_results_filter_set(qr)

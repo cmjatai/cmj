@@ -28,21 +28,18 @@
     <hr>
     {% crispy filter.form %}
 
-
     {% if tipos_autores_materias %}
-    <br>
-        <fieldset>
-          <legend>
-            <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?em_tramitacao_b=1">
-              Acesso Rápido às Matérias em Tramitação
-            </a>
-          </legend>
-          <br>
-        </fieldset>
-          {% include 'materia/materias_em_tramitacao_widget.html' %}
-
-      {% endif %}
-    </div>
+      <br>
+      <fieldset>
+        <legend>
+          <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?em_tramitacao_b=1">
+            Acesso Rápido às Matérias em Tramitação
+          </a>
+        </legend>
+        <br>
+      </fieldset>
+      {% include 'materia/materias_em_tramitacao_widget.html' %}
+    {% endif %}
   {% endif %}
 {% endblock detail_content %}
 

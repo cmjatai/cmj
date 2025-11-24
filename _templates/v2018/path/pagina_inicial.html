@@ -7,7 +7,7 @@
 {% block main_container_class %}container-fluid p-0 container{{fluid}}{{path}}{% endblock %}
 {% block content_container %}{{ block.super }}{% endblock %}
 {% block base_content %}
-{% cache 300 cache_pagina_inicial_parte1 %}
+{% cache 86400 portalcmj_pagina_inicial_parte1 %}
 <div class="container" id="main_content">
   <div class="row">
     <div class="col p-0 p-lg-2 pt-lg-3">
@@ -25,7 +25,7 @@
 </div>
 {% endcache %}
 
-{% cache 60 cache_pagina_inicial_parte2 %}
+{% cache 60 portalcmj_pagina_inicial_parte2 %}
 {% with ""|transmissao_ao_vivo as aovivo %}
 {% if aovivo.exists %}
 <div class="container mt-4">
@@ -38,7 +38,7 @@
 {% endif %}
 {% endwith %}
 {% endcache %}
-{% cache 1200 cache_pagina_inicial_parte3 %}
+{% cache 86400 portalcmj_pagina_inicial_parte3 %}
 {% include "path/pagina_inicial_ultimos_videos.html" %}
 <div class="container-fluid mt-4">
   <div class="row">

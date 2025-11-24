@@ -90,7 +90,7 @@ class CasaLegislativa(models.Model):
         if not casa:
             return None
 
-        cache.set(f'portalcmj_casalegislativa', casa, 600)
+        cache.set(f'portalcmj_casalegislativa', casa, 86400)
 
         return casa
 
@@ -234,7 +234,7 @@ class AppConfig(models.Model):
 
     @classmethod
     def attr(cls, attr):
-        value = cache.get(f'portalcmj_{attr}') #if not settings.DEBUG else None
+        value = cache.get(f'portalcmj_appconfig_{attr}') #if not settings.DEBUG else None
         if not value is None:
             return value
 
@@ -246,7 +246,7 @@ class AppConfig(models.Model):
 
         value = getattr(config, attr)
         #if not settings.DEBUG:
-        cache.set(f'portalcmj_{attr}', value, 600)
+        cache.set(f'portalcmj_appconfig_{attr}', value, 86400)
 
         return value
 

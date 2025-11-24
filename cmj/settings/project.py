@@ -148,15 +148,15 @@ CACHES = {
     #    'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
     #    'LOCATION': '/var/tmp/django_cache',
     # }
+    #'default': {
+    #    'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', #if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
+    #    #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
+    #    'LOCATION': 'unique-snowflake',
+    #}
     'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache', #if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
-        #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
-        'LOCATION': 'unique-snowflake',
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
     }
-    # "default": {
-    #    "BACKEND": "django.core.cache.backends.redis.RedisCache",
-    #    "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
-    # }
 }
 
 APPEND_SLASH = False

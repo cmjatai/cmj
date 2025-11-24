@@ -11,7 +11,7 @@
 
     <div id="rowlogo" class="d-flex align-items-center">
 
-      {% cache 60 cache_transmissao_ao_vivo %}
+      {% cache 60 portalcmj_transmissao_ao_vivo %}
         <div id="portallogo">
           <div>
             <a class="navbar-brand" href="{{site_url}}/">
@@ -126,7 +126,7 @@
           {% if perms.sigad.add_documento %}
             {% include 'base_header_transparencia.html' %}
           {% else %}
-            {% cache 1800 cache_acesso_informacao %}
+            {% cache 86400 portalcmj_acesso_informacao %}
               {% include 'base_header_transparencia.html' %}
             {% endcache %}
           {% endif %}

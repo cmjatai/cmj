@@ -1,6 +1,8 @@
 import inspect
 import logging
 
+from django.core.cache import cache
+from django.core.cache.utils import make_template_fragment_key
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_delete, post_save
 from django.db.models.signals import post_migrate
@@ -9,12 +11,30 @@ from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
 
 from sapl.base.models import Autor, TipoAutor as modelTipoAutor
-from sapl.materia.models import Tramitacao
+from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.protocoloadm.models import TramitacaoAdministrativo
+from sapl.sessao.models import SessaoPlenaria
 from sapl.utils import get_base_url
 from sapl.utils import models_with_gr_for_model
 
 from .tasks import task_envia_email_tramitacao
+
+
+@receiver([post_save, post_delete], sender=Tramitacao)
+@receiver([post_save, post_delete], sender=MateriaLegislativa)
+def handle_materia_materialegislativa_signal(sender, **kwargs):
+    key = make_template_fragment_key('portalcmj_pesquisar_materia')
+    cache.delete(key)
+
+
+@receiver([post_save, post_delete], sender=SessaoPlenaria)
+def handle_sessao_sessaoplenaria_signal(sender, **kwargs):
+    keys = [
+        make_template_fragment_key('portalcmj_pagina_inicial_parte1'),
+        make_template_fragment_key('portalcmj_sessoes_futuras'),
+    ]
+    for key in keys:
+        cache.delete(key)
 
 
 @receiver(post_save, sender=Tramitacao)

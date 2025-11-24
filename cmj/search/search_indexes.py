@@ -238,6 +238,14 @@ class NormaJuridicaIndex(BaseIndex, CelerySearchIndex, Indexable):
     def prepare_numero_s(self, obj):
         return f'{obj.numero:>06}'
 
+    def index_queryset(self, using=None):
+
+        qs = self.get_model()._default_manager.all()
+
+        return qs.select_related(
+            "tipo",
+        )
+
 
 class DocumentoAcessorioIndex(BaseIndex, CelerySearchIndex, Indexable):
     model = DocumentoAcessorio

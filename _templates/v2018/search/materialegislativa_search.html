@@ -1,5 +1,5 @@
 {% extends 'crud/detail.html' %}
-{% load i18n crispy_forms_tags cropping thumbnail  %}
+{% load i18n cache crispy_forms_tags cropping thumbnail  %}
 {% load common_cmj_tags highlight menus %}
 {% load common_tags sigad_filters  %}
 {% load render_bundle from webpack_loader %}
@@ -47,42 +47,43 @@
 
 <div class="container-search">
   {% if not show_results %}
-    {% include 'search/search_help_text.html' %}
+    {% cache 86400 portalcmj_pesquisar_materia %}
+      {% include 'search/search_help_text.html' %}
+      <div class="row">
+        <div class="col-12">
+        </div>
+        <div class="col-12 col-md-8">
 
-    <div class="row">
-      <div class="col-12">
-      </div>
-      <div class="col-12 col-md-8">
+          {% crispy form %}
 
-        {% crispy form %}
-
-        <hr>
-        {{ dashboard.dash_grids.materiasearchdashboard }}
-
-        <small class="text-black-50">
-          OBS: Classificação de Assuntos é automatizada e realizada, atualmente, apenas para os Requerimentos. Feita pela Inteligência Artificial Gemini 2.0.
-        </small>
-
-      </div>
-      <div class="col-12 col-md-4 " style="border-left: 1px solid white;">
-        {% if tipos_autores_materias %}
-          <br>
-          <fieldset>
-            <h3>
-              <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?em_tramitacao_b=1">
-                Acesso Rápido às Matérias em Tramitação
-              </a>
-            </h3>
-          </fieldset>
           <hr>
-          {% include 'materia/materias_em_tramitacao_widget.html' %}
-        {% endif %}
+          {{ dashboard.dash_grids.materiasearchdashboard }}
+
+          <small class="text-black-50">
+            OBS: Classificação de Assuntos é automatizada e realizada, atualmente, apenas para os Requerimentos. Feita pela Inteligência Artificial Gemini 2.0.
+          </small>
+
+        </div>
+        <div class="col-12 col-md-4 " style="border-left: 1px solid white;">
+          {% with view.tipos_autores_materias as tipos_autores_materias %}
+            {% if tipos_autores_materias %}
+              <br>
+              <fieldset>
+                <h3>
+                  <a class="text-black-50" href="{% url 'cmj.search:materia_haystack_search'%}?em_tramitacao_b=1">
+                    Acesso Rápido às Matérias em Tramitação
+                  </a>
+                </h3>
+              </fieldset>
+              <hr>
+              {% include 'materia/materias_em_tramitacao_widget.html' %}
+            {% endif %}
+          {% endwith %}
+        </div>
       </div>
-    </div>
-
+    {% endcache %}
   {% else %}
-
-  <div class="container-table">
+    <div class="container-table">
     {% for result in page.object_list %}
       {% if forloop.first %}
         <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
@@ -400,9 +401,6 @@
 
                   </div>
                   {% endwith %}
-
-
-
 
 
         {% endif %}

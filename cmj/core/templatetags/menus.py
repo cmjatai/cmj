@@ -124,7 +124,7 @@ def sigad_navbar(context, field=None):
 
     menu = get_how_menu(raizes)
     if not user.is_superuser:
-        cache.set('portalcmj_menu_publico', menu, 600)
+        cache.set('portalcmj_menu_publico', menu, 86400)
 
     menu = encapsule_menu_em_dropdown_portal(menu)
 
