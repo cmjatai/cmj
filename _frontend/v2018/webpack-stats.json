@@ -1324,35 +1324,35 @@
       "path": "js/8748.f612b944.js.gz",
       "publicPath": "/static/v2018/js/8748.f612b944.js.gz"
     },
-    "js/app.bdd0d66c.js": {
-      "name": "js/app.bdd0d66c.js",
-      "path": "js/app.bdd0d66c.js",
-      "publicPath": "/static/v2018/js/app.bdd0d66c.js"
+    "js/app.a66f7d83.js": {
+      "name": "js/app.a66f7d83.js",
+      "path": "js/app.a66f7d83.js",
+      "publicPath": "/static/v2018/js/app.a66f7d83.js"
     },
-    "js/app.bdd0d66c.js.gz": {
-      "name": "js/app.bdd0d66c.js.gz",
-      "path": "js/app.bdd0d66c.js.gz",
-      "publicPath": "/static/v2018/js/app.bdd0d66c.js.gz"
+    "js/app.a66f7d83.js.gz": {
+      "name": "js/app.a66f7d83.js.gz",
+      "path": "js/app.a66f7d83.js.gz",
+      "publicPath": "/static/v2018/js/app.a66f7d83.js.gz"
     },
-    "js/compilacao.dc362d41.js": {
-      "name": "js/compilacao.dc362d41.js",
-      "path": "js/compilacao.dc362d41.js",
-      "publicPath": "/static/v2018/js/compilacao.dc362d41.js"
+    "js/compilacao.17d35008.js": {
+      "name": "js/compilacao.17d35008.js",
+      "path": "js/compilacao.17d35008.js",
+      "publicPath": "/static/v2018/js/compilacao.17d35008.js"
     },
-    "js/compilacao.dc362d41.js.gz": {
-      "name": "js/compilacao.dc362d41.js.gz",
-      "path": "js/compilacao.dc362d41.js.gz",
-      "publicPath": "/static/v2018/js/compilacao.dc362d41.js.gz"
+    "js/compilacao.17d35008.js.gz": {
+      "name": "js/compilacao.17d35008.js.gz",
+      "path": "js/compilacao.17d35008.js.gz",
+      "publicPath": "/static/v2018/js/compilacao.17d35008.js.gz"
     },
-    "js/construct.1470c3ca.js": {
-      "name": "js/construct.1470c3ca.js",
-      "path": "js/construct.1470c3ca.js",
-      "publicPath": "/static/v2018/js/construct.1470c3ca.js"
+    "js/construct.2fcd56fe.js": {
+      "name": "js/construct.2fcd56fe.js",
+      "path": "js/construct.2fcd56fe.js",
+      "publicPath": "/static/v2018/js/construct.2fcd56fe.js"
     },
-    "js/construct.1470c3ca.js.gz": {
-      "name": "js/construct.1470c3ca.js.gz",
-      "path": "js/construct.1470c3ca.js.gz",
-      "publicPath": "/static/v2018/js/construct.1470c3ca.js.gz"
+    "js/construct.2fcd56fe.js.gz": {
+      "name": "js/construct.2fcd56fe.js.gz",
+      "path": "js/construct.2fcd56fe.js.gz",
+      "publicPath": "/static/v2018/js/construct.2fcd56fe.js.gz"
     },
     "js/dashboard_custom.js": {
       "name": "js/dashboard_custom.js",
@@ -1365,15 +1365,25 @@
       "path": "js/dashboard_custom.js.gz",
       "publicPath": "/static/v2018/js/dashboard_custom.js.gz"
     },
-    "js/loa.3743add5.js": {
-      "name": "js/loa.3743add5.js",
-      "path": "js/loa.3743add5.js",
-      "publicPath": "/static/v2018/js/loa.3743add5.js"
+    "js/libsuserauth.b66d799f.js": {
+      "name": "js/libsuserauth.b66d799f.js",
+      "path": "js/libsuserauth.b66d799f.js",
+      "publicPath": "/static/v2018/js/libsuserauth.b66d799f.js"
     },
-    "js/loa.3743add5.js.gz": {
-      "name": "js/loa.3743add5.js.gz",
-      "path": "js/loa.3743add5.js.gz",
-      "publicPath": "/static/v2018/js/loa.3743add5.js.gz"
+    "js/libsuserauth.b66d799f.js.gz": {
+      "name": "js/libsuserauth.b66d799f.js.gz",
+      "path": "js/libsuserauth.b66d799f.js.gz",
+      "publicPath": "/static/v2018/js/libsuserauth.b66d799f.js.gz"
+    },
+    "js/loa.5ecaac9f.js": {
+      "name": "js/loa.5ecaac9f.js",
+      "path": "js/loa.5ecaac9f.js",
+      "publicPath": "/static/v2018/js/loa.5ecaac9f.js"
+    },
+    "js/loa.5ecaac9f.js.gz": {
+      "name": "js/loa.5ecaac9f.js.gz",
+      "path": "js/loa.5ecaac9f.js.gz",
+      "publicPath": "/static/v2018/js/loa.5ecaac9f.js.gz"
     },
     "js/npm.autosize.18c79efb.js": {
       "name": "js/npm.autosize.18c79efb.js",
@@ -1565,15 +1575,15 @@
       "path": "js/npm.split.js.4fb31ddb.js.gz",
       "publicPath": "/static/v2018/js/npm.split.js.4fb31ddb.js.gz"
     },
-    "js/npm.tinymce.5a2cd167.js": {
-      "name": "js/npm.tinymce.5a2cd167.js",
-      "path": "js/npm.tinymce.5a2cd167.js",
-      "publicPath": "/static/v2018/js/npm.tinymce.5a2cd167.js"
+    "js/npm.tinymce.c80fb0fe.js": {
+      "name": "js/npm.tinymce.c80fb0fe.js",
+      "path": "js/npm.tinymce.c80fb0fe.js",
+      "publicPath": "/static/v2018/js/npm.tinymce.c80fb0fe.js"
     },
-    "js/npm.tinymce.5a2cd167.js.gz": {
-      "name": "js/npm.tinymce.5a2cd167.js.gz",
-      "path": "js/npm.tinymce.5a2cd167.js.gz",
-      "publicPath": "/static/v2018/js/npm.tinymce.5a2cd167.js.gz"
+    "js/npm.tinymce.c80fb0fe.js.gz": {
+      "name": "js/npm.tinymce.c80fb0fe.js.gz",
+      "path": "js/npm.tinymce.c80fb0fe.js.gz",
+      "publicPath": "/static/v2018/js/npm.tinymce.c80fb0fe.js.gz"
     },
     "js/npm.vue-chartjs.27fdf07c.js": {
       "name": "js/npm.vue-chartjs.27fdf07c.js",
@@ -2416,10 +2426,9 @@
   "chunks": {
     "app": [
       "js/npm.core-js.f60d62f9.js",
-      "js/npm.lodash.b671d9f5.js",
       "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
       "js/npm.axios.1f04d043.js",
-      "js/npm.tinymce.5a2cd167.js",
       "js/npm.bootstrap-vue.672ad741.js",
       "js/npm.vue.6c2bcc9f.js",
       "css/npm.unknown.8c2fe9c9.css",
@@ -2439,24 +2448,24 @@
       "js/npm.bootstrap-select.353c2cd3.js",
       "js/1774.466ce24e.js",
       "css/app.82adf1db.css",
-      "js/app.bdd0d66c.js"
+      "js/app.a66f7d83.js"
     ],
     "compilacao": [
       "js/npm.core-js.f60d62f9.js",
-      "js/npm.lodash.b671d9f5.js",
       "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
       "js/npm.diff.0f7f453a.js",
       "js/1774.466ce24e.js",
       "css/4649.efafaacc.css",
       "js/4649.a0c554db.js",
-      "js/compilacao.dc362d41.js"
+      "js/compilacao.17d35008.js"
     ],
     "construct": [
       "js/npm.core-js.f60d62f9.js",
-      "js/npm.lodash.b671d9f5.js",
       "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
       "js/npm.axios.1f04d043.js",
-      "js/npm.tinymce.5a2cd167.js",
+      "js/npm.tinymce.c80fb0fe.js",
       "js/npm.bootstrap-vue.672ad741.js",
       "js/npm.vue.6c2bcc9f.js",
       "css/npm.unknown.8c2fe9c9.css",
@@ -2471,16 +2480,21 @@
       "js/npm.autosize.18c79efb.js",
       "js/1774.466ce24e.js",
       "css/construct.a9a5f02d.css",
-      "js/construct.1470c3ca.js"
+      "js/construct.2fcd56fe.js"
+    ],
+    "libsuserauth": [
+      "js/npm.jquery.1b4d0761.js",
+      "js/npm.tinymce.c80fb0fe.js",
+      "js/libsuserauth.b66d799f.js"
     ],
     "loa": [
       "js/npm.core-js.f60d62f9.js",
-      "js/npm.lodash.b671d9f5.js",
       "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
       "js/npm.axios.1f04d043.js",
       "js/1774.466ce24e.js",
       "css/loa.b66502c0.css",
-      "js/loa.3743add5.js"
+      "js/loa.5ecaac9f.js"
     ]
   },
   "publicPath": "/static/v2018/"

@@ -11,17 +11,6 @@ import 'jquery-ui/ui/i18n/datepicker-pt-BR'
 
 import 'jquery-ui-themes/themes/pepper-grinder/jquery-ui.min.css'
 
-import tinymce from 'tinymce/tinymce'
-import './tinymce/lang/pt_BR.js'
-
-import 'tinymce/themes/silver'
-import 'tinymce/icons/default'
-import 'tinymce/plugins/table'
-import 'tinymce/plugins/lists'
-import 'tinymce/plugins/code'
-import 'tinymce/plugins/link'
-import 'tinymce/models/dom'
-
 import 'jquery-mask-plugin'
 
 import dateFormat from 'dateformat'
@@ -29,5 +18,4 @@ import dateFormat from 'dateformat'
 // import './jquery_runner' // django app painel
 import './image_cropping'
 
-window.tinymce = tinymce
 window.dateFormat = dateFormat

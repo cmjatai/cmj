@@ -21,6 +21,9 @@
     {% endblock %}
     {% block webpack_loader_css %}
       {% render_bundle  'app' 'css' %}
+      {% if not user.is_anonymous %}
+        {% render_bundle  'libsuserauth' 'css' %}
+      {% endif %}
     {% endblock webpack_loader_css %}
     {% block widgets_form_css %}{% endblock widgets_form_css %}
   </head>
@@ -190,6 +193,9 @@
 
     {% block webpack_loader_js %}
       {% render_bundle  'app' 'js' %}
+      {% if not user.is_anonymous %}
+        {% render_bundle  'libsuserauth' 'js' %}
+      {% endif %}
     {% endblock webpack_loader_js %}
 
     {% block extra_js %}{% endblock %}

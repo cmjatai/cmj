@@ -58,6 +58,10 @@ module.exports = {
       .add('./src/__apps/loa/main.js')
       .end()
 
+    config.entry('libsuserauth')
+      .add('./src/__apps/libsuserauth/main.js')
+      .end()
+
     config.plugin('provide')
       .use(require('webpack').ProvidePlugin, [{
         $: 'jquery',
