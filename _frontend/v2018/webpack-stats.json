@@ -4,1371 +4,2499 @@
     "brasao/brasao_1024.png": {
       "name": "brasao/brasao_1024.png",
       "path": "brasao/brasao_1024.png",
-      "publicPath": "http://localhost:8080/brasao/brasao_1024.png",
+      "publicPath": "/static/v2018/brasao/brasao_1024.png",
       "sourceFilename": "src/assets/brasao/brasao_1024.png"
     },
     "brasao/brasao_128.png": {
       "name": "brasao/brasao_128.png",
       "path": "brasao/brasao_128.png",
-      "publicPath": "http://localhost:8080/brasao/brasao_128.png",
+      "publicPath": "/static/v2018/brasao/brasao_128.png",
       "sourceFilename": "src/assets/brasao/brasao_128.png"
     },
     "brasao/brasao_256.png": {
       "name": "brasao/brasao_256.png",
       "path": "brasao/brasao_256.png",
-      "publicPath": "http://localhost:8080/brasao/brasao_256.png",
+      "publicPath": "/static/v2018/brasao/brasao_256.png",
       "sourceFilename": "src/assets/brasao/brasao_256.png"
     },
     "brasao/brasao_32.png": {
       "name": "brasao/brasao_32.png",
       "path": "brasao/brasao_32.png",
-      "publicPath": "http://localhost:8080/brasao/brasao_32.png",
+      "publicPath": "/static/v2018/brasao/brasao_32.png",
       "sourceFilename": "src/assets/brasao/brasao_32.png"
     },
     "brasao/brasao_512.png": {
       "name": "brasao/brasao_512.png",
       "path": "brasao/brasao_512.png",
-      "publicPath": "http://localhost:8080/brasao/brasao_512.png",
+      "publicPath": "/static/v2018/brasao/brasao_512.png",
       "sourceFilename": "src/assets/brasao/brasao_512.png"
     },
     "brasao/brasao_64.png": {
       "name": "brasao/brasao_64.png",
       "path": "brasao/brasao_64.png",
-      "publicPath": "http://localhost:8080/brasao/brasao_64.png",
+      "publicPath": "/static/v2018/brasao/brasao_64.png",
       "sourceFilename": "src/assets/brasao/brasao_64.png"
     },
     "brasao/escola_1024.png": {
       "name": "brasao/escola_1024.png",
       "path": "brasao/escola_1024.png",
-      "publicPath": "http://localhost:8080/brasao/escola_1024.png",
+      "publicPath": "/static/v2018/brasao/escola_1024.png",
       "sourceFilename": "src/assets/brasao/escola_1024.png"
+    },
+    "css/1580.167a0a7e.css": {
+      "name": "css/1580.167a0a7e.css",
+      "path": "css/1580.167a0a7e.css",
+      "publicPath": "/static/v2018/css/1580.167a0a7e.css"
+    },
+    "css/1580.167a0a7e.css.gz": {
+      "name": "css/1580.167a0a7e.css.gz",
+      "path": "css/1580.167a0a7e.css.gz",
+      "publicPath": "/static/v2018/css/1580.167a0a7e.css.gz"
+    },
+    "css/2008.84128abf.css": {
+      "name": "css/2008.84128abf.css",
+      "path": "css/2008.84128abf.css",
+      "publicPath": "/static/v2018/css/2008.84128abf.css"
+    },
+    "css/2008.84128abf.css.gz": {
+      "name": "css/2008.84128abf.css.gz",
+      "path": "css/2008.84128abf.css.gz",
+      "publicPath": "/static/v2018/css/2008.84128abf.css.gz"
+    },
+    "css/3907.72731099.css": {
+      "name": "css/3907.72731099.css",
+      "path": "css/3907.72731099.css",
+      "publicPath": "/static/v2018/css/3907.72731099.css"
+    },
+    "css/3907.72731099.css.gz": {
+      "name": "css/3907.72731099.css.gz",
+      "path": "css/3907.72731099.css.gz",
+      "publicPath": "/static/v2018/css/3907.72731099.css.gz"
+    },
+    "css/4629.b30dcb99.css": {
+      "name": "css/4629.b30dcb99.css",
+      "path": "css/4629.b30dcb99.css",
+      "publicPath": "/static/v2018/css/4629.b30dcb99.css"
+    },
+    "css/4629.b30dcb99.css.gz": {
+      "name": "css/4629.b30dcb99.css.gz",
+      "path": "css/4629.b30dcb99.css.gz",
+      "publicPath": "/static/v2018/css/4629.b30dcb99.css.gz"
+    },
+    "css/4649.efafaacc.css": {
+      "name": "css/4649.efafaacc.css",
+      "path": "css/4649.efafaacc.css",
+      "publicPath": "/static/v2018/css/4649.efafaacc.css"
+    },
+    "css/4649.efafaacc.css.gz": {
+      "name": "css/4649.efafaacc.css.gz",
+      "path": "css/4649.efafaacc.css.gz",
+      "publicPath": "/static/v2018/css/4649.efafaacc.css.gz"
+    },
+    "css/4686.723a3357.css": {
+      "name": "css/4686.723a3357.css",
+      "path": "css/4686.723a3357.css",
+      "publicPath": "/static/v2018/css/4686.723a3357.css"
+    },
+    "css/4686.723a3357.css.gz": {
+      "name": "css/4686.723a3357.css.gz",
+      "path": "css/4686.723a3357.css.gz",
+      "publicPath": "/static/v2018/css/4686.723a3357.css.gz"
+    },
+    "css/5186.f73c8cbd.css": {
+      "name": "css/5186.f73c8cbd.css",
+      "path": "css/5186.f73c8cbd.css",
+      "publicPath": "/static/v2018/css/5186.f73c8cbd.css"
+    },
+    "css/5186.f73c8cbd.css.gz": {
+      "name": "css/5186.f73c8cbd.css.gz",
+      "path": "css/5186.f73c8cbd.css.gz",
+      "publicPath": "/static/v2018/css/5186.f73c8cbd.css.gz"
+    },
+    "css/6083.8fdd54d6.css": {
+      "name": "css/6083.8fdd54d6.css",
+      "path": "css/6083.8fdd54d6.css",
+      "publicPath": "/static/v2018/css/6083.8fdd54d6.css"
+    },
+    "css/6083.8fdd54d6.css.gz": {
+      "name": "css/6083.8fdd54d6.css.gz",
+      "path": "css/6083.8fdd54d6.css.gz",
+      "publicPath": "/static/v2018/css/6083.8fdd54d6.css.gz"
+    },
+    "css/6176.f9de3b90.css": {
+      "name": "css/6176.f9de3b90.css",
+      "path": "css/6176.f9de3b90.css",
+      "publicPath": "/static/v2018/css/6176.f9de3b90.css"
+    },
+    "css/6176.f9de3b90.css.gz": {
+      "name": "css/6176.f9de3b90.css.gz",
+      "path": "css/6176.f9de3b90.css.gz",
+      "publicPath": "/static/v2018/css/6176.f9de3b90.css.gz"
+    },
+    "css/6264.539b87f1.css": {
+      "name": "css/6264.539b87f1.css",
+      "path": "css/6264.539b87f1.css",
+      "publicPath": "/static/v2018/css/6264.539b87f1.css"
+    },
+    "css/6264.539b87f1.css.gz": {
+      "name": "css/6264.539b87f1.css.gz",
+      "path": "css/6264.539b87f1.css.gz",
+      "publicPath": "/static/v2018/css/6264.539b87f1.css.gz"
+    },
+    "css/6583.c964fa39.css": {
+      "name": "css/6583.c964fa39.css",
+      "path": "css/6583.c964fa39.css",
+      "publicPath": "/static/v2018/css/6583.c964fa39.css"
+    },
+    "css/6583.c964fa39.css.gz": {
+      "name": "css/6583.c964fa39.css.gz",
+      "path": "css/6583.c964fa39.css.gz",
+      "publicPath": "/static/v2018/css/6583.c964fa39.css.gz"
+    },
+    "css/6829.4b139a9c.css": {
+      "name": "css/6829.4b139a9c.css",
+      "path": "css/6829.4b139a9c.css",
+      "publicPath": "/static/v2018/css/6829.4b139a9c.css"
+    },
+    "css/6829.4b139a9c.css.gz": {
+      "name": "css/6829.4b139a9c.css.gz",
+      "path": "css/6829.4b139a9c.css.gz",
+      "publicPath": "/static/v2018/css/6829.4b139a9c.css.gz"
+    },
+    "css/7022.def021ef.css": {
+      "name": "css/7022.def021ef.css",
+      "path": "css/7022.def021ef.css",
+      "publicPath": "/static/v2018/css/7022.def021ef.css"
+    },
+    "css/7022.def021ef.css.gz": {
+      "name": "css/7022.def021ef.css.gz",
+      "path": "css/7022.def021ef.css.gz",
+      "publicPath": "/static/v2018/css/7022.def021ef.css.gz"
+    },
+    "css/7223.f7b20aea.css": {
+      "name": "css/7223.f7b20aea.css",
+      "path": "css/7223.f7b20aea.css",
+      "publicPath": "/static/v2018/css/7223.f7b20aea.css"
+    },
+    "css/7223.f7b20aea.css.gz": {
+      "name": "css/7223.f7b20aea.css.gz",
+      "path": "css/7223.f7b20aea.css.gz",
+      "publicPath": "/static/v2018/css/7223.f7b20aea.css.gz"
+    },
+    "css/7811.6effa2ff.css": {
+      "name": "css/7811.6effa2ff.css",
+      "path": "css/7811.6effa2ff.css",
+      "publicPath": "/static/v2018/css/7811.6effa2ff.css"
+    },
+    "css/7811.6effa2ff.css.gz": {
+      "name": "css/7811.6effa2ff.css.gz",
+      "path": "css/7811.6effa2ff.css.gz",
+      "publicPath": "/static/v2018/css/7811.6effa2ff.css.gz"
+    },
+    "css/797.b5fc6bb2.css": {
+      "name": "css/797.b5fc6bb2.css",
+      "path": "css/797.b5fc6bb2.css",
+      "publicPath": "/static/v2018/css/797.b5fc6bb2.css"
+    },
+    "css/797.b5fc6bb2.css.gz": {
+      "name": "css/797.b5fc6bb2.css.gz",
+      "path": "css/797.b5fc6bb2.css.gz",
+      "publicPath": "/static/v2018/css/797.b5fc6bb2.css.gz"
+    },
+    "css/8323.473678de.css": {
+      "name": "css/8323.473678de.css",
+      "path": "css/8323.473678de.css",
+      "publicPath": "/static/v2018/css/8323.473678de.css"
+    },
+    "css/8323.473678de.css.gz": {
+      "name": "css/8323.473678de.css.gz",
+      "path": "css/8323.473678de.css.gz",
+      "publicPath": "/static/v2018/css/8323.473678de.css.gz"
+    },
+    "css/app.82adf1db.css": {
+      "name": "css/app.82adf1db.css",
+      "path": "css/app.82adf1db.css",
+      "publicPath": "/static/v2018/css/app.82adf1db.css"
+    },
+    "css/app.82adf1db.css.gz": {
+      "name": "css/app.82adf1db.css.gz",
+      "path": "css/app.82adf1db.css.gz",
+      "publicPath": "/static/v2018/css/app.82adf1db.css.gz"
+    },
+    "css/construct.a9a5f02d.css": {
+      "name": "css/construct.a9a5f02d.css",
+      "path": "css/construct.a9a5f02d.css",
+      "publicPath": "/static/v2018/css/construct.a9a5f02d.css"
+    },
+    "css/construct.a9a5f02d.css.gz": {
+      "name": "css/construct.a9a5f02d.css.gz",
+      "path": "css/construct.a9a5f02d.css.gz",
+      "publicPath": "/static/v2018/css/construct.a9a5f02d.css.gz"
+    },
+    "css/loa.b66502c0.css": {
+      "name": "css/loa.b66502c0.css",
+      "path": "css/loa.b66502c0.css",
+      "publicPath": "/static/v2018/css/loa.b66502c0.css"
+    },
+    "css/loa.b66502c0.css.gz": {
+      "name": "css/loa.b66502c0.css.gz",
+      "path": "css/loa.b66502c0.css.gz",
+      "publicPath": "/static/v2018/css/loa.b66502c0.css.gz"
+    },
+    "css/npm.unknown.8c2fe9c9.css": {
+      "name": "css/npm.unknown.8c2fe9c9.css",
+      "path": "css/npm.unknown.8c2fe9c9.css",
+      "publicPath": "/static/v2018/css/npm.unknown.8c2fe9c9.css"
+    },
+    "css/npm.unknown.8c2fe9c9.css.gz": {
+      "name": "css/npm.unknown.8c2fe9c9.css.gz",
+      "path": "css/npm.unknown.8c2fe9c9.css.gz",
+      "publicPath": "/static/v2018/css/npm.unknown.8c2fe9c9.css.gz"
     },
     "favicon.ico": {
       "name": "favicon.ico",
       "path": "favicon.ico",
-      "publicPath": "http://localhost:8080/favicon.ico",
+      "publicPath": "/static/v2018/favicon.ico",
       "sourceFilename": "src/assets/favicon.ico"
+    },
+    "favicon.ico.gz": {
+      "name": "favicon.ico.gz",
+      "path": "favicon.ico.gz",
+      "publicPath": "/static/v2018/favicon.ico.gz"
     },
     "fonts/fa-brands-400.0e53fe4f.woff": {
       "name": "fonts/fa-brands-400.0e53fe4f.woff",
       "path": "fonts/fa-brands-400.0e53fe4f.woff",
-      "publicPath": "http://localhost:8080/fonts/fa-brands-400.0e53fe4f.woff",
+      "publicPath": "/static/v2018/fonts/fa-brands-400.0e53fe4f.woff",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff"
     },
     "fonts/fa-brands-400.7edea186.woff2": {
       "name": "fonts/fa-brands-400.7edea186.woff2",
       "path": "fonts/fa-brands-400.7edea186.woff2",
-      "publicPath": "http://localhost:8080/fonts/fa-brands-400.7edea186.woff2",
+      "publicPath": "/static/v2018/fonts/fa-brands-400.7edea186.woff2",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.woff2"
     },
     "fonts/fa-brands-400.9c02eaf6.ttf": {
       "name": "fonts/fa-brands-400.9c02eaf6.ttf",
       "path": "fonts/fa-brands-400.9c02eaf6.ttf",
-      "publicPath": "http://localhost:8080/fonts/fa-brands-400.9c02eaf6.ttf",
+      "publicPath": "/static/v2018/fonts/fa-brands-400.9c02eaf6.ttf",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.ttf"
+    },
+    "fonts/fa-brands-400.9c02eaf6.ttf.gz": {
+      "name": "fonts/fa-brands-400.9c02eaf6.ttf.gz",
+      "path": "fonts/fa-brands-400.9c02eaf6.ttf.gz",
+      "publicPath": "/static/v2018/fonts/fa-brands-400.9c02eaf6.ttf.gz"
     },
     "fonts/fa-brands-400.b2970adc.eot": {
       "name": "fonts/fa-brands-400.b2970adc.eot",
       "path": "fonts/fa-brands-400.b2970adc.eot",
-      "publicPath": "http://localhost:8080/fonts/fa-brands-400.b2970adc.eot",
+      "publicPath": "/static/v2018/fonts/fa-brands-400.b2970adc.eot",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.eot"
+    },
+    "fonts/fa-brands-400.b2970adc.eot.gz": {
+      "name": "fonts/fa-brands-400.b2970adc.eot.gz",
+      "path": "fonts/fa-brands-400.b2970adc.eot.gz",
+      "publicPath": "/static/v2018/fonts/fa-brands-400.b2970adc.eot.gz"
     },
     "fonts/fa-regular-400.04dd5282.woff": {
       "name": "fonts/fa-regular-400.04dd5282.woff",
       "path": "fonts/fa-regular-400.04dd5282.woff",
-      "publicPath": "http://localhost:8080/fonts/fa-regular-400.04dd5282.woff",
+      "publicPath": "/static/v2018/fonts/fa-regular-400.04dd5282.woff",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff"
     },
     "fonts/fa-regular-400.7346017c.ttf": {
       "name": "fonts/fa-regular-400.7346017c.ttf",
       "path": "fonts/fa-regular-400.7346017c.ttf",
-      "publicPath": "http://localhost:8080/fonts/fa-regular-400.7346017c.ttf",
+      "publicPath": "/static/v2018/fonts/fa-regular-400.7346017c.ttf",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.ttf"
+    },
+    "fonts/fa-regular-400.7346017c.ttf.gz": {
+      "name": "fonts/fa-regular-400.7346017c.ttf.gz",
+      "path": "fonts/fa-regular-400.7346017c.ttf.gz",
+      "publicPath": "/static/v2018/fonts/fa-regular-400.7346017c.ttf.gz"
     },
     "fonts/fa-regular-400.a0140e7c.eot": {
       "name": "fonts/fa-regular-400.a0140e7c.eot",
       "path": "fonts/fa-regular-400.a0140e7c.eot",
-      "publicPath": "http://localhost:8080/fonts/fa-regular-400.a0140e7c.eot",
+      "publicPath": "/static/v2018/fonts/fa-regular-400.a0140e7c.eot",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.eot"
+    },
+    "fonts/fa-regular-400.a0140e7c.eot.gz": {
+      "name": "fonts/fa-regular-400.a0140e7c.eot.gz",
+      "path": "fonts/fa-regular-400.a0140e7c.eot.gz",
+      "publicPath": "/static/v2018/fonts/fa-regular-400.a0140e7c.eot.gz"
     },
     "fonts/fa-regular-400.e2b3a9dc.woff2": {
       "name": "fonts/fa-regular-400.e2b3a9dc.woff2",
       "path": "fonts/fa-regular-400.e2b3a9dc.woff2",
-      "publicPath": "http://localhost:8080/fonts/fa-regular-400.e2b3a9dc.woff2",
+      "publicPath": "/static/v2018/fonts/fa-regular-400.e2b3a9dc.woff2",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.woff2"
     },
     "fonts/fa-solid-900.620019ed.woff2": {
       "name": "fonts/fa-solid-900.620019ed.woff2",
       "path": "fonts/fa-solid-900.620019ed.woff2",
-      "publicPath": "http://localhost:8080/fonts/fa-solid-900.620019ed.woff2",
+      "publicPath": "/static/v2018/fonts/fa-solid-900.620019ed.woff2",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff2"
     },
     "fonts/fa-solid-900.974801a4.eot": {
       "name": "fonts/fa-solid-900.974801a4.eot",
       "path": "fonts/fa-solid-900.974801a4.eot",
-      "publicPath": "http://localhost:8080/fonts/fa-solid-900.974801a4.eot",
+      "publicPath": "/static/v2018/fonts/fa-solid-900.974801a4.eot",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.eot"
+    },
+    "fonts/fa-solid-900.974801a4.eot.gz": {
+      "name": "fonts/fa-solid-900.974801a4.eot.gz",
+      "path": "fonts/fa-solid-900.974801a4.eot.gz",
+      "publicPath": "/static/v2018/fonts/fa-solid-900.974801a4.eot.gz"
     },
     "fonts/fa-solid-900.d5b0a356.ttf": {
       "name": "fonts/fa-solid-900.d5b0a356.ttf",
       "path": "fonts/fa-solid-900.d5b0a356.ttf",
-      "publicPath": "http://localhost:8080/fonts/fa-solid-900.d5b0a356.ttf",
+      "publicPath": "/static/v2018/fonts/fa-solid-900.d5b0a356.ttf",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.ttf"
+    },
+    "fonts/fa-solid-900.d5b0a356.ttf.gz": {
+      "name": "fonts/fa-solid-900.d5b0a356.ttf.gz",
+      "path": "fonts/fa-solid-900.d5b0a356.ttf.gz",
+      "publicPath": "/static/v2018/fonts/fa-solid-900.d5b0a356.ttf.gz"
     },
     "fonts/fa-solid-900.e67670b0.woff": {
       "name": "fonts/fa-solid-900.e67670b0.woff",
       "path": "fonts/fa-solid-900.e67670b0.woff",
-      "publicPath": "http://localhost:8080/fonts/fa-solid-900.e67670b0.woff",
+      "publicPath": "/static/v2018/fonts/fa-solid-900.e67670b0.woff",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.woff"
     },
     "img/arrow.png": {
       "name": "img/arrow.png",
       "path": "img/arrow.png",
-      "publicPath": "http://localhost:8080/img/arrow.png",
+      "publicPath": "/static/v2018/img/arrow.png",
       "sourceFilename": "src/assets/img/arrow.png"
     },
     "img/authenticated.png": {
       "name": "img/authenticated.png",
       "path": "img/authenticated.png",
-      "publicPath": "http://localhost:8080/img/authenticated.png",
+      "publicPath": "/static/v2018/img/authenticated.png",
       "sourceFilename": "src/assets/img/authenticated.png"
     },
     "img/avatar.png": {
       "name": "img/avatar.png",
       "path": "img/avatar.png",
-      "publicPath": "http://localhost:8080/img/avatar.png",
+      "publicPath": "/static/v2018/img/avatar.png",
       "sourceFilename": "src/assets/img/avatar.png"
     },
     "img/banners/bg_left.png": {
       "name": "img/banners/bg_left.png",
       "path": "img/banners/bg_left.png",
-      "publicPath": "http://localhost:8080/img/banners/bg_left.png",
+      "publicPath": "/static/v2018/img/banners/bg_left.png",
       "sourceFilename": "src/assets/img/banners/bg_left.png"
     },
     "img/banners/bg_right.png": {
       "name": "img/banners/bg_right.png",
       "path": "img/banners/bg_right.png",
-      "publicPath": "http://localhost:8080/img/banners/bg_right.png",
+      "publicPath": "/static/v2018/img/banners/bg_right.png",
       "sourceFilename": "src/assets/img/banners/bg_right.png"
     },
     "img/banners/tema_seminario.png": {
       "name": "img/banners/tema_seminario.png",
       "path": "img/banners/tema_seminario.png",
-      "publicPath": "http://localhost:8080/img/banners/tema_seminario.png",
+      "publicPath": "/static/v2018/img/banners/tema_seminario.png",
       "sourceFilename": "src/assets/img/banners/tema_seminario.png"
     },
     "img/beta.png": {
       "name": "img/beta.png",
       "path": "img/beta.png",
-      "publicPath": "http://localhost:8080/img/beta.png",
+      "publicPath": "/static/v2018/img/beta.png",
       "sourceFilename": "src/assets/img/beta.png"
     },
     "img/bg.png": {
       "name": "img/bg.png",
       "path": "img/bg.png",
-      "publicPath": "http://localhost:8080/img/bg.png",
+      "publicPath": "/static/v2018/img/bg.png",
       "sourceFilename": "src/assets/img/bg.png"
     },
     "img/bg_cmj_topo_menu_box_left.png": {
       "name": "img/bg_cmj_topo_menu_box_left.png",
       "path": "img/bg_cmj_topo_menu_box_left.png",
-      "publicPath": "http://localhost:8080/img/bg_cmj_topo_menu_box_left.png",
+      "publicPath": "/static/v2018/img/bg_cmj_topo_menu_box_left.png",
       "sourceFilename": "src/assets/img/bg_cmj_topo_menu_box_left.png"
     },
     "img/bg_cmj_topo_menu_box_right.png": {
       "name": "img/bg_cmj_topo_menu_box_right.png",
       "path": "img/bg_cmj_topo_menu_box_right.png",
-      "publicPath": "http://localhost:8080/img/bg_cmj_topo_menu_box_right.png",
+      "publicPath": "/static/v2018/img/bg_cmj_topo_menu_box_right.png",
       "sourceFilename": "src/assets/img/bg_cmj_topo_menu_box_right.png"
     },
     "img/bg_left.c16aea2a.png": {
       "name": "img/bg_left.c16aea2a.png",
       "path": "img/bg_left.c16aea2a.png",
-      "publicPath": "http://localhost:8080/img/bg_left.c16aea2a.png",
+      "publicPath": "/static/v2018/img/bg_left.c16aea2a.png",
       "sourceFilename": "src/assets/img/banners/bg_left.png"
     },
     "img/bg_right.a8d84ba8.png": {
       "name": "img/bg_right.a8d84ba8.png",
       "path": "img/bg_right.a8d84ba8.png",
-      "publicPath": "http://localhost:8080/img/bg_right.a8d84ba8.png",
+      "publicPath": "/static/v2018/img/bg_right.a8d84ba8.png",
       "sourceFilename": "src/assets/img/banners/bg_right.png"
     },
     "img/brasao_transp.gif": {
       "name": "img/brasao_transp.gif",
       "path": "img/brasao_transp.gif",
-      "publicPath": "http://localhost:8080/img/brasao_transp.gif",
+      "publicPath": "/static/v2018/img/brasao_transp.gif",
       "sourceFilename": "src/assets/img/brasao_transp.gif"
     },
     "img/down_arrow_select.jpg": {
       "name": "img/down_arrow_select.jpg",
       "path": "img/down_arrow_select.jpg",
-      "publicPath": "http://localhost:8080/img/down_arrow_select.jpg",
+      "publicPath": "/static/v2018/img/down_arrow_select.jpg",
       "sourceFilename": "src/assets/img/down_arrow_select.jpg"
+    },
+    "img/down_arrow_select.jpg.gz": {
+      "name": "img/down_arrow_select.jpg.gz",
+      "path": "img/down_arrow_select.jpg.gz",
+      "publicPath": "/static/v2018/img/down_arrow_select.jpg.gz"
     },
     "img/escola_1024.3688a788.png": {
       "name": "img/escola_1024.3688a788.png",
       "path": "img/escola_1024.3688a788.png",
-      "publicPath": "http://localhost:8080/img/escola_1024.3688a788.png",
+      "publicPath": "/static/v2018/img/escola_1024.3688a788.png",
       "sourceFilename": "src/assets/brasao/escola_1024.png"
     },
     "img/etiqueta.png": {
       "name": "img/etiqueta.png",
       "path": "img/etiqueta.png",
-      "publicPath": "http://localhost:8080/img/etiqueta.png",
+      "publicPath": "/static/v2018/img/etiqueta.png",
       "sourceFilename": "src/assets/img/etiqueta.png"
     },
     "img/fa-brands-400.a76d53bf.svg": {
       "name": "img/fa-brands-400.a76d53bf.svg",
       "path": "img/fa-brands-400.a76d53bf.svg",
-      "publicPath": "http://localhost:8080/img/fa-brands-400.a76d53bf.svg",
+      "publicPath": "/static/v2018/img/fa-brands-400.a76d53bf.svg",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-brands-400.svg"
+    },
+    "img/fa-brands-400.a76d53bf.svg.gz": {
+      "name": "img/fa-brands-400.a76d53bf.svg.gz",
+      "path": "img/fa-brands-400.a76d53bf.svg.gz",
+      "publicPath": "/static/v2018/img/fa-brands-400.a76d53bf.svg.gz"
     },
     "img/fa-regular-400.ee37fbcc.svg": {
       "name": "img/fa-regular-400.ee37fbcc.svg",
       "path": "img/fa-regular-400.ee37fbcc.svg",
-      "publicPath": "http://localhost:8080/img/fa-regular-400.ee37fbcc.svg",
+      "publicPath": "/static/v2018/img/fa-regular-400.ee37fbcc.svg",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-regular-400.svg"
+    },
+    "img/fa-regular-400.ee37fbcc.svg.gz": {
+      "name": "img/fa-regular-400.ee37fbcc.svg.gz",
+      "path": "img/fa-regular-400.ee37fbcc.svg.gz",
+      "publicPath": "/static/v2018/img/fa-regular-400.ee37fbcc.svg.gz"
     },
     "img/fa-solid-900.cd7322bf.svg": {
       "name": "img/fa-solid-900.cd7322bf.svg",
       "path": "img/fa-solid-900.cd7322bf.svg",
-      "publicPath": "http://localhost:8080/img/fa-solid-900.cd7322bf.svg",
+      "publicPath": "/static/v2018/img/fa-solid-900.cd7322bf.svg",
       "sourceFilename": "node_modules/@fortawesome/fontawesome-free/webfonts/fa-solid-900.svg"
+    },
+    "img/fa-solid-900.cd7322bf.svg.gz": {
+      "name": "img/fa-solid-900.cd7322bf.svg.gz",
+      "path": "img/fa-solid-900.cd7322bf.svg.gz",
+      "publicPath": "/static/v2018/img/fa-solid-900.cd7322bf.svg.gz"
     },
     "img/file.png": {
       "name": "img/file.png",
       "path": "img/file.png",
-      "publicPath": "http://localhost:8080/img/file.png",
+      "publicPath": "/static/v2018/img/file.png",
       "sourceFilename": "src/assets/img/file.png"
     },
     "img/foto_aerea_camara_paisagem.jpg": {
       "name": "img/foto_aerea_camara_paisagem.jpg",
       "path": "img/foto_aerea_camara_paisagem.jpg",
-      "publicPath": "http://localhost:8080/img/foto_aerea_camara_paisagem.jpg",
+      "publicPath": "/static/v2018/img/foto_aerea_camara_paisagem.jpg",
       "sourceFilename": "src/assets/img/foto_aerea_camara_paisagem.jpg"
     },
     "img/foto_aerea_camara_retrato.jpg": {
       "name": "img/foto_aerea_camara_retrato.jpg",
       "path": "img/foto_aerea_camara_retrato.jpg",
-      "publicPath": "http://localhost:8080/img/foto_aerea_camara_retrato.jpg",
+      "publicPath": "/static/v2018/img/foto_aerea_camara_retrato.jpg",
       "sourceFilename": "src/assets/img/foto_aerea_camara_retrato.jpg"
     },
     "img/foto_chao_camara_paisagem.jpg": {
       "name": "img/foto_chao_camara_paisagem.jpg",
       "path": "img/foto_chao_camara_paisagem.jpg",
-      "publicPath": "http://localhost:8080/img/foto_chao_camara_paisagem.jpg",
+      "publicPath": "/static/v2018/img/foto_chao_camara_paisagem.jpg",
       "sourceFilename": "src/assets/img/foto_chao_camara_paisagem.jpg"
     },
     "img/foto_chao_camara_retrato.jpg": {
       "name": "img/foto_chao_camara_retrato.jpg",
       "path": "img/foto_chao_camara_retrato.jpg",
-      "publicPath": "http://localhost:8080/img/foto_chao_camara_retrato.jpg",
+      "publicPath": "/static/v2018/img/foto_chao_camara_retrato.jpg",
       "sourceFilename": "src/assets/img/foto_chao_camara_retrato.jpg"
     },
     "img/fundo_topo_compressed.59e5f002.jpg": {
       "name": "img/fundo_topo_compressed.59e5f002.jpg",
       "path": "img/fundo_topo_compressed.59e5f002.jpg",
-      "publicPath": "http://localhost:8080/img/fundo_topo_compressed.59e5f002.jpg",
+      "publicPath": "/static/v2018/img/fundo_topo_compressed.59e5f002.jpg",
       "sourceFilename": "src/assets/img/fundo_topo_compressed.jpg"
     },
     "img/fundo_topo_compressed.jpg": {
       "name": "img/fundo_topo_compressed.jpg",
       "path": "img/fundo_topo_compressed.jpg",
-      "publicPath": "http://localhost:8080/img/fundo_topo_compressed.jpg",
+      "publicPath": "/static/v2018/img/fundo_topo_compressed.jpg",
       "sourceFilename": "src/assets/img/fundo_topo_compressed.jpg"
     },
     "img/hand-note.png": {
       "name": "img/hand-note.png",
       "path": "img/hand-note.png",
-      "publicPath": "http://localhost:8080/img/hand-note.png",
+      "publicPath": "/static/v2018/img/hand-note.png",
       "sourceFilename": "src/assets/img/hand-note.png"
     },
     "img/icon_comissoes.png": {
       "name": "img/icon_comissoes.png",
       "path": "img/icon_comissoes.png",
-      "publicPath": "http://localhost:8080/img/icon_comissoes.png",
+      "publicPath": "/static/v2018/img/icon_comissoes.png",
       "sourceFilename": "src/assets/img/icon_comissoes.png"
     },
     "img/icon_copy_area_transferencia.png": {
       "name": "img/icon_copy_area_transferencia.png",
       "path": "img/icon_copy_area_transferencia.png",
-      "publicPath": "http://localhost:8080/img/icon_copy_area_transferencia.png",
+      "publicPath": "/static/v2018/img/icon_copy_area_transferencia.png",
       "sourceFilename": "src/assets/img/icon_copy_area_transferencia.png"
     },
     "img/icon_delete_white.png": {
       "name": "img/icon_delete_white.png",
       "path": "img/icon_delete_white.png",
-      "publicPath": "http://localhost:8080/img/icon_delete_white.png",
+      "publicPath": "/static/v2018/img/icon_delete_white.png",
       "sourceFilename": "src/assets/img/icon_delete_white.png"
     },
     "img/icon_diario_oficial.png": {
       "name": "img/icon_diario_oficial.png",
       "path": "img/icon_diario_oficial.png",
-      "publicPath": "http://localhost:8080/img/icon_diario_oficial.png",
+      "publicPath": "/static/v2018/img/icon_diario_oficial.png",
       "sourceFilename": "src/assets/img/icon_diario_oficial.png"
     },
     "img/icon_facebook64x64.9650c8b1.png": {
       "name": "img/icon_facebook64x64.9650c8b1.png",
       "path": "img/icon_facebook64x64.9650c8b1.png",
-      "publicPath": "http://localhost:8080/img/icon_facebook64x64.9650c8b1.png",
+      "publicPath": "/static/v2018/img/icon_facebook64x64.9650c8b1.png",
       "sourceFilename": "src/assets/img/icon_facebook64x64.png"
     },
     "img/icon_facebook64x64.png": {
       "name": "img/icon_facebook64x64.png",
       "path": "img/icon_facebook64x64.png",
-      "publicPath": "http://localhost:8080/img/icon_facebook64x64.png",
+      "publicPath": "/static/v2018/img/icon_facebook64x64.png",
       "sourceFilename": "src/assets/img/icon_facebook64x64.png"
     },
     "img/icon_favo.ac106d7b.svg": {
       "name": "img/icon_favo.ac106d7b.svg",
       "path": "img/icon_favo.ac106d7b.svg",
-      "publicPath": "http://localhost:8080/img/icon_favo.ac106d7b.svg",
+      "publicPath": "/static/v2018/img/icon_favo.ac106d7b.svg",
       "sourceFilename": "src/assets/img/icon_favo.svg"
+    },
+    "img/icon_favo.ac106d7b.svg.gz": {
+      "name": "img/icon_favo.ac106d7b.svg.gz",
+      "path": "img/icon_favo.ac106d7b.svg.gz",
+      "publicPath": "/static/v2018/img/icon_favo.ac106d7b.svg.gz"
     },
     "img/icon_favo.svg": {
       "name": "img/icon_favo.svg",
       "path": "img/icon_favo.svg",
-      "publicPath": "http://localhost:8080/img/icon_favo.svg",
+      "publicPath": "/static/v2018/img/icon_favo.svg",
       "sourceFilename": "src/assets/img/icon_favo.svg"
+    },
+    "img/icon_favo.svg.gz": {
+      "name": "img/icon_favo.svg.gz",
+      "path": "img/icon_favo.svg.gz",
+      "publicPath": "/static/v2018/img/icon_favo.svg.gz"
     },
     "img/icon_instagram64x64.c6766155.png": {
       "name": "img/icon_instagram64x64.c6766155.png",
       "path": "img/icon_instagram64x64.c6766155.png",
-      "publicPath": "http://localhost:8080/img/icon_instagram64x64.c6766155.png",
+      "publicPath": "/static/v2018/img/icon_instagram64x64.c6766155.png",
       "sourceFilename": "src/assets/img/icon_instagram64x64.png"
     },
     "img/icon_instagram64x64.png": {
       "name": "img/icon_instagram64x64.png",
       "path": "img/icon_instagram64x64.png",
-      "publicPath": "http://localhost:8080/img/icon_instagram64x64.png",
+      "publicPath": "/static/v2018/img/icon_instagram64x64.png",
       "sourceFilename": "src/assets/img/icon_instagram64x64.png"
     },
     "img/icon_licitacao.png": {
       "name": "img/icon_licitacao.png",
       "path": "img/icon_licitacao.png",
-      "publicPath": "http://localhost:8080/img/icon_licitacao.png",
+      "publicPath": "/static/v2018/img/icon_licitacao.png",
       "sourceFilename": "src/assets/img/icon_licitacao.png"
     },
     "img/icon_materia_legislativa.png": {
       "name": "img/icon_materia_legislativa.png",
       "path": "img/icon_materia_legislativa.png",
-      "publicPath": "http://localhost:8080/img/icon_materia_legislativa.png",
+      "publicPath": "/static/v2018/img/icon_materia_legislativa.png",
       "sourceFilename": "src/assets/img/icon_materia_legislativa.png"
     },
     "img/icon_mesa_diretora.png": {
       "name": "img/icon_mesa_diretora.png",
       "path": "img/icon_mesa_diretora.png",
-      "publicPath": "http://localhost:8080/img/icon_mesa_diretora.png",
+      "publicPath": "/static/v2018/img/icon_mesa_diretora.png",
       "sourceFilename": "src/assets/img/icon_mesa_diretora.png"
     },
     "img/icon_normas_juridicas.png": {
       "name": "img/icon_normas_juridicas.png",
       "path": "img/icon_normas_juridicas.png",
-      "publicPath": "http://localhost:8080/img/icon_normas_juridicas.png",
+      "publicPath": "/static/v2018/img/icon_normas_juridicas.png",
       "sourceFilename": "src/assets/img/icon_normas_juridicas.png"
     },
     "img/icon_normas_juridicas_destaque.png": {
       "name": "img/icon_normas_juridicas_destaque.png",
       "path": "img/icon_normas_juridicas_destaque.png",
-      "publicPath": "http://localhost:8080/img/icon_normas_juridicas_destaque.png",
+      "publicPath": "/static/v2018/img/icon_normas_juridicas_destaque.png",
       "sourceFilename": "src/assets/img/icon_normas_juridicas_destaque.png"
     },
     "img/icon_parlamentares.png": {
       "name": "img/icon_parlamentares.png",
       "path": "img/icon_parlamentares.png",
-      "publicPath": "http://localhost:8080/img/icon_parlamentares.png",
+      "publicPath": "/static/v2018/img/icon_parlamentares.png",
       "sourceFilename": "src/assets/img/icon_parlamentares.png"
     },
     "img/icon_pautas.png": {
       "name": "img/icon_pautas.png",
       "path": "img/icon_pautas.png",
-      "publicPath": "http://localhost:8080/img/icon_pautas.png",
+      "publicPath": "/static/v2018/img/icon_pautas.png",
       "sourceFilename": "src/assets/img/icon_pautas.png"
     },
     "img/icon_plenarias.png": {
       "name": "img/icon_plenarias.png",
       "path": "img/icon_plenarias.png",
-      "publicPath": "http://localhost:8080/img/icon_plenarias.png",
+      "publicPath": "/static/v2018/img/icon_plenarias.png",
       "sourceFilename": "src/assets/img/icon_plenarias.png"
     },
     "img/icon_plenarias_online.6e36c605.png": {
       "name": "img/icon_plenarias_online.6e36c605.png",
       "path": "img/icon_plenarias_online.6e36c605.png",
-      "publicPath": "http://localhost:8080/img/icon_plenarias_online.6e36c605.png",
+      "publicPath": "/static/v2018/img/icon_plenarias_online.6e36c605.png",
       "sourceFilename": "src/assets/img/icon_plenarias_online.png"
     },
     "img/icon_plenarias_online.png": {
       "name": "img/icon_plenarias_online.png",
       "path": "img/icon_plenarias_online.png",
-      "publicPath": "http://localhost:8080/img/icon_plenarias_online.png",
+      "publicPath": "/static/v2018/img/icon_plenarias_online.png",
       "sourceFilename": "src/assets/img/icon_plenarias_online.png"
     },
     "img/icon_relatorios.png": {
       "name": "img/icon_relatorios.png",
       "path": "img/icon_relatorios.png",
-      "publicPath": "http://localhost:8080/img/icon_relatorios.png",
+      "publicPath": "/static/v2018/img/icon_relatorios.png",
       "sourceFilename": "src/assets/img/icon_relatorios.png"
     },
     "img/icon_save_white.png": {
       "name": "img/icon_save_white.png",
       "path": "img/icon_save_white.png",
-      "publicPath": "http://localhost:8080/img/icon_save_white.png",
+      "publicPath": "/static/v2018/img/icon_save_white.png",
       "sourceFilename": "src/assets/img/icon_save_white.png"
     },
     "img/icon_telegram64x64.c43c8364.png": {
       "name": "img/icon_telegram64x64.c43c8364.png",
       "path": "img/icon_telegram64x64.c43c8364.png",
-      "publicPath": "http://localhost:8080/img/icon_telegram64x64.c43c8364.png",
+      "publicPath": "/static/v2018/img/icon_telegram64x64.c43c8364.png",
       "sourceFilename": "src/assets/img/icon_telegram64x64.png"
     },
     "img/icon_telegram64x64.png": {
       "name": "img/icon_telegram64x64.png",
       "path": "img/icon_telegram64x64.png",
-      "publicPath": "http://localhost:8080/img/icon_telegram64x64.png",
+      "publicPath": "/static/v2018/img/icon_telegram64x64.png",
       "sourceFilename": "src/assets/img/icon_telegram64x64.png"
     },
     "img/icon_transparencia.png": {
       "name": "img/icon_transparencia.png",
       "path": "img/icon_transparencia.png",
-      "publicPath": "http://localhost:8080/img/icon_transparencia.png",
+      "publicPath": "/static/v2018/img/icon_transparencia.png",
       "sourceFilename": "src/assets/img/icon_transparencia.png"
     },
     "img/icon_transparencia_prata.9702395f.png": {
       "name": "img/icon_transparencia_prata.9702395f.png",
       "path": "img/icon_transparencia_prata.9702395f.png",
-      "publicPath": "http://localhost:8080/img/icon_transparencia_prata.9702395f.png",
+      "publicPath": "/static/v2018/img/icon_transparencia_prata.9702395f.png",
       "sourceFilename": "src/assets/img/icon_transparencia_prata.png"
     },
     "img/icon_transparencia_prata.png": {
       "name": "img/icon_transparencia_prata.png",
       "path": "img/icon_transparencia_prata.png",
-      "publicPath": "http://localhost:8080/img/icon_transparencia_prata.png",
+      "publicPath": "/static/v2018/img/icon_transparencia_prata.png",
       "sourceFilename": "src/assets/img/icon_transparencia_prata.png"
     },
     "img/icon_twitter64x64.f68ce134.png": {
       "name": "img/icon_twitter64x64.f68ce134.png",
       "path": "img/icon_twitter64x64.f68ce134.png",
-      "publicPath": "http://localhost:8080/img/icon_twitter64x64.f68ce134.png",
+      "publicPath": "/static/v2018/img/icon_twitter64x64.f68ce134.png",
       "sourceFilename": "src/assets/img/icon_twitter64x64.png"
     },
     "img/icon_twitter64x64.png": {
       "name": "img/icon_twitter64x64.png",
       "path": "img/icon_twitter64x64.png",
-      "publicPath": "http://localhost:8080/img/icon_twitter64x64.png",
+      "publicPath": "/static/v2018/img/icon_twitter64x64.png",
       "sourceFilename": "src/assets/img/icon_twitter64x64.png"
     },
     "img/icon_whatsapp64x64.cb51e0a8.png": {
       "name": "img/icon_whatsapp64x64.cb51e0a8.png",
       "path": "img/icon_whatsapp64x64.cb51e0a8.png",
-      "publicPath": "http://localhost:8080/img/icon_whatsapp64x64.cb51e0a8.png",
+      "publicPath": "/static/v2018/img/icon_whatsapp64x64.cb51e0a8.png",
       "sourceFilename": "src/assets/img/icon_whatsapp64x64.png"
     },
     "img/icon_whatsapp64x64.png": {
       "name": "img/icon_whatsapp64x64.png",
       "path": "img/icon_whatsapp64x64.png",
-      "publicPath": "http://localhost:8080/img/icon_whatsapp64x64.png",
+      "publicPath": "/static/v2018/img/icon_whatsapp64x64.png",
       "sourceFilename": "src/assets/img/icon_whatsapp64x64.png"
     },
     "img/icon_x_twitter.c3f087c1.png": {
       "name": "img/icon_x_twitter.c3f087c1.png",
       "path": "img/icon_x_twitter.c3f087c1.png",
-      "publicPath": "http://localhost:8080/img/icon_x_twitter.c3f087c1.png",
+      "publicPath": "/static/v2018/img/icon_x_twitter.c3f087c1.png",
       "sourceFilename": "src/assets/img/icon_x_twitter.png"
     },
     "img/icon_x_twitter.png": {
       "name": "img/icon_x_twitter.png",
       "path": "img/icon_x_twitter.png",
-      "publicPath": "http://localhost:8080/img/icon_x_twitter.png",
+      "publicPath": "/static/v2018/img/icon_x_twitter.png",
       "sourceFilename": "src/assets/img/icon_x_twitter.png"
     },
     "img/icon_x_twitter.svg": {
       "name": "img/icon_x_twitter.svg",
       "path": "img/icon_x_twitter.svg",
-      "publicPath": "http://localhost:8080/img/icon_x_twitter.svg",
+      "publicPath": "/static/v2018/img/icon_x_twitter.svg",
       "sourceFilename": "src/assets/img/icon_x_twitter.svg"
     },
     "img/icon_youtube64x64.ed319901.png": {
       "name": "img/icon_youtube64x64.ed319901.png",
       "path": "img/icon_youtube64x64.ed319901.png",
-      "publicPath": "http://localhost:8080/img/icon_youtube64x64.ed319901.png",
+      "publicPath": "/static/v2018/img/icon_youtube64x64.ed319901.png",
       "sourceFilename": "src/assets/img/icon_youtube64x64.png"
     },
     "img/icon_youtube64x64.png": {
       "name": "img/icon_youtube64x64.png",
       "path": "img/icon_youtube64x64.png",
-      "publicPath": "http://localhost:8080/img/icon_youtube64x64.png",
+      "publicPath": "/static/v2018/img/icon_youtube64x64.png",
       "sourceFilename": "src/assets/img/icon_youtube64x64.png"
     },
     "img/icons/android-chrome-192x192.png": {
       "name": "img/icons/android-chrome-192x192.png",
       "path": "img/icons/android-chrome-192x192.png",
-      "publicPath": "http://localhost:8080/img/icons/android-chrome-192x192.png",
+      "publicPath": "/static/v2018/img/icons/android-chrome-192x192.png",
       "sourceFilename": "src/assets/img/icons/android-chrome-192x192.png"
     },
     "img/icons/android-chrome-512x512.png": {
       "name": "img/icons/android-chrome-512x512.png",
       "path": "img/icons/android-chrome-512x512.png",
-      "publicPath": "http://localhost:8080/img/icons/android-chrome-512x512.png",
+      "publicPath": "/static/v2018/img/icons/android-chrome-512x512.png",
       "sourceFilename": "src/assets/img/icons/android-chrome-512x512.png"
     },
     "img/icons/apple-touch-icon-120x120.png": {
       "name": "img/icons/apple-touch-icon-120x120.png",
       "path": "img/icons/apple-touch-icon-120x120.png",
-      "publicPath": "http://localhost:8080/img/icons/apple-touch-icon-120x120.png",
+      "publicPath": "/static/v2018/img/icons/apple-touch-icon-120x120.png",
       "sourceFilename": "src/assets/img/icons/apple-touch-icon-120x120.png"
     },
     "img/icons/apple-touch-icon-152x152.png": {
       "name": "img/icons/apple-touch-icon-152x152.png",
       "path": "img/icons/apple-touch-icon-152x152.png",
-      "publicPath": "http://localhost:8080/img/icons/apple-touch-icon-152x152.png",
+      "publicPath": "/static/v2018/img/icons/apple-touch-icon-152x152.png",
       "sourceFilename": "src/assets/img/icons/apple-touch-icon-152x152.png"
     },
     "img/icons/apple-touch-icon-180x180.png": {
       "name": "img/icons/apple-touch-icon-180x180.png",
       "path": "img/icons/apple-touch-icon-180x180.png",
-      "publicPath": "http://localhost:8080/img/icons/apple-touch-icon-180x180.png",
+      "publicPath": "/static/v2018/img/icons/apple-touch-icon-180x180.png",
       "sourceFilename": "src/assets/img/icons/apple-touch-icon-180x180.png"
     },
     "img/icons/apple-touch-icon-60x60.png": {
       "name": "img/icons/apple-touch-icon-60x60.png",
       "path": "img/icons/apple-touch-icon-60x60.png",
-      "publicPath": "http://localhost:8080/img/icons/apple-touch-icon-60x60.png",
+      "publicPath": "/static/v2018/img/icons/apple-touch-icon-60x60.png",
       "sourceFilename": "src/assets/img/icons/apple-touch-icon-60x60.png"
     },
     "img/icons/apple-touch-icon-76x76.png": {
       "name": "img/icons/apple-touch-icon-76x76.png",
       "path": "img/icons/apple-touch-icon-76x76.png",
-      "publicPath": "http://localhost:8080/img/icons/apple-touch-icon-76x76.png",
+      "publicPath": "/static/v2018/img/icons/apple-touch-icon-76x76.png",
       "sourceFilename": "src/assets/img/icons/apple-touch-icon-76x76.png"
     },
     "img/icons/apple-touch-icon.png": {
       "name": "img/icons/apple-touch-icon.png",
       "path": "img/icons/apple-touch-icon.png",
-      "publicPath": "http://localhost:8080/img/icons/apple-touch-icon.png",
+      "publicPath": "/static/v2018/img/icons/apple-touch-icon.png",
       "sourceFilename": "src/assets/img/icons/apple-touch-icon.png"
     },
     "img/icons/favicon-16x16.png": {
       "name": "img/icons/favicon-16x16.png",
       "path": "img/icons/favicon-16x16.png",
-      "publicPath": "http://localhost:8080/img/icons/favicon-16x16.png",
+      "publicPath": "/static/v2018/img/icons/favicon-16x16.png",
       "sourceFilename": "src/assets/img/icons/favicon-16x16.png"
     },
     "img/icons/favicon-32x32.png": {
       "name": "img/icons/favicon-32x32.png",
       "path": "img/icons/favicon-32x32.png",
-      "publicPath": "http://localhost:8080/img/icons/favicon-32x32.png",
+      "publicPath": "/static/v2018/img/icons/favicon-32x32.png",
       "sourceFilename": "src/assets/img/icons/favicon-32x32.png"
     },
     "img/icons/msapplication-icon-144x144.png": {
       "name": "img/icons/msapplication-icon-144x144.png",
       "path": "img/icons/msapplication-icon-144x144.png",
-      "publicPath": "http://localhost:8080/img/icons/msapplication-icon-144x144.png",
+      "publicPath": "/static/v2018/img/icons/msapplication-icon-144x144.png",
       "sourceFilename": "src/assets/img/icons/msapplication-icon-144x144.png"
     },
     "img/icons/mstile-150x150.png": {
       "name": "img/icons/mstile-150x150.png",
       "path": "img/icons/mstile-150x150.png",
-      "publicPath": "http://localhost:8080/img/icons/mstile-150x150.png",
+      "publicPath": "/static/v2018/img/icons/mstile-150x150.png",
       "sourceFilename": "src/assets/img/icons/mstile-150x150.png"
     },
     "img/lexml.gif": {
       "name": "img/lexml.gif",
       "path": "img/lexml.gif",
-      "publicPath": "http://localhost:8080/img/lexml.gif",
+      "publicPath": "/static/v2018/img/lexml.gif",
       "sourceFilename": "src/assets/img/lexml.gif"
     },
     "img/logo.png": {
       "name": "img/logo.png",
       "path": "img/logo.png",
-      "publicPath": "http://localhost:8080/img/logo.png",
+      "publicPath": "/static/v2018/img/logo.png",
       "sourceFilename": "src/assets/img/logo.png"
     },
     "img/logo_128.png": {
       "name": "img/logo_128.png",
       "path": "img/logo_128.png",
-      "publicPath": "http://localhost:8080/img/logo_128.png",
+      "publicPath": "/static/v2018/img/logo_128.png",
       "sourceFilename": "src/assets/img/logo_128.png"
     },
     "img/logo_cc.png": {
       "name": "img/logo_cc.png",
       "path": "img/logo_cc.png",
-      "publicPath": "http://localhost:8080/img/logo_cc.png",
+      "publicPath": "/static/v2018/img/logo_cc.png",
       "sourceFilename": "src/assets/img/logo_cc.png"
     },
     "img/logo_cmj_redesocial.jpg": {
       "name": "img/logo_cmj_redesocial.jpg",
       "path": "img/logo_cmj_redesocial.jpg",
-      "publicPath": "http://localhost:8080/img/logo_cmj_redesocial.jpg",
+      "publicPath": "/static/v2018/img/logo_cmj_redesocial.jpg",
       "sourceFilename": "src/assets/img/logo_cmj_redesocial.jpg"
     },
     "img/logo_interlegis.png": {
       "name": "img/logo_interlegis.png",
       "path": "img/logo_interlegis.png",
-      "publicPath": "http://localhost:8080/img/logo_interlegis.png",
+      "publicPath": "/static/v2018/img/logo_interlegis.png",
       "sourceFilename": "src/assets/img/logo_interlegis.png"
     },
     "img/logo_portaldocidadao.png": {
       "name": "img/logo_portaldocidadao.png",
       "path": "img/logo_portaldocidadao.png",
-      "publicPath": "http://localhost:8080/img/logo_portaldocidadao.png",
+      "publicPath": "/static/v2018/img/logo_portaldocidadao.png",
       "sourceFilename": "src/assets/img/logo_portaldocidadao.png"
     },
     "img/logo_radar.fe33ac0f.png": {
       "name": "img/logo_radar.fe33ac0f.png",
       "path": "img/logo_radar.fe33ac0f.png",
-      "publicPath": "http://localhost:8080/img/logo_radar.fe33ac0f.png",
+      "publicPath": "/static/v2018/img/logo_radar.fe33ac0f.png",
       "sourceFilename": "src/assets/img/logo_radar.png"
     },
     "img/logo_radar.png": {
       "name": "img/logo_radar.png",
       "path": "img/logo_radar.png",
-      "publicPath": "http://localhost:8080/img/logo_radar.png",
+      "publicPath": "/static/v2018/img/logo_radar.png",
       "sourceFilename": "src/assets/img/logo_radar.png"
     },
     "img/logo_radar_1000.png": {
       "name": "img/logo_radar_1000.png",
       "path": "img/logo_radar_1000.png",
-      "publicPath": "http://localhost:8080/img/logo_radar_1000.png",
+      "publicPath": "/static/v2018/img/logo_radar_1000.png",
       "sourceFilename": "src/assets/img/logo_radar_1000.png"
     },
     "img/logo_radar_before.png": {
       "name": "img/logo_radar_before.png",
       "path": "img/logo_radar_before.png",
-      "publicPath": "http://localhost:8080/img/logo_radar_before.png",
+      "publicPath": "/static/v2018/img/logo_radar_before.png",
       "sourceFilename": "src/assets/img/logo_radar_before.png"
     },
     "img/logo_sic.0a88e01d.png": {
       "name": "img/logo_sic.0a88e01d.png",
       "path": "img/logo_sic.0a88e01d.png",
-      "publicPath": "http://localhost:8080/img/logo_sic.0a88e01d.png",
+      "publicPath": "/static/v2018/img/logo_sic.0a88e01d.png",
       "sourceFilename": "src/assets/img/logo_sic.png"
     },
     "img/logo_sic.png": {
       "name": "img/logo_sic.png",
       "path": "img/logo_sic.png",
-      "publicPath": "http://localhost:8080/img/logo_sic.png",
+      "publicPath": "/static/v2018/img/logo_sic.png",
       "sourceFilename": "src/assets/img/logo_sic.png"
     },
     "img/logoradar.svg": {
       "name": "img/logoradar.svg",
       "path": "img/logoradar.svg",
-      "publicPath": "http://localhost:8080/img/logoradar.svg",
+      "publicPath": "/static/v2018/img/logoradar.svg",
       "sourceFilename": "src/assets/img/logoradar.svg"
+    },
+    "img/logoradar.svg.gz": {
+      "name": "img/logoradar.svg.gz",
+      "path": "img/logoradar.svg.gz",
+      "publicPath": "/static/v2018/img/logoradar.svg.gz"
     },
     "img/manual.png": {
       "name": "img/manual.png",
       "path": "img/manual.png",
-      "publicPath": "http://localhost:8080/img/manual.png",
+      "publicPath": "/static/v2018/img/manual.png",
       "sourceFilename": "src/assets/img/manual.png"
     },
     "img/pdf_cabec.jpg": {
       "name": "img/pdf_cabec.jpg",
       "path": "img/pdf_cabec.jpg",
-      "publicPath": "http://localhost:8080/img/pdf_cabec.jpg",
+      "publicPath": "/static/v2018/img/pdf_cabec.jpg",
       "sourceFilename": "src/assets/img/pdf_cabec.jpg"
     },
     "img/pdf_cabec_margem.jpg": {
       "name": "img/pdf_cabec_margem.jpg",
       "path": "img/pdf_cabec_margem.jpg",
-      "publicPath": "http://localhost:8080/img/pdf_cabec_margem.jpg",
+      "publicPath": "/static/v2018/img/pdf_cabec_margem.jpg",
       "sourceFilename": "src/assets/img/pdf_cabec_margem.jpg"
     },
     "img/pdf_rodape.jpg": {
       "name": "img/pdf_rodape.jpg",
       "path": "img/pdf_rodape.jpg",
-      "publicPath": "http://localhost:8080/img/pdf_rodape.jpg",
+      "publicPath": "/static/v2018/img/pdf_rodape.jpg",
       "sourceFilename": "src/assets/img/pdf_rodape.jpg"
     },
     "img/pdf_rodape_margem.jpg": {
       "name": "img/pdf_rodape_margem.jpg",
       "path": "img/pdf_rodape_margem.jpg",
-      "publicPath": "http://localhost:8080/img/pdf_rodape_margem.jpg",
+      "publicPath": "/static/v2018/img/pdf_rodape_margem.jpg",
       "sourceFilename": "src/assets/img/pdf_rodape_margem.jpg"
     },
     "img/pdflogo.png": {
       "name": "img/pdflogo.png",
       "path": "img/pdflogo.png",
-      "publicPath": "http://localhost:8080/img/pdflogo.png",
+      "publicPath": "/static/v2018/img/pdflogo.png",
       "sourceFilename": "src/assets/img/pdflogo.png"
     },
     "img/perfil.1.jpg": {
       "name": "img/perfil.1.jpg",
       "path": "img/perfil.1.jpg",
-      "publicPath": "http://localhost:8080/img/perfil.1.jpg",
+      "publicPath": "/static/v2018/img/perfil.1.jpg",
       "sourceFilename": "src/assets/img/perfil.1.jpg"
     },
     "img/perfil.jpg": {
       "name": "img/perfil.jpg",
       "path": "img/perfil.jpg",
-      "publicPath": "http://localhost:8080/img/perfil.jpg",
+      "publicPath": "/static/v2018/img/perfil.jpg",
       "sourceFilename": "src/assets/img/perfil.jpg"
     },
     "img/perfil.png": {
       "name": "img/perfil.png",
       "path": "img/perfil.png",
-      "publicPath": "http://localhost:8080/img/perfil.png",
+      "publicPath": "/static/v2018/img/perfil.png",
       "sourceFilename": "src/assets/img/perfil.png"
     },
     "img/search-gray.png": {
       "name": "img/search-gray.png",
       "path": "img/search-gray.png",
-      "publicPath": "http://localhost:8080/img/search-gray.png",
+      "publicPath": "/static/v2018/img/search-gray.png",
       "sourceFilename": "src/assets/img/search-gray.png"
     },
     "img/search.png": {
       "name": "img/search.png",
       "path": "img/search.png",
-      "publicPath": "http://localhost:8080/img/search.png",
+      "publicPath": "/static/v2018/img/search.png",
       "sourceFilename": "src/assets/img/search.png"
     },
     "img/search_box_icon36.png": {
       "name": "img/search_box_icon36.png",
       "path": "img/search_box_icon36.png",
-      "publicPath": "http://localhost:8080/img/search_box_icon36.png",
+      "publicPath": "/static/v2018/img/search_box_icon36.png",
       "sourceFilename": "src/assets/img/search_box_icon36.png"
     },
     "img/search_box_icon36_black.png": {
       "name": "img/search_box_icon36_black.png",
       "path": "img/search_box_icon36_black.png",
-      "publicPath": "http://localhost:8080/img/search_box_icon36_black.png",
+      "publicPath": "/static/v2018/img/search_box_icon36_black.png",
       "sourceFilename": "src/assets/img/search_box_icon36_black.png"
     },
     "img/search_box_icon36_delete.png": {
       "name": "img/search_box_icon36_delete.png",
       "path": "img/search_box_icon36_delete.png",
-      "publicPath": "http://localhost:8080/img/search_box_icon36_delete.png",
+      "publicPath": "/static/v2018/img/search_box_icon36_delete.png",
       "sourceFilename": "src/assets/img/search_box_icon36_delete.png"
     },
     "img/spl_logo.png": {
       "name": "img/spl_logo.png",
       "path": "img/spl_logo.png",
-      "publicPath": "http://localhost:8080/img/spl_logo.png",
+      "publicPath": "/static/v2018/img/spl_logo.png",
       "sourceFilename": "src/assets/img/spl_logo.png"
     },
     "img/tema_seminario.b2675bd3.png": {
       "name": "img/tema_seminario.b2675bd3.png",
       "path": "img/tema_seminario.b2675bd3.png",
-      "publicPath": "http://localhost:8080/img/tema_seminario.b2675bd3.png",
+      "publicPath": "/static/v2018/img/tema_seminario.b2675bd3.png",
       "sourceFilename": "src/assets/img/banners/tema_seminario.png"
     },
     "img/topo_email.jpg": {
       "name": "img/topo_email.jpg",
       "path": "img/topo_email.jpg",
-      "publicPath": "http://localhost:8080/img/topo_email.jpg",
+      "publicPath": "/static/v2018/img/topo_email.jpg",
       "sourceFilename": "src/assets/img/topo_email.jpg"
     },
     "img/ui-bg_fine-grain_10_eceadf_60x60.ac1b5e68.png": {
       "name": "img/ui-bg_fine-grain_10_eceadf_60x60.ac1b5e68.png",
       "path": "img/ui-bg_fine-grain_10_eceadf_60x60.ac1b5e68.png",
-      "publicPath": "http://localhost:8080/img/ui-bg_fine-grain_10_eceadf_60x60.ac1b5e68.png",
+      "publicPath": "/static/v2018/img/ui-bg_fine-grain_10_eceadf_60x60.ac1b5e68.png",
       "sourceFilename": "node_modules/jquery-ui-themes/themes/pepper-grinder/images/ui-bg_fine-grain_10_eceadf_60x60.png"
     },
     "img/ui-bg_fine-grain_10_f8f7f6_60x60.d81a151a.png": {
       "name": "img/ui-bg_fine-grain_10_f8f7f6_60x60.d81a151a.png",
       "path": "img/ui-bg_fine-grain_10_f8f7f6_60x60.d81a151a.png",
-      "publicPath": "http://localhost:8080/img/ui-bg_fine-grain_10_f8f7f6_60x60.d81a151a.png",
+      "publicPath": "/static/v2018/img/ui-bg_fine-grain_10_f8f7f6_60x60.d81a151a.png",
       "sourceFilename": "node_modules/jquery-ui-themes/themes/pepper-grinder/images/ui-bg_fine-grain_10_f8f7f6_60x60.png"
     },
     "img/ui-bg_fine-grain_15_eceadf_60x60.bdedfd45.png": {
       "name": "img/ui-bg_fine-grain_15_eceadf_60x60.bdedfd45.png",
       "path": "img/ui-bg_fine-grain_15_eceadf_60x60.bdedfd45.png",
-      "publicPath": "http://localhost:8080/img/ui-bg_fine-grain_15_eceadf_60x60.bdedfd45.png",
+      "publicPath": "/static/v2018/img/ui-bg_fine-grain_15_eceadf_60x60.bdedfd45.png",
       "sourceFilename": "node_modules/jquery-ui-themes/themes/pepper-grinder/images/ui-bg_fine-grain_15_eceadf_60x60.png"
     },
     "img/ui-bg_fine-grain_15_f7f3de_60x60.5203d9a3.png": {
       "name": "img/ui-bg_fine-grain_15_f7f3de_60x60.5203d9a3.png",
       "path": "img/ui-bg_fine-grain_15_f7f3de_60x60.5203d9a3.png",
-      "publicPath": "http://localhost:8080/img/ui-bg_fine-grain_15_f7f3de_60x60.5203d9a3.png",
+      "publicPath": "/static/v2018/img/ui-bg_fine-grain_15_f7f3de_60x60.5203d9a3.png",
       "sourceFilename": "node_modules/jquery-ui-themes/themes/pepper-grinder/images/ui-bg_fine-grain_15_f7f3de_60x60.png"
     },
     "img/ui-bg_fine-grain_65_654b24_60x60.9140729a.png": {
       "name": "img/ui-bg_fine-grain_65_654b24_60x60.9140729a.png",
       "path": "img/ui-bg_fine-grain_65_654b24_60x60.9140729a.png",
-      "publicPath": "http://localhost:8080/img/ui-bg_fine-grain_65_654b24_60x60.9140729a.png",
+      "publicPath": "/static/v2018/img/ui-bg_fine-grain_65_654b24_60x60.9140729a.png",
       "sourceFilename": "node_modules/jquery-ui-themes/themes/pepper-grinder/images/ui-bg_fine-grain_65_654b24_60x60.png"
     },
     "img/ui-bg_fine-grain_68_b83400_60x60.d0a9f0f6.png": {
       "name": "img/ui-bg_fine-grain_68_b83400_60x60.d0a9f0f6.png",
       "path": "img/ui-bg_fine-grain_68_b83400_60x60.d0a9f0f6.png",
-      "publicPath": "http://localhost:8080/img/ui-bg_fine-grain_68_b83400_60x60.d0a9f0f6.png",
+      "publicPath": "/static/v2018/img/ui-bg_fine-grain_68_b83400_60x60.d0a9f0f6.png",
       "sourceFilename": "node_modules/jquery-ui-themes/themes/pepper-grinder/images/ui-bg_fine-grain_68_b83400_60x60.png"
     },
     "img/user.png": {
       "name": "img/user.png",
       "path": "img/user.png",
-      "publicPath": "http://localhost:8080/img/user.png",
+      "publicPath": "/static/v2018/img/user.png",
       "sourceFilename": "src/assets/img/user.png"
     },
     "index.html": {
       "name": "index.html",
       "path": "index.html",
-      "publicPath": "http://localhost:8080/index.html"
+      "publicPath": "/static/v2018/index.html"
     },
-    "js/app.js": {
-      "name": "js/app.js",
-      "path": "js/app.js",
-      "publicPath": "http://localhost:8080/js/app.js"
+    "index.html.gz": {
+      "name": "index.html.gz",
+      "path": "index.html.gz",
+      "publicPath": "/static/v2018/index.html.gz"
     },
-    "js/chunk-vendors.js": {
-      "name": "js/chunk-vendors.js",
-      "path": "js/chunk-vendors.js",
-      "publicPath": "http://localhost:8080/js/chunk-vendors.js"
+    "js/1580.fdcd26ce.js": {
+      "name": "js/1580.fdcd26ce.js",
+      "path": "js/1580.fdcd26ce.js",
+      "publicPath": "/static/v2018/js/1580.fdcd26ce.js"
     },
-    "js/compilacao.js": {
-      "name": "js/compilacao.js",
-      "path": "js/compilacao.js",
-      "publicPath": "http://localhost:8080/js/compilacao.js"
+    "js/1580.fdcd26ce.js.gz": {
+      "name": "js/1580.fdcd26ce.js.gz",
+      "path": "js/1580.fdcd26ce.js.gz",
+      "publicPath": "/static/v2018/js/1580.fdcd26ce.js.gz"
     },
-    "js/construct.js": {
-      "name": "js/construct.js",
-      "path": "js/construct.js",
-      "publicPath": "http://localhost:8080/js/construct.js"
+    "js/1642.2b540146.js": {
+      "name": "js/1642.2b540146.js",
+      "path": "js/1642.2b540146.js",
+      "publicPath": "/static/v2018/js/1642.2b540146.js"
+    },
+    "js/1642.2b540146.js.gz": {
+      "name": "js/1642.2b540146.js.gz",
+      "path": "js/1642.2b540146.js.gz",
+      "publicPath": "/static/v2018/js/1642.2b540146.js.gz"
+    },
+    "js/1774.466ce24e.js": {
+      "name": "js/1774.466ce24e.js",
+      "path": "js/1774.466ce24e.js",
+      "publicPath": "/static/v2018/js/1774.466ce24e.js"
+    },
+    "js/2008.c2ff8a61.js": {
+      "name": "js/2008.c2ff8a61.js",
+      "path": "js/2008.c2ff8a61.js",
+      "publicPath": "/static/v2018/js/2008.c2ff8a61.js"
+    },
+    "js/2008.c2ff8a61.js.gz": {
+      "name": "js/2008.c2ff8a61.js.gz",
+      "path": "js/2008.c2ff8a61.js.gz",
+      "publicPath": "/static/v2018/js/2008.c2ff8a61.js.gz"
+    },
+    "js/2274.2b9ca508.js": {
+      "name": "js/2274.2b9ca508.js",
+      "path": "js/2274.2b9ca508.js",
+      "publicPath": "/static/v2018/js/2274.2b9ca508.js"
+    },
+    "js/2274.2b9ca508.js.gz": {
+      "name": "js/2274.2b9ca508.js.gz",
+      "path": "js/2274.2b9ca508.js.gz",
+      "publicPath": "/static/v2018/js/2274.2b9ca508.js.gz"
+    },
+    "js/3739.535cbb5f.js": {
+      "name": "js/3739.535cbb5f.js",
+      "path": "js/3739.535cbb5f.js",
+      "publicPath": "/static/v2018/js/3739.535cbb5f.js"
+    },
+    "js/3739.535cbb5f.js.gz": {
+      "name": "js/3739.535cbb5f.js.gz",
+      "path": "js/3739.535cbb5f.js.gz",
+      "publicPath": "/static/v2018/js/3739.535cbb5f.js.gz"
+    },
+    "js/3907.431d7950.js": {
+      "name": "js/3907.431d7950.js",
+      "path": "js/3907.431d7950.js",
+      "publicPath": "/static/v2018/js/3907.431d7950.js"
+    },
+    "js/3907.431d7950.js.gz": {
+      "name": "js/3907.431d7950.js.gz",
+      "path": "js/3907.431d7950.js.gz",
+      "publicPath": "/static/v2018/js/3907.431d7950.js.gz"
+    },
+    "js/4629.74a8117a.js": {
+      "name": "js/4629.74a8117a.js",
+      "path": "js/4629.74a8117a.js",
+      "publicPath": "/static/v2018/js/4629.74a8117a.js"
+    },
+    "js/4629.74a8117a.js.gz": {
+      "name": "js/4629.74a8117a.js.gz",
+      "path": "js/4629.74a8117a.js.gz",
+      "publicPath": "/static/v2018/js/4629.74a8117a.js.gz"
+    },
+    "js/4649.79124bdf.js": {
+      "name": "js/4649.79124bdf.js",
+      "path": "js/4649.79124bdf.js",
+      "publicPath": "/static/v2018/js/4649.79124bdf.js"
+    },
+    "js/4649.79124bdf.js.gz": {
+      "name": "js/4649.79124bdf.js.gz",
+      "path": "js/4649.79124bdf.js.gz",
+      "publicPath": "/static/v2018/js/4649.79124bdf.js.gz"
+    },
+    "js/4686.9cc22c2e.js": {
+      "name": "js/4686.9cc22c2e.js",
+      "path": "js/4686.9cc22c2e.js",
+      "publicPath": "/static/v2018/js/4686.9cc22c2e.js"
+    },
+    "js/4686.9cc22c2e.js.gz": {
+      "name": "js/4686.9cc22c2e.js.gz",
+      "path": "js/4686.9cc22c2e.js.gz",
+      "publicPath": "/static/v2018/js/4686.9cc22c2e.js.gz"
+    },
+    "js/5186.8d001f2e.js": {
+      "name": "js/5186.8d001f2e.js",
+      "path": "js/5186.8d001f2e.js",
+      "publicPath": "/static/v2018/js/5186.8d001f2e.js"
+    },
+    "js/5186.8d001f2e.js.gz": {
+      "name": "js/5186.8d001f2e.js.gz",
+      "path": "js/5186.8d001f2e.js.gz",
+      "publicPath": "/static/v2018/js/5186.8d001f2e.js.gz"
+    },
+    "js/5256.d42f445f.js": {
+      "name": "js/5256.d42f445f.js",
+      "path": "js/5256.d42f445f.js",
+      "publicPath": "/static/v2018/js/5256.d42f445f.js"
+    },
+    "js/5256.d42f445f.js.gz": {
+      "name": "js/5256.d42f445f.js.gz",
+      "path": "js/5256.d42f445f.js.gz",
+      "publicPath": "/static/v2018/js/5256.d42f445f.js.gz"
+    },
+    "js/6083.f7d74091.js": {
+      "name": "js/6083.f7d74091.js",
+      "path": "js/6083.f7d74091.js",
+      "publicPath": "/static/v2018/js/6083.f7d74091.js"
+    },
+    "js/6083.f7d74091.js.gz": {
+      "name": "js/6083.f7d74091.js.gz",
+      "path": "js/6083.f7d74091.js.gz",
+      "publicPath": "/static/v2018/js/6083.f7d74091.js.gz"
+    },
+    "js/6176.c387ef9a.js": {
+      "name": "js/6176.c387ef9a.js",
+      "path": "js/6176.c387ef9a.js",
+      "publicPath": "/static/v2018/js/6176.c387ef9a.js"
+    },
+    "js/6176.c387ef9a.js.gz": {
+      "name": "js/6176.c387ef9a.js.gz",
+      "path": "js/6176.c387ef9a.js.gz",
+      "publicPath": "/static/v2018/js/6176.c387ef9a.js.gz"
+    },
+    "js/6264.6172913b.js": {
+      "name": "js/6264.6172913b.js",
+      "path": "js/6264.6172913b.js",
+      "publicPath": "/static/v2018/js/6264.6172913b.js"
+    },
+    "js/6264.6172913b.js.gz": {
+      "name": "js/6264.6172913b.js.gz",
+      "path": "js/6264.6172913b.js.gz",
+      "publicPath": "/static/v2018/js/6264.6172913b.js.gz"
+    },
+    "js/6583.26dd2a1a.js": {
+      "name": "js/6583.26dd2a1a.js",
+      "path": "js/6583.26dd2a1a.js",
+      "publicPath": "/static/v2018/js/6583.26dd2a1a.js"
+    },
+    "js/6583.26dd2a1a.js.gz": {
+      "name": "js/6583.26dd2a1a.js.gz",
+      "path": "js/6583.26dd2a1a.js.gz",
+      "publicPath": "/static/v2018/js/6583.26dd2a1a.js.gz"
+    },
+    "js/6829.b471ad4e.js": {
+      "name": "js/6829.b471ad4e.js",
+      "path": "js/6829.b471ad4e.js",
+      "publicPath": "/static/v2018/js/6829.b471ad4e.js"
+    },
+    "js/6829.b471ad4e.js.gz": {
+      "name": "js/6829.b471ad4e.js.gz",
+      "path": "js/6829.b471ad4e.js.gz",
+      "publicPath": "/static/v2018/js/6829.b471ad4e.js.gz"
+    },
+    "js/7022.a76bc682.js": {
+      "name": "js/7022.a76bc682.js",
+      "path": "js/7022.a76bc682.js",
+      "publicPath": "/static/v2018/js/7022.a76bc682.js"
+    },
+    "js/7022.a76bc682.js.gz": {
+      "name": "js/7022.a76bc682.js.gz",
+      "path": "js/7022.a76bc682.js.gz",
+      "publicPath": "/static/v2018/js/7022.a76bc682.js.gz"
+    },
+    "js/7223.853fdcf4.js": {
+      "name": "js/7223.853fdcf4.js",
+      "path": "js/7223.853fdcf4.js",
+      "publicPath": "/static/v2018/js/7223.853fdcf4.js"
+    },
+    "js/7223.853fdcf4.js.gz": {
+      "name": "js/7223.853fdcf4.js.gz",
+      "path": "js/7223.853fdcf4.js.gz",
+      "publicPath": "/static/v2018/js/7223.853fdcf4.js.gz"
+    },
+    "js/7811.5edaa843.js": {
+      "name": "js/7811.5edaa843.js",
+      "path": "js/7811.5edaa843.js",
+      "publicPath": "/static/v2018/js/7811.5edaa843.js"
+    },
+    "js/7811.5edaa843.js.gz": {
+      "name": "js/7811.5edaa843.js.gz",
+      "path": "js/7811.5edaa843.js.gz",
+      "publicPath": "/static/v2018/js/7811.5edaa843.js.gz"
+    },
+    "js/7840.b787111a.js": {
+      "name": "js/7840.b787111a.js",
+      "path": "js/7840.b787111a.js",
+      "publicPath": "/static/v2018/js/7840.b787111a.js"
+    },
+    "js/7840.b787111a.js.gz": {
+      "name": "js/7840.b787111a.js.gz",
+      "path": "js/7840.b787111a.js.gz",
+      "publicPath": "/static/v2018/js/7840.b787111a.js.gz"
+    },
+    "js/797.841f717d.js": {
+      "name": "js/797.841f717d.js",
+      "path": "js/797.841f717d.js",
+      "publicPath": "/static/v2018/js/797.841f717d.js"
+    },
+    "js/797.841f717d.js.gz": {
+      "name": "js/797.841f717d.js.gz",
+      "path": "js/797.841f717d.js.gz",
+      "publicPath": "/static/v2018/js/797.841f717d.js.gz"
+    },
+    "js/8323.27eeb4af.js": {
+      "name": "js/8323.27eeb4af.js",
+      "path": "js/8323.27eeb4af.js",
+      "publicPath": "/static/v2018/js/8323.27eeb4af.js"
+    },
+    "js/8323.27eeb4af.js.gz": {
+      "name": "js/8323.27eeb4af.js.gz",
+      "path": "js/8323.27eeb4af.js.gz",
+      "publicPath": "/static/v2018/js/8323.27eeb4af.js.gz"
+    },
+    "js/8748.f612b944.js": {
+      "name": "js/8748.f612b944.js",
+      "path": "js/8748.f612b944.js",
+      "publicPath": "/static/v2018/js/8748.f612b944.js"
+    },
+    "js/8748.f612b944.js.gz": {
+      "name": "js/8748.f612b944.js.gz",
+      "path": "js/8748.f612b944.js.gz",
+      "publicPath": "/static/v2018/js/8748.f612b944.js.gz"
+    },
+    "js/app.be95424a.js": {
+      "name": "js/app.be95424a.js",
+      "path": "js/app.be95424a.js",
+      "publicPath": "/static/v2018/js/app.be95424a.js"
+    },
+    "js/app.be95424a.js.gz": {
+      "name": "js/app.be95424a.js.gz",
+      "path": "js/app.be95424a.js.gz",
+      "publicPath": "/static/v2018/js/app.be95424a.js.gz"
+    },
+    "js/compilacao.8b5678c2.js": {
+      "name": "js/compilacao.8b5678c2.js",
+      "path": "js/compilacao.8b5678c2.js",
+      "publicPath": "/static/v2018/js/compilacao.8b5678c2.js"
+    },
+    "js/compilacao.8b5678c2.js.gz": {
+      "name": "js/compilacao.8b5678c2.js.gz",
+      "path": "js/compilacao.8b5678c2.js.gz",
+      "publicPath": "/static/v2018/js/compilacao.8b5678c2.js.gz"
+    },
+    "js/construct.2fcd56fe.js": {
+      "name": "js/construct.2fcd56fe.js",
+      "path": "js/construct.2fcd56fe.js",
+      "publicPath": "/static/v2018/js/construct.2fcd56fe.js"
+    },
+    "js/construct.2fcd56fe.js.gz": {
+      "name": "js/construct.2fcd56fe.js.gz",
+      "path": "js/construct.2fcd56fe.js.gz",
+      "publicPath": "/static/v2018/js/construct.2fcd56fe.js.gz"
     },
     "js/dashboard_custom.js": {
       "name": "js/dashboard_custom.js",
       "path": "js/dashboard_custom.js",
-      "publicPath": "http://localhost:8080/js/dashboard_custom.js",
+      "publicPath": "/static/v2018/js/dashboard_custom.js",
       "sourceFilename": "src/assets/js/dashboard_custom.js"
     },
-    "js/libsuserauth.js": {
-      "name": "js/libsuserauth.js",
-      "path": "js/libsuserauth.js",
-      "publicPath": "http://localhost:8080/js/libsuserauth.js"
+    "js/dashboard_custom.js.gz": {
+      "name": "js/dashboard_custom.js.gz",
+      "path": "js/dashboard_custom.js.gz",
+      "publicPath": "/static/v2018/js/dashboard_custom.js.gz"
     },
-    "js/loa.js": {
-      "name": "js/loa.js",
-      "path": "js/loa.js",
-      "publicPath": "http://localhost:8080/js/loa.js"
+    "js/libsuserauth.b66d799f.js": {
+      "name": "js/libsuserauth.b66d799f.js",
+      "path": "js/libsuserauth.b66d799f.js",
+      "publicPath": "/static/v2018/js/libsuserauth.b66d799f.js"
+    },
+    "js/libsuserauth.b66d799f.js.gz": {
+      "name": "js/libsuserauth.b66d799f.js.gz",
+      "path": "js/libsuserauth.b66d799f.js.gz",
+      "publicPath": "/static/v2018/js/libsuserauth.b66d799f.js.gz"
+    },
+    "js/loa.5ecaac9f.js": {
+      "name": "js/loa.5ecaac9f.js",
+      "path": "js/loa.5ecaac9f.js",
+      "publicPath": "/static/v2018/js/loa.5ecaac9f.js"
+    },
+    "js/loa.5ecaac9f.js.gz": {
+      "name": "js/loa.5ecaac9f.js.gz",
+      "path": "js/loa.5ecaac9f.js.gz",
+      "publicPath": "/static/v2018/js/loa.5ecaac9f.js.gz"
+    },
+    "js/npm.autosize.18c79efb.js": {
+      "name": "js/npm.autosize.18c79efb.js",
+      "path": "js/npm.autosize.18c79efb.js",
+      "publicPath": "/static/v2018/js/npm.autosize.18c79efb.js"
+    },
+    "js/npm.autosize.18c79efb.js.gz": {
+      "name": "js/npm.autosize.18c79efb.js.gz",
+      "path": "js/npm.autosize.18c79efb.js.gz",
+      "publicPath": "/static/v2018/js/npm.autosize.18c79efb.js.gz"
+    },
+    "js/npm.axios.1f04d043.js": {
+      "name": "js/npm.axios.1f04d043.js",
+      "path": "js/npm.axios.1f04d043.js",
+      "publicPath": "/static/v2018/js/npm.axios.1f04d043.js"
+    },
+    "js/npm.axios.1f04d043.js.gz": {
+      "name": "js/npm.axios.1f04d043.js.gz",
+      "path": "js/npm.axios.1f04d043.js.gz",
+      "publicPath": "/static/v2018/js/npm.axios.1f04d043.js.gz"
+    },
+    "js/npm.bootstrap-select.353c2cd3.js": {
+      "name": "js/npm.bootstrap-select.353c2cd3.js",
+      "path": "js/npm.bootstrap-select.353c2cd3.js",
+      "publicPath": "/static/v2018/js/npm.bootstrap-select.353c2cd3.js"
+    },
+    "js/npm.bootstrap-select.353c2cd3.js.gz": {
+      "name": "js/npm.bootstrap-select.353c2cd3.js.gz",
+      "path": "js/npm.bootstrap-select.353c2cd3.js.gz",
+      "publicPath": "/static/v2018/js/npm.bootstrap-select.353c2cd3.js.gz"
+    },
+    "js/npm.bootstrap-vue.672ad741.js": {
+      "name": "js/npm.bootstrap-vue.672ad741.js",
+      "path": "js/npm.bootstrap-vue.672ad741.js",
+      "publicPath": "/static/v2018/js/npm.bootstrap-vue.672ad741.js"
+    },
+    "js/npm.bootstrap-vue.672ad741.js.gz": {
+      "name": "js/npm.bootstrap-vue.672ad741.js.gz",
+      "path": "js/npm.bootstrap-vue.672ad741.js.gz",
+      "publicPath": "/static/v2018/js/npm.bootstrap-vue.672ad741.js.gz"
+    },
+    "js/npm.bootstrap.346e2cd4.js": {
+      "name": "js/npm.bootstrap.346e2cd4.js",
+      "path": "js/npm.bootstrap.346e2cd4.js",
+      "publicPath": "/static/v2018/js/npm.bootstrap.346e2cd4.js"
+    },
+    "js/npm.bootstrap.346e2cd4.js.gz": {
+      "name": "js/npm.bootstrap.346e2cd4.js.gz",
+      "path": "js/npm.bootstrap.346e2cd4.js.gz",
+      "publicPath": "/static/v2018/js/npm.bootstrap.346e2cd4.js.gz"
+    },
+    "js/npm.chart.js.dee27be8.js": {
+      "name": "js/npm.chart.js.dee27be8.js",
+      "path": "js/npm.chart.js.dee27be8.js",
+      "publicPath": "/static/v2018/js/npm.chart.js.dee27be8.js"
+    },
+    "js/npm.chart.js.dee27be8.js.gz": {
+      "name": "js/npm.chart.js.dee27be8.js.gz",
+      "path": "js/npm.chart.js.dee27be8.js.gz",
+      "publicPath": "/static/v2018/js/npm.chart.js.dee27be8.js.gz"
+    },
+    "js/npm.chartjs-plugin-datalabels.09dfaaf9.js": {
+      "name": "js/npm.chartjs-plugin-datalabels.09dfaaf9.js",
+      "path": "js/npm.chartjs-plugin-datalabels.09dfaaf9.js",
+      "publicPath": "/static/v2018/js/npm.chartjs-plugin-datalabels.09dfaaf9.js"
+    },
+    "js/npm.chartjs-plugin-datalabels.09dfaaf9.js.gz": {
+      "name": "js/npm.chartjs-plugin-datalabels.09dfaaf9.js.gz",
+      "path": "js/npm.chartjs-plugin-datalabels.09dfaaf9.js.gz",
+      "publicPath": "/static/v2018/js/npm.chartjs-plugin-datalabels.09dfaaf9.js.gz"
+    },
+    "js/npm.core-js.f60d62f9.js": {
+      "name": "js/npm.core-js.f60d62f9.js",
+      "path": "js/npm.core-js.f60d62f9.js",
+      "publicPath": "/static/v2018/js/npm.core-js.f60d62f9.js"
+    },
+    "js/npm.core-js.f60d62f9.js.gz": {
+      "name": "js/npm.core-js.f60d62f9.js.gz",
+      "path": "js/npm.core-js.f60d62f9.js.gz",
+      "publicPath": "/static/v2018/js/npm.core-js.f60d62f9.js.gz"
+    },
+    "js/npm.dateformat.66351150.js": {
+      "name": "js/npm.dateformat.66351150.js",
+      "path": "js/npm.dateformat.66351150.js",
+      "publicPath": "/static/v2018/js/npm.dateformat.66351150.js"
+    },
+    "js/npm.dateformat.66351150.js.gz": {
+      "name": "js/npm.dateformat.66351150.js.gz",
+      "path": "js/npm.dateformat.66351150.js.gz",
+      "publicPath": "/static/v2018/js/npm.dateformat.66351150.js.gz"
+    },
+    "js/npm.diff.0f7f453a.js": {
+      "name": "js/npm.diff.0f7f453a.js",
+      "path": "js/npm.diff.0f7f453a.js",
+      "publicPath": "/static/v2018/js/npm.diff.0f7f453a.js"
+    },
+    "js/npm.diff.0f7f453a.js.gz": {
+      "name": "js/npm.diff.0f7f453a.js.gz",
+      "path": "js/npm.diff.0f7f453a.js.gz",
+      "publicPath": "/static/v2018/js/npm.diff.0f7f453a.js.gz"
+    },
+    "js/npm.jquery-mask-plugin.fddcafd2.js": {
+      "name": "js/npm.jquery-mask-plugin.fddcafd2.js",
+      "path": "js/npm.jquery-mask-plugin.fddcafd2.js",
+      "publicPath": "/static/v2018/js/npm.jquery-mask-plugin.fddcafd2.js"
+    },
+    "js/npm.jquery-mask-plugin.fddcafd2.js.gz": {
+      "name": "js/npm.jquery-mask-plugin.fddcafd2.js.gz",
+      "path": "js/npm.jquery-mask-plugin.fddcafd2.js.gz",
+      "publicPath": "/static/v2018/js/npm.jquery-mask-plugin.fddcafd2.js.gz"
+    },
+    "js/npm.jquery-ui.70d0fcdd.js": {
+      "name": "js/npm.jquery-ui.70d0fcdd.js",
+      "path": "js/npm.jquery-ui.70d0fcdd.js",
+      "publicPath": "/static/v2018/js/npm.jquery-ui.70d0fcdd.js"
+    },
+    "js/npm.jquery-ui.70d0fcdd.js.gz": {
+      "name": "js/npm.jquery-ui.70d0fcdd.js.gz",
+      "path": "js/npm.jquery-ui.70d0fcdd.js.gz",
+      "publicPath": "/static/v2018/js/npm.jquery-ui.70d0fcdd.js.gz"
+    },
+    "js/npm.jquery.1b4d0761.js": {
+      "name": "js/npm.jquery.1b4d0761.js",
+      "path": "js/npm.jquery.1b4d0761.js",
+      "publicPath": "/static/v2018/js/npm.jquery.1b4d0761.js"
+    },
+    "js/npm.jquery.1b4d0761.js.gz": {
+      "name": "js/npm.jquery.1b4d0761.js.gz",
+      "path": "js/npm.jquery.1b4d0761.js.gz",
+      "publicPath": "/static/v2018/js/npm.jquery.1b4d0761.js.gz"
+    },
+    "js/npm.js-yaml.27c78c0b.js": {
+      "name": "js/npm.js-yaml.27c78c0b.js",
+      "path": "js/npm.js-yaml.27c78c0b.js",
+      "publicPath": "/static/v2018/js/npm.js-yaml.27c78c0b.js"
+    },
+    "js/npm.js-yaml.27c78c0b.js.gz": {
+      "name": "js/npm.js-yaml.27c78c0b.js.gz",
+      "path": "js/npm.js-yaml.27c78c0b.js.gz",
+      "publicPath": "/static/v2018/js/npm.js-yaml.27c78c0b.js.gz"
+    },
+    "js/npm.lodash.b671d9f5.js": {
+      "name": "js/npm.lodash.b671d9f5.js",
+      "path": "js/npm.lodash.b671d9f5.js",
+      "publicPath": "/static/v2018/js/npm.lodash.b671d9f5.js"
+    },
+    "js/npm.lodash.b671d9f5.js.gz": {
+      "name": "js/npm.lodash.b671d9f5.js.gz",
+      "path": "js/npm.lodash.b671d9f5.js.gz",
+      "publicPath": "/static/v2018/js/npm.lodash.b671d9f5.js.gz"
+    },
+    "js/npm.popper.js.82c77a1f.js": {
+      "name": "js/npm.popper.js.82c77a1f.js",
+      "path": "js/npm.popper.js.82c77a1f.js",
+      "publicPath": "/static/v2018/js/npm.popper.js.82c77a1f.js"
+    },
+    "js/npm.popper.js.82c77a1f.js.gz": {
+      "name": "js/npm.popper.js.82c77a1f.js.gz",
+      "path": "js/npm.popper.js.82c77a1f.js.gz",
+      "publicPath": "/static/v2018/js/npm.popper.js.82c77a1f.js.gz"
+    },
+    "js/npm.portal-vue.2c654cc0.js": {
+      "name": "js/npm.portal-vue.2c654cc0.js",
+      "path": "js/npm.portal-vue.2c654cc0.js",
+      "publicPath": "/static/v2018/js/npm.portal-vue.2c654cc0.js"
+    },
+    "js/npm.portal-vue.2c654cc0.js.gz": {
+      "name": "js/npm.portal-vue.2c654cc0.js.gz",
+      "path": "js/npm.portal-vue.2c654cc0.js.gz",
+      "publicPath": "/static/v2018/js/npm.portal-vue.2c654cc0.js.gz"
+    },
+    "js/npm.register-service-worker.dba5b069.js": {
+      "name": "js/npm.register-service-worker.dba5b069.js",
+      "path": "js/npm.register-service-worker.dba5b069.js",
+      "publicPath": "/static/v2018/js/npm.register-service-worker.dba5b069.js"
+    },
+    "js/npm.register-service-worker.dba5b069.js.gz": {
+      "name": "js/npm.register-service-worker.dba5b069.js.gz",
+      "path": "js/npm.register-service-worker.dba5b069.js.gz",
+      "publicPath": "/static/v2018/js/npm.register-service-worker.dba5b069.js.gz"
+    },
+    "js/npm.split.js.4fb31ddb.js": {
+      "name": "js/npm.split.js.4fb31ddb.js",
+      "path": "js/npm.split.js.4fb31ddb.js",
+      "publicPath": "/static/v2018/js/npm.split.js.4fb31ddb.js"
+    },
+    "js/npm.split.js.4fb31ddb.js.gz": {
+      "name": "js/npm.split.js.4fb31ddb.js.gz",
+      "path": "js/npm.split.js.4fb31ddb.js.gz",
+      "publicPath": "/static/v2018/js/npm.split.js.4fb31ddb.js.gz"
+    },
+    "js/npm.tinymce.c80fb0fe.js": {
+      "name": "js/npm.tinymce.c80fb0fe.js",
+      "path": "js/npm.tinymce.c80fb0fe.js",
+      "publicPath": "/static/v2018/js/npm.tinymce.c80fb0fe.js"
+    },
+    "js/npm.tinymce.c80fb0fe.js.gz": {
+      "name": "js/npm.tinymce.c80fb0fe.js.gz",
+      "path": "js/npm.tinymce.c80fb0fe.js.gz",
+      "publicPath": "/static/v2018/js/npm.tinymce.c80fb0fe.js.gz"
+    },
+    "js/npm.vue-chartjs.27fdf07c.js": {
+      "name": "js/npm.vue-chartjs.27fdf07c.js",
+      "path": "js/npm.vue-chartjs.27fdf07c.js",
+      "publicPath": "/static/v2018/js/npm.vue-chartjs.27fdf07c.js"
+    },
+    "js/npm.vue-chartjs.27fdf07c.js.gz": {
+      "name": "js/npm.vue-chartjs.27fdf07c.js.gz",
+      "path": "js/npm.vue-chartjs.27fdf07c.js.gz",
+      "publicPath": "/static/v2018/js/npm.vue-chartjs.27fdf07c.js.gz"
+    },
+    "js/npm.vue-functional-data-merge.764271ae.js": {
+      "name": "js/npm.vue-functional-data-merge.764271ae.js",
+      "path": "js/npm.vue-functional-data-merge.764271ae.js",
+      "publicPath": "/static/v2018/js/npm.vue-functional-data-merge.764271ae.js"
+    },
+    "js/npm.vue-functional-data-merge.764271ae.js.gz": {
+      "name": "js/npm.vue-functional-data-merge.764271ae.js.gz",
+      "path": "js/npm.vue-functional-data-merge.764271ae.js.gz",
+      "publicPath": "/static/v2018/js/npm.vue-functional-data-merge.764271ae.js.gz"
+    },
+    "js/npm.vue-native-websocket.6aa0fd2e.js": {
+      "name": "js/npm.vue-native-websocket.6aa0fd2e.js",
+      "path": "js/npm.vue-native-websocket.6aa0fd2e.js",
+      "publicPath": "/static/v2018/js/npm.vue-native-websocket.6aa0fd2e.js"
+    },
+    "js/npm.vue-native-websocket.6aa0fd2e.js.gz": {
+      "name": "js/npm.vue-native-websocket.6aa0fd2e.js.gz",
+      "path": "js/npm.vue-native-websocket.6aa0fd2e.js.gz",
+      "publicPath": "/static/v2018/js/npm.vue-native-websocket.6aa0fd2e.js.gz"
+    },
+    "js/npm.vue-resize.f0c247d1.js": {
+      "name": "js/npm.vue-resize.f0c247d1.js",
+      "path": "js/npm.vue-resize.f0c247d1.js",
+      "publicPath": "/static/v2018/js/npm.vue-resize.f0c247d1.js"
+    },
+    "js/npm.vue-resize.f0c247d1.js.gz": {
+      "name": "js/npm.vue-resize.f0c247d1.js.gz",
+      "path": "js/npm.vue-resize.f0c247d1.js.gz",
+      "publicPath": "/static/v2018/js/npm.vue-resize.f0c247d1.js.gz"
+    },
+    "js/npm.vue-resource.1264f6dc.js": {
+      "name": "js/npm.vue-resource.1264f6dc.js",
+      "path": "js/npm.vue-resource.1264f6dc.js",
+      "publicPath": "/static/v2018/js/npm.vue-resource.1264f6dc.js"
+    },
+    "js/npm.vue-resource.1264f6dc.js.gz": {
+      "name": "js/npm.vue-resource.1264f6dc.js.gz",
+      "path": "js/npm.vue-resource.1264f6dc.js.gz",
+      "publicPath": "/static/v2018/js/npm.vue-resource.1264f6dc.js.gz"
+    },
+    "js/npm.vue-router.a8804f59.js": {
+      "name": "js/npm.vue-router.a8804f59.js",
+      "path": "js/npm.vue-router.a8804f59.js",
+      "publicPath": "/static/v2018/js/npm.vue-router.a8804f59.js"
+    },
+    "js/npm.vue-router.a8804f59.js.gz": {
+      "name": "js/npm.vue-router.a8804f59.js.gz",
+      "path": "js/npm.vue-router.a8804f59.js.gz",
+      "publicPath": "/static/v2018/js/npm.vue-router.a8804f59.js.gz"
+    },
+    "js/npm.vue.6c2bcc9f.js": {
+      "name": "js/npm.vue.6c2bcc9f.js",
+      "path": "js/npm.vue.6c2bcc9f.js",
+      "publicPath": "/static/v2018/js/npm.vue.6c2bcc9f.js"
+    },
+    "js/npm.vue.6c2bcc9f.js.gz": {
+      "name": "js/npm.vue.6c2bcc9f.js.gz",
+      "path": "js/npm.vue.6c2bcc9f.js.gz",
+      "publicPath": "/static/v2018/js/npm.vue.6c2bcc9f.js.gz"
+    },
+    "js/npm.vuex-router-sync.42079689.js": {
+      "name": "js/npm.vuex-router-sync.42079689.js",
+      "path": "js/npm.vuex-router-sync.42079689.js",
+      "publicPath": "/static/v2018/js/npm.vuex-router-sync.42079689.js"
+    },
+    "js/npm.vuex-router-sync.42079689.js.gz": {
+      "name": "js/npm.vuex-router-sync.42079689.js.gz",
+      "path": "js/npm.vuex-router-sync.42079689.js.gz",
+      "publicPath": "/static/v2018/js/npm.vuex-router-sync.42079689.js.gz"
+    },
+    "js/npm.vuex.6232501c.js": {
+      "name": "js/npm.vuex.6232501c.js",
+      "path": "js/npm.vuex.6232501c.js",
+      "publicPath": "/static/v2018/js/npm.vuex.6232501c.js"
+    },
+    "js/npm.vuex.6232501c.js.gz": {
+      "name": "js/npm.vuex.6232501c.js.gz",
+      "path": "js/npm.vuex.6232501c.js.gz",
+      "publicPath": "/static/v2018/js/npm.vuex.6232501c.js.gz"
     },
     "js/skins/content/dark/content.css": {
       "name": "js/skins/content/dark/content.css",
       "path": "js/skins/content/dark/content.css",
-      "publicPath": "http://localhost:8080/js/skins/content/dark/content.css",
+      "publicPath": "/static/v2018/js/skins/content/dark/content.css",
       "sourceFilename": "node_modules/tinymce/skins/content/dark/content.css"
+    },
+    "js/skins/content/dark/content.css.gz": {
+      "name": "js/skins/content/dark/content.css.gz",
+      "path": "js/skins/content/dark/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/dark/content.css.gz"
     },
     "js/skins/content/dark/content.js": {
       "name": "js/skins/content/dark/content.js",
       "path": "js/skins/content/dark/content.js",
-      "publicPath": "http://localhost:8080/js/skins/content/dark/content.js",
+      "publicPath": "/static/v2018/js/skins/content/dark/content.js",
       "sourceFilename": "node_modules/tinymce/skins/content/dark/content.js"
+    },
+    "js/skins/content/dark/content.js.gz": {
+      "name": "js/skins/content/dark/content.js.gz",
+      "path": "js/skins/content/dark/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/content/dark/content.js.gz"
     },
     "js/skins/content/dark/content.min.css": {
       "name": "js/skins/content/dark/content.min.css",
       "path": "js/skins/content/dark/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/content/dark/content.min.css",
+      "publicPath": "/static/v2018/js/skins/content/dark/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/content/dark/content.min.css"
+    },
+    "js/skins/content/dark/content.min.css.gz": {
+      "name": "js/skins/content/dark/content.min.css.gz",
+      "path": "js/skins/content/dark/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/dark/content.min.css.gz"
     },
     "js/skins/content/default/content.css": {
       "name": "js/skins/content/default/content.css",
       "path": "js/skins/content/default/content.css",
-      "publicPath": "http://localhost:8080/js/skins/content/default/content.css",
+      "publicPath": "/static/v2018/js/skins/content/default/content.css",
       "sourceFilename": "node_modules/tinymce/skins/content/default/content.css"
+    },
+    "js/skins/content/default/content.css.gz": {
+      "name": "js/skins/content/default/content.css.gz",
+      "path": "js/skins/content/default/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/default/content.css.gz"
     },
     "js/skins/content/default/content.js": {
       "name": "js/skins/content/default/content.js",
       "path": "js/skins/content/default/content.js",
-      "publicPath": "http://localhost:8080/js/skins/content/default/content.js",
+      "publicPath": "/static/v2018/js/skins/content/default/content.js",
       "sourceFilename": "node_modules/tinymce/skins/content/default/content.js"
+    },
+    "js/skins/content/default/content.js.gz": {
+      "name": "js/skins/content/default/content.js.gz",
+      "path": "js/skins/content/default/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/content/default/content.js.gz"
     },
     "js/skins/content/default/content.min.css": {
       "name": "js/skins/content/default/content.min.css",
       "path": "js/skins/content/default/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/content/default/content.min.css",
+      "publicPath": "/static/v2018/js/skins/content/default/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/content/default/content.min.css"
+    },
+    "js/skins/content/default/content.min.css.gz": {
+      "name": "js/skins/content/default/content.min.css.gz",
+      "path": "js/skins/content/default/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/default/content.min.css.gz"
     },
     "js/skins/content/document/content.css": {
       "name": "js/skins/content/document/content.css",
       "path": "js/skins/content/document/content.css",
-      "publicPath": "http://localhost:8080/js/skins/content/document/content.css",
+      "publicPath": "/static/v2018/js/skins/content/document/content.css",
       "sourceFilename": "node_modules/tinymce/skins/content/document/content.css"
+    },
+    "js/skins/content/document/content.css.gz": {
+      "name": "js/skins/content/document/content.css.gz",
+      "path": "js/skins/content/document/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/document/content.css.gz"
     },
     "js/skins/content/document/content.js": {
       "name": "js/skins/content/document/content.js",
       "path": "js/skins/content/document/content.js",
-      "publicPath": "http://localhost:8080/js/skins/content/document/content.js",
+      "publicPath": "/static/v2018/js/skins/content/document/content.js",
       "sourceFilename": "node_modules/tinymce/skins/content/document/content.js"
+    },
+    "js/skins/content/document/content.js.gz": {
+      "name": "js/skins/content/document/content.js.gz",
+      "path": "js/skins/content/document/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/content/document/content.js.gz"
     },
     "js/skins/content/document/content.min.css": {
       "name": "js/skins/content/document/content.min.css",
       "path": "js/skins/content/document/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/content/document/content.min.css",
+      "publicPath": "/static/v2018/js/skins/content/document/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/content/document/content.min.css"
+    },
+    "js/skins/content/document/content.min.css.gz": {
+      "name": "js/skins/content/document/content.min.css.gz",
+      "path": "js/skins/content/document/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/document/content.min.css.gz"
     },
     "js/skins/content/tinymce-5-dark/content.css": {
       "name": "js/skins/content/tinymce-5-dark/content.css",
       "path": "js/skins/content/tinymce-5-dark/content.css",
-      "publicPath": "http://localhost:8080/js/skins/content/tinymce-5-dark/content.css",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5-dark/content.css",
       "sourceFilename": "node_modules/tinymce/skins/content/tinymce-5-dark/content.css"
+    },
+    "js/skins/content/tinymce-5-dark/content.css.gz": {
+      "name": "js/skins/content/tinymce-5-dark/content.css.gz",
+      "path": "js/skins/content/tinymce-5-dark/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5-dark/content.css.gz"
     },
     "js/skins/content/tinymce-5-dark/content.js": {
       "name": "js/skins/content/tinymce-5-dark/content.js",
       "path": "js/skins/content/tinymce-5-dark/content.js",
-      "publicPath": "http://localhost:8080/js/skins/content/tinymce-5-dark/content.js",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5-dark/content.js",
       "sourceFilename": "node_modules/tinymce/skins/content/tinymce-5-dark/content.js"
+    },
+    "js/skins/content/tinymce-5-dark/content.js.gz": {
+      "name": "js/skins/content/tinymce-5-dark/content.js.gz",
+      "path": "js/skins/content/tinymce-5-dark/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5-dark/content.js.gz"
     },
     "js/skins/content/tinymce-5-dark/content.min.css": {
       "name": "js/skins/content/tinymce-5-dark/content.min.css",
       "path": "js/skins/content/tinymce-5-dark/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/content/tinymce-5-dark/content.min.css",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5-dark/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/content/tinymce-5-dark/content.min.css"
+    },
+    "js/skins/content/tinymce-5-dark/content.min.css.gz": {
+      "name": "js/skins/content/tinymce-5-dark/content.min.css.gz",
+      "path": "js/skins/content/tinymce-5-dark/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5-dark/content.min.css.gz"
     },
     "js/skins/content/tinymce-5/content.css": {
       "name": "js/skins/content/tinymce-5/content.css",
       "path": "js/skins/content/tinymce-5/content.css",
-      "publicPath": "http://localhost:8080/js/skins/content/tinymce-5/content.css",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5/content.css",
       "sourceFilename": "node_modules/tinymce/skins/content/tinymce-5/content.css"
+    },
+    "js/skins/content/tinymce-5/content.css.gz": {
+      "name": "js/skins/content/tinymce-5/content.css.gz",
+      "path": "js/skins/content/tinymce-5/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5/content.css.gz"
     },
     "js/skins/content/tinymce-5/content.js": {
       "name": "js/skins/content/tinymce-5/content.js",
       "path": "js/skins/content/tinymce-5/content.js",
-      "publicPath": "http://localhost:8080/js/skins/content/tinymce-5/content.js",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5/content.js",
       "sourceFilename": "node_modules/tinymce/skins/content/tinymce-5/content.js"
+    },
+    "js/skins/content/tinymce-5/content.js.gz": {
+      "name": "js/skins/content/tinymce-5/content.js.gz",
+      "path": "js/skins/content/tinymce-5/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5/content.js.gz"
     },
     "js/skins/content/tinymce-5/content.min.css": {
       "name": "js/skins/content/tinymce-5/content.min.css",
       "path": "js/skins/content/tinymce-5/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/content/tinymce-5/content.min.css",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/content/tinymce-5/content.min.css"
+    },
+    "js/skins/content/tinymce-5/content.min.css.gz": {
+      "name": "js/skins/content/tinymce-5/content.min.css.gz",
+      "path": "js/skins/content/tinymce-5/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/tinymce-5/content.min.css.gz"
     },
     "js/skins/content/writer/content.css": {
       "name": "js/skins/content/writer/content.css",
       "path": "js/skins/content/writer/content.css",
-      "publicPath": "http://localhost:8080/js/skins/content/writer/content.css",
+      "publicPath": "/static/v2018/js/skins/content/writer/content.css",
       "sourceFilename": "node_modules/tinymce/skins/content/writer/content.css"
+    },
+    "js/skins/content/writer/content.css.gz": {
+      "name": "js/skins/content/writer/content.css.gz",
+      "path": "js/skins/content/writer/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/writer/content.css.gz"
     },
     "js/skins/content/writer/content.js": {
       "name": "js/skins/content/writer/content.js",
       "path": "js/skins/content/writer/content.js",
-      "publicPath": "http://localhost:8080/js/skins/content/writer/content.js",
+      "publicPath": "/static/v2018/js/skins/content/writer/content.js",
       "sourceFilename": "node_modules/tinymce/skins/content/writer/content.js"
+    },
+    "js/skins/content/writer/content.js.gz": {
+      "name": "js/skins/content/writer/content.js.gz",
+      "path": "js/skins/content/writer/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/content/writer/content.js.gz"
     },
     "js/skins/content/writer/content.min.css": {
       "name": "js/skins/content/writer/content.min.css",
       "path": "js/skins/content/writer/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/content/writer/content.min.css",
+      "publicPath": "/static/v2018/js/skins/content/writer/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/content/writer/content.min.css"
+    },
+    "js/skins/content/writer/content.min.css.gz": {
+      "name": "js/skins/content/writer/content.min.css.gz",
+      "path": "js/skins/content/writer/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/content/writer/content.min.css.gz"
     },
     "js/skins/ui/oxide-dark/content.css": {
       "name": "js/skins/ui/oxide-dark/content.css",
       "path": "js/skins/ui/oxide-dark/content.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/content.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/content.css"
+    },
+    "js/skins/ui/oxide-dark/content.css.gz": {
+      "name": "js/skins/ui/oxide-dark/content.css.gz",
+      "path": "js/skins/ui/oxide-dark/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.css.gz"
     },
     "js/skins/ui/oxide-dark/content.inline.css": {
       "name": "js/skins/ui/oxide-dark/content.inline.css",
       "path": "js/skins/ui/oxide-dark/content.inline.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/content.inline.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.inline.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/content.inline.css"
+    },
+    "js/skins/ui/oxide-dark/content.inline.css.gz": {
+      "name": "js/skins/ui/oxide-dark/content.inline.css.gz",
+      "path": "js/skins/ui/oxide-dark/content.inline.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.inline.css.gz"
     },
     "js/skins/ui/oxide-dark/content.inline.js": {
       "name": "js/skins/ui/oxide-dark/content.inline.js",
       "path": "js/skins/ui/oxide-dark/content.inline.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/content.inline.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.inline.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/content.inline.js"
+    },
+    "js/skins/ui/oxide-dark/content.inline.js.gz": {
+      "name": "js/skins/ui/oxide-dark/content.inline.js.gz",
+      "path": "js/skins/ui/oxide-dark/content.inline.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.inline.js.gz"
     },
     "js/skins/ui/oxide-dark/content.inline.min.css": {
       "name": "js/skins/ui/oxide-dark/content.inline.min.css",
       "path": "js/skins/ui/oxide-dark/content.inline.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/content.inline.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.inline.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/content.inline.min.css"
+    },
+    "js/skins/ui/oxide-dark/content.inline.min.css.gz": {
+      "name": "js/skins/ui/oxide-dark/content.inline.min.css.gz",
+      "path": "js/skins/ui/oxide-dark/content.inline.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.inline.min.css.gz"
     },
     "js/skins/ui/oxide-dark/content.js": {
       "name": "js/skins/ui/oxide-dark/content.js",
       "path": "js/skins/ui/oxide-dark/content.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/content.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/content.js"
+    },
+    "js/skins/ui/oxide-dark/content.js.gz": {
+      "name": "js/skins/ui/oxide-dark/content.js.gz",
+      "path": "js/skins/ui/oxide-dark/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.js.gz"
     },
     "js/skins/ui/oxide-dark/content.min.css": {
       "name": "js/skins/ui/oxide-dark/content.min.css",
       "path": "js/skins/ui/oxide-dark/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/content.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/content.min.css"
+    },
+    "js/skins/ui/oxide-dark/content.min.css.gz": {
+      "name": "js/skins/ui/oxide-dark/content.min.css.gz",
+      "path": "js/skins/ui/oxide-dark/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/content.min.css.gz"
     },
     "js/skins/ui/oxide-dark/skin.css": {
       "name": "js/skins/ui/oxide-dark/skin.css",
       "path": "js/skins/ui/oxide-dark/skin.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/skin.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/skin.css"
+    },
+    "js/skins/ui/oxide-dark/skin.css.gz": {
+      "name": "js/skins/ui/oxide-dark/skin.css.gz",
+      "path": "js/skins/ui/oxide-dark/skin.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.css.gz"
     },
     "js/skins/ui/oxide-dark/skin.js": {
       "name": "js/skins/ui/oxide-dark/skin.js",
       "path": "js/skins/ui/oxide-dark/skin.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/skin.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/skin.js"
+    },
+    "js/skins/ui/oxide-dark/skin.js.gz": {
+      "name": "js/skins/ui/oxide-dark/skin.js.gz",
+      "path": "js/skins/ui/oxide-dark/skin.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.js.gz"
     },
     "js/skins/ui/oxide-dark/skin.min.css": {
       "name": "js/skins/ui/oxide-dark/skin.min.css",
       "path": "js/skins/ui/oxide-dark/skin.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/skin.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/skin.min.css"
+    },
+    "js/skins/ui/oxide-dark/skin.min.css.gz": {
+      "name": "js/skins/ui/oxide-dark/skin.min.css.gz",
+      "path": "js/skins/ui/oxide-dark/skin.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.min.css.gz"
     },
     "js/skins/ui/oxide-dark/skin.shadowdom.css": {
       "name": "js/skins/ui/oxide-dark/skin.shadowdom.css",
       "path": "js/skins/ui/oxide-dark/skin.shadowdom.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/skin.shadowdom.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.shadowdom.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/skin.shadowdom.css"
+    },
+    "js/skins/ui/oxide-dark/skin.shadowdom.css.gz": {
+      "name": "js/skins/ui/oxide-dark/skin.shadowdom.css.gz",
+      "path": "js/skins/ui/oxide-dark/skin.shadowdom.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.shadowdom.css.gz"
     },
     "js/skins/ui/oxide-dark/skin.shadowdom.js": {
       "name": "js/skins/ui/oxide-dark/skin.shadowdom.js",
       "path": "js/skins/ui/oxide-dark/skin.shadowdom.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/skin.shadowdom.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.shadowdom.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/skin.shadowdom.js"
+    },
+    "js/skins/ui/oxide-dark/skin.shadowdom.js.gz": {
+      "name": "js/skins/ui/oxide-dark/skin.shadowdom.js.gz",
+      "path": "js/skins/ui/oxide-dark/skin.shadowdom.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.shadowdom.js.gz"
     },
     "js/skins/ui/oxide-dark/skin.shadowdom.min.css": {
       "name": "js/skins/ui/oxide-dark/skin.shadowdom.min.css",
       "path": "js/skins/ui/oxide-dark/skin.shadowdom.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide-dark/skin.shadowdom.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.shadowdom.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide-dark/skin.shadowdom.min.css"
+    },
+    "js/skins/ui/oxide-dark/skin.shadowdom.min.css.gz": {
+      "name": "js/skins/ui/oxide-dark/skin.shadowdom.min.css.gz",
+      "path": "js/skins/ui/oxide-dark/skin.shadowdom.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide-dark/skin.shadowdom.min.css.gz"
     },
     "js/skins/ui/oxide/content.css": {
       "name": "js/skins/ui/oxide/content.css",
       "path": "js/skins/ui/oxide/content.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/content.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/content.css"
+    },
+    "js/skins/ui/oxide/content.css.gz": {
+      "name": "js/skins/ui/oxide/content.css.gz",
+      "path": "js/skins/ui/oxide/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.css.gz"
     },
     "js/skins/ui/oxide/content.inline.css": {
       "name": "js/skins/ui/oxide/content.inline.css",
       "path": "js/skins/ui/oxide/content.inline.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/content.inline.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.inline.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/content.inline.css"
+    },
+    "js/skins/ui/oxide/content.inline.css.gz": {
+      "name": "js/skins/ui/oxide/content.inline.css.gz",
+      "path": "js/skins/ui/oxide/content.inline.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.inline.css.gz"
     },
     "js/skins/ui/oxide/content.inline.js": {
       "name": "js/skins/ui/oxide/content.inline.js",
       "path": "js/skins/ui/oxide/content.inline.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/content.inline.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.inline.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/content.inline.js"
+    },
+    "js/skins/ui/oxide/content.inline.js.gz": {
+      "name": "js/skins/ui/oxide/content.inline.js.gz",
+      "path": "js/skins/ui/oxide/content.inline.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.inline.js.gz"
     },
     "js/skins/ui/oxide/content.inline.min.css": {
       "name": "js/skins/ui/oxide/content.inline.min.css",
       "path": "js/skins/ui/oxide/content.inline.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/content.inline.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.inline.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/content.inline.min.css"
+    },
+    "js/skins/ui/oxide/content.inline.min.css.gz": {
+      "name": "js/skins/ui/oxide/content.inline.min.css.gz",
+      "path": "js/skins/ui/oxide/content.inline.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.inline.min.css.gz"
     },
     "js/skins/ui/oxide/content.js": {
       "name": "js/skins/ui/oxide/content.js",
       "path": "js/skins/ui/oxide/content.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/content.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/content.js"
+    },
+    "js/skins/ui/oxide/content.js.gz": {
+      "name": "js/skins/ui/oxide/content.js.gz",
+      "path": "js/skins/ui/oxide/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.js.gz"
     },
     "js/skins/ui/oxide/content.min.css": {
       "name": "js/skins/ui/oxide/content.min.css",
       "path": "js/skins/ui/oxide/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/content.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/content.min.css"
+    },
+    "js/skins/ui/oxide/content.min.css.gz": {
+      "name": "js/skins/ui/oxide/content.min.css.gz",
+      "path": "js/skins/ui/oxide/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/content.min.css.gz"
     },
     "js/skins/ui/oxide/skin.css": {
       "name": "js/skins/ui/oxide/skin.css",
       "path": "js/skins/ui/oxide/skin.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/skin.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/skin.css"
+    },
+    "js/skins/ui/oxide/skin.css.gz": {
+      "name": "js/skins/ui/oxide/skin.css.gz",
+      "path": "js/skins/ui/oxide/skin.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.css.gz"
     },
     "js/skins/ui/oxide/skin.js": {
       "name": "js/skins/ui/oxide/skin.js",
       "path": "js/skins/ui/oxide/skin.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/skin.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/skin.js"
+    },
+    "js/skins/ui/oxide/skin.js.gz": {
+      "name": "js/skins/ui/oxide/skin.js.gz",
+      "path": "js/skins/ui/oxide/skin.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.js.gz"
     },
     "js/skins/ui/oxide/skin.min.css": {
       "name": "js/skins/ui/oxide/skin.min.css",
       "path": "js/skins/ui/oxide/skin.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/skin.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/skin.min.css"
+    },
+    "js/skins/ui/oxide/skin.min.css.gz": {
+      "name": "js/skins/ui/oxide/skin.min.css.gz",
+      "path": "js/skins/ui/oxide/skin.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.min.css.gz"
     },
     "js/skins/ui/oxide/skin.shadowdom.css": {
       "name": "js/skins/ui/oxide/skin.shadowdom.css",
       "path": "js/skins/ui/oxide/skin.shadowdom.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/skin.shadowdom.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.shadowdom.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/skin.shadowdom.css"
+    },
+    "js/skins/ui/oxide/skin.shadowdom.css.gz": {
+      "name": "js/skins/ui/oxide/skin.shadowdom.css.gz",
+      "path": "js/skins/ui/oxide/skin.shadowdom.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.shadowdom.css.gz"
     },
     "js/skins/ui/oxide/skin.shadowdom.js": {
       "name": "js/skins/ui/oxide/skin.shadowdom.js",
       "path": "js/skins/ui/oxide/skin.shadowdom.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/skin.shadowdom.js",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.shadowdom.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/skin.shadowdom.js"
+    },
+    "js/skins/ui/oxide/skin.shadowdom.js.gz": {
+      "name": "js/skins/ui/oxide/skin.shadowdom.js.gz",
+      "path": "js/skins/ui/oxide/skin.shadowdom.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.shadowdom.js.gz"
     },
     "js/skins/ui/oxide/skin.shadowdom.min.css": {
       "name": "js/skins/ui/oxide/skin.shadowdom.min.css",
       "path": "js/skins/ui/oxide/skin.shadowdom.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/oxide/skin.shadowdom.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.shadowdom.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/oxide/skin.shadowdom.min.css"
+    },
+    "js/skins/ui/oxide/skin.shadowdom.min.css.gz": {
+      "name": "js/skins/ui/oxide/skin.shadowdom.min.css.gz",
+      "path": "js/skins/ui/oxide/skin.shadowdom.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/oxide/skin.shadowdom.min.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/content.css": {
       "name": "js/skins/ui/tinymce-5-dark/content.css",
       "path": "js/skins/ui/tinymce-5-dark/content.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/content.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/content.css"
+    },
+    "js/skins/ui/tinymce-5-dark/content.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/content.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/content.inline.css": {
       "name": "js/skins/ui/tinymce-5-dark/content.inline.css",
       "path": "js/skins/ui/tinymce-5-dark/content.inline.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/content.inline.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.inline.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/content.inline.css"
+    },
+    "js/skins/ui/tinymce-5-dark/content.inline.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/content.inline.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/content.inline.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.inline.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/content.inline.js": {
       "name": "js/skins/ui/tinymce-5-dark/content.inline.js",
       "path": "js/skins/ui/tinymce-5-dark/content.inline.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/content.inline.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.inline.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/content.inline.js"
+    },
+    "js/skins/ui/tinymce-5-dark/content.inline.js.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/content.inline.js.gz",
+      "path": "js/skins/ui/tinymce-5-dark/content.inline.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.inline.js.gz"
     },
     "js/skins/ui/tinymce-5-dark/content.inline.min.css": {
       "name": "js/skins/ui/tinymce-5-dark/content.inline.min.css",
       "path": "js/skins/ui/tinymce-5-dark/content.inline.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/content.inline.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.inline.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/content.inline.min.css"
+    },
+    "js/skins/ui/tinymce-5-dark/content.inline.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/content.inline.min.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/content.inline.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.inline.min.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/content.js": {
       "name": "js/skins/ui/tinymce-5-dark/content.js",
       "path": "js/skins/ui/tinymce-5-dark/content.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/content.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/content.js"
+    },
+    "js/skins/ui/tinymce-5-dark/content.js.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/content.js.gz",
+      "path": "js/skins/ui/tinymce-5-dark/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.js.gz"
     },
     "js/skins/ui/tinymce-5-dark/content.min.css": {
       "name": "js/skins/ui/tinymce-5-dark/content.min.css",
       "path": "js/skins/ui/tinymce-5-dark/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/content.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/content.min.css"
+    },
+    "js/skins/ui/tinymce-5-dark/content.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/content.min.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/content.min.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/skin.css": {
       "name": "js/skins/ui/tinymce-5-dark/skin.css",
       "path": "js/skins/ui/tinymce-5-dark/skin.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/skin.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/skin.css"
+    },
+    "js/skins/ui/tinymce-5-dark/skin.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/skin.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/skin.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/skin.js": {
       "name": "js/skins/ui/tinymce-5-dark/skin.js",
       "path": "js/skins/ui/tinymce-5-dark/skin.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/skin.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/skin.js"
+    },
+    "js/skins/ui/tinymce-5-dark/skin.js.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/skin.js.gz",
+      "path": "js/skins/ui/tinymce-5-dark/skin.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.js.gz"
     },
     "js/skins/ui/tinymce-5-dark/skin.min.css": {
       "name": "js/skins/ui/tinymce-5-dark/skin.min.css",
       "path": "js/skins/ui/tinymce-5-dark/skin.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/skin.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/skin.min.css"
+    },
+    "js/skins/ui/tinymce-5-dark/skin.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/skin.min.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/skin.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.min.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/skin.shadowdom.css": {
       "name": "js/skins/ui/tinymce-5-dark/skin.shadowdom.css",
       "path": "js/skins/ui/tinymce-5-dark/skin.shadowdom.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/skin.shadowdom.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.shadowdom.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/skin.shadowdom.css"
+    },
+    "js/skins/ui/tinymce-5-dark/skin.shadowdom.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/skin.shadowdom.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/skin.shadowdom.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.shadowdom.css.gz"
     },
     "js/skins/ui/tinymce-5-dark/skin.shadowdom.js": {
       "name": "js/skins/ui/tinymce-5-dark/skin.shadowdom.js",
       "path": "js/skins/ui/tinymce-5-dark/skin.shadowdom.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/skin.shadowdom.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.shadowdom.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/skin.shadowdom.js"
+    },
+    "js/skins/ui/tinymce-5-dark/skin.shadowdom.js.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/skin.shadowdom.js.gz",
+      "path": "js/skins/ui/tinymce-5-dark/skin.shadowdom.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.shadowdom.js.gz"
     },
     "js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css": {
       "name": "js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css",
       "path": "js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5-dark/skin.shadowdom.min.css"
+    },
+    "js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css.gz",
+      "path": "js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5-dark/skin.shadowdom.min.css.gz"
     },
     "js/skins/ui/tinymce-5/content.css": {
       "name": "js/skins/ui/tinymce-5/content.css",
       "path": "js/skins/ui/tinymce-5/content.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/content.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/content.css"
+    },
+    "js/skins/ui/tinymce-5/content.css.gz": {
+      "name": "js/skins/ui/tinymce-5/content.css.gz",
+      "path": "js/skins/ui/tinymce-5/content.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.css.gz"
     },
     "js/skins/ui/tinymce-5/content.inline.css": {
       "name": "js/skins/ui/tinymce-5/content.inline.css",
       "path": "js/skins/ui/tinymce-5/content.inline.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/content.inline.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.inline.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/content.inline.css"
+    },
+    "js/skins/ui/tinymce-5/content.inline.css.gz": {
+      "name": "js/skins/ui/tinymce-5/content.inline.css.gz",
+      "path": "js/skins/ui/tinymce-5/content.inline.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.inline.css.gz"
     },
     "js/skins/ui/tinymce-5/content.inline.js": {
       "name": "js/skins/ui/tinymce-5/content.inline.js",
       "path": "js/skins/ui/tinymce-5/content.inline.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/content.inline.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.inline.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/content.inline.js"
+    },
+    "js/skins/ui/tinymce-5/content.inline.js.gz": {
+      "name": "js/skins/ui/tinymce-5/content.inline.js.gz",
+      "path": "js/skins/ui/tinymce-5/content.inline.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.inline.js.gz"
     },
     "js/skins/ui/tinymce-5/content.inline.min.css": {
       "name": "js/skins/ui/tinymce-5/content.inline.min.css",
       "path": "js/skins/ui/tinymce-5/content.inline.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/content.inline.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.inline.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/content.inline.min.css"
+    },
+    "js/skins/ui/tinymce-5/content.inline.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5/content.inline.min.css.gz",
+      "path": "js/skins/ui/tinymce-5/content.inline.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.inline.min.css.gz"
     },
     "js/skins/ui/tinymce-5/content.js": {
       "name": "js/skins/ui/tinymce-5/content.js",
       "path": "js/skins/ui/tinymce-5/content.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/content.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/content.js"
+    },
+    "js/skins/ui/tinymce-5/content.js.gz": {
+      "name": "js/skins/ui/tinymce-5/content.js.gz",
+      "path": "js/skins/ui/tinymce-5/content.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.js.gz"
     },
     "js/skins/ui/tinymce-5/content.min.css": {
       "name": "js/skins/ui/tinymce-5/content.min.css",
       "path": "js/skins/ui/tinymce-5/content.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/content.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/content.min.css"
+    },
+    "js/skins/ui/tinymce-5/content.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5/content.min.css.gz",
+      "path": "js/skins/ui/tinymce-5/content.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/content.min.css.gz"
     },
     "js/skins/ui/tinymce-5/skin.css": {
       "name": "js/skins/ui/tinymce-5/skin.css",
       "path": "js/skins/ui/tinymce-5/skin.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/skin.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/skin.css"
+    },
+    "js/skins/ui/tinymce-5/skin.css.gz": {
+      "name": "js/skins/ui/tinymce-5/skin.css.gz",
+      "path": "js/skins/ui/tinymce-5/skin.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.css.gz"
     },
     "js/skins/ui/tinymce-5/skin.js": {
       "name": "js/skins/ui/tinymce-5/skin.js",
       "path": "js/skins/ui/tinymce-5/skin.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/skin.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/skin.js"
+    },
+    "js/skins/ui/tinymce-5/skin.js.gz": {
+      "name": "js/skins/ui/tinymce-5/skin.js.gz",
+      "path": "js/skins/ui/tinymce-5/skin.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.js.gz"
     },
     "js/skins/ui/tinymce-5/skin.min.css": {
       "name": "js/skins/ui/tinymce-5/skin.min.css",
       "path": "js/skins/ui/tinymce-5/skin.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/skin.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/skin.min.css"
+    },
+    "js/skins/ui/tinymce-5/skin.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5/skin.min.css.gz",
+      "path": "js/skins/ui/tinymce-5/skin.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.min.css.gz"
     },
     "js/skins/ui/tinymce-5/skin.shadowdom.css": {
       "name": "js/skins/ui/tinymce-5/skin.shadowdom.css",
       "path": "js/skins/ui/tinymce-5/skin.shadowdom.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/skin.shadowdom.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.shadowdom.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/skin.shadowdom.css"
+    },
+    "js/skins/ui/tinymce-5/skin.shadowdom.css.gz": {
+      "name": "js/skins/ui/tinymce-5/skin.shadowdom.css.gz",
+      "path": "js/skins/ui/tinymce-5/skin.shadowdom.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.shadowdom.css.gz"
     },
     "js/skins/ui/tinymce-5/skin.shadowdom.js": {
       "name": "js/skins/ui/tinymce-5/skin.shadowdom.js",
       "path": "js/skins/ui/tinymce-5/skin.shadowdom.js",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/skin.shadowdom.js",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.shadowdom.js",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/skin.shadowdom.js"
+    },
+    "js/skins/ui/tinymce-5/skin.shadowdom.js.gz": {
+      "name": "js/skins/ui/tinymce-5/skin.shadowdom.js.gz",
+      "path": "js/skins/ui/tinymce-5/skin.shadowdom.js.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.shadowdom.js.gz"
     },
     "js/skins/ui/tinymce-5/skin.shadowdom.min.css": {
       "name": "js/skins/ui/tinymce-5/skin.shadowdom.min.css",
       "path": "js/skins/ui/tinymce-5/skin.shadowdom.min.css",
-      "publicPath": "http://localhost:8080/js/skins/ui/tinymce-5/skin.shadowdom.min.css",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.shadowdom.min.css",
       "sourceFilename": "node_modules/tinymce/skins/ui/tinymce-5/skin.shadowdom.min.css"
     },
-    "js/src_components_Pagination_vue-src_components_selects_ModelSelect_vue.js": {
-      "name": "js/src_components_Pagination_vue-src_components_selects_ModelSelect_vue.js",
-      "path": "js/src_components_Pagination_vue-src_components_selects_ModelSelect_vue.js",
-      "publicPath": "http://localhost:8080/js/src_components_Pagination_vue-src_components_selects_ModelSelect_vue.js"
-    },
-    "js/src_components_charts_BarChart_vue-src_components_selects_ModelSelect_vue-node_modules_core-j-de84d7.js": {
-      "name": "js/src_components_charts_BarChart_vue-src_components_selects_ModelSelect_vue-node_modules_core-j-de84d7.js",
-      "path": "js/src_components_charts_BarChart_vue-src_components_selects_ModelSelect_vue-node_modules_core-j-de84d7.js",
-      "publicPath": "http://localhost:8080/js/src_components_charts_BarChart_vue-src_components_selects_ModelSelect_vue-node_modules_core-j-de84d7.js"
-    },
-    "js/src_components_norma_NormaSimpleModalView_vue.js": {
-      "name": "js/src_components_norma_NormaSimpleModalView_vue.js",
-      "path": "js/src_components_norma_NormaSimpleModalView_vue.js",
-      "publicPath": "http://localhost:8080/js/src_components_norma_NormaSimpleModalView_vue.js"
-    },
-    "js/src_modules_arq_ArqLayout_vue.js": {
-      "name": "js/src_modules_arq_ArqLayout_vue.js",
-      "path": "js/src_modules_arq_ArqLayout_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_arq_ArqLayout_vue.js"
-    },
-    "js/src_modules_arq_admin_AdminLayout_vue.js": {
-      "name": "js/src_modules_arq_admin_AdminLayout_vue.js",
-      "path": "js/src_modules_arq_admin_AdminLayout_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_arq_admin_AdminLayout_vue.js"
-    },
-    "js/src_modules_arq_admin_DocListLayout_vue.js": {
-      "name": "js/src_modules_arq_admin_DocListLayout_vue.js",
-      "path": "js/src_modules_arq_admin_DocListLayout_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_arq_admin_DocListLayout_vue.js"
-    },
-    "js/src_modules_arq_draft_DraftManage_vue.js": {
-      "name": "js/src_modules_arq_draft_DraftManage_vue.js",
-      "path": "js/src_modules_arq_draft_DraftManage_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_arq_draft_DraftManage_vue.js"
-    },
-    "js/src_modules_loa_LoaDash_vue.js": {
-      "name": "js/src_modules_loa_LoaDash_vue.js",
-      "path": "js/src_modules_loa_LoaDash_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_loa_LoaDash_vue.js"
-    },
-    "js/src_modules_loa_LoaDetail_vue.js": {
-      "name": "js/src_modules_loa_LoaDetail_vue.js",
-      "path": "js/src_modules_loa_LoaDetail_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_loa_LoaDetail_vue.js"
-    },
-    "js/src_modules_loa_LoaLayout_vue.js": {
-      "name": "js/src_modules_loa_LoaLayout_vue.js",
-      "path": "js/src_modules_loa_LoaLayout_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_loa_LoaLayout_vue.js"
-    },
-    "js/src_modules_loa_LoaList_vue.js": {
-      "name": "js/src_modules_loa_LoaList_vue.js",
-      "path": "js/src_modules_loa_LoaList_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_loa_LoaList_vue.js"
-    },
-    "js/src_modules_online_OnlineLayout_vue.js": {
-      "name": "js/src_modules_online_OnlineLayout_vue.js",
-      "path": "js/src_modules_online_OnlineLayout_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_OnlineLayout_vue.js"
-    },
-    "js/src_modules_online_painelset_PainelSetEventoListItem_vue.js": {
-      "name": "js/src_modules_online_painelset_PainelSetEventoListItem_vue.js",
-      "path": "js/src_modules_online_painelset_PainelSetEventoListItem_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_painelset_PainelSetEventoListItem_vue.js"
-    },
-    "js/src_modules_online_painelset_PainelSetEventoList_vue.js": {
-      "name": "js/src_modules_online_painelset_PainelSetEventoList_vue.js",
-      "path": "js/src_modules_online_painelset_PainelSetEventoList_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_painelset_PainelSetEventoList_vue.js"
-    },
-    "js/src_modules_online_painelset_PainelSetModule_vue.js": {
-      "name": "js/src_modules_online_painelset_PainelSetModule_vue.js",
-      "path": "js/src_modules_online_painelset_PainelSetModule_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_painelset_PainelSetModule_vue.js"
-    },
-    "js/src_modules_online_painelset_admin_PainelSetAdmin_vue.js": {
-      "name": "js/src_modules_online_painelset_admin_PainelSetAdmin_vue.js",
-      "path": "js/src_modules_online_painelset_admin_PainelSetAdmin_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_painelset_admin_PainelSetAdmin_vue.js"
-    },
-    "js/src_modules_online_painelset_components_cronometros_CronometroBase_vue.js": {
-      "name": "js/src_modules_online_painelset_components_cronometros_CronometroBase_vue.js",
-      "path": "js/src_modules_online_painelset_components_cronometros_CronometroBase_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_painelset_components_cronometros_CronometroBase_vue.js"
-    },
-    "js/src_modules_online_painelset_painel_PainelSetPainel_vue.js": {
-      "name": "js/src_modules_online_painelset_painel_PainelSetPainel_vue.js",
-      "path": "js/src_modules_online_painelset_painel_PainelSetPainel_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_painelset_painel_PainelSetPainel_vue.js"
-    },
-    "js/src_modules_online_sessao_SessaoList_vue.js": {
-      "name": "js/src_modules_online_sessao_SessaoList_vue.js",
-      "path": "js/src_modules_online_sessao_SessaoList_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_sessao_SessaoList_vue.js"
-    },
-    "js/src_modules_online_sessao_SessaoPlenariaModule_vue.js": {
-      "name": "js/src_modules_online_sessao_SessaoPlenariaModule_vue.js",
-      "path": "js/src_modules_online_sessao_SessaoPlenariaModule_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_sessao_SessaoPlenariaModule_vue.js"
-    },
-    "js/src_modules_online_sessao_SessaoPlenariaOnline_vue.js": {
-      "name": "js/src_modules_online_sessao_SessaoPlenariaOnline_vue.js",
-      "path": "js/src_modules_online_sessao_SessaoPlenariaOnline_vue.js",
-      "publicPath": "http://localhost:8080/js/src_modules_online_sessao_SessaoPlenariaOnline_vue.js"
+    "js/skins/ui/tinymce-5/skin.shadowdom.min.css.gz": {
+      "name": "js/skins/ui/tinymce-5/skin.shadowdom.min.css.gz",
+      "path": "js/skins/ui/tinymce-5/skin.shadowdom.min.css.gz",
+      "publicPath": "/static/v2018/js/skins/ui/tinymce-5/skin.shadowdom.min.css.gz"
     },
     "robots.txt": {
       "name": "robots.txt",
       "path": "robots.txt",
-      "publicPath": "http://localhost:8080/robots.txt",
+      "publicPath": "/static/v2018/robots.txt",
       "sourceFilename": "src/assets/robots.txt"
+    },
+    "robots.txt.gz": {
+      "name": "robots.txt.gz",
+      "path": "robots.txt.gz",
+      "publicPath": "/static/v2018/robots.txt.gz"
+    },
+    "service-worker.js": {
+      "name": "service-worker.js",
+      "path": "service-worker.js",
+      "publicPath": "/static/v2018/service-worker.js"
+    },
+    "service-worker.js.gz": {
+      "name": "service-worker.js.gz",
+      "path": "service-worker.js.gz",
+      "publicPath": "/static/v2018/service-worker.js.gz"
     }
   },
   "chunks": {
     "app": [
-      "js/chunk-vendors.js",
-      "js/app.js"
+      "js/npm.core-js.f60d62f9.js",
+      "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
+      "js/npm.axios.1f04d043.js",
+      "js/npm.bootstrap-vue.672ad741.js",
+      "js/npm.vue.6c2bcc9f.js",
+      "js/npm.jquery-ui.70d0fcdd.js",
+      "css/npm.unknown.8c2fe9c9.css",
+      "js/npm.popper.js.82c77a1f.js",
+      "js/npm.vue-router.a8804f59.js",
+      "js/npm.vuex.6232501c.js",
+      "js/npm.portal-vue.2c654cc0.js",
+      "js/npm.vue-resize.f0c247d1.js",
+      "js/npm.vuex-router-sync.42079689.js",
+      "js/npm.vue-functional-data-merge.764271ae.js",
+      "js/npm.dateformat.66351150.js",
+      "js/npm.vue-native-websocket.6aa0fd2e.js",
+      "js/npm.register-service-worker.dba5b069.js",
+      "js/npm.jquery-mask-plugin.fddcafd2.js",
+      "js/npm.bootstrap.346e2cd4.js",
+      "js/npm.bootstrap-select.353c2cd3.js",
+      "js/1774.466ce24e.js",
+      "css/app.82adf1db.css",
+      "js/app.be95424a.js"
     ],
     "compilacao": [
-      "js/chunk-vendors.js",
-      "js/compilacao.js"
+      "js/npm.core-js.f60d62f9.js",
+      "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
+      "js/npm.diff.0f7f453a.js",
+      "js/npm.jquery-ui.70d0fcdd.js",
+      "js/1774.466ce24e.js",
+      "css/4649.efafaacc.css",
+      "js/4649.79124bdf.js",
+      "js/compilacao.8b5678c2.js"
     ],
     "construct": [
-      "js/chunk-vendors.js",
-      "js/construct.js"
+      "js/npm.core-js.f60d62f9.js",
+      "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
+      "js/npm.axios.1f04d043.js",
+      "js/npm.tinymce.c80fb0fe.js",
+      "js/npm.bootstrap-vue.672ad741.js",
+      "js/npm.vue.6c2bcc9f.js",
+      "css/npm.unknown.8c2fe9c9.css",
+      "js/npm.popper.js.82c77a1f.js",
+      "js/npm.vue-router.a8804f59.js",
+      "js/npm.vuex.6232501c.js",
+      "js/npm.portal-vue.2c654cc0.js",
+      "js/npm.vue-resize.f0c247d1.js",
+      "js/npm.vuex-router-sync.42079689.js",
+      "js/npm.vue-functional-data-merge.764271ae.js",
+      "js/npm.vue-resource.1264f6dc.js",
+      "js/npm.autosize.18c79efb.js",
+      "js/1774.466ce24e.js",
+      "css/construct.a9a5f02d.css",
+      "js/construct.2fcd56fe.js"
     ],
     "libsuserauth": [
-      "js/chunk-vendors.js",
-      "js/libsuserauth.js"
+      "js/npm.jquery.1b4d0761.js",
+      "js/npm.tinymce.c80fb0fe.js",
+      "js/libsuserauth.b66d799f.js"
     ],
     "loa": [
-      "js/chunk-vendors.js",
-      "js/loa.js"
+      "js/npm.core-js.f60d62f9.js",
+      "js/npm.jquery.1b4d0761.js",
+      "js/npm.lodash.b671d9f5.js",
+      "js/npm.axios.1f04d043.js",
+      "js/1774.466ce24e.js",
+      "css/loa.b66502c0.css",
+      "js/loa.5ecaac9f.js"
     ]
   },
-  "publicPath": "http://localhost:8080/"
+  "publicPath": "/static/v2018/"
 }
