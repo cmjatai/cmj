@@ -49,7 +49,13 @@ else
 fi
 
 rm /var/cmjatai/cmj/logs/celery/*.pid
-celery multi start 16 -A cmj -l INFO -Q:1-5 cq_arq -Q:6-7 cq_core -Q:8 cq_videos -Q:9-14 cq_base -Q:15-16 celery -c 2 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
+celery multi start 8 -A cmj -l INFO \
+    -Q:1-2 cq_arq -c 32 \
+    -Q:3 cq_core -c 2 \
+    -Q:4 cq_videos -c 2 \
+    -Q:5 cq_base -c 2 \
+    -Q:6-7 cq_painelset -c 2 \
+    -Q:8 celery -c 2 --hostname=cmjredis --pidfile=./logs/celery/%n.pid --logfile=./logs/celery/%n%I.log
 
 celery -A cmj beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler &
 

@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 def send_signal_for_websocket_time_refresh(inst, **kwargs):
+    return  # Disabled for now
 
     action = 'post_save' if 'created' in kwargs else 'post_delete'
     created = kwargs.get('created', False)

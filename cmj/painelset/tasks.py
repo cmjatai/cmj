@@ -3,6 +3,7 @@ from datetime import timedelta
 from celery import shared_task
 
 from cmj.painelset.tasks_function import task_refresh_states_from_visaodepainel_function
+from cmj.utils import TimeExecution
 from .cronometro_manager import CronometroManager
 from .models import Cronometro, CronometroState
 import logging
@@ -11,11 +12,11 @@ from django.utils import timezone
 from pythonosc import udp_client
 from cmj.celery import app as cmj_celery_app
 
-
-#logger = logging.getLogger(__name__)
 from celery.utils.log import get_task_logger
 
-logger = get_task_logger(__name__)
+logger = logging.getLogger(__name__)
+
+logger_celery = get_task_logger(__name__)
 
 porta = 10023
 clients = {}
@@ -23,7 +24,7 @@ clients = {}
 SEND_MESSAGE_MICROPHONE = True
 
 
-@cmj_celery_app.task(queue='cq_base', bind=True)
+@cmj_celery_app.task(queue='cq_painelset', bind=True)
 def task_cancel_auto_corte_microfone(self, individuo_id):
     """Cancelar o auto corte de microfone após religar manualmente"""
     from .models import Individuo
@@ -32,12 +33,12 @@ def task_cancel_auto_corte_microfone(self, individuo_id):
         if individuo.auto_corte_microfone:
             individuo.auto_corte_microfone = False
             individuo.save()
-            logger.info(f"Auto corte de microfone cancelado para {individuo}")
+            logger_celery.info(f"Auto corte de microfone cancelado para {individuo}")
     except Individuo.DoesNotExist:
-        logger.error(f"Individuo com ID {individuo_id} não encontrado para cancelar auto corte de microfone")
+        logger_celery.error(f"Individuo com ID {individuo_id} não encontrado para cancelar auto corte de microfone")
 
 
-def check_finished_cronometros_function():
+def task_check_finished_cronometros_function():
     global client
     cronometro_manager = CronometroManager()
     zero_time_cronometros, running_cronometros = cronometro_manager.check_zero_timer()
@@ -47,15 +48,15 @@ def check_finished_cronometros_function():
         for ip, client_info in clients.items():
             client = client_info['client']
             if 'last_send' in client_info and (timezone.now() - client_info['last_send']) > timedelta(seconds=300):
-                logger.info(f"Removendo cliente OSC {client._address}:{client._port} por inatividade")
+                logger_celery.info(f"Removendo cliente OSC {client._address}:{client._port} por inatividade")
                 remove_ips.append(ip)
             elif 'last_ping' in client_info and (timezone.now() - client_info['last_ping']) > timedelta(seconds=7):
                 try:
-                    logger.debug(f"Enviando comando /xremote para {client._address}:{client._port} por inatividade")
+                    logger_celery.debug(f"Enviando comando /xremote para {client._address}:{client._port} por inatividade")
                     client.send_message("/xremote", None)
                     client_info['last_ping'] = timezone.now()
                 except Exception as e:
-                    logger.error(f"Erro ao enviar mensagem OSC para {client._address}:{client._port}: {e}")
+                    logger_celery.error(f"Erro ao enviar mensagem OSC para {client._address}:{client._port}: {e}")
                     remove_ips.append(ip)
 
         for ip in remove_ips:
@@ -67,7 +68,7 @@ def check_finished_cronometros_function():
 
     if zero_time_cronometros:
 
-        logger.info(f"Finalizados {len(zero_time_cronometros)} cronômetros")
+        logger_celery.info(f"Finalizados {len(zero_time_cronometros)} cronômetros")
 
         for cronometro in zero_time_cronometros:
             individuo = cronometro.vinculo
@@ -93,7 +94,7 @@ def check_finished_cronometros_function():
 
             remaining_time = cronometro.remaining_time
 
-            logger.info(f"Cronometro {cronometro.name} (ID: {cronometro.id}) tempo encerrado")
+            logger_celery.info(f"Cronometro {cronometro.name} (ID: {cronometro.id}) tempo encerrado")
 
             for ip in ips:
                 client_info = clients.get(ip)
@@ -105,7 +106,7 @@ def check_finished_cronometros_function():
 
                 try:
                     if timedelta(seconds=int(corte_religar*(1.5))) < remaining_time < timedelta(seconds=corte_religar):
-                        logger.debug(f"Microfone religado para o cronômetro {cronometro.name} (ID: {cronometro.id})")
+                        logger_celery.debug(f"Microfone religado para o cronômetro {cronometro.name} (ID: {cronometro.id})")
                         individuo.status_microfone = True
                         individuo.auto_corte_microfone = False
                         individuo.save()
@@ -117,7 +118,7 @@ def check_finished_cronometros_function():
                                 client_info['last_ping'] = timezone.now()
 
                     elif timedelta(seconds=corte_religar) < remaining_time < timedelta(seconds=2):
-                        logger.debug(f"Corte de microfone detectado no cronômetro {cronometro.name} (ID: {cronometro.id})")
+                        logger_celery.debug(f"Corte de microfone detectado no cronômetro {cronometro.name} (ID: {cronometro.id})")
                         if individuo.status_microfone and not individuo.auto_corte_microfone:
                             individuo.status_microfone = False
                             individuo.auto_corte_microfone = True
@@ -134,66 +135,14 @@ def check_finished_cronometros_function():
 
 
                 except Exception as e:
-                    logger.error(f"Erro ao enviar mensagem OSC para {ip}: {e}")
+                    logger_celery.error(f"Erro ao enviar mensagem OSC para {ip}: {e}")
                     del clients[ip]
 
-    return len(zero_time_cronometros)
+    return zero_time_cronometros, running_cronometros
 
 @shared_task
-def check_finished_cronometros():
-    check_finished_cronometros_function()
+def task_painelset_refresh_states():
 
-@cmj_celery_app.task(queue='cq_base', bind=True)
-def task_refresh_states_from_visaodepainel(self, *args, **kwargs):
-    task_refresh_states_from_visaodepainel_function(*args, **kwargs)
+    zero_time_cronometros, running_cronometros = task_check_finished_cronometros_function()
 
-@shared_task
-def cleanup_old_events():
-    """
-    Tarefa para limpar eventos antigos (opcional)
-    Manter apenas eventos dos últimos 30 dias
-    """
-    from django.utils import timezone
-    from datetime import timedelta
-    from .models import CronometroEvent
-
-    cutoff_date = timezone.now() - timedelta(days=30)
-    deleted_count = CronometroEvent.objects.filter(timestamp__lt=cutoff_date).delete()[0]
-
-    logger.info(f"Removidos {deleted_count} eventos antigos")
-    return deleted_count
-
-@shared_task
-def generate_cronometro_report(cronometro_id):
-    """Gerar relatório de uso de um cronômetro"""
-    try:
-        cronometro = Cronometro.objects.get(id=cronometro_id)
-        events = cronometro.events.all().order_by('timestamp')
-
-        report_data = {
-            'cronometro_name': cronometro.name,
-            'total_events': events.count(),
-            'start_events': events.filter(event_type='started').count(),
-            'pause_events': events.filter(event_type='paused').count(),
-            'stop_events': events.filter(event_type='stopped').count(),
-            'finish_events': events.filter(event_type='finished').count(),
-        }
-
-        return report_data
-    except Cronometro.DoesNotExist:
-        return {'error': 'Cronometro not found'}
-
-def check_finished_cronometros__old():
-    """
-    Tarefa periódica para verificar cronômetros que terminaram
-    Deve ser executada a cada segundo via Celery Beat
-    """
-    cronometro_manager = CronometroManager()
-    finished_cronometros = cronometro_manager.check_finished_cronometros()
-
-    if finished_cronometros:
-        logger.info(f"Finalizados {len(finished_cronometros)} cronômetros")
-        for cronometro in finished_cronometros:
-            logger.info(f"Cronometro {cronometro.name} (ID: {cronometro.id}) finalizado")
-
-    return len(finished_cronometros)
+    task_refresh_states_from_visaodepainel_function()

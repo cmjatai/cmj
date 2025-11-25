@@ -114,7 +114,8 @@ class CronometroManager:
     def check_zero_timer(self):
         running_cronometros = Cronometro.objects.filter(
             state=CronometroState.RUNNING,
-            content_type=ContentType.objects.get_for_model(Individuo)
+            content_type__app_label='painelset',
+            content_type__model='individuo'
             )
         zero_time_cronometros = []
         for cronometro in running_cronometros:

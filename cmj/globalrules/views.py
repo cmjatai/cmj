@@ -51,7 +51,8 @@ def service_worker_proxy(request):
         try:
             try:
                 response = requests.get(url, timeout=5)
-                content = response.content
+                if response.status_code == 200:
+                    content = response.content
             except Exception:
                 content = open(sw_file).read()
         except ImportError:

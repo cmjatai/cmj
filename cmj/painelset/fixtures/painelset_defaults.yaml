@@ -1,5 +1,5 @@
 paineis:
-- painel: painel-71-painel-com-visao-unica-do-cronometro-da-palavra
+- painel: painel-17-painel-com-visao-unica-do-cronometro-da-palavra
   name: Painel Com Visão Única do Cronômetro da Palavra
   description: Painelset para exibir apenas o cronômetro da palavra ativa, otimizado
     para TVs do CMJ.
@@ -13,7 +13,7 @@ paineis:
       color: '#fff'
       background-color: '#00b140'
   visoes:
-  - visao: visao-199-visao-de-cronometro-da-palavra-ativo
+  - visao: visao-35-visao-de-cronometro-da-palavra-ativo
     name: Visão de Cronômetro da Palavra Ativo
     description: Exibe o cronômetro da palavra ativa.
     config:
@@ -29,7 +29,7 @@ paineis:
         display: none
       component: {}
     widgets:
-    - widget: widget-539
+    - widget: widget-105
       parent: null
       name: Cronômetro da Palavra
       description: Exibe o cronômetro da palavra.
@@ -47,7 +47,7 @@ paineis:
         title:
           display: none
         component: {}
-- painel: painel-72-painel-principal-de-sessao-plenaria
+- painel: painel-18-painel-principal-de-sessao-plenaria
   name: Painel Principal de Sessão Plenária
   description: Painelset para exibir informações da sessão plenária, incluindo status
     e cronômetro da palavra.
@@ -61,7 +61,7 @@ paineis:
       color: '#fff'
       background-color: '#000'
   visoes:
-  - visao: visao-200-visao-de-sessao-nao-iniciada-ou-iniciada-mas-suspensa
+  - visao: visao-36-visao-de-sessao-nao-iniciada-ou-iniciada-mas-suspensa
     name: Visão de sessão não iniciada ou, iniciada mas suspensa
     description: Exibe o status da sessão quando ela ainda não foi iniciada ou foi
       suspensa.
@@ -87,7 +87,7 @@ paineis:
         background-repeat: no-repeat
         background-position: center 50%
     widgets:
-    - widget: widget-540
+    - widget: widget-106
       parent: null
       name: Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
@@ -108,12 +108,12 @@ paineis:
         title:
           display: none
         component:
-          font-size: 3.5em
+          font-size: 3.6em
           text-align: center
           font-weight: bold
           line-height: 1.2
           background-color: '#000d'
-  - visao: visao-201-visao-de-sessao-em-andamento
+  - visao: visao-37-visao-de-sessao-em-andamento
     name: Visão de Sessão em Andamento
     description: Exibe o status da sessão quando está em andamento, sem indivíduo
       com a palavra.
@@ -139,7 +139,7 @@ paineis:
         background-repeat: no-repeat
         background-position: right 50%
     widgets:
-    - widget: widget-542
+    - widget: widget-107
       parent: null
       name: Registro de Presença dos Parlamentares
       description: Exibe o registro de presença dos parlamentares na sessão.
@@ -147,7 +147,7 @@ paineis:
       config:
         coords:
           h: 100
-          w: 26
+          w: 28
           x: 0
           y: 0
         displayVotacao: true
@@ -162,7 +162,7 @@ paineis:
           font-weight: bold
           line-height: 1
           background-color: '#000d'
-    - widget: widget-543
+    - widget: widget-108
       parent: null
       name: Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
@@ -170,8 +170,8 @@ paineis:
       config:
         coords:
           h: 14
-          w: 74
-          x: 26
+          w: 72
+          x: 28
           y: 0
         displayCols: 6
         displayTitulo: true
@@ -188,7 +188,7 @@ paineis:
           text-align: center
           font-weight: bold
           line-height: 1
-    - widget: widget-541
+    - widget: widget-109
       parent: null
       name: Item em Pauta da Sessão Plenária
       description: Exibe o item atualmente em pauta na sessão plenária.
@@ -196,8 +196,8 @@ paineis:
       config:
         coords:
           h: 86
-          w: 74
-          x: 26
+          w: 72
+          x: 28
           y: 14
       styles:
         inner:
@@ -206,7 +206,7 @@ paineis:
         title:
           display: none
         component: {}
-  - visao: visao-202-visao-de-sessao-em-andamento-com-cronometro-palavra
+  - visao: visao-38-visao-de-sessao-em-andamento-com-cronometro-palavra
     name: Visão de Sessão em Andamento, com cronometro palavra
     description: Exibe o status da sessão quando está em andamento, com indivíduo
       com a palavra.
@@ -214,6 +214,19 @@ paineis:
       activates:
       - activate:
           sessao__ordemdia__discussao_aberta:
+            value: true
+            func_exec:
+              exists: true
+          painelset__individuo__com_a_palavra:
+            value: true
+            func_exec:
+              exists: true
+          painelset__evento__cronometro__state:
+            value: running
+            func_exec:
+              exists: true
+      - activate:
+          sessao__ordemdia__votacao_aberta:
             value: true
             func_exec:
               exists: true
@@ -262,7 +275,7 @@ paineis:
         background-repeat: no-repeat
         background-position: right 50%
     widgets:
-    - widget: widget-547
+    - widget: widget-110
       parent: null
       name: Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
@@ -270,8 +283,8 @@ paineis:
       config:
         coords:
           h: 14
-          w: 74
-          x: 26
+          w: 72
+          x: 28
           y: 0
         displayCols: 6
         displayTitulo: true
@@ -288,7 +301,7 @@ paineis:
           text-align: center
           font-weight: bold
           line-height: 1
-    - widget: widget-545
+    - widget: widget-111
       parent: null
       name: Item em Pauta da Sessão Plenária
       description: Exibe o item atualmente em pauta na sessão plenária.
@@ -296,8 +309,8 @@ paineis:
       config:
         coords:
           h: 86
-          w: 74
-          x: 26
+          w: 72
+          x: 28
           y: 14
       styles:
         inner:
@@ -306,7 +319,7 @@ paineis:
         title:
           display: none
         component: {}
-    - widget: widget-544
+    - widget: widget-112
       parent: null
       name: Registro de Presença dos Parlamentares
       description: Exibe o registro de presença dos parlamentares na sessão.
@@ -314,7 +327,7 @@ paineis:
       config:
         coords:
           h: 100
-          w: 26
+          w: 28
           x: 0
           y: 0
         displayVotacao: true
@@ -329,8 +342,8 @@ paineis:
           font-weight: bold
           line-height: 1
           background-color: '#000d'
-    - widget: widget-560
-      parent: widget-545
+    - widget: widget-113
+      parent: widget-111
       name: Novo Widget
       description: ''
       vue_component: WidgetCronometroPalavra
@@ -351,7 +364,7 @@ paineis:
           display: none
         component:
           padding: 3em
-  - visao: visao-203-visao-de-cronometro-da-palavra-ativo
+  - visao: visao-39-visao-de-cronometro-da-palavra-ativo
     name: Visão de Cronômetro da Palavra Ativo
     description: Exibe o cronômetro da palavra ativa.
     config:
@@ -371,7 +384,7 @@ paineis:
         background-repeat: no-repeat
         background-position: center bottom
     widgets:
-    - widget: widget-548
+    - widget: widget-114
       parent: null
       name: Titulo e Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
@@ -393,7 +406,7 @@ paineis:
           color: '#0f0'
           border-bottom: '1px solid #040'
           background-color: '#111511'
-    - widget: widget-549
+    - widget: widget-115
       parent: null
       name: Tempo de Sessão
       description: Exibe o cronômetro do evento da sessão plenária.
@@ -414,7 +427,7 @@ paineis:
           color: '#0f0'
           border-bottom: '1px solid #040'
           background-color: '#111511'
-    - widget: widget-550
+    - widget: widget-116
       parent: null
       name: Cronômetro da Palavra
       description: Exibe o cronômetro da palavra.
@@ -433,11 +446,10 @@ paineis:
           display: none
         component:
           backgroundColor: '#000d'
-  - visao: visao-204-visao-youtube-live-com-cronometro-de-uso-da-palavra
+  - visao: visao-40-visao-youtube-live-com-cronometro-de-uso-da-palavra
     name: Visão Youtube Live com crônometro de uso da palavra
     description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
     config:
-      only_manual_activation: true
       activates:
       - activate:
           painelset__evento__cronometro__state:
@@ -451,11 +463,11 @@ paineis:
         display: none
       component:
         background-size: auto 30%
-        background-image: url(/static/v2018/brasao/brasao_1024.png)
+        background-image: url(/static/brasao/brasao_1024.png)
         background-repeat: no-repeat
         background-position: 13% 95%
     widgets:
-    - widget: widget-554
+    - widget: widget-117
       parent: null
       name: YouTube Live Embed
       description: Exibe o vídeo incorporado do YouTube.
@@ -477,7 +489,7 @@ paineis:
         title:
           display: none
         component: {}
-    - widget: widget-551
+    - widget: widget-118
       parent: null
       name: Titulo e Status da Sessão Plenária
       description: Exibe o status da sessão plenária.
@@ -498,7 +510,7 @@ paineis:
           display: none
         component:
           color: '#ff0'
-    - widget: widget-552
+    - widget: widget-119
       parent: null
       name: TEMPO DE SESSÃO
       description: Exibe o cronômetro do evento.
@@ -523,7 +535,7 @@ paineis:
           padding: 1em
           border-radius: 1em
           background-color: '#222'
-    - widget: widget-553
+    - widget: widget-120
       parent: null
       name: Cronômetro da Palavra
       description: Exibe o cronômetro da palavra.
@@ -531,22 +543,20 @@ paineis:
       config:
         coords:
           h: 51
-          w: 42
+          w: 44
           x: 0
-          y: 10
+          y: 9
       styles:
         inner:
-          font-size: 7em
+          font-size: 8em
           font-weight: bold
         title:
           display: none
         component: {}
-
-  - visao: visao-205-visao-youtube-live-100
+  - visao: visao-41-visao-youtube-live-100
     name: Visão Youtube Live 100%
     description: Exibe o painelset otimizado para transmissão ao vivo no YouTube.
     config:
-      only_manual_activation: true
       activates:
       - activate:
           painelset__evento__cronometro__state:
@@ -559,7 +569,7 @@ paineis:
         display: none
       component: {}
     widgets:
-    - widget: widget-555
+    - widget: widget-121
       parent: null
       name: YouTube Live Embed
       description: Exibe o vídeo incorporado do YouTube.

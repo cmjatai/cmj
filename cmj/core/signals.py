@@ -6,7 +6,6 @@ from django.utils import timezone
 
 from cmj.core.models import Notificacao
 from cmj.core.signals_time_refresh import send_signal_for_websocket_time_refresh
-from cmj.painelset.signals_sync_refresh import send_signal_for_websocket_sync_refresh
 from cmj.core.signals_functions import auditlog_signal_function, \
     notificacao_signal_function, redesocial_post_function, \
     signed_files_extraction_post_save_signal_function, signed_files_extraction_pre_save_signal_function
@@ -16,9 +15,9 @@ from sapl.materia.models import Proposicao
 logger = logging.getLogger(__name__)
 
 
-@receiver([post_save, post_delete], dispatch_uid='timerefresh_post_signal')
-def timerefresh_post_signal(sender, instance, **kwargs):
-    send_signal_for_websocket_time_refresh(instance, **kwargs)
+#@receiver([post_save, post_delete], dispatch_uid='timerefresh_post_signal')
+#def timerefresh_post_signal(sender, instance, **kwargs):
+#    send_signal_for_websocket_time_refresh(instance, **kwargs)
 
 
 @receiver([post_save, post_delete], dispatch_uid='auditlog_post_signal')
