@@ -1,0 +1,27 @@
+{% include "path/pagina_inicial_ultimos_videos.html" %}
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-12 p-0">
+      {% include "base_acesso_rapido.html" %}
+    </div>
+  </div>
+</div>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-6 p-2">
+      {% include "path/pagina_inicial_noticias_secudarias.html" %}
+    </div>
+    <div class="col-lg-6 p-2">
+      {% with noticias_dos_parlamentares as object_list %}
+        {% include "path/pagina_inicial_noticia_parlamentares.html" %}
+      {% endwith %}
+    </div>
+    <div class="col-lg-12 p-2">
+      <hr>
+      <h2 class="title-container">
+        <strong>Soluções de Terceiros que colaboram com a transparência da Câmara de Jataí.</strong>
+      </h2>
+      {% include "path/widget__aplicativos_moveis.html" %}
+    </div>
+  </div>
+</div>

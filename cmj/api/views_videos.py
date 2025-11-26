@@ -8,6 +8,6 @@ logger = logging.getLogger(__name__)
 
 ApiViewSetConstrutor.build_class(
     [
-        apps.get_app_config('sigad')
+        apps.get_app_config('videos')
     ]
 )

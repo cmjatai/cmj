@@ -13,7 +13,7 @@ LoaDetail:
   - resumo_emendas_impositivas
   - resumo_entidades
   - resumo_unidades
-  
+
 LoaDetailATE2022:
   {% trans 'Dados Gerais da LOA' %}:
   - ano:3 materia_ou_norma
@@ -124,6 +124,7 @@ AgrupamentoCreate:
 Agrupamento:
   {% trans 'Agrupamento' %}:
   - nome
+  - despesas
   - emendas
 
 Entidade:

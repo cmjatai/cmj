@@ -286,7 +286,8 @@ rules_sigad_view_status_restritos = {
         ], set()),
 
         (sigad_models.Documento, [
-            'view_documento_show'
+            'view_docume'
+            'nto_show'
         ], set())]
 }
 

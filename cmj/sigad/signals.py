@@ -4,9 +4,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
-from cmj.sigad.models import CaixaPublicacao, Classe
+from cmj.sigad.models import CaixaPublicacao, Classe, Documento
 
 @receiver([post_save, post_delete], sender=Classe)
+@receiver([post_save, post_delete], sender=Documento)
 @receiver([post_save, post_delete], sender=CaixaPublicacao)
 def handle_sigad_signal(sender, **kwargs):
     keys = [

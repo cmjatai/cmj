@@ -160,7 +160,7 @@ def get_field_display(obj, fieldname):
         display = '<ul>'
         for v in value.all():
             v = str(v)
-            v = v.replace(' ', '&nbsp;')
+            #v = v.replace(' ', '&nbsp;')
             display += '<li>%s</li>' % str(v)
         display += '</ul>'
         if not verbose_name:

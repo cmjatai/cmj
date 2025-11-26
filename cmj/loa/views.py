@@ -725,6 +725,17 @@ class AgrupamentoCrud(MasterDetailCrud):
             initial['user'] = self.request.user
             return initial
 
+    class DetailView(MasterDetailCrud.DetailView):
+
+        def hook_despesas(self, obj, verbose_name, field_display):
+            str_regs = []
+            for rc in obj.agrupamentoregistrocontabil_set.order_by('-percentual'):
+                src = f'{rc.str_percentual}% - {rc.despesa}'
+                str_regs.append(src)
+            src = ''.join(map(lambda x: f'<li>{x}</li>', str_regs))
+
+            return verbose_name, f'<ul>{src}</ul>'
+
 
 class EmendaLoaCrud(MasterDetailCrud):
     model = EmendaLoa
