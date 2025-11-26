@@ -75,7 +75,7 @@ module.exports = {
       .use(BundleTrackerPlugin, [{
         path: '.',
         relativePath: true,
-        filename: `${process.env.DEBUG === 'True' && process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
+        filename: `${process.env.NODE_ENV !== 'production' ? 'dev-' : ''}webpack-stats.json`
       }])
 
     config.plugin('copy')
@@ -110,7 +110,7 @@ module.exports = {
       })
 
     if (process.env.NODE_ENV !== 'production') {
-      config.devtool('inline-source-map')
+      config.devtool('eval-source-map')
     }
 
     if (process.env.NODE_ENV === 'production') {
@@ -135,19 +135,17 @@ module.exports = {
       })
 
       config
-      .optimization
-      .minimizer('terser')
-      .tap(args => {
-        args[0]['terserOptions']['compress']['drop_console'] = true
-        return args
-      })
+        .optimization
+        .minimizer('terser')
+        .tap(args => {
+          args[0]['terserOptions']['compress']['drop_console'] = true
+          return args
+        })
 
       config
-      .plugin('CompressionPlugin')
-      .use(CompressionPlugin, [{}])
-    }
+        .plugin('CompressionPlugin')
+        .use(CompressionPlugin, [{}])
 
-    if (process.env.NODE_ENV === 'production') {
       config.plugin('pwa-manifest')
         .use(WebpackPwaManifest, [{
           id: 'br.leg.go.jatai.portalcmj.v2018',

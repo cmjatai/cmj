@@ -29,7 +29,7 @@ export default {
     eventos: {
       get () {
         if (this.data_cache?.painelset_evento) {
-          return _.orderBy(Object.values(this.data_cache.painelset_evento), ['start_real', 'start_previsto'], ['desc', 'desc'])
+          return _.orderBy(Object.values(this.data_cache.painelset_evento), ['end_real', 'start_real', 'start_previsto'], ['desc', 'desc', 'desc'])
         }
         return []
       }

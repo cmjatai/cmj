@@ -57,7 +57,7 @@ class _EventoViewSet:
         logger.debug(f'Acessando cronômetro do evento: {pk}')
         evento = self.get_object()
         cronometro, created = evento.get_or_create_unique_cronometro()
-        sleep(1)
+        sleep(3)
         if cronometro:
             if not evento.start_real and cronometro.started_at and not cronometro.finished_at:
                 evento.start_real = cronometro.started_at

@@ -14,7 +14,7 @@
       </div>
       <div class="col-auto">
         <div class="btn-group">
-          <a href="#" @click.prevent="finish($event)" v-if="has_perm && evento.start_real && !evento.end_real" class="btn btn-danger" title="Encerrar Evento"><i class="fas fa-stop-circle"></i></a>
+          <a href="#" @click.prevent="finish($event)" v-if="has_perm && !evento.end_real" class="btn btn-danger" title="Encerrar Evento"><i class="fas fa-stop-circle"></i></a>
           <a href="#" @click.prevent="edit($event)" v-if="has_perm && !evento.end_real" class="btn btn-secondary" title="Editar Evento"><i class="fas fa-edit"></i></a>
           <a href="#" @click.prevent="copy($event)" v-if="has_perm && evento.end_real" class="btn btn-success" title="Duplicar Evento"><i class="fas fa-copy"></i></a>
           <a href="#" @click.prevent="admin($event)" v-if="has_perm && !evento.end_real" class="btn btn-primary" title="Execução do Evento"><i class="fas fa-toolbox"></i></a>
@@ -57,8 +57,8 @@
                 </a>
                 <div class="d-inline-block" v-if="has_perm">
                   <select class="form-control form-control-sm"
-                    id="painel-sessao"
-                    name="sessao_plenaria"
+                    :id="`painel-sessao-${painel.id}`"
+                    :name="`sessao_plenaria-${painel.id}`"
                     v-if="!evento.end_real"
                     v-model="painel.sessao"
                     @change="
@@ -100,7 +100,8 @@ export default {
   data () {
     return {
       sessao_cache: {},
-      paineis: {}
+      paineis: {},
+      reload: false
     }
   },
   computed: {
@@ -138,6 +139,15 @@ export default {
                 t.$set(t.sessao_cache, painel.id, r.data)
               })
           })
+        })
+        .catch(() => {
+          console.debug('Erro ao buscar paineis do evento.')
+          if (t.reload === false) {
+            t.reload = true
+            setTimeout(() => {
+              t.refresh()
+            }, 5000)
+          }
         })
     },
     admin () {
