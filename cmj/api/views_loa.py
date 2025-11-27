@@ -1014,10 +1014,11 @@ class _DespesaConsulta:
                 q &= (Q(codigo__icontains=termo) |
                       Q(especificacao__icontains=termo) |
                       Q(cod_orgao__icontains=termo) |
-                      Q(cod_unidade__icontains=termo) |
                       Q(esp_orgao__icontains=termo) |
+                      Q(cod_unidade__icontains=termo) |
                       Q(esp_unidade__icontains=termo) |
                       Q(cod_natureza__icontains=termo) |
+                      Q(esp_natureza__icontains=termo) |
                       Q(cod_fonte__icontains=termo))
 
             qs = qs.filter(loa__ano=ano)

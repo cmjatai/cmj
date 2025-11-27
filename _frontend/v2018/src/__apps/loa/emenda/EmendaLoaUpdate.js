@@ -22,6 +22,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
     this.loadRegistrosContabeis()
     this.setupBuscaDespesa()
     this.setupFormEvents()
+    this.setupPopovers()
 
     // Trigger initial change to set state
     this.form.trigger('change')
@@ -283,17 +284,17 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
         let parts = event.target.value.trim().split(' ')
 
         _.each(response.data.results, (value) => {
-          let text_html = `
-              Órgão...: ${value.cod_orgao} - ${value.esp_orgao}<br>
-              Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}<br>
-              Código..: ${value.codigo} - ${value.especificacao}<br>
-              Natureza: ${value.cod_natureza} - ${value.esp_natureza} // Fonte: ${value.cod_fonte}<br>
+          let text_html = `Órgão...: ${value.cod_orgao} - ${value.esp_orgao}
+              Und Orç.: ${value.cod_unidade} - ${value.esp_unidade}
+              Código..: ${value.codigo} - ${value.especificacao}
+              Natureza: ${value.cod_natureza} - ${value.esp_natureza} // Fonte: ${value.cod_fonte}
               Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
           _.each(parts, (p) => {
             const re = new RegExp(`(${p})`, 'ig')
             text_html = text_html.replace(re, '<strong class="highlight">$1</strong>')
           })
+          text_html = text_html.replaceAll('\n', '<br/>')
 
           let html = `<div class="small item" pk="${value.id}">${text_html}</div>`
           let item = $(html).appendTo(inner)
@@ -395,5 +396,10 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
       .catch(() => {
         window.location.reload()
       })
+  }
+  setupPopovers () {
+    this.form.find('input[name^="despesa_"]').each((index, element) => {
+
+    })
   }
 }

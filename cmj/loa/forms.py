@@ -253,7 +253,9 @@ class AgrupamentoForm(ModelForm):
         label='Procurar por emendas cadastradas', required=False,)
 
     busca_despesa = forms.CharField(
-        label='Buscar', required=False,)
+        label='Buscar', required=False,
+        widget=TextInput(attrs={'autocomplete': 'off', 'type': 'search'})
+    )
 
     perc_despesa = DecimalField(
         label='Percentual da Despesa', required=False, max_digits=5, decimal_places=2,)
@@ -433,7 +435,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False)
 
     busca_despesa = forms.CharField(
-        label='Buscar', required=False,)
+        label='Buscar', required=False,
+        widget=TextInput(attrs={'autocomplete': 'off', 'type': 'search'})
+        )
 
     valor_despesa = DecimalField(
         label='Valor da Despesa', required=False, max_digits=14, decimal_places=2,)
