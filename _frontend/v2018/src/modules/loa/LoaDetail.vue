@@ -498,7 +498,7 @@ export default {
           if (hist !== 0) {
             return this
           }
-          if (t.loa.id === null) {
+          if (!t.loa || !t.loa.id) {
             return this
           }
           // t.barchart_max_items = formFilter.itens

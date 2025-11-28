@@ -200,10 +200,20 @@
   }
   &.emendaloa-update, &.emendaloa-create {
     #div_id_entidade {
+      li a {
+        margin: 0;
+        padding: 0;
+      }
       li .text {
         font-family: 'Courier New', Courier, monospace;
         font-weight: bold ;
-        font-size: 70%;
+        font-size: 110%;
+        background-color: #0000000a;
+        padding: 6px;
+        color: #333;
+      }
+      li:nth-child(odd) .text {
+        background-color: #00000000;
       }
     }
   }

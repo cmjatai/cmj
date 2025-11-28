@@ -64,8 +64,10 @@
     }
   }
 
-  .navbar-topo .container {
-    background: none;
+  .navbar-topo{
+    .container, .container-fluid {
+      background: none;
+    }
   }
 
   .carousel-indicators {

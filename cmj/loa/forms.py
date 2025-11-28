@@ -583,8 +583,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         if not self.creating:
             row_form = to_row([
-                (rows_base, 8 if full_editor else 7),
-                (Div(css_class='container-preview'), 4 if full_editor else 5)
+                (rows_base, 8 if full_editor else 6),
+                (Div(css_class='container-preview'), 4 if full_editor else 6)
             ])
 
         super().__init__(*args, **kwargs)
@@ -630,7 +630,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             tipo_entidade = str(e.tipo_entidade.descricao[:40].strip()) if e.tipo_entidade else ''
             tipo_entidade = tipo_entidade + '&nbsp;' * (40 - len(tipo_entidade))
 
-            html = mark_safe(nome + ' - ' + tipo_entidade + f' {"cnes:" if e.cnes else "cnpj:"} {e.cnes or e.cpfcnpj or "Sem Identificação"}')
+            cnes_cnpj = f' {"CNES:" if e.cnes else "CNPJ:"} {e.cnes or e.cpfcnpj or ""}'
+            cnes_cnpj = cnes_cnpj + '&nbsp;' * (25 - len(cnes_cnpj))
+
+            html = mark_safe(f'{nome} - {cnes_cnpj}')
 
             return e.id, html
 

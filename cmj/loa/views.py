@@ -1336,6 +1336,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             context = super().get_context_data(**kwargs)
             path = context.get('path', '')
             context['path'] = f'{path} emendaloa-update'
+            #context['fluid'] ='-fluid'
             return context
 
         def get_success_url(self):

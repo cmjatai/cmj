@@ -169,7 +169,7 @@
       no-repeat scroll left top;
     background-size: auto $navbar-brand-height * 4;
   }
-  & > .container {
+  & > .container, & > .container-fluid {
     //background: radial-gradient(transparent, $color_primary);
     transition: all 1s ease;
     &::after {
