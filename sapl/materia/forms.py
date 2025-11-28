@@ -2272,7 +2272,8 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                   'especie']
 
         widgets = {
-            'descricao': widgets.Textarea(attrs={'rows': 4}),
+            'descricao': widgets.Textarea(attrs={'rows': 6}),
+            'observacao': widgets.Textarea(attrs={'rows': 6}),
             'hash_code': forms.HiddenInput(),
             'user': forms.HiddenInput(),
             'ip': forms.HiddenInput(),
@@ -2295,12 +2296,12 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
         fields = [
             to_row([
-                ('especie', 5),
-                ('tipo', 7)]
+                ('especie', 3),
+                ('tipo', 9)]
             ),
             to_row([
-                ('descricao', 12),
-                ('observacao', 12)
+                ('descricao', 8),
+                ('observacao', 4)
             ])
         ]
 
@@ -2316,43 +2317,6 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
         fields.append(to_column((
             'texto_original', 7 if self.texto_articulado_proposicao else 12)))
-
-        fields.append(
-            Div(
-                to_row([
-                    (
-                        Fieldset(_('Víncular a Proposição ainda não recebida')), 12),
-                    (
-                        HTML(
-                            '<small class="form-text text-muted">Esta proposição é parte de outra de sua própria autoria? '
-                            'Exemplo: Você está está registrando um '
-                            'documento acessório de uma proposição que '
-                            'ainda não foi recebida pelo protocolo, '
-                            'informe aqui que proposição é essa! (Caso a proposição já tenha sido recebida pelo protocolo, o sistema fará vínculo automatícamente com a matéria, e não com a proposição.</small>'
-                        ), 12),
-                    (
-                        Div(
-                            to_row(
-                                [
-                                    ('vinculo_numero', 6),
-                                    ('vinculo_ano', 6),
-                                    (
-                                        Alert(
-                                            '',
-                                            css_class="ementa_proposicao hidden alert-info",
-                                            dismiss=False
-                                        ),
-                                        12
-                                    )
-                                ]
-                            ),
-                        ),
-                        8
-                    ),
-                ]),
-                css_id='vinculo_proposicao'
-            )
-        )
 
         fields.append(
             Div(
@@ -2388,6 +2352,44 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                 css_id="vinculo_materia"
             )
         )
+        fields.append(
+            Div(
+                to_row([
+                    (
+                        Fieldset(_('Víncular a Proposição ainda não recebida')), 12),
+                    (
+                        HTML(
+                            '<small class="form-text text-muted">Esta proposição é parte de outra de sua própria autoria? '
+                            'Exemplo: Você está está registrando um '
+                            'documento acessório de uma proposição que '
+                            'ainda não foi recebida pelo protocolo, '
+                            'informe aqui que proposição é essa! (Caso a proposição já tenha sido recebida pelo protocolo, o sistema fará vínculo automatícamente com a matéria, e não com a proposição.</small>'
+                        ), 12),
+                    (
+                        Div(
+                            to_row(
+                                [
+                                    ('vinculo_numero', 6),
+                                    ('vinculo_ano', 6),
+                                    (
+                                        Alert(
+                                            '',
+                                            css_class="ementa_proposicao hidden alert-info",
+                                            dismiss=False
+                                        ),
+                                        12
+                                    )
+                                ]
+                            ),
+                        ),
+                        8
+                    ),
+                ]),
+                css_id='vinculo_proposicao',
+                css_class='small'
+            )
+        )
+
 
         self.helper = SaplFormHelper()
         self.helper.layout = SaplFormLayout(*fields)
@@ -2653,11 +2655,6 @@ class DevolverProposicaoForm(forms.ModelForm):
 
 class ConfirmarProposicaoForm(ProposicaoForm):
 
-    tipo_readonly = forms.CharField(
-        label=TipoProposicao._meta.verbose_name,
-        required=False, widget=widgets.TextInput(
-            attrs={'readonly': 'readonly'}))
-
     autor_readonly = forms.CharField(
         label=Autor._meta.verbose_name,
         required=False, widget=widgets.TextInput(
@@ -2737,21 +2734,16 @@ class ConfirmarProposicaoForm(ProposicaoForm):
 
         super(ProposicaoForm, self).__init__(*args, **kwargs)
 
-        if self.instance.tipo.content_type.model_class() == \
-                TipoMateriaLegislativa:
-            self.fields['regime_tramitacao'].required = True
-        self.fields['especie'].required = False
-        self.fields['tipo'].required = False
-
         fields = [
             Fieldset(
                 _('Dados Básicos'),
                 to_row(
                     [
-                        ('tipo_readonly', 4),
+                        ('especie', 2),
+                        ('tipo', 4),
                         ('numero_materia_futuro', 2),
-                        ('data_envio', 3),
-                        ('autor_readonly', 3),
+                        ('data_envio', 2),
+                        ('autor_readonly', 2),
                         (
                             Alert(
                                 self.instance.extract_epigrafe if self.instance.tipo.content_type.model_class(
@@ -2842,7 +2834,26 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         self.helper = SaplFormHelper()
         self.helper.layout = Layout(*fields)
 
-        self.fields['tipo_readonly'].initial = self.instance.tipo.descricao
+        self.fields['especie'].initial = self.instance.tipo.content_type_id
+        self.fields['especie'].choices = [
+            (
+                self.instance.tipo.content_type_id,
+                self.instance.tipo.content_type.name
+            )
+        ]
+
+        self.fields['tipo'].initial = self.instance.tipo.id
+        self.fields['tipo'].choices = [
+            (t.id, str(t)) for t in TipoProposicao.objects.filter(
+                content_type_id=self.instance.tipo.content_type_id
+            )
+        ]
+
+        if self.instance.tipo.content_type.model_class() == \
+                TipoMateriaLegislativa:
+            self.fields['regime_tramitacao'].required = True
+
+
         self.fields['autor_readonly'].initial = str(self.instance.autor)
         if self.instance.numero_materia_futuro:
             self.fields['numero_materia_futuro'].initial = self.instance.numero_materia_futuro
@@ -2975,7 +2986,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 self.logger.error("Erro ao obter modelo. " + str(e))
                 pass
 
-            tipo = self.instance.tipo.tipo_conteudo_related
+            tipo = cd.get('tipo', self.instance.tipo).tipo_conteudo_related
             if tipo.sequencia_numeracao:
                 numeracao = tipo.sequencia_numeracao
             ano = timezone.now().year

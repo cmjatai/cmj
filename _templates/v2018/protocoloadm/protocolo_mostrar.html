@@ -50,6 +50,9 @@
     {{protocolo.conteudo_content_type}}
     <br><strong>Tipo do Documento: </strong>
     {{protocolo.tipo_conteudo_protocolado}}
+    {% if protocolo.tipo_conteudo_protocolado != protocolo.conteudo_protocolado.tipo %}
+     - <strong>Tipo Ajustado: </strong> {{protocolo.conteudo_protocolado.tipo}}
+    {% endif %}
     <br><strong>Documento: </strong>
     <a href="{% url 'sapl.protocoloadm:redirect_conteudo' protocolo.pk %}">{{protocolo.conteudo_protocolado|default:''}}</a>
     <br>

@@ -7,8 +7,6 @@ header {
   right: -1.3cm;
 }
 
-footer {
-}
 section {
   position: fixed;
   width: 5cm;
@@ -17,9 +15,9 @@ section {
   font-size: 16pt;
   transform: rotate(45deg);
   right: -2cm;
-  top: 1cm;
+  top: 1.6cm;
   line-height: 1.2;
-  padding: 0.4cm
+  padding: 0.4cm;
 }
 
 section.red {
@@ -31,6 +29,16 @@ section.blue {
   color:#0073b7;
   border: 4px dashed #0073b7;
 }
+p.referencia {
+  margin: 0cm;
+  text-align: justify;
+  font-size: 10pt;
+  line-height: 1;
+}
+p.art {
+  margin: 0.2cm 0;
+  text-indent: 2cm;
+}
 
 .ementa, .preambulo, .art {
   text-align: justify;
@@ -41,13 +49,14 @@ section.blue {
 }
 
 .ementa {
-  margin: 1cm 0cm 1cm 5cm;
+  margin: 0.7cm 0cm 0.7cm 5.5cm;
 }
+
 .data {
   text-align: right;
 }
 
-h3, h4 {
+h3, h4, h5 {
   margin: 0;
   padding: 0;
 }
@@ -56,8 +65,8 @@ h3, h4 {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-
 }
+
 .assinatura {
   flex: 1 1 33%;
   display: flex;
@@ -68,6 +77,7 @@ h3, h4 {
   font-weight: bold;
   line-height: 1.15;
 }
+
 .assinatura small {
   font-style: italic;
 }

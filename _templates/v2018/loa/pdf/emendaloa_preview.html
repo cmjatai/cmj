@@ -68,10 +68,10 @@
   </h3>
 
   {% with object.loa.materia as mat_loa %}
-    <small>
+    <p class="referencia">
       Ao {{mat_loa.tipo|default:"PROJETO"}} nº {{mat_loa.numero}}, de {{ mat_loa.data_apresentacao|date:"d \d\e F \d\e Y" }},
       que {{mat_loa.ementa}}
-    </small>
+    </p>
   {% endwith %}
 
   <br>
@@ -94,7 +94,6 @@
       {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
     {% endfor %}
   </h5>
-
   {% if object.tipo %}
     <p class="ementa">
       Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},

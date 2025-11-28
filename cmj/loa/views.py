@@ -1,10 +1,14 @@
 from decimal import ROUND_DOWN, Decimal
+import io
 import logging
 import re
 
+import tempfile
+from urllib.parse import urlencode
+import zipfile
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.http.response import Http404, HttpResponse
@@ -16,6 +20,7 @@ from django.urls.base import reverse_lazy
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
+import requests
 
 from cmj.core.models import AuditLog
 from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, PrestacaoContaLoaForm, PrestacaoContaRegistroForm,\
@@ -752,6 +757,10 @@ class EmendaLoaCrud(MasterDetailCrud):
         ]
 
         @property
+        def ordered_list(self):
+            return False
+
+        @property
         def create_url(self):
             url = super().create_url
             if not url and \
@@ -812,20 +821,80 @@ class EmendaLoaCrud(MasterDetailCrud):
     class ListView(FilterView, MasterDetailCrud.ListView):
         filterset_class = EmendaLoaFilterSet
         paginate_by = 25
-        ordered_list = False
+
+
+        @property
+        def extras_url(self):
+            if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
+                return []
+
+            btns = []
+            return [
+                (reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?zip',
+                'btn-outline-primary',
+                _('Baixar as Emendas Impositivas/Modificativas')
+                )
+            ]
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs['pk'])
+            return FilterView.get(self, request, *args, **kwargs)
 
-            if 'pdf' not in request.GET:
-                return FilterView.get(self, request, *args, **kwargs)
+        def render_to_response(self, context, **response_kwargs):
+            if 'pdf' in self.request.GET:
+                return self.makepdf(context, **response_kwargs)
+            elif 'zip' in self.request.GET:
+                return self.makezip(context, **response_kwargs)
+            return super().render_to_response(context, **response_kwargs)
 
-            return self.makepdf(request, *args, **kwargs)
+        def makezip(self, context, **response_kwargs):
+            user = self.request.user
+            if user.is_anonymous:
+                raise PermissionDenied()
 
-        def makepdf(self, request, *args, **kwargs):
+            if not user.is_superuser and not user.operadorautor_set.exists():
+                raise PermissionDenied()
+
+            req = self.request
+            base_url =  f"{req.scheme}://{req.get_host()}"
+
+            emendas = self.get_queryset(
+            ).filter(
+                Q(fase__gte=EmendaLoa.LIBERACAO_CONTABIL) | Q(tipo=EmendaLoa.MODIFICATIVA),
+                parlamentares__in=user.operadorautor_set.values_list(
+                    'autor__object_id', flat=True),
+            )
+            if not emendas.exists():
+                messages.info(
+                    self.request,
+                    'Nenhuma Emenda Impositiva/Modificativa disponível para download.'
+                )
+                return super().render_to_response(context, **response_kwargs)
+
+            with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
+                with zipfile.ZipFile(tmp, 'w') as file:
+
+                    for emenda in emendas:
+                        response = requests.get(f'{base_url}/api/loa/emendaloa/{emenda.id}/view/')
+
+                        if response.status_code == 200:
+
+                            file.writestr(
+                                f'emendaloa_{emenda.id}_{emenda.loa.ano}.pdf',
+                                response.content
+                            )
+                tmp.seek(0)
+                response = HttpResponse(tmp.read(),
+                                    content_type='application/zip')
+                response['Content-Disposition'] = f'attachment; filename="emendaloa_{self.loa.ano}.zip"'
+                response['Cache-Control'] = 'no-cache'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = 0
+                return response
+
+        def makepdf(self, context, **response_kwargs):
             self.paginate_by = 0
-            base_url = request.build_absolute_uri()
-            response_html = FilterView.get(self, request, *args, **kwargs)
+            base_url = self.request.build_absolute_uri()
 
             try:
                 context = self.get_context_data_makepdf()
@@ -1371,6 +1440,49 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def layout_key(self):
             return 'EmendaLoaDetail'
+
+        @property
+        def extras_url(self):
+            if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
+                return []
+
+            #if self.object.fase < EmendaLoa.LIBERACAO_CONTABIL:
+            #    return []
+
+            if self.object.tipo:
+                ementa = f'''
+        Altera destinação de recursos orçamentários, indicando {self.object.prefixo_indicacao}
+    {self.object.indicacao or "XXXXXXX"}, para a recepção do valor de
+      R$ { self.object.str_valor} ({self.object.valor_por_extenso}), que será { self.object.prefixo_finalidade}
+    { self.object.finalidade_format or "XXXXXXX"}.
+                '''
+            else:
+                ementa = f'''
+        Altera destinação de recursos orçamentários, indicando {self.object.prefixo_indicacao}
+    {self.object.indicacao or "XXXXXXX"}, para a recepção do valor de
+      R$ { self.object.str_valor} ({self.object.valor_por_extenso}), que será { self.object.prefixo_finalidade}
+    { self.object.finalidade_format or "XXXXXXX"}.
+                '''
+
+            ementa = ementa.strip().replace('\n', ' ')
+            ementa = re.sub(r'\s+', ' ', ementa)
+
+            params = dict(
+                descricao=ementa.strip(),
+                tipo_materia=self.object.loa.materia.tipo.id if self.object.loa.materia else '',
+                numero_materia=self.object.loa.materia.numero if self.object.loa.materia else '',
+                ano_materia=self.object.loa.materia.ano if self.object.loa.materia else '',
+                tipo=33
+            )
+
+            query_params = urlencode(params)
+
+            return [
+                (reverse_lazy('sapl.materia:proposicao_create') + f'?{query_params}',
+                'btn-outline-primary',
+                _('Cadastrar Proposição pré-preenchida')
+                )
+            ]
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)

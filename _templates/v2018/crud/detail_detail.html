@@ -29,6 +29,19 @@
           </a>
         {% endif %}
       </div>
+
+      {% block extra_actions %}
+        {% if view.extras_url %}
+          <div class="actions btn-group btn-group-sm p-2" role="group">
+            {% for href, css_class, text in view.extras_url %}
+              <a href="{{href}}" class="btn {{css_class}}" style="margin-right: 2px;">
+                {{text}}
+              </a>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endblock extra_actions %}
+
       {% if view.update_url or view.delete_url %}
         <div class="actions btn-group " role="group">
           {% if view.update_url %}
@@ -40,6 +53,7 @@
         </div>
       {% endif %}
     {% endblock actions %}
+
   </div>
 
   <div class="container-detail clearfix">

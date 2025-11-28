@@ -33,6 +33,7 @@ from django.utils.functional import cached_property
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
+from num2words import num2words
 from unipath.path import Path
 from weasyprint import HTML
 
@@ -48,6 +49,9 @@ media_protected_storage = FileSystemStorage(
 media_cache_storage = FileSystemStorage(
     location=settings.MEDIA_CACHE_ROOT, base_url='DO_NOT_USE')
 
+
+def valor_por_extenso(valor):
+    return num2words(valor,  to='currency', lang='pt_BR')
 
 def get_celery_worker_status():
     i = celery_app.control.inspect()

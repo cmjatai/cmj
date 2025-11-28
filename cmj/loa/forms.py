@@ -401,7 +401,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
     finalidade = forms.CharField(
         label='Finalidade',
-        widget=forms.Textarea(attrs={'rows': 2}),
+        widget=forms.Textarea(attrs={'rows': 3}),
         required=True)
 
     indicacao = forms.CharField(
@@ -655,10 +655,11 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
 
                 if self.instance.fase > EmendaLoa.PROPOSTA_LIBERADA:
-                    self.fields['prefixo_indicacao'].widget.attrs['readonly'] = 'readonly'
-                    self.fields['prefixo_finalidade'].widget.attrs['readonly'] = 'readonly'
-                    self.fields['finalidade'].widget.attrs['readonly'] = 'readonly'
-                    self.fields['indicacao'].widget.attrs['readonly'] = 'readonly'
+                    #self.fields['prefixo_indicacao'].widget.attrs['readonly'] = 'readonly'
+                    #self.fields['prefixo_finalidade'].widget.attrs['readonly'] = 'readonly'
+                    #self.fields['finalidade'].widget.attrs['readonly'] = 'readonly'
+
+                    self.fields['indicacao'].widget.attrs['readonly'] = 'readonly' # campo obsoleto
 
                     self.fields['tipo'].choices = [(self.instance.tipo, self.instance.get_tipo_display())]
                     self.fields['fase'].choices = [(self.instance.fase, self.instance.get_fase_display())]
@@ -671,13 +672,6 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             else:
                 self.fields['fase'].widget.attrs['class'] = 'is-invalid'
                 self.fields['fase'].choices = [(self.instance.fase, self.instance.get_fase_display())]
-
-
-
-
-
-
-
 
         if full_editor:
             self.fields.pop('parlamentares__valor')

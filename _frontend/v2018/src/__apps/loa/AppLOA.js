@@ -14,8 +14,6 @@ class AppLOA {
   }
 
   run () {
-    // Sua lógica de inicialização aqui
-    // Ex: this.LoaCRUD();
     console.log('AppLOA inicializado')
     this.EmendaLoaCRUD = new EmendaLoaCRUD()
     this.AgrupamentoCRUD = new AgrupamentoCRUD()

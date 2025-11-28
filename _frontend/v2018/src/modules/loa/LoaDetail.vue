@@ -498,6 +498,9 @@ export default {
           if (hist !== 0) {
             return this
           }
+          if (t.loa.id === null) {
+            return this
+          }
           // t.barchart_max_items = formFilter.itens
           t.barchart_offset = 0
           t.barchart_exec_offset = 0

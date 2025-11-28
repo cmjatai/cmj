@@ -1,16 +1,13 @@
 from _decimal import ROUND_HALF_DOWN, ROUND_DOWN
 from datetime import datetime
 from decimal import Decimal
-from enum import unique
 from io import StringIO
 import csv
-from math import e
-from pyexpat import model
 import re
 from django.core.validators import RegexValidator
+from cmj.utils import valor_por_extenso
 
 from bs4 import BeautifulSoup as bs
-from django.conf.locale import ro
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction
@@ -318,10 +315,11 @@ class EmendaLoa(models.Model):
 
     SAUDE = 10
     DIVERSOS = 99
+    MODIFICATIVA = 0
     TIPOEMENDALOA_CHOICE = (
         (SAUDE, _('Em.Imp. Saúde')),
         (DIVERSOS, _('Em.Imp. Áreas Diversas')),
-        (0, _('Emenda Modificativa')),
+        (MODIFICATIVA, _('Emenda Modificativa')),
     )
 
     PROPOSTA = 10
@@ -463,6 +461,10 @@ class EmendaLoa(models.Model):
     @property
     def str_valor(self):
         return formats.number_format(self.valor, force_grouping=True)
+
+    @property
+    def valor_por_extenso(self):
+        return valor_por_extenso(self.valor)
 
     class Meta:
         verbose_name = _('Emenda Impositiva/Modificativa')

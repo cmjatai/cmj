@@ -185,7 +185,7 @@ rules_diarios_group_operador = {
 rules_loa_group_operador = {
     'group': GROUP_LOA_OPERADOR,
     'rules': [
-        (loa_models.Loa, __base__, set()),
+        (loa_models.Loa, __base__, set(__perms_publicas__)),
         (loa_models.LoaParlamentar, __base__, __perms_publicas__),
         (loa_models.EmendaLoa, __base__ + ['emendaloa_full_editor'], __perms_publicas__),
         (loa_models.EmendaLoaParlamentar, __base__, __perms_publicas__),

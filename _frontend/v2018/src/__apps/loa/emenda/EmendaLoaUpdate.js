@@ -291,6 +291,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
               Val.Orç.: ${value.str_valor} | Saldo: ${value.str_saldo}`
 
           _.each(parts, (p) => {
+            if (p.length < 3) return
             const re = new RegExp(`(${p})`, 'ig')
             text_html = text_html.replace(re, '<strong class="highlight">$1</strong>')
           })
@@ -398,8 +399,8 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
       })
   }
   setupPopovers () {
-    this.form.find('input[name^="despesa_"]').each((index, element) => {
+    // this.form.find('input[name^="despesa_"]').each((index, element) => {
 
-    })
+    // })
   }
 }

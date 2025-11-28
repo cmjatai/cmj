@@ -150,7 +150,13 @@
         get_pages_recursive()
   		});
 
-      $("select[name=tipo_materia], select[name=especie], input[name=vinculo_numero] ").trigger('change');
+      $("select[name=tipo_materia], input[name=vinculo_numero] ").trigger('change');
+
+      // Inicializa o select de tipos de proposição, caso esteja editando a proposição
+      {% if object or not request.GET.tipo %}
+        $("select[name=tipo_materia]").trigger('change');
+      {% endif %}
+
 
     });
 	</script>

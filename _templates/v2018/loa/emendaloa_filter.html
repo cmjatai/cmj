@@ -2,6 +2,19 @@
 {% load i18n %}
 {% load crispy_forms_tags cropping common_tags %}
 
+{% block more_buttons_left %}
+{% if view.extras_url %}
+<div class="actions btn-group btn-group-sm" role="group">
+    {% for href, css_class, text in view.extras_url %}
+    <a href="{{href}}" class="btn {{css_class}}">
+        {{text}}
+    </a>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock more_buttons_left %}
 {% block extra_content %}
-{% crispy filter.form %} 
+<hr>
+{% crispy filter.form %}
 {% endblock %}

@@ -1054,7 +1054,12 @@ class ProposicaoCrud(Crud):
 
             p = self.object
 
-            p_md_signs_texto_original = p.metadata.get(
+            if not p.texto_original:
+                messages.error(request, _(
+                    'Proposição não possui texto associado.'))
+
+
+            p_md_signs_texto_original = (p.metadata or {}).get(
                 'signs', {}
             ).get(
                 'texto_original', {}
@@ -1075,7 +1080,7 @@ class ProposicaoCrud(Crud):
                         signs = set(map(lambda x: x[0], signs))
                         nc = p.autor.autor_related.nome_completo
                         signs = {s for s in signs if nc.startswith(s) or s.startswith(nc)}
-                        if not signs:
+                        if not signs and p.texto_original:
                             msg_error = _(
                                 f'Documento não possui assinatura digital do Parlamentar: {p.autor}')
 
@@ -1125,7 +1130,7 @@ class ProposicaoCrud(Crud):
                                 signs = set(map(lambda x: x[0], signs))
                                 nc = p.autor.autor_related.nome_completo
                                 signs = {s for s in signs if nc.startswith(s) or s.startswith(nc)}
-                                if not signs:
+                                if not signs and p.texto_original:
                                     msg_error = _(f'Documento não possui assinatura digital do Parlamentar: {p.autor}')
 
                         if not msg_error:
@@ -1384,6 +1389,19 @@ class ProposicaoCrud(Crud):
 
             initial['user'] = self.request.user
             initial['ip'] = get_client_ip(self.request)
+            initial['descricao'] = self.request.GET.get('descricao', '')
+            initial['tipo'] = self.request.GET.get('tipo', '')
+
+            if initial['tipo']:
+                try:
+                    tipo = TipoProposicao.objects.get(pk=initial['tipo'])
+                    initial['especie'] = tipo.content_type
+                except TipoProposicao.DoesNotExist:
+                    pass
+
+            initial['tipo_materia'] = self.request.GET.get('tipo_materia', '')
+            initial['numero_materia'] = self.request.GET.get('numero_materia', '')
+            initial['ano_materia'] = self.request.GET.get('ano_materia', '')
 
             initial['ultima_edicao'] = timezone.localtime()
 
