@@ -13,34 +13,38 @@ from django.utils.translation import gettext_lazy as _
 from sapl.base.models import Autor, TipoAutor as modelTipoAutor
 from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.protocoloadm.models import TramitacaoAdministrativo
-from sapl.sessao.models import SessaoPlenaria
 from sapl.utils import get_base_url
 from sapl.utils import models_with_gr_for_model
 
 from .tasks import task_envia_email_tramitacao
 
+logger = logging.getLogger(__name__)
 
-@receiver([post_save, post_delete], sender=Tramitacao)
-@receiver([post_save, post_delete], sender=MateriaLegislativa)
-def handle_materia_materialegislativa_signal(sender, **kwargs):
-    key = make_template_fragment_key('portalcmj_pesquisar_materia')
-    cache.delete(key)
+@receiver([post_save, post_delete])
+def signal_materia_materialegislativa_disable_cache(sender, **kwargs):
+    if sender and hasattr(sender, '_meta'):
+        if sender._meta.app_label in ('materia', 'sessao', 'norma'):
+            try:
+                key = make_template_fragment_key('portalcmj_pesquisar_materia')
+                cache.delete(key)
 
-
-@receiver([post_save, post_delete], sender=SessaoPlenaria)
-def handle_sessao_sessaoplenaria_signal(sender, **kwargs):
-    keys = [
-        make_template_fragment_key('portalcmj_pagina_inicial_parte1'),
-        make_template_fragment_key('portalcmj_sessoes_futuras'),
-    ]
-    for key in keys:
-        cache.delete(key)
+                inst = kwargs.get('instance', None)
+                if inst and isinstance(inst, MateriaLegislativa):
+                    key = make_template_fragment_key(
+                        'm.ml.l', [inst.pk])
+                elif inst and hasattr(inst, 'materia') and inst.materia:
+                    key = make_template_fragment_key(
+                        'm.ml.l', [inst.materia.pk])
+                cache.delete(key)
+            except Exception as e:
+                #logger.error(
+                #    "Erro ao tentar invalidar cache de matéria: {}".format(e))
+                pass
 
 
 @receiver(post_save, sender=Tramitacao)
 @receiver(post_save, sender=TramitacaoAdministrativo)
-def handle_tramitacao_signal(sender, **kwargs):
-    logger = logging.getLogger(__name__)
+def signal_materia_tramitacao(sender, **kwargs):
 
     tramitacao = kwargs.get('instance')
 
@@ -85,8 +89,8 @@ def status_tramitacao_materia(sender, instance, **kwargs):
             documento.save()
 
 
-@receiver(post_migrate, dispatch_uid='cria_models_tipo_autor')
-def cria_models_tipo_autor(app_config=None, verbosity=2, interactive=True,
+@receiver(post_migrate, dispatch_uid='signal_cria_models_tipo_autor')
+def signal_cria_models_tipo_autor(app_config=None, verbosity=2, interactive=True,
                            using=DEFAULT_DB_ALIAS, **kwargs):
 
     models = models_with_gr_for_model(Autor)
@@ -117,5 +121,6 @@ def cria_models_tipo_autor(app_config=None, verbosity=2, interactive=True,
                 TipoAutor._meta.verbose_name, content_type.model)
             msg = "  {}{}".format(msg1, msg2)
         print(msg)
+
     # Disconecta função para evitar a chamada repetidas vezes.
-    post_migrate.disconnect(dispatch_uid='cria_models_tipo_autor')
+    post_migrate.disconnect(dispatch_uid='signal_cria_models_tipo_autor')

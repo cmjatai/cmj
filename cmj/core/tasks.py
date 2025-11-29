@@ -1,5 +1,6 @@
 import datetime
 import logging
+import requests
 
 from PyPDF4.pdf import PdfFileReader
 from asn1crypto import cms
@@ -10,7 +11,6 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save, pre_save
 from django.utils import timezone
 from django.utils.text import slugify
-import requests
 
 from cmj.celery import app
 from cmj.sigad.models import Documento

@@ -259,7 +259,7 @@ def send_mail(subject, email_template_name, context, from_email, to_email):
     email_message.send()
 
 
-def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs):
+def signed_files_extraction_post_signal_function(sender, instance, **kwargs):
 
     if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
         return
@@ -280,7 +280,7 @@ def signed_files_extraction_post_save_signal_function(sender, instance, **kwargs
         tasks.task_signed_files_extraction_function(*params_tasks)
 
 
-def signed_files_extraction_pre_save_signal_function(sender, instance, **kwargs):
+def signed_files_extraction_pre_signal_function(sender, instance, **kwargs):
 
     if not hasattr(instance, 'FIELDFILE_NAME') or not hasattr(instance, 'metadata'):
         return

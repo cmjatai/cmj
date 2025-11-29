@@ -2,6 +2,7 @@
 import glob
 import logging
 import os
+import re
 from time import sleep
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -1491,12 +1492,11 @@ class Tramitacao(models.Model):
 class MateriaEmTramitacao(models.Model):
     materia = models.ForeignKey(
         MateriaLegislativa, on_delete=models.DO_NOTHING)
-    tramitacao = models.ForeignKey(Tramitacao, on_delete=models.DO_NOTHING)
-
-    em_tramitacao = models.BooleanField(
-        verbose_name=_('Em Tramitação ?'),
-        choices=YES_NO_CHOICES,
-        default=False)
+    tramitacao = models.ForeignKey(
+        Tramitacao,
+        on_delete=models.DO_NOTHING,
+        related_name='materiaemtramitacao_set'
+        )
 
     unidade_tramitacao_atual = models.ForeignKey(
         UnidadeTramitacao,
@@ -1504,6 +1504,18 @@ class MateriaEmTramitacao(models.Model):
         related_name='materiasemtramitacao_set',
         on_delete=models.PROTECT,
         verbose_name=_('Unidade Atual'))
+
+    em_tramitacao = models.BooleanField(
+        verbose_name=_('Em Tramitação ?'),
+        choices=YES_NO_CHOICES,
+        default=False)
+
+    status = models.ForeignKey(
+        StatusTramitacao,
+        null=True,
+        related_name='materiasemtramitacao_set',
+        on_delete=models.PROTECT,
+        verbose_name=_('Status Atual'))
 
     class Meta:
         managed = False

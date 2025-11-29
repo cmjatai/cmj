@@ -11,7 +11,7 @@ import re
 
 logger = logging.getLogger(__name__)
 
-regex_labels_permitidos = [
+regex_applabels_permitidos = [
     r'^painelset',
     r'^sessao',
     r'^parlamentares',
@@ -19,14 +19,14 @@ regex_labels_permitidos = [
     r'^base',
     r'^norma',
 ]
-regex_labels_permitidos = [re.compile(label) for label in regex_labels_permitidos]
+regex_applabels_permitidos = [re.compile(label) for label in regex_applabels_permitidos]
 
 def send_signal_for_websocket_sync_refresh(inst, **kwargs):
 
     action = 'post_save' if 'created' in kwargs else 'post_delete'
     created = kwargs.get('created', False)
 
-    if any(regex.match(inst._meta.label) for regex in regex_labels_permitidos):
+    if any(regex.match(inst._meta.label) for regex in regex_applabels_permitidos):
         if settings.DEBUG:
             logger.debug(f'start: {inst.id} {inst._meta.app_label}.{inst._meta.model_name}')
 

@@ -1,5 +1,5 @@
 from django import apps
-from django.db.models.signals import post_save, post_delete, post_migrate
+from django.db.models.signals import post_migrate
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.text import format_lazy
@@ -12,8 +12,8 @@ class AppConfig(apps.AppConfig):
     verbose_name = _('Regras e Permissões para o Portal')
 
 
-@receiver(post_migrate, dispatch_uid='update_groups_cmj')
-def update_groups_cmj(app_config, verbosity=2, interactive=True,
+@receiver(post_migrate, dispatch_uid='signal_post_migrate_update_groups_cmj')
+def signal_post_migrate_update_groups_cmj(app_config, verbosity=2, interactive=True,
                       using=DEFAULT_DB_ALIAS, **kwargs):
 
     if app_config != AppConfig and not isinstance(app_config, AppConfig):

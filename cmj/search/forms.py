@@ -14,6 +14,7 @@ from haystack.forms import ModelSearchForm, SearchForm
 from haystack.inputs import Raw
 from haystack.models import SearchResult
 from haystack.utils.app_loading import haystack_get_model
+from haystack.query import EmptySearchQuerySet, SearchQuerySet
 
 from cmj.core.models import AreaTrabalho
 from cmj.utils import NONE_YES_NO_CHOICES
@@ -272,11 +273,6 @@ class MateriaSearchForm(SearchForm):
         })
     )
 
-    tipo_listagem = forms.ChoiceField(
-        required=False,
-        choices=CHOICE_TIPO_LISTAGEM,
-        label=_('Tipo da Pesquisa'))
-
     autoria_is = forms.CharField(
         required=False,
         label=_('Autor'),
@@ -317,16 +313,15 @@ class MateriaSearchForm(SearchForm):
             (q_field, 10),
             (Div(), 1),
 
-            ('tipo_i', 9),
-            ('em_tramitacao_b', 3),
+            ('tipo_i', 7),
+            ('numero_i', 2),
+            ('ano_i', 3,),
         ])
 
         row2 = to_row([
-            ('numero_i', 4),
-            ('ano_i', 4,),
-            ('tipo_listagem', 4),
-            ('uta_i', 6),
-            ('sta_i', 6),
+            ('em_tramitacao_b', 3),
+            ('uta_i', 5),
+            ('sta_i', 4),
         ])
 
 
@@ -363,6 +358,9 @@ class MateriaSearchForm(SearchForm):
 
         super().__init__(*args, **kwargs)
 
+        if self.data:
+            return
+
         self.fields['q'].label = ''
 
         grupos_de_tipos = (
@@ -388,10 +386,12 @@ class MateriaSearchForm(SearchForm):
         self.fields['tipo_i'].choices = choices
 
         uta_choices = OrderedDict()
+
         for uta in UnidadeTramitacao.objects.filter(
             ativo=True,
             # tramitacoes_destino__isnull=False
             materiasemtramitacao_set__isnull=False
+            ).select_related('comissao', 'orgao', 'parlamentar'
             ).order_by('comissao', 'orgao', 'parlamentar').distinct():
             uta_obj = uta.comissao or uta.orgao or uta.parlamentar
 
@@ -402,6 +402,14 @@ class MateriaSearchForm(SearchForm):
             uta_choices[grupo].append((uta.id, str(uta)))
 
         self.fields['uta_i'].choices = uta_choices.items()
+
+        sta_choices = OrderedDict()
+        sta_choices[('Status da Tramitação')] = []
+        for sta in StatusTramitacao.objects.filter(
+            materiasemtramitacao_set__isnull=False
+            ).order_by('descricao').distinct():
+            sta_choices[('Status da Tramitação')].append((sta.id, str(sta)))
+        self.fields['sta_i'].choices = sta_choices.items()
 
     def clean_tipo_i(self, *args, **kwargs):
         tipo_i = self.cleaned_data['tipo_i']
@@ -507,6 +515,7 @@ class MateriaSearchForm(SearchForm):
             '-pk_i',
             '-last_update'
         )
+
         return s
 
 

@@ -1,5 +1,4 @@
 
-from attr import fields
 from django.conf import settings
 from django.forms import ValidationError
 from django.urls.base import reverse
@@ -19,6 +18,7 @@ from sapl.materia.models import MateriaLegislativa
 from sapl.materia.views import tipos_autores_materias
 from sapl.norma.models import NormaJuridica
 from sapl.utils import show_results_filter_set
+from haystack.models import SearchResult
 
 
 class CmjSearchView(AudigLogFilterMixin, SearchView):
@@ -136,6 +136,7 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
         'pdf': fields_pdf_report,
     }
 
+
     def hook_epigrafe_ementa(self, obj):
         html = f'''
                 <a href="{self.hook_texto_original(obj)}">{obj.epigrafe}</a><br>
@@ -203,7 +204,9 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
 
     def get_context(self):
         context = super().get_context()
-        #context['title'] = _('Pesquisa Geral')
+
+        user = self.request.user
+        user_perm = user.has_perm('materia.change_materialegislativa')
 
         data = self.request.GET or self.request.POST
 
@@ -220,6 +223,19 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
         paginator = context['paginator']
         context['page_range'] = make_pagination(
             page_obj.number, paginator.num_pages)
+
+
+        if len(page_obj.object_list) and user_perm:
+            pk_is = [sr.pk_i for sr in page_obj.object_list]
+            sr = page_obj.object_list[0]
+            materias = sr.searchindex.index_queryset(
+                using='materia_admin'
+            ).filter(
+                pk__in=pk_is
+            )
+            materias = {m.id: m for m in materias}
+            for obj in page_obj.object_list:
+                obj.object = materias.get(obj.pk_i, None)
 
         if 'page' in data:
             del data['page']

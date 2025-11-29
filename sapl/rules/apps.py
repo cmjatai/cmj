@@ -1,20 +1,19 @@
 from builtins import LookupError
 import logging
 
-from asgiref.sync import async_to_sync
-from channels.layers import get_channel_layer
 import django.apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.management import _get_all_permissions
 from django.core import exceptions
 from django.db import router, connection
-from django.db.models.signals import post_save, post_delete, post_migrate,\
-    pre_delete
+from django.db.models.signals import post_migrate
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch.dispatcher import receiver
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -219,8 +218,8 @@ def get_rules():
     return Rules(rules_patterns)
 
 
-@receiver(post_migrate, dispatch_uid='update_groups')
-def update_groups(app_config, verbosity=2, interactive=True,
+@receiver(post_migrate, dispatch_uid='signal_update_groups_sapl')
+def signal_update_groups_sapl(app_config, verbosity=2, interactive=True,
                   using=DEFAULT_DB_ALIAS, **kwargs):
     if app_config != AppConfig and not isinstance(app_config, AppConfig):
         return
@@ -288,8 +287,8 @@ def reset_id_model(model):
         pass
 
 
-@receiver(post_migrate, dispatch_uid='check_ids_sequences')
-def check_ids_sequences(app_config, verbosity=2, interactive=True,
+@receiver(post_migrate, dispatch_uid='signal_check_ids_sequences')
+def signal_check_ids_sequences(app_config, verbosity=2, interactive=True,
                         using=DEFAULT_DB_ALIAS, **kwargs):
 
     models = app_config.models

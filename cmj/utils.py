@@ -8,7 +8,7 @@ from unicodedata import normalize as unicodedata_normalize
 import logging
 import re
 import ssl
-import subprocess
+import subprocess 
 import threading
 from django import forms
 from django.forms import TextInput
@@ -35,7 +35,6 @@ from django.utils.translation import gettext_lazy as _
 from easy_thumbnails import source_generators
 from num2words import num2words
 from unipath.path import Path
-from weasyprint import HTML
 
 from cmj.celery import app as celery_app
 

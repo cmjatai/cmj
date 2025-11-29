@@ -305,8 +305,9 @@ class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
 
         qs = self.get_model()._default_manager.all()
 
-        # return qs
-        # prefetch_related
+        if using != 'materia_admin':
+            return qs
+
         return qs.select_related(
             "tipo",
         ).prefetch_related(

@@ -1,7 +1,7 @@
 import logging
 
 from django.conf import settings
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import pre_save
 from django.dispatch.dispatcher import receiver
 
 from cmj.core.signals_functions import send_mail
@@ -13,8 +13,8 @@ from sapl.utils import create_barcode
 logger = logging.getLogger(__name__)
 
 
-@receiver(pre_save, sender=Protocolo, dispatch_uid='protocolo_pre_save')
-def protocolo_pre_save(sender, instance, using, **kwargs):
+@receiver(pre_save, sender=Protocolo, dispatch_uid='signal_pre_save_protocolo')
+def signal_pre_save_protocolo(sender, instance, using, **kwargs):
 
     if hasattr(instance, 'not_send_mail') and instance.not_send_mail:
         return
@@ -71,8 +71,8 @@ def protocolo_pre_save(sender, instance, using, **kwargs):
                 ))
 
 
-@receiver(pre_save, sender=DocumentoAdministrativo, dispatch_uid='docadm_pre_save_segmenta_download')
-def docadm_pre_save_segmenta_download(sender, instance, using, **kwargs):
+@receiver(pre_save, sender=DocumentoAdministrativo, dispatch_uid='signal_pre_save_docadm_segmenta_download')
+def signal_pre_save_docadm_segmenta_download(sender, instance, using, **kwargs):
 
     if not instance.id:
         return
