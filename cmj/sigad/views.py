@@ -262,12 +262,13 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                     file, content_type=midia.content_type)
 
                 response['Cache-Control'] = 'max-age=2592000'
+
                 if not request.user.is_anonymous:
                     if request.META.get('HTTP_REFERER', '').endswith('construct'):
                         response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                        response['Expires'] = 0
+                        response['Pragma'] = 'no-cache'
 
-                response['Expires'] = 0
-                response['Pragma'] = 'no-cache'
                 response['Content-Disposition'] = 'inline; filename=' + \
                     midia.file.name
                 return response
