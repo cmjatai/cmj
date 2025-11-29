@@ -136,33 +136,6 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
         'pdf': fields_pdf_report,
     }
 
-
-    def hook_epigrafe_ementa(self, obj):
-        html = f'''
-                <a href="{self.hook_texto_original(obj)}">{obj.epigrafe}</a><br>
-                {obj.ementa}
-        '''
-        return html
-
-    def hook_header_autores_for_pdf(self):
-        return force_str(_('Autores'))
-
-    def hook_autores_for_pdf(self, obj):
-        autores = list(obj.autores.values_list('nome', flat=True))
-        autores = list(map(lambda x: f'<span class="whitespace">{x}</span>', autores))
-        return autores
-
-
-    def hook_header_epigrafe_ementa(self):
-        return force_str(_('Epígrafe / Ementa'))
-
-    def hook_header_texto_original(self):
-        return force_str(_('Link para Matéria Legislativa'))
-
-    def hook_texto_original(self, obj):
-        id = obj["id"] if isinstance(obj, dict) else obj.id
-        return f'{settings.SITE_URL}/materia/{id}'
-
     def __call__(self, request):
         self.log(request)
         return SearchView.__call__(self, request)
@@ -174,6 +147,71 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
             form_class=MateriaSearchForm,
             searchqueryset=None,
             results_per_page=results_per_page)
+
+    def get_context(self):
+        context = super().get_context()
+
+        data = self.request.GET or self.request.POST
+        context['show_results'] = len(data) > 0
+        context['view'] = self.view_actions()
+
+        if not data:
+            del context['view']['search_url']
+            context['view']['tipos_autores_materias'] = self.tipo_autores_materias # não chamar a função aqui para n fazer query desnecessária
+            return context
+
+        data = data.copy()
+
+        context['infofilter'] = self.infofilter(data)
+
+        if 'csrfmiddlewaretoken' in data:
+            del data['csrfmiddlewaretoken']
+
+        if 'page' in data:
+            del data['page']
+
+        page = context['page']
+        paginator = context['paginator']
+        context['page_range'] = make_pagination(page.number, paginator.num_pages)
+        context['is_paginated'] = True
+
+        context['filter_url'] = ('&' + data.urlencode()) if len(data) > 0 else ''
+
+        return context
+
+    def infofilter(self, data):
+        cd = self.form.cleaned_data if self.form.is_valid() else {}
+
+        filters = []
+
+        for k, v in cd.items():
+
+            if not v:
+                continue
+
+            if k in ('ordenacao', 'tipo_listagem'):
+                continue
+
+            label = self.form.fields[k].label if k in self.form.fields else k
+
+            if k == 'autoria_is':
+                filtro = f'<strong>{label}:</strong> {Autor.objects.get(id=v).nome}'
+            elif isinstance(v, (list, tuple)):
+                filtro = f'<strong>{label}:</strong> {" / ".join([str(x) for x in v])}'
+            elif isinstance(v, bool):
+                filtro = f'<strong>{label}:</strong> {"Sim" if v else ("Não")}'
+            elif not isinstance(v, QuerySet):
+                filtro = f'<strong>{label}:</strong> {v}'
+            else:
+                items = self.form.fields[k].queryset.filter(id__in=v)
+                filtro = f'<strong>{label}:</strong> {" / ".join([str(x) for x in items])}'
+            filters.append(filtro)
+
+        if filters:
+            filters.insert(0, '<strong>FILTROS APLICADOS</strong>')
+            filters.append('')
+
+        return '<br>'.join(filters)
 
     def build_form(self, form_kwargs=None):
 
@@ -197,61 +235,9 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
             'search_url': '?',
             'verbose_name': _('Materia Legislativa'),
             'create_url': '' if u.is_anonymous or
-            not u.has_perm('materia.add_materialegislativa') else
-            reverse('sapl.materia:materialegislativa_create'),
-            'tipos_autores_materias': self.tipo_autores_materias,
+                not u.has_perm('materia.add_materialegislativa') else
+                reverse('sapl.materia:materialegislativa_create'),
         }
-
-    def get_context(self):
-        context = super().get_context()
-
-        user = self.request.user
-        user_perm = user.has_perm('materia.change_materialegislativa')
-
-        data = self.request.GET or self.request.POST
-
-        data = data.copy()
-        if 'csrfmiddlewaretoken' in data:
-            del data['csrfmiddlewaretoken']
-
-        context['tipo_listagem'] = self.form.cleaned_data.get(
-            'tipo_listagem', None)
-        context['is_paginated'] = True
-
-        page_obj = context['page']
-        context['page_obj'] = page_obj
-        paginator = context['paginator']
-        context['page_range'] = make_pagination(
-            page_obj.number, paginator.num_pages)
-
-
-        if len(page_obj.object_list) and user_perm:
-            pk_is = [sr.pk_i for sr in page_obj.object_list]
-            sr = page_obj.object_list[0]
-            materias = sr.searchindex.index_queryset(
-                using='materia_admin'
-            ).filter(
-                pk__in=pk_is
-            )
-            materias = {m.id: m for m in materias}
-            for obj in page_obj.object_list:
-                obj.object = materias.get(obj.pk_i, None)
-
-        if 'page' in data:
-            del data['page']
-
-        context['view'] = self.view_actions()
-
-        qr = self.request.GET.copy()
-        context['show_results'] = show_results_filter_set(qr)
-        if not context['show_results']:
-            del context['view']['search_url']
-            #context['tipos_autores_materias'] = self.tipo_autores_materias()
-
-        context['filter_url'] = (
-            '&' + data.urlencode()) if len(data) > 0 else ''
-
-        return context
 
     def tipo_autores_materias(self):
         acesso_rapido_list = list(tipos_autores_materias(
@@ -262,6 +248,30 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
             key=lambda tup: tup[0].sequencia_regimental)
 
         return acesso_rapido_list
+
+    def hook_epigrafe_ementa(self, obj):
+        html = f'''
+                <a href="{self.hook_texto_original(obj)}">{obj.epigrafe}</a><br>
+                {obj.ementa}'''
+        return html
+
+    def hook_header_autores_for_pdf(self):
+        return force_str(_('Autores'))
+
+    def hook_autores_for_pdf(self, obj):
+        autores = list(obj.autores.values_list('nome', flat=True))
+        autores = list(map(lambda x: f'<span class="whitespace">{x}</span>', autores))
+        return autores
+
+    def hook_header_epigrafe_ementa(self):
+        return force_str(_('Epígrafe / Ementa'))
+
+    def hook_header_texto_original(self):
+        return force_str(_('Link para Matéria Legislativa'))
+
+    def hook_texto_original(self, obj):
+        id = obj["id"] if isinstance(obj, dict) else obj.id
+        return f'{settings.SITE_URL}/materia/{id}'
 
     def render_to_pdf(self, context):
 

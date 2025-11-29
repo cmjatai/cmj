@@ -25,17 +25,28 @@ def signal_materia_materialegislativa_disable_cache(sender, **kwargs):
     if sender and hasattr(sender, '_meta'):
         if sender._meta.app_label in ('materia', 'sessao', 'norma'):
             try:
+
+                # keys com cache semanal
+
                 key = make_template_fragment_key('portalcmj_pesquisar_materia')
                 cache.delete(key)
 
-                inst = kwargs.get('instance', None)
-                if inst and isinstance(inst, MateriaLegislativa):
-                    key = make_template_fragment_key(
-                        'm.ml.l', [inst.pk])
-                elif inst and hasattr(inst, 'materia') and inst.materia:
-                    key = make_template_fragment_key(
-                        'm.ml.l', [inst.materia.pk])
-                cache.delete(key)
+                inst = kwargs.get('instance', {})
+                if inst:
+                    if hasattr(inst, 'materia_id') and inst.materia_id:
+                        inst = inst.materia_id
+                    elif hasattr(inst, 'materia') and inst.materia and hasattr(inst.materia, 'id'):
+                        inst = inst.materia.id
+                    elif hasattr(inst, 'id'):
+                        inst = inst.id
+                    else:
+                        inst = None
+
+                    if inst:
+                        key = make_template_fragment_key(
+                            'm.ml.d', [inst])
+                        cache.delete(key)
+
             except Exception as e:
                 #logger.error(
                 #    "Erro ao tentar invalidar cache de matéria: {}".format(e))

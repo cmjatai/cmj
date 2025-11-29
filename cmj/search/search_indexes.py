@@ -305,15 +305,14 @@ class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
 
         qs = self.get_model()._default_manager.all()
 
-        if using != 'materia_admin':
-            return qs
-
         return qs.select_related(
             "tipo",
         ).prefetch_related(
             "autoria_set",
             "autoria_set__autor",
             "anexadas",
+            '_diario__diario',
+            '_certidao',
             "tramitacao_set",
             "tramitacao_set__status",
             #"tramitacao_set__unidade_tramitacao_local",

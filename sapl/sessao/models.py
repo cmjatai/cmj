@@ -236,7 +236,6 @@ class SessaoPlenaria(models.Model):
         return f"""
             Abertura: {o.data_inicio.strftime("%d/%m/%Y")} às {o.hora_inicio}<br>
             Encerramento: {o.data_fim.strftime("%d/%m/%Y")} às {o.hora_fim}<br>
-
         """
 
     @property
@@ -254,6 +253,10 @@ class SessaoPlenaria(models.Model):
     @property
     def render_description(self):
         return self.str_subtitle
+
+    @property
+    def diariosoficiais(self):
+        return self._diario.all()
 
     @property
     def diariooficial(self):

@@ -155,6 +155,10 @@
   &:not(:last-child) {
     margin-right: 15px;
   }
+  &:hover {
+    background-color:white;
+    text-decoration: none;
+  }
 
 }
 
@@ -164,8 +168,8 @@
     position: absolute;
     top: -15px;
     right: 15px;
-    left: 84px;
-    min-height: 60vh;
+    left: 63px;
+    min-height: 70vh;
     max-height: none;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
     background-color: #fff;
@@ -190,26 +194,6 @@
   }
 }
 
-
-.container-search {
-  .page-preview {
-    .preview {
-      bottom: -15px;
-      @keyframes keyframe_linktexto_preview {
-        0% {
-          bottom: -15px;
-          top: -15px;
-        }
-        100% {
-          bottom: -100px;
-          top: -100px;
-          max-height: 90vh;
-        }
-      }
-      // animation: keyframe_linktexto_preview 1s linear 0s 1 forwards;
-    }
-  }
-}
 
 .item-listas {
   position: relative;
@@ -322,7 +306,7 @@
   }
 
   .link-texto {
-    margin: 10px 20px 10px 10px;
+    margin: 1rem 1rem 1rem 0.1rem;
   }
 }
 

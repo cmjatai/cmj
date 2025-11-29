@@ -268,10 +268,6 @@ class DocumentoAdministrativo(CommonMixin):
         content_type_field='conteudo_content_type',
         related_query_name='protocolo_gr')
 
-    diariosoficiais = GenericRelation(
-        VinculoDocDiarioOficial,
-        related_query_name='diariosoficiais',)
-
     materia = models.ForeignKey(
         MateriaLegislativa,
         blank=True,
@@ -407,6 +403,10 @@ class DocumentoAdministrativo(CommonMixin):
     @property
     def render_description(self):
         return str(self.assunto)
+
+    @property
+    def diariosoficiais(self):
+        return self._diario.all()
 
     @property
     def diariooficial(self):

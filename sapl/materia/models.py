@@ -386,22 +386,6 @@ class MateriaLegislativa(CommonMixin):
         validators=[restringe_tipos_de_arquivo_txt],
         max_length=512)
 
-    texto_articulado = GenericRelation(
-        TextoArticulado, related_query_name='texto_articulado')
-
-    proposicao = GenericRelation(
-        'Proposicao', related_query_name='proposicao')
-
-    protocolo_gr = GenericRelation(
-        'protocoloadm.Protocolo',
-        object_id_field='conteudo_object_id',
-        content_type_field='conteudo_content_type',
-        related_query_name='protocolo_gr')
-
-    diariosoficiais = GenericRelation(
-        VinculoDocDiarioOficial,
-        related_query_name='diariosoficiais')
-
     autores = models.ManyToManyField(
         Autor,
         through='Autoria',
@@ -441,6 +425,18 @@ class MateriaLegislativa(CommonMixin):
         max_length=150, blank=True,
         verbose_name=_('URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)'))
 
+    texto_articulado = GenericRelation(
+        TextoArticulado, related_query_name='texto_articulado')
+
+    proposicao = GenericRelation(
+        'Proposicao', related_query_name='proposicao')
+
+    protocolo_gr = GenericRelation(
+        'protocoloadm.Protocolo',
+        object_id_field='conteudo_object_id',
+        content_type_field='conteudo_content_type',
+        related_query_name='protocolo_gr')
+
     _certidao = GenericRelation(
         CertidaoPublicacao, related_query_name='materialegislativa_cert')
 
@@ -448,7 +444,9 @@ class MateriaLegislativa(CommonMixin):
         Metadata, related_query_name='materialegislativa_metadata')
 
     _diario = GenericRelation(
-        VinculoDocDiarioOficial, related_query_name='materialegislativa_diario')
+        VinculoDocDiarioOficial,
+        related_query_name='materialegislativa_diario'
+    )
 
     class Meta:
         verbose_name = _('Matéria Legislativa')
@@ -481,6 +479,10 @@ class MateriaLegislativa(CommonMixin):
     @property
     def metadata_model(self):
         return self._metadata_model.order_by('-id').first()
+
+    @property
+    def diariosoficiais(self):
+        return self._diario.all()
 
     @property
     def diariooficial(self):

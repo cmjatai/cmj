@@ -157,10 +157,6 @@ class NormaJuridica(CommonMixin):
     texto_articulado = GenericRelation(
         TextoArticulado, related_query_name='texto_articulado')
 
-    diariosoficiais = GenericRelation(
-        VinculoDocDiarioOficial,
-        related_query_name='diariosoficiais')
-
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,
         auto_now=True,
@@ -285,6 +281,10 @@ class NormaJuridica(CommonMixin):
     @property
     def render_description(self):
         return str(self.ementa)
+
+    @property
+    def diariosoficiais(self):
+        return self._diario.all()
 
     @property
     def diariooficial(self):

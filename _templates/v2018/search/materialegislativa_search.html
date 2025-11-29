@@ -1,8 +1,5 @@
 {% extends 'crud/detail.html' %}
-{% load i18n cache crispy_forms_tags cropping thumbnail  %}
-{% load common_cmj_tags highlight menus %}
-{% load common_tags sigad_filters  %}
-{% load render_bundle from webpack_loader %}
+{% load i18n cache crispy_forms_tags %}
 {% load webpack_static from webpack_loader %}
 
   {% block head_content %}
@@ -40,14 +37,18 @@
   {% endif %}
 {% endblock %}
 
-{% block extra_content %} {% endblock %}
-{% block detail_content %} {% endblock %}
+{% block extra_content %}
+
+{% endblock %}
+{% block detail_content %}
+{{infofilter|safe}}
+{% endblock %}
 
 {% block table_content %}
 
 <div class="container-search">
   {% if not show_results %}
-    {% cache 86400 portalcmj_pesquisar_materia %}
+    {% cache 604800 portalcmj_pesquisar_materia %}
       {% include 'search/search_help_text.html' %}
       <div class="row">
         <div class="col-12">
@@ -60,7 +61,7 @@
           {{ dashboard.dash_grids.materiasearchdashboard }}
 
           <small class="text-black-50">
-            OBS: Classificação de Assuntos é automatizada e realizada, atualmente, apenas para os Requerimentos. Feita pela Inteligência Artificial Gemini 2.0.
+            OBS: Classificação de Assuntos é automatizada e realizada, atualmente, apenas para os Requerimentos, sendo feita diariamente pela Inteligência Artificial Gemini 2.0.
           </small>
 
         </div>
@@ -85,47 +86,69 @@
   {% else %}
     <div class="container-table">
     {% for result in page.object_list %}
+
       {% if forloop.first %}
         <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
       {% endif %}
-      {% if result.object %}
 
-
-      {% with result.object as m %}
       <div class="item-listas p-2">
-        <div class="item-raiz">
+        <div class="item-raiz row m-0 p-0">
+
+          <div class="col px-0 px-md-2">
+            {% cache 604800 m.ml.l result.pk_i %}
+              {% with result.object as m %}
+                {% include "search/materialegislativa_search_cache.html" %}
+              {% endwith %}
+            {% endcache %}
 
             {% if perms.materia.change_materialegislativa %}
-              {% include "search/materialegislativa_search_cache.html" %}
-            {% else %}
-              {% cache 604800 m.ml.l result.object.pk %}
-                {% include "search/materialegislativa_search_cache.html" %}
-              {% endcache %}
-            {% endif %}
 
-            {% if result.highlighted.text %}
-              <div class="highlight-search m-0">
-                {% for hl in result.highlighted.text %}
-                {{ hl|safe }}
-                {% endfor %}
-              </div>
-            {% endif %}
+              {% with result.object as m %}
+                <div class="bg-white d-flex flex-column mt-2">
+                  {% if m.certidao %}
+                    <small>
+                    <a class="text-danger" href="{% url 'cmj.core:certidaopublicacao_detail' m.certidao.id %}">Certidão de Publicação nº {{m.certidao.id|stringformat:"06d" }} de {{m.certidao.created}}</a>
+                    </small>
+                  {% endif %}
+                  {% if m.diariosoficiais.exists %}
+                    <small>
+                      <a class="text-green" href="{% url 'cmj.diarios:diariooficial_detail' m.diariosoficiais.first.id %}">{{m.diariosoficiais.first.diario}}</a>
+                    </small>
+                  {% endif %}
+                  {% if m.metadata.signs.texto_original.hom %}
+                    <small>
+                    Homologação: {{m.metadata.signs.texto_original.hom.0}}
+                    </small>
+                  {% endif %}
+                  <small>
+                    Score: {{result.score|floatformat:"4"}}
+                  </small>
+                </div>
+              {% endwith %}
 
-            </div>
+            {% endif %}
           </div>
-        {% endwith %}
 
-      {% endif %}
+          {% if result.highlighted.text %}
+            <div class="col-12 col-md-4 highlight-search m-0 p-0">
+              {% for hl in result.highlighted.text %}
+              {{ hl|safe }}
+              {% endfor %}
+            </div>
+          {% endif %}
 
-      {% empty %}
-          <h3 class="p-5">Nenhuma Matéria Legislativa encontrada com os critérios de busca acima!</h3>
-      {% endfor %}
+        </div>
+      </div>
+
+    {% empty %}
+        <h3 class="p-5">Nenhuma Matéria Legislativa encontrada com os critérios de busca acima!</h3>
+    {% endfor %}
     </div>
 
     {% if page.object_list  %}
       {% include "paginacao.html" %}
     {% endif %}
 
-{% endif %}
+  {% endif %}
 </div>
 {% endblock %}
