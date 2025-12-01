@@ -13,6 +13,7 @@ def signal_post_sigad(sender, **kwargs):
         make_template_fragment_key('portalcmj_pagina_inicial_parte1'),
         make_template_fragment_key('portalcmj_pagina_inicial_parte3'),
         make_template_fragment_key('portalcmj_acesso_informacao'),
+        make_template_fragment_key('portalcmj_menu_publico'),
     ]
     for key in keys:
         cache.delete(key)

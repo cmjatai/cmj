@@ -53,8 +53,8 @@ class TextExtractField(CharField):
             self.logger.error('erro processando arquivo: ' % arquivo.path)
             data = ''
 
-        # data = clean_text(data)
-        return clean_text(data)
+        data = clean_text(data)
+        return data
 
     def print_error(self, arquivo, error):
         msg = 'Erro inesperado processando arquivo %s erro: %s' % (
@@ -136,22 +136,29 @@ class TextExtractField(CharField):
 
             # if callable(value):
             if type(value) is type(self.extract_data):
-                data_attr = getattr(self, func)(value()) + '  '
+                data_attr = getattr(self, func)(value()) + '\n'
             else:
-                data_attr = getattr(self, func)(value) + '  '
+                data_attr = getattr(self, func)(value) + '\n'
 
             data += data_attr
+            #data += '-----------------------------\n'
 
             # if func == 'ta_extractor':
             #    data_attr = data_attr.strip()
             #    if data_attr:
             #        break
 
-        data = data.replace('\n', ' ')
+        #data = self.sanitize(data)
+        #with open('/home/leandrojatai/extracted_text.txt', 'w') as f:
+        #    f.write(data)
 
         return data
 
+    def sanitize(self, value):
+        return clean_text(value)
+
     def prepare_template(self, obj):
+
         #app_label, model_name = get_model_ct_tuple(obj)
         template_names = ['search/indexes/default_text.txt']
         # template_names = ['search/indexes/%s/%s_%s.txt' %
@@ -296,6 +303,7 @@ class MateriaLegislativaIndex(BaseIndex, CelerySearchIndex, Indexable):
             ('indexacao', 'string_extractor'),
             ('observacao', 'string_extractor'),
             ('autores', 'list_string_extractor'),
+            ('assuntos', 'list_string_extractor'),
             ('texto_articulado', 'ta_extractor'),
             ('texto_original', 'file_extractor'),
         )

@@ -171,6 +171,7 @@ class MateriaSearchView(AudigLogFilterMixin, MultiFormatOutputMixin, SearchView,
             del data['page']
 
         page = context['page']
+        context['page_obj'] = page
         paginator = context['paginator']
         context['page_range'] = make_pagination(page.number, paginator.num_pages)
         context['is_paginated'] = True
@@ -392,6 +393,12 @@ class NormaSearchView(AudigLogFilterMixin,  MultiFormatOutputMixin, SearchView, 
         context = super().get_context()
 
         data = self.request.GET or self.request.POST
+        context['show_results'] = len(data) > 0
+        context['view'] = self.urls()
+
+        if not data:
+            del context['view']['search_url']
+            return context
 
         data = data.copy()
         if 'csrfmiddlewaretoken' in data:

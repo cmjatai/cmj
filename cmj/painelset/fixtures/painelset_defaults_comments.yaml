@@ -49,7 +49,7 @@ paineis:
 # config.activates, activate tem a função de "se" para ativar a visão de acordo com condições.
 # Pode haver múltiplos activate em uma visão, funcionam como OR, ou seja, ao menos um deve ser satisfeito para ativar a visão.
 # Dentro de cada activate, as condições funcionam como AND, ou seja, todas as condições devem ser satisfeitas para ativar a visão.
-# As condições são baseadas nos lookups do django, incluíndo as apps e os models, ou seja, painelset__individuo__com_a_palavra refere-se ao campo com_a_palavra do model individuo da app painelset.
+# As condições são baseadas nos lookups do django, incluindo as apps e os models, ou seja, painelset__individuo__com_a_palavra refere-se ao campo com_a_palavra do model individuo da app painelset.
 # Adicionar um lookup contraditório em um activate (ex: painelset__individuo__com_a_palavra: true e painelset__individuo__com_a_palavra: false) faz com que o activate nunca seja satisfeito, desativando a visão.
 # Eventos e Sessões associadas ao painel são injetadas automaticamente no filtro de ativação de visão ao nível do Model do lookup acima, e não ao nível dos fields, se estes forem FKs ou M2M.
 # Os activates e a ativação e desativação das visões são tratados na tarefa assíncrona task_refresh_states_from_visaodepainel, ativada pelo signals_sync_refresh.
