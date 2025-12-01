@@ -19,6 +19,8 @@ services:
     container_name: cmjsolr
     labels:
         NAME: "cmjsolr"
+    environment:
+      - SOLR_HEAP=4g
     volumes:
       - csolr9_data:/var/solr
       - csolr9_configsets:/opt/solr/server/solr/configsets

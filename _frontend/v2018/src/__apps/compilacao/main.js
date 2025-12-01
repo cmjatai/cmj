@@ -1,5 +1,12 @@
 import '../../expose-global-jquery'
 
+import 'bootstrap'
+
+import 'jquery-ui/ui/widgets/dialog'
+import 'jquery-ui/ui/widgets/sortable'
+import 'jquery-ui/ui/widgets/datepicker'
+import 'jquery-ui/ui/i18n/datepicker-pt-BR'
+
 import './scss/compilacao.scss'
 
 import compilacao from './js/old/compilacao'

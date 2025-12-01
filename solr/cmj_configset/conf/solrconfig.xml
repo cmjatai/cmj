@@ -398,9 +398,9 @@
                       to occupy. Note that when this option is specified, the size
                       and initialSize parameters are ignored.
       -->
-    <filterCache size="512"
+    <filterCache size="2048"
                  initialSize="512"
-                 autowarmCount="0"/>
+                 autowarmCount="128"/>
 
     <!-- Query Result Cache
 
@@ -410,9 +410,9 @@
             maxRamMB - the maximum amount of RAM (in MB) that this cache is allowed
                        to occupy
       -->
-    <queryResultCache size="512"
+    <queryResultCache size="2048"
                       initialSize="512"
-                      autowarmCount="0"/>
+                      autowarmCount="128"/>
 
     <!-- Document Cache
 
@@ -420,9 +420,9 @@
          document).  Since Lucene internal document ids are transient,
          this cache will not be autowarmed.
       -->
-    <documentCache size="512"
-                   initialSize="512"
-                   autowarmCount="0"/>
+    <documentCache size="10000"
+                   initialSize="10000"
+                   autowarmCount="128"/>
 
     <!-- custom cache currently used by block join -->
     <cache name="perSegFilter"

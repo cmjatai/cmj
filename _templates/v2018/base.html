@@ -191,7 +191,7 @@
     {% block webpack_loader_js %}
       {% render_bundle  'app' 'js' %}
       {% if not user.is_anonymous %}
-        {% render_bundle  'libsuserauth' 'js' %}
+        {% render_bundle  'libsuserauth' 'js'  skip_common_chunks=True %}
       {% endif %}
     {% endblock webpack_loader_js %}
 
