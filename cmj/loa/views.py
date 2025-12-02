@@ -608,16 +608,20 @@ class LoaCrud(Crud):
                 loa=l,
                 tipo__gt=0
             ).values(
+                'tipo',
                 'entidade__nome_fantasia',
+                'unidade__especificacao',
                 'parlamentares__id',
                 'parlamentares__nome_parlamentar'
             ).order_by(
+                'tipo',
                 'entidade__nome_fantasia'
             ).annotate(soma_valor=Sum('valor')):
-                nom_entidade = el['entidade__nome_fantasia'] or 'Direcionado às Secretarias para ações especificadas nas Emendas Impositivas'
-                el['entidade__nome_fantasia'] = nom_entidade
+                nom_entidade = el['entidade__nome_fantasia'] or el['unidade__especificacao']
+                el['entidade__nome_fantasia'] = nom_entidade.upper()
                 if el['entidade__nome_fantasia'] not in entidades:
                     entidades[el['entidade__nome_fantasia']] = {
+                        'tipo': el['tipo'],
                         'parlamentares': [],
                         'soma_entidade': Decimal('0.00'),
                     }
@@ -632,8 +636,10 @@ class LoaCrud(Crud):
 
                 soma_geral += el['soma_valor']
 
+            entidades = sorted(entidades.items(), key=lambda x: x[1]['tipo'])
+
             context = dict(
-                entidades=entidades.items(),
+                entidades=entidades,
                 soma_geral=soma_geral,
                 loa=l
             )
