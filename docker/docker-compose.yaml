@@ -17,6 +17,8 @@ services:
     restart: always
     command: bin/solr start -c -f
     container_name: cmjsolr
+    environment:
+      - SOLR_HEAP=4g
     labels:
         NAME: "cmjsolr"
     volumes:
