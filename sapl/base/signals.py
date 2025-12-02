@@ -44,7 +44,7 @@ def signal_materia_materialegislativa_disable_cache(sender, **kwargs):
 
                     if inst:
                         key = make_template_fragment_key(
-                            'm.ml.d', [inst])
+                            'm.ml.l', [inst])
                         cache.delete(key)
 
             except Exception as e:
