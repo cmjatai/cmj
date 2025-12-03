@@ -1,4 +1,4 @@
-django==5.2.8
+django==5.2.9
 django-image-cropping==1.7.0   # Suporte ao django 4.2
 django-haystack==3.3.0         # Suporte ao django 5.0
 django-extensions==4.1
