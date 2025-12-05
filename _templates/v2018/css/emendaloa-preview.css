@@ -49,7 +49,14 @@ p.art {
 }
 
 .ementa {
-  margin: 0.7cm 0cm 0.7cm 5.5cm;
+  margin: 0.7cm 0cm 0.7cm 0;
+
+  &.recuo4 {
+    margin-left: 4cm;
+  }
+  &.recuo5 {
+    margin-left: 5cm;
+  }
 }
 
 .data {

@@ -335,7 +335,7 @@ class EmendaLoa(models.Model):
         (PROPOSTA, _('Proposta Legislativa')),
         (PROPOSTA_LIBERADA, _('Proposta Liberada para Edição Contábil')),
         (EDICAO_CONTABIL, _('Em edição pela Contabilidade')),
-        (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade')),
+        (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade / Aguardando Protocolo')),
         (EM_TRAMITACAO, _('Matéria protocolada, em tramitação')),
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
@@ -455,6 +455,8 @@ class EmendaLoa(models.Model):
                     valor = str(valor)
             valor = valor.upper() if valor and isinstance(valor, str) else valor
             finalidade = finalidade.replace(f'{{{chave}}}', str(valor))
+
+        finalidade = finalidade if finalidade[-1] != '.' else finalidade[:-1]
 
         return finalidade
 

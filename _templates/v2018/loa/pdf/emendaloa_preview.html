@@ -95,14 +95,14 @@
     {% endfor %}
   </h5>
   {% if object.tipo %}
-    <p class="ementa">
+    <p class="ementa recuo5">
       Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
       para a recepção do valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
       que será {{ object.prefixo_finalidade}} <strong>{{ object.finalidade_format|default:"XXXXXXX" }}</strong>.
     </p>
   {% else %}
-    <p class="ementa">
+    <p class="ementa recuo4">
       Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
       para a recepção do valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>

@@ -141,10 +141,23 @@ class LoaCrud(Crud):
             if l.ano < 2023:
                 return ' - ' , args[2]
 
-            em_fase_execucao = l.rcl_previa != l.receita_corrente_liquida
             ano_atual = timezone.now().year
 
-            if em_fase_execucao and l.ano == ano_atual:
+            rcl_previa = formats.number_format(l.rcl_previa, force_grouping=True)
+
+            if l.ano > ano_atual:
+                frase = 'Processo Legislativo em adamento' if not l.materia.normajuridica() else 'LOA Aprovada'
+                return f'''
+                    {rcl_previa}
+                    <small class="text-gray">
+                        <small>
+                            <em class="text-blue"><strong>{frase}</strong></em>
+                            <em>RCL referente ao ano anterior ao Projeto da LOA</em>
+                        </small>
+                    </small>
+                ''', ''
+
+            if l.ano == ano_atual:
                 return f'''
                     {args[1]}
                     <small class="text-gray">
@@ -152,26 +165,14 @@ class LoaCrud(Crud):
                             <em>LOA em fase de Execução</em>
                             <em>RCL referente ao ano anterior à Execução</em>
                 ''', ''
-            elif em_fase_execucao:
-                return f'''
-                    {args[1]}
-                    <small class="text-gray">
-                        <small>
-                            <em>LOA executada em {l.ano}</em>
-                            <em>RCL referente ao ano anterior à Execução</em>
-                ''', ''
-
-            rcl_previa = formats.number_format(l.rcl_previa, force_grouping=True)
 
             return f'''
-                {rcl_previa}
+                {args[1]}
                 <small class="text-gray">
                     <small>
-                        <em>RCL referente ao ano anterior ao Projeto da LOA</em>
-                    </small>
-                </small>
+                        <em>LOA executada em {l.ano}</em>
+                        <em>RCL referente ao ano anterior à Execução</em>
             ''', ''
-
 
 
         # def hook_header_receita_corrente_liquida(self):

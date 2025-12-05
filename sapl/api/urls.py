@@ -34,8 +34,8 @@ urlpatterns = [
     re_path(r'^api/', include(urlpatterns_api_doc)),
     re_path(r'^api/', include(urlpatterns_router)),
 
-    re_path(r'^api/version$', AppVersionView.as_view()),
-    re_path(r'^api/auth/token$', obtain_auth_token),
+    re_path(r'^api/version', AppVersionView.as_view()),
+    re_path(r'^api/auth/token', obtain_auth_token),
     re_path(r'^api/auth/session', AppSessionAuthView.as_view()),
     re_path(r'^api/recriar-token/(?P<pk>\d*)$',
             recria_token, name="recria_token"),
