@@ -5,7 +5,7 @@ window.onpageshow = event => {
 }
 
 window.loadingCMJ = function (msg) {
-  history.replaceState({ loading: true }, '', '#')
+  // history.replaceState({ loading: true }, '', '#')
   const html = `<div class="loading">
   <div class="loader"></div>
   <div class="message">${msg}</div>

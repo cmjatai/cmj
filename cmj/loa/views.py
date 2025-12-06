@@ -29,7 +29,6 @@ from cmj.loa.models import Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, Ofici
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
 from cmj.utils_report import make_pdf
-from sapl import parlamentares
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.parlamentares.models import Legislatura, Parlamentar
 
@@ -835,6 +834,10 @@ class EmendaLoaCrud(MasterDetailCrud):
             if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
                 return []
 
+
+            if not self.get_emendas_criadas_por_operador_mesmo_autor().exists():
+                return []
+
             btns = []
             return [
                 (reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?zip',
@@ -842,6 +845,24 @@ class EmendaLoaCrud(MasterDetailCrud):
                 _('Baixar as Emendas Impositivas/Modificativas')
                 )
             ]
+
+        def get_emendas_criadas_por_operador_mesmo_autor(self):
+            autor_operado = self.request.user.operadorautor_set.values_list('autor', flat=True)
+            OperadorAutor = autor_operado.model
+
+            return self.get_queryset(
+                ).filter(
+                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL,
+                        owner__id__in=OperadorAutor.objects.filter(
+                            autor__in=autor_operado
+                    ).values_list('user', flat=True)
+                )
+
+        @property
+        def title(self):
+            return f'''Emendas Impositivas/Modificativas à LOA {self.loa.ano} <small>({self.loa.materia.epigrafe_short if self.loa.materia else ''})</small>
+                '''
+
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs['pk'])
@@ -865,18 +886,16 @@ class EmendaLoaCrud(MasterDetailCrud):
             req = self.request
             base_url =  f"{req.scheme}://{req.get_host()}"
 
-            emendas = self.get_queryset(
-            ).filter(
-                Q(fase__gte=EmendaLoa.LIBERACAO_CONTABIL) | Q(tipo=EmendaLoa.MODIFICATIVA),
-                parlamentares__in=user.operadorautor_set.values_list(
-                    'autor__object_id', flat=True),
-            )
+            emendas = self.get_emendas_criadas_por_operador_mesmo_autor()
+
             if not emendas.exists():
                 messages.info(
                     self.request,
                     'Nenhuma Emenda Impositiva/Modificativa disponível para download.'
                 )
                 return super().render_to_response(context, **response_kwargs)
+
+            autoroperado_id = user.operadorautor_set.values_list('autor', flat=True).first()
 
             with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
                 with zipfile.ZipFile(tmp, 'w') as file:
@@ -893,7 +912,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 tmp.seek(0)
                 response = HttpResponse(tmp.read(),
                                     content_type='application/zip')
-                response['Content-Disposition'] = f'attachment; filename="emendaloa_{self.loa.ano}.zip"'
+                response['Content-Disposition'] = f'attachment; filename="emendaloa_{self.loa.ano}_autor_{autoroperado_id}.zip"'
                 response['Cache-Control'] = 'no-cache'
                 response['Pragma'] = 'no-cache'
                 response['Expires'] = 0
@@ -1454,8 +1473,8 @@ class EmendaLoaCrud(MasterDetailCrud):
             if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
                 return []
 
-            #if self.object.fase < EmendaLoa.LIBERACAO_CONTABIL:
-            #    return []
+            if self.object.fase < EmendaLoa.LIBERACAO_CONTABIL:
+                return []
 
             if self.object.tipo:
                 ementa = f'''

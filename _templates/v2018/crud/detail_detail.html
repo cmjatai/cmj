@@ -11,7 +11,7 @@
 {% block webpack_loader_js %}
     {{ block.super }}
     {% if view.crud.frontend %}
-      {% render_bundle view.crud.frontend 'js' %}
+      {% render_bundle view.crud.frontend 'js' skip_common_chunks=True %}
     {% endif %}
 {% endblock %}
 

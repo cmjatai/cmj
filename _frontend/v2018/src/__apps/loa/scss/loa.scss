@@ -105,6 +105,11 @@
       .custom-control-input, input[name=salvar] {
         display: none;
       }
+      legend {
+        font-size: 110%;
+        font-weight: bold;
+        color: lighten(#114d81, 20%);
+      }
       [class^=row] {
         margin-left: -$mp;
         margin-right: -$mp;
@@ -130,14 +135,13 @@
         & > div {
           // display: flex;
           gap: 1rem;
-          padding: 5px 15px 3px;
-          font-size: 85%;
-          align-items: center;
+          padding: 0px 0px 3px;
+          font-size: 75%;
         }
       }
       #div_id_tipo {
         .custom-control {
-          display: inline-block;
+          display: inline-flex;
           padding-right: 0.5em;
         }
       }

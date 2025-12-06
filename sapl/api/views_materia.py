@@ -105,6 +105,8 @@ class _ProposicaoViewSet(ResponseFileMixin):
     def texto_original(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
 
+    def dispatch(self, request, *args, **kwargs):
+        return super().dispatch(request, *args, **kwargs)
 
 @customize(MateriaLegislativa)
 class _MateriaLegislativaViewSet(ResponseFileMixin):
@@ -126,7 +128,7 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
     def ultima_tramitacao(self, request, *args, **kwargs):
 
         materia = self.get_object()
-        if not materia.tramitacao_set.exists(): 
+        if not materia.tramitacao_set.exists():
             return Response({})
 
         ultima_tramitacao = materia.tramitacao_set.first()

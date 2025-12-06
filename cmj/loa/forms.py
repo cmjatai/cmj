@@ -936,7 +936,7 @@ class EmendaLoaFilterSet(FilterSet):
         required=False,
         choices=EmendaLoa.FASE_CHOICE,
         label=_('Fases'),
-        widget=forms.CheckboxSelectMultiple
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'small'})
     )
 
     agrupamento = ChoiceFilter(
@@ -1094,14 +1094,15 @@ class EmendaLoaFilterSet(FilterSet):
                 (
                     to_row(
                         [
+                            (Fieldset(_('Pesquisa de Emendas Parlamentares')), 12),
                             ('parlamentares', 12),
-                            ('fase', 5),
+                            ('fase', 4),
                             (
                                 to_row([
                                     ('tipo', 12),
                                     (finalidade_field, 12),
                                 ]),
-                                7
+                                'col-md-8 p-0'
                             ),
                         ]
                     ),

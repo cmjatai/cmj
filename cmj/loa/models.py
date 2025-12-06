@@ -335,7 +335,7 @@ class EmendaLoa(models.Model):
         (PROPOSTA, _('Proposta Legislativa')),
         (PROPOSTA_LIBERADA, _('Proposta Liberada para Edição Contábil')),
         (EDICAO_CONTABIL, _('Em edição pela Contabilidade')),
-        (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade / Aguardando Protocolo')),
+        (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade e/ou Aguardando Protocolo')),
         (EM_TRAMITACAO, _('Matéria protocolada, em tramitação')),
         (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
         (APROVACAO_LEGAL, _('Aprovada')),
@@ -438,7 +438,7 @@ class EmendaLoa(models.Model):
         chaves = re.findall(r'\{(.*?)\}', finalidade)
 
         for chave in chaves:
-            chave_strip = chave.strip()
+            chave_strip = chave.strip().lower()
             if '__' in chave_strip:
                 partes = chave_strip.split('__')
                 obj = self
