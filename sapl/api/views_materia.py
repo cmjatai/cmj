@@ -101,6 +101,15 @@ class _ProposicaoViewSet(ResponseFileMixin):
         qs = qs.filter(q)
         return qs
 
+    def custom_filename(self, item):
+        arcname = '{}-{}-{:03d}-proposicao-{}.{}'.format(
+            item.ano,
+            slugify(item.autor),
+            item.numero_proposicao,
+            slugify(item.tipo),
+            item.texto_original.path.split('.')[-1])
+        return arcname
+
     @action(detail=True)
     def texto_original(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
