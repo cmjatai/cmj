@@ -19,7 +19,7 @@ from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
 from cmj.utils import UF, run_sql, texto_upload_path, get_settings_auth_user_model
-from sapl.materia.models import EM_TRAMITACAO, MateriaLegislativa
+from sapl.materia.models import EM_TRAMITACAO, MateriaLegislativa, Proposicao
 from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.utils import PortalFileField, OverwriteStorage
 
@@ -396,6 +396,13 @@ class EmendaLoa(models.Model):
         related_name='emendaloa',
         on_delete=PROTECT)
 
+    proposicao = models.OneToOneField(
+        Proposicao,
+        blank=True, null=True, default=None,
+        verbose_name=_('Proposição Legislativa'),
+        related_name='emendaloa',
+        on_delete=SET_NULL)
+
     valor = models.DecimalField(
         max_digits=14, decimal_places=2, default=Decimal('0.00'),
         verbose_name=_('Valor Global da Emenda (R$)'),
@@ -431,6 +438,28 @@ class EmendaLoa(models.Model):
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
         return f'R$ {valor_str} - {self.finalidade_format}'
+
+    @property
+    def ementa_format(self):
+        if self.tipo:
+            ementa = f'''
+                Altera destinação de recursos orçamentários, indicando {self.prefixo_indicacao}
+                {self.indicacao or "XXXXXXX"}, para a recepção do valor de
+                R$ { self.str_valor} ({self.valor_por_extenso}), que será { self.prefixo_finalidade}
+                { self.finalidade_format or "XXXXXXX"}.
+            '''
+        else:
+            ementa = f'''
+                Altera destinação de recursos orçamentários, indicando {self.prefixo_indicacao}
+                {self.indicacao or "XXXXXXX"}, para a recepção do valor de
+                R$ { self.str_valor} ({self.valor_por_extenso}), que será { self.prefixo_finalidade}
+                { self.finalidade_format or "XXXXXXX"}.
+            '''
+
+        ementa = ementa.strip().replace('\n', ' ')
+        ementa = re.sub(r'\s+', ' ', ementa)
+        return ementa
+
 
     @property
     def finalidade_format(self):

@@ -105,8 +105,10 @@ class _ProposicaoViewSet(ResponseFileMixin):
     def texto_original(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
 
-    def dispatch(self, request, *args, **kwargs):
-        return super().dispatch(request, *args, **kwargs)
+    def perform_update(self, serializer):
+        inst = serializer.save()
+        inst.save()
+
 
 @customize(MateriaLegislativa)
 class _MateriaLegislativaViewSet(ResponseFileMixin):

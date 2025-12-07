@@ -1079,10 +1079,11 @@ class ProposicaoCrud(Crud):
                     if isinstance(p.autor.autor_related, Parlamentar):
                         signs = set(map(lambda x: x[0], signs))
                         nc = p.autor.autor_related.nome_completo
+                        pronome_sexo = 'do' if p.autor.autor_related.sexo == 'M' else 'da'
                         signs = {s for s in signs if nc.startswith(s) or s.startswith(nc)}
                         if not signs and p.texto_original:
                             msg_error = _(
-                                f'Documento não possui assinatura digital do Parlamentar: {p.autor}')
+                                f'Documento não possui assinatura digital {pronome_sexo} Parlamentar: {p.autor}')
 
                 if msg_error:
                     messages.error(request, msg_error)

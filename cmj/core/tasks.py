@@ -432,7 +432,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
         }
 
         for s in signs:
-            cn = settings.CERT_PRIVATE_KEY_NAME
+            cn = 'FALSE' #settings.CERT_PRIVATE_KEY_NAME
             meta_signs['hom' if s[0] == cn else 'signs'].append(s)
         return meta_signs
 

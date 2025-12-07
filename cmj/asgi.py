@@ -5,6 +5,8 @@ defined in the ASGI_APPLICATION setting.
 
 import os
 
+from django.conf import settings
+from django.contrib.staticfiles.handlers import ASGIStaticFilesHandler
 from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 import django
@@ -18,8 +20,12 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cmj.settings")
 
 django.setup()
 
+http_handler = ASGIHandler()
+if settings.DEBUG:
+    http_handler = ASGIStaticFilesHandler(http_handler)
+
 application = ProtocolTypeRouter({
-    'http': ASGIHandler(),
+    'http': http_handler,
     'websocket': AuthMiddlewareStack(
         URLRouter(
             cmj.core.routing.websocket_urlpatterns +

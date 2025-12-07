@@ -9,7 +9,7 @@ import zipfile
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.db.models.aggregates import Sum
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect
@@ -20,6 +20,8 @@ from django.urls.base import reverse_lazy
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
+from django.core.files import File
+import fitz
 import requests
 
 from cmj.core.models import AuditLog
@@ -28,8 +30,10 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, Prestacao
 from cmj.loa.models import Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
+from cmj.utils import get_client_ip
 from cmj.utils_report import make_pdf
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
+from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Legislatura, Parlamentar
 
 
@@ -835,7 +839,9 @@ class EmendaLoaCrud(MasterDetailCrud):
                 return []
 
 
-            if not self.get_emendas_criadas_por_operador_mesmo_autor().exists():
+            if not self.get_emendas_criadas_por_operador_mesmo_autor().filter(
+                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL
+                ).exists():
                 return []
 
             btns = []
@@ -847,14 +853,16 @@ class EmendaLoaCrud(MasterDetailCrud):
             ]
 
         def get_emendas_criadas_por_operador_mesmo_autor(self):
+            if self.request.user.is_anonymous:
+                return self.get_queryset().none()
             autor_operado = self.request.user.operadorautor_set.values_list('autor', flat=True)
             OperadorAutor = autor_operado.model
 
             return self.get_queryset(
                 ).filter(
-                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL,
-                        owner__id__in=OperadorAutor.objects.filter(
-                            autor__in=autor_operado
+                    loa=self.loa,
+                    owner__id__in=OperadorAutor.objects.filter(
+                        autor__in=autor_operado
                     ).values_list('user', flat=True)
                 )
 
@@ -886,7 +894,10 @@ class EmendaLoaCrud(MasterDetailCrud):
             req = self.request
             base_url =  f"{req.scheme}://{req.get_host()}"
 
-            emendas = self.get_emendas_criadas_por_operador_mesmo_autor()
+            emendas = self.get_emendas_criadas_por_operador_mesmo_autor(
+                ).filter(
+                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL
+                )
 
             if not emendas.exists():
                 messages.info(
@@ -972,6 +983,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                 filters.insert(0, '<strong>FILTROS APLICADOS</strong>')
 
             context = {
+                'object': self.loa,
+                'loa': self.loa,
                 'tipo_agrupamento': cd.get('tipo_agrupamento', ''),
                 'title': title,
                 'filters': '<br>'.join(filters),
@@ -1201,16 +1214,52 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def hook_tipo(self, *args, **kwargs):
             el = args[0]
-            link_pdf = ''
-            if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia:
-                url = reverse_lazy(
-                    'sapl.api:loa_emendaloa-view',
-                    kwargs={'pk': el.id})
-
-                link_pdf = f'<a href="{url}"><i class="far fa-2x fa-file-pdf"></i></a>'
-
             tipo = args[1] if args[1] else 'EMENDA MODIFICATIVA'
-            return f'{link_pdf}<br>{tipo}', args[2]
+            link_pdf = ''
+            link_create_proposicao_pre_preenchida = ''
+            link_generate_proposicao = ''
+
+            emendas_mesmo_autor = self.get_emendas_criadas_por_operador_mesmo_autor(
+                ).filter(fase__gte=EmendaLoa.LIBERACAO_CONTABIL
+                )
+            if not emendas_mesmo_autor.filter(id=el.id).exists():
+                return f'''
+                    {link_pdf}
+                    <br>{tipo}
+                ''', args[2]
+
+            if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia :
+
+                url = reverse_lazy('sapl.api:loa_emendaloa-view',kwargs={'pk': el.id})
+                link_pdf = f'<a href="{url}" target="_blank"><i class="far fa-2x fa-file-pdf"></i></a>'
+
+                params = dict(
+                    descricao=el.ementa_format,
+                    tipo_materia=el.loa.materia.tipo.id if el.loa.materia else '',
+                    numero_materia=el.loa.materia.numero if el.loa.materia else '',
+                    ano_materia=el.loa.materia.ano if el.loa.materia else '',
+                    tipo=33 if el.tipo != EmendaLoa.MODIFICATIVA else 5,
+                )
+                query_params = urlencode(params)
+                link_create_proposicao_pre_preenchida = f'''
+                    <a target="_blank" href="{reverse_lazy('sapl.materia:proposicao_create')}?{query_params}">
+
+                    </a>
+                '''
+                # {link_create_proposicao_pre_preenchida} <i class="fas fa-2x fa-magic"></i>
+
+                link_generate_proposicao = f'''
+                    <a href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': el.id})}?register" target="_blank" >
+                        <i class="fas fa-2x fa-file-contract"></i>
+                    </a>
+                '''
+
+            return f'''
+                {link_pdf} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+
+                {link_generate_proposicao}
+                <br>{tipo}
+            ''', args[2]
 
         def hook_fase(self, *args, **kwargs):
             fase_display = f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>'
@@ -1470,36 +1519,19 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         @property
         def extras_url(self):
+            return []
             if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
                 return []
 
             if self.object.fase < EmendaLoa.LIBERACAO_CONTABIL:
                 return []
 
-            if self.object.tipo:
-                ementa = f'''
-        Altera destinação de recursos orçamentários, indicando {self.object.prefixo_indicacao}
-    {self.object.indicacao or "XXXXXXX"}, para a recepção do valor de
-      R$ { self.object.str_valor} ({self.object.valor_por_extenso}), que será { self.object.prefixo_finalidade}
-    { self.object.finalidade_format or "XXXXXXX"}.
-                '''
-            else:
-                ementa = f'''
-        Altera destinação de recursos orçamentários, indicando {self.object.prefixo_indicacao}
-    {self.object.indicacao or "XXXXXXX"}, para a recepção do valor de
-      R$ { self.object.str_valor} ({self.object.valor_por_extenso}), que será { self.object.prefixo_finalidade}
-    { self.object.finalidade_format or "XXXXXXX"}.
-                '''
-
-            ementa = ementa.strip().replace('\n', ' ')
-            ementa = re.sub(r'\s+', ' ', ementa)
-
             params = dict(
-                descricao=ementa.strip(),
+                descricao=self.object.ementa_format.strip(),
                 tipo_materia=self.object.loa.materia.tipo.id if self.object.loa.materia else '',
                 numero_materia=self.object.loa.materia.numero if self.object.loa.materia else '',
                 ano_materia=self.object.loa.materia.ano if self.object.loa.materia else '',
-                tipo=33
+                tipo=33 if self.object.tipo != EmendaLoa.MODIFICATIVA else 5,
             )
 
             query_params = urlencode(params)
@@ -1510,6 +1542,131 @@ class EmendaLoaCrud(MasterDetailCrud):
                 _('Cadastrar Proposição pré-preenchida')
                 )
             ]
+
+        def get(self, request, *args, **kwargs):
+            self.object = self.get_object()
+
+            if 'register' in request.GET:
+                user = request.user
+                if user.is_anonymous:
+                    raise PermissionDenied()
+
+                if not user.operadorautor_set.exists() and not user.has_perm('loa.emendaloa_full_editor'):
+                    raise PermissionDenied()
+
+                if self.object.fase != EmendaLoa.LIBERACAO_CONTABIL or self.object.materia or self.object.proposicao:
+                    messages.error(
+                        request,
+                        'Proposição Legislativa já registrada anteriormente' if self.object.proposicao else 'A Proposição Legislativa não pode ser registrada para esta Emenda. Verifique a fase da Emenda ou se a Proposição já foi registrada.'
+                    )
+                    if self.object.proposicao:
+                        return redirect(
+                            reverse_lazy(
+                                'sapl.materia:proposicao_detail',
+                                kwargs={'pk': self.object.proposicao.id}
+                            )
+                        )
+                    return redirect(self.detail_url)
+
+                try:
+
+                    arq_bytes = self.retrieve_file_bytes(request)
+
+                    autor = user.operadorautor_set.first().autor
+
+                    np_max = Proposicao.objects.filter(
+                        autor=autor,
+                        ano=timezone.now().year
+                        ).aggregate(np=Max('numero_proposicao'))
+
+                    proposicao = Proposicao()
+                    proposicao.autor = autor
+
+                    proposicao.numero_proposicao = np_max.get('np', 0) + 1
+
+                    proposicao.tipo = TipoProposicao.objects.get(
+                        id=33 if self.object.tipo != EmendaLoa.MODIFICATIVA else 5,
+                    )
+                    proposicao.descricao = self.object.ementa_format
+                    proposicao.ano = timezone.now().year
+                    proposicao.materia_de_vinculo = self.object.loa.materia
+                    proposicao.user = user
+                    proposicao.ip = get_client_ip(request)
+                    proposicao.texto_original = File(arq_bytes, name=f'emenda_loa_{self.object.id}.pdf')
+                    proposicao.save()
+
+                    self.object.proposicao = proposicao
+                    self.object.save()
+
+                    messages.success(
+                        request,
+                        'Proposição Legislativa registrada com sucesso.'
+                    )
+                    return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': proposicao.id}))
+                except Exception as e:
+                    messages.error(
+                        request,
+                        f'Ocorreu um erro ao registrar a Proposição Legislativa: {e}'
+                    )
+
+                return redirect(self.detail_url)
+
+            return MasterDetailCrud.DetailView.get(self, request, *args, **kwargs)
+
+        def retrieve_file_bytes(self, request):
+            base_url =  f"{request.scheme}://{request.get_host()}"
+
+            pra_frente = True
+            while True:
+                response = requests.get(f'{base_url}/api/loa/emendaloa/{self.object.id}/view/')
+                if response.status_code != 200:
+                    raise Exception('Não foi possível gerar o PDF da Emenda.')
+
+                arq_bytes = io.BytesIO(response.content)
+                pdf = fitz.open(stream=arq_bytes, filetype="pdf")
+
+                if pdf.page_count == 0:
+                    break
+
+                if pdf.page_count > 1:
+                    pra_frente = False
+
+                md = self.object.metadata
+                md['style'] = md.get('style', {
+                    'lineHeight': 150,
+                    'espacoAssinatura': 0,
+                })
+                md['style']['espacoAssinatura'] = md['style'].get('espacoAssinatura', 0)
+                lineHeight = md['style']['lineHeight']
+
+                if lineHeight < 110:
+                    break
+
+                if pdf.page_count == 1 and not pra_frente:
+                    break
+
+                if pra_frente and lineHeight > 200 and pdf.page_count == 1:
+                    break
+
+                if pra_frente:
+                    lineHeight += 5
+                else:
+                    lineHeight -= 1
+
+                md['style']['lineHeight'] = lineHeight
+                self.object.metadata = md
+                self.object.save()
+
+                if pra_frente:
+                    continue
+
+                page2 = pdf.load_page(1)
+                text = page2.get_text("text")
+                text = text
+                if 'A presente emenda fará parte integrante do Projeto' in text:
+                    break
+
+            return arq_bytes
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
