@@ -1139,8 +1139,12 @@ class EmendaLoaCrud(MasterDetailCrud):
                                     rc0_split = rc[0].split(' ')
                                     rc0_split[-1] = f'+{rc0_split[-1]}'
                                     rc[0] = ' '.join(rc0_split)
-                                while len(rc[0]) < 17:
-                                    rc[0] = rc[0].replace(' ', '  ', 1)
+                                    while len(rc[0]) < 17:
+                                        rc[0] = rc[0].replace(' ', '  ', 1)
+                                if '-' in rc[0]:
+                                    while len(rc[0]) < 18:
+                                        rc[0] = rc[0].replace(' ', '  ', 1)
+
                                 rc[0] = rc[0].replace(' ', '&nbsp;')
                                 registros.append(f'<li>{" - ".join(rc)}</li>')
 
@@ -1255,7 +1259,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 '''
 
             return f'''
-                {link_pdf} &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                {link_pdf} &nbsp; &nbsp; &nbsp;
 
                 {link_generate_proposicao}
                 <br>{tipo}
