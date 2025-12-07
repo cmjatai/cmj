@@ -3,9 +3,12 @@ import io
 import logging
 import re
 
+import fitz
+import requests
 import tempfile
-from urllib.parse import urlencode
 import zipfile
+
+from urllib.parse import urlencode
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -21,8 +24,7 @@ from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 from django.core.files import File
-import fitz
-import requests
+from django.utils.text import slugify
 
 from cmj.core.models import AuditLog
 from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, PrestacaoContaLoaForm, PrestacaoContaRegistroForm,\
@@ -848,8 +850,16 @@ class EmendaLoaCrud(MasterDetailCrud):
             return [
                 (reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?zip',
                 'btn-outline-primary',
-                _('Baixar as Emendas Impositivas/Modificativas')
-                )
+                '''
+                    <span title="Baixar Emendas Impositivas/Modificativas em arquivo ZIP">
+                    <i class="fas fa-file-pdf"></i> Baixar Emendas Liberadas</span>
+                '''),
+                (reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?register',
+                'btn-outline-primary',
+                '''
+                    <span title="Registrar todas as emendas Liberadas no módulo de proposições">
+                    <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas</span>
+                '''),
             ]
 
         def get_emendas_criadas_por_operador_mesmo_autor(self):
@@ -915,9 +925,15 @@ class EmendaLoaCrud(MasterDetailCrud):
                         response = requests.get(f'{base_url}/api/loa/emendaloa/{emenda.id}/view/')
 
                         if response.status_code == 200:
+                            nome_emenda = f'emendaloa_{emenda.id}_{emenda.loa.ano}'
+                            if emenda.materia:
+                                nome_emenda = f'emendaloa_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}'
+                            elif emenda.proposicao:
+                                nome_emenda = f'emendaloa_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}'
+                            nome_emenda = slugify(nome_emenda)
 
                             file.writestr(
-                                f'emendaloa_{emenda.id}_{emenda.loa.ano}.pdf',
+                                f'{nome_emenda}.pdf',
                                 response.content
                             )
                 tmp.seek(0)
@@ -1555,38 +1571,72 @@ class EmendaLoaCrud(MasterDetailCrud):
                 if user.is_anonymous:
                     raise PermissionDenied()
 
-                if not user.operadorautor_set.exists() and not user.has_perm('loa.emendaloa_full_editor'):
-                    raise PermissionDenied()
-
-                if self.object.fase != EmendaLoa.LIBERACAO_CONTABIL or self.object.materia or self.object.proposicao:
+                autor_operado = self.request.user.operadorautor_set.values_list('autor', flat=True)
+                OperadorAutor = autor_operado.model
+                if not OperadorAutor.objects.filter(
+                        user=self.object.owner,
+                        autor__in=autor_operado
+                    ).exists():
                     messages.error(
                         request,
-                        'Proposição Legislativa já registrada anteriormente' if self.object.proposicao else 'A Proposição Legislativa não pode ser registrada para esta Emenda. Verifique a fase da Emenda ou se a Proposição já foi registrada.'
+                        'Você não tem permissão para registrar a Proposição Legislativa desta Emenda Impositiva/Modificativa.'
                     )
-                    if self.object.proposicao:
-                        return redirect(
-                            reverse_lazy(
-                                'sapl.materia:proposicao_detail',
-                                kwargs={'pk': self.object.proposicao.id}
-                            )
-                        )
                     return redirect(self.detail_url)
+
+                if self.object.materia:
+                    messages.error(
+                        request,
+                        'A Proposição Legislativa não pode ser gerada novamente pois já foi protocolada e está vinculada a uma Matéria Legislativa.'
+                    )
+                    return redirect(
+                        reverse_lazy(
+                            'cmj.loa:emendaloa_detail',
+                            kwargs={'pk': self.object.id}
+                        )
+                    )
+
+                if self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
+                    messages.error(
+                        request,
+                        'A Proposição Legislativa só pode ser gerada quando a Emenda Impositiva/Modificativa estiver na fase de "Liberado pela Contabilidade e/ou Aguardando Protocolo".'
+                    )
+                    return redirect(self.detail_url)
+
+                if self.object.proposicao and self.object.proposicao.data_envio and self.object.proposicao.data_recebimento:
+                    messages.warning(
+                        request,
+                        'A Proposição Legislativa já foi registrada e recebida pelo protocolo, não pode ser atualizada via módulo de Orçamento Impositivo.'
+                    )
+                    return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': self.object.proposicao.id}))
+
+                if self.object.proposicao and self.object.proposicao.data_envio and not self.object.proposicao.data_recebimento:
+                    messages.warning(
+                        request,
+                        'A Proposição Legislativa já foi registrada e enviada ao protocolo, para ser atualizada é necessário retomar a proposição antes do protocolo autuar.'
+                    )
+                    return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': self.object.proposicao.id}))
+
+
 
                 try:
 
-                    arq_bytes = self.retrieve_file_bytes(request)
+                    arq_bytes, arq_name = self.retrieve_file_bytes(request)
 
                     autor = user.operadorautor_set.first().autor
 
-                    np_max = Proposicao.objects.filter(
-                        autor=autor,
-                        ano=timezone.now().year
-                        ).aggregate(np=Max('numero_proposicao'))
+                    proposicao = self.object.proposicao
+                    created = False
+                    if not proposicao:
+                        np_max = Proposicao.objects.filter(
+                            autor=autor,
+                            ano=timezone.now().year
+                            ).aggregate(np=Max('numero_proposicao'))
 
-                    proposicao = Proposicao()
+                        proposicao = Proposicao()
+                        proposicao.numero_proposicao = np_max.get('np', 0) + 1
+                        created = True
+
                     proposicao.autor = autor
-
-                    proposicao.numero_proposicao = np_max.get('np', 0) + 1
 
                     proposicao.tipo = TipoProposicao.objects.get(
                         id=33 if self.object.tipo != EmendaLoa.MODIFICATIVA else 5,
@@ -1596,7 +1646,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     proposicao.materia_de_vinculo = self.object.loa.materia
                     proposicao.user = user
                     proposicao.ip = get_client_ip(request)
-                    proposicao.texto_original = File(arq_bytes, name=f'emenda_loa_{self.object.id}.pdf')
+                    proposicao.texto_original = File(arq_bytes, name=arq_name)
                     proposicao.save()
 
                     self.object.proposicao = proposicao
@@ -1604,7 +1654,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                     messages.success(
                         request,
-                        'Proposição Legislativa registrada com sucesso.'
+                        f'Proposição Legislativa {"criada" if created else "atualizada"} com sucesso.'
                     )
                     return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': proposicao.id}))
                 except Exception as e:
@@ -1625,6 +1675,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                 response = requests.get(f'{base_url}/api/loa/emendaloa/{self.object.id}/view/')
                 if response.status_code != 200:
                     raise Exception('Não foi possível gerar o PDF da Emenda.')
+
+                arq_name = response.headers.get('Content-Disposition', f'emenda_loa_{self.object.id}.pdf').split('filename=')[-1].strip('"')
 
                 arq_bytes = io.BytesIO(response.content)
                 pdf = fitz.open(stream=arq_bytes, filetype="pdf")
@@ -1670,7 +1722,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 if 'A presente emenda fará parte integrante do Projeto' in text:
                     break
 
-            return arq_bytes
+            return arq_bytes, arq_name
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)

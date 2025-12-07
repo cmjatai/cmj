@@ -7,7 +7,7 @@
 <div class="actions btn-group btn-group-sm" role="group">
     {% for href, css_class, text in view.extras_url %}
     <a href="{{href}}" class="btn {{css_class}}">
-        {{text}}
+        {{text|safe}}
     </a>
     {% endfor %}
 </div>
