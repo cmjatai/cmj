@@ -919,11 +919,23 @@ class _EmendaLoaViewSet:
         else:
             bresponse = doc.tobytes()
 
+        nome_autor = el.owner.operadorautor_set.first() or ''
+        if nome_autor:
+            nome_autor = nome_autor.autor.nome
+
+        arcname = '{}-{}-{:04d}-{}{}.{}'.format(
+            el.loa.ano,
+            slugify(nome_autor),
+            el.id,
+            slugify(el.get_tipo_display()),
+            f'-p{p+1}' if p else '',
+            ext)
+
         response = HttpResponse(
             bresponse,
             content_type='image/png' if p else 'application/pdf'
         )
-        response['Content-Disposition'] = f'inline; filename="emenda_{el.id}.{ext}"'
+        response['Content-Disposition'] = f'inline; filename="{arcname}"'
         response['Cache-Control'] = 'no-cache'
         response['Pragma'] = 'no-cache'
         response['Expires'] = 0
@@ -936,6 +948,7 @@ class _EmendaLoaViewSet:
         #    cv.close()
         #    output.seek(0)
         # return HttpResponse(output.read(), content_type='application/docx')
+
 
     @action(methods=['get', ], detail=True)
     def totais(self, request, *args, **kwargs):
