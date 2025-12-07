@@ -15,6 +15,9 @@
 
 {% block actions %}
   <div>
+    {% if view.existe_emendaloa_sendo_gerada %}
+      <div class="alert alert-info">Proposições estão sendo geradas vindas do módulo de Orçamento Impositivo. Quando o processo de geração estiver concluído, esta mensagem não aparecerá em sua tela.</div>
+    {% endif %}
   {% for tipo, autores in view.tipos_autores_materias %}
     {% if forloop.first %}
       <strong>Matérias em tramitação:</strong><br>

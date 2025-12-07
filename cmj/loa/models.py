@@ -8,18 +8,20 @@ from django.core.validators import RegexValidator
 from cmj.utils import valor_por_extenso
 
 from bs4 import BeautifulSoup as bs
+from django.conf import settings
+from django.core.files import File
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, transaction
-from django.db.models import manager
+from django.db.models import manager, Max
 from django.db.models.aggregates import Sum
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.db.models.fields.json import JSONField
-from django.utils import formats
+from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.utils import UF, run_sql, texto_upload_path, get_settings_auth_user_model
-from sapl.materia.models import EM_TRAMITACAO, MateriaLegislativa, Proposicao
+from sapl.materia.models import EM_TRAMITACAO, MateriaLegislativa, Proposicao, TipoProposicao
 from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.utils import PortalFileField, OverwriteStorage
 
@@ -656,6 +658,109 @@ class EmendaLoa(models.Model):
             'divergencia_emenda': divergencia_emenda,
             'valor_emendaloa': self.valor
         }
+
+    def retrieve_file_bytes(self):
+
+        base_url =  settings.SITE_URL.rstrip('/')
+        import requests
+        import fitz  # PyMuPDF
+        import io
+
+        pra_frente = True
+        arq_bytes, arq_name = None, ''
+        while True:
+            response = requests.get(f'{base_url}/api/loa/emendaloa/{self.id}/view/')
+            if response.status_code != 200:
+                break
+
+            arq_name = response.headers.get('Content-Disposition', f'emenda_loa_{self.id}.pdf').split('filename=')[-1].strip('"')
+
+            arq_bytes = io.BytesIO(response.content)
+            pdf = fitz.open(stream=arq_bytes, filetype="pdf")
+
+            if pdf.page_count == 0:
+                break
+
+            if pdf.page_count > 1:
+                pra_frente = False
+
+            md = self.metadata
+            md['style'] = md.get('style', {
+                'lineHeight': 150,
+                'espacoAssinatura': 0,
+            })
+            md['style']['espacoAssinatura'] = md['style'].get('espacoAssinatura', 0)
+            lineHeight = md['style']['lineHeight']
+
+            if lineHeight < 110:
+                break
+
+            if pdf.page_count == 1 and not pra_frente:
+                break
+
+            if pra_frente and lineHeight > 200 and pdf.page_count == 1:
+                break
+
+            if pra_frente:
+                lineHeight += 5
+            else:
+                lineHeight -= 1
+
+            md['style']['lineHeight'] = lineHeight
+            self.metadata = md
+            self.save()
+
+            if pra_frente:
+                continue
+
+            page2 = pdf.load_page(1)
+            text = page2.get_text("text")
+            text = text
+            if 'A presente emenda fará parte' in text:
+                break
+
+        return arq_bytes, arq_name
+
+    def registrar_proposicao(self):
+        try:
+            arq_bytes, arq_name = self.retrieve_file_bytes()
+
+            autor = self.owner.operadorautor_set.first().autor
+
+            proposicao = self.proposicao
+            created = False
+            if not proposicao:
+                np_max = Proposicao.objects.filter(
+                    autor=autor,
+                    ano=self.loa.materia.ano if self.loa.materia else timezone.now().year,
+                    ).aggregate(np=Max('numero_proposicao'))
+
+                proposicao = Proposicao()
+                proposicao.numero_proposicao = np_max.get('np', 0) + 1
+                created = True
+
+            proposicao.autor = autor
+
+            proposicao.tipo = TipoProposicao.objects.get(
+                id=33 if self.tipo != EmendaLoa.MODIFICATIVA else 5,
+            )
+            proposicao.descricao = self.ementa_format
+            proposicao.ano = timezone.now().year
+            proposicao.materia_de_vinculo = self.loa.materia
+            proposicao.user = self.owner
+            proposicao.texto_original = File(arq_bytes, name=arq_name)
+            proposicao.save()
+
+            self.proposicao = proposicao
+
+            metadata = self.metadata or {}
+            metadata.pop('register_emendaloa_proposicao_task', None)
+            self.metadata = metadata
+
+            self.save()
+            return proposicao
+        except Exception as e:
+            raise Exception(f'Ocorreu um erro ao registrar a Proposição Legislativa: {e}')
 
 class EmendaLoaParlamentar(models.Model):
 

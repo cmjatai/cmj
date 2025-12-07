@@ -9,6 +9,7 @@ import tempfile
 import zipfile
 
 from urllib.parse import urlencode
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -38,6 +39,7 @@ from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Legislatura, Parlamentar
 
+from . import tasks
 
 class LoaContextDataMixin:
 
@@ -848,18 +850,20 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             btns = []
             return [
-                (reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?zip',
-                'btn-outline-primary',
-                '''
-                    <span title="Baixar Emendas Impositivas/Modificativas em arquivo ZIP">
-                    <i class="fas fa-file-pdf"></i> Baixar Emendas Liberadas</span>
-                '''),
-                (reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?register',
-                'btn-outline-primary',
-                '''
-                    <span title="Registrar todas as emendas Liberadas no módulo de proposições">
-                    <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas</span>
-                '''),
+                (
+                    reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?zip',
+                    'btn-success',
+                    '''<span title="Baixar Emendas Impositivas/Modificativas em arquivo ZIP">
+                        <i class="far fa-file-archive"></i> Baixar Emendas Liberadas</span>
+                    '''
+                ),
+                (
+                    reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?register',
+                    'btn-warning',
+                    '''<span title="Registrar todas as emendas Liberadas no módulo de proposições. Emendas já registradas serão atualizadas se ainda não enviadas ao protocolo.">
+                        <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas</span>
+                    '''
+                ),
             ]
 
         def get_emendas_criadas_por_operador_mesmo_autor(self):
@@ -884,6 +888,27 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs['pk'])
+            if 'register' in self.request.GET:
+                messages.info(
+                    self.request,
+                    'Iniciando o registro das emendas liberadas no módulo de proposições... atualize esta página para acompanhar o progresso.'
+                )
+                params_task = (
+                    self.loa.id,
+                    self.request.user.id
+                )
+                if not settings.DEBUG or (settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
+                    tasks.task_register_emendaloa_proposicao.apply_async(
+                        params_task,
+                        countdown=0
+                    )
+                else:
+                    tasks.task_register_emendaloa_proposicao_function(*params_task)
+                return redirect(
+                    reverse_lazy('sapl.materia:proposicao_list')
+                )
+
+
             return FilterView.get(self, request, *args, **kwargs)
 
         def render_to_response(self, context, **response_kwargs):
@@ -925,11 +950,11 @@ class EmendaLoaCrud(MasterDetailCrud):
                         response = requests.get(f'{base_url}/api/loa/emendaloa/{emenda.id}/view/')
 
                         if response.status_code == 200:
-                            nome_emenda = f'emendaloa_{emenda.id}_{emenda.loa.ano}'
+                            nome_emenda = f'emendaloa_{emenda.id}_sem_vinculo_com_proposicao_{emenda.loa.ano}'
                             if emenda.materia:
-                                nome_emenda = f'emendaloa_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}'
+                                nome_emenda = f'emendaloa_{emenda.id}_ja_procolocada_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}'
                             elif emenda.proposicao:
-                                nome_emenda = f'emendaloa_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}'
+                                nome_emenda = f'emendaloa_{emenda.id}_com_proposicao_gerada_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}'
                             nome_emenda = slugify(nome_emenda)
 
                             file.writestr(
@@ -1253,7 +1278,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 url = reverse_lazy('sapl.api:loa_emendaloa-view',kwargs={'pk': el.id})
                 link_pdf = f'<a href="{url}" target="_blank"><i class="far fa-2x fa-file-pdf"></i></a>'
 
-                params = dict(
+                """params = dict(
                     descricao=el.ementa_format,
                     tipo_materia=el.loa.materia.tipo.id if el.loa.materia else '',
                     numero_materia=el.loa.materia.numero if el.loa.materia else '',
@@ -1266,10 +1291,11 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                     </a>
                 '''
-                # {link_create_proposicao_pre_preenchida} <i class="fas fa-2x fa-magic"></i>
+                # {link_create_proposicao_pre_preenchida} <i class="fas fa-2x fa-magic"></i>"""
 
+                title = 'Gerar Proposição Legislativa para esta Emenda Impositiva/Modificativa' if not el.proposicao else f'Atualizar a {el.proposicao} vinculada a esta Emenda Impositiva/Modificativa'
                 link_generate_proposicao = f'''
-                    <a href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': el.id})}?register" target="_blank" >
+                    <a title="{title}" href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': el.id})}?register" target="_blank" >
                         <i class="fas fa-2x fa-file-contract"></i>
                     </a>
                 '''
@@ -1629,7 +1655,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     if not proposicao:
                         np_max = Proposicao.objects.filter(
                             autor=autor,
-                            ano=timezone.now().year
+                            ano=self.object.loa.materia.ano if self.object.loa.materia else timezone.now().year,
                             ).aggregate(np=Max('numero_proposicao'))
 
                         proposicao = Proposicao()

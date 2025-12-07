@@ -1437,6 +1437,7 @@ class ProposicaoCrud(Crud):
 
     class ListView(Crud.ListView):
         ordering = ['-data_recebimento', '-data_envio', '-id']
+        paginate_by = 50
 
         def hook_header_detalhe(self, *args, **kwargs):
             return 'Proposição'
@@ -1445,6 +1446,16 @@ class ProposicaoCrud(Crud):
             return '''
                 <strong>{}</strong><br>{}<br><small><i>Registrado por: {}</i></small>
             '''.format(args[0], args[0].descricao, args[0].user), args[2]
+
+        def existe_emendaloa_sendo_gerada(self):
+            from cmj.loa.models import EmendaLoa
+
+            u = self.request.user
+            autor = u.operadorautor_set.all().first().autor
+            return EmendaLoa.objects.filter(
+                owner__in= autor.operadores.all(),
+                metadata__has_key='register_emendaloa_proposicao_task'
+            ).exists()
 
         def get_queryset(self):
             qs = super().get_queryset()

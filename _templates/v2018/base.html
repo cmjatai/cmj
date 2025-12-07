@@ -111,10 +111,10 @@
                   <div class="clearfix">
                     {% block title %}
                       <h1 class="page-header {{bg_title}}">
-                        {% if view.title %}
-                          {{ view.title|safe|linebreaksbr }}
-                        {% elif title %}
+                        {% if title %}
                           {{ title|safe|linebreaksbr }}
+                        {% elif view.title %}
+                          {{ view.title|safe|linebreaksbr }}
                         {% elif object %}
                           {{ object|safe|linebreaksbr }}
                         {% endif %}
