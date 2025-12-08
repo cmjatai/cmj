@@ -660,6 +660,23 @@ class LoaCrud(Crud):
 
             return 'Resumo Por Entidades <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>', rendered
 
+class DespesaCrud(MasterDetailCrud):
+    model = Despesa
+    parent_field = 'loa'
+    public = [RP_LIST, RP_DETAIL]
+    ordered_list = False
+    frontend = Loa._meta.app_label
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class ListView(MasterDetailCrud.ListView):
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} despesa-list'
+            return context
+
 class UnidadeOrcamentariaCrud(MasterDetailCrud):
     model = UnidadeOrcamentaria
     parent_field = 'loa'

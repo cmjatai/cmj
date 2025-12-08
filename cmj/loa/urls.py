@@ -14,6 +14,7 @@ urlpatterns = [
         r'^loa',
         include(
             views.LoaCrud.get_urls() +
+            views.DespesaCrud.get_urls() +
             views.EmendaLoaCrud.get_urls() +
             views.OficioAjusteLoaCrud.get_urls() +
             views.RegistroAjusteLoaCrud.get_urls() +

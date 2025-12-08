@@ -1,6 +1,8 @@
 {% load i18n common_tags%}
 - title: {% trans 'Resumo' %}
   url: loa_detail
+- title: {% trans 'Despesas' %}
+  url: despesa_list
 - title: {% trans 'Emendas Impositivas/Modificativas' %}
   url: emendaloa_list
 {% if perms.loa.emendaloa_full_editor %}

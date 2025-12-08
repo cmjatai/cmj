@@ -1,6 +1,6 @@
 <template>
   <div class="vue-loa-detail">
-    <h2 class="legend">Resumo Gráfico das Despesas Orçamentárias da LOA<br><small>(Valores originais do projeto do Poder Executivo, sem aplicação das Emendas Impositivas)</small></h2>
+    <h2 class="pt-4 legend">Resumo Gráfico das Despesas Orçamentárias da LOA<br><small>(Valores originais do projeto do Poder Executivo, sem aplicação das Emendas Impositivas)</small></h2>
     <div class="container" v-if="!loa.ano || !chartDataLoa">
       <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
     </div>

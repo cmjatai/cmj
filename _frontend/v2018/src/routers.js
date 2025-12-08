@@ -37,7 +37,7 @@ export const routes = [
         component: () => import('@/modules/loa/LoaList')
       },
       {
-        path: ':pkloa(\\d+)',
+        path: ':pkloa(\\d+)/despesa',
         name: 'loadetail_route',
         component: () => import('@/modules/loa/LoaDetail')
       },

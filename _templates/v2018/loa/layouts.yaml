@@ -18,6 +18,10 @@ LoaDetailATE2022:
   {% trans 'Dados Gerais da LOA' %}:
   - ano:3 materia_ou_norma
 
+Despesa:
+  {% trans 'Dados Gerais' %}:
+  - orgao unidade funcao subfuncao programa acao natureza fonte
+
 UnidadeOrcamentaria:
   {% trans 'Dados Gerais' %}:
   - codigo:3 especificacao:6 area:3
