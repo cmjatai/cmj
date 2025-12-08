@@ -110,7 +110,7 @@
                 {% block base_header %}
                   <div class="clearfix">
                     {% block title %}
-                      <h1 class="page-header {{bg_title}}">
+                      <h2 class="page-header {{bg_title}}">
                         {% if title %}
                           {{ title|safe|linebreaksbr }}
                         {% elif view.title %}
@@ -118,7 +118,7 @@
                         {% elif object %}
                           {{ object|safe|linebreaksbr }}
                         {% endif %}
-                      </h1>
+                      </h2>
                     {% endblock %}
                   </div>
                 {% endblock base_header %}
@@ -136,11 +136,11 @@
 
               {% block subtitle %}
                   {% if subtitle and '<' not in subtitle %}
-                    <h2 class="page-header p-0 px-4">
+                    <h3 class="page-header p-0 px-4">
                       <small><small>
                         <em>{{ subtitle }}</em>
                       </small></small>
-                    </h2>
+                    </h3>
                   {% elif subtitle %}
                     {{ subtitle|safe }}
                   {% endif %}

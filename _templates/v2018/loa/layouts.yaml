@@ -52,7 +52,7 @@ EmendaLoaDetail:
   col-12 1:
     {% trans 'Dados Gerais' %}:
       col-md-8:
-      - tipo:5 fase:7
+      - tipo:4 fase:8
       - materia|fk_urlize_for_detail
       - entidade
       - indicacao

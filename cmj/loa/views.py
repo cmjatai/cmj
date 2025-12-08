@@ -1202,7 +1202,16 @@ class EmendaLoaCrud(MasterDetailCrud):
                     for i in range(0, len(agrupamento), 2):
                         part = key[i]
                         if part:
-                            title_parts.append(f'{part} - {key[i+1]}')
+                            title_parts.append((part, key[i+1]))
+
+                    codigo, titulo = zip(*title_parts)
+                    max_lenght_codigo = max(map(len, codigo))
+                    codigo = list(map(lambda x: x.rjust(max_lenght_codigo, ' '), codigo))
+                    codigo = list(map(lambda x: x.replace(' ', '&nbsp;'), codigo))
+                    title_parts = []
+                    for i in range(len(codigo)):
+                        title_parts.append(f'<strong>{codigo[i]}</strong> - {titulo[i]}')
+
                     title = '<br>'.join(title_parts)
 
                     columns = ['Emendas', 'Valores das Emendas']
@@ -1249,7 +1258,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                             registros.append(f'<li>{" - ".join(rc)}</li>')
 
                         cols[0][0] = cols[0][0].replace(
-                            '<ul></ul>', f'<small class="courier"><small>AÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
+                            '<ul></ul>', f'<small class="courier"><small>DOTAÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
 
                     agrupamento_soma = list(map(lambda x: '__'.join(x.split('__')[1:]), agrupamento))
 

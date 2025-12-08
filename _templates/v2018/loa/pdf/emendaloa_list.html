@@ -31,19 +31,19 @@
 
   <h2>{{title|safe}}</h2>
   {% if filters %}
-    <small>{{filters|safe}}</small><br>
+    <small>{{filters|safe}}</small><br><br>
   {% endif %}
 
   {% for group in groups %}
     {% if group.title %}
-      <h5>{{group.title|safe}}</h5>
+      <div class="title_group">{{group.title|safe}}</div>
     {% else %}
       <br>
     {% endif %}
 
-    <div class="courier">
+    <div class="courier text-right">
       {% if tipo_agrupamento and tipo_agrupamento != 'sem_registro' %}
-      <small><small><em>Orçamento Original: {{group.soma_valor_orcamento}} | Movimentação Geral: {{group.movimentacao_valores}} | Saldo: {{group.saldo_orcamento}}</em></small></small>
+      <small><small><em>Orçamento Original: <strong>{{group.soma_valor_orcamento}}</strong> | Movimentação Geral: <strong>{{group.movimentacao_valores}}</strong> | Saldo: <strong>{{group.saldo_orcamento}} *</strong> </em></small></small>
       {% endif %}
     </div>
 
@@ -64,7 +64,7 @@
           </tr>
 
           {% if forloop.last %}
-            {% if not tipo_agrupamento or tipo_agrupamento == 'sem_registro' %}
+            {% if True or not tipo_agrupamento or tipo_agrupamento == 'sem_registro' %}
                 <tr>
                   <td class="text-right sub-total" {% if group.ncols_menos2 > 0 %}colspan="{{group.ncols_menos1}}"{% endif %}>
                     <strong>SubTotais:</strong>
@@ -80,40 +80,35 @@
     </table>
     {% if forloop.last %}
       {% if not tipo_agrupamento or tipo_agrupamento == 'sem_registro' %}
-          <hr>
-          <div class="text-right">
-            Total: {{total}}
-          </div>
+        <hr>
+        <div class="text-right">
+          Total: {{total}}
+        </div>
       {% else %}
-          <hr>
-          <div>
+        <div>
+          <small>
             <small>
-              <small>
-                <em>
-                  OBS 1: Uma linha com subtotais ao fim de cada tabela
-                    listada acima é colocada apenas quando feito a listagem
-                    "Via Valor da Emenda" pois, a depender dos lançamentos
-                    de contábeis de dedução e inserção, <b>em outra via de totalização</b>,
-                    uma mesma Emenda pode aparecer em mais de um Agrupamento/Totalizador.
-                    Do mesmo modo, uma linha de "TOTAL:" ao final com a soma geral
-                    só faz sentido quando o tipo de agrupamento é "Via Valor da Emenda"
-                </em>
-              </small>
+              <em>
+                * Os valores de "Orçamento Original", "Movimentação Geral" e "Saldo"
+                mostrados no inicio de cada tabela são a totalização da base inteira
+                de emendas com registros contábeis do agrupamento e não particularizados pelos filtros aplicados, caso existam.
+              </em>
             </small>
-          </div>
-          <hr>
-          <div>
+          </small>
+        </div>
+        <hr>
+        <div>
+          <small>
             <small>
-              <small>
-                <em>
-                  OBS 2: Os valores de "Orçamento Original", "Movimentação Geral" e "Saldo"
-                  mostrados no inicio de cada tabela são a totalização da base inteira
-                  de emendas com registros contábeis e não particularizados pelos filtros aplicados.
-                </em>
-              </small>
+              <em>
+                **: Uma linha de "TOTAL:" ao final com a soma geral só faz sentido quando o tipo de agrupamento é "Via Valor da Emenda" pois, se agrupado por inserção/dedução, uma emenda pode aparecer em mais de um grupo.
+              </em>
             </small>
-          </div>
+          </small>
+        </div>
       {% endif %}
+    {% else %}
+      <div class="new-page"></div>
     {% endif %}
   {% empty %}
     <h4>

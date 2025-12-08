@@ -2753,8 +2753,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                             ), 12
                         ),
                         ('descricao', 12),
-                        ('emendaloa', 6),
-                        ('observacao', 6)
+                        ('emendaloa', 8),
+                        ('observacao', 4)
                     ]
                 ),
             )
