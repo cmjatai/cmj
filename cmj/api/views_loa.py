@@ -456,11 +456,12 @@ class _LoaViewSet:
 
 
         # TODO: refatorar "sql_geral" para usar o modelo de dados de view não gerenciada pelo django
-        sql_geral = f"""SELECT
+        sql_geral = f"""SELECT distinct
                             d.id,
                             d.valor_materia,
                             loa.ano || '.' || o.codigo || '.' || u.codigo || '.' || f.codigo || '.' || sf.codigo || '.' || p.codigo || '.' || a.codigo || '.' || n.codigo || '.' || fte.codigo as codigo,
-                            loa.ano || o.codigo || u.codigo || f.codigo || sf.codigo || p.codigo || a.codigo || n.codigo || fte.codigo as codigo_base
+                            loa.ano || o.codigo || u.codigo || f.codigo || sf.codigo || p.codigo || a.codigo || n.codigo || fte.codigo as codigo_base,
+                            SUM(elrc.valor) OVER (PARTITION BY d.id) AS soma_registroscontabeis
                         from loa_despesa d
                             inner join loa_loa             loa on (loa.id = d.loa_id)
                             inner join loa_orgao             o on (  o.id = d.orgao_id)
@@ -471,6 +472,7 @@ class _LoaViewSet:
                             inner join loa_acao              a on (  a.id = d.acao_id)
                             inner join loa_natureza          n on (  n.id = d.natureza_id)
                             inner join loa_fonte           fte on (fte.id = d.fonte_id)
+                            left outer join loa_emendaloaregistrocontabil elrc on (elrc.despesa_id = d.id)
                             where loa.id = {loa.pk} {filter_sql} order by codigo_base
         """
 
@@ -478,13 +480,14 @@ class _LoaViewSet:
             (
                 SELECT DISTINCT
                     Substr(codigo_base, 1, {partcb}) AS codigo_base, Substr(codigo, 1, {partc}) AS codigo,
-                    SUM(valor_materia) AS soma
+                    SUM(valor_materia) AS soma,
+                    SUM(soma_registroscontabeis) AS soma_registroscontabeis
                     FROM (
                         {sql_geral}
                     ) todas_as_despesas
                         GROUP BY
                             Substr(codigo_base, 1, {partcb}), Substr(codigo, 1, {partc})
-                            HAVING SUM(valor_materia) > 0
+                            /* HAVING SUM(valor_materia) > 0*/
                         order by codigo_base
             )
         """
@@ -533,6 +536,7 @@ class _LoaViewSet:
                         else ''
                 END as especificacao
             """,
+            'geral.soma_registroscontabeis',
         ]
 
         sql_for_run = f"""
@@ -570,13 +574,18 @@ class _LoaViewSet:
 
             # remove natureza da despesa do tipo X.X.XX.XX.00 se este for igual a X.X.XX.XX
             if lr == 41 and r[1][-2:] == '00':
-                if r[2:4] == results[i - 1][2:4]:
+                if r[2:5] == results[i - 1][2:5]:
                     continue
 
             r = list(r)
+            r[2] = r[2] or Decimal(0)  # valor_materia
+            r[4] = r[4] or Decimal(0)  # emendas_impositivas
+            r.append((r[2] + r[4]))  # saldo
             rs.append(r)
 
             d2s = decimal2str(r[2])
+            dEmendas2s = decimal2str(r[4]) if r[4] else ''
+            dSaldo2s = decimal2str(r[5]) if r[5] else ''
 
             if lr in (7,) or lr <= lr_old or value != r[2]:
                 value = r[2]
@@ -586,15 +595,18 @@ class _LoaViewSet:
             else:
                 r[2] = ''
 
+            r[4] = '<strong>' + dEmendas2s + '</strong>' if r[2] and r[4] else ''
+            r[5] = '<strong>' + dSaldo2s + '</strong>' if r[2] and r[5] else ''
+
             lr_old = lr
 
             r[0] = r[0][5:]
             r[3] = r[3] or ''
             if len(r[0]) > 36:
-                r[0] = f'{"&nbsp;" * 34}{r[0][36:]}'
+                r[0] = f'{"&nbsp;" * 5}{r[0][36:]}'  # 34 space - original
                 r[3] = '<small>' + r[3] + '</small>'
             elif len(r[0]) > 23:
-                r[0] = f'{"&nbsp;" * 22}{r[0][23:]}'
+                r[0] = f'{"&nbsp;" * 1}{r[0][23:]}' # 22 space - original
             else:
                 r[3] = '<strong>' + r[3] + '</strong>'
 

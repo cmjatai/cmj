@@ -105,17 +105,26 @@
         <div class="col-12 mt-3" v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
 
         <div class="col-12 mt-3" v-if="espelho">
+          <h2 class="legend">Espelho das Despesas Orçamentárias da LOA<br><small>(Valores com Emendas Impositivas Aplicadas)</small></h2>
+          <label for="check_filter" class="d-block mb-2 text-right text-blue">
+            <input type="checkbox" id="check_filter" v-model="check_filter" />
+            Mostrar apenas itens alterados por Emendas Impositivas
+          </label>
           <table class="table table-sm table-bordered table-striped table_espelho">
             <thead>
               <tr>
                 <th>Código / Especificação</th>
-                <th>Valor</th>
+                <th>Valor Orçamentário</th>
+                <th>Emendas Impositivas</th>
+                <th>Saldo</th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(value, key) in espelho" :key="key">
+              <tr v-for="(value, key) in espelho_filtered" :key="key">
                 <td v-html="value[0] + ' - ' + value[3]"></td>
                 <td v-html="value[2]"></td>
+                <td v-html="value[4]"></td>
+                <td v-html="value[5]"></td>
               </tr>
             </tbody>
           </table>
@@ -170,6 +179,7 @@ export default {
   },
   data () {
     return {
+      check_filter: false,
       loa: {
         id: this.$route.params.pkloa
       },
@@ -270,6 +280,18 @@ export default {
     }
   },
   computed: {
+    espelho_filtered: function () {
+      if (!this.espelho) {
+        return []
+      }
+      if (!this.check_filter) {
+        return this.espelho
+      }
+      //  item[4] é uma string, filtra se vazio
+      return this.espelho.filter(item => {
+        return item[4] && item[4] !== ''
+      })
+    },
     qs_loa: function () {
       const value = this.loa.id
       return value ? `&loa=${value}&despesa_set__isnull=False` : ''
@@ -783,7 +805,7 @@ export default {
     }
     .fonte {
       font-family: 'Courier New', Courier, monospace;
-      font-size: 80%;
+      font-size: 75%;
       a {
         text-decoration: underline;
       }
@@ -798,15 +820,15 @@ export default {
     font-size: 90%;
     th, td {
       font-family: 'Courier New', Courier, monospace;
-      padding: 0.1rem 0.3rem;
+      padding: 0.1rem 0.2rem;
       vertical-align: top;
     }
     td:nth-child(1) {
       // font-size: 75%;
       // font-weight: 600;
     }
-    td:nth-child(2) {
-      width: 15%;
+    td:nth-child(2), td:nth-child(3) , td:nth-child(4) {
+      width: 12%;
       text-align: right;
       white-space: nowrap;
     }

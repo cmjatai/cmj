@@ -1360,7 +1360,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             ''', args[2]
 
         def hook_fase(self, *args, **kwargs):
-            fase_display = f'<br><small class="text-nowrap">({args[0].get_fase_display()})</small>'
+            fase_display = f'<br><small>({args[0].get_fase_display()})</small>'
             el = args[0]
             link_pdf = ''
             if el.fase == EmendaLoa.IMPEDIMENTO_TECNICO:

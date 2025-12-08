@@ -8,7 +8,7 @@ from unicodedata import normalize as unicodedata_normalize
 import logging
 import re
 import ssl
-import subprocess 
+import subprocess
 import threading
 from django import forms
 from django.forms import TextInput
@@ -135,7 +135,7 @@ def decimal2str(
 ) -> str:
     try:
         value = quantize(
-            value, decimal_places=DECIMAL_PLACES[decimal_places], rounding=rounding
+            value or decimal.Decimal('0'), decimal_places=DECIMAL_PLACES[decimal_places], rounding=rounding
         )
 
         return formats.number_format(
