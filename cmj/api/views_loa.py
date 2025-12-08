@@ -552,6 +552,7 @@ class _LoaViewSet:
             """
 
         with TimeExecution(): #'gerar_espelho'
+            #print('Running SQL for espelho:', sql_for_run)
             results = run_sql(sql_for_run)
 
         rs = []
@@ -969,12 +970,12 @@ class _EmendaLoaViewSet:
             q = Q()
 
             for termo in query:
-                q &= (Q(unidade__especificacao__icontains=termo) |
-                      Q(entidade__razao_social__icontains=termo) |
-                      Q(entidade__nome_fantasia__icontains=termo) |
-                      Q(entidade__cnes__icontains=termo) |
-                      Q(entidade__cpfcnpj__icontains=termo) |
-                      Q(finalidade__icontains=termo))
+                q &= (Q(unidade__especificacao__unaccent__icontains=termo) |
+                      Q(entidade__razao_social__unaccent__icontains=termo) |
+                      Q(entidade__nome_fantasia__unaccent__icontains=termo) |
+                      Q(entidade__cnes__unaccent__icontains=termo) |
+                      Q(entidade__cpfcnpj__unaccent__icontains=termo) |
+                      Q(finalidade__unaccent__icontains=termo))
 
             qs = qs.filter(fase__lt=EmendaLoa.LIBERACAO_CONTABIL, loa__ano=ano)
             if query:
@@ -1024,15 +1025,15 @@ class _DespesaConsulta:
             q = Q()
 
             for termo in query:
-                q &= (Q(codigo__icontains=termo) |
-                      Q(especificacao__icontains=termo) |
-                      Q(cod_orgao__icontains=termo) |
-                      Q(esp_orgao__icontains=termo) |
-                      Q(cod_unidade__icontains=termo) |
-                      Q(esp_unidade__icontains=termo) |
-                      Q(cod_natureza__icontains=termo) |
-                      Q(esp_natureza__icontains=termo) |
-                      Q(cod_fonte__icontains=termo))
+                q &= (Q(codigo__unaccent__icontains=termo) |
+                      Q(especificacao__unaccent__icontains=termo) |
+                      Q(cod_orgao__unaccent__icontains=termo) |
+                      Q(esp_orgao__unaccent__icontains=termo) |
+                      Q(cod_unidade__unaccent__icontains=termo) |
+                      Q(esp_unidade__unaccent__icontains=termo) |
+                      Q(cod_natureza__unaccent__icontains=termo) |
+                      Q(esp_natureza__unaccent__icontains=termo) |
+                      Q(cod_fonte__unaccent__icontains=termo))
 
             qs = qs.filter(loa__ano=ano)
             if query:
