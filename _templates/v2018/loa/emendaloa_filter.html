@@ -18,3 +18,19 @@
 <hr>
 {% crispy filter.form %}
 {% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.btn-register-emendas-liberadas').on('click', function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+            if (confirm('Confirma a criação automatizada de proposições para suas emendas em fase "Liberado pela Contabilidade e/ou Aguardando Protocolo"? Você poderá acompanhar o andamento no módulo de proposições.')) {
+                window.location.href = url;
+            } else {
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}

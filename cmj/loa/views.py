@@ -859,7 +859,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 ),
                 (
                     reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?register',
-                    'btn-warning',
+                    'btn-warning btn-register-emendas-liberadas',
                     '''<span title="Registrar todas as emendas Liberadas no módulo de proposições. Emendas já registradas serão atualizadas se ainda não enviadas ao protocolo.">
                         <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas</span>
                     '''
@@ -891,7 +891,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             if 'register' in self.request.GET:
                 messages.info(
                     self.request,
-                    'Iniciando o registro das emendas liberadas no módulo de proposições... atualize esta página para acompanhar o progresso.'
+                    'Iniciando o registro aqui no módulo de proposições das emendas liberadas... atualize esta página para acompanhar o progresso.'
                 )
                 params_task = (
                     self.loa.id,
