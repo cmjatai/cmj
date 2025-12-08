@@ -36,7 +36,7 @@
 
   {% for group in groups %}
     {% if group.title %}
-      <h5>{{group.title}}</h5>
+      <h5>{{group.title|safe}}</h5>
     {% else %}
       <br>
     {% endif %}

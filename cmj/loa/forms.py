@@ -939,23 +939,22 @@ class EmendaLoaFilterSet(FilterSet):
         widget=forms.CheckboxSelectMultiple(attrs={'class': 'small'})
     )
 
-    agrupamento = ChoiceFilter(
+    agrupamento = MultipleChoiceFilter(
         required=False,
         label=_('Totalizar listagem por:'),
         choices=list(
             {
-                'model_orgao': 'Órgãos',
-                'model_unidadeorcamentaria': 'Unidades Orçamentárias',
-                'model_funcao': 'Funções',
-                'model_subfuncao': 'SubFunções',
-                'model_programa': 'Programas',
-                'model_acao': 'Ações',
-                'model_fonte': 'Fonte de Recursos',
-                # 'choice_tipo': 'Tipo de Emenda',
-                # 'choice_fase': 'Fase de Emenda'
+                'despesa__orgao': 'Órgãos',
+                'despesa__unidade': 'Unidades Orçamentárias',
+                'despesa__funcao': 'Funções',
+                'despesa__subfuncao': 'SubFunções',
+                'despesa__programa': 'Programas',
+                'despesa__acao': 'Ações',
+                'despesa__natureza': 'Natureza da Despesa',
+                'despesa__fonte': 'Fonte de Recursos',
             }.items()),
-        method='filter_agrupamento'
-
+        method='filter_agrupamento',
+        widget=forms.CheckboxSelectMultiple(attrs={'class': 'small'})
     )
 
     tipo_agrupamento = ChoiceFilter(

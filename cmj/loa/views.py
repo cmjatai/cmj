@@ -3,10 +3,12 @@ import io
 import logging
 import re
 
+from attr import fields
 import fitz
 import requests
 import tempfile
 import zipfile
+from _collections import OrderedDict
 
 from urllib.parse import urlencode
 from django.conf import settings
@@ -30,7 +32,7 @@ from django.utils.text import slugify
 from cmj.core.models import AuditLog
 from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, PrestacaoContaLoaForm, PrestacaoContaRegistroForm,\
     RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
-from cmj.loa.models import Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro,\
+from cmj.loa.models import Despesa, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
 from cmj.utils import get_client_ip
@@ -40,6 +42,7 @@ from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Legislatura, Parlamentar
 
 from . import tasks
+from cmj import loa
 
 class LoaContextDataMixin:
 
@@ -836,7 +839,6 @@ class EmendaLoaCrud(MasterDetailCrud):
         filterset_class = EmendaLoaFilterSet
         paginate_by = 25
 
-
         @property
         def extras_url(self):
             if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
@@ -1061,7 +1063,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 return col_emenda
 
             total = Decimal('0.00')
-            if not cd['agrupamento']:
+            if not cd.get('agrupamento', []):
 
                 if not self.object_list.exists():
                     return context
@@ -1102,131 +1104,164 @@ class EmendaLoaCrud(MasterDetailCrud):
                 context['groups'].append(group)
 
             else:
-                agrup = cd['agrupamento'].split('_')
+                agrupamento1 = list(map(lambda x: f'{x}__codigo', cd['agrupamento']))
+                agrupamento2 = list(map(lambda x: f'{x}__especificacao', cd['agrupamento']))
+                agrupamento = []
+                for i in range(len(agrupamento1)):
+                    agrupamento.append(agrupamento1[i])
+                    agrupamento.append(agrupamento2[i])
 
-                if agrup[0] == 'model':
+                # agrupamento terá itens strings como:
+                # ['despesa__programa__codigo', 'despesa__unidade__codigo']
+                # desmembre todos de modo que resulte: 'despesa', 'despesa__programa', 'despesa__programa__codigo'
+                agrup = set()
+                for ag in agrupamento:
+                    parts = ag.split('__')
+                    for i in range(1, len(parts) + 1):
+                        sub_ag = '__'.join(parts[:i])
+                        if sub_ag not in agrup:
+                            agrup.add(sub_ag)
+                agrup = list(agrup)
 
-                    ct = ContentType.objects.get_by_natural_key(
-                        'loa', agrup[1])
-                    model = ct.model_class()
 
-                    if agrup[1] == 'unidadeorcamentaria':
-                        agrup[1] = 'unidade'
+                emendas_filtradas_ids = self.object_list.values_list('id', flat=True)
+                emendas_dict = { e.id: e for e in self.object_list}
 
-                    via = ''
-                    if cd['tipo_agrupamento'] == 'insercao':
-                        via = ' - Via dotações de inserção.'
-                    elif cd['tipo_agrupamento'] == 'deducao':
-                        via = ' - Via dotações de dedução.'
+                via = ''
+                if cd['tipo_agrupamento'] == 'insercao':
+                    via = '<br>* Agrupado  - Via dotações de inserção.'
+                elif cd['tipo_agrupamento'] == 'deducao':
+                    via = '<br>* Agrupado  - Via dotações de dedução.'
+                else:
+                    via = '<br>* Agrupado  - Via Unidade Orçamentária.'
+                context['title'] = context['title'].format(
+                    f'{via}'
+                )
 
-                    context['title'] = context['title'].format(
-                        f'<br>* Agrupado por: {model._meta.verbose_name}{via}'
-                    )
+                groups = OrderedDict()
+
+                if cd['tipo_agrupamento'] != 'sem_registro':
+                    lookup_totalizador = 'gt' if cd['tipo_agrupamento'] == 'insercao' else 'lt'
+
+                    agrup.extend(['emendaloa', 'valor'])
+                    registros_contabeis = EmendaLoaRegistroContabil.objects.filter(
+                        emendaloa__in=emendas_filtradas_ids,
+                        **{f'valor__{lookup_totalizador}': Decimal('0.00')},
+                    ).order_by(*agrupamento, 'emendaloa').values(*agrup).distinct()
+
+                    for rc in registros_contabeis:
+
+                        key = tuple()
+                        for ag in agrupamento:
+                            key += (rc[ag], )
+                        if key not in groups:
+                            groups[key] = {
+                                'emendas': OrderedDict(),
+                                'soma_valor': Decimal('0.00')
+                            }
+
+                        emenda = emendas_dict.get(rc['emendaloa'])
+                        if not emenda:
+                            continue
+
+                        if rc['emendaloa'] not in groups[key]['emendas']:
+                            groups[key]['emendas'][rc['emendaloa']] = emenda
+                        groups[key]['soma_valor'] += rc['valor']
+
+                else:
+                    for emenda in self.object_list:
+                        key = (emenda.unidade.codigo, emenda.unidade.especificacao)
+                        if key not in groups:
+                            groups[key] = {
+                                'emendas': OrderedDict(),
+                                'soma_valor': Decimal('0.00')
+                            }
+                        groups[key]['emendas'][emenda.id] = emenda
+                        groups[key]['soma_valor'] += emenda.valor
+
+
+                for key, cd_group in groups.items():
+                    title_parts = []
+                    for i in range(0, len(agrupamento), 2):
+                        part = key[i]
+                        if part:
+                            title_parts.append(f'{part} - {key[i+1]}')
+                    title = '<br>'.join(title_parts)
 
                     columns = ['Emendas', 'Valores das Emendas']
 
                     if not cd['tipo'] or len(cd['tipo']) > 1:
                         columns.insert(1, 'Tipos')
 
-                    lookup_ta = 'gt' if cd['tipo_agrupamento'] == 'insercao' else 'lt'
-                    for im in model.objects.filter(loa=self.loa):
-                        columns = columns[:]
 
-                        if 'sem_registro' in cd['tipo_agrupamento']:
-                            object_list = self.object_list.filter(
-                                unidade=im
-                            )
-                        else:
-                            try:
-                                object_list = self.object_list.filter(
-                                    **{f'registrocontabil_set__valor__{lookup_ta}': Decimal('0.00'),
-                                        f'registrocontabil_set__despesa__{agrup[1]}': im,
-                                       }
-                                )
-                            except Exception as e:
-                                print(e)
+                    sub_total_emendas = cd_group['soma_valor'].quantize(Decimal('0.01'))
 
-                        if not object_list.exists():
-                            continue
+                    total += sub_total_emendas
+                    movimentacao_valores = Decimal('0.00')
+                    rows = []
+                    for item in cd_group['emendas'].values():
+                        cols = []
+                        rows.append(cols)
 
-                        sub_total_emendas = object_list.aggregate(Sum('valor'))
+                        col_emenda = render_col_emenda(item, )
+                        cols.append([col_emenda, ''])
 
-                        total += sub_total_emendas['valor__sum']
-                        movimentacao_valores = Decimal('0.00')
-                        rows = []
-                        for item in object_list:
-                            cols = []
-                            rows.append(cols)
+                        if not cd['tipo'] or len(cd['tipo']) > 1:
+                            cols.append(
+                                (item.get_tipo_display(), 'text-center'))
 
-                            col_emenda = render_col_emenda(item, )
-                            cols.append([col_emenda, ''])
+                        cols.append([item.str_valor, 'text-right'])
 
-                            if not cd['tipo'] or len(cd['tipo']) > 1:
-                                cols.append(
-                                    (item.get_tipo_display(), 'text-center'))
+                        qs_rc = item.registrocontabil_set.order_by('valor')
 
-                            cols.append([item.str_valor, 'text-right'])
+                        registros = []
+                        for rc in qs_rc:
 
-                            if 'sem_registro' in cd['tipo_agrupamento']:
-                                continue
+                            rc = str(rc).split(' - ')
+                            if '-' not in rc[0]:
+                                rc0_split = rc[0].split(' ')
+                                rc0_split[-1] = f'+{rc0_split[-1]}'
+                                rc[0] = ' '.join(rc0_split)
+                                while len(rc[0]) < 17:
+                                    rc[0] = rc[0].replace(' ', '  ', 1)
+                            if '-' in rc[0]:
+                                while len(rc[0]) < 18:
+                                    rc[0] = rc[0].replace(' ', '  ', 1)
 
-                            qs_rc = item.registrocontabil_set.order_by('valor')
+                            rc[0] = rc[0].replace(' ', '&nbsp;')
+                            registros.append(f'<li>{" - ".join(rc)}</li>')
 
-                            registros = []
-                            for rc in qs_rc:
+                        cols[0][0] = cols[0][0].replace(
+                            '<ul></ul>', f'<small class="courier"><small>AÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
 
-                                rc = str(rc).split(' - ')
-                                if '-' not in rc[0]:
-                                    rc0_split = rc[0].split(' ')
-                                    rc0_split[-1] = f'+{rc0_split[-1]}'
-                                    rc[0] = ' '.join(rc0_split)
-                                    while len(rc[0]) < 17:
-                                        rc[0] = rc[0].replace(' ', '  ', 1)
-                                if '-' in rc[0]:
-                                    while len(rc[0]) < 18:
-                                        rc[0] = rc[0].replace(' ', '  ', 1)
+                    agrupamento_soma = list(map(lambda x: '__'.join(x.split('__')[1:]), agrupamento))
 
-                                rc[0] = rc[0].replace(' ', '&nbsp;')
-                                registros.append(f'<li>{" - ".join(rc)}</li>')
+                    soma_valor_orcamento = Despesa.objects.filter(
+                        loa=self.loa,
+                        **dict(zip(agrupamento_soma, key))
+                    ).order_by(*agrupamento_soma).distinct().aggregate(Sum('valor_materia'))
+                    soma_valor_orcamento = soma_valor_orcamento.get(
+                        'valor_materia__sum'
+                    ) or Decimal('0.00')
 
-                            cols[0][0] = cols[0][0].replace(
-                                '<ul></ul>', f'<small class="courier"><small>AÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
+                    params = dict(zip(agrupamento, key))
+                    movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
+                        emendaloa__loa=self.loa,
+                        **params
+                    ).order_by(*agrupamento).aggregate(Sum('valor')).get('valor__sum') or Decimal('0.00')
 
-                            """deducao_insercao = qs_rc.filter(
-                                **{
-                                    f'valor__{lookup_ta}': Decimal('0.00'),
-                                    f'despesa__{agrup[1]}': im
-                                }
-                            ).aggregate(
-                                Sum('valor')
-                            ).get('valor__sum', Decimal('0.00'))
-
-                            deducao_insercao = formats.number_format(
-                                deducao_insercao, force_grouping=True)
-                            cols[-1][0] = f'{cols[-1][0]}<hr>{deducao_insercao}'"""
-
-                        soma_valor_orcamento = im.despesa_set.aggregate(
-                            Sum('valor_materia'))
-                        soma_valor_orcamento = soma_valor_orcamento.get(
-                            'valor_materia__sum'
-                        ) or Decimal('0.00')
-
-                        movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
-                            **{f'despesa__{agrup[1]}': im}
-                        ).aggregate(Sum('valor')).get('valor__sum') or Decimal('0.00')
-
-                        group = {
-                            'title': str(im),
-                            'columns': columns,
-                            'ncols_menos2': len(columns) - 2,
-                            'ncols_menos1': len(columns) - 1,
-                            'rows': rows,
-                            'soma_valor_orcamento':  formats.number_format(soma_valor_orcamento, force_grouping=True),
-                            'saldo_orcamento': formats.number_format(soma_valor_orcamento + movimentacao_valores, force_grouping=True),
-                            'movimentacao_valores': formats.number_format(movimentacao_valores, force_grouping=True),
-                            'sub_total_emendas': formats.number_format(sub_total_emendas['valor__sum'], force_grouping=True)
-                        }
-                        context['groups'].append(group)
+                    group = {
+                        'title': title,
+                        'columns': columns,
+                        'ncols_menos2': len(columns) - 2,
+                        'ncols_menos1': len(columns) - 1,
+                        'rows': rows,
+                        'soma_valor_orcamento':  formats.number_format(soma_valor_orcamento, force_grouping=True),
+                        'saldo_orcamento': formats.number_format(soma_valor_orcamento + movimentacao_valores, force_grouping=True),
+                        'movimentacao_valores': formats.number_format(movimentacao_valores, force_grouping=True),
+                        'sub_total_emendas': formats.number_format(sub_total_emendas, force_grouping=True)
+                    }
+                    context['groups'].append(group)
             context['total'] = formats.number_format(
                 total, force_grouping=True)
 

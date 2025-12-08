@@ -107,44 +107,34 @@ export default class EmendaLoaList {
       form.submit()
     }
 
-    const sAgrup = form.find('select[name="agrupamento"]')
+    const sAgrup = form.find('input[type="checkbox"][name="agrupamento"]')
     const rTipoAgrup = form.find('input[type="radio"][name="tipo_agrupamento"]')
     sAgrup.change((event) => {
-      if (event.target.value === '') {
-        rTipoAgrup.filter('[value=sem_registro]').prop('checked', true)
+      if (sAgrup.filter(':checked').length === 0) {
+        rTipoAgrup.filter('[value="sem_registro"]').prop('checked', true)
       }
     }).change()
 
     rTipoAgrup
       .change((event) => {
-        const piscarSAgrup = () => {
-          sAgrup.addClass('bg-yellow')
-          setTimeout(() => {
-            sAgrup.removeClass('bg-yellow')
-            setTimeout(() => {
-              sAgrup.addClass('bg-yellow')
-              setTimeout(() => {
-                sAgrup.removeClass('bg-yellow')
-              }, 400)
-            }, 400)
-          }, 400)
-        }
         if (event.target.checked && event.target.value === 'sem_registro') {
-          sAgrup.find('option:not([value="model_unidadeorcamentaria"])').attr('disabled', 'disabled').addClass('d-none')
-          sAgrup.find('option[value=""]').removeAttr('disabled').removeClass('d-none')
-          sAgrup.val('').change()
-          piscarSAgrup()
+          sAgrup.not('[value="despesa__unidade"]').prop('disabled', true).prop('checked', false).parent().addClass('d-none')
+          sAgrup.filter('[value="despesa__unidade"]').prop('disabled', false).parent().removeClass('d-none')
+          sAgrup.filter('[value="despesa__unidade"]').prop('checked', true)
         } else if (event.target.checked) {
-          sAgrup.find('option').removeAttr('disabled').removeClass('d-none')
-          sAgrup.find('option[value=""]').removeAttr('disabled').addClass('d-none')
-          if (!sAgrup[0].selectedIndex) {
-            sAgrup[0].selectedIndex = 2
-            piscarSAgrup()
+          sAgrup.prop('disabled', false).parent().removeClass('d-none')
+          if (sAgrup.filter(':checked').length === 0) {
+            if (sAgrup.length > 1) {
+              $(sAgrup[1]).prop('checked', true)
+            } else if (sAgrup.length > 0) {
+              $(sAgrup[0]).prop('checked', true)
+            }
           }
         } else {
-          sAgrup.find('option').removeAttr('disabled').removeClass('d-none')
+          sAgrup.prop('disabled', false).parent().removeClass('d-none')
         }
       }).change()
+
     form
       .find('#div_id_parlamentares input[type="checkbox"]')
       .change((event) => {
