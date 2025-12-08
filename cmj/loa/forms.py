@@ -674,7 +674,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
             else:
                 self.fields['fase'].widget.attrs['class'] = 'is-invalid'
-                self.fields['fase'].choices = [(self.instance.fase, self.instance.get_fase_display())]
+                self.fields['fase'].choices = EmendaLoa.FASE_CHOICE[2:4]
 
         if full_editor:
             self.fields.pop('parlamentares__valor')
