@@ -233,15 +233,15 @@
       "path": "css/construct.a9a5f02d.css.gz",
       "publicPath": "/static/v2018/css/construct.a9a5f02d.css.gz"
     },
-    "css/loa.8bbf7868.css": {
-      "name": "css/loa.8bbf7868.css",
-      "path": "css/loa.8bbf7868.css",
-      "publicPath": "/static/v2018/css/loa.8bbf7868.css"
+    "css/loa.0b209a19.css": {
+      "name": "css/loa.0b209a19.css",
+      "path": "css/loa.0b209a19.css",
+      "publicPath": "/static/v2018/css/loa.0b209a19.css"
     },
-    "css/loa.8bbf7868.css.gz": {
-      "name": "css/loa.8bbf7868.css.gz",
-      "path": "css/loa.8bbf7868.css.gz",
-      "publicPath": "/static/v2018/css/loa.8bbf7868.css.gz"
+    "css/loa.0b209a19.css.gz": {
+      "name": "css/loa.0b209a19.css.gz",
+      "path": "css/loa.0b209a19.css.gz",
+      "publicPath": "/static/v2018/css/loa.0b209a19.css.gz"
     },
     "css/npm.unknown.8c2fe9c9.css": {
       "name": "css/npm.unknown.8c2fe9c9.css",
@@ -2496,7 +2496,7 @@
       "js/npm.lodash.b671d9f5.js",
       "js/npm.axios.1f04d043.js",
       "js/1774.466ce24e.js",
-      "css/loa.8bbf7868.css",
+      "css/loa.0b209a19.css",
       "js/loa.eedaa6fe.js"
     ]
   },

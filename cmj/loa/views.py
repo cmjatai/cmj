@@ -1390,8 +1390,14 @@ class EmendaLoaCrud(MasterDetailCrud):
             registrocontabil_insercao_set = emenda.registrocontabil_set.filter(
                 valor__gt=Decimal('0.00')
             )
-            for rc in registrocontabil_insercao_set:
-                render.append(f'<small class="text-gray"><strong>Ação Orçamentária:</strong> {rc.despesa.acao}</small><br>')
+            if registrocontabil_insercao_set.exists():
+                render.append('<small class="text-gray"><strong>Ação Orçamentária:</strong> ')
+                acoes = set()
+                for rc in registrocontabil_insercao_set:
+                    acoes.add(str(rc.despesa.acao))
+                render.append('<br>'.join(list(acoes)))
+
+                render.append('<br></small>')
 
 
             finalidade = emenda.finalidade_format
