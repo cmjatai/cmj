@@ -566,6 +566,9 @@ class _LoaViewSet:
         #parts_codigo =      [4, 7, 10, 13, 17, 22, 28, 41, 46]
         #parts_codigo_base = [4, 6,  8, 10, 13, 17, 22, 34, 37]
 
+        if agrupamento_select in ('natureza_1', 'natureza_2', 'natureza_3', 'natureza_4', 'natureza_5'):
+            agrupamento_select = 'natureza_5'
+
         for i, r in enumerate(results):
             agrupamento = agrupamentos.get(agrupamento_select, 45)
             lr = len(r[0])
@@ -587,28 +590,36 @@ class _LoaViewSet:
             dEmendas2s = decimal2str(r[4]) if r[4] else ''
             dSaldo2s = decimal2str(r[5]) if r[5] else ''
 
+            #if lr in (7,) or lr <= lr_old or value != r[2]:
+            tag = 'small'
             if lr in (7,) or lr <= lr_old or value != r[2]:
                 value = r[2]
-                r[2] = '<strong>' + d2s + '</strong>'
             elif lr in (45,):
-                r[2] = '<em>' + d2s + '</em>'
-            else:
-                r[2] = ''
+                tag = 'em'
 
-            r[4] = '<strong>' + dEmendas2s + '</strong>' if r[2] and r[4] else ''
-            r[5] = '<strong>' + dSaldo2s + '</strong>' if r[2] and r[5] else ''
+            if lr == agrupamento:
+                tag = 'strong'
+
+            r[2] = f'<{tag}>{d2s}</{tag}>'
+
+            r[4] = f'<{tag}>{dEmendas2s}</{tag}>' if r[4] else ''
+            r[5] = f'<{tag}>{dSaldo2s}</{tag}>' if r[5] else ''
 
             lr_old = lr
 
             r[0] = r[0][5:]
             r[3] = r[3] or ''
+
             if len(r[0]) > 36:
-                r[0] = f'{"&nbsp;" * 5}{r[0][36:]}'  # 34 space - original
-                r[3] = '<small>' + r[3] + '</small>'
+                r[0] = f'{"&nbsp;" * 28}{r[0][37:]}'  # 34 space - original
+                r[3] = '<small><em>' + r[3] + '</em></small>'
             elif len(r[0]) > 23:
-                r[0] = f'{"&nbsp;" * 1}{r[0][23:]}' # 22 space - original
+                r[0] = f'{"&nbsp;" * 10}..{r[0][23:]}' # 22 space - original
+                #r[3] = f'<strong>' + r[3] + '</strong>'
             else:
-                r[3] = '<strong>' + r[3] + '</strong>'
+                #r[0] = f'{r[0]}{"&nbsp;" * (min(28, agrupamento) - len(r[0]) - 5)}'
+
+                r[3] = f'<strong>' + r[3] + '</strong>'
 
         return Response(rs)
 
