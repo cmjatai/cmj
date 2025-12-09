@@ -1150,6 +1150,7 @@ class ProposicaoCrud(Crud):
                                     ta = p.texto_articulado.first()
                                     p.hash_code = 'P' + ta.hash() + SEPARADOR_HASH_PROPOSICAO + str(p.pk)
 
+                            p.gerar_hash()
                             p.data_devolucao = None
                             p.data_envio = timezone.now()
                             p.save()

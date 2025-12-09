@@ -25,7 +25,7 @@ def task_register_emendaloa_proposicao_function(*args, **kwargs):
     emendas = loa.emendaloa_set.filter(
         fase=EmendaLoa.LIBERACAO_CONTABIL,
         owner_id__in=operadores
-    ).distinct()
+    ).order_by('tipo', 'id').distinct()
 
 
     for emenda in emendas:

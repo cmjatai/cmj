@@ -29,7 +29,7 @@ from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
                                     TextoArticulado)
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
-                        SaplGenericRelation, restringe_tipos_de_arquivo_txt,
+                        SaplGenericRelation, gerar_hash_arquivo, restringe_tipos_de_arquivo_txt,
                         texto_upload_path, get_settings_auth_user_model,
                         OverwriteStorage, PortalFileField)
 
@@ -1337,11 +1337,16 @@ class Proposicao(CommonMixin):
                               update_fields=update_fields)
             self.texto_original = texto_original
 
+        #self.gerar_hash()
+
         return models.Model.save(self, force_insert=force_insert,
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
 
+    def gerar_hash(self):
+        if self.texto_original:
+            self.hash_code = gerar_hash_arquivo(self.texto_original.path, str(self.pk))
 
 class StatusTramitacao(models.Model):
     INDICADOR_CHOICES = Choices(('F', 'fim', _('Fim')),
