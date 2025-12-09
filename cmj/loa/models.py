@@ -750,16 +750,21 @@ class EmendaLoa(models.Model):
             proposicao.user = self.owner
             proposicao.texto_original = File(arq_bytes, name=arq_name)
             proposicao.save()
+            proposicao.hash_code = proposicao.gerar_hash()
+            proposicao.save()
 
             self.proposicao = proposicao
 
             metadata = self.metadata or {}
             metadata.pop('register_emendaloa_proposicao_task', None)
             self.metadata = metadata
-
             self.save()
             return proposicao
         except Exception as e:
+            metadata = self.metadata or {}
+            metadata.pop('register_emendaloa_proposicao_task', None)
+            self.metadata = metadata
+            self.save()
             raise Exception(f'Ocorreu um erro ao registrar a Proposição Legislativa: {e}')
 
 class EmendaLoaParlamentar(models.Model):

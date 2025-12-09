@@ -1741,6 +1741,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     proposicao.ip = get_client_ip(request)
                     proposicao.texto_original = File(arq_bytes, name=arq_name)
                     proposicao.save()
+                    proposicao.hash_code = proposicao.gerar_hash()
+                    proposicao.save()
 
                     self.object.proposicao = proposicao
                     self.object.save()
