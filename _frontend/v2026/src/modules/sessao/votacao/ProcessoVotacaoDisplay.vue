@@ -13,7 +13,7 @@
         :class="['btn-auto-rolagem', isAutoRolagem ? 'active' : '']"
         @click="clickAutoRolagem"
       >
-        Autorolagem?
+        Autorrolagem?
         <font-awesome-icon icon="fa-solid fa-up-down" />
       </button>
     </div>

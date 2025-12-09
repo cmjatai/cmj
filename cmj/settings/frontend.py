@@ -4,6 +4,8 @@ from unipath import Path
 
 config = AutoConfig()
 DEBUG = config('DEBUG', default=False, cast=bool)
+DEV_HOST_NAME = config('DEV_HOST_NAME', default='localhost', cast=str)
+DEV_BACKENDPORT = config('DEV_BACKENDPORT', default='8000', cast=int)
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
@@ -27,6 +29,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
 
                 'django.template.context_processors.debug',
+
                 'django.template.context_processors.request',
                 "django.template.context_processors.media",
                 "django.template.context_processors.static",
@@ -36,6 +39,7 @@ TEMPLATES = [
                 'social_django.context_processors.backends',
                 'social_django.context_processors.login_redirect',
 
+                'cmj.context_processors.debug_and_remote_database',
                 'cmj.context_processors.areatrabalho',
                 'cmj.context_processors.debug',
                 'cmj.context_processors.site_url',

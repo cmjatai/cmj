@@ -809,7 +809,7 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
         initial = UpdateView.get_initial(self)
         obj = self.get_object()
         initial['numero_de_paginas'] = obj.paginas
-        initial['emendaloa'] = obj.emendaloa or None
+        initial['emendaloa'] = getattr(obj, 'emendaloa', None)
 
         return initial
 

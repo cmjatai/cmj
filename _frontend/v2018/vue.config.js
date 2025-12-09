@@ -9,24 +9,17 @@ const CopyPlugin = require('copy-webpack-plugin')
 const WebpackPwaManifest = require('webpack-pwa-manifest')
 const WorkboxPlugin = require('workbox-webpack-plugin')
 
-// const dotenv = require('dotenv')
-// dotenv.config({
-//   path: '../../cmj/.env'
-// })
+const dotenv = require('dotenv')
+dotenv.config({
+   path: '../../cmj/.env'
+})
 
-let HOST_NAME = 'localhost'
-// HOST_NAME = '192.168.15.9'
-// HOST_NAME = '10.42.0.1'
-HOST_NAME = '10.3.163.21'
-// HOST_NAME = '10.3.162.151'
-// HOST_NAME = '168.228.184.70'
-let BACKENDPORT = '9098'
-// BACKENDPORT = '9099'
-// PORT = '8080'
+let DEV_HOST_NAME = process.env.DEV_HOST_NAME || 'localhost'
+let DEV_BACKENDPORT = process.env.DEV_BACKENDPORT || '8000'
 
 module.exports = {
   runtimeCompiler: true,
-  publicPath: process.env.NODE_ENV === 'production' ? '/static/v2018' : `http://${HOST_NAME}:8080/`,
+  publicPath: process.env.NODE_ENV === 'production' ? '/static/v2018' : `http://${DEV_HOST_NAME}:8080/`,
   outputDir: 'dist/v2018',
   devServer: {
     headers: {
@@ -154,7 +147,7 @@ module.exports = {
           description: 'Portal da Câmara Municipal de Jataí - GO',
           background_color: '#ffffff',
           theme_color: '#114d81',
-          start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${HOST_NAME}:${BACKENDPORT}/`,
+          start_url: process.env.NODE_ENV === 'production' ? '/' : `http://${DEV_HOST_NAME}:${DEV_BACKENDPORT}/`,
           display: 'standalone',
           orientation: 'omit',
           fingerprints: false,

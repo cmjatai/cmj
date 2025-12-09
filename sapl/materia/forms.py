@@ -2883,13 +2883,19 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         if self.instance.tipo and 'impositiva' in self.instance.tipo.descricao.lower():
             self.fields['emendaloa'].choices = [('', '---------')]+[
                 (e.id, str(e)) for e in EmendaLoa.objects.filter(
-                    fase=17, owner__in=self.instance.autor.operadorautor_set.values('user')
+                    fase=17,
+                    tipo__gt=EmendaLoa.MODIFICATIVA,
+                    materia__isnull=True,
+                    owner__in=self.instance.autor.operadorautor_set.values('user')
                 )
             ]
         else:
             self.fields['emendaloa'].choices = [('', '---------')]+[
                 (e.id, str(e)) for e in EmendaLoa.objects.filter(
-                    fase=17, tipo=0, materia__isnull=True
+                    fase=17,
+                    tipo=EmendaLoa.MODIFICATIVA,
+                    materia__isnull=True,
+                    owner__in=self.instance.autor.operadorautor_set.values('user')
                 )
             ]
 

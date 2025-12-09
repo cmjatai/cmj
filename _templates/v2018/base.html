@@ -79,6 +79,14 @@
           </nav>
         {% endblock navigation %}
 
+        {% if DEBUG_AND_REMOTE_DATABASE %}
+          <div class="bg-red">
+            <p class="text-center text-white m-0 p-1">
+              <strong>Atenção:</strong> Você está em modo DEBUG e conectado a um banco de dados remoto.
+            </p>
+          </div>
+        {% endif %}
+
         {% block canais_diretos %}
           {% include "base_sidebar.html" %}
         {% endblock canais_diretos%}
