@@ -5,6 +5,7 @@ from io import StringIO
 import csv
 import re
 from django.core.validators import RegexValidator
+from cmj.core.models import CmjSearchMixin
 from cmj.utils import valor_por_extenso
 
 from bs4 import BeautifulSoup as bs
@@ -313,7 +314,7 @@ class LoaParlamentar(models.Model):
         verbose_name_plural = _('Valores dos Parlamentares')
         ordering = ['id']
 
-class EmendaLoa(models.Model):
+class EmendaLoa(CmjSearchMixin):
 
     SAUDE = 10
     DIVERSOS = 99
@@ -461,6 +462,12 @@ class EmendaLoa(models.Model):
         ementa = ementa.strip().replace('\n', ' ')
         ementa = re.sub(r'\s+', ' ', ementa)
         return ementa
+
+    @property
+    def fields_search(self):
+        return [
+            'finalidade_format', 'ementa_format'
+        ]
 
 
     @property
@@ -629,7 +636,7 @@ class EmendaLoa(models.Model):
             self._syncing = False
             return r
 
-        r = models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        r = super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
         self.loa.update_disponibilidades()
         return r

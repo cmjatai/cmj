@@ -312,8 +312,7 @@ class CmjSearchMixin(models.Model):
     class Meta:
         abstract = True
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None, auto_update_search=True):
+    def save(self, force_insert=False, force_update=False, using=None, update_fields=None, auto_update_search=True):
 
         if auto_update_search and hasattr(self, 'fields_search'):
             search = ''

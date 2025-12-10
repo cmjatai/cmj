@@ -908,6 +908,52 @@ class EmendaLoaCrud(MasterDetailCrud):
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs['pk'])
             if 'register' in self.request.GET:
+
+                from sapl.base.models import OperadorAutor
+                # verifica se existe emenda desse usuario que está com metadata setado para register
+
+                if request.user.is_anonymous:
+                    messages.warning(
+                        self.request,
+                        'Ação não permitida para usuários anônimos.'
+                    )
+                    return redirect(
+                        reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.loa.id})
+                    )
+
+                user_id = request.user.id
+
+                autor_operado = OperadorAutor.objects.filter(user_id=user_id).first()
+                if not autor_operado:
+                    messages.warning(
+                        self.request,
+                        'Ação não permitida. Usuário não é operador de nenhum autor parlamentar.'
+                    )
+
+                    return redirect(
+                        reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.loa.id})
+                    )
+
+                autor_operado = autor_operado.autor
+                operadores = OperadorAutor.objects.filter(autor=autor_operado).values_list('user_id', flat=True)
+
+                emendas_sendo_registradas = EmendaLoa.objects.filter(
+                    loa=self.loa,
+                    owner__id__in=operadores,
+                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL,
+                    metadata__register_emendaloa_proposicao_task__isnull=False
+                )
+
+                if emendas_sendo_registradas.exists():
+                    messages.warning(
+                        self.request,
+                        'Ação não permitida. Existem emendas liberadas que estão sendo registradas no módulo de proposições. Aguarde o término do processo antes de iniciar um novo.'
+                    )
+
+                    return redirect(
+                        reverse_lazy('sapl.materia:proposicao_list')
+                    )
+
                 messages.info(
                     self.request,
                     'Iniciando o registro aqui no módulo de proposições das emendas liberadas... atualize esta página para acompanhar o progresso.'
@@ -1739,7 +1785,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                         ):
                             raise Exception(
                                 'Não é possível atualizar a Proposição Legislativa '
-                                'de uma Emenda LOA que já foi assinada digitalmente. ' 
+                                'de uma Emenda LOA que já foi assinada digitalmente. '
                                 'É necessário realizar a substituição manual do arquivo no módulo de Proposições Legislativas.')
 
                     proposicao.autor = autor

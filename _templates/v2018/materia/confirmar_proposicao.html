@@ -28,6 +28,20 @@
   <script type="text/javascript">
 
     $(document).ready(function(){
+      $("select[name=emendaloa] ").change(function(event) {
+        var selected = $(this).find("option:selected").text();
+        var fieldset = $(this).closest('fieldset');
+        if (selected) {
+          var alertDiv = `<div class="alert alert-warning mt-2" role="alert">
+                            <strong>Atenção!</strong> Você está vinculando esta proposição à Emenda da LOA: <br>${selected}
+                          </div>`;
+          fieldset.find('.alert.alert-warning').remove();
+          fieldset.append(alertDiv);
+        } else {
+          fieldset.find('.alert.alert-warning').remove();
+        }
+      }).change();
+
       $("select[name=tipo_materia], input[name=numero_materia], input[name=ano_materia]").change(function(event) {
         var url = '{% url 'sapl.api:materia_materialegislativa-list'%}'
 

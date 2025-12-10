@@ -991,8 +991,9 @@ class _EmendaLoaViewSet:
             query = query.split(' ')
 
             q = Q()
-
             for termo in query:
+                q &= (Q(search__unaccent__icontains=termo))
+                continue
                 q &= (Q(unidade__especificacao__unaccent__icontains=termo) |
                       Q(entidade__razao_social__unaccent__icontains=termo) |
                       Q(entidade__nome_fantasia__unaccent__icontains=termo) |
