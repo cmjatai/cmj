@@ -89,7 +89,7 @@
 
   <h2 class="legend">{% model_verbose_name 'sapl.materia.models.Proposicao' %}</h2>
   <div class="row">
-    <div class="col-sm-4 small">
+    <div class="col-sm-3 small">
       <div id="div_id_tipo" class="form-group">
         <p class="control-label">{%field_verbose_name object 'tipo'%}</p>
         <div class="controls">
@@ -100,7 +100,7 @@
 
 
     {% if object.conteudo_gerado_related %}
-      <div class="col-sm-8">
+      <div class="col-sm-5">
         <p class="control-label">{% trans "Conteúdo Gerado" %}</p>
         <div id="div_id_conteudo_gerado_related" class="form-group">
           <div class="controls form-control-static">
@@ -111,6 +111,22 @@
         </div>
       </div>
     {% endif %}
+
+
+    <div class="col-sm-auto">
+    {% if object.emendaloa %}
+        <p class="control-label">{% trans "Orçamento Impositivo" %}</p>
+        <div id="div_id_emendaloa" class="form-group">
+          <div class="controls form-control-static">
+            <a href="{% url 'cmj.loa:emendaloa_detail' object.emendaloa.id %}">
+              Link para a Emenda Registrada no Orçamento Impositivo
+            </a>
+          </div>
+        </div>
+    {% endif %}
+    </div>
+  </div>
+  <div class="row">
 
 
     {% if object.data_devolucao %}

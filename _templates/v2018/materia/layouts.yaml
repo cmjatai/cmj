@@ -110,8 +110,8 @@ Proposicao:
   - tipo data_envio
   - descricao
   - observacao
-  {% trans 'Materia' %}:
-  - materia_de_vinculo
+  {% trans 'Vínculos' %}:
+  - materia_de_vinculo emendaloa
   {% trans 'Complemento' %}:
   - texto_original
 

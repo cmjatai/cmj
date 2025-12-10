@@ -2675,7 +2675,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
 
     emendaloa = forms.ModelChoiceField(
         label="Vincular a um Registro de Emenda da LOA",
-        required=False, queryset=EmendaLoa.objects.all())
+        required=False, queryset=EmendaLoa.objects.all(),
+        widget=widgets.Select(attrs={'size': 8}))
 
     observacao = forms.CharField(
         label='Observação',
@@ -2695,7 +2696,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         ]
         widgets = {
             'descricao': widgets.Textarea(
-                attrs={'rows': 5}),
+                attrs={'rows': 7}),
             'data_envio': widgets.DateTimeInput(
                 attrs={'readonly': 'readonly'}),
         }
@@ -2750,11 +2751,11 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                                 ) == TipoMateriaLegislativa else '',
                                 css_class="extract_epigrafe alert-info",
                                 dismiss=False
-                            ), 12
+                            ), 8
                         ),
-                        ('descricao', 12),
-                        ('emendaloa', 8),
-                        ('observacao', 4)
+                        ('observacao', 4),
+                        ('descricao', 5),
+                        ('emendaloa', 7),
                     ]
                 ),
             )

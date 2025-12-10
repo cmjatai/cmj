@@ -738,6 +738,20 @@ class EmendaLoa(models.Model):
                 proposicao = Proposicao()
                 proposicao.numero_proposicao = np_max.get('np', 0) + 1
                 created = True
+            else:
+                metadata = self.metadata or {}
+                if metadata.get(
+                    'signs', {}
+                    ).get(
+                        'texto_original', {}
+                    ).get(
+                        'signs', []
+                    ):
+                    raise Exception(
+                                'Não é possível atualizar a Proposição Legislativa '
+                                'de uma Emenda LOA que já foi assinada digitalmente. '
+                                'É necessário realizar a substituição manual do arquivo no módulo de Proposições Legislativas.')
+
 
             proposicao.autor = autor
 
