@@ -1755,8 +1755,6 @@ class EmendaLoaCrud(MasterDetailCrud):
                     )
                     return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': self.object.proposicao.id}))
 
-
-
                 try:
 
                     arq_bytes, arq_name = self.retrieve_file_bytes(request)
@@ -1799,8 +1797,6 @@ class EmendaLoaCrud(MasterDetailCrud):
                     proposicao.user = user
                     proposicao.ip = get_client_ip(request)
                     proposicao.texto_original = File(arq_bytes, name=arq_name)
-                    proposicao.save()
-                    proposicao.hash_code = proposicao.gerar_hash()
                     proposicao.save()
 
                     self.object.proposicao = proposicao

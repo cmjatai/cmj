@@ -931,7 +931,7 @@ class DocumentoAdministrativoOrderingFilter(django_filters.OrderingFilter):
         return super().filter(qs, _value)
 
 
-def gerar_hash_arquivo(arquivo, pk, block_size=2 ** 20):
+def gerar_hash_arquivo(arquivo, pk, block_size=2 ** 20, field_name=''):
 
     arquivo = arquivo.replace('media/sapl/', 'media/original__sapl/')
     arquivo = arquivo.replace('media/cmj/', 'media/original__cmj/')

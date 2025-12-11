@@ -1328,25 +1328,35 @@ class Proposicao(CommonMixin):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
+        hash_code = self.hash_code
+
         if not self.pk and self.texto_original:
             texto_original = self.texto_original
             self.texto_original = None
-            models.Model.save(self, force_insert=force_insert,
-                              force_update=force_update,
-                              using=using,
-                              update_fields=update_fields)
+            models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
             self.texto_original = texto_original
 
-        #self.gerar_hash()
-
-        return models.Model.save(self, force_insert=force_insert,
+        models.Model.save(self, force_insert=force_insert,
                                  force_update=force_update,
                                  using=using,
                                  update_fields=update_fields)
 
-    def gerar_hash(self):
         if self.texto_original:
-            self.hash_code = gerar_hash_arquivo(self.texto_original.path, str(self.pk))
+            hash = ''
+            try:
+                hash = self.gerar_hash()
+            except Exception as e:
+                logger.error(f'Erro ao gerar hash do arquivo: {self.texto_original.path}. {e}')
+                self.hash_code = ''
+
+            if hash_code != hash:
+                self.hash_code = hash
+                models.Model.save(self, force_insert=False, force_update=True, using=using, update_fields=['hash_code'])
+
+
+    def gerar_hash(self):
+        hash = gerar_hash_arquivo(self.texto_original.path, str(self.pk))
+        return hash or ''
 
 class StatusTramitacao(models.Model):
     INDICADOR_CHOICES = Choices(('F', 'fim', _('Fim')),

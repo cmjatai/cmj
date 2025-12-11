@@ -509,6 +509,6 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
     with DisableSignals([pre_save, post_save]):
         try:
             instance.metadata = metadata
-            instance.save()
+            instance.save(update_fields=['metadata'])
         except:
             logger.error(f'Erro ao salvar {instance.pk} - {instance}')
