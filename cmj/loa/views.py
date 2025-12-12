@@ -1220,7 +1220,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                         if key not in groups:
                             groups[key] = {
                                 'emendas': OrderedDict(),
-                                'soma_valor': Decimal('0.00')
+                                'soma_valor': Decimal('0.00'),
+                                'soma_agrupado': Decimal('0.00')
                             }
 
                         emenda = emendas_dict.get(rc['emendaloa'])
@@ -1229,7 +1230,8 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                         if rc['emendaloa'] not in groups[key]['emendas']:
                             groups[key]['emendas'][rc['emendaloa']] = emenda
-                        groups[key]['soma_valor'] += rc['valor']
+                        groups[key]['soma_agrupado'] += rc['valor']
+                        groups[key]['soma_valor'] += emenda.valor
 
                 else:
                     for emenda in self.object_list:
@@ -1237,7 +1239,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                         if key not in groups:
                             groups[key] = {
                                 'emendas': OrderedDict(),
-                                'soma_valor': Decimal('0.00')
+                                'soma_valor': Decimal('0.00'),
+                                'soma_agrupado': Decimal('0.00')
                             }
                         groups[key]['emendas'][emenda.id] = emenda
                         groups[key]['soma_valor'] += emenda.valor
@@ -1267,8 +1270,13 @@ class EmendaLoaCrud(MasterDetailCrud):
 
 
                     sub_total_emendas = cd_group['soma_valor'].quantize(Decimal('0.01'))
+                    sub_total_agrupado = cd_group['soma_agrupado'].quantize(Decimal('0.01'))
 
-                    total += sub_total_emendas
+                    if cd['tipo_agrupamento'] != 'sem_registro':
+                        total += sub_total_agrupado
+                    else:
+                        total += sub_total_emendas
+
                     movimentacao_valores = Decimal('0.00')
                     rows = []
                     for item in cd_group['emendas'].values():
@@ -1331,7 +1339,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                         'soma_valor_orcamento':  formats.number_format(soma_valor_orcamento, force_grouping=True),
                         'saldo_orcamento': formats.number_format(soma_valor_orcamento + movimentacao_valores, force_grouping=True),
                         'movimentacao_valores': formats.number_format(movimentacao_valores, force_grouping=True),
-                        'sub_total_emendas': formats.number_format(sub_total_emendas, force_grouping=True)
+                        'sub_total_emendas': formats.number_format(sub_total_emendas, force_grouping=True),
+                        'sub_total_agrupado': formats.number_format(sub_total_agrupado, force_grouping=True)
                     }
                     context['groups'].append(group)
             context['total'] = formats.number_format(
