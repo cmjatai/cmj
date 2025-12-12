@@ -23,7 +23,9 @@ module.exports = {
   outputDir: 'dist/v2018',
   devServer: {
     headers: {
-      'Access-Control-Allow-Origin': '*'
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+      'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
     },
     hot: true,
     https: false,
@@ -34,10 +36,23 @@ module.exports = {
       directory: path.join(__dirname, 'src', 'assets'),
       publicPath: '',
       watch: true
-    }
+    },
+    client: {
+      webSocketURL: {
+        hostname: DEV_HOST_NAME,
+        pathname: '/ws',
+        port: 8080,
+        protocol: 'ws',
+      },
+      overlay: false
+    },
+    webSocketServer: 'ws'
   },
 
   chainWebpack: config => {
+    config.output.crossOriginLoading('anonymous')
+
+    config.optimization.runtimeChunk('single')
 
     config.entry('construct')
       .add('./src/__construct/main.js')

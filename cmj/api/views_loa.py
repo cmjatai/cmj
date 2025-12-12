@@ -584,26 +584,17 @@ class _LoaViewSet:
             r[2] = r[2] or Decimal(0)  # valor_materia
             r[4] = r[4] or Decimal(0)  # emendas_impositivas
             r.append((r[2] + r[4]))  # saldo
+            r.append(lr == agrupamento)
             rs.append(r)
 
             d2s = decimal2str(r[2])
             dEmendas2s = decimal2str(r[4]) if r[4] else ''
             dSaldo2s = decimal2str(r[5]) if r[5] else ''
+            # old code substituido a partir daqui
 
-            #if lr in (7,) or lr <= lr_old or value != r[2]:
-            tag = 'small'
-            if lr in (7,) or lr <= lr_old or value != r[2]:
-                value = r[2]
-            elif lr in (45,):
-                tag = 'em'
-
-            if lr == agrupamento:
-                tag = 'strong'
-
-            r[2] = f'<{tag}>{d2s}</{tag}>'
-
-            r[4] = f'<{tag}>{dEmendas2s}</{tag}>' if r[4] else ''
-            r[5] = f'<{tag}>{dSaldo2s}</{tag}>' if r[5] else ''
+            r[2] = d2s
+            r[4] = dEmendas2s
+            r[5] = dSaldo2s
 
             lr_old = lr
 
@@ -611,15 +602,47 @@ class _LoaViewSet:
             r[3] = r[3] or ''
 
             if len(r[0]) > 36:
-                r[0] = f'{"&nbsp;" * 28}{r[0][37:]}'  # 34 space - original
-                r[3] = '<small><em>' + r[3] + '</em></small>'
+                r[0] = f'{"&nbsp;" * 20}{r[0][37:]}'
             elif len(r[0]) > 23:
-                r[0] = f'{"&nbsp;" * 10}..{r[0][23:]}' # 22 space - original
-                #r[3] = f'<strong>' + r[3] + '</strong>'
+                r[0] = f'{"&nbsp;" * 8}..{r[0][23:]}' # 22 space - original
             else:
-                #r[0] = f'{r[0]}{"&nbsp;" * (min(28, agrupamento) - len(r[0]) - 5)}'
+                #r[0] = f'{r[0]}<div class="ident">{"&nbsp;" * (min(28, agrupamento) - len(r[0]) - 5)}</div>'
+                r[0] = f'{r[0]}{" " * (min(28, agrupamento) - len(r[0]) - 5)}'
+                #print(r[0])
+                pass
 
-                r[3] = f'<strong>' + r[3] + '</strong>'
+        return Response(rs)
+
+        #if lr in (7,) or lr <= lr_old or value != r[2]:
+        tag = 'small'
+        if lr in (7,) or lr <= lr_old or value != r[2]:
+            value = r[2]
+        elif lr in (45,):
+            tag = 'em'
+
+        if lr == agrupamento:
+            tag = 'strong'
+
+        r[2] = f'<{tag}>{d2s}</{tag}>'
+
+        r[4] = f'<{tag}>{dEmendas2s}</{tag}>' if r[4] else ''
+        r[5] = f'<{tag}>{dSaldo2s}</{tag}>' if r[5] else ''
+
+        lr_old = lr
+
+        r[0] = r[0][5:]
+        r[3] = r[3] or ''
+
+        if len(r[0]) > 36:
+            r[0] = f'{"&nbsp;" * 28}{r[0][37:]}'  # 34 space - original
+            r[3] = '<small><em>' + r[3] + '</em></small>'
+        elif len(r[0]) > 23:
+            r[0] = f'{"&nbsp;" * 10}..{r[0][23:]}' # 22 space - original
+            #r[3] = f'<strong>' + r[3] + '</strong>'
+        else:
+            #r[0] = f'{r[0]}{"&nbsp;" * (min(28, agrupamento) - len(r[0]) - 5)}'
+
+            r[3] = f'<strong>' + r[3] + '</strong>'
 
         return Response(rs)
 

@@ -82,9 +82,7 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-1">
-        </div>
-        <div class="col-md-2 c-groups">
+        <div class="col-md-3 c-groups pl-4">
           <div class="">
             <strong>Agrupamentos</strong>
             <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos__options" :select-size="1"/>
@@ -106,10 +104,16 @@
 
         <div class="col-12 mt-3" v-if="espelho">
           <h2 class="legend">Espelho das Despesas Orçamentárias da LOA<br><small>(Valores com Emendas Impositivas Aplicadas)</small></h2>
-          <label for="check_filter" class="d-block mb-2 text-right text-blue">
-            <input type="checkbox" id="check_filter" v-model="check_filter" />
-            Mostrar apenas itens alterados por Emendas Impositivas
-          </label>
+          <div class="d-flex justify-content-between">
+            <label for="check_espec" class="d-block text-blue">
+              <input type="checkbox" id="check_espec" v-model="check_espec" />
+              Alinhar Especificação
+            </label>
+            <label for="check_filter" class="d-block text-blue">
+              <input type="checkbox" id="check_filter" v-model="check_filter" />
+              Mostrar apenas itens alterados por Emendas Impositivas
+            </label>
+          </div>
           <table class="table table-sm table-bordered table-striped table_espelho">
             <thead>
               <tr>
@@ -120,8 +124,14 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(value, key) in espelho_filtered" :key="key">
-                <td v-html="value[0] + ' - ' + value[3]"></td>
+              <tr v-for="(value, key) in espelho_filtered" :key="key" :class="[value[6] ? 'agrupamento text-blue': '']">
+                <td>
+                  <div>
+                    <span class="dotacao" v-html="check_espec ? space2nbsp(value[0]) : value[0]"></span>
+                    <span> - </span>
+                    <span>{{ value[3] }}</span>
+                  </div>
+                </td>
                 <td v-html="value[2]"></td>
                 <td v-html="value[4]"></td>
                 <td v-html="value[5]"></td>
@@ -180,6 +190,7 @@ export default {
   data () {
     return {
       check_filter: false,
+      check_espec: false,
       loa: {
         id: this.$route.params.pkloa
       },
@@ -216,8 +227,8 @@ export default {
         subfuncaoselected: null,
         programaselected: null,
         acaoselected: null,
-        agrupamentoselected: 'funcao',
-        itensselected: 20
+        agrupamentoselected: 'unidade',
+        itensselected: 15
       },
       filters: [
         'orgaoselected',
@@ -459,6 +470,9 @@ export default {
     }
   },
   methods: {
+    space2nbsp (value) {
+      return value.replace(/ /g, '&nbsp;')
+    },
     clearFilters (event) {
       const t = this
       t.despesa = {
@@ -599,7 +613,7 @@ export default {
               t.espelho = response.data
             })
         })
-        .then(() => {
+        /* .then(() => {
           t.utils.patchModelAction('loa', 'loa', t.loa.id, 'despesas_executadas')
             .then((response) => {
               t.data_exec = response.data
@@ -660,7 +674,7 @@ export default {
               // t.sendMessage(
               // { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 })
             })
-        })
+        }) */
     },
     build_colors (n, alpha = '') {
       const colors = []
@@ -817,15 +831,19 @@ export default {
     }
   }
   .table_espelho {
-    font-size: 90%;
+    font-size: 80%;
+    tr.agrupamento {
+      td {
+        font-weight: bold;
+      }
+    }
     th, td {
       font-family: 'Courier New', Courier, monospace;
       padding: 0.1rem 0.2rem;
-      vertical-align: top;
-    }
-    td:nth-child(1) {
-      // font-size: 75%;
-      // font-weight: 600;
+      vertical-align: middle;
+      .ident {
+        display: none;
+      }
     }
     td:nth-child(2), td:nth-child(3) , td:nth-child(4) {
       width: 12%;
