@@ -126,6 +126,13 @@ const possuiRegistroVotacao = computed(() => {
       opacity: 1;
     }
   }
+  &.parent-item {
+    & > .item-content {
+      &.item-admin {
+        min-height: calc(70vh);
+      }
+    }
+  }
   .item-content {
     position: relative;
     padding: 1.5em 0.5em;
@@ -134,7 +141,6 @@ const possuiRegistroVotacao = computed(() => {
       min-height: 60vh;
     }
     &.item-admin {
-      min-height: calc(70vh);
       transition: all 0.3s ease;
       &.possui-registro-votacao-1, &.possui-registro-votacao-2, &.possui-registro-votacao-3 {
         background-color: #4bc56633;
