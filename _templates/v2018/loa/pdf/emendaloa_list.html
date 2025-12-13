@@ -64,58 +64,59 @@
           </tr>
 
           {% if forloop.last %}
-            {% if True or not tipo_agrupamento or tipo_agrupamento == 'sem_registro' %}
-                <tr>
-                  <td class="text-right sub-total" {% if group.ncols_menos2 > 0 %}colspan="{{group.ncols_menos1}}"{% endif %}>
-                    <strong>Soma das Emendas:</strong>
-                    {% if group.sub_total_agrupado != group.sub_total_emendas and tipo_agrupamento != 'sem_registro'%}
-                      <br><strong>Soma do Agrupamento:</strong>&nbsp;
-                    {% endif %}
-                  </td>
-                  <td class="text-right sub-total">
-                    <strong>{{group.sub_total_emendas}}</strong>
-                    {% if group.sub_total_agrupado != group.sub_total_emendas and tipo_agrupamento != 'sem_registro'%}
-                      <br><strong>{{group.sub_total_agrupado}}</strong>&nbsp;
-                    {% endif %}
-                  </td>
-                </tr>
-              {% endif %}
+              <tr>
+                <td class="text-right sub-total" {% if group.ncols_menos2 > 0 %}colspan="{{group.ncols_menos1}}"{% endif %}>
+                  <strong>Soma das Emendas{% if group.agrupamento %} do Agrupamento{% endif %}:</strong>
+                  {% if group.agrupamento and tipo_agrupamento != 'sem_registro'%}
+                    <br><strong>Soma do Agrupamento:</strong>&nbsp;
+                  {% endif %}
+                </td>
+                <td class="text-right sub-total">
+                  <strong>{{group.sub_total_emendas}}</strong>
+                  {% if group.agrupamento and tipo_agrupamento != 'sem_registro'%}
+                    <br><strong>{{group.sub_total_agrupado}}</strong>&nbsp;
+                  {% endif %}
+                </td>
+              </tr>
             {% endif %}
           {% endfor %}
         </tbody>
       </table>
-      {% if group.sub_total_agrupado != group.sub_total_emendas and tipo_agrupamento != 'sem_registro'%}
-        <small><small><em>As somas podem ser diferentes nos dois subtotais se a emenda destina/recebe recursos em mais de um registro contábil do agrupamento.</em></small></small>
+
+      {% if group.agrupamento and group.sub_total_agrupado != group.sub_total_emendas and tipo_agrupamento != 'sem_registro'%}
+        <small><small><em>As somas podem ser diferentes nos dois subtotais se a emenda recebe/destina recursos para mais de um agrupamento.</em></small></small>
       {% endif %}
-    {% if forloop.last %}
-      {% if True or not tipo_agrupamento or tipo_agrupamento == 'sem_registro' %}
+      {% if group.agrupamento and group.sub_total_agrupado != group.movimentacao_valores %}
         <hr>
-        <div class="text-right">
-          ** Total: {{total}}
+        <div>
+          <small>
+            <small>
+              <em>
+                * Os valores de "Orçamento Original", "Movimentação Geral" e "Saldo"
+                mostrados no inicio da tabela são a totalização da base inteira
+                de emendas com registros contábeis do agrupamento visualizado acima, e não particularizados pelos filtros aplicados, caso existam.
+              </em>
+            </small>
+          </small>
         </div>
       {% endif %}
-      <div>
-        <small>
-          <small>
-            <em>
-              Esta totalização mostrada é a soma das emendas listadas acima uma única vez,
-              mesmo que apareça em mais de um agrupamento. **
-            </em>
-          </small>
-        </small>
-      </div>
+    {% if forloop.last %}
       <hr>
-      <div>
-        <small>
-          <small>
-            <em>
-              * Os valores de "Orçamento Original", "Movimentação Geral" e "Saldo"
-              mostrados no inicio de cada tabela são a totalização da base inteira
-              de emendas com registros contábeis do agrupamento e não particularizados pelos filtros aplicados, caso existam.
-            </em>
-          </small>
-        </small>
+      <div class="text-right">
+        {% if group.agrupamento and tipo_agrupamento != 'sem_registro' %}**{% endif %} Total: {{total}}
       </div>
+      {% if group.agrupamento and tipo_agrupamento != 'sem_registro' %}
+        <div>
+          <small>
+            <small>
+              <em>
+                Esta totalização mostrada é a soma das emendas listadas acima uma única vez,
+                mesmo que apareça em mais de um agrupamento. **
+              </em>
+            </small>
+          </small>
+        </div>
+      {% endif %}
     {% else %}
       <div class="new-page"></div>
     {% endif %}

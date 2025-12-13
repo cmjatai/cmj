@@ -19,8 +19,13 @@ h5 {
 }
 
 .loa-mat {
-  div {
-    padding: 2px 7px ;
+  .row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  .col {
+    display: inline-flex;
   }
 }
 .text-right {
@@ -38,10 +43,10 @@ span.materia {
 }
 ul {
   font-family: 'Courier New', Courier, monospace;
-  padding-left: 2em;
+  padding-left: 1.5em;
   margin: 0;
   li {
-    font-size: 5pt;
+    font-size: 7pt;
     color: #222;
   }
 }
@@ -73,5 +78,9 @@ small {
 
 .new-page {
   break-before: always;
+}
+
+.materia {
+  font-weight: bold;
 }
 

@@ -1103,19 +1103,27 @@ class EmendaLoaCrud(MasterDetailCrud):
                 if item.materia:
                     materia = f'''
                             <span class="materia">
-                                <a href="{reverse('cmj.loa:emendaloa_detail',kwargs={'pk': item.id})}">
+                                <a href="{reverse('sapl.materia:materialegislativa_detail',kwargs={'pk': item.materia.id})}">
                                 {item.materia.epigrafe_short}
                                 </a>
-                            </span> -
+                            </span>&nbsp;-&nbsp;
                     '''
 
                 col_emenda = f'''
 
                     <div class="loa-mat">
-                        {materia}
-                        <small>
-                            <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
-                        </small><br>
+                        <div class="row">
+                            <div class="col">
+                                {materia}
+                                <small>
+                                    <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
+                                </small>
+                            </div>
+                            <div class="col">
+                                <span>Tipo:</span>&nbsp;
+                                <strong class="tipo">{item.get_tipo_display()}</strong>
+                            </div>
+                        </div>
                         <span class="indicacao">{item.indicacao}</span>
                         <div>
                             {item.finalidade_format}
@@ -1139,8 +1147,8 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                 columns = ['Emendas', 'Valores']
 
-                if not cd['tipo'] or len(cd['tipo']) > 1:
-                    columns.insert(1, 'Tipos')
+                #if not cd['tipo'] or len(cd['tipo']) > 1:
+                #    columns.insert(1, 'Tipos')
 
                 rows = []
 
@@ -1149,8 +1157,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     col_emenda = render_col_emenda(item)
                     cols.append((col_emenda, ''))
 
-                    if not cd['tipo'] or len(cd['tipo']) > 1:
-                        cols.append((item.get_tipo_display(), 'text-center'))
+                    #if not cd['tipo'] or len(cd['tipo']) > 1:
+                    #    cols.append((item.get_tipo_display(), 'text-center'))
 
                     cols.append((item.str_valor, 'text-right'))
 
@@ -1162,7 +1170,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     'ncols_menos2': len(columns) - 2,
                     'ncols_menos1': len(columns) - 1,
                     'rows': rows,
-                    'sub_total_emendas': formats.number_format(sub_total['valor__sum'], force_grouping=True)
+                    'sub_total_emendas': formats.number_format(sub_total['valor__sum'], force_grouping=True),
+                    'agrupamento': False,
                 }
                 context['groups'].append(group)
 
@@ -1265,8 +1274,8 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                     columns = ['Emendas', 'Valores das Emendas']
 
-                    if not cd['tipo'] or len(cd['tipo']) > 1:
-                        columns.insert(1, 'Tipos')
+                    #if not cd['tipo'] or len(cd['tipo']) > 1:
+                    #    columns.insert(1, 'Tipos')
 
 
                     sub_total_emendas = cd_group['soma_valor'].quantize(Decimal('0.01'))
@@ -1286,30 +1295,32 @@ class EmendaLoaCrud(MasterDetailCrud):
                         col_emenda = render_col_emenda(item, )
                         cols.append([col_emenda, ''])
 
-                        if not cd['tipo'] or len(cd['tipo']) > 1:
-                            cols.append(
-                                (item.get_tipo_display(), 'text-center'))
+                        #if not cd['tipo'] or len(cd['tipo']) > 1:
+                        #    cols.append(
+                        #        (item.get_tipo_display(), 'text-center'))
 
                         cols.append([item.str_valor, 'text-right'])
 
                         qs_rc = item.registrocontabil_set.order_by('valor')
 
                         registros = []
+                        max_lenght_valor = 0
                         for rc in qs_rc:
-
                             rc = str(rc).split(' - ')
-                            if '-' not in rc[0]:
-                                rc0_split = rc[0].split(' ')
-                                rc0_split[-1] = f'+{rc0_split[-1]}'
-                                rc[0] = ' '.join(rc0_split)
-                                while len(rc[0]) < 17:
-                                    rc[0] = rc[0].replace(' ', '  ', 1)
-                            if '-' in rc[0]:
-                                while len(rc[0]) < 18:
-                                    rc[0] = rc[0].replace(' ', '  ', 1)
+                            rc[0] = list(filter(lambda x: x, rc[0].split(' ')))
+                            if '-' not in rc[0][-1]:
+                                rc[0][-1] = f'+{rc[0][-1]}'
+                            rc[0] = ' '.join(rc[0])
+                            if len(rc[0]) > max_lenght_valor:
+                                max_lenght_valor = len(rc[0])
+                            registros.append(rc)
 
+                        for index, rc in enumerate(registros):
+                            while len(rc[0]) < max_lenght_valor:
+                                rc[0] = rc[0].replace(' ', '  ', 1)
                             rc[0] = rc[0].replace(' ', '&nbsp;')
-                            registros.append(f'<li>{" - ".join(rc)}</li>')
+                            registros[index] = f'<li>{" - ".join(rc)}</li>'
+
 
                         cols[0][0] = cols[0][0].replace(
                             '<ul></ul>', f'<small class="courier"><small>DOTAÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
@@ -1340,7 +1351,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                         'saldo_orcamento': formats.number_format(soma_valor_orcamento + movimentacao_valores, force_grouping=True),
                         'movimentacao_valores': formats.number_format(movimentacao_valores, force_grouping=True),
                         'sub_total_emendas': formats.number_format(sub_total_emendas, force_grouping=True),
-                        'sub_total_agrupado': formats.number_format(sub_total_agrupado, force_grouping=True)
+                        'sub_total_agrupado': formats.number_format(sub_total_agrupado, force_grouping=True),
+                        'agrupamento': True,
                     }
                     context['groups'].append(group)
             context['total'] = formats.number_format(
