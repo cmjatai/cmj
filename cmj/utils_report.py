@@ -52,6 +52,5 @@ def make_pdf(base_url,
             page_body.children += footer_body.all_children()
 
     pdf_file = main_doc.write_pdf()
-    main_doc
 
     return pdf_file

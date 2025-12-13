@@ -25,12 +25,12 @@ table tbody tr:nth-child(even) {
 }
 /* Evita quebras dentro das linhas (tr) */
 tr {
-  break-inside: avoid;
-  page-break-inside: avoid; /* Propriedade antiga, mas útil para compatibilidade */
+  /* break-inside: avoid; /* */
+  /* page-break-inside: avoid; /* Propriedade antiga, mas útil para compatibilidade */
   display: table-row; /* Garante que 'tr' seja tratado como um elemento de linha de tabela */
 }
 td, th {
   /* Opcional: Evita quebras dentro das células, se o conteúdo for pequeno o suficiente */
-  break-inside: avoid;
-  page-break-inside: avoid;
+  /* break-inside: avoid; /* */
+  /* page-break-inside: avoid; /* */
 }
