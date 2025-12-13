@@ -781,12 +781,14 @@ class DisableSignals(object):
 
 
 class TimeExecution(object):
-    def __init__(self, print_date=False):
+    def __init__(self, print_date=False, label='TimeExecution'):
         self.print_date = print_date
+        self.label = label
 
     def __enter__(self):
         self.start = timezone.localtime()
         if self.print_date:
+            print(self.label)
             print(self.start)
         logger.debug(f'TimeExecution: {str(self.start)}')
 

@@ -1015,7 +1015,7 @@ class EmendaLoaFilterSet(FilterSet):
                 '<div class="container-avatar d-flex justify-content-center w-100"><div class="custom-control custom-checkbox">',
                 html, count=1)
 
-            help_text_parlamentares = f'<small id="hint_id_parlamentares" class="form-text text-muted">{form.fields["parlamentares"].help_text}</small>\n</div>'
+            help_text_parlamentares = f'<small id="id_parlamentares_helptext" class="form-text text-muted">{form.fields["parlamentares"].help_text}</small>\n</div>'
             help_reverse = help_text_parlamentares.split('\n')
             html = re.sub(
                 help_text_parlamentares,

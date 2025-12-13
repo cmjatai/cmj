@@ -35,7 +35,7 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, Prestacao
 from cmj.loa.models import Despesa, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
-from cmj.utils import get_client_ip
+from cmj.utils import TimeExecution, get_client_ip
 from cmj.utils_report import make_pdf
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.materia.models import Proposicao, TipoProposicao
@@ -578,26 +578,28 @@ class LoaCrud(Crud):
                 tipo__gt=0
             ).values(
                 'unidade__especificacao',
-                'parlamentares__id',
-                'parlamentares__nome_parlamentar'
+                'emendaloaparlamentar_set__parlamentar__id',
+                'emendaloaparlamentar_set__parlamentar__nome_parlamentar',
             ).order_by(
-                'unidade__especificacao'
-            ).annotate(soma_valor=Sum('valor')):
+                'unidade__especificacao', 'emendaloaparlamentar_set__parlamentar__nome_parlamentar'
+            ).annotate(valor_parte_parlamentar=Sum('emendaloaparlamentar_set__valor')):
                 if el['unidade__especificacao'] not in unidades:
                     unidades[el['unidade__especificacao']] = {
                         'parlamentares': [],
                         'soma_unidade': Decimal('0.00'),
                     }
 
-                unidades[el['unidade__especificacao']]['parlamentares'].append({
-                    'id': el['parlamentares__id'],
-                    'nome_parlamentar': el['parlamentares__nome_parlamentar'],
-                    'soma_valor': el['soma_valor'],
-                })
+                unidades[el['unidade__especificacao']]['soma_unidade'] += el['valor_parte_parlamentar']
 
-                unidades[el['unidade__especificacao']]['soma_unidade'] += el['soma_valor']
+                unidades[el['unidade__especificacao']]['parlamentares'].append(
+                    {
+                        'id': el['emendaloaparlamentar_set__parlamentar__id'],
+                        'nome_parlamentar': el['emendaloaparlamentar_set__parlamentar__nome_parlamentar'],
+                        'soma_valor': el['valor_parte_parlamentar'],
+                    }
+                )
 
-                soma_geral += el['soma_valor']
+                soma_geral += el['valor_parte_parlamentar']
 
             context = dict(
                 unidades=unidades.items(),
@@ -622,13 +624,17 @@ class LoaCrud(Crud):
                 'tipo',
                 'entidade__nome_fantasia',
                 'unidade__especificacao',
-                'parlamentares__id',
-                'parlamentares__nome_parlamentar'
+                'emendaloaparlamentar_set__parlamentar__id',
+                'emendaloaparlamentar_set__parlamentar__nome_parlamentar',
             ).order_by(
                 'tipo',
-                'entidade__nome_fantasia'
-            ).annotate(soma_valor=Sum('valor')):
-                nom_entidade = el['entidade__nome_fantasia'] or el['unidade__especificacao']
+                'entidade__nome_fantasia',
+                'emendaloaparlamentar_set__parlamentar__nome_parlamentar'
+            ).annotate(valor_parte_parlamentar=Sum('emendaloaparlamentar_set__valor')):
+                nom_entidade = el['entidade__nome_fantasia']
+                if not nom_entidade:
+                    continue
+
                 el['entidade__nome_fantasia'] = nom_entidade.upper()
                 if el['entidade__nome_fantasia'] not in entidades:
                     entidades[el['entidade__nome_fantasia']] = {
@@ -637,20 +643,19 @@ class LoaCrud(Crud):
                         'soma_entidade': Decimal('0.00'),
                     }
 
-                entidades[el['entidade__nome_fantasia']]['parlamentares'].append({
-                    'id': el['parlamentares__id'],
-                    'nome_parlamentar': el['parlamentares__nome_parlamentar'],
-                    'soma_valor': el['soma_valor'],
-                })
+                entidades[el['entidade__nome_fantasia']]['soma_entidade'] += el['valor_parte_parlamentar']
+                entidades[el['entidade__nome_fantasia']]['parlamentares'].append(
+                    {
+                        'id': el['emendaloaparlamentar_set__parlamentar__id'],
+                        'nome_parlamentar': el['emendaloaparlamentar_set__parlamentar__nome_parlamentar'],
+                        'soma_valor': el['valor_parte_parlamentar'],
+                    }
+                )
 
-                entidades[el['entidade__nome_fantasia']]['soma_entidade'] += el['soma_valor']
-
-                soma_geral += el['soma_valor']
-
-            entidades = sorted(entidades.items(), key=lambda x: x[1]['tipo'])
+                soma_geral += el['valor_parte_parlamentar']
 
             context = dict(
-                entidades=entidades,
+                entidades=entidades.items(),
                 soma_geral=soma_geral,
                 loa=l
             )
@@ -1038,15 +1043,18 @@ class EmendaLoaCrud(MasterDetailCrud):
         def makepdf(self, context, **response_kwargs):
             self.paginate_by = 0
             base_url = self.request.build_absolute_uri()
+            with TimeExecution(print_date=settings.DEBUG, label='Make Context PDF EmendaLoa List'):
+                try:
+                    context = self.get_context_data_makepdf()
+                except:
+                    raise ValidationError(
+                        'Ocorreu um erro ao processar seus filtros e agrupamentos.')
 
-            try:
-                context = self.get_context_data_makepdf()
-            except:
-                raise ValidationError(
-                    'Ocorreu um erro ao processar seus filtros e agrupamentos.')
+            with TimeExecution(print_date=settings.DEBUG, label='Render Html EmendaLoa List'):
+                template = render_to_string('loa/pdf/emendaloa_list.html', context)
 
-            template = render_to_string('loa/pdf/emendaloa_list.html', context)
-            pdf_file = make_pdf(base_url=base_url, main_template=template)
+            with TimeExecution(print_date=settings.DEBUG, label='Generate PDF EmendaLoa List'):
+                pdf_file = make_pdf(base_url=base_url, main_template=template)
 
             response = HttpResponse(
                 pdf_file,
