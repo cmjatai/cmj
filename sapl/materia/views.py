@@ -641,6 +641,15 @@ class ProposicaoPendente(PermissionRequiredMixin, ListView):
             data_recebimento__isnull=True,
             data_devolucao__isnull=True).order_by('data_envio')
 
+        if context['object_list'].exists():
+            count = context['object_list'].count()
+            if count == 1:
+                context['head_title'] = '(1) Proposição Pendente'
+            else:
+                context['head_title'] = f'({count}) Proposições Pendentes'
+        else:
+            context['head_title'] = 'Nenhuma Proposição Pendente'
+
         paginator = context['paginator']
         page_obj = context['page_obj']
         context['page_range'] = make_pagination(
