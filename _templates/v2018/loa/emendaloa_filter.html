@@ -4,17 +4,23 @@
 
 {% block more_buttons_left %}
 {% if view.extras_url %}
-<div class="actions btn-group btn-group-sm" role="group">
-    {% for href, css_class, text in view.extras_url %}
-    <a href="{{href}}" class="btn {{css_class}}">
-        {{text|safe}}
-    </a>
-    {% endfor %}
-</div>
+    <div class="actions btn-group btn-group-sm" role="group">
+        {% for href, css_class, text in view.extras_url %}
+        <a href="{{href}}" class="btn {{css_class}}">
+            {{text|safe}}
+        </a>
+        {% endfor %}
+    </div>
 {% endif %}
 
 {% endblock more_buttons_left %}
 {% block extra_content %}
+
+<div class="d-md-flex justify-content-end">
+  <div class="actions btn-group btn-exports" role="group">
+    <a class="btn btn-success btn-sm" href="{% url 'sapl.api:loa_emendaloa-list' %}" title="OpenAPI">OpenAPI</a>
+  </div>
+</div>
 <hr>
 {% crispy filter.form %}
 {% endblock %}
