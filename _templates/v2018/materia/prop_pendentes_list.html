@@ -10,6 +10,10 @@
 
 {% block container_table_list %}
   <fieldset>
+    <label for="id_hot_reload_page">
+      {% trans "Atualizar página automaticamente a cada 60 segundos" %}
+      <input type="checkbox" id="id_hot_reload_page" name="hot_reload_page" {% if request.GET.hot_reload_page %}checked{% endif %}/>
+    </label>
     {% if not object_list %}
       <p>{{ NO_ENTRIES_MSG }}</p>
     {% else %}
@@ -86,3 +90,33 @@
     {% include 'materia/materias_em_tramitacao_widget.html' %}
 
 {% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+  $(document).ready(function(){
+    $('#id_hot_reload_page').change(function(){
+      var check_value = $(this).is(':checked');
+      var current_url = window.location.href;
+      if(check_value){
+        if(current_url.indexOf('?') > -1){
+          if(current_url.indexOf('hot_reload_page=on') == -1){
+            current_url += '&hot_reload_page=on';
+          }
+        }else{
+          current_url += '?hot_reload_page=on';
+        }
+      }else{
+        current_url = current_url.replace('&hot_reload_page=on','');
+        current_url = current_url.replace('?hot_reload_page=on','');
+      }
+      window.location.href = current_url;
+    });
+
+    {% if request.GET.hot_reload_page %}
+      setTimeout(function(){
+        location.reload();
+      },60000);
+    {% endif %}
+  });
+</script>
+{% endblock extra_js %}
