@@ -8,11 +8,11 @@
   {% render_bundle 'construct' 'css' %}
 {% endblock %}
 {% block content_container %}
-<div id="app-vue">
-  <app></app>
-</div>
+  <div id="app-vue">
+    <app></app>
+  </div>
 {% endblock content_container %}
 
 {% block webpack_loader_js %}{{block.super}}
-{% render_bundle 'construct' 'js' %}
+{% render_bundle 'construct' 'js' skip_common_chunks=True %}
 {% endblock %}

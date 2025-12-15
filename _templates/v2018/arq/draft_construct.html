@@ -14,5 +14,5 @@
 {% endblock content_container %}
 
 {% block webpack_loader_js %}{{block.super}}
-{% render_bundle 'draft' 'js' %}
+{% render_bundle 'draft' 'js' skip_common_chunks=True %}
 {% endblock %}
