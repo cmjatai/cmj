@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Max, Q, F
+from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import render, redirect
@@ -4213,9 +4214,13 @@ class VotacaoEmBlocoOrdemDia(VotacaoEmBlocoExpediente):
     expediente = False
 
     def get_queryset(self):
-        return OrdemDia.objects.filter(sessao_plenaria_id=self.kwargs['pk'],
-                                       resultado='',
-                                       retiradapauta=None).order_by('numero_ordem')
+        return OrdemDia.objects.filter(
+            sessao_plenaria_id=self.kwargs['pk'],
+            resultado='',
+            retiradapauta=None
+        ).annotate(
+            ordem_grupo=Coalesce(F('parent__numero_ordem'), F('numero_ordem'))
+        ).order_by('ordem_grupo', 'numero_ordem')
 
 
 class VotacaoEmBlocoSimbolicaView(PermissionRequiredForAppCrudMixin, TemplateView):
