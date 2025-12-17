@@ -124,7 +124,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="(value, key) in espelho_filtered" :key="key" :class="[value[6] ? 'agrupamento text-blue': '']">
+              <tr v-for="(value, key) in espelho_filtered" :key="key" :class="[value[8] ? 'agrupamento text-blue': '']">
                 <td>
                   <div>
                     <span class="dotacao" v-html="check_espec ? space2nbsp(value[0]) : value[0]"></span>
@@ -133,8 +133,9 @@
                   </div>
                 </td>
                 <td v-html="value[2]"></td>
-                <td v-html="value[4]"></td>
-                <td v-html="value[5]"></td>
+                <td v-html="value[6]"></td>
+                <td v-html="value[7]"></td>
+                <!-- <td v-html="value[8]"></td> -->
               </tr>
             </tbody>
           </table>
@@ -298,9 +299,10 @@ export default {
       if (!this.check_filter) {
         return this.espelho
       }
-      //  item[4] é uma string, filtra se vazio
+      //  item[4 ou 5 ou 6] são uma string, filtra todas vazio
       return this.espelho.filter(item => {
-        return item[4] && item[4] !== ''
+        console.log(item)
+        return item[4] !== '' || item[5] !== '' || item[6] !== ''
       })
     },
     qs_loa: function () {

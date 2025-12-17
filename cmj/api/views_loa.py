@@ -1,3 +1,4 @@
+from operator import index
 from attr import field
 from django.db import IntegrityError
 from _collections import OrderedDict
@@ -408,11 +409,11 @@ class _LoaViewSet:
 
     @action(methods=['post', ], detail=True)
     def espelho(self, request, *args, **kwargs):
-
         loa = self.get_object()
-
-
         filters_data = request.data
+        return Response(self.run_espelho(filters_data, loa))
+
+    def run_espelho(self, filters_data, loa):
 
         try:
             itens = filters_data.pop('itens')
@@ -455,13 +456,15 @@ class _LoaViewSet:
         filter_sql = f' and {filter_sql} ' if filter_sql else ''
 
 
-        # TODO: refatorar "sql_geral" para usar o modelo de dados de view não gerenciada pelo django
+        # TODO: refatorar "sql" para usar o modelo de dados de view db não gerenciada pelo django
         sql_geral = f"""SELECT distinct
                             d.id,
                             d.valor_materia,
                             loa.ano || '.' || o.codigo || '.' || u.codigo || '.' || f.codigo || '.' || sf.codigo || '.' || p.codigo || '.' || a.codigo || '.' || n.codigo || '.' || fte.codigo as codigo,
                             loa.ano || o.codigo || u.codigo || f.codigo || sf.codigo || p.codigo || a.codigo || n.codigo || fte.codigo as codigo_base,
-                            SUM(elrc.valor) OVER (PARTITION BY d.id) AS soma_registroscontabeis
+                            SUM(CASE WHEN elrc.valor > 0 THEN elrc.valor ELSE 0 END) OVER (PARTITION BY d.id) AS soma_registroscontabeis_acrescimo,
+                            SUM(CASE WHEN elrc.valor < 0 THEN elrc.valor ELSE 0 END) OVER (PARTITION BY d.id) AS soma_registroscontabeis_reducao
+
                         from loa_despesa d
                             inner join loa_loa             loa on (loa.id = d.loa_id)
                             inner join loa_orgao             o on (  o.id = d.orgao_id)
@@ -481,7 +484,8 @@ class _LoaViewSet:
                 SELECT DISTINCT
                     Substr(codigo_base, 1, {partcb}) AS codigo_base, Substr(codigo, 1, {partc}) AS codigo,
                     SUM(valor_materia) AS soma,
-                    SUM(soma_registroscontabeis) AS soma_registroscontabeis
+                    SUM(soma_registroscontabeis_acrescimo) AS soma_registroscontabeis_acrescimo,
+                    SUM(soma_registroscontabeis_reducao) AS soma_registroscontabeis_reducao
                     FROM (
                         {sql_geral}
                     ) todas_as_despesas
@@ -514,6 +518,7 @@ class _LoaViewSet:
             ('natureza_5', 41),
             ('fonte', 45),
         ])
+        agrupamentos_inverse = {v: k for k, v in agrupamentos.items()}
 
 
         columns = [
@@ -536,7 +541,8 @@ class _LoaViewSet:
                         else ''
                 END as especificacao
             """,
-            'geral.soma_registroscontabeis',
+            'geral.soma_registroscontabeis_acrescimo',
+            'geral.soma_registroscontabeis_reducao',
         ]
 
         sql_for_run = f"""
@@ -569,32 +575,51 @@ class _LoaViewSet:
         if agrupamento_select in ('natureza_1', 'natureza_2', 'natureza_3', 'natureza_4', 'natureza_5'):
             agrupamento_select = 'natureza_5'
 
-        for i, r in enumerate(results):
-            agrupamento = agrupamentos.get(agrupamento_select, 45)
-            lr = len(r[0])
-            if lr > agrupamento:
-                continue
-
+        agrupamento = agrupamentos.get(agrupamento_select, 45)
+        agrupamento_local = agrupamento
+        for i, rr in enumerate(results):
+            lr = len(rr[0])
             # remove natureza da despesa do tipo X.X.XX.XX.00 se este for igual a X.X.XX.XX
-            if lr == 41 and r[1][-2:] == '00':
-                if r[2:5] == results[i - 1][2:5]:
+            if lr == 41 and rr[1][-2:] == '00':
+                if rr[2:6] == results[i - 1][2:6]:
                     continue
 
-            r = list(r)
+            r = list(rr)
             r[2] = r[2] or Decimal(0)  # valor_materia
-            r[4] = r[4] or Decimal(0)  # emendas_impositivas
-            r.append((r[2] + r[4]))  # saldo
-            r.append(lr == agrupamento)
+
+            acrescimo = r[4] or Decimal(0)
+            reducao = r[5] or Decimal(0)
+            ar = acrescimo + reducao
+
+            if lr < lr_old:
+                agrupamento_local = agrupamento
+
+            if (acrescimo or reducao) and ar == Decimal(0) and lr == agrupamento_local:
+                idx_part = parts_codigo.index(lr)
+                agrupamento_local = parts_codigo[idx_part + 1] if idx_part + 1 < len(parts_codigo) else 45
+
+            if lr > agrupamento_local:
+                continue
+
+            saldo = r[2] + ar
+
+            r.append(ar)  # acrescimo + reducao
+            r.append(saldo)  # saldo
+            r.append(lr == agrupamento_local)
             rs.append(r)
 
             d2s = decimal2str(r[2])
-            dEmendas2s = decimal2str(r[4]) if r[4] else ''
-            dSaldo2s = decimal2str(r[5]) if r[5] else ''
+            dAcrescimo2s = decimal2str(acrescimo) if acrescimo else ''
+            dReducao2s = decimal2str(reducao) if reducao else ''
+            dAr2s = decimal2str(ar) if ar else ''
+            dSaldo2s = decimal2str(saldo) if saldo else ''
             # old code substituido a partir daqui
 
             r[2] = d2s
-            r[4] = dEmendas2s
-            r[5] = dSaldo2s
+            r[4] = dAcrescimo2s
+            r[5] = dReducao2s
+            r[6] = dAr2s
+            r[7] = dSaldo2s
 
             lr_old = lr
 
@@ -607,11 +632,11 @@ class _LoaViewSet:
                 r[0] = f'{"&nbsp;" * 8}..{r[0][23:]}' # 22 space - original
             else:
                 #r[0] = f'{r[0]}<div class="ident">{"&nbsp;" * (min(28, agrupamento) - len(r[0]) - 5)}</div>'
-                r[0] = f'{r[0]}{" " * (min(28, agrupamento) - len(r[0]) - 5)}'
+                r[0] = f'{r[0]}{" " * (min(28, agrupamento_local) - len(r[0]) - 5)}'
                 #print(r[0])
                 pass
 
-        return Response(rs)
+        return rs
 
         #if lr in (7,) or lr <= lr_old or value != r[2]:
         tag = 'small'
