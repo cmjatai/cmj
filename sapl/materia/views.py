@@ -2355,6 +2355,20 @@ class MateriaLegislativaCrud(Crud):
         def download(self, download):
 
             principal = self.get_object()
+            test = [
+                not principal.anexadas.exists(),
+                not principal.documentoacessorio_set.exists(),
+                not principal.documentoadministrativo_set.exists()
+            ]
+            if principal.anexo_de.exists() or all(test) :
+                messages.error(
+                    self.request,
+                    _('Matéria possui apenas seu PDF, não há anexadas ou documentos acessórios para download.')
+                )
+                return HttpResponseRedirect(reverse(
+                    'sapl.materia:materialegislativa_detail',
+                    kwargs={'pk': self.kwargs['pk']}
+                ))
             path_zip_cache = principal.zip_process(original=download == 'original')
             response = HttpResponse(
                 open(path_zip_cache, 'rb'),

@@ -30,7 +30,7 @@
       <i class="far fa-file-code"></i>
     </a>
 
-    {% if not object.anexo_de.exists %}
+    {% if not object.anexo_de.exists and object.anexadas.exists or not object.anexo_de.exists and object.documentoacessorio_set.exists %}
       <a href="{% url 'sapl.materia:materialegislativa_detail' object.id %}?download" title="Baixar todos os arquivos deste Processo Legislativo">
         <i class="fas fa-download"></i>
       </a>
