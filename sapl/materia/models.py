@@ -1,8 +1,11 @@
 
 import glob
+import hashlib
 import logging
 import os
 import re
+import tempfile
+import zipfile
 from time import sleep
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -16,12 +19,14 @@ from django.db.models.fields.json import JSONField
 from django.db.models.functions import Concat
 from django.template import defaultfilters
 from django.utils import formats, timezone
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin, PluginSignMixin
+from cmj.utils import media_cache_storage
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor, \
     TipoAutor, Metadata
 from sapl.comissoes.models import Comissao, Reuniao
@@ -574,25 +579,6 @@ class MateriaLegislativa(CommonMixin):
                                  using=using,
                                  update_fields=update_fields)
 
-    def clear_cache(self, page=None, error=0):
-        try:
-            fcache = glob.glob(
-                f'{self.texto_original.path}-p{page:0>3}*'
-                if page else f'{self.texto_original.path}*.png'
-            )
-
-            for f in fcache:
-                os.remove(f)
-
-        except Exception as e:
-            if not error:
-                error = 1
-            logger.error(f'Erro ao limpar cache de: {self.texto_original.path}. {e}')
-
-        if error == 1:
-            sleep(3)
-            self.clear_cache(page=page, error=2)
-
     def autografos(self):
         return self.normajuridica_set.filter(tipo_id=27)
 
@@ -694,6 +680,143 @@ class MateriaLegislativa(CommonMixin):
         self.save()
 
         task_add_selo_votacao_function(list(self.registrovotacao_set.values_list('id', flat=True)))
+
+    def clear_cache(self, page=None, error=0):
+        try:
+            fcache = glob.glob(
+                f'{self.texto_original.path}-p{page:0>3}*'
+                if page else f'{self.texto_original.path}*.png'
+            )
+
+            for f in fcache:
+                os.remove(f)
+
+        except Exception as e:
+            if not error:
+                error = 1
+            logger.error(f'Erro ao limpar cache de: {self.texto_original.path}. {e}')
+
+        if error == 1:
+            sleep(3)
+            self.clear_cache(page=page, error=2)
+
+    def zip_process(self, original=False):
+
+        ff = 'original_path' if original else 'path'
+
+        m_paths = []
+
+        principal = self
+
+        def get_anexadas_from(m, prefixo=''):
+            p = getattr(m.texto_original, ff)
+            m_paths.append((m, prefixo, p))
+            for a in m.materia_principal_set.filter(
+                data_desanexacao__isnull=True
+            ).order_by('materia_anexada__tipo', 'data_anexacao'):
+                manex = a.materia_anexada
+                p2 = f'Anexada-{manex.tipo.sigla}'
+
+                get_anexadas_from(
+                    a.materia_anexada,
+                    prefixo=p2)
+
+            for d in m.documentoacessorio_set.all():
+
+                m_paths.append((d, prefixo, getattr(d.arquivo, ff)))
+
+        def get_docadm_anexados_from(d):
+            if d.texto_integral:
+                p = getattr(d.texto_integral, ff)
+                m_paths.append((d, 'DocAdm', p))
+
+            for danex in d.anexados.all():
+                get_docadm_anexados_from(danex)
+
+        get_anexadas_from(principal)
+
+        docs = principal.documentoadministrativo_set.all()
+        for d in docs:
+            get_docadm_anexados_from(d)
+
+        m_paths = list(set(m_paths))
+        m_paths.sort(key=lambda x: f'{x[1]}{x[2]}')
+
+        def calc_hash(paths):
+            hash_input = ''.join(
+                [f'{i.id}-{prefixo}-{os.path.getmtime(path)}'
+                 for i, prefixo, path in paths]
+            ).encode('utf-8')
+            md5 = hashlib.md5()
+            md5.update(hash_input)
+            return md5.hexdigest()
+
+        hash_files = calc_hash(m_paths)
+
+        opt = self._meta
+
+        path_cache = '{}/{}/{}'.format(
+            opt.app_label,
+            opt.model_name,
+            f'cache-{self.ano}-{self.tipo.sigla}-{self.numero}-{self.id}-{hash_files}.zip'
+        )
+
+        if media_cache_storage.exists(path_cache):
+            return media_cache_storage.path(path_cache)
+
+        with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
+
+            with zipfile.ZipFile(tmp, 'w') as file:
+
+                for i, prefixo, path in m_paths:
+
+                    if isinstance(i, DocumentoAcessorio):
+                        arcname = '{}-DA-{}-{}-{}-{}'.format(
+                            prefixo,
+                            i.ano,
+                            i.tipo.descricao,
+                            i.nome,
+                            i.id
+                        )
+                        arcname = slugify(arcname)
+                        arcname = f'{arcname}.{path.split(".")[-1] or "pdf"}'
+
+                    elif isinstance(i, MateriaLegislativa) and hasattr(i, 'emendaloa'):
+                        arcname = '{}-{}-{}--{}'.format(
+                            prefixo,
+                            i.ano,
+                            i.numero,
+                            i.id
+                        )
+                        arcname = slugify(arcname)
+                        arcname = f'{arcname}.{path.split(".")[-1] or "pdf"}'
+                        unidade_orcamentaria = f'{i.emendaloa.unidade.codigo}-{i.emendaloa.unidade.especificacao}'
+                        unidade_orcamentaria = slugify(unidade_orcamentaria)
+                        arcname = f'{unidade_orcamentaria}/{arcname}'
+                    else:
+                        arcname = '{}-{}-{}-{}-{}-{}-{}'.format(
+                            prefixo,
+                            'ML' if isinstance(
+                                i, MateriaLegislativa) else 'DA',
+                            i.ano,
+                            i.numero,
+                            i.tipo.sigla,
+                            i.tipo.descricao,
+                            i.id
+                        )
+                        arcname = slugify(arcname)
+                        arcname = f'{arcname}.{path.split(".")[-1] or "pdf"}'
+
+                    file.write(
+                        path,
+                        arcname
+                    )
+
+            tmp.seek(0)
+
+            media_cache_storage.save(path_cache, tmp)
+        return media_cache_storage.path(path_cache)
+
 
 
 class AutoriaManager(models.Manager):

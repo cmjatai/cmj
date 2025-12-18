@@ -2354,86 +2354,12 @@ class MateriaLegislativaCrud(Crud):
 
         def download(self, download):
 
-            ff = 'original_path' if download == 'original' else 'path'
-
-            m_paths = []
-
             principal = self.get_object()
-
-            def get_anexadas_from(m, prefixo=''):
-                p = getattr(m.texto_original, ff)
-                m_paths.append((m, prefixo, p))
-                for a in m.materia_principal_set.filter(
-                    data_desanexacao__isnull=True
-                ).order_by('materia_anexada__tipo', 'data_anexacao'):
-                    manex = a.materia_anexada
-                    p2 = 'MatAnexadas-{}-{}-{:03d}-{}'.format(
-                        slugify(manex.tipo.descricao),
-                        manex.ano,
-                        manex.numero,
-                        slugify(manex.tipo.sigla)
-                    )
-
-                    get_anexadas_from(
-                        a.materia_anexada,
-                        prefixo=p2)
-
-                for d in m.documentoacessorio_set.all():
-
-                    m_paths.append((d, prefixo, getattr(d.arquivo, ff)))
-
-            def get_docadm_anexados_from(d):
-                if d.texto_integral:
-                    p = getattr(d.texto_integral, ff)
-                    m_paths.append((d, 'DocAdms', p))
-
-                for danex in d.anexados.all():
-                    get_docadm_anexados_from(danex)
-
-            get_anexadas_from(principal)
-
-            docs = principal.documentoadministrativo_set.all()
-            for d in docs:
-                get_docadm_anexados_from(d)
-
-            m_paths = list(set(m_paths))
-
-            with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
-
-                with zipfile.ZipFile(tmp, 'w') as file:
-
-                    for i, prefixo, path in m_paths:
-
-                        if isinstance(i, DocumentoAcessorio):
-                            arcname = '{}-DA-{}-{}-{}-{}.{}'.format(
-                                prefixo,
-                                i.ano,
-                                slugify(i.tipo.descricao),
-                                slugify(i.nome),
-                                i.id,
-                                path.split('.')[-1]
-                            )
-                        else:
-                            arcname = '{}-{}-{}-{}-{}-{}-{:02d}.{}'.format(
-                                prefixo,
-                                'ML' if isinstance(
-                                    i, MateriaLegislativa) else 'DA',
-                                i.ano,
-                                i.numero,
-                                slugify(i.tipo.sigla),
-                                slugify(i.tipo.descricao),
-                                i.id,
-                                path.split('.')[-1])
-
-                        file.write(
-                            path,
-                            arcname
-                        )
-
-                tmp.seek(0)
-
-                response = HttpResponse(tmp.read(),
-                                        content_type='application/zip')
+            path_zip_cache = principal.zip_process(original=download == 'original')
+            response = HttpResponse(
+                open(path_zip_cache, 'rb'),
+                content_type='application/zip'
+            )
 
             response['Cache-Control'] = 'no-cache'
             response['Pragma'] = 'no-cache'
