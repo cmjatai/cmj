@@ -12,7 +12,7 @@ from sapl.protocoloadm.models import StatusTramitacaoAdministrativo, DocumentoAd
 from cmj.genia import IAAnaliseSimilaridadeService, IAClassificacaoMateriaService
 from sapl.materia.models import MateriaLegislativa
 from sapl.base.models import Metadata
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils import timezone
 from django.conf import settings
 
@@ -135,7 +135,7 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
         ).prefetch_related('autores', 'assuntos'
                         ).order_by('-id').distinct()
 
-        # cria uma lista de tuplas contendo o id do requerimento, uma tumpla com os ids dos autores e uma tupla com os ids dos assuntos
+        # cria uma lista de tuplas contendo o id do requerimento, uma tupla com os ids dos autores e uma tupla com os ids dos assuntos
         requerimentos_ids = []
         for requerimento in requerimentos:
             requerimentos_ids.append(
@@ -154,15 +154,30 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
         requerimentos_comparacao = {}
         for i, r1 in enumerate(requerimentos_ids):
             for j, r2 in enumerate(requerimentos_ids):
-                if i == j:
+                if i == j: # mesmo requerimento
                     continue
-                if r1[1] == r2[1]:
+
+                if r1[0] < r2[0]: # para evitar duplicidade, sempre compara o maior id com o menor
                     continue
-                if len(r1[1]) >=5 or len(r2[1]) >= 5:
+
+                if len(r1[1]) >=5 or len(r2[1]) >= 5: # de cinco autores para cima, não compara
                     continue
+
+                # se existe interseção entre os autores, não compara
+                set1 = set(r1[1])
+                set2 = set(r2[1])
+                if set1.intersection(set2):
+                    continue
+
+                # se um dos requerimentos não possui assuntos, inclui na comparação com interseção vazia
+                if not r1[2] or not r2[2]:
+                    requerimentos_comparacao[(r1[0], r2[0])] = tuple()
+                    continue
+
                 set1 = set(r1[2])
                 set2 = set(r2[2])
                 intersection = set1.intersection(set2)
+
                 requerimentos_comparacao[(r1[0], r2[0])] = tuple(intersection)
 
         # remove os requerimentos que possuem chave invertida
@@ -198,34 +213,32 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             Q(materia_1_id=only_materia_id) | Q(materia_2_id=only_materia_id)
         )
 
-
-    analise = AnaliseSimilaridade.objects.filter(
-        q,
-        similaridade = -1,
-        qtd_assuntos_comuns__gt=0,
-        data_analise__gte=(hoje-timedelta(days=7)),
-    ).first()
-
-    if not analise:
-        # recupera uma analise para enviar a ia.
-        analise = AnaliseSimilaridade.objects.filter(
+        analises = AnaliseSimilaridade.objects.filter(
+            q,
             similaridade = -1,
-            qtd_assuntos_comuns__gt=0
-        ).first()
+            qtd_assuntos_comuns__gt=0,
+            materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
+        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-id')
 
-    if not analise:
-        gera_registros_de_analise_vazios()
-        analise = AnaliseSimilaridade.objects.filter(
-            similaridade = -1
-        ).first()
+        gen = IAAnaliseSimilaridadeService()
+        gen.batch_run(analises)
 
-    if not analise:
-        return
+    else:
 
-    gen = IAAnaliseSimilaridadeService()
-    analise = gen.run(analise)
+        # recupera analises que possue assuntos em comum para enviar a ia.
+        analises = AnaliseSimilaridade.objects.filter(
+            similaridade = -1,
+            qtd_assuntos_comuns__gt=0,
+            materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
+            #data_analise__gte=(hoje-timedelta(days=7)), # prioriza analises recentes com pendência de similaridade
+        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-id')
 
-    return analise
+        if analises.exists():
+            gen = IAAnaliseSimilaridadeService()
+            gen.batch_run(analises[:10])
+        else:
+            gera_registros_de_analise_vazios()
+
 
 
 @cmj_celery_app.task(queue='cq_base', bind=True)
@@ -240,17 +253,9 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
 
     #if restart:
     logger.info('Executando...')
-    analise = None
     only_materia_id = args[0] if args else None
 
     try:
-        analise = task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
+        task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
     except Exception as e:
         logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
-
-    if analise:
-        return json.dumps({
-            'materia_1_id': analise.materia_1_id,
-            'materia_2_id': analise.materia_2_id,
-        })
-

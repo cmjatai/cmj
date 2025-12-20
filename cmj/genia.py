@@ -1,6 +1,8 @@
 import json
 import logging
+from pydoc import text
 import re
+import time
 
 from django.conf import settings
 from django.contrib import messages
@@ -381,9 +383,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 """
         return prompt1
 
-    def run(self, similaridade, *args, **kwargs):
-        # não presuma semelhança com run da classe acima
-
+    def extract_text_from_similaridade(self, similaridade):
         mat1 = similaridade.materia_1
         mat2 = similaridade.materia_2
 
@@ -394,6 +394,15 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
         doc2 = pymupdf.open(mat2.texto_original.original_path)
         text2 = self._extract_pdf_text_robust(doc2)
         text2 = clean_text(text2)
+
+        return text1, text2
+
+    def run(self, similaridade, *args, **kwargs):
+        # não presuma semelhança com run da classe acima
+
+        text1, text2 = self.extract_text_from_similaridade(similaridade)
+        mat1 = similaridade.materia_1
+        mat2 = similaridade.materia_2
 
         prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
 
@@ -414,5 +423,88 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
         similaridade.save()
         return similaridade
 
+    def batch_run(self, analises):
+
+        quota = self.select_iamodel_with_quota()
+
+        inline_analises = []
+        inline_requests = []
+        for analise in analises:
+
+            text1, text2 = self.extract_text_from_similaridade(analise)
+            mat1 = analise.materia_1
+            mat2 = analise.materia_2
+
+            prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
+            inline_analises.append(analise)
+            inline_requests.append(
+                {
+                    'config': dict(
+                        #temperature=self.temperature,
+                        #top_p=self.top_p,
+                        #top_k=self.top_k,
+                        response_mime_type=self.response_mime_type,
+                    ),
+                    'contents': [
+                        {
+                            'parts': [
+                                {
+                                    'text': prompt
+                                }
+                            ],
+                            'role': 'user'
+                        }
+                    ],
+                }
+            )
+
+        inline_batch_job = self.client.batches.create(
+            model = self.ia_model_name,
+            src =  inline_requests,
+            config = {
+                'display_name': 'batch_analise_similaridade_entre_materias',
+            }
+        )
 
 
+        # wait for the job to finish
+        job_name = inline_batch_job.name
+        #print(f"Polling status for job: {job_name}")
+
+        while True:
+            batch_job_inline = self.client.batches.get(name=job_name)
+            if batch_job_inline.state.name in ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'):
+                break
+            #print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")
+            time.sleep(30)
+
+        #print(f"Job finished with state: {batch_job_inline.state.name}")
+
+        if batch_job_inline.state.name != 'JOB_STATE_SUCCEEDED':
+            #print("Batch job did not succeed.")
+            return
+
+        # print the response
+        for i, inline_response in enumerate(batch_job_inline.dest.inlined_responses, start=0):
+            #print(f"\n--- Response {i} ---")
+
+            # Check for a successful response
+            if inline_response.response:
+                # The .text property is a shortcut to the generated text.
+                text = inline_response.response.text
+                #print(text)
+
+                quota.create_log()
+
+                similaridade = inline_analises[i]
+                similaridade.analise = text
+                similaridade.ia_name = self.ia_model_name
+                similaridade.data_analise = timezone.localtime()
+
+                try:
+                    similaridade_value = similaridade.analise.split('[[')[1].split('%')[0].strip()
+                    similaridade.similaridade = int(similaridade_value)
+                except Exception as e:
+                    logger.error(e)
+                    similaridade.similaridade = 0
+                similaridade.save()

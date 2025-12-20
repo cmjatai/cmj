@@ -2429,11 +2429,15 @@ class MateriaLegislativaCrud(Crud):
                         materia=obj
                     )
 
-            # task_analise_similaridade_entre_materias_function(gen.object.id)
-            task_analise_similaridade_entre_materias.apply_async(
-                (gen.object.id, ),
-                countdown=10
-            )
+
+            if not settings.DEBUG or (
+                    settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
+                task_analise_similaridade_entre_materias.apply_async(
+                    (gen.object.id, ),
+                    countdown=10
+                )
+            else:
+                task_analise_similaridade_entre_materias_function(gen.object.id)
 
             return HttpResponseRedirect(reverse(
                 'sapl.materia:materialegislativa_detail',
