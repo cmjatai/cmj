@@ -13,27 +13,29 @@ from django.utils import timezone
 from cmj.core.models import IAQuota
 from cmj.utils import clean_text
 from sapl.base.models import Metadata
-import google.generativeai as genai
+from google import genai
+from google.genai import types
+
 
 logger = logging.getLogger(__name__)
 
 class IAGenaiBase:
-    ia_model_name = "gemini-2.0-flash-exp"
+    ia_model_name = "gemini-2.0-flash-lite"
     temperature = 0.1
     top_k = 40
     top_p = 0.95
     response_mime_type = "application/json"
 
-    def get_iamodel_configured(self):
-        generation_config = {
-          "temperature": self.temperature,
-          "top_p": self.top_p,
-          "top_k": self.top_k,
-          # "max_output_tokens": 8192,
-          "response_mime_type": self.response_mime_type,
-        }
+    def select_iamodel_with_quota(self):
+        self.generation_config = types.GenerateContentConfig(
+            temperature=self.temperature,
+            top_p=self.top_p,
+            top_k=self.top_k,
+            # max_output_tokens=8192,
+            response_mime_type=self.response_mime_type,
+        )
 
-        genai.configure(api_key=settings.GEMINI_API_KEY)
+        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
         qms = IAQuota.objects.quotas_with_margin()
         if not qms:
@@ -47,12 +49,15 @@ class IAGenaiBase:
             qms = qms_custom
             quota = qms[0]
 
-        model = genai.GenerativeModel(
-          model_name=self.ia_model_name,
-          generation_config=generation_config,
-        )
+        return quota
 
-        return model, quota
+    def generate_content(self, contents):
+        response = self.client.models.generate_content(
+            model=self.ia_model_name,
+            contents=contents,
+            config=self.generation_config,
+        )
+        return response
 
     def _extract_pdf_text_robust(self, doc):
         """
@@ -278,9 +283,9 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             if not prompt:
                 return
 
-            ia_model, quota = self.get_iamodel_configured()
+            quota = self.select_iamodel_with_quota()
 
-            answer = ia_model.generate_content(prompt)
+            answer = self.generate_content(prompt)
             quota.create_log()
 
             obj = self.object
@@ -392,8 +397,8 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
         prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
 
-        ia_model, quota = self.get_iamodel_configured()
-        answer = ia_model.generate_content(prompt)
+        quota = self.select_iamodel_with_quota()
+        answer = self.generate_content(prompt)
         quota.create_log()
 
         similaridade.analise = answer.text
