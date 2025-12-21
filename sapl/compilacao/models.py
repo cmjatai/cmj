@@ -1,9 +1,9 @@
 from collections import OrderedDict
-from pickle import NONE
 import re
+from bs4 import BeautifulSoup as bs
 
 from django.contrib import messages
-from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.db.models import F, Q
@@ -19,7 +19,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from numpy import isin
 
-from cmj.utils import media_cache_storage
+from cmj.utils import clean_text, media_cache_storage
 from sapl.compilacao.utils import (get_integrations_view_names, int_to_letter,
                                    int_to_roman)
 from sapl.crud.base import SearchMixin
@@ -649,6 +649,133 @@ class TextoArticulado(TimestampedMixin):
         if content_object and hasattr(content_object, 'is_revogado'):
             return content_object.is_revogado()
         return False
+
+    def generate_chunks(self, tipo_dispositivo):
+        qs_dispositivos = self.dispositivos_set.all()
+        dispositivos = []
+        dispositivos_dict = OrderedDict()
+        for d in qs_dispositivos:
+
+            d_tuple = (d, {
+                    'embeddings': d.embeddings.all(),
+                    'rendered': d.render_texto(),
+                    'texto' : d.texto.strip(),
+                    'rotulo': d.rotulo.strip(),
+                    'chunks': []
+                })
+
+            dispositivos.append(d_tuple)
+            dispositivos_dict[d.pk] = d_tuple
+
+        for i, dispositivo in enumerate(dispositivos):
+            d, context = dispositivo
+
+            # não individualizar dispositivos menores que o tipo solicitado
+            if d.tipo_dispositivo.id < tipo_dispositivo.id:
+                continue
+
+            texto = context['texto']
+            rotulo = context['rotulo']
+            renderizado = context['rendered']
+            if not texto and not rotulo:
+                continue
+
+            # se é caput, não cria chunk
+            if d.tipo_dispositivo.id == 120:
+                continue
+
+            disp_renderizado = (rotulo + ' ' + renderizado) if rotulo else renderizado
+
+            textos_next = [disp_renderizado]
+            faz_mais_um = True
+            for j, dnext in enumerate(dispositivos[i+1:]):
+                dnext, contextnext = dnext
+                texto_next = contextnext['rendered']
+                disp_renderizado = (contextnext['rotulo'] + ' ' + texto_next) if contextnext['rotulo'] else texto_next
+                textos_next.append(disp_renderizado)
+
+                if not faz_mais_um:
+                    break
+
+                if dnext.nivel <= d.nivel:
+                    if dnext.tipo_dispositivo_id == 119:
+                        faz_mais_um = False
+                    else:
+                        break
+
+            textos_previous = []
+            parents = d.get_parents()
+            for dprev in parents:
+                texto_prev = dprev.render_texto()
+                disp_renderizado = (dprev.rotulo + ' ' + texto_prev) if dprev.rotulo else texto_prev
+                textos_previous.insert(0, disp_renderizado)
+
+
+            if False: # retorno linear
+                disp_previous = dispositivos[:i]
+                disp_previous.reverse()
+                textos_previous = []
+                for k, dprev in enumerate(disp_previous):
+                    dprev, contextprev = dprev
+
+                    texto_prev = contextprev['rendered']
+                    disp_renderizado = (contextprev['rotulo'] + ' ' + texto_prev) if contextprev['rotulo'] else texto_prev
+                    textos_previous.insert(0, disp_renderizado)
+
+                    if d.tipo_dispositivo_id > 120 and dprev.tipo_dispositivo_id <= 119:
+                        break
+
+                    if d.tipo_dispositivo_id == dprev.tipo_dispositivo_id:
+                        break
+
+            chunks = []
+            textos = textos_previous + textos_next
+
+            chunk_size = 3072
+            current_chunk = ''
+            for t in textos:
+                if len(current_chunk.split()) + len(t.split()) > chunk_size:
+                    chunks.append(current_chunk)
+                    current_chunk = t
+                else:
+                    current_chunk += ' \n ' + t
+            if current_chunk:
+                chunks.append(current_chunk)
+
+            for idx, c in enumerate(chunks):
+                chunks[idx] = str(bs(c, 'html.parser')) # converte letras acentuadas em formato html para letra com acento
+
+                chunks[idx] = re.sub(r'[ \t]{2,}', ' ', chunks[idx])
+                chunks[idx] = re.sub(r' \n \n ', ' \n ', chunks[idx])
+
+                while len(chunks[idx]) > 0 and chunks[idx][0] in [' ', '\n']:
+                    chunks[idx] = chunks[idx][1:]
+
+            context['chunks'] = chunks
+
+        for dpt in dispositivos:
+            d, context = dpt
+            if not context['chunks']:
+                continue
+
+            for c in context['chunks']:
+
+                emb = d.embeddings.filter(chunk=c).first()
+                if not emb:
+                    emb = d.embeddings.create(
+                        chunk=c
+                    )
+                print(emb)
+
+        return dispositivos
+
+
+
+
+
+
+
+
 
 
 class TipoNota(models.Model):
@@ -1351,6 +1478,11 @@ class Dispositivo(BaseModel, TimestampedMixin):
         max_length=256,
         default='',
         blank=True)
+
+    embeddings = GenericRelation(
+        'search.Embedding',
+        related_query_name='dispositivo_set',
+        )
 
     class Meta:
         verbose_name = _('Dispositivo')
@@ -2070,6 +2202,14 @@ class Dispositivo(BaseModel, TimestampedMixin):
     def render_texto(self):
         return UrlizeReferencia.urlize(self.texto)
 
+    def deep_childs(self):
+        dc = []
+        childs = Dispositivo.objects.filter(
+            dispositivo_pai=self, dispositivo_subsequente__isnull=True)
+        for c in childs:
+            dc.extend(self.deep_childs(c))
+        return dc
+
     def render_relative_chunk(self, initial=True, nivel=None):
         chunk_parents = []
         parents = self.get_parents_asc() if initial else []
@@ -2082,8 +2222,11 @@ class Dispositivo(BaseModel, TimestampedMixin):
             if p.tipo_dispositivo_id == 120:
                 continue
 
+            if not p.rotulo and not p.texto:
+                continue
+
             s = ' ' * p.nivel
-            c = f'{s}{p.rotulo} - {p.render_texto()}'
+            c = f'{s}{p.rotulo}{" - " if p.texto.strip() else ""}{p.render_texto()}'
             c = c.rstrip()
             if not c:
                 continue
@@ -2099,8 +2242,12 @@ class Dispositivo(BaseModel, TimestampedMixin):
                 chunk_parents[-1] += ' ' + c
             else:
                 chunk_parents.append(c)
+            if p.tipo_dispositivo_id < self.tipo_dispositivo_id:
+                chunk_parents.append('\n')
 
         for c in self.dispositivos_filhos_set.all():
+            if c.tipo_dispositivo_id == 120:
+                continue
             chunk_parents.extend(c.render_relative_chunk(
                 initial=False, nivel=nivel))
 
