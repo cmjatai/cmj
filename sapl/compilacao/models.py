@@ -651,7 +651,9 @@ class TextoArticulado(TimestampedMixin):
         return False
 
     def generate_chunks(self, tipo_dispositivo):
-        qs_dispositivos = self.dispositivos_set.all()
+        qs_dispositivos = self.dispositivos_set.filter(
+            dispositivo_subsequente__isnull=True
+        )
         dispositivos = []
         dispositivos_dict = OrderedDict()
         for d in qs_dispositivos:
@@ -731,7 +733,7 @@ class TextoArticulado(TimestampedMixin):
             chunks = []
             textos = textos_previous + textos_next
 
-            chunk_size = 3072
+            chunk_size = 1536
             current_chunk = ''
             for t in textos:
                 if len(current_chunk.split()) + len(t.split()) > chunk_size:
@@ -758,7 +760,25 @@ class TextoArticulado(TimestampedMixin):
             if not context['chunks']:
                 continue
 
+            chunks_db = [c.chunk for c in d.embeddings.all()]
+            if len(chunks_db) == len(context['chunks']):
+                equal = True
+                for i, c in enumerate(context['chunks']):
+                    c = f'{self} \n {c}'
+                    if c != chunks_db[i]:
+                        equal = False
+                        break
+                if equal:
+                    continue
+            else:
+                equal = False
+
+            if not equal:
+                d.embeddings.all().delete()
+
             for c in context['chunks']:
+
+                c = f'{self} \n {c}'
 
                 emb = d.embeddings.filter(chunk=c).first()
                 if not emb:
