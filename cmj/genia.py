@@ -28,6 +28,10 @@ class IAGenaiBase:
     top_p = 0.95
     response_mime_type = "application/json"
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.select_iamodel_with_quota()
+
     def select_iamodel_with_quota(self):
         self.generation_config = types.GenerateContentConfig(
             temperature=self.temperature,
@@ -51,6 +55,7 @@ class IAGenaiBase:
             qms = qms_custom
             quota = qms[0]
 
+        self.quota = quota
         return quota
 
     def generate_content(self, contents):
@@ -93,6 +98,41 @@ class IAGenaiBase:
                 text_parts.append("")
 
         return ' '.join(text_parts)
+
+    def count_tokens_in_text(self, text):
+        self.select_iamodel_with_quota()
+        try:
+            #self.ia_model_name = "gemini-3-pro-preview"
+            response = self.client.models.count_tokens(
+                model=self.ia_model_name,
+                contents=text
+            )
+            return response.total_tokens
+        except Exception as e:
+            logger.error(f"Erro ao contar tokens: {e}")
+            time.sleep(2)
+            return 0
+
+    def embed_content(self, text):
+        self.select_iamodel_with_quota()
+        try:
+            response = self.client.models.embed_content(
+                model='gemini-embedding-001',
+                contents=[text],
+                config=types.EmbedContentConfig(
+                    task_type='RETRIEVAL_QUERY',
+                    output_dimensionality=3072,
+                )
+            )
+            [embedding_object] = response.embeddings
+            #print(len(embedding_object.values))
+            return embedding_object.values
+        except Exception as e:
+            logger.error(f"Erro ao gerar embedding: {e}")
+            time.sleep(2)
+            return []
+
+
 
 class IAClassificacaoMateriaService(IAGenaiBase):
 
