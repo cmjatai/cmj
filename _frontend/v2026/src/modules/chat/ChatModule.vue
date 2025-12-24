@@ -14,7 +14,7 @@
       data-bs-target="#chatHistoryOffcanvas"
       aria-controls="chatHistoryOffcanvas"
     >
-      <i class="fas fa-history" />
+      <FontAwesomeIcon icon="history" />
     </button>
 
     <!-- Offcanvas for Mobile -->

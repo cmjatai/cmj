@@ -192,7 +192,7 @@ const links = ref([
   {
     icon: 'hat-wizard',
     route: 'chat_module_view',
-    texto: 'BeeLegis'
+    texto: 'LegisBee'
   }
 ])
 
