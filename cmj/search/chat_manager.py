@@ -68,18 +68,25 @@ class ChatContextManager:
             defaults={'user': user}
         )
 
-        # Salva cada mensagem
-        messages = []
-        for msg in history:
-            messages.append(
-                ChatMessage(
-                    session=chat_session,
-                    role=msg['role'],
-                    content=msg['parts'][0]['text']
-                )
-            )
+        # Verifica quantas mensagens já existem para evitar duplicatas
+        existing_count = chat_session.messages.count()
 
-        ChatMessage.objects.bulk_create(messages, batch_size=100)
+        # Se o cache tem mais mensagens que o banco, salva as novas
+        if len(history) > existing_count:
+            new_messages_data = history[existing_count:]
+
+            messages = []
+            for msg in new_messages_data:
+                messages.append(
+                    ChatMessage(
+                        chat=chat_session,
+                        role=msg['role'],
+                        content=msg['parts'][0]['text']
+                    )
+                )
+
+            ChatMessage.objects.bulk_create(messages, batch_size=100)
+
         return chat_session
 
     # Restaurar contexto anterior
