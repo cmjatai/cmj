@@ -29,7 +29,7 @@ services:
     networks:
       - cmj-net
   cmjdb:
-    image: postgres:14.5-alpine
+    image: pgvector/pgvector:0.8.1-pg15  #postgres:14.5-alpine
     restart: always
     container_name: cmjpostgres
     labels:
@@ -40,7 +40,7 @@ services:
       POSTGRES_DB: cmj
       PGDATA : /var/lib/postgresql/data/
     volumes:
-      - cmjdb_data:/var/lib/postgresql/data/
+      - cmjdb15_data:/var/lib/postgresql/data/
     ports:
       - "5432:5432"
     networks:
@@ -78,7 +78,7 @@ networks:
     name: cmj-net
     driver: bridge
 volumes:
-  cmjdb_data:
+  cmjdb15_data:
   cmj_data:
   cmj_media:
   cmj_logs:
