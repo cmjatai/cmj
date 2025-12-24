@@ -46,6 +46,8 @@ GROUP_ARQ_OPERADOR = _('Operador do Modulo Arq')
 
 GROUP_PAINELSET_OPERADOR = _('Operador do Modulo PainelSet')
 
+GROUP_IA_OPERADOR = _('Usuário do Chat I.A.')
+
 GROUP_ANONYMOUS = ''
 
 CMJ_GROUPS = [

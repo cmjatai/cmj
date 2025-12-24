@@ -10,7 +10,8 @@ from cmj.sigad import models as sigad_models
 from cmj.cerimonial import models as cerimonial_models
 from cmj.core import models as core_models
 from sapl.parlamentares import models as parlamentares_models
-from cmj.globalrules import (GROUP_PAINELSET_OPERADOR, RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
+from cmj.search import models as search_models
+from cmj.globalrules import (GROUP_IA_OPERADOR, GROUP_PAINELSET_OPERADOR, RP_ADD, RP_CHANGE, RP_DELETE, RP_DETAIL, RP_LIST,
                              GROUP_SOCIAL_USERS,
                              GROUP_SAAP_WORKSPACE_OPER_CONTATOS,
                              menu_contatos, menu_dados_auxiliares,
@@ -225,6 +226,21 @@ rules_draft_group_operador = {
     'rules': [
         (arq_models.Draft, __base__, set()),
         (arq_models.DraftMidia, __base__, set()),
+    ]
+}
+
+rules_ia_group_operador = {
+    'group': GROUP_IA_OPERADOR,
+    'rules': [
+        (get_user_model(), [
+            'search.can_use_chat_module'], set()),
+        (search_models.ChatSession, __base__ + [
+            'search.can_use_chat_module'
+        ], set()),
+        (search_models.ChatMessage, __base__+ [
+            'search.can_use_chat_module'
+        ], set()),
+        #(search_models.Embedding, __base__, set()),
     ]
 }
 

@@ -86,7 +86,7 @@ class ChatMessage(models.Model):
         ('model', 'Model'),
     ]
 
-    session = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name='messages')
+    chat = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name='messages')
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -96,5 +96,5 @@ class ChatMessage(models.Model):
     class Meta:
         ordering = ['timestamp']
         indexes = [
-            models.Index(fields=['session', 'timestamp']),
+            models.Index(fields=['chat', 'timestamp']),
         ]

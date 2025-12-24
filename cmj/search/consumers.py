@@ -18,7 +18,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope['user']
         self.session_id = self.scope['url_route']['kwargs']['session_id']
 
-        if self.user == AnonymousUser():
+        if self.user == AnonymousUser() or not self.user.has_perm('search.can_use_chat_module'):
             await self.close()
             return
 
@@ -28,6 +28,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Carrega histórico anterior do banco (se existir)
         await self.load_previous_context()
 
+        # Recupera histórico formatado para o frontend
+        history = await self.get_formatted_history()
+
         await self.channel_layer.group_add(
             f"chat_{self.session_id}",
             self.channel_name
@@ -36,7 +39,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         await self.send(json.dumps({
             "type": "connection_established",
-            "session_id": self.session_id
+            "session_id": self.session_id,
+            "history": history
         }))
 
     async def disconnect(self, close_code):
@@ -52,6 +56,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
     def load_previous_context(self):
         """Carrega histórico do banco para Cache"""
         return self.context_manager.load_session_context(self.session_id)
+
+    @sync_to_async
+    def get_formatted_history(self):
+        """Recupera histórico do cache e formata para o frontend"""
+        history = self.context_manager.get_context_for_gemini(self.session_id)
+        return [
+            {
+                "role": msg["role"],
+                "content": msg["parts"][0]["text"]
+            }
+            for msg in history
+        ]
 
     async def receive(self, text_data):
         if not self.user.is_authenticated or not self.user.has_perm('search.can_use_chat_module'):
@@ -88,6 +104,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'role': 'model'
                 }
             )
+
+            # ✅ Sincroniza com o banco de dados após a interação
+            await self.save_context_to_database()
 
         except Exception as e:
             await self.send_error(str(e))

@@ -116,6 +116,7 @@ CmjApiViewSetConstrutor.import_modules([
     'cmj.api.views_diarios',
     'cmj.api.views_loa',
     'cmj.api.views_painelset',
+    'cmj.api.views_search',
 ]
 )
 

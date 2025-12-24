@@ -42,7 +42,14 @@ export const routes = [
             meta: {
               title: 'Bee IA Chat Module',
               description: 'Home of Bee IA Chat Module'
-            }
+            },
+            children: [
+              {
+                path: ':sessionId?',
+                name: 'chat_session_view',
+                component: () => import('~@/modules/chat/ChatSessionView.vue')
+              }
+            ]
           }
         ]
       },
