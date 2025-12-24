@@ -43,11 +43,11 @@
         >
           <div class="d-flex w-100 justify-content-between">
             <h6 class="mb-1 text-truncate">
-              {{ getSessionTitle(session) }}
+              {{ session.title }}
             </h6>
             <small>{{ formatDate(session.created_at) }}</small>
           </div>
-          <small class="text-muted text-truncate d-block">
+          <small v-if="false" class="text-muted text-truncate d-block">
             {{ getLastMessage(session) }}
           </small>
         </li>

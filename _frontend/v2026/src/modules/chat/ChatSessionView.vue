@@ -16,7 +16,7 @@
       ref="messagesContainer"
     >
       <div
-        v-if="messages.length === 0"
+        v-if="messages.length === 0 && userCanUserChat"
         class="empty-state"
       >
         <p>Olá! Como posso ajudar você hoje?</p>
@@ -72,7 +72,8 @@
       v-else
       class="chat-input-area permission-denied"
     >
-      <p>Você não tem permissão para acessar o chat.</p>
+      <p>LegisBee está em desenvolvimento.</p>
+      <p v-if="false">Você não tem permissão para acessar o chat.</p>
     </div>
   </div>
 </template>
