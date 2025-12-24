@@ -54,6 +54,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return self.context_manager.load_session_context(self.session_id)
 
     async def receive(self, text_data):
+        if not self.user.is_authenticated or not self.user.has_perm('search.can_use_chat_module'):
+            await self.send_error("Authentication required")
+            await self.close()
+            return
+
         try:
             data = json.loads(text_data)
             user_message = data.get('message', '')

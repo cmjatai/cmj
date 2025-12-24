@@ -45,7 +45,10 @@
       </div>
     </div>
 
-    <div class="chat-input-area">
+    <div
+      v-if="userCanUserChat"
+      class="chat-input-area"
+    >
       <textarea
         v-model="inputMessage"
         @keydown.enter.prevent="sendMessage"
@@ -62,11 +65,21 @@
         <i class="fas fa-paper-plane" />
       </button>
     </div>
+    <div
+      v-else
+      class="chat-input-area permission-denied"
+    >
+      <p>Você não tem permissão para acessar o chat.</p>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue'
+
+import { useAuthStore } from '~@/stores/AuthStore'
+
+const authStore = useAuthStore()
 
 // Props
 const props = defineProps({
@@ -91,6 +104,8 @@ const inputRef = ref(null)
 
 // WebSocket Connection
 const connectWebSocket = () => {
+  if (!userCanUserChat.value) return
+
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
   const host = window.location.host
   const url = `${protocol}//${host}${props.wsEndpoint}${props.sessionId}/`
@@ -153,6 +168,10 @@ const handleSocketMessage = (data) => {
   }
 }
 
+const userCanUserChat = computed(() => {
+  return authStore.hasPermission('search.can_use_chat_module')
+})
+
 // Actions
 const sendMessage = () => {
   const text = inputMessage.value.trim()
@@ -205,7 +224,19 @@ watch(inputMessage, () => {
 
 // Lifecycle
 onMounted(() => {
-  connectWebSocket()
+  if (userCanUserChat.value) {
+    connectWebSocket()
+  }
+})
+
+watch(userCanUserChat, (newValue) => {
+  if (newValue && !isConnected.value) {
+    connectWebSocket()
+  } else if (!newValue && isConnected.value) {
+    if (socket.value) {
+      socket.value.close()
+    }
+  }
 })
 
 onUnmounted(() => {
@@ -323,6 +354,13 @@ onUnmounted(() => {
   gap: 10px;
   background: #f8f9fa;
   align-items: flex-end;
+}
+
+.chat-input-area.permission-denied {
+  justify-content: center;
+  color: #dc3545;
+  font-weight: 500;
+  align-items: center;
 }
 
 textarea {

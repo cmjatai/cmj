@@ -77,6 +77,8 @@ class ChatSession(models.Model):
         indexes = [
             models.Index(fields=['user', '-updated_at']),
         ]
+        permissions = [
+            ('can_use_chat_module', 'Usuário pode usar o módulo de chat'),]
 
 class ChatMessage(models.Model):
     ROLE_CHOICES = [
