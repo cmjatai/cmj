@@ -14,6 +14,7 @@ from django.core.handlers.asgi import ASGIHandler
 
 import cmj.core.routing
 import cmj.painelset.routing
+import cmj.search.routing
 
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cmj.settings")
@@ -29,7 +30,8 @@ application = ProtocolTypeRouter({
     'websocket': AuthMiddlewareStack(
         URLRouter(
             cmj.core.routing.websocket_urlpatterns +
-            cmj.painelset.routing.websocket_urlpatterns
+            cmj.painelset.routing.websocket_urlpatterns +
+            cmj.search.routing.websocket_urlpatterns
         )
     ),
     # Just HTTP for now. (We can add other protocols later.)

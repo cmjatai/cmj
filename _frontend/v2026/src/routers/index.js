@@ -34,6 +34,15 @@ export const routes = [
                 component: () => import('~@/modules/sessao/SessaoPlenariaView.vue')
               }
             ]
+          },
+          {
+            path: 'chat',
+            name: 'chat_module_view',
+            component: () => import('~@/modules/chat/ChatModule.vue'),
+            meta: {
+              title: 'Bee IA Chat Module',
+              description: 'Home of Bee IA Chat Module'
+            }
           }
         ]
       },
