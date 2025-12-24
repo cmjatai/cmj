@@ -1,3 +1,4 @@
 #google-generativeai==0.8.5
 google-genai==1.56.0
+pgvector==0.4.2
 #langchain-google-genai
