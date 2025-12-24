@@ -1,7 +1,10 @@
 <template>
   <div class="chat-module-layout">
     <!-- Sidebar / Offcanvas for Mobile -->
-    <div class="chat-sidebar d-none d-md-block">
+    <div
+      v-if="userCanUserChat"
+      class="chat-sidebar d-none d-md-block"
+    >
       <ChatHistoryList />
     </div>
 
@@ -19,6 +22,7 @@
 
     <!-- Offcanvas for Mobile -->
     <div
+      v-if="userCanUserChat"
       class="offcanvas offcanvas-start d-md-none"
       tabindex="-1"
       id="chatHistoryOffcanvas"
@@ -53,13 +57,19 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import ChatHistoryList from './ChatHistoryList.vue'
+import { useAuthStore } from '~@/stores/AuthStore'
+const authStore = useAuthStore()
+
+const userCanUserChat = computed(() => authStore.hasPermission('search.can_use_chat_module'))
+
 </script>
 
 <style scoped>
 .chat-module-layout {
   display: flex;
-  height: 100%; /* Ensure it takes full height of parent */
+  height: calc(100vh - 5rem); /* Ocupa a altura da tela menos a margem superior e um buffer */
   width: 100%;
   overflow: hidden;
   background-color: #fff;

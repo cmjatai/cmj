@@ -87,6 +87,19 @@ class ChatContextManager:
 
             ChatMessage.objects.bulk_create(messages, batch_size=100)
 
+            # Atualiza o título se ainda for o padrão e houver mensagem do usuário
+            if chat_session.title == "Nova Conversa":
+                for msg in history:
+                    if msg['role'] == 'user':
+                        # Limita o título a 100 caracteres
+                        content = msg['parts'][0]['text']
+                        new_title = content[:100]
+                        if len(content) > 100:
+                            new_title += "..."
+                        chat_session.title = new_title
+                        chat_session.save()
+                        break
+
         return chat_session
 
     # Restaurar contexto anterior
