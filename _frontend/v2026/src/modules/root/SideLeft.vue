@@ -188,6 +188,11 @@ const links = ref([
     route: '',
     link: '/online/painelset/',
     texto: 'Eventos e Painéis'
+  },
+  {
+    icon: 'hat-wizard',
+    route: 'chat_module_view',
+    texto: 'BeeLegis'
   }
 ])
 
