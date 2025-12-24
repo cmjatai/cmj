@@ -6,7 +6,7 @@
         class="btn btn-sm btn-outline-primary"
         @click="createNewChat"
       >
-        <i class="fas fa-plus" /> Novo
+        <i class="fas fa-plus" /> Nova Conversa
       </button>
     </div>
 
@@ -57,9 +57,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, inject } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
+
+const EventBus = inject('EventBus')
 
 const router = useRouter()
 const route = useRoute()
@@ -80,6 +82,10 @@ const fetchSessions = async () => {
     loading.value = false
   }
 }
+
+EventBus.on('chat:init:conversation', () => {
+  fetchSessions()
+})
 
 const createNewChat = () => {
   const newSessionId = 'session_' + Math.random().toString(36).substr(2, 9)

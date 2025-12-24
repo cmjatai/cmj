@@ -1,7 +1,10 @@
 <template>
   <div class="chat-session-view">
     <div class="chat-header">
-      <h3>Assistente Virtual</h3>
+      <h3>
+        <FontAwesomeIcon icon="hat-wizard" />
+        LegisBee
+      </h3>
       <span
         class="status-indicator"
         :class="{ connected: isConnected }"
@@ -62,7 +65,7 @@
         :disabled="!isConnected || !inputMessage.trim() || isLoading"
         class="send-btn"
       >
-        <i class="fas fa-paper-plane" />
+        <FontAwesomeIcon icon="paper-plane" />
       </button>
     </div>
     <div
@@ -75,12 +78,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick, watch, computed, inject } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '~@/stores/AuthStore'
+import MarkdownIt from 'markdown-it'
+
+const md = new MarkdownIt({
+  html: false,
+  linkify: true,
+  typographer: true
+})
 
 const authStore = useAuthStore()
 const route = useRoute()
+
+const EventBus = inject('EventBus')
 
 // Props
 const props = defineProps({
@@ -158,6 +170,9 @@ const handleSocketMessage = (data) => {
 
     case 'chat_message':
       isLoading.value = false
+      if (messages.value.length === 1) {
+        EventBus.emit('chat:init:conversation')
+      }
       messages.value.push({
         role: data.role, // 'model'
         content: data.message
@@ -209,7 +224,7 @@ const sendMessage = () => {
 }
 
 const formatMessage = (text) => {
-  return text.replace(/\n/g, '<br>')
+  return md.render(text)
 }
 
 const scrollToBottom = () => {
