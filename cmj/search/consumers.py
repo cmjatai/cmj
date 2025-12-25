@@ -23,12 +23,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = self.scope['user']
         self.session_id = self.scope['url_route']['kwargs']['session_id']
 
-        if self.user == AnonymousUser() or not self.user.has_perm('search.can_use_chat_module'):
+        has_perm = await sync_to_async(self.user.has_perm)('search.can_use_chat_module')
+        if self.user == AnonymousUser() or not has_perm:
             await self.close()
             return
-
-        # Recupera histórico formatado para o frontend
-        history = await self.get_formatted_history()
 
         # Controle de Concorrência: Derruba conexões anteriores na mesma sessão
         # Envia sinal para o grupo ANTES de entrar nele, para não desconectar a si mesmo
@@ -43,11 +41,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )
         await self.accept()
 
+        # Recupera histórico formatado para o frontend
+        history = await self.get_formatted_history()
+
+        max_length = self.context_manager.MAX_LENGTH_USER_MESSAGE
+        if self.user.is_superuser:
+            max_length = 10000
+
         await self.send(json.dumps({
             "type": "connection_established",
             "session_id": self.session_id,
             "history": history,
-            "max_length": self.context_manager.MAX_LENGTH_USER_MESSAGE
+            "max_length": max_length
         }))
 
     async def disconnect(self, close_code):
@@ -73,7 +78,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         ]
 
     async def receive(self, text_data):
-        if not self.user.is_authenticated or not self.user.has_perm('search.can_use_chat_module'):
+        has_perm = await sync_to_async(self.user.has_perm)('search.can_use_chat_module')
+        if not self.user.is_authenticated or not has_perm:
             await self.send_error("Authentication required")
             await self.close()
             return
@@ -82,8 +88,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             data = json.loads(text_data)
             user_message = data.get('message', '').strip()
 
-            if len(user_message) > self.context_manager.MAX_LENGTH_USER_MESSAGE:
-                await self.send_error(f"Mensagem muito longa. O limite é de {self.context_manager.MAX_LENGTH_USER_MESSAGE} caracteres.")
+            max_length = self.context_manager.MAX_LENGTH_USER_MESSAGE
+            if self.user.is_superuser:
+                max_length = 10000
+
+            if len(user_message) > max_length:
+                await self.send_error(f"Mensagem muito longa. O limite é de {max_length} caracteres.")
                 return
 
             user_message = escape(user_message)

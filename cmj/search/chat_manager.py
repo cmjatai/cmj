@@ -35,7 +35,8 @@ class ChatManager:
             )
             return response.text
 
-        return f'RESPOSTA: len_history {len(history)}' #sync_call()
+        #return f'RESPOSTA: len_history {len(history)}'
+        return sync_call()
 
     def process_user_message(self, session_id, user_message, user):
         """
@@ -61,8 +62,8 @@ class ChatManager:
         """
         # Verifica limite de sessões antes de criar uma nova
         if not ChatSession.objects.filter(session_id=session_id).exists():
-            if ChatSession.objects.filter(user=user).count() >= self.MAX_SESSIONS_PER_USER:
-                raise ValueError(f"Limite de sessões por usuário atingido ({self.MAX_SESSIONS_PER_USER}).")
+            if not user.is_superuser and ChatSession.objects.filter(user=user).count() >= self.MAX_SESSIONS_PER_USER:
+                raise ValueError(f"Devido aos custos com I.A. o limite de conversas por usuário atingido ({self.MAX_SESSIONS_PER_USER}).")
 
         # Cria ou obtém a sessão
         chat_session, created = ChatSession.objects.get_or_create(
@@ -71,8 +72,8 @@ class ChatManager:
         )
 
         # Verifica limite de mensagens
-        if chat_session.messages.count() >= self.MAX_MESSAGES_PER_SESSION:
-             raise ValueError(f"Limite de mensagens por sessão atingido ({self.MAX_MESSAGES_PER_SESSION}).")
+        if not user.is_superuser and chat_session.messages.count() >= self.MAX_MESSAGES_PER_SESSION:
+             raise ValueError(f"Devido aos custos com I.A. o limite de mensagens por conversa foi atingido ({self.MAX_MESSAGES_PER_SESSION}).")
 
         # Cria a mensagem
         ChatMessage.objects.create(

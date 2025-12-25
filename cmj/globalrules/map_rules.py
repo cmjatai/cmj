@@ -232,13 +232,11 @@ rules_draft_group_operador = {
 rules_ia_group_operador = {
     'group': GROUP_IA_OPERADOR,
     'rules': [
-        (get_user_model(), [
-            'search.can_use_chat_module'], set()),
         (search_models.ChatSession, __base__ + [
-            'search.can_use_chat_module'
+            'can_use_chat_module'
         ], set()),
         (search_models.ChatMessage, __base__+ [
-            'search.can_use_chat_module'
+            'can_use_chat_module'
         ], set()),
         #(search_models.Embedding, __base__, set()),
     ]
@@ -338,6 +336,7 @@ rules_patterns = [
     rules_ouvidoria_visualizacao_respostas,
 
     rules_painelset_group_operador,
+    rules_ia_group_operador,
 
     # rules_group_geral
 ]

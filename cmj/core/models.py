@@ -983,18 +983,21 @@ class CertidaoPublicacao(CmjAuditoriaModelMixin):
 class IAQuotaManager(models.Manager):
     use_for_related_fields = True
 
-    def quotas_with_margin(self):
+    def quotas_with_margin(self, ascending=True):
         """
         Retorna as quotas que possuem margem para serem utilizadas hoje.
         """
         hoje = timezone.localtime().date()
-        return self.get_queryset().filter(
+        qs = self.get_queryset().filter(
             ativo=True
         ).annotate(
             total=models.Sum('iaquotaslog_set__peso', filter=models.Q(iaquotaslog_set__data=hoje))
         ).filter(
             models.Q(total__isnull=True) | models.Q(total__lt=models.F('quota_diaria'))
-        ).order_by('quota_diaria', 'total')
+        )
+        if ascending:
+            return qs.order_by('quota_diaria', 'total')
+        return qs.order_by('-quota_diaria', '-total')
 
 class IAQuota(models.Model):
 

@@ -341,8 +341,8 @@ onUnmounted(() => {
 }
 
 .status-indicator {
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background-color: #dc3545;
   transition: background-color 0.3s;
