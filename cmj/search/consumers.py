@@ -29,12 +29,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         # Configure Gemini
-        self.ia = await sync_to_async(IAGenaiBase)()
+        self.ia = IAGenaiBase()
         self.ia.response_mime_type = 'text/plain'
         #self.ia.ia_model_name = 'gemini-3-flash-preview'
-
-        # Carrega histórico anterior do banco (se existir)
-        await self.load_previous_context()
 
         # Recupera histórico formatado para o frontend
         history = await self.get_formatted_history()
@@ -52,18 +49,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def disconnect(self, close_code):
-        # CRÍTICO: Salvar contexto ao desconectar
-        await self.save_context_to_database()
-
         await self.channel_layer.group_discard(
             f"chat_{self.session_id}",
             self.channel_name
         )
-
-    @sync_to_async
-    def load_previous_context(self):
-        """Carrega histórico do banco para Cache"""
-        return self.context_manager.load_session_context(self.session_id)
 
     @sync_to_async
     def get_formatted_history(self):
@@ -88,19 +77,19 @@ class ChatConsumer(AsyncWebsocketConsumer):
             user_message = data.get('message', '')
 
             # Salva mensagem do usuário no contexto
-            self.context_manager.add_message_to_context(
-                self.session_id, 'user', user_message
+            await sync_to_async(self.context_manager.add_message_to_context)(
+                self.session_id, 'user', user_message, self.user
             )
 
-            # Obtém histórico completo do Cache
-            history = self.context_manager.get_context_for_gemini(self.session_id)
+            # Obtém histórico completo do DB
+            history = await sync_to_async(self.context_manager.get_context_for_gemini)(self.session_id)
 
             # Envia para Gemini com histórico
             response = await self.query_gemini(history)
 
             # Salva resposta do modelo no contexto
-            self.context_manager.add_message_to_context(
-                self.session_id, 'model', response
+            await sync_to_async(self.context_manager.add_message_to_context)(
+                self.session_id, 'model', response, self.user
             )
 
             # Envia resposta ao cliente
@@ -112,9 +101,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     'role': 'model'
                 }
             )
-
-            # Sincroniza com o banco de dados após a interação
-            await self.save_context_to_database()
 
         except Exception as e:
             await self.send_error(str(e))
@@ -138,12 +124,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             )
             return response.text
 
-        return await sync_to_async(sync_call)()
-
-    @sync_to_async
-    def save_context_to_database(self):
-        """Persiste contexto ao desconectar"""
-        return self.context_manager.export_to_database(self.session_id, self.user)
+        return f'RESPOSTA: len_history {len(history)}' #await sync_to_async(sync_call)()
 
     async def chat_message(self, event):
         await self.send(json.dumps({

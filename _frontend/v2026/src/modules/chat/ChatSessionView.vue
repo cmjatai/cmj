@@ -66,7 +66,7 @@
         v-model="inputMessage"
         @keydown.enter.prevent="sendMessage"
         :class="[messages.length >= 8 ? 'permission-denied' : '']"
-        :placeholder="messages.length >= 8 ? 'Limite de mensagens atingido' : 'Digite sua mensagem...'"
+        :placeholder="messages.length >= 8 ? 'Limite Atingido. LegisBee está limitado à 8 mensagens por conversa e apenas duas conversas no histórico' : 'Digite sua mensagem...'"
         :disabled="!isConnected || isLoading || messages.length >= 8"
         rows="1"
         ref="inputRef"

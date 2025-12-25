@@ -1,139 +1,69 @@
 
-import json
-from django.core.cache import cache
-from django.conf import settings
-from datetime import timedelta
-
+import logging
 from cmj.search.models import ChatMessage, ChatSession
 
-MAX_SESSIONS_PER_USER = 20
-MAX_MESSAGES_PER_SESSION = 50
+logger = logging.getLogger(__name__)
 
 class ChatContextManager:
+
+    MAX_SESSIONS_PER_USER = 2
+    MAX_MESSAGES_PER_SESSION = 8
+
     def __init__(self):
-        self.CONTEXT_TTL = 3600  # 1 hora de inatividade
+        pass
 
-    def get_session_key(self, session_id):
-        return f"chat_context:{session_id}"
-
-    def get_history_key(self, session_id):
-        return f"chat_history:{session_id}"
-
-    # Salvar novo mensagem no contexto ATIVO
-    def add_message_to_context(self, session_id, role, content):
+    def add_message_to_context(self, session_id, role, content, user):
         """
-        Adiciona mensagem ao Cache (conversa ativa)
+        Adiciona mensagem diretamente ao banco de dados
         """
-        history_key = self.get_history_key(session_id)
-
-        message = {
-            "role": role,
-            "parts": [{"text": content}]  # Formato esperado pela SDK Gemini
-        }
-
-        # Recupera lista atual ou inicia nova
-        history = cache.get(history_key, [])
-
-        if len(history) >= MAX_MESSAGES_PER_SESSION:
-            raise ValueError(f"Limite de mensagens por sessão atingido ({MAX_MESSAGES_PER_SESSION}).")
-
-        history.append(message)
-
-        # Salva no cache com TTL renovado
-        cache.set(history_key, history, self.CONTEXT_TTL)
-
-    # Recuperar contexto COMPLETO para o Gemini
-    def get_context_for_gemini(self, session_id):
-        """
-        Retorna o histórico completo no formato que Gemini espera
-        """
-        history_key = self.get_history_key(session_id)
-        return cache.get(history_key, [])
-
-    # Limpar contexto (usuário abandona conversa)
-    def clear_session_context(self, session_id):
-        """
-        Deleta do Cache quando usuário sai
-        """
-        history_key = self.get_history_key(session_id)
-        cache.delete(history_key)
-
-    # Exportar para banco de dados ANTES de limpar
-    def export_to_database(self, session_id, user):
-        """
-        Salva todo o contexto do Cache no banco permanente
-        """
-        history_key = self.get_history_key(session_id)
-        history = cache.get(history_key, [])
-
-        if not history:
-            return None
-
         # Verifica limite de sessões antes de criar uma nova
         if not ChatSession.objects.filter(session_id=session_id).exists():
-            if ChatSession.objects.filter(user=user).count() >= MAX_SESSIONS_PER_USER:
-                raise ValueError(f"Limite de sessões por usuário atingido ({MAX_SESSIONS_PER_USER}).")
+            if ChatSession.objects.filter(user=user).count() >= self.MAX_SESSIONS_PER_USER:
+                raise ValueError(f"Limite de sessões por usuário atingido ({self.MAX_SESSIONS_PER_USER}).")
 
         # Cria ou obtém a sessão
-        chat_session, _ = ChatSession.objects.get_or_create(
+        chat_session, created = ChatSession.objects.get_or_create(
             session_id=session_id,
             defaults={'user': user}
         )
 
-        # Verifica quantas mensagens já existem para evitar duplicatas
-        existing_count = chat_session.messages.count()
+        # Verifica limite de mensagens
+        if chat_session.messages.count() >= self.MAX_MESSAGES_PER_SESSION:
+             raise ValueError(f"Limite de mensagens por sessão atingido ({self.MAX_MESSAGES_PER_SESSION}).")
 
-        # Se o cache tem mais mensagens que o banco, salva as novas
-        if len(history) > existing_count:
-            new_messages_data = history[existing_count:]
+        # Cria a mensagem
+        ChatMessage.objects.create(
+            chat=chat_session,
+            role=role,
+            content=content
+        )
 
-            messages = []
-            for msg in new_messages_data:
-                messages.append(
-                    ChatMessage(
-                        chat=chat_session,
-                        role=msg['role'],
-                        content=msg['parts'][0]['text']
-                    )
-                )
+        # Atualiza timestamp da sessão
+        chat_session.save()
 
-            ChatMessage.objects.bulk_create(messages, batch_size=100)
+        # Atualiza o título se ainda for o padrão e houver mensagem do usuário
+        if chat_session.title == "Nova Conversa" and role == 'user':
+            # Limita o título a 100 caracteres
+            new_title = content[:100]
+            if len(content) > 100:
+                new_title += "..."
+            chat_session.title = new_title
+            chat_session.save()
 
-            # Atualiza o título se ainda for o padrão e houver mensagem do usuário
-            if chat_session.title == "Nova Conversa":
-                for msg in history:
-                    if msg['role'] == 'user':
-                        # Limita o título a 100 caracteres
-                        content = msg['parts'][0]['text']
-                        new_title = content[:100]
-                        if len(content) > 100:
-                            new_title += "..."
-                        chat_session.title = new_title
-                        chat_session.save()
-                        break
-
-        return chat_session
-
-    # Restaurar contexto anterior
-    def load_session_context(self, session_id):
+    def get_context_for_gemini(self, session_id):
         """
-        Carrega histórico do banco para o Cache (reanimar sessão anterior)
+        Retorna o histórico completo do banco no formato que Gemini espera
         """
         try:
             chat_session = ChatSession.objects.get(session_id=session_id)
             messages = chat_session.messages.all().order_by('timestamp')
 
-            history_key = self.get_history_key(session_id)
-
             history = []
             for msg in messages:
-                message_data = {
+                history.append({
                     "role": msg.role,
                     "parts": [{"text": msg.content}]
-                }
-                history.append(message_data)
-
-            cache.set(history_key, history, self.CONTEXT_TTL)
-            return len(messages)
+                })
+            return history
         except ChatSession.DoesNotExist:
-            return 0
+            return []
