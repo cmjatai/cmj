@@ -31,7 +31,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Configure Gemini
         self.ia = await sync_to_async(IAGenaiBase)()
         self.ia.response_mime_type = 'text/plain'
-        self.ia.ia_model_name = 'gemini-3-flash-preview'
+        #self.ia.ia_model_name = 'gemini-3-flash-preview'
 
         # Carrega histórico anterior do banco (se existir)
         await self.load_previous_context()

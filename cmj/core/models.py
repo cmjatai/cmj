@@ -987,14 +987,14 @@ class IAQuotaManager(models.Manager):
         """
         Retorna as quotas que possuem margem para serem utilizadas hoje.
         """
-        hoje = timezone.now().date()
+        hoje = timezone.localtime().date()
         return self.get_queryset().filter(
             ativo=True
         ).annotate(
             total=models.Sum('iaquotaslog_set__peso', filter=models.Q(iaquotaslog_set__data=hoje))
         ).filter(
             models.Q(total__isnull=True) | models.Q(total__lt=models.F('quota_diaria'))
-        ).order_by('-id', '-total', '-quota_diaria')
+        ).order_by('quota_diaria', 'total')
 
 class IAQuota(models.Model):
 
