@@ -1,10 +1,20 @@
 <template>
   <div class="chat-session-view">
     <div class="chat-header">
-      <h3 class="blue">
+      <h3>
         <FontAwesomeIcon icon="hat-wizard" />
         LegisBee
       </h3>
+      <h6>
+        Fonte de Dados da LegisBee:
+        <a
+          href="/norma/destaques"
+          target="_blank"
+          title="Inicialmente, apenas as normas de destaque estão disponíveis para pesquisa"
+        >
+          Normas de Destaque
+        </a>
+      </h6>
       <span
         class="status-indicator"
         :class="{ connected: isConnected }"
@@ -55,8 +65,9 @@
       <textarea
         v-model="inputMessage"
         @keydown.enter.prevent="sendMessage"
-        placeholder="Digite sua mensagem..."
-        :disabled="!isConnected || isLoading"
+        :class="[messages.length >= 8 ? 'permission-denied' : '']"
+        :placeholder="messages.length >= 8 ? 'Limite de mensagens atingido' : 'Digite sua mensagem...'"
+        :disabled="!isConnected || isLoading || messages.length >= 8"
         rows="1"
         ref="inputRef"
       />
@@ -73,7 +84,9 @@
       class="chat-input-area permission-denied"
     >
       <p>LegisBee está em desenvolvimento.</p>
-      <p v-if="false">Você não tem permissão para acessar o chat.</p>
+      <p v-if="false">
+        Você não tem permissão para acessar o chat.
+      </p>
     </div>
   </div>
 </template>
@@ -299,8 +312,8 @@ onUnmounted(() => {
 
 .chat-header h3 {
   margin: 0;
-  font-size: 1.1rem;
-  color: #333;
+  font-size: 1.3rem;
+  color: #0056b3;
 }
 
 .status-indicator {
@@ -391,6 +404,10 @@ onUnmounted(() => {
   color: #dc3545;
   font-weight: 500;
   align-items: center;
+}
+
+textarea.permission-denied::placeholder {
+  color: #dc3545;
 }
 
 textarea {
