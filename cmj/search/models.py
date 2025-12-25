@@ -1,11 +1,16 @@
+from collections import OrderedDict
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.db.models.fields.json import JSONField
+from django.utils.datastructures import OrderedSet
 from django.utils.translation import gettext_lazy as _
 from pgvector.django.vector import VectorField
+
+from pgvector.django import CosineDistance
+
 
 from cmj.genia import IAGenaiBase
 from cmj.mixins import CmjModelMixin
@@ -64,6 +69,31 @@ class Embedding(CmjModelMixin):
         self.vetor = embedding_vector
         self.save()
 
+    @classmethod
+    def make_context(cls, query_embedding, top_k=50):
+        embeddings = Embedding.objects.annotate(
+                distance=CosineDistance('vetor', query_embedding)
+            ).order_by('distance')[:top_k]
+
+        context = []
+        for embed in embeddings:
+            #similarity_score = 1 - embed.distance
+            #print(f"Item ID: {embed.id}, Similarity: {similarity_score:.4f}, Tokens: {embed.total_tokens}")
+            context.append(list(map(str.strip, embed.chunk.split('\n'))))
+
+        context.sort()
+
+        context_dict = OrderedDict()
+        for idx, item in enumerate(context):
+            if item[0] not in context_dict:
+                context_dict[item[0]] = []
+            context_dict[item[0]].extend(item)
+
+        context = list(context_dict.values())
+        for idx, item in enumerate(context):
+            context[idx] = list(OrderedSet(item))
+
+        return context
 
 class ChatSession(models.Model):
     user = models.ForeignKey(get_settings_auth_user_model(), on_delete=models.CASCADE)

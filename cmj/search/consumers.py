@@ -4,7 +4,10 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from google import genai
 from django.conf import settings
+
+from cmj.search.models import Embedding
 from .chat_manager import ChatContextManager
+from cmj.genia import IAGenaiBase
 
 class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -12,7 +15,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         self.user = None
         self.session_id = None
         self.context_manager = ChatContextManager()
-        self.client = None
+        self.ia = None
 
     async def connect(self):
         self.user = self.scope['user']
@@ -23,7 +26,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
             return
 
         # Configure Gemini
-        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        self.ia = await sync_to_async(IAGenaiBase)()
+        self.ia.response_mime_type = 'text/plain'
+        self.ia.ia_model_name = 'gemini-3-flash-preview'
 
         # Carrega histórico anterior do banco (se existir)
         await self.load_previous_context()
@@ -44,7 +49,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         }))
 
     async def disconnect(self, close_code):
-        # ✅ CRÍTICO: Salvar contexto ao desconectar
+        # CRÍTICO: Salvar contexto ao desconectar
         await self.save_context_to_database()
 
         await self.channel_layer.group_discard(
@@ -113,10 +118,22 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def query_gemini(self, history):
         """Envia para Gemini com histórico completo"""
+
+        # 1. Defina a função que consulta sua base de dados (ex: busca vetorial)
+        def buscar_na_base_dados(query: str) -> str:
+            """Busca informações específicas na base de dados interna da empresa."""
+            # Aqui entraria sua lógica de busca no ChromaDB, Pinecone, FAISS, etc.
+            print(f"\n[Sistema] LLM solicitou busca por: {query}")
+
+            ia_embedding = IAGenaiBase()
+            query_embedding = ia_embedding.embed_content(query)
+            context = Embedding.make_context(query_embedding)
+
+            return context
+
         def sync_call():
-            response = self.client.models.generate_content(
-                model='gemini-2.0-flash',
-                contents=history
+            response = self.ia.generate_content(
+                contents=history, tools=[buscar_na_base_dados]
             )
             return response.text
 
