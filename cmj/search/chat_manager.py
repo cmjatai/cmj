@@ -6,6 +6,9 @@ from datetime import timedelta
 
 from cmj.search.models import ChatMessage, ChatSession
 
+MAX_SESSIONS_PER_USER = 20
+MAX_MESSAGES_PER_SESSION = 50
+
 class ChatContextManager:
     def __init__(self):
         self.CONTEXT_TTL = 3600  # 1 hora de inatividade
@@ -30,6 +33,10 @@ class ChatContextManager:
 
         # Recupera lista atual ou inicia nova
         history = cache.get(history_key, [])
+
+        if len(history) >= MAX_MESSAGES_PER_SESSION:
+            raise ValueError(f"Limite de mensagens por sessão atingido ({MAX_MESSAGES_PER_SESSION}).")
+
         history.append(message)
 
         # Salva no cache com TTL renovado
@@ -61,6 +68,11 @@ class ChatContextManager:
 
         if not history:
             return None
+
+        # Verifica limite de sessões antes de criar uma nova
+        if not ChatSession.objects.filter(session_id=session_id).exists():
+            if ChatSession.objects.filter(user=user).count() >= MAX_SESSIONS_PER_USER:
+                raise ValueError(f"Limite de sessões por usuário atingido ({MAX_SESSIONS_PER_USER}).")
 
         # Cria ou obtém a sessão
         chat_session, _ = ChatSession.objects.get_or_create(
