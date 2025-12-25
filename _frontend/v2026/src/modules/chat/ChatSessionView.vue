@@ -101,8 +101,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, nextTick, watch, computed, inject } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '~@/stores/AuthStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
 import MarkdownIt from 'markdown-it'
 
 const md = new MarkdownIt({
@@ -112,7 +113,9 @@ const md = new MarkdownIt({
 })
 
 const authStore = useAuthStore()
+const messageStore = useMessageStore()
 const route = useRoute()
+const router = useRouter()
 
 const EventBus = inject('EventBus')
 
@@ -173,6 +176,15 @@ const connectWebSocket = () => {
   socket.value.onclose = (e) => {
     isConnected.value = false
     console.log('Chat WebSocket Closed', e.code, e.reason)
+
+    if (e.code === 4001) {
+      // router.push({ name: 'chat_session_view' })
+      messageStore.addMessage({
+        type: 'danger',
+        text: 'Você abriu esta conversa em outra guia/janela!',
+        timeout: 0
+      })
+    }
   }
 
   socket.value.onerror = (error) => {
