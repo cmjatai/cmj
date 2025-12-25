@@ -1,16 +1,58 @@
 
 import logging
-from cmj.search.models import ChatMessage, ChatSession
+from cmj.search.models import ChatMessage, ChatSession, Embedding
+from cmj.genia import IAGenaiBase
 
 logger = logging.getLogger(__name__)
 
-class ChatContextManager:
+class ChatManager:
 
     MAX_SESSIONS_PER_USER = 2
     MAX_MESSAGES_PER_SESSION = 8
 
     def __init__(self):
-        pass
+        self.ia = IAGenaiBase()
+        self.ia.response_mime_type = 'text/plain'
+        #self.ia.ia_model_name = 'gemini-3-flash-preview'
+
+    def query_gemini(self, history):
+        """Envia para Gemini com histórico completo"""
+
+        def buscar_na_base_dados(query: str) -> str:
+            """Busca informações específicas na base de dados interna ."""
+            logger.info(f"[Sistema] LLM solicitou busca por: {query}")
+
+            ia_embedding = IAGenaiBase()
+            query_embedding = ia_embedding.embed_content(query)
+            context = Embedding.make_context(query_embedding)
+
+            return context
+
+        def sync_call():
+            response = self.ia.generate_content(
+                contents=history, tools=[buscar_na_base_dados]
+            )
+            return response.text
+
+        return f'RESPOSTA: len_history {len(history)}' #sync_call()
+
+    def process_user_message(self, session_id, user_message, user):
+        """
+        Processa a mensagem do usuário: salva, consulta a IA e salva a resposta.
+        """
+        # Salva mensagem do usuário no contexto
+        self.add_message_to_context(session_id, 'user', user_message, user)
+
+        # Obtém histórico completo do DB
+        history = self.get_context_for_gemini(session_id)
+
+        # Envia para Gemini com histórico
+        response = self.query_gemini(history)
+
+        # Salva resposta do modelo no contexto
+        self.add_message_to_context(session_id, 'model', response, user)
+
+        return response
 
     def add_message_to_context(self, session_id, role, content, user):
         """

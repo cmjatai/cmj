@@ -62,14 +62,23 @@
       v-if="userCanUserChat"
       class="chat-input-area"
     >
-      <textarea
-        v-model="inputMessage"
-        @keydown.enter.prevent="sendMessage"
-        placeholder="Digite sua mensagem..."
-        :disabled="!isConnected || isLoading"
-        rows="2"
-        ref="inputRef"
-      />
+      <div class="input-wrapper">
+        <span
+          class="char-counter"
+          :class="{ 'limit-reached': inputMessage.length >= 250 }"
+        >
+          {{ inputMessage.length }} / 250
+        </span>
+        <textarea
+          v-model="inputMessage"
+          @keydown.enter.prevent="sendMessage"
+          placeholder="Digite sua mensagem..."
+          :disabled="!isConnected || isLoading"
+          rows="2"
+          ref="inputRef"
+          maxlength="250"
+        />
+      </div>
       <button
         @click="sendMessage"
         :disabled="!isConnected || !inputMessage.trim() || isLoading"
@@ -466,5 +475,25 @@ textarea:focus {
 @keyframes typing {
   0%, 80%, 100% { transform: scale(0); }
   40% { transform: scale(1); }
+}
+
+.input-wrapper {
+  position: relative;
+  flex: 1;
+  display: flex;
+}
+
+.char-counter {
+  position: absolute;
+  right: 12px;
+  top: 3px;
+  font-size: 0.75rem;
+  color: #6c757d;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.char-counter.limit-reached {
+  color: #dc3545;
 }
 </style>

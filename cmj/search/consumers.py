@@ -5,10 +5,9 @@ from asgiref.sync import sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from google import genai
 from django.conf import settings
+from django.utils.html import escape
 
-from cmj.search.models import Embedding
-from .chat_manager import ChatContextManager
-from cmj.genia import IAGenaiBase
+from .chat_manager import ChatManager
 
 logger = logging.getLogger(__name__)
 
@@ -17,8 +16,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         super().__init__(*args, **kwargs)
         self.user = None
         self.session_id = None
-        self.context_manager = ChatContextManager()
-        self.ia = None
+        self.context_manager = ChatManager()
+
 
     async def connect(self):
         self.user = self.scope['user']
@@ -27,11 +26,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if self.user == AnonymousUser() or not self.user.has_perm('search.can_use_chat_module'):
             await self.close()
             return
-
-        # Configure Gemini
-        self.ia = IAGenaiBase()
-        self.ia.response_mime_type = 'text/plain'
-        #self.ia.ia_model_name = 'gemini-3-flash-preview'
 
         # Recupera histórico formatado para o frontend
         history = await self.get_formatted_history()
@@ -74,22 +68,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         try:
             data = json.loads(text_data)
-            user_message = data.get('message', '')
+            user_message = data.get('message', '').strip()
 
-            # Salva mensagem do usuário no contexto
-            await sync_to_async(self.context_manager.add_message_to_context)(
-                self.session_id, 'user', user_message, self.user
-            )
+            if len(user_message) > 250:
+                await self.send_error("Mensagem muito longa. O limite é de 250 caracteres.")
+                return
 
-            # Obtém histórico completo do DB
-            history = await sync_to_async(self.context_manager.get_context_for_gemini)(self.session_id)
+            user_message = escape(user_message)
 
-            # Envia para Gemini com histórico
-            response = await self.query_gemini(history)
-
-            # Salva resposta do modelo no contexto
-            await sync_to_async(self.context_manager.add_message_to_context)(
-                self.session_id, 'model', response, self.user
+            # Processa mensagem e obtém resposta
+            response = await sync_to_async(self.context_manager.process_user_message)(
+                self.session_id, user_message, self.user
             )
 
             # Envia resposta ao cliente
@@ -104,27 +93,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         except Exception as e:
             await self.send_error(str(e))
-
-    async def query_gemini(self, history):
-        """Envia para Gemini com histórico completo"""
-
-        def buscar_na_base_dados(query: str) -> str:
-            """Busca informações específicas na base de dados interna ."""
-            logger.info(f"[Sistema] LLM solicitou busca por: {query}")
-
-            ia_embedding = IAGenaiBase()
-            query_embedding = ia_embedding.embed_content(query)
-            context = Embedding.make_context(query_embedding)
-
-            return context
-
-        def sync_call():
-            response = self.ia.generate_content(
-                contents=history, tools=[buscar_na_base_dados]
-            )
-            return response.text
-
-        return f'RESPOSTA: len_history {len(history)}' #await sync_to_async(sync_call)()
 
     async def chat_message(self, event):
         await self.send(json.dumps({
