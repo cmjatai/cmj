@@ -39,7 +39,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.send(json.dumps({
             "type": "connection_established",
             "session_id": self.session_id,
-            "history": history
+            "history": history,
+            "max_length": self.context_manager.MAX_LENGTH_USER_MESSAGE
         }))
 
     async def disconnect(self, close_code):
@@ -70,8 +71,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
             data = json.loads(text_data)
             user_message = data.get('message', '').strip()
 
-            if len(user_message) > 250:
-                await self.send_error("Mensagem muito longa. O limite é de 250 caracteres.")
+            if len(user_message) > self.context_manager.MAX_LENGTH_USER_MESSAGE:
+                await self.send_error(f"Mensagem muito longa. O limite é de {self.context_manager.MAX_LENGTH_USER_MESSAGE} caracteres.")
                 return
 
             user_message = escape(user_message)

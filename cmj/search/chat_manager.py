@@ -9,6 +9,7 @@ class ChatManager:
 
     MAX_SESSIONS_PER_USER = 2
     MAX_MESSAGES_PER_SESSION = 8
+    MAX_LENGTH_USER_MESSAGE = 200
 
     def __init__(self):
         self.ia = IAGenaiBase()
