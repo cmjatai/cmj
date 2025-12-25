@@ -30,6 +30,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Recupera histórico formatado para o frontend
         history = await self.get_formatted_history()
 
+        # Controle de Concorrência: Derruba conexões anteriores na mesma sessão
+        # Envia sinal para o grupo ANTES de entrar nele, para não desconectar a si mesmo
+        await self.channel_layer.group_send(
+            f"chat_{self.session_id}",
+            {"type": "disconnect_old_connection"}
+        )
+
         await self.channel_layer.group_add(
             f"chat_{self.session_id}",
             self.channel_name
@@ -48,6 +55,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             f"chat_{self.session_id}",
             self.channel_name
         )
+
+    async def disconnect_old_connection(self, event):
+        """Fecha a conexão se receber sinal de nova conexão na mesma sessão"""
+        await self.close(code=4001)  # 4001: Código personalizado para "Substituído por nova conexão"
 
     @sync_to_async
     def get_formatted_history(self):
