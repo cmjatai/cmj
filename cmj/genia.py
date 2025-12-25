@@ -82,6 +82,16 @@ class IAGenaiBase:
     top_p = 0.95
     response_mime_type = "application/json"
 
+    #modelos llm permitidos
+    allowed_models = [
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash",
+        'gemini-3-flash-preview',
+        'gemini-3-pro-preview',
+    ]
+
     def __init__(self, *args, **kwargs):
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
@@ -94,11 +104,12 @@ class IAGenaiBase:
         )
         return self.generation_config
 
-    def retrieve_quota_if_available(self, ia_model_name=None):
+    def retrieve_quota_if_available(self, ia_model_name=None, ascending=True):
 
         e_message = _('Nenhum Modelo com Quota para consumo disponível.')
 
-        qms = IAQuota.objects.quotas_with_margin()
+        qms = IAQuota.objects.quotas_with_margin(ascending=ascending)
+        qms = qms.filter(modelo__in=self.allowed_models)
         if not qms:
             raise Exception(e_message)
 
@@ -111,8 +122,8 @@ class IAGenaiBase:
         self.ia_model_name = qms_custom.first().modelo
         return qms_custom.first()
 
-    def generate_content(self, contents, ia_model_name=None, tools=None):
-        quota = self.retrieve_quota_if_available(ia_model_name=ia_model_name)
+    def generate_content(self, contents, ia_model_name=None, tools=None, ascending=True):
+        quota = self.retrieve_quota_if_available(ia_model_name=ia_model_name, ascending=ascending)
         self.update_generation_config()
         config = self.generation_config
         if tools:
@@ -202,6 +213,13 @@ class IAClassificacaoMateriaService(IAGenaiBase):
     _model = None # Model from app django
     _content_type = None # ContentType from app django
     _object = None # Object from app django
+
+    allowed_models = [
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash",
+    ]
 
     @property
     def model(self):
@@ -388,7 +406,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             if not prompt:
                 return
 
-            answer = self.generate_content(prompt)
+            answer = self.generate_content(prompt, ascending=False)
 
             obj = self.object
 
@@ -428,6 +446,13 @@ class IAAnaliseSimilaridadeService(IAGenaiBase):
     """
     Classe para análise de similaridade
     """
+
+    allowed_models = [
+        "gemini-2.0-flash-lite",
+        "gemini-2.0-flash",
+        "gemini-2.5-flash-lite",
+        "gemini-2.5-flash",
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -506,7 +531,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
         prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
 
-        answer = self.generate_content(prompt)
+        answer = self.generate_content(prompt, ascending=False)
 
         similaridade.analise = answer.text
         similaridade.ia_name = self.ia_model_name

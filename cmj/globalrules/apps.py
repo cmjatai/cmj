@@ -37,10 +37,13 @@ def signal_post_migrate_update_groups_cmj(app_config, verbosity=2, interactive=T
                 codename = (t[1:] + model._meta.model_name)\
                     if t[0] == '.' and t[-1] == '_' else t
 
-                p = Permission.objects.get(
-                    content_type=content_type,
-                    codename=codename)
-                g.permissions.add(p)
+                try:
+                    p = Permission.objects.get(
+                        content_type=content_type,
+                        codename=codename)
+                    g.permissions.add(p)
+                except Permission.DoesNotExist:
+                    pass
             g.save()
 
         def _config_group(self, group_name, rules_list):
