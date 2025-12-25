@@ -3,10 +3,11 @@
     <div class="history-header">
       <h4>Histórico</h4>
       <button
+        v-if="sessions.length < 2"
         class="btn btn-sm btn-outline-primary"
         @click="createNewChat"
       >
-        <i class="fas fa-plus" /> Nova Conversa
+        <FontAwesomeIcon icon="plus" /> Nova Conversa
       </button>
     </div>
 
