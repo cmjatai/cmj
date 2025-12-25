@@ -65,9 +65,9 @@
       <div class="input-wrapper">
         <span
           class="char-counter"
-          :class="{ 'limit-reached': inputMessage.length >= 250 }"
+          :class="{ 'limit-reached': inputMessage.length >= maxMessageLength }"
         >
-          {{ inputMessage.length }} / 250
+          {{ inputMessage.length }} / {{ maxMessageLength }}
         </span>
         <textarea
           v-model="inputMessage"
@@ -76,7 +76,7 @@
           :disabled="!isConnected || isLoading"
           rows="2"
           ref="inputRef"
-          maxlength="250"
+          :maxlength="maxMessageLength"
         />
       </div>
       <button
@@ -132,6 +132,7 @@ const isLoading = ref(false)
 const socket = ref(null)
 const messagesContainer = ref(null)
 const inputRef = ref(null)
+const maxMessageLength = ref(250)
 
 // Computed Session ID from Route
 const sessionId = computed(() => {
@@ -184,6 +185,9 @@ const handleSocketMessage = (data) => {
   switch (data.type) {
     case 'connection_established':
       console.log('Session established:', data.session_id)
+      if (data.max_length) {
+        maxMessageLength.value = data.max_length
+      }
       if (data.history && Array.isArray(data.history)) {
         messages.value = data.history
         scrollToBottom()
@@ -299,7 +303,7 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .chat-session-view {
   display: flex;
   flex-direction: column;
@@ -316,12 +320,12 @@ onUnmounted(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
 
-.chat-header h3 {
-  margin: 0;
-  font-size: 1.3rem;
-  color: #0056b3;
+  h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #0056b3;
+  }
 }
 
 .status-indicator {
@@ -330,10 +334,10 @@ onUnmounted(() => {
   border-radius: 50%;
   background-color: #dc3545;
   transition: background-color 0.3s;
-}
 
-.status-indicator.connected {
-  background-color: #28a745;
+  &.connected {
+    background-color: #28a745;
+  }
 }
 
 .chat-messages {
@@ -355,21 +359,21 @@ onUnmounted(() => {
 .message-wrapper {
   display: flex;
   max-width: 80%;
-}
 
-.message-wrapper.user {
-  align-self: flex-end;
-  justify-content: flex-end;
-}
+  &.user {
+    align-self: flex-end;
+    justify-content: flex-end;
+  }
 
-.message-wrapper.model {
-  align-self: flex-start;
-  justify-content: flex-start;
-}
+  &.model {
+    align-self: flex-start;
+    justify-content: flex-start;
+  }
 
-.message-wrapper.system {
-  align-self: center;
-  max-width: 90%;
+  &.system {
+    align-self: center;
+    max-width: 90%;
+  }
 }
 
 .message-bubble {
@@ -378,24 +382,24 @@ onUnmounted(() => {
   font-size: 0.95rem;
   line-height: 1.4;
   word-wrap: break-word;
-}
 
-.user .message-bubble {
-  background-color: #007bff;
-  color: white;
-  border-bottom-right-radius: 2px;
-}
+  .user & {
+    background-color: #007bff;
+    color: white;
+    border-bottom-right-radius: 2px;
+  }
 
-.model .message-bubble {
-  background-color: #f1f0f0;
-  color: #333;
-  border-bottom-left-radius: 2px;
-}
+  .model & {
+    background-color: #f1f0f0;
+    color: #333;
+    border-bottom-left-radius: 2px;
+  }
 
-.system .message-bubble {
-  background-color: #fff3cd;
-  color: #856404;
-  border: 1px solid #ffeeba;
+  .system & {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+  }
 }
 
 .chat-input-area {
@@ -405,17 +409,13 @@ onUnmounted(() => {
   gap: 10px;
   background: #f8f9fa;
   align-items: flex-end;
-}
 
-.chat-input-area.permission-denied {
-  justify-content: center;
-  color: #dc3545;
-  font-weight: 500;
-  align-items: center;
-}
-
-textarea.permission-denied::placeholder {
-  color: #dc3545;
+  &.permission-denied {
+    justify-content: center;
+    color: #dc3545;
+    font-weight: 500;
+    align-items: center;
+  }
 }
 
 textarea {
@@ -428,10 +428,14 @@ textarea {
   font-family: inherit;
   max-height: 100px;
   overflow-y: auto;
-}
 
-textarea:focus {
-  border-color: #80bdff;
+  &.permission-denied::placeholder {
+    color: #dc3545;
+  }
+
+  &:focus {
+    border-color: #80bdff;
+  }
 }
 
 .send-btn {
@@ -446,16 +450,16 @@ textarea:focus {
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s;
-}
 
-.send-btn:hover:not(:disabled) {
-  background-color: #0056b3;
-}
+  &:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
 
-.send-btn:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.7;
+  &:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
 }
 
 /* Loading animation */
@@ -467,10 +471,10 @@ textarea:focus {
   background-color: #666;
   border-radius: 50%;
   animation: typing 1.4s infinite ease-in-out both;
-}
 
-.typing-dot:nth-child(1) { animation-delay: -0.32s; }
-.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+  &:nth-child(1) { animation-delay: -0.32s; }
+  &:nth-child(2) { animation-delay: -0.16s; }
+}
 
 @keyframes typing {
   0%, 80%, 100% { transform: scale(0); }
@@ -491,9 +495,9 @@ textarea:focus {
   color: #6c757d;
   font-weight: 500;
   pointer-events: none;
-}
 
-.char-counter.limit-reached {
-  color: #dc3545;
+  &.limit-reached {
+    color: #dc3545;
+  }
 }
 </style>
