@@ -1,5 +1,6 @@
 import json
 import logging
+from math import e
 from pydoc import text
 import re
 import time
@@ -74,36 +75,42 @@ class IAGenaiBase:
     response_mime_type = "application/json"
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.select_iamodel_with_quota()
+        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-    def select_iamodel_with_quota(self):
+    def update_generation_config(self):
         self.generation_config = types.GenerateContentConfig(
             temperature=self.temperature,
             top_p=self.top_p,
             top_k=self.top_k,
-            # max_output_tokens=8192,
             response_mime_type=self.response_mime_type,
         )
+        return self.generation_config
 
-        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
+    def retrieve_quota_if_available(self, ia_model_name=None):
+
+        e_message = _('Nenhum Modelo com Quota para consumo disponível.')
 
         qms = IAQuota.objects.quotas_with_margin()
         if not qms:
-            raise Exception(_('Quota de IA excedida.'))
+            raise Exception(e_message)
+
+        if ia_model_name:
+            qms_custom = qms.filter(modelo=ia_model_name)
+            if not qms_custom:
+                raise Exception(e_message)
+            self.ia_model_name = qms_custom.first().modelo
+            return qms_custom.first()
 
         qms_custom = qms.filter(modelo=self.ia_model_name)
         if not qms_custom:
-            quota = qms[0]
-            self.ia_model_name = quota.modelo
-        else:
-            qms = qms_custom
-            quota = qms[0]
+            raise Exception(e_message)
 
-        self.quota = quota
-        return quota
+        self.ia_model_name = qms_custom.first().modelo
+        return qms_custom.first()
 
     def generate_content(self, contents, ia_model_name=None, tools=None):
+        quota = self.retrieve_quota_if_available(ia_model_name=ia_model_name)
+        self.update_generation_config()
         config = self.generation_config
         if tools:
             config = types.GenerateContentConfig(
@@ -119,18 +126,15 @@ class IAGenaiBase:
             )
 
         response = self.client.models.generate_content(
-            model=ia_model_name or self.ia_model_name,
+            model=quota.modelo,
             contents=contents,
             config=config,
         )
+
+        quota.create_log()
         return response
 
-    def _extract_pdf_text_robust(self, doc):
-        """
-        Extrai texto de PDF de forma mais robusta, tratando problemas de codificação
-        e caracteres especiais que podem aparecer em PDFs mal formados.
-        """
-        import re
+    def _extract_pdf_text(self, doc):
 
         text_parts = []
 
@@ -159,7 +163,6 @@ class IAGenaiBase:
         return ' '.join(text_parts)
 
     def count_tokens_in_text(self, text):
-        self.select_iamodel_with_quota()
         try:
             #self.ia_model_name = "gemini-3-pro-preview"
             response = self.client.models.count_tokens(
@@ -173,7 +176,6 @@ class IAGenaiBase:
             return 0
 
     def embed_content(self, text):
-        self.select_iamodel_with_quota()
         try:
             response = self.client.models.embed_content(
                 model='gemini-embedding-001',
@@ -369,7 +371,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
                 continue
 
             doc = pymupdf.open(getattr(obj, fn).path)
-            doc_text = self._extract_pdf_text_robust(doc)
+            doc_text = self._extract_pdf_text(doc)
             doc_text = clean_text(doc_text)
 
             text += doc_text
@@ -383,10 +385,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             if not prompt:
                 return
 
-            quota = self.select_iamodel_with_quota()
-
             answer = self.generate_content(prompt)
-            quota.create_log()
 
             obj = self.object
 
@@ -486,11 +485,11 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
         mat2 = similaridade.materia_2
 
         doc1 = pymupdf.open(mat1.texto_original.original_path)
-        text1 = self._extract_pdf_text_robust(doc1)
+        text1 = self._extract_pdf_text(doc1)
         text1 = clean_text(text1)
 
         doc2 = pymupdf.open(mat2.texto_original.original_path)
-        text2 = self._extract_pdf_text_robust(doc2)
+        text2 = self._extract_pdf_text(doc2)
         text2 = clean_text(text2)
 
         return text1, text2
@@ -504,9 +503,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
         prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
 
-        quota = self.select_iamodel_with_quota()
         answer = self.generate_content(prompt)
-        quota.create_log()
 
         similaridade.analise = answer.text
         similaridade.ia_name = self.ia_model_name
@@ -523,7 +520,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
     def batch_run(self, analises):
 
-        quota = self.select_iamodel_with_quota()
+        quota = self.retrieve_quota_if_available()
 
         inline_analises = []
         inline_requests = []

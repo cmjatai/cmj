@@ -1,3 +1,4 @@
+import logging
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
@@ -8,6 +9,8 @@ from django.conf import settings
 from cmj.search.models import Embedding
 from .chat_manager import ChatContextManager
 from cmj.genia import IAGenaiBase
+
+logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -84,7 +87,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             data = json.loads(text_data)
             user_message = data.get('message', '')
 
-            # ✅ Salva mensagem do usuário no contexto
+            # Salva mensagem do usuário no contexto
             self.context_manager.add_message_to_context(
                 self.session_id, 'user', user_message
             )
@@ -95,7 +98,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             # Envia para Gemini com histórico
             response = await self.query_gemini(history)
 
-            # ✅ Salva resposta do modelo no contexto
+            # Salva resposta do modelo no contexto
             self.context_manager.add_message_to_context(
                 self.session_id, 'model', response
             )
@@ -110,7 +113,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-            # ✅ Sincroniza com o banco de dados após a interação
+            # Sincroniza com o banco de dados após a interação
             await self.save_context_to_database()
 
         except Exception as e:
@@ -119,11 +122,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def query_gemini(self, history):
         """Envia para Gemini com histórico completo"""
 
-        # 1. Defina a função que consulta sua base de dados (ex: busca vetorial)
         def buscar_na_base_dados(query: str) -> str:
-            """Busca informações específicas na base de dados interna da empresa."""
-            # Aqui entraria sua lógica de busca no ChromaDB, Pinecone, FAISS, etc.
-            print(f"\n[Sistema] LLM solicitou busca por: {query}")
+            """Busca informações específicas na base de dados interna ."""
+            logger.info(f"[Sistema] LLM solicitou busca por: {query}")
 
             ia_embedding = IAGenaiBase()
             query_embedding = ia_embedding.embed_content(query)
