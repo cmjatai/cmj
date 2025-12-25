@@ -1,7 +1,7 @@
 <template>
   <div class="chat-session-view">
     <div class="chat-header">
-      <h3>
+      <h3 class="blue">
         <FontAwesomeIcon icon="hat-wizard" />
         LegisBee
       </h3>

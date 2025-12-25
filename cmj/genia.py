@@ -21,6 +21,51 @@ from google.genai import types
 
 logger = logging.getLogger(__name__)
 
+rag_system_instruction = """
+1. Você é assistente jurídico especializado em Direito Público.
+2. Responda EXCLUSIVAMENTE baseado no contexto jurídico fornecido.
+3. Utilize a ferramenta 'buscar_na_base_dados' para recuperar informações relevantes.
+4. A ferramenta 'buscar_na_base_dados' pode ser chamada várias vezes para melhorar o contexto. Ela possui acesso a uma base de dados jurídica interna.
+5. Sempre que necessário, chame a ferramenta para obter informações adicionais.
+6. A base vetorial que 'buscar_na_base_dados' consulta é formada por vetores de 3072 dimensões e contém dispositivos legais, artigos, seções e parágrafos de legislações municipais.
+6. Cite artigos/seções/parágrafos específicos.
+7. Finalizadas as buscas, se a informação não está no contexto, declare isso.
+8. Mantenha linguagem juridicamente precisa e compreensível a leigos.
+
+REGRAS DE INTERAÇÃO COM A FERRAMENTA 'buscar_na_base_dados':
+"""
+
+# Apendice de https://arxiv.org/html/2503.10654v1
+rag_system_instruction += """
+Transforme as entradas do usuário em declarações simplificadas que preservem claramente a linguagem natural, o conteúdo proposicional central, removendo sistematicamente os indicadores linguísticos de força ilocucionária para otimizar o desempenho de recuperação.
+
+Aplique estas regras de transformação aprimoradas para cada categoria de ato de fala:
+1. Assertivas:
+- Mantenha o conteúdo e a redação originais exatamente como foram fornecidos, sem alterações.
+2. Interrogativas:
+- Converter perguntas em afirmações claras e diretas.
+- Remover completamente os marcadores de interrogação ("?"), palavras interrogativas ("o que", "quem", "onde", "quando", "por que", "como") e verbos auxiliares em perguntas ("é", "faz", "fez", "pode", "irá").
+3. Diretivas (solicitações/comandos):
+- Converter comandos ou solicitações em frases nominais concisas ou expressões tópicas.
+- Eliminar verbos imperativos ("mostrar", "fornecer", "dizer") e termos de polidez ("por favor", "gentilmente").
+4. Expressivos:
+- Remova todos os marcadores subjetivos, emocionais ou atitudinais ("Estou feliz," "Infelizmente", "felizmente"), mantendo o conteúdo estritamente factual.
+5. Comissivos (compromissos/promessas do orador):
+- Simplifique para refletir a ação comprometida de forma clara e concisa, omitindo verbos performativos explícitos ("Eu prometo", "Eu me comprometo", "Eu irei").
+- Expresse o núcleo proposicional como uma declaração neutra da ação pretendida ou ocorrência futura.
+6. Atos de fala indiretos:
+- Elimine as orações introdutórias ou frases indiretas (por exemplo, "Eu me pergunto se," "Você poderia me dizer?", "Você sabe se?", convertendo consultas indiretas em diretas declarações afirmativas.
+7. Declarativas:
+- Remover frases declarativas introdutórias que mencionem explicitamente o ato em si, tais como "Eu declaro", "Nós declaramos", "Eu confirmo", "Eu proclamo oficialmente", deixando apenas o conteúdo proposicional central claramente expresso.
+
+Direcione e aborde especificamente estes indicadores linguísticos:
+- Marcadores de interrogação: Remove completamente a pontuação e os termos interrogativos associados com perguntas.
+- Marcadores de imperativo: Elimine completamente os verbos de comando e as expressões de cortesia.
+- Verbos performativos: Omita verbos que declarem explicitamente intenção ou compromisso ("Eu pergunto", "Eu solicito", "Eu sugiro", "Eu me pergunto", "Eu prometo", "Eu me comprometo", "Eu declaro", "Confirmo por meio deste documento," "Proclamo oficialmente").
+- Termos expressivos: Exclua completamente expressões emocionais ou atitudinais.
+- Frases metaconversacionais: Elimine completamente os clichês conversacionais e marcadores de discurso indireto ("você pode", "você poderia", "você gostaria", "você sabe", "Gostaria de saber").
+"""
+
 class IAGenaiBase:
     ia_model_name = "gemini-2.0-flash-lite"
     temperature = 0.1
@@ -58,11 +103,25 @@ class IAGenaiBase:
         self.quota = quota
         return quota
 
-    def generate_content(self, contents):
+    def generate_content(self, contents, ia_model_name=None, tools=None):
+        config = self.generation_config
+        if tools:
+            config = types.GenerateContentConfig(
+                system_instruction=rag_system_instruction,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                top_k=self.top_k,
+                response_mime_type=self.response_mime_type,
+                tools=tools,
+                automatic_function_calling=genai.types.AutomaticFunctionCallingConfig(
+                    maximum_remote_calls=10
+                )
+            )
+
         response = self.client.models.generate_content(
-            model=self.ia_model_name,
+            model=ia_model_name or self.ia_model_name,
             contents=contents,
-            config=self.generation_config,
+            config=config,
         )
         return response
 
@@ -131,7 +190,6 @@ class IAGenaiBase:
             logger.error(f"Erro ao gerar embedding: {e}")
             time.sleep(2)
             return []
-
 
 
 class IAClassificacaoMateriaService(IAGenaiBase):

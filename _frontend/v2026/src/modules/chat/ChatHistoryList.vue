@@ -45,7 +45,7 @@
             <h6 class="mb-1 text-truncate">
               {{ session.title }}
             </h6>
-            <small>{{ formatDate(session.created_at) }}</small>
+            <small class="text-nowrap">{{ formatDate(session.created_at) }}</small>
           </div>
           <small v-if="false" class="text-muted text-truncate d-block">
             {{ getLastMessage(session) }}
