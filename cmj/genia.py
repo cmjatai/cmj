@@ -95,7 +95,45 @@ class IAGenaiBase:
     def __init__(self, *args, **kwargs):
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-    def update_generation_config(self):
+    _chat = None
+    _chat_quota = None
+
+    def chat_send_message(self, message, history, tools=None):
+        if not self._chat:
+            self.response_mime_type = 'text/plain'
+            self._chat_quota = self.retrieve_quota_if_available()
+            config = self.update_generation_config(tools=tools)
+            self._chat = self.client.chats.create(
+                model=self.ia_model_name,
+                config=config,
+                history=history,
+            )
+
+        message = str(message)
+        response = self._chat.send_message(message)
+        print(self._chat.get_history())
+
+        if self._chat_quota:
+            self._chat_quota.create_log()
+
+        return response
+
+
+    def update_generation_config(self, tools=None):
+        if tools:
+            self.generation_config = types.GenerateContentConfig(
+                system_instruction=rag_system_instruction,
+                temperature=self.temperature,
+                top_p=self.top_p,
+                top_k=self.top_k,
+                response_mime_type=self.response_mime_type,
+                tools=tools,
+                automatic_function_calling=genai.types.AutomaticFunctionCallingConfig(
+                    maximum_remote_calls=10
+                )
+            )
+            return self.generation_config
+
         self.generation_config = types.GenerateContentConfig(
             temperature=self.temperature,
             top_p=self.top_p,

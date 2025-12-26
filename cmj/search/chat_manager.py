@@ -13,10 +13,9 @@ class ChatManager:
 
     def __init__(self):
         self.ia = IAGenaiBase()
-        self.ia.response_mime_type = 'text/plain'
         #self.ia.ia_model_name = 'gemini-3-flash-preview'
 
-    def query_gemini(self, history):
+    def query_gemini(self, user_message, history):
         """Envia para Gemini com histórico completo"""
 
         rag_results = []
@@ -36,19 +35,18 @@ class ChatManager:
 
             return context
 
-        def sync_call():
-            response = self.ia.generate_content(
-                contents=history, tools=[buscar_na_base_dados]
-            )
-            return response.text
+        response = self.ia.chat_send_message(
+            user_message, history, tools=[buscar_na_base_dados]
+        )
 
         #return f'RESPOSTA: len_history {len(history)}'
-        return sync_call(), rag_results
+        return response.text, rag_results
 
     def process_user_message(self, session_id, user_message, user):
         """
         Processa a mensagem do usuário: salva, consulta a IA e salva a resposta.
         """
+
         # Salva mensagem do usuário no contexto
         self.add_message_to_context(session_id, 'user', user_message, user)
 
@@ -56,7 +54,7 @@ class ChatManager:
         history = self.get_context_for_gemini(session_id)
 
         # Envia para Gemini com histórico
-        response, rag_results = self.query_gemini(history)
+        response, rag_results = self.query_gemini(user_message, history)
 
         # Salva resposta do modelo no contexto
         self.add_message_to_context(session_id, 'model', response, user, metadata={'rag_results': rag_results})
@@ -123,6 +121,8 @@ class ChatManager:
                     "role": msg.role,
                     "parts": [{"text": msg.content}]
                 })
+            if history and history[-1]["role"] == "user":
+                history.pop()
             return history
         except ChatSession.DoesNotExist:
             return []
