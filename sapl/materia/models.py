@@ -1693,6 +1693,12 @@ class AnaliseSimilaridade(models.Model):
         verbose_name = _('Análise de Similaridade')
         verbose_name_plural = _('Análises de Similaridade')
         ordering = ['-data_analise', '-qtd_assuntos_comuns']
+        indexes = [
+            models.Index(fields=['-data_analise', '-qtd_assuntos_comuns']),
+            models.Index(fields=['materia_1', '-similaridade']),
+            models.Index(fields=['materia_2', '-similaridade']),
+            models.Index(fields=['similaridade']),
+        ]
 
     def __str__(self):
         return _('Matéria 1: %(materia_1)s'

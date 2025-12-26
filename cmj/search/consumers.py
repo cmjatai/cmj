@@ -2,17 +2,16 @@ import logging
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-from django.contrib.auth.models import AnonymousUser
 from google import genai
 from django.conf import settings
 from django.utils.html import escape
 
-from .chat_manager import ChatManager
 
 logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     def __init__(self, *args, **kwargs):
+        from .chat_manager import ChatManager
         super().__init__(*args, **kwargs)
         self.user = None
         self.session_id = None
@@ -20,6 +19,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
     async def connect(self):
+        from django.contrib.auth.models import AnonymousUser
         self.user = self.scope['user']
         self.session_id = self.scope['url_route']['kwargs']['session_id']
 

@@ -19,6 +19,8 @@ class ChatManager:
     def query_gemini(self, history):
         """Envia para Gemini com histórico completo"""
 
+        rag_results = []
+
         def buscar_na_base_dados(query: str) -> str:
             """Busca informações específicas na base de dados interna ."""
             logger.info(f"[Sistema] LLM solicitou busca por: {query}")
@@ -26,6 +28,11 @@ class ChatManager:
             ia_embedding = IAGenaiBase()
             query_embedding = ia_embedding.embed_content(query)
             context = Embedding.make_context(query_embedding)
+
+            rag_results.append({
+                'query': query,
+                'results': context
+            })
 
             return context
 
@@ -36,7 +43,7 @@ class ChatManager:
             return response.text
 
         #return f'RESPOSTA: len_history {len(history)}'
-        return sync_call()
+        return sync_call(), rag_results
 
     def process_user_message(self, session_id, user_message, user):
         """
@@ -49,17 +56,24 @@ class ChatManager:
         history = self.get_context_for_gemini(session_id)
 
         # Envia para Gemini com histórico
-        response = self.query_gemini(history)
+        response, rag_results = self.query_gemini(history)
 
         # Salva resposta do modelo no contexto
-        self.add_message_to_context(session_id, 'model', response, user)
+        self.add_message_to_context(session_id, 'model', response, user, metadata={'rag_results': rag_results})
 
         return response
 
-    def add_message_to_context(self, session_id, role, content, user):
+    def add_message_to_context(self, session_id, role, content, user, metadata=None):
         """
         Adiciona mensagem diretamente ao banco de dados
         """
+        if metadata is None:
+            metadata = {}
+        else:
+            metadata.update({
+                'ia_model_name': self.ia.ia_model_name,
+            })
+
         # Verifica limite de sessões antes de criar uma nova
         if not ChatSession.objects.filter(session_id=session_id).exists():
             if not user.is_superuser and ChatSession.objects.filter(user=user).count() >= self.MAX_SESSIONS_PER_USER:
@@ -79,7 +93,8 @@ class ChatManager:
         ChatMessage.objects.create(
             chat=chat_session,
             role=role,
-            content=content
+            content=content,
+            metadata=metadata
         )
 
         # Atualiza timestamp da sessão

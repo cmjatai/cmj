@@ -79,21 +79,40 @@ class Embedding(CmjModelMixin):
         for embed in embeddings:
             #similarity_score = 1 - embed.distance
             #print(f"Item ID: {embed.id}, Similarity: {similarity_score:.4f}, Tokens: {embed.total_tokens}")
-            context.append(list(map(str.strip, embed.chunk.split('\n'))))
+            context.append((embed.content_object, list(map(str.strip, embed.chunk.split('\n')))))
 
-        context.sort()
+        keys = OrderedSet()
+        for item in context:
+            keys.add(item[1][0])
+
+        context.sort(key=lambda x: x[1][0])
+
+        context_dict1 = OrderedDict()
+        context_dict2 = {}
+        for idx, (content_object, item) in enumerate(context):
+            if item[0] not in context_dict1:
+                context_dict1[item[0]] = []
+                context_dict2[item[0]] = content_object
+            context_dict1[item[0]].extend(item)
+
 
         context_dict = OrderedDict()
-        for idx, item in enumerate(context):
-            if item[0] not in context_dict:
-                context_dict[item[0]] = []
-            context_dict[item[0]].extend(item)
+        for key in keys:
+            context_dict[key] = context_dict1[key]
 
         context = list(context_dict.values())
         for idx, item in enumerate(context):
             context[idx] = list(OrderedSet(item))
 
-        return context
+        context_final = []
+        for item in context:
+            d = context_dict2[item[0]]
+            item[0] = f'\nFonte: <a href="/ta/{d.ta_id}/text">{item[0]}</a>'
+            context_final.extend(item)
+
+        context_final = '\n'.join(context_final)
+
+        return context_final
 
 class ChatSession(models.Model):
     user = models.ForeignKey(get_settings_auth_user_model(), on_delete=models.CASCADE)
@@ -124,7 +143,6 @@ class ChatMessage(models.Model):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
-    # Armazena metadados (ex: documentos usados no RAG)
     metadata = models.JSONField(default=dict)
 
     class Meta:
@@ -132,3 +150,4 @@ class ChatMessage(models.Model):
         indexes = [
             models.Index(fields=['chat', 'timestamp']),
         ]
+
