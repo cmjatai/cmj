@@ -74,6 +74,7 @@ const initMoving = (event) => {
 </script>
 <style lang="scss" scoped>
   .painelset-module {
+    user-select: none;
     position: absolute;
     top: 0;
     bottom: 0;
