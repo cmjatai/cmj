@@ -79,21 +79,24 @@ class Embedding(CmjModelMixin):
         for embed in embeddings:
             #similarity_score = 1 - embed.distance
             #print(f"Item ID: {embed.id}, Similarity: {similarity_score:.4f}, Tokens: {embed.total_tokens}")
+            ##print(embed.content_object)
+            #print(embed.chunk)
+            #print('---'*10)
             context.append((embed.content_object, list(map(str.strip, embed.chunk.split('\n')))))
 
         keys = OrderedSet()
         for item in context:
             keys.add(item[1][0])
 
-        context.sort(key=lambda x: x[1][0])
+        context.sort(key=lambda x: (x[0].ta_id, x[0].ordem))
 
         context_dict1 = OrderedDict()
         context_dict2 = {}
         for idx, (content_object, item) in enumerate(context):
             if item[0] not in context_dict1:
-                context_dict1[item[0]] = []
+                context_dict1[item[0]] = [item[0]]
                 context_dict2[item[0]] = content_object
-            context_dict1[item[0]].extend(item)
+            context_dict1[item[0]].extend(item[1:])
 
 
         context_dict = OrderedDict()
