@@ -52,6 +52,14 @@
           </small>
         </li>
       </ul>
+      <div class="p-3">
+        <small class="text-muted">
+          <em>
+            As respostas da IA podem estar incorretas ou desatualizadas.
+            Utilize com cautela, para fins informativos. Confira sempre as fontes originais.
+          </em>
+        </small>
+      </div>
     </div>
   </div>
 </template>

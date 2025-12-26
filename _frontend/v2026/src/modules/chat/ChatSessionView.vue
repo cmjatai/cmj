@@ -39,6 +39,13 @@
         :class="msg.role"
       >
         <div class="message-bubble">
+          <button
+            class="copy-btn"
+            @click="copyToClipboard(msg.content)"
+            title="Copiar mensagem"
+          >
+            <FontAwesomeIcon icon="copy" />
+          </button>
           <div
             class="message-content"
             v-html="formatMessage(msg.content)"
@@ -261,6 +268,49 @@ const sendMessage = () => {
   }
 }
 
+const copyToClipboard = async (text) => {
+  try {
+    const html = formatMessage(text)
+
+    if (navigator.clipboard && navigator.clipboard.write) {
+      const blobHtml = new Blob([html], { type: 'text/html' })
+      const blobText = new Blob([text], { type: 'text/plain' })
+
+      const data = [new ClipboardItem({
+        ['text/html']: blobHtml,
+        ['text/plain']: blobText
+      })]
+
+      await navigator.clipboard.write(data)
+    } else {
+      await navigator.clipboard.writeText(text)
+    }
+
+    messageStore.addMessage({
+      type: 'success',
+      text: 'Copiado para a área de transferência',
+      timeout: 2000
+    })
+  } catch (err) {
+    console.error('Failed to copy:', err)
+    // Fallback para texto simples em caso de erro (ex: suporte a ClipboardItem)
+    try {
+      await navigator.clipboard.writeText(text)
+      messageStore.addMessage({
+        type: 'success',
+        text: 'Copiado (apenas texto)',
+        timeout: 2000
+      })
+    } catch (e) {
+      messageStore.addMessage({
+        type: 'danger',
+        text: 'Erro ao copiar',
+        timeout: 2000
+      })
+    }
+  }
+}
+
 const formatMessage = (text) => {
   return md.render(text)
 }
@@ -394,6 +444,11 @@ onUnmounted(() => {
   font-size: 0.95rem;
   line-height: 1.4;
   word-wrap: break-word;
+  position: relative;
+
+  &:hover .copy-btn {
+    opacity: 0.6;
+  }
 
   .user & {
     background-color: #007bff;
@@ -411,6 +466,24 @@ onUnmounted(() => {
     background-color: #fff3cd;
     color: #856404;
     border: 1px solid #ffeeba;
+  }
+}
+
+.copy-btn {
+  position: absolute;
+  top: 2px;
+  right: 5px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 5px;
+
+  &:hover {
+    opacity: 1 !important;
   }
 }
 

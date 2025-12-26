@@ -46,6 +46,6 @@ onMounted(() => {
 
 <style lang="scss">
 .sessaoplenaria-module {
-  // line-height: 1.2;
+  user-select: none;
 }
 </style>

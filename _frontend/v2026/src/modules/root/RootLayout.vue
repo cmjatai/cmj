@@ -69,7 +69,6 @@ body {
 }
 .root-layout {
 
-  user-select: none;
   top: 0;
   right: 0;
   bottom: 0;
