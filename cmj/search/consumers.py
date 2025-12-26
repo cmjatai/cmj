@@ -97,6 +97,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 return
 
             user_message = escape(user_message)
+            user_message = user_message.split()
+            user_message = ' '.join(user_message)
+
 
             # Processa mensagem e obtém resposta
             response = await sync_to_async(self.context_manager.process_user_message)(
