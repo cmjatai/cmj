@@ -586,7 +586,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
     def batch_run(self, analises):
 
-        quota = self.retrieve_quota_if_available()
+        quota = self.retrieve_quota_if_available(ascending=False)
 
         inline_analises = []
         inline_requests = []
