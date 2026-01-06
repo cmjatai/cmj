@@ -157,7 +157,7 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
                 if i == j: # mesmo requerimento
                     continue
 
-                if r1[0] < r2[0]: # para evitar duplicidade, sempre compara o maior id com o menor
+                if r1[0] < r2[0]: # para evitar duplicidade, descarta matéria com id menor
                     continue
 
                 if len(r1[1]) >=5 or len(r2[1]) >= 5: # de cinco autores para cima, não compara
@@ -235,7 +235,7 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
 
         if analises.exists():
             gen = IAAnaliseSimilaridadeService()
-            gen.batch_run(analises[:10])
+            gen.batch_run(analises[:100]) # processa no máximo 100 analises por vez
         else:
             gera_registros_de_analise_vazios()
 
