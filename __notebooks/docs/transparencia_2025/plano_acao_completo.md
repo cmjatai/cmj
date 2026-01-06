@@ -159,7 +159,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * <https://www.jatai.go.leg.br/pesquisar>
     * <http://camaradejatai.sigepnet.com.br/?portal=1>
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/employee-transparency.jsf>
+    * <http://camarajatai.sigep.com.br/portal/employee-transparency.jsf>
 
 #### **Fase 3: Informações Institucionais**
 
@@ -311,7 +311,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Produtos:**
     * Publicação das informações sobre licitações
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/bidding-transparency.jsf>
+    * <http://camarajatai.sigep.com.br/portal/bidding-transparency.jsf>
 
 ##### **Atividade 8.2**
   * **Pergunta:** DDivulga a íntegra dos editais de licitação? [(PNTP)](#82-divulga-a-íntegra-dos-editais-de-licitação)
@@ -319,7 +319,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Produtos:**
     * Publicação dos editais das licitações
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/bidding-transparency.jsf>
+    * <http://camarajatai.sigep.com.br/portal/bidding-transparency.jsf>
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-em-andamento>
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-encerradas>
 
@@ -329,7 +329,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Produtos:**
     * Publicação dos documentos das fases interna e externa das licitações
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/bidding-transparency.jsf>
+    * <http://camarajatai.sigep.com.br/portal/bidding-transparency.jsf>
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-em-andamento>
     * <https://www.jatai.go.leg.br/informacao/licitacoes/licitacoes-encerradas>
 
@@ -341,7 +341,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Links:**
     * Dispensas: <https://www.jatai.go.leg.br/informacao/licitacoes/dispensas>
     * Inexigibilidades: <https://www.jatai.go.leg.br/informacao/licitacoes/inexigibilidade>
-    * Link do Portal de Transparência: <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/dispensation-bidding-transparency.jsf>
+    * Link do Portal de Transparência: <http://camarajatai.sigep.com.br/portal/dispensation-bidding-transparency.jsf>
 
 ##### **Atividade 8.5**
   * **Pergunta:** Divulga a íntegra das Atas de Adesão – SRP? [(PNTP)](#85-divulga-a-íntegra-das-atas-de-adesão---srp)
@@ -360,7 +360,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Publicação da relação dos contratos celebrados...
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/contratos/contratos-em-vigencia>
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/contract-transparency.jsf>
+    * <http://camarajatai.sigep.com.br/portal/contract-transparency.jsf>
 
 ##### **Atividade 9.2**
   * **Pergunta:** Divulga o inteiro teor dos contratos e dos respectivos termos aditivos? [(PNTP)](#92-divulga-o-inteiro-teor-dos-contratos-e-dos-respectivos-termos-aditivos)
@@ -369,7 +369,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
     * Publicação do inteiro teor dos contratos e dos respectivos termos aditivos
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/contratos/contratos-em-vigencia>
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/contract-transparency.jsf>
+    * <http://camarajatai.sigep.com.br/portal/contract-transparency.jsf>
 
 ##### **Atividade 9.3** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga a relação/lista dos fiscais de cada contrato vigente e encerrado? [(PNTP)](#93-divulga-a-relaçãolista-dos-fiscais-de-cada-contrato-vigente-e-encerrado)
@@ -377,7 +377,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Produtos:**
     * Publicação da relação/lista dos fiscais de cada contrato vigente e encerrado
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/tax-contract.jsf>
+    * <http://camarajatai.sigep.com.br/portal/tax-contract.jsf>
 
 ##### **Atividade 9.4** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga a ordem cronológica de seus pagamentos, bem como as justificativas que fundamentaram a eventual alteração dessa ordem? [(PNTP)](#94-divulga-a-ordem-cronológica-de-seus-pagamentos-bem-como-as-justificativas-que-fundamentaram-a-eventual-alteração-dessa-ordem)
@@ -385,7 +385,7 @@ Padronizar a divulgação das despesas da Câmara, destacando execução e class
   * **Produtos:**
     * Publicação da ordem cronológica de seus pagamentos
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/order-of-payment.jsf>
+    * <http://camarajatai.sigep.com.br/portal/order-of-payment.jsf>
 
 #### **Fase 3: Obras**
 
@@ -507,7 +507,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Produtos:**
     * Publicação do relatório anual estatístico
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-indicators.jsf>
+    * <http://camarajatai.sigep.com.br/portal/esic-indicators.jsf>
 
 ##### **Atividade 12.8**
   * **Pergunta:** Divulga lista de documentos classificados em cada grau de sigilo, contendo pelo menos o assunto sobre o qual versa a informação, a categoria na qual ela se encontra, o dispositivo legal que fundamenta a classificação e o respectivo prazo? [(PNTP)](#128-divulga-lista-de-documentos-classificados-em-cada-grau-de-sigilo-contendo-pelo-menos-o-assunto-sobre-o-qual-versa-a-informação-a-categoria-na-qual-ela-se-encontra-o-dispositivo-legal-que-fundamenta-a-classificação-e-o-respectivo-prazo)
@@ -515,7 +515,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Produtos:**
     * Publicação da lista de documentos classificados
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-list-information.jsf>
+    * <http://camarajatai.sigep.com.br/portal/esic-list-information.jsf>
 
 ##### **Atividade 12.9**
   * **Pergunta:** Divulga lista das informações que tenham sido desclassificadas nos últimos 12 (doze) meses? [(PNTP)](#129-divulga-lista-das-informações-que-tenham-sido-desclassificadas-nos-últimos-12-doze-meses)
@@ -523,7 +523,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
   * **Produtos:**
     * Publicação da lista das informações desclassificadas
   * **Links:**
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/esic-list-information.jsf>
+    * <http://camarajatai.sigep.com.br/portal/esic-list-information.jsf>
 
 #### **Acessibilidade**
 
@@ -705,7 +705,7 @@ nº 12.527/2011 – LAI? [(PNTP)](#125-divulga-nesta-seção-instrumento-normati
     * Publicação do plano de contratações anual
   * **Links:**
     * <https://www.jatai.go.leg.br/informacao/licitacoes/plano-de-contratacoes-anual>
-    * <http://gestaopublica.camara.jatai.bsit-br.com.br/portal/annual-hiring-plan.jsf>
+    * <http://camarajatai.sigep.com.br/portal/annual-hiring-plan.jsf>
 
 ##### **Atividade 8.7** - <span style="color: red;">NÃO ATENDIDO EM 2024</span>
   * **Pergunta:** Divulga a relação dos licitantes e/ou contratados sancionados administrativamente pelo Poder ou órgão? [(PNTP)](#87-divulga-a-relação-dos-licitantes-eou-contratados-sancionados-administrativamente-pelo-poder-ou-órgão)
