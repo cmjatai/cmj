@@ -1050,6 +1050,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     raise ValidationError(
                         'Ocorreu um erro ao processar seus filtros e agrupamentos.')
 
+            #context['groups'][0]['rows'] = context['groups'][0]['rows'][:10]
+
             with TimeExecution(print_date=settings.DEBUG, label='Render Html EmendaLoa List'):
                 template = render_to_string('loa/pdf/emendaloa_list.html', context)
 
@@ -1114,8 +1116,14 @@ class EmendaLoaCrud(MasterDetailCrud):
                                 <a href="{reverse('sapl.materia:materialegislativa_detail',kwargs={'pk': item.materia.id})}">
                                 {item.materia.epigrafe_short}
                                 </a>
-                            </span>&nbsp;-&nbsp;
+                            </span>
                     '''
+
+                autores = f'''
+                    <small>
+                        <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
+                    </small>
+                '''
 
                 col_emenda = f'''
 
@@ -1123,15 +1131,16 @@ class EmendaLoaCrud(MasterDetailCrud):
                         <div class="row">
                             <div class="col">
                                 {materia}
-                                <small>
-                                    <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
-                                </small>
+                                { '&nbsp;-&nbsp;' if item.parlamentares.count() <= 3 else '' }
+                                { autores if item.parlamentares.count() <= 3 else ''}
                             </div>
                             <div class="col">
                                 <span>Tipo:</span>&nbsp;
                                 <strong class="tipo">{item.get_tipo_display()}</strong>
                             </div>
                         </div>
+                        { autores if item.parlamentares.count() > 3 else ''}
+                        { '<br>' if item.parlamentares.count() > 3 else ''}
                         <span class="indicacao">{item.indicacao}</span>
                         <div>
                             {item.finalidade_format}
@@ -1329,9 +1338,9 @@ class EmendaLoaCrud(MasterDetailCrud):
                             rc[0] = rc[0].replace(' ', '&nbsp;')
                             registros[index] = f'<li>{" - ".join(rc)}</li>'
 
-
-                        cols[0][0] = cols[0][0].replace(
-                            '<ul></ul>', f'<small class="courier"><small>DOTAÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
+                        if registros:
+                            cols[0][0] = cols[0][0].replace(
+                                '<ul></ul>', f'<small class="courier"><small>DOTAÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
 
                     agrupamento_soma = list(map(lambda x: '__'.join(x.split('__')[1:]), agrupamento))
 
