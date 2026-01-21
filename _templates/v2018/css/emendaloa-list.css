@@ -26,6 +26,8 @@ h5 {
   }
   .col {
     display: inline-flex;
+    flex-wrap: wrap;
+
   }
 }
 .text-right {
