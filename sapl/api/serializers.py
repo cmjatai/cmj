@@ -70,6 +70,9 @@ class MateriaLegislativaSerializer(CmjSerializerMixin):
     desanexadas = serializers.SerializerMethodField()
     ultima_tramitacao = serializers.SerializerMethodField()
 
+    numero = serializers.IntegerField(required=False)
+    ano = serializers.IntegerField(required=False)
+
     class Meta:
         model = MateriaLegislativa
         exclude = ['similaridades']
@@ -91,6 +94,19 @@ class MateriaLegislativaSerializer(CmjSerializerMixin):
             Tramitacao).serializer_class(ultima_tramitacao)
 
         return serializer_class.data
+
+    def create(self, validated_data):
+        tipo = validated_data.get('tipo')
+        ano = validated_data.get('ano', None)
+        numero_preferido = validated_data.get('numero', None)
+
+        validated_data['numero'], validated_data['ano'] = MateriaLegislativa.get_proximo_numero(
+            tipo=tipo,
+            ano=ano,
+            numero_preferido=numero_preferido
+        )
+
+        return super().create(validated_data)
 
 
 class ParlamentarSerializerPublic(CmjSerializerMixin):
