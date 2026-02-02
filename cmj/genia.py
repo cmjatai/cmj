@@ -590,6 +590,10 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
         inline_analises = []
         inline_requests = []
+
+        if analises.count() > 10:
+            analises = analises[:10]
+
         for analise in analises:
 
             text1, text2 = self.extract_text_from_similaridade(analise)
@@ -619,11 +623,14 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
                 }
             )
 
+        keytime = time.time()
+        display_name = f'batch_analise_similaridade_entre_materias_{int(keytime)}'
+
         inline_batch_job = self.client.batches.create(
             model = self.ia_model_name,
             src =  inline_requests,
             config = {
-                'display_name': 'batch_analise_similaridade_entre_materias',
+                'display_name': display_name
             }
         )
 
