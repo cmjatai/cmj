@@ -206,38 +206,25 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             analise.save()
         return
 
+    gera_registros_de_analise_vazios()
+
     q = Q()
     if only_materia_id:
-        gera_registros_de_analise_vazios()
         q = Q(
             Q(materia_1_id=only_materia_id) | Q(materia_2_id=only_materia_id)
         )
 
-        analises = AnaliseSimilaridade.objects.filter(
-            q,
-            similaridade = -1,
-            qtd_assuntos_comuns__gt=0,
-            materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
-        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-materia_1_id', '-id')
+    analises = AnaliseSimilaridade.objects.filter(
+        q,
+        similaridade = -1,
+        qtd_assuntos_comuns__gt=0,
+        materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
+    ).order_by('-materia_1__ano', '-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-materia_1_id', '-id')
 
-        gen = IAAnaliseSimilaridadeService()
-        gen.batch_run(analises)
+    gen = IAAnaliseSimilaridadeService()
+    gen.batch_run(analises)
 
-    else:
 
-        # recupera analises que possue assuntos em comum para enviar a ia.
-        analises = AnaliseSimilaridade.objects.filter(
-            similaridade = -1,
-            qtd_assuntos_comuns__gt=0,
-            materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
-            #data_analise__gte=(hoje-timedelta(days=7)), # prioriza analises recentes com pendência de similaridade
-        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-materia_1_id', '-id')
-
-        if analises.exists():
-            gen = IAAnaliseSimilaridadeService()
-            gen.batch_run(analises[:10]) # processa no máximo 10 analises por vez
-        else:
-            gera_registros_de_analise_vazios()
 
 
 

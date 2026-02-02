@@ -3615,7 +3615,13 @@ class AnaliseSimilaridadeRankingCrud(Crud):
             filtro_minino = max(min(int(self.request.GET.get('lm', 50)), 100), 10)
             qs = qs.filter(
                 similaridade__gte=filtro_minino
-                ).order_by('-data_analise__year', '-data_analise__month', '-similaridade', '-data_analise__day')
+                ).order_by(
+                    '-materia_1__ano',
+                    '-data_analise__year',
+                    '-data_analise__month',
+                    '-similaridade',
+                    '-data_analise__day'
+                )
             return qs
 
         def hook_analise(self, obj, ss, url):
