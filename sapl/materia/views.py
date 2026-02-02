@@ -2402,7 +2402,7 @@ class MateriaLegislativaCrud(Crud):
                     countdown=10
                 )
             else:
-                task_analise_similaridade_entre_materias_function(gen.object.id)
+                task_analise_similaridade_entre_materias_function(only_materia_id=gen.object.id)
 
             return HttpResponseRedirect(reverse(
                 'sapl.materia:materialegislativa_detail',

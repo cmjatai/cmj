@@ -218,7 +218,7 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             similaridade = -1,
             qtd_assuntos_comuns__gt=0,
             materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
-        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-id')
+        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-materia_1_id', '-id')
 
         gen = IAAnaliseSimilaridadeService()
         gen.batch_run(analises)
@@ -231,11 +231,11 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             qtd_assuntos_comuns__gt=0,
             materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
             #data_analise__gte=(hoje-timedelta(days=7)), # prioriza analises recentes com pendência de similaridade
-        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-id')
+        ).order_by('-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-materia_1_id', '-id')
 
         if analises.exists():
             gen = IAAnaliseSimilaridadeService()
-            gen.batch_run(analises[:100]) # processa no máximo 100 analises por vez
+            gen.batch_run(analises[:10]) # processa no máximo 10 analises por vez
         else:
             gera_registros_de_analise_vazios()
 
@@ -252,8 +252,8 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
     #)
 
     #if restart:
-    logger.info('Executando...')
     only_materia_id = args[0] if args else None
+    logger.info(f'Executando... only_materia_id={only_materia_id}')
 
     try:
         task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
