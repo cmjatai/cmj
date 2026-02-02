@@ -878,7 +878,7 @@ class MateriaLegislativa(CommonMixin):
                 tipo=tipo,
                 ano=ano,
                 numero=numero_preferido).exists():
-            return int(numero_preferido)
+            return int(numero_preferido), ano
 
         # Retorna o próximo número sequencial
         max_numero = numero['numero__max']

@@ -2986,8 +2986,8 @@ class ConfirmarProposicaoForm(ProposicaoForm):
             tipo = cd.get('tipo', self.instance.tipo).tipo_conteudo_related
             max_numero, ano = MateriaLegislativa.get_proximo_numero(
                 tipo=tipo,
-                ano=ano,
-                numero_preferido=cd.get('numero_materia_futuro')
+                ano=None,
+                numero_preferido=cd.get('numero_materia_futuro', None)
             )
 
             # dados básicos

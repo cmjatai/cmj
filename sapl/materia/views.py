@@ -475,7 +475,6 @@ def recuperar_materia(request):
     )
 
     response = JsonResponse({'numero': max_numero, 'ano': ano})
-
     return response
 
 
