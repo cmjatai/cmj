@@ -206,10 +206,10 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             analise.save()
         return
 
-    gera_registros_de_analise_vazios()
 
     q = Q()
     if only_materia_id:
+        gera_registros_de_analise_vazios()
         q = Q(
             Q(materia_1_id=only_materia_id) | Q(materia_2_id=only_materia_id)
         )
