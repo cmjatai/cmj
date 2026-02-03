@@ -2396,6 +2396,7 @@ class MateriaLegislativaCrud(Crud):
 
             if not settings.DEBUG or (
                     settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
+                logger.info('Iniciando tarefa assíncrona de análise de similaridade entre matérias via classificação.')
                 task_analise_similaridade_entre_materia_via_classificacao.apply_async(
                     (gen.object.id, ),
                     countdown=10

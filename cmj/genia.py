@@ -658,36 +658,12 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
             exec['job_name'] = inline_batch_job.name
 
         def process_exec(exec):
-
-        while True:
-            all_finished = True
-            for exec in execs:
-                if exec['finished']:
-                    continue
-                job_name = exec['job_name']
-                batch_job_inline = self.client.batches.get(name=job_name)
-                if batch_job_inline.state.name not in ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'):
-                    all_finished = False
-                    logger.info(f"Batch job {job_name}. Current state: {batch_job_inline.state.name}")
-                else:
-                    exec['finished'] = True
-                    exec['state_job'] = batch_job_inline.state.name
-                    if batch_job_inline.state.name == 'JOB_STATE_SUCCEEDED':
-                        exec['inline_responses'] = [resp.response.text for resp in batch_job_inline.dest.inlined_responses if resp.response]
-
-            if all_finished:
-                break
-            #print(f"Some jobs not finished. Waiting 30 seconds...")
-            time.sleep(30)
-            #print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")
-
-        for exec in execs:
             job_name = exec['job_name']
             inline_analises = exec['inline_analises']
 
             if exec['state_job'] != 'JOB_STATE_SUCCEEDED':
                 logger.error(f"Batch job {job_name} did not succeed. State: {exec['state_job']}")
-                continue
+                return
 
             for i, text in enumerate(exec['inline_responses']):
 
@@ -708,3 +684,28 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
                     logger.error(e)
                     similaridade.similaridade = 0
                 similaridade.save()
+
+
+        while True:
+            all_finished = True
+            for exec in execs:
+                if exec['finished']:
+                    continue
+                job_name = exec['job_name']
+                batch_job_inline = self.client.batches.get(name=job_name)
+                if batch_job_inline.state.name not in ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'):
+                    all_finished = False
+                    logger.info(f"Batch job {job_name}. Current state: {batch_job_inline.state.name}")
+                else:
+                    exec['finished'] = True
+                    exec['state_job'] = batch_job_inline.state.name
+                    if batch_job_inline.state.name == 'JOB_STATE_SUCCEEDED':
+                        exec['inline_responses'] = [resp.response.text for resp in batch_job_inline.dest.inlined_responses if resp.response]
+
+                    process_exec(exec)
+
+            if all_finished:
+                break
+            #print(f"Some jobs not finished. Waiting 30 seconds...")
+            time.sleep(50)
+            #print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")
