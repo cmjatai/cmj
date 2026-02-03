@@ -602,7 +602,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
                 'inline_responses': [],
             })
 
-        analises = list(analises[50:50+2*num_threads])  # limita para evitar excesso de requisições
+        analises = list(analises[0:10*num_threads])  # limita para evitar excesso de requisições
 
         # distribui as análises entre os threads
         for i, analise in enumerate(analises):
