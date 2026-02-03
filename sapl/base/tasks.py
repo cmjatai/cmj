@@ -206,7 +206,6 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             analise.save()
         return
 
-
     q = Q()
     if only_materia_id:
         gera_registros_de_analise_vazios()
@@ -219,13 +218,16 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
         similaridade = -1,
         qtd_assuntos_comuns__gt=0,
         materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
-    ).order_by('-materia_1__ano', '-data_analise__year', '-data_analise__month', '-qtd_assuntos_comuns', '-materia_1_id', '-id')
+    ).order_by('-materia_1__ano',
+               '-data_analise__year',
+               '-data_analise__month',
+               '-qtd_assuntos_comuns',
+               '-materia_1_id',
+               '-materia_2_id',
+               '-id')
 
     gen = IAAnaliseSimilaridadeService()
-    gen.batch_run(analises)
-
-
-
+    gen.batch_run(analises, num_threads=3)
 
 
 @cmj_celery_app.task(queue='cq_base', bind=True)

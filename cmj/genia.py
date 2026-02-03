@@ -584,83 +584,111 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
         similaridade.save()
         return similaridade
 
-    def batch_run(self, analises):
+    def batch_run(self, analises, num_threads=1):
+
 
         quota = self.retrieve_quota_if_available(ascending=False)
 
-        inline_analises = []
-        inline_requests = []
+        execs = []
+        for i in range(num_threads):
+            execs.append({
+                'inline_analises': [],
+                'inline_requests': [],
+                'analises': [],
+                'display_name': f'batch_analise_similaridade_entre_materias_thread_{i}_{int(time.time())}',
+                'job_name': None,
+                'finished': False,
+                'state_job': None,
+                'inline_responses': [],
+            })
 
-        if analises.count() > 10:
-            analises = analises[:10]
+        analises = list(analises[50:50+2*num_threads])  # limita para evitar excesso de requisições
 
-        for analise in analises:
+        # distribui as análises entre os threads
+        for i, analise in enumerate(analises):
+            execs[i % num_threads]['analises'].append(analise)
 
-            text1, text2 = self.extract_text_from_similaridade(analise)
-            mat1 = analise.materia_1
-            mat2 = analise.materia_2
+        for exec in execs:
+            analises = exec['analises']
 
-            prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
-            inline_analises.append(analise)
-            inline_requests.append(
-                {
-                    'config': dict(
-                        #temperature=self.temperature,
-                        #top_p=self.top_p,
-                        #top_k=self.top_k,
-                        response_mime_type=self.response_mime_type,
-                    ),
-                    'contents': [
-                        {
-                            'parts': [
-                                {
-                                    'text': prompt
-                                }
-                            ],
-                            'role': 'user'
-                        }
-                    ],
+            for analise in analises:
+                inline_analises = exec['inline_analises']
+                inline_requests = exec['inline_requests']
+
+                text1, text2 = self.extract_text_from_similaridade(analise)
+                mat1 = analise.materia_1
+                mat2 = analise.materia_2
+
+                prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
+                inline_analises.append(analise)
+                inline_requests.append(
+                    {
+                        'config': dict(
+                            #temperature=self.temperature,
+                            #top_p=self.top_p,
+                            #top_k=self.top_k,
+                            response_mime_type=self.response_mime_type,
+                        ),
+                        'contents': [
+                            {
+                                'parts': [
+                                    {
+                                        'text': prompt
+                                    }
+                                ],
+                                'role': 'user'
+                            }
+                        ],
+                    }
+                )
+
+            display_name = exec['display_name']
+            inline_analises = exec['inline_analises']
+            inline_requests = exec['inline_requests']
+
+            inline_batch_job = self.client.batches.create(
+                model = self.ia_model_name,
+                src =  inline_requests,
+                config = {
+                    'display_name': display_name
                 }
             )
-
-        keytime = time.time()
-        display_name = f'batch_analise_similaridade_entre_materias_{int(keytime)}'
-
-        inline_batch_job = self.client.batches.create(
-            model = self.ia_model_name,
-            src =  inline_requests,
-            config = {
-                'display_name': display_name
-            }
-        )
-
-
-        # wait for the job to finish
-        job_name = inline_batch_job.name
-        #print(f"Polling status for job: {job_name}")
+            exec['job_name'] = inline_batch_job.name
 
         while True:
-            batch_job_inline = self.client.batches.get(name=job_name)
-            if batch_job_inline.state.name in ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'):
+            all_finished = True
+            for exec in execs:
+                if exec['finished']:
+                    continue
+                job_name = exec['job_name']
+                batch_job_inline = self.client.batches.get(name=job_name)
+                if batch_job_inline.state.name not in ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'):
+                    all_finished = False
+                    break
+                else:
+                    exec['finished'] = True
+                    exec['state_job'] = batch_job_inline.state.name
+                    if batch_job_inline.state.name == 'JOB_STATE_SUCCEEDED':
+                        exec['inline_responses'] = [resp.response.text for resp in batch_job_inline.dest.inlined_responses if resp.response]
+
+            if all_finished:
                 break
-            #print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")
+            #print(f"Some jobs not finished. Waiting 30 seconds...")
             time.sleep(30)
+            #print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")
 
-        #print(f"Job finished with state: {batch_job_inline.state.name}")
+        for exec in execs:
+            job_name = exec['job_name']
+            inline_analises = exec['inline_analises']
 
-        if batch_job_inline.state.name != 'JOB_STATE_SUCCEEDED':
-            #print("Batch job did not succeed.")
-            return
+            if exec['state_job'] != 'JOB_STATE_SUCCEEDED':
+                logger.error(f"Batch job {job_name} did not succeed. State: {exec['state_job']}")
+                continue
 
-        # print the response
-        for i, inline_response in enumerate(batch_job_inline.dest.inlined_responses, start=0):
-            #print(f"\n--- Response {i} ---")
+            for i, text in enumerate(exec['inline_responses']):
 
-            # Check for a successful response
-            if inline_response.response:
-                # The .text property is a shortcut to the generated text.
-                text = inline_response.response.text
-                #print(text)
+                if not text:
+                    continue
 
                 quota.create_log()
 
