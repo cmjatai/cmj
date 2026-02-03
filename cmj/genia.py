@@ -562,6 +562,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
     def run(self, similaridade, *args, **kwargs):
         # não presuma semelhança com run da classe acima
+        _logger = kwargs.get('logger', logger)
 
         text1, text2 = self.extract_text_from_similaridade(similaridade)
         mat1 = similaridade.materia_1
@@ -579,7 +580,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
             similaridade_value = similaridade.analise.split('[[ ')[1].split('%')[0]
             similaridade.similaridade = int(similaridade_value)
         except Exception as e:
-            logger.error(e)
+            _logger.error(e)
             similaridade.similaridade = 0
         similaridade.save()
         return similaridade
@@ -707,5 +708,5 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
             if all_finished:
                 break
             #print(f"Some jobs not finished. Waiting 30 seconds...")
-            time.sleep(50)
+            time.sleep(60)
             #print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")

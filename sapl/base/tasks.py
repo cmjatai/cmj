@@ -227,7 +227,11 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
                '-id')
 
     gen = IAAnaliseSimilaridadeService()
-    gen.batch_run(analises, logger=logger)
+    if only_materia_id:
+        for analise in analises[:100]:
+            gen.run(analise)
+    else:
+        gen.batch_run(analises, logger=logger)
 
 
 @cmj_celery_app.task(queue='cq_base', bind=True)
