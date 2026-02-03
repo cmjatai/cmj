@@ -21,7 +21,7 @@ from celery.utils.log import get_task_logger
 logger = get_task_logger(__name__)
 
 
-@cmj_celery_app.task(queue='cq_base')
+@cmj_celery_app.task(queue='cq_core')
 def task_envia_email_tramitacao(kwargs):
     print(f'task_envia_email_tramitacao: {kwargs}')
     logger.info(f'task_envia_email_tramitacao: {kwargs}')
@@ -227,20 +227,14 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
                '-id')
 
     gen = IAAnaliseSimilaridadeService()
-    gen.batch_run(analises, num_threads=3, logger=logger)
+    gen.batch_run(analises, logger=logger)
 
 
 @cmj_celery_app.task(queue='cq_base', bind=True)
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
     if settings.DEBUG:
         return
-    #restart = start_task(
-    #    'sapl.base.tasks.task_analise_similaridade_entre_materias',
-    #    task_analise_similaridade_entre_materias,
-    #    timezone.now() + timezone.timedelta(seconds=120)
-    #)
 
-    #if restart:
     only_materia_id = args[0] if args else None
     logger.info(f'Executando... only_materia_id={only_materia_id}')
 
@@ -248,3 +242,16 @@ def task_analise_similaridade_entre_materias(self, *args, **kwargs):
         task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
     except Exception as e:
         logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
+
+@cmj_celery_app.task(queue='cq_core', bind=True)
+def task_analise_similaridade_entre_materia_via_classificacao(self, *args, **kwargs):
+    if settings.DEBUG:
+        return
+
+    only_materia_id = args[0] if args else None
+    logger.info(f'Executando... only_materia_id={only_materia_id}')
+
+    try:
+        task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
+    except Exception as e:
+        logger.error(f'Erro ao executar task_analise_similaridade_entre_materia_via_classificacao: {e}')

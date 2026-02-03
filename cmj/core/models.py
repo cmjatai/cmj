@@ -7,6 +7,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
 from django.db.models.fields.json import JSONField
@@ -1017,10 +1018,25 @@ class IAQuota(models.Model):
         choices=YES_NO_CHOICES,
         default=True)
 
+    batch_size = models.PositiveIntegerField(
+        verbose_name=_('Tamanho do Lote'),
+        default=5,
+        help_text=_('Número de requisições processadas por vez.'),
+        validators=[MinValueValidator(1), MaxValueValidator(100)])
+
+    get_threads = models.PositiveIntegerField(
+        verbose_name=_('Número de Batch Create ao mesmo tempo'),
+        default=1,
+        help_text=_('Número de threads para processamento paralelo.'),
+        validators=[MinValueValidator(1), MaxValueValidator(5)])
+
     class Meta:
         verbose_name = _('Quota IA')
         verbose_name_plural = _('Quotas IA')
         ordering = ('-id', )
+
+    def __str__(self):
+        return '%s - %d (Remaining: %d; Ativo: %s)' % (self.modelo, self.quota_diaria, self.remaining_quota(), self.ativo)
 
     def has_margin(self):
         """

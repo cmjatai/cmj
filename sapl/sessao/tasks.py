@@ -12,7 +12,7 @@ from sapl.sessao.models import RegistroVotacao
 logger = logging.getLogger(__name__)
 
 
-@app.task(queue='cq_base', bind=True)
+@app.task(queue='cq_core', bind=True)
 def task_add_selo_votacao(self,  list_pk):
     print(f'task_add_selo_votacao RegistroVotacao {list_pk}')
     logger.info(f'task_add_selo_votacao RegistroVotacao {list_pk}')

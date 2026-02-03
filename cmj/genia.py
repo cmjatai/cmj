@@ -584,12 +584,15 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
         similaridade.save()
         return similaridade
 
-    def batch_run(self, analises, num_threads=1, logger=logger):
+    def batch_run(self, analises, logger=logger):
 
         quota = self.retrieve_quota_if_available(ascending=False)
 
+        get_threads = quota.get_threads
+        batch_size = quota.batch_size
+
         execs = []
-        for i in range(num_threads):
+        for i in range(get_threads):
             execs.append({
                 'inline_analises': [],
                 'inline_requests': [],
@@ -601,11 +604,11 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
                 'inline_responses': [],
             })
 
-        analises = list(analises[0:10*num_threads])  # limita para evitar excesso de requisições
+        analises = list(analises[0:batch_size*get_threads])  # limita para evitar excesso de requisições
 
         # distribui as análises entre os threads
         for i, analise in enumerate(analises):
-            execs[i % num_threads]['analises'].append(analise)
+            execs[i % get_threads]['analises'].append(analise)
 
         for exec in execs:
             analises = exec['analises']
@@ -653,6 +656,8 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
                 }
             )
             exec['job_name'] = inline_batch_job.name
+
+        def process_exec(exec):
 
         while True:
             all_finished = True
