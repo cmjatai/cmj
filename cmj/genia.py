@@ -663,8 +663,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
                 batch_job_inline = self.client.batches.get(name=job_name)
                 if batch_job_inline.state.name not in ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'):
                     all_finished = False
-                    logger.info(f"Batch job {job_name} not finished yet. Current state: {batch_job_inline.state.name}") 
-                    break
+                    logger.info(f"Batch job {job_name}. Current state: {batch_job_inline.state.name}")
                 else:
                     exec['finished'] = True
                     exec['state_job'] = batch_job_inline.state.name
