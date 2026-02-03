@@ -227,7 +227,7 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
                '-id')
 
     gen = IAAnaliseSimilaridadeService()
-    gen.batch_run(analises, num_threads=3)
+    gen.batch_run(analises, num_threads=3, logger=logger)
 
 
 @cmj_celery_app.task(queue='cq_base', bind=True)
