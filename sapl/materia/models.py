@@ -609,10 +609,16 @@ class MateriaLegislativa(CommonMixin):
 
     def homologar(self, compression=None, original2copia=True, x=193, y=50):
         from sapl.sessao.tasks import task_add_selo_votacao_function
+        from sapl.protocoloadm.models import Protocolo
 
         self.registrovotacao_set.all().update(selo_votacao=False)
 
         protocolo = self.protocolo_gr.first()
+
+        if not protocolo:
+            protocolo = Protocolo()
+            
+
 
         if compression is None:
             autores = self.autores.values_list('sign_compression', flat=True)

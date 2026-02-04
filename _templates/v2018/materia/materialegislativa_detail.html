@@ -17,7 +17,7 @@
 
   <div>
     {% if user.is_superuser %}
-      <a href="{% url 'sapl.materia:materialegislativa_detail' object.id %}?homologar=&compression=False&x=193&y=50&original2copia=True" title="Cabeçalho do Autógrafo.">H</a>
+      <a href="{% url 'sapl.materia:materialegislativa_detail' object.id %}?homologar=&compression=False&x=193&y=50&original2copia=True" title="Homologar.">H</a>
     {% endif %}
 
     {% if not object.anexo_de.exists and perms.materia.add_materialegislativa %}

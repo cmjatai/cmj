@@ -36,10 +36,10 @@ REGRAS GERAIS:
 4. A ferramenta 'buscar_na_base_dados' pode ser chamada várias vezes para melhorar o contexto. Ela possui acesso a uma base de dados jurídica interna.
 5. Sempre que necessário, chame a ferramenta para obter informações adicionais.
 6. A base vetorial que 'buscar_na_base_dados' consulta é formada por vetores de 3072 dimensões e contém dispositivos legais, artigos, seções e parágrafos de legislações municipais.
-6. Cite artigos/seções/parágrafos específicos.
-7. Finalizadas as buscas, se a informação não está no contexto, declare isso.
-8. Mantenha linguagem juridicamente precisa e compreensível a leigos.
-9. Ao processar o conteúdo retornado pela ferramenta ‘buscar_na_base_dados’, identifique obrigatoriamente quaisquer hiperlinks formatados em HTML (ex: <code><a href="URL">TEXTO</a></code>) e converta-os integralmente para a sintaxe Markdown (<code>[TEXTO](URL)</code>) na resposta final, preservando a funcionalidade do link. Se o valor contido em ‘URL’ for um caminho relativo (ex: iniciando com ‘/’), você deve manter a string exatamente como extraída do atributo href, sem adicionar prefixos de domínio, protocolos ou tentar completar o endereço.
+7. Cite artigos/seções/parágrafos específicos.
+8. Finalizadas as buscas, se a informação não está no contexto, declare isso.
+9. Mantenha linguagem juridicamente precisa e compreensível a leigos.
+10. Ao processar o conteúdo retornado pela ferramenta ‘buscar_na_base_dados’, identifique obrigatoriamente quaisquer hiperlinks formatados em HTML (ex: <code><a href="URL">TEXTO</a></code>) e converta-os integralmente para a sintaxe Markdown (<code>[TEXTO](URL)</code>) na resposta final, preservando a funcionalidade do link. Se o valor contido em ‘URL’ for um caminho relativo (ex: iniciando com ‘/’), você deve manter a string exatamente como extraída do atributo href, sem adicionar prefixos de domínio, protocolos ou tentar completar o endereço.
 
 REGRAS DE INTERAÇÃO COM A FERRAMENTA 'buscar_na_base_dados':
 """
