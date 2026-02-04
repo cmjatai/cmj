@@ -2033,46 +2033,13 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
         username = self.request.user.username
         self.logger.debug("user=" + username +
                           ". Tentando obter sequência de numeração.")
-        numeracao = AppConfig.objects.last(
-        ).sequencia_numeracao_protocolo
-        if not numeracao:
-            self.logger.error("user=" + username + ". É preciso definir a sequencia de "
-                              "numeração na tabelas auxiliares!")
-            msg = _('É preciso definir a sequencia de ' +
-                    'numeração na tabelas auxiliares!')
-            messages.add_message(self.request, messages.ERROR, msg)
+        numeracao = AppConfig.objects.last().sequencia_numeracao_protocolo
+        try:
+            numero = Protocolo.get_proximo_numero_protocolo(numeracao)
+        except ValueError as e:
+            self.logger.error(f"user={username}. {str(e)}")
+            messages.add_message(self.request, messages.ERROR, _(str(e)))
             return self.render_to_response(self.get_context_data())
-
-        if numeracao == 'A':
-            numero = Protocolo.objects.filter(
-                ano=timezone.now().year).aggregate(Max('numero'))
-        elif numeracao == 'L':
-            legislatura = Legislatura.objects.filter(
-                data_inicio__year__lte=timezone.now().year,
-                data_fim__year__gte=timezone.now().year).first()
-            data_inicio = legislatura.data_inicio
-            data_fim = legislatura.data_fim
-
-            data_inicio_utc = from_date_to_datetime_utc(data_inicio)
-            data_fim_utc = from_date_to_datetime_utc(data_fim)
-
-            numero = Protocolo.objects.filter(
-                Q(data__isnull=False,
-                  data__gte=data_inicio,
-                  data__lte=data_fim) |
-                Q(timestamp__isnull=False,
-                  timestamp__gte=data_inicio_utc,
-                  timestamp__lte=data_fim_utc) |
-                Q(timestamp_data_hora_manual__isnull=False,
-                  timestamp_data_hora_manual__gte=data_inicio_utc,
-                  timestamp_data_hora_manual__lte=data_fim_utc,)
-            ).aggregate(Max('numero'))
-
-        elif numeracao == 'U':
-            numero = Protocolo.objects.all().aggregate(Max('numero'))
-
-        if numeracao is None:
-            numero['numero__max'] = 0
 
         if not protocolo.numero:
             protocolo.numero = (

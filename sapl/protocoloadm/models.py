@@ -22,7 +22,7 @@ from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao, \
 from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, texto_upload_path,
                         get_settings_auth_user_model,
                         OverwriteStorage, PortalFileField,
-                        SaplGenericForeignKey)
+                        SaplGenericForeignKey, from_date_to_datetime_utc)
 
 
 class TipoDocumentoAdministrativo(models.Model):
@@ -205,6 +205,73 @@ class Protocolo(models.Model):
         except:
             return None
         return materia
+
+    @staticmethod
+    def get_proximo_numero_protocolo(numeracao):
+        """
+        Retorna o próximo número de protocolo baseado na sequência de numeração.
+
+        Args:
+            numeracao: Tipo de numeração ('A' = Anual, 'L' = Legislatura, 'U' = Único)
+
+        Returns:
+            dict: Dicionário com 'numero__max' contendo o maior número encontrado
+                  ou None se não houver protocolos.
+
+        Raises:
+            ValueError: Se a numeração for inválida ou não definida.
+        """
+        from django.db.models import Max, Q
+        from sapl.parlamentares.models import Legislatura
+
+        if not numeracao:
+            raise ValueError(
+                'É preciso definir a sequência de numeração nas tabelas auxiliares!'
+            )
+
+        if numeracao == 'A':
+            numero = Protocolo.objects.filter(
+                ano=timezone.now().year
+            ).aggregate(Max('numero'))
+
+        elif numeracao == 'L':
+            legislatura = Legislatura.objects.filter(
+                data_inicio__year__lte=timezone.now().year,
+                data_fim__year__gte=timezone.now().year
+            ).first()
+
+            if not legislatura:
+                raise ValueError(
+                    'Não foi encontrada legislatura vigente para o ano atual!'
+                )
+
+            data_inicio = legislatura.data_inicio
+            data_fim = legislatura.data_fim
+
+            data_inicio_utc = from_date_to_datetime_utc(data_inicio)
+            data_fim_utc = from_date_to_datetime_utc(data_fim)
+
+            numero = Protocolo.objects.filter(
+                Q(data__isnull=False,
+                  data__gte=data_inicio,
+                  data__lte=data_fim) |
+                Q(timestamp__isnull=False,
+                  timestamp__gte=data_inicio_utc,
+                  timestamp__lte=data_fim_utc) |
+                Q(timestamp_data_hora_manual__isnull=False,
+                  timestamp_data_hora_manual__gte=data_inicio_utc,
+                  timestamp_data_hora_manual__lte=data_fim_utc)
+            ).aggregate(Max('numero'))
+
+        elif numeracao == 'U':
+            numero = Protocolo.objects.all().aggregate(Max('numero'))
+
+        else:
+            raise ValueError(
+                f'Tipo de numeração inválido: {numeracao}'
+            )
+
+        return numero
 
 
 # class DocumentoAdministrativoManager(models.Manager):
