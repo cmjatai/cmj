@@ -10,13 +10,13 @@ from django.utils.html import escape
 logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
+
     def __init__(self, *args, **kwargs):
         from .chat_manager import ChatManager
         super().__init__(*args, **kwargs)
         self.user = None
         self.session_id = None
         self.context_manager = ChatManager()
-
 
     async def connect(self):
         from django.contrib.auth.models import AnonymousUser

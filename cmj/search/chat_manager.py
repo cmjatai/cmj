@@ -18,7 +18,7 @@ class ChatManager:
     def query_gemini(self, user_message, history):
         """Envia para Gemini com histórico completo"""
 
-        rag_results = []
+        rag_query = []
 
         def buscar_na_base_dados(query: str) -> str:
             """Busca informações específicas na base de dados interna ."""
@@ -28,7 +28,7 @@ class ChatManager:
             query_embedding = ia_embedding.embed_content(query)
             context = Embedding.make_context(query_embedding)
 
-            rag_results.append({
+            rag_query.append({
                 'query': query,
                 'results': context
             })
@@ -39,7 +39,22 @@ class ChatManager:
             user_message, history, tools=[buscar_na_base_dados]
         )
 
-        #return f'RESPOSTA: len_history {len(history)}'
+        rag_results = {
+            'rag_query': rag_query,
+            'rag_infos': {}
+        }
+        try:
+            for field in [
+                'total_token_count',
+                'prompt_token_count',
+                'candidate_token_count',
+                'thoughts_token_count'
+            ]:
+                if hasattr(response.usage_metadata, field):
+                    rag_results['rag_infos'][field] = getattr(response.usage_metadata, field)
+        except Exception:
+            logger.warning("Não foi possível obter metadata de token counts da resposta da IA.")
+
         return response.text, rag_results
 
     def process_user_message(self, session_id, user_message, user):
@@ -54,12 +69,12 @@ class ChatManager:
         history = self.get_context_for_gemini(session_id)
 
         # Envia para Gemini com histórico
-        response, rag_results = self.query_gemini(user_message, history)
+        text_response, rag_results = self.query_gemini(user_message, history)
 
         # Salva resposta do modelo no contexto
-        self.add_message_to_context(session_id, 'model', response, user, metadata={'rag_results': rag_results})
+        self.add_message_to_context(session_id, 'model', text_response, user, metadata={'rag_results': rag_results})
 
-        return response
+        return text_response
 
     def add_message_to_context(self, session_id, role, content, user, metadata=None):
         """
@@ -117,6 +132,9 @@ class ChatManager:
 
             history = []
             for msg in messages:
+                ia_model_name = msg.metadata.get("ia_model_name", "")
+                if ia_model_name:
+                    msg.content = f'''{msg.content}\n\n_Por: {ia_model_name}_'''
                 history.append({
                     "role": msg.role,
                     "parts": [{"text": msg.content}]

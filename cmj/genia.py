@@ -120,7 +120,14 @@ class IAGenaiBase:
 
 
     def update_generation_config(self, tools=None):
+        
         if tools:
+
+            # Carece de revisão de Prompts para permitir pesquisa Online
+            # grounding_tool = types.Tool(
+            #    google_search=types.GoogleSearch()
+            #)
+
             self.generation_config = types.GenerateContentConfig(
                 system_instruction=rag_system_instruction,
                 temperature=self.temperature,
