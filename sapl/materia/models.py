@@ -12,7 +12,7 @@ from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Q, F
 from django.db.models.deletion import PROTECT
 from django.db.models.fields.json import JSONField
@@ -28,7 +28,8 @@ from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
 from cmj.mixins import CommonMixin, PluginSignMixin
 from cmj.utils import media_cache_storage
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor, \
-    TipoAutor, Metadata
+    TipoAutor, Metadata, AppConfig as BaseAppConfig
+
 from sapl.comissoes.models import Comissao, Reuniao
 from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
                                     TextoArticulado)
@@ -607,6 +608,7 @@ class MateriaLegislativa(CommonMixin):
             autoria.autor for autoria in Autoria.objects.autores_coautores().filter(materia=self)]
         return autorias
 
+    @transaction.atomic
     def homologar(self, compression=None, original2copia=True, x=193, y=50):
         from sapl.sessao.tasks import task_add_selo_votacao_function
         from sapl.protocoloadm.models import Protocolo
@@ -615,14 +617,30 @@ class MateriaLegislativa(CommonMixin):
 
         protocolo = self.protocolo_gr.first()
 
-        if not protocolo:
-            protocolo = Protocolo()
-            
-
-
+        autores = self.autores.all()
         if compression is None:
-            autores = self.autores.values_list('sign_compression', flat=True)
-            compression = all(autores)
+            compression = all(autores.values_list('sign_compression', flat=True))
+
+        if not protocolo:
+            numeracao = BaseAppConfig.objects.last().sequencia_numeracao_protocolo
+            p = Protocolo()
+            p.numero = Protocolo.get_proximo_numero_protocolo(numeracao=numeracao)
+            p.ano = self.ano
+            p.timestamp_data_hora_manual = timezone.now()
+            p.timestamp = timezone.now()
+            p.tipo_protocolo = 1
+            p.tipo_processo = 1
+            p.interessado = str(autores[0]) if autores else ''
+            p.email = ''
+            p.autor = autores[0] if autores else ''
+            p.assunto_ementa = self.ementa
+            p.tipo_content_type = ContentType.objects.get_for_model(TipoMateriaLegislativa)
+            p.tipo_object_id = self.tipo_id
+            p.conteudo_content_type = ContentType.objects.get_for_model(MateriaLegislativa)
+            p.conteudo_object_id = self.id
+            p.numero_paginas = self.paginas
+            p.save()
+            protocolo = p
 
         for field_file in self.FIELDFILE_NAME:
             if original2copia:

@@ -3152,25 +3152,9 @@ class ConfirmarProposicaoForm(ProposicaoForm):
         """
 
         numeracao = AppConfig.attr('sequencia_numeracao_protocolo')
-        if numeracao == 'A':
-            nm = Protocolo.objects.filter(
-                ano=timezone.now().year).aggregate(Max('numero'))
-        elif numeracao == 'L':
-            legislatura = Legislatura.objects.filter(
-                data_inicio__year__lte=timezone.now().year,
-                data_fim__year__gte=timezone.now().year).first()
-            data_inicio = legislatura.data_inicio
-            data_fim = legislatura.data_fim
-            nm = MateriaLegislativa.objects.filter(
-                data_apresentacao__gte=data_inicio,
-                data_apresentacao__lte=data_fim,
-                tipo=tipo).aggregate(Max('numero'))
-
-        else:
-            # numeracao == 'U' ou não informada
-            nm = Protocolo.objects.all().aggregate(Max('numero'))
+        proximo_numero = Protocolo.get_proximo_numero_protocolo(numeracao)
         protocolo = Protocolo()
-        protocolo.numero = (nm['numero__max'] + 1) if nm['numero__max'] else 1
+        protocolo.numero = proximo_numero
         protocolo.ano = timezone.now().year
 
         protocolo.tipo_protocolo = '1'

@@ -1611,44 +1611,19 @@ class ProtocoloDocumentoView(PermissionRequiredMixin,
 
         self.logger.debug("user=" + username +
                           ". Tentando obter sequência de numeração.")
-        numeracao = AppConfig.objects.last(
-        ).sequencia_numeracao_protocolo
-        if not numeracao:
-            self.logger.error("user=" + username + ". É preciso definir a sequencia de "
-                              "numeração na tabelas auxiliares! ")
-            msg = _('É preciso definir a sequencia de ' +
-                    'numeração na tabelas auxiliares!')
-            messages.add_message(self.request, messages.ERROR, msg)
+        numeracao = AppConfig.objects.last().sequencia_numeracao_protocolo
+        try:
+            proximo_numero = Protocolo.get_proximo_numero_protocolo(numeracao)
+        except ValueError as e:
+            self.logger.error(f"user={username}. {str(e)}")
+            messages.add_message(self.request, messages.ERROR, _(str(e)))
             return self.render_to_response(self.get_context_data())
-
-        if numeracao == 'A':
-            numero = Protocolo.objects.filter(
-                ano=timezone.now().year).aggregate(Max('numero'))
-        elif numeracao == 'L':
-            legislatura = Legislatura.objects.filter(
-                data_inicio__year__lte=timezone.now().year,
-                data_fim__year__gte=timezone.now().year).first()
-            data_inicio = legislatura.data_inicio
-            data_fim = legislatura.data_fim
-            numero = Protocolo.objects.filter(
-                data__gte=data_inicio,
-                data__lte=data_fim).aggregate(
-                Max('numero'))
-        elif numeracao == 'U':
-            numero = Protocolo.objects.all().aggregate(Max('numero'))
 
         protocolo.tipo_processo = '0'  # TODO validar o significado
         protocolo.anulado = False
         if not protocolo.numero:
-            protocolo.numero = (
-                numero['numero__max'] + 1) if numero['numero__max'] else 1
-        elif protocolo.numero < (numero['numero__max'] + 1) if numero['numero__max'] else 0:
-            msg = _('Número de protocolo deve ser maior que {}'.format(
-                numero['numero__max']))
-            self.logger.error(
-                "user=" + username + ". Número de protocolo deve ser maior que {}.".format(numero['numero__max']))
-            messages.add_message(self.request, messages.ERROR, msg)
-            return self.render_to_response(self.get_context_data())
+            protocolo.numero = proximo_numero
+            
         protocolo.ano = timezone.now().year
         protocolo.assunto_ementa = self.request.POST['assunto']
 
@@ -1700,44 +1675,18 @@ class ProtocoloDocumentoAcessorioView(PermissionRequiredMixin,
 
         self.logger.debug("user=" + username +
                           ". Tentando obter sequência de numeração.")
-        numeracao = AppConfig.objects.last(
-        ).sequencia_numeracao_protocolo
-        if not numeracao:
-            self.logger.error("user=" + username + ". É preciso definir a sequencia de "
-                              "numeração na tabelas auxiliares! ")
-            msg = _('É preciso definir a sequencia de ' +
-                    'numeração na tabelas auxiliares!')
-            messages.add_message(self.request, messages.ERROR, msg)
+        numeracao = AppConfig.objects.last().sequencia_numeracao_protocolo
+        try:
+            proximo_numero = Protocolo.get_proximo_numero_protocolo(numeracao)
+        except ValueError as e:
+            self.logger.error(f"user={username}. {str(e)}")
+            messages.add_message(self.request, messages.ERROR, _(str(e)))
             return self.render_to_response(self.get_context_data())
-
-        if numeracao == 'A':
-            numero = Protocolo.objects.filter(
-                ano=timezone.now().year).aggregate(Max('numero'))
-        elif numeracao == 'L':
-            legislatura = Legislatura.objects.filter(
-                data_inicio__year__lte=timezone.now().year,
-                data_fim__year__gte=timezone.now().year).first()
-            data_inicio = legislatura.data_inicio
-            data_fim = legislatura.data_fim
-            numero = Protocolo.objects.filter(
-                data__gte=data_inicio,
-                data__lte=data_fim).aggregate(
-                Max('numero'))
-        elif numeracao == 'U':
-            numero = Protocolo.objects.all().aggregate(Max('numero'))
 
         protocolo.tipo_processo = '0'  # TODO validar o significado
         protocolo.anulado = False
         if not protocolo.numero:
-            protocolo.numero = (
-                numero['numero__max'] + 1) if numero['numero__max'] else 1
-        elif protocolo.numero < (numero['numero__max'] + 1) if numero['numero__max'] else 0:
-            msg = _('Número de protocolo deve ser maior que {}'.format(
-                numero['numero__max']))
-            self.logger.error(
-                "user=" + username + ". Número de protocolo deve ser maior que {}.".format(numero['numero__max']))
-            messages.add_message(self.request, messages.ERROR, msg)
-            return self.render_to_response(self.get_context_data())
+            protocolo.numero = proximo_numero
         protocolo.ano = timezone.now().year
         protocolo.assunto_ementa = self.request.POST['assunto']
 
@@ -2035,23 +1984,15 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
                           ". Tentando obter sequência de numeração.")
         numeracao = AppConfig.objects.last().sequencia_numeracao_protocolo
         try:
-            numero = Protocolo.get_proximo_numero_protocolo(numeracao)
+            proximo_numero = Protocolo.get_proximo_numero_protocolo(numeracao)
         except ValueError as e:
             self.logger.error(f"user={username}. {str(e)}")
             messages.add_message(self.request, messages.ERROR, _(str(e)))
             return self.render_to_response(self.get_context_data())
 
         if not protocolo.numero:
-            protocolo.numero = (
-                numero['numero__max'] + 1) if numero['numero__max'] else 1
-        if numero['numero__max']:
-            if protocolo.numero < (numero['numero__max'] + 1):
-                self.logger.error("user=" + username + ". Número de protocolo ({}) é menor que {}"
-                                  .format(protocolo.numero, numero['numero__max']))
-                msg = _('Número de protocolo deve ser maior que {}'.format(
-                    numero['numero__max']))
-                messages.add_message(self.request, messages.ERROR, msg)
-                return self.render_to_response(self.get_context_data())
+            protocolo.numero = proximo_numero
+
         protocolo.ano = timezone.now().year
 
         protocolo.tipo_protocolo = 0

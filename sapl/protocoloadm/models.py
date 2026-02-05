@@ -104,7 +104,6 @@ class Protocolo(models.Model):
         default=timezone.now, null=True, blank=True)
     tipo_protocolo = models.PositiveIntegerField(
         blank=True, null=True, verbose_name=_('Tipo de Protocolo'))
-    tipo_processo = models.PositiveIntegerField()
     interessado = models.CharField(
         max_length=200, blank=True, verbose_name=_('Interessado'))
     tipo_processo = models.PositiveIntegerField()
@@ -271,7 +270,7 @@ class Protocolo(models.Model):
                 f'Tipo de numeração inválido: {numeracao}'
             )
 
-        return numero
+        return (numero.get('numero__max', 0) + 1) or 1
 
 
 # class DocumentoAdministrativoManager(models.Manager):
