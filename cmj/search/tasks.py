@@ -29,7 +29,9 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
 
         for emb in Embedding.objects.filter(
             total_tokens__gt=0,
-            vetor1536__isnull=True
+            vetor1536__isnull=True,
+            dispositivo_set__in=list(map(lambda d: d[0].id if d and d[0] and hasattr(d[0], 'id') else None, dispositivos))
+
         ):
             emb.generate_embedding()
             logger.info(f'T.A.: {ta.id} Embedding: {emb.id} Generated embedding.')
@@ -46,9 +48,12 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
             print('-' * 150)
 
 @cmj_celery_app.task(queue='cq_base', bind=True)
-def task_sync_embeddings_textoarticulado(self, textoarticulado_ids=[]):
+def task_sync_embeddings_textoarticulado(self, textoarticulado_ids):
 
     #if settings.DEBUG:
     #    return
 
-    task_sync_embeddings_textoarticulado_function(ta_ids=textoarticulado_ids)
+    try:
+        task_sync_embeddings_textoarticulado_function(ta_ids=textoarticulado_ids)
+    except Exception as e:
+        logger.error(f'Erro ao executar task_sync_embeddings_textoarticulado: {e}')

@@ -1448,7 +1448,14 @@ class TextEditView(CompMixin, TemplateView):
                     self.object.privacidade = STATUS_TA_PUBLIC
                     self.object.save()
 
-                    task_sync_embeddings_textoarticulado.delay(textoarticulado_ids=[self.object.id])
+                    if not settings.DEBUG:
+                        task_sync_embeddings_textoarticulado.apply_async(
+                            (
+                               [
+                                   self.object.id
+                                ],
+                            ), countdown=5
+                        )
 
                     messages.success(request, _('Texto Articulado publicado com sucesso.'))
 
