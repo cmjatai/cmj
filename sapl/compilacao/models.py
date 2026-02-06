@@ -1,3 +1,4 @@
+import logging
 from collections import OrderedDict
 import re
 from bs4 import BeautifulSoup as bs
@@ -25,6 +26,7 @@ from sapl.compilacao.utils import (get_integrations_view_names, int_to_letter,
 from sapl.crud.base import SearchMixin
 from sapl.utils import YES_NO_CHOICES, get_settings_auth_user_model
 
+logger = logging.getLogger(__name__)
 
 class TimestampedMixin(models.Model):
     created = models.DateTimeField(
@@ -650,7 +652,21 @@ class TextoArticulado(TimestampedMixin):
             return content_object.is_revogado()
         return False
 
-    def generate_chunks(self, tipo_dispositivo):
+    def generate_chunks(self, tipos_indivisualizaveis=[]):
+
+        if not tipos_indivisualizaveis:
+            tipos_indivisualizaveis = TipoDispositivo.objects.filter(
+                nome__in=[
+                    'Ementa',
+                    'Artigo',
+                    'Caput',
+                    'Parágrafo',
+                    'Inciso',
+                    'Alínea',
+                    'Item'
+            ]
+            ).values_list('nome', flat=True)
+
         qs_dispositivos = self.dispositivos_set.filter(
             dispositivo_subsequente__isnull=True
         )
@@ -673,7 +689,7 @@ class TextoArticulado(TimestampedMixin):
             d, context = dispositivo
 
             # não individualizar dispositivos menores que o tipo solicitado
-            if d.tipo_dispositivo.id < tipo_dispositivo.id:
+            if d.tipo_dispositivo.nome not in tipos_indivisualizaveis:
                 continue
 
             texto = context['texto']
@@ -683,7 +699,7 @@ class TextoArticulado(TimestampedMixin):
                 continue
 
             # se é caput, não cria chunk
-            if d.tipo_dispositivo.id == 120:
+            if d.tipo_dispositivo.nome == 'Caput':
                 continue
 
             disp_renderizado = (rotulo + ' ' + renderizado) if rotulo else renderizado
@@ -700,7 +716,7 @@ class TextoArticulado(TimestampedMixin):
                     break
 
                 if dnext.nivel <= d.nivel:
-                    if dnext.tipo_dispositivo_id == 119:
+                    if dnext.tipo_dispositivo.nome == 'Artigo':
                         faz_mais_um = False
                     else:
                         break
@@ -732,7 +748,7 @@ class TextoArticulado(TimestampedMixin):
 
             chunks = []
             textos = textos_previous + textos_next
-
+            textos = list(filter(lambda x: x.strip(), textos))
             chunk_size = 1536
             current_chunk = ''
             for t in textos:
@@ -785,18 +801,9 @@ class TextoArticulado(TimestampedMixin):
                     emb = d.embeddings.create(
                         chunk=c
                     )
-                print(emb)
+                logger.info(f'Chunk criado para dispositivo {d.pk} do TA {self.pk} com {len(c.split())} palavras.')
 
         return dispositivos
-
-
-
-
-
-
-
-
-
 
 class TipoNota(models.Model):
     sigla = models.CharField(

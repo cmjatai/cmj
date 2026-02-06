@@ -8,8 +8,8 @@ from django.db.models.fields.json import JSONField
 from django.utils.datastructures import OrderedSet
 from django.utils.translation import gettext_lazy as _
 from pgvector.django.vector import VectorField
-
-from pgvector.django import CosineDistance
+from pgvector.django.halfvec import HalfVectorField
+from pgvector.django import CosineDistance, HnswIndex
 
 
 from cmj.genia import IAGenaiBase
@@ -36,7 +36,7 @@ class Embedding(CmjModelMixin):
         content_object: Referência genérica ao objeto fonte do embedding.
         chunk: Fragmento de texto que foi vetorizado.
         total_tokens: Contagem de tokens do chunk (útil para controle de custos).
-        vetor: Vetor de embedding com 3072 dimensões (compatível com
+        vetor1536: Vetor de embedding com 1536 dimensões (compatível com
                text-embedding-3-large da OpenAI ou modelos similares).
 
     Example:
@@ -81,6 +81,14 @@ class Embedding(CmjModelMixin):
         verbose_name=_('Vetor de embedding')
     )
 
+    vetor1536 = HalfVectorField(
+        dimensions=1536,
+        default=None,
+        null=True,
+        blank=True,
+        verbose_name=_('Vetor de embedding 1536')
+    )
+
     class Meta:
         verbose_name = _('Embedding')
         verbose_name_plural = _('Embeddings')
@@ -89,6 +97,14 @@ class Embedding(CmjModelMixin):
         indexes = [
             # Índice composto para otimizar buscas por objeto relacionado
             models.Index(fields=['content_type', 'object_id']),
+            # Índice HNSW para busca por similaridade em vetor1536
+            HnswIndex(
+                name='embedding_vetor1536_hnsw',
+                fields=['vetor1536'],
+                m=16,
+                ef_construction=64,
+                opclasses=['halfvec_cosine_ops'],
+            ),
         ]
 
     def __str__(self):
@@ -111,13 +127,13 @@ class Embedding(CmjModelMixin):
         Gera o vetor de embedding a partir do chunk de texto.
 
         Utiliza a API de embedding configurada em IAGenaiBase
-        para converter o texto em representação vetorial de 3072 dimensões.
-        O vetor resultante é salvo no campo `vetor` para uso em
+        para converter o texto em representação vetorial de 1536 dimensões.
+        O vetor resultante é salvo no campo `vetor1536` para uso em
         buscas por similaridade semântica.
         """
         IAGenaiBase_instance = IAGenaiBase()
         embedding_vector = IAGenaiBase_instance.embed_content(self.chunk)
-        self.vetor = embedding_vector
+        self.vetor1536 = embedding_vector
         self.save()
 
     @classmethod
@@ -131,7 +147,7 @@ class Embedding(CmjModelMixin):
 
         Args:
             query_embedding: Vetor de embedding da consulta do usuário
-                            (deve ter 3072 dimensões).
+                            (deve ter 1536 dimensões).
             top_k: Número máximo de embeddings similares a recuperar.
                    Default: 50.
 
@@ -148,7 +164,7 @@ class Embedding(CmjModelMixin):
         # Busca os top_k embeddings mais próximos usando distância do cosseno
         # CosineDistance retorna valores entre 0 (idêntico) e 2 (oposto)
         embeddings = Embedding.objects.annotate(
-                distance=CosineDistance('vetor', query_embedding)
+                distance=CosineDistance('vetor1536', query_embedding)
             ).order_by('distance')[:top_k]
 
         # Extrai chunks e objetos relacionados

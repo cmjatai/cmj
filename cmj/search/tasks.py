@@ -8,16 +8,14 @@ from celery.utils.log import get_task_logger
 
 logger = get_task_logger(__name__)
 
-def task_sync_embeddings_textoarticulado_function(textoarticulado_ids=[]):
+def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
 
-    logger.info(f'Starting task_sync_embeddings_textoarticulado_function for TextoArticulado IDs: {textoarticulado_ids}'    )
+    logger.info(f'Starting task_sync_embeddings_textoarticulado_function for TextoArticulado IDs: {ta_ids}'    )
 
-    tipo_base = TipoDispositivo.objects.get(id=119)
-
-    for ta in TextoArticulado.objects.filter(id__in=textoarticulado_ids):
+    for ta in TextoArticulado.objects.filter(id__in=ta_ids):
         logger.info(f'T.A.: {ta.id} Iniciando processamento de chunking e embeddings.')
 
-        dispositivos = ta.generate_chunks(tipo_base)
+        dispositivos = ta.generate_chunks()
 
         #count_embedding = Embedding.objects.filter(total_tokens=0).count()
         #logger.info(f'Total de dispositivos para chunking: {len(dispositivos)}')
@@ -31,7 +29,7 @@ def task_sync_embeddings_textoarticulado_function(textoarticulado_ids=[]):
 
         for emb in Embedding.objects.filter(
             total_tokens__gt=0,
-            vetor__isnull=True
+            vetor1536__isnull=True
         ):
             emb.generate_embedding()
             logger.info(f'T.A.: {ta.id} Embedding: {emb.id} Generated embedding.')
@@ -53,4 +51,4 @@ def task_sync_embeddings_textoarticulado(self, textoarticulado_ids=[]):
     #if settings.DEBUG:
     #    return
 
-    task_sync_embeddings_textoarticulado_function(textoarticulado_ids=textoarticulado_ids)
+    task_sync_embeddings_textoarticulado_function(ta_ids=textoarticulado_ids)

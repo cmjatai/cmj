@@ -35,7 +35,7 @@ REGRAS GERAIS:
 3. Utilize a ferramenta 'buscar_na_base_dados' para recuperar informações relevantes.
 4. A ferramenta 'buscar_na_base_dados' pode ser chamada várias vezes para melhorar o contexto. Ela possui acesso a uma base de dados jurídica interna.
 5. Sempre que necessário, chame a ferramenta para obter informações adicionais.
-6. A base vetorial que 'buscar_na_base_dados' consulta é formada por vetores de 3072 dimensões e contém dispositivos legais, artigos, seções e parágrafos de legislações municipais.
+6. A base vetorial que 'buscar_na_base_dados' consulta é formada por vetores de 1536 dimensões e contém dispositivos legais, artigos, seções e parágrafos de legislações municipais.
 7. Cite artigos/seções/parágrafos específicos.
 8. Finalizadas as buscas, se a informação não está no contexto, declare isso.
 9. Mantenha linguagem juridicamente precisa e compreensível a leigos.
@@ -120,7 +120,7 @@ class IAGenaiBase:
 
 
     def update_generation_config(self, tools=None):
-        
+
         if tools:
 
             # Carece de revisão de Prompts para permitir pesquisa Online
@@ -231,7 +231,6 @@ class IAGenaiBase:
             return response.total_tokens
         except Exception as e:
             logger.error(f"Erro ao contar tokens: {e}")
-            time.sleep(2)
             return 0
 
     def embed_content(self, text):
@@ -241,7 +240,7 @@ class IAGenaiBase:
                 contents=[text],
                 config=types.EmbedContentConfig(
                     task_type='RETRIEVAL_QUERY',
-                    output_dimensionality=3072,
+                    output_dimensionality=1536,
                 )
             )
             [embedding_object] = response.embeddings
@@ -249,7 +248,6 @@ class IAGenaiBase:
             return embedding_object.values
         except Exception as e:
             logger.error(f"Erro ao gerar embedding: {e}")
-            time.sleep(2)
             return []
 
 

@@ -35,6 +35,7 @@ from django.views.generic.edit import (CreateView, DeleteView, FormView,
 from django.views.generic.list import ListView
 import pymupdf
 
+from cmj.search.tasks import task_sync_embeddings_textoarticulado
 from cmj.utils import media_cache_storage
 from sapl.compilacao.apps import AppConfig
 from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
@@ -1446,8 +1447,10 @@ class TextEditView(CompMixin, TemplateView):
                     self.object.editing_locked = True
                     self.object.privacidade = STATUS_TA_PUBLIC
                     self.object.save()
-                    messages.success(request, _(
-                        'Texto Articulado publicado com sucesso.'))
+
+                    task_sync_embeddings_textoarticulado.delay(textoarticulado_ids=[self.object.id])
+
+                    messages.success(request, _('Texto Articulado publicado com sucesso.'))
 
                     for d in self.object.dispositivos_alterados_pelo_ta_set.order_by('ta_id').distinct('ta_id'):
                         d.ta.clear_cache()
