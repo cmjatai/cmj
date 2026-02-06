@@ -67,6 +67,9 @@ class ChatManager:
 
         # Obtém histórico completo do DB
         history = self.get_context_for_gemini(session_id)
+        for h in history:
+            if 'ia_model_name' in h:
+                del h['ia_model_name']
 
         # Envia para Gemini com histórico
         text_response, rag_results = self.query_gemini(user_message, history)
@@ -133,11 +136,10 @@ class ChatManager:
             history = []
             for msg in messages:
                 ia_model_name = msg.metadata.get("ia_model_name", "")
-                if ia_model_name:
-                    msg.content = f'''{msg.content}\n\n_Por: {ia_model_name}_'''
                 history.append({
                     "role": msg.role,
-                    "parts": [{"text": msg.content}]
+                    "parts": [{"text": msg.content}],
+                    "ia_model_name": ia_model_name
                 })
             if history and history[-1]["role"] == "user":
                 history.pop()

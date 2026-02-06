@@ -142,7 +142,7 @@ def task_check_finished_cronometros_function():
 
 #@shared_task
 @cmj_celery_app.task(queue='cq_painelset', bind=True)
-def task_painelset_refresh_states():
+def task_painelset_refresh_states(self):
 
     zero_time_cronometros, running_cronometros = task_check_finished_cronometros_function()
 

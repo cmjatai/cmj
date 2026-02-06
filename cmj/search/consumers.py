@@ -72,7 +72,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return [
             {
                 "role": msg["role"],
-                "content": msg["parts"][0]["text"]
+                "content": f'{msg["parts"][0]["text"]}' + (f'\n\n_(LLM: {msg["ia_model_name"]})_' if "ia_model_name" in msg and msg["ia_model_name"] else "")
             }
             for msg in history
         ]
