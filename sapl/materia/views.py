@@ -2315,16 +2315,17 @@ class MateriaLegislativaCrud(Crud):
                 )
 
             if self.request.user.has_perm('materia.add_materialegislativa'):
-                btns.extend(
-                    [
-                        (
-                            '%s?homologar=true' % reverse('sapl.materia:materialegislativa_detail',
-                                    kwargs={'pk': self.object.pk}),
-                            'btn-success',
-                            _('Homologar')
-                        )
-                    ]
-                )
+                if not self.object.protocolo_gr.exists():
+                    btns.extend(
+                        [
+                            (
+                                '%s?homologar=true' % reverse('sapl.materia:materialegislativa_detail',
+                                        kwargs={'pk': self.object.pk}),
+                                'btn-success',
+                                _('Homologar')
+                            )
+                        ]
+                    )
 
             btns = list(filter(None, btns))
             return btns
