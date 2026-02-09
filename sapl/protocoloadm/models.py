@@ -270,7 +270,7 @@ class Protocolo(models.Model):
                 f'Tipo de numeração inválido: {numeracao}'
             )
 
-        return (numero.get('numero__max', 0) + 1) or 1
+        return (numero.get('numero__max', 0) or 0) + 1
 
 
 # class DocumentoAdministrativoManager(models.Manager):
