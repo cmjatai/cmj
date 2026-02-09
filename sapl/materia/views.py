@@ -2445,6 +2445,7 @@ class MateriaLegislativaCrud(Crud):
                     self.object.homologar(x=x, y=y, compression=compression, original2copia=original2copia)
                 else:
                     self.object.homologar()
+                messages.info(self.request, _('Matéria homologada com sucesso.'))
                 return redirect('sapl.materia:materialegislativa_detail', pk=self.object.pk)
 
             return Crud.DetailView.get(self, request, *args, **kwargs)
