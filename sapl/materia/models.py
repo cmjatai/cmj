@@ -609,7 +609,7 @@ class MateriaLegislativa(CommonMixin):
         return autorias
 
     @transaction.atomic
-    def homologar(self, compression=None, original2copia=True, x=193, y=50):
+    def homologar(self, compression=None, original2copia=False, x=193, y=50):
         from sapl.sessao.tasks import task_add_selo_votacao_function
         from sapl.protocoloadm.models import Protocolo
 

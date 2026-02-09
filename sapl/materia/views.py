@@ -2435,13 +2435,17 @@ class MateriaLegislativaCrud(Crud):
             elif 'cabec_autografo' in request.GET:
                 return self.cabec_autografo(request.GET.get('cabec_autografo'))
 
-            if 'homologar' in request.GET and request.user.is_superuser:
+            if 'homologar' in request.GET and request.user.has_perm('materia.add_materialegislativa'):
                 self.object = self.get_object()
-                x = int(self.request.GET.get('x', 193))
-                y = int(self.request.GET.get('y', 50))
-                compression = self.request.GET.get('compression', None)
-                original2copia = self.request.GET.get('original2copia', True)
-                self.object.homologar(x=x, y=y, compression=compression, original2copia=original2copia)
+                if request.user.is_superuser:
+                    x = int(self.request.GET.get('x', 193))
+                    y = int(self.request.GET.get('y', 50))
+                    compression = self.request.GET.get('compression', None)
+                    original2copia = self.request.GET.get('original2copia', False)
+                    self.object.homologar(x=x, y=y, compression=compression, original2copia=original2copia)
+                else:
+                    self.object.homologar()
+                return redirect('sapl.materia:materialegislativa_detail', pk=self.object.pk)
 
             return Crud.DetailView.get(self, request, *args, **kwargs)
 
