@@ -90,6 +90,12 @@ def reordernar_materias_expediente(request, pk):
 
 
 def reordernar_materias_ordem(request, pk):
+    try:
+        step = int(request.GET.get('step', '1'))
+    except ValueError:
+        step = 1
+    step = min(max(step, 1), 100)
+
     ordens = OrdemDia.objects.filter(
         sessao_plenaria_id=pk,
         parent__isnull=True
@@ -100,7 +106,7 @@ def reordernar_materias_ordem(request, pk):
         'materia__numero'
     )
     for ordem_num, o in enumerate(ordens, 1):
-        o.numero_ordem = ordem_num
+        o.numero_ordem = ordem_num * step
         o.save()
 
     return HttpResponseRedirect(
@@ -108,13 +114,19 @@ def reordernar_materias_ordem(request, pk):
 
 
 def renumerar_materias_ordem(request, pk):
+    try:
+        step = int(request.GET.get('step', '1'))
+    except ValueError:
+        step = 1
+    step = min(max(step, 1), 100)
+
     ordens = OrdemDia.objects.filter(
         sessao_plenaria_id=pk,
         parent__isnull=True
     )
 
     for ordem_num, o in enumerate(ordens, 1):
-        o.numero_ordem = ordem_num
+        o.numero_ordem = ordem_num * step
         o.save()
 
     return HttpResponseRedirect(
@@ -122,10 +134,16 @@ def renumerar_materias_ordem(request, pk):
 
 
 def renumerar_materias_expediente(request, pk):
+    try:
+        step = int(request.GET.get('step', '1'))
+    except ValueError:
+        step = 1
+    step = min(max(step, 1), 100)
+
     expedientes = ExpedienteMateria.objects.filter(sessao_plenaria_id=pk)
 
     for exp_num, e in enumerate(expedientes, 1):
-        e.numero_ordem = exp_num
+        e.numero_ordem = exp_num * step
         e.save()
 
     return HttpResponseRedirect(
