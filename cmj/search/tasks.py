@@ -16,12 +16,14 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
         logger.info(f'T.A.: {ta.id} Iniciando processamento de chunking e embeddings.')
 
         dispositivos = ta.generate_chunks()
+        dispositivo_set__in=list(map(lambda d: d[0].id if d and d[0] and hasattr(d[0], 'id') else None, dispositivos))
 
         #count_embedding = Embedding.objects.filter(total_tokens=0).count()
         #logger.info(f'Total de dispositivos para chunking: {len(dispositivos)}')
 
         for emb in Embedding.objects.filter(
-            total_tokens=0
+            total_tokens=0,
+            dispositivo_set__in=dispositivo_set__in
         ):
             emb.update_total_tokens()
             logger.info(f'T.A.: {ta.id} Embedding: {emb.id} Updated total tokens: {emb.total_tokens},')
@@ -30,8 +32,7 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
         for emb in Embedding.objects.filter(
             total_tokens__gt=0,
             vetor1536__isnull=True,
-            dispositivo_set__in=list(map(lambda d: d[0].id if d and d[0] and hasattr(d[0], 'id') else None, dispositivos))
-
+            dispositivo_set__in=dispositivo_set__in
         ):
             emb.generate_embedding()
             logger.info(f'T.A.: {ta.id} Embedding: {emb.id} Generated embedding.')

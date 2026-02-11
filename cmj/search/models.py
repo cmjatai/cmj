@@ -138,8 +138,65 @@ class Embedding(CmjModelMixin):
 
     @classmethod
     def make_context(cls, query_embedding, top_k=50):
+        # Busca os top_k embeddings mais próximos usando distância do cosseno
+        # CosineDistance retorna valores entre 0 (idêntico) e 2 (oposto)
+        embeddings = Embedding.objects.annotate(
+                distance=CosineDistance('vetor1536', query_embedding)
+            ).order_by('distance')[:top_k]
+
+        embeddings = list(embeddings)
+
+        tas = OrderedSet()
+        for embed in embeddings:
+            if embed.content_object and hasattr(embed.content_object, 'ta_id'):
+                tas.add(embed.content_object.ta_id)
+
+        ta_dict = {}
+        for embed in embeddings:
+            ta_id = getattr(embed.content_object, 'ta_id', None)
+            if ta_id and ta_id in tas:
+                if ta_id not in ta_dict:
+                    ta_dict[ta_id] = []
+                ta_dict[ta_id].append(embed)
+
+        context = []
+        for ta_id in tas:
+            ta_dict[ta_id].sort(key=lambda e: e.content_object.ordem)
+            for embed in ta_dict[ta_id]:
+                context.append((embed.content_object, list(map(str.strip, embed.chunk.split('\n')))))
+
+        context_list_of_list = []
+        for item in context:
+            d = item[0]
+            d_item = item[1]
+            d_item[0] = f'\nFonte: <a href="/ta/{d.ta_id}/text">{d_item[0]}</a>'
+            context_list_of_list.append(d_item)
+
+        context_list_of_str = []
+        while True:
+            item_str = None
+            for list_of_str in context_list_of_list:
+                if not list_of_str:
+                    continue
+                if item_str is None:
+                    item_str = list_of_str.pop(0)
+                    continue
+                if item_str == list_of_str[0]:
+                    list_of_str.pop(0)
+                    continue
+                break
+            if item_str is None:
+                break
+            context_list_of_str.append(item_str)
+
+        return '\n'.join(context_list_of_str)
+
+    @classmethod
+    def make_context__old(cls, query_embedding, top_k=50):
         """
         Constrói contexto textual a partir dos embeddings mais similares.
+
+        Falha: essa implementação falha ao lidar com dispositivos que possuem o mesmo texto mas com pais diferentes, causando perda de contexto relevante. A ordenação por similaridade é perdida ao usar o texto como chave, e o resultado final pode incluir apenas um dos dispositivos relevantes, mesmo que outros tenham o mesmo texto e sejam igualmente importantes para a resposta da IA.
 
         Implementa a etapa de "Retrieval" do padrão RAG, buscando os
         chunks mais semanticamente similares à query e formatando-os

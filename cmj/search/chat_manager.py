@@ -75,9 +75,9 @@ class ChatManager:
         text_response, rag_results = self.query_gemini(user_message, history)
 
         # Salva resposta do modelo no contexto
-        self.add_message_to_context(session_id, 'model', text_response, user, metadata={'rag_results': rag_results})
+        msg = self.add_message_to_context(session_id, 'model', text_response, user, metadata={'rag_results': rag_results})
 
-        return text_response
+        return msg
 
     def add_message_to_context(self, session_id, role, content, user, metadata=None):
         """
@@ -106,7 +106,7 @@ class ChatManager:
              raise ValueError(f"Devido aos custos com I.A. o limite de mensagens por conversa foi atingido ({self.MAX_MESSAGES_PER_SESSION}).")
 
         # Cria a mensagem
-        ChatMessage.objects.create(
+        msg = ChatMessage.objects.create(
             chat=chat_session,
             role=role,
             content=content,
@@ -124,6 +124,8 @@ class ChatManager:
                 new_title += "..."
             chat_session.title = new_title
             chat_session.save()
+
+        return msg
 
     def get_context_for_gemini(self, session_id):
         """

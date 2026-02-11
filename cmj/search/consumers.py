@@ -102,7 +102,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
 
             # Processa mensagem e obtém resposta
-            response = await sync_to_async(self.context_manager.process_user_message)(
+            msg = await sync_to_async(self.context_manager.process_user_message)(
                 self.session_id, user_message, self.user
             )
 
@@ -111,7 +111,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 f"chat_{self.session_id}",
                 {
                     'type': 'chat_message',
-                    'message': response,
+                    'message': msg.content + (f'\n\n_(LLM: {msg.metadata.get("ia_model_name", "")})_' if "ia_model_name" in msg.metadata and msg.metadata["ia_model_name"] else ""),
                     'role': 'model'
                 }
             )

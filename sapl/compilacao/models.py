@@ -659,10 +659,9 @@ class TextoArticulado(TimestampedMixin):
                 nome__in=[
                     'Ementa',
                     'Artigo',
-                    'Caput',
                     'Parágrafo',
                     'Inciso',
-                    'Alínea',
+                    'Alinea',
                     'Item'
             ]
             ).values_list('nome', flat=True)
@@ -688,7 +687,7 @@ class TextoArticulado(TimestampedMixin):
         for i, dispositivo in enumerate(dispositivos):
             d, context = dispositivo
 
-            # não individualizar dispositivos menores que o tipo solicitado
+            # não individualizar dispositivos diferentes dos tipos solicitados
             if d.tipo_dispositivo.nome not in tipos_indivisualizaveis:
                 continue
 
@@ -698,14 +697,10 @@ class TextoArticulado(TimestampedMixin):
             if not texto and not rotulo:
                 continue
 
-            # se é caput, não cria chunk
-            if d.tipo_dispositivo.nome == 'Caput':
-                continue
-
             disp_renderizado = (rotulo + ' ' + renderizado) if rotulo else renderizado
 
             textos_next = [disp_renderizado]
-            faz_mais_um = True
+            faz_mais_um = True # flag para incluir um dispositivo a mais no contexto, mesmo que seja de nível igual ou superior, caso seja do tipo Artigo
             for j, dnext in enumerate(dispositivos[i+1:]):
                 dnext, contextnext = dnext
                 texto_next = contextnext['rendered']
