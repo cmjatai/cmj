@@ -220,6 +220,8 @@ class AppConfig(models.Model):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
 
+        self.clear_cache()
+
         if not self.disabled:
             now = timezone.localtime()
             self.disabled = f'''
@@ -232,9 +234,17 @@ class AppConfig(models.Model):
 
         return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
 
+    def clear_cache(self):
+        # capture todos os fields e crie um for
+        for field in self._meta.get_fields():
+            try:
+                cache.delete(f'portalcmj_appconfig_{field.name}')
+            except Exception as e:
+                pass
+
     @classmethod
     def attr(cls, attr):
-        value = cache.get(f'portalcmj_appconfig_{attr}') #if not settings.DEBUG else None
+        value = cache.get(f'portalcmj_appconfig_{attr}')
         if not value is None:
             return value
 
