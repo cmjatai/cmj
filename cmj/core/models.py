@@ -1045,7 +1045,7 @@ class IAQuota(models.Model):
         if not self.ativo:
             return False
 
-        hoje = timezone.now().date()
+        hoje = timezone.localtime().date()
         sum_log = self.iaquotaslog_set.filter(data=hoje).aggregate(
             total=models.Sum('peso'))['total'] or 0
 
@@ -1055,7 +1055,7 @@ class IAQuota(models.Model):
         """
         Retorna a quota restante para hoje.
         """
-        hoje = timezone.now().date()
+        hoje = timezone.localtime().date()
         sum_log = self.iaquotaslog_set.filter(data=hoje).aggregate(
             total=models.Sum('peso'))['total'] or 0
 
