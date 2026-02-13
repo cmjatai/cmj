@@ -511,12 +511,21 @@ def xstr(s):
 
 
 def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-    if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
-    else:
-        ip = request.META.get('REMOTE_ADDR')
-    return ip
+    from django_ratelimit.core import _get_ip
+    #x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    #if x_forwarded_for:
+    #    ip = x_forwarded_for.split(',')[0]
+    #else:
+    #    ip = request.META.get('HTTP_X_REAL_IP') or request.META.get('REMOTE_ADDR') or '0.0.0.0'
+    return _get_ip(request)
+
+def ratelimit_ip(group, request):
+    """
+        Ignore group param in django-ratelimit==4.1.0
+    """
+    return get_client_ip(request)
+
+
 
 
 def get_base_url(request):

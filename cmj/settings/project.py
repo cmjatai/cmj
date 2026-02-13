@@ -153,6 +153,7 @@ CACHES = {
     #    #'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if not DEBUG else 'django.core.cache.backends.dummy.DummyCache',
     #    'LOCATION': 'unique-snowflake',
     #}
+    #'cache-for-ratelimiting': {}, # Use default cache
     'default': {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}",
@@ -188,3 +189,9 @@ if DEBUG_TOOLBAR_ACTIVE:
         'debug_toolbar.middleware.DebugToolbarMiddleware',
         'silk.middleware.SilkyMiddleware' ,
     ) + MIDDLEWARE[1:]
+
+RATELIMIT_ENABLE = True # default is True, but we want to be sure that it's enabled
+RATELIMIT_USE_CACHE = 'default'
+RATELIMIT_IP_META_KEY = lambda r: r.META.get('HTTP_X_REAL_IP', r.META.get('HTTP_X_FORWARDED_FOR', r.META.get('REMOTE_ADDR', '')))
+
+RATE_LIMITER_RATE = config('RATE_LIMITER_RATE', default='10/m')

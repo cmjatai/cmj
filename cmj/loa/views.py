@@ -35,8 +35,9 @@ from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, Prestacao
 from cmj.loa.models import Despesa, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro,\
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
     Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
-from cmj.utils import TimeExecution, get_client_ip
+from cmj.utils import TimeExecution
 from cmj.utils_report import make_pdf
+from sapl.utils import get_client_ip
 from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
 from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Legislatura, Parlamentar
