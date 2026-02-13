@@ -1,3 +1,4 @@
+import logging
 import time
 from django.conf import settings
 from cmj.celery import app as cmj_celery_app
@@ -6,7 +7,7 @@ from sapl.compilacao.models import TextoArticulado, TipoDispositivo
 
 from celery.utils.log import get_task_logger
 
-logger = get_task_logger(__name__)
+logger = get_task_logger(__name__) if not settings.DEBUG else logging.getLogger(__name__)
 
 def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
 
@@ -27,7 +28,7 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
         ):
             emb.update_total_tokens()
             logger.info(f'T.A.: {ta.id} Embedding: {emb.id} Updated total tokens: {emb.total_tokens},')
-            time.sleep(0.1)
+            #time.sleep(0.1)
 
         for emb in Embedding.objects.filter(
             total_tokens__gt=0,
@@ -35,8 +36,10 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
             dispositivo_set__in=dispositivo_set__in
         ):
             emb.generate_embedding()
+            emb.vetor = None
+            emb.save()
             logger.info(f'T.A.: {ta.id} Embedding: {emb.id} Generated embedding.')
-            time.sleep(0.1)
+            #time.sleep(0.1)
 
         continue
 

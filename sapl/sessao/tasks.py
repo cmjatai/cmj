@@ -7,22 +7,19 @@ from django.utils import formats, timezone
 from cmj.celery import app
 from cmj.mixins import PluginSignMixin
 from sapl.sessao.models import RegistroVotacao
+from celery.utils.log import get_task_logger
 
 
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__) if not settings.DEBUG else logging.getLogger(__name__)
 
 
 @app.task(queue='cq_core', bind=True)
 def task_add_selo_votacao(self,  list_pk):
-    print(f'task_add_selo_votacao RegistroVotacao {list_pk}')
     logger.info(f'task_add_selo_votacao RegistroVotacao {list_pk}')
-
     task_add_selo_votacao_function(list_pk)
 
 
 def task_add_selo_votacao_function(list_pk):
-
-    print(f'task_add_selo_votacao_function RegistroVotacao {list_pk}')
     logger.info(
         f'task_add_selo_votacao_function RegistroVotacao {list_pk}')
 

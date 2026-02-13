@@ -1,15 +1,15 @@
 
-from datetime import datetime
+import fitz
 import logging
 import os
 import subprocess
 import sys
 
+from datetime import datetime
 from django.apps import apps
-from django.utils import timezone
-import fitz
+from django.conf import settings
 
-from pymupdf import Point, Rect
+from pymupdf import Rect
 
 from cmj.arq.models import DraftMidia
 from cmj.celery import app
@@ -18,7 +18,8 @@ from sapl.utils import hash_sha512
 import cv2
 from PIL import Image
 
-logger = logging.getLogger(__name__)
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__) if not settings.DEBUG else logging.getLogger(__name__)
 
 
 def console(cmd):
