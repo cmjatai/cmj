@@ -23,7 +23,6 @@ logger = get_task_logger(__name__)
 
 @cmj_celery_app.task(queue='cq_core')
 def task_envia_email_tramitacao(kwargs):
-    print(f'task_envia_email_tramitacao: {kwargs}')
     logger.info(f'task_envia_email_tramitacao: {kwargs}')
 
     tipo = kwargs.get("tipo")

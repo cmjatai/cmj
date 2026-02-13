@@ -19,7 +19,8 @@ from cmj.videos.models import VideoParte
 from sapl.materia.models import MateriaLegislativa
 
 
-logger = logging.getLogger(__name__)
+from celery.utils.log import get_task_logger
+logger = get_task_logger(__name__) if not settings.DEBUG else logging.getLogger(__name__)
 
 socials_connects = {
     'telegram': dict(
