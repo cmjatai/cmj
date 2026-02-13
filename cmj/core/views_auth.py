@@ -14,9 +14,12 @@ from django.views.generic.edit import FormView, UpdateView
 
 from cmj.core.forms_auth import CmjUserChangeForm, LoginForm,\
     RecuperarSenhaForm, CmjUserAdminForm, NovaSenhaForm
-from cmj.settings import EMAIL_SEND_USER
+from django.conf import settings
 from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE, Crud, CrudAux, ListWithSearchForm
 
+from django.utils.decorators import method_decorator
+from django_ratelimit.decorators import ratelimit
+from sapl.utils import ratelimit_ip
 
 class CmjUserChangeView(FormMessagesMixin, UpdateView):
     form_valid_message, form_invalid_message = FORM_MESSAGES[ACTION_UPDATE]
@@ -42,6 +45,15 @@ class CmjUserChangeView(FormMessagesMixin, UpdateView):
         return self.request.user
 
 
+@method_decorator(
+    ratelimit(
+        key=ratelimit_ip,
+        rate=settings.RATE_LIMITER_RATE,
+        method=ratelimit.UNSAFE,
+        block=True
+    ),
+    name='dispatch'
+)
 class CmjLoginView(LoginView):
     template_name = 'core/user/login.html'
     authentication_form = LoginForm
@@ -54,7 +66,7 @@ class CmjPasswordResetView(PasswordResetView):
 
     html_email_template_name = 'core/user/recuperar_senha_email.html'
     template_name = 'core/user/recuperar_senha_email_form.html'
-    from_email = EMAIL_SEND_USER
+    from_email = settings.EMAIL_SEND_USER
     form_class = RecuperarSenhaForm
 
     @method_decorator(csrf_protect)

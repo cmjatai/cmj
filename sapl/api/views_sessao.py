@@ -4,7 +4,6 @@ from django.apps.registry import apps
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from cmj.utils import get_client_ip
 from django.db.models import Q
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, \
     customize, wrapper_queryset_response_for_drf_action
@@ -13,7 +12,7 @@ from sapl.api.mixins import ResponseFileMixin
 from sapl.api.serializers import ChoiceSerializer,\
     SessaoPlenariaECidadaniaSerializer
 from sapl.sessao.models import ExpedienteMateria, IntegranteMesa, PresencaOrdemDia, RegistroLeitura, RegistroVotacao, SessaoPlenaria, ExpedienteSessao, OrdemDia, SessaoPlenariaPresenca, TipoResultadoVotacao, VotoParlamentar
-from sapl.utils import choice_anos_com_sessaoplenaria
+from sapl.utils import choice_anos_com_sessaoplenaria, get_client_ip
 
 
 ApiViewSetConstrutor.build_class(
