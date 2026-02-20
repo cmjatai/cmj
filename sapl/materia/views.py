@@ -40,6 +40,7 @@ from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 import markdown
 import weasyprint
+import werkzeug
 
 from cmj import celery
 from cmj.core.models import AreaTrabalho
@@ -3008,6 +3009,7 @@ class DocumentoAcessorioEmLoteView(PermissionRequiredMixin, FilterView):
             return self.get(request, self.kwargs)
 
         tmp_name = os.path.join(MEDIA_ROOT, request.FILES['arquivo'].name)
+        tmp_name = werkzeug.utils.secure_filename(tmp_name)
         with open(tmp_name, 'wb') as destination:
             for chunk in request.FILES['arquivo'].chunks():
                 destination.write(chunk)

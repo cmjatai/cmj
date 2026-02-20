@@ -1,6 +1,5 @@
 django==5.2.11
 
-
 django-ratelimit==4.1.0
 
 django-image-cropping==1.7.0   # Suporte ao django 4.2
@@ -44,6 +43,8 @@ django-silk==5.4.3
 pymupdf==1.25.1
 pymupdf4llm==0.0.17
 
+Werkzeug==3.1.6
+
 ocrmypdf==16.8.0
 #pikepdf>=5.0.0,<6.0.0
 trml2pdf
@@ -62,8 +63,6 @@ django-braces==1.14.0
 django-model-utils==4.0.0
 drf-spectacular==0.24.2
 django-webpack-loader
-
-
 
 dj-database-url==0.5.0
 easy-thumbnails==2.10
@@ -95,7 +94,6 @@ kazoo==2.8.0
 opencv-python==4.11.0.86
 
 python-osc==1.9.3
-
 
 django-vite==3.1.0
 crispy-bootstrap5==2025.6
