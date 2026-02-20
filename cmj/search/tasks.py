@@ -13,6 +13,11 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
 
     logger.info(f'Starting task_sync_embeddings_textoarticulado_function for TextoArticulado IDs: {ta_ids}'    )
 
+    Embedding.objects.filter(
+        dispositivo_set__dispositivo_subsequente__isnull=False,
+        dispositivo_set__ta__id__in=ta_ids
+        ).delete()
+
     for ta in TextoArticulado.objects.filter(id__in=ta_ids):
         logger.info(f'T.A.: {ta.id} Iniciando processamento de chunking e embeddings.')
 
