@@ -54,12 +54,14 @@ def valor_por_extenso(valor):
 
 def get_celery_worker_status():
     i = celery_app.control.inspect()
+    reserved = i.reserved()
     availability = i.ping()
     stats = i.stats()
     registered_tasks = i.registered()
     active_tasks = i.active()
     scheduled_tasks = i.scheduled()
     result = {
+        'reserved': reserved or {},
         'availability': availability or {},
         'stats': stats or {},
         'registered_tasks': registered_tasks or {},
