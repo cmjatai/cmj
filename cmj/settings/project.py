@@ -194,4 +194,5 @@ RATELIMIT_ENABLE = True # default is True, but we want to be sure that it's enab
 RATELIMIT_USE_CACHE = 'default'
 RATELIMIT_IP_META_KEY = lambda r: r.META.get('HTTP_X_REAL_IP', r.META.get('HTTP_X_FORWARDED_FOR', r.META.get('REMOTE_ADDR', '')))
 
-RATE_LIMITER_RATE = config('RATE_LIMITER_RATE', default='10/m')
+RATE_LIMITER_RATE = config('RATE_LIMITER_RATE', default='10/m', cast=str)
+RATELIMIT_RETRY_AFTER = config('RATELIMIT_RETRY_AFTER', default='60', cast=str)

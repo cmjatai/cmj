@@ -135,7 +135,7 @@ def custom_permission_denied_view(request, exception=None):
     from django_ratelimit.exceptions import Ratelimited
     if isinstance(exception, Ratelimited):
         resp = HttpResponse('Too many requests', status=429)
-        resp['Retry-After'] = '60'
+        resp['Retry-After'] = settings.RATELIMIT_RETRY_AFTER
         return resp
     return HttpResponseForbidden('Forbidden')
 

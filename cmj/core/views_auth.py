@@ -1,21 +1,17 @@
-
 from braces.views import FormMessagesMixin
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import LoginView, PasswordResetView,\
     PasswordResetConfirmView, PasswordResetCompleteView
 from django.db.models import Q
 from django.urls.base import reverse_lazy
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
-from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_protect
-from django.views.decorators.debug import sensitive_post_parameters
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import UpdateView
 
 from cmj.core.forms_auth import CmjUserChangeForm, LoginForm,\
     RecuperarSenhaForm, CmjUserAdminForm, NovaSenhaForm
-from django.conf import settings
-from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE, Crud, CrudAux, ListWithSearchForm
+from sapl.crud.base import FORM_MESSAGES, ACTION_UPDATE, Crud, ListWithSearchForm
 
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
