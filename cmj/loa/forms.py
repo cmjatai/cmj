@@ -163,7 +163,7 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             cd = self.cleaned_data
 
         try:
-            yo = yaml.full_load(cd['yaml_obs'])
+            yo = yaml.safe_load(cd['yaml_obs'])
             #print(yo)
         except Exception as e:
             raise ValidationError(
