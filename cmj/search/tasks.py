@@ -19,7 +19,7 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
         ).delete()
 
     for ta in TextoArticulado.objects.filter(id__in=ta_ids):
-        logger.info(f'T.A.: {ta.id} Iniciando processamento de chunking e embeddings.')
+        #logger.info(f'T.A.: {ta.id} Iniciando processamento de chunking e embeddings.')
 
         dispositivos = ta.generate_chunks()
         dispositivo_set__in=list(map(lambda d: d[0].id if d and d[0] and hasattr(d[0], 'id') else None, dispositivos))
