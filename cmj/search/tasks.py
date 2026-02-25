@@ -1,9 +1,12 @@
 import logging
 import time
 from django.conf import settings
+from django.db.models import Q
 from cmj.celery import app as cmj_celery_app
 from cmj.search.models import Embedding
-from sapl.compilacao.models import TextoArticulado, TipoDispositivo
+from sapl.compilacao.models import Dispositivo, TextoArticulado
+
+from sapl.norma.models import NormaJuridica
 
 from celery.utils.log import get_task_logger
 
@@ -13,13 +16,31 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
 
     logger.info(f'Starting task_sync_embeddings_textoarticulado_function for TextoArticulado IDs: {ta_ids}'    )
 
+    ta_ids = Dispositivo.objects.filter(
+        Q(ta__id__in=ta_ids) | Q(ta_publicado__id__in=ta_ids)
+    ).values_list('ta__id', flat=True).order_by('ta__id').distinct()
+
     Embedding.objects.filter(
         dispositivo_set__dispositivo_subsequente__isnull=False,
         dispositivo_set__ta__id__in=ta_ids
         ).delete()
 
+    textos_revogados = TextoArticulado.objects.filter(
+        texto_articulado__norma_relacionada__tipo_vinculo__revoga_integralmente=True
+    ).values_list('id', flat=True).order_by('id').distinct()
+    Embedding.objects.filter(
+        dispositivo_set__ta__id__in=textos_revogados
+        ).delete()
+
     for ta in TextoArticulado.objects.filter(id__in=ta_ids):
-        #logger.info(f'T.A.: {ta.id} Iniciando processamento de chunking e embeddings.')
+        logger.info(f'T.A.: {ta.id} Iniciando processamento de chunking e embeddings.')
+
+        if ta.is_revogado():
+            Embedding.objects.filter(
+                dispositivo_set__ta=ta
+            ).delete()
+            logger.info(f'T.A.: {ta.id} Está revogado. Embeddings relacionados foram deletados.')
+            continue
 
         dispositivos = ta.generate_chunks()
         dispositivo_set__in=list(map(lambda d: d[0].id if d and d[0] and hasattr(d[0], 'id') else None, dispositivos))

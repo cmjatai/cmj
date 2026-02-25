@@ -26,7 +26,7 @@ class ChatManager:
 
             ia_embedding = IAGenaiBase()
             query_embedding = ia_embedding.embed_content(query)
-            context = Embedding.make_context(query_embedding)
+            context = Embedding.make_context(query, query_embedding)
 
             rag_query.append({
                 'query': query,

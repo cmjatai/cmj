@@ -796,6 +796,7 @@ class TextoArticulado(TimestampedMixin):
                     emb = d.embeddings.create(
                         chunk=c
                     )
+                    emb.update_search_vector()
                 logger.info(f'Chunk criado para dispositivo {d.pk} do TA {self.pk} com {len(c.split())} palavras.')
 
         return dispositivos

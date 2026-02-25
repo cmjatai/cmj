@@ -1,6 +1,8 @@
 from collections import OrderedDict
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
@@ -10,7 +12,6 @@ from django.utils.translation import gettext_lazy as _
 from pgvector.django.vector import VectorField
 from pgvector.django.halfvec import HalfVectorField
 from pgvector.django import CosineDistance, HnswIndex
-
 
 from cmj.genia import IAGenaiBase
 from cmj.mixins import CmjModelMixin
@@ -89,6 +90,8 @@ class Embedding(CmjModelMixin):
         verbose_name=_('Vetor de embedding 1536')
     )
 
+    search_vector = SearchVectorField(null=True, blank=True, default=None, verbose_name=_('Vetor de busca full-text') )
+
     class Meta:
         verbose_name = _('Embedding')
         verbose_name_plural = _('Embeddings')
@@ -105,10 +108,15 @@ class Embedding(CmjModelMixin):
                 ef_construction=64,
                 opclasses=['halfvec_cosine_ops'],
             ),
+            # Índice GIN para busca de texto completo no campo chunk
+            GinIndex(
+                name='embedding_search_vector_gin',
+                fields=['search_vector'],
+            ),
         ]
 
     def __str__(self):
-        return f'Embedding {self.id} - Object {self.content_object} '
+        return f'Embedding {self.id} - Object {self.content_object} - T.A. {getattr(self.content_object, "ta_id", "N/A")} - Tokens: {self.total_tokens}'
 
     def update_total_tokens(self):
         """
@@ -136,8 +144,120 @@ class Embedding(CmjModelMixin):
         self.vetor1536 = embedding_vector
         self.save()
 
+    def update_search_vector(self):
+        """
+        Popula o campo search_vector a partir do conteúdo do chunk.
+
+        Utiliza a configuração 'portuguese' do PostgreSQL para gerar
+        o tsvector adequado para busca full-text em português.
+        """
+        from django.contrib.postgres.search import SearchVector
+        Embedding.objects.filter(pk=self.pk).update(
+            search_vector=SearchVector('chunk', config='portuguese')
+        )
+        self.refresh_from_db(fields=['search_vector'])
+
     @classmethod
-    def make_context(cls, query_embedding, top_k=50):
+    def update_all_search_vectors(cls):
+        """
+        Popula o search_vector de todos os Embeddings em batch.
+
+        Mais eficiente que chamar update_search_vector() individualmente,
+        pois executa um único UPDATE no banco.
+        """
+        from django.contrib.postgres.search import SearchVector
+        cls.objects.update(
+            search_vector=SearchVector('chunk', config='portuguese')
+        )
+
+    @classmethod
+    def make_context(cls, search_query, query_embedding, top_k=60):
+        from django.contrib.postgres.search import SearchQuery, SearchRank
+
+        RRF_K = 60  # Constante de suavização para Reciprocal Rank Fusion
+
+        # 1. Busca semântica via pgvector (distância do cosseno)
+        semantic_ids = list(
+            Embedding.objects.annotate(
+                distance=CosineDistance('vetor1536', query_embedding)
+            ).order_by('distance')[:top_k]
+            .values_list('id', flat=True)
+        )
+
+        # 2. Busca por palavra-chave via Full-Text Search (PostgreSQL)
+        fts_query = SearchQuery(search_query, config='portuguese')
+        text_ids = list(
+            Embedding.objects.filter(
+                search_vector=fts_query
+            ).annotate(
+                fts_rank=SearchRank('search_vector', fts_query)
+            ).order_by('-fts_rank')[:top_k]
+            .values_list('id', flat=True)
+        )
+
+        # 3. Reciprocal Rank Fusion (RRF)
+        # score = 1/(k + rank_semantico) + 1/(k + rank_texto)
+        rrf_scores = {}
+        for rank, eid in enumerate(semantic_ids, start=1):
+            rrf_scores[eid] = rrf_scores.get(eid, 0) + 1.0 / (RRF_K + rank)
+
+        for rank, eid in enumerate(text_ids, start=1):
+            rrf_scores[eid] = rrf_scores.get(eid, 0) + 1.0 / (RRF_K + rank)
+
+        # 4. Ordena por score RRF decrescente e seleciona top_k
+        sorted_ids = sorted(rrf_scores, key=rrf_scores.get, reverse=True)[:top_k]
+
+        # 5. Busca os embeddings completos preservando a ordem RRF
+        embeddings_map = Embedding.objects.in_bulk(sorted_ids)
+        embeddings = [embeddings_map[eid] for eid in sorted_ids if eid in embeddings_map]
+
+        tas = OrderedSet()
+        for embed in embeddings:
+            if embed.content_object and hasattr(embed.content_object, 'ta_id'):
+                tas.add(embed.content_object.ta_id)
+
+        ta_dict = {}
+        for embed in embeddings:
+            ta_id = getattr(embed.content_object, 'ta_id', None)
+            if ta_id and ta_id in tas:
+                if ta_id not in ta_dict:
+                    ta_dict[ta_id] = []
+                ta_dict[ta_id].append(embed)
+
+        context = []
+        for ta_id in tas:
+            ta_dict[ta_id].sort(key=lambda e: e.content_object.ordem)
+            for embed in ta_dict[ta_id]:
+                context.append((embed.content_object, list(map(str.strip, embed.chunk.split('\n')))))
+
+        context_list_of_list = []
+        for item in context:
+            d = item[0]
+            d_item = item[1]
+            d_item[0] = f'\nFonte: <a href="/ta/{d.ta_id}/text">{d_item[0]}</a>'
+            context_list_of_list.append(d_item)
+
+        context_list_of_str = []
+        while True:
+            item_str = None
+            for list_of_str in context_list_of_list:
+                if not list_of_str:
+                    continue
+                if item_str is None:
+                    item_str = list_of_str.pop(0)
+                    continue
+                if item_str == list_of_str[0]:
+                    list_of_str.pop(0)
+                    continue
+                break
+            if item_str is None:
+                break
+            context_list_of_str.append(item_str)
+
+        return '\n'.join(context_list_of_str)
+
+    @classmethod
+    def make_context__20260225(cls, query_embedding, top_k=50):
         # Busca os top_k embeddings mais próximos usando distância do cosseno
         # CosineDistance retorna valores entre 0 (idêntico) e 2 (oposto)
         embeddings = Embedding.objects.annotate(

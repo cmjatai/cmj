@@ -35,7 +35,7 @@ from django.views.generic.edit import (CreateView, DeleteView, FormView,
 from django.views.generic.list import ListView
 import pymupdf
 
-from cmj.search.tasks import task_sync_embeddings_textoarticulado
+from cmj.search.tasks import task_sync_embeddings_textoarticulado, task_sync_embeddings_textoarticulado_function
 from cmj.utils import media_cache_storage
 from sapl.compilacao.apps import AppConfig
 from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
@@ -1448,13 +1448,22 @@ class TextEditView(CompMixin, TemplateView):
                     self.object.privacidade = STATUS_TA_PUBLIC
                     self.object.save()
 
-                    if not settings.DEBUG:
+                    if not settings.DEBUG or (
+                        settings.DEBUG and \
+                        settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR
+                    ):
                         task_sync_embeddings_textoarticulado.apply_async(
                             (
                                [
                                    self.object.id
                                 ],
                             ), countdown=5
+                        )
+                    else:
+                        task_sync_embeddings_textoarticulado_function(
+                            [
+                                self.object.id
+                            ],
                         )
 
                     messages.success(request, _('Texto Articulado publicado com sucesso.'))
