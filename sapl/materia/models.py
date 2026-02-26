@@ -641,6 +641,7 @@ class MateriaLegislativa(CommonMixin):
             p.numero_paginas = self.paginas
             p.save()
             protocolo = p
+            self.numero_protocolo = protocolo.numero
 
         for field_file in self.FIELDFILE_NAME:
             if original2copia:
