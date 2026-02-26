@@ -99,7 +99,7 @@ PrestacaoContaRegistro:
 
 PrestacaoContaRegistroDetail:
   {% trans 'Registro de Prestação de Conta' %}:
-  - registro_ajuste situacao:4
+  - registro_ajuste|fk_urlize_for_detail situacao:4
   - emendaloa
   - detalhamento
 

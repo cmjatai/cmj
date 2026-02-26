@@ -2271,8 +2271,8 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
 
             for pc in obj.prestacaocontaregistro_set.all():
                 pc_url = reverse_lazy(
-                    'cmj.loa:prestacaocontaloa_detail',
-                    kwargs={'pk': pc.prestacao_conta.id}
+                    'cmj.loa:prestacaocontaregistro_detail',
+                    kwargs={'pk': pc.id}
                 )
                 pcs.append(
                     f'''<li>
@@ -2413,7 +2413,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
 
         @property
         def list_field_names_set(self):
-            return 'situacao', 'emendaloa_registro_ajuste', 'descricao', 'detalhamento'
+            return 'emendaloa_registro_ajuste', 'descricao',  'situacao', 'detalhamento',
 
         def hook_header_descricao(self):
             return 'Descrição do Item da Prestação de Contas'
@@ -2424,7 +2424,11 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 descricao.append(f'{obj.emendaloa}')
             if obj.registro_ajuste:
                 descricao.append(f'{obj.registro_ajuste.descricao}')
-            return verbose_name, '<br>'.join(descricao)
+            # add link para descrição
+            url = reverse_lazy(
+                'cmj.loa:prestacaocontaregistro_detail',
+                kwargs={'pk': obj.id})
+            return verbose_name, f'<a href="{url}">{"<br>".join(descricao)}</a>'
 
 
         def hook_header_emendaloa_registro_ajuste(self):
