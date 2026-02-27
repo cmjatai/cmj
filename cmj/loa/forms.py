@@ -26,7 +26,7 @@ from numpy import full
 import yaml
 
 from cmj import loa
-from cmj.loa.models import ArquivoPrestacaoContaLoa, Despesa, DespesaConsulta, EmendaLoaRegistroContabil, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro, \
+from cmj.loa.models import ArquivoPrestacaoContaLoa, ArquivoPrestacaoContaRegistro, Despesa, DespesaConsulta, EmendaLoaRegistroContabil, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro, \
     RegistroAjusteLoa, RegistroAjusteLoaParlamentar, UnidadeOrcamentaria,\
     Agrupamento, quantize
 from cmj.utils import normalize, DecimalField
@@ -1222,6 +1222,19 @@ class PrestacaoContaLoaForm(ModelForm):
 
 class PrestacaoContaRegistroForm(ModelForm):
 
+    arquivos_cadastrados = forms.ModelMultipleChoiceField(
+        label='Arquivos do Registro da Prestação de Contas',
+        queryset=ArquivoPrestacaoContaRegistro.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text='Desmarque para excluir arquivos vinculados ao registro da prestação de contas.'
+    )
+
+    arquivos = forms.FileField(
+        required=False,
+        label=_('Arquivos para Upload')
+    )
+
     registro_ajuste = forms.ModelChoiceField(
         queryset=RegistroAjusteLoa.objects.all(),
         label='Registro de Ajuste Técnico',
@@ -1257,10 +1270,22 @@ class PrestacaoContaRegistroForm(ModelForm):
             'situacao',
             'emendaloa',
             'detalhamento',
+            'arquivos',
         ]
     def __init__(self, *args, **kwargs):
         loa = kwargs['initial'].pop('loa')
         super().__init__(*args, **kwargs)
+
+        if self.instance.pk:
+            self.fields['arquivos_cadastrados'].queryset = ArquivoPrestacaoContaRegistro.objects.filter(
+                registro=self.instance
+            )
+            self.fields['arquivos_cadastrados'].initial = self.fields['arquivos_cadastrados'].queryset
+        else:
+            self.fields['arquivos_cadastrados'].queryset = ArquivoPrestacaoContaRegistro.objects.none()
+
+        self.fields['arquivos'].widget.attrs.update(
+            {'multiple': 'multiple'})
 
         self.fields['emendaloa'].queryset = EmendaLoa.objects.filter(loa=loa)
         self.fields['registro_ajuste'].queryset = RegistroAjusteLoa.objects.filter(
@@ -1283,3 +1308,25 @@ class PrestacaoContaRegistroForm(ModelForm):
             )
 
         return cleaned_data
+
+    def save(self, commit = ...):
+        inst = super().save(commit)
+
+        new_files = []
+        if 'arquivos' in self.files:
+            for f in self.files.getlist('arquivos'):
+                a = ArquivoPrestacaoContaRegistro()
+                a.registro = inst
+                a.arquivo = f
+                a.descricao = f.name
+                a.save()
+                new_files.append(a.id)
+
+        # remove arquivos não selecionados
+        if inst.pk:
+            arquivos_selecionados = self.cleaned_data.get('arquivos_cadastrados')
+            for a in inst.arquivoprestacaocontaregistro_set.exclude(id__in=new_files):
+                if a not in arquivos_selecionados:
+                    a.delete()
+
+        return inst

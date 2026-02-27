@@ -96,12 +96,24 @@ PrestacaoContaRegistro:
   - registro_ajuste situacao:4
   - emendaloa
   - detalhamento
+  - arquivos_cadastrados
+  - arquivos
+
+PrestacaoContaRegistroUpdate:
+  {% trans 'Registro de Prestação de Conta' %}:
+  - registro_ajuste situacao:4
+  - emendaloa
+  - detalhamento
+  - arquivos_cadastrados
+  - arquivos
 
 PrestacaoContaRegistroDetail:
   {% trans 'Registro de Prestação de Conta' %}:
   - registro_ajuste|fk_urlize_for_detail situacao:4
-  - emendaloa
-  - detalhamento
+  - registro_ajuste__descricao
+  - emendaloa|fk_urlize_for_detail
+  - detalhamento:8 prestacao_conta|fk_urlize_for_detail
+  - arquivoprestacaocontaregistro_set
 
 OficioAjusteLoa:
   {% trans 'Dados Gerais' %}:

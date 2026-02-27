@@ -991,6 +991,14 @@ def prestacaoconta_upload_path(instance, filename):
         )
 
 
+def prestacaocontaregistro_upload_path(instance, filename):
+    return texto_upload_path(
+        instance,
+        filename,
+        subpath=instance.registro.prestacao_conta.loa.ano
+        )
+
+
 class PrestacaoContaLoa(models.Model):
 
     loa = models.ForeignKey(
@@ -1117,6 +1125,54 @@ class PrestacaoContaRegistro(models.Model):
 
     def __str__(self):
         return f'{self.prestacao_conta.loa.ano} - {self.registro_ajuste or self.emendaloa}'
+
+class ArquivoPrestacaoContaRegistro(models.Model):
+
+    FIELDFILE_NAME = ('arquivo',)
+
+    registro = models.ForeignKey(
+        PrestacaoContaRegistro,
+        verbose_name=_('Registro de Prestação de Conta'),
+        related_name='arquivoprestacaocontaregistro_set',
+        on_delete=PROTECT)
+
+    arquivo = PortalFileField(
+        blank=True,
+        null=True,
+        upload_to=prestacaocontaregistro_upload_path,
+        verbose_name=_('Arquivo Anexo'),
+        max_length=512)
+
+    descricao = models.CharField(
+        max_length=256,
+        verbose_name=_("Descrição"), default='', blank=True)
+
+    class Meta:
+        verbose_name = _('Arquivo do Registro de Prestação de Conta')
+        verbose_name_plural = _(
+            'Arquivos do Registro de Prestação de Conta')
+        ordering = ['id']
+
+    def __str__(self):
+        return f'{self.descricao} - {self.registro.prestacao_conta.loa.ano}'
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+
+        if not self.pk and self.arquivo:
+            arquivo = self.arquivo
+            self.arquivo = None
+            models.Model.save(self, force_insert=force_insert,
+                              force_update=force_update,
+                              using=using,
+                              update_fields=update_fields)
+            self.arquivo = arquivo
+            update_fields = ('arquivo', )
+
+        return models.Model.save(self, force_insert=False,
+                                 force_update=force_update,
+                                 using=using,
+                                 update_fields=update_fields)
 
 
 class ElementoBase(models.Model):

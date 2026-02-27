@@ -642,6 +642,7 @@ class MateriaLegislativa(CommonMixin):
             p.save()
             protocolo = p
             self.numero_protocolo = protocolo.numero
+            self.save()
 
         for field_file in self.FIELDFILE_NAME:
             if original2copia:

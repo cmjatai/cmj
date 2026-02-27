@@ -2005,8 +2005,8 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             for pc in emendaloa.prestacaocontaregistro_set.all():
                 pc_url = reverse_lazy(
-                    'cmj.loa:prestacaocontaloa_detail',
-                    kwargs={'pk': pc.prestacao_conta.id}
+                    'cmj.loa:prestacaocontaregistro_detail',
+                    kwargs={'pk': pc.id}
                 )
                 pcs.append(
                     f'''<li>
@@ -2362,32 +2362,52 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
 
         def get_success_url(self):
             return reverse_lazy(
-                'cmj.loa:prestacaocontaloa_detail',
-                kwargs={'pk': self.object.prestacao_conta.id})
+                'cmj.loa:prestacaocontaregistro_detail',
+                kwargs={'pk': self.object.id})
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = PrestacaoContaRegistroForm
+        layout_key = 'PrestacaoContaRegistroUpdate'
+
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = self.object.loa
+            initial['loa'] = self.object.prestacao_conta.loa
             return initial
 
         def get_success_url(self):
             return reverse_lazy(
-                'cmj.loa:prestacaocontaloa_detail',
-                kwargs={'pk': self.object.prestacao_conta.id})
+                'cmj.loa:prestacaocontaregistro_detail',
+                kwargs={'pk': self.object.id})
 
 
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'PrestacaoContaRegistroDetail'
 
+        def hook_registro_ajuste__descricao(self, obj, verbose_name='', field_display=''):
+            if not obj.registro_ajuste:
+                return '', ''
+
+            # refatore, sem url
+
+            field_display = f'R$ {obj.registro_ajuste.str_valor} - {obj.registro_ajuste.descricao}'
+            return 'Descrição do Registro de Ajuste', field_display
+
     class DeleteView(MasterDetailCrud.DeleteView):
 
         def get_success_url(self):
-            return reverse_lazy(
-                'cmj.loa:registroajusteloa_detail',
-                kwargs={'pk': self.object.registro_ajuste.id})
+            if self.object.registro_ajuste:
+                return reverse_lazy(
+                    'cmj.loa:registroajusteloa_detail',
+                    kwargs={'pk': self.object.registro_ajuste.id})
+            elif self.object.emendaloa:
+                return reverse_lazy(
+                    'cmj.loa:emendaloa_detail',
+                    kwargs={'pk': self.object.emendaloa.id})
+            else:
+                return reverse_lazy(
+                    'cmj.loa:prestacaocontaloa_detail',
+                    kwargs={'pk': self.object.prestacao_conta.id})
 
 
 
@@ -2423,7 +2443,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             if obj.emendaloa:
                 descricao.append(f'{obj.emendaloa}')
             if obj.registro_ajuste:
-                descricao.append(f'{obj.registro_ajuste.descricao}')
+                descricao.append(f'R$ {obj.registro_ajuste.str_valor} - {obj.registro_ajuste.descricao}')
             # add link para descrição
             url = reverse_lazy(
                 'cmj.loa:prestacaocontaregistro_detail',
