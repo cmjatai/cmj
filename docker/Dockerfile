@@ -1,4 +1,4 @@
-FROM leandrojatai/portalcmj:base.0005
+FROM leandrojatai/portalcmj:base.0006
 
 # TODO:
 #    A imagem gerada a partir deste dockerfile
