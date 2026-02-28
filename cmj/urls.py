@@ -51,7 +51,7 @@ import sapl.audiencia.urls
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
-import sapl.lexml.urls
+#import sapl.lexml.urls
 import sapl.materia.urls
 import sapl.norma.urls
 import sapl.painel.urls
@@ -90,7 +90,7 @@ urlpatterns_all = [
     re_path(r'', include(sapl.parlamentares.urls)),
     re_path(r'', include(sapl.materia.urls)),
     re_path(r'', include(sapl.norma.urls)),
-    re_path(r'', include(sapl.lexml.urls)),
+    #re_path(r'', include(sapl.lexml.urls)),
     re_path(r'', include(sapl.painel.urls)),
     re_path(r'', include(sapl.protocoloadm.urls)),
     re_path(r'', include(sapl.compilacao.urls)),

@@ -1,4 +1,4 @@
-FROM python:3.12.9-bookworm
+FROM python:3.12.12-bookworm
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -74,5 +74,8 @@ RUN rm -f /etc/nginx/conf.d/* && \
 
 COPY requirements/requirements.txt $HOME
 RUN pip install -r requirements.txt
+
+COPY requirements/ia-requirements.txt $HOME
+RUN pip install -r ia-requirements.txt
 
 CMD ["python3"]
