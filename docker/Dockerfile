@@ -20,6 +20,8 @@ RUN mkdir -p /var/cmjatai/BD_POSTGRESQL
 ENV HOME=/var/cmjatai/cmj
 WORKDIR ${HOME}
 
+RUN pip install --no-cache-dir setuptools
+
 # instalados na imagem base
 COPY requirements/requirements.txt $HOME
 RUN pip install -r /var/cmjatai/cmj/requirements.txt

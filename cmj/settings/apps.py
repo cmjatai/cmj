@@ -57,7 +57,7 @@ SAPL_APPS = (
     'sapl.materia',
     'sapl.norma',
     'sapl.sessao',
-    'sapl.lexml',
+    #'sapl.lexml',
     'sapl.painel',
     'sapl.protocoloadm',
     'sapl.redireciona_urls',

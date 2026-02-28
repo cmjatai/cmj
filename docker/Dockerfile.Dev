@@ -1,4 +1,4 @@
-FROM leandrojatai/portalcmj:base.0005
+FROM leandrojatai/portalcmj:base.0006
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -6,15 +6,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-COPY requirements/ia-requirements.txt $HOME
-RUN pip install -r ia-requirements.txt
+RUN pip install --no-cache-dir setuptools
 
 COPY requirements/requirements.txt $HOME
 RUN pip install -r requirements.txt
 
-RUN pip install pgvector
-#RUN pip install sentence-transformers
-RUN pip install django-celery-beat==2.8.1
+COPY requirements/ia-requirements.txt $HOME
+RUN pip install -r ia-requirements.txt
+
 
 ENV HOME=/var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj
