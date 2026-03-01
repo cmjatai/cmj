@@ -4,6 +4,7 @@ from decimal import Decimal
 from io import StringIO
 import csv
 import re
+from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.core.validators import RegexValidator
 from cmj.core.models import CmjSearchMixin
 from cmj.utils import valor_por_extenso
@@ -655,6 +656,13 @@ class EmendaLoa(CmjSearchMixin):
         verbose_name = _('Emenda Impositiva/Modificativa')
         verbose_name_plural = _('Emendas Impositivas/Modificativas')
         ordering = ['id']
+
+        indexes = [
+            GinIndex(
+                OpClass('search', name='gin_trgm_ops'),
+                name='emendaloa_search_gin_trgm',
+            ),
+        ]
 
         permissions = (
             (
