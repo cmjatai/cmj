@@ -472,34 +472,40 @@ class EmendaLoa(CmjSearchMixin):
             'finalidade_format', 'ementa_format'
         ]
 
+    @property
+    def artigos(self):
+        pass
+
 
     @property
     def finalidade_format(self):
-        finalidade = self.finalidade
-        chaves = re.findall(r'\{(.*?)\}', finalidade)
+        try:
+            finalidade = self.finalidade
+            chaves = re.findall(r'\{(.*?)\}', finalidade)
 
-        for chave in chaves:
-            chave_strip = chave.strip().lower()
-            if '__' in chave_strip:
-                partes = chave_strip.split('__')
-                obj = self
-                for parte in partes:
-                    if hasattr(obj, parte):
-                        obj = getattr(obj, parte)
-                    else:
-                        obj = None
-                        break
-                valor = str(obj) if obj else ''
-            elif hasattr(self, chave_strip):
-                valor = getattr(self, chave_strip) or ''
-                if isinstance(valor, models.Model):
-                    valor = str(valor)
-            valor = valor.upper() if valor and isinstance(valor, str) else valor
-            finalidade = finalidade.replace(f'{{{chave}}}', str(valor))
+            for chave in chaves:
+                chave_strip = chave.strip().lower()
+                if '__' in chave_strip:
+                    partes = chave_strip.split('__')
+                    obj = self
+                    for parte in partes:
+                        if hasattr(obj, parte):
+                            obj = getattr(obj, parte)
+                        else:
+                            obj = None
+                            break
+                    valor = str(obj) if obj else ''
+                elif hasattr(self, chave_strip):
+                    valor = getattr(self, chave_strip) or ''
+                    if isinstance(valor, models.Model):
+                        valor = str(valor)
+                valor = valor.upper() if valor and isinstance(valor, str) else valor
+                finalidade = finalidade.replace(f'{{{chave}}}', str(valor))
 
-        finalidade = finalidade if finalidade[-1] != '.' else finalidade[:-1]
-
-        return finalidade
+            finalidade = finalidade if finalidade[-1] != '.' else finalidade[:-1]
+            return finalidade
+        except:
+            return self.finalidade
 
     @property
     def str_valor(self):

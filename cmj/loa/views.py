@@ -868,7 +868,6 @@ class EmendaLoaCrud(MasterDetailCrud):
             if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
                 return []
 
-
             if not self.get_emendas_criadas_por_operador_mesmo_autor().filter(
                     fase__gte=EmendaLoa.LIBERACAO_CONTABIL
                 ).exists():
