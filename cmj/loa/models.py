@@ -429,6 +429,27 @@ class EmendaLoa(CmjSearchMixin):
         related_name='+',
         on_delete=PROTECT)
 
+    _syncing = False
+
+    class Meta:
+        verbose_name = _('Emenda Impositiva/Modificativa')
+        verbose_name_plural = _('Emendas Impositivas/Modificativas')
+        ordering = ['id']
+
+        indexes = [
+            GinIndex(
+                OpClass('search', name='gin_trgm_ops'),
+                name='emendaloa_search_gin_trgm',
+            ),
+        ]
+
+        permissions = (
+            (
+                'emendaloa_full_editor',
+                _('Edição completa de Emendas Impositivas.')
+            ),
+        )
+
     @property
     def valor_computado(self):
         soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
@@ -652,26 +673,6 @@ class EmendaLoa(CmjSearchMixin):
     def valor_por_extenso(self):
         return valor_por_extenso(self.valor)
 
-    class Meta:
-        verbose_name = _('Emenda Impositiva/Modificativa')
-        verbose_name_plural = _('Emendas Impositivas/Modificativas')
-        ordering = ['id']
-
-        indexes = [
-            GinIndex(
-                OpClass('search', name='gin_trgm_ops'),
-                name='emendaloa_search_gin_trgm',
-            ),
-        ]
-
-        permissions = (
-            (
-                'emendaloa_full_editor',
-                _('Edição completa de Emendas Impositivas.')
-            ),
-        )
-
-    _syncing = False
 
     def errors(self):
         erros = []
@@ -1065,6 +1066,13 @@ class RegistroAjusteLoa(models.Model):
 
     descricao = models.TextField(
         verbose_name=_("Descrição"))
+
+    unidade = models.ForeignKey(
+        'UnidadeOrcamentaria',
+        verbose_name=_('Unidade Orçamentária'),
+        related_name='registroajusteloa_set',
+        blank=True, null=True, default=None,
+        on_delete=PROTECT)
 
     class Meta:
         verbose_name = _('Registro do Ajuste Técnico')

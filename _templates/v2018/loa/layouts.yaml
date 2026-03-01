@@ -83,14 +83,14 @@ OficioAjusteLoa:
 
 RegistroAjusteLoa:
   {% trans 'Registro de Ajuste do Ofício' %}:
-  - tipo:2 emendaloa:7
-  - parlamentares__valor
+  - tipo:3 emendaloa:9
+  - unidade parlamentares__valor
   - descricao
 
 RegistroAjusteLoaDetail:
   {% trans 'Registro de Ajuste do Ofício' %}:
   - tipo:2 oficio_ajuste_loa registroajusteloaparlamentar_set:5
-  - emendaloa
+  - emendaloa unidade:5
   - descricao
   - prestacaocontaregistro_set
 

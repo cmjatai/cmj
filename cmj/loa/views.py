@@ -2213,6 +2213,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
                 emenda_epigrafe = ajuste.emendaloa.materia.epigrafe_short if ajuste.emendaloa else ""
                 emenda_epigrafe = f'<strong>Emenda:</strong> {emenda_epigrafe if emenda_epigrafe else "Ajuste sem ligação com emenda impositiva."}<br>'
+                unidade_orcamentaria = f'<strong>Unidade Orçamentária:</strong> {ajuste.unidade.especificacao if ajuste.unidade else ""}<br>'
 
                 a_str = f'''
                     <tr>
@@ -2225,6 +2226,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
                         </td>
                         <td>
                           {emenda_epigrafe}
+                          {unidade_orcamentaria}
                           <small>
                             <em>{ajuste.descricao}</em>
                           </small>
@@ -2254,8 +2256,9 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
             emenda_epigrafe = obj.emendaloa.materia.epigrafe_short if obj.emendaloa else ""
             emenda_epigrafe = f'<strong>Emenda:</strong> {emenda_epigrafe if emenda_epigrafe else "Ajuste sem ligação com emenda impositiva."}<br>'
+            unidade_orcamentaria = f'<strong>Unidade Orçamentária:</strong> {obj.unidade.especificacao if obj.unidade else ""}<br>'
 
-            return verbose_name, f'{emenda_epigrafe}<em>{field_display}</em>'
+            return verbose_name, f'{emenda_epigrafe}{unidade_orcamentaria}<em>{field_display}</em>'
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)

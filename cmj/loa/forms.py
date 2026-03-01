@@ -832,8 +832,18 @@ class OficioAjusteLoaForm(FileFieldCheckMixin, ModelForm):
 class RegistroAjusteLoaForm(ModelForm):
 
     emendaloa = forms.ModelChoiceField(
+        queryset=EmendaLoa.objects.all(),
+        label='Emendas da LOA relacionadas ao Parlamentar do Oficio de Ajuste',
         required=False,
-        queryset=EmendaLoa.objects.all())
+        widget=forms.Select(
+            attrs={
+                'class': 'selectpicker',
+                'data-live-search': 'true',
+                'data-header': 'Emendas Cadastradas',
+                'data-dropup-auto': 'false'
+            }
+        )
+    )
 
     parlamentares__valor = SplitArrayField(
         DecimalField(required=False, max_digits=14, decimal_places=2,), 10,
@@ -848,6 +858,7 @@ class RegistroAjusteLoaForm(ModelForm):
             'parlamentares__valor',
             'tipo',
             'emendaloa',
+            'unidade',
             'descricao'
         ]
 
@@ -867,6 +878,13 @@ class RegistroAjusteLoaForm(ModelForm):
 
         self.fields['emendaloa'].choices = [('', '---------')] + [
             (e.pk, f'{e.materia.epigrafe_short if e.materia else ""} - {e}') for e in self.emendas
+        ]
+
+        self.fields['unidade'].choices = [
+            (u.id, str(u)) for u in UnidadeOrcamentaria.objects.filter(
+                loa=self.oficioajusteloa.loa,
+                recebe_emenda_impositiva=True
+            )
         ]
 
         initial_pv = []
@@ -1058,7 +1076,7 @@ class EmendaLoaFilterSet(FilterSet):
             q = Q()
             for term in terms:
                 q &= (
-                    Q(search__icontains=term) #| Q(search__trigram_word_similar=term)
+                    Q(search__unaccent__icontains=term) #| Q(search__trigram_word_similar=term)
                 )
             queryset = queryset.filter(q)
         return queryset
