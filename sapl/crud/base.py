@@ -111,7 +111,7 @@ class SearchMixin(models.Model):
     logger = logging.getLogger(__name__)
 
     class Meta:
-        abstract = True
+        abstract = True 
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None, auto_update_search=True):

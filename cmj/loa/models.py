@@ -469,13 +469,149 @@ class EmendaLoa(CmjSearchMixin):
     @property
     def fields_search(self):
         return [
-            'finalidade_format', 'ementa_format'
+            'artigos_search'
         ]
 
     @property
-    def artigos(self):
-        pass
+    def artigos_search(self):
+        _artigos_search = '\n'.join([art[1] for art in self.artigos])
+        _artigos_search = f'{self.materia.epigrafe_short if self.materia else ""}\n{_artigos_search}'
+        return _artigos_search
 
+    @property
+    def artigos(self):
+        artigos = []
+        art_num = 0
+        feminino = self.parlamentares.isonly_sexo_feminino()
+        plural = self.parlamentares.count() > 1
+        valor_str = self.str_valor
+        extenso = self.valor_por_extenso
+
+        # ementa
+        ementa = (
+            f'Altera destinação de recursos orçamentários, indicando '
+            f'{self.prefixo_indicacao} {self.indicacao or "XXXXXXX"}, '
+            f'para a recepção do valor de '
+            f'R$ {valor_str} ({extenso}), '
+            f'que será {self.prefixo_finalidade} '
+            f'{self.finalidade_format or "XXXXXXX"}.'
+        )
+        artigos.append(('ementa', ementa))
+
+        # preâmbulo
+        art_def = 'A' if feminino else 'O'
+        if plural:
+            art_def += 's'
+        subscritor = 'subscritora' if feminino else ('subscritores' if plural else 'subscritor')
+        if feminino and plural:
+            subscritor = 'subscritoras'
+        tipo_emenda = 'Impositiva' if self.tipo else 'Modificativa'
+        preambulo = (
+            f'{art_def} {subscritor} da presente Emenda {tipo_emenda}, '
+            f'propõem a seguinte modificação no Projeto de Lei '
+            f'Orçamentária Anual supracitado:'
+        )
+        artigos.append(('preambulo', preambulo))
+
+        if self.tipo:
+            # Art - Dedução
+            art_num += 1
+            deducoes = self.registrocontabil_set.all_deducoes()
+            partes_deducao = []
+            for i, rc in enumerate(deducoes):
+                parte = (
+                    f'Unidade Orçamentária {rc.despesa.unidade.especificacao} / '
+                    f'Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / '
+                    f'Natureza da Despesa: {rc.despesa.consulta.cod_natureza}'
+                )
+                if deducoes.count() > 1:
+                    parte += f' - Valor: R$ {formats.number_format(rc.valor.copy_abs(), force_grouping=True)}'
+                partes_deducao.append(parte)
+            texto_deducoes = ' // '.join(partes_deducao) if partes_deducao else 'XXXXXXXXXX'
+            texto = (
+                f'Art {art_num}º - Deduz-se da {texto_deducoes}, '
+                f'o valor de R$ {valor_str} ({extenso}).'
+            )
+            artigos.append(('artigo', texto))
+
+            # Art - Inserção
+            art_num += 1
+            insercoes = self.registrocontabil_set.all_insercoes()
+            partes_insercao = []
+            for i, rc in enumerate(insercoes):
+                parte = (
+                    f'Unidade Orçamentária {rc.despesa.unidade.especificacao} / '
+                    f'Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / '
+                    f'Natureza da Despesa: {rc.despesa.consulta.cod_natureza}'
+                )
+                if insercoes.count() > 1:
+                    parte += f' - Valor: R$ {formats.number_format(rc.valor, force_grouping=True)}'
+                partes_insercao.append(parte)
+            texto_insercoes = ' // '.join(partes_insercao) if partes_insercao else 'XXXXXXXXXX'
+            texto = (
+                f'Art {art_num}º - O valor deduzido de '
+                f'R$ {valor_str} ({extenso}), '
+                f'será inserido na {texto_insercoes}, '
+                f'{self.prefixo_finalidade} {self.finalidade_format}.'
+            )
+            artigos.append(('artigo', texto))
+
+            # Art - Divisão entre parlamentares (se mais de 1 e impositiva)
+            if plural:
+                art_num += 1
+                art_gen = 'as' if feminino else 'os'
+                vereador_gen = 'vereadoras' if feminino else 'vereadores'
+                subscritor_gen = 'subscritoras' if feminino else 'subscritores'
+
+                partes_parlamentares = []
+                for elp in self.emendaloaparlamentar_set.all():
+                    elp_valor_str = formats.number_format(elp.valor, force_grouping=True)
+                    elp_extenso = valor_por_extenso(elp.valor)
+                    gen_parl = 'a' if elp.parlamentar.sexo == 'F' else 'o'
+                    vereador_parl = 'Vereadora' if elp.parlamentar.sexo == 'F' else 'Vereador'
+                    partes_parlamentares.append(
+                        f'R$ {elp_valor_str} ({elp_extenso}), '
+                        f'd{gen_parl} {vereador_parl} {elp.parlamentar.nome_parlamentar}'
+                    )
+                lista_parlamentares = '; '.join(partes_parlamentares[:-1])
+                if lista_parlamentares:
+                    lista_parlamentares += '; ' + partes_parlamentares[-1] + '.'
+                else:
+                    lista_parlamentares = partes_parlamentares[0] + '.' if partes_parlamentares else ''
+
+                texto = (
+                    f'Art {art_num}º - O valor de '
+                    f'R$ {valor_str} ({extenso}), '
+                    f'será divido entre {art_gen} {vereador_gen} {subscritor_gen}, '
+                    f'sendo utilizado: {lista_parlamentares}'
+                )
+                artigos.append(('artigo', texto))
+
+        else:
+            # Emenda Modificativa - artigo único de alteração
+            art_num += 1
+            texto = (
+                f'Art {art_num}º - Altera-se o Orçamento de {self.loa.ano}, '
+                f'incluindo o valor de R$ {valor_str} ({extenso}), '
+                f'{self.prefixo_finalidade} {self.finalidade_format}.'
+            )
+            artigos.append(('artigo', texto))
+
+        # Art - Demais artigos inalterados
+        art_num += 1
+        artigos.append((
+            'artigo',
+            f'Art {art_num}º - Os demais artigos e dispositivos da matéria acima permanecem inalterados.'
+        ))
+
+        # Art - Parte integrante
+        art_num += 1
+        artigos.append((
+            'artigo',
+            f'Art {art_num}º - A presente emenda fará parte integrante do Projeto de Lei em referência.'
+        ))
+
+        return artigos
 
     @property
     def finalidade_format(self):

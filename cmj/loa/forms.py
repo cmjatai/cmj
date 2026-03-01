@@ -978,7 +978,7 @@ class EmendaLoaFilterSet(FilterSet):
     )
 
     finalidade = CharFilter(label='Busca por termos',
-                            help_text='Os Termos informados serão buscados em várias partes da Emenda, como Unidade, Código de Dotação, Entidade, Finalidade e Matéria.',
+                            help_text='Informe termos separados por espaço para filtrar as emendas.',
                             method='filter_finalidade')
 
     class Meta:
@@ -1053,6 +1053,21 @@ class EmendaLoaFilterSet(FilterSet):
         return queryset
 
     def filter_finalidade(self, queryset, field_name, value):
+        query = value
+
+        query = query.split(' ')
+        if query:
+            q = Q()
+            for item in query:
+
+                if not item:
+                    continue
+                q &=Q(search__icontains=item)
+            if q:
+                queryset = queryset.filter(q)
+        return queryset
+
+    def filter_finalidade_old(self, queryset, field_name, value):
 
         query = value
 
