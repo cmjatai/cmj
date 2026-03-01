@@ -978,11 +978,10 @@ class EmendaLoaFilterSet(FilterSet):
     )
 
     finalidade = CharFilter(label='Busca por termos',
-                            help_text='Os Termos informados serão buscados nos campos finalidade ou Unidade Orçamentária',
+                            help_text='Os Termos informados serão buscados em várias partes da Emenda, como Unidade, Código de Dotação, Entidade, Finalidade e Matéria.',
                             method='filter_finalidade')
 
     class Meta:
-
         class Form(forms.Form):
             crispy_field_template = (
                 'fase',
@@ -994,9 +993,7 @@ class EmendaLoaFilterSet(FilterSet):
             )
 
         model = EmendaLoa
-        fields = ['fase', 'parlamentares', 'tipo', 'indicacao',  'finalidade',
-                  'tipo_agrupamento',
-                  'agrupamento']
+        fields = ['fase', 'parlamentares', 'tipo', 'indicacao',  'finalidade', 'tipo_agrupamento', 'agrupamento']
         form = Form
 
     class ELSaplFormHelper(SaplFormHelper):
@@ -1063,14 +1060,18 @@ class EmendaLoaFilterSet(FilterSet):
         if query:
             q = Q()
             for item in query:
+
                 if not item:
                     continue
-                q &= (Q(unidade__especificacao__icontains=item) |
-                      Q(entidade__razao_social__icontains=item) |
-                      Q(entidade__nome_fantasia__icontains=item) |
-                      Q(entidade__cnes__icontains=item) |
-                      Q(entidade__cpfcnpj__icontains=item) |
-                      Q(finalidade__icontains=item))
+                q &= (
+                    Q(unidade__especificacao__icontains=item) |
+                    Q(entidade__razao_social__icontains=item) |
+                    Q(entidade__nome_fantasia__icontains=item) |
+                    Q(entidade__cnes__icontains=item) |
+                    Q(entidade__cpfcnpj__icontains=item) |
+                    Q(finalidade__icontains=item) |
+                    Q(materia__numero=item)
+                )
 
             if q:
                 queryset = queryset.filter(q)
