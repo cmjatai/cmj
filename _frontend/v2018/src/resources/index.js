@@ -93,9 +93,15 @@ export default {
       `${basePath}/${app}/${model}/`,
       form
     ),
-    fetch: (m, method = 'GET') => axios({
-      url: `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}${m.query_string ? '?' : ''}${m.query_string ? m.query_string : ''}`,
-      method: method
-    })
+    fetch: (m, method = 'GET') => {
+      if (m.params && !m.query_string) {
+        const params = new URLSearchParams(m.params)
+        m.query_string = params.toString()
+      }
+      return axios({
+        url: `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}${m.query_string ? '?' : ''}${m.query_string ? m.query_string : ''}`,
+        method: method
+      })
+    }
   }
 }
