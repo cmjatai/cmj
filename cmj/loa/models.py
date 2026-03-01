@@ -440,7 +440,10 @@ class EmendaLoa(CmjSearchMixin):
 
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
-        return f'R$ {valor_str} - {self.finalidade_format}'
+        materia = ''
+        if self.materia:
+            materia = f'{self.materia.epigrafe_short} - '
+        return f'{materia}R$ {valor_str} - {self.finalidade_format}'
 
     @property
     def ementa_format(self):
@@ -564,7 +567,8 @@ class EmendaLoa(CmjSearchMixin):
 
             if hasattr(self, 'agrupamentoemendaloa'):
                 registros.delete()
-                self.agrupamentoemendaloa.save()
+                #self.agrupamentoemendaloa.save()
+                self.agrupamentoemendaloa.agrupamento.sync()
             else:
                 if old_self:
                     valor_old = old_self.valor

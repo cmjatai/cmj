@@ -30,7 +30,7 @@ from rest_framework.viewsets import ViewSet
 import pymupdf
 
 from cmj import loa
-from cmj.loa.models import ArquivoPrestacaoContaLoa, OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar, \
+from cmj.loa.models import ArquivoPrestacaoContaLoa, ArquivoPrestacaoContaRegistro, OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar, \
     DespesaConsulta, EmendaLoaRegistroContabil, UnidadeOrcamentaria, Despesa, \
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza,\
     AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento, quantize,\
@@ -1679,6 +1679,12 @@ class _AgrupamentoRegistroContabilViewSet:
 
 @customize(ArquivoPrestacaoContaLoa)
 class _ArquivoPrestacaoContaLoaViewSet(ResponseFileMixin):
+    @action(detail=True)
+    def arquivo(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+@customize(ArquivoPrestacaoContaRegistro)
+class _ArquivoPrestacaoContaRegistroViewSet(ResponseFileMixin):
     @action(detail=True)
     def arquivo(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)

@@ -296,19 +296,29 @@ class CrispyLayoutFormMixin:
             verbose_name, field_display = getattr(self, func)(obj, fieldname)
 
         hook_fieldname = 'hook_%s' % fieldname
+        class_col = ''
         if hasattr(self, hook_fieldname):
             try:
-                verbose_name, field_display = getattr(
-                    self, hook_fieldname)(obj, verbose_name=verbose_name, field_display=field_display)
+                r_hook = getattr(self, hook_fieldname)(obj, verbose_name=verbose_name, field_display=field_display)
+                if isinstance(r_hook, (tuple, list)):
+                    if len(r_hook) == 2:
+                        verbose_name, field_display = r_hook
+                    elif len(r_hook) == 3:
+                        verbose_name, field_display, class_col = r_hook
             except:
-                verbose_name, field_display = getattr(
-                    self, hook_fieldname)(obj)
+                try:
+                    verbose_name, field_display = getattr(
+                        self, hook_fieldname)(obj, verbose_name=verbose_name, field_display=field_display)
+                except:
+                    verbose_name, field_display = getattr(
+                        self, hook_fieldname)(obj)
         elif not func:
             verbose_name, field_display = get_field_display(obj, fieldname)
 
         return {
             'id': fieldname,
             'span': span,
+            'class_col': class_col,
             'verbose_name': verbose_name,
             'text': field_display,
         }

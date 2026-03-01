@@ -132,8 +132,8 @@
     </small>
     <div class="clearfix"></div>
     {% if object.emendaloa %}
-      <div>
-        <strong>Emenda Impositiva no Orçamento Impositivo:</strong><br>
+      <div class="alert alert-info m-0">
+        <strong >Para acompanhar a Emenda Impositiva após a Aprovação Legislativa:</strong><br>
         Acesse: <a href="{% url 'cmj.loa:emendaloa_detail' object.emendaloa.id %}">
           {{ object.emendaloa }}
         </a>

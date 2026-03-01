@@ -109,6 +109,7 @@ class LoaCrud(Crud):
             context = super().get_context_data(**kwargs)
             path = context.get('path', '')
             context['path'] = f'{path} loa-list'
+            context['type_pagination'] = 'pagination-static'
             return context
 
         def get_queryset(self):
@@ -860,7 +861,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
     class ListView(FilterView, MasterDetailCrud.ListView):
         filterset_class = EmendaLoaFilterSet
-        paginate_by = 25
+        paginate_by = 10
 
         @property
         def extras_url(self):
@@ -1394,6 +1395,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 self, **kwargs)
             path = context.get('path', '')
             context['path'] = f'{path} emendaloa-list'
+            context['type_pagination'] = 'pagination-static'
 
             return context
 
@@ -1917,13 +1919,22 @@ class EmendaLoaCrud(MasterDetailCrud):
             context = super().get_context_data(**kwargs)
             path = context.get('path', '')
             context['path'] = f'{path} emendaloa-detail'
+            title = f'''{self.object.materia.epigrafe_short + ' - ' if self.object.materia else ''}
+            R$ { self.object.str_valor } -
+            { self.object.entidade.nome_fantasia if self.object.entidade else ''}
+            {self.object.unidade.especificacao if not self.object.entidade else ''}
+            <small>{'<br>' + str(self.object) if not self.object.materia else ''}</small>
+            <br><small>({self.object.loa})</small>
+
+            '''
+            context['title'] = title.replace('\n', '')
             return context
 
         def hook_valor_computado(self, el, verbose_name='', field_display=''):
             if not el.materia:
                 return '', ''
 
-            return 'Valor Final da Emenda (R$)', field_display
+            return 'Valor Final da Emenda (R$)', field_display, 'form-control-static text-blue text-nowrap text-center font-weight-bold'
 
         def hook_tipo(self, el, verbose_name='', field_display=''):
             if el.tipo:
@@ -1931,23 +1942,34 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return 'Emenda Modificativa', 'Emenda Modificativa'
 
+        def hook_fase(self, el, verbose_name='', field_display=''):
+            classes = 'form-control-static text-center font-weight-bold'
+            if el.fase == EmendaLoa.IMPEDIMENTO_TECNICO:
+                return verbose_name, field_display, f'{classes} text-danger'
+            return verbose_name, field_display, classes
+
         def hook_indicacao(self, el, verbose_name='', field_display=''):
             return f'{verbose_name} (Unidade Orçamentária)', field_display
 
         def hook_finalidade(self, el, verbose_name='', field_display=''):
-            return verbose_name, el.finalidade_format
+            return verbose_name, el.finalidade_format,
 
         def hook_materia(self, el, verbose_name='', field_display=''):
-            if el.materia:
-                strm = str(el.materia)
-                field_display = field_display.replace(
-                    strm, el.materia.epigrafe_short)
-            return 'Processo Legislativo da Emenda Impositiva', field_display
+            if not el.materia:
+                return '',''
+
+            strm = str(el.materia)
+            field_display = field_display.replace(strm, el.materia.epigrafe_short)
+            return 'Processo Legislativo da Emenda Impositiva', f'''
+                Arquivo PDF: <a href="{el.materia.texto_original.url}" class="btn btn-link" title="Arquivo PDF da Emenda no Processo Legislativo"><i class="fas fa-file-pdf"></i></a>
+                | Processo Legislativo: <a href="{reverse_lazy('sapl.materia:materialegislativa_detail', kwargs={'pk': el.materia.id})}">
+                    {field_display}
+                </a>'''
 
         def hook_registroajusteloa_set(self, el, verbose_name='', field_display=''):
 
             if not el.materia:
-                return 'Sem registros de Ajuste Técnico', ''
+                return '', ''
 
             ajustes = []
             for ajuste in el.registroajusteloa_set.all():
@@ -1971,7 +1993,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def hook_documentos_acessorios(self, el, verbose_name='', field_display=''):
 
-            if not el.materia:
+            if not el.materia or not el.materia.documentoacessorio_set.exists():
                 return '', ''
 
             docs = []
@@ -1988,8 +2010,10 @@ class EmendaLoaCrud(MasterDetailCrud):
                 docs.append(
                     f'<tr><td>{rendered}</td></tr>'
                 )
+            if not docs:
+                return verbose_name, 'Esta Emenda não possui outros documentos acessórios cadastrados ao Processo Legislativo'
 
-            return 'Documentos Adicionados à Emenda Impositiva', f'''
+            return 'Documentos Acessórios vinculados ao Processo Legislativo', f'''
                 <div class="container-table m-0 mx-n3">
                     <table class="table table-form table-bordered table-hover w-100">
                         {"".join(docs)}
@@ -1998,6 +2022,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 '''
 
         def hook_prestacaocontaregistro_set(self, emendaloa, verbose_name='', field_display=''):
+
             if not emendaloa.materia:
                 return '', ''
 
@@ -2010,20 +2035,23 @@ class EmendaLoaCrud(MasterDetailCrud):
                 )
                 pcs.append(
                     f'''<li>
-                        <span class="badge badge-secondary p-2">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
-                        <span class="badge badge-secondary p-2">{pc.situacao}</span>
-                        <a href="{ pc_url}" class="d-inline-block p-2 font-weight-bold">
+                        <span class="badge badge-secondary">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
+                        <span class="badge badge-secondary">{pc.situacao}</span>
+                        <a href="{ pc_url}" class="d-inline-block font-weight-bold pt-1">
                         {pc.prestacao_conta}
                         </a>
                         <span class="text-gray d-block">{pc.detalhamento}</span>
                     </li>'''
                 )
 
+            if not pcs:
+                return verbose_name, 'Esta Emenda não possui registros de Prestação de Contas'
+
             return 'Registros de Prestação de Contas', f'''
                 <ul>
                     {"".join(pcs)}
                 </ul>
-                '''
+                ''', 'bg-light'
 
         def hook_parlamentares(self, emendaloa, verbose_name='', field_display=''):
             pls = []
@@ -2263,7 +2291,11 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
             return verbose_name, field_display
 
         def hook_oficio_ajuste_loa(self, obj, verbose_name='', field_display=''):
-            field_display = f'<a href="{obj.oficio_ajuste_loa.arquivo.url}">{obj.oficio_ajuste_loa.epigrafe}</a>'
+            url = reverse_lazy(
+                'cmj.loa:oficioajusteloa_detail',
+                kwargs={'pk': obj.oficio_ajuste_loa.id}
+            )
+            field_display = f'<a href="{url}">{obj.oficio_ajuste_loa.epigrafe}</a>'
             return verbose_name, field_display
 
         def hook_prestacaocontaregistro_set(self, obj, verbose_name='', field_display=''):
@@ -2384,14 +2416,60 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'PrestacaoContaRegistroDetail'
 
-        def hook_registro_ajuste__descricao(self, obj, verbose_name='', field_display=''):
+        #def hook_registro_ajuste__descricao(self, obj, verbose_name='', field_display=''):
+        #    if not obj.registro_ajuste:
+        #        return '', ''
+        #    field_display = f'R$ {obj.registro_ajuste.str_valor} - {obj.registro_ajuste.descricao}'
+        #    return 'Descrição do Registro de Ajuste', field_display
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} prestacaocontaregistro-detail'
+
+            title = f'''{self.object.prestacao_conta}<br><small>({self.object.prestacao_conta.loa})</small>'''
+            context['title'] = title.replace('\n', '')
+            return context
+
+        def hook_registro_ajuste(self, obj, verbose_name='', field_display=''):
             if not obj.registro_ajuste:
                 return '', ''
+            url = reverse_lazy(
+                'cmj.loa:registroajusteloa_detail',
+                kwargs={'pk': obj.registro_ajuste.id})
+            field_display = f'{obj.registro_ajuste.oficio_ajuste_loa.epigrafe} - R$ {obj.registro_ajuste.str_valor}'
+            field_display = f'<a href="{url}">{field_display}</a> - {obj.registro_ajuste.descricao}'
+            return 'Registro de Ajuste Técnico Vinculado', field_display
 
-            # refatore, sem url
+        def hook_prestacao_conta(self, obj, verbose_name='', field_display=''):
+            url = reverse_lazy(
+                'cmj.loa:prestacaocontaloa_detail',
+                kwargs={'pk': obj.prestacao_conta.id})
+            field_display = f'<a href="{url}">{obj.prestacao_conta}</a>'
+            return 'Este Registro Pertence à Prestação de Contas', field_display
 
-            field_display = f'R$ {obj.registro_ajuste.str_valor} - {obj.registro_ajuste.descricao}'
-            return 'Descrição do Registro de Ajuste', field_display
+        def hook_arquivoprestacaocontaregistro_set(self, obj, verbose_name='', field_display=''):
+            arquivos = []
+
+            qs_arquivos = obj.arquivoprestacaocontaregistro_set.order_by('-id')
+            for arquivo in qs_arquivos:
+                arq_template = f'''
+                    <a class="d-flex align-items-center" href="{arquivo.arquivo.url}">
+                        <i class="far fa-2x fa-file-pdf"></i>
+                        <span class="pb-3">{arquivo.descricao}</span>
+                    </a>
+                '''
+                arquivos.append(
+                    f'<tr><td>{arq_template}</td></tr>'
+                )
+
+            return 'Arquivos deste Registro de Prestação de Contas', f'''
+                <div class="container-table m-0 mx-n3">
+                    <table class="table table-form table-bordered table-hover w-100">
+                        {"".join(arquivos)}
+                    </table>
+                </div>
+                '''
 
     class DeleteView(MasterDetailCrud.DeleteView):
 
@@ -2430,13 +2508,30 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = 'PrestacaoContaLoaDetail'
         template_name = 'loa/prestacaocontaloa_detail.html'
+        paginate_by = 100
 
         @property
         def list_field_names_set(self):
-            return 'emendaloa_registro_ajuste', 'descricao',  'situacao', 'detalhamento',
+            return  'emendaloa_registro_ajuste', 'descricao',  'situacao', 'detalhamento' #
+
+        def get_queryset(self):
+            qs = super().get_queryset().order_by(
+                'situacao',
+                'emendaloa__materia__numero',
+                'registro_ajuste__oficio_ajuste_loa__epigrafe',
+                )
+            return qs
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} prestacaocontaloa-detail'
+            title = f'''{self.object}<br><small>({self.object.loa})</small>'''
+            context['title'] = title.replace('\n', '')
+            return context
 
         def hook_header_descricao(self):
-            return 'Descrição do Item da Prestação de Contas'
+            return 'Itens da Prestação de Contas'
 
         def hook_descricao(self, obj, verbose_name='', field_display=''):
             descricao = []
@@ -2485,9 +2580,9 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             qs_arquivos = obj.arquivoprestacaocontaloa_set.order_by('-id')
             for arquivo in qs_arquivos:
                 arq_template = f'''
-                    <a href="{arquivo.arquivo.url}">
+                    <a class="d-flex align-items-center" href="{arquivo.arquivo.url}">
                         <i class="far fa-2x fa-file-pdf"></i>
-                        {arquivo.descricao}
+                        <span class="p-2">{arquivo.descricao}</span>
                     </a>
                 '''
                 arquivos.append(

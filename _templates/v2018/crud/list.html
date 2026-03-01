@@ -67,8 +67,8 @@
         <tbody>
         {% for value_list in rows %}
         <tr>
-          {% for value, href in value_list %}
-          <td>
+          {% for value, href, css_class in value_list %}
+          <td class="{{ css_class }}">
             {% if href %}
               <a href="{{ href }}">{{ value|safe|default:"" }}</a>
             {% elif value != 'core.Cep.None' %}
