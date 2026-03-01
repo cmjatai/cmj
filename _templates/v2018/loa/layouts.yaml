@@ -53,7 +53,7 @@ EmendaLoaDetail:
     {% trans 'Dados Gerais' %}:
       col-md-8:
       - tipo:4 fase:8
-      - materia|fk_urlize_for_detail
+      - materia
       - entidade
       - indicacao
       col-md-4:
@@ -68,13 +68,31 @@ EmendaLoaDetail:
     {% trans 'Documentos da Emenda Impositiva' %}:
       col-md-12:
       - registroajusteloa_set
-      - documentos_acessorios
       - prestacaocontaregistro_set
-{% if perms.emendas.change_emendaloa %}
+      - documentos_acessorios
+{% if False %}
     {% trans 'Registro de Alterações' %}:
       col-md-12:
       - auditlog
 {% endif %}
+
+OficioAjusteLoa:
+  {% trans 'Dados Gerais' %}:
+  - epigrafe parlamentares
+  - arquivo
+
+RegistroAjusteLoa:
+  {% trans 'Registro de Ajuste do Ofício' %}:
+  - tipo:2 emendaloa:7
+  - parlamentares__valor
+  - descricao
+
+RegistroAjusteLoaDetail:
+  {% trans 'Registro de Ajuste do Ofício' %}:
+  - tipo:2 oficio_ajuste_loa registroajusteloaparlamentar_set:5
+  - emendaloa
+  - descricao
+  - prestacaocontaregistro_set
 
 PrestacaoContaLoa:
   {% trans 'Dados Gerais' %}:
@@ -109,29 +127,11 @@ PrestacaoContaRegistroUpdate:
 
 PrestacaoContaRegistroDetail:
   {% trans 'Registro de Prestação de Conta' %}:
-  - registro_ajuste|fk_urlize_for_detail situacao:4
-  - registro_ajuste__descricao
+  - situacao:4 detalhamento:8
+  - registro_ajuste|fk_urlize_for_detail
   - emendaloa|fk_urlize_for_detail
-  - detalhamento:8 prestacao_conta|fk_urlize_for_detail
+  - prestacao_conta|fk_urlize_for_detail
   - arquivoprestacaocontaregistro_set
-
-OficioAjusteLoa:
-  {% trans 'Dados Gerais' %}:
-  - epigrafe parlamentares
-  - arquivo
-
-RegistroAjusteLoa:
-  {% trans 'Registro de Ajuste do Ofício' %}:
-  - tipo:2 emendaloa:7
-  - parlamentares__valor
-  - descricao
-
-RegistroAjusteLoaDetail:
-  {% trans 'Registro de Ajuste do Ofício' %}:
-  - tipo:2 emendaloa
-  - oficio_ajuste_loa registroajusteloaparlamentar_set:5
-  - descricao
-  - prestacaocontaregistro_set
 
 AgrupamentoCreate:
   {% trans 'Agrupamento' %}:

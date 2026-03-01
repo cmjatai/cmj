@@ -467,7 +467,7 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
         for i, name in enumerate(self.list_field_names):
             url = self.resolve_url(
                 ACTION_DETAIL, args=(obj.id,)) if i == 0 else None
-
+            css_class = ''
             """Caso o crud list seja para uma relação ManyToManyField"""
             if url and hasattr(self, 'crud') and\
                     hasattr(self.crud, 'is_m2m') and self.crud.is_m2m:
@@ -504,14 +504,24 @@ class CrudListView(PermissionRequiredContainerCrudMixin, ListView):
                     except:
                         pass
                     finally:
-                        hook = 'hook_{}'.format(''.join(n))
+                        hook = 'hook_{}'.format('__'.join(n))
                         if hasattr(self, hook):
-                            hs, url = getattr(self, hook)(obj, ss, url)
-                            s += str(hs)
+                            r_hook = getattr(self, hook)(obj, ss, url)
+                            if isinstance(r_hook, (tuple, list)):
+                                if len(r_hook) == 3:
+                                    ss, url, css_class = r_hook
+                                elif len(r_hook) == 2:
+                                    ss, url = r_hook
+                                    css_class = ''
+                                else:
+                                    ss = r_hook
+                            else:
+                                ss = r_hook
+                            s += str(ss)
                         else:
                             s += ss
 
-                r.append((s, url))
+                r.append((s, url, css_class))
         return r
 
     def get_context_data(self, **kwargs):
@@ -1262,11 +1272,14 @@ class MasterDetailCrud(Crud):
                 root_pk = self.kwargs['pk'] if 'pkk' not in self.request.GET\
                     else self.request.GET['pkk']
             kwargs.setdefault('root_pk', root_pk)
-            context = super(CrudBaseMixin, self).get_context_data(**kwargs)
+
+            context = {}
 
             if parent_object:
                 context['title'] = '%s <small>(%s)</small>' % (
                     self.object, parent_object)
+
+            context.update(super(CrudBaseMixin, self).get_context_data(**kwargs))
 
             return context
 

@@ -217,6 +217,7 @@ rules_loa_group_operador = {
         (loa_models.PrestacaoContaLoa, __base__, __perms_publicas__),
         (loa_models.ArquivoPrestacaoContaLoa, __base__, __perms_publicas__),
         (loa_models.PrestacaoContaRegistro, __base__, __perms_publicas__),
+        (loa_models.ArquivoPrestacaoContaRegistro, __base__, __perms_publicas__),
 
     ]
 }

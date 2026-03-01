@@ -367,7 +367,8 @@ class AgrupamentoForm(ModelForm):
             return ModelForm.save(self, commit=commit)
 
         for e in self.instance.emendas.all():
-            e.fase = 17
+            if e.fase < EmendaLoa.LIBERACAO_CONTABIL:
+                e.fase = 17
             e.save()
 
         return self.instance

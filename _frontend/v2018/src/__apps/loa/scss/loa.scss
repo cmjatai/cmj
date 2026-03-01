@@ -150,6 +150,10 @@
     }
     .container-avatar {
       align-items: center;
+      gap: 7px;
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1 1 auto;
       .custom-control:first-of-type {
         .avatar {
           margin: 0
@@ -159,12 +163,13 @@
         position: relative;
         opacity: 0.5;
         cursor: pointer;
+        margin: 0;
         &:hover {
           opacity: 1;
         }
         &.active {
           opacity: 1;
-          width: 80px;
+          width: 70px;
         }
       }
       .custom-control {
@@ -457,6 +462,11 @@
         grid-template-columns: 1fr 1fr 1fr 1fr 1fr ;
         grid-template-rows: auto;
         grid-template-areas:
+          "div div div div div"
+          "div div div div div"
+          "div div div div div"
+          "div div div div div"
+          "div div div div div"
           "div div div div div"
           "div div div div div";
         .custom-control {
