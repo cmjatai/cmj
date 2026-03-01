@@ -1053,18 +1053,14 @@ class EmendaLoaFilterSet(FilterSet):
         return queryset
 
     def filter_finalidade(self, queryset, field_name, value):
-        query = value
-
-        query = query.split(' ')
-        if query:
+        terms = value.split()
+        if terms:
             q = Q()
-            for item in query:
-
-                if not item:
-                    continue
-                q &=Q(search__icontains=item)
-            if q:
-                queryset = queryset.filter(q)
+            for term in terms:
+                q &= (
+                    Q(search__icontains=term) #| Q(search__trigram_word_similar=term)
+                )
+            queryset = queryset.filter(q)
         return queryset
 
     def filter_finalidade_old(self, queryset, field_name, value):
