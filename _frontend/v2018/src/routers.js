@@ -42,6 +42,11 @@ export const routes = [
         component: () => import('@/modules/loa/LoaDetail')
       },
       {
+        path: ':pkloa(\\d+)/prestacaocontaloa',
+        name: 'prestacaocontaloa_route',
+        component: () => import('@/modules/loa/pcl/PrestacaoContaLoaLayout')
+      },
+      {
         path: 'dash',
         name: 'loadash_route',
         component: () => import('@/modules/loa/LoaDash')

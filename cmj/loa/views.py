@@ -2488,7 +2488,6 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
                     kwargs={'pk': self.object.prestacao_conta.id})
 
 
-
 class PrestacaoContaLoaCrud(MasterDetailCrud):
     model = PrestacaoContaLoa
     parent_field = 'loa'
@@ -2496,8 +2495,22 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
     frontend = PrestacaoContaLoa._meta.app_label
 
-    class CreateView(MasterDetailCrud.CreateView):
+    class ListView(MasterDetailCrud.ListView):
+        ordering = '-data_envio'
+        paginate_by = 25
 
+        def get(self, request, *args, **kwargs):
+            #if request.user.is_anonymous:
+            #    self.template_name = 'loa/prestacaocontaloa_list_public.html'
+            return super().get(request, *args, **kwargs)
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get('path', '')
+            context['path'] = f'{path} prestacaocontaloa-list'
+            return context
+
+    class CreateView(MasterDetailCrud.CreateView):
         def get_success_url(self):
             return self.update_url
 
