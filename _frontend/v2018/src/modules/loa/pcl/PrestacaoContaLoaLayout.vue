@@ -1,43 +1,52 @@
 <template>
   <div class="prestacaocontaloa-layout pt-3">
     <div v-if="loa.ano">
-      <div class="row c-fields">
-        <div class="col-md-3">
-          Parlamentares
-          <b-form-select @change="value => filters_value.parlamentares=value" v-model="filters_value.parlamentares" :options="parlamentares_choice" ></b-form-select>
-        </div>
-        <div class="col-md-4">
-          Unidades Orçamentárias
-          <model-select @change="value => filters_value.unidade=value"
-            v-model="filters_value.unidade"
-            app="loa"
-            model="unidadeorcamentaria"
-            choice="__str__"
-            ordering="codigo"
-            ref="unidadeSelect"
-            :required="false"
-            :extra_query="`${qs_loa}&recebe_emenda_impositiva=True`"
-            ></model-select>
-        </div>
-        <div class="col-md-5">
-          Filtre por termos nos Ajustes e Emendas Impositivas
-          <b-form-input v-model="filters_value.search" placeholder="Digite um termo para pesquisa" class="mb-2"></b-form-input>
-        </div>
-        <div class="col-auto pt-2">
-          Documentos
-          <div class="d-flex">
-            <b-form-checkbox class="ml-1" v-model="filters_value.emendas" value="True" unchecked-value="False">Emendas Impositivas</b-form-checkbox>
-            <b-form-checkbox class="ml-4" v-model="filters_value.ajustes" value="True" unchecked-value="False">Registros de Ajustes</b-form-checkbox>
+      <div class="c-fields card card-body bg-light py-3 px-3 mb-0">
+        <div class="row">
+          <div class="col-md-3 mb-2">
+            <label class="c-fields-label">Parlamentares</label>
+            <b-form-select @change="value => filters_value.parlamentares=value" v-model="filters_value.parlamentares" :options="parlamentares_choice" size="sm"></b-form-select>
+          </div>
+          <div class="col-md-4 mb-2">
+            <label class="c-fields-label">Unidade Orçamentária</label>
+            <model-select @change="value => filters_value.unidade=value"
+              v-model="filters_value.unidade"
+              app="loa"
+              model="unidadeorcamentaria"
+              choice="__str__"
+              ordering="codigo"
+              ref="unidadeSelect"
+              :required="false"
+              :extra_query="`${qs_loa}&recebe_emenda_impositiva=True`"
+              ></model-select>
+          </div>
+          <div class="col-md-5 mb-2">
+            <label class="c-fields-label">Pesquisa</label>
+            <b-form-input v-model="filters_value.search" placeholder="Filtre por termos nos Ajustes e Emendas" size="sm"></b-form-input>
           </div>
         </div>
-        <div class="col-auto pt-2">
-          Situação
-          <div class="d-flex">
-            <b-form-checkbox-group v-model="filters_value.situacao">
-              <b-form-checkbox class="ml-1" value="EM_TRAMITACAO">Aprovado: Em Tramitação</b-form-checkbox>
-              <b-form-checkbox class="ml-4" value="FINALIZADO">Aprovado: Finalizado</b-form-checkbox>
-              <b-form-checkbox class="ml-4" value="IMPEDIMENTO">Impedimento Técnico</b-form-checkbox>
-            </b-form-checkbox-group>
+        <div class="row align-items-end">
+          <div class="col-auto">
+            <label class="c-fields-label">Documentos</label>
+            <div class="d-flex">
+              <b-form-checkbox class="mr-3" v-model="filters_value.emendas" value="True" unchecked-value="False">Emendas Impositivas</b-form-checkbox>
+              <b-form-checkbox v-model="filters_value.ajustes" value="True" unchecked-value="False">Registros de Ajustes</b-form-checkbox>
+            </div>
+          </div>
+          <div class="col-auto">
+            <label class="c-fields-label">Situação</label>
+            <div class="d-flex">
+              <b-form-checkbox-group v-model="filters_value.situacao">
+                <b-form-checkbox class="mr-3" value="EM_TRAMITACAO">Aprovado: Em Tramitação</b-form-checkbox>
+                <b-form-checkbox class="mr-3" value="FINALIZADO">Aprovado: Finalizado</b-form-checkbox>
+                <b-form-checkbox value="IMPEDIMENTO">Impedimento Técnico</b-form-checkbox>
+              </b-form-checkbox-group>
+            </div>
+          </div>
+          <div class="col-auto ml-auto">
+            <button class="btn btn-sm btn-outline-secondary" @click="resetFilters" title="Limpar todos os filtros">
+              <i class="fas fa-times mr-1"></i>Limpar
+            </button>
           </div>
         </div>
       </div>
@@ -85,12 +94,22 @@
                 </a>
               </div>
               <div class="card-body py-2">
-                <p class="mb-0" v-if="registro_selecionado.__label__ === 'loa_emendaloa'">
+                <p class="mb-2" v-if="registro_selecionado.__label__ === 'loa_emendaloa'">
                   {{ registro_selecionado.__str__ }}
                 </p>
-                <p class="mb-0" v-else>
+                <p class="mb-2" v-else>
                   {{ registro_selecionado.descricao }}
                 </p>
+                <div class="row small text-muted mt-1" v-if="registro_selecionado.unidade || (registro_selecionado.parlamentares && registro_selecionado.parlamentares.length)">
+                  <div class="col-12" v-if="registro_selecionado.unidade">
+                    <i class="fas fa-building mr-1"></i>
+                    <strong>Unidade Orçamentária:</strong> {{ registro_selecionado.unidade.__str__ }}
+                  </div>
+                  <div class="col-12" v-if="registro_selecionado.parlamentares && registro_selecionado.parlamentares.length">
+                    <i class="fas fa-users mr-1"></i>
+                    <strong>Parlamentares:</strong> {{ registro_selecionado.parlamentares.map(p => p.__str__).join(', ') }}
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -139,7 +158,7 @@
               :items="prestacaocontaregistro"
               :fields="prestacao_fields"
               small striped hover
-              class="mb-0"
+              class="mb-0 text-center"
             >
               <template #cell(situacao)="data">
                 <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
@@ -243,7 +262,8 @@ export default {
         const query = {}
         this.filters.forEach(f => {
           if (this.filters_value[f] !== null && this.filters_value[f] !== undefined) {
-            query[f] = this.filters_value[f]
+            const val = this.filters_value[f]
+            query[f] = (typeof val === 'object' && val !== null && !Array.isArray(val)) ? val.id : val
           }
         })
         this.$router.replace({ query })
@@ -252,6 +272,14 @@ export default {
     }
   },
   methods: {
+    resetFilters () {
+      this.filters_value.unidade = null
+      this.filters_value.parlamentares = null
+      this.filters_value.situacao = []
+      this.filters_value.emendas = 'True'
+      this.filters_value.ajustes = 'True'
+      this.filters_value.search = ''
+    },
     fase_variant (fase) {
       const map = { 30: 'success', 40: 'danger', 50: 'info', 20: 'secondary' }
       return map[fase] || 'light'
@@ -328,7 +356,11 @@ export default {
       if ((this.filters_value.emendas === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')) {
         const params_emendas = {
           loa: this.loa.id,
-          exclude: 'search'
+          exclude: 'search;parlamentares.metadata',
+          include: 'parlamentares.id,__str__;unidade.id,__str__',
+          expand: 'parlamentares;unidade',
+          get_all: 'True', // parâmetro para retornar todas as emendas sem paginação, visto que o número de emendas é relativamente baixo
+          situacao: this.filters_value.situacao.join(',')
         }
         if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {
           params_emendas['unidade'] = this.filters_value.unidade.id
@@ -339,9 +371,6 @@ export default {
         if (this.filters_value.search) {
           params_emendas['search'] = this.filters_value.search
         }
-        params_emendas['situacao'] = this.filters_value.situacao.join(',')
-        params_emendas['get_all'] = 'True' // parâmetro para retornar todos os ajustes sem paginação, visto que o número de ajustes é relativamente baixo
-
         this.utils.fetch({
           app: 'loa',
           model: 'emendaloa',
@@ -364,6 +393,7 @@ export default {
         }
         params_ajustes['situacao'] = this.filters_value.situacao.join(',')
         params_ajustes['get_all'] = 'True' // parâmetro para retornar todos os ajustes sem paginação, visto que o número de ajustes é relativamente baixo
+
         this.utils.fetch({
           app: 'loa',
           model: 'registroajusteloa',
@@ -408,3 +438,30 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.c-fields {
+  border-radius: 0.375rem;
+}
+.c-fields-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.c-fields .row > div >>> select,
+.c-fields .row > div >>> input,
+.c-fields .row > div >>> .form-control {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+}
+.c-emendas-ajustes {
+}
+.c-emendas-ajustes .list-group-item.active {
+  z-index: 0;
+}
+</style>
