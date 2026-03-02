@@ -17,6 +17,7 @@ from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.parlamentares.models import Parlamentar, Mandato, Legislatura
 from sapl.sessao.models import OrdemDia, SessaoPlenaria
 from cmj.api.serializers import CmjSerializerMixin
+from cmj.api.serializers import RegistroAjusteLoaSerializer  # noqa: F401 - auto-discovered by drfautoapi
 
 class ChoiceSerializer(serializers.Serializer):
     value = serializers.SerializerMethodField()
