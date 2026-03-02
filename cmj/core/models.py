@@ -327,8 +327,11 @@ class CmjSearchMixin(models.Model):
                 else:
                     _self = self
                     for field in fields:
+                        if not _self:
+                            break
                         _self = getattr(_self, field)
-                    search += str(_self) + ' '
+                    if _self:
+                        search += str(_self) + ' '
             self.search = search
         self.search = normalize(self.search)
 
