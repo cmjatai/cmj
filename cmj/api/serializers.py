@@ -15,6 +15,7 @@ from rest_framework.relations import RelatedField, ManyRelatedField,\
 
 from cmj.arq.models import DraftMidia, ArqClasse, ArqDoc
 from cmj.core.models import Bi
+from cmj.loa.models import RegistroAjusteLoa
 from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
     DOC_TEMPLATES_CHOICE, CMSMixin
 from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
@@ -357,3 +358,12 @@ class ArqDocSerializer(CmjSerializerMixin):
 
     class Meta(CmjSerializerMixin.Meta):
         model = ArqDoc
+
+
+class RegistroAjusteLoaSerializer(CmjSerializerMixin):
+    str_valor = serializers.CharField(read_only=True)
+
+    class Meta(CmjSerializerMixin.Meta):
+        model = RegistroAjusteLoa
+
+
