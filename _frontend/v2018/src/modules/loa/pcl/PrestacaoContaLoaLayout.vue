@@ -1,15 +1,15 @@
 <template>
   <div class="prestacaocontaloa-layout pt-3">
-    <div class="container" v-if="loa.ano">
+    <div v-if="loa.ano">
       <div class="row c-fields">
         <div class="col-md-3">
           Parlamentares
-          <b-form-select @change="value => despesa.parlamentares_selected=value" v-model="despesa.parlamentares_selected" :options="parlamentares_choice" ></b-form-select>
+          <b-form-select @change="value => filters_value.parlamentares=value" v-model="filters_value.parlamentares" :options="parlamentares_choice" ></b-form-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-4">
           Unidades Orçamentárias
-          <model-select @change="value => despesa.unidade_selected=value"
-            v-model="despesa.unidade_selected"
+          <model-select @change="value => filters_value.unidade=value"
+            v-model="filters_value.unidade"
             app="loa"
             model="unidadeorcamentaria"
             choice="__str__"
@@ -19,30 +19,32 @@
             :extra_query="`${qs_loa}&recebe_emenda_impositiva=True`"
             ></model-select>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-5">
           Filtre por termos nos Ajustes e Emendas Impositivas
-          <b-form-input v-model="despesa.termo_search" placeholder="Digite um termo para pesquisa" class="mb-2"></b-form-input>
-        </div>
-        <div class="col-auto pt-2">
-          Situação
-          <div class="d-flex">
-            <b-form-checkbox class="m-2" v-model="despesa.emtramitacao_selected" value="True" unchecked-value="False">Em Tramitação</b-form-checkbox>
-            <b-form-checkbox class="m-2" v-model="despesa.finalizada_selected" value="True" unchecked-value="False">Finalizado</b-form-checkbox>
-            <b-form-checkbox class="m-2" v-model="despesa.impedimento_selected" value="True" unchecked-value="False">Impedimento Técnico</b-form-checkbox>
-          </div>
+          <b-form-input v-model="filters_value.search" placeholder="Digite um termo para pesquisa" class="mb-2"></b-form-input>
         </div>
         <div class="col-auto pt-2">
           Documentos
           <div class="d-flex">
-            <b-form-checkbox class="m-2" v-model="despesa.emendas_selected" value="True" unchecked-value="False">Emendas Impositivas</b-form-checkbox>
-            <b-form-checkbox class="m-2" v-model="despesa.oficios_selected" value="True" unchecked-value="False">Registros de Ajustes</b-form-checkbox>
+            <b-form-checkbox class="ml-1" v-model="filters_value.emendas" value="True" unchecked-value="False">Emendas Impositivas</b-form-checkbox>
+            <b-form-checkbox class="ml-4" v-model="filters_value.ajustes" value="True" unchecked-value="False">Registros de Ajustes</b-form-checkbox>
+          </div>
+        </div>
+        <div class="col-auto pt-2">
+          Situação
+          <div class="d-flex">
+            <b-form-checkbox-group v-model="filters_value.situacao">
+              <b-form-checkbox class="ml-1" value="EM_TRAMITACAO">Aprovado: Em Tramitação</b-form-checkbox>
+              <b-form-checkbox class="ml-4" value="FINALIZADO">Aprovado: Finalizado</b-form-checkbox>
+              <b-form-checkbox class="ml-4" value="IMPEDIMENTO">Impedimento Técnico</b-form-checkbox>
+            </b-form-checkbox-group>
           </div>
         </div>
       </div>
-    </div>
-    <div class="container-table" v-if="results">
-      <p>Exibir tabela de despesas aqui</p>
-      <pre>{{ results }}</pre>
+      <div class="row" v-if="results.ajustes || results.emendas">
+        <div class="col-md-4 c-emendas-ajustes"><pre>{{ results }}</pre></div>
+        <div class="col-md-8 c-prestacao-contas"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -58,27 +60,29 @@ export default {
   data () {
     return {
       loa: { id: this.$route.params.pkloa },
-      despesa: {
-        unidade_selected: null,
-        parlamentares_selected: null,
-        emtramitacao_selected: 'False',
-        finalizada_selected: 'False',
-        impedimento_selected: 'False',
-        emendas_selected: 'False',
-        oficios_selected: 'False',
-        termo_search: ''
+      ready: false,
+      filters_value: {
+        unidade: null,
+        parlamentares: null,
+        situacao: [],
+        emendas: 'True',
+        ajustes: 'True',
+        search: ''
       },
       filters: [
-        'unidade_selected',
-        'parlamentares_selected',
-        'emtramitacao_selected',
-        'finalizada_selected',
-        'impedimento_selected',
-        'emendas_selected',
-        'oficios_selected',
-        'termo_search'
+        'unidade',
+        'parlamentares',
+        'situacao',
+        'emendas',
+        'ajustes',
+        'search'
       ],
-      results: null
+      results: {
+        'emendas': {},
+        'ajustes': {}
+      },
+      registro_selecionado: null,
+      prestacaocontaregistro: null
     }
   },
   computed: {
@@ -94,39 +98,97 @@ export default {
     }
   },
   watch: {
-    despesa: {
+    filters_value: {
       deep: true,
-      immediate: true,
       handler: function (nv, ov) {
+        if (!this.ready) return
+        // adicione todos os paramtros no histórico de rotas
+        const query = {}
+        this.filters.forEach(f => {
+          if (this.filters_value[f] !== null && this.filters_value[f] !== undefined) {
+            query[f] = this.filters_value[f]
+          }
+        })
+        this.$router.replace({ query })
         this.fetch()
       }
     }
   },
   methods: {
-    fetch () {
-      this.results = 'response.data'
-      const params = {}
-      this.filters.forEach(filter => {
-        if (this.despesa[filter] !== null) {
-          // se this.despesa[filter] for um objeto, passa o id, senão passa o valor diretamente
-          params[filter.replace('_selected', '')] = typeof this.despesa[filter] === 'object' ? this.despesa[filter].id : this.despesa[filter]
-        }
-      })
-      params['prestacao_conta__loa'] = this.loa.id
-      params['expand'] = 'emendaloa;registro_ajuste;prestacao_conta'
+    fetch_prestacaocontaregistro (registro) {
+      this.registro_selecionado = registro
+      const params = {
+        [registro.__label__ === 'loa_emendaloa' ? 'emendaloa' : 'registro_ajuste']: registro.id,
+        get_all: 'True' // parâmetro para retornar todos os registros sem paginação, visto que o número de registros é relativamente baixo
+      }
       this.utils.fetch({
         app: 'loa',
         model: 'prestacaocontaregistro',
-        params: params
+        params
       })
         .then((response) => {
-          this.results = response.data
+          this.prestacaocontaregistro = response.data
         })
+    },
+    fetch () {
+      this.results = {
+        'emendas': {},
+        'ajustes': {}
+      }
+      if ((this.filters_value.emendas === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')) {
+        const params_emendas = {
+          loa: this.loa.id,
+          exclude: 'search'
+        }
+        if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {
+          params_emendas['unidade'] = this.filters_value.unidade.id
+        }
+        if (this.filters_value.parlamentares && typeof this.filters_value.parlamentares === 'object') {
+          params_emendas['parlamentares'] = this.filters_value.parlamentares.id
+        }
+        if (this.filters_value.search) {
+          params_emendas['search'] = this.filters_value.search
+        }
+        params_emendas['situacao'] = this.filters_value.situacao.join(',')
+        params_emendas['get_all'] = 'True' // parâmetro para retornar todos os ajustes sem paginação, visto que o número de ajustes é relativamente baixo
+
+        this.utils.fetch({
+          app: 'loa',
+          model: 'emendaloa',
+          params: params_emendas
+        })
+          .then((response) => {
+            this.results['emendas'] = response.data
+          })
+      }
+      if ((this.filters_value.ajustes === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')) {
+        const params_ajustes = {
+          oficio_ajuste_loa__loa: this.loa.id,
+          exclude: 'search'
+        }
+        if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {
+          params_ajustes['unidade'] = this.filters_value.unidade.id
+        }
+        if (this.filters_value.search) {
+          params_ajustes['search'] = this.filters_value.search
+        }
+        params_ajustes['situacao'] = this.filters_value.situacao.join(',')
+        params_ajustes['get_all'] = 'True' // parâmetro para retornar todos os ajustes sem paginação, visto que o número de ajustes é relativamente baixo
+        this.utils.fetch({
+          app: 'loa',
+          model: 'registroajusteloa',
+          params: params_ajustes
+        })
+          .then((response) => {
+            this.results['ajustes'] = response.data
+          })
+      }
     }
   },
   mounted: function () {
     const t = this
     t.removeAside()
+    const query = t.$route.query
     t.$nextTick()
       .then(() => {
         t.utils.fetch({
@@ -139,6 +201,18 @@ export default {
         })
           .then((response) => {
             t.loa = response.data
+            // aplica parâmetros da query string nos filtros
+            t.filters.forEach(f => {
+              if (query[f] !== undefined) {
+                if (f === 'situacao') {
+                  t.filters_value[f] = typeof query[f] === 'string' ? query[f].split(',') : query[f]
+                } else {
+                  t.filters_value[f] = query[f]
+                }
+              }
+            })
+            t.ready = true
+            t.fetch()
           })
       })
   }

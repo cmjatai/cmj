@@ -23,16 +23,13 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError as DRFValidationError
-from rest_framework.fields import RegexField, DecimalField, CharField, \
-    SerializerMethodField
+from rest_framework.fields import CharField,  SerializerMethodField
 from rest_framework.response import Response
-from rest_framework.viewsets import ViewSet
 import pymupdf
 
-from cmj import loa
-from cmj.api.forms import PrestacaoContaRegistroFilterSet
+from cmj.api.forms import EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
 from cmj.loa.models import ArquivoPrestacaoContaLoa, ArquivoPrestacaoContaRegistro, OficioAjusteLoa, EmendaLoa, Loa, EmendaLoaParlamentar, \
-    DespesaConsulta, EmendaLoaRegistroContabil, PrestacaoContaRegistro, UnidadeOrcamentaria, Despesa, \
+    DespesaConsulta, EmendaLoaRegistroContabil, PrestacaoContaRegistro, RegistroAjusteLoa, UnidadeOrcamentaria, Despesa, \
     Orgao, Funcao, SubFuncao, Programa, Acao, Natureza,\
     AgrupamentoRegistroContabil, AgrupamentoEmendaLoa, Agrupamento, quantize,\
     Fonte
@@ -672,22 +669,6 @@ class _LoaViewSet:
 
         return Response(rs)
 
-
-@customize(OficioAjusteLoa)
-class _OficioAjusteLoaViewSet(ResponseFileMixin):
-
-    def custom_filename(self, item):
-        arcname = '{}-{}.{}'.format(
-            item.loa.ano,
-            slugify(item.epigrafe),
-            item.arquivo.path.split('.')[-1])
-        return arcname
-
-    @action(detail=True)
-    def arquivo(self, request, *args, **kwargs):
-        return self.response_file(request, *args, **kwargs)
-
-
 class EmendaLoaSearchSerializer(CmjSerializerMixin):
 
     str_valor = SerializerMethodField()
@@ -756,6 +737,7 @@ class EmendaLoaSerializer(CmjSerializerMixin):
 @customize(EmendaLoa)
 class _EmendaLoaViewSet:
 
+
     class EmendaLoaPermission(SaplModelPermissions):
         def has_permission(self, request, view):
             has_perm = super().has_permission(request, view)
@@ -813,6 +795,7 @@ class _EmendaLoaViewSet:
             return False
 
     permission_classes = (EmendaLoaPermission, )
+    filterset_class = EmendaLoaFilterSet
 
     @action(methods=['patch', ], detail=True)
     def update_parlassinantes(self, request, *args, **kwargs):
@@ -1678,6 +1661,27 @@ class _AgrupamentoRegistroContabilViewSet:
         except Exception as exc:
             raise DRFValidationError('\n'.join(exc.messages))
 
+
+@customize(OficioAjusteLoa)
+class _OficioAjusteLoaViewSet(ResponseFileMixin):
+
+    def custom_filename(self, item):
+        arcname = '{}-{}.{}'.format(
+            item.loa.ano,
+            slugify(item.epigrafe),
+            item.arquivo.path.split('.')[-1])
+        return arcname
+
+    @action(detail=True)
+    def arquivo(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
+
+@customize(RegistroAjusteLoa)
+class _RegistroAjusteLoaViewSet:
+    filterset_class = RegistroAjusteLoaFilterSet
+
+
 @customize(ArquivoPrestacaoContaLoa)
 class _ArquivoPrestacaoContaLoaViewSet(ResponseFileMixin):
     @action(detail=True)
@@ -1692,4 +1696,4 @@ class _ArquivoPrestacaoContaRegistroViewSet(ResponseFileMixin):
 
 @customize(PrestacaoContaRegistro)
 class _PrestacaoContaRegistroViewSet:
-    filterset_class = PrestacaoContaRegistroFilterSet
+    pass

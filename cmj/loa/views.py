@@ -2502,8 +2502,8 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
         paginate_by = 25
 
         def get(self, request, *args, **kwargs):
-            #if not request.user.has_perm('cmj.loa.add_prestacaocontaloa'):
-            #    self.template_name = 'loa/prestacaocontaloa_list_public.html'
+            if not request.user.has_perm('cmj.loa.add_prestacaocontaloa'):
+                self.template_name = 'loa/prestacaocontaloa_list_public.html'
             return super().get(request, *args, **kwargs)
 
         def get_context_data(self, **kwargs):

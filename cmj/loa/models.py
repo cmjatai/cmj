@@ -1038,7 +1038,7 @@ class OficioAjusteLoa(models.Model):
                                  update_fields=update_fields)
 
 
-class RegistroAjusteLoa(models.Model):
+class RegistroAjusteLoa(CmjSearchMixin):
 
     SAUDE = 10
     DIVERSOS = 99
@@ -1074,12 +1074,6 @@ class RegistroAjusteLoa(models.Model):
         blank=True, null=True, default=None,
         on_delete=PROTECT)
 
-    class Meta:
-        verbose_name = _('Registro do Ajuste Técnico')
-        verbose_name_plural = _(
-            'Registros do Ajuste Técnico')
-        ordering = ['id']
-
     parlamentares_valor = models.ManyToManyField(
         Parlamentar,
         through='RegistroAjusteLoaParlamentar',
@@ -1089,6 +1083,25 @@ class RegistroAjusteLoa(models.Model):
         through_fields=(
             'registro',
             'parlamentar'))
+
+    class Meta:
+        verbose_name = _('Registro do Ajuste Técnico')
+        verbose_name_plural = _(
+            'Registros do Ajuste Técnico')
+        ordering = ['id']
+
+        indexes = [
+            GinIndex(
+                OpClass('search', name='gin_trgm_ops'),
+                name='loa_rjl_search_gin_trgm',
+            ),
+        ]
+
+    @property
+    def fields_search(self):
+        return [
+            'emendaloa__search', 'descricao', 'oficio_ajuste_loa',
+        ]
 
     @property
     def str_valor(self):
