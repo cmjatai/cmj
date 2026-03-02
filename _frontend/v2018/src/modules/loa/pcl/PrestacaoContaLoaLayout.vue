@@ -68,14 +68,31 @@
         </div>
         <div class="col-md-7 c-prestacao-contas">
           <template v-if="registro_selecionado">
-            <h6>
-              Prestação de Contas:
-              <b-badge :variant="registro_selecionado.__label__ === 'loa_emendaloa' ? 'primary' : 'warning'">
-                {{ registro_selecionado.__label__ === 'loa_emendaloa' ? 'Emenda' : 'Ajuste' }}
-              </b-badge>
-            </h6>
-            
-            <p class="small text-muted mb-2">{{ registro_selecionado.__str__ }}</p>
+            <div class="card mb-3">
+              <div class="card-header d-flex align-items-center justify-content-between py-2">
+                <div>
+                  <b-badge :variant="registro_selecionado.__label__ === 'loa_emendaloa' ? 'primary' : 'warning'" class="mr-2">
+                    {{ registro_selecionado.__label__ === 'loa_emendaloa' ? 'Emenda Impositiva' : 'Registro de Ajuste' }}
+                  </b-badge>
+                  <span class="font-weight-bold">Prestação de Contas</span>
+                </div>
+                <a :href="registro_selecionado.link_detail_backend"
+                  target="_blank"
+                  class="btn btn-sm btn-outline-secondary"
+                  title="Abrir detalhes no painel administrativo"
+                >
+                  <i class="fas fa-external-link-alt mr-1"></i> Abrir
+                </a>
+              </div>
+              <div class="card-body py-2">
+                <p class="mb-0" v-if="registro_selecionado.__label__ === 'loa_emendaloa'">
+                  {{ registro_selecionado.__str__ }}
+                </p>
+                <p class="mb-0" v-else>
+                  {{ registro_selecionado.descricao }}
+                </p>
+              </div>
+            </div>
 
             <div v-if="prestacaocontaregistro === null" class="text-center py-3">
               <b-spinner small></b-spinner> Carregando...
@@ -99,7 +116,6 @@
                 <span class="small">{{ data.item.prestacao_conta__str__ || data.value }}</span>
               </template>
             </b-table>
-            <pre>{{ registro_selecionado }}</pre>
           </template>
           <div v-else class="text-muted text-center py-5">
             Selecione uma emenda ou ajuste para ver os registros de prestação de contas.
