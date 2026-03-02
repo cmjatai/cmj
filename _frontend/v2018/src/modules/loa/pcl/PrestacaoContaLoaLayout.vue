@@ -41,9 +41,73 @@
           </div>
         </div>
       </div>
-      <div class="row" v-if="results.ajustes || results.emendas">
-        <div class="col-md-4 c-emendas-ajustes"><pre>{{ results }}</pre></div>
-        <div class="col-md-8 c-prestacao-contas"></div>
+      <div class="row mt-3" v-if="emendas_ajustes_list.length">
+        <div class="col-md-5 c-emendas-ajustes">
+          <h6>Emendas e Ajustes <small class="text-muted">({{ emendas_ajustes_list.length }})</small></h6>
+          <div class="list-group">
+            <a href="#"
+              v-for="item in emendas_ajustes_list"
+              :key="`${item.__label__}_${item.id}`"
+              class="list-group-item list-group-item-action py-2"
+              :class="{ active: registro_selecionado && registro_selecionado.id === item.id && registro_selecionado.__label__ === item.__label__ }"
+              @click.prevent="fetch_prestacaocontaregistro(item)"
+            >
+              <div class="d-flex justify-content-between align-items-start">
+                <div class="flex-grow-1 mr-2">
+                  <b-badge :variant="item.__label__ === 'loa_emendaloa' ? 'primary' : 'warning'" class="mr-1">
+                    {{ item.__label__ === 'loa_emendaloa' ? 'Emenda' : 'Ajuste' }}
+                  </b-badge>
+                  <b-badge v-if="item.__label__ === 'loa_emendaloa'" :variant="fase_variant(item.fase)" class="mr-1">
+                    {{ fase_label(item.fase) }}
+                  </b-badge>
+                  <div class="mt-1 small">{{ item.__str__ }}</div>
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+        <div class="col-md-7 c-prestacao-contas">
+          <template v-if="registro_selecionado">
+            <h6>
+              Prestação de Contas:
+              <b-badge :variant="registro_selecionado.__label__ === 'loa_emendaloa' ? 'primary' : 'warning'">
+                {{ registro_selecionado.__label__ === 'loa_emendaloa' ? 'Emenda' : 'Ajuste' }}
+              </b-badge>
+            </h6>
+            
+            <p class="small text-muted mb-2">{{ registro_selecionado.__str__ }}</p>
+
+            <div v-if="prestacaocontaregistro === null" class="text-center py-3">
+              <b-spinner small></b-spinner> Carregando...
+            </div>
+            <div v-else-if="prestacaocontaregistro.length === 0" class="text-muted text-center py-3">
+              Nenhum registro de prestação de contas encontrado.
+            </div>
+            <b-table v-else
+              :items="prestacaocontaregistro"
+              :fields="prestacao_fields"
+              small striped hover
+              class="mb-0"
+            >
+              <template #cell(situacao)="data">
+                <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
+              </template>
+              <template #cell(detalhamento)="data">
+                <span class="small">{{ data.value || '—' }}</span>
+              </template>
+              <template #cell(prestacao_conta)="data">
+                <span class="small">{{ data.item.prestacao_conta__str__ || data.value }}</span>
+              </template>
+            </b-table>
+            <pre>{{ registro_selecionado }}</pre>
+          </template>
+          <div v-else class="text-muted text-center py-5">
+            Selecione uma emenda ou ajuste para ver os registros de prestação de contas.
+          </div>
+        </div>
+      </div>
+      <div v-else-if="ready" class="text-muted text-center py-5">
+        Nenhum resultado encontrado para os filtros selecionados.
       </div>
     </div>
   </div>
@@ -95,6 +159,18 @@ export default {
         return [{ value: null, text: '----------------' }, ...this.loa.parlamentares.map(p => ({ value: p, text: p.nome_parlamentar }))]
       }
       return this.loa.parlamentares ? this.loa.parlamentares.map(p => ({ value: p, text: p.nome_parlamentar })) : []
+    },
+    emendas_ajustes_list: function () {
+      const emendas = Array.isArray(this.results.emendas) ? this.results.emendas : []
+      const ajustes = Array.isArray(this.results.ajustes) ? this.results.ajustes : []
+      return [...emendas, ...ajustes]
+    },
+    prestacao_fields: function () {
+      return [
+        { key: 'situacao', label: 'Situação', sortable: true },
+        { key: 'detalhamento', label: 'Detalhamento' },
+        { key: 'prestacao_conta', label: 'Prestação de Conta' }
+      ]
     }
   },
   watch: {
@@ -115,6 +191,32 @@ export default {
     }
   },
   methods: {
+    fase_variant (fase) {
+      const map = { 30: 'success', 40: 'danger', 50: 'info', 20: 'secondary' }
+      return map[fase] || 'light'
+    },
+    fase_label (fase) {
+      const map = {
+        10: 'Proposta',
+        12: 'Proposta Liberada',
+        15: 'Edição Contábil',
+        17: 'Liberado Contab.',
+        20: 'Em Tramitação',
+        25: 'Aprov. Legislativa',
+        30: 'Aprovada',
+        40: 'Impedimento',
+        50: 'Imped. Sanado'
+      }
+      return map[fase] || `Fase ${fase}`
+    },
+    situacao_variant (situacao) {
+      const map = { EM_TRAMITACAO: 'info', FINALIZADO: 'success', OUTRO: 'secondary' }
+      return map[situacao] || 'light'
+    },
+    situacao_label (situacao) {
+      const map = { EM_TRAMITACAO: 'Em Tramitação', FINALIZADO: 'Finalizado', OUTRO: 'Outros' }
+      return map[situacao] || situacao
+    },
     fetch_prestacaocontaregistro (registro) {
       this.registro_selecionado = registro
       const params = {
@@ -131,6 +233,8 @@ export default {
         })
     },
     fetch () {
+      this.registro_selecionado = null
+      this.prestacaocontaregistro = null
       this.results = {
         'emendas': {},
         'ajustes': {}
