@@ -42,7 +42,7 @@
         </div>
       </div>
       <div class="row mt-3" v-if="emendas_ajustes_list.length">
-        <div class="col-md-5 c-emendas-ajustes">
+        <div class="col-md-4 c-emendas-ajustes">
           <h6>Emendas e Ajustes <small class="text-muted">({{ emendas_ajustes_list.length }})</small></h6>
           <div class="list-group">
             <a href="#"
@@ -66,7 +66,7 @@
             </a>
           </div>
         </div>
-        <div class="col-md-7 c-prestacao-contas pl-0">
+        <div class="col-md-8 c-prestacao-contas pl-0">
           <template v-if="registro_selecionado">
             <div class="card mb-3">
               <div class="card-header d-flex align-items-center justify-content-between py-2">
@@ -145,10 +145,12 @@
                 <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
               </template>
               <template #cell(detalhamento)="data">
-                <span class="small">{{ data.value || '—' }}</span>
+                <a v-if="data.item.link_detail_backend" :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value || '—' }}</a>
+                <span v-else class="small">{{ data.value || '—' }}</span>
               </template>
               <template #cell(prestacao_conta)="data">
-                <span class="small">{{ data.item.prestacao_conta__str__ || data.value }}</span>
+                <a v-if="data.value && data.value.link_detail_backend" :href="data.value.link_detail_backend" target="_blank" class="small">{{ data.value.__str__ }}</a>
+                <span v-else class="small">{{ data.value ? data.value.__str__ : '—' }}</span>
               </template>
             </b-table>
           </template>
@@ -283,7 +285,8 @@ export default {
 
       const params = {
         [registro.__label__ === 'loa_emendaloa' ? 'emendaloa' : 'registro_ajuste']: registro.id,
-        get_all: 'True'
+        get_all: 'True',
+        expand: 'prestacao_conta'
       }
       this.utils.fetch({
         app: 'loa',
