@@ -547,10 +547,10 @@ class MandatoCrud(MasterDetailCrud):
             coluna_votos_recebidos = 3
             for row in rows:
                 if not row[coluna_coligacao][0]:
-                    row[coluna_coligacao] = (' ', None)
+                    row[coluna_coligacao] = (' ', None, '')
 
                 if not row[coluna_votos_recebidos][0]:
-                    row[coluna_votos_recebidos] = (' ', None)
+                    row[coluna_votos_recebidos] = (' ', None, '')
 
             return context
 
@@ -765,9 +765,9 @@ class ParlamentarCrud(Crud):
 
                 if mandato:
                     titular = 'Sim' if mandato.titular else 'Não'
-                    row.append((titular, None))
+                    row.append((titular, None, ''))
                 else:
-                    row.append(('-', None))
+                    row.append(('-', None, ''))
 
                 for index, value in enumerate(row):
                     row[index] += (None if index else parlamentar,)
@@ -792,7 +792,7 @@ class ParlamentarCrud(Crud):
                     self.logger.error("user=" + username + ". Parlamentar com (data<={} e data_desfiliacao>={}) "
                                       "ou (data<={} e data_desfiliacao=Null)) não possui filiação."
                                       .format(legislatura.data_fim, legislatura.data_fim, legislatura.data_fim))
-                    row[1] = ('Não possui filiação', None, None)
+                    row[1] = ('Não possui filiação', None, '', None)
 
                 # Caso exista mais de uma filiação nesse intervalo
                 # Entretanto, NÃO DEVE OCORRER
@@ -802,7 +802,7 @@ class ParlamentarCrud(Crud):
                                       .format(legislatura.data_fim, legislatura.data_fim, legislatura.data_fim))
                     row[1] = (
                         'O Parlamentar possui duas filiações conflitantes',
-                        None, None)
+                        None, '', None)
 
                 # Caso encontre UMA filiação nessas condições
                 else:
@@ -816,7 +816,7 @@ class ParlamentarCrud(Crud):
                         partido_aux = next(iter(
                             [p for p in historico if p.inicio_historico < legislatura.data_fim <= p.fim_historico]), filiacao.partido)
 
-                    row[1] = (partido_aux.sigla, None, None)
+                    row[1] = (partido_aux.sigla, None, '', None)
 
             return context
 

@@ -891,10 +891,10 @@ class UnidadeTramitacaoCrud(CrudAux):
                 if row[0][0]:  # Comissão
                     pass
                 elif row[1][0]:  # Órgão
-                    row[0] = (row[1][0], row[0][1])
+                    row[0] = (row[1][0], row[0][1], '')
                 elif row[2][0]:  # Parlamentar
-                    row[0] = (row[2][0], row[0][1])
-                row[1], row[2] = ('', ''), ('', '')
+                    row[0] = (row[2][0], row[0][1], '')
+                row[1], row[2] = ('', '', ''), ('', '', '')
             return context
 
     class UpdateView(Crud.UpdateView):

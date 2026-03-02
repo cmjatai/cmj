@@ -59,7 +59,7 @@
         <tbody>
         {% for value_list in rows %}
         <tr>
-          {% for value, href, obj in value_list %}
+          {% for value, href, css_class, obj in value_list %}
             {% if forloop.first %}
                 <td>
                   {% if obj.fotografia %}
