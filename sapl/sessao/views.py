@@ -369,7 +369,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
         ).first()
 
         if user and user.is_anonymous:
-            row[2] = (materia.ementa, None)
+            row[2] = (materia.ementa, None, '')
 
         turno = '  '
         if tramitacao:
@@ -426,7 +426,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
 
         # Na linha abaixo, o segundo argumento é None para não colocar
         # url em toda a string de title_materia
-        context['rows'][i][1] = (title_materia, None)
+        context['rows'][i][1] = (title_materia, None, '')
 
         is_expediente = obj._meta.model == ExpedienteMateria
 
@@ -634,7 +634,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
                     resultado = ('%s<br/>%s' %
                                  (resultado_descricao,
                                   resultado_observacao))
-        context['rows'][i][3] = (resultado, None)
+        context['rows'][i][3] = (resultado, None, '')
 
     return context
 
