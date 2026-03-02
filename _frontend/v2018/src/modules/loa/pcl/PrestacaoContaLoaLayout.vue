@@ -22,7 +22,7 @@
           </div>
           <div class="col-md-5 mb-2">
             <label class="c-fields-label">Pesquisa</label>
-            <b-form-input v-model="filters_value.search" placeholder="Filtre por termos nos Ajustes e Emendas" size="sm"></b-form-input>
+            <b-form-input :value="filters_value.search" @change="value => filters_value.search = value" placeholder="Filtre por termos nos Ajustes e Emendas" size="sm"></b-form-input>
           </div>
         </div>
         <div class="row align-items-end">
@@ -349,13 +349,15 @@ export default {
       this.registro_selecionado = null
       this.prestacaocontaregistro = null
       this.ajustes_emendas_selecionados = null
-      this.results = {
-        'emendas': {},
-        'ajustes': {}
-      }
-      if ((this.filters_value.emendas === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')) {
+
+      const promises = {}
+      const fetchEmendas = (this.filters_value.emendas === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')
+      const fetchAjustes = (this.filters_value.ajustes === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')
+
+      if (fetchEmendas) {
         const params_emendas = {
           loa: this.loa.id,
+          'o': 'fase,materia__numero',
           exclude: 'search;parlamentares.metadata',
           include: 'parlamentares.id,__str__;unidade.id,__str__',
           expand: 'parlamentares;unidade',
@@ -371,19 +373,18 @@ export default {
         if (this.filters_value.search) {
           params_emendas['search'] = this.filters_value.search
         }
-        this.utils.fetch({
+        promises['emendas'] = this.utils.fetch({
           app: 'loa',
           model: 'emendaloa',
           params: params_emendas
         })
-          .then((response) => {
-            this.results['emendas'] = response.data
-          })
       }
-      if ((this.filters_value.ajustes === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')) {
+
+      if (fetchAjustes) {
         const params_ajustes = {
           oficio_ajuste_loa__loa: this.loa.id,
-          exclude: 'search'
+          exclude: 'search',
+          'o': 'oficio_ajuste_loa__parlamentares__nome_parlamentar'
         }
         if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {
           params_ajustes['unidade'] = this.filters_value.unidade.id
@@ -394,15 +395,21 @@ export default {
         params_ajustes['situacao'] = this.filters_value.situacao.join(',')
         params_ajustes['get_all'] = 'True' // parâmetro para retornar todos os ajustes sem paginação, visto que o número de ajustes é relativamente baixo
 
-        this.utils.fetch({
+        promises['ajustes'] = this.utils.fetch({
           app: 'loa',
           model: 'registroajusteloa',
           params: params_ajustes
         })
-          .then((response) => {
-            this.results['ajustes'] = response.data
-          })
       }
+
+      const keys = Object.keys(promises)
+      return Promise.all(Object.values(promises)).then((responses) => {
+        const newResults = { 'emendas': {}, 'ajustes': {} }
+        keys.forEach((key, i) => {
+          newResults[key] = responses[i].data
+        })
+        this.results = newResults
+      })
     }
   },
   mounted: function () {
