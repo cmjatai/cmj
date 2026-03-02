@@ -1182,9 +1182,9 @@ class PrestacaoContaLoa(models.Model):
         blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
 
     class Meta:
-        verbose_name = _('Prestação de Conta')
+        verbose_name = _('Prestação de Contas do Orçamento Impositivo')
         verbose_name_plural = _(
-            'Prestações de Conta')
+            'Prestações de Contas do Orçamento Impositivo')
         ordering = ['id']
 
     def __str__(self):

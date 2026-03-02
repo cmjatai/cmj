@@ -236,6 +236,10 @@ Vue.mixin({
       const aside = document.getElementsByTagName('aside')
       const wrapper = document.getElementById('wrapper')
 
+      if (aside.length === 0) {
+        return
+      }
+
       const parent = aside[0].parentElement
       parent.removeChild(aside[0])
 
