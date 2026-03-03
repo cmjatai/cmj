@@ -3,6 +3,10 @@
     <div v-if="loa.ano">
       <div class="c-fields card card-body bg-light py-3 px-3 mb-0">
         <div class="row">
+          <div class="col-md-5 mb-2">
+            <label class="c-fields-label">Pesquisa</label>
+            <b-form-input :value="filters_value.search" @change="value => filters_value.search = value" placeholder="Filtre por termos nos Ajustes e Emendas" size="sm"></b-form-input>
+          </div>
           <div class="col-md-3 mb-2">
             <label class="c-fields-label">Parlamentares</label>
             <b-form-select @change="value => filters_value.parlamentares=value" v-model="filters_value.parlamentares" :options="parlamentares_choice" size="sm"></b-form-select>
@@ -20,28 +24,24 @@
               :extra_query="`${qs_loa}&recebe_emenda_impositiva=True`"
               ></model-select>
           </div>
-          <div class="col-md-5 mb-2">
-            <label class="c-fields-label">Pesquisa</label>
-            <b-form-input :value="filters_value.search" @change="value => filters_value.search = value" placeholder="Filtre por termos nos Ajustes e Emendas" size="sm"></b-form-input>
-          </div>
           <div class="col-12 text-muted small mb-0">
             OBS: A não seleção de todos os filtros de cada categoria retorna todos os registros relacionados à LOA.
           </div>
         </div>
-        <div class="row align-items-end">
+        <div class="row align-items-end mt-2">
           <div class="col-auto">
             <label class="c-fields-label">Documentos</label>
-            <div class="d-flex">
+            <div class="c-fields-check-group d-flex">
               <b-form-checkbox class="mr-3" v-model="filters_value.emendas" value="True" unchecked-value="False">Emendas Impositivas</b-form-checkbox>
               <b-form-checkbox v-model="filters_value.ajustes" value="True" unchecked-value="False">Registros de Ajustes</b-form-checkbox>
             </div>
           </div>
           <div class="col-auto">
             <label class="c-fields-label">Situação</label>
-            <div class="d-flex">
+            <div class="c-fields-check-group d-flex">
               <b-form-checkbox-group v-model="filters_value.situacao">
-                <b-form-checkbox class="mr-3" value="EM_TRAMITACAO">Aprovado: Em Tramitação</b-form-checkbox>
-                <b-form-checkbox class="mr-3" value="FINALIZADO">Aprovado: Finalizado</b-form-checkbox>
+                <b-form-checkbox class="mr-3" value="EM_TRAMITACAO">Em Tramitação</b-form-checkbox>
+                <b-form-checkbox class="mr-3" value="FINALIZADO">Finalizado</b-form-checkbox>
                 <b-form-checkbox value="IMPEDIMENTO">Impedimento Técnico</b-form-checkbox>
               </b-form-checkbox-group>
             </div>
@@ -53,9 +53,9 @@
           </div>
         </div>
       </div>
-      <div class="row mt-3" v-if="emendas_ajustes_list.length">
+      <div class="row mt-3" v-if="emendas_ajustes_list.length || fetching">
         <div class="col-md-4 c-emendas-ajustes">
-          <h6 class="c-emendas-ajustes-header">Emendas e Ajustes <small class="text-muted">({{ emendas_ajustes_list.length }})</small></h6>
+          <h6 class="c-emendas-ajustes-header">Emendas e Ajustes <small class="text-muted">({{ emendas_ajustes_list.length }})</small> <b-spinner v-if="fetching" small variant="secondary" class="ml-1"></b-spinner></h6>
           <div class="list-group">
             <a href="#"
               v-for="item in emendas_ajustes_list"
@@ -235,7 +235,8 @@ export default {
       ajustes_emendas_selecionados: [],
       prestacaocontaregistro: null,
       sortBy: 'prestacao_conta',
-      sortDesc: false
+      sortDesc: false,
+      fetching: false
     }
   },
   computed: {
@@ -365,6 +366,7 @@ export default {
       this.registro_selecionado = null
       this.prestacaocontaregistro = null
       this.ajustes_emendas_selecionados = null
+      this.fetching = true
 
       const promises = {}
       const fetchEmendas = (this.filters_value.emendas === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')
@@ -428,6 +430,8 @@ export default {
           newResults[key] = responses[i].data
         })
         this.results = newResults
+      }).finally(() => {
+        this.fetching = false
       })
     }
   },
@@ -452,6 +456,34 @@ export default {
               if (query[f] !== undefined) {
                 if (f === 'situacao') {
                   t.filters_value[f] = typeof query[f] === 'string' ? query[f].split(',') : query[f]
+                } else if (f === 'parlamentares') {
+                  // parlamentares é salvo como id na QS, precisamos encontrar o objeto correspondente
+                  const pid = parseInt(query[f])
+                  if (pid && t.loa.parlamentares) {
+                    const found = t.loa.parlamentares.find(p => p.id === pid)
+                    if (found) {
+                      t.filters_value[f] = found
+                    }
+                  }
+                } else if (f === 'unidade') {
+                  // unidade é salvo como id na QS, precisamos encontrar o objeto no ModelSelect
+                  const uid = parseInt(query[f])
+                  if (uid) {
+                    t.$nextTick(() => {
+                      const unidadeSelect = t.$refs.unidadeSelect
+                      if (unidadeSelect) {
+                        const checkOptions = () => {
+                          const opt = unidadeSelect.options.find(o => o.value && o.value.id === uid)
+                          if (opt) {
+                            t.filters_value.unidade = opt.value
+                          } else {
+                            setTimeout(checkOptions, 100)
+                          }
+                        }
+                        checkOptions()
+                      }
+                    })
+                  }
                 } else {
                   t.filters_value[f] = query[f]
                 }
@@ -485,15 +517,30 @@ export default {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
 }
+.c-fields-check-group {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.875rem;
+}
+.c-fields-check-group >>> .custom-control-label {
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
 
 .c-emendas-ajustes-header {
   background-color: #f8f9fa;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-bottom: none;
   border-radius: 0.25rem 0.25rem 0 0;
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.75rem;
   margin-bottom: 0;
   font-weight: 600;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .c-emendas-ajustes .list-group .list-group-item:first-child {
   border-top-left-radius: 0;
