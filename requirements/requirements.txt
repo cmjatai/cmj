@@ -44,7 +44,7 @@ pymupdf4llm==0.0.17
 
 Werkzeug==3.1.6
 
-ocrmypdf==16.8.0
+ocrmypdf==17.3.0
 #pikepdf>=5.0.0,<6.0.0
 trml2pdf
 pypdf4==1.27.0
