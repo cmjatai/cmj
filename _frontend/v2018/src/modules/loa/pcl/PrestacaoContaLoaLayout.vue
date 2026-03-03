@@ -32,14 +32,14 @@
               ></model-select>
           </div>
           <div class="col-12 text-muted small mb-0">
-            OBS: A não seleção de todos os filtros de cada categoria retorna todos os registros relacionados à LOA.
+            OBS: A não seleção de todos os filtros de cada categoria retorna todos os registros relacionados à LOA e, no caso de Emendas Modificativas, os filtros de situação são irrelevantes.
           </div>
         </div>
         <div class="row align-items-end mt-2">
           <div class="col-auto">
             <label class="c-fields-label">Documentos</label>
             <div class="c-fields-check-group d-flex">
-              <b-form-checkbox class="mr-3" v-model="filters_value.emendas" value="True" unchecked-value="False">Emendas Impositivas</b-form-checkbox>
+              <b-form-checkbox class="mr-3" v-model="filters_value.emendas" value="True" unchecked-value="False">Emendas Impositivas/Modificativas</b-form-checkbox>
               <b-form-checkbox v-model="filters_value.ajustes" value="True" unchecked-value="False">Registros de Ajustes</b-form-checkbox>
             </div>
           </div>
@@ -73,13 +73,14 @@
             >
               <div class="d-flex justify-content-between align-items-start">
                 <div class="flex-grow-1 mr-2">
-                  <b-badge :variant="item.__label__ === 'loa_emendaloa' ? 'primary' : 'warning'" class="mr-1">
-                    {{ item.__label__ === 'loa_emendaloa' ? 'Emenda' : 'Ajuste' }}
+                  <b-badge :variant="item.__label__ === 'loa_emendaloa' ? (item.tipo !== 0 ? 'primary' : 'secondary') : 'warning'" class="mr-1">
+                    {{ item.__label__ === 'loa_emendaloa' ? (item.tipo !== 0 ? 'Emenda Impositiva' : 'Emenda Modificativa') : 'Ajuste' }}
                   </b-badge>
                   <b-badge v-if="item.__label__ === 'loa_emendaloa'" :variant="fase_variant(item.fase)" class="mr-1">
                     {{ fase_label(item.fase) }}
                   </b-badge>
                   <div class="mt-1 small">{{ item.__str__ }}</div>
+                  <div class="mt-1 small">{{ item.descricao }}</div>
                 </div>
               </div>
             </a>
@@ -90,8 +91,8 @@
             <div class="card mb-3">
               <div class="card-header d-flex align-items-center justify-content-between py-2">
                 <div>
-                  <b-badge :variant="registro_selecionado.__label__ === 'loa_emendaloa' ? 'primary' : 'warning'" class="mr-2">
-                    {{ registro_selecionado.__label__ === 'loa_emendaloa' ? 'Emenda Impositiva' : 'Registro de Ajuste' }}
+                  <b-badge :variant="registro_selecionado.__label__ === 'loa_emendaloa' ? (registro_selecionado.tipo !== 0 ? 'primary' : 'secondary') : 'warning'" class="mr-2">
+                    {{ registro_selecionado.__label__ === 'loa_emendaloa' ? (registro_selecionado.tipo !== 0 ? 'Emenda Impositiva' : 'Emenda Modificativa') : 'Registro de Ajuste' }}
                   </b-badge>
                   <span class="font-weight-bold">Prestação de Contas</span>
                 </div>
@@ -111,6 +112,9 @@
                   {{ registro_selecionado.descricao }}
                 </p>
                 <div class="row small text-muted mt-1" v-if="registro_selecionado.unidade || (registro_selecionado.parlamentares && registro_selecionado.parlamentares.length)">
+                  <div class="col-12" v-if="registro_selecionado.emendaloa">
+                    <strong>Vinculado à Emenda:</strong> {{ registro_selecionado.emendaloa.__str__ }}
+                  </div>
                   <div class="col-12" v-if="registro_selecionado.unidade">
                     <i class="fas fa-building mr-1"></i>
                     <strong>Unidade Orçamentária:</strong> {{ registro_selecionado.unidade.__str__ }}
@@ -123,7 +127,7 @@
               </div>
             </div>
 
-            <b-tabs class="c-tabs-detalhe" content-class="mt-0" small>
+            <b-tabs v-if="registro_selecionado.__label__ !== 'loa_emendaloa' || registro_selecionado.tipo !== 0" class="c-tabs-detalhe" content-class="mt-0" small>
               <b-tab active>
                 <template #title>
                   Prestação de Contas
@@ -134,6 +138,9 @@
                 </div>
                 <div v-else-if="prestacaocontaregistro.length === 0" class="text-muted text-center py-3">
                   Nenhum registro de prestação de contas encontrado.
+                  <div v-if="registro_selecionado.emendaloa">
+                    Verifique na Emenda Vinculada a Prestação de Contas.
+                  </div>
                 </div>
                 <b-table v-else
                   :items="prestacaocontaregistro"
@@ -357,7 +364,7 @@ export default {
       const params = {
         emendaloa: registro.id,
         get_all: 'True',
-        expand: 'oficio_ajuste_loa'
+        expand: 'oficio_ajuste_loa;unidade'
       }
       this.utils.fetch({
         app: 'loa',
@@ -409,6 +416,7 @@ export default {
         const params_ajustes = {
           oficio_ajuste_loa__loa: this.loa.id,
           exclude: 'search',
+          expand: 'emendaloa.id,__str__;unidade',
           'o': 'parlamentares_valor__nome_parlamentar'
         }
         if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {

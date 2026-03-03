@@ -2443,11 +2443,23 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
             field_display = f'<a href="{url}">{field_display}</a> - {obj.registro_ajuste.descricao}'
             return 'Registro de Ajuste Técnico Vinculado', field_display
 
-        def hook_prestacao_conta(self, obj, verbose_name='', field_display=''):
+        def hook_prestacao_conta_data_envio(self, obj, verbose_name='', field_display=''):
             url = reverse_lazy(
                 'cmj.loa:prestacaocontaloa_detail',
                 kwargs={'pk': obj.prestacao_conta.id})
-            field_display = f'<a href="{url}">{obj.prestacao_conta}</a>'
+            field_display = f'''<a href="{url}">
+            {obj.prestacao_conta.data_envio}
+            </a>'''
+            return 'Data de Envio da Prestação de Contas', field_display
+
+        def hook_prestacao_conta(self, obj, verbose_name='', field_display=''):
+            data_envio = formats.date_format(obj.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")
+            url = reverse_lazy(
+                'cmj.loa:prestacaocontaloa_detail',
+                kwargs={'pk': obj.prestacao_conta.id})
+            field_display = f'''<a href="{url}">
+            {data_envio} - {obj.prestacao_conta}
+            </a>'''
             return 'Este Registro Pertence à Prestação de Contas', field_display
 
         def hook_arquivoprestacaocontaregistro_set(self, obj, verbose_name='', field_display=''):
