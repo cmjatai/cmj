@@ -78,7 +78,7 @@
             </a>
           </div>
         </div>
-        <div class="col-md-8 c-prestacao-contas pl-0">
+        <div class="col-md-8 c-prestacao-contas pl-md-0">
           <template v-if="registro_selecionado">
             <div class="card mb-3">
               <div class="card-header d-flex align-items-center justify-content-between py-2">
@@ -160,8 +160,10 @@
             <b-table v-else
               :items="prestacaocontaregistro"
               :fields="prestacao_fields"
+              :sort-by.sync="sortBy"
+              :sort-desc.sync="sortDesc"
               small striped hover
-              class="mb-0 text-center"
+              class="mb-0 text-center c-prestacao-table"
             >
               <template #cell(detalhamento)="data">
                 <a v-if="data.item.link_detail_backend" :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value || '—' }}</a>
@@ -222,7 +224,9 @@ export default {
       },
       registro_selecionado: null,
       ajustes_emendas_selecionados: [],
-      prestacaocontaregistro: null
+      prestacaocontaregistro: null,
+      sortBy: 'prestacao_conta',
+      sortDesc: false
     }
   },
   computed: {
@@ -472,9 +476,39 @@ export default {
   padding: 0.25rem 0.5rem;
   font-size: 0.875rem;
 }
-.c-emendas-ajustes {
-}
+
 .c-emendas-ajustes .list-group-item.active {
   z-index: 0;
+}
+@media (max-width: 767.98px) {
+  .c-emendas-ajustes {
+    max-height: 50vh;
+    overflow-y: auto;
+    margin-bottom: 1em;
+  }
+}
+.c-prestacao-table >>> thead th[aria-sort] {
+  cursor: pointer;
+  position: relative;
+  padding-right: 1.5em;
+}
+.c-prestacao-table >>> thead th[aria-sort]::after {
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-size: 0.7em;
+  position: absolute;
+  right: 0.5em;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.4;
+  content: '\f0dc';
+}
+.c-prestacao-table >>> thead th[aria-sort="ascending"]::after {
+  content: '\f0de';
+  opacity: 1;
+}
+.c-prestacao-table >>> thead th[aria-sort="descending"]::after {
+  content: '\f0dd';
+  opacity: 1;
 }
 </style>
