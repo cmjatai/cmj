@@ -24,6 +24,9 @@
             <label class="c-fields-label">Pesquisa</label>
             <b-form-input :value="filters_value.search" @change="value => filters_value.search = value" placeholder="Filtre por termos nos Ajustes e Emendas" size="sm"></b-form-input>
           </div>
+          <div class="col-12 text-muted small mb-0">
+            OBS: A não seleção de todos os filtros de cada categoria retorna todos os registros relacionados à LOA.
+          </div>
         </div>
         <div class="row align-items-end">
           <div class="col-auto">
@@ -160,16 +163,16 @@
               small striped hover
               class="mb-0 text-center"
             >
-              <template #cell(situacao)="data">
-                <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
-              </template>
               <template #cell(detalhamento)="data">
                 <a v-if="data.item.link_detail_backend" :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value || '—' }}</a>
                 <span v-else class="small">{{ data.value || '—' }}</span>
               </template>
               <template #cell(prestacao_conta)="data">
-                <a v-if="data.value && data.value.link_detail_backend" :href="data.value.link_detail_backend" target="_blank" class="small">{{ data.value.__str__ }}</a>
-                <span v-else class="small">{{ data.value ? data.value.__str__ : '—' }}</span>
+                <a v-if="data.value && data.value.link_detail_backend" :href="data.value.link_detail_backend" target="_blank" class="small" :title="data.value.__str__">{{ data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</a>
+                <span v-else class="small">{{ data.value && data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</span>
+              </template>
+              <template #cell(situacao)="data">
+                <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
               </template>
             </b-table>
           </template>
@@ -240,9 +243,9 @@ export default {
     },
     prestacao_fields: function () {
       return [
-        { key: 'situacao', label: 'Situação', sortable: true },
+        { key: 'prestacao_conta', label: 'Prestação de Conta', sortable: true },
         { key: 'detalhamento', label: 'Detalhamento' },
-        { key: 'prestacao_conta', label: 'Prestação de Conta' }
+        { key: 'situacao', label: 'Situação' }
       ]
     },
     ajustes_fields: function () {
@@ -357,7 +360,7 @@ export default {
       if (fetchEmendas) {
         const params_emendas = {
           loa: this.loa.id,
-          'o': 'fase,materia__numero',
+          'o': 'fase,materia__tipo__sigla,materia__numero',
           exclude: 'search;parlamentares.metadata',
           include: 'parlamentares.id,__str__;unidade.id,__str__',
           expand: 'parlamentares;unidade',
@@ -384,13 +387,16 @@ export default {
         const params_ajustes = {
           oficio_ajuste_loa__loa: this.loa.id,
           exclude: 'search',
-          'o': 'oficio_ajuste_loa__parlamentares__nome_parlamentar'
+          'o': 'parlamentares_valor__nome_parlamentar'
         }
         if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {
           params_ajustes['unidade'] = this.filters_value.unidade.id
         }
         if (this.filters_value.search) {
           params_ajustes['search'] = this.filters_value.search
+        }
+        if (this.filters_value.parlamentares && typeof this.filters_value.parlamentares === 'object') {
+          params_ajustes['parlamentares_valor'] = this.filters_value.parlamentares.id
         }
         params_ajustes['situacao'] = this.filters_value.situacao.join(',')
         params_ajustes['get_all'] = 'True' // parâmetro para retornar todos os ajustes sem paginação, visto que o número de ajustes é relativamente baixo

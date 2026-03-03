@@ -40,21 +40,21 @@ class EmendaLoaFilterSet(ApiFilterSetMixin):
 
         # Regra 1: inclui IMPEDIMENTO apenas se selecionado
         if has_impedimento:
-            q |= Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q &= Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
 
         non_impedimento = ~Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
 
         if has_em_tramitacao and has_finalizado:
             # ambos selecionados (sem impedimento): todas as não-impedimento
-            q |= non_impedimento
+            q &= non_impedimento
         elif has_em_tramitacao:
             # Regra 2: exclui emendas que possuem registro FINALIZADO
-            q |= non_impedimento & ~Q(
+            q &= non_impedimento & ~Q(
                 prestacaocontaregistro_set__situacao='FINALIZADO'
             )
         elif has_finalizado:
             # Regra 3: apenas emendas que possuem registro FINALIZADO
-            q |= non_impedimento & Q(
+            q &= non_impedimento & Q(
                 prestacaocontaregistro_set__situacao='FINALIZADO'
             )
 
@@ -129,21 +129,21 @@ class RegistroAjusteLoaFilterSet(ApiFilterSetMixin):
 
         # Regra 1: inclui IMPEDIMENTO apenas se selecionado
         if has_impedimento:
-            q |= Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q &= Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
 
         non_impedimento = ~Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
 
         if has_em_tramitacao and has_finalizado:
             # ambos selecionados (sem impedimento): todas as não-impedimento
-            q |= non_impedimento
+            q &= non_impedimento
         elif has_em_tramitacao:
             # Regra 2: exclui emendas que possuem registro FINALIZADO
-            q |= non_impedimento & ~Q(
+            q &= non_impedimento & ~Q(
                 prestacaocontaregistro_set__situacao='FINALIZADO'
             )
         elif has_finalizado:
             # Regra 3: apenas emendas que possuem registro FINALIZADO
-            q |= non_impedimento & Q(
+            q &= non_impedimento & Q(
                 prestacaocontaregistro_set__situacao='FINALIZADO'
             )
 
