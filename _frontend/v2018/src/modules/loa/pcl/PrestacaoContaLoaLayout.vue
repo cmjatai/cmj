@@ -5,7 +5,14 @@
         <div class="row">
           <div class="col-md-5 mb-2">
             <label class="c-fields-label">Pesquisa</label>
-            <b-form-input :value="filters_value.search" @change="value => filters_value.search = value" placeholder="Filtre por termos nos Ajustes e Emendas" size="sm"></b-form-input>
+            <b-input-group size="sm">
+              <b-form-input ref="searchInput" type="search" :value="filters_value.search" @change="value => filters_value.search = value" placeholder="Filtre por termos nos Ajustes e Emendas"></b-form-input>
+              <b-input-group-append>
+                <b-button class="btn-secondary" @click="$refs.searchInput.$el.blur()" title="Pesquisar">
+                  <i class="fas fa-search"></i>
+                </b-button>
+              </b-input-group-append>
+            </b-input-group>
           </div>
           <div class="col-md-3 mb-2">
             <label class="c-fields-label">Parlamentares</label>
@@ -430,6 +437,11 @@ export default {
           newResults[key] = responses[i].data
         })
         this.results = newResults
+        this.$nextTick(() => {
+          if (this.emendas_ajustes_list.length > 0) {
+            this.fetch_prestacaocontaregistro(this.emendas_ajustes_list[0])
+          }
+        })
       }).finally(() => {
         this.fetching = false
       })
@@ -527,6 +539,19 @@ export default {
 .c-fields-check-group >>> .custom-control-label {
   font-size: 0.8rem;
   line-height: 1.6;
+}
+.c-btn-search {
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-left: none;
+  color: #555;
+}
+.c-btn-search:hover,
+.c-btn-search:focus {
+  background-color: #e9ecef;
+  color: #333;
+  border-color: #ced4da;
+  box-shadow: none;
 }
 
 .c-emendas-ajustes-header {
