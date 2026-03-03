@@ -55,7 +55,7 @@
       </div>
       <div class="row mt-3" v-if="emendas_ajustes_list.length">
         <div class="col-md-4 c-emendas-ajustes">
-          <h6>Emendas e Ajustes <small class="text-muted">({{ emendas_ajustes_list.length }})</small></h6>
+          <h6 class="c-emendas-ajustes-header">Emendas e Ajustes <small class="text-muted">({{ emendas_ajustes_list.length }})</small></h6>
           <div class="list-group">
             <a href="#"
               v-for="item in emendas_ajustes_list"
@@ -116,67 +116,76 @@
               </div>
             </div>
 
-            <template v-if="registro_selecionado.__label__ === 'loa_emendaloa'">
-              <h6 class="mt-2">Ajustes vinculados à Emenda <small class="text-muted" v-if="ajustes_emendas_selecionados">({{ ajustes_emendas_selecionados.length }})</small></h6>
-              <div v-if="ajustes_emendas_selecionados === null" class="text-center py-2">
-                <b-spinner small></b-spinner> Carregando...
-              </div>
-              <div v-else-if="ajustes_emendas_selecionados.length === 0" class="text-muted small py-2">
-                Nenhum ajuste vinculado a esta emenda.
-              </div>
-              <b-table v-else
-                :items="ajustes_emendas_selecionados"
-                :fields="ajustes_fields"
-                small striped hover
-                class="mb-3"
-              >
-                <template #cell(str_valor)="data">
-                  <span class="text-nowrap">R$ {{ data.value }}</span>
+            <b-tabs class="c-tabs-detalhe" content-class="mt-0" small>
+              <b-tab active>
+                <template #title>
+                  Prestação de Contas
+                  <b-badge variant="secondary" pill class="ml-1" v-if="prestacaocontaregistro">{{ prestacaocontaregistro.length }}</b-badge>
                 </template>
-                <template #cell(descricao)="data">
-                  <a :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value }}</a>
-                </template>
-                <template #cell(oficio_ajuste_loa)="data">
-                  <a v-if="data.value && data.value.link_detail_backend"
-                    :href="data.value.link_detail_backend"
-                    target="_blank"
-                    class="btn btn-sm btn-outline-secondary"
-                    title="Abrir ofício"
-                  >
-                    <i class="fas fa-external-link-alt mr-1"></i>{{ data.value.__str__ || 'Ofício' }}
-                  </a>
-                  <span v-else class="small">{{ data.value ? data.value.__str__ : '—' }}</span>
-                </template>
-              </b-table>
-            </template>
+                <div v-if="prestacaocontaregistro === null" class="text-center py-3">
+                  <b-spinner small></b-spinner> Carregando...
+                </div>
+                <div v-else-if="prestacaocontaregistro.length === 0" class="text-muted text-center py-3">
+                  Nenhum registro de prestação de contas encontrado.
+                </div>
+                <b-table v-else
+                  :items="prestacaocontaregistro"
+                  :fields="prestacao_fields"
+                  :sort-by.sync="sortBy"
+                  :sort-desc.sync="sortDesc"
+                  small striped hover
+                  class="mb-0 text-center c-prestacao-table"
+                >
+                  <template #cell(prestacao_conta)="data">
+                    <a v-if="data.value && data.item.link_detail_backend" :href="data.item.link_detail_backend" target="_blank" class="small" :title="data.value.__str__">{{ data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</a>
+                    <span v-else class="small">{{ data.value && data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</span>
+                  </template>
+                  <template #cell(detalhamento)="data">
+                    <span class="small">{{ data.value || '—' }}</span>
+                  </template>
+                  <template #cell(situacao)="data">
+                    <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
+                  </template>
+                </b-table>
+              </b-tab>
 
-            <h6 class="mt-2">Registros de Prestação de Contas <small class="text-muted" v-if="prestacaocontaregistro">({{ prestacaocontaregistro.length }})</small></h6>
-            <div v-if="prestacaocontaregistro === null" class="text-center py-3">
-              <b-spinner small></b-spinner> Carregando...
-            </div>
-            <div v-else-if="prestacaocontaregistro.length === 0" class="text-muted text-center py-3">
-              Nenhum registro de prestação de contas encontrado.
-            </div>
-            <b-table v-else
-              :items="prestacaocontaregistro"
-              :fields="prestacao_fields"
-              :sort-by.sync="sortBy"
-              :sort-desc.sync="sortDesc"
-              small striped hover
-              class="mb-0 text-center c-prestacao-table"
-            >
-              <template #cell(detalhamento)="data">
-                <a v-if="data.item.link_detail_backend" :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value || '—' }}</a>
-                <span v-else class="small">{{ data.value || '—' }}</span>
-              </template>
-              <template #cell(prestacao_conta)="data">
-                <a v-if="data.value && data.value.link_detail_backend" :href="data.value.link_detail_backend" target="_blank" class="small" :title="data.value.__str__">{{ data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</a>
-                <span v-else class="small">{{ data.value && data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</span>
-              </template>
-              <template #cell(situacao)="data">
-                <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
-              </template>
-            </b-table>
+              <b-tab v-if="registro_selecionado.__label__ === 'loa_emendaloa'">
+                <template #title>
+                  Ajustes vinculados à Emenda
+                  <b-badge variant="secondary" pill class="ml-1" v-if="ajustes_emendas_selecionados">{{ ajustes_emendas_selecionados.length }}</b-badge>
+                </template>
+                <div v-if="ajustes_emendas_selecionados === null" class="text-center py-2">
+                  <b-spinner small></b-spinner> Carregando...
+                </div>
+                <div v-else-if="ajustes_emendas_selecionados.length === 0" class="text-muted small py-3 text-center">
+                  Nenhum ajuste vinculado a esta emenda.
+                </div>
+                <b-table v-else
+                  :items="ajustes_emendas_selecionados"
+                  :fields="ajustes_fields"
+                  small striped hover
+                  class="mb-0"
+                >
+                  <template #cell(str_valor)="data">
+                    <span class="text-nowrap">R$ {{ data.value }}</span>
+                  </template>
+                  <template #cell(descricao)="data">
+                    <a :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value }}</a>
+                  </template>
+                  <template #cell(oficio_ajuste_loa)="data">
+                    <a v-if="data.value && data.value.link_detail_backend"
+                      :href="data.value.link_detail_backend"
+                      target="_blank"
+                      class="btn btn-sm btn-outline-secondary"
+                      title="Abrir ofício"
+                    >
+                      <i class="fas fa-external-link-alt mr-1"></i>{{ data.value.__str__ || 'Ofício' }}
+                    </a>
+                    <span v-else class="small">{{ data.value ? data.value.__str__ : '—' }}</span>
+                  </template>
+                </b-table>
+              </b-tab>
+            </b-tabs>
           </template>
           <div v-else class="text-muted text-center py-5">
             Selecione uma emenda ou ajuste para ver os registros de prestação de contas.
@@ -477,6 +486,19 @@ export default {
   font-size: 0.875rem;
 }
 
+.c-emendas-ajustes-header {
+  background-color: #f8f9fa;
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-bottom: none;
+  border-radius: 0.25rem 0.25rem 0 0;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0;
+  font-weight: 600;
+}
+.c-emendas-ajustes .list-group .list-group-item:first-child {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
 .c-emendas-ajustes .list-group-item.active {
   z-index: 0;
 }
@@ -486,6 +508,24 @@ export default {
     overflow-y: auto;
     margin-bottom: 1em;
   }
+}
+.c-tabs-detalhe >>> .nav-tabs {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+.c-tabs-detalhe >>> .nav-tabs .nav-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  padding: 0.4rem 0.75rem;
+}
+.c-tabs-detalhe >>> .nav-tabs .nav-link.active {
+  color: #212529;
+  border-color: rgba(0, 0, 0, 0.125) rgba(0, 0, 0, 0.125) #fff;
+}
+.c-tabs-detalhe >>> .tab-content {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-top: none;
+  border-radius: 0 0 0.25rem 0.25rem;
 }
 .c-prestacao-table >>> thead th[aria-sort] {
   cursor: pointer;
