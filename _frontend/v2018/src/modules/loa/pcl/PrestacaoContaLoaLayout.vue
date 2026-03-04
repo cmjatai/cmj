@@ -389,7 +389,7 @@ export default {
       if (fetchEmendas) {
         const params_emendas = {
           loa: this.loa.id,
-          'o': 'fase,materia__tipo__sigla,materia__numero',
+          o: '-tipo,fase,materia__tipo__sigla,materia__numero',
           exclude: 'search;parlamentares.metadata',
           include: 'parlamentares.id,__str__;unidade.id,__str__',
           expand: 'parlamentares;unidade',
@@ -560,6 +560,14 @@ export default {
   color: #333;
   border-color: #ced4da;
   box-shadow: none;
+}
+
+.c-prestacao-contas {
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
 }
 
 .c-emendas-ajustes-header {
