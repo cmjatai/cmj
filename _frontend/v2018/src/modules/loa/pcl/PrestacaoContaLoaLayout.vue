@@ -172,7 +172,8 @@ export default {
       const materiaId = typeof registro.materia === 'object' ? registro.materia.id : registro.materia
       const params = {
         materia: materiaId,
-        get_all: 'True'
+        get_all: 'True',
+        expand: 'tipo'
       }
       this.utils.fetch({
         app: 'materia',
