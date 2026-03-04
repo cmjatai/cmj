@@ -1,0 +1,178 @@
+<template>
+  <div class="pcl-detalhe-registro">
+    <template v-if="registro">
+      <div class="card mb-3">
+        <div class="card-header d-flex align-items-center justify-content-between py-2">
+          <div>
+            <b-badge :variant="itemBadgeVariant(registro)" class="mr-2">
+              {{ registroBadgeLabel(registro) }}
+            </b-badge>
+            <span class="font-weight-bold">Prestação de Contas</span>
+          </div>
+          <a :href="registro.link_detail_backend"
+            target="_blank"
+            class="btn btn-sm btn-outline-secondary"
+            title="Abrir detalhes no painel administrativo"
+          >
+            <i class="fas fa-external-link-alt mr-1"></i> Abrir
+          </a>
+        </div>
+        <div class="card-body py-2">
+          <p class="mb-2" v-if="isEmenda(registro)">
+            {{ registro.__str__ }}
+          </p>
+          <p class="mb-2" v-else>
+            {{ registro.descricao }}
+          </p>
+          <div class="row small text-muted mt-1" v-if="registro.unidade || (registro.parlamentares && registro.parlamentares.length)">
+            <div class="col-12" v-if="registro.emendaloa">
+              <strong>Vinculado à Emenda:</strong> {{ registro.emendaloa.__str__ }}
+            </div>
+            <div class="col-12" v-if="registro.unidade">
+              <i class="fas fa-building mr-1"></i>
+              <strong>Unidade Orçamentária:</strong> {{ registro.unidade.__str__ }}
+            </div>
+            <div class="col-12" v-if="registro.parlamentares && registro.parlamentares.length">
+              <i class="fas fa-users mr-1"></i>
+              <strong>Parlamentares:</strong> {{ registro.parlamentares.map(p => p.__str__).join(', ') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <b-tabs v-if="showTabs" class="pcl-tabs-detalhe" content-class="mt-0" small>
+        <template v-for="(tab, index) in orderedTabs">
+          <b-tab v-if="tab.key === 'prestacao'" :key="tab.key" :active="index === 0">
+            <template #title>
+              Prestação de Contas
+              <b-badge variant="secondary" pill class="ml-1" v-if="prestacaoItems">{{ prestacaoItems.length }}</b-badge>
+            </template>
+            <pcl-tab-prestacao :items="prestacaoItems" :registro="registro" />
+          </b-tab>
+
+          <b-tab v-if="tab.key === 'ajustes'" :key="tab.key" :active="index === 0">
+            <template #title>
+              Ajustes vinculados à Emenda
+              <b-badge variant="secondary" pill class="ml-1" v-if="ajustesItems">{{ ajustesItems.length }}</b-badge>
+            </template>
+            <pcl-tab-ajustes :items="ajustesItems" />
+          </b-tab>
+
+          <b-tab v-if="tab.key === 'documentos'" :key="tab.key" :active="index === 0">
+            <template #title>
+              Documentos Acessórios
+              <b-badge variant="secondary" pill class="ml-1" v-if="documentosItems">{{ documentosItems.length }}</b-badge>
+            </template>
+            <pcl-tab-documentos :items="documentosItems" />
+          </b-tab>
+        </template>
+      </b-tabs>
+    </template>
+    <div v-else class="text-muted text-center py-5">
+      Selecione uma emenda ou ajuste para ver os registros de prestação de contas.
+    </div>
+  </div>
+</template>
+
+<script>
+import {
+  itemBadgeVariant,
+  registroBadgeLabel,
+  isEmenda
+} from './utils/pcl-helpers'
+import PclTabPrestacao from './tabs/PclTabPrestacao.vue'
+import PclTabAjustes from './tabs/PclTabAjustes.vue'
+import PclTabDocumentos from './tabs/PclTabDocumentos.vue'
+
+export default {
+  name: 'pcl-detalhe-registro',
+  components: {
+    PclTabPrestacao,
+    PclTabAjustes,
+    PclTabDocumentos
+  },
+  props: {
+    registro: {
+      type: Object,
+      default: null
+    },
+    prestacaoItems: {
+      type: Array,
+      default: null
+    },
+    ajustesItems: {
+      type: Array,
+      default: null
+    },
+    documentosItems: {
+      type: Array,
+      default: null
+    }
+  },
+  computed: {
+    showTabs () {
+      if (!this.registro) return false
+      // Emendas modificativas (tipo === 0) não exibem tabs
+      return !this.isEmenda(this.registro) || this.registro.tipo !== 0
+    },
+    orderedTabs () {
+      const tabs = []
+      const emenda = this.isEmenda(this.registro)
+
+      tabs.push({
+        key: 'prestacao',
+        hasData: Array.isArray(this.prestacaoItems) && this.prestacaoItems.length > 0
+      })
+
+      if (emenda) {
+        tabs.push({
+          key: 'ajustes',
+          hasData: Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0
+        })
+      }
+
+      if (emenda && this.registro.materia) {
+        tabs.push({
+          key: 'documentos',
+          hasData: Array.isArray(this.documentosItems) && this.documentosItems.length > 0
+        })
+      }
+
+      return tabs.sort((a, b) => (b.hasData ? 1 : 0) - (a.hasData ? 1 : 0))
+    }
+  },
+  methods: {
+    itemBadgeVariant,
+    registroBadgeLabel,
+    isEmenda
+  }
+}
+</script>
+
+<style scoped>
+.pcl-detalhe-registro {
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+}
+.pcl-tabs-detalhe >>> .nav-tabs {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+.pcl-tabs-detalhe >>> .nav-tabs .nav-link {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #555;
+  padding: 0.4rem 0.75rem;
+}
+.pcl-tabs-detalhe >>> .nav-tabs .nav-link.active {
+  color: #212529;
+  border-color: rgba(0, 0, 0, 0.125) rgba(0, 0, 0, 0.125) #fff;
+}
+.pcl-tabs-detalhe >>> .tab-content {
+  border: 1px solid rgba(0, 0, 0, 0.125);
+  border-top: none;
+  border-radius: 0 0 0.25rem 0.25rem;
+}
+</style>
