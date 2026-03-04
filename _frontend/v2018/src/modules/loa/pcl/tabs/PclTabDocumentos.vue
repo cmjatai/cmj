@@ -10,8 +10,17 @@
       :items="items"
       :fields="fields"
       small striped hover
-      class="mb-0"
+      class="mb-0 text-center"
     >
+      <template #cell(nome)="data">
+        <a v-if="data.value && data.item.link_detail_backend"
+           :href="data.item.link_detail_backend"
+           target="_blank"
+           class="small">
+          {{ data.value.__str__ || data.value }}
+        </a>
+        <span v-else class="small">{{ data.value ? (data.value.__str__ || data.value) : '—' }}</span>
+      </template>
       <template #cell(tipo)="data">
         <span class="small">{{ data.value ? (data.value.__str__ || data.value) : '—' }}</span>
       </template>
