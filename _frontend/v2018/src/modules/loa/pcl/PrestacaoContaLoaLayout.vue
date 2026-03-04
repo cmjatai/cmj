@@ -128,112 +128,114 @@
             </div>
 
             <b-tabs v-if="registro_selecionado.__label__ !== 'loa_emendaloa' || registro_selecionado.tipo !== 0" class="c-tabs-detalhe" content-class="mt-0" small>
-              <b-tab active>
-                <template #title>
-                  Prestação de Contas
-                  <b-badge variant="secondary" pill class="ml-1" v-if="prestacaocontaregistro">{{ prestacaocontaregistro.length }}</b-badge>
-                </template>
-                <div v-if="prestacaocontaregistro === null" class="text-center py-3">
-                  <b-spinner small></b-spinner> Carregando...
-                </div>
-                <div v-else-if="prestacaocontaregistro.length === 0" class="text-muted text-center py-3">
-                  Nenhum registro de prestação de contas encontrado.
-                  <div v-if="registro_selecionado.emendaloa">
-                    Verifique na Emenda Vinculada a Prestação de Contas.
+              <template v-for="(tab, index) in ordered_tabs">
+                <b-tab v-if="tab.key === 'prestacao'" :key="tab.key" :active="index === 0">
+                  <template #title>
+                    Prestação de Contas
+                    <b-badge variant="secondary" pill class="ml-1" v-if="prestacaocontaregistro">{{ prestacaocontaregistro.length }}</b-badge>
+                  </template>
+                  <div v-if="prestacaocontaregistro === null" class="text-center py-3">
+                    <b-spinner small></b-spinner> Carregando...
                   </div>
-                </div>
-                <b-table v-else
-                  :items="prestacaocontaregistro"
-                  :fields="prestacao_fields"
-                  :sort-by.sync="sortBy"
-                  :sort-desc.sync="sortDesc"
-                  small striped hover
-                  class="mb-0 text-center c-prestacao-table"
-                >
-                  <template #cell(prestacao_conta)="data">
-                    <a v-if="data.value && data.item.link_detail_backend" :href="data.item.link_detail_backend" target="_blank" class="small" :title="data.value.__str__">{{ data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</a>
-                    <span v-else class="small">{{ data.value && data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</span>
-                  </template>
-                  <template #cell(detalhamento)="data">
-                    <span class="small">{{ data.value || '—' }}</span>
-                  </template>
-                  <template #cell(situacao)="data">
-                    <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
-                  </template>
-                </b-table>
-              </b-tab>
+                  <div v-else-if="prestacaocontaregistro.length === 0" class="text-muted text-center py-3">
+                    Nenhum registro de prestação de contas encontrado.
+                    <div v-if="registro_selecionado.emendaloa">
+                      Verifique na Emenda Vinculada a Prestação de Contas.
+                    </div>
+                  </div>
+                  <b-table v-else
+                    :items="prestacaocontaregistro"
+                    :fields="prestacao_fields"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
+                    small striped hover
+                    class="mb-0 text-center c-prestacao-table"
+                  >
+                    <template #cell(prestacao_conta)="data">
+                      <a v-if="data.value && data.item.link_detail_backend" :href="data.item.link_detail_backend" target="_blank" class="small" :title="data.value.__str__">{{ data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</a>
+                      <span v-else class="small">{{ data.value && data.value.data_envio ? data.value.data_envio.split('-').reverse().join('/') : '—' }}</span>
+                    </template>
+                    <template #cell(detalhamento)="data">
+                      <span class="small">{{ data.value || '—' }}</span>
+                    </template>
+                    <template #cell(situacao)="data">
+                      <b-badge :variant="situacao_variant(data.value)">{{ situacao_label(data.value) }}</b-badge>
+                    </template>
+                  </b-table>
+                </b-tab>
 
-              <b-tab v-if="registro_selecionado.__label__ === 'loa_emendaloa'">
-                <template #title>
-                  Ajustes vinculados à Emenda
-                  <b-badge variant="secondary" pill class="ml-1" v-if="ajustes_emendas_selecionados">{{ ajustes_emendas_selecionados.length }}</b-badge>
-                </template>
-                <div v-if="ajustes_emendas_selecionados === null" class="text-center py-2">
-                  <b-spinner small></b-spinner> Carregando...
-                </div>
-                <div v-else-if="ajustes_emendas_selecionados.length === 0" class="text-muted small py-3 text-center">
-                  Nenhum ajuste vinculado a esta emenda.
-                </div>
-                <b-table v-else
-                  :items="ajustes_emendas_selecionados"
-                  :fields="ajustes_fields"
-                  small striped hover
-                  class="mb-0"
-                >
-                  <template #cell(str_valor)="data">
-                    <span class="text-nowrap">R$ {{ data.value }}</span>
+                <b-tab v-if="tab.key === 'ajustes'" :key="tab.key" :active="index === 0">
+                  <template #title>
+                    Ajustes vinculados à Emenda
+                    <b-badge variant="secondary" pill class="ml-1" v-if="ajustes_emendas_selecionados">{{ ajustes_emendas_selecionados.length }}</b-badge>
                   </template>
-                  <template #cell(descricao)="data">
-                    <a :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value }}</a>
-                  </template>
-                  <template #cell(oficio_ajuste_loa)="data">
-                    <a v-if="data.value && data.value.link_detail_backend"
-                      :href="data.value.link_detail_backend"
-                      target="_blank"
-                      class="btn btn-sm btn-outline-secondary"
-                      title="Abrir ofício"
-                    >
-                      <i class="fas fa-external-link-alt mr-1"></i>{{ data.value.__str__ || 'Ofício' }}
-                    </a>
-                    <span v-else class="small">{{ data.value ? data.value.__str__ : '—' }}</span>
-                  </template>
-                </b-table>
-              </b-tab>
+                  <div v-if="ajustes_emendas_selecionados === null" class="text-center py-2">
+                    <b-spinner small></b-spinner> Carregando...
+                  </div>
+                  <div v-else-if="ajustes_emendas_selecionados.length === 0" class="text-muted small py-3 text-center">
+                    Nenhum ajuste vinculado a esta emenda.
+                  </div>
+                  <b-table v-else
+                    :items="ajustes_emendas_selecionados"
+                    :fields="ajustes_fields"
+                    small striped hover
+                    class="mb-0"
+                  >
+                    <template #cell(str_valor)="data">
+                      <span class="text-nowrap">R$ {{ data.value }}</span>
+                    </template>
+                    <template #cell(descricao)="data">
+                      <a :href="data.item.link_detail_backend" target="_blank" class="small">{{ data.value }}</a>
+                    </template>
+                    <template #cell(oficio_ajuste_loa)="data">
+                      <a v-if="data.value && data.value.link_detail_backend"
+                        :href="data.value.link_detail_backend"
+                        target="_blank"
+                        class="btn btn-sm btn-outline-secondary"
+                        title="Abrir ofício"
+                      >
+                        <i class="fas fa-external-link-alt mr-1"></i>{{ data.value.__str__ || 'Ofício' }}
+                      </a>
+                      <span v-else class="small">{{ data.value ? data.value.__str__ : '—' }}</span>
+                    </template>
+                  </b-table>
+                </b-tab>
 
-              <b-tab v-if="registro_selecionado.__label__ === 'loa_emendaloa' && registro_selecionado.materia">
-                <template #title>
-                  Documentos Acessórios
-                  <b-badge variant="secondary" pill class="ml-1" v-if="documentos_acessorios">{{ documentos_acessorios.length }}</b-badge>
-                </template>
-                <div v-if="documentos_acessorios === null" class="text-center py-2">
-                  <b-spinner small></b-spinner> Carregando...
-                </div>
-                <div v-else-if="documentos_acessorios.length === 0" class="text-muted small py-3 text-center">
-                  Nenhum documento acessório encontrado para a matéria vinculada.
-                </div>
-                <b-table v-else
-                  :items="documentos_acessorios"
-                  :fields="documentos_acessorios_fields"
-                  small striped hover
-                  class="mb-0"
-                >
-                  <template #cell(tipo)="data">
-                    <span class="small">{{ data.value ? (data.value.__str__ || data.value) : '—' }}</span>
+                <b-tab v-if="tab.key === 'documentos'" :key="tab.key" :active="index === 0">
+                  <template #title>
+                    Documentos Acessórios
+                    <b-badge variant="secondary" pill class="ml-1" v-if="documentos_acessorios">{{ documentos_acessorios.length }}</b-badge>
                   </template>
-                  <template #cell(data)="data">
-                    <span class="small">{{ data.value ? data.value.split('-').reverse().join('/') : '—' }}</span>
-                  </template>
-                  <template #cell(autor)="data">
-                    <span class="small">{{ data.value || '—' }}</span>
-                  </template>
-                  <template #cell(arquivo)="data">
-                    <a v-if="data.value" :href="data.value" target="_blank" class="btn btn-sm btn-outline-secondary">
-                      <i class="fas fa-download mr-1"></i>Baixar
-                    </a>
-                    <span v-else class="small">—</span>
-                  </template>
-                </b-table>
-              </b-tab>
+                  <div v-if="documentos_acessorios === null" class="text-center py-2">
+                    <b-spinner small></b-spinner> Carregando...
+                  </div>
+                  <div v-else-if="documentos_acessorios.length === 0" class="text-muted small py-3 text-center">
+                    Nenhum documento acessório encontrado para a matéria vinculada.
+                  </div>
+                  <b-table v-else
+                    :items="documentos_acessorios"
+                    :fields="documentos_acessorios_fields"
+                    small striped hover
+                    class="mb-0"
+                  >
+                    <template #cell(tipo)="data">
+                      <span class="small">{{ data.value ? (data.value.__str__ || data.value) : '—' }}</span>
+                    </template>
+                    <template #cell(data)="data">
+                      <span class="small">{{ data.value ? data.value.split('-').reverse().join('/') : '—' }}</span>
+                    </template>
+                    <template #cell(autor)="data">
+                      <span class="small">{{ data.value || '—' }}</span>
+                    </template>
+                    <template #cell(arquivo)="data">
+                      <a v-if="data.value" :href="data.value" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="fas fa-download mr-1"></i>Baixar
+                      </a>
+                      <span v-else class="small">—</span>
+                    </template>
+                  </b-table>
+                </b-tab>
+              </template>
             </b-tabs>
           </template>
           <div v-else class="text-muted text-center py-5">
@@ -327,6 +329,31 @@ export default {
         { key: 'autor', label: 'Autor' },
         { key: 'arquivo', label: 'Arquivo' }
       ]
+    },
+    ordered_tabs: function () {
+      const tabs = []
+      const isEmenda = this.registro_selecionado && this.registro_selecionado.__label__ === 'loa_emendaloa'
+
+      tabs.push({
+        key: 'prestacao',
+        hasData: Array.isArray(this.prestacaocontaregistro) && this.prestacaocontaregistro.length > 0
+      })
+
+      if (isEmenda) {
+        tabs.push({
+          key: 'ajustes',
+          hasData: Array.isArray(this.ajustes_emendas_selecionados) && this.ajustes_emendas_selecionados.length > 0
+        })
+      }
+
+      if (isEmenda && this.registro_selecionado.materia) {
+        tabs.push({
+          key: 'documentos',
+          hasData: Array.isArray(this.documentos_acessorios) && this.documentos_acessorios.length > 0
+        })
+      }
+
+      return tabs.sort((a, b) => (b.hasData ? 1 : 0) - (a.hasData ? 1 : 0))
     }
   },
   watch: {
