@@ -199,6 +199,41 @@
                   </template>
                 </b-table>
               </b-tab>
+
+              <b-tab v-if="registro_selecionado.__label__ === 'loa_emendaloa' && registro_selecionado.materia">
+                <template #title>
+                  Documentos Acessórios
+                  <b-badge variant="secondary" pill class="ml-1" v-if="documentos_acessorios">{{ documentos_acessorios.length }}</b-badge>
+                </template>
+                <div v-if="documentos_acessorios === null" class="text-center py-2">
+                  <b-spinner small></b-spinner> Carregando...
+                </div>
+                <div v-else-if="documentos_acessorios.length === 0" class="text-muted small py-3 text-center">
+                  Nenhum documento acessório encontrado para a matéria vinculada.
+                </div>
+                <b-table v-else
+                  :items="documentos_acessorios"
+                  :fields="documentos_acessorios_fields"
+                  small striped hover
+                  class="mb-0"
+                >
+                  <template #cell(tipo)="data">
+                    <span class="small">{{ data.value ? (data.value.__str__ || data.value) : '—' }}</span>
+                  </template>
+                  <template #cell(data)="data">
+                    <span class="small">{{ data.value ? data.value.split('-').reverse().join('/') : '—' }}</span>
+                  </template>
+                  <template #cell(autor)="data">
+                    <span class="small">{{ data.value || '—' }}</span>
+                  </template>
+                  <template #cell(arquivo)="data">
+                    <a v-if="data.value" :href="data.value" target="_blank" class="btn btn-sm btn-outline-secondary">
+                      <i class="fas fa-download mr-1"></i>Baixar
+                    </a>
+                    <span v-else class="small">—</span>
+                  </template>
+                </b-table>
+              </b-tab>
             </b-tabs>
           </template>
           <div v-else class="text-muted text-center py-5">
@@ -248,6 +283,7 @@ export default {
       registro_selecionado: null,
       ajustes_emendas_selecionados: [],
       prestacaocontaregistro: null,
+      documentos_acessorios: null,
       sortBy: 'prestacao_conta',
       sortDesc: false,
       fetching: false
@@ -281,6 +317,15 @@ export default {
         { key: 'str_valor', label: 'Valor' },
         { key: 'descricao', label: 'Descrição' },
         { key: 'oficio_ajuste_loa', label: 'Ofício' }
+      ]
+    },
+    documentos_acessorios_fields: function () {
+      return [
+        { key: 'nome', label: 'Nome' },
+        { key: 'tipo', label: 'Tipo' },
+        { key: 'data', label: 'Data' },
+        { key: 'autor', label: 'Autor' },
+        { key: 'arquivo', label: 'Arquivo' }
       ]
     }
   },
@@ -341,6 +386,7 @@ export default {
       this.registro_selecionado = registro
       this.prestacaocontaregistro = null
       this.ajustes_emendas_selecionados = null
+      this.documentos_acessorios = null
 
       const params = {
         [registro.__label__ === 'loa_emendaloa' ? 'emendaloa' : 'registro_ajuste']: registro.id,
@@ -358,6 +404,9 @@ export default {
 
       if (registro.__label__ === 'loa_emendaloa') {
         this.fetch_registroajusteloa(registro)
+        if (registro.materia) {
+          this.fetch_documentos_acessorios(registro)
+        }
       }
     },
     fetch_registroajusteloa (registro) {
@@ -375,11 +424,27 @@ export default {
           this.ajustes_emendas_selecionados = response.data
         })
     },
+    fetch_documentos_acessorios (registro) {
+      const materiaId = typeof registro.materia === 'object' ? registro.materia.id : registro.materia
+      const params = {
+        materia: materiaId,
+        get_all: 'True'
+      }
+      this.utils.fetch({
+        app: 'materia',
+        model: 'documentoacessorio',
+        params
+      })
+        .then((response) => {
+          this.documentos_acessorios = response.data
+        })
+    },
 
     fetch () {
       this.registro_selecionado = null
       this.prestacaocontaregistro = null
       this.ajustes_emendas_selecionados = null
+      this.documentos_acessorios = null
       this.fetching = true
 
       const promises = {}
@@ -391,8 +456,8 @@ export default {
           loa: this.loa.id,
           o: '-tipo,fase,materia__tipo__sigla,materia__numero',
           exclude: 'search;parlamentares.metadata',
-          include: 'parlamentares.id,__str__;unidade.id,__str__',
-          expand: 'parlamentares;unidade',
+          include: 'parlamentares.id,__str__;unidade.id,__str__;materia.id',
+          expand: 'parlamentares;unidade;materia',
           get_all: 'True', // parâmetro para retornar todas as emendas sem paginação, visto que o número de emendas é relativamente baixo
           situacao: this.filters_value.situacao.join(',')
         }
