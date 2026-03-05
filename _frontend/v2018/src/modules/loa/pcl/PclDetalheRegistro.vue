@@ -2,14 +2,17 @@
   <div class="pcl-detalhe-registro">
     <template v-if="registro">
       <div class="card mb-3">
-        <div class="card-header d-flex align-items-center justify-content-between py-2">
+        <div
+          class="card-header d-flex align-items-center justify-content-between py-2"
+        >
           <div>
             <b-badge :variant="itemBadgeVariant(registro)" class="mr-2">
               {{ registroBadgeLabel(registro) }}
             </b-badge>
             <span class="font-weight-bold">Prestação de Contas</span>
           </div>
-          <a :href="registro.link_detail_backend"
+          <a
+            :href="registro.link_detail_backend"
             target="_blank"
             class="btn btn-sm btn-outline-secondary"
             title="Abrir detalhes no painel administrativo"
@@ -24,52 +27,118 @@
           <p class="mb-2" v-else>
             {{ registro.descricao }}
           </p>
-          <div class="row small text-muted mt-1" v-if="registro.unidade || (registro.parlamentares && registro.parlamentares.length)">
+          <div
+            class="row small text-muted mt-1"
+            v-if="
+              registro.unidade ||
+              (registro.parlamentares && registro.parlamentares.length)
+            "
+          >
             <div class="col-12" v-if="registro.emendaloa">
-              <strong>Vinculado à Emenda:</strong> {{ registro.emendaloa.__str__ }}
+              <strong>Vinculado à Emenda:</strong>
+              {{ registro.emendaloa.__str__ }}
             </div>
             <div class="col-12" v-if="registro.unidade">
               <i class="fas fa-building mr-1"></i>
-              <strong>Unidade Orçamentária:</strong> {{ registro.unidade.__str__ }}
+              <strong>Unidade Orçamentária:</strong>
+              {{ registro.unidade.__str__ }}
             </div>
-            <div class="col-12" v-if="registro.parlamentares && registro.parlamentares.length">
+            <div
+              class="col-12"
+              v-if="registro.parlamentares && registro.parlamentares.length"
+            >
               <i class="fas fa-users mr-1"></i>
-              <strong>Parlamentares:</strong> {{ registro.parlamentares.map(p => p.__str__).join(', ') }}
+              <strong>Parlamentares:</strong>
+              {{ registro.parlamentares.map((p) => p.__str__).join(", ") }}
             </div>
           </div>
         </div>
       </div>
 
-      <b-tabs v-if="showTabs" class="pcl-tabs-detalhe" content-class="mt-0" small>
+      <b-tabs
+        v-if="showTabs"
+        class="pcl-tabs-detalhe"
+        content-class="mt-0"
+        small
+      >
         <template v-for="(tab, index) in orderedTabs">
-          <b-tab v-if="tab.key === 'prestacao'" :key="tab.key" :active="index === 0">
+          <b-tab
+            v-if="tab.key === 'prestacao'"
+            :key="tab.key"
+            :active="index === 0"
+          >
             <template #title>
               Prestação de Contas
-              <b-badge variant="secondary" pill class="ml-1" v-if="prestacaoItems">{{ prestacaoItems.length }}</b-badge>
+              <b-badge
+                variant="secondary"
+                pill
+                class="ml-1"
+                v-if="prestacaoItems"
+                >{{ prestacaoItems.length }}</b-badge
+              >
             </template>
             <pcl-tab-prestacao :items="prestacaoItems" :registro="registro" />
           </b-tab>
 
-          <b-tab v-if="tab.key === 'ajustes'" :key="tab.key" :active="index === 0">
+          <b-tab
+            v-if="tab.key === 'ajustes'"
+            :key="tab.key"
+            :active="index === 0"
+          >
             <template #title>
               Ajustes vinculados à Emenda
-              <b-badge variant="secondary" pill class="ml-1" v-if="ajustesItems">{{ ajustesItems.length }}</b-badge>
+              <b-badge
+                variant="secondary"
+                pill
+                class="ml-1"
+                v-if="ajustesItems"
+                >{{ ajustesItems.length }}</b-badge
+              >
             </template>
             <pcl-tab-ajustes :items="ajustesItems" />
           </b-tab>
 
-          <b-tab v-if="tab.key === 'documentos'" :key="tab.key" :active="index === 0">
+          <b-tab
+            v-if="tab.key === 'documentos'"
+            :key="tab.key"
+            :active="index === 0"
+          >
             <template #title>
               Documentos Acessórios
-              <b-badge variant="secondary" pill class="ml-1" v-if="documentosItems">{{ documentosItems.length }}</b-badge>
+              <b-badge
+                variant="secondary"
+                pill
+                class="ml-1"
+                v-if="documentosItems"
+                >{{ documentosItems.length }}</b-badge
+              >
             </template>
             <pcl-tab-documentos :items="documentosItems" />
+          </b-tab>
+
+          <b-tab
+            v-if="tab.key === 'tramitacoes'"
+            :key="tab.key"
+            :active="index === 0"
+          >
+            <template #title>
+              Tramitações
+              <b-badge
+                variant="secondary"
+                pill
+                class="ml-1"
+                v-if="tramitacoesItems"
+                >{{ tramitacoesItems.length }}</b-badge
+              >
+            </template>
+            <pcl-tab-tramitacoes :items="tramitacoesItems" />
           </b-tab>
         </template>
       </b-tabs>
     </template>
     <div v-else class="text-muted text-center py-5">
-      Selecione uma emenda ou ajuste para ver os registros de prestação de contas.
+      Selecione uma emenda ou ajuste para ver os registros de prestação de
+      contas.
     </div>
   </div>
 </template>
@@ -83,13 +152,15 @@ import {
 import PclTabPrestacao from './tabs/PclTabPrestacao.vue'
 import PclTabAjustes from './tabs/PclTabAjustes.vue'
 import PclTabDocumentos from './tabs/PclTabDocumentos.vue'
+import PclTabTramitacoes from './tabs/PclTabTramitacoes.vue'
 
 export default {
   name: 'pcl-detalhe-registro',
   components: {
     PclTabPrestacao,
     PclTabAjustes,
-    PclTabDocumentos
+    PclTabDocumentos,
+    PclTabTramitacoes
   },
   props: {
     registro: {
@@ -107,6 +178,10 @@ export default {
     documentosItems: {
       type: Array,
       default: null
+    },
+    tramitacoesItems: {
+      type: Array,
+      default: null
     }
   },
   computed: {
@@ -121,20 +196,30 @@ export default {
 
       tabs.push({
         key: 'prestacao',
-        hasData: Array.isArray(this.prestacaoItems) && this.prestacaoItems.length > 0
+        hasData:
+          Array.isArray(this.prestacaoItems) && this.prestacaoItems.length > 0
       })
 
       if (emenda) {
         tabs.push({
           key: 'ajustes',
-          hasData: Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0
+          hasData:
+            Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0
         })
       }
 
       if (emenda && this.registro.materia) {
         tabs.push({
+          key: 'tramitacoes',
+          hasData:
+            Array.isArray(this.tramitacoesItems) &&
+            this.tramitacoesItems.length > 0
+        })
+        tabs.push({
           key: 'documentos',
-          hasData: Array.isArray(this.documentosItems) && this.documentosItems.length > 0
+          hasData:
+            Array.isArray(this.documentosItems) &&
+            this.documentosItems.length > 0
         })
       }
 
