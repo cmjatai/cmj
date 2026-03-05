@@ -24,6 +24,7 @@
             :prestacao-items="prestacaocontaregistro"
             :ajustes-items="ajustes_emendas_selecionados"
             :documentos-items="documentos_acessorios"
+            :tramitacoes-items="tramitacoes"
           />
         </div>
       </div>
@@ -74,6 +75,7 @@ export default {
       ajustes_emendas_selecionados: [],
       prestacaocontaregistro: null,
       documentos_acessorios: null,
+      tramitacoes: null,
       fetching: false
     }
   },
@@ -84,13 +86,28 @@ export default {
     },
     parlamentares_choice () {
       if (this.loa.parlamentares && this.loa.parlamentares.length > 1) {
-        return [{ value: null, text: '----------------' }, ...this.loa.parlamentares.map(p => ({ value: p, text: p.nome_parlamentar }))]
+        return [
+          { value: null, text: '----------------' },
+          ...this.loa.parlamentares.map((p) => ({
+            value: p,
+            text: p.nome_parlamentar
+          }))
+        ]
       }
-      return this.loa.parlamentares ? this.loa.parlamentares.map(p => ({ value: p, text: p.nome_parlamentar })) : []
+      return this.loa.parlamentares
+        ? this.loa.parlamentares.map((p) => ({
+          value: p,
+          text: p.nome_parlamentar
+        }))
+        : []
     },
     emendas_ajustes_list () {
-      const emendas = Array.isArray(this.results.emendas) ? this.results.emendas : []
-      const ajustes = Array.isArray(this.results.ajustes) ? this.results.ajustes : []
+      const emendas = Array.isArray(this.results.emendas)
+        ? this.results.emendas
+        : []
+      const ajustes = Array.isArray(this.results.ajustes)
+        ? this.results.ajustes
+        : []
       return [...emendas, ...ajustes]
     }
   },
@@ -101,10 +118,16 @@ export default {
         if (!this.ready) return
         // sincroniza parâmetros com o histórico de rotas
         const query = {}
-        this.filters.forEach(f => {
-          if (this.filters_value[f] !== null && this.filters_value[f] !== undefined) {
+        this.filters.forEach((f) => {
+          if (
+            this.filters_value[f] !== null &&
+            this.filters_value[f] !== undefined
+          ) {
             const val = this.filters_value[f]
-            query[f] = (typeof val === 'object' && val !== null && !Array.isArray(val)) ? val.id : val
+            query[f] =
+              typeof val === 'object' && val !== null && !Array.isArray(val)
+                ? val.id
+                : val
           }
         })
         this.$router.replace({ query })
@@ -129,17 +152,19 @@ export default {
       this.prestacaocontaregistro = null
       this.ajustes_emendas_selecionados = null
       this.documentos_acessorios = null
+      this.tramitacoes = null
 
       const params = {
         [registro.__label__ === 'loa_emendaloa' ? 'emendaloa' : 'registro_ajuste']: registro.id,
         get_all: 'True',
         expand: 'prestacao_conta'
       }
-      this.utils.fetch({
-        app: 'loa',
-        model: 'prestacaocontaregistro',
-        params
-      })
+      this.utils
+        .fetch({
+          app: 'loa',
+          model: 'prestacaocontaregistro',
+          params
+        })
         .then((response) => {
           this.prestacaocontaregistro = response.data
         })
@@ -148,6 +173,7 @@ export default {
         this.fetch_registroajusteloa(registro)
         if (registro.materia) {
           this.fetch_documentos_acessorios(registro)
+          this.fetch_tramitacoes(registro)
         }
       }
     },
@@ -158,30 +184,56 @@ export default {
         get_all: 'True',
         expand: 'oficio_ajuste_loa;unidade'
       }
-      this.utils.fetch({
-        app: 'loa',
-        model: 'registroajusteloa',
-        params
-      })
+      this.utils
+        .fetch({
+          app: 'loa',
+          model: 'registroajusteloa',
+          params
+        })
         .then((response) => {
           this.ajustes_emendas_selecionados = response.data
         })
     },
 
     fetch_documentos_acessorios (registro) {
-      const materiaId = typeof registro.materia === 'object' ? registro.materia.id : registro.materia
+      const materiaId =
+        typeof registro.materia === 'object'
+          ? registro.materia.id
+          : registro.materia
       const params = {
         materia: materiaId,
         get_all: 'True',
         expand: 'tipo'
       }
-      this.utils.fetch({
-        app: 'materia',
-        model: 'documentoacessorio',
-        params
-      })
+      this.utils
+        .fetch({
+          app: 'materia',
+          model: 'documentoacessorio',
+          params
+        })
         .then((response) => {
           this.documentos_acessorios = response.data
+        })
+    },
+
+    fetch_tramitacoes (registro) {
+      const materiaId =
+        typeof registro.materia === 'object'
+          ? registro.materia.id
+          : registro.materia
+      const params = {
+        materia: materiaId,
+        get_all: 'True',
+        expand: 'unidade_tramitacao_destino;status'
+      }
+      this.utils
+        .fetch({
+          app: 'materia',
+          model: 'tramitacao',
+          params
+        })
+        .then((response) => {
+          this.tramitacoes = response.data
         })
     },
 
@@ -190,11 +242,18 @@ export default {
       this.prestacaocontaregistro = null
       this.ajustes_emendas_selecionados = null
       this.documentos_acessorios = null
+      this.tramitacoes = null
       this.fetching = true
 
       const promises = {}
-      const fetchEmendas = (this.filters_value.emendas === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')
-      const fetchAjustes = (this.filters_value.ajustes === 'True') | (this.filters_value.ajustes === 'False' && this.filters_value.emendas === 'False')
+      const fetchEmendas =
+        (this.filters_value.emendas === 'True') |
+        (this.filters_value.ajustes === 'False' &&
+          this.filters_value.emendas === 'False')
+      const fetchAjustes =
+        (this.filters_value.ajustes === 'True') |
+        (this.filters_value.ajustes === 'False' &&
+          this.filters_value.emendas === 'False')
 
       if (fetchEmendas) {
         const params_emendas = {
@@ -206,10 +265,16 @@ export default {
           get_all: 'True',
           situacao: this.filters_value.situacao.join(',')
         }
-        if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {
+        if (
+          this.filters_value.unidade &&
+          typeof this.filters_value.unidade === 'object'
+        ) {
           params_emendas.unidade = this.filters_value.unidade.id
         }
-        if (this.filters_value.parlamentares && typeof this.filters_value.parlamentares === 'object') {
+        if (
+          this.filters_value.parlamentares &&
+          typeof this.filters_value.parlamentares === 'object'
+        ) {
           params_emendas.parlamentares = this.filters_value.parlamentares.id
         }
         if (this.filters_value.search) {
@@ -229,14 +294,21 @@ export default {
           expand: 'emendaloa.id,__str__;unidade',
           o: 'parlamentares_valor__nome_parlamentar'
         }
-        if (this.filters_value.unidade && typeof this.filters_value.unidade === 'object') {
+        if (
+          this.filters_value.unidade &&
+          typeof this.filters_value.unidade === 'object'
+        ) {
           params_ajustes.unidade = this.filters_value.unidade.id
         }
         if (this.filters_value.search) {
           params_ajustes.search = this.filters_value.search
         }
-        if (this.filters_value.parlamentares && typeof this.filters_value.parlamentares === 'object') {
-          params_ajustes.parlamentares_valor = this.filters_value.parlamentares.id
+        if (
+          this.filters_value.parlamentares &&
+          typeof this.filters_value.parlamentares === 'object'
+        ) {
+          params_ajustes.parlamentares_valor =
+            this.filters_value.parlamentares.id
         }
         params_ajustes.situacao = this.filters_value.situacao.join(',')
         params_ajustes.get_all = 'True'
@@ -249,29 +321,31 @@ export default {
       }
 
       const keys = Object.keys(promises)
-      return Promise.all(Object.values(promises)).then((responses) => {
-        const newResults = { emendas: {}, ajustes: {} }
-        keys.forEach((key, i) => {
-          newResults[key] = responses[i].data
+      return Promise.all(Object.values(promises))
+        .then((responses) => {
+          const newResults = { emendas: {}, ajustes: {} }
+          keys.forEach((key, i) => {
+            newResults[key] = responses[i].data
+          })
+          this.results = newResults
+          this.$nextTick(() => {
+            if (this.emendas_ajustes_list.length > 0) {
+              this.fetch_prestacaocontaregistro(this.emendas_ajustes_list[0])
+            }
+          })
         })
-        this.results = newResults
-        this.$nextTick(() => {
-          if (this.emendas_ajustes_list.length > 0) {
-            this.fetch_prestacaocontaregistro(this.emendas_ajustes_list[0])
-          }
+        .finally(() => {
+          this.fetching = false
         })
-      }).finally(() => {
-        this.fetching = false
-      })
     }
   },
   mounted () {
     const t = this
     t.removeAside()
     const query = t.$route.query
-    t.$nextTick()
-      .then(() => {
-        t.utils.fetch({
+    t.$nextTick().then(() => {
+      t.utils
+        .fetch({
           app: 'loa',
           model: 'loa',
           id: t.loa.id,
@@ -279,48 +353,52 @@ export default {
             expand: 'parlamentares'
           }
         })
-          .then((response) => {
-            t.loa = response.data
-            // aplica parâmetros da query string nos filtros
-            t.filters.forEach(f => {
-              if (query[f] !== undefined) {
-                if (f === 'situacao') {
-                  t.filters_value[f] = typeof query[f] === 'string' ? query[f].split(',') : query[f]
-                } else if (f === 'parlamentares') {
-                  const pid = parseInt(query[f])
-                  if (pid && t.loa.parlamentares) {
-                    const found = t.loa.parlamentares.find(p => p.id === pid)
-                    if (found) {
-                      t.filters_value[f] = found
-                    }
+        .then((response) => {
+          t.loa = response.data
+          // aplica parâmetros da query string nos filtros
+          t.filters.forEach((f) => {
+            if (query[f] !== undefined) {
+              if (f === 'situacao') {
+                t.filters_value[f] =
+                  typeof query[f] === 'string' ? query[f].split(',') : query[f]
+              } else if (f === 'parlamentares') {
+                const pid = parseInt(query[f])
+                if (pid && t.loa.parlamentares) {
+                  const found = t.loa.parlamentares.find((p) => p.id === pid)
+                  if (found) {
+                    t.filters_value[f] = found
                   }
-                } else if (f === 'unidade') {
-                  const uid = parseInt(query[f])
-                  if (uid) {
-                    t.$nextTick(() => {
-                      const unidadeSelect = t.$refs.filtros && t.$refs.filtros.getUnidadeSelectRef()
-                      if (unidadeSelect) {
-                        const checkOptions = () => {
-                          const opt = unidadeSelect.options.find(o => o.value && o.value.id === uid)
-                          if (opt) {
-                            t.filters_value.unidade = opt.value
-                          } else {
-                            setTimeout(checkOptions, 100)
-                          }
-                        }
-                        checkOptions()
-                      }
-                    })
-                  }
-                } else {
-                  t.filters_value[f] = query[f]
                 }
+              } else if (f === 'unidade') {
+                const uid = parseInt(query[f])
+                if (uid) {
+                  t.$nextTick(() => {
+                    const unidadeSelect =
+                      t.$refs.filtros && t.$refs.filtros.getUnidadeSelectRef()
+                    if (unidadeSelect) {
+                      const checkOptions = () => {
+                        const opt = unidadeSelect.options.find(
+                          (o) => o.value && o.value.id === uid
+                        )
+                        if (opt) {
+                          t.filters_value.unidade = opt.value
+                        } else {
+                          setTimeout(checkOptions, 100)
+                        }
+                      }
+                      checkOptions()
+                    }
+                  })
+                }
+              } else {
+                t.filters_value[f] = query[f]
               }
-            })
-            t.ready = true
-            t.fetch()
+            }
           })
-      })
+          t.ready = true
+          t.fetch()
+        })
+    })
   }
 }
 </script>

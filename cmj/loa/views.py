@@ -2000,7 +2000,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             docs = []
 
             qs_docs = [
-            ] if not el.materia else el.materia.documentoacessorio_set.order_by('-id')
+            ] if not el.materia else el.materia.documentoacessorio_set.order_by('-data')
             for doc in qs_docs:
                 doc_template = loader.get_template(
                     'materia/documentoacessorio_widget_itemlist.html')
