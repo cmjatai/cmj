@@ -11,9 +11,15 @@ from django.views.generic.detail import DetailView
 from sapl.materia.models import Autoria
 from sapl.sessao.filterviews import PesquisarSessaoPlenariaView
 
-from .forms import (PautaSessaoFilterSet, PautaComissaoFilterSet,)
-from .models import (ExpedienteMateria, ExpedienteSessao, OradorExpediente, OrdemDia,
-                     SessaoPlenaria, TipoSessaoPlenaria)
+from ..forms import PautaComissaoFilterSet, PautaSessaoFilterSet
+from ..models import (
+    ExpedienteMateria,
+    ExpedienteSessao,
+    OradorExpediente,
+    OrdemDia,
+    SessaoPlenaria,
+    TipoSessaoPlenaria,
+)
 
 
 class PautaSessaoView(TemplateView):
