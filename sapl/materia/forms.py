@@ -730,6 +730,12 @@ class TramitacaoForm(ModelForm):
 
     logger = logging.getLogger(__name__)
 
+    turno = forms.ChoiceField(
+        required=True,
+        choices=Tramitacao.TURNO_CHOICES,
+        label=_('Turno')
+    )
+
     class Meta:
         model = Tramitacao
         fields = ['data_tramitacao',

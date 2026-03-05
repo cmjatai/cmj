@@ -4,10 +4,10 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import Q, F
+from django.db.models import F, Q
 from django.db.models.fields.json import JSONField
 from django.db.models.fields.related import ManyToManyField
-from django.utils import timezone, formats
+from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
@@ -17,12 +17,22 @@ from cmj.mixins import CmjChoices
 from cmj.videos.models import VideoParte
 from sapl.base.models import Autor
 from sapl.materia.models import MateriaLegislativa, Tramitacao
-from sapl.parlamentares.models import (CargoMesa, Legislatura, Parlamentar,
-                                       Partido, SessaoLegislativa)
-from sapl.utils import (YES_NO_CHOICES, SaplGenericRelation,
-                        get_settings_auth_user_model,
-                        restringe_tipos_de_arquivo_txt, texto_upload_path,
-                        OverwriteStorage, PortalFileField)
+from sapl.parlamentares.models import (
+    CargoMesa,
+    Legislatura,
+    Parlamentar,
+    Partido,
+    SessaoLegislativa,
+)
+from sapl.utils import (
+    YES_NO_CHOICES,
+    OverwriteStorage,
+    PortalFileField,
+    SaplGenericRelation,
+    get_settings_auth_user_model,
+    restringe_tipos_de_arquivo_txt,
+    texto_upload_path,
+)
 
 
 class TipoSessaoPlenaria(models.Model):
@@ -405,11 +415,17 @@ class SessaoPlenaria(models.Model):
 
 
 class AbstractOrdemDia(models.Model):
+
+    SIMBOLICA = 1
+    NOMINAL = 2
+    SECRETA = 3
+    LEITURA = 4
+
     TIPO_VOTACAO_CHOICES = Choices(
-        (1, 'simbolica', 'Simbólica'),
-        (2, 'nominal', 'Nominal'),
-        (3, 'secreta', 'Secreta'),
-        (4, 'leitura', 'Leitura'),
+        (SIMBOLICA, 'simbolica', 'Simbólica'),
+        (NOMINAL, 'nominal', 'Nominal'),
+        (SECRETA, 'secreta', 'Secreta'),
+        (LEITURA, 'leitura', 'Leitura'),
     )
 
     sessao_plenaria = models.ForeignKey(
@@ -432,9 +448,11 @@ class AbstractOrdemDia(models.Model):
     numero_ordem = models.PositiveIntegerField(verbose_name=_('Nº Ordem'))
     resultado = models.TextField(blank=True, verbose_name=_('Resultado'))
     tipo_votacao = models.PositiveIntegerField(
-        verbose_name=_('Tipo de votação'), choices=TIPO_VOTACAO_CHOICES, default=1)
+        verbose_name=_('Tipo de votação'),
+        choices=TIPO_VOTACAO_CHOICES, default=SIMBOLICA)
 
-    discussao_aberta = models.BooleanField(null=True,
+    discussao_aberta = models.BooleanField(
+        null=True,
                                          blank=True,
                                          choices=YES_NO_CHOICES,
                                          verbose_name=_('Discussão aberta?'))

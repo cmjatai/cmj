@@ -24,3 +24,6 @@ numpy==2.2.3
 #sudo apt install tesseract-ocr
 #sudo apt install tesseract-ocr-por
 #sudo apt install jbig2enc
+
+black
+isort

@@ -37,8 +37,6 @@ urlpatterns = [
     re_path(r'^relatorios/sessao/(?P<pk>\d+)/pauta$',
         RelatorioPautaSessao.as_view(), name='rel_sessao_pauta'),
 
-
-
     # weaseprint
     re_path(r'^relatorios/(?P<pk>\d+)/sessao-plenaria-pdf$',
         relatorio_sessao_plenaria_pdf, name='relatorio_sessao_plenaria_pdf'),
