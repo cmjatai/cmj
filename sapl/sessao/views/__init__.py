@@ -163,7 +163,7 @@ def renumerar_materias_ordem(request, pk):
     ordens = OrdemDia.objects.filter(
         sessao_plenaria_id=pk,
         parent__isnull=True
-    )
+    ).order_by('numero_ordem')
 
     for ordem_num, o in enumerate(ordens, 1):
         o.numero_ordem = ordem_num * step
