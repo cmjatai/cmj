@@ -19,7 +19,12 @@
       class="mb-0"
     >
       <template #cell(data_tramitacao)="data">
-        <span class="small">{{ formatDateBR(data.value) }}</span>
+        <a v-if="data.value && data.item.link_detail_backend"
+           :href="data.item.link_detail_backend"
+           target="_blank"
+           class="small text-center d-block">
+         {{ formatDateBR(data.value) }}
+        </a>
       </template>
       <template #cell(data_fim_prazo)="data">
         <span class="small">{{ formatDateBR(data.value) }}</span>
