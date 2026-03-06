@@ -139,3 +139,8 @@ RetiradaPauta:
   - tipo_de_retirada materia
   - data parlamentar
   - observacao
+
+OcorrenciaSessao:
+  {% trans 'Ocorrência da Sessão' %}:
+  - numero_ordem:2 expediente ordemdia
+  - conteudo
