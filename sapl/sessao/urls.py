@@ -13,7 +13,7 @@ from sapl.sessao.views import (
     JustificativaAusenciaCrud,
     MateriaOrdemDiaCrud,
     MesaView,
-    OcorrenciaSessaoView,
+    OcorrenciaSessaoCrud,
     OradorCrud,
     OradorExpedienteCrud,
     OradorOrdemDiaCrud,
@@ -87,6 +87,7 @@ urlpatterns = [
             + MateriaOrdemDiaCrud.get_urls()
             + OradorOrdemDiaCrud.get_urls()
             + RetiradaPautaCrud.get_urls()
+            + OcorrenciaSessaoCrud.get_urls()
         ),
     ),
     re_path(r"^sessao/(?P<pk>\d+)/mesa$", MesaView.as_view(), name="mesa"),
@@ -200,11 +201,6 @@ urlpatterns = [
     # Subnav sessão
     re_path(
         r"^sessao/(?P<pk>\d+)/expediente$", ExpedienteView.as_view(), name="expediente"
-    ),
-    re_path(
-        r"^sessao/(?P<pk>\d+)/ocorrencia_sessao$",
-        OcorrenciaSessaoView.as_view(),
-        name="ocorrencia_sessao",
     ),
     re_path(r"^sessao/(?P<pk>\d+)/presenca$", PresencaView.as_view(), name="presenca"),
     re_path(r"^sessao/(?P<pk>\d+)/painel$", PainelView.as_view(), name="painel"),

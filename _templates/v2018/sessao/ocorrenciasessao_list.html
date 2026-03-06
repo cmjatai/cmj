@@ -1,0 +1,11 @@
+{% extends "crud/list.html" %}
+{% load i18n %}
+{% load common_tags %}
+
+{% block more_buttons_left %}
+  {% if perms|get_add_perm:view %}
+    <a href="?renumerar_ordem&step=1" class="btn btn-outline-primary">
+      {% blocktrans with verbose_name=view.verbose_name %} Renumerar Ordem {% endblocktrans %}
+    </a>
+  {% endif %}
+{% endblock more_buttons_left %}
