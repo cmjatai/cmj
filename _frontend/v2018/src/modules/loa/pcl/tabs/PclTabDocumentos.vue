@@ -10,7 +10,7 @@
       :items="items"
       :fields="fields"
       small striped hover
-      class="mb-0 text-center"
+      class="mb-0"
     >
       <template #cell(nome)="data">
         <a v-if="data.value && data.item.link_detail_backend"
@@ -27,8 +27,9 @@
       <template #cell(data)="data">
         <span class="small">{{ formatDateBR(data.value) }}</span>
       </template>
-      <template #cell(autor)="data">
+      <template #cell(ementa)="data">
         <span class="small">{{ data.value || '—' }}</span>
+        <br>(<i class="small">{{ data.item.autor }}</i>)
       </template>
       <template #cell(arquivo)="data">
         <a v-if="data.value" :href="data.value" target="_blank" class="btn btn-sm btn-outline-secondary">
@@ -57,7 +58,7 @@ export default {
         { key: 'nome', label: 'Nome' },
         { key: 'tipo', label: 'Tipo' },
         { key: 'data', label: 'Data' },
-        { key: 'autor', label: 'Autor' },
+        { key: 'ementa', label: 'Ementa' },
         { key: 'arquivo', label: 'Arquivo' }
       ]
     }
