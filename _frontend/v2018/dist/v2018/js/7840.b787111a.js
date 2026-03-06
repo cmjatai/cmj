@@ -1,1 +1,0 @@
-"use strict";(self["webpackChunkportalcmj_frontend"]=self["webpackChunkportalcmj_frontend"]||[]).push([[7840],{7840:function(n,t,e){e.r(t),e.d(t,{default:function(){return f}});var u=function(){var n=this,t=n._self._c;return t("div",[t("router-view")],1)},r=[],l={name:"loa-layout",methods:{},mounted:function(){}},o=l,a=e(1656),c=(0,a.A)(o,u,r,!1,null,null,null),f=c.exports}}]);
