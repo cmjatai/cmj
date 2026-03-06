@@ -54,7 +54,7 @@ WeasyPrint==68.0
 python-docx==1.1.2
 XlsxWriter==3.2.0
 Pillow==12.1.1
-markdown==3.7
+markdown==3.8.1
 
 reportlab==4.2.5
 rl-renderPM==4.0.3
