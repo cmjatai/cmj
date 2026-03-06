@@ -1,0 +1,1 @@
+"use strict";(self["webpackChunkportalcmj_frontend"]=self["webpackChunkportalcmj_frontend"]||[]).push([[1774],{1774:function(n,e,t){var c=t(4692),o=t.n(c);t(4692);window["$"]=o()}}]);
