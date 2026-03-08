@@ -1,0 +1,8 @@
+{% load common_tags %}
+{% if presenca_ordem %}
+    <strong>| LISTA DE PRESENÇA NA ORDEM DO DIA: </strong>
+    {% for p in presenca_ordem %}
+        {{p.nome_completo}} / {% if p|filiacao_data_filter:object.data_inicio %} {{ p|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %}
+        {% if not forloop.last %} ; {% endif %}
+    {% endfor %}
+{% endif %}

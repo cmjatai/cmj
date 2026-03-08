@@ -69,7 +69,7 @@ from sapl.sessao.views.pautas import (
     PesquisarPautaComissaoView,
     PesquisarPautaSessaoView,
 )
-from sapl.sessao.views.resumos import ResumoAtaView, ResumoView
+from sapl.sessao.views.resumos import ResumoAtaPdfView, ResumoAtaView, ResumoView
 
 from .apps import AppConfig
 
@@ -231,7 +231,14 @@ urlpatterns = [
     ),
     re_path(r"^sessao/(?P<pk>\d+)/resumo$", ResumoView.as_view(), name="resumo"),
     re_path(
-        r"^sessao/(?P<pk>\d+)/resumo_ata$", ResumoAtaView.as_view(), name="resumo_ata"
+        r"^sessao/(?P<pk>\d+)/ata_eletronica$",
+        ResumoAtaView.as_view(),
+        name="resumo_ata",
+    ),
+    re_path(
+        r"^sessao/(?P<pk>\d+)/ata_eletronica.pdf$",
+        ResumoAtaPdfView.as_view(),
+        name="resumo_ata_pdf",
     ),
     re_path(
         r"^sessao/pesquisar-sessao$",

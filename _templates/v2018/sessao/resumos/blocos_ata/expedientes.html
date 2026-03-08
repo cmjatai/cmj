@@ -1,0 +1,9 @@
+{% if expedientes %}
+    <strong>| EXPEDIENTES: </strong>
+    {% for e in expedientes %}
+        {% if e.conteudo %}
+            <b>{{e.tipo}}</b>:
+            {{e.conteudo|striptags|safe}}
+        {% endif %}
+    {% endfor %}
+{% endif %}

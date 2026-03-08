@@ -1,0 +1,41 @@
+{% extends "crud/detail.html" %}
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+  <h1 class="page-header">
+    Ata Eletrônica da <small><small>({{sessaoplenaria}})</small></small>
+  </h1>
+{% endblock %}
+
+{% block actions %}
+<div>
+  <a class="btn btn-sm btn-outline-primary" href="{%url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}" class="">Fazer nova Pesquisa</a>
+</div>
+<div>
+    <a class="btn btn-primary" href="{% url 'sapl.sessao:resumo_ata_pdf' sessaoplenaria.pk %}">
+    PDF
+    </a>
+</div>
+{% endblock %}
+
+
+{% block detail_content %}
+<p style="text-align: justify;">
+  {% include 'sessao/resumos/blocos_ata/'|add:primeiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:segundo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:terceiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:quarto_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:quinto_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:sexto_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:setimo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:oitavo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:nono_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_primeiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_segundo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_terceiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_quarto_ordenacao %}
+</p>
+  {% include 'sessao/resumos/blocos_ata/assinaturas.html' %}
+{% endblock detail_content %}

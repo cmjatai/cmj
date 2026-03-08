@@ -1,0 +1,10 @@
+{% if ocorrencias_da_sessao %}
+    <strong>| OCORRÊNCIAS DA SESSÃO: </strong>
+    {% for ocorrencia in ocorrencias_da_sessao %}
+        {% if ocorrencia.titulo %}
+            <strong>{{ ocorrencia.titulo }}</strong>
+        {% endif %}
+        {{ ocorrencia.conteudo|safe|linebreaksbr }}
+        {% if not forloop.last %} // {% endif %}
+    {% endfor %}
+{% endif %}

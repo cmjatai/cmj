@@ -1,0 +1,14 @@
+{% if ocorrencias_da_sessao %}
+<fieldset>
+  <legend>Ocorrências Gerais da Sessão</legend>
+  <ul>
+    {% for ocorrencia in ocorrencias_da_sessao %}
+          <li>
+            <strong>{{ ocorrencia.titulo }}</strong>
+            <p>{{ ocorrencia.conteudo|safe|linebreaksbr }}</p>
+          </li>
+    {% endfor %}
+  </ul>
+</fieldset>
+<br>
+{% endif %}

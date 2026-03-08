@@ -1152,12 +1152,12 @@ class OcorrenciaSessaoForm(forms.ModelForm):
 
     class Meta:
         model = OcorrenciaSessao
-        fields = ["numero_ordem", "expediente", "ordemdia", "conteudo"]
+        fields = ["numero_ordem", "expediente", "ordemdia", "titulo", "conteudo"]
 
     def __init__(self, *args, **kwargs):
 
-        if not hasattr(self, "instance") or not self.instance.pk:
-            sessao_plenaria = kwargs["initial"]["sessao_plenaria"]
+        sessao_plenaria = kwargs["initial"].get("sessao_plenaria", None)
+        if sessao_plenaria:
             kwargs["initial"]["numero_ordem"] = (
                 OcorrenciaSessao.objects.filter(
                     sessao_plenaria=sessao_plenaria
