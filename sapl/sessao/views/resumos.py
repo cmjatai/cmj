@@ -76,7 +76,10 @@ class ResumoMixin:
         mesa = IntegranteMesa.objects.filter(sessao_plenaria=sessao_plenaria).order_by(
             "cargo_id"
         )
-        integrantes = [{"parlamentar": m.parlamentar, "cargo": m.cargo} for m in mesa]
+        integrantes = [
+            {"parlamentar": m.parlamentar, "cargo": m.cargo, "assina_ata": m.assina_ata}
+            for m in mesa
+        ]
         return {"mesa": integrantes}
 
     @classmethod
@@ -236,7 +239,7 @@ class ResumoMixin:
                     [
                         m["parlamentar"]
                         for m in mesa_dia
-                        if m["cargo"].descricao == "Presidente"
+                        if m["cargo"].descricao.startswith("Presidente")
                     ]
                 ),
                 "",
@@ -258,30 +261,49 @@ class ResumoMixin:
         ]
 
         context = {}
-        config_assinatura_ata = AppsAppConfig.attr("assinatura_ata")
-        if config_assinatura_ata == "T" and parlamentares_ordem:
-            context.update(
-                {
-                    "texto_assinatura": "Assinatura de Todos os Parlamentares Presentes na Sessão"
-                }
-            )
-            context.update(
-                {
-                    "assinatura_mesa": mesa_dia,
-                    "assinatura_presentes": parlamentares_ordem,
-                }
-            )
-        elif config_assinatura_ata == "M" and mesa_dia:
-            context.update(
-                {"texto_assinatura": "Assinatura da Mesa Diretora da Sessão"}
-            )
-            context.update({"assinatura_mesa": mesa_dia})
-        elif config_assinatura_ata == "P" and presidente_dia and presidente_dia[0]:
-            context.update({"texto_assinatura": "Assinatura do Presidente da Sessão"})
-            assinatura_presidente = [
-                {"parlamentar": presidente_dia[0], "cargo": "Presidente"}
+        if any([m["assina_ata"] for m in mesa_dia]):
+            # join dos cargos que assinam a ata
+            cargos_dos_assinantes = [
+                m["cargo"].descricao for m in mesa_dia if m["assina_ata"]
             ]
-            context.update({"assinatura_mesa": assinatura_presidente})
+            # join com ", " e " e " para o ultimo item
+            if len(cargos_dos_assinantes) > 1:
+                texto_assinatura = ", ".join(cargos_dos_assinantes[:-1]) + " e " + cargos_dos_assinantes[-1]
+            else:
+                texto_assinatura = cargos_dos_assinantes[0]
+
+            # filtra mesa dia para conter apenas os cargos que assinam a ata
+            mesa_dia = [m for m in mesa_dia if m["assina_ata"]]
+            context.update({"texto_assinatura": f"Assina{'m' if len(mesa_dia) > 1 else ''} %s" % texto_assinatura})
+            context.update({"assinatura_mesa": mesa_dia})
+            pass
+        else:
+            config_assinatura_ata = AppsAppConfig.attr("assinatura_ata")
+            if config_assinatura_ata == "T" and parlamentares_ordem:
+                context.update(
+                    {
+                        "texto_assinatura": "Assinatura de Todos os Parlamentares Presentes na Sessão"
+                    }
+                )
+                context.update(
+                    {
+                        "assinatura_mesa": mesa_dia,
+                        "assinatura_presentes": parlamentares_ordem,
+                    }
+                )
+            elif config_assinatura_ata == "M" and mesa_dia:
+                context.update(
+                    {"texto_assinatura": "Assinatura da Mesa Diretora da Sessão"}
+                )
+                context.update({"assinatura_mesa": mesa_dia})
+            elif config_assinatura_ata == "P" and presidente_dia and presidente_dia[0]:
+                context.update(
+                    {"texto_assinatura": "Assinatura do Presidente da Sessão"}
+                )
+                assinatura_presidente = [
+                    {"parlamentar": presidente_dia[0], "cargo": "Presidente"}
+                ]
+                context.update({"assinatura_mesa": assinatura_presidente})
 
         return context
 
