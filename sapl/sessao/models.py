@@ -568,6 +568,7 @@ class IntegranteMesa(models.Model):  # MesaSessaoPlenaria
     )
     cargo = models.ForeignKey(CargoMesa, on_delete=models.PROTECT)
     parlamentar = models.ForeignKey(Parlamentar, on_delete=models.PROTECT)
+    assina_ata = models.BooleanField(default=False, verbose_name=_("Assina Ata"))
 
     class Meta:
         verbose_name = _("Participação em Mesa de Sessão Plenaria")
