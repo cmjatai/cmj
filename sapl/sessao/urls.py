@@ -59,6 +59,7 @@ from sapl.sessao.views import (
     resumo_ordenacao,
     retirar_leitura,
     sessao_legislativa_legislatura_ajax,
+    toggle_assina_ata,
     voto_nominal_parlamentar,
 )
 from sapl.sessao.views.pautas import (
@@ -101,6 +102,11 @@ urlpatterns = [
         r"^sessao/mesa/remove-parlamentar-composicao/$",
         remove_parlamentar_composicao,
         name="remove_parlamentar_composicao",
+    ),
+    re_path(
+        r"^sessao/mesa/toggle-assina-ata/$",
+        toggle_assina_ata,
+        name="toggle_assina_ata",
     ),
     re_path(r"^sessao/recuperar-materia/", recuperar_materia, name="recuperar_materia"),
     re_path(r"^sessao/recuperar-tramitacao/", recuperar_tramitacao),

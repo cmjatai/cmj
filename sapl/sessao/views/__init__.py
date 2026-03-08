@@ -103,6 +103,8 @@ from sapl.utils import (
     verifica_afastamento_parlamentar,
 )
 
+logger = logging.getLogger(__name__)
+
 TipoSessaoCrud = CrudAux.build(TipoSessaoPlenaria, "tipo_sessao_plenaria")
 TipoJustificativaCrud = CrudAux.build(TipoJustificativa, "tipo_justificativa")
 TipoResultadoVotacaoCrud = CrudAux.build(TipoResultadoVotacao, "tipo_resultado_votacao")
@@ -1998,72 +2000,57 @@ class ListMateriaOrdemDiaView(FormMixin, DetailView):
         return self.get(self, request, args, kwargs)
 
 
+def _get_dados_mesa(sessao):
+    """Retorna composição, parlamentares disponíveis e cargos vagos da mesa."""
+    composicao = sessao.integrantemesa.select_related(
+        'cargo', 'parlamentar'
+    ).order_by('cargo_id')
+
+    cargos_ocupados = set(m.cargo_id for m in composicao)
+    cargos_vagos = list(
+        CargoMesa.objects.exclude(id__in=cargos_ocupados)
+    )
+
+    parlamentares_ocupados = set(m.parlamentar_id for m in composicao)
+    mandatos = sessao.legislatura.mandato_set.select_related(
+        'parlamentar'
+    ).all()
+
+    parlamentares_vagos = sorted(
+        [
+            m.parlamentar for m in mandatos
+            if m.parlamentar_id not in parlamentares_ocupados
+            and m.parlamentar.ativo
+            and not verifica_afastamento_parlamentar(
+                m.parlamentar, sessao.data_inicio, sessao.data_fim
+            )
+        ],
+        key=lambda p: remover_acentos(p.nome_parlamentar)
+    )
+
+    if not cargos_vagos:
+        parlamentares_vagos = []
+
+    return composicao, parlamentares_vagos, cargos_vagos
+
+
 class MesaView(FormMixin, DetailView):
     template_name = "sessao/mesa.html"
     form_class = MesaForm
     model = SessaoPlenaria
-    logger = logging.getLogger(__name__)
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
         context = self.get_context_data(object=self.object)
-        username = request.user.username
+        sessao = self.object
 
-        try:
-            self.logger.debug(
-                "user="
-                + username
-                + ". Tentando obter SessaoPlenaria com id={}".format(kwargs["pk"])
-            )
-            sessao = SessaoPlenaria.objects.get(id=kwargs["pk"])
-        except ObjectDoesNotExist:
-            self.logger.error(
-                "user="
-                + username
-                + ". SessaoPlenaria com id={} não existe.".format(kwargs["pk"])
-            )
-            mensagem = _("Esta Sessão Plenária não existe!")
-            messages.add_message(request, messages.INFO, mensagem)
+        composicao, parlamentares_vagos, cargos_vagos = _get_dados_mesa(sessao)
 
-            return self.render_to_response(context)
-
-        mesa = sessao.integrantemesa.all().order_by("cargo_id") if sessao else []
-        cargos_ocupados = [m.cargo for m in mesa]
-        cargos = CargoMesa.objects.all()
-        cargos_vagos = list(set(cargos) - set(cargos_ocupados))
-
-        # FIX-ME: tem formas melhores de fazer isso, poupando linhas.
-        parlamentares = Legislatura.objects.get(
-            id=sessao.legislatura_id
-        ).mandato_set.all()
-        parlamentares_ocupados = [m.parlamentar for m in mesa]
-        parlamentares_vagos = list(
-            set([p.parlamentar for p in parlamentares]) - set(parlamentares_ocupados)
-        )
-        org_parlamentares_vagos = parlamentares_vagos
-        org_parlamentares_vagos.sort(key=lambda x: remover_acentos(x.nome_parlamentar))
-        org_parlamentares_vagos = [
-            p
-            for p in org_parlamentares_vagos
-            if (
-                p.ativo
-                and not verifica_afastamento_parlamentar(
-                    p, sessao.data_inicio, sessao.data_fim
-                )
-            )
-        ]
-        # Se todos os cargos estiverem ocupados, a listagem de parlamentares
-        # deve ser renderizada vazia
-        if not cargos_vagos:
-            org_parlamentares_vagos = []
-
-        context.update(
-            {
-                "composicao_mesa": mesa,
-                "parlamentares": org_parlamentares_vagos,
-                "cargos_vagos": cargos_vagos,
-            }
-        )
+        context.update({
+            "composicao_mesa": composicao,
+            "parlamentares": parlamentares_vagos,
+            "cargos_vagos": cargos_vagos,
+        })
 
         return self.render_to_response(context)
 
@@ -2071,211 +2058,142 @@ class MesaView(FormMixin, DetailView):
         context = FormMixin.get_context_data(self, **kwargs)
         context["title"] = "%s <small>(%s)</small>" % (_("Mesa Diretora"), self.object)
         sessao = context["object"]
-        tipo_sessao = sessao.tipo
-        if tipo_sessao.nome == "Solene":
-            context.update({"subnav_template_name": "sessao/subnav-solene.yaml"})
+        if sessao.tipo.nome == "Solene":
+            context["subnav_template_name"] = "sessao/subnav-solene.yaml"
         return context
 
     def get_success_url(self):
-        pk = self.kwargs["pk"]
-        return reverse("sapl.sessao:mesa", kwargs={"pk": pk})
+        return reverse("sapl.sessao:mesa", kwargs={"pk": self.kwargs["pk"]})
 
 
+@permission_required(
+    f"{AppConfig.label}.add_{IntegranteMesa._meta.model_name}",
+    raise_exception=True
+)
 def atualizar_mesa(request):
-    """
-    Esta função lida com qualquer alteração nos campos
-    da Mesa Diretora, atualizando os campos após cada alteração
-    """
-    logger = logging.getLogger(__name__)
-    username = request.user.username
+    """Retorna JSON com a composição atualizada da mesa diretora."""
+    sessao_id = request.GET.get("sessao")
     try:
-        logger.debug(
-            "user="
-            + username
-            + ". Tentando obter SessaoPlenaria com id={}.".format(request.GET["sessao"])
-        )
-        sessao = SessaoPlenaria.objects.get(id=int(request.GET["sessao"]))
-    except ObjectDoesNotExist:
-        logger.error(
-            "user="
-            + username
-            + ". SessaoPlenaria com id={} inexistente.".format(request.GET["sessao"])
-        )
+        sessao = SessaoPlenaria.objects.get(id=int(sessao_id))
+    except (ObjectDoesNotExist, TypeError, ValueError):
         return JsonResponse({"msg": ("Sessão Inexistente!", 0)})
 
-    # Atualiza os componentes da view após a mudança
-    composicao_mesa = IntegranteMesa.objects.filter(sessao_plenaria=sessao.id).order_by(
-        "cargo_id"
-    )
+    composicao, parlamentares_vagos, cargos_vagos = _get_dados_mesa(sessao)
 
-    cargos_ocupados = [m.cargo for m in composicao_mesa]
-    cargos = CargoMesa.objects.all()
-    cargos_vagos = list(set(cargos) - set(cargos_ocupados))
-
-    parlamentares = Legislatura.objects.get(id=sessao.legislatura.id).mandato_set.all()
-    parlamentares_ocupados = [m.parlamentar for m in composicao_mesa]
-    parlamentares_vagos = list(
-        set([p.parlamentar for p in parlamentares]) - set(parlamentares_ocupados)
-    )
-
-    lista_composicao = [
-        (c.id, c.parlamentar.__str__(), c.cargo.__str__()) for c in composicao_mesa
-    ]
-    lista_parlamentares = [
-        (p.id, p.nome_parlamentar) for p in parlamentares_vagos if p.ativo
-    ]
-    lista_cargos = [(c.id, c.__str__()) for c in cargos_vagos]
-    lista_parlamentares.sort(key=lambda x: remover_acentos(x[1]))
-
-    return JsonResponse(
-        {
-            "lista_composicao": lista_composicao,
-            "lista_parlamentares": lista_parlamentares,
-            "lista_cargos": lista_cargos,
-            "msg": ("", 1),
-        }
-    )
+    return JsonResponse({
+        "lista_composicao": [
+            (c.id, str(c.parlamentar), str(c.cargo), c.assina_ata) for c in composicao
+        ],
+        "lista_parlamentares": [
+            (p.id, p.nome_parlamentar) for p in parlamentares_vagos
+        ],
+        "lista_cargos": [
+            (c.id, str(c)) for c in cargos_vagos
+        ],
+        "msg": ("", 1),
+    })
 
 
+@permission_required(
+    f"{AppConfig.label}.add_{IntegranteMesa._meta.model_name}",
+    raise_exception=True
+)
 def insere_parlamentar_composicao(request):
-    """
-    Esta função lida com qualquer operação de inserção
-    na composição da Mesa Diretora
-    """
-    logger = logging.getLogger(__name__)
-    username = request.user.username
-    if request.user.has_perm(
-        "%s.add_%s" % (AppConfig.label, IntegranteMesa._meta.model_name)
-    ):
+    """Insere um parlamentar na composição da Mesa Diretora."""
+    if request.method != "POST":
+        return JsonResponse({"msg": ("Método não permitido!", 0)}, status=405)
 
-        composicao = IntegranteMesa()
+    sessao_id = request.POST.get("sessao")
+    parlamentar_id = request.POST.get("parlamentar")
+    cargo_id = request.POST.get("cargo")
 
-        try:
-            logger.debug(
-                "user="
-                + username
-                + ". Tentando obter SessaoPlenaria com id={}.".format(
-                    request.POST["sessao"]
-                )
-            )
-            composicao.sessao_plenaria = SessaoPlenaria.objects.get(
-                id=int(request.POST["sessao"])
-            )
-        except MultiValueDictKeyError:
-            logger.error(
-                "user="
-                + username
-                + ". SessaoPlenaria com id={} não existe.".format(
-                    request.POST["sessao"]
-                )
-            )
-            return JsonResponse({"msg": ("A Sessão informada não existe!", 0)})
+    if not all((sessao_id, parlamentar_id, cargo_id)):
+        return JsonResponse({"msg": ("Dados incompletos!", 0)})
 
-        try:
-            logger.debug(
-                "user="
-                + username
-                + ". Tentando obter Parlamentar com id={}.".format(
-                    request.POST["parlamentar"]
-                )
-            )
-            composicao.parlamentar = Parlamentar.objects.get(
-                id=int(request.POST["parlamentar"])
-            )
-        except MultiValueDictKeyError:
-            logger.error(
-                "user="
-                + username
-                + ". Parlamentar com id={} não existe.".format(
-                    request.POST["parlamentar"]
-                )
-            )
-            return JsonResponse({"msg": ("Nenhum parlamentar foi inserido!", 0)})
+    try:
+        sessao = SessaoPlenaria.objects.get(id=int(sessao_id))
+    except (ObjectDoesNotExist, ValueError):
+        return JsonResponse({"msg": ("A Sessão informada não existe!", 0)})
 
-        try:
-            composicao.cargo = CargoMesa.objects.get(id=int(request.POST["cargo"]))
-            parlamentar_ja_inserido = IntegranteMesa.objects.filter(
-                sessao_plenaria_id=composicao.sessao_plenaria.id,
-                cargo_id=composicao.cargo.id,
-            ).exists()
+    try:
+        parlamentar = Parlamentar.objects.get(id=int(parlamentar_id))
+    except (ObjectDoesNotExist, ValueError):
+        return JsonResponse({"msg": ("Nenhum parlamentar foi inserido!", 0)})
 
-            if parlamentar_ja_inserido:
-                logger.debug(
-                    "user="
-                    + username
-                    + ". Parlamentar (id={}) já inserido na sessao_plenaria(id={}) e cargo(ìd={}).".format(
-                        request.POST["parlamentar"],
-                        composicao.sessao_plenaria.id,
-                        composicao.cargo.id,
-                    )
-                )
-                return JsonResponse({"msg": ("Parlamentar já inserido!", 0)})
+    try:
+        cargo = CargoMesa.objects.get(id=int(cargo_id))
+    except (ObjectDoesNotExist, ValueError):
+        return JsonResponse({"msg": ("Nenhum cargo foi inserido!", 0)})
 
-            composicao.save()
+    if IntegranteMesa.objects.filter(
+        sessao_plenaria=sessao, cargo=cargo
+    ).exists():
+        return JsonResponse({"msg": ("Parlamentar já inserido!", 0)})
 
-        except MultiValueDictKeyError as e:
-            logger.error("user=" + username + ". Nenhum cargo foi inserido! " + str(e))
-            return JsonResponse({"msg": ("Nenhum cargo foi inserido!", 0)})
+    IntegranteMesa.objects.create(
+        sessao_plenaria=sessao, parlamentar=parlamentar, cargo=cargo
+    )
 
-        logger.info(
-            "user="
-            + username
-            + ". Parlamentar (id={}) inserido com sucesso na sessao_plenaria(id={}) e cargo(ìd={})."
-        )
-        return JsonResponse({"msg": ("Parlamentar inserido com sucesso!", 1)})
-
-    else:
-        return JsonResponse({"msg": ("Você não tem permissão para esta operação!", 0)})
+    logger.info(
+        "user=%s. Parlamentar (id=%s) inserido na sessao_plenaria(id=%s), cargo(id=%s).",
+        request.user.username, parlamentar_id, sessao_id, cargo_id,
+    )
+    return JsonResponse({"msg": ("Parlamentar inserido com sucesso!", 1)})
 
 
+@permission_required(
+    f"{AppConfig.label}.delete_{IntegranteMesa._meta.model_name}",
+    raise_exception=True
+)
 def remove_parlamentar_composicao(request):
-    """
-    Essa função lida com qualquer operação de remoção
-    na composição da Mesa Diretora
-    """
-    logger = logging.getLogger(__name__)
-    username = request.user.username
-    if request.POST and request.user.has_perm(
-        "%s.delete_%s" % (AppConfig.label, IntegranteMesa._meta.model_name)
-    ):
+    """Remove um parlamentar da composição da Mesa Diretora."""
+    if request.method != "POST":
+        return JsonResponse({"msg": ("Método não permitido!", 0)}, status=405)
 
-        if "composicao_mesa" in request.POST:
-            try:
-                logger.debug(
-                    "user="
-                    + username
-                    + ". Tentando remover IntegranteMesa com id={}".format(
-                        request.POST["composicao_mesa"]
-                    )
-                )
-                IntegranteMesa.objects.get(
-                    id=int(request.POST["composicao_mesa"])
-                ).delete()
-            except ObjectDoesNotExist:
-                logger.error(
-                    "user="
-                    + username
-                    + ". IntegranteMesa com id={} não existe e não pôde ser removido.".format(
-                        request.POST["composicao_mesa"]
-                    )
-                )
-                return JsonResponse(
-                    {"msg": ("Composição da Mesa não pôde ser removida!", 0)}
-                )
+    composicao_id = request.POST.get("composicao_mesa")
+    if not composicao_id:
+        return JsonResponse(
+            {"msg": ("Selecione algum parlamentar para ser excluido!", 0)}
+        )
 
-            logger.info(
-                "user=" + username + ". IntegranteMesa com id={} removido com sucesso."
-            )
-            return JsonResponse({"msg": ("Parlamentar excluido com sucesso!", 1)})
-        else:
-            logger.debug(
-                "user="
-                + username
-                + ". Nenhum parlamentar selecionado para ser excluido!"
-            )
-            return JsonResponse(
-                {"msg": ("Selecione algum parlamentar para ser excluido!", 0)}
-            )
+    try:
+        IntegranteMesa.objects.get(id=int(composicao_id)).delete()
+    except (ObjectDoesNotExist, ValueError):
+        return JsonResponse(
+            {"msg": ("Composição da Mesa não pôde ser removida!", 0)}
+        )
+
+    logger.info(
+        "user=%s. IntegranteMesa id=%s removido.", request.user.username, composicao_id,
+    )
+    return JsonResponse({"msg": ("Parlamentar excluido com sucesso!", 1)})
+
+
+@permission_required(
+    f"{AppConfig.label}.change_{IntegranteMesa._meta.model_name}",
+    raise_exception=True
+)
+def toggle_assina_ata(request):
+    """Alterna o campo assina_ata de um IntegranteMesa."""
+    if request.method != "POST":
+        return JsonResponse({"msg": ("Método não permitido!", 0)}, status=405)
+
+    integrante_id = request.POST.get("integrante_id")
+    if not integrante_id:
+        return JsonResponse({"msg": ("Integrante não informado!", 0)})
+
+    try:
+        integrante = IntegranteMesa.objects.get(id=int(integrante_id))
+    except (ObjectDoesNotExist, ValueError):
+        return JsonResponse({"msg": ("Integrante não encontrado!", 0)})
+
+    integrante.assina_ata = not integrante.assina_ata
+    integrante.save(update_fields=["assina_ata"])
+
+    return JsonResponse({
+        "msg": ("", 1),
+        "assina_ata": integrante.assina_ata,
+    })
 
 
 def get_tupla(tupla_key):
