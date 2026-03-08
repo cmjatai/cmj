@@ -1379,54 +1379,6 @@ def get_pauta_sessao(sessao, casa):
     return (lst_expediente_materia, lst_votacao, inf_basicas_dic, expedientes)
 
 
-def resumo_ata_pdf(request, pk):
-    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
-    casa = CasaLegislativa.objects.first()
-    rodape = " ".join(get_rodape(casa))
-
-    sessao_plenaria = SessaoPlenaria.objects.get(pk=pk)
-
-    context = {}
-    context.update(ResumoMixin.get_identificacao_basica(sessao_plenaria))
-    context.update(ResumoMixin.get_mesa_diretora(sessao_plenaria))
-    context.update(ResumoMixin.get_presenca_sessao(sessao_plenaria))
-    context.update(ResumoMixin.get_expedientes(sessao_plenaria))
-    context.update(ResumoMixin.get_materias_expediente(sessao_plenaria))
-    context.update(ResumoMixin.get_oradores_expediente(sessao_plenaria))
-    context.update(ResumoMixin.get_presenca_ordem_do_dia(sessao_plenaria))
-    context.update(ResumoMixin.get_materias_ordem_do_dia(sessao_plenaria))
-    context.update(ResumoMixin.get_oradores_ordemdia(sessao_plenaria))
-    context.update(ResumoMixin.get_oradores_explicacoes_pessoais(sessao_plenaria))
-    context.update(ResumoMixin.get_ocorrencias_da_sessao(sessao_plenaria))
-    context.update(ResumoMixin.get_assinaturas(sessao_plenaria))
-    context.update({"object": sessao_plenaria})
-    context.update({"data": dt.today().strftime("%d/%m/%Y")})
-    context.update({"rodape": rodape})
-
-    info = f"Ata Eletrônica da {context['sessaoplenaria']}"
-
-    header_context = {
-        "casa": casa,
-        "logotipo": casa.logotipo,
-        "MEDIA_URL": MEDIA_URL if not settings.DEBUG else "",
-        "info": info,
-    }
-
-    html_template = render_to_string("relatorios/relatorio_ata.html", context)
-    html_header = render_to_string("relatorios/header.html", header_context)
-
-    pdf_file = make_pdf(
-        base_url=base_url, main_template=html_template, header_template=html_header
-    )
-
-    response = HttpResponse(content_type="application/pdf;")
-    response["Content-Disposition"] = "inline; filename=relatorio.pdf"
-    response["Content-Transfer-Encoding"] = "binary"
-    response.write(pdf_file)
-
-    return response
-
-
 def relatorio_doc_administrativos(request, context):
     base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
     casa = CasaLegislativa.objects.first()

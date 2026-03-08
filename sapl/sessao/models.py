@@ -1093,7 +1093,9 @@ class RegistroLeitura(models.Model):
 class OcorrenciaSessao(models.Model):  # OcorrenciaSessaoPlenaria
     sessao_plenaria = models.ForeignKey(SessaoPlenaria, on_delete=models.PROTECT)
 
-    numero_ordem = models.PositiveIntegerField(verbose_name=_("Ordem de ocorrência"), default=1)
+    numero_ordem = models.PositiveIntegerField(
+        verbose_name=_("Ordem de ocorrência"), default=1
+    )
 
     expediente = models.ForeignKey(
         ExpedienteMateria,
@@ -1113,9 +1115,10 @@ class OcorrenciaSessao(models.Model):  # OcorrenciaSessaoPlenaria
         verbose_name=_("Matéria da Ordem do Dia"),
     )
 
-    conteudo = models.TextField(
-        verbose_name=_("Descrição da Ocorrência")
+    titulo = models.CharField(
+        max_length=255, default="", verbose_name=_("Título da Ocorrência")
     )
+    conteudo = models.TextField(verbose_name=_("Descrição da Ocorrência"))
 
     class Meta:
         verbose_name = _("Ocorrência da Sessão Plenaria")

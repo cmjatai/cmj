@@ -1,0 +1,109 @@
+{% load common_tags %}
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+<head>
+  <style>
+    {% include "css/base.css" %}
+    {% include "css/base_table.css" %}
+
+    @page :right {
+      @bottom-right{
+        content: "Página " counter(page) " de " counter(pages);
+        padding-top: 0cm;
+        font-style: italic;
+        color: #444;
+      }
+    }
+    p {
+      text-align: justify;
+      font-size: 11pt;
+      line-height: 1.5;
+    }
+    h2, h3, h4 {
+      text-align: center;
+      font-weight: bold;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <img src="{% webpack_static '/img/pdf_cabec.jpg' %}">
+  </header>
+  <h2>Ata Eletrônica</h2>
+  <h3>{{object.str_title}}</h3>
+  <h4>{{object.str_subtitle}}</h4>
+
+
+<p>
+  {% include 'sessao/resumos/blocos_ata/'|add:primeiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:segundo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:terceiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:quarto_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:quinto_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:sexto_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:setimo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:oitavo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:nono_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_primeiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_segundo_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_terceiro_ordenacao %}
+  {% include 'sessao/resumos/blocos_ata/'|add:decimo_quarto_ordenacao %}
+</p>
+  {% include 'sessao/resumos/blocos_ata/assinaturas.html' %}
+
+
+    {% if assinatura_mesa or assinatura_presentes %}
+
+    <div style="padding:5px;margin-top:50px;border-top: 1px solid black;">
+        <legend >{{texto_assinatura}}</legend>
+
+        <table style="margin-top:80px">
+            <colgroup>
+                <col>
+            </colgroup>
+            <tbody>
+                {% for p in assinatura_mesa %}
+                    {% if forloop.counter0|divisibleby:2 %}
+                        <tr style="margin-top:20px">
+                            <td>
+                                <div style="float: left; position: relative; top: -50px; left: 8px; width: 120px">____________________ </br>
+                                    <p style="font-size:8pt"><b>{{p.cargo}}: </b> {{p.parlamentar.nome_completo}} / {% if p.parlamentar|filiacao_data_filter:object.data_inicio %} {{ p.parlamentar|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %}</p>
+                                        </br></br></br>
+                                  </div>
+                    {% else %}
+                                <div style="float: left; position: relative; top: -50px; left: 142px; width: 120px; margin-right:-220px;">____________________ </br>
+                                    <p style="font-size:8pt"><b>{{p.cargo}}: </b> {{p.parlamentar.nome_completo}} / {% if p.parlamentar|filiacao_data_filter:object.data_inicio %} {{ p.parlamentar|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %}</p>
+                                        </br></br></br>
+                                  </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+
+                  {% for p in assinatura_presentes %}
+                    {% if forloop.counter0|divisibleby:2 %}
+                        <tr style="margin-top:20px">
+                            <td>
+                                <div style="float: left; position: relative;top: -50px; left: 8px; width: 120px;">_____________________</br>
+                                    <p style="font-size:8pt">
+                                        {{p.nome_completo}} / {% if p|filiacao_data_filter:object.data_inicio %} {{ p|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %}</p>
+                                        </br></br></br>
+                                  </div>
+                    {% else %}
+                                <div style="float: left; position: relative; top: -50px;left: 142px; width: 120px; margin-right:-220px;">_____________________ </br>
+                                    <p style="font-size:8pt">{{p.nome_completo}} / {% if p|filiacao_data_filter:object.data_inicio %} {{ p|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %}</p>
+                                        </br></br></br>
+                                  </div>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif%}
+    </div>
+</body>

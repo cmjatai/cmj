@@ -1,0 +1,37 @@
+{% if materia_expediente %}
+    <strong>| MATÉRIAS DO EXPEDIENTE: </strong>
+    {% for m in materia_expediente %}
+        <b style="font-size: 150%; line-height: 0">&bull;</b>
+        <b>{{m.titulo}}</b>: {{m.ementa|safe}}
+        <b>Autor{{ m.autor|length|pluralize:"es" }}:</b> {{ m.autor|join:', ' }},
+        {% if m.numero_protocolo %}
+            <b>Número de Protocolo:</b> {{ m.numero_protocolo }},
+        {% endif %}
+        {% if m.numero_processo %}
+            <b>Processo:</b> {{ m.numero_processo }},
+        {% endif %}
+        {% if m.turno %}
+            <b>Turno:</b> {{m.turno}},
+        {% endif %}
+        {% if m.tipo_votacao %}
+            <b>Tipo:</b> {{m.tipo_votacao}},
+            <b>Sim:</b> {{ m.voto_sim }},
+            <b>Não:</b> {{ m.voto_nao }},
+            <b>Abstenções:</b> {{m.voto_abstencoes}},
+        {% endif %}
+        <b>Resultado:</b> {{m.resultado}}
+        {% if m.resultado_observacao %} - {{m.resultado_observacao}} {% endif %}
+        {% if m.voto_nominal%}
+            <b>Votos Nominais :</b>
+            {% for voto in m.voto_nominal %}
+                {{voto.0}} - {{voto.1}}
+                {% if not forloop.last %} ; {% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if m.ocorrencias_exp %}
+            {% for titulo, conteudo in m.ocorrencias_exp %}
+                {% if titulo %}<b>{{titulo}}</b> - {% endif %}{{conteudo}}{% if not forloop.last %}; {% endif %}
+            {% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}

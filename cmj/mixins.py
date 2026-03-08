@@ -507,6 +507,25 @@ class AudigLogFilterMixin:
             logger.error('Error saving auditing log object')
             logger.error(e)
 
+class PdfOutputMixin:
+    def render_to_response(self, context, **response_kwargs):
+        base_url = self.request.build_absolute_uri()
+
+        context = self.get_context_data()
+
+        template = render_to_string(self.template_name, context)
+
+        pdf_file = make_pdf(base_url=base_url, main_template=template)
+
+        filename = self.template_name.split("/")[-1].replace(".html", "")
+        filename = f'{filename}_{self.kwargs.get("pk","")}.pdf'
+
+        response = HttpResponse(pdf_file, content_type="application/pdf")
+        response["Content-Disposition"] = f'inline; filename="{filename}"'
+        response["Cache-Control"] = "no-cache"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = 0
+        return response
 
 class MultiFormatOutputMixin:
 

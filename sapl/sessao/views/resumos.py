@@ -1,8 +1,12 @@
 import logging
 
+from django.http import HttpResponse
+from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 
+from cmj.mixins import PdfOutputMixin
+from cmj.utils_report import make_pdf
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.materia.models import Autoria, Tramitacao
 from sapl.parlamentares.models import Filiacao, Parlamentar
@@ -42,11 +46,11 @@ class ResumoMixin:
         tema_solene = sessao_plenaria.tema_solene
         context = {
             "basica": [
-                _("Tipo de Sessão: %(tipo)s") % {"tipo": sessao_plenaria.tipo},
                 _("Abertura: %(abertura)s - %(hora_inicio)s")
                 % {"abertura": abertura, "hora_inicio": sessao_plenaria.hora_inicio},
                 _("Encerramento: %(encerramento)s %(hora_fim)s")
                 % {"encerramento": encerramento, "hora_fim": sessao_plenaria.hora_fim},
+                _("Tipo de Sessão: %(tipo)s") % {"tipo": sessao_plenaria.tipo},
             ],
             "sessaoplenaria": sessao_plenaria,
         }
@@ -121,7 +125,7 @@ class ResumoMixin:
         for mat_exp in materias_do_expediente:
 
             ementa = mat_exp.materia.ementa
-            titulo = mat_exp.materia
+            titulo = mat_exp.materia.epigrafe_short
             numero = mat_exp.numero_ordem
 
             if mat_exp.tramitacao:
@@ -137,6 +141,12 @@ class ResumoMixin:
                         break
 
             turno = tramitacao.get_turno_display() if tramitacao else ""
+
+            # Ocorrências da Sessão Ligadas a ordemdia (o)
+            ocorrencias_exp = OcorrenciaSessao.objects.filter(
+                expediente=mat_exp
+            ).order_by("numero_ordem")
+            ocorrencias_exp = [(e.titulo, e.conteudo) for e in ocorrencias_exp]
 
             if mat_exp.tipo_votacao == AbstractOrdemDia.LEITURA:
                 rv = mat_exp.registroleitura_set.first()
@@ -177,6 +187,7 @@ class ResumoMixin:
                 "numero_protocolo": mat_exp.materia.numero_protocolo,
                 "numero_processo": mat_exp.materia.numeracao_set.last(),
                 "observacao": mat_exp.observacao,
+                "ocorrencias_exp": ocorrencias_exp,
             }
             materias_expediente.append(mat)
 
@@ -284,7 +295,7 @@ class ResumoMixin:
         for o in ordem:
             ementa = o.materia.ementa
             ementa_observacao = o.observacao
-            titulo = o.materia
+            titulo = o.materia.epigrafe_short
             numero = o.numero_ordem
 
             if o.tramitacao:
@@ -301,6 +312,12 @@ class ResumoMixin:
 
             turno = tramitacao.get_turno_display() if tramitacao else ""
 
+            # Ocorrências da Sessão Ligadas a ordemdia (o)
+            ocorrencias_ordem = OcorrenciaSessao.objects.filter(ordemdia=o).order_by(
+                "numero_ordem"
+            )
+            ocorrencias_ordem = [(oo.titulo, oo.conteudo) for oo in ocorrencias_ordem]
+
             # Verificar resultado
             rv = o.registrovotacao_set.filter(materia=o.materia).first()
             rp = o.retiradapauta_set.filter(materia=o.materia).first()
@@ -314,7 +331,7 @@ class ResumoMixin:
 
             else:
                 resultado = _("Matéria não votada")
-                resultado_observacao = _(" ")
+                resultado_observacao = ""
 
             voto_sim = ""
             voto_nao = ""
@@ -347,6 +364,7 @@ class ResumoMixin:
                 "resultado": resultado,
                 "resultado_observacao": resultado_observacao,
                 "autor": autor,
+                "ocorrencias_ordem": ocorrencias_ordem,
                 "numero_protocolo": o.materia.numero_protocolo,
                 "numero_processo": o.materia.numeracao_set.last(),
                 "tipo_votacao": o.TIPO_VOTACAO_CHOICES[o.tipo_votacao],
@@ -422,8 +440,10 @@ class ResumoMixin:
     @classmethod
     def get_ocorrencias_da_sessao(cls, sessao_plenaria):
         ocorrencias_sessao = OcorrenciaSessao.objects.filter(
-            sessao_plenaria_id=sessao_plenaria.id
-        )
+            sessao_plenaria_id=sessao_plenaria.id,
+            expediente__isnull=True,
+            ordemdia__isnull=True,
+        ).order_by("numero_ordem")
         context = {"ocorrencias_da_sessao": ocorrencias_sessao}
         return context
 
@@ -452,7 +472,7 @@ class ResumoMixin:
     @classmethod
     def get_votos_nominais_materia_ordem_dia(cls, sessao_plenaria):
         materias_ordem_dia_votacao_nominal = OrdemDia.objects.filter(
-            sessao_plenaria_id=sessao_plenaria.id, tipo_votacao=2
+            sessao_plenaria_id=sessao_plenaria.id, tipo_votacao=AbstractOrdemDia.NOMINAL
         ).order_by("-materia")
 
         votacoes_od = []
@@ -473,7 +493,7 @@ class ResumoMixin:
 
 
 class ResumoView(ResumoMixin, DetailView):
-    template_name = "sessao/resumo.html"
+    template_name = "sessao/resumos/index.html"
     model = SessaoPlenaria
 
     def get_context_data(self, *args, **kwargs):
@@ -509,6 +529,7 @@ class ResumoView(ResumoMixin, DetailView):
         # =====================================================================
         # Assinaturas
         context.update(self.get_assinaturas(self.object))
+
         # =====================================================================
         # Matérias Ordem do Dia
         # Votos de Votação Nominal de Matérias Ordem do Dia
@@ -603,4 +624,8 @@ class ResumoView(ResumoMixin, DetailView):
 
 
 class ResumoAtaView(ResumoView):
-    template_name = "sessao/resumo_ata.html"
+    template_name = "sessao/resumos/ata.html"
+
+
+class ResumoAtaPdfView(PdfOutputMixin, ResumoView):
+    template_name = "sessao/resumos/pdf/ata_eletronica.html"
