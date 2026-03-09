@@ -20,10 +20,10 @@
             Não: {{ m.voto_nao }},
             Abstenções: {{m.voto_abstencoes}},
         {% endif %}
-        <b>Resultado:</b> {{m.resultado}}.
+        Resultado: {{m.resultado}}.
             {% if m.resultado_observacao %} - {{m.resultado_observacao}} {% endif %}
         {% if m.voto_nominal%}
-        <b>Votos Nominais :</b>
+        Votos Nominais:
             {% for voto in m.voto_nominal %}
                 {{voto.0}} - {{voto.1}}
                 {% if not forloop.last %} ; {% endif %}
@@ -33,6 +33,6 @@
             {% for titulo, conteudo in m.ocorrencias_ordem %}
                 {% if titulo %}<b>{{titulo}}</b> - {% endif %}{{conteudo}}{% if not forloop.last %}; {% endif %}
             {% endfor %}
-        {% endif %}
+        {% endif %}{% if check %}</br></br>{% endif %}
     {% endfor %}
 {% endif %}

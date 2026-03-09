@@ -5,6 +5,6 @@
             <strong>{{ ocorrencia.titulo }}</strong>
         {% endif %}
         {{ ocorrencia.conteudo|safe|linebreaksbr }}
-        {% if not forloop.last %} // {% endif %}
+        {% if not forloop.last %} // {% endif %}{% if check %}</br></br>{% endif %}
     {% endfor %}
 {% endif %}

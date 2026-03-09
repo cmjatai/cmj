@@ -4,6 +4,6 @@
   {% for m in mesa %}
     {{m.cargo}}:
     {{m.parlamentar.nome_completo}} / {% if m.parlamentar|filiacao_data_filter:object.data_inicio %} {{ m.parlamentar|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %}
-    {% if not forloop.last %} ; {% endif %}
+    {% if not forloop.last %} ; {% endif %}{% if check %}</br></br>{% endif %}
   {% endfor %}
 {% endif %}
