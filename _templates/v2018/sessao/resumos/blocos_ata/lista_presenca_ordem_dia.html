@@ -3,6 +3,6 @@
     <strong>| LISTA DE PRESENÇA NA ORDEM DO DIA: </strong>
     {% for p in presenca_ordem %}
         {{p.nome_completo}} / {% if p|filiacao_data_filter:object.data_inicio %} {{ p|filiacao_data_filter:object.data_inicio }} {% else %} Sem partido {% endif %}
-        {% if not forloop.last %} ; {% endif %}
+        {% if not forloop.last %} ; {% endif %}{% if check %}</br></br>{% endif %}
     {% endfor %}
 {% endif %}

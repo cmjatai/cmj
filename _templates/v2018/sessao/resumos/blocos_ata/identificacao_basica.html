@@ -3,5 +3,5 @@
     {{b}}{% if not forloop.last %};
     {% else %}{% if tema_solene %}; {{tema_solene}}
         {% endif %}
-    {% endif %}
+    {% endif %}{% if check %}</br></br>{% endif %}
 {% endfor %}

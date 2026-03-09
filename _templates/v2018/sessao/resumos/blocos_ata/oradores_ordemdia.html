@@ -1,9 +1,9 @@
-        {% if oradores_ordemdia %}
-            <strong>ORADORES DA ORDEM DO DIA: </strong>
-            {% for orador in oradores_ordemdia %}
-                <div><b>{{ orador.numero_ordem }}</b> - {{ orador.parlamentar.nome_completo }}</div>
-                <div>{{ orador.url_discurso }}</div>
-                <div>{{ orador.observacao }}</div>
-                </br>
-            {% endfor %}
-        {% endif %}
+{% if oradores_ordemdia %}
+    <strong>ORADORES DA ORDEM DO DIA: </strong>
+    {% for orador in oradores_ordemdia %}
+        <div><b>{{ orador.numero_ordem }}</b> - {{ orador.parlamentar.nome_completo }}</div>
+        <div>{{ orador.url_discurso }}</div>
+        <div>{{ orador.observacao }}</div>
+        </br>{% if check %}</br></br>{% endif %}
+    {% endfor %}
+{% endif %}

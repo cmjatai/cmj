@@ -521,6 +521,9 @@ class ResumoView(ResumoMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
+        if 'check' in self.request.GET and self.request.user.is_authenticated:
+             context.update({"check": True})
+
         # Votos de Votação Nominal de Matérias Expediente
         context.update(self.get_votos_nominais_materia_expediente(self.object))
 

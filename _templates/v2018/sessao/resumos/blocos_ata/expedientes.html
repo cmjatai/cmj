@@ -4,6 +4,6 @@
         {% if e.conteudo %}
             <b>{{e.tipo}}</b>:
             {{e.conteudo|striptags|safe}}
-        {% endif %}
+        {% endif %}{% if check %}</br></br>{% endif %}
     {% endfor %}
 {% endif %}
