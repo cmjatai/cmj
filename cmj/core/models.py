@@ -1036,7 +1036,7 @@ class IAQuota(models.Model):
     class Meta:
         verbose_name = _('Quota IA')
         verbose_name_plural = _('Quotas IA')
-        ordering = ('-id', )
+        ordering = ('-modelo', )
 
     def __str__(self):
         return '%s - %d (Remaining: %d; Ativo: %s)' % (self.modelo, self.quota_diaria, self.remaining_quota(), self.ativo)

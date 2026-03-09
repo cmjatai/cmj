@@ -1,24 +1,24 @@
 import json
 import logging
-from math import e
-from pydoc import text
 import re
 import time
+from math import e
+from pydoc import text
 
+import pymupdf
+import yaml
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.urls.base import reverse
-from django.utils.translation import gettext_lazy as _
-import pymupdf
-import yaml
 from django.utils import timezone
-from cmj.core.models import IAQuota
-from cmj.utils import clean_text
-from sapl.base.models import Metadata
+from django.utils.translation import gettext_lazy as _
 from google import genai
 from google.genai import types
 
+from cmj.core.models import IAQuota
+from cmj.utils import clean_text
+from sapl.base.models import Metadata
 
 logger = logging.getLogger(__name__)
 
@@ -85,21 +85,25 @@ E. Direcione e aborde especificamente estes indicadores linguísticos:
 - Frases metaconversacionais: Elimine completamente os clichês conversacionais e marcadores de discurso indireto ("você pode", "você poderia", "você gostaria", "você sabe", "Gostaria de saber").
 """
 
+
 class IAGenaiBase:
-    ia_model_name = "gemini-2.0-flash-lite"
+    ia_model_name = "gemini-3.1-flash-preview"
     temperature = 0.1
     top_k = 40
     top_p = 0.95
     response_mime_type = "application/json"
 
-    #modelos llm permitidos
+    # modelos llm permitidos
     allowed_models = [
-        "gemini-2.0-flash-lite",
-        "gemini-2.0-flash",
         "gemini-2.5-flash-lite",
         "gemini-2.5-flash",
-        'gemini-3-flash-preview',
-        'gemini-3-pro-preview',
+
+        "gemini-3-pro-preview",
+        "gemini-3-flash-preview",
+
+        "gemini-3.1-pro-preview",
+        "gemini-3.1-flash-lite-preview",
+        "gemini-3.1-pro-preview-customtools"
     ]
 
     def __init__(self, *args, **kwargs):
@@ -110,7 +114,7 @@ class IAGenaiBase:
 
     def chat_send_message(self, message, history, tools=None):
         if not self._chat:
-            self.response_mime_type = 'text/plain'
+            self.response_mime_type = "text/plain"
             self._chat_quota = self.retrieve_quota_if_available()
             config = self.update_generation_config(tools=tools)
             self._chat = self.client.chats.create(
@@ -128,7 +132,6 @@ class IAGenaiBase:
 
         return response
 
-
     def update_generation_config(self, tools=None):
 
         if tools:
@@ -136,7 +139,7 @@ class IAGenaiBase:
             # Carece de revisão de Prompts para permitir pesquisa Online
             # grounding_tool = types.Tool(
             #    google_search=types.GoogleSearch()
-            #)
+            # )
 
             self.generation_config = types.GenerateContentConfig(
                 system_instruction=rag_system_instruction,
@@ -147,7 +150,7 @@ class IAGenaiBase:
                 tools=tools,
                 automatic_function_calling=genai.types.AutomaticFunctionCallingConfig(
                     maximum_remote_calls=10
-                )
+                ),
             )
             return self.generation_config
 
@@ -161,7 +164,7 @@ class IAGenaiBase:
 
     def retrieve_quota_if_available(self, ia_model_name=None, ascending=True):
 
-        e_message = _('Nenhum Modelo com Quota para consumo disponível.')
+        e_message = _("Nenhum Modelo com Quota para consumo disponível.")
 
         qms = IAQuota.objects.quotas_with_margin(ascending=ascending)
         qms = qms.filter(modelo__in=self.allowed_models)
@@ -177,8 +180,12 @@ class IAGenaiBase:
         self.ia_model_name = qms_custom.first().modelo
         return qms_custom.first()
 
-    def generate_content(self, contents, ia_model_name=None, tools=None, ascending=True):
-        quota = self.retrieve_quota_if_available(ia_model_name=ia_model_name, ascending=ascending)
+    def generate_content(
+        self, contents, ia_model_name=None, tools=None, ascending=True
+    ):
+        quota = self.retrieve_quota_if_available(
+            ia_model_name=ia_model_name, ascending=ascending
+        )
         self.update_generation_config()
         config = self.generation_config
         if tools:
@@ -191,7 +198,7 @@ class IAGenaiBase:
                 tools=tools,
                 automatic_function_calling=genai.types.AutomaticFunctionCallingConfig(
                     maximum_remote_calls=10
-                )
+                ),
             )
 
         response = self.client.models.generate_content(
@@ -210,13 +217,15 @@ class IAGenaiBase:
         for page in doc:
             try:
                 page_text = page.get_text()
-                private_use_pattern = re.compile(r'[\ue000-\uf8ff]')
+                private_use_pattern = re.compile(r"[\ue000-\uf8ff]")
                 private_use_count = len(private_use_pattern.findall(page_text))
 
                 if private_use_count > len(page_text) * 0.1:
-                    rect = pymupdf.Rect(0, 80, page.rect.width-45, page.rect.height-55)
+                    rect = pymupdf.Rect(
+                        0, 80, page.rect.width - 45, page.rect.height - 55
+                    )
                     pix = page.get_pixmap(clip=rect, dpi=300)
-                    #pix.save("/tmp/temp_page.png")
+                    # pix.save("/tmp/temp_page.png")
                     bpix = pix.pdfocr_tobytes()
                     bpdf = pymupdf.open(stream=bpix)
                     bpage = bpdf[0]
@@ -229,14 +238,13 @@ class IAGenaiBase:
                 logger.warning(f"Erro ao extrair texto da página: {e}")
                 text_parts.append("")
 
-        return ' '.join(text_parts)
+        return " ".join(text_parts)
 
     def count_tokens_in_text(self, text):
         try:
-            #self.ia_model_name = "gemini-3-pro-preview"
+            # self.ia_model_name = "gemini-3-pro-preview"
             response = self.client.models.count_tokens(
-                model=self.ia_model_name,
-                contents=text
+                model=self.ia_model_name, contents=text
             )
             return response.total_tokens
         except Exception as e:
@@ -246,15 +254,15 @@ class IAGenaiBase:
     def embed_content(self, text):
         try:
             response = self.client.models.embed_content(
-                model='gemini-embedding-001',
+                model="gemini-embedding-001",
                 contents=[text],
                 config=types.EmbedContentConfig(
-                    task_type='RETRIEVAL_QUERY',
+                    task_type="RETRIEVAL_QUERY",
                     output_dimensionality=1536,
-                )
+                ),
             )
             [embedding_object] = response.embeddings
-            #print(len(embedding_object.values))
+            # print(len(embedding_object.values))
             return embedding_object.values
         except Exception as e:
             logger.error(f"Erro ao gerar embedding: {e}")
@@ -263,13 +271,13 @@ class IAGenaiBase:
 
 class IAClassificacaoMateriaService(IAGenaiBase):
 
-    _model = None # Model from app django
-    _content_type = None # ContentType from app django
-    _object = None # Object from app django
+    _model = None  # Model from app django
+    _content_type = None  # ContentType from app django
+    _object = None  # Object from app django
 
     allowed_models = [
-        "gemini-2.0-flash-lite",
-        "gemini-2.0-flash",
+        # "gemini-2.0-flash-lite",
+        # "gemini-2.0-flash",
         "gemini-2.5-flash-lite",
         "gemini-2.5-flash",
     ]
@@ -277,7 +285,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
     @property
     def model(self):
         if not self._model:
-            raise Exception('Model not configured')
+            raise Exception("Model not configured")
 
         return self._model
 
@@ -289,7 +297,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
     @property
     def content_type(self):
         if not self._content_type:
-            raise Exception('ContentType not configured')
+            raise Exception("ContentType not configured")
 
         return self._content_type
 
@@ -300,7 +308,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
     @property
     def object(self):
         if not self._object:
-            raise Exception('Object not configured')
+            raise Exception("Object not configured")
         return self._object
 
     @object.setter
@@ -312,46 +320,44 @@ class IAClassificacaoMateriaService(IAGenaiBase):
                 obj = int(obj)
                 self._object = self.model.objects.get(pk=obj)
             except Exception as e:
-                raise Exception('Registro não encontrado.')
+                raise Exception("Registro não encontrado.")
         else:
-            raise Exception('Registro não encontrado.')
-
+            raise Exception("Registro não encontrado.")
 
     def run(self, *args, **kwargs):
         """
         Executa a ação de IA, que pode ser gerar ou deletar
         """
-        self.request = kwargs.get('request', {})
-        self.GET = self.request.GET if hasattr(self.request, 'GET') else {}
+        self.request = kwargs.get("request", {})
+        self.GET = self.request.GET if hasattr(self.request, "GET") else {}
         if not self.GET:
             self.GET = {
-                'action': kwargs.get('action', 'generate'),
-                'temperature': kwargs.get('temperature', self.temperature),
-                'top_k': kwargs.get('top_k', self.top_k),
-                'top_p': kwargs.get('top_p', self.top_p),
+                "action": kwargs.get("action", "generate"),
+                "temperature": kwargs.get("temperature", self.temperature),
+                "top_k": kwargs.get("top_k", self.top_k),
+                "top_p": kwargs.get("top_p", self.top_p),
             }
-            self.action = self.GET.get('action', 'generate')
+            self.action = self.GET.get("action", "generate")
         else:
-            self.action = self.GET.get('ia_run', 'generate')
+            self.action = self.GET.get("ia_run", "generate")
 
-        if self.action.startswith('generate'):
+        if self.action.startswith("generate"):
             self.delete()
-            self.temperature = self.GET.get('temperature', self.temperature)
-            self.top_k = self.GET.get('top_k', self.top_k)
-            self.top_p = self.GET.get('top_p', self.top_p)
+            self.temperature = self.GET.get("temperature", self.temperature)
+            self.top_k = self.GET.get("top_k", self.top_k)
+            self.top_p = self.GET.get("top_p", self.top_p)
             return self.generate()
-        elif self.action == 'delete':
+        elif self.action == "delete":
             self.delete()
             if self.request:
                 messages.add_message(
-                    self.request, messages.SUCCESS,
-                    _('Análise removida com sucesso!'))
+                    self.request, messages.SUCCESS, _("Análise removida com sucesso!")
+                )
 
     def delete(self):
         obj = self.object
         Metadata.objects.filter(
-            object_id=obj.id,
-            content_type=self.content_type
+            object_id=obj.id, content_type=self.content_type
         ).delete()
 
     def has_analise(self):
@@ -363,14 +369,13 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             return False
 
         metadata = Metadata.objects.filter(
-            object_id=obj.id,
-            content_type=self.content_type
+            object_id=obj.id, content_type=self.content_type
         ).first()
 
         if not metadata:
             return False
 
-        if 'genia' not in metadata.metadata:
+        if "genia" not in metadata.metadata:
             return False
 
         return True
@@ -384,62 +389,61 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             return None
 
         metadata = Metadata.objects.filter(
-            object_id=obj.id,
-            content_type=self.content_type
+            object_id=obj.id, content_type=self.content_type
         ).first()
 
         if not metadata:
             return None
 
-        if 'genia' not in metadata.metadata:
+        if "genia" not in metadata.metadata:
             return None
 
-        return metadata.metadata['genia']
+        return metadata.metadata["genia"]
 
     def make_prompt(self, context):
         obj = self.object
 
         prompt_mask = obj.tipo.prompt
         if not prompt_mask:
-            return ''
+            return ""
 
         yaml_data = yaml.load(prompt_mask, Loader=yaml.FullLoader)
 
         status = False
-        for prompt_object in yaml_data['PROMPTs']:
-            status = prompt_object['status']
+        for prompt_object in yaml_data["PROMPTs"]:
+            status = prompt_object["status"]
             if status:
                 break
 
         if not status:
-            return ''
+            return ""
 
-        if self.action == 'generate':
-            self.ia_model_name = prompt_object.get('ia_model_name', self.ia_model_name)
-            self.temperature = prompt_object.get('temperature', self.temperature)
-            self.top_k = prompt_object.get('top_k', self.top_k)
-            self.top_p = prompt_object.get('top_p', self.top_p)
-        elif self.action == 'generate_custom':
-            self.ia_model_name = prompt_object.get('ia_model_name', self.ia_model_name)
-            self.temperature = float(self.GET.get('temperature', self.temperature))
-            self.top_p = float(self.GET.get('top_p', self.top_p))
-            self.top_k = int(self.GET.get('top_k', self.top_k))
+        if self.action == "generate":
+            self.ia_model_name = prompt_object.get("ia_model_name", self.ia_model_name)
+            self.temperature = prompt_object.get("temperature", self.temperature)
+            self.top_k = prompt_object.get("top_k", self.top_k)
+            self.top_p = prompt_object.get("top_p", self.top_p)
+        elif self.action == "generate_custom":
+            self.ia_model_name = prompt_object.get("ia_model_name", self.ia_model_name)
+            self.temperature = float(self.GET.get("temperature", self.temperature))
+            self.top_p = float(self.GET.get("top_p", self.top_p))
+            self.top_k = int(self.GET.get("top_k", self.top_k))
 
-        prompt_mask = prompt_object.get('mask', '')
+        prompt_mask = prompt_object.get("mask", "")
 
         if not prompt_mask:
-            return ''
+            return ""
 
         prompt = prompt_mask.format(context=context)
-        while '  ' in prompt:
-            prompt = prompt.replace('  ', ' ')
+        while "  " in prompt:
+            prompt = prompt.replace("  ", " ")
 
         return prompt
 
     def extract_text(self):
         obj = self.object
 
-        text = ''
+        text = ""
         for fn in obj.FIELDFILE_NAME:
             if not getattr(obj, fn):
                 continue
@@ -465,12 +469,12 @@ class IAClassificacaoMateriaService(IAGenaiBase):
 
             md = Metadata()
             md.content_object = obj
-            metadata = {'genia': json.loads(answer.text)}
-            metadata['genia']['model_name'] = self.ia_model_name
-            metadata['genia']['template'] = 'table1'
-            metadata['genia']['temperature'] = self.temperature
-            metadata['genia']['top_k'] = self.top_k
-            metadata['genia']['top_p'] = self.top_p
+            metadata = {"genia": json.loads(answer.text)}
+            metadata["genia"]["model_name"] = self.ia_model_name
+            metadata["genia"]["template"] = "table1"
+            metadata["genia"]["temperature"] = self.temperature
+            metadata["genia"]["top_k"] = self.top_k
+            metadata["genia"]["top_p"] = self.top_p
             md.metadata = metadata
 
             if settings.DEBUG:
@@ -481,8 +485,8 @@ class IAClassificacaoMateriaService(IAGenaiBase):
 
             if self.request:
                 messages.add_message(
-                    self.request, messages.SUCCESS,
-                    _('Análise gerada com sucesso!'))
+                    self.request, messages.SUCCESS, _("Análise gerada com sucesso!")
+                )
 
             return md
 
@@ -491,8 +495,10 @@ class IAClassificacaoMateriaService(IAGenaiBase):
 
             if self.request:
                 messages.add_message(
-                    self.request, messages.ERROR,
-                    _('Ocorreu erro na geração da análise!'))
+                    self.request,
+                    messages.ERROR,
+                    _("Ocorreu erro na geração da análise!"),
+                )
 
 
 class IAAnaliseSimilaridadeService(IAGenaiBase):
@@ -501,15 +507,15 @@ class IAAnaliseSimilaridadeService(IAGenaiBase):
     """
 
     allowed_models = [
-        "gemini-2.0-flash-lite",
-        "gemini-2.0-flash",
+        # "gemini-2.0-flash-lite",
+        # "gemini-2.0-flash",
         "gemini-2.5-flash-lite",
         "gemini-2.5-flash",
     ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.response_mime_type = 'text/plain'
+        self.response_mime_type = "text/plain"
 
     def make_prompt(self, original, analisado, o_epigrafe, a_epigrafe):
 
@@ -577,13 +583,15 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
     def run(self, similaridade, *args, **kwargs):
         # não presuma semelhança com run da classe acima
-        _logger = kwargs.get('logger', logger)
+        _logger = kwargs.get("logger", logger)
 
         text1, text2 = self.extract_text_from_similaridade(similaridade)
         mat1 = similaridade.materia_1
         mat2 = similaridade.materia_2
 
-        prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
+        prompt = self.make_prompt(
+            text1, text2, mat1.epigrafe_short, mat2.epigrafe_short
+        )
 
         answer = self.generate_content(prompt, ascending=False)
 
@@ -592,7 +600,7 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
         similaridade.data_analise = timezone.localtime()
 
         try:
-            similaridade_value = similaridade.analise.split('[[ ')[1].split('%')[0]
+            similaridade_value = similaridade.analise.split("[[ ")[1].split("%")[0]
             similaridade.similaridade = int(similaridade_value)
         except Exception as e:
             _logger.error(e)
@@ -609,79 +617,76 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
 
         execs = []
         for i in range(get_threads):
-            execs.append({
-                'inline_analises': [],
-                'inline_requests': [],
-                'analises': [],
-                'display_name': f'batch_analise_similaridade_entre_materias_thread_{i}_{int(time.time())}',
-                'job_name': None,
-                'finished': False,
-                'state_job': None,
-                'inline_responses': [],
-            })
+            execs.append(
+                {
+                    "inline_analises": [],
+                    "inline_requests": [],
+                    "analises": [],
+                    "display_name": f"batch_analise_similaridade_entre_materias_thread_{i}_{int(time.time())}",
+                    "job_name": None,
+                    "finished": False,
+                    "state_job": None,
+                    "inline_responses": [],
+                }
+            )
 
-        analises = list(analises[0:batch_size*get_threads])  # limita para evitar excesso de requisições
+        analises = list(
+            analises[0 : batch_size * get_threads]
+        )  # limita para evitar excesso de requisições
 
         # distribui as análises entre os threads
         for i, analise in enumerate(analises):
-            execs[i % get_threads]['analises'].append(analise)
+            execs[i % get_threads]["analises"].append(analise)
 
         for exec in execs:
-            analises = exec['analises']
+            analises = exec["analises"]
 
             for analise in analises:
-                inline_analises = exec['inline_analises']
-                inline_requests = exec['inline_requests']
+                inline_analises = exec["inline_analises"]
+                inline_requests = exec["inline_requests"]
 
                 text1, text2 = self.extract_text_from_similaridade(analise)
                 mat1 = analise.materia_1
                 mat2 = analise.materia_2
 
-                prompt = self.make_prompt(text1, text2, mat1.epigrafe_short, mat2.epigrafe_short)
+                prompt = self.make_prompt(
+                    text1, text2, mat1.epigrafe_short, mat2.epigrafe_short
+                )
                 inline_analises.append(analise)
                 inline_requests.append(
                     {
-                        'config': dict(
-                            #temperature=self.temperature,
-                            #top_p=self.top_p,
-                            #top_k=self.top_k,
+                        "config": dict(
+                            # temperature=self.temperature,
+                            # top_p=self.top_p,
+                            # top_k=self.top_k,
                             response_mime_type=self.response_mime_type,
                         ),
-                        'contents': [
-                            {
-                                'parts': [
-                                    {
-                                        'text': prompt
-                                    }
-                                ],
-                                'role': 'user'
-                            }
-                        ],
+                        "contents": [{"parts": [{"text": prompt}], "role": "user"}],
                     }
                 )
 
-            display_name = exec['display_name']
-            inline_analises = exec['inline_analises']
-            inline_requests = exec['inline_requests']
+            display_name = exec["display_name"]
+            inline_analises = exec["inline_analises"]
+            inline_requests = exec["inline_requests"]
 
             inline_batch_job = self.client.batches.create(
-                model = self.ia_model_name,
-                src =  inline_requests,
-                config = {
-                    'display_name': display_name
-                }
+                model=self.ia_model_name,
+                src=inline_requests,
+                config={"display_name": display_name},
             )
-            exec['job_name'] = inline_batch_job.name
+            exec["job_name"] = inline_batch_job.name
 
         def process_exec(exec):
-            job_name = exec['job_name']
-            inline_analises = exec['inline_analises']
+            job_name = exec["job_name"]
+            inline_analises = exec["inline_analises"]
 
-            if exec['state_job'] != 'JOB_STATE_SUCCEEDED':
-                logger.error(f"Batch job {job_name} did not succeed. State: {exec['state_job']}")
+            if exec["state_job"] != "JOB_STATE_SUCCEEDED":
+                logger.error(
+                    f"Batch job {job_name} did not succeed. State: {exec['state_job']}"
+                )
                 return
 
-            for i, text in enumerate(exec['inline_responses']):
+            for i, text in enumerate(exec["inline_responses"]):
 
                 if not text:
                     continue
@@ -694,34 +699,46 @@ Escreva de forma dissertativa explicativa utilizando o mínimo de palavras ou fr
                 similaridade.data_analise = timezone.localtime()
 
                 try:
-                    similaridade_value = similaridade.analise.split('[[')[1].split('%')[0].strip()
+                    similaridade_value = (
+                        similaridade.analise.split("[[")[1].split("%")[0].strip()
+                    )
                     similaridade.similaridade = int(similaridade_value)
                 except Exception as e:
                     logger.error(e)
                     similaridade.similaridade = 0
                 similaridade.save()
 
-
         while True:
             all_finished = True
             for exec in execs:
-                if exec['finished']:
+                if exec["finished"]:
                     continue
-                job_name = exec['job_name']
+                job_name = exec["job_name"]
                 batch_job_inline = self.client.batches.get(name=job_name)
-                if batch_job_inline.state.name not in ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'):
+                if batch_job_inline.state.name not in (
+                    "JOB_STATE_SUCCEEDED",
+                    "JOB_STATE_FAILED",
+                    "JOB_STATE_CANCELLED",
+                    "JOB_STATE_EXPIRED",
+                ):
                     all_finished = False
-                    logger.info(f"Batch job {job_name}. Current state: {batch_job_inline.state.name}")
+                    logger.info(
+                        f"Batch job {job_name}. Current state: {batch_job_inline.state.name}"
+                    )
                 else:
-                    exec['finished'] = True
-                    exec['state_job'] = batch_job_inline.state.name
-                    if batch_job_inline.state.name == 'JOB_STATE_SUCCEEDED':
-                        exec['inline_responses'] = [resp.response.text for resp in batch_job_inline.dest.inlined_responses if resp.response]
+                    exec["finished"] = True
+                    exec["state_job"] = batch_job_inline.state.name
+                    if batch_job_inline.state.name == "JOB_STATE_SUCCEEDED":
+                        exec["inline_responses"] = [
+                            resp.response.text
+                            for resp in batch_job_inline.dest.inlined_responses
+                            if resp.response
+                        ]
 
                     process_exec(exec)
 
             if all_finished:
                 break
-            #print(f"Some jobs not finished. Waiting 30 seconds...")
+            # print(f"Some jobs not finished. Waiting 30 seconds...")
             time.sleep(60)
-            #print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")
+            # print(f"Job not finished. Current state: {batch_job_inline.state.name}. Waiting 30 seconds...")
