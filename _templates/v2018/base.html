@@ -3,7 +3,7 @@
 {% load render_bundle from webpack_loader %}
 
 <!DOCTYPE html>
-<html class="no-js {% block html_class %}{%endblock%}" lang="pt-br">
+<html class="no-js {% block html_class %}{% endblock %}" lang="pt-br">
   <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8">
     <meta name="reply-to" content="manager@jatai.go.leg.br">
@@ -22,7 +22,7 @@
         {% render_bundle  'libsuserauth' 'css' %}
       {% endif %}
     {% endblock webpack_loader_css %}
-    {% block widgets_form_css %}{% endblock widgets_form_css %}
+    {% block css_custom %}{% endblock css_custom %}
   </head>
   <body class="{% block body_class %}{% endblock body_class %}">
   {% block root_body %}
@@ -79,7 +79,7 @@
           </nav>
         {% endblock navigation %}
 
-        {% if DEBUG_AND_REMOTE_DATABASE %}
+        {% if False and DEBUG_AND_REMOTE_DATABASE %}
           <div class="bg-red">
             <p class="text-center text-white m-0 p-1">
               <strong>Atenção:</strong> Você está em modo DEBUG e conectado a um banco de dados remoto.

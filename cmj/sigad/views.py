@@ -1,41 +1,55 @@
-from datetime import timedelta
-from operator import attrgetter
 import io
 import zipfile
+from datetime import timedelta
+from operator import attrgetter
 
+import dateutil.parser
 from braces.views import FormMessagesMixin
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
 from django.db.models import F, Q
-from django.db.models.aggregates import Max, Count
-from django.http.response import Http404, HttpResponse, HttpResponseForbidden, \
-    HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.db.models.aggregates import Count, Max
+from django.http.response import (
+    Http404,
+    HttpResponse,
+    HttpResponseForbidden,
+    HttpResponsePermanentRedirect,
+    HttpResponseRedirect,
+)
 from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView, MultipleObjectMixin
 from haystack.forms import model_choices
 from haystack.query import SearchQuerySet
 from haystack.utils.app_loading import haystack_get_models
-import dateutil.parser
 
 from cmj import globalrules
 from cmj.core.models import AreaTrabalho, CertidaoPublicacao
 from cmj.sigad import forms, models
-from cmj.sigad.forms import DocumentoForm, CaixaPublicacaoForm
-from cmj.sigad.models import Documento, Classe, ReferenciaEntreDocumentos, \
-    PermissionsUserClasse, PermissionsUserDocumento, CMSMixin, \
-    CLASSE_TEMPLATES_CHOICE, CaixaPublicacao, CaixaPublicacaoClasse, \
-    CaixaPublicacaoRelationship, UrlShortener
+from cmj.sigad.forms import CaixaPublicacaoForm, DocumentoForm
+from cmj.sigad.models import (
+    CLASSE_TEMPLATES_CHOICE,
+    CaixaPublicacao,
+    CaixaPublicacaoClasse,
+    CaixaPublicacaoRelationship,
+    Classe,
+    CMSMixin,
+    Documento,
+    PermissionsUserClasse,
+    PermissionsUserDocumento,
+    ReferenciaEntreDocumentos,
+    UrlShortener,
+)
 from cmj.utils import make_pagination
 from cmj.videos.models import Video, VideoParte
 from sapl.comissoes.models import Comissao
-from sapl.crud.base import MasterDetailCrud, Crud
-from sapl.parlamentares.models import Parlamentar, Legislatura
+from sapl.crud.base import Crud, MasterDetailCrud
+from sapl.parlamentares.models import Legislatura, Parlamentar
 from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
@@ -50,85 +64,96 @@ class TabIndexMixin:
 
 class PaginaInicialView(TabIndexMixin, TemplateView):
 
-    template_name = 'path/pagina_inicial.html'
+    template_name = "path/pagina_inicial.html"
 
     raiz = True
 
     def get_context_data(self, **kwargs):
         context = TemplateView.get_context_data(self, **kwargs)
-        context['path'] = '-path'
+        context["path"] = "-path"
 
         np = self.get_noticias_dos_parlamentares()
 
-        context['noticias_dos_parlamentares'] = np
+        context["noticias_dos_parlamentares"] = np
 
         # context['noticias_da_procuradoria'] = self.get_noticias_da_procuradoria()
 
-        #context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
+        # context['ultimas_publicacoes'] = self.get_ultimas_publicacoes()
 
-        #context['ultimos_videos'] = self.get_ultimos_videos()
+        # context['ultimos_videos'] = self.get_ultimos_videos()
 
-        #context['docs_adms_pagina_inicial'] = self.get_docs_adms_pagina_inicial()
+        # context['docs_adms_pagina_inicial'] = self.get_docs_adms_pagina_inicial()
 
         return context
 
     def get_ultimos_videos(self):
-        docs = Documento.objects.qs_video_news()[:100].values('id', 'extra_data', 'titulo')
+        docs = Documento.objects.qs_video_news()[:100].values(
+            "id", "extra_data", "titulo"
+        )
 
         r = []
 
         inserir_programa_diario = {
-            'manhã cmj': True,
-            'doação de corpos': True,
-            'nada se perde': True,
-            'sessão ordinária': True
+            "manhã cmj": True,
+            "doação de corpos": True,
+            "nada se perde": True,
+            "sessão ordinária": True,
         }
 
         for d in docs:
-            ed = d['extra_data']
-            if 'snippet' in ed and \
-                'liveBroadcastContent' in ed['snippet'] and\
-                    ed['snippet']['liveBroadcastContent'] == 'upcoming':
-                r.append(d['id'])
+            ed = d["extra_data"]
+            if (
+                "snippet" in ed
+                and "liveBroadcastContent" in ed["snippet"]
+                and ed["snippet"]["liveBroadcastContent"] == "upcoming"
+            ):
+                r.append(d["id"])
 
             if len(r) == 4:
                 break
 
         if len(r) < 4:
             for d in docs:
-                ed = d['extra_data']
-                if 'snippet' in ed and \
-                    'liveBroadcastContent' in ed['snippet'] and\
-                        ed['snippet']['liveBroadcastContent'] in ('live', 'upcoming'):
+                ed = d["extra_data"]
+                if (
+                    "snippet" in ed
+                    and "liveBroadcastContent" in ed["snippet"]
+                    and ed["snippet"]["liveBroadcastContent"] in ("live", "upcoming")
+                ):
                     continue
 
                 is_ipd = False
                 for ipd in inserir_programa_diario.keys():
-                    if ipd in d['titulo'].lower():
+                    if ipd in d["titulo"].lower():
                         is_ipd = True
                         if inserir_programa_diario[ipd]:
                             inserir_programa_diario[ipd] = False
-                            r.append(d['id'])
+                            r.append(d["id"])
                             break
 
                 if not is_ipd:
-                    r.append(d['id'])
+                    r.append(d["id"])
 
                 if len(r) == 4:
                     break
 
         if len(r):
-            r = list(Documento.objects.filter(id__in=r).order_by('-public_date', '-created')[:4])
+            r = list(
+                Documento.objects.filter(id__in=r).order_by("-public_date", "-created")[
+                    :4
+                ]
+            )
         return r
 
     def get_docs_adms_pagina_inicial(self):
         param_tip_pub = {
-            'workspace__tipo': AreaTrabalho.TIPO_PUBLICO,
-            'visibilidade': DocumentoAdministrativo.STATUS_DOC_ADM_PUBLICO,
-            'documento_anexado_set__isnull': True,
+            "workspace__tipo": AreaTrabalho.TIPO_PUBLICO,
+            "visibilidade": DocumentoAdministrativo.STATUS_DOC_ADM_PUBLICO,
+            "documento_anexado_set__isnull": True,
         }
-        docs = DocumentoAdministrativo.objects.filter(
-            **param_tip_pub).order_by('-data_ultima_atualizacao')
+        docs = DocumentoAdministrativo.objects.filter(**param_tip_pub).order_by(
+            "-data_ultima_atualizacao"
+        )
         return list(docs[:100])
 
     def get_noticias_da_procuradoria(self):
@@ -149,7 +174,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             sqs = SearchQuerySet().all()
             sqs = sqs.filter(at=0)
             sqs = sqs.models(*haystack_get_models(m[0]))
-            sqs = sqs.order_by('-data', '-last_update')[:5]
+            sqs = sqs.order_by("-data", "-last_update")[:5]
             if len(sqs):
                 results.append(sqs[0])
 
@@ -165,11 +190,15 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
     def get_ultimas_publicacoes__deprecated(self):
         sqs = SearchQuerySet().all()
         sqs = sqs.filter(
-            Q(at=0) |
-            Q(at__in=AreaTrabalho.objects.areatrabalho_publica().values_list('id', flat=True)))
-        sqs = sqs.models(
-            *haystack_get_models('protocoloadm.documentoadministrativo'))
-        sqs = sqs.order_by('-id')[:100]
+            Q(at=0)
+            | Q(
+                at__in=AreaTrabalho.objects.areatrabalho_publica().values_list(
+                    "id", flat=True
+                )
+            )
+        )
+        sqs = sqs.models(*haystack_get_models("protocoloadm.documentoadministrativo"))
+        sqs = sqs.order_by("-id")[:100]
 
         r = []
         for sr in sqs:
@@ -196,36 +225,37 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         except:
             dini_la = legislatura_atual["data_inicio"]
 
-        docs = docs.annotate(
-            count_parlamentar=Count("parlamentares", distinct=True)
-        ).filter(
-            parlamentares__mandato__legislatura_id=legislatura_atual['id'],
-            count_parlamentar=1,
-            parlamentares__ativo=True,
-            public_date__gte=dini_la - timedelta(days=60)
-        ).values_list('id', flat=True)
+        docs = (
+            docs.annotate(count_parlamentar=Count("parlamentares", distinct=True))
+            .filter(
+                parlamentares__mandato__legislatura_id=legislatura_atual["id"],
+                count_parlamentar=1,
+                parlamentares__ativo=True,
+                public_date__gte=dini_la - timedelta(days=60),
+            )
+            .values_list("id", flat=True)
+        )
 
-        docs = Documento.objects.filter(
-            id__in=docs
-        ).distinct(
-            'parlamentares__id'
-        ).order_by(
-            'parlamentares__id', '-public_date'
-        ).values_list('id', flat=True)
+        docs = (
+            Documento.objects.filter(id__in=docs)
+            .distinct("parlamentares__id")
+            .order_by("parlamentares__id", "-public_date")
+            .values_list("id", flat=True)
+        )
 
-        docs = Documento.objects.filter(
-            id__in=docs
-        ).order_by(
-            '-public_date'
-        ).prefetch_related(
-            'parlamentares',
+        docs = (
+            Documento.objects.filter(id__in=docs)
+            .order_by("-public_date")
+            .prefetch_related(
+                "parlamentares",
+            )
         )
 
         return docs
 
 
 class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
-    template_name = 'base_path.html'
+    template_name = "base_path.html"
     documento = None
     classe = None
     referencia = None
@@ -245,69 +275,79 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                 except Exception as e:
                     raise Http404
 
-                page = kwargs.get('page', None)
+                page = kwargs.get("page", None)
 
-                if page == 'page':
+                if page == "page":
                     return TemplateView.get(self, request, *args, **kwargs)
 
-                if 'resize' in kwargs and kwargs['resize']:
+                if "resize" in kwargs and kwargs["resize"]:
                     try:
-                        file = midia.thumbnail(kwargs['resize'])
+                        file = midia.thumbnail(kwargs["resize"])
                     except Exception as e:
                         file = midia.file
                 else:
                     file = midia.file
 
-                response = HttpResponse(
-                    file, content_type=midia.content_type)
+                response = HttpResponse(file, content_type=midia.content_type)
 
-                response['Cache-Control'] = 'max-age=2592000'
+                response["Cache-Control"] = "max-age=2592000"
 
                 if not request.user.is_anonymous:
-                    if request.META.get('HTTP_REFERER', '').endswith('construct'):
-                        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-                    response['Expires'] = 0
-                    response['Pragma'] = 'no-cache'
+                    if request.META.get("HTTP_REFERER", "").endswith("construct"):
+                        response["Cache-Control"] = (
+                            "no-cache, no-store, must-revalidate"
+                        )
+                    response["Expires"] = 0
+                    response["Pragma"] = "no-cache"
 
-                response['Content-Disposition'] = 'inline; filename=' + \
-                    midia.file.name
+                response["Content-Disposition"] = "inline; filename=" + midia.file.name
                 return response
 
             elif self.documento.tipo == Documento.TPD_CONTAINER_FILE:
                 return self.documento.build_container_file()
 
-            elif self.documento.tipo == Documento.TPD_GALLERY and \
-                    'zipfile' in request.GET:
+            elif (
+                self.documento.tipo == Documento.TPD_GALLERY
+                and "zipfile" in request.GET
+            ):
                 file_buffer = io.BytesIO()
-                with zipfile.ZipFile(file_buffer, 'w') as file:
+                with zipfile.ZipFile(file_buffer, "w") as file:
                     for f in self.documento.documentos_citados.view_childs():
-                        file.write(f.midia.last.file.path,
-                                   arcname='%s-%s' % (
-                                       f.id,
-                                       f.midia.last.file.path.split(
-                                           '/')[-1]))
+                        file.write(
+                            f.midia.last.file.path,
+                            arcname="%s-%s"
+                            % (f.id, f.midia.last.file.path.split("/")[-1]),
+                        )
 
-                response = HttpResponse(file_buffer.getvalue(),
-                                        content_type='application/zip')
+                response = HttpResponse(
+                    file_buffer.getvalue(), content_type="application/zip"
+                )
 
-                response['Cache-Control'] = 'no-cache'
-                response['Pragma'] = 'no-cache'
-                response['Expires'] = 0
-                response['Content-Disposition'] = \
-                    'inline; filename=%s.zip' % self.documento.parents[0].slug
+                response["Cache-Control"] = "no-cache"
+                response["Pragma"] = "no-cache"
+                response["Expires"] = 0
+                response["Content-Disposition"] = (
+                    "inline; filename=%s.zip" % self.documento.parents[0].slug
+                )
 
                 return response
 
-            elif self.documento.tipo == Documento.TPD_GALLERY and \
-                    request.META['REQUEST_METHOD'] == 'GET':
+            elif (
+                self.documento.tipo == Documento.TPD_GALLERY
+                and request.META["REQUEST_METHOD"] == "GET"
+            ):
                 return HttpResponseForbidden()
 
-        elif self.classe and self.classe.url_redirect and not self.classe.url_redirect .startswith('__'):
+        elif (
+            self.classe
+            and self.classe.url_redirect
+            and not self.classe.url_redirect.startswith("__")
+        ):
             if self.classe.perfil == self.classe.CLASSE_REDIRECT_VIEWS:
-                if self.classe.url_redirect.endswith(',list'):
+                if self.classe.url_redirect.endswith(",list"):
                     return redirect(
                         reverse_lazy(
-                            self.classe.url_redirect.split(',', 1)[0],
+                            self.classe.url_redirect.split(",", 1)[0],
                         )
                     )
             else:
@@ -318,9 +358,9 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
     def get_context_data(self, **kwargs):
 
         if self.referencia:
-            self.template_name = 'path/path_imagem.html'
+            self.template_name = "path/path_imagem.html"
             context = TemplateView.get_context_data(self, **kwargs)
-            context['object'] = self.referencia
+            context["object"] = self.referencia
 
         elif self.documento:
             context = self.get_context_data_documento(**kwargs)
@@ -328,7 +368,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
             context = self.get_context_data_classe(**kwargs)
         else:
             context = TemplateView.get_context_data(self, **kwargs)
-        context['path'] = '-path'
+        context["path"] = "-path"
 
         return context
 
@@ -336,131 +376,155 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         context = TemplateView.get_context_data(self, **kwargs)
 
         if self.documento.tipo == Documento.TPD_GALLERY:
-            self.template_name = 'path/path_gallery.html'
+            self.template_name = "path/path_gallery.html"
 
         elif self.documento.tipo == Documento.TPD_IMAGE:
-            self.template_name = 'path/path_imagem.html'
-            context['object'] = self.documento
-            context['referencia'] = None
+            self.template_name = "path/path_imagem.html"
+            context["object"] = self.documento
+            context["referencia"] = None
         else:
             parlamentares = self.documento.parlamentares.all()
 
-            if hasattr(self, 'parlamentar') and self.parlamentar:
-                parlamentares = parlamentares.filter(
-                    pk=self.parlamentar.parlamentar.pk)
+            if hasattr(self, "parlamentar") and self.parlamentar:
+                parlamentares = parlamentares.filter(pk=self.parlamentar.parlamentar.pk)
 
             if self.documento.public_date:
 
                 if parlamentares:
 
-                    next = Documento.objects.qs_news().filter(
-                        public_date__gte=self.documento.public_date,
-                        classe=self.documento.classe,
-                        parlamentares__in=parlamentares,
-                    ).exclude(
-                        id=self.documento.id).last()
+                    next = (
+                        Documento.objects.qs_news()
+                        .filter(
+                            public_date__gte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares__in=parlamentares,
+                        )
+                        .exclude(id=self.documento.id)
+                        .last()
+                    )
 
-                    previous = Documento.objects.qs_news().filter(
-                        public_date__lte=self.documento.public_date,
-                        classe=self.documento.classe,
-                        parlamentares__in=parlamentares,
-                    ).exclude(
-                        id=self.documento.id).first()
+                    previous = (
+                        Documento.objects.qs_news()
+                        .filter(
+                            public_date__lte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares__in=parlamentares,
+                        )
+                        .exclude(id=self.documento.id)
+                        .first()
+                    )
                 else:
 
-                    next = Documento.objects.qs_news().filter(
-                        public_date__gte=self.documento.public_date,
-                        classe=self.documento.classe,
-                        parlamentares__isnull=True,
-                    ).exclude(
-                        id=self.documento.id).last()
+                    next = (
+                        Documento.objects.qs_news()
+                        .filter(
+                            public_date__gte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares__isnull=True,
+                        )
+                        .exclude(id=self.documento.id)
+                        .last()
+                    )
 
-                    previous = Documento.objects.qs_news().filter(
-                        public_date__lte=self.documento.public_date,
-                        classe=self.documento.classe,
-                        parlamentares__isnull=True,
-                    ).exclude(
-                        id=self.documento.id).first()
+                    previous = (
+                        Documento.objects.qs_news()
+                        .filter(
+                            public_date__lte=self.documento.public_date,
+                            classe=self.documento.classe,
+                            parlamentares__isnull=True,
+                        )
+                        .exclude(id=self.documento.id)
+                        .first()
+                    )
 
             else:
                 next = None
                 previous = None
 
-            context['next'] = next
-            context['previous'] = previous
+            context["next"] = next
+            context["previous"] = previous
 
-            docs = Documento.objects.qs_news(
-            ).exclude(id=self.documento.id)
+            docs = Documento.objects.qs_news().exclude(id=self.documento.id)
 
             if parlamentares.exists():
-                docs = docs.filter(
-                    parlamentares__in=parlamentares)
+                docs = docs.filter(parlamentares__in=parlamentares)
             else:
                 docs = docs.filter(parlamentares__isnull=True)
 
             if parlamentares.count() > 4:
-                docs = docs.distinct(
-                    'parlamentares__id').order_by('parlamentares__id')
+                docs = docs.distinct("parlamentares__id").order_by("parlamentares__id")
 
-            context['object_list'] = docs[:4]
+            context["object_list"] = docs[:4]
 
-        context['object'] = self.documento
+        context["object"] = self.documento
         return context
 
     def get_context_data_classe(self, **kwargs):
         template = self.classe.template_classe
 
         if template == models.CLASSE_TEMPLATES_CHOICE.lista_em_linha:
-            kwargs['object_list'] = self.classe.documento_set.qs_news(
-                user=self.request.user)
+            kwargs["object_list"] = self.classe.documento_set.qs_news(
+                user=self.request.user
+            )
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.galeria:
-            kwargs['object_list'] = Documento.objects.view_public_gallery()
+            kwargs["object_list"] = Documento.objects.view_public_gallery()
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.fotografia:
-            kwargs['object_list'] = self.classe.documento_set.qs_bi(
-                self.request.user)
+            kwargs["object_list"] = self.classe.documento_set.qs_bi(self.request.user)
         elif template == models.CLASSE_TEMPLATES_CHOICE.galeria_audio:
-            kwargs['object_list'] = self.classe.documento_set.qs_audio_news(
-                self.request.user)
+            kwargs["object_list"] = self.classe.documento_set.qs_audio_news(
+                self.request.user
+            )
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.galeria_video:
-            kwargs['object_list'] = self.classe.documento_set.qs_video_news(
-                self.request.user)
+            kwargs["object_list"] = self.classe.documento_set.qs_video_news(
+                self.request.user
+            )
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.parlamentar:
             docs = self.classe.parlamentar.documento_set
-            kwargs['object_list'] = docs.qs_news(self.request.user)
+            kwargs["object_list"] = docs.qs_news(self.request.user)
+
         elif template == models.CLASSE_TEMPLATES_CHOICE.documento_especifico:
-            kwargs['object_list'] = Documento.objects.qs_news().filter(
-                parlamentares__isnull=True)[:4]
+            kwargs["object_list"] = Documento.objects.qs_news().filter(
+                parlamentares__isnull=True
+            )[:4]
+
+        elif template == models.CLASSE_TEMPLATES_CHOICE.subsites:
+            kwargs["object_list"] = self.classe.documento_set.qs_news(self.request.user)
+
         elif template == models.CLASSE_TEMPLATES_CHOICE.mapa_site:
-            kwargs['object_list'] = None
+            kwargs["object_list"] = None
             self.paginate_by = None
 
         else:
-            kwargs['object_list'] = Documento.objects.qs_news().filter(
-                parlamentares__isnull=True)[:4]
+            kwargs["object_list"] = Documento.objects.qs_news().filter(
+                parlamentares__isnull=True
+            )[:4]
 
-        self.object_list = kwargs['object_list']
+        self.object_list = kwargs["object_list"]
 
         context = super().get_context_data(**kwargs)
 
         if self.paginate_by:
-            page_obj = context['page_obj']
-            paginator = context['paginator']
-            context['page_range'] = make_pagination(
-                page_obj.number, paginator.num_pages)
+            page_obj = context["page_obj"]
+            paginator = context["paginator"]
+            context["page_range"] = make_pagination(
+                page_obj.number, paginator.num_pages
+            )
 
         if self.classe.capa:
-            context['object'] = self.classe.capa
+            context["object"] = self.classe.capa
             self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                self.classe.capa.template_doc]['template_name']
+                self.classe.capa.template_doc
+            ]["template_name"]
         else:
-            context['object'] = self.classe
+            context["object"] = self.classe
 
-        context['create_doc_url'] = models.DOC_TEMPLATES_CHOICE_FILES[
-            self.classe.template_doc_padrao]['create_url']
+        context["create_doc_url"] = models.DOC_TEMPLATES_CHOICE_FILES[
+            self.classe.template_doc_padrao
+        ]["create_url"]
 
         return context
 
@@ -468,14 +532,14 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         # busca documento dentro de classes de nivel > 1
         for i, item in enumerate(slug):
             try:
-                slug_part = slug[:i + 1]
+                slug_part = slug[: i + 1]
                 slug_part.reverse()
-                slug_class = slug[i + 1:]
+                slug_class = slug[i + 1 :]
                 slug_class.reverse()
                 # print(slug_class, slug_part)
                 return Documento.objects.get(
-                    slug='/'.join(slug_part),
-                    classe__slug='/'.join(slug_class))
+                    slug="/".join(slug_part), classe__slug="/".join(slug_class)
+                )
                 break
             except:
                 pass
@@ -483,12 +547,12 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
 
-        slug = kwargs.get('slug', '')
+        slug = kwargs.get("slug", "")
 
         if not slug:
             raise Http404()
 
-        if slug[0] == 'j':
+        if slug[0] == "j":
             return self._dispath_url_short(slug[1:])
 
         result = self._pre_dispatch(request, *args, **kwargs)
@@ -499,43 +563,48 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
     def _dispath_url_short(self, slug):
         try:
-            slug = slug.split('/')
-            url = UrlShortener.objects.get(
-                url_short=slug[0])
+            slug = slug.split("/")
+            url = UrlShortener.objects.get(url_short=slug[0])
 
-            if len(slug) == 2 and slug[1] == 'qrcode':
+            if len(slug) == 2 and slug[1] == "qrcode":
 
-                response = HttpResponse(url.qrcode,
-                                        content_type='image/png')
+                response = HttpResponse(url.qrcode, content_type="image/png")
 
-                response['Cache-Control'] = 'no-cache'
-                response['Pragma'] = 'no-cache'
-                response['Expires'] = 0
-                response['Content-Disposition'] = \
-                    'inline; filename=%s.png' % slug[0]
+                response["Cache-Control"] = "no-cache"
+                response["Pragma"] = "no-cache"
+                response["Expires"] = 0
+                response["Content-Disposition"] = "inline; filename=%s.png" % slug[0]
                 return response
 
-            return redirect('/' + url.url_long, permanent=True)
+            return redirect("/" + url.url_long, permanent=True)
 
         except Exception as e:
             raise Http404()
 
     def _pre_dispatch(self, request, *args, **kwargs):
 
-        slug = kwargs.get('slug', '')
+        slug = kwargs.get("slug", "")
         # Localização do Objecto
 
-        if slug.startswith('portal'):
-            slug = slug.replace('portal', '')
-            if not slug.startswith('/'):
-                slug = f'/{slug}'
+        if slug.startswith("portal"):
+            slug = slug.replace("portal", "")
+            if not slug.startswith("/"):
+                slug = f"/{slug}"
             return redirect(slug, permanent=True)
 
         referente = None
         try:
             # Verifica se é um documento
-            self.documento = Documento.objects.filter(slug=slug).select_related(
-                'classe', 'midia').get()
+            self.documento = (
+                Documento.objects.filter(slug=slug)
+                .select_related("classe", "midia")
+                .get()
+            )
+            if (
+                hasattr(self.documento.classe, "capa")
+                and self.documento == self.documento.classe.capa
+            ):
+                return redirect("/" + self.documento.classe.slug)
         except:
             try:
                 # verifica se o slug é uma classe
@@ -549,14 +618,13 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
                 except:
                     try:
                         # Verifica se é um link do antigo site
-                        self.documento = Documento.objects.get(
-                            old_path='/' + slug)
+                        self.documento = Documento.objects.get(old_path="/" + slug)
 
                         if self.documento:
-                            return redirect('/' + self.documento.slug)
+                            return redirect("/" + self.documento.slug)
                     except:
                         raise Http404()
-                        #view = PaginaInicialView.as_view()(request, *args, **kwargs)
+                        # view = PaginaInicialView.as_view()(request, *args, **kwargs)
                         # return view
 
         if self.documento and self.documento.tipo in Documento.TDp_exclude_render:
@@ -565,16 +633,21 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         if self.documento:
             if self.documento.template_doc:
                 self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                    self.documento.template_doc]['template_name']
+                    self.documento.template_doc
+                ]["template_name"]
             else:
                 self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                    self.documento.classe.template_doc_padrao]['template_name']
+                    self.documento.classe.template_doc_padrao
+                ]["template_name"]
         else:
             self.template_name = models.CLASSE_TEMPLATES_CHOICE_FILES[
-                self.classe.template_classe]
+                self.classe.template_classe
+            ]
 
-        obj = [self.documento if self.documento else self.classe,
-               'view_documento' if self.documento else 'view_pathclasse']
+        obj = [
+            self.documento if self.documento else self.classe,
+            "view_documento" if self.documento else "view_pathclasse",
+        ]
 
         if self.referencia:
             if obj[0].visibilidade != CMSMixin.STATUS_PRIVATE:
@@ -585,14 +658,13 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         # Analise de Permissão
         if obj[0]:
             u = request.user
-            if u.is_anonymous and obj[0].visibilidade != \
-                    CMSMixin.STATUS_PUBLIC:
+            if u.is_anonymous and obj[0].visibilidade != CMSMixin.STATUS_PUBLIC:
                 raise Http404()
 
             elif obj[0].visibilidade == CMSMixin.STATUS_PRIVATE:
                 if obj[0].owner != request.user:
                     raise Http404()
-                if not request.user.has_perm('sigad.' + obj[1]):
+                if not request.user.has_perm("sigad." + obj[1]):
                     raise PermissionDenied()
                 # com este if acima... se um usuário perde a permissão de
                 # manter tal informação, mesmo sendo o dono, não poderá
@@ -633,23 +705,20 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
                 if parent:
                     if parent.permissions_user_set.filter(
-                            user=request.user,
-                            permission__codename=obj[1]).exists():
+                        user=request.user, permission__codename=obj[1]
+                    ).exists():
                         pass
                     elif parent.permissions_user_set.filter(
-                            user=request.user,
-                            permission__isnull=True).exists() and\
-                            request.user.has_perm('sigad.' + obj[1]):
+                        user=request.user, permission__isnull=True
+                    ).exists() and request.user.has_perm("sigad." + obj[1]):
                         pass
                     elif parent.permissions_user_set.filter(
-                        user__isnull=True,
-                        permission__codename=obj[1]).exists() and\
-                            request.user.has_perm('sigad.' + obj[1]):
+                        user__isnull=True, permission__codename=obj[1]
+                    ).exists() and request.user.has_perm("sigad." + obj[1]):
                         pass
                     elif parent.permissions_user_set.filter(
-                        user__isnull=True,
-                        permission__isnull=True).exists() and\
-                            request.user.has_perm('sigad.' + obj[1]):
+                        user__isnull=True, permission__isnull=True
+                    ).exists() and request.user.has_perm("sigad." + obj[1]):
                         pass
                     elif request.user.is_superuser:
                         pass
@@ -670,10 +739,10 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
     def _pre_dispatch___Old(self, request, *args, **kwargs):
 
-        slug = kwargs.get('slug', '')
+        slug = kwargs.get("slug", "")
 
         if isinstance(slug, str):
-            slug = slug.split('/')
+            slug = slug.split("/")
             slug = [s for s in slug if s]
         slug = list(filter(lambda x: x, slug))
 
@@ -681,14 +750,14 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         referente = None
         try:
             # verifica se o slug é uma classe
-            self.classe = Classe.objects.get(slug='/'.join(slug))
+            self.classe = Classe.objects.get(slug="/".join(slug))
         except:
 
             try:
                 # se documento é filho de uma classe de primeiro nivel
                 self.documento = Documento.objects.get(
-                    slug='/'.join(slug[1:]),
-                    classe__slug=slug[0])
+                    slug="/".join(slug[1:]), classe__slug=slug[0]
+                )
             except:
 
                 slug.reverse()
@@ -702,8 +771,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
                     if self.documento:
                         try:
-                            ref = ReferenciaEntreDocumentos.objects.get(
-                                slug=slug[0])
+                            ref = ReferenciaEntreDocumentos.objects.get(slug=slug[0])
                             self.documento = ref.referenciado
                             self.referencia = ref
                         except:
@@ -718,16 +786,21 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         if self.documento:
             if self.documento.template_doc:
                 self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                    self.documento.template_doc]['template_name']
+                    self.documento.template_doc
+                ]["template_name"]
             else:
                 self.template_name = models.DOC_TEMPLATES_CHOICE_FILES[
-                    self.documento.classe.template_doc_padrao]['template_name']
+                    self.documento.classe.template_doc_padrao
+                ]["template_name"]
         else:
             self.template_name = models.CLASSE_TEMPLATES_CHOICE_FILES[
-                self.classe.template_classe]
+                self.classe.template_classe
+            ]
 
-        obj = [self.documento if self.documento else self.classe,
-               'view_documento' if self.documento else 'view_pathclasse']
+        obj = [
+            self.documento if self.documento else self.classe,
+            "view_documento" if self.documento else "view_pathclasse",
+        ]
 
         if self.referencia:
             if obj[0].visibilidade != CMSMixin.STATUS_PRIVATE:
@@ -738,14 +811,13 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         # Analise de Permissão
         if obj[0]:
             u = request.user
-            if u.is_anonymous and obj[0].visibilidade != \
-                    CMSMixin.STATUS_PUBLIC:
+            if u.is_anonymous and obj[0].visibilidade != CMSMixin.STATUS_PUBLIC:
                 raise Http404()
 
             elif obj[0].visibilidade == CMSMixin.STATUS_PRIVATE:
                 if obj[0].owner != request.user:
                     raise Http404()
-                if not request.user.has_perm('sigad.' + obj[1]):
+                if not request.user.has_perm("sigad." + obj[1]):
                     raise PermissionDenied()
 
             elif obj[0].visibilidade == CMSMixin.STATUS_RESTRICT:
@@ -763,13 +835,12 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
 
                 if parent:
                     if parent.permissions_user_set.filter(
-                            user=request.user,
-                            permission__codename=obj[1]).exists():
+                        user=request.user, permission__codename=obj[1]
+                    ).exists():
                         pass
                     elif parent.permissions_user_set.filter(
-                        user__isnull=True,
-                        permission__codename=obj[1]).exists() and\
-                            request.user.has_perm('sigad.' + obj[1]):
+                        user__isnull=True, permission__codename=obj[1]
+                    ).exists() and request.user.has_perm("sigad." + obj[1]):
                         pass
                     else:
                         raise Http404()
@@ -782,7 +853,7 @@ class PathParlamentarView(PathView):
 
     def dispatch(self, request, *args, **kwargs):
 
-        slug = kwargs.get('slug', '')
+        slug = kwargs.get("slug", "")
 
         if slug:
             self._pre_dispatch(request, *args, **kwargs)
@@ -790,11 +861,11 @@ class PathParlamentarView(PathView):
         classe = self.classe
         # recupera classe de parlamentar avaliando permissões
 
-        slug = 'parlamentar'
-        if kwargs['parlamentar']:
-            slug = 'parlamentar/' + kwargs['parlamentar']
+        slug = "parlamentar"
+        if kwargs["parlamentar"]:
+            slug = "parlamentar/" + kwargs["parlamentar"]
 
-        kwargs['slug'] = slug
+        kwargs["slug"] = slug
         self._pre_dispatch(request, *args, **kwargs)
         self.parlamentar = self.classe
 
@@ -804,7 +875,8 @@ class PathParlamentarView(PathView):
     def ultimas_autorias(self):
         if self.parlamentar.parlamentar:
             return self.parlamentar.parlamentar.autor.first().autoria_set.order_by(
-                '-materia__data_apresentacao')[:5]
+                "-materia__data_apresentacao"
+            )[:5]
         else:
             return []
 
@@ -813,16 +885,15 @@ class PathParlamentarView(PathView):
         if not self.parlamentar:
             raise Http404
 
-        if self.parlamentar.template_classe != \
-                CLASSE_TEMPLATES_CHOICE.parlamentares:
+        if self.parlamentar.template_classe != CLASSE_TEMPLATES_CHOICE.parlamentares:
             context = PathView.get_context_data(self, **kwargs)
 
         else:
             context = TemplateView.get_context_data(self, **kwargs)
-            context['object'] = self.classe
+            context["object"] = self.classe
 
-            legislatura_selecionada = int(self.request.GET.get('l', '0'))
-            sl_selecionada = int(self.request.GET.get('sl', '0'))
+            legislatura_selecionada = int(self.request.GET.get("l", "0"))
+            sl_selecionada = int(self.request.GET.get("sl", "0"))
             # parlamentar_ativo = int(self.request.GET.get('p', '0'))
 
             legs = Legislatura.objects
@@ -832,101 +903,116 @@ class PathParlamentarView(PathView):
             #    context['parlamentar_ativo'] = pms.get(pk=parlamentar_ativo)
 
             legislaturas = []
-            context['legislatura_selecionada'] = legislatura_selecionada
-            context['sessaolegislativa_selecionada'] = sl_selecionada
+            context["legislatura_selecionada"] = legislatura_selecionada
+            context["sessaolegislativa_selecionada"] = sl_selecionada
             for l in legs.all():
 
                 # if l.numero < 17:
                 #    continue
                 l_atual = l.atual()
 
-                if not context['legislatura_selecionada'] and l.atual() \
-                        or l.pk == context['legislatura_selecionada']:
-                    context['legislatura_selecionada'] = l
+                if (
+                    not context["legislatura_selecionada"]
+                    and l.atual()
+                    or l.pk == context["legislatura_selecionada"]
+                ):
+                    context["legislatura_selecionada"] = l
 
-                leg = {
-                    'legislatura': l,
-                    'sessoes': [],
-                    'parlamentares': []
-                }
+                leg = {"legislatura": l, "sessoes": [], "parlamentares": []}
 
-                sl_atual = list(filter(lambda y: 'Atual' in y[1],
-                                       map(lambda x: (x.id, str(x)), l.sessaolegislativa_set.all())))
+                sl_atual = list(
+                    filter(
+                        lambda y: "Atual" in y[1],
+                        map(lambda x: (x.id, str(x)), l.sessaolegislativa_set.all()),
+                    )
+                )
 
                 if sl_atual:
                     fs = l.sessaolegislativa_set.get(pk=sl_atual[0][0])
                 else:
-                    fs = l.sessaolegislativa_set.order_by('numero').first()
-                for s in l.sessaolegislativa_set.order_by('numero').all():
+                    fs = l.sessaolegislativa_set.order_by("numero").first()
+                for s in l.sessaolegislativa_set.order_by("numero").all():
 
-                    if s.pk == sl_selecionada or \
-                            not sl_selecionada and s == fs and s.legislatura == context['legislatura_selecionada']:
-                        context['sessaolegislativa_selecionada'] = s
+                    if (
+                        s.pk == sl_selecionada
+                        or not sl_selecionada
+                        and s == fs
+                        and s.legislatura == context["legislatura_selecionada"]
+                    ):
+                        context["sessaolegislativa_selecionada"] = s
                         if s.pk == sl_selecionada:
-                            context['legislatura_selecionada'] = l
+                            context["legislatura_selecionada"] = l
 
                     # if s.legislatura != context['legislatura_selecionada']:
                     #    continue
 
-                    sessao = {
-                        'sessao': s,
-                        'comissoes': []
-                    }
+                    sessao = {"sessao": s, "comissoes": []}
 
-                    if s == context['sessaolegislativa_selecionada']:
-                        sessao.update({
-                            'mesa': [
-                                p for p in pms.filter(
-                                    mandato__legislatura=l,
-                                    composicaomesa__sessao_legislativa=s
-                                ).annotate(
-                                    cargo_mesa=F(
-                                        'composicaomesa__cargo__descricao')
-                                ).order_by('composicaomesa__cargo__descricao')
-                            ],
-                            'parlamentares': [
-                                p for p in pms.filter(
-                                    mandato__legislatura=l
-                                ).exclude(
-                                    composicaomesa__sessao_legislativa=s
-                                ).order_by(
-                                    '-ativo',
-                                    '-mandato__data_fim_mandato',
-                                    '-mandato__titular',
-                                    'nome_parlamentar')
-                                .annotate(
-                                    data_inicio_mandato=F(
-                                        'mandato__data_inicio_mandato'),
-                                    data_fim_mandato=F(
-                                        'mandato__data_fim_mandato'),
-                                    afastado=F('afastamentoparlamentar'),
-                                    titular=F('mandato__titular')
-                                ).distinct()]
-                        })
+                    if s == context["sessaolegislativa_selecionada"]:
+                        sessao.update(
+                            {
+                                "mesa": [
+                                    p
+                                    for p in pms.filter(
+                                        mandato__legislatura=l,
+                                        composicaomesa__sessao_legislativa=s,
+                                    )
+                                    .annotate(
+                                        cargo_mesa=F("composicaomesa__cargo__descricao")
+                                    )
+                                    .order_by("composicaomesa__cargo__descricao")
+                                ],
+                                "parlamentares": [
+                                    p
+                                    for p in pms.filter(mandato__legislatura=l)
+                                    .exclude(composicaomesa__sessao_legislativa=s)
+                                    .order_by(
+                                        "-ativo",
+                                        "-mandato__data_fim_mandato",
+                                        "-mandato__titular",
+                                        "nome_parlamentar",
+                                    )
+                                    .annotate(
+                                        data_inicio_mandato=F(
+                                            "mandato__data_inicio_mandato"
+                                        ),
+                                        data_fim_mandato=F("mandato__data_fim_mandato"),
+                                        afastado=F("afastamentoparlamentar"),
+                                        titular=F("mandato__titular"),
+                                    )
+                                    .distinct()
+                                ],
+                            }
+                        )
 
-                    if 'parlamentares' in sessao:
+                    if "parlamentares" in sessao:
                         parlamentares = sorted(
-                            list(set(sessao['parlamentares'])),
-                            key=lambda x: x.nome_parlamentar)
+                            list(set(sessao["parlamentares"])),
+                            key=lambda x: x.nome_parlamentar,
+                        )
 
                         n = timezone.now()
-                        sessao['parlamentares'] = {
-                            'titular': [],
-                            'suplente': [],
-                            'afastado': []
+                        sessao["parlamentares"] = {
+                            "titular": [],
+                            "suplente": [],
+                            "afastado": [],
                         }
 
-                        sp = sessao['parlamentares']
+                        sp = sessao["parlamentares"]
 
                         for p in parlamentares:
 
-                            key = 'titular' if p.titular else 'suplente'
+                            key = "titular" if p.titular else "suplente"
                             if not l_atual:
                                 sp[key].append(p)
                                 continue
 
-                            if not p.data_inicio_mandato <= n.date() <= p.data_fim_mandato:
-                                sp['afastado'].append(p)
+                            if (
+                                not p.data_inicio_mandato
+                                <= n.date()
+                                <= p.data_fim_mandato
+                            ):
+                                sp["afastado"].append(p)
                                 continue
                             else:
 
@@ -935,8 +1021,8 @@ class PathParlamentarView(PathView):
                                     continue
 
                                 af = p.afastamentoparlamentar_set.filter(
-                                    data_inicio__lte=n,
-                                    data_fim__gte=n).exists()
+                                    data_inicio__lte=n, data_fim__gte=n
+                                ).exists()
 
                                 if not af:
                                     p.afastado = None
@@ -945,34 +1031,46 @@ class PathParlamentarView(PathView):
 
                         for comissao in Comissao.objects.all():
 
-                            composicao = comissao.composicao_set.filter(
-                                Q(periodo__data_inicio__lte=s.data_fim,
-                                  periodo__data_fim__gte=s.data_fim) |
-                                Q(periodo__data_inicio__gte=s.data_inicio,
-                                  periodo__data_fim__lte=s.data_inicio)
-                            ).order_by('-id').first()
+                            composicao = (
+                                comissao.composicao_set.filter(
+                                    Q(
+                                        periodo__data_inicio__lte=s.data_fim,
+                                        periodo__data_fim__gte=s.data_fim,
+                                    )
+                                    | Q(
+                                        periodo__data_inicio__gte=s.data_inicio,
+                                        periodo__data_fim__lte=s.data_inicio,
+                                    )
+                                )
+                                .order_by("-id")
+                                .first()
+                            )
 
                             if not composicao:
                                 continue
 
-                            sessao['comissoes'].append(
+                            sessao["comissoes"].append(
                                 (
                                     comissao,
                                     composicao,
-                                    [p for p in composicao.participacao_set.all(
-                                    ).order_by('id')]
+                                    [
+                                        p
+                                        for p in composicao.participacao_set.all().order_by(
+                                            "id"
+                                        )
+                                    ],
                                 )
                             )
 
-                    leg['sessoes'].append(sessao)
+                    leg["sessoes"].append(sessao)
 
-                if not leg['sessoes'] and l == context['legislatura_selecionada']:
+                if not leg["sessoes"] and l == context["legislatura_selecionada"]:
                     for p in pms.filter(mandato__legislatura=l):
-                        leg['parlamentares'].append(p)
+                        leg["parlamentares"].append(p)
 
                 legislaturas.append(leg)
 
-            context['legislaturas'] = legislaturas
+            context["legislaturas"] = legislaturas
 
         return context
 
@@ -982,13 +1080,12 @@ class ClasseParentMixin:
 
     @property
     def parent(self):
-        if 'pk' not in self.kwargs:
+        if "pk" not in self.kwargs:
             self._parent = None
             return None
 
-        if not self._parent or (self._parent and
-                                self._parent.pk != self.kwargs['pk']):
-            self._parent = get_object_or_404(self.model, pk=self.kwargs['pk'])
+        if not self._parent or (self._parent and self._parent.pk != self.kwargs["pk"]):
+            self._parent = get_object_or_404(self.model, pk=self.kwargs["pk"])
 
         return self._parent
 
@@ -1003,34 +1100,34 @@ class ClasseParentMixin:
     @property
     def title(self):
         if not self.parent:
-            return _('Cadastro de Classe Geral')
+            return _("Cadastro de Classe Geral")
 
-        return '%s - %s - <small>(%s)</small>' % (
-            self.parent, self.parent.apelido or '', _('Cadastro de SubClasse'))
+        return "%s - %s - <small>(%s)</small>" % (
+            self.parent,
+            self.parent.apelido or "",
+            _("Cadastro de SubClasse"),
+        )
 
     @property
     def cancel_url(self):
-        if 'pk' not in self.kwargs:
-            return reverse_lazy('cmj.sigad:classe_list')
+        if "pk" not in self.kwargs:
+            return reverse_lazy("cmj.sigad:classe_list")
         else:
             return reverse_lazy(
-                'cmj.sigad:subclasse_list',
-                kwargs={'pk': self.kwargs['pk']})
+                "cmj.sigad:subclasse_list", kwargs={"pk": self.kwargs["pk"]}
+            )
 
     def get_success_url(self):
-        return reverse_lazy(
-            'cmj.sigad:subclasse_list',
-            kwargs={'pk': self.object.id})
+        return reverse_lazy("cmj.sigad:subclasse_list", kwargs={"pk": self.object.id})
 
 
-class ClasseCreateView(ClasseParentMixin,
-                       FormMessagesMixin,
-                       PermissionRequiredMixin,
-                       CreateView):
-    permission_required = 'sigad.add_classe'
-    form_valid_message = _('Classe criada com sucesso!')
-    form_invalid_message = _('Existem erros no formulário de cadastro!')
-    template_name = 'crud/form.html'
+class ClasseCreateView(
+    ClasseParentMixin, FormMessagesMixin, PermissionRequiredMixin, CreateView
+):
+    permission_required = "sigad.add_classe"
+    form_valid_message = _("Classe criada com sucesso!")
+    form_invalid_message = _("Existem erros no formulário de cadastro!")
+    template_name = "crud/form.html"
     form_class = forms.ClasseForm
     model = Classe
 
@@ -1048,30 +1145,33 @@ class ClasseCreateView(ClasseParentMixin,
         return response
 
     def get_initial(self):
-        self.initial = {'parent': self.parent}
+        self.initial = {"parent": self.parent}
 
-        cod__max = Classe.objects.filter(
-            parent=self.parent).order_by('codigo').aggregate(Max('codigo'))
+        cod__max = (
+            Classe.objects.filter(parent=self.parent)
+            .order_by("codigo")
+            .aggregate(Max("codigo"))
+        )
 
-        self.initial['codigo'] = cod__max['codigo__max'] + \
-            1 if cod__max['codigo__max'] else 1
+        self.initial["codigo"] = (
+            cod__max["codigo__max"] + 1 if cod__max["codigo__max"] else 1
+        )
 
         return CreateView.get_initial(self)
 
 
-class ClasseUpdateView(ClasseParentMixin,
-                       FormMessagesMixin,
-                       PermissionRequiredMixin,
-                       UpdateView):
-    permission_required = 'sigad.change_classe'
-    form_valid_message = _('Classe Alterada com sucesso!')
-    form_invalid_message = _('Existem erros no formulário!')
-    template_name = 'crud/form.html'
+class ClasseUpdateView(
+    ClasseParentMixin, FormMessagesMixin, PermissionRequiredMixin, UpdateView
+):
+    permission_required = "sigad.change_classe"
+    form_valid_message = _("Classe Alterada com sucesso!")
+    form_invalid_message = _("Existem erros no formulário!")
+    template_name = "crud/form.html"
     form_class = forms.ClasseForm
     model = Classe
 
     def get_initial(self):
-        self.initial = {'parent': self.parent.parent}
+        self.initial = {"parent": self.parent.parent}
         return UpdateView.get_initial(self)
 
     def form_valid(self, form):
@@ -1079,8 +1179,8 @@ class ClasseUpdateView(ClasseParentMixin,
 
 
 class ClasseDeleteView(PermissionRequiredMixin, DeleteView):
-    permission_required = 'sigad.delete_classe'
-    template_name = 'crud/confirm_delete.html'
+    permission_required = "sigad.delete_classe"
+    template_name = "crud/confirm_delete.html"
     model = Classe
 
     def post(self, request, *args, **kwargs):
@@ -1090,61 +1190,57 @@ class ClasseDeleteView(PermissionRequiredMixin, DeleteView):
         return DeleteView.post(self, request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy(
-            'cmj.sigad:subclasse_list',
-            kwargs={'pk': self.parent.id})
+        return reverse_lazy("cmj.sigad:subclasse_list", kwargs={"pk": self.parent.id})
 
 
 class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
-    permission_required = 'sigad.view_subclasse'
+    permission_required = "sigad.view_subclasse"
 
     model = Classe
-    template_name = 'sigad/classe_list.html'
+    template_name = "sigad/classe_list.html"
 
     @property
     def create_url(self):
-        if not self.request.user.has_perm('sigad.add_classe'):
-            return ''
-        if 'pk' not in self.kwargs:
-            return reverse_lazy('cmj.sigad:classe_create')
+        if not self.request.user.has_perm("sigad.add_classe"):
+            return ""
+        if "pk" not in self.kwargs:
+            return reverse_lazy("cmj.sigad:classe_create")
         else:
             return reverse_lazy(
-                'cmj.sigad:subclasse_create',
-                kwargs={'pk': self.kwargs['pk']})
+                "cmj.sigad:subclasse_create", kwargs={"pk": self.kwargs["pk"]}
+            )
 
     @property
     def update_url(self):
-        if not self.request.user.has_perm('sigad.change_classe'):
-            return ''
-        return reverse_lazy(
-            'cmj.sigad:classe_edit',
-            kwargs={'pk': self.kwargs['pk']})
+        if not self.request.user.has_perm("sigad.change_classe"):
+            return ""
+        return reverse_lazy("cmj.sigad:classe_edit", kwargs={"pk": self.kwargs["pk"]})
 
     @property
     def delete_url(self):
         if not self.object.parent and not self.request.user.is_superuser:
-            return ''
+            return ""
         else:
             return reverse_lazy(
-                'cmj.sigad:classe_delete',
-                kwargs={'pk': self.kwargs['pk']})
+                "cmj.sigad:classe_delete", kwargs={"pk": self.kwargs["pk"]}
+            )
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['object'] = self.object
+        context["object"] = self.object
 
         if self.object:
-            context['subnav_template_name'] = 'sigad/subnav_classe.yaml'
+            context["subnav_template_name"] = "sigad/subnav_classe.yaml"
 
         return ListView.get_context_data(self, **context)
 
     def get_queryset(self):
         qpub = None
-        if 'pk' not in self.kwargs:
+        if "pk" not in self.kwargs:
             self.object = None
             qpub = Classe.objects.filter(parent__isnull=True)
         else:
-            qpub = Classe.objects.filter(parent_id=self.kwargs['pk'])
+            qpub = Classe.objects.filter(parent_id=self.kwargs["pk"])
 
         if self.has_permission():
             return qpub
@@ -1152,11 +1248,11 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         qpub = qpub.filter(visibilidade=Classe.STATUS_PUBLIC)
 
         qs = list(qpub)
-        ''' Inclui os filhos da classe atual de visualização que
-        possuam algum herdeiro que seja público'''
-        pubs = Classe.objects.filter(
-            visibilidade=Classe.STATUS_PUBLIC).select_related(
-            'parent', 'parent__parent')
+        """ Inclui os filhos da classe atual de visualização que
+        possuam algum herdeiro que seja público"""
+        pubs = Classe.objects.filter(visibilidade=Classe.STATUS_PUBLIC).select_related(
+            "parent", "parent__parent"
+        )
         for pub in pubs:
             parents = pub.parents
             for p in parents[::-1]:
@@ -1166,47 +1262,47 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
 
         if not self.request.user.is_anonymous:
 
-            ''' Seleciona todas as classes com permissões expressas e visuali-
+            """Seleciona todas as classes com permissões expressas e visuali-
             zação para o usuário conectado
-            '''
-            pr = self.permission_required.split('.')
+            """
+            pr = self.permission_required.split(".")
             puc_list = PermissionsUserClasse.objects.filter(
                 user=self.request.user,
                 permission__content_type__app_label=pr[0],
-                permission__codename=pr[1]).select_related(
-                    'classe__parent', 'classe__parent__parent')
+                permission__codename=pr[1],
+            ).select_related("classe__parent", "classe__parent__parent")
 
             for puc in puc_list:
-                ''' Inclui no resultado a classe que possui autorização
+                """Inclui no resultado a classe que possui autorização
                 expressa de visualização e é filha direta da classe em
-                visualizaçao'''
+                visualizaçao"""
                 if self.object == puc.classe.parent:
                     if puc.classe not in qs:
                         qs.append(puc.classe)
                         continue
 
-                ''' Inclui todos os filhos imediatos da classe em visualiza-
+                """ Inclui todos os filhos imediatos da classe em visualiza-
                 ção caso seja esta a com permissão expressa para o usuário
-                conectado'''
+                conectado"""
                 if self.object and self.object == puc.classe:
-                    qs = qs + \
-                        [sub for sub in self.object.subclasses.all()
-                         if sub not in qs]
+                    qs = qs + [
+                        sub for sub in self.object.subclasses.all() if sub not in qs
+                    ]
                     continue
 
-                ''' Inclui os filhos da classe atual de visualização que
+                """ Inclui os filhos da classe atual de visualização que
                 possuam algum herdeiro que o usuário conectado possua direito
-                de visualização'''
+                de visualização"""
                 parents = puc.classe.parents
                 for p in parents[::-1]:
                     if p.parent == self.object:
                         if p not in qs:
                             qs.append(p)
 
-        return sorted(qs, key=attrgetter('codigo'))
+        return sorted(qs, key=attrgetter("codigo"))
 
     def get(self, request, *args, **kwargs):
-        renumere = request.GET.get('renumere', None)
+        renumere = request.GET.get("renumere", None)
 
         if not renumere is None:
 
@@ -1215,7 +1311,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
             if not self.object:
                 childs = childs.filter(parent=None)
 
-            childs = childs.order_by('codigo', 'titulo')
+            childs = childs.order_by("codigo", "titulo")
 
             for i, c in enumerate(childs, 1):
                 mult = 2 - c.nivel
@@ -1227,20 +1323,22 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
 
     def dispatch(self, request, *args, **kwargs):
         self.object = None
-        if 'pk' in self.kwargs:
-            self.object = get_object_or_404(Classe, pk=self.kwargs['pk'])
+        if "pk" in self.kwargs:
+            self.object = get_object_or_404(Classe, pk=self.kwargs["pk"])
 
             has_permission = self.has_permission()
 
             if not has_permission:
-                if not request.user.is_superuser and \
-                        self.object.visibilidade != Classe.STATUS_PUBLIC:
+                if (
+                    not request.user.is_superuser
+                    and self.object.visibilidade != Classe.STATUS_PUBLIC
+                ):
                     has_permission = False
 
                     # FIXME: refatorar e analisar apartir de self.object
                     pubs = Classe.objects.filter(
-                        visibilidade=Classe.STATUS_PUBLIC).select_related(
-                        'parent', 'parent__parent')
+                        visibilidade=Classe.STATUS_PUBLIC
+                    ).select_related("parent", "parent__parent")
                     for pub in pubs:
                         parents = pub.parents
                         for p in parents[::-1]:
@@ -1251,17 +1349,18 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                             break
 
                     if not has_permission and not request.user.is_anonymous:
-                        if (self.object.visibilidade ==
-                                Classe.STATUS_PRIVATE and
-                                self.object.owner != request.user):
+                        if (
+                            self.object.visibilidade == Classe.STATUS_PRIVATE
+                            and self.object.owner != request.user
+                        ):
                             has_permission = False
                         else:
-                            pr = self.permission_required.split('.')
+                            pr = self.permission_required.split(".")
                             puc_list = PermissionsUserClasse.objects.filter(
                                 user=request.user,
                                 permission__content_type__app_label=pr[0],
-                                permission__codename=pr[1]).select_related(
-                                    'classe__parent', 'classe__parent__parent')
+                                permission__codename=pr[1],
+                            ).select_related("classe__parent", "classe__parent__parent")
                             for puc in puc_list:
                                 if puc.classe == self.object:
                                     has_permission = True
@@ -1282,43 +1381,38 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
 
 class PermissionsUserClasseCrud(MasterDetailCrud):
     model = PermissionsUserClasse
-    parent_field = 'classe'
+    parent_field = "classe"
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = [
-            ('user__id', 'user', 'user__email', 'permission')]
+        list_field_names = [("user__id", "user", "user__email", "permission")]
 
         def get_context_data(self, **kwargs):
 
             ctxt = MasterDetailCrud.BaseMixin.get_context_data(self, **kwargs)
 
-            if 'pk' in self.kwargs:
-                ctxt['subnav_template_name'] = 'sigad/subnav_classe.yaml'
+            if "pk" in self.kwargs:
+                ctxt["subnav_template_name"] = "sigad/subnav_classe.yaml"
 
             return ctxt
 
 
-class DocumentoCreateView(
-        PermissionRequiredMixin,
-        CreateView):
-    permission_required = ('sigad.add_documento')
-    template_name = 'crud/form.html'
+class DocumentoCreateView(PermissionRequiredMixin, CreateView):
+    permission_required = "sigad.add_documento"
+    template_name = "crud/form.html"
     form_class = DocumentoForm
     model = Documento
 
     def get_success_url(self):
-        return reverse_lazy(
-            'cmj.sigad:documento_edit',
-            kwargs={'pk': self.object.id})
+        return reverse_lazy("cmj.sigad:documento_edit", kwargs={"pk": self.object.id})
 
     def get_form(self, form_class=None):
         form = super().get_form(self.form_class)
-        form.instance.classe = Classe.objects.get(pk=self.kwargs['pk'])
+        form.instance.classe = Classe.objects.get(pk=self.kwargs["pk"])
         form.instance.owner = self.request.user
         return form
 
     def title(self):
-        classe = Classe.objects.get(pk=self.kwargs['pk'])
+        classe = Classe.objects.get(pk=self.kwargs["pk"])
         return classe
 
 
@@ -1336,8 +1430,10 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 
                 # se documento é privado e usuário que acessa não é o dono
                 # não terá permissão.
-                if self.object.visibilidade == Documento.STATUS_PRIVATE and \
-                        self.request.user != self.object.owner:
+                if (
+                    self.object.visibilidade == Documento.STATUS_PRIVATE
+                    and self.request.user != self.object.owner
+                ):
                     has_permission = False
 
                 # independente do status, o usuário deve ter permissão da
@@ -1347,57 +1443,69 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 
                 # se documento é restrito, verifica se usuário possue
                 # permissão para o documento
-                if has_permission and \
-                        self.object.visibilidade == Documento.STATUS_RESTRICT:
+                if (
+                    has_permission
+                    and self.object.visibilidade == Documento.STATUS_RESTRICT
+                ):
 
                     if not PermissionsUserDocumento.objects.filter(
-                            documento=self.object).exists():
+                        documento=self.object
+                    ).exists():
 
                         pus = self.object.classe.permissions_user_set
-                        if pus.filter(
-                            user__isnull=False).exists() and not pus.filter(
-                                user=self.request.user).exists():
+                        if (
+                            pus.filter(user__isnull=False).exists()
+                            and not pus.filter(user=self.request.user).exists()
+                        ):
                             has_permission = False
 
                     else:
                         # Permissão para usuário sem associação com permission
-                        qu = Q(permission__isnull=True,
-                               user=self.request.user,
-                               documento=self.object)
+                        qu = Q(
+                            permission__isnull=True,
+                            user=self.request.user,
+                            documento=self.object,
+                        )
 
-                        if PermissionsUserDocumento.objects.filter(qu).exists(
-                        ) or self.request.user == self.object.owner:
+                        if (
+                            PermissionsUserDocumento.objects.filter(qu).exists()
+                            or self.request.user == self.object.owner
+                        ):
                             pass
                         else:
 
                             perms = self.get_permission_required()
 
                             for perm in perms:
-                                perm = perm.split('.')
+                                perm = perm.split(".")
 
                                 # Permissão individual user, object, permission
                                 qup = Q(
                                     permission__content_type__app_label=perm[0],
                                     permission__codename=perm[1],
                                     user=self.request.user,
-                                    documento=self.object)
+                                    documento=self.object,
+                                )
 
                                 # Permissão de objeto
                                 qp = Q(
                                     permission__content_type__app_label=perm[0],
                                     permission__codename=perm[1],
                                     user__isnull=True,
-                                    documento=self.object)
+                                    documento=self.object,
+                                )
 
                                 # Se o objeto não possui
                                 qp = Q(
                                     permission__content_type__app_label=perm[0],
                                     permission__codename=perm[1],
                                     user__isnull=True,
-                                    documento=self.object)
+                                    documento=self.object,
+                                )
 
                                 if not PermissionsUserDocumento.objects.filter(
-                                        qp | qup).exists():
+                                    qp | qup
+                                ).exists():
                                     has_permission = False
                                     break
         else:
@@ -1407,19 +1515,19 @@ class DocumentoPermissionRequiredMixin(PermissionRequiredMixin):
 
 
 class DocumentoDetailView(DocumentoPermissionRequiredMixin, DetailView):
-    permission_required = ('sigad.view_documento')
+    permission_required = "sigad.view_documento"
     model = Documento
 
 
 class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
-    permission_required = ('sigad.delete_documento')
+    permission_required = "sigad.delete_documento"
     model = Documento
-    template_name = 'crud/confirm_delete.html'
+    template_name = "crud/confirm_delete.html"
 
     def get_success_url(self):
         return reverse_lazy(
-            'cmj.sigad:path_view',
-            kwargs={'slug': self.object.classe.slug})
+            "cmj.sigad:path_view", kwargs={"slug": self.object.classe.slug}
+        )
 
     def form_valid(self, form):
         self.object = self.get_object()
@@ -1428,7 +1536,7 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
         self.object.delete(user=self.request.user)
 
         vps = VideoParte.objects.filter(object_id=pk)
-        videos = set(vps.values_list('video', flat=True))
+        videos = set(vps.values_list("video", flat=True))
         vps.delete()
         VideoParte.objects.filter(video__in=videos).delete()
         Video.objects.filter(pk__in=videos).delete()
@@ -1437,25 +1545,25 @@ class DocumentoDeleteView(DocumentoPermissionRequiredMixin, DeleteView):
 
 
 class DocumentoConstructView(DocumentoPermissionRequiredMixin, TemplateView):
-    permission_required = ('sigad.change_documento',)
-    template_name = 'sigad/documento_construct.html'
+    permission_required = ("sigad.change_documento",)
+    template_name = "sigad/documento_construct.html"
     model = Documento
 
     def get_object(self):
         kw = self.kwargs
-        return self.model.objects.get(pk=kw.get('pk'))
+        return self.model.objects.get(pk=kw.get("pk"))
 
 
 class DocumentoConstructCreateView(DocumentoConstructView):
-    permission_required = ('sigad.add_documento',)
+    permission_required = ("sigad.add_documento",)
     model = Classe
 
 
 class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
-    permission_required = ('sigad.change_documento')
+    permission_required = "sigad.change_documento"
     model = Documento
     form_class = DocumentoForm
-    template_name = 'sigad/documento_form.html'
+    template_name = "sigad/documento_form.html"
 
     @property
     def cancel_url(self):
@@ -1463,13 +1571,13 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse_lazy(
-            'cmj.sigad:path_view',
-            kwargs={'slug': self.object.absolute_slug})
+            "cmj.sigad:path_view", kwargs={"slug": self.object.absolute_slug}
+        )
 
     def get_context_data(self, **kwargs):
 
         ctxt = UpdateView.get_context_data(self, **kwargs)
-        ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
+        ctxt["subnav_template_name"] = "sigad/subnav_documento.yaml"
         return ctxt
 
     def form_valid(self, form):
@@ -1479,28 +1587,26 @@ class DocumentoUpdateView(DocumentoPermissionRequiredMixin, UpdateView):
 
 class PermissionsUserDocumentoCrud(MasterDetailCrud):
     model = PermissionsUserDocumento
-    parent_field = 'documento'
+    parent_field = "documento"
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = [
-            ('user__id', 'user', 'user__email', 'permission')]
+        list_field_names = [("user__id", "user", "user__email", "permission")]
 
         def get_context_data(self, **kwargs):
 
             ctxt = MasterDetailCrud.BaseMixin.get_context_data(self, **kwargs)
 
-            ctxt['subnav_template_name'] = 'sigad/subnav_documento.yaml'
+            ctxt["subnav_template_name"] = "sigad/subnav_documento.yaml"
 
             return ctxt
 
 
 class CaixaPublicacaoCrud(Crud):
     model = CaixaPublicacao
-    help_text = 'caixapublicacao'
+    help_text = "caixapublicacao"
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = [
-            'nome', 'key', 'documentos']
+        list_field_names = ["nome", "key", "documentos"]
 
     class CreateView(Crud.CreateView):
         form_class = CaixaPublicacaoForm
@@ -1509,17 +1615,17 @@ class CaixaPublicacaoCrud(Crud):
         form_class = CaixaPublicacaoForm
 
     class DetailView(Crud.DetailView):
-        layout_key = 'CaixaPublicacaoDetail'
-        template_name = 'sigad/caixapublicacao_detail.html'
+        layout_key = "CaixaPublicacaoDetail"
+        template_name = "sigad/caixapublicacao_detail.html"
 
         def get_context_data(self, **kwargs):
             context = Crud.DetailView.get_context_data(self, **kwargs)
             return context
 
         def get(self, request, *args, **kwargs):
-            cpd_pk = request.GET.get('cpd_pk', 0)
+            cpd_pk = request.GET.get("cpd_pk", 0)
             if cpd_pk:
-                up = -1500 if 'up' in request.GET else 1500
+                up = -1500 if "up" in request.GET else 1500
                 try:
                     cpd = CaixaPublicacaoRelationship.objects.get(pk=cpd_pk)
                     cpd.ordem += up
@@ -1533,20 +1639,19 @@ class CaixaPublicacaoCrud(Crud):
 
 class CaixaPublicacaoClasseCrud(MasterDetailCrud):
     model = CaixaPublicacaoClasse
-    parent_field = 'classe'
+    parent_field = "classe"
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = [
-            'nome', 'key', 'classe', 'documentos']
+        list_field_names = ["nome", "key", "classe", "documentos"]
 
         def get_initial(self):
             if self.object:
                 classe = self.object.classe
             else:
-                classe = Classe.objects.get(pk=self.kwargs.get('pk'))
+                classe = Classe.objects.get(pk=self.kwargs.get("pk"))
 
             initial = MasterDetailCrud.CreateView.get_initial(self)
-            initial.update({'classe': classe})
+            initial.update({"classe": classe})
             return initial
 
     class CreateView(MasterDetailCrud.CreateView):

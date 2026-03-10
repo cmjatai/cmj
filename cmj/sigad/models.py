@@ -1,12 +1,10 @@
-from datetime import datetime
 import io
 import os
 import tempfile
 import zipfile
+from datetime import datetime
 
-from PIL import Image, ImageFont
-from PIL.Image import LANCZOS
-from PIL.ImageDraw import Draw
+import qrcode
 from django import db
 from django.conf import settings
 from django.contrib.auth.models import Permission
@@ -18,8 +16,8 @@ from django.core.files.base import File
 from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models import Q, F
-from django.db.models.deletion import PROTECT, CASCADE
+from django.db.models import F, Q
+from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields.json import JSONField
 from django.http.response import HttpResponse
 from django.utils import timezone
@@ -27,101 +25,126 @@ from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
+from PIL import Image, ImageFont
+from PIL.Image import LANCZOS
+from PIL.ImageDraw import Draw
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
-import qrcode
 
 from cmj import globalrules
 from cmj.core.models import AuditLog
 from cmj.mixins import CmjChoices
-from cmj.utils import get_settings_auth_user_model, YES_NO_CHOICES, \
-    restringe_tipos_de_arquivo_midias, TIPOS_IMG_PERMITIDOS, \
-    media_protected_storage
+from cmj.utils import (
+    TIPOS_IMG_PERMITIDOS,
+    YES_NO_CHOICES,
+    get_settings_auth_user_model,
+    media_protected_storage,
+    restringe_tipos_de_arquivo_midias,
+)
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
-
 DOC_TEMPLATES_CHOICE_FILES = {
     1: {
-        'template_name': 'path/path_documento.html',
-        'create_url': 'cmj.sigad:documento_construct_create'
+        "template_name": "path/path_documento.html",
+        "create_url": "cmj.sigad:documento_construct_create",
     },
     2: {
-        'template_name': 'path/path_thumbnails.html',
-        'create_url': 'cmj.sigad:documento_construct_create'
+        "template_name": "path/path_thumbnails.html",
+        "create_url": "cmj.sigad:documento_construct_create",
     },
     99: {
-        'template_name': 'path/path_documento.html',
-        'create_url': 'cmj.sigad:documento_construct_create'
+        "template_name": "path/path_documento.html",
+        "create_url": "cmj.sigad:documento_construct_create",
+    },
+    501: {
+        "template_name": "path/path_subsite_capa.html",
+        "create_url": "cmj.sigad:documento_construct_create",
     },
 }
 
 DOC_TEMPLATES_CHOICE = CmjChoices(
-    (1, 'noticia', _('Notícia Pública')),
-    (2, 'galeria', _('Galeria de Imagens')),
+    (1, "noticia", _("Notícia Pública")),
+    (2, "galeria", _("Galeria de Imagens")),
+    (501, "capa_subsite", _("Capa de Subsite")),
+
 )
 
 CLASSE_TEMPLATES_CHOICE_FILES = {
-    1: 'path/path_classe.html',
-    2: 'path/path_galeria.html',
-    3: 'path/path_parlamentares.html',
-    4: 'path/path_parlamentar.html',
-    5: 'path/path_galeria.html',
-    6: 'path/path_classe.html',
-    7: 'path/path_galeria_video.html',
-    99: 'path/path_documento.html',
-    999: 'path/path_mapa_site.html',
+    1: "path/path_classe.html",
+    2: "path/path_galeria.html",
+    3: "path/path_parlamentares.html",
+    4: "path/path_parlamentar.html",
+    5: "path/path_galeria.html",
+    6: "path/path_classe.html",
+    7: "path/path_galeria_video.html",
+    99: "path/path_documento.html",
+    500: "path/path_subsite.html",
+    501: "path/path_subsite_capa.html",
+    999: "path/path_mapa_site.html",
 }
 
 CLASSE_DOC_MANAGER_CHOICE = {
-    1: 'qs_news',
-    2: 'view_public_gallery',
-    3: 'qs_news',
-    4: 'qs_news',
-    5: 'qs_bi',
-    6: 'qs_audio_news',
-    7: 'qs_video_news',
+    1: "qs_news",
+    2: "view_public_gallery",
+    3: "qs_news",
+    4: "qs_news",
+    5: "qs_bi",
+    6: "qs_audio_news",
+    7: "qs_video_news",
     99: None,
-    999: 'qs_mapa_site',
+    500: "qs_news",
+    999: "qs_mapa_site",
 }
 
 CLASSE_TEMPLATES_CHOICE = CmjChoices(
-    (1, 'lista_em_linha', _('Listagem em Linha')),
-    (2, 'galeria', _('Galeria Albuns')),
-    (3, 'parlamentares', _('Página dos Parlamentares')),
-    (4, 'parlamentar', _('Página individual de Parlamentar')),
-    (5, 'fotografia', _('Banco de Imagens')),
-    (6, 'galeria_audio', _('Galeria de Áudios')),
-    (7, 'galeria_video', _('Galeria de Vídeos')),
-    (99, 'documento_especifico', _('Documento Específico')),
-    (999, 'mapa_site', _('Mapa do Site')),
+    (1, "lista_em_linha", _("Listagem em Linha")),
+    (2, "galeria", _("Galeria Albuns")),
+    (3, "parlamentares", _("Página dos Parlamentares")),
+    (4, "parlamentar", _("Página individual de Parlamentar")),
+    (5, "fotografia", _("Banco de Imagens")),
+    (6, "galeria_audio", _("Galeria de Áudios")),
+    (7, "galeria_video", _("Galeria de Vídeos")),
+    (99, "documento_especifico", _("Documento Específico")),
+    (500, "subsites", _("Subsites")),
+    (999, "mapa_site", _("Mapa do Site")),
 )
 
 
 class Parent(models.Model):
 
     parent = models.ForeignKey(
-        'self',
-        blank=True, null=True, default=None,
-        related_name='childs',
-        verbose_name=_('Filhos'),
-        on_delete=PROTECT)
+        "self",
+        blank=True,
+        null=True,
+        default=None,
+        related_name="childs",
+        verbose_name=_("Filhos"),
+        on_delete=PROTECT,
+    )
 
     raiz = models.ForeignKey(
-        'self',
-        blank=True, null=True, default=None,
-        related_name='nodes',
-        verbose_name=_('Containers'),
-        on_delete=PROTECT)
+        "self",
+        blank=True,
+        null=True,
+        default=None,
+        related_name="nodes",
+        verbose_name=_("Containers"),
+        on_delete=PROTECT,
+    )
 
     related_classes = models.ManyToManyField(
-        'self', blank=True,
-        verbose_name=_('Classes Relacionadas'))
+        "self", blank=True, verbose_name=_("Classes Relacionadas")
+    )
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     class Meta:
         abstract = True
@@ -131,7 +154,9 @@ class Parent(models.Model):
         if not self.parent:
             return []
 
-        parents = self.parent.parents + [self.parent, ]
+        parents = self.parent.parents + [
+            self.parent,
+        ]
         return parents
 
     @property
@@ -145,7 +170,7 @@ class Parent(models.Model):
     @property
     def classes_parents(self):
 
-        if not hasattr(self, 'classe'):
+        if not hasattr(self, "classe"):
             return self.parents
 
         _p = self.parents
@@ -157,7 +182,7 @@ class Parent(models.Model):
     @property
     def classes_parents_and_me(self):
 
-        if not hasattr(self, 'classe'):
+        if not hasattr(self, "classe"):
             return self.parents_and_me
 
         p = self.parents_and_me
@@ -168,9 +193,9 @@ class Parent(models.Model):
     def treechilds2list(self, qs_name=None, params={}):
         yield self
         if not qs_name:
-            qs_name = 'view_childs'
+            qs_name = "view_childs"
         if params:
-            params.update({'parent': self})
+            params.update({"parent": self})
         for child in getattr(self.childs, qs_name)().filter(**params):
             for item in child.treechilds2list(qs_name=qs_name, params=params):
                 yield item
@@ -183,9 +208,9 @@ class CMSMixin(models.Model):
     STATUS_PUBLIC = 0
 
     VISIBILIDADE_STATUS = CmjChoices(
-        (STATUS_RESTRICT, 'status_restrict', _('Restrito')),
-        (STATUS_PUBLIC, 'status_public', _('Público')),
-        (STATUS_PRIVATE, 'status_private', _('Privado')),
+        (STATUS_RESTRICT, "status_restrict", _("Restrito")),
+        (STATUS_PUBLIC, "status_public", _("Público")),
+        (STATUS_PRIVATE, "status_private", _("Privado")),
     )
 
     ALINHAMENTO_LEFT = 0
@@ -195,12 +220,15 @@ class CMSMixin(models.Model):
     ALINHAMENTO_EXPAND = 4
 
     alinhamento_choice = CmjChoices(
-        (ALINHAMENTO_LEFT, 'alinhamento_left', _('Alinhamento Esquerdo')),
-        (ALINHAMENTO_JUSTIFY, 'alinhamento_justify', _('Alinhamento Completo')),
-        (ALINHAMENTO_RIGHT, 'alinhamento_right', _('Alinhamento Direito')),
-        (ALINHAMENTO_CENTER, 'alinhamento_center', _('Alinhamento Centralizado')),
-        (ALINHAMENTO_EXPAND, 'alinhamento_expand',
-         _('Alinhamento Completo - Render Large')),
+        (ALINHAMENTO_LEFT, "alinhamento_left", _("Alinhamento Esquerdo")),
+        (ALINHAMENTO_JUSTIFY, "alinhamento_justify", _("Alinhamento Completo")),
+        (ALINHAMENTO_RIGHT, "alinhamento_right", _("Alinhamento Direito")),
+        (ALINHAMENTO_CENTER, "alinhamento_center", _("Alinhamento Centralizado")),
+        (
+            ALINHAMENTO_EXPAND,
+            "alinhamento_expand",
+            _("Alinhamento Completo - Render Large"),
+        ),
     )
 
     TD_NEWS = 0
@@ -221,8 +249,7 @@ class CMSMixin(models.Model):
     TPD_GALLERY = 901
 
     # Documentos completos
-    TDs = (TD_NEWS, TD_DOC, TD_BI, TD_GALERIA_PUBLICA,
-           TD_AUDIO_NEWS, TD_VIDEO_NEWS)
+    TDs = (TD_NEWS, TD_DOC, TD_BI, TD_GALERIA_PUBLICA, TD_AUDIO_NEWS, TD_VIDEO_NEWS)
 
     # Containers
     TDc = (TPD_CONTAINER_SIMPLES, TPD_CONTAINER_EXTENDIDO, TPD_CONTAINER_FILE)
@@ -231,78 +258,82 @@ class CMSMixin(models.Model):
     TDp = (TPD_TEXTO, TPD_FILE, TPD_VIDEO, TPD_AUDIO, TPD_IMAGE, TPD_GALLERY)
 
     # Tipos não acessiveis diretamente via URL
-    TDp_exclude_render = (TPD_TEXTO,
-                          TPD_CONTAINER_SIMPLES,
-                          TPD_CONTAINER_EXTENDIDO,
-                          TPD_VIDEO,
-                          TPD_AUDIO)
+    TDp_exclude_render = (
+        TPD_TEXTO,
+        TPD_CONTAINER_SIMPLES,
+        TPD_CONTAINER_EXTENDIDO,
+        TPD_VIDEO,
+        TPD_AUDIO,
+    )
 
     tipo_parte_doc = {
-        'documentos': CmjChoices(
-            (TD_NEWS, 'td_news', _('Notícias')),
-            (TD_DOC, 'td_doc', _('Documento')),
-            (TD_BI, 'td_bi', _('Banco de Imagem')),
-            (TD_GALERIA_PUBLICA, 'td_galeria_publica', _('Galeria Pública')),
-            (TD_AUDIO_NEWS, 'td_audio_news', _('Áudio Notícia')),
-            (TD_VIDEO_NEWS, 'td_video_news', _('Vídeo Notícia')),
+        "documentos": CmjChoices(
+            (TD_NEWS, "td_news", _("Notícias")),
+            (TD_DOC, "td_doc", _("Documento")),
+            (TD_BI, "td_bi", _("Banco de Imagem")),
+            (TD_GALERIA_PUBLICA, "td_galeria_publica", _("Galeria Pública")),
+            (TD_AUDIO_NEWS, "td_audio_news", _("Áudio Notícia")),
+            (TD_VIDEO_NEWS, "td_video_news", _("Vídeo Notícia")),
         ),
-
-        'containers': CmjChoices(
-            (TPD_CONTAINER_SIMPLES,
-             'container', _('Container Simples')),
-            (TPD_CONTAINER_EXTENDIDO,
-             'container_fluid', _('Container Extendido')),
-            (TPD_CONTAINER_FILE,
-             'container_file', _('Container de Imagens para Arquivo PDF')),
+        "containers": CmjChoices(
+            (TPD_CONTAINER_SIMPLES, "container", _("Container Simples")),
+            (TPD_CONTAINER_EXTENDIDO, "container_fluid", _("Container Extendido")),
+            (
+                TPD_CONTAINER_FILE,
+                "container_file",
+                _("Container de Imagens para Arquivo PDF"),
+            ),
         ),
-
-        'subtipos': CmjChoices(
-            (TPD_TEXTO, 'tpd_texto', _('Texto')),
-            (TPD_FILE, 'tpd_file', _('Arquivo')),
-            (TPD_VIDEO, 'tpd_video', _('Vídeo')),
-            (TPD_AUDIO, 'tpd_audio', _('Áudio')),
-            (TPD_IMAGE, 'tpd_image', _('Imagem')),
-            (TPD_GALLERY, 'tpd_gallery', _('Galeria de Imagens')),
-        )
+        "subtipos": CmjChoices(
+            (TPD_TEXTO, "tpd_texto", _("Texto")),
+            (TPD_FILE, "tpd_file", _("Arquivo")),
+            (TPD_VIDEO, "tpd_video", _("Vídeo")),
+            (TPD_AUDIO, "tpd_audio", _("Áudio")),
+            (TPD_IMAGE, "tpd_image", _("Imagem")),
+            (TPD_GALLERY, "tpd_gallery", _("Galeria de Imagens")),
+        ),
     }
 
-    tipo_parte_doc_choice = (tipo_parte_doc['documentos'] +
-                             tipo_parte_doc['containers'] +
-                             tipo_parte_doc['subtipos'])
+    tipo_parte_doc_choice = (
+        tipo_parte_doc["documentos"]
+        + tipo_parte_doc["containers"]
+        + tipo_parte_doc["subtipos"]
+    )
 
     created = models.DateTimeField(
-        verbose_name=_('created'), editable=False, auto_now_add=True)
+        verbose_name=_("created"), editable=False, auto_now_add=True
+    )
 
     public_date = models.DateTimeField(
-        null=True, default=None,
-        verbose_name=_('Data de Início de Publicação'))
+        null=True, default=None, verbose_name=_("Data de Início de Publicação")
+    )
 
     public_end_date = models.DateTimeField(
-        null=True, default=None,
-        verbose_name=_('Data de Fim de Publicação'))
+        null=True, default=None, verbose_name=_("Data de Fim de Publicação")
+    )
 
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('owner'), related_name='+',
-        on_delete=PROTECT)
+        verbose_name=_("owner"),
+        related_name="+",
+        on_delete=PROTECT,
+    )
 
     descricao = models.TextField(
-        verbose_name=_('Descrição'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Descrição"), blank=True, null=True, default=None
+    )
 
     autor = models.TextField(
-        verbose_name=_('Autor'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Autor"), blank=True, null=True, default=None
+    )
 
     visibilidade = models.IntegerField(
-        _('Visibilidade'),
-        choices=VISIBILIDADE_STATUS,
-        default=STATUS_PRIVATE)
+        _("Visibilidade"), choices=VISIBILIDADE_STATUS, default=STATUS_PRIVATE
+    )
 
     listar = models.BooleanField(
-        _('Aparecer nas Listagens'),
-        choices=YES_NO_CHOICES,
-        default=True)
+        _("Aparecer nas Listagens"), choices=YES_NO_CHOICES, default=True
+    )
 
     class Meta:
         abstract = True
@@ -318,7 +349,8 @@ class CMSMixin(models.Model):
                 concret_model = kls
         qs = AuditLog.objects.filter(
             content_type=ContentType.objects.get_for_model(concret_model),
-            object_id=self.pk)
+            object_id=self.pk,
+        )
         return qs
 
     @property
@@ -331,7 +363,8 @@ class CMSMixin(models.Model):
                 concret_model = kls
         qs = Revisao.objects.filter(
             content_type=ContentType.objects.get_for_model(concret_model),
-            object_id=self.pk)
+            object_id=self.pk,
+        )
         return qs
 
     @property
@@ -354,41 +387,36 @@ class CMSMixin(models.Model):
             for field_name in field_tuple:
                 field_value = getattr(self, field_name)
                 if getattr(self, field_name) is None:
-                    unique_filter['%s__isnull' % field_name] = True
+                    unique_filter["%s__isnull" % field_name] = True
                     null_found = True
                 else:
-                    unique_filter['%s' % field_name] = field_value
+                    unique_filter["%s" % field_name] = field_value
                     unique_fields.append(field_name)
             if null_found:
-                unique_queryset = self.__class__.objects.filter(
-                    **unique_filter)
+                unique_queryset = self.__class__.objects.filter(**unique_filter)
                 if self.pk:
                     unique_queryset = unique_queryset.exclude(pk=self.pk)
                 if unique_queryset.exists():
                     msg = self.unique_error_message(
-                        self.__class__, tuple(unique_fields))
+                        self.__class__, tuple(unique_fields)
+                    )
                     raise ValidationError(msg)
 
 
 class Slugged(Parent):
     titulo = models.CharField(
-        verbose_name=_('Título'),
-        max_length=250,
-        blank=True, null=True, default='')
+        verbose_name=_("Título"), max_length=250, blank=True, null=True, default=""
+    )
 
     subtitle = models.TextField(
-        verbose_name=_('Subtítulo'),
-        blank=True, null=True, default='')
+        verbose_name=_("Subtítulo"), blank=True, null=True, default=""
+    )
 
     apelido = models.CharField(
-        verbose_name=_('Apelido'),
-        max_length=250,
-        blank=True, null=True, default='')
+        verbose_name=_("Apelido"), max_length=250, blank=True, null=True, default=""
+    )
 
-    slug = models.SlugField(
-        max_length=2000,
-        db_index=True
-        )
+    slug = models.SlugField(max_length=2000, db_index=True)
 
     class Meta:
         abstract = True
@@ -402,8 +430,8 @@ class Slugged(Parent):
         if not self.id:
             super(Slugged, self).save(*args, **kwargs)
 
-        kwargs['force_insert'] = False
-        kwargs['force_update'] = True
+        kwargs["force_insert"] = False
+        kwargs["force_update"] = True
 
         if self._meta.model == Documento and not self.parent and self.titulo:
             slug = self.titulo
@@ -414,15 +442,17 @@ class Slugged(Parent):
 
         self.slug = self.generate_unique_slug(slug)
 
-        if self.parent and hasattr(self, 'classe'):
+        if self.parent and hasattr(self, "classe"):
             self.visibilidade = self.parent.visibilidade
             self.public_date = self.parent.public_date
             self.listar = self.parent.listar
 
-            if hasattr(self, 'classe'):
+            if hasattr(self, "classe"):
                 self.classe = self.parent.classe
 
-        self.raiz = self.parent.raiz if self.parent and self.parent.raiz else self.parent
+        self.raiz = (
+            self.parent.raiz if self.parent and self.parent.raiz else self.parent
+        )
 
         super(Slugged, self).save(*args, **kwargs)
 
@@ -436,7 +466,7 @@ class Slugged(Parent):
         for child in self.childs.all():
             child.save()
 
-        if hasattr(self, 'cita'):
+        if hasattr(self, "cita"):
             for citacao in self.cita.all():
                 citacao.save()
 
@@ -448,13 +478,13 @@ class Slugged(Parent):
 
         slug = slugify(slug)
 
-        parents_slug = (self.parent.slug + '/') if self.parent else ''
+        parents_slug = (self.parent.slug + "/") if self.parent else ""
 
-        custom_slug = ''
-        if not self.parent and hasattr(self, 'classe'):
-            custom_slug = self.classe.slug + '/'
-        elif hasattr(self, 'referente'):
-            custom_slug = self.referente.slug + '/'
+        custom_slug = ""
+        if not self.parent and hasattr(self, "classe"):
+            custom_slug = self.classe.slug + "/"
+        elif hasattr(self, "referente"):
+            custom_slug = self.referente.slug + "/"
 
         slug_base = custom_slug + parents_slug + slug
         slug = slug_base
@@ -467,7 +497,8 @@ class Slugged(Parent):
             try:
                 obj = concret_model.objects.get(
                     #    **{'slug': slug, 'parent': self.parent})
-                    ** {'slug': slug})
+                    **{"slug": slug}
+                )
                 if obj == self:
                     raise ObjectDoesNotExist
 
@@ -487,18 +518,21 @@ class Slugged(Parent):
         if not self.parent:
             return []
 
-        parents = self.parent.strparents + [self.parent.titulo, ]
+        parents = self.parent.strparents + [
+            self.parent.titulo,
+        ]
         return parents
 
     def __str__(self):
         parents = self.strparents
         parents.append(self.titulo)
 
-        return ':'.join(parents)
+        return ":".join(parents)
 
     @property
     def absolute_slug(self):
-        raise NotImplementedError(_('Método não implementado pela subclasse!'))
+        raise NotImplementedError(_("Método não implementado pela subclasse!"))
+
 
 # short_service = build(
 #    'urlshortener', 'v1', developerKey=settings.GOOGLE_URL_SHORTENER_KEY)
@@ -506,38 +540,40 @@ class Slugged(Parent):
 
 def short_url(**kwargs):
 
-    return ''
+    return ""
 
     # GOOGLE FOI DESATIVADO EM 30/05/2019
-    import urllib3
     import json
 
-    domain = kwargs.get('domain', 'https://www.jatai.go.leg.br')
+    import urllib3
 
-    slug = kwargs.get('slug', '')
+    domain = kwargs.get("domain", "https://www.jatai.go.leg.br")
+
+    slug = kwargs.get("slug", "")
 
     fields = {
-        'longUrl': '%s/%s' % (domain, slug),
+        "longUrl": "%s/%s" % (domain, slug),
     }
 
-    encoded_data = json.dumps(fields).encode('utf-8')
+    encoded_data = json.dumps(fields).encode("utf-8")
 
     http = urllib3.PoolManager()
     r = http.request(
-        'POST',
-        'https://www.googleapis.com/urlshortener/v1/url?'
-        'fields=id&key=' + settings.GOOGLE_URL_SHORTENER_KEY,
+        "POST",
+        "https://www.googleapis.com/urlshortener/v1/url?"
+        "fields=id&key=" + settings.GOOGLE_URL_SHORTENER_KEY,
         body=encoded_data,
-        headers={'Content-Type': 'application/json'})
+        headers={"Content-Type": "application/json"},
+    )
 
     try:
-        data = r.data.decode('utf-8')
+        data = r.data.decode("utf-8")
         jdata = json.loads(data)
 
-        return jdata['id']
+        return jdata["id"]
     except Exception as e:
         print(e)
-        return ''
+        return ""
 
 
 class UrlShortenerManager(models.Manager):
@@ -546,12 +582,12 @@ class UrlShortenerManager(models.Manager):
         url = self.get_queryset().filter(**kwargs).first()
         if not url:
 
-            bts = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+            bts = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
             url = UrlShortener()
-            url.url_long = kwargs['url_long']
-            url.automatico = kwargs.get('automatico', True)
-            url.link_absoluto = kwargs.get('link_absoluto', False)
+            url.url_long = kwargs["url_long"]
+            url.automatico = kwargs.get("automatico", True)
+            url.link_absoluto = kwargs.get("link_absoluto", False)
             url.save()
 
             def b62encode(id):
@@ -572,56 +608,51 @@ class UrlShortener(models.Model):
     objects = UrlShortenerManager()
 
     url_short = models.TextField(
-        verbose_name=_('Link Curto'),
-        db_index=True,
-        blank=True, null=True, default=None)
+        verbose_name=_("Link Curto"), db_index=True, blank=True, null=True, default=None
+    )
 
-    url_long = models.TextField(
-        verbose_name=_('Link Longo'),
-        db_index=True)
+    url_long = models.TextField(verbose_name=_("Link Longo"), db_index=True)
 
     link_absoluto = models.BooleanField(
-        _('Link Absoluto'),
-        choices=YES_NO_CHOICES,
-        default=False)
+        _("Link Absoluto"), choices=YES_NO_CHOICES, default=False
+    )
 
     automatico = models.BooleanField(
-        _('Link Automático'),
-        choices=YES_NO_CHOICES,
-        default=True)
+        _("Link Automático"), choices=YES_NO_CHOICES, default=True
+    )
 
     created = models.DateTimeField(
-        verbose_name=_('Data de Criação'),
-        editable=False, auto_now_add=True)
+        verbose_name=_("Data de Criação"), editable=False, auto_now_add=True
+    )
 
     class Meta:
-        ordering = ('url_short',)
+        ordering = ("url_short",)
 
         unique_together = (
-            ('url_short', 'url_long',),
+            (
+                "url_short",
+                "url_long",
+            ),
         )
-        verbose_name = _('UrlShortener')
-        verbose_name_plural = _('UrlShortener')
+        verbose_name = _("UrlShortener")
+        verbose_name_plural = _("UrlShortener")
 
     @property
     def absolute_short(self, protocol=True):
         if settings.DEBUG:
-            return 'http://localhost:9000/j{}'.format(
-                self.url_short
-            )
-        return '{}jatai.go.leg.br/j{}'.format(
-            'https://' if protocol else '',
-            self.url_short
+            return "http://localhost:9000/j{}".format(self.url_short)
+        return "{}jatai.go.leg.br/j{}".format(
+            "https://" if protocol else "", self.url_short
         )
 
     def __str__(self):
-        return 'Link Curto: {}'.format(self.url_short)
+        return "Link Curto: {}".format(self.url_short)
 
     @property
     def qrcode(self):
-        fn = '/tmp/portalcmj_qrcode_{}.png'.format(self.url_short)
+        fn = "/tmp/portalcmj_qrcode_{}.png".format(self.url_short)
 
-        brasao = settings.FRONTEND_BRASAO_PATH['128']
+        brasao = settings.FRONTEND_BRASAO_PATH["128"]
 
         ibr = Image.open(brasao)
 
@@ -631,74 +662,81 @@ class UrlShortener(models.Model):
         draw = Draw(new_image)
 
         font = ImageFont.truetype(
-            font=settings.PROJECT_DIR.child('fonts').child('Helvetica.ttf'),
-            size=11)
+            font=settings.PROJECT_DIR.child("fonts").child("Helvetica.ttf"), size=11
+        )
         size_text = font.getsize(self.absolute_short)
 
         draw.rectangle(
             (0, 128 - size_text[1] - 8, 144 - 1, 128 - 1),
             fill=(17, 77, 129),
             outline=(17, 77, 129),
-            width=2)
+            width=2,
+        )
 
         draw.text(
             (72 - size_text[0] / 2, 128 - size_text[1] - 4),
             self.absolute_short,
             (255, 255, 255),
-            font=font)
+            font=font,
+        )
 
         draw.rectangle(
-            (0, 0, 144 - 1, 128 - 1),
-            fill=None,
-            outline=(17, 77, 129),
-            width=2)
+            (0, 0, 144 - 1, 128 - 1), fill=None, outline=(17, 77, 129), width=2
+        )
 
         qr = qrcode.QRCode(
             version=6,
             error_correction=qrcode.constants.ERROR_CORRECT_H,
             box_size=8,
-            border=2
+            border=2,
         )
 
         qr.add_data(self.absolute_short)
 
         qr.make()
-        irq = qr.make_image().convert('RGB')
-        pos = ((irq.size[0] - new_image.size[0]) // 2,
-               (irq.size[1] - new_image.size[1]) // 2)
+        irq = qr.make_image().convert("RGB")
+        pos = (
+            (irq.size[0] - new_image.size[0]) // 2,
+            (irq.size[1] - new_image.size[1]) // 2,
+        )
 
         irq.paste(new_image, pos)
         irq.save(fn)
 
-        with open(fn, 'rb') as f:
+        with open(fn, "rb") as f:
             return f.read()
 
 
 class ShortRedirect(models.Model):
 
-    url = models.ForeignKey(UrlShortener, related_name='acessos_set',
-                            verbose_name=_('UrlShortner'),
-                            on_delete=CASCADE)
+    url = models.ForeignKey(
+        UrlShortener,
+        related_name="acessos_set",
+        verbose_name=_("UrlShortner"),
+        on_delete=CASCADE,
+    )
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     created = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=False, auto_now_add=True)
+        verbose_name=_("created"), editable=False, auto_now_add=True
+    )
 
     class Meta:
-        ordering = ('-created',)
+        ordering = ("-created",)
 
 
 class ShortUrl(Slugged):
 
     def short_url(self, sufix=None):
-        slug = self.absolute_slug + (sufix if sufix else '')
-        return UrlShortener.objects.get_or_create_short(
-            url_long=slug
-        ).absolute_short
+        slug = self.absolute_slug + (sufix if sufix else "")
+        return UrlShortener.objects.get_or_create_short(url_long=slug).absolute_short
 
     class Meta:
         abstract = True
@@ -709,12 +747,9 @@ class ClasseManager(models.Manager):
 
     def qs_mapa_site(self, user=None):
         qs = self.get_queryset()
-        qs = qs.filter(
-            visibilidade=Classe.STATUS_PUBLIC,
-            list_in_mapa=True
-        )
+        qs = qs.filter(visibilidade=Classe.STATUS_PUBLIC, list_in_mapa=True)
 
-        return qs.order_by('-parent', 'parent__codigo', 'codigo')
+        return qs.order_by("-parent", "parent__codigo", "codigo")
 
     def qs_classes_publicas(self):
 
@@ -723,11 +758,10 @@ class ClasseManager(models.Manager):
         qs = self.get_queryset()
 
         q = Q(visibilidade=Classe.STATUS_PUBLIC)
-        q &= (Q(public_end_date__isnull=True) | Q(public_end_date__gte=now))
-        q &= (Q(public_date__isnull=True) | Q(public_date__lte=now))
+        q &= Q(public_end_date__isnull=True) | Q(public_end_date__gte=now)
+        q &= Q(public_date__isnull=True) | Q(public_date__lte=now)
 
         return qs.filter(q)
-
 
 
 class Classe(ShortUrl, CMSMixin):
@@ -740,96 +774,105 @@ class Classe(ShortUrl, CMSMixin):
     CLASSE_REDIRECT_VIEWS = 99
 
     PERFIL_CLASSE = (
-        (CLASSE_ESTRUTURAL, _('Classe Estrutural')),
-        (CLASSE_DOCUMENTAL, _('Classe de Conteúdo')),
-        (CLASSE_MISTA, _('Classe Mista')),
-        (CLASSE_REDIRECT, _('Classe de Redirecionamento via URL')),
-        (CLASSE_REDIRECT_VIEWS, _('Classe de Redirecionamento via Views'))
+        (CLASSE_ESTRUTURAL, _("Classe Estrutural")),
+        (CLASSE_DOCUMENTAL, _("Classe de Conteúdo")),
+        (CLASSE_MISTA, _("Classe Mista")),
+        (CLASSE_REDIRECT, _("Classe de Redirecionamento via URL")),
+        (CLASSE_REDIRECT_VIEWS, _("Classe de Redirecionamento via Views")),
     )
 
-    codigo = models.PositiveIntegerField(verbose_name=_('Código'), default=0)
+    codigo = models.PositiveIntegerField(verbose_name=_("Código"), default=0)
 
-    atricon = models.CharField(verbose_name=_('Atricon'), max_length=10, default='')
+    atricon = models.CharField(verbose_name=_("Atricon"), max_length=10, default="")
 
     perfil = models.IntegerField(
-        _('Perfil da Classe'),
-        choices=PERFIL_CLASSE,
-        default=CLASSE_ESTRUTURAL)
+        _("Perfil da Classe"), choices=PERFIL_CLASSE, default=CLASSE_ESTRUTURAL
+    )
 
     template_doc_padrao = models.IntegerField(
-        _('Template para o Documento'),
+        _("Template para o Documento"),
         choices=DOC_TEMPLATES_CHOICE,
-        default=DOC_TEMPLATES_CHOICE.noticia)
+        default=DOC_TEMPLATES_CHOICE.noticia,
+    )
 
     tipo_doc_padrao = models.IntegerField(
-        _('Tipo Padrão para Docs da Classe'),
-        choices=CMSMixin.tipo_parte_doc['documentos'],
-        default=CMSMixin.TD_DOC)
+        _("Tipo Padrão para Docs da Classe"),
+        choices=CMSMixin.tipo_parte_doc["documentos"],
+        default=CMSMixin.TD_DOC,
+    )
 
     template_classe = models.IntegerField(
-        _('Template para a Classe'),
+        _("Template para a Classe"),
         choices=CLASSE_TEMPLATES_CHOICE,
-        default=CLASSE_TEMPLATES_CHOICE.lista_em_linha)
+        default=CLASSE_TEMPLATES_CHOICE.lista_em_linha,
+    )
 
     parlamentar = models.ForeignKey(
-        Parlamentar, related_name='classe_set',
-        verbose_name=_('Parlamentar'),
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
+        Parlamentar,
+        related_name="classe_set",
+        verbose_name=_("Parlamentar"),
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
 
     capa = models.OneToOneField(
-        'Documento',
-        blank=True, null=True, default=None,
-        verbose_name=_('Capa da Classe'),
-        related_name='capa',
-        on_delete=PROTECT)
+        "Documento",
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Capa da Classe"),
+        related_name="capa",
+        on_delete=PROTECT,
+    )
 
     list_in_mapa = models.BooleanField(
-        _('Listar no mapa do site'),
-        choices=YES_NO_CHOICES,
-        default=False)
+        _("Listar no mapa do site"), choices=YES_NO_CHOICES, default=False
+    )
 
     list_in_inf = models.BooleanField(
-        _('Listar no Acesso à Informação'),
-        choices=YES_NO_CHOICES,
-        default=False)
+        _("Listar no Acesso à Informação"), choices=YES_NO_CHOICES, default=False
+    )
 
     list_in_menu = models.BooleanField(
-        _('Listar no Menu Geral'),
-        choices=YES_NO_CHOICES,
-        default=False)
+        _("Listar no Menu Geral"), choices=YES_NO_CHOICES, default=False
+    )
 
     menu_lateral = models.BooleanField(
-        _('Montar Menu Lateral'),
-        choices=YES_NO_CHOICES,
-        default=False)
+        _("Montar Menu Lateral"), choices=YES_NO_CHOICES, default=False
+    )
 
     url_redirect = models.CharField(
-        _('URL de redirecionamento'),
-        max_length=1024,
-        db_index=True,
-        default='')
+        _("URL de redirecionamento"), max_length=1024, db_index=True, default=""
+    )
 
     class Meta:
-        ordering = ('codigo', '-public_date',)
+        ordering = (
+            "codigo",
+            "-public_date",
+        )
 
         unique_together = (
-            ('slug', 'parent',),
+            (
+                "slug",
+                "parent",
+            ),
         )
-        verbose_name = _('Classe')
-        verbose_name_plural = _('Classes')
+        verbose_name = _("Classe")
+        verbose_name_plural = _("Classes")
         permissions = (
-            ('view_subclasse', _('Visualização de Subclasses')),
-            ('view_pathclasse', _('Visualização de Classe via Path')),
+            ("view_subclasse", _("Visualização de Subclasses")),
+            ("view_pathclasse", _("Visualização de Classe via Path")),
         )
 
     def imagem_representativa(self):
-        if hasattr(self, 'parlamentar'):
+        if hasattr(self, "parlamentar"):
             return self.parlamentar
         return None
 
     def imagem_representativa_metatags(self):
-        if hasattr(self, 'parlamentar'):
+        if hasattr(self, "parlamentar"):
             return self.parlamentar
         return None
 
@@ -838,8 +881,8 @@ class Classe(ShortUrl, CMSMixin):
         ct = [str(p.codigo) for p in self.parents]
         ct.append(str(self.codigo))
         if len(ct[0]) < 3:
-            ct[0] = '{:03,d}'.format(int(ct[0]))
-        return '.'.join(ct)
+            ct[0] = "{:03,d}".format(int(ct[0]))
+        return ".".join(ct)
 
     @property
     def absolute_slug(self):
@@ -847,33 +890,42 @@ class Classe(ShortUrl, CMSMixin):
 
 
 class PermissionsUserClasse(CMSMixin):
-    user = models.ForeignKey(get_settings_auth_user_model(),
-                             blank=True, null=True, default=None,
-                             verbose_name=_('Usuário'),
-                             on_delete=PROTECT)
-    classe = models.ForeignKey(Classe, verbose_name=_('Classe'),
-                               related_name='permissions_user_set',
-                               on_delete=PROTECT)
-    permission = models.ForeignKey(Permission,
-                                   blank=True, null=True, default=None,
-                                   verbose_name=_('Permissão'),
-                                   on_delete=PROTECT)
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Usuário"),
+        on_delete=PROTECT,
+    )
+    classe = models.ForeignKey(
+        Classe,
+        verbose_name=_("Classe"),
+        related_name="permissions_user_set",
+        on_delete=PROTECT,
+    )
+    permission = models.ForeignKey(
+        Permission,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Permissão"),
+        on_delete=PROTECT,
+    )
 
     def __str__(self):
-        return '%s - %s' % (self.permission, self.user or '')
+        return "%s - %s" % (self.permission, self.user or "")
 
     def validate_unique(self, exclude=None):
-        if 'classe' in exclude:
-            exclude.remove('classe')
+        if "classe" in exclude:
+            exclude.remove("classe")
         CMSMixin.validate_unique(self, exclude=exclude)
 
     class Meta:
-        ordering = ['id']
-        unique_together = (
-            ('user', 'classe', 'permission'),
-        )
-        verbose_name = _('Permissão de Usuário para Classe')
-        verbose_name_plural = _('Permissões de Usuários para Classes')
+        ordering = ["id"]
+        unique_together = (("user", "classe", "permission"),)
+        verbose_name = _("Permissão de Usuário para Classe")
+        verbose_name_plural = _("Permissões de Usuários para Classes")
 
 
 class DocumentoManager(models.Manager):
@@ -883,10 +935,9 @@ class DocumentoManager(models.Manager):
 
     @property
     def q_doc_public(self):
-        return (Q(public_end_date__gte=timezone.now()) |
-                Q(public_end_date__isnull=True) &
-                Q(public_date__lte=timezone.now(),
-                  visibilidade=Documento.STATUS_PUBLIC))
+        return Q(public_end_date__gte=timezone.now()) | Q(
+            public_end_date__isnull=True
+        ) & Q(public_date__lte=timezone.now(), visibilidade=Documento.STATUS_PUBLIC)
 
     def q_filters(self):
         if self.filters_created:
@@ -898,10 +949,8 @@ class DocumentoManager(models.Manager):
         self.q_gallery = Q(tipo=Documento.TPD_GALLERY)
         self.q_image = Q(tipo=Documento.TPD_IMAGE)
         self.q_bi = Q(tipo=Documento.TD_BI, parent__isnull=True)
-        self.q_audio_news = Q(
-            tipo=Documento.TD_AUDIO_NEWS, parent__isnull=True)
-        self.q_video_news = Q(
-            tipo=Documento.TD_VIDEO_NEWS, parent__isnull=True)
+        self.q_audio_news = Q(tipo=Documento.TD_AUDIO_NEWS, parent__isnull=True)
+        self.q_video_news = Q(tipo=Documento.TD_VIDEO_NEWS, parent__isnull=True)
 
     def filter_q_private(self, user):
         return Q(visibilidade=Documento.STATUS_PRIVATE, owner=user)
@@ -912,21 +961,29 @@ class DocumentoManager(models.Manager):
 
         # Itens restritos que possuem usuário catalogados para o acesso
         # e não dependem de permissões
-        q0 = Q(permissions_user_set__permission__isnull=True,
-               permissions_user_set__user=user)
+        q0 = Q(
+            permissions_user_set__permission__isnull=True,
+            permissions_user_set__user=user,
+        )
 
         # se não existir restrição, basta pertencer ao grupo de view restrito
         q1 = Q(permissions_user_set__isnull=True)
 
-        q2 = Q(classe__permissions_user_set__permission__isnull=True,
-               classe__permissions_user_set__user=user)
+        q2 = Q(
+            classe__permissions_user_set__permission__isnull=True,
+            classe__permissions_user_set__user=user,
+        )
 
         q3 = Q(classe__permissions_user_set__isnull=True)
 
-        q4 = Q(permissions_user_set__user__isnull=True,
-               permissions_user_set__permission__isnull=False)
-        q5 = Q(classe__permissions_user_set__user__isnull=True,
-               classe__permissions_user_set__permission__isnull=False)
+        q4 = Q(
+            permissions_user_set__user__isnull=True,
+            permissions_user_set__permission__isnull=False,
+        )
+        q5 = Q(
+            classe__permissions_user_set__user__isnull=True,
+            classe__permissions_user_set__permission__isnull=False,
+        )
 
         if type.mro(type(self))[0] == DocumentoManager:
             return qstatus & (q0 | q1)
@@ -939,8 +996,9 @@ class DocumentoManager(models.Manager):
         elif isinstance(self.instance, Documento):
             return qstatus
         else:
-            raise Exception(_('Modelo não tratado na filtragem de um '
-                              'Documento restrito'))
+            raise Exception(
+                _("Modelo não tratado na filtragem de um " "Documento restrito")
+            )
 
     def filter_q_restrict_teste_com_permissoes(self, user):
 
@@ -948,14 +1006,17 @@ class DocumentoManager(models.Manager):
 
         # Itens restritos que possuem usuário catalogados para o acesso
         # e não dependem de permissões
-        q0 = Q(permissions_user_set__permission__isnull=True,
-               permissions_user_set__user=user)
+        q0 = Q(
+            permissions_user_set__permission__isnull=True,
+            permissions_user_set__user=user,
+        )
 
         # Itens restritos que não possuem usuário catalogados para o acesso
         # mas exigem que o usuário possua certas permissões
         q1 = Q(
             permissions_user_set__permission__group_set__name=globalrules.GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
-            permissions_user_set__user__isnull=True)
+            permissions_user_set__user__isnull=True,
+        )
 
         if type.mro(type(self))[0] == DocumentoManager:
             # TODO: existe a possibilidade de isolar funcionalidades
@@ -975,12 +1036,15 @@ class DocumentoManager(models.Manager):
         if isinstance(self.instance, Classe):
             parent = self.instance
 
-            q2 = Q(classe__permissions_user_set__permission__isnull=True,
-                   classe__permissions_user_set__user=user)
+            q2 = Q(
+                classe__permissions_user_set__permission__isnull=True,
+                classe__permissions_user_set__user=user,
+            )
 
             q3 = Q(
                 classe__permissions_user_set__permission__group_set__name=globalrules.GROUP_SIGAD_VIEW_STATUS_RESTRITOS,
-                classe__permissions_user_set__user__isnull=True)
+                classe__permissions_user_set__user__isnull=True,
+            )
 
             return (qstatus & (q0 | q1)) | (qstatus & (q2 | q3))
 
@@ -989,12 +1053,13 @@ class DocumentoManager(models.Manager):
         elif isinstance(self.instance, Documento):
             pass
         else:
-            raise Exception(_('Modelo não tratado na filtragem de um '
-                              'Documento restrito'))
+            raise Exception(
+                _("Modelo não tratado na filtragem de um " "Documento restrito")
+            )
 
     def view_childs(self):
         qs = self.get_queryset()
-        return qs.order_by('ordem')
+        return qs.order_by("ordem")
 
     def qs_bi(self, user=None):  # banco de imagens
         self.q_filters()
@@ -1026,9 +1091,9 @@ class DocumentoManager(models.Manager):
         if not self.filters_created:
             self.q_filters()
 
-        return qs.filter(
-            self.q_doc_public,
-            parent__isnull=True).order_by('-public_date', '-created')
+        return qs.filter(self.q_doc_public, parent__isnull=True).order_by(
+            "-public_date", "-created"
+        )
 
     def qs_docs(self, user=None, q_filter=None):
 
@@ -1042,12 +1107,12 @@ class DocumentoManager(models.Manager):
 
         if user and not user.is_anonymous:
             # FIXME: manter condição apenas enquanto estiver desenvolvendo
-            if user.is_superuser:
+            if user.is_superuser:  # and settings.DEBUG:
                 qs_user = self.get_queryset()
                 qs_user = qs_user.filter(
-                    Q(visibilidade=Documento.STATUS_PRIVATE) |
-                    Q(visibilidade=Documento.STATUS_RESTRICT),
-                    q_filter
+                    Q(visibilidade=Documento.STATUS_PRIVATE)
+                    | Q(visibilidade=Documento.STATUS_RESTRICT),
+                    q_filter,
                 )
             else:
                 qs_user = self.get_queryset()
@@ -1065,20 +1130,20 @@ class DocumentoManager(models.Manager):
         else:
             qs = qs.filter(listar=True)
 
-        qs = qs.order_by('-public_date', '-created')
+        qs = qs.order_by("-public_date", "-created")
         return qs
 
     def view_public_gallery(self):
         qs = self.get_queryset()
 
         qs = qs.filter(
-            Q(parent__parent__public_end_date__gte=timezone.now()) |
-            Q(parent__parent__public_end_date__isnull=True),
+            Q(parent__parent__public_end_date__gte=timezone.now())
+            | Q(parent__parent__public_end_date__isnull=True),
             parent__parent__public_date__lte=timezone.now(),
             parent__parent__visibilidade=Documento.STATUS_PUBLIC,
             listar=True,
-            tipo=Documento.TPD_GALLERY
-        ).order_by('-parent__parent__public_date')
+            tipo=Documento.TPD_GALLERY,
+        ).order_by("-parent__parent__public_date")
         return qs
 
     def count_images(self):
@@ -1093,7 +1158,7 @@ class DocumentoManager(models.Manager):
         if exclude:
             qs = qs.exclude(id=exclude.id)
 
-        qs = qs.update(ordem=F('ordem') + 1)
+        qs = qs.update(ordem=F("ordem") + 1)
 
         return qs
 
@@ -1105,7 +1170,7 @@ class DocumentoManager(models.Manager):
         if exclude:
             qs = qs.exclude(id=exclude.id)
 
-        qs = qs.update(ordem=F('ordem') - 1)
+        qs = qs.update(ordem=F("ordem") - 1)
 
         return qs
 
@@ -1114,72 +1179,93 @@ class Documento(ShortUrl, CMSMixin):
     objects = DocumentoManager()
 
     texto = models.TextField(
-        verbose_name=_('Texto'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Texto"), blank=True, null=True, default=None
+    )
 
     old_path = models.TextField(
-        verbose_name=_('Path no Portal Modelo 1.0'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Path no Portal Modelo 1.0"), blank=True, null=True, default=None
+    )
     old_json = models.TextField(
-        verbose_name=_('Json no Portal Modelo 1.0'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Json no Portal Modelo 1.0"), blank=True, null=True, default=None
+    )
 
     extra_data = django_extensions_JSONField(
-        verbose_name=_('Dados Extras'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Dados Extras"), blank=True, null=True, default=None
+    )
 
     parlamentares = models.ManyToManyField(
-        Parlamentar, related_name='documento_set',
-        verbose_name=_('Parlamentares'))
+        Parlamentar, related_name="documento_set", verbose_name=_("Parlamentares")
+    )
 
     materias = models.ManyToManyField(
-        MateriaLegislativa, related_name='documento_set',
-        verbose_name=_('Matérias Relacionadas'))
+        MateriaLegislativa,
+        related_name="documento_set",
+        verbose_name=_("Matérias Relacionadas"),
+    )
 
     classe = models.ForeignKey(
         Classe,
-        related_name='documento_set',
-        verbose_name=_('Classes'),
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
+        related_name="documento_set",
+        verbose_name=_("Classes"),
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
+
+    classes_relacionadas = models.ManyToManyField(
+        Classe,
+        related_name="documentos_relacionados_set",
+        verbose_name=_("Classes Relacionadas"),
+        blank=True,
+        default=None,
+    )
 
     tipo = models.IntegerField(
-        _('Tipo da Parte do Documento'),
+        _("Tipo da Parte do Documento"),
         choices=CMSMixin.tipo_parte_doc_choice,
-        default=CMSMixin.TD_DOC)
+        default=CMSMixin.TD_DOC,
+    )
 
     template_doc = models.IntegerField(
-        _('Template para o Documento'),
+        _("Template para o Documento"),
         choices=DOC_TEMPLATES_CHOICE,
-        blank=True, null=True, default=None)
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     # Possui ordem de renderização se não é uma parte de documento
-    ordem = models.IntegerField(
-        _('Ordem de Renderização'), default=0)
+    ordem = models.IntegerField(_("Ordem de Renderização"), default=0)
 
     alinhamento = models.IntegerField(
-        _('Alinhamento'),
+        _("Alinhamento"),
         choices=CMSMixin.alinhamento_choice,
-        default=CMSMixin.ALINHAMENTO_LEFT)
+        default=CMSMixin.ALINHAMENTO_LEFT,
+    )
 
     documentos_citados = models.ManyToManyField(
-        'self',
-        through='ReferenciaEntreDocumentos',
-        through_fields=('referente', 'referenciado'),
-        symmetrical=False,)
+        "self",
+        through="ReferenciaEntreDocumentos",
+        through_fields=("referente", "referenciado"),
+        symmetrical=False,
+    )
 
     class Meta:
-        ordering = ('public_date',)
-        verbose_name = _('Documento')
-        verbose_name_plural = _('Documentos')
+        ordering = ("public_date",)
+        verbose_name = _("Documento")
+        verbose_name_plural = _("Documentos")
         permissions = (
-            ('view_documento_show', _('Visualização dos Metadados do Documento.')),
-            ('view_documento_media',
-             _('Visualização das mídias do Documento')),
+            ("view_documento_show", _("Visualização dos Metadados do Documento.")),
+            ("view_documento_media", _("Visualização das mídias do Documento")),
         )
         indexes = (
-            models.Index(fields=['-public_date', ]),
-            models.Index(fields=['-public_date', '-created']),
+            models.Index(
+                fields=[
+                    "-public_date",
+                ]
+            ),
+            models.Index(fields=["-public_date", "-created"]),
         )
 
     @property
@@ -1206,14 +1292,22 @@ class Documento(ShortUrl, CMSMixin):
             citado = self.cita.first()
             return citado
 
-        img = self.nodes.view_childs().filter(
-            tipo=Documento.TPD_IMAGE).order_by('parent__ordem', 'ordem').first()
+        img = (
+            self.nodes.view_childs()
+            .filter(tipo=Documento.TPD_IMAGE)
+            .order_by("parent__ordem", "ordem")
+            .first()
+        )
 
         if img:
             return img
 
-        galeria = self.nodes.view_childs().filter(
-            tipo=Documento.TPD_GALLERY).order_by('parent__ordem', 'ordem').first()
+        galeria = (
+            self.nodes.view_childs()
+            .filter(tipo=Documento.TPD_GALLERY)
+            .order_by("parent__ordem", "ordem")
+            .first()
+        )
         if galeria:
             img = galeria.cita.first()
             return img
@@ -1233,26 +1327,24 @@ class Documento(ShortUrl, CMSMixin):
 
     def short_url(self):
         return super().short_url(
-            sufix='.page'
-            if self.tipo == Documento.TPD_IMAGE else None)
+            sufix=".page" if self.tipo == Documento.TPD_IMAGE else None
+        )
 
     def url_prefixo_parlamentar(self):
         if self.parlamentares.count() != 1:
-            return ''
+            return ""
 
         p = self.parlamentares.first()
 
-        c = p.classe_set.values_list('slug', flat=True).first()
+        c = p.classe_set.values_list("slug", flat=True).first()
 
         if not c:
-            return ''
+            return ""
 
         return c
 
     def delete(self, using=None, keep_parents=False, user=None):
         # transfere  midia, caso exista, para ult rev de cada descendente
-
-
 
         childs = self.childs.view_childs()
 
@@ -1261,7 +1353,7 @@ class Documento(ShortUrl, CMSMixin):
 
         ultima_revisao = self.revisoes.first()
 
-        if hasattr(self, 'midia'):
+        if hasattr(self, "midia"):
             midia = self.midia
             print(midia.pk)
             midia.documento = None
@@ -1283,39 +1375,39 @@ class Documento(ShortUrl, CMSMixin):
 
     @property
     def is_pdf(self):
-        return self.midia.last.content_type == 'application/pdf'
+        return self.midia.last.content_type == "application/pdf"
 
     @property
     def is_pdf_container(self):
 
-        s = set(self.childs.all().order_by(
-            '-midia__versions__created').values_list(
-                'midia__versions__content_type', flat=True))
+        s = set(
+            self.childs.all()
+            .order_by("-midia__versions__created")
+            .values_list("midia__versions__content_type", flat=True)
+        )
 
         return not bool(s - TIPOS_IMG_PERMITIDOS)
 
     def build_container_file(self):
 
-        s = set(self.childs.all().order_by(
-            '-midia__versions__created').values_list(
-                'midia__versions__content_type', flat=True))
+        s = set(
+            self.childs.all()
+            .order_by("-midia__versions__created")
+            .values_list("midia__versions__content_type", flat=True)
+        )
 
         if not (s - TIPOS_IMG_PERMITIDOS):
-            response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = \
-                'inline; filename="documento.pdf"'
+            response = HttpResponse(content_type="application/pdf")
+            response["Content-Disposition"] = 'inline; filename="documento.pdf"'
 
             doc = SimpleDocTemplate(
-                response,
-                rightMargin=0,
-                leftMargin=0,
-                topMargin=0,
-                bottomMargin=0)
+                response, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0
+            )
 
             c = canvas.Canvas(response)
             c.setTitle(self.titulo)
             A4_landscape = landscape(A4)
-            for img in self.childs.order_by('ordem'):
+            for img in self.childs.order_by("ordem"):
                 path = img.midia.last.file.path
 
                 if img.midia.last.is_paisagem:
@@ -1324,9 +1416,7 @@ class Documento(ShortUrl, CMSMixin):
                     c.setPageSize(A4)
 
                 dim = A4_landscape if img.midia.last.is_paisagem else A4
-                c.drawImage(path, 0, 0,
-                            width=dim[0],
-                            height=dim[1])
+                c.drawImage(path, 0, 0, width=dim[0], height=dim[1])
                 c.showPage()
             c.save()
             return response
@@ -1334,23 +1424,19 @@ class Documento(ShortUrl, CMSMixin):
         else:
             file_buffer = io.BytesIO()
 
-            with zipfile.ZipFile(file_buffer, 'w') as file:
-                for f in self.childs.order_by('ordem'):
-                    fn = '%s-%s' % (
-                        f.id,
-                        f.midia.last.file.path.split(
-                            '/')[-1])
-                    file.write(f.midia.last.file.path,
-                               arcname=fn)
+            with zipfile.ZipFile(file_buffer, "w") as file:
+                for f in self.childs.order_by("ordem"):
+                    fn = "%s-%s" % (f.id, f.midia.last.file.path.split("/")[-1])
+                    file.write(f.midia.last.file.path, arcname=fn)
 
-            response = HttpResponse(file_buffer.getvalue(),
-                                    content_type='application/zip')
+            response = HttpResponse(
+                file_buffer.getvalue(), content_type="application/zip"
+            )
 
-            response['Cache-Control'] = 'no-cache'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = 0
-            response['Content-Disposition'] = \
-                'inline; filename=%s.zip' % self.raiz.slug
+            response["Cache-Control"] = "no-cache"
+            response["Pragma"] = "no-cache"
+            response["Expires"] = 0
+            response["Content-Disposition"] = "inline; filename=%s.zip" % self.raiz.slug
             return response
 
 
@@ -1364,7 +1450,7 @@ class ReferenciaEntreDocumentosManager(models.Manager):
         if exclude:
             qs = qs.exclude(id=exclude.id)
 
-        qs = qs.update(ordem=F('ordem') + 1)
+        qs = qs.update(ordem=F("ordem") + 1)
 
         return qs
 
@@ -1376,7 +1462,7 @@ class ReferenciaEntreDocumentosManager(models.Manager):
         if exclude:
             qs = qs.exclude(id=exclude.id)
 
-        qs = qs.update(ordem=F('ordem') - 1)
+        qs = qs.update(ordem=F("ordem") - 1)
 
         return qs
 
@@ -1387,32 +1473,37 @@ class ReferenciaEntreDocumentos(ShortUrl):
     # TODO - IMPLEMENTAR VISIBILIDADE NA REFERENCIA...
     # SIGNIFICA QUE O DOC PRIVADO PODE SER PÚBLICO POR REFERENCIA
     # TRATAR SEGURANÇA PARA QUEM REALIZAR ESSA MUDANÇA DE VISIBILIDADE
-    referente = models.ForeignKey(Documento, related_name='cita',
-                                  verbose_name=_('Documento Referente'),
-                                  on_delete=models.PROTECT)
-    referenciado = models.ForeignKey(Documento, related_name='citado_em',
-                                     verbose_name=_('Documento Referenciado'),
-                                     on_delete=models.CASCADE)
+    referente = models.ForeignKey(
+        Documento,
+        related_name="cita",
+        verbose_name=_("Documento Referente"),
+        on_delete=models.PROTECT,
+    )
+    referenciado = models.ForeignKey(
+        Documento,
+        related_name="citado_em",
+        verbose_name=_("Documento Referenciado"),
+        on_delete=models.CASCADE,
+    )
 
     descricao = models.TextField(
-        verbose_name=_('Descrição'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Descrição"), blank=True, null=True, default=None
+    )
 
     autor = models.TextField(
-        verbose_name=_('Autor'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Autor"), blank=True, null=True, default=None
+    )
 
     # Possui ordem de renderização
-    ordem = models.IntegerField(
-        _('Ordem de Renderização'), default=0)
+    ordem = models.IntegerField(_("Ordem de Renderização"), default=0)
 
     class Meta:
-        ordering = ('referente', 'ordem')
+        ordering = ("referente", "ordem")
 
     def short_url(self):
         return super().short_url(
-            sufix='.page'
-            if self.referenciado.tipo == Documento.TPD_IMAGE else None)
+            sufix=".page" if self.referenciado.tipo == Documento.TPD_IMAGE else None
+        )
 
     @property
     def parents(self):
@@ -1420,7 +1511,9 @@ class ReferenciaEntreDocumentos(ShortUrl):
         if not _self.parent:
             return []
 
-        parents = _self.parent.parents + [_self.parent, ]
+        parents = _self.parent.parents + [
+            _self.parent,
+        ]
         return parents
 
     @property
@@ -1430,48 +1523,62 @@ class ReferenciaEntreDocumentos(ShortUrl):
 
 
 class PermissionsUserDocumento(CMSMixin):
-    user = models.ForeignKey(get_settings_auth_user_model(),
-                             blank=True, null=True, default=None,
-                             verbose_name=_('Usuário'),
-                             on_delete=PROTECT)
-    documento = models.ForeignKey(Documento,
-                                  related_name='permissions_user_set',
-                                  verbose_name=_('Documento'),
-                                  on_delete=PROTECT)
-    permission = models.ForeignKey(Permission,
-                                   blank=True, null=True, default=None,
-                                   verbose_name=_('Permissão'),
-                                   on_delete=PROTECT)
+    user = models.ForeignKey(
+        get_settings_auth_user_model(),
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Usuário"),
+        on_delete=PROTECT,
+    )
+    documento = models.ForeignKey(
+        Documento,
+        related_name="permissions_user_set",
+        verbose_name=_("Documento"),
+        on_delete=PROTECT,
+    )
+    permission = models.ForeignKey(
+        Permission,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Permissão"),
+        on_delete=PROTECT,
+    )
 
     class Meta:
-        unique_together = (
-            ('user', 'documento', 'permission'),
-        )
-        verbose_name = _('Permissão de Usuário para Documento')
-        verbose_name_plural = _('Permissões de Usuários para Documentos')
-        ordering = ['id']
+        unique_together = (("user", "documento", "permission"),)
+        verbose_name = _("Permissão de Usuário para Documento")
+        verbose_name_plural = _("Permissões de Usuários para Documentos")
+        ordering = ["id"]
 
 
 class Midia(models.Model):
 
     documento = models.OneToOneField(
         Documento,
-        blank=True, null=True, default=None,
-        verbose_name=_('Documento'),
-        related_name='midia',
-        on_delete=PROTECT)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Documento"),
+        related_name="midia",
+        on_delete=PROTECT,
+    )
 
     auditlog = models.OneToOneField(
         AuditLog,
-        blank=True, null=True, default=None,
-        verbose_name=_('AuditLog'),
-        related_name='midia',
-        on_delete=PROTECT)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("AuditLog"),
+        related_name="midia",
+        on_delete=PROTECT,
+    )
 
     class Meta:
-        verbose_name = _('Mídia Versionada')
-        verbose_name_plural = _('Mídias Versionadas')
-        ordering = ['id']
+        verbose_name = _("Mídia Versionada")
+        verbose_name_plural = _("Mídias Versionadas")
+        ordering = ["id"]
 
     @cached_property
     def last(self):
@@ -1479,74 +1586,92 @@ class Midia(models.Model):
 
 
 def media_path(instance, filename):
-    return './sigad/documento/%s/media/%s/%s' % (
+    return "./sigad/documento/%s/media/%s/%s" % (
         instance.midia.documento_id,
         instance.midia_id,
-        filename)
+        filename,
+    )
 
 
 class VersaoDeMidia(models.Model):
 
-    FIELDFILE_NAME = ('file',)
+    FIELDFILE_NAME = ("file",)
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     created = models.DateTimeField(
-        verbose_name=_('created'),
-        editable=False, auto_now_add=True)
+        verbose_name=_("created"), editable=False, auto_now_add=True
+    )
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('owner'), related_name='+',
-        on_delete=PROTECT)
+        verbose_name=_("owner"),
+        related_name="+",
+        on_delete=PROTECT,
+    )
 
     file = models.FileField(
         blank=True,
         null=True,
         storage=media_protected_storage,
         upload_to=media_path,
-        verbose_name=_('Mídia'),
-        validators=[restringe_tipos_de_arquivo_midias])
+        verbose_name=_("Mídia"),
+        validators=[restringe_tipos_de_arquivo_midias],
+    )
 
-    content_type = models.CharField(
-        max_length=250,
-        default='')
+    content_type = models.CharField(max_length=250, default="")
 
     midia = models.ForeignKey(
-        Midia, verbose_name=_('Mídia Versionada'),
-        related_name='versions',
-        on_delete=PROTECT)
+        Midia,
+        verbose_name=_("Mídia Versionada"),
+        related_name="versions",
+        on_delete=PROTECT,
+    )
 
     def delete(self, using=None, keep_parents=False):
         if self.file:
             self.file.delete()
 
-        return models.Model.delete(
-            self, using=using, keep_parents=keep_parents)
+        return models.Model.delete(self, using=using, keep_parents=keep_parents)
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None, with_file=None):
-        _ret = models.Model.save(self, force_insert=force_insert,
-                                 force_update=force_update, using=using, update_fields=update_fields)
+    def save(
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
+        with_file=None,
+    ):
+        _ret = models.Model.save(
+            self,
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
         if not with_file:
             return _ret
 
         mime, ext = restringe_tipos_de_arquivo_midias(with_file)
 
-        name_file = 'midia.%s' % ext
+        name_file = "midia.%s" % ext
         self.content_type = mime
         self.file.save(name_file, File(with_file))
 
     @cached_property
     def simple_name(self):
-        return self.file.name.split('/')[-1]
+        return self.file.name.split("/")[-1]
 
     @cached_property
     def width(self):
         try:
-            nf = '%s/%s' % (media_protected_storage.location, self.file.name)
+            nf = "%s/%s" % (media_protected_storage.location, self.file.name)
             im = Image.open(nf)
             return im.width
         except:
@@ -1555,7 +1680,7 @@ class VersaoDeMidia(models.Model):
     @cached_property
     def height(self):
         try:
-            nf = '%s/%s' % (media_protected_storage.location, self.file.name)
+            nf = "%s/%s" % (media_protected_storage.location, self.file.name)
             im = Image.open(nf)
             return im.height
         except:
@@ -1567,47 +1692,48 @@ class VersaoDeMidia(models.Model):
 
     def rotate(self, rotate):
         import os
+
         try:
-            nf = '%s/%s' % (media_protected_storage.location, self.file.name)
+            nf = "%s/%s" % (media_protected_storage.location, self.file.name)
             im = Image.open(nf)
             im = im.rotate(rotate, resample=LANCZOS, expand=True)
             im.save(nf, dpi=(300, 300))
             im.close()
             dirname = os.path.dirname(self.file.path)
             for f in os.listdir(dirname):
-                filename = '%s/%s' % (dirname, f)
+                filename = "%s/%s" % (dirname, f)
                 if filename == nf:
                     continue
                 os.remove(filename)
         except Exception as e:
             pass
 
-    def thumbnail(self, width='thumb'):
+    def thumbnail(self, width="thumb"):
         sizes = {
-            '24': (24, 24),
-            '48': (48, 48),
-            '96': (96, 96),
-            '128': (128, 128),
-            '256': (256, 256),
-            '512': (512, 512),
-            '768': (768, 768),
-            '1024': (1024, 1024),
+            "24": (24, 24),
+            "48": (48, 48),
+            "96": (96, 96),
+            "128": (128, 128),
+            "256": (256, 256),
+            "512": (512, 512),
+            "768": (768, 768),
+            "1024": (1024, 1024),
         }
 
         if width not in sizes:
-            width = '96'
+            width = "96"
 
-        nf = '%s/%s' % (media_protected_storage.location, self.file.name)
-        nft = nf.split('/')
-        nft = '%s/%s.%s' % ('/'.join(nft[:-1]), width, nft[-1])
+        nf = "%s/%s" % (media_protected_storage.location, self.file.name)
+        nft = nf.split("/")
+        nft = "%s/%s.%s" % ("/".join(nft[:-1]), width, nft[-1])
 
         if os.path.exists(nft):
-            file = io.open(nft, 'rb')
+            file = io.open(nft, "rb")
             return file
 
         im = Image.open(nf)
         if sizes[width][0] >= im.width:
-            file = io.open(nf, 'rb')
+            file = io.open(nf, "rb")
         else:
             if sizes[width][0] < 512:
                 if im.width > im.height:
@@ -1615,48 +1741,49 @@ class VersaoDeMidia(models.Model):
                 else:
                     size = (
                         int(sizes[width][0] * (im.width / im.height)),
-                        int(sizes[width][1] * (im.width / im.height))
+                        int(sizes[width][1] * (im.width / im.height)),
                     )
                     im.thumbnail(size)
             else:
                 im.thumbnail(sizes[width], resample=LANCZOS)
             im.save(nft)
             im.close()
-            file = io.open(nft, 'rb')
+            file = io.open(nft, "rb")
 
         return file
 
     def icon(self):
-        return self.get_filename.split('.')[-1]
+        return self.get_filename.split(".")[-1]
 
     class Meta:
-        ordering = ('-created',)
-        verbose_name = _('Mídia')
-        verbose_name_plural = _('Mídias')
+        ordering = ("-created",)
+        verbose_name = _("Mídia")
+        verbose_name_plural = _("Mídias")
 
 
 class CaixaPublicacao(models.Model):
-    key = models.CharField(
-        max_length=250,
-        default='')
-    nome = models.CharField(
-        max_length=250,
-        default='')
+    key = models.CharField(max_length=250, default="")
+    nome = models.CharField(max_length=250, default="")
 
     classe = models.ForeignKey(
         Classe,
-        related_name='caixapublicacao_set',
-        verbose_name=_('Classes'),
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
+        related_name="caixapublicacao_set",
+        verbose_name=_("Classes"),
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
 
     documentos = models.ManyToManyField(
-        'sigad.Documento', blank=True,
-        through='CaixaPublicacaoRelationship',
-        through_fields=('caixapublicacao', 'documento'),
-        related_query_name='caixapublicacao_set',
-        verbose_name=_('Documentos da Caixa de Públicação'),
-        symmetrical=False)
+        "sigad.Documento",
+        blank=True,
+        through="CaixaPublicacaoRelationship",
+        through_fields=("caixapublicacao", "documento"),
+        related_query_name="caixapublicacao_set",
+        verbose_name=_("Documentos da Caixa de Públicação"),
+        symmetrical=False,
+    )
 
     def reordene(self):
         ordem = 0
@@ -1667,37 +1794,36 @@ class CaixaPublicacao(models.Model):
 
     def __str__(self):
         if self.classe:
-            return '%s (%s)' % (self.nome, self.classe)
+            return "%s (%s)" % (self.nome, self.classe)
         else:
             return self.nome
 
     class Meta:
-        verbose_name = _('Caixa de Publicação')
-        verbose_name_plural = _('Caixas de Publicação')
-        ordering = ['id']
+        verbose_name = _("Caixa de Publicação")
+        verbose_name_plural = _("Caixas de Publicação")
+        ordering = ["id"]
 
 
 class CaixaPublicacaoClasse(CaixaPublicacao):
 
     class Meta:
         proxy = True
-        verbose_name = _('Caixa de Publicação')
-        verbose_name_plural = _('Caixas de Publicação')
-        ordering = ['id']
+        verbose_name = _("Caixa de Publicação")
+        verbose_name_plural = _("Caixas de Publicação")
+        ordering = ["id"]
 
 
 class CaixaPublicacaoRelationship(models.Model):
 
-    caixapublicacao = models.ForeignKey(
-        CaixaPublicacao, on_delete=models.CASCADE)
+    caixapublicacao = models.ForeignKey(CaixaPublicacao, on_delete=models.CASCADE)
     documento = models.ForeignKey(Documento, on_delete=models.CASCADE)
     ordem = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return '{:02d} - {}'.format(self.ordem // 1000, self.documento)
+        return "{:02d} - {}".format(self.ordem // 1000, self.documento)
 
     class Meta:
-        unique_together = ('caixapublicacao', 'documento')
-        ordering = ('ordem', '-documento')
-        verbose_name = _('Documentos da Caixa de Publicação')
-        verbose_name_plural = _('Documentos da Caixa de Publicação')
+        unique_together = ("caixapublicacao", "documento")
+        ordering = ("ordem", "-documento")
+        verbose_name = _("Documentos da Caixa de Publicação")
+        verbose_name_plural = _("Documentos da Caixa de Publicação")

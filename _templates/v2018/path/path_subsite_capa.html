@@ -1,0 +1,121 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters social_utils common_tags common_cmj_tags menus %}
+{% block second_header %}{% endblock %}
+{% block historico_publicacao %}{% endblock %}
+{% block breadcrumb %}{% endblock %}
+
+{% block head_title %}{{object.classe.titulo}} - {{block.super}}{% endblock head_title %}
+
+{% block css_custom %}
+<style type="text/css">
+  {% if object == object.classe.capa %}
+{{object.classe.metadata.styles|default:''|safe}}
+  {% endif %}
+{{object.metadata.styles|default:''|safe}}
+
+</style>
+{% endblock css_custom %}
+
+{% block main_container_class %}container-path container-subsite{% endblock %}
+{% block controls_content %}
+  {% if object.classe %}
+    {% if perms.sigad.change_documento %}
+      <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:documento_construct' object.id %}">{% trans "Editar" %}</a>
+    {% endif %}
+    {% if perms.sigad.delete_documento %}
+      <a class="btn btn-danger" href="{% url 'cmj.sigad:documento_delete' object.id %}">{% trans "Excluir" %}</a>
+    {% endif %}
+  {% endif %}
+
+  {% if not object.classe or object == object.classe.capa %}
+    {% if perms.sigad.change_classe %}
+      <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.classe.id %}">{% trans "Editar Classe" %}: {{object.classe}}</a>
+    {% endif %}
+    {% if perms.sigad.add_documento and create_doc_url %}
+      <a class="btn btn-outline-primary" href="{% url create_doc_url object.classe.id %}">{% trans "Adicionar item a" %} {{object.classe }}</a>
+    {% endif %}
+  {% endif %}
+{% endblock %}
+
+{% block base_container_header %}
+{% endblock base_container_header %}
+
+{% block render_main_content %}
+
+  {% with object.imagem_representativa as imagem %}
+    {% if imagem %}
+      <div class="container-fluid bg-subsite-capa">
+        <div class="container">
+          <div class="row">
+            <div class="col">
+              <div class="path-imagem">
+                <img class="capa imagem" src="/{{imagem.absolute_slug}}">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% breadcrumb %}
+
+  {% with  object.childs.view_childs.first as container%}
+    <div class="container{% if container.tipo == container.TPD_CONTAINER_EXTENDIDO%}-fluid{% endif %} {% if forloop.first%}container-first{% endif %}">
+      {% block base_header %}
+      {% endblock %}
+
+    </div>
+  {% endwith %}
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6">
+        {% with True as not_render_first_container %}
+        {% include "path/path_fragments.html" %}
+        {% endwith %}
+      </div>
+      <div class="col-md-6">
+        <div class="container container-simples">
+          {% if 'markdown' in object.texto %}
+            {{object.texto|default:''|markdown|safe}}
+          {% else %}
+            {{object.texto|default:''|safe|urlize}}
+          {% endif %}
+        </div>
+        {% with object.classe.documentos_relacionados_set.all as object_list %}
+          {% with 'path-item-list' as css_class %}
+            {% include "path/path_list_docs.html" %}
+          {% endwith %}
+        {% endwith %}
+      </div>
+    </div>
+  </div>
+
+{% endblock render_main_content %}
+
+{% block base_extra_content %}
+
+  <div class="container text-center"><br><br>
+    <div class="container"><small>ShortLink: {{object.short_url|urlize}}</small></div>
+    {% comment %}
+      <img class="qrcode d-none" src="{{object.short_url}}/qrcode" alt="">
+      {% endcomment %}
+  </div>
+
+{% endblock base_extra_content %}
+
+{% block cmj_extra_content %}
+{% if object != object.classe.capa %}
+
+{% endif %}
+{% endblock cmj_extra_content %}
+
+{% block extra_js %}
+<script>
+  $(document).ready(function (){
+    //ContainerFirst();
+    Gallery().init();
+  });
+</script>
+{% endblock extra_js %}
