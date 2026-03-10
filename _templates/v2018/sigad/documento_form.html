@@ -4,3 +4,19 @@
 {% block base_content %}
   {% crispy form %}
 {% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('select[multiple]').forEach(function (sel) {
+      sel.addEventListener('mousedown', function (e) {
+        if (e.target.tagName !== 'OPTION') return
+        e.preventDefault()
+        var option = e.target
+        option.selected = !option.selected
+        sel.dispatchEvent(new Event('change'))
+      })
+    })
+  })
+</script>
+{% endblock extra_js %}

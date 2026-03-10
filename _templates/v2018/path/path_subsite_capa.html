@@ -49,7 +49,7 @@
           <div class="row">
             <div class="col">
               <div class="path-imagem">
-                <img class="capa imagem" src="/{{imagem.absolute_slug}}">
+                <img class="capa" src="/{{imagem.absolute_slug}}">
               </div>
             </div>
           </div>
@@ -70,12 +70,12 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-lg-6">
         {% with True as not_render_first_container %}
         {% include "path/path_fragments.html" %}
         {% endwith %}
       </div>
-      <div class="col-md-6">
+      <div class="col-lg-6">
         <div class="container container-simples">
           {% if 'markdown' in object.texto %}
             {{object.texto|default:''|markdown|safe}}
@@ -84,7 +84,7 @@
           {% endif %}
         </div>
         {% with object.classe.documentos_relacionados_set.all as object_list %}
-          {% with 'path-item-list' as css_class %}
+          {% with 'path-item-list w-100' as css_class %}
             {% include "path/path_list_docs.html" %}
           {% endwith %}
         {% endwith %}

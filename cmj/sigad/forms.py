@@ -259,16 +259,12 @@ class DocumentoForm(ModelForm):
 
         super(DocumentoForm, self).__init__(*args, **kwargs)
 
-        self.fields["parlamentares"].choices = [("0", "--------------")] + list(
-            self.fields["parlamentares"].choices
-        )
-
-        self.fields["materias"].choices = [("0", "--------------")] + [
+        self.fields["materias"].choices = [
             (m.id, str(m) + " - " + m.ementa)
             for m in self.fields["materias"].queryset[:200]
         ]
 
-        self.fields["classes_relacionadas"].choices = [("", "--------------")] + [
+        self.fields["classes_relacionadas"].choices = [
             (c.id, str(c))
             for c in Classe.objects.filter(
                 visibilidade=models.CMSMixin.STATUS_PUBLIC,
