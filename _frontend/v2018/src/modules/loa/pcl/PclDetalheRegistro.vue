@@ -14,31 +14,37 @@
           <a
             :href="registro.link_detail_backend"
             target="_blank"
-            class="btn btn-sm btn-outline-secondary"
+            class="btn btn-lg btn-link m-0 p-0 text-decoration-none font-weight-bold"
             title="Abrir detalhes no painel administrativo"
           >
-            <i class="fas fa-external-link-alt mr-1"></i> {{ isEmenda(registro) && emendaParts[0] ? emendaParts[0].trim() : 'Abrir' }}
+            {{ isEmenda(registro) && emendaParts[0] ? emendaParts[0].trim() : 'Abrir' }} <i class="fas fa-external-link-alt ml-3"></i>
           </a>
         </div>
         <div class="card-body py-2">
           <div
-            class="d-flex flex-wrap align-items-center mb-2 justify-content-between"
+            class="d-flex align-items-center mb-2 justify-content-between"
             v-if="registro.parlamentares && registro.parlamentares.length"
           >
-            <div
-              v-for="p in registro.parlamentares"
-              :key="p.id"
-              class="d-inline-flex align-items-center mr-2 mb-1 parlamentar-chip"
-              :title="p.__str__"
-            >
-              <img
-                :src="fotoThumb(p.fotografia)"
-                :alt="p.__str__"
-                class="rounded-circle mr-1 parlamentar-avatar"
-              />
-              <span class="small font-weight-bold">{{ p.__str__ }}</span>
+            <div class="d-flex align-items-center">
+              <div class="avatar-stack mr-2">
+                <img
+                  v-for="p in registro.parlamentares"
+                  :key="p.id"
+                  :src="fotoThumb(p.fotografia)"
+                  :alt="p.__str__"
+                  :title="p.__str__"
+                  class="avatar-stack-item"
+                />
+              </div>
+              <div class="parlamentar-names">
+                <span
+                  v-for="(p, idx) in registro.parlamentares"
+                  :key="p.id"
+                  class="parlamentar-name"
+                >{{ p.__str__ }}<template v-if="idx < registro.parlamentares.length - 1">, </template></span>
+              </div>
             </div>
-            <h3 :class="['font-weight-bold', 'text-' + faseVariant(registro.fase)]" v-if="emendaParts[1]">{{ emendaParts[1].trim() }}</h3>
+            <h2 :class="['font-weight-bold', 'mb-0', 'ml-2', 'text-nowrap', 'text-' + faseVariant(registro.fase)]" v-if="emendaParts[1]">{{ emendaParts[1].trim() }}</h2>
           </div>
           <p class="mb-2" v-if="isEmenda(registro)">
             {{ emendaParts[2] ? emendaParts[2].trim() : registro.__str__ }}
@@ -275,13 +281,38 @@ export default {
 </script>
 
 <style scoped>
-.parlamentar-avatar {
+.avatar-stack {
+  display: flex;
+  flex-direction: row;
+}
+.avatar-stack-item {
   width: 48px;
   height: 48px;
+  border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+  margin-right: -10px;
+  transition: transform 0.15s ease, z-index 0s;
+  position: relative;
+  z-index: 1;
 }
-.parlamentar-chip {
-  line-height: 1;
+.avatar-stack-item:last-child {
+  margin-right: 0;
+}
+.avatar-stack-item:hover {
+  transform: translateY(-2px) scale(1.1);
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+.parlamentar-names {
+  font-size: 0.8rem;
+  color: #555;
+  line-height: 1.2;
+  max-width: 200px;
+}
+.parlamentar-name {
+  font-weight: 600;
 }
 .pcl-detalhe-registro {
   position: sticky;
