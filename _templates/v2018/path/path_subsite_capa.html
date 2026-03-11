@@ -70,7 +70,7 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-lg-6">
+      <div class="col-lg-6" style="position: sticky; top: 0; align-self: start;">
         {% with True as not_render_first_container %}
         {% include "path/path_fragments.html" %}
         {% endwith %}
@@ -83,7 +83,7 @@
             {{object.texto|default:''|safe|urlize}}
           {% endif %}
         </div>
-        {% with object.classe.documentos_relacionados_set.all as object_list %}
+        {% with object.classe.documentos_relacionados_set.qs_news as object_list %}
           {% with 'path-item-list w-100' as css_class %}
             {% include "path/path_list_docs.html" %}
           {% endwith %}
