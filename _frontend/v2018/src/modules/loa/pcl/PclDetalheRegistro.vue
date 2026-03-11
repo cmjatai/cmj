@@ -17,12 +17,12 @@
             class="btn btn-sm btn-outline-secondary"
             title="Abrir detalhes no painel administrativo"
           >
-            <i class="fas fa-external-link-alt mr-1"></i> Abrir
+            <i class="fas fa-external-link-alt mr-1"></i> {{ isEmenda(registro) && emendaParts[0] ? emendaParts[0].trim() : 'Abrir' }}
           </a>
         </div>
         <div class="card-body py-2">
           <div
-            class="d-flex flex-wrap align-items-center mb-2"
+            class="d-flex flex-wrap align-items-center mb-2 justify-content-between"
             v-if="registro.parlamentares && registro.parlamentares.length"
           >
             <div
@@ -38,9 +38,10 @@
               />
               <span class="small font-weight-bold">{{ p.__str__ }}</span>
             </div>
+            <h3 :class="['font-weight-bold', 'text-' + faseVariant(registro.fase)]" v-if="emendaParts[1]">{{ emendaParts[1].trim() }}</h3>
           </div>
           <p class="mb-2" v-if="isEmenda(registro)">
-            {{ registro.__str__ }}
+            {{ emendaParts[2] ? emendaParts[2].trim() : registro.__str__ }}
           </p>
           <p class="mb-2" v-else>
             {{ registro.descricao }}
@@ -65,10 +66,10 @@
                 <strong>Beneficiário:</strong>
                 {{ registro.entidade.nome_fantasia }}
               </div>
-              <div class="col-12" v-if="registro.entidade.cpfcnpj || registro.entidade.cnes">
+              <div class="col-12" v-if="cpfcnpjLimpo(registro.entidade.cpfcnpj) || registro.entidade.cnes">
                 <i class="fas fa-id-card mr-1"></i>
-                <strong>{{ registro.entidade.cpfcnpj ? 'CPF/CNPJ' : 'CNES' }}:</strong>
-                {{ registro.entidade.cpfcnpj || registro.entidade.cnes }}
+                <strong>{{ cpfcnpjLimpo(registro.entidade.cpfcnpj) ? 'CPF/CNPJ' : 'CNES' }}:</strong>
+                {{ cpfcnpjLimpo(registro.entidade.cpfcnpj) || registro.entidade.cnes }}
               </div>
             </template>
           </div>
@@ -167,7 +168,8 @@
 import {
   itemBadgeVariant,
   registroBadgeLabel,
-  isEmenda
+  isEmenda,
+  faseVariant
 } from './utils/pcl-helpers'
 import PclTabPrestacao from './tabs/PclTabPrestacao.vue'
 import PclTabAjustes from './tabs/PclTabAjustes.vue'
@@ -210,6 +212,15 @@ export default {
       // Emendas modificativas (tipo === 0) não exibem tabs
       return !this.isEmenda(this.registro) || this.registro.tipo !== 0
     },
+    emendaParts () {
+      if (!this.registro || !this.isEmenda(this.registro) || !this.registro.__str__) return []
+      const str = this.registro.__str__
+      const i1 = str.indexOf('-')
+      if (i1 === -1) return [str, '', '']
+      const i2 = str.indexOf('-', i1 + 1)
+      if (i2 === -1) return [str.substring(0, i1), str.substring(i1 + 1), '']
+      return [str.substring(0, i1), str.substring(i1 + 1, i2), str.substring(i2 + 1)]
+    },
     orderedTabs () {
       const tabs = []
       const emenda = this.isEmenda(this.registro)
@@ -250,9 +261,14 @@ export default {
     itemBadgeVariant,
     registroBadgeLabel,
     isEmenda,
+    faseVariant,
     fotoThumb (url) {
       if (!url) return ''
       return url.replace(/\.png$/, '.c128.png')
+    },
+    cpfcnpjLimpo (val) {
+      if (!val) return ''
+      return val.replace(/[0\s]/g, '') ? val.trim() : ''
     }
   }
 }
