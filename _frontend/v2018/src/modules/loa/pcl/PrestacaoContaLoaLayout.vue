@@ -260,8 +260,8 @@ export default {
           loa: this.loa.id,
           o: '-tipo,fase,materia__tipo__sigla,materia__numero',
           exclude: 'search;parlamentares.metadata',
-          include: 'parlamentares.id,__str__;unidade.id,__str__;materia.id',
-          expand: 'parlamentares;unidade;materia',
+          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
+          expand: 'parlamentares;unidade;materia;entidade',
           get_all: 'True',
           situacao: this.filters_value.situacao.join(',')
         }

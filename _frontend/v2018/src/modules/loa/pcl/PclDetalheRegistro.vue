@@ -1,7 +1,7 @@
 <template>
   <div class="pcl-detalhe-registro">
     <template v-if="registro">
-      <div class="card mb-3">
+      <div class="card mb-3 card-detalhe-registro">
         <div
           class="card-header d-flex align-items-center justify-content-between py-2"
         >
@@ -21,6 +21,24 @@
           </a>
         </div>
         <div class="card-body py-2">
+          <div
+            class="d-flex flex-wrap align-items-center mb-2"
+            v-if="registro.parlamentares && registro.parlamentares.length"
+          >
+            <div
+              v-for="p in registro.parlamentares"
+              :key="p.id"
+              class="d-inline-flex align-items-center mr-2 mb-1 parlamentar-chip"
+              :title="p.__str__"
+            >
+              <img
+                :src="fotoThumb(p.fotografia)"
+                :alt="p.__str__"
+                class="rounded-circle mr-1 parlamentar-avatar"
+              />
+              <span class="small font-weight-bold">{{ p.__str__ }}</span>
+            </div>
+          </div>
           <p class="mb-2" v-if="isEmenda(registro)">
             {{ registro.__str__ }}
           </p>
@@ -29,10 +47,7 @@
           </p>
           <div
             class="row small text-muted mt-1"
-            v-if="
-              registro.unidade ||
-              (registro.parlamentares && registro.parlamentares.length)
-            "
+            v-if="registro.unidade"
           >
             <div class="col-12" v-if="registro.emendaloa">
               <strong>Vinculado à Emenda:</strong>
@@ -43,14 +58,19 @@
               <strong>Unidade Orçamentária:</strong>
               {{ registro.unidade.__str__ }}
             </div>
-            <div
-              class="col-12"
-              v-if="registro.parlamentares && registro.parlamentares.length"
-            >
-              <i class="fas fa-users mr-1"></i>
-              <strong>Parlamentares:</strong>
-              {{ registro.parlamentares.map((p) => p.__str__).join(", ") }}
-            </div>
+
+            <template v-if="isEmenda(registro) && registro.entidade">
+              <div class="col-12" v-if="registro.entidade.nome_fantasia">
+                <i class="fas fa-user mr-1"></i>
+                <strong>Beneficiário:</strong>
+                {{ registro.entidade.nome_fantasia }}
+              </div>
+              <div class="col-12" v-if="registro.entidade.cpfcnpj || registro.entidade.cnes">
+                <i class="fas fa-id-card mr-1"></i>
+                <strong>{{ registro.entidade.cpfcnpj ? 'CPF/CNPJ' : 'CNES' }}:</strong>
+                {{ registro.entidade.cpfcnpj || registro.entidade.cnes }}
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -229,12 +249,24 @@ export default {
   methods: {
     itemBadgeVariant,
     registroBadgeLabel,
-    isEmenda
+    isEmenda,
+    fotoThumb (url) {
+      if (!url) return ''
+      return url.replace(/\.png$/, '.c128.png')
+    }
   }
 }
 </script>
 
 <style scoped>
+.parlamentar-avatar {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+}
+.parlamentar-chip {
+  line-height: 1;
+}
 .pcl-detalhe-registro {
   position: sticky;
   top: 1rem;
