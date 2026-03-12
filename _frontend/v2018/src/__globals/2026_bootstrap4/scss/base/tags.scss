@@ -1,0 +1,33 @@
+
+body, html {
+  font-size: 1rem;
+}
+
+body {
+  background: $color_main_bg;
+  &.body-print {
+    background: #fff;
+    #wrapper {
+      padding: 0;
+    }
+  }
+}
+
+main {
+  min-height: 70vh;
+  &.appvue:hover {
+    position: relative;
+    z-index: $zindex-appvue;
+  }
+}
+
+hr {
+  .divider {
+    height: 1px;
+    list-style: none;
+    background-color: #9fcbf2;
+    margin: 0;
+    border: 0;
+    padding: 0;
+  }
+}

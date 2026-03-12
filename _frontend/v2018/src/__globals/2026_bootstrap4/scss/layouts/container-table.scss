@@ -1,0 +1,11 @@
+.container-table {
+  // margin: 0 $grid-gutter-width * -0.5;
+  .result-count {
+    display: inline-block;
+    background-color: $bg_color_table_base;
+    color: $color_text_title;
+    padding: 3px 15px 0;
+    margin-left: 15px;
+    border-radius: 5px 5px 0 0;
+  }
+}

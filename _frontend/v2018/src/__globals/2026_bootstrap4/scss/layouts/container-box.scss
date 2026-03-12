@@ -1,0 +1,33 @@
+@use "sass:math";
+
+.container-box {
+  margin: 0 auto $grid-gutter-width;
+  background: $color_box_bg;
+  padding-bottom: $grid-gutter-width * 0.5;
+  position: relative;
+  border-radius: 5px;
+
+  .page-header {
+    padding: $grid-gutter-width * 0.5 $grid-gutter-width * 0.5 $grid-gutter-width * 0.3;
+    margin: 0 $grid-gutter-width * -0.5 $grid-gutter-width * 0.5;
+    color: $color_primary;
+    //background: darken($color_main_bg, 1%) $url_bg_png;
+    border-radius: 5px 5px 0 0;
+    border-bottom: 1px solid $color_container_border;
+    //font-weight: normal;
+    //font-size: 1.7em;
+    small {
+      color: #777;
+      font-size: 0.7em;
+    }
+  }
+
+  .page-subheader {
+    // padding: $grid-gutter-width *0.5 ;
+    //background: darken($color_main_bg, 3%) $url_bg_png;
+    // border-radius: 5px 5px 0 0;
+    // border-bottom: 1px solid $color_container_border;
+    margin: 0px;
+  }
+
+}

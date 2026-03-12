@@ -1,0 +1,13 @@
+.table-responsive {
+    border-radius: 5px;
+}
+
+.table {
+    th, td {
+        vertical-align: middle;
+    }
+    th {
+        text-align: center;
+        background-color: $bg_color_table_base;
+    }
+}

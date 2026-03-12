@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% load i18n common_cmj_tags crispy_forms_tags%}
+
+{% load render_bundle from webpack_loader %}
+{% block webpack_loader_css %}
+    {{ block.super }}
+    {% if view.crud.frontend %}
+      {% render_bundle view.crud.frontend 'css' %}
+    {% endif %}
+{% endblock %}
+{% block webpack_loader_js %}
+    {{ block.super }}
+    {% if view.crud.frontend %}
+      {% render_bundle view.crud.frontend 'js' skip_common_chunks=True %}
+    {% endif %}
+{% endblock %}
+
+{% block base_content %}
+<div class="d-flex context-actions justify-content-between">
+  {% if form %}
+    <div class="actions search">
+      {% crispy form %}
+    </div>
+  {% endif %}
+  {% block actions %}
+    <div class="actions btn-group btn-group" role="group">
+      {% block more_buttons_left %}{% endblock more_buttons_left %}
+    </div>
+    <div class="actions btn-group btn-group-lg" role="group">
+      {% block more_buttons %}{% endblock more_buttons %}
+      {% if view.create_url %}
+        <a href="{{ view.create_url }}" class="btn btn-outline-primary">
+          {% blocktrans with verbose_name=view.verbose_name %} Adicionar {{ verbose_name }} {% endblocktrans %}
+        </a>
+      {% endif %}
+    </div>
+  {% endblock actions %}
+</div>
+
+{% block extra_content %} {% endblock %}
+{% block container_table_list %}
+  {% if not rows %}
+    <p>{{ NO_ENTRIES_MSG }}</p>
+  {% else %}
+    <div class="container-table">
+      <div class="result-count">{% blocktrans with verbose_name_plural=view.verbose_name_plural %}Total de {{ verbose_name_plural }}: <strong>{{count}}</strong>{% endblocktrans %}</div>
+      <div class="table-responsive">
+        <table class="table table-hover table-striped table-borderless">
+          <thead>
+            <tr>
+              {% for name in headers %}
+                <th scope="col">
+                  {% if view.ordered_list %}
+                    <a title="{% trans 'Clique para alterar a ordem a listagem'%}" href="?o={% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}-{%endif%}{{forloop.counter}}{{ordering_url}}">{{ name|safe }}
+                    {% if 'o' not in request.GET and forloop.counter == 1 or 'o' in request.GET and forloop.counter|safe == request.GET.o %}
+                      <span class="caret top" title="{% trans 'Listado na Ordem Ascendente'%}"></span>
+                    {% elif 'o' in request.GET and forloop.counter == request.GET.o|str2intabs %}
+                      <span class="caret" title="{% trans 'Listado na Ordem Descendente'%}"></span>
+                    {% endif %}
+                    </a>
+                  {% else %}
+                      {{ name|safe }}
+                  {% endif %}
+                </th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+          {% for value_list in rows %}
+          <tr>
+            {% for value, href, css_class in value_list %}
+            <td class="{{ css_class }}">
+              {% if href %}
+                <a href="{{ href }}">{{ value|safe|default:"" }}</a>
+              {% elif value != 'core.Cep.None' %}
+                {% if value|url %}
+                  <a href="{{ value|safe }}"> {{ value|safe|default:"" }} </a>
+                {% else %}
+                  {{ value|safe|default:"" }}
+                {% endif %}
+              {% endif %}
+            </td>
+            {% endfor %}
+          </tr>
+          {% endfor %}
+        </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+
+{% endblock container_table_list %}
+
+  {% include "paginacao.html" %}
+
+{% endblock %}
