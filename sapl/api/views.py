@@ -1,12 +1,12 @@
 import logging
 
 from django.conf import settings
+from django.views.decorators.http import condition as django_condition
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.views.decorators.http import condition as django_condition
 
 from cmj.core.models import AuditLog
 from drfautoapi.drfautoapi import ApiViewSetConstrutor
@@ -14,13 +14,14 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor
 logger = logging.getLogger(__name__)
 
 
-@api_view(['POST'])
+@api_view(["POST"])
 @permission_classes([IsAdminUser])
 def recria_token(request, pk):
     Token.objects.filter(user_id=pk).delete()
     token = Token.objects.create(user_id=pk)
 
     return Response({"message": "Token recriado com sucesso!", "token": token.key})
+
 
 class LastModifiedDecorator:
     def __call__(self, cls):
@@ -32,7 +33,11 @@ class LastModifiedDecorator:
             drf_request = request
             wsgi_request = view.initialize_request(request, *args, **kwargs)
 
-            last_modified_func = self.last_modified_func if not hasattr(view, 'last_modified_func') else view.last_modified_func
+            last_modified_func = (
+                self.last_modified_func
+                if not hasattr(view, "last_modified_func")
+                else view.last_modified_func
+            )
 
             def patched_viewset_method(*_args, **_kwargs):
                 return original_dispatch(view, drf_request, *args, **kwargs)
@@ -45,35 +50,53 @@ class LastModifiedDecorator:
         return cls
 
     def last_modified_func(self, request, *args, **kwargs):
-        """ - Método padrão para obter o last_modified baseado no AuditLog
-            - Pode ser sobrescrito na customização do ViewSet caso necessário
-            - Existe um exemplo de sobrescrita em sapl/api/views_materia.py
+        """- Método padrão para obter o last_modified baseado no AuditLog
+        - Pode ser sobrescrito na customização do ViewSet caso necessário
+        - Existe um exemplo de sobrescrita em sapl/api/views_materia.py
         """
         try:
-            if 'pk' in kwargs:
-                obj_id = kwargs['pk']
-                last_log = AuditLog.objects.filter(
-                    model_name=self.model._meta.model_name,
-                    object_id=obj_id
-                ).order_by('-timestamp').values_list('timestamp', flat=True)[:1].first()
+            if "pk" in kwargs:
+                obj_id = kwargs["pk"]
+                last_log = (
+                    AuditLog.objects.filter(
+                        model_name=self.model._meta.model_name, object_id=obj_id
+                    )
+                    .order_by("-timestamp")
+                    .values_list("timestamp", flat=True)[:1]
+                    .first()
+                )
             else:
-                view = kwargs.get('view', None)
+                view = kwargs.get("view", None)
                 if view:
                     for backend in list(view.filter_backends):
-                        queryset = backend().filter_queryset(request, view.queryset, view)
+                        queryset = backend().filter_queryset(
+                            request, view.queryset, view
+                        )
 
                     if queryset.exists():
-                        last_log = AuditLog.objects.filter(
-                            model_name=self.model._meta.model_name,
-                            object_id__in=queryset.values_list('pk', flat=True)
-                        ).order_by('-timestamp').values_list('timestamp', flat=True)[:1].first()
+                        last_log = (
+                            AuditLog.objects.filter(
+                                model_name=self.model._meta.model_name,
+                                object_id__in=queryset.values_list("pk", flat=True),
+                            )
+                            .order_by("-timestamp")
+                            .values_list("timestamp", flat=True)[:1]
+                            .first()
+                        )
                     else:
                         last_log = None
                 else:
-                    last_log = AuditLog.objects.filter(
-                        model_name=self.model._meta.model_name,
-                        object_id__in=self.model.objects.values_list('pk', flat=True)
-                    ).order_by('-timestamp').values_list('timestamp', flat=True)[:1].first()
+                    last_log = (
+                        AuditLog.objects.filter(
+                            model_name=self.model._meta.model_name,
+                            object_id__in=self.model.objects.values_list(
+                                "pk", flat=True
+                            ),
+                        )
+                        .order_by("-timestamp")
+                        .values_list("timestamp", flat=True)[:1]
+                        .first()
+                    )
 
             if last_log:
                 return last_log
@@ -83,21 +106,24 @@ class LastModifiedDecorator:
 
         return None
 
+
 SaplApiViewSetConstrutor = ApiViewSetConstrutor
 SaplApiViewSetConstrutor.last_modified_class(LastModifiedDecorator)
 
-SaplApiViewSetConstrutor.import_modules([
-    'sapl.api.views_audiencia',
-    'sapl.api.views_base',
-    'sapl.api.views_comissoes',
-    'sapl.api.views_compilacao',
-    'sapl.api.views_materia',
-    'sapl.api.views_norma',
-    'sapl.api.views_painel',
-    'sapl.api.views_parlamentares',
-    'sapl.api.views_protocoloadm',
-    'sapl.api.views_sessao',
-])
+SaplApiViewSetConstrutor.import_modules(
+    [
+        "sapl.api.views_audiencia",
+        "sapl.api.views_base",
+        "sapl.api.views_comissoes",
+        "sapl.api.views_compilacao",
+        "sapl.api.views_materia",
+        "sapl.api.views_norma",
+        "sapl.api.views_painel",
+        "sapl.api.views_parlamentares",
+        "sapl.api.views_protocoloadm",
+        "sapl.api.views_sessao",
+    ]
+)
 
 
 """
@@ -121,7 +147,7 @@ SaplApiViewSetConstrutor.import_modules([
     4.3 - Caso exista GLOBAL_FILTERSET_MIXIN definido,
           utiliza este FilterSet para construir o genérico de 4.1
     4.4 - Caso não exista GLOBAL_FILTERSET_MIXIN, será aplicado
-          drfautoapi.drjautoapi.ApiFilterSetMixin que inclui parametro para:
+          drfautoapi.drjautoapi.CmjFilterSetMixin que inclui parametro para:
           - order_by: através do parâmetro "o"
           - amplia os lookups aceitos pelo FilterSet default
             para os aceitos pelo django sem a necessidade de criar

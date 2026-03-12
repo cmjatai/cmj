@@ -1,23 +1,29 @@
-
 import os
+from decimal import Decimal
 
 from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.urls.base import reverse
 from django.utils import timezone
-from model_utils.choices import Choices
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from rest_framework.fields import empty, JSONField, ChoiceField,\
-    SerializerMethodField, SlugField
-from rest_framework.relations import RelatedField, ManyRelatedField,\
-    MANY_RELATION_KWARGS
+from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.fields import SerializerMethodField, SlugField, empty
+from rest_framework.relations import (
+    MANY_RELATION_KWARGS,
+    ManyRelatedField,
+    RelatedField,
+)
 
-from cmj.arq.models import DraftMidia, ArqClasse, ArqDoc
+from cmj.arq.models import ArqClasse, ArqDoc, DraftMidia
 from cmj.core.models import Bi
-from cmj.loa.models import RegistroAjusteLoa
-from cmj.sigad.models import Documento, ReferenciaEntreDocumentos,\
-    DOC_TEMPLATES_CHOICE, CMSMixin
+from cmj.loa.models import EmendaLoa, RegistroAjusteLoa
+from cmj.sigad.models import (
+    DOC_TEMPLATES_CHOICE,
+    CMSMixin,
+    Documento,
+    ReferenciaEntreDocumentos,
+)
 from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
 
 
@@ -25,14 +31,16 @@ class CmjSerializerMixin(DrfAutoApiSerializerMixin):
     link_detail_backend = serializers.SerializerMethodField()
 
     class Meta(DrfAutoApiSerializerMixin.Meta):
-        fields = '__all__'
+        fields = "__all__"
 
     def get_link_detail_backend(self, obj) -> str:
         try:
-            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
-                           kwargs={'pk': obj.pk})
+            return reverse(
+                f"{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail",
+                kwargs={"pk": obj.pk},
+            )
         except:
-            return ''
+            return ""
 
 
 class ChoiceSerializer(serializers.Serializer):
@@ -55,6 +63,13 @@ class ModelChoiceSerializer(ChoiceSerializer):
         return obj.id
 
 
+@extend_schema_field({"type": "string"})
+class ModelChoiceObjectRelatedField(serializers.RelatedField):
+
+    def to_representation(self, value):
+        return ModelChoiceSerializer(value).data
+
+
 class DocumentoChoiceSerializer(ModelChoiceSerializer):
 
     def get_text(self, obj):
@@ -62,7 +77,7 @@ class DocumentoChoiceSerializer(ModelChoiceSerializer):
 
     class Meta:
         model = Documento
-        fields = ['id', 'titulo']
+        fields = ["id", "titulo"]
 
 
 class DocumentoParteField(RelatedField):
@@ -71,21 +86,21 @@ class DocumentoParteField(RelatedField):
         cfg = self.configs
 
         if isinstance(instance, Documento):
-            inst = cfg['serializer'](instance).data
+            inst = cfg["serializer"](instance).data
             # inst = model_to_dict(instance, fields=cfg['fields'])
 
-            inst['has_midia'] = hasattr(instance, 'midia')
-            inst[cfg['field']] = {}
+            inst["has_midia"] = hasattr(instance, "midia")
+            inst[cfg["field"]] = {}
         else:
             inst = model_to_dict(instance)
-            inst['refresh'] = 0
+            inst["refresh"] = 0
 
-        if not hasattr(instance, cfg['field']):
+        if not hasattr(instance, cfg["field"]):
             return inst
 
-        inst[cfg['field']] = {
-            child.id: cfg['serializer'](child, m2ms=cfg['m2ms']).data
-            for child in getattr(instance, cfg['field']).order_by('ordem')
+        inst[cfg["field"]] = {
+            child.id: cfg["serializer"](child, m2ms=cfg["m2ms"]).data
+            for child in getattr(instance, cfg["field"]).order_by("ordem")
         }
         return inst
 
@@ -94,7 +109,7 @@ class DocumentoParteField(RelatedField):
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        list_kwargs = {'child_relation': cls(*args, **kwargs)}
+        list_kwargs = {"child_relation": cls(*args, **kwargs)}
         for key in kwargs.keys():
             if key in MANY_RELATION_KWARGS:
                 list_kwargs[key] = kwargs[key]
@@ -103,13 +118,14 @@ class DocumentoParteField(RelatedField):
 
             def get_attribute(self, instance):
                 relationship = super().get_attribute(instance)
-                return relationship.order_by('ordem')
+                return relationship.order_by("ordem")
 
             def to_representation(self, iterable):
                 return {
                     value.id: self.child_relation.to_representation(value)
                     for value in iterable
                 }
+
         return CustomManyRelatedField(**list_kwargs)
 
 
@@ -124,7 +140,7 @@ class BiSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Bi
-        fields = '__all__'
+        fields = "__all__"
 
 
 class DocumentoSerializer(serializers.ModelSerializer):
@@ -141,18 +157,20 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Documento
-        exclude = ('old_json',
-                   'old_path',
-                   'documentos_citados',
-                   'owner',
-                   'parlamentares',
-                   'materias')
+        exclude = (
+            "old_json",
+            "old_path",
+            "documentos_citados",
+            "owner",
+            "parlamentares",
+            "materias",
+        )
 
     def get_has_midia(self, obj):
-        return hasattr(obj, 'midia')
+        return hasattr(obj, "midia")
 
     def get_mime_type(self, obj):
-        return obj.midia.last.content_type if hasattr(obj, 'midia') else ''
+        return obj.midia.last.content_type if hasattr(obj, "midia") else ""
 
     def get_refresh(self, obj):
         return 0
@@ -161,29 +179,31 @@ class DocumentoSerializer(serializers.ModelSerializer):
         if obj.tipo not in CMSMixin.TDs:
             return {}
         choices = {
-            'tipo': {key: value.triple_map
-                     for key, value in Documento.tipo_parte_doc.items()},
-            'visibilidade': Documento.VISIBILIDADE_STATUS.triple_map,
-            'alinhamento': Documento.alinhamento_choice.triple_map,
-            'template_doc': DOC_TEMPLATES_CHOICE.triple_map,
+            "tipo": {
+                key: value.triple_map for key, value in Documento.tipo_parte_doc.items()
+            },
+            "visibilidade": Documento.VISIBILIDADE_STATUS.triple_map,
+            "alinhamento": Documento.alinhamento_choice.triple_map,
+            "template_doc": DOC_TEMPLATES_CHOICE.triple_map,
         }
 
-        choices['all_bycode'] = Documento.tipo_parte_doc_choice.triple_map
-        choices['all_bycomponent'
-                ] = Documento.tipo_parte_doc_choice.triple_map_component
+        choices["all_bycode"] = Documento.tipo_parte_doc_choice.triple_map
+        choices["all_bycomponent"] = (
+            Documento.tipo_parte_doc_choice.triple_map_component
+        )
         return choices
 
     def __init__(self, instance=None, data=empty, m2ms=[], **kwargs):
         super().__init__(instance=instance, data=data, **kwargs)
 
-        meta = getattr(self, 'Meta', None)
+        meta = getattr(self, "Meta", None)
 
         exclude = ()
         if meta:
             exclude = meta.exclude
 
         if not m2ms:
-            m2ms = ['childs', 'cita']
+            m2ms = ["childs", "cita"]
 
         for m2m in m2ms:
 
@@ -193,60 +213,66 @@ class DocumentoSerializer(serializers.ModelSerializer):
             child_relation = self.fields.fields.get(m2m).child_relation
 
             child_relation.configs = {
-                'field': m2m,
-                'serializer': DocumentoSerializer,
-                'fields': [
-                    field for field in self.fields.fields
-                    if field not in meta.exclude
-
+                "field": m2m,
+                "serializer": DocumentoSerializer,
+                "fields": [
+                    field for field in self.fields.fields if field not in meta.exclude
                 ],
-                'm2ms': m2ms
+                "m2ms": m2ms,
             }
 
     def update(self, instance, validated_data):
         vd = validated_data
-        if 'visibilidade' in vd and \
-                vd['visibilidade'] == Documento.STATUS_PUBLIC and\
-                instance.visibilidade != Documento.STATUS_PUBLIC:
-            vd['public_date'] = timezone.now()
+        if (
+            "visibilidade" in vd
+            and vd["visibilidade"] == Documento.STATUS_PUBLIC
+            and instance.visibilidade != Documento.STATUS_PUBLIC
+        ):
+            vd["public_date"] = timezone.now()
 
-        if 'ordem' in vd and vd['ordem']:
+        if "ordem" in vd and vd["ordem"]:
             ordem_atual = instance.ordem
-            ordem_nova = vd['ordem']
+            ordem_nova = vd["ordem"]
             Documento.objects.remove_space(instance.parent, ordem_atual)
             Documento.objects.create_space(instance.parent, ordem_nova)
 
-        if 'cita' in vd:
-            cita = vd.pop('cita')
+        if "cita" in vd:
+            cita = vd.pop("cita")
             if len(cita) == 1:
                 cita = cita[0]
-                if 'id' not in cita:
-                    ordem = cita['ordem']
-                    if cita['ordem'] == 0:
+                if "id" not in cita:
+                    ordem = cita["ordem"]
+                    if cita["ordem"] == 0:
                         max_ordem = ReferenciaEntreDocumentos.objects.filter(
-                            referente=instance).aggregate(Max('ordem'))
-                        ordem = (max_ordem['ordem__max'] + 1
-                                 ) if max_ordem['ordem__max'] else 1
+                            referente=instance
+                        ).aggregate(Max("ordem"))
+                        ordem = (
+                            (max_ordem["ordem__max"] + 1)
+                            if max_ordem["ordem__max"]
+                            else 1
+                        )
                     else:
                         ReferenciaEntreDocumentos.objects.create_space(
-                            instance, cita['ordem'])
+                            instance, cita["ordem"]
+                        )
                     ref = ReferenciaEntreDocumentos()
                     ref.ordem = ordem
-                    ref.referenciado_id = cita['referenciado']
-                    ref.referente_id = cita['referente']
+                    ref.referenciado_id = cita["referenciado"]
+                    ref.referente_id = cita["referente"]
                     ref.save()
 
                 else:
-                    ref = ReferenciaEntreDocumentos.objects.get(
-                        pk=cita.pop('id'))
+                    ref = ReferenciaEntreDocumentos.objects.get(pk=cita.pop("id"))
 
-                    if 'ordem' in cita:
+                    if "ordem" in cita:
                         ordem_atual = ref.ordem
-                        ordem_nova = cita.pop('ordem')
+                        ordem_nova = cita.pop("ordem")
                         ReferenciaEntreDocumentos.objects.remove_space(
-                            instance, ordem_atual)
+                            instance, ordem_atual
+                        )
                         ReferenciaEntreDocumentos.objects.create_space(
-                            instance, ordem_nova)
+                            instance, ordem_nova
+                        )
                         ref.ordem = ordem_nova
 
                     for attr, value in cita.items():
@@ -254,9 +280,12 @@ class DocumentoSerializer(serializers.ModelSerializer):
                     ref.save()
 
             else:
-                raise ValidationError(
-                    _('Não existe implentação para tratar '
-                      'mais de uma citação ao mesmo tempo.'))
+                raise DRFValidationError(
+                    _(
+                        "Não existe implentação para tratar "
+                        "mais de uma citação ao mesmo tempo."
+                    )
+                )
         else:
             instance = serializers.ModelSerializer.update(self, instance, vd)
 
@@ -264,24 +293,24 @@ class DocumentoSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         vd = validated_data
-        vd['owner'] = self.context['request'].user
+        vd["owner"] = self.context["request"].user
 
-        if 'ordem' in vd and vd['ordem']:
-            Documento.objects.create_space(vd['parent'], vd['ordem'])
+        if "ordem" in vd and vd["ordem"]:
+            Documento.objects.create_space(vd["parent"], vd["ordem"])
 
-        if 'classe' in vd and vd['classe']:
-            vd['template_doc'] = vd['classe'].template_doc_padrao
-            vd['tipo'] = vd['classe'].tipo_doc_padrao
+        if "classe" in vd and vd["classe"]:
+            vd["template_doc"] = vd["classe"].template_doc_padrao
+            vd["tipo"] = vd["classe"].tipo_doc_padrao
 
-            if vd['classe'].visibilidade != CMSMixin.STATUS_PUBLIC:
-                vd['visibilidade'] = vd['classe'].visibilidade
+            if vd["classe"].visibilidade != CMSMixin.STATUS_PUBLIC:
+                vd["visibilidade"] = vd["classe"].visibilidade
 
         instance = serializers.ModelSerializer.create(self, validated_data)
 
         if not instance.is_parte_de_documento():
             container = Documento()
-            container.titulo = ''
-            container.descricao = ''
+            container.titulo = ""
+            container.descricao = ""
             container.classe = instance.classe
             container.tipo = Documento.TPD_CONTAINER_SIMPLES
             container.owner = instance.owner
@@ -304,7 +333,7 @@ class DocumentoUserAnonymousSerializer(DocumentoSerializer):
 
     class Meta(DocumentoSerializer.Meta):
         model = Documento
-        exclude = ('old_json', 'old_path', 'owner')
+        exclude = ("old_json", "old_path", "owner")
 
 
 class DraftMidiaSerializer(CmjSerializerMixin):
@@ -332,7 +361,7 @@ class ArqClasseSerializer(CmjSerializerMixin):
     count_childs = serializers.SerializerMethodField()
 
     def get_parents(self, obj):
-        return map(lambda x: {'id': x.id, 'titulo': x.titulo}, obj.parents)
+        return map(lambda x: {"id": x.id, "titulo": x.titulo}, obj.parents)
 
     def get_conta(self, obj):
         return obj.conta
@@ -348,13 +377,12 @@ class ArqDocSerializer(CmjSerializerMixin):
 
     def get_link_detail_backend(self, obj) -> str:
         try:
-            return reverse(f'{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail',
-                           kwargs={
-                               'classe_id': obj.classe_estrutural_id,
-                               'pk': obj.pk
-                           })
+            return reverse(
+                f"{self.Meta.model._meta.app_config.name}:{self.Meta.model._meta.model_name}_detail",
+                kwargs={"classe_id": obj.classe_estrutural_id, "pk": obj.pk},
+            )
         except:
-            return ''
+            return ""
 
     class Meta(CmjSerializerMixin.Meta):
         model = ArqDoc
@@ -367,3 +395,39 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
         model = RegistroAjusteLoa
 
 
+class EmendaLoaSerializer(CmjSerializerMixin):
+
+    class Meta(CmjSerializerMixin.Meta):
+        model = EmendaLoa
+
+    def validate_valor(self, obj, *args, **kwargs):
+
+        obj = obj or "0.00"
+
+        try:
+            if obj and "." in obj and "," in obj:
+                if obj.rindex(",") > obj.rindex("."):
+                    obj = obj.replace(".", "").replace(",", ".")
+                else:
+                    obj = obj.replace(",", "")
+            elif obj and "," in obj:
+                obj = obj.replace(",", ".")
+
+            obj = Decimal(obj)
+        except:
+            raise DRFValidationError(
+                _(
+                    'O campo "Valor Global da Emenda" deve ser prenchido e '
+                    "seguir o formado 999.999.999,99. "
+                )
+            )
+
+        if obj == Decimal("0.00"):
+            raise DRFValidationError(
+                _(
+                    'O campo "Valor Global da Emenda" deve ser prenchido e '
+                    "seguir o formado 999.999.999,99. "
+                )
+            )
+
+        return obj

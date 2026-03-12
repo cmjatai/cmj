@@ -1,3 +1,4 @@
+import logging
 from decimal import Decimal
 
 from django.db.models import Q
@@ -5,16 +6,21 @@ from django_filters import CharFilter, ModelChoiceFilter
 
 from cmj.loa.models import EmendaLoa, Loa, RegistroAjusteLoa
 from drfautoapi.drfautoapi import ApiFilterSetMixin
-from sapl.parlamentares.models import Parlamentar
+
+logger = logging.getLogger(__name__)
 
 
-class EmendaLoaFilterSet(ApiFilterSetMixin):
+class CmjFilterSetMixin(ApiFilterSetMixin):
+    pass
+
+
+class EmendaLoaFilterSet(CmjFilterSetMixin):
 
     search = CharFilter(label="Busca", required=False, method="filter_search")
 
     situacao = CharFilter(label="Situação", required=False, method="filter_situacao")
 
-    class Meta(ApiFilterSetMixin.Meta):
+    class Meta(CmjFilterSetMixin.Meta):
         model = EmendaLoa
 
     @property
@@ -69,7 +75,7 @@ class EmendaLoaFilterSet(ApiFilterSetMixin):
         return queryset.filter(q)
 
 
-class RegistroAjusteLoaFilterSet(ApiFilterSetMixin):
+class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
 
     search = CharFilter(label="Busca", required=False, method="filter_search")
 
@@ -79,7 +85,7 @@ class RegistroAjusteLoaFilterSet(ApiFilterSetMixin):
         label="LOA", queryset=Loa.objects.all(), method="filter_oficio_ajuste_loa__loa"
     )
 
-    class Meta(ApiFilterSetMixin.Meta):
+    class Meta(CmjFilterSetMixin.Meta):
         model = RegistroAjusteLoa
 
     @property
@@ -114,7 +120,9 @@ class RegistroAjusteLoaFilterSet(ApiFilterSetMixin):
             q &= Q(registroajusteloaparlamentar_set__valor__lt=0)
             q &= Q(emendaloa__isnull=False)
         else:
-            q &= (Q(registroajusteloaparlamentar_set__valor__gte=Decimal(0)) | Q(registroajusteloaparlamentar_set__isnull=True))
+            q &= Q(registroajusteloaparlamentar_set__valor__gte=Decimal(0)) | Q(
+                registroajusteloaparlamentar_set__isnull=True
+            )
 
         # tudo selecionado, retorna sem filtro
         if has_em_tramitacao and has_finalizado and has_impedimento:
