@@ -70,32 +70,43 @@ export default {
 }
 </script>
 
-<style scoped>
-.pcl-lista-header {
-  background-color: #f8f9fa;
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-bottom: none;
-  border-radius: 0.25rem 0.25rem 0 0;
-  padding: 0.4rem 0.75rem;
-  margin-bottom: 0;
-  font-weight: 600;
-  line-height: 1.4;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.pcl-lista-emendas-ajustes .list-group .list-group-item:first-child {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-}
-.pcl-lista-emendas-ajustes .list-group-item.active {
-  z-index: 0;
-}
-@media (max-width: 767.98px) {
-  .pcl-lista-emendas-ajustes {
-    max-height: 50vh;
-    overflow-y: auto;
-    margin-bottom: 1em;
+<style lang="scss" scoped>
+$border-color: rgba(0, 0, 0, 0.125);
+
+.pcl-lista {
+  &-header {
+    background-color: #f8f9fa;
+    border: 1px solid $border-color;
+    border-bottom: none;
+    border-radius: 0.25rem 0.25rem 0 0;
+    padding: 0.4rem 0.75rem;
+    margin-bottom: 0;
+    font-weight: 600;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-variant: small-caps;
+  }
+
+  &-emendas-ajustes {
+    .list-group {
+      .list-group-item:first-child {
+        border-top: 0;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+    }
+
+    .list-group-item.active {
+      z-index: 0;
+    }
+
+    @media (max-width: 767.98px) {
+      max-height: 50vh;
+      overflow-y: auto;
+      margin-bottom: 1em;
+    }
   }
 }
 </style>

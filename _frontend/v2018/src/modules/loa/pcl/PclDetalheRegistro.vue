@@ -9,7 +9,7 @@
             <b-badge :variant="itemBadgeVariant(registro)" class="mr-2">
               {{ registroBadgeLabel(registro) }}
             </b-badge>
-            <span class="font-weight-bold">Prestação de Contas</span>
+            <span class="font-weight-bold card-header-title">Prestação de Contas</span>
           </div>
           <a
             :href="registro.link_detail_backend"
@@ -280,63 +280,86 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+$border-color: rgba(0, 0, 0, 0.125);
+
 .avatar-stack {
   display: flex;
   flex-direction: row;
+
+  &-item {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    margin-right: -10px;
+    transition: transform 0.15s ease, z-index 0s;
+    position: relative;
+    z-index: 1;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &:hover {
+      transform: translateY(-2px) scale(1.1);
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+  }
 }
-.avatar-stack-item {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-  margin-right: -10px;
-  transition: transform 0.15s ease, z-index 0s;
-  position: relative;
-  z-index: 1;
+
+.parlamentar {
+  &-names {
+    font-size: 0.8rem;
+    color: #555;
+    line-height: 1.2;
+    max-width: 200px;
+  }
+
+  &-name {
+    font-weight: 600;
+  }
 }
-.avatar-stack-item:last-child {
-  margin-right: 0;
-}
-.avatar-stack-item:hover {
-  transform: translateY(-2px) scale(1.1);
-  z-index: 2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-.parlamentar-names {
-  font-size: 0.8rem;
-  color: #555;
-  line-height: 1.2;
-  max-width: 200px;
-}
-.parlamentar-name {
-  font-weight: 600;
-}
+
 .pcl-detalhe-registro {
   position: sticky;
   top: 1rem;
   align-self: flex-start;
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
+  .card-header {
+    border-bottom: 0;
+    .card-header-title {
+      font-variant: small-caps;
+    }
+  }
 }
-.pcl-tabs-detalhe >>> .nav-tabs {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
-}
-.pcl-tabs-detalhe >>> .nav-tabs .nav-link {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #555;
-  padding: 0.4rem 0.75rem;
-}
-.pcl-tabs-detalhe >>> .nav-tabs .nav-link.active {
-  color: #212529;
-  border-color: rgba(0, 0, 0, 0.125) rgba(0, 0, 0, 0.125) #fff;
-}
-.pcl-tabs-detalhe >>> .tab-content {
-  border: 1px solid rgba(0, 0, 0, 0.125);
-  border-top: none;
-  border-radius: 0 0 0.25rem 0.25rem;
+
+.pcl-tabs-detalhe ::v-deep {
+
+  .nav-tabs {
+    border-bottom: 1px solid $border-color;
+
+    .nav-link {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #555;
+      padding: 0.4rem 0.75rem;
+
+      &.active {
+        color: #212529;
+        border-color: $border-color $border-color #fff;
+      }
+    }
+  }
+
+  .tab-content {
+    border: 1px solid $border-color;
+    border-top: none;
+    border-radius: 0 0 0.25rem 0.25rem;
+  }
 }
 </style>
