@@ -259,7 +259,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
     documento = None
     classe = None
     referencia = None
-    paginate_by = 36
+    paginate_by = 24
 
     def post(self, request, *args, **kwargs):
         return self.get(request, *args, **kwargs)
@@ -369,7 +369,7 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
         else:
             context = TemplateView.get_context_data(self, **kwargs)
         context["path"] = "-path"
-
+        context["type_pagination"] = "pagination-static"
         return context
 
     def get_context_data_documento(self, **kwargs):
@@ -492,7 +492,9 @@ class PathView(TabIndexMixin, MultipleObjectMixin, TemplateView):
             )[:4]
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.subsites:
-            kwargs["object_list"] = self.classe.documento_set.qs_news(self.request.user)
+            kwargs["object_list"] = self.classe.documentos_relacionados_set.qs_news(
+                self.request.user
+            )
 
         elif template == models.CLASSE_TEMPLATES_CHOICE.mapa_site:
             kwargs["object_list"] = None

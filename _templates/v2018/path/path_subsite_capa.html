@@ -83,11 +83,11 @@
             {{object.texto|default:''|safe|urlize}}
           {% endif %}
         </div>
-        {% with object.classe.documentos_relacionados_set.qs_news as object_list %}
-          {% with 'path-item-list w-100' as css_class %}
-            {% include "path/path_list_docs.html" %}
-          {% endwith %}
+        {% with 'path-item-list w-100' as css_class %}
+          {% include "path/path_list_docs.html" %}
         {% endwith %}
+
+  {% include "paginacao.html" %}
       </div>
     </div>
   </div>
