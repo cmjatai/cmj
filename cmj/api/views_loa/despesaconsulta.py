@@ -17,8 +17,8 @@ from rest_framework.response import Response
 
 from cmj.api.forms import EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
 from cmj.api.serializers import CmjSerializerMixin
-from cmj.api.views_loa.emendaloa_viewset import EmendaLoaViewSet
-from cmj.api.views_loa.loa_viewset import LoaViewSet
+from cmj.api.views_loa.emendaloa import EmendaLoaViewSet
+from cmj.api.views_loa.loa import LoaViewSet
 from cmj.loa.models import (
     Acao,
     Agrupamento,
@@ -56,6 +56,7 @@ from sapl.api.permissions import SaplModelPermissions
 from sapl.parlamentares.models import Parlamentar
 
 logger = logging.getLogger(__name__)
+
 
 class DespesaConsultaSerializer(CmjSerializerMixin):
 
@@ -117,4 +118,3 @@ class DespesaConsultaViewSet:
         self.filter_queryset = filter_queryset
 
         return self.list(request, *args, **kwargs)
-

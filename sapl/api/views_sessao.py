@@ -12,7 +12,6 @@ from drfautoapi.drfautoapi import (
     wrapper_queryset_response_for_drf_action,
 )
 from sapl.api.mixins import ResponseFileMixin
-from sapl.api.serializers import SessaoPlenariaECidadaniaSerializer
 from sapl.sessao.models import (
     ExpedienteMateria,
     ExpedienteSessao,
@@ -66,11 +65,15 @@ class _SessaoPlenariaViewSet(ResponseFileMixin):
 
     @action(detail=True)
     def ecidadania(self, request, *args, **kwargs):
+        from sapl.api.serializers import SessaoPlenariaECidadaniaSerializer
+
         self.serializer_class = SessaoPlenariaECidadaniaSerializer
         return self.retrieve(request, *args, **kwargs)
 
     @action(detail=False, url_path="ecidadania")
     def ecidadania_list(self, request, *args, **kwargs):
+        from sapl.api.serializers import SessaoPlenariaECidadaniaSerializer
+
         self.serializer_class = SessaoPlenariaECidadaniaSerializer
         return self.list(request, *args, **kwargs)
 
