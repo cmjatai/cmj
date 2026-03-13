@@ -281,7 +281,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$border-color: rgba(0, 0, 0, 0.125);
+$border-color: #fff;
 
 .avatar-stack {
   display: flex;
@@ -292,7 +292,7 @@ $border-color: rgba(0, 0, 0, 0.125);
     height: 48px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid #fff;
+    border: 2px solid $border-color;
     box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
     margin-right: -10px;
     transition: transform 0.15s ease, z-index 0s;
@@ -342,7 +342,6 @@ $border-color: rgba(0, 0, 0, 0.125);
 
   .nav-tabs {
     border-bottom: 1px solid $border-color;
-
     .nav-link {
       font-size: 0.85rem;
       font-weight: 600;
@@ -351,7 +350,7 @@ $border-color: rgba(0, 0, 0, 0.125);
 
       &.active {
         color: #212529;
-        border-color: $border-color $border-color #fff;
+        border-color: $border-color;
       }
     }
   }

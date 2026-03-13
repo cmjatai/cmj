@@ -118,8 +118,8 @@ export default class EmendaLoaList {
     rTipoAgrup
       .change((event) => {
         if (event.target.checked && event.target.value === 'sem_registro') {
-          sAgrup.not('[value="despesa__unidade"]').prop('disabled', true).prop('checked', false).parent().addClass('d-none')
-          sAgrup.filter('[value="despesa__unidade"]').prop('disabled', false).parent().removeClass('d-none')
+          sAgrup.not('[value="despesa__unidade"], [value="entidade"]').prop('disabled', true).prop('checked', false).parent().addClass('d-none')
+          sAgrup.filter('[value="despesa__unidade"], [value="entidade"]').prop('disabled', false).parent().removeClass('d-none')
           sAgrup.filter('[value="despesa__unidade"]').prop('checked', true)
         } else if (event.target.checked) {
           sAgrup.prop('disabled', false).parent().removeClass('d-none')

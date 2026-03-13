@@ -1,56 +1,77 @@
-from decimal import ROUND_DOWN, Decimal
 import io
 import logging
 import re
-
-from attr import fields
-import fitz
-import requests
 import tempfile
 import zipfile
-from _collections import OrderedDict
-
+from decimal import ROUND_DOWN, Decimal
 from urllib.parse import urlencode
+
+import fitz
+import requests
+from _collections import OrderedDict
+from attr import fields
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError, PermissionDenied
-from django.db.models import Q, Max
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.files import File
+from django.db.models import Max, Q
 from django.db.models.aggregates import Sum
 from django.http.response import Http404, HttpResponse
 from django.shortcuts import redirect
 from django.template import loader
 from django.template.loader import render_to_string
-from django.urls.base import reverse
-from django.urls.base import reverse_lazy
+from django.urls.base import reverse, reverse_lazy
 from django.utils import formats, timezone
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
-from django.core.files import File
-from django.utils.text import slugify
 
+from cmj import loa
 from cmj.core.models import AuditLog
-from cmj.loa.forms import LoaForm, EmendaLoaForm, OficioAjusteLoaForm, PrestacaoContaLoaForm, PrestacaoContaRegistroForm,\
-    RegistroAjusteLoaForm, EmendaLoaFilterSet, AgrupamentoForm
-from cmj.loa.models import Despesa, Entidade, Loa, EmendaLoa, EmendaLoaParlamentar, OficioAjusteLoa, PrestacaoContaLoa, PrestacaoContaRegistro,\
-    RegistroAjusteLoa, RegistroAjusteLoaParlamentar, EmendaLoaRegistroContabil,\
-    Agrupamento, SubFuncao, UnidadeOrcamentaria, quantize
+from cmj.loa.forms import (
+    AgrupamentoForm,
+    EmendaLoaFilterSet,
+    EmendaLoaForm,
+    LoaForm,
+    OficioAjusteLoaForm,
+    PrestacaoContaLoaForm,
+    PrestacaoContaRegistroForm,
+    RegistroAjusteLoaForm,
+)
+from cmj.loa.models import (
+    Agrupamento,
+    Despesa,
+    EmendaLoa,
+    EmendaLoaParlamentar,
+    EmendaLoaRegistroContabil,
+    Entidade,
+    Loa,
+    OficioAjusteLoa,
+    PrestacaoContaLoa,
+    PrestacaoContaRegistro,
+    RegistroAjusteLoa,
+    RegistroAjusteLoaParlamentar,
+    SubFuncao,
+    UnidadeOrcamentaria,
+    quantize,
+)
 from cmj.utils import TimeExecution
 from cmj.utils_report import make_pdf
-from sapl.utils import get_client_ip
-from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST
+from sapl.crud.base import RP_DETAIL, RP_LIST, Crud, CrudAux, MasterDetailCrud
 from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Legislatura, Parlamentar
+from sapl.utils import get_client_ip
 
 from . import tasks
-from cmj import loa
+
 
 class LoaContextDataMixin:
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        path = context.get('path', '')
-        context['path'] = f'{path} container-loa'
+        path = context.get("path", "")
+        context["path"] = f"{path} container-loa"
         return context
 
 
@@ -65,31 +86,31 @@ class LoaCrud(Crud):
         @property
         def list_field_names(self):
             list_field_names = [
-                'ano',
-                'receita_corrente_liquida',
-                ('disp_total', 'perc_disp_total'),
-                ('disp_saude', 'perc_disp_saude'),
-                ('disp_diversos', 'perc_disp_diversos'),
+                "ano",
+                "receita_corrente_liquida",
+                ("disp_total", "perc_disp_total"),
+                ("disp_saude", "perc_disp_saude"),
+                ("disp_diversos", "perc_disp_diversos"),
             ]
 
             if not self.request.user.is_anonymous:
-                list_field_names.append('publicado')
+                list_field_names.append("publicado")
             return list_field_names
 
         @property
         def verbose_name(self):
-            return _('Lei Orçamentária Anual')
+            return _("Lei Orçamentária Anual")
 
         @property
         def verbose_name_plural(self):
-            return _('Leis Orçamentárias Anuais')
+            return _("Leis Orçamentárias Anuais")
 
         @property
         def list_url(self):
             url = super().list_url
             if self.request.user.is_anonymous:
                 c = Loa.objects.filter(publicado=True).count()
-                return url if c > 1 else ''
+                return url if c > 1 else ""
             return url
 
     class ListView(Crud.ListView):
@@ -101,15 +122,16 @@ class LoaCrud(Crud):
 
             if self.object_list.count() == 1:
                 loa = self.object_list.first()
-                return redirect(to=reverse_lazy('cmj.loa:loa_detail',
-                                                kwargs={'pk': loa.pk}))
+                return redirect(
+                    to=reverse_lazy("cmj.loa:loa_detail", kwargs={"pk": loa.pk})
+                )
             return response
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} loa-list'
-            context['type_pagination'] = 'pagination-static'
+            path = context.get("path", "")
+            context["path"] = f"{path} loa-list"
+            context["type_pagination"] = "pagination-static"
             return context
 
         def get_queryset(self):
@@ -121,7 +143,7 @@ class LoaCrud(Crud):
             if u.is_anonymous:
                 return qsp
 
-            if u.has_perm('loa.emendaloa_full_editor'):
+            if u.has_perm("loa.emendaloa_full_editor"):
                 return qs
 
             if u.operadorautor_set.exists():
@@ -133,33 +155,38 @@ class LoaCrud(Crud):
             return qsp
 
         def hook_header_perc_disp_total(self):
-            return ''
+            return ""
 
         def hook_header_perc_disp_saude(self):
-            return ''
+            return ""
 
         def hook_header_perc_disp_diversos(self):
-            return ''
+            return ""
 
         def hook_header_btn_lista_emendas(self):
-            return ''
+            return ""
 
         def hook_btn_lista_emendas(self, *args, **kwargs):
             l = args[0]
-            return f' <em>(Emendas à LOA)</em>', f'/loa/{l.pk}/emendaloa'
+            return f" <em>(Emendas à LOA)</em>", f"/loa/{l.pk}/emendaloa"
 
         def hook_receita_corrente_liquida(self, *args, **kwargs):
             l = args[0]
             if l.ano < 2023:
-                return ' - ' , args[2]
+                return " - ", args[2]
 
             ano_atual = timezone.now().year
 
             rcl_previa = formats.number_format(l.rcl_previa, force_grouping=True)
 
             if l.ano > ano_atual:
-                frase = 'Processo Legislativo em adamento' if not l.materia.normajuridica() else 'LOA Aprovada'
-                return f'''
+                frase = (
+                    "Processo Legislativo em adamento"
+                    if not l.materia.normajuridica()
+                    else "LOA Aprovada"
+                )
+                return (
+                    f"""
                     {rcl_previa}
                     <small class="text-gray">
                         <small>
@@ -167,51 +194,61 @@ class LoaCrud(Crud):
                             <em>RCL referente ao ano anterior ao Projeto da LOA</em>
                         </small>
                     </small>
-                ''', ''
+                """,
+                    "",
+                )
 
             if l.ano == ano_atual:
-                return f'''
+                return (
+                    f"""
                     {args[1]}
                     <small class="text-gray">
                         <small>
                             <em>LOA em fase de Execução</em>
                             <em>RCL referente ao ano anterior à Execução</em>
-                ''', ''
+                """,
+                    "",
+                )
 
-            return f'''
+            return (
+                f"""
                 {args[1]}
                 <small class="text-gray">
                     <small>
                         <em>LOA executada em {l.ano}</em>
                         <em>RCL referente ao ano anterior à Execução</em>
-            ''', ''
-
+            """,
+                "",
+            )
 
         # def hook_header_receita_corrente_liquida(self):
         #     return 'Receita Corrente Líquida - RCL (R$)<br><small class="text-gray">RCL Referente ao ano anterior.</small>'
 
         def hook_ano(self, *args, **kwargs):
             l = args[0]
-            return f'''
+            return (
+                f"""
             <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
             <div class="btn-group" role="group">
                 <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/emendaloa" title="Listagem de Emendas à LOA"><i class="fas fa-clipboard-list"></i></a>
                 <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/oficioajusteloa" title="Ofícios de Ajustes"><i class="fas fa-file-signature"></i></a>
                 <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/prestacaocontaloa" title="Prestação de Contas"><i class="fas fa-hand-holding-usd"></i></a>
             </div>
-            ''', ''
+            """,
+                "",
+            )
 
         def hook_perc_disp_total(self, *args, **kwargs):
             l = args[0]
-            return f' <em>({l.perc_disp_total:3.1f}%)</em>', ''
+            return f" <em>({l.perc_disp_total:3.1f}%)</em>", ""
 
         def hook_perc_disp_saude(self, *args, **kwargs):
             l = args[0]
-            return f' <em>({l.perc_disp_saude:3.1f}%)</em>', ''
+            return f" <em>({l.perc_disp_saude:3.1f}%)</em>", ""
 
         def hook_perc_disp_diversos(self, *args, **kwargs):
             l = args[0]
-            return f' <em>({l.perc_disp_diversos:3.1f}%)</em>', ''
+            return f" <em>({l.perc_disp_diversos:3.1f}%)</em>", ""
 
     class CreateView(Crud.CreateView):
         form_class = LoaForm
@@ -219,9 +256,11 @@ class LoaCrud(Crud):
         def form_invalid(self, form):
             r = Crud.CreateView.form_invalid(self, form)
 
-            err_materia = form.errors.get('materia', None)
+            err_materia = form.errors.get("materia", None)
             if err_materia:
-                err_materia = 'Já existe Loa vinculada a Matéria Legislativa selecionada.'
+                err_materia = (
+                    "Já existe Loa vinculada a Matéria Legislativa selecionada."
+                )
 
                 self.messages.error(err_materia, fail_silently=True)
             return r
@@ -232,23 +271,25 @@ class LoaCrud(Crud):
         def get_initial(self):
             initial = super().get_initial()
             if self.object.materia:
-                initial['tipo_materia'] = self.object.materia.tipo.id
-                initial['numero_materia'] = self.object.materia.numero
-                initial['ano_materia'] = self.object.materia.ano
+                initial["tipo_materia"] = self.object.materia.tipo.id
+                initial["numero_materia"] = self.object.materia.numero
+                initial["ano_materia"] = self.object.materia.ano
             return initial
 
         def form_invalid(self, form):
             r = Crud.UpdateView.form_invalid(self, form)
 
-            err_materia = form.errors.get('materia', None)
+            err_materia = form.errors.get("materia", None)
             if err_materia:
-                err_materia = 'Já existe Loa vinculada a Matéria Legislativa selecionada.'
+                err_materia = (
+                    "Já existe Loa vinculada a Matéria Legislativa selecionada."
+                )
 
                 self.messages.error(err_materia, fail_silently=True)
             return r
 
     class DetailView(Crud.DetailView):
-        layout_key = 'LoaDetail'
+        layout_key = "LoaDetail"
 
         @property
         def extras_list_url(self):
@@ -257,10 +298,11 @@ class LoaCrud(Crud):
             btns.extend(
                 [
                     (
-                        reverse('cmj.loa:emendaloa_list',
-                                kwargs={'pk': self.kwargs['pk']}),
-                        'btn-primary',
-                        _('Listas Emendas Impositivas')
+                        reverse(
+                            "cmj.loa:emendaloa_list", kwargs={"pk": self.kwargs["pk"]}
+                        ),
+                        "btn-primary",
+                        _("Listas Emendas Impositivas"),
                     )
                 ]
             )
@@ -270,64 +312,68 @@ class LoaCrud(Crud):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} loa-detail'
+            path = context.get("path", "")
+            context["path"] = f"{path} loa-detail"
             return context
 
         def get(self, request, *args, **kwargs):
 
-            pk = int(kwargs['pk'])
+            pk = int(kwargs["pk"])
             if pk <= 2022:
-                self.layout_key = 'LoaDetailATE2022'
+                self.layout_key = "LoaDetailATE2022"
 
             response = super().get(request, *args, **kwargs)
             if not self.object.publicado and request.user.is_anonymous:
                 raise Http404
             return response
 
-        def hook_materia_ou_norma(self, l, verbose_name='', field_display=''):
+        def hook_materia_ou_norma(self, l, verbose_name="", field_display=""):
             if l.materia:
                 nj = l.materia.normajuridica()
                 if not nj:
-                    get_column = self.get_column(
-                        'materia|fk_urlize_for_detail', '')
-                    return get_column['verbose_name'], get_column['text']
+                    get_column = self.get_column("materia|fk_urlize_for_detail", "")
+                    return get_column["verbose_name"], get_column["text"]
 
-                return 'Norma Jurídica', f'''
+                return (
+                    "Norma Jurídica",
+                    f"""
                     <a href="{reverse_lazy(
                     'sapl.norma:normajuridica_detail',
                     kwargs={'pk': nj.id})}">{nj}</a>
-                '''
+                """,
+                )
 
             return verbose_name, field_display
 
-        def hook_materia(self, l, verbose_name='', field_display=''):
+        def hook_materia(self, l, verbose_name="", field_display=""):
             if l.materia:
                 strm = str(l.materia)
-                field_display = field_display.replace(
-                    strm, l.materia.epigrafe_short)
+                field_display = field_display.replace(strm, l.materia.epigrafe_short)
             return verbose_name, field_display
 
-
-        def hook_receita_corrente_liquida(self, l, verbose_name='', field_display=''):
+        def hook_receita_corrente_liquida(self, l, verbose_name="", field_display=""):
 
             em_fase_execucao = l.rcl_previa != l.receita_corrente_liquida
-            header = f'RCL de {l.ano - (1 if em_fase_execucao else 2)}'
+            header = f"RCL de {l.ano - (1 if em_fase_execucao else 2)}"
             valor = formats.number_format(
                 l.receita_corrente_liquida if em_fase_execucao else l.rcl_previa,
-                force_grouping=True
+                force_grouping=True,
             )
-            return 'Receita Corrente Líquida', f'''
+            return (
+                "Receita Corrente Líquida",
+                f"""
                 {valor}
                 <hr>
                 <small class="text-gray">
                     <em>{header}</em>
                     <em>(RCL referente ao ano anterior { "à Execução" if em_fase_execucao else "ao Projeto" })</em>
                 </small>
-            '''
+            """,
+            )
 
-
-        def _hook_disp_generic(self, l, verbose_name='', field_display='', field_type=''):
+        def _hook_disp_generic(
+            self, l, verbose_name="", field_display="", field_type=""
+        ):
             """
             Generic function to handle display of disp_* fields
 
@@ -338,18 +384,26 @@ class LoaCrud(Crud):
             - field_type: One of 'total', 'saude', or 'diversos'
             - show_per_parliamentarian: Whether to show value per parliamentarian
             """
-            percentage_attr = f'perc_disp_{field_type}'
+            percentage_attr = f"perc_disp_{field_type}"
             percentage = getattr(l, percentage_attr, 0)
 
-            result = f'{field_display} <em>({percentage:3.1f}%)</em>'
+            result = f"{field_display} <em>({percentage:3.1f}%)</em>"
 
             legislatura_atual = Legislatura.cache_legislatura_atual()
             materia_in_legislatura_atual = True
             loa_in_legislatura_atual = True
 
             if l.materia:
-                materia_in_legislatura_atual = legislatura_atual['data_inicio'] <= l.materia.data_apresentacao <= legislatura_atual['data_fim']
-                loa_in_legislatura_atual = legislatura_atual['data_inicio'].year <= l.ano <= legislatura_atual['data_fim'].year
+                materia_in_legislatura_atual = (
+                    legislatura_atual["data_inicio"]
+                    <= l.materia.data_apresentacao
+                    <= legislatura_atual["data_fim"]
+                )
+                loa_in_legislatura_atual = (
+                    legislatura_atual["data_inicio"].year
+                    <= l.ano
+                    <= legislatura_atual["data_fim"].year
+                )
 
             lps = l.loaparlamentar_set.all()
             count_lps = lps.count()
@@ -358,40 +412,37 @@ class LoaCrud(Crud):
                 count_lps = Parlamentar.objects.filter(ativo=True).count()
 
             if count_lps > 0:
-                disp_value = getattr(l, f'disp_{field_type}')
+                disp_value = getattr(l, f"disp_{field_type}")
                 valor_por_parlamentar = formats.number_format(
-                    quantize(
-                        disp_value / count_lps,
-                        rounding=ROUND_DOWN
-                    ),
-                    force_grouping=True
+                    quantize(disp_value / count_lps, rounding=ROUND_DOWN),
+                    force_grouping=True,
                 )
 
-                result = f'''
+                result = f"""
                     {field_display}
                     <em>({percentage:3.1f}%)</em>
                     <small><small class="text-gray"><hr><em>Valor por Parlamentar</em>
                         <strong>R$ {valor_por_parlamentar}</strong>
                     </small></small>
-                '''
+                """
 
             return verbose_name, result
 
-        def hook_disp_total(self, l, verbose_name='', field_display=''):
-            return self._hook_disp_generic(l, verbose_name, field_display, 'total')
+        def hook_disp_total(self, l, verbose_name="", field_display=""):
+            return self._hook_disp_generic(l, verbose_name, field_display, "total")
 
-        def hook_disp_saude(self, l, verbose_name='', field_display=''):
-            return self._hook_disp_generic(l, verbose_name, field_display, 'saude')
+        def hook_disp_saude(self, l, verbose_name="", field_display=""):
+            return self._hook_disp_generic(l, verbose_name, field_display, "saude")
 
-        def hook_disp_diversos(self, l, verbose_name='', field_display=''):
-            return self._hook_disp_generic(l, verbose_name, field_display, 'diversos')
+        def hook_disp_diversos(self, l, verbose_name="", field_display=""):
+            return self._hook_disp_generic(l, verbose_name, field_display, "diversos")
 
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
 
             loaparlamentares = l.loaparlamentar_set.order_by(
-                '-parlamentar__ativo',
-                'parlamentar__nome_parlamentar')
+                "-parlamentar__ativo", "parlamentar__nome_parlamentar"
+            )
 
             resumo_emendas_impositivas = []
 
@@ -399,98 +450,102 @@ class LoaCrud(Crud):
 
             for lp in loaparlamentares:
 
-                resumo_parlamentar = {'loaparlamentar': lp}
+                resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
-                    resumo_parlamentar[k] = {
-                        'name': v
-                    }
+                    resumo_parlamentar[k] = {"name": v}
 
                     if k not in totais:
                         totais[k] = dict(
-                            ja_destinado=Decimal('0.00'),
-                            impedimento_tecnico=Decimal('0.00'),
-                            sem_destinacao=Decimal('0.00'),
+                            ja_destinado=Decimal("0.00"),
+                            impedimento_tecnico=Decimal("0.00"),
+                            sem_destinacao=Decimal("0.00"),
                         )
 
                     if k == EmendaLoa.SAUDE:
-                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_saude
+                        resumo_parlamentar[k]["sem_destinacao"] = lp.disp_saude
                     elif k == EmendaLoa.DIVERSOS:
-                        resumo_parlamentar[k]['sem_destinacao'] = lp.disp_diversos
+                        resumo_parlamentar[k]["sem_destinacao"] = lp.disp_diversos
 
-                    resumo_parlamentar[k]['impedimento_tecnico'] = 0
-                    resumo_parlamentar[k]['ja_destinado'] = 0
+                    resumo_parlamentar[k]["impedimento_tecnico"] = 0
+                    resumo_parlamentar[k]["ja_destinado"] = 0
 
                     params = dict(
                         parlamentar=lp.parlamentar,
                         emendaloa__loa=self.object,
-                        emendaloa__tipo=k
+                        emendaloa__tipo=k,
                     )
 
                     ja_destinado = EmendaLoaParlamentar.objects.filter(
                         **params
                         # ).exclude(
                         #    emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
-                    ).aggregate(Sum('valor'))
+                    ).aggregate(Sum("valor"))
 
-                    resumo_parlamentar[k]['ja_destinado'] = (
-                        ja_destinado['valor__sum'] or Decimal('0.00')
-                    )
+                    resumo_parlamentar[k]["ja_destinado"] = ja_destinado[
+                        "valor__sum"
+                    ] or Decimal("0.00")
 
                     ajustes = RegistroAjusteLoaParlamentar.objects.filter(
                         parlamentar=lp.parlamentar,
                         registro__tipo=k,
                         registro__oficio_ajuste_loa__loa=l,
-                    ).aggregate(Sum('valor'))
+                    ).aggregate(Sum("valor"))
 
-                    ajustes_negativos_sem_emendas = RegistroAjusteLoaParlamentar.objects.filter(
-                        parlamentar=lp.parlamentar,
-                        registro__tipo=k,
-                        registro__oficio_ajuste_loa__loa=l,
-                        registro__emendaloa__isnull=True,
-                        valor__lt=0
-                    ).aggregate(Sum('valor'))
-
-                    resumo_parlamentar[k]['ja_destinado'] += (
-                        (ajustes['valor__sum'] or Decimal('0.00')) - (ajustes_negativos_sem_emendas['valor__sum'] or Decimal('0.00'))
+                    ajustes_negativos_sem_emendas = (
+                        RegistroAjusteLoaParlamentar.objects.filter(
+                            parlamentar=lp.parlamentar,
+                            registro__tipo=k,
+                            registro__oficio_ajuste_loa__loa=l,
+                            registro__emendaloa__isnull=True,
+                            valor__lt=0,
+                        ).aggregate(Sum("valor"))
                     )
+
+                    resumo_parlamentar[k]["ja_destinado"] += (
+                        ajustes["valor__sum"] or Decimal("0.00")
+                    ) - (ajustes_negativos_sem_emendas["valor__sum"] or Decimal("0.00"))
 
                     # ------------------------------------
 
-                    params.update(
-                        dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
+                    params.update(dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
                     impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
-                        **params).aggregate(Sum('valor'))
-                    resumo_parlamentar[k]['impedimento_tecnico'] = (
-                        impedimento_tecnico['valor__sum'] or Decimal('0.00')
-                    )
+                        **params
+                    ).aggregate(Sum("valor"))
+                    resumo_parlamentar[k]["impedimento_tecnico"] = impedimento_tecnico[
+                        "valor__sum"
+                    ] or Decimal("0.00")
 
                     ajuste_de_impedimento = RegistroAjusteLoaParlamentar.objects.filter(
                         parlamentar=lp.parlamentar,
                         registro__emendaloa__tipo=k,
                         registro__oficio_ajuste_loa__loa=l,
-                        registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO
-                    ).aggregate(Sum('valor'))
+                        registro__emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO,
+                    ).aggregate(Sum("valor"))
 
-                    resumo_parlamentar[k]['impedimento_tecnico'] += (
-                        ajuste_de_impedimento['valor__sum'] or Decimal('0.00')
+                    resumo_parlamentar[k][
+                        "impedimento_tecnico"
+                    ] += ajuste_de_impedimento["valor__sum"] or Decimal("0.00")
+
+                    resumo_parlamentar[k]["sem_destinacao"] -= (
+                        resumo_parlamentar[k]["ja_destinado"]
+                        - resumo_parlamentar[k]["impedimento_tecnico"]
                     )
 
-                    resumo_parlamentar[k]['sem_destinacao'] -= (
-                        resumo_parlamentar[k]['ja_destinado'] -
-                        resumo_parlamentar[k]['impedimento_tecnico']
-                    )
-
-                    totais[k]['ja_destinado'] += resumo_parlamentar[k]['ja_destinado']
-                    totais[k]['impedimento_tecnico'] += resumo_parlamentar[k]['impedimento_tecnico']
-                    totais[k]['sem_destinacao'] += resumo_parlamentar[k]['sem_destinacao']
+                    totais[k]["ja_destinado"] += resumo_parlamentar[k]["ja_destinado"]
+                    totais[k]["impedimento_tecnico"] += resumo_parlamentar[k][
+                        "impedimento_tecnico"
+                    ]
+                    totais[k]["sem_destinacao"] += resumo_parlamentar[k][
+                        "sem_destinacao"
+                    ]
 
                 resumo_emendas_impositivas.append(resumo_parlamentar)
 
             resumo_emendas_impositivas.sort(
                 key=lambda x: (
-                    not x['loaparlamentar'].parlamentar.ativo,
+                    not x["loaparlamentar"].parlamentar.ativo,
                     # -x[10]['ja_destinado'],
-                    x['loaparlamentar'].parlamentar.nome_parlamentar
+                    x["loaparlamentar"].parlamentar.nome_parlamentar,
                 )
             )
 
@@ -499,41 +554,59 @@ class LoaCrud(Crud):
             t10 = EmendaLoa.SAUDE
             t99 = EmendaLoa.DIVERSOS
             # dsjd display_saude_ja_destinado
-            dsjd = 1 if totais[t10]['ja_destinado'] or is_us else 0
-            dsit = 1 if totais[t10]['impedimento_tecnico'] or is_us else 0
-            dssd = 1 if totais[t10]['sem_destinacao'] or is_us else 0
+            dsjd = 1 if totais[t10]["ja_destinado"] or is_us else 0
+            dsit = 1 if totais[t10]["impedimento_tecnico"] or is_us else 0
+            dssd = 1 if totais[t10]["sem_destinacao"] or is_us else 0
 
             # ddjd display_diversos_ja_destinado
-            ddjd = 1 if totais[t99]['ja_destinado'] or is_us else 0
-            ddit = 1 if totais[t99]['impedimento_tecnico'] or is_us else 0
-            ddsd = 1 if totais[t99]['sem_destinacao'] or is_us else 0
+            ddjd = 1 if totais[t99]["ja_destinado"] or is_us else 0
+            ddit = 1 if totais[t99]["impedimento_tecnico"] or is_us else 0
+            ddsd = 1 if totais[t99]["sem_destinacao"] or is_us else 0
 
             context = dict(
                 resumo_emendas_impositivas=resumo_emendas_impositivas,
                 columns=dict(
                     saude=dict(
                         num_columns=dsjd + dsit + dssd,
-                        ja_destinado='Valores<br>Já Destinados' if dsjd else '',
-                        impedimento_tecnico='Impedimentos<br>Técnicos' if dsit else '',
+                        ja_destinado="Valores<br>Já Destinados" if dsjd else "",
+                        impedimento_tecnico="Impedimentos<br>Técnicos" if dsit else "",
                         sem_destinacao=(
-                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica() else 'Remanescente') if dssd else '',
+                            (
+                                "Sem Destinação"
+                                if not l.materia
+                                or l.materia
+                                and not l.materia.normajuridica()
+                                else "Remanescente"
+                            )
+                            if dssd
+                            else ""
+                        ),
                     ),
                     diversos=dict(
                         num_columns=ddjd + ddit + ddsd,
-                        ja_destinado='Valores<br>Já Destinados' if ddjd else '',
-                        impedimento_tecnico='Impedimentos<br>Técnicos' if ddit else '',
+                        ja_destinado="Valores<br>Já Destinados" if ddjd else "",
+                        impedimento_tecnico="Impedimentos<br>Técnicos" if ddit else "",
                         sem_destinacao=(
-                            'Sem Destinação' if not l.materia or l.materia and not l.materia.normajuridica() else 'Remanescente') if ddsd else '',
-                    )
-                )
+                            (
+                                "Sem Destinação"
+                                if not l.materia
+                                or l.materia
+                                and not l.materia.normajuridica()
+                                else "Remanescente"
+                            )
+                            if ddsd
+                            else ""
+                        ),
+                    ),
+                ),
             )
 
-            template = loader.get_template('loa/loaparlamentar_set_list.html')
+            template = loader.get_template("loa/loaparlamentar_set_list.html")
             rendered = template.render(context, self.request)
 
-            return 'Resumo Geral das Emendas Impositivas Parlamentares', rendered
+            return "Resumo Geral das Emendas Impositivas Parlamentares", rendered
 
-            '''
+            """
             params.update(
                 dict(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO))
             impedimento_tecnico = EmendaLoaParlamentar.objects.filter(
@@ -570,108 +643,124 @@ class LoaCrud(Crud):
                 resumo_parlamentar[k]['sem_destinacao'] - \
                 resumo_parlamentar[k]['ja_destinado'] - \
                 resumo_parlamentar[k]['impedimento_tecnico']
-            '''
+            """
 
         def hook_resumo_unidades(self, *args, **kwargs):
             l = args[0]
 
-            soma_geral = Decimal('0.00')
+            soma_geral = Decimal("0.00")
             unidades = {}
-            for el in EmendaLoa.objects.filter(
-                loa=l,
-                tipo__gt=0
-            ).values(
-                'unidade__especificacao',
-                'emendaloaparlamentar_set__parlamentar__id',
-                'emendaloaparlamentar_set__parlamentar__nome_parlamentar',
-            ).order_by(
-                'unidade__especificacao', 'emendaloaparlamentar_set__parlamentar__nome_parlamentar'
-            ).annotate(valor_parte_parlamentar=Sum('emendaloaparlamentar_set__valor')):
-                if el['unidade__especificacao'] not in unidades:
-                    unidades[el['unidade__especificacao']] = {
-                        'parlamentares': [],
-                        'soma_unidade': Decimal('0.00'),
+            for el in (
+                EmendaLoa.objects.filter(loa=l, tipo__gt=0)
+                .values(
+                    "unidade__especificacao",
+                    "emendaloaparlamentar_set__parlamentar__id",
+                    "emendaloaparlamentar_set__parlamentar__nome_parlamentar",
+                )
+                .order_by(
+                    "unidade__especificacao",
+                    "emendaloaparlamentar_set__parlamentar__nome_parlamentar",
+                )
+                .annotate(
+                    valor_parte_parlamentar=Sum("emendaloaparlamentar_set__valor")
+                )
+            ):
+                if el["unidade__especificacao"] not in unidades:
+                    unidades[el["unidade__especificacao"]] = {
+                        "parlamentares": [],
+                        "soma_unidade": Decimal("0.00"),
                     }
 
-                unidades[el['unidade__especificacao']]['soma_unidade'] += el['valor_parte_parlamentar']
+                unidades[el["unidade__especificacao"]]["soma_unidade"] += el[
+                    "valor_parte_parlamentar"
+                ]
 
-                unidades[el['unidade__especificacao']]['parlamentares'].append(
+                unidades[el["unidade__especificacao"]]["parlamentares"].append(
                     {
-                        'id': el['emendaloaparlamentar_set__parlamentar__id'],
-                        'nome_parlamentar': el['emendaloaparlamentar_set__parlamentar__nome_parlamentar'],
-                        'soma_valor': el['valor_parte_parlamentar'],
+                        "id": el["emendaloaparlamentar_set__parlamentar__id"],
+                        "nome_parlamentar": el[
+                            "emendaloaparlamentar_set__parlamentar__nome_parlamentar"
+                        ],
+                        "soma_valor": el["valor_parte_parlamentar"],
                     }
                 )
 
-                soma_geral += el['valor_parte_parlamentar']
+                soma_geral += el["valor_parte_parlamentar"]
 
-            context = dict(
-                unidades=unidades.items(),
-                soma_geral=soma_geral,
-                loa=l
-            )
+            context = dict(unidades=unidades.items(), soma_geral=soma_geral, loa=l)
 
-            template = loader.get_template('loa/emendaloa_totalize_unidade.html')
+            template = loader.get_template("loa/emendaloa_totalize_unidade.html")
             rendered = template.render(context, self.request)
 
-            return 'Resumo Por Unidades Orçamentárias <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>', rendered
+            return (
+                "Resumo Por Unidades Orçamentárias <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>",
+                rendered,
+            )
 
         def hook_resumo_entidades(self, *args, **kwargs):
             l = args[0]
 
-            soma_geral = Decimal('0.00')
+            soma_geral = Decimal("0.00")
             entidades = {}
-            for el in EmendaLoa.objects.filter(
-                loa=l,
-                tipo__gt=0
-            ).values(
-                'tipo',
-                'entidade__nome_fantasia',
-                'unidade__especificacao',
-                'emendaloaparlamentar_set__parlamentar__id',
-                'emendaloaparlamentar_set__parlamentar__nome_parlamentar',
-            ).order_by(
-                'tipo',
-                'entidade__nome_fantasia',
-                'emendaloaparlamentar_set__parlamentar__nome_parlamentar'
-            ).annotate(valor_parte_parlamentar=Sum('emendaloaparlamentar_set__valor')):
-                nom_entidade = el['entidade__nome_fantasia']
+            for el in (
+                EmendaLoa.objects.filter(loa=l, tipo__gt=0)
+                .values(
+                    "tipo",
+                    "entidade__nome_fantasia",
+                    "unidade__especificacao",
+                    "emendaloaparlamentar_set__parlamentar__id",
+                    "emendaloaparlamentar_set__parlamentar__nome_parlamentar",
+                )
+                .order_by(
+                    "tipo",
+                    "entidade__nome_fantasia",
+                    "emendaloaparlamentar_set__parlamentar__nome_parlamentar",
+                )
+                .annotate(
+                    valor_parte_parlamentar=Sum("emendaloaparlamentar_set__valor")
+                )
+            ):
+                nom_entidade = el["entidade__nome_fantasia"]
                 if not nom_entidade:
                     continue
 
-                el['entidade__nome_fantasia'] = nom_entidade.upper()
-                if el['entidade__nome_fantasia'] not in entidades:
-                    entidades[el['entidade__nome_fantasia']] = {
-                        'tipo': el['tipo'],
-                        'parlamentares': [],
-                        'soma_entidade': Decimal('0.00'),
+                el["entidade__nome_fantasia"] = nom_entidade.upper()
+                if el["entidade__nome_fantasia"] not in entidades:
+                    entidades[el["entidade__nome_fantasia"]] = {
+                        "tipo": el["tipo"],
+                        "parlamentares": [],
+                        "soma_entidade": Decimal("0.00"),
                     }
 
-                entidades[el['entidade__nome_fantasia']]['soma_entidade'] += el['valor_parte_parlamentar']
-                entidades[el['entidade__nome_fantasia']]['parlamentares'].append(
+                entidades[el["entidade__nome_fantasia"]]["soma_entidade"] += el[
+                    "valor_parte_parlamentar"
+                ]
+                entidades[el["entidade__nome_fantasia"]]["parlamentares"].append(
                     {
-                        'id': el['emendaloaparlamentar_set__parlamentar__id'],
-                        'nome_parlamentar': el['emendaloaparlamentar_set__parlamentar__nome_parlamentar'],
-                        'soma_valor': el['valor_parte_parlamentar'],
+                        "id": el["emendaloaparlamentar_set__parlamentar__id"],
+                        "nome_parlamentar": el[
+                            "emendaloaparlamentar_set__parlamentar__nome_parlamentar"
+                        ],
+                        "soma_valor": el["valor_parte_parlamentar"],
                     }
                 )
 
-                soma_geral += el['valor_parte_parlamentar']
+                soma_geral += el["valor_parte_parlamentar"]
 
-            context = dict(
-                entidades=entidades.items(),
-                soma_geral=soma_geral,
-                loa=l
-            )
+            context = dict(entidades=entidades.items(), soma_geral=soma_geral, loa=l)
 
-            template = loader.get_template('loa/emendaloa_totalize_entidade.html')
+            template = loader.get_template("loa/emendaloa_totalize_entidade.html")
             rendered = template.render(context, self.request)
 
-            return 'Resumo Por Entidades <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>', rendered
+            return (
+                "Resumo Por Entidades <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>",
+                rendered,
+            )
+
 
 class DespesaCrud(MasterDetailCrud):
     model = Despesa
-    parent_field = 'loa'
+    parent_field = "loa"
     public = [RP_LIST, RP_DETAIL]
     ordered_list = False
     frontend = Loa._meta.app_label
@@ -682,23 +771,24 @@ class DespesaCrud(MasterDetailCrud):
     class ListView(MasterDetailCrud.ListView):
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} despesa-list'
+            path = context.get("path", "")
+            context["path"] = f"{path} despesa-list"
             return context
+
 
 class UnidadeOrcamentariaCrud(MasterDetailCrud):
     model = UnidadeOrcamentaria
-    parent_field = 'loa'
+    parent_field = "loa"
 
 
 class SubFuncaoCrud(MasterDetailCrud):
     model = SubFuncao
-    parent_field = 'loa'
+    parent_field = "loa"
 
 
 class AgrupamentoCrud(MasterDetailCrud):
     model = Agrupamento
-    parent_field = 'loa'
+    parent_field = "loa"
     public = [RP_LIST, RP_DETAIL]
     frontend = Agrupamento._meta.app_label
 
@@ -708,16 +798,16 @@ class AgrupamentoCrud(MasterDetailCrud):
         @property
         def create_url(self):
             url = super().create_url
-            if self.request.user.has_perm('loa.emendaloa_full_editor'):
-                url = self.resolve_url('create', args=(self.kwargs['pk'],))
+            if self.request.user.has_perm("loa.emendaloa_full_editor"):
+                url = self.resolve_url("create", args=(self.kwargs["pk"],))
             return url
 
         @property
         def update_url(self):
 
             url = super().update_url
-            if self.request.user.has_perm('loa.emendaloa_full_editor'):
-                url = self.resolve_url('update', args=(self.object.id,))
+            if self.request.user.has_perm("loa.emendaloa_full_editor"):
+                url = self.resolve_url("update", args=(self.object.id,))
 
             return url
 
@@ -725,22 +815,22 @@ class AgrupamentoCrud(MasterDetailCrud):
         def delete_url(self):
 
             url = super().delete_url
-            if self.request.user.has_perm('loa.emendaloa_full_editor'):
-                url = self.resolve_url('delete', args=(self.object.id,))
+            if self.request.user.has_perm("loa.emendaloa_full_editor"):
+                url = self.resolve_url("delete", args=(self.object.id,))
 
             return url
 
         @property
         def cancel_url(self):
-            url = self.resolve_url('detail', args=(self.kwargs['pk'],))
+            url = self.resolve_url("detail", args=(self.kwargs["pk"],))
             return url
 
     class DeleteView(MasterDetailCrud.DeleteView):
-        permission_required = ('loa.emendaloa_full_editor', )
+        permission_required = ("loa.emendaloa_full_editor",)
 
     class CreateView(MasterDetailCrud.CreateView):
-        permission_required = ('loa.emendaloa_full_editor', )
-        layout_key = 'AgrupamentoCreate'
+        permission_required = ("loa.emendaloa_full_editor",)
+        layout_key = "AgrupamentoCreate"
 
         def get_success_url(self):
             return self.update_url
@@ -748,55 +838,55 @@ class AgrupamentoCrud(MasterDetailCrud):
     class ListView(MasterDetailCrud.ListView):
         def hook_despesas(self, obj, ss, url):
             str_regs = []
-            for rc in obj.agrupamentoregistrocontabil_set.order_by('-percentual'):
-                src = f'{rc.str_percentual}% - {rc.despesa}'
+            for rc in obj.agrupamentoregistrocontabil_set.order_by("-percentual"):
+                src = f"{rc.str_percentual}% - {rc.despesa}"
                 str_regs.append(src)
-            src = ''.join(map(lambda x: f'<li>{x}</li>', str_regs))
+            src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
 
-            return f'<ul>{src}</ul>', ''
+            return f"<ul>{src}</ul>", ""
 
     class UpdateView(MasterDetailCrud.UpdateView):
-        permission_required = ('loa.emendaloa_full_editor', )
+        permission_required = ("loa.emendaloa_full_editor",)
         layout_key = None
         form_class = AgrupamentoForm
 
         def get_context_data(self, **kwargs):
-            self.loa = Loa.objects.get(pk=kwargs['root_pk'])
+            self.loa = Loa.objects.get(pk=kwargs["root_pk"])
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} agrupamento-update'
+            path = context.get("path", "")
+            context["path"] = f"{path} agrupamento-update"
             return context
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = self.object.loa
-            initial['user'] = self.request.user
+            initial["loa"] = self.object.loa
+            initial["user"] = self.request.user
             return initial
 
     class DetailView(MasterDetailCrud.DetailView):
 
         def hook_despesas(self, obj, verbose_name, field_display):
             str_regs = []
-            for rc in obj.agrupamentoregistrocontabil_set.order_by('-percentual'):
-                src = f'{rc.str_percentual}% - {rc.despesa}'
+            for rc in obj.agrupamentoregistrocontabil_set.order_by("-percentual"):
+                src = f"{rc.str_percentual}% - {rc.despesa}"
                 str_regs.append(src)
-            src = ''.join(map(lambda x: f'<li>{x}</li>', str_regs))
+            src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
 
-            return verbose_name, f'<ul>{src}</ul>'
+            return verbose_name, f"<ul>{src}</ul>"
 
 
 class EmendaLoaCrud(MasterDetailCrud):
     model = EmendaLoa
-    parent_field = 'loa'
+    parent_field = "loa"
     public = [RP_LIST, RP_DETAIL]
     frontend = EmendaLoa._meta.app_label
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
-            ('finalidade'),
-            'valor_computado',
-            ('tipo', 'fase'),
-            'parlamentares'
+            ("finalidade"),
+            "valor_computado",
+            ("tipo", "fase"),
+            "parlamentares",
         ]
 
         @property
@@ -806,12 +896,15 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def create_url(self):
             url = super().create_url
-            if not url and \
-                    not self.request.user.is_anonymous and (
-                    self.request.user.operadorautor_set.exists() or
-                    self.request.user.is_superuser
-                    ):
-                url = self.resolve_url('create', args=(self.kwargs['pk'],))
+            if (
+                not url
+                and not self.request.user.is_anonymous
+                and (
+                    self.request.user.operadorautor_set.exists()
+                    or self.request.user.is_superuser
+                )
+            ):
+                url = self.resolve_url("create", args=(self.kwargs["pk"],))
             return url
 
         @property
@@ -822,22 +915,27 @@ class EmendaLoaCrud(MasterDetailCrud):
                 return url
 
             if not url and self.object.fase >= EmendaLoa.EM_TRAMITACAO:
-                return ''
+                return ""
 
-            url_perm = self.resolve_url('update', args=(self.object.id,))
+            url_perm = self.resolve_url("update", args=(self.object.id,))
 
-            if self.request.user.has_perm('loa.emendaloa_full_editor') and \
-                EmendaLoa.PROPOSTA < self.object.fase < EmendaLoa.EM_TRAMITACAO:
+            if (
+                self.request.user.has_perm("loa.emendaloa_full_editor")
+                and EmendaLoa.PROPOSTA < self.object.fase < EmendaLoa.EM_TRAMITACAO
+            ):
                 return url_perm
-            elif self.request.user.operadorautor_set.exists() and \
-                EmendaLoa.PROPOSTA <= self.object.fase < EmendaLoa.EM_TRAMITACAO and \
-                    self.object.parlamentares.filter(
-                        id__in=self.request.user.operadorautor_set.values_list(
-                            'autor__object_id', flat=True)
-                    ).exists():
+            elif (
+                self.request.user.operadorautor_set.exists()
+                and EmendaLoa.PROPOSTA <= self.object.fase < EmendaLoa.EM_TRAMITACAO
+                and self.object.parlamentares.filter(
+                    id__in=self.request.user.operadorautor_set.values_list(
+                        "autor__object_id", flat=True
+                    )
+                ).exists()
+            ):
                 return url_perm
 
-            return ''
+            return ""
 
         @property
         def detail_url(self):
@@ -846,9 +944,11 @@ class EmendaLoaCrud(MasterDetailCrud):
             if url or self.request.user.is_anonymous:
                 return url
 
-            if self.request.user.has_perm('loa.emendaloa_full_editor') or \
-                    self.request.user.operadorautor_set.exists():
-                url = self.resolve_url('detail', args=(self.object.id,))
+            if (
+                self.request.user.has_perm("loa.emendaloa_full_editor")
+                or self.request.user.operadorautor_set.exists()
+            ):
+                url = self.resolve_url("detail", args=(self.object.id,))
 
             return url
 
@@ -867,66 +967,79 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         @property
         def extras_url(self):
-            if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
+            if (
+                self.request.user.is_anonymous
+                or not self.request.user.operadorautor_set.exists()
+            ):
                 return []
 
-            if not self.get_emendas_criadas_por_operador_mesmo_autor().filter(
-                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL
-                ).exists():
+            if (
+                not self.get_emendas_criadas_por_operador_mesmo_autor()
+                .filter(fase__gte=EmendaLoa.LIBERACAO_CONTABIL)
+                .exists()
+            ):
                 return []
 
             btns = []
             return [
                 (
-                    reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?zip',
-                    'btn-success',
-                    '''<span title="Baixar Emendas Impositivas/Modificativas em arquivo ZIP">
+                    reverse_lazy(
+                        "cmj.loa:emendaloa_list", kwargs={"pk": self.kwargs["pk"]}
+                    )
+                    + "?zip",
+                    "btn-success",
+                    """<span title="Baixar Emendas Impositivas/Modificativas em arquivo ZIP">
                         <i class="far fa-file-archive"></i> Baixar Emendas Liberadas</span>
-                    '''
+                    """,
                 ),
                 (
-                    reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.kwargs['pk']}) + '?register',
-                    'btn-warning btn-register-emendas-liberadas',
-                    '''<span title="Registrar todas as emendas Liberadas no módulo de proposições. Emendas já registradas serão atualizadas se ainda não enviadas ao protocolo.">
+                    reverse_lazy(
+                        "cmj.loa:emendaloa_list", kwargs={"pk": self.kwargs["pk"]}
+                    )
+                    + "?register",
+                    "btn-warning btn-register-emendas-liberadas",
+                    """<span title="Registrar todas as emendas Liberadas no módulo de proposições. Emendas já registradas serão atualizadas se ainda não enviadas ao protocolo.">
                         <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas</span>
-                    '''
+                    """,
                 ),
             ]
 
         def get_emendas_criadas_por_operador_mesmo_autor(self):
             if self.request.user.is_anonymous:
                 return self.get_queryset().none()
-            autor_operado = self.request.user.operadorautor_set.values_list('autor', flat=True)
+            autor_operado = self.request.user.operadorautor_set.values_list(
+                "autor", flat=True
+            )
             OperadorAutor = autor_operado.model
 
-            return self.get_queryset(
-                ).filter(
-                    loa=self.loa,
-                    owner__id__in=OperadorAutor.objects.filter(
-                        autor__in=autor_operado
-                    ).values_list('user', flat=True)
-                )
+            return self.get_queryset().filter(
+                loa=self.loa,
+                owner__id__in=OperadorAutor.objects.filter(
+                    autor__in=autor_operado
+                ).values_list("user", flat=True),
+            )
 
         @property
         def title(self):
-            return f'''Emendas Impositivas/Modificativas à LOA {self.loa.ano} <small>({self.loa.materia.epigrafe_short if self.loa.materia else ''})</small>
-                '''
-
+            return f"""Emendas Impositivas/Modificativas à LOA {self.loa.ano} <small>({self.loa.materia.epigrafe_short if self.loa.materia else ''})</small>
+                """
 
         def get(self, request, *args, **kwargs):
-            self.loa = Loa.objects.get(pk=kwargs['pk'])
-            if 'register' in self.request.GET:
+            self.loa = Loa.objects.get(pk=kwargs["pk"])
+            if "register" in self.request.GET:
 
                 from sapl.base.models import OperadorAutor
+
                 # verifica se existe emenda desse usuario que está com metadata setado para register
 
                 if request.user.is_anonymous:
                     messages.warning(
-                        self.request,
-                        'Ação não permitida para usuários anônimos.'
+                        self.request, "Ação não permitida para usuários anônimos."
                     )
                     return redirect(
-                        reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.loa.id})
+                        reverse_lazy(
+                            "cmj.loa:emendaloa_list", kwargs={"pk": self.loa.id}
+                        )
                     )
 
                 user_id = request.user.id
@@ -935,59 +1048,57 @@ class EmendaLoaCrud(MasterDetailCrud):
                 if not autor_operado:
                     messages.warning(
                         self.request,
-                        'Ação não permitida. Usuário não é operador de nenhum autor parlamentar.'
+                        "Ação não permitida. Usuário não é operador de nenhum autor parlamentar.",
                     )
 
                     return redirect(
-                        reverse_lazy('cmj.loa:emendaloa_list', kwargs={'pk': self.loa.id})
+                        reverse_lazy(
+                            "cmj.loa:emendaloa_list", kwargs={"pk": self.loa.id}
+                        )
                     )
 
                 autor_operado = autor_operado.autor
-                operadores = OperadorAutor.objects.filter(autor=autor_operado).values_list('user_id', flat=True)
+                operadores = OperadorAutor.objects.filter(
+                    autor=autor_operado
+                ).values_list("user_id", flat=True)
 
                 emendas_sendo_registradas = EmendaLoa.objects.filter(
                     loa=self.loa,
                     owner__id__in=operadores,
                     fase__gte=EmendaLoa.LIBERACAO_CONTABIL,
-                    metadata__register_emendaloa_proposicao_task__isnull=False
+                    metadata__register_emendaloa_proposicao_task__isnull=False,
                 )
 
                 if emendas_sendo_registradas.exists():
                     messages.warning(
                         self.request,
-                        'Ação não permitida. Existem emendas liberadas que estão sendo registradas no módulo de proposições. Aguarde o término do processo antes de iniciar um novo.'
+                        "Ação não permitida. Existem emendas liberadas que estão sendo registradas no módulo de proposições. Aguarde o término do processo antes de iniciar um novo.",
                     )
 
-                    return redirect(
-                        reverse_lazy('sapl.materia:proposicao_list')
-                    )
+                    return redirect(reverse_lazy("sapl.materia:proposicao_list"))
 
                 messages.info(
                     self.request,
-                    'Iniciando o registro aqui no módulo de proposições das emendas liberadas... atualize esta página para acompanhar o progresso.'
+                    "Iniciando o registro aqui no módulo de proposições das emendas liberadas... atualize esta página para acompanhar o progresso.",
                 )
-                params_task = (
-                    self.loa.id,
-                    self.request.user.id
-                )
-                if not settings.DEBUG or (settings.DEBUG and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR):
+                params_task = (self.loa.id, self.request.user.id)
+                if not settings.DEBUG or (
+                    settings.DEBUG
+                    and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR
+                ):
                     tasks.task_register_emendaloa_proposicao.apply_async(
-                        params_task,
-                        countdown=0
+                        params_task, countdown=0
                     )
                 else:
                     tasks.task_register_emendaloa_proposicao_function(*params_task)
-                return redirect(
-                    reverse_lazy('sapl.materia:proposicao_list')
-                )
-
+                return redirect(reverse_lazy("sapl.materia:proposicao_list"))
 
             return FilterView.get(self, request, *args, **kwargs)
 
         def render_to_response(self, context, **response_kwargs):
-            if 'pdf' in self.request.GET:
+            if "pdf" in self.request.GET:
                 return self.makepdf(context, **response_kwargs)
-            elif 'zip' in self.request.GET:
+            elif "zip" in self.request.GET:
                 return self.makezip(context, **response_kwargs)
             return super().render_to_response(context, **response_kwargs)
 
@@ -1000,135 +1111,142 @@ class EmendaLoaCrud(MasterDetailCrud):
                 raise PermissionDenied()
 
             req = self.request
-            base_url =  f"{req.scheme}://{req.get_host()}"
+            base_url = f"{req.scheme}://{req.get_host()}"
 
-            emendas = self.get_emendas_criadas_por_operador_mesmo_autor(
-                ).filter(
-                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL
-                )
+            emendas = self.get_emendas_criadas_por_operador_mesmo_autor().filter(
+                fase__gte=EmendaLoa.LIBERACAO_CONTABIL
+            )
 
             if not emendas.exists():
                 messages.info(
                     self.request,
-                    'Nenhuma Emenda Impositiva/Modificativa disponível para download.'
+                    "Nenhuma Emenda Impositiva/Modificativa disponível para download.",
                 )
                 return super().render_to_response(context, **response_kwargs)
 
-            autoroperado_id = user.operadorautor_set.values_list('autor', flat=True).first()
+            autoroperado_id = user.operadorautor_set.values_list(
+                "autor", flat=True
+            ).first()
 
             with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
-                with zipfile.ZipFile(tmp, 'w') as file:
+                with zipfile.ZipFile(tmp, "w") as file:
 
                     for emenda in emendas:
-                        response = requests.get(f'{base_url}/api/loa/emendaloa/{emenda.id}/view/')
+                        response = requests.get(
+                            f"{base_url}/api/loa/emendaloa/{emenda.id}/view/"
+                        )
 
                         if response.status_code == 200:
-                            nome_emenda = f'emendaloa_{emenda.id}_sem_vinculo_com_proposicao_{emenda.loa.ano}'
+                            nome_emenda = f"emendaloa_{emenda.id}_sem_vinculo_com_proposicao_{emenda.loa.ano}"
                             if emenda.materia:
-                                nome_emenda = f'emendaloa_{emenda.id}_ja_procolocada_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}'
+                                nome_emenda = f"emendaloa_{emenda.id}_ja_procolocada_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}"
                             elif emenda.proposicao:
-                                nome_emenda = f'emendaloa_{emenda.id}_com_proposicao_gerada_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}'
+                                nome_emenda = f"emendaloa_{emenda.id}_com_proposicao_gerada_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}"
                             nome_emenda = slugify(nome_emenda)
 
-                            file.writestr(
-                                f'{nome_emenda}.pdf',
-                                response.content
-                            )
+                            file.writestr(f"{nome_emenda}.pdf", response.content)
                 tmp.seek(0)
-                response = HttpResponse(tmp.read(),
-                                    content_type='application/zip')
-                response['Content-Disposition'] = f'attachment; filename="emendaloa_{self.loa.ano}_autor_{autoroperado_id}.zip"'
-                response['Cache-Control'] = 'no-cache'
-                response['Pragma'] = 'no-cache'
-                response['Expires'] = 0
+                response = HttpResponse(tmp.read(), content_type="application/zip")
+                response["Content-Disposition"] = (
+                    f'attachment; filename="emendaloa_{self.loa.ano}_autor_{autoroperado_id}.zip"'
+                )
+                response["Cache-Control"] = "no-cache"
+                response["Pragma"] = "no-cache"
+                response["Expires"] = 0
                 return response
 
         def makepdf(self, context, **response_kwargs):
             self.paginate_by = 0
             base_url = self.request.build_absolute_uri()
-            with TimeExecution(print_date=settings.DEBUG, label='Make Context PDF EmendaLoa List'):
+            with TimeExecution(
+                print_date=settings.DEBUG, label="Make Context PDF EmendaLoa List"
+            ):
                 try:
                     context = self.get_context_data_makepdf()
                 except:
                     raise ValidationError(
-                        'Ocorreu um erro ao processar seus filtros e agrupamentos.')
+                        "Ocorreu um erro ao processar seus filtros e agrupamentos."
+                    )
 
-            #context['groups'][0]['rows'] = context['groups'][0]['rows'][:10]
+            # context['groups'][0]['rows'] = context['groups'][0]['rows'][:10]
 
-            with TimeExecution(print_date=settings.DEBUG, label='Render Html EmendaLoa List'):
-                template = render_to_string('loa/pdf/emendaloa_list.html', context)
+            with TimeExecution(
+                print_date=settings.DEBUG, label="Render Html EmendaLoa List"
+            ):
+                template = render_to_string("loa/pdf/emendaloa_list.html", context)
 
-            with TimeExecution(print_date=settings.DEBUG, label='Generate PDF EmendaLoa List'):
+            with TimeExecution(
+                print_date=settings.DEBUG, label="Generate PDF EmendaLoa List"
+            ):
                 pdf_file = make_pdf(base_url=base_url, main_template=template)
 
-            response = HttpResponse(
-                pdf_file,
-                content_type='application/pdf'
+            response = HttpResponse(pdf_file, content_type="application/pdf")
+            response["Content-Disposition"] = (
+                f'inline; filename="emendaloa_{self.loa.ano}.pdf"'
             )
-            response['Content-Disposition'] = f'inline; filename="emendaloa_{self.loa.ano}.pdf"'
-            response['Cache-Control'] = 'no-cache'
-            response['Pragma'] = 'no-cache'
-            response['Expires'] = 0
+            response["Cache-Control"] = "no-cache"
+            response["Pragma"] = "no-cache"
+            response["Expires"] = 0
             return response
 
         def get_context_data_makepdf(self):
 
             cd = self.filterset.form.cleaned_data
 
-            title = 'Listagem Geral das Emendas <small>{}</small>'
+            title = "Listagem Geral das Emendas <small>{}</small>"
 
             filters = []
-            if cd.get('parlamentares', ''):
+            if cd.get("parlamentares", ""):
                 filtro = f'<strong>Parlamentares:</strong> {" / ".join(map(lambda x: str(x), cd["parlamentares"]))}'
                 filters.append(filtro)
 
-            if cd.get('finalidade', ''):
+            if cd.get("finalidade", ""):
                 filtro = f'<strong>Finalidade:</strong> {cd["finalidade"]}'
                 filters.append(filtro)
 
-            if cd.get('tipo', ''):
-                dt = dict(map(lambda x: (str(x[0]), x[1]),
-                          EmendaLoa.TIPOEMENDALOA_CHOICE))
+            if cd.get("tipo", ""):
+                dt = dict(
+                    map(lambda x: (str(x[0]), x[1]), EmendaLoa.TIPOEMENDALOA_CHOICE)
+                )
                 filtro = f'<strong>Tipos de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["tipo"]))}'
                 filters.append(filtro)
 
-            if cd.get('fase', ''):
-                dt = dict(map(lambda x: (str(x[0]), x[1]),
-                          EmendaLoa.FASE_CHOICE))
+            if cd.get("fase", ""):
+                dt = dict(map(lambda x: (str(x[0]), x[1]), EmendaLoa.FASE_CHOICE))
                 filtro = f'<strong>Fases de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["fase"]))}'
                 filters.append(filtro)
 
             if filters:
-                filters.insert(0, '<strong>FILTROS APLICADOS</strong>')
+                filters.insert(0, "<strong>FILTROS APLICADOS</strong>")
 
             context = {
-                'object': self.loa,
-                'loa': self.loa,
-                'tipo_agrupamento': cd.get('tipo_agrupamento', ''),
-                'title': title,
-                'filters': '<br>'.join(filters),
-                'groups': []
+                "object": self.loa,
+                "loa": self.loa,
+                "tipo_agrupamento": cd.get("tipo_agrupamento", ""),
+                "title": title,
+                "filters": "<br>".join(filters),
+                "groups": [],
             }
 
             def render_col_emenda(item):
 
-                materia = ''
+                materia = ""
                 if item.materia:
-                    materia = f'''
+                    materia = f"""
                             <span class="materia">
                                 <a href="{reverse('sapl.materia:materialegislativa_detail',kwargs={'pk': item.materia.id})}">
                                 {item.materia.epigrafe_short}
                                 </a>
                             </span>
-                    '''
+                    """
 
-                autores = f'''
+                autores = f"""
                     <small>
                         <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
                     </small>
-                '''
+                """
 
-                col_emenda = f'''
+                col_emenda = f"""
 
                     <div class="loa-mat">
                         <div class="row">
@@ -1150,24 +1268,24 @@ class EmendaLoaCrud(MasterDetailCrud):
                         </div>
                         <ul></ul>
                     </div>
-                '''
+                """
                 return col_emenda
 
-            total = Decimal('0.00')
-            if not cd.get('agrupamento', []):
+            total = Decimal("0.00")
+            if not cd.get("agrupamento", []):
 
                 if not self.object_list.exists():
                     return context
 
-                context['title'] = context['title'].replace('{}', '')
+                context["title"] = context["title"].replace("{}", "")
 
-                sub_total = self.object_list.aggregate(Sum('valor'))
+                sub_total = self.object_list.aggregate(Sum("valor"))
 
-                total += sub_total['valor__sum']
+                total += sub_total["valor__sum"]
 
-                columns = ['Emendas', 'Valores']
+                columns = ["Emendas", "Valores"]
 
-                #if not cd['tipo'] or len(cd['tipo']) > 1:
+                # if not cd['tipo'] or len(cd['tipo']) > 1:
                 #    columns.insert(1, 'Tipos')
 
                 rows = []
@@ -1175,29 +1293,41 @@ class EmendaLoaCrud(MasterDetailCrud):
                 for item in self.object_list:
                     cols = []
                     col_emenda = render_col_emenda(item)
-                    cols.append((col_emenda, ''))
+                    cols.append((col_emenda, ""))
 
-                    #if not cd['tipo'] or len(cd['tipo']) > 1:
+                    # if not cd['tipo'] or len(cd['tipo']) > 1:
                     #    cols.append((item.get_tipo_display(), 'text-center'))
 
-                    cols.append((item.str_valor, 'text-right'))
+                    cols.append((item.str_valor, "text-right"))
 
                     rows.append(cols)
 
                 group = {
-                    'title': '',
-                    'columns': columns,
-                    'ncols_menos2': len(columns) - 2,
-                    'ncols_menos1': len(columns) - 1,
-                    'rows': rows,
-                    'sub_total_emendas': formats.number_format(sub_total['valor__sum'], force_grouping=True),
-                    'agrupamento': False,
+                    "title": "",
+                    "columns": columns,
+                    "ncols_menos2": len(columns) - 2,
+                    "ncols_menos1": len(columns) - 1,
+                    "rows": rows,
+                    "sub_total_emendas": formats.number_format(
+                        sub_total["valor__sum"], force_grouping=True
+                    ),
+                    "agrupamento": False,
                 }
-                context['groups'].append(group)
+                context["groups"].append(group)
 
             else:
-                agrupamento1 = list(map(lambda x: f'{x}__codigo', cd['agrupamento']))
-                agrupamento2 = list(map(lambda x: f'{x}__especificacao', cd['agrupamento']))
+                agrupamento1 = list(
+                    map(
+                        lambda x: f"{x}__codigo" if x != "entidade" else x,
+                        cd["agrupamento"],
+                    )
+                )
+                agrupamento2 = list(
+                    map(
+                        lambda x: f"{x}__especificacao" if x != "entidade" else x,
+                        cd["agrupamento"],
+                    )
+                )
                 agrupamento = []
                 for i in range(len(agrupamento1)):
                     agrupamento.append(agrupamento1[i])
@@ -1208,223 +1338,294 @@ class EmendaLoaCrud(MasterDetailCrud):
                 # desmembre todos de modo que resulte: 'despesa', 'despesa__programa', 'despesa__programa__codigo'
                 agrup = set()
                 for ag in agrupamento:
-                    parts = ag.split('__')
+                    parts = ag.split("__")
                     for i in range(1, len(parts) + 1):
-                        sub_ag = '__'.join(parts[:i])
+                        sub_ag = "__".join(parts[:i])
                         if sub_ag not in agrup:
                             agrup.add(sub_ag)
                 agrup = list(agrup)
 
+                emendas_filtradas_ids = self.object_list.values_list("id", flat=True)
+                emendas_dict = {e.id: e for e in self.object_list}
 
-                emendas_filtradas_ids = self.object_list.values_list('id', flat=True)
-                emendas_dict = { e.id: e for e in self.object_list}
-
-                via = ''
-                if cd['tipo_agrupamento'] == 'insercao':
-                    via = '<br>* Agrupado  - Via dotações de inserção.'
-                elif cd['tipo_agrupamento'] == 'deducao':
-                    via = '<br>* Agrupado  - Via dotações de dedução.'
+                via = ""
+                if cd["tipo_agrupamento"] == "insercao":
+                    via = "<br>* Agrupado  - Via dotações de inserção."
+                elif cd["tipo_agrupamento"] == "deducao":
+                    via = "<br>* Agrupado  - Via dotações de dedução."
                 else:
-                    via = '<br>* Agrupado  - Via Unidade Orçamentária.'
-                context['title'] = context['title'].format(
-                    f'{via}'
-                )
+                    via = "<br>* Agrupado  - Via Entidades / Unidade Orçamentária."
+                context["title"] = context["title"].format(f"{via}")
 
                 groups = OrderedDict()
 
-                if cd['tipo_agrupamento'] != 'sem_registro':
-                    lookup_totalizador = 'gt' if cd['tipo_agrupamento'] == 'insercao' else 'lt'
+                if cd["tipo_agrupamento"] != "sem_registro":
+                    lookup_totalizador = (
+                        "gt" if cd["tipo_agrupamento"] == "insercao" else "lt"
+                    )
 
-                    agrup.extend(['emendaloa', 'valor'])
-                    registros_contabeis = EmendaLoaRegistroContabil.objects.filter(
-                        emendaloa__in=emendas_filtradas_ids,
-                        **{f'valor__{lookup_totalizador}': Decimal('0.00')},
-                    ).order_by(*agrupamento, 'emendaloa').values(*agrup).distinct()
+                    agrup.extend(["emendaloa", "valor"])
+                    registros_contabeis = (
+                        EmendaLoaRegistroContabil.objects.filter(
+                            emendaloa__in=emendas_filtradas_ids,
+                            **{f"valor__{lookup_totalizador}": Decimal("0.00")},
+                        )
+                        .order_by(*agrupamento, "emendaloa")
+                        .values(*agrup)
+                        .distinct()
+                    )
 
                     for rc in registros_contabeis:
 
                         key = tuple()
                         for ag in agrupamento:
-                            key += (rc[ag], )
+                            key += (rc[ag],)
                         if key not in groups:
                             groups[key] = {
-                                'emendas': OrderedDict(),
-                                'soma_valor': Decimal('0.00'),
-                                'soma_agrupado': Decimal('0.00')
+                                "emendas": OrderedDict(),
+                                "soma_valor": Decimal("0.00"),
+                                "soma_agrupado": Decimal("0.00"),
                             }
 
-                        emenda = emendas_dict.get(rc['emendaloa'])
+                        emenda = emendas_dict.get(rc["emendaloa"])
                         if not emenda:
                             continue
 
-                        if rc['emendaloa'] not in groups[key]['emendas']:
-                            groups[key]['emendas'][rc['emendaloa']] = emenda
-                        groups[key]['soma_agrupado'] += rc['valor']
-                        groups[key]['soma_valor'] += emenda.valor
+                        if rc["emendaloa"] not in groups[key]["emendas"]:
+                            groups[key]["emendas"][rc["emendaloa"]] = emenda
+                        groups[key]["soma_agrupado"] += rc["valor"]
+                        groups[key]["soma_valor"] += emenda.valor
 
                 else:
                     for emenda in self.object_list:
-                        key = (emenda.unidade.codigo, emenda.unidade.especificacao)
+                        key = []
+                        if "despesa__unidade" in cd["agrupamento"]:
+                            key = [emenda.unidade.codigo, emenda.unidade.especificacao]
+                        if "entidade" in cd["agrupamento"]:
+                            if emenda.entidade:
+                                cpfcnpj = re.sub(
+                                    r"[0\s]", "", emenda.entidade.cpfcnpj or ""
+                                )
+                                if cpfcnpj:
+                                    cpfcnpj = emenda.entidade.cpfcnpj
+                                key += [
+                                    f"{cpfcnpj or emenda.entidade.cnes}",
+                                    emenda.entidade.nome_fantasia,
+                                ]
+                            else:
+                                if "despesa__unidade" in cd["agrupamento"]:
+                                    key += ["", ""]
+
+                        key = tuple(key)
+                        if not key:
+                            continue
                         if key not in groups:
                             groups[key] = {
-                                'emendas': OrderedDict(),
-                                'soma_valor': Decimal('0.00'),
-                                'soma_agrupado': Decimal('0.00')
+                                "emendas": OrderedDict(),
+                                "soma_valor": Decimal("0.00"),
+                                "soma_agrupado": Decimal("0.00"),
                             }
-                        groups[key]['emendas'][emenda.id] = emenda
-                        groups[key]['soma_valor'] += emenda.valor
-
+                        groups[key]["emendas"][emenda.id] = emenda
+                        groups[key]["soma_valor"] += emenda.valor
 
                 for key, cd_group in groups.items():
                     title_parts = []
                     for i in range(0, len(agrupamento), 2):
                         part = key[i]
                         if part:
-                            title_parts.append((part, key[i+1]))
+                            title_parts.append((part, key[i + 1]))
 
-                    codigo, titulo = zip(*title_parts)
+                    try:
+                        codigo, titulo = zip(*title_parts)
+                    except Exception as e:
+                        print(e)
+                        continue
                     max_lenght_codigo = max(map(len, codigo))
-                    codigo = list(map(lambda x: x.rjust(max_lenght_codigo, ' '), codigo))
-                    codigo = list(map(lambda x: x.replace(' ', '&nbsp;'), codigo))
+                    codigo = list(
+                        map(lambda x: x.rjust(max_lenght_codigo, " "), codigo)
+                    )
+                    codigo = list(map(lambda x: x.replace(" ", "&nbsp;"), codigo))
                     title_parts = []
                     for i in range(len(codigo)):
-                        title_parts.append(f'<strong>{codigo[i]}</strong> - {titulo[i]}')
+                        title_parts.append(
+                            f"<strong>{codigo[i]}</strong> - {titulo[i]}"
+                        )
 
-                    title = '<br>'.join(title_parts)
+                    title = "<br>".join(title_parts)
 
-                    columns = ['Emendas', 'Valores das Emendas']
+                    columns = ["Emendas", "Valores das Emendas"]
 
-                    #if not cd['tipo'] or len(cd['tipo']) > 1:
+                    # if not cd['tipo'] or len(cd['tipo']) > 1:
                     #    columns.insert(1, 'Tipos')
 
+                    sub_total_emendas = cd_group["soma_valor"].quantize(Decimal("0.01"))
+                    sub_total_agrupado = cd_group["soma_agrupado"].quantize(
+                        Decimal("0.01")
+                    )
 
-                    sub_total_emendas = cd_group['soma_valor'].quantize(Decimal('0.01'))
-                    sub_total_agrupado = cd_group['soma_agrupado'].quantize(Decimal('0.01'))
-
-                    if cd['tipo_agrupamento'] != 'sem_registro':
+                    if cd["tipo_agrupamento"] != "sem_registro":
                         total += sub_total_agrupado
                     else:
                         total += sub_total_emendas
 
-                    movimentacao_valores = Decimal('0.00')
+                    movimentacao_valores = Decimal("0.00")
                     rows = []
-                    for item in cd_group['emendas'].values():
+                    for item in cd_group["emendas"].values():
                         cols = []
                         rows.append(cols)
 
-                        col_emenda = render_col_emenda(item, )
-                        cols.append([col_emenda, ''])
+                        col_emenda = render_col_emenda(
+                            item,
+                        )
+                        cols.append([col_emenda, ""])
 
-                        #if not cd['tipo'] or len(cd['tipo']) > 1:
+                        # if not cd['tipo'] or len(cd['tipo']) > 1:
                         #    cols.append(
                         #        (item.get_tipo_display(), 'text-center'))
 
-                        cols.append([item.str_valor, 'text-right'])
+                        cols.append([item.str_valor, "text-right"])
 
-                        qs_rc = item.registrocontabil_set.order_by('valor')
+                        qs_rc = item.registrocontabil_set.order_by("valor")
 
                         registros = []
                         max_lenght_valor = 0
                         for rc in qs_rc:
-                            rc = str(rc).split(' - ')
-                            rc[0] = list(filter(lambda x: x, rc[0].split(' ')))
-                            if '-' not in rc[0][-1]:
-                                rc[0][-1] = f'+{rc[0][-1]}'
-                            rc[0] = ' '.join(rc[0])
+                            rc = str(rc).split(" - ")
+                            rc[0] = list(filter(lambda x: x, rc[0].split(" ")))
+                            if "-" not in rc[0][-1]:
+                                rc[0][-1] = f"+{rc[0][-1]}"
+                            rc[0] = " ".join(rc[0])
                             if len(rc[0]) > max_lenght_valor:
                                 max_lenght_valor = len(rc[0])
                             registros.append(rc)
 
                         for index, rc in enumerate(registros):
                             while len(rc[0]) < max_lenght_valor:
-                                rc[0] = rc[0].replace(' ', '  ', 1)
-                            rc[0] = rc[0].replace(' ', '&nbsp;')
+                                rc[0] = rc[0].replace(" ", "  ", 1)
+                            rc[0] = rc[0].replace(" ", "&nbsp;")
                             registros[index] = f'<li>{" - ".join(rc)}</li>'
 
                         if registros:
                             cols[0][0] = cols[0][0].replace(
-                                '<ul></ul>', f'<small class="courier"><small>DOTAÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>')
+                                "<ul></ul>",
+                                f'<small class="courier"><small>DOTAÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>',
+                            )
 
-                    agrupamento_soma = list(map(lambda x: '__'.join(x.split('__')[1:]), agrupamento))
+                    agrupamento_soma = list(
+                        filter(
+                            lambda x: x,
+                            map(lambda x: "__".join(x.split("__")[1:]), agrupamento),
+                        )
+                    )
 
-                    soma_valor_orcamento = Despesa.objects.filter(
-                        loa=self.loa,
-                        **dict(zip(agrupamento_soma, key))
-                    ).order_by(*agrupamento_soma).distinct().aggregate(Sum('valor_materia'))
+                    soma_valor_orcamento = (
+                        Despesa.objects.filter(
+                            loa=self.loa, **dict(zip(agrupamento_soma, key))
+                        )
+                        .order_by(*agrupamento_soma)
+                        .distinct()
+                        .aggregate(Sum("valor_materia"))
+                    )
                     soma_valor_orcamento = soma_valor_orcamento.get(
-                        'valor_materia__sum'
-                    ) or Decimal('0.00')
+                        "valor_materia__sum"
+                    ) or Decimal("0.00")
 
                     params = dict(zip(agrupamento, key))
+                    params.pop("entidade")
+                    agrupset = list(
+                        set(agrupamento)
+                        - set(
+                            [
+                                "entidade",
+                            ]
+                        )
+                    )
                     movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
-                        emendaloa__loa=self.loa,
-                        **params
-                    ).order_by(*agrupamento).aggregate(Sum('valor')).get('valor__sum') or Decimal('0.00')
+                        emendaloa__loa=self.loa, **params
+                    ).order_by(*agrupset).aggregate(Sum("valor")).get(
+                        "valor__sum"
+                    ) or Decimal(
+                        "0.00"
+                    )
 
                     group = {
-                        'title': title,
-                        'columns': columns,
-                        'ncols_menos2': len(columns) - 2,
-                        'ncols_menos1': len(columns) - 1,
-                        'rows': rows,
-                        'soma_valor_orcamento':  formats.number_format(soma_valor_orcamento, force_grouping=True),
-                        'saldo_orcamento': formats.number_format(soma_valor_orcamento + movimentacao_valores, force_grouping=True),
-                        'movimentacao_valores': formats.number_format(movimentacao_valores, force_grouping=True),
-                        'sub_total_emendas': formats.number_format(sub_total_emendas, force_grouping=True),
-                        'sub_total_agrupado': formats.number_format(sub_total_agrupado, force_grouping=True),
-                        'agrupamento': True,
+                        "title": title,
+                        "columns": columns,
+                        "ncols_menos2": len(columns) - 2,
+                        "ncols_menos1": len(columns) - 1,
+                        "rows": rows,
+                        "soma_valor_orcamento": formats.number_format(
+                            soma_valor_orcamento, force_grouping=True
+                        ),
+                        "saldo_orcamento": formats.number_format(
+                            soma_valor_orcamento + movimentacao_valores,
+                            force_grouping=True,
+                        ),
+                        "movimentacao_valores": formats.number_format(
+                            movimentacao_valores, force_grouping=True
+                        ),
+                        "sub_total_emendas": formats.number_format(
+                            sub_total_emendas, force_grouping=True
+                        ),
+                        "sub_total_agrupado": formats.number_format(
+                            sub_total_agrupado, force_grouping=True
+                        ),
+                        "agrupamento": True,
                     }
-                    context['groups'].append(group)
-            context['total'] = formats.number_format(
-                total, force_grouping=True)
+                    context["groups"].append(group)
+            context["total"] = formats.number_format(total, force_grouping=True)
 
             return context
 
         def get_filterset_kwargs(self, filterset_class):
             kw = FilterView.get_filterset_kwargs(self, filterset_class)
-            kw['loa'] = self.loa
+            kw["loa"] = self.loa
             return kw
 
         def get_queryset(self):
             qs = super().get_queryset()
             if self.request.user.is_anonymous:
                 qs = qs.filter(loa__publicado=True)
-            return qs.order_by('fase', '-tipo', 'materia__numero', '-id')
+            return qs.order_by("fase", "-tipo", "materia__numero", "-id")
 
         def get_context_data(self, **kwargs):
-            context = MasterDetailCrud.ListView.get_context_data(
-                self, **kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} emendaloa-list'
-            context['type_pagination'] = 'pagination-static'
+            context = MasterDetailCrud.ListView.get_context_data(self, **kwargs)
+            path = context.get("path", "")
+            context["path"] = f"{path} emendaloa-list"
+            context["type_pagination"] = "pagination-static"
 
             return context
 
         def hook_header_valor_computado(self, *args, **kwargs):
-            return 'Valor Final da Emenda' if self.loa.publicado else 'Valor da Emenda'
+            return "Valor Final da Emenda" if self.loa.publicado else "Valor da Emenda"
 
         def hook_valor_computado(self, *args, **kwargs):
             return f'<div class="text-nowrap text-center">R$ {args[1]}</div>', args[2]
 
         def hook_tipo(self, *args, **kwargs):
             el = args[0]
-            tipo = args[1] if args[1] else 'EMENDA MODIFICATIVA'
-            link_pdf = ''
-            link_create_proposicao_pre_preenchida = ''
-            link_generate_proposicao = ''
+            tipo = args[1] if args[1] else "EMENDA MODIFICATIVA"
+            link_pdf = ""
+            link_create_proposicao_pre_preenchida = ""
+            link_generate_proposicao = ""
 
-            emendas_mesmo_autor = self.get_emendas_criadas_por_operador_mesmo_autor(
-                ).filter(fase__gte=EmendaLoa.LIBERACAO_CONTABIL
+            emendas_mesmo_autor = (
+                self.get_emendas_criadas_por_operador_mesmo_autor().filter(
+                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL
                 )
+            )
             if not emendas_mesmo_autor.filter(id=el.id).exists():
-                return f'''
+                return (
+                    f"""
                     {link_pdf}
                     <br>{tipo}
-                ''', args[2]
+                """,
+                    args[2],
+                )
 
-            if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia :
+            if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia:
 
-                url = reverse_lazy('sapl.api:loa_emendaloa-view',kwargs={'pk': el.id})
+                url = reverse_lazy("sapl.api:loa_emendaloa-view", kwargs={"pk": el.id})
                 link_pdf = f'<a href="{url}" target="_blank"><i class="far fa-2x fa-file-pdf"></i></a>'
 
                 """params = dict(
@@ -1442,35 +1643,43 @@ class EmendaLoaCrud(MasterDetailCrud):
                 '''
                 # {link_create_proposicao_pre_preenchida} <i class="fas fa-2x fa-magic"></i>"""
 
-                title = 'Gerar Proposição Legislativa para esta Emenda Impositiva/Modificativa' if not el.proposicao else f'Atualizar a {el.proposicao} vinculada a esta Emenda Impositiva/Modificativa'
-                link_generate_proposicao = f'''
+                title = (
+                    "Gerar Proposição Legislativa para esta Emenda Impositiva/Modificativa"
+                    if not el.proposicao
+                    else f"Atualizar a {el.proposicao} vinculada a esta Emenda Impositiva/Modificativa"
+                )
+                link_generate_proposicao = f"""
                     <a title="{title}" href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': el.id})}?register" target="_blank" >
                         <i class="fas fa-2x fa-file-contract"></i>
                     </a>
-                '''
+                """
 
-            return f'''
+            return (
+                f"""
                 {link_pdf} &nbsp; &nbsp; &nbsp;
 
                 {link_generate_proposicao}
                 <br>{tipo}
-            ''', args[2]
+            """,
+                args[2],
+            )
 
         def hook_fase(self, *args, **kwargs):
-            fase_display = f'<br><small>({args[0].get_fase_display()})</small>'
+            fase_display = f"<br><small>({args[0].get_fase_display()})</small>"
             el = args[0]
-            link_pdf = ''
+            link_pdf = ""
             if el.fase == EmendaLoa.IMPEDIMENTO_TECNICO:
-                doc_acessorio = el.materia.documentoacessorio_set.order_by('data').first()
+                doc_acessorio = el.materia.documentoacessorio_set.order_by(
+                    "data"
+                ).first()
                 if doc_acessorio:
                     link_pdf = f'<a title="Acesse Impedimento Técnico" href="{doc_acessorio.arquivo.url}"><i class="far fa-2x fa-file-pdf"></i></a>'
-                return f'{fase_display}<br>{link_pdf}', args[2]
-
+                return f"{fase_display}<br>{link_pdf}", args[2]
 
             return fase_display, args[2]
 
         def hook_header_finalidade(self, *args, **kwargs):
-            return 'Descrição da Emenda'
+            return "Descrição da Emenda"
 
         def hook_finalidade(self, *args, **kwargs):
             emenda, display_base, url = args
@@ -1478,31 +1687,36 @@ class EmendaLoaCrud(MasterDetailCrud):
             render = []
             materia = emenda.materia
             if materia:
-                render.append(f'<small><strong>Matéria Legislativa:</strong> {materia}</small><br>')
+                render.append(
+                    f"<small><strong>Matéria Legislativa:</strong> {materia}</small><br>"
+                )
 
             unidade_orcamentaria = emenda.unidade or emenda.indicacao
             if unidade_orcamentaria:
-                render.append(f'<small class="text-gray"><strong>Órgão Executor:</strong> {unidade_orcamentaria}</small><br>')
+                render.append(
+                    f'<small class="text-gray"><strong>Órgão Executor:</strong> {unidade_orcamentaria}</small><br>'
+                )
 
             registrocontabil_insercao_set = emenda.registrocontabil_set.filter(
-                valor__gt=Decimal('0.00')
+                valor__gt=Decimal("0.00")
             )
             if registrocontabil_insercao_set.exists():
-                render.append('<small class="text-gray"><strong>Ação Orçamentária:</strong> ')
+                render.append(
+                    '<small class="text-gray"><strong>Ação Orçamentária:</strong> '
+                )
                 acoes = set()
                 for rc in registrocontabil_insercao_set:
                     acoes.add(str(rc.despesa.acao))
-                render.append('<br>'.join(list(acoes)))
+                render.append("<br>".join(list(acoes)))
 
-                render.append('<br></small>')
-
+                render.append("<br></small>")
 
             finalidade = emenda.finalidade_format
-            finalidade = f'{finalidade[0].upper()}{finalidade[1:]}'
+            finalidade = f"{finalidade[0].upper()}{finalidade[1:]}"
             finalidade = f'<small class="text-gray"><strong>Entidade/Finalidade:</strong> {finalidade}</small><br>'
             render.append(finalidade)
 
-            return ''.join(render), url
+            return "".join(render), url
 
         def hook_parlamentares(self, *args, **kwargs):
             pls = []
@@ -1512,51 +1726,54 @@ class EmendaLoaCrud(MasterDetailCrud):
                     pls.append(
                         '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
                             elp.parlamentar.nome_parlamentar,
-                            formats.number_format(
-                                elp.valor, force_grouping=True)
+                            formats.number_format(elp.valor, force_grouping=True),
                         )
                     )
                 else:
-                    pls.append(
-                        f'<tr><td>{elp.parlamentar.nome_parlamentar}</td>')
+                    pls.append(f"<tr><td>{elp.parlamentar.nome_parlamentar}</td>")
 
             ajustes = []
             for ajuste in args[0].registroajusteloa_set.all():
                 url = reverse_lazy(
-                    'cmj.loa:oficioajusteloa_detail',
-                    kwargs={'pk': ajuste.oficio_ajuste_loa.id})
+                    "cmj.loa:oficioajusteloa_detail",
+                    kwargs={"pk": ajuste.oficio_ajuste_loa.id},
+                )
 
-                descr = ''
+                descr = ""
                 # if ajuste.valor <= Decimal('0.00'):
                 descr = ajuste.descricao
 
                 ajustes.append(
-                    f'<li><a href="{url}">{ajuste}</a><small class="text-gray"><br>{descr}</small></li>')
+                    f'<li><a href="{url}">{ajuste}</a><small class="text-gray"><br>{descr}</small></li>'
+                )
 
             ajustes = "".join(ajustes)
             if ajustes:
-                ajustes = f'''
+                ajustes = f"""
                     <hr class="my-1">
                     <small class="px-2 d-block">
                         <strong>Registros de Ajuste Técnico</strong>
                         <ul class="pl-3  m-0">{ajustes}</ul>
                     </small>
-                '''
+                """
 
-            return f'''
+            return (
+                f"""
                     <table class="w-100 text-nowrap">{"".join(pls)}</table>
                     {ajustes}
-                    ''', ''
+                    """,
+                "",
+            )
 
     class CreateView(MasterDetailCrud.CreateView):
         layout_key = None
         form_class = EmendaLoaForm
 
         def get_context_data(self, **kwargs):
-            self.loa = Loa.objects.get(pk=kwargs['root_pk'])
+            self.loa = Loa.objects.get(pk=kwargs["root_pk"])
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} emendaloa-create'
+            path = context.get("path", "")
+            context["path"] = f"{path} emendaloa-create"
             return context
 
         def get_success_url(self):
@@ -1566,8 +1783,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         def cancel_url(self):
             url = super().cancel_url
             if not url and self.request.user.operadorautor_set.exists():
-                url = self.resolve_url(
-                    'list', args=(self.kwargs['pk'],))
+                url = self.resolve_url("list", args=(self.kwargs["pk"],))
             return url
 
         def has_permission(self):
@@ -1578,7 +1794,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             has_perm = MasterDetailCrud.CreateView.has_permission(self)
 
-            self.loa = Loa.objects.get(pk=self.kwargs['pk'])
+            self.loa = Loa.objects.get(pk=self.kwargs["pk"])
 
             if not has_perm:
                 return u.operadorautor_set.exists() and self.loa.publicado
@@ -1587,17 +1803,17 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = self.loa
-            initial['user'] = self.request.user
-            initial['creating'] = True
+            initial["loa"] = self.loa
+            initial["user"] = self.request.user
+            initial["creating"] = True
             return initial
 
         def form_invalid(self, form):
             r = MasterDetailCrud.CreateView.form_invalid(self, form)
 
-            err_materia = form.errors.get('materia', None)
+            err_materia = form.errors.get("materia", None)
             if err_materia:
-                err_materia = 'Já existe registro de valores para a Matéria Legislativa selecionada.'
+                err_materia = "Já existe registro de valores para a Matéria Legislativa selecionada."
 
                 self.messages.error(err_materia, fail_silently=True)
             return r
@@ -1605,14 +1821,14 @@ class EmendaLoaCrud(MasterDetailCrud):
     class UpdateView(MasterDetailCrud.UpdateView):
         layout_key = None
         form_class = EmendaLoaForm
-        permission_required = ('loa.emendaloa_full_editor', )
+        permission_required = ("loa.emendaloa_full_editor",)
 
         def get_context_data(self, **kwargs):
-            self.loa = Loa.objects.get(pk=kwargs['root_pk'])
+            self.loa = Loa.objects.get(pk=kwargs["root_pk"])
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} emendaloa-update'
-            #context['fluid'] ='-fluid'
+            path = context.get("path", "")
+            context["path"] = f"{path} emendaloa-update"
+            # context['fluid'] ='-fluid'
             return context
 
         def get_success_url(self):
@@ -1622,21 +1838,29 @@ class EmendaLoaCrud(MasterDetailCrud):
             u = request.user
             if not u.is_superuser and not u.is_anonymous:
                 if u.operadorautor_set.exists():
-                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA and \
-                            self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
+                    if (
+                        self.object.fase > EmendaLoa.PROPOSTA_LIBERADA
+                        and self.object.fase != EmendaLoa.LIBERACAO_CONTABIL
+                    ):
                         messages.warning(
-                            request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
+                            request,
+                            f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.',
+                        )
                         return redirect(self.detail_url)
 
             return MasterDetailCrud.UpdateView.post(self, request, *args, **kwargs)
 
         def form_valid(self, form):
             u = self.request.user
-            if u.has_perm('loa.emendaloa_full_editor'):
-                submit_concluir = 'submit_concluir' in self.request.POST
-                submit_devolver = 'submit_devolver' in self.request.POST
+            if u.has_perm("loa.emendaloa_full_editor"):
+                submit_concluir = "submit_concluir" in self.request.POST
+                submit_devolver = "submit_devolver" in self.request.POST
                 if submit_concluir or submit_devolver:
-                    form.instance.fase = EmendaLoa.LIBERACAO_CONTABIL if submit_concluir else EmendaLoa.PROPOSTA
+                    form.instance.fase = (
+                        EmendaLoa.LIBERACAO_CONTABIL
+                        if submit_concluir
+                        else EmendaLoa.PROPOSTA
+                    )
 
             return super().form_valid(form)
 
@@ -1644,14 +1868,20 @@ class EmendaLoaCrud(MasterDetailCrud):
             u = request.user
             if not u.is_superuser and not u.is_anonymous:
                 if u.operadorautor_set.exists():
-                    if self.object.fase > EmendaLoa.PROPOSTA_LIBERADA and \
-                            self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
+                    if (
+                        self.object.fase > EmendaLoa.PROPOSTA_LIBERADA
+                        and self.object.fase != EmendaLoa.LIBERACAO_CONTABIL
+                    ):
                         messages.warning(
-                            request, f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.')
+                            request,
+                            f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.',
+                        )
                         return redirect(self.detail_url)
 
-                if u.has_perm('loa.emendaloa_full_editor') and \
-                    self.object.fase == EmendaLoa.PROPOSTA_LIBERADA:
+                if (
+                    u.has_perm("loa.emendaloa_full_editor")
+                    and self.object.fase == EmendaLoa.PROPOSTA_LIBERADA
+                ):
                     self.object.fase = EmendaLoa.EDICAO_CONTABIL
                     self.object.save()
 
@@ -1664,7 +1894,9 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             has_perm = MasterDetailCrud.UpdateView.has_permission(self)
 
-            self.object = self.get_object() if not hasattr(self, 'object') else self.object
+            self.object = (
+                self.get_object() if not hasattr(self, "object") else self.object
+            )
 
             if not has_perm:
                 # 1) possui permissão: emendaloa_full_editor
@@ -1677,51 +1909,54 @@ class EmendaLoaCrud(MasterDetailCrud):
                 if u.operadorautor_set.exists():
                     parlamentar = u.operadorautor_set.first().autor.autor_related
                     if isinstance(parlamentar, Parlamentar):
-                        participa = self.object.emendaloaparlamentar_set.filter(
-                            parlamentar=parlamentar,
-                            emendaloa__tipo__gt=0
-                        ).exists() or self.object.emendaloaparlamentar_set.filter(
-                            emendaloa__owner=u,
-                            emendaloa__tipo=0
-                        ).exists()
+                        participa = (
+                            self.object.emendaloaparlamentar_set.filter(
+                                parlamentar=parlamentar, emendaloa__tipo__gt=0
+                            ).exists()
+                            or self.object.emendaloaparlamentar_set.filter(
+                                emendaloa__owner=u, emendaloa__tipo=0
+                            ).exists()
+                        )
 
                 return (
-                    u.has_perm('loa.emendaloa_full_editor') and
-                    not self.object.materia
+                    u.has_perm("loa.emendaloa_full_editor") and not self.object.materia
                 ) or (
-                    u.operadorautor_set.exists() and
-                    not self.object.materia and
-                    participa
+                    u.operadorautor_set.exists()
+                    and not self.object.materia
+                    and participa
                 )
 
             return has_perm
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = self.object.loa
-            initial['user'] = self.request.user
-            initial['creating'] = False
+            initial["loa"] = self.object.loa
+            initial["user"] = self.request.user
+            initial["creating"] = False
             if self.object.materia:
-                initial['tipo_materia'] = self.object.materia.tipo.id
-                initial['numero_materia'] = self.object.materia.numero
-                initial['ano_materia'] = self.object.materia.ano
+                initial["tipo_materia"] = self.object.materia.tipo.id
+                initial["numero_materia"] = self.object.materia.numero
+                initial["ano_materia"] = self.object.materia.ano
             return initial
 
         @property
         def cancel_url(self):
-            url = self.resolve_url('detail', args=(self.kwargs['pk'],))
+            url = self.resolve_url("detail", args=(self.kwargs["pk"],))
             return url
 
     class DetailView(MasterDetailCrud.DetailView):
 
         @property
         def layout_key(self):
-            return 'EmendaLoaDetail'
+            return "EmendaLoaDetail"
 
         @property
         def extras_url(self):
             return []
-            if self.request.user.is_anonymous or not self.request.user.operadorautor_set.exists():
+            if (
+                self.request.user.is_anonymous
+                or not self.request.user.operadorautor_set.exists()
+            ):
                 return []
 
             if self.object.fase < EmendaLoa.LIBERACAO_CONTABIL:
@@ -1729,73 +1964,98 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             params = dict(
                 descricao=self.object.ementa_format.strip(),
-                tipo_materia=self.object.loa.materia.tipo.id if self.object.loa.materia else '',
-                numero_materia=self.object.loa.materia.numero if self.object.loa.materia else '',
-                ano_materia=self.object.loa.materia.ano if self.object.loa.materia else '',
+                tipo_materia=(
+                    self.object.loa.materia.tipo.id if self.object.loa.materia else ""
+                ),
+                numero_materia=(
+                    self.object.loa.materia.numero if self.object.loa.materia else ""
+                ),
+                ano_materia=(
+                    self.object.loa.materia.ano if self.object.loa.materia else ""
+                ),
                 tipo=33 if self.object.tipo != EmendaLoa.MODIFICATIVA else 5,
             )
 
             query_params = urlencode(params)
 
             return [
-                (reverse_lazy('sapl.materia:proposicao_create') + f'?{query_params}',
-                'btn-outline-primary',
-                _('Cadastrar Proposição pré-preenchida')
+                (
+                    reverse_lazy("sapl.materia:proposicao_create") + f"?{query_params}",
+                    "btn-outline-primary",
+                    _("Cadastrar Proposição pré-preenchida"),
                 )
             ]
 
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
 
-            if 'register' in request.GET:
+            if "register" in request.GET:
                 user = request.user
                 if user.is_anonymous:
                     raise PermissionDenied()
 
-                autor_operado = self.request.user.operadorautor_set.values_list('autor', flat=True)
+                autor_operado = self.request.user.operadorautor_set.values_list(
+                    "autor", flat=True
+                )
                 OperadorAutor = autor_operado.model
                 if not OperadorAutor.objects.filter(
-                        user=self.object.owner,
-                        autor__in=autor_operado
-                    ).exists():
+                    user=self.object.owner, autor__in=autor_operado
+                ).exists():
                     messages.error(
                         request,
-                        'Você não tem permissão para registrar a Proposição Legislativa desta Emenda Impositiva/Modificativa.'
+                        "Você não tem permissão para registrar a Proposição Legislativa desta Emenda Impositiva/Modificativa.",
                     )
                     return redirect(self.detail_url)
 
                 if self.object.materia:
                     messages.error(
                         request,
-                        'A Proposição Legislativa não pode ser gerada novamente pois já foi protocolada e está vinculada a uma Matéria Legislativa.'
+                        "A Proposição Legislativa não pode ser gerada novamente pois já foi protocolada e está vinculada a uma Matéria Legislativa.",
                     )
                     return redirect(
                         reverse_lazy(
-                            'cmj.loa:emendaloa_detail',
-                            kwargs={'pk': self.object.id}
+                            "cmj.loa:emendaloa_detail", kwargs={"pk": self.object.id}
                         )
                     )
 
                 if self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
                     messages.error(
                         request,
-                        'A Proposição Legislativa só pode ser gerada quando a Emenda Impositiva/Modificativa estiver na fase de "Liberado pela Contabilidade e/ou Aguardando Protocolo".'
+                        'A Proposição Legislativa só pode ser gerada quando a Emenda Impositiva/Modificativa estiver na fase de "Liberado pela Contabilidade e/ou Aguardando Protocolo".',
                     )
                     return redirect(self.detail_url)
 
-                if self.object.proposicao and self.object.proposicao.data_envio and self.object.proposicao.data_recebimento:
+                if (
+                    self.object.proposicao
+                    and self.object.proposicao.data_envio
+                    and self.object.proposicao.data_recebimento
+                ):
                     messages.warning(
                         request,
-                        'A Proposição Legislativa já foi registrada e recebida pelo protocolo, não pode ser atualizada via módulo de Orçamento Impositivo.'
+                        "A Proposição Legislativa já foi registrada e recebida pelo protocolo, não pode ser atualizada via módulo de Orçamento Impositivo.",
                     )
-                    return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': self.object.proposicao.id}))
+                    return redirect(
+                        reverse_lazy(
+                            "sapl.materia:proposicao_detail",
+                            kwargs={"pk": self.object.proposicao.id},
+                        )
+                    )
 
-                if self.object.proposicao and self.object.proposicao.data_envio and not self.object.proposicao.data_recebimento:
+                if (
+                    self.object.proposicao
+                    and self.object.proposicao.data_envio
+                    and not self.object.proposicao.data_recebimento
+                ):
                     messages.warning(
                         request,
-                        'A Proposição Legislativa já foi registrada e enviada ao protocolo, para ser atualizada é necessário retomar a proposição antes do protocolo autuar.'
+                        "A Proposição Legislativa já foi registrada e enviada ao protocolo, para ser atualizada é necessário retomar a proposição antes do protocolo autuar.",
                     )
-                    return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': self.object.proposicao.id}))
+                    return redirect(
+                        reverse_lazy(
+                            "sapl.materia:proposicao_detail",
+                            kwargs={"pk": self.object.proposicao.id},
+                        )
+                    )
 
                 try:
 
@@ -1808,25 +2068,28 @@ class EmendaLoaCrud(MasterDetailCrud):
                     if not proposicao:
                         np_max = Proposicao.objects.filter(
                             autor=autor,
-                            ano=self.object.loa.materia.ano if self.object.loa.materia else timezone.now().year,
-                            ).aggregate(np=Max('numero_proposicao'))
+                            ano=(
+                                self.object.loa.materia.ano
+                                if self.object.loa.materia
+                                else timezone.now().year
+                            ),
+                        ).aggregate(np=Max("numero_proposicao"))
 
                         proposicao = Proposicao()
-                        proposicao.numero_proposicao = np_max.get('np', 0) + 1
+                        proposicao.numero_proposicao = np_max.get("np", 0) + 1
                         created = True
                     else:
                         metadata = proposicao.metadata or {}
-                        if metadata.get(
-                        'signs', {}
-                        ).get(
-                            'texto_original', {}
-                        ).get(
-                            'signs', []
+                        if (
+                            metadata.get("signs", {})
+                            .get("texto_original", {})
+                            .get("signs", [])
                         ):
                             raise Exception(
-                                'Não é possível atualizar a Proposição Legislativa '
-                                'de uma Emenda LOA que já foi assinada digitalmente. '
-                                'É necessário realizar a substituição manual do arquivo no módulo de Proposições Legislativas.')
+                                "Não é possível atualizar a Proposição Legislativa "
+                                "de uma Emenda LOA que já foi assinada digitalmente. "
+                                "É necessário realizar a substituição manual do arquivo no módulo de Proposições Legislativas."
+                            )
 
                     proposicao.autor = autor
 
@@ -1846,13 +2109,18 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                     messages.success(
                         request,
-                        f'Proposição Legislativa {"criada" if created else "atualizada"} com sucesso.'
+                        f'Proposição Legislativa {"criada" if created else "atualizada"} com sucesso.',
                     )
-                    return redirect(reverse_lazy('sapl.materia:proposicao_detail', kwargs={'pk': proposicao.id}))
+                    return redirect(
+                        reverse_lazy(
+                            "sapl.materia:proposicao_detail",
+                            kwargs={"pk": proposicao.id},
+                        )
+                    )
                 except Exception as e:
                     messages.error(
                         request,
-                        f'Ocorreu um erro ao registrar a Proposição Legislativa: {e}'
+                        f"Ocorreu um erro ao registrar a Proposição Legislativa: {e}",
                     )
 
                 return redirect(self.detail_url)
@@ -1860,15 +2128,23 @@ class EmendaLoaCrud(MasterDetailCrud):
             return MasterDetailCrud.DetailView.get(self, request, *args, **kwargs)
 
         def retrieve_file_bytes(self, request):
-            base_url =  f"{request.scheme}://{request.get_host()}"
+            base_url = f"{request.scheme}://{request.get_host()}"
 
             pra_frente = True
             while True:
-                response = requests.get(f'{base_url}/api/loa/emendaloa/{self.object.id}/view/')
+                response = requests.get(
+                    f"{base_url}/api/loa/emendaloa/{self.object.id}/view/"
+                )
                 if response.status_code != 200:
-                    raise Exception('Não foi possível gerar o PDF da Emenda.')
+                    raise Exception("Não foi possível gerar o PDF da Emenda.")
 
-                arq_name = response.headers.get('Content-Disposition', f'emenda_loa_{self.object.id}.pdf').split('filename=')[-1].strip('"')
+                arq_name = (
+                    response.headers.get(
+                        "Content-Disposition", f"emenda_loa_{self.object.id}.pdf"
+                    )
+                    .split("filename=")[-1]
+                    .strip('"')
+                )
 
                 arq_bytes = io.BytesIO(response.content)
                 pdf = fitz.open(stream=arq_bytes, filetype="pdf")
@@ -1880,12 +2156,15 @@ class EmendaLoaCrud(MasterDetailCrud):
                     pra_frente = False
 
                 md = self.object.metadata
-                md['style'] = md.get('style', {
-                    'lineHeight': 150,
-                    'espacoAssinatura': 0,
-                })
-                md['style']['espacoAssinatura'] = md['style'].get('espacoAssinatura', 0)
-                lineHeight = md['style']['lineHeight']
+                md["style"] = md.get(
+                    "style",
+                    {
+                        "lineHeight": 150,
+                        "espacoAssinatura": 0,
+                    },
+                )
+                md["style"]["espacoAssinatura"] = md["style"].get("espacoAssinatura", 0)
+                lineHeight = md["style"]["lineHeight"]
 
                 if lineHeight < 110:
                     break
@@ -1901,7 +2180,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 else:
                     lineHeight -= 1
 
-                md['style']['lineHeight'] = lineHeight
+                md["style"]["lineHeight"] = lineHeight
                 self.object.metadata = md
                 self.object.save()
 
@@ -1911,72 +2190,82 @@ class EmendaLoaCrud(MasterDetailCrud):
                 page2 = pdf.load_page(1)
                 text = page2.get_text("text")
                 text = text
-                if 'A presente emenda fará parte integrante do Projeto' in text:
+                if "A presente emenda fará parte integrante do Projeto" in text:
                     break
 
             return arq_bytes, arq_name
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} emendaloa-detail'
-            title = f'''{self.object.materia.epigrafe_short + ' - ' if self.object.materia else ''}
+            path = context.get("path", "")
+            context["path"] = f"{path} emendaloa-detail"
+            title = f"""{self.object.materia.epigrafe_short + ' - ' if self.object.materia else ''}
             R$ { self.object.str_valor } -
             { self.object.entidade.nome_fantasia if self.object.entidade else ''}
             {self.object.unidade.especificacao if not self.object.entidade else ''}
             <small>{'<br>' + str(self.object) if not self.object.materia else ''}</small>
             <br><small>({self.object.loa})</small>
 
-            '''
-            context['title'] = title.replace('\n', '')
+            """
+            context["title"] = title.replace("\n", "")
             return context
 
-        def hook_valor_computado(self, el, verbose_name='', field_display=''):
+        def hook_valor_computado(self, el, verbose_name="", field_display=""):
             if not el.materia:
-                return '', ''
+                return "", ""
 
-            return 'Valor Final da Emenda (R$)', field_display, 'form-control-static text-blue text-nowrap text-center font-weight-bold'
+            return (
+                "Valor Final da Emenda (R$)",
+                field_display,
+                "form-control-static text-blue text-nowrap text-center font-weight-bold",
+            )
 
-        def hook_tipo(self, el, verbose_name='', field_display=''):
+        def hook_tipo(self, el, verbose_name="", field_display=""):
             if el.tipo:
                 return verbose_name, field_display
 
-            return 'Emenda Modificativa', 'Emenda Modificativa'
+            return "Emenda Modificativa", "Emenda Modificativa"
 
-        def hook_fase(self, el, verbose_name='', field_display=''):
-            classes = 'form-control-static text-center font-weight-bold'
+        def hook_fase(self, el, verbose_name="", field_display=""):
+            classes = "form-control-static text-center font-weight-bold"
             if el.fase == EmendaLoa.IMPEDIMENTO_TECNICO:
-                return verbose_name, field_display, f'{classes} text-danger'
+                return verbose_name, field_display, f"{classes} text-danger"
             return verbose_name, field_display, classes
 
-        def hook_indicacao(self, el, verbose_name='', field_display=''):
-            return f'{verbose_name} (Unidade Orçamentária)', field_display
+        def hook_indicacao(self, el, verbose_name="", field_display=""):
+            return f"{verbose_name} (Unidade Orçamentária)", field_display
 
-        def hook_finalidade(self, el, verbose_name='', field_display=''):
-            return verbose_name, el.finalidade_format,
+        def hook_finalidade(self, el, verbose_name="", field_display=""):
+            return (
+                verbose_name,
+                el.finalidade_format,
+            )
 
-        def hook_materia(self, el, verbose_name='', field_display=''):
+        def hook_materia(self, el, verbose_name="", field_display=""):
             if not el.materia:
-                return '',''
+                return "", ""
 
             strm = str(el.materia)
             field_display = field_display.replace(strm, el.materia.epigrafe_short)
-            return 'Processo Legislativo da Emenda Impositiva', f'''
+            return (
+                "Processo Legislativo da Emenda Impositiva",
+                f"""
                 Arquivo PDF: <a href="{el.materia.texto_original.url}" class="btn btn-link" title="Arquivo PDF da Emenda no Processo Legislativo"><i class="fas fa-file-pdf"></i></a>
                 | Processo Legislativo: <a href="{reverse_lazy('sapl.materia:materialegislativa_detail', kwargs={'pk': el.materia.id})}">
                     {field_display}
-                </a>'''
+                </a>""",
+            )
 
-        def hook_registroajusteloa_set(self, el, verbose_name='', field_display=''):
+        def hook_registroajusteloa_set(self, el, verbose_name="", field_display=""):
 
             if not el.materia:
-                return '', ''
+                return "", ""
 
             ajustes = []
             for ajuste in el.registroajusteloa_set.all():
                 url = reverse_lazy(
-                    'cmj.loa:registroajusteloa_detail',
-                    kwargs={'pk': ajuste.id})
+                    "cmj.loa:registroajusteloa_detail", kwargs={"pk": ajuste.id}
+                )
 
                 a_str = f"""
                     <li>
@@ -1988,73 +2277,92 @@ class EmendaLoaCrud(MasterDetailCrud):
                 ajustes.append(a_str)
 
             if not ajustes:
-                return verbose_name, 'Esta Emenda não possui registros de Ajuste Técnico'
+                return (
+                    verbose_name,
+                    "Esta Emenda não possui registros de Ajuste Técnico",
+                )
 
             return verbose_name, f'<ul>{"".join(ajustes)}</ul>'
 
-        def hook_documentos_acessorios(self, el, verbose_name='', field_display=''):
+        def hook_documentos_acessorios(self, el, verbose_name="", field_display=""):
 
             if not el.materia or not el.materia.documentoacessorio_set.exists():
-                return '', ''
+                return "", ""
 
             docs = []
 
-            qs_docs = [
-            ] if not el.materia else el.materia.documentoacessorio_set.order_by('-data')
+            qs_docs = (
+                []
+                if not el.materia
+                else el.materia.documentoacessorio_set.order_by("-data")
+            )
             for doc in qs_docs:
                 doc_template = loader.get_template(
-                    'materia/documentoacessorio_widget_itemlist.html')
+                    "materia/documentoacessorio_widget_itemlist.html"
+                )
                 context = {}
-                context['object'] = doc
+                context["object"] = doc
                 rendered = doc_template.render(context, self.request)
 
-                docs.append(
-                    f'<tr><td>{rendered}</td></tr>'
-                )
+                docs.append(f"<tr><td>{rendered}</td></tr>")
             if not docs:
-                return verbose_name, 'Esta Emenda não possui outros documentos acessórios cadastrados ao Processo Legislativo'
+                return (
+                    verbose_name,
+                    "Esta Emenda não possui outros documentos acessórios cadastrados ao Processo Legislativo",
+                )
 
-            return 'Documentos Acessórios vinculados ao Processo Legislativo', f'''
+            return (
+                "Documentos Acessórios vinculados ao Processo Legislativo",
+                f"""
                 <div class="container-table m-0 mx-n3">
                     <table class="table table-form table-bordered table-hover w-100">
                         {"".join(docs)}
                     </table>
                 </div>
-                '''
+                """,
+            )
 
-        def hook_prestacaocontaregistro_set(self, emendaloa, verbose_name='', field_display=''):
+        def hook_prestacaocontaregistro_set(
+            self, emendaloa, verbose_name="", field_display=""
+        ):
 
             if not emendaloa.materia:
-                return '', ''
+                return "", ""
 
             pcs = []
 
             for pc in emendaloa.prestacaocontaregistro_set.all():
                 pc_url = reverse_lazy(
-                    'cmj.loa:prestacaocontaregistro_detail',
-                    kwargs={'pk': pc.id}
+                    "cmj.loa:prestacaocontaregistro_detail", kwargs={"pk": pc.id}
                 )
                 pcs.append(
-                    f'''<li>
+                    f"""<li>
                         <span class="badge badge-secondary">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
                         <span class="badge badge-secondary">{pc.situacao}</span>
                         <a href="{ pc_url}" class="d-inline-block font-weight-bold pt-1">
                         {pc.prestacao_conta}
                         </a>
                         <span class="text-gray d-block">{pc.detalhamento}</span>
-                    </li>'''
+                    </li>"""
                 )
 
             if not pcs:
-                return verbose_name, 'Esta Emenda não possui registros de Prestação de Contas'
+                return (
+                    verbose_name,
+                    "Esta Emenda não possui registros de Prestação de Contas",
+                )
 
-            return 'Registros de Prestação de Contas', f'''
+            return (
+                "Registros de Prestação de Contas",
+                f"""
                 <ul>
                     {"".join(pcs)}
                 </ul>
-                ''', 'bg-light'
+                """,
+                "bg-light",
+            )
 
-        def hook_parlamentares(self, emendaloa, verbose_name='', field_display=''):
+        def hook_parlamentares(self, emendaloa, verbose_name="", field_display=""):
             pls = []
 
             for elp in emendaloa.emendaloaparlamentar_set.all():
@@ -2062,63 +2370,64 @@ class EmendaLoaCrud(MasterDetailCrud):
                     pls.append(
                         '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
                             elp.parlamentar.nome_parlamentar,
-                            formats.number_format(
-                                elp.valor, force_grouping=True)
+                            formats.number_format(elp.valor, force_grouping=True),
                         )
                     )
                 else:
-                    pls.append(
-                        f'<tr><td>{elp.parlamentar.nome_parlamentar}</td>')
+                    pls.append(f"<tr><td>{elp.parlamentar.nome_parlamentar}</td>")
 
-            return verbose_name, f'''
+            return (
+                verbose_name,
+                f"""
                 <div class="py-3">
                     <table class="table table-form table-bordered table-hover w-100">
                         {"".join(pls)}
                     </table>
                 </div>
-                '''
-
-        def hook_auditlog(self, emendaloa, verbose_name='', field_display=''):
-            if not self.request.user.is_superuser:
-                return '', ''
-            cts = list(
-                ContentType.objects.get_for_models(
-                    EmendaLoa,
-                    EmendaLoaRegistroContabil,
-                    EmendaLoaParlamentar).values()
+                """,
             )
 
-            al_create = AuditLog.objects.filter(
-                content_type=cts[0],
-                object_id=emendaloa.id,
-            ).order_by('id').first()
+        def hook_auditlog(self, emendaloa, verbose_name="", field_display=""):
+            if not self.request.user.is_superuser:
+                return "", ""
+            cts = list(
+                ContentType.objects.get_for_models(
+                    EmendaLoa, EmendaLoaRegistroContabil, EmendaLoaParlamentar
+                ).values()
+            )
+
+            al_create = (
+                AuditLog.objects.filter(
+                    content_type=cts[0],
+                    object_id=emendaloa.id,
+                )
+                .order_by("id")
+                .first()
+            )
             if not al_create:
-                return '', ''
+                return "", ""
 
             q = Q()
-            q |= Q(obj_id=emendaloa.id, model_name='emendaloa')
+            q |= Q(obj_id=emendaloa.id, model_name="emendaloa")
             q |= Q(obj__0__fields__emendaloa=emendaloa.id)
             models_name = list(map(lambda ct: ct.model, cts))
-            als = AuditLog.objects.filter(
-                q, model_name__in=models_name).order_by('id')
+            als = AuditLog.objects.filter(q, model_name__in=models_name).order_by("id")
 
             result = dict(
-                emendaloa=[],
-                emendaloaparlamentar=[],
-                emendaloaregistrocontabil=[]
+                emendaloa=[], emendaloaparlamentar=[], emendaloaregistrocontabil=[]
             )
 
             last_fields = dict(
                 emendaloa=None,
                 emendaloaparlamentar=None,
-                emendaloaregistrocontabil=None
+                emendaloaregistrocontabil=None,
             )
 
             for al in als:
 
                 fields = al.obj[0]["fields"]
 
-                if fields != last_fields[al.model_name] or al.operation in ('C', 'D'):
+                if fields != last_fields[al.model_name] or al.operation in ("C", "D"):
                     result[al.model_name].append(al)
                     last_fields[al.model_name] = fields
 
@@ -2131,31 +2440,30 @@ class EmendaLoaCrud(MasterDetailCrud):
             lines = []
             for al in results:
                 lines.append(
-                    f'{al.timestamp} - {al.operation} - '
-                    f'{al.content_type} - {al.user} - {al.obj[0]["pk"]} - {al.obj[0]["fields"]}<br>')
+                    f"{al.timestamp} - {al.operation} - "
+                    f'{al.content_type} - {al.user} - {al.obj[0]["pk"]} - {al.obj[0]["fields"]}<br>'
+                )
 
-            return verbose_name, ''.join(lines)
+            return verbose_name, "".join(lines)
 
 
 class OficioAjusteLoaCrud(MasterDetailCrud):
     model = OficioAjusteLoa
-    parent_field = 'loa'
-    model_set = 'registroajusteloa_set'
+    parent_field = "loa"
+    model_set = "registroajusteloa_set"
     public = [RP_LIST, RP_DETAIL]
     frontend = OficioAjusteLoa._meta.app_label
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         ordered_list = False
-        list_field_names = [
-            'registros'
-        ]
+        list_field_names = ["registros"]
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = OficioAjusteLoaForm
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = Loa.objects.get(pk=self.kwargs['pk'])
+            initial["loa"] = Loa.objects.get(pk=self.kwargs["pk"])
             return initial
 
     class UpdateView(MasterDetailCrud.UpdateView):
@@ -2163,28 +2471,28 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = self.object.loa
+            initial["loa"] = self.object.loa
             return initial
 
     class ListView(MasterDetailCrud.ListView):
-        ordering = 'epigrafe'
+        ordering = "epigrafe"
         paginate_by = 25
 
         def hook_header_registros(self):
-            return 'Registros de Ajuste Técnico'
+            return "Registros de Ajuste Técnico"
 
-        def hook_registros(self, obj, field_display='', url=''):
+        def hook_registros(self, obj, field_display="", url=""):
             ajustes = []
 
-            url = reverse_lazy(
-                'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': obj.id})
+            url = reverse_lazy("cmj.loa:oficioajusteloa_detail", kwargs={"pk": obj.id})
 
-            epigrafe = f'<h2><a class="text-nowrap" href="{url}">{obj.epigrafe}</a></h2>'
+            epigrafe = (
+                f'<h2><a class="text-nowrap" href="{url}">{obj.epigrafe}</a></h2>'
+            )
             ajustes.append(epigrafe)
 
-            parlamentares = ' - '.join(map(lambda x: str(x), obj.parlamentares.all()))
-            ajustes.append(f'<h4><strong>Parlamentares:</strong> {parlamentares}</h4>')
+            parlamentares = " - ".join(map(lambda x: str(x), obj.parlamentares.all()))
+            ajustes.append(f"<h4><strong>Parlamentares:</strong> {parlamentares}</h4>")
 
             registros = obj.registroajusteloa_set.all()
 
@@ -2193,31 +2501,37 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
             registros_zero = []
 
             for r in registros:
-                if r.soma_valor > Decimal('0.00'):
+                if r.soma_valor > Decimal("0.00"):
                     registros_positivos.append(r)
-                elif r.soma_valor < Decimal('0.00'):
+                elif r.soma_valor < Decimal("0.00"):
                     registros_negativos.append(r)
                 else:
                     registros_zero.append(r)
 
-            registros = list(registros_positivos) + list(registros_negativos) + list(registros_zero)
+            registros = (
+                list(registros_positivos)
+                + list(registros_negativos)
+                + list(registros_zero)
+            )
 
             for ajuste in registros:
                 url = reverse_lazy(
-                    'cmj.loa:registroajusteloa_detail',
-                    kwargs={'pk': ajuste.id})
+                    "cmj.loa:registroajusteloa_detail", kwargs={"pk": ajuste.id}
+                )
 
-                a_str = f'R$ {ajuste.str_valor}'
-                if ajuste.soma_valor < Decimal('0.00'):
+                a_str = f"R$ {ajuste.str_valor}"
+                if ajuste.soma_valor < Decimal("0.00"):
                     a_str = f'<span class="text-danger">{a_str}</span>'
-                elif ajuste.soma_valor == Decimal('0.00'):
+                elif ajuste.soma_valor == Decimal("0.00"):
                     a_str = f'<span class="text-danger">R$ 0,00</span>'
 
-                emenda_epigrafe = ajuste.emendaloa.materia.epigrafe_short if ajuste.emendaloa else ""
+                emenda_epigrafe = (
+                    ajuste.emendaloa.materia.epigrafe_short if ajuste.emendaloa else ""
+                )
                 emenda_epigrafe = f'<strong>Emenda:</strong> {emenda_epigrafe if emenda_epigrafe else "Ajuste sem ligação com emenda impositiva."}<br>'
                 unidade_orcamentaria = f'<strong>Unidade Orçamentária:</strong> {ajuste.unidade.especificacao if ajuste.unidade else ""}<br>'
 
-                a_str = f'''
+                a_str = f"""
                     <tr>
                         <td align="right">
                             <a href="{url}">
@@ -2234,144 +2548,159 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
                           </small>
                         </td>
                     </tr>
-                '''
+                """
 
                 ajustes.append(a_str)
 
-            return f'<table>{"".join(ajustes)}</table>', ''
+            return f'<table>{"".join(ajustes)}</table>', ""
 
     class DetailView(MasterDetailCrud.DetailView):
-        template_name = 'loa/oficioajusteloa_detail.html'
+        template_name = "loa/oficioajusteloa_detail.html"
         paginate_by = 100
 
         @property
         def list_field_names_set(self):
-            return 'descricao', 'str_valor', 'tipo'  # , 'emendaloa'
+            return "descricao", "str_valor", "tipo"  # , 'emendaloa'
 
         def hook_header_str_valor(self):
-            return 'Valor (R$)'
+            return "Valor (R$)"
 
-        def hook_str_valor(self, obj, verbose_name='', field_display=''):
+        def hook_str_valor(self, obj, verbose_name="", field_display=""):
             return verbose_name, f'{field_display if field_display != "0" else "0,00"}'
 
-        def hook_descricao(self, obj, verbose_name='', field_display=''):
+        def hook_descricao(self, obj, verbose_name="", field_display=""):
 
-            emenda_epigrafe = obj.emendaloa.materia.epigrafe_short if obj.emendaloa else ""
+            emenda_epigrafe = (
+                obj.emendaloa.materia.epigrafe_short if obj.emendaloa else ""
+            )
             emenda_epigrafe = f'<strong>Emenda:</strong> {emenda_epigrafe if emenda_epigrafe else "Ajuste sem ligação com emenda impositiva."}<br>'
             unidade_orcamentaria = f'<strong>Unidade Orçamentária:</strong> {obj.unidade.especificacao if obj.unidade else ""}<br>'
 
-            return verbose_name, f'{emenda_epigrafe}{unidade_orcamentaria}<em>{field_display}</em>'
+            return (
+                verbose_name,
+                f"{emenda_epigrafe}{unidade_orcamentaria}<em>{field_display}</em>",
+            )
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} oficioajusteloa-detail'
+            path = context.get("path", "")
+            context["path"] = f"{path} oficioajusteloa-detail"
             return context
 
 
 class RegistroAjusteLoaCrud(MasterDetailCrud):
     model = RegistroAjusteLoa
-    parent_field = 'oficio_ajuste_loa__loa'
+    parent_field = "oficio_ajuste_loa__loa"
     public = [RP_LIST, RP_DETAIL]
     frontend = RegistroAjusteLoa._meta.app_label
 
     class DetailView(MasterDetailCrud.DetailView):
 
-        layout_key = 'RegistroAjusteLoaDetail'
+        layout_key = "RegistroAjusteLoaDetail"
 
         @property
         def detail_list_url(self):
             return reverse_lazy(
-                'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': self.object.oficio_ajuste_loa_id})
+                "cmj.loa:oficioajusteloa_detail",
+                kwargs={"pk": self.object.oficio_ajuste_loa_id},
+            )
 
-        def hook_emendaloa(self, obj, verbose_name='', field_display=''):
+        def hook_emendaloa(self, obj, verbose_name="", field_display=""):
             if not obj.emendaloa:
-                return '', ''
+                return "", ""
 
-            url = reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': obj.emendaloa.id})
-            field_display = f'{obj.emendaloa.materia.epigrafe_short} - {obj.emendaloa.indicacao}<br>{obj.emendaloa.finalidade}'
+            url = reverse_lazy(
+                "cmj.loa:emendaloa_detail", kwargs={"pk": obj.emendaloa.id}
+            )
+            field_display = f"{obj.emendaloa.materia.epigrafe_short} - {obj.emendaloa.indicacao}<br>{obj.emendaloa.finalidade}"
             field_display = f'<a href="{url}">{field_display}</a>'
             return verbose_name, field_display
 
-        def hook_oficio_ajuste_loa(self, obj, verbose_name='', field_display=''):
+        def hook_oficio_ajuste_loa(self, obj, verbose_name="", field_display=""):
             url = reverse_lazy(
-                'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': obj.oficio_ajuste_loa.id}
+                "cmj.loa:oficioajusteloa_detail",
+                kwargs={"pk": obj.oficio_ajuste_loa.id},
             )
             field_display = f'<a href="{url}">{obj.oficio_ajuste_loa.epigrafe}</a>'
             return verbose_name, field_display
 
-        def hook_prestacaocontaregistro_set(self, obj, verbose_name='', field_display=''):
+        def hook_prestacaocontaregistro_set(
+            self, obj, verbose_name="", field_display=""
+        ):
             pcs = []
 
             for pc in obj.prestacaocontaregistro_set.all():
                 pc_url = reverse_lazy(
-                    'cmj.loa:prestacaocontaregistro_detail',
-                    kwargs={'pk': pc.id}
+                    "cmj.loa:prestacaocontaregistro_detail", kwargs={"pk": pc.id}
                 )
                 pcs.append(
-                    f'''<li>
+                    f"""<li>
                         <span class="badge badge-secondary p-2">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
                         <span class="badge badge-secondary p-2">{pc.situacao}</span>
                         <a href="{ pc_url}" class="d-inline-block p-2 font-weight-bold">
                         {pc.prestacao_conta}
                         </a>
                         <span class="text-gray d-block">{pc.detalhamento}</span>
-                    </li>'''
+                    </li>"""
                 )
 
-            return verbose_name, f'''
+            return (
+                verbose_name,
+                f"""
                 <ul>
                     {"".join(pcs)}
                 </ul>
-                '''
+                """,
+            )
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = RegistroAjusteLoaForm
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['oficioajusteloa'] = self.object.oficio_ajuste_loa
+            initial["oficioajusteloa"] = self.object.oficio_ajuste_loa
             return initial
 
         @property
         def cancel_url(self):
             return reverse_lazy(
-                'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': self.object.oficio_ajuste_loa.id})
+                "cmj.loa:oficioajusteloa_detail",
+                kwargs={"pk": self.object.oficio_ajuste_loa.id},
+            )
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = RegistroAjusteLoaForm
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['oficioajusteloa'] = OficioAjusteLoa.objects.get(
-                pk=self.kwargs['pk'])
+            initial["oficioajusteloa"] = OficioAjusteLoa.objects.get(
+                pk=self.kwargs["pk"]
+            )
             return initial
 
         @property
         def cancel_url(self):
             return reverse_lazy(
-                'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': self.kwargs['pk']})
+                "cmj.loa:oficioajusteloa_detail", kwargs={"pk": self.kwargs["pk"]}
+            )
 
         def get_success_url(self):
             return reverse_lazy(
-                'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': self.kwargs['pk']})
+                "cmj.loa:oficioajusteloa_detail", kwargs={"pk": self.kwargs["pk"]}
+            )
 
     class DeleteView(MasterDetailCrud.DeleteView):
 
         def get_success_url(self):
             return reverse_lazy(
-                'cmj.loa:oficioajusteloa_detail',
-                kwargs={'pk': self.object.oficio_ajuste_loa.id})
+                "cmj.loa:oficioajusteloa_detail",
+                kwargs={"pk": self.object.oficio_ajuste_loa.id},
+            )
 
 
 class PrestacaoContaRegistroCrud(MasterDetailCrud):
     model = PrestacaoContaRegistro
-    parent_field = 'prestacao_conta__loa'
+    parent_field = "prestacao_conta__loa"
     public = [RP_LIST, RP_DETAIL]
     frontend = PrestacaoContaRegistro._meta.app_label
     link_return_to_parent_field = True
@@ -2384,43 +2713,40 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
             if self.object:
                 return self.detail_url
             return reverse_lazy(
-                'cmj.loa:prestacaocontaloa_detail',
-                kwargs={'pk': self.kwargs['pk']})
+                "cmj.loa:prestacaocontaloa_detail", kwargs={"pk": self.kwargs["pk"]}
+            )
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = PrestacaoContaRegistroForm
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = PrestacaoContaLoa.objects.get(
-                pk=self.kwargs['pk']).loa
+            initial["loa"] = PrestacaoContaLoa.objects.get(pk=self.kwargs["pk"]).loa
             return initial
 
         def get_success_url(self):
             return reverse_lazy(
-                'cmj.loa:prestacaocontaregistro_detail',
-                kwargs={'pk': self.object.id})
+                "cmj.loa:prestacaocontaregistro_detail", kwargs={"pk": self.object.id}
+            )
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = PrestacaoContaRegistroForm
-        layout_key = 'PrestacaoContaRegistroUpdate'
-
+        layout_key = "PrestacaoContaRegistroUpdate"
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['loa'] = self.object.prestacao_conta.loa
+            initial["loa"] = self.object.prestacao_conta.loa
             return initial
 
         def get_success_url(self):
             return reverse_lazy(
-                'cmj.loa:prestacaocontaregistro_detail',
-                kwargs={'pk': self.object.id})
-
+                "cmj.loa:prestacaocontaregistro_detail", kwargs={"pk": self.object.id}
+            )
 
     class DetailView(MasterDetailCrud.DetailView):
-        layout_key = 'PrestacaoContaRegistroDetail'
+        layout_key = "PrestacaoContaRegistroDetail"
 
-        #def hook_registro_ajuste__descricao(self, obj, verbose_name='', field_display=''):
+        # def hook_registro_ajuste__descricao(self, obj, verbose_name='', field_display=''):
         #    if not obj.registro_ajuste:
         #        return '', ''
         #    field_display = f'R$ {obj.registro_ajuste.str_valor} - {obj.registro_ajuste.descricao}'
@@ -2428,102 +2754,116 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} prestacaocontaregistro-detail'
+            path = context.get("path", "")
+            context["path"] = f"{path} prestacaocontaregistro-detail"
 
-            title = f'''{self.object.prestacao_conta}<br><small>({self.object.prestacao_conta.loa})</small>'''
-            context['title'] = title.replace('\n', '')
+            title = f"""{self.object.prestacao_conta}<br><small>({self.object.prestacao_conta.loa})</small>"""
+            context["title"] = title.replace("\n", "")
             return context
 
-        def hook_registro_ajuste(self, obj, verbose_name='', field_display=''):
+        def hook_registro_ajuste(self, obj, verbose_name="", field_display=""):
             if not obj.registro_ajuste:
-                return '', ''
+                return "", ""
             url = reverse_lazy(
-                'cmj.loa:registroajusteloa_detail',
-                kwargs={'pk': obj.registro_ajuste.id})
-            field_display = f'{obj.registro_ajuste.oficio_ajuste_loa.epigrafe} - R$ {obj.registro_ajuste.str_valor}'
-            field_display = f'<a href="{url}">{field_display}</a> - {obj.registro_ajuste.descricao}'
-            return 'Registro de Ajuste Técnico Vinculado', field_display
+                "cmj.loa:registroajusteloa_detail",
+                kwargs={"pk": obj.registro_ajuste.id},
+            )
+            field_display = f"{obj.registro_ajuste.oficio_ajuste_loa.epigrafe} - R$ {obj.registro_ajuste.str_valor}"
+            field_display = (
+                f'<a href="{url}">{field_display}</a> - {obj.registro_ajuste.descricao}'
+            )
+            return "Registro de Ajuste Técnico Vinculado", field_display
 
-        def hook_prestacao_conta_data_envio(self, obj, verbose_name='', field_display=''):
+        def hook_prestacao_conta_data_envio(
+            self, obj, verbose_name="", field_display=""
+        ):
             url = reverse_lazy(
-                'cmj.loa:prestacaocontaloa_detail',
-                kwargs={'pk': obj.prestacao_conta.id})
-            field_display = f'''<a href="{url}">
+                "cmj.loa:prestacaocontaloa_detail",
+                kwargs={"pk": obj.prestacao_conta.id},
+            )
+            field_display = f"""<a href="{url}">
             {obj.prestacao_conta.data_envio}
-            </a>'''
-            return 'Data de Envio da Prestação de Contas', field_display
+            </a>"""
+            return "Data de Envio da Prestação de Contas", field_display
 
-        def hook_prestacao_conta(self, obj, verbose_name='', field_display=''):
-            data_envio = formats.date_format(obj.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")
+        def hook_prestacao_conta(self, obj, verbose_name="", field_display=""):
+            data_envio = formats.date_format(
+                obj.prestacao_conta.data_envio, "SHORT_DATE_FORMAT"
+            )
             url = reverse_lazy(
-                'cmj.loa:prestacaocontaloa_detail',
-                kwargs={'pk': obj.prestacao_conta.id})
-            field_display = f'''<a href="{url}">
+                "cmj.loa:prestacaocontaloa_detail",
+                kwargs={"pk": obj.prestacao_conta.id},
+            )
+            field_display = f"""<a href="{url}">
             {data_envio} - {obj.prestacao_conta}
-            </a>'''
-            return 'Este Registro Pertence à Prestação de Contas', field_display
+            </a>"""
+            return "Este Registro Pertence à Prestação de Contas", field_display
 
-        def hook_arquivoprestacaocontaregistro_set(self, obj, verbose_name='', field_display=''):
+        def hook_arquivoprestacaocontaregistro_set(
+            self, obj, verbose_name="", field_display=""
+        ):
             arquivos = []
 
-            qs_arquivos = obj.arquivoprestacaocontaregistro_set.order_by('-id')
+            qs_arquivos = obj.arquivoprestacaocontaregistro_set.order_by("-id")
             for arquivo in qs_arquivos:
-                arq_template = f'''
+                arq_template = f"""
                     <a class="d-flex align-items-center" href="{arquivo.arquivo.url}">
                         <i class="far fa-2x fa-file-pdf"></i>
                         <span class="pb-3">{arquivo.descricao}</span>
                     </a>
-                '''
-                arquivos.append(
-                    f'<tr><td>{arq_template}</td></tr>'
-                )
+                """
+                arquivos.append(f"<tr><td>{arq_template}</td></tr>")
 
-            return 'Arquivos deste Registro de Prestação de Contas', f'''
+            return (
+                "Arquivos deste Registro de Prestação de Contas",
+                f"""
                 <div class="container-table m-0 mx-n3">
                     <table class="table table-form table-bordered table-hover w-100">
                         {"".join(arquivos)}
                     </table>
                 </div>
-                '''
+                """,
+            )
 
     class DeleteView(MasterDetailCrud.DeleteView):
 
         def get_success_url(self):
             if self.object.registro_ajuste:
                 return reverse_lazy(
-                    'cmj.loa:registroajusteloa_detail',
-                    kwargs={'pk': self.object.registro_ajuste.id})
+                    "cmj.loa:registroajusteloa_detail",
+                    kwargs={"pk": self.object.registro_ajuste.id},
+                )
             elif self.object.emendaloa:
                 return reverse_lazy(
-                    'cmj.loa:emendaloa_detail',
-                    kwargs={'pk': self.object.emendaloa.id})
+                    "cmj.loa:emendaloa_detail", kwargs={"pk": self.object.emendaloa.id}
+                )
             else:
                 return reverse_lazy(
-                    'cmj.loa:prestacaocontaloa_detail',
-                    kwargs={'pk': self.object.prestacao_conta.id})
+                    "cmj.loa:prestacaocontaloa_detail",
+                    kwargs={"pk": self.object.prestacao_conta.id},
+                )
 
 
 class PrestacaoContaLoaCrud(MasterDetailCrud):
     model = PrestacaoContaLoa
-    parent_field = 'loa'
-    model_set = 'prestacaocontaregistro_set'
+    parent_field = "loa"
+    model_set = "prestacaocontaregistro_set"
     public = [RP_LIST, RP_DETAIL]
     frontend = PrestacaoContaLoa._meta.app_label
 
     class ListView(MasterDetailCrud.ListView):
-        ordering = '-data_envio'
+        ordering = "-data_envio"
         paginate_by = 25
 
         def get(self, request, *args, **kwargs):
-            if not request.user.has_perm('cmj.loa.add_prestacaocontaloa'):
-                self.template_name = 'loa/prestacaocontaloa_list_public.html'
+            if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
+                self.template_name = "loa/prestacaocontaloa_list_public.html"
             return super().get(request, *args, **kwargs)
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} prestacaocontaloa-list'
+            path = context.get("path", "")
+            context["path"] = f"{path} prestacaocontaloa-list"
             return context
 
     class CreateView(MasterDetailCrud.CreateView):
@@ -2531,102 +2871,120 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             return self.update_url
 
     class UpdateView(MasterDetailCrud.UpdateView):
-        layout_key = 'PrestacaoContaLoaUpdate'
+        layout_key = "PrestacaoContaLoaUpdate"
         form_class = PrestacaoContaLoaForm
 
     class DetailView(MasterDetailCrud.DetailView):
-        layout_key = 'PrestacaoContaLoaDetail'
-        template_name = 'loa/prestacaocontaloa_detail.html'
+        layout_key = "PrestacaoContaLoaDetail"
+        template_name = "loa/prestacaocontaloa_detail.html"
         paginate_by = 100
 
         @property
         def list_field_names_set(self):
-            return  'emendaloa_registro_ajuste', 'descricao',  'situacao', 'detalhamento' #
+            return (
+                "emendaloa_registro_ajuste",
+                "descricao",
+                "situacao",
+                "detalhamento",
+            )  #
 
         def get_queryset(self):
-            qs = super().get_queryset().order_by(
-                'situacao',
-                'emendaloa__materia__numero',
-                'registro_ajuste__oficio_ajuste_loa__epigrafe',
+            qs = (
+                super()
+                .get_queryset()
+                .order_by(
+                    "situacao",
+                    "emendaloa__materia__numero",
+                    "registro_ajuste__oficio_ajuste_loa__epigrafe",
                 )
+            )
             return qs
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            path = context.get('path', '')
-            context['path'] = f'{path} prestacaocontaloa-detail'
-            title = f'''{self.object}<br><small>({self.object.loa})</small>'''
-            context['title'] = title.replace('\n', '')
+            path = context.get("path", "")
+            context["path"] = f"{path} prestacaocontaloa-detail"
+            title = f"""{self.object}<br><small>({self.object.loa})</small>"""
+            context["title"] = title.replace("\n", "")
             return context
 
         def hook_header_descricao(self):
-            return 'Itens da Prestação de Contas'
+            return "Itens da Prestação de Contas"
 
-        def hook_descricao(self, obj, verbose_name='', field_display=''):
+        def hook_descricao(self, obj, verbose_name="", field_display=""):
             descricao = []
             if obj.emendaloa:
-                descricao.append(f'{obj.emendaloa}')
+                descricao.append(f"{obj.emendaloa}")
             if obj.registro_ajuste:
-                descricao.append(f'R$ {obj.registro_ajuste.str_valor} - {obj.registro_ajuste.descricao}')
+                descricao.append(
+                    f"R$ {obj.registro_ajuste.str_valor} - {obj.registro_ajuste.descricao}"
+                )
             # add link para descrição
             url = reverse_lazy(
-                'cmj.loa:prestacaocontaregistro_detail',
-                kwargs={'pk': obj.id})
+                "cmj.loa:prestacaocontaregistro_detail", kwargs={"pk": obj.id}
+            )
             return verbose_name, f'<a href="{url}">{"<br>".join(descricao)}</a>'
 
-
         def hook_header_emendaloa_registro_ajuste(self):
-            return 'Emenda Impositiva / Registro de Ajuste Técnico'
+            return "Emenda Impositiva / Registro de Ajuste Técnico"
 
-        def hook_emendaloa_registro_ajuste(self, obj, verbose_name='', field_display=''):
+        def hook_emendaloa_registro_ajuste(
+            self, obj, verbose_name="", field_display=""
+        ):
             links = []
 
             if obj.emendaloa:
                 url_emenda = reverse_lazy(
-                    'cmj.loa:emendaloa_detail',
-                    kwargs={'pk': obj.emendaloa.id})
-                links.append(f'''
+                    "cmj.loa:emendaloa_detail", kwargs={"pk": obj.emendaloa.id}
+                )
+                links.append(
+                    f"""
                     <a href="{url_emenda}">
                         {obj.emendaloa.materia.epigrafe_short}
                     </a>
-                ''')
+                """
+                )
 
             if obj.registro_ajuste:
                 url_ajuste = reverse_lazy(
-                    'cmj.loa:registroajusteloa_detail',
-                    kwargs={'pk': obj.registro_ajuste.id})
-                links.append(f'''
+                    "cmj.loa:registroajusteloa_detail",
+                    kwargs={"pk": obj.registro_ajuste.id},
+                )
+                links.append(
+                    f"""
                     <a href="{url_ajuste}">
                         {obj.registro_ajuste.oficio_ajuste_loa.epigrafe}
                     </a>
-                ''')
+                """
+                )
 
-            return verbose_name, '<br>'.join(links)
+            return verbose_name, "<br>".join(links)
 
-        def hook_arquivoprestacaocontaloa_set(self, obj, verbose_name='', field_display=''):
+        def hook_arquivoprestacaocontaloa_set(
+            self, obj, verbose_name="", field_display=""
+        ):
             arquivos = []
 
-            qs_arquivos = obj.arquivoprestacaocontaloa_set.order_by('-id')
+            qs_arquivos = obj.arquivoprestacaocontaloa_set.order_by("-id")
             for arquivo in qs_arquivos:
-                arq_template = f'''
+                arq_template = f"""
                     <a class="d-flex align-items-center" href="{arquivo.arquivo.url}">
                         <i class="far fa-2x fa-file-pdf"></i>
                         <span class="p-2">{arquivo.descricao}</span>
                     </a>
-                '''
-                arquivos.append(
-                    f'<tr><td>{arq_template}</td></tr>'
-                )
+                """
+                arquivos.append(f"<tr><td>{arq_template}</td></tr>")
 
-            return 'Arquivos da Prestação de Contas', f'''
+            return (
+                "Arquivos da Prestação de Contas",
+                f"""
                 <div class="container-table m-0 mx-n3">
                     <table class="table table-form table-bordered table-hover w-100">
                         {"".join(arquivos)}
                     </table>
                 </div>
-                '''
-
-
+                """,
+            )
 
 
 class EntidadeCrud(CrudAux):
@@ -2635,26 +2993,27 @@ class EntidadeCrud(CrudAux):
     frontend = Entidade._meta.app_label
 
     class BaseMixin(CrudAux.BaseMixin):
-        list_field_names = [
-            'nome_fantasia', ('cnes', 'cpfcnpj'), 'ativo'
-        ]
+        list_field_names = ["nome_fantasia", ("cnes", "cpfcnpj"), "ativo"]
 
     class DetailView(CrudAux.DetailView):
-        layout_key = 'EntidadeDetail'
+        layout_key = "EntidadeDetail"
 
-        def hook_metadata__import_fields(self, obj, verbose_name='', field_display=''):
+        def hook_metadata__import_fields(self, obj, verbose_name="", field_display=""):
 
-            import_fields = obj.metadata.get('import_fields', {})
+            import_fields = obj.metadata.get("import_fields", {})
 
             if not import_fields:
-                return verbose_name, 'Nenhum campo de importação definido.'
+                return verbose_name, "Nenhum campo de importação definido."
 
             lines = []
             for k, v in import_fields.items():
                 if v:
-                    lines.append(f'<li><strong>{k}:</strong> {v}</li>')
+                    lines.append(f"<li><strong>{k}:</strong> {v}</li>")
 
-            return _('Dados importados da base do CNES'), f'<ul class="monospace">{"".join(lines)}</ul>'
+            return (
+                _("Dados importados da base do CNES"),
+                f'<ul class="monospace">{"".join(lines)}</ul>',
+            )
 
     class ListView(CrudAux.ListView):
-        ordering = ('-ativo', 'nome_fantasia')
+        ordering = ("-ativo", "nome_fantasia")
