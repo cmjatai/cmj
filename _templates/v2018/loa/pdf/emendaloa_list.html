@@ -85,6 +85,7 @@
 
       {% if group.agrupamento and group.sub_total_agrupado != group.sub_total_emendas and tipo_agrupamento != 'sem_registro'%}
         <small><small><em>As somas podem ser diferentes nos dois subtotais se a emenda recebe/destina recursos para mais de um agrupamento.</em></small></small>
+        <br>
       {% endif %}
       {% if group.agrupamento and group.sub_total_agrupado != group.movimentacao_valores and tipo_agrupamento != 'sem_registro'%}
         <hr>
