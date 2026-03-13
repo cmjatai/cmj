@@ -224,7 +224,9 @@ export default {
       const params = {
         materia: materiaId,
         get_all: 'True',
-        expand: 'unidade_tramitacao_destino;status'
+        expand: 'unidade_tramitacao_destino;status',
+        include: 'status.id,__str__;unidade_tramitacao_destino.id,__str__'
+
       }
       this.utils
         .fetch({
@@ -259,7 +261,7 @@ export default {
         const params_emendas = {
           loa: this.loa.id,
           o: '-tipo,fase,materia__tipo__sigla,materia__numero',
-          exclude: 'search;parlamentares.metadata',
+          exclude: 'search;metadata',
           include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
           expand: 'parlamentares;unidade;materia;entidade',
           get_all: 'True',
@@ -350,7 +352,9 @@ export default {
           model: 'loa',
           id: t.loa.id,
           params: {
-            expand: 'parlamentares'
+            expand: 'parlamentares',
+            include: 'parlamentares.id,nome_parlamentar'
+
           }
         })
         .then((response) => {
