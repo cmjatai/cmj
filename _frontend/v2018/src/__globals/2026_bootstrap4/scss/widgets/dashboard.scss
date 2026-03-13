@@ -39,25 +39,4 @@
     margin: 0;
     line-height: 1;
   }
-
-}
-
-.visually-hidden {
-  display: none;
-}
-
-.flex-row {
-  justify-content: space-between;
-  align-items: stretch;
-}
-
-.card-header {
-  .dropdown {
-    &:hover {
-      .dropdown-menu {
-        display: block;
-        margin: 0
-      }
-    }
-  }
 }

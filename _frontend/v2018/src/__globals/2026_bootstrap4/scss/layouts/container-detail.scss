@@ -1,0 +1,41 @@
+.container-detail {
+  .item-listas {
+    a {
+      text-decoration: none;
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+    padding-bottom: 15px;
+    .item-raiz {
+      padding-top: 15px;
+    }
+  }
+  .childs {
+    padding: 10px;
+  }
+  .item-node {
+    padding: 15px;
+    line-height: 1.15;
+    margin-bottom: 10px;
+    .item-listas {
+      padding-bottom: 0;
+    }
+  }
+}
+
+@media screen and (max-width: 767.98px)  {
+  .container-detail {
+    .item-listas {
+      line-height: 1.15;
+      .item-node {
+        padding-top: 20px;
+        .parent-right {
+          top: 10px;
+          left: auto;
+          right: 0;
+        }
+      }
+    }
+  }
+}

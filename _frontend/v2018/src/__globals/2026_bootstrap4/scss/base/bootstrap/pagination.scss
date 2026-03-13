@@ -1,0 +1,47 @@
+.nav-pagination {
+  position: sticky;
+  z-index: $zindex-pagination;
+  margin-top: 15px;
+  padding: 15px 0;
+
+  bottom: 0;
+  background: linear-gradient(to bottom, #fff0, #ffff);
+  left: 0;
+  right: 0;
+
+  &.pagination-sticky {
+    position: sticky;
+  }
+
+  &.pagination-static {
+    position: static;
+  }
+
+  .pagination {
+    margin-bottom: 0;
+  }
+}
+
+
+@media screen and (max-width: 575.98px) {
+  .nav-pagination {
+    .pagination {
+      display: flex;
+      li {
+        flex: 1 1 8.333%;
+      }
+      a {
+        padding: 0.5em 5px;
+        text-align: center;
+      }
+    }
+  }
+}
+
+@media screen and (min-width: 576px) {
+  .nav-pagination {
+    left: auto;
+    top: 90px;
+  }
+}
+

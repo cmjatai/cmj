@@ -1,5 +1,5 @@
 .breadcrumb {
-
+  background: darken($color_main_bg, 10%) $url_bg_png;
   border-radius: 0;
   margin: 0rem;
   padding: 0rem 0.25rem;
@@ -13,7 +13,6 @@
     display: none;
     position: absolute;
     list-style: none;
-    background: darken($color_main_bg, 10%) $url_bg_png;
     left: 1rem;
     padding: 0px;
     min-width: 120%;
@@ -57,7 +56,6 @@
       }
     }
   }
-
 }
 
 @media screen and (max-width: 991.98px) {

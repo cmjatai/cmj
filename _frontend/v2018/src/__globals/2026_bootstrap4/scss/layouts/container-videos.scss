@@ -1,7 +1,4 @@
 .container-videos {
-  //margin: 0;
-  //padding: 0;
-
   .video-list {
     .card-image,
     .inner-imagem {
@@ -238,25 +235,6 @@
   }
 }
 
-@media (min-width: 992px) and (max-width: 1199px) {
-
-  .container-videos {
-    &.portlet-aovivo {
-      .container {
-        //width: 100%;
-      }
-    }
-  }
-}
-
-@media screen and (max-width: 991.98px) {
-  .container-videos {
-    &.pagina-inicial {
-      .video-list {
-      }
-    }
-  }
-}
 
 @media screen and (max-width: 767.98px) {
   .container-videos {

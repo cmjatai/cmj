@@ -1,0 +1,32 @@
+.page-preview {
+  .preview {
+    display: none;
+    position: absolute;
+    top: -15px;
+    right: 15px;
+    left: 63px;
+    min-height: 70vh;
+    max-height: none;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    background-color: #fff;
+    overflow: auto;
+    z-index: 99999;
+    margin-bottom: 2em;
+    span {
+      position: absolute;
+      z-index: -1;
+      top: 0;
+      left: 0;
+    }
+    img {
+      z-index: 1;
+    }
+  }
+
+  &:hover {
+    .preview {
+      display: block;
+    }
+  }
+}
+

@@ -1,0 +1,56 @@
+@import "~bootstrap-select/sass/bootstrap-select";
+
+.bootstrap-select {
+  width: 100% !important;
+  border: 0;
+  padding: 0;
+  .dropdown-header  {
+    padding: 0 0.5em;
+    line-height: 3em;
+  }
+  .dropdown-menu {
+    z-index: $zindex-selectbox;
+    li {
+      a.opt {
+        padding-left: 1em;
+      }
+    }
+  }
+  .btn {
+      border: 1px solid $color_border_input;
+      background-color: white;
+      padding: 0.375rem 0.75rem;
+      color: rgba($color_text_link, 0.9);
+  }
+  .bs-actionsbox {
+    padding-top: 0 ;
+    padding-bottom: 0;
+
+    border-bottom: 1px solid #4444;
+    .bs-select-all, .bs-deselect-all {
+      border: 0;
+    }
+  }
+  .container-search button {
+    padding: 0;
+  }
+}
+
+@media screen and (max-width: 575.98px) {
+  .bootstrap-select {
+    position: relative;
+    width: 100%;
+    .dropdown-menu {
+      margin-left: -0.5rem;
+      margin-right: -0.5rem;
+      right: 0;
+      li {
+        a.opt {
+          padding-left: 0.3rem;
+          padding-right: 2rem;
+          white-space: wrap;
+        }
+      }
+    }
+  }
+}

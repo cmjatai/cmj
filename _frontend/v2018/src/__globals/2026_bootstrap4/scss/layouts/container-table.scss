@@ -1,5 +1,5 @@
 .container-table {
-  // margin: 0 $grid-gutter-width * -0.5;
+  margin: $grid-gutter-width * -0.5;
   .result-count {
     display: inline-block;
     background-color: $bg_color_table_base;
@@ -7,5 +7,136 @@
     padding: 3px 15px 0;
     margin-left: 15px;
     border-radius: 5px 5px 0 0;
+  }
+
+  .item-listas {
+    position: relative;
+    margin: 15px 0;
+    background-color: white;
+    border-radius: 5px;;
+    .verbose_name {
+      margin-top: -5px;
+      font-size: 1em;
+      color: #0006;
+    }
+    .item-titulo {
+      font-size: 120%;
+      padding-right: 0.5em;
+    }
+
+    .childs {
+      .text-ementa {
+        font-size: 110%;
+        color: $color_text_descricao !important;
+      }
+      .link-texto {
+        padding: 6px 9px;
+        line-height: 1;
+        margin: 3px 15px 0 0 ;
+        .fa-2x {
+          font-size: 1.5em;
+        }
+      }
+    }
+    .item-raiz {
+      &.anexador {
+        font-size: 75%;
+      }
+    }
+
+    .item-node {
+      position: relative;
+      border-left: 2px solid #fff0;
+
+      &:hover {
+        background-color: rgba(#fff, 0.5);
+        border-left-color: #ccc;
+      }
+      .item-node {
+        &:hover {
+          background-color: rgba(#fff, 0.8);
+        }
+      }
+      .item-titulo {
+        color:#004499;
+      }
+    }
+
+    .parent, .parent-right {
+      position: absolute;
+      font-size: 0.7em;
+      color: #0005;
+      top: 1px;
+      left: 2px;
+      line-height: 1;
+      cursor:help;
+      &:hover {
+        color: #05f;
+      }
+    }
+    .parent-right {
+      left: auto;
+      right: 2px;
+    }
+
+    .col-md-auto {
+      display: flex;
+      padding-right: 0;
+    }
+  }
+
+  .item-listas {
+    // border-top: 1px solid white;
+    page-break-inside: avoid;
+    &:last-child {
+      border-bottom: 1px solid white;
+    }
+    &:hover {
+      background-color: rgba(#fff, 0.5);
+    }
+  }
+
+  .item-raiz {
+    padding: 10px 0 0 10px;
+    margin-bottom: 10px;
+  }
+  .item-node {
+    padding: 15px;// 0px 11px 15px;
+    margin: 11px;//0 11px 18px;
+  }
+
+  .link-texto {
+    margin: 1rem 1rem 1rem 0.1rem;
+  }
+}
+
+@media screen and (max-width: 767.98px)  {
+  .container-table {
+    .result-count {
+      font-size: 80%;
+    }
+    .item-listas {
+      line-height: 1.15;
+      font-size: 90%;
+      .col-md-auto {
+        padding-right: 15px;
+        padding-bottom: 15px;
+      }
+      .item-node {
+        padding: 20px 0px 10px 10px;
+        margin: 5px 0 5px 10px;
+        .parent-right {
+          top: 10px;
+          left: auto;
+          right: 0;
+        }
+        .link-texto {
+          margin: 0px 10px 0 0px;
+          .preview {
+            left: 65px
+          }
+        }
+      }
+    }
   }
 }

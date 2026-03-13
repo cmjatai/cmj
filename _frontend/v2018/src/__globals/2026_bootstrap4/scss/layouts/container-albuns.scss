@@ -1,0 +1,142 @@
+@use "sass:math";
+
+.container-albuns {
+  margin-top: 10px;
+  .row > div {
+    padding: 0 10px 20px 10px;
+
+  }
+  .album-item-list {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 2px 2px 4px #c8cac8;
+    .show-image {
+      height: 250px;
+    }
+    .image {
+      transition: all 0.4s ease;
+      height: 100%;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: 50% center;
+      opacity: 0.7;
+    }
+    .show-descricao{
+      display: none;
+    }
+    .show-texto {
+      position: absolute;
+      padding: $grid-gutter-width * 0.75;
+      bottom: 0px;
+      color: white;
+      text-shadow: 0 1px 1px #000;
+      line-height: 1.2;
+      font-size: 90%;
+      font-weight: bold;
+      small {
+        display: block;
+      }
+    }
+    .show-contexto {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: 0;
+      background: linear-gradient(0deg, rgba(0, 0, 0, 0.9) 0px, transparent 40%, transparent);
+      transition: top 0.15s ease-in-out;
+      .btn-actions {
+        height: 0px;
+        overflow: hidden;
+        transition: height 0.15s ease-in-out;
+        text-align: right;
+        position: absolute;
+        bottom: $grid-gutter-width;
+        right: $grid-gutter-width;
+        background: transparent;
+        left: 0;
+        a {
+          display: inline-block;
+          left: auto;
+          color: rgba(#fff, 0.7);
+          &:hover {
+            color: white;
+          }
+        }
+      }
+      a {
+        display: inline-block;
+      }
+      &:hover {
+        transition: top 0.15s ease-in-out;
+        top: -30%;
+        .show-texto {
+          line-height: 1.5;
+          bottom: 10px;
+          transition: all 0.15s ease-in-out;
+        }
+        .btn-actions {
+          height: 28px;
+          transition: height 0.15s ease-in-out;
+        }
+      }
+    }
+
+    &:hover {
+      .image {
+        transition: all 0.4s ease;
+        opacity: 1;
+        transform: scale(1.15);
+      }
+    }
+  }
+  .albuns-show-gallery {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 9000;
+    .container-gallery {
+      margin: 0;
+    }
+    .btn-close {
+      color: rgba(#fff, 0.7);
+      position: absolute;
+      right: 0;
+      top: 0;
+      z-index: 1;
+      display: inline-block;
+      cursor: pointer;
+      line-height: 1em;
+      padding: 10px;
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+  .show-image {
+    .navbar-social-links a i {
+      color:white;
+      text-shadow: 0 0 15px rgba(#000, 0.5);
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .container-albuns {
+    .album-item-list {
+      .show-image {
+        height: 200px;
+      }
+      .show-contexto {
+        .show-texto {
+          font-size: 80%;
+        }
+        .show-autor {
+          font-size: 50%
+        }
+      }
+    }
+  }
+}

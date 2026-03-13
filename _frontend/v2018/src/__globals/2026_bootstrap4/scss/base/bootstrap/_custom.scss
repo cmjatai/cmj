@@ -1,0 +1,35 @@
+
+@import './header.scss';
+
+@import './mixins.scss';
+@import './colors.scss';
+
+@import './alert.scss';
+@import './breadcrumb.scss';
+@import './btn.scss';
+@import './carousel-custom.scss';
+@import './forms.scss';
+@import './pagination.scss';
+@import './tables.scss';
+
+@import './bootstrap-select.scss';
+
+.card-header {
+  .dropdown {
+    &:hover {
+      .dropdown-menu {
+        display: block;
+        margin: 0;
+      }
+    }
+  }
+}
+
+.flex-row {
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.visually-hidden {
+  display: none;
+}

@@ -1,0 +1,72 @@
+.container-segmentos {
+  display: flex;
+  flex-direction: row;
+  justify-content: stretch;
+  align-items: stretch;
+
+  .btn-segmentos {
+    background: darken($bg_color_thematic, 10%) $url_bg_png;
+    flex: 1 1 25%;
+    font-size: 1.4rem;
+    line-height: 1;
+    align-items: center;
+    display: flex;
+    justify-content: flex-start;
+    margin: 0 1px;
+
+    &:first-child, &:last-child {
+      background-color: #00a65a;
+    }
+
+    span {
+      font-family: "Rubik";
+      font-variant: small-caps;
+      font-weight: 400;
+      color: $text_color_thematic;
+    }
+    &:hover {
+      text-decoration: none;
+      background: darken($color_main_bg, 70%) $url_bg_png;
+    }
+
+    i {
+      flex: 0 0 auto;
+      color: $text_color_thematic;
+      width: 3.5rem;
+      height: 3.5rem;
+      text-align: center;
+      border: 3px solid transparentize($text_color_thematic, 0.4);
+      border-radius: 50%;
+      line-height: 3.3rem;
+      margin: 5px 10px;
+    }
+  }
+}
+
+
+@media screen and (max-width: 1399.98px)  {
+  .container-segmentos {
+    .btn-segmentos {
+      font-size: 1.2rem;
+      font-weight: 400;
+    }
+  }
+}
+@media screen and (max-width: 991.98px)  {
+  .container-segmentos {
+    flex-direction: column;
+    .btn-segmentos {
+      justify-content: left;
+      margin: 1px 0;
+    }
+  }
+}
+
+
+@media screen and (max-width: 767.98px)  {
+  .container-segmentos {
+    flex-direction: column;
+    .btn-segmentos {
+    }
+  }
+}

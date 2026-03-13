@@ -4,7 +4,7 @@ body, html {
 }
 
 body {
-  background: $color_main_bg;
+  background: $color_main_bg $url_bg_png;
   &.body-print {
     background: #fff;
     #wrapper {

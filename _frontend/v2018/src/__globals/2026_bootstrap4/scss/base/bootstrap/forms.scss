@@ -95,4 +95,24 @@ form {
     margin: 0;
     padding-left: $grid-gutter-width * 1.2;
   }
+  .link-texto {
+    line-height: 1.15;
+  }
 }
+
+.form-control {
+  border: 1px solid $color_border_input;
+}
+
+.form-compact, .grid-compact {
+  .row {
+    margin: 0 -0.5rem;
+  }
+  div[class^="col-"] {
+    padding: 0 0.5rem;
+  }
+  label {
+    margin: 0;
+  }
+}
+

@@ -5,8 +5,10 @@
 {% block container_table_list %}
   <div class="container-table">
     <div class="result-count">{% blocktrans with verbose_name_plural=view.verbose_name_plural %}Total de {{ verbose_name_plural }}: <strong>{{count}}</strong>{% endblocktrans %}</div>
-    <table class="table table-striped table-hover table-link-ordering">
-      {% include 'materia/tramitacao_list_container.html' %}
-    </table>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover table-link-ordering">
+        {% include 'materia/tramitacao_list_container.html' %}
+      </table>
+    </div>
   </div>
 {% endblock container_table_list %}

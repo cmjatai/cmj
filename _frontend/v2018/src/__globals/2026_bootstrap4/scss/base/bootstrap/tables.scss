@@ -3,6 +3,9 @@
 }
 
 .table {
+    margin: 0;
+    border-radius: 5px;
+    overflow: hidden;
     th, td {
         vertical-align: middle;
     }

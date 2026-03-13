@@ -125,72 +125,11 @@
       {% endfor %}
 
       {% include "paginacao.html" %}
-
     </div>
   {% endif %}
-
-    {% comment %}
-
-    <br><br><br>
-
-    <div class="container container-sessao_old">
-      <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
-        <div class="row sessao-list align-items-stretch">
-        {% for s in page_obj %}
-            <div class="item col-12 col-lg-4 col-md-6" >
-              <div class="card">
-                {% if s.url_video %}
-                  <div class="card-image">
-                    <a href="{% url 'sapl.sessao:sessaoplenaria_detail' s.id %}" style="background-image: url({{s.videoparte.video.json.snippet.thumbnails.high.url}})">
-                      <i class="fa fa-play" aria-hidden="true"></i>
-                        {% if s.videoparte.video.json.contentDetails.duration %}
-                          <span class="duration">
-                          {{ s.videoparte.video.json|video_duration }}
-                          </span>
-                        {% endif %}
-                    </a>
-                  </div>
-                {% endif %}
-                <div class="card-body">
-                  <div class="card-title">
-                    <a href="{% url 'sapl.sessao:resumo' s.id %}">{{s}}</a>
-                  </div>
-                  <div class="card-text">
-                    <strong>Abertura:</strong> {{s.data_inicio}}</br>
-                    <strong>Legislatura:</strong> {{s.legislatura}}</br>
-                    <strong>Sessão Legislativa:</strong> {{s.sessao_legislativa}}</br>
-                    <strong>Tipo:</strong> {{s.tipo}}</br>
-                  </div>
-                  <div class="d-flex justify-content-around align-items-center">
-
-                    {% if s.upload_pauta and not s.upload_ata %}
-                      <a class="btn btn-link" href="{{s.upload_pauta.url}}">Pauta da {{s.tipo}}</a>
-                    {% endif %}
-                    {% if s.finalizada %}
-                      <a clas="btn btn-link" href="{% url 'sapl.sessao:resumo_ata' s.id %}">
-                        <strong>
-                          Ata Eletrônica
-                        </strong>
-                      </a>
-                    {% endif %}
-                    {% if s.upload_ata %}
-                      <a class="btn btn-primary" href="{{s.upload_ata.url}}">Ata Aprovada</a>
-                    {% endif %}
-                  </div>
-                </div>
-              </div>
-            </div>
-        {% empty  %}
-          <h3>Nenhuma Sessão Plenária encontrada com essas especificações</h3>
-        {% endfor %}
-      </div>
-    </div>
-    {% endcomment %}
 {% endblock table_content %}
 
-
 {% block extra_js %}
-
 <script type="text/javascript">
   var querystring = "{{filter_url|safe}}"
 

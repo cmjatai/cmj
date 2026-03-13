@@ -2,10 +2,26 @@
 
 .container-box {
   margin: 0 auto $grid-gutter-width;
-  background: $color_box_bg;
+  // background: $color_box_bg;
   padding-bottom: $grid-gutter-width * 0.5;
   position: relative;
   border-radius: 5px;
+
+  .box-area-trabalho {
+    display: inline-block;
+    position: absolute;
+    right: $grid-gutter-width * 0.5;
+    margin-top: math.div($grid-gutter-width, -3);
+    a {
+      border: 1px solid darken($color_main_bg, 1%);
+      font-family: Lato;
+      font-size: 1em;
+      line-height: 1;
+      background: darken($color_main_bg, 40%) $url_bg_png;
+      color: #fff;
+      padding: 3px $grid-gutter-width * 0.5;
+    }
+  }
 
   .page-header {
     padding: $grid-gutter-width * 0.5 $grid-gutter-width * 0.5 $grid-gutter-width * 0.3;
@@ -30,4 +46,41 @@
     margin: 0px;
   }
 
+  .legend, legend {
+    clear:both;
+    display: block;
+    width: 100%;
+    padding: 0;
+    font-size: ($font-size-base * 1.5);
+    line-height: 1;
+    color: #444;
+    border: 0;
+    border-bottom: 1px solid #ddd;
+    font-weight: normal;
+    font-family: "SourceSansProSemiBold", Helvetica, Arial, sans-serif;
+    small {
+      color: #777;
+      margin-left: 1em;
+      font-size: 0.55em;
+    }
+  }
+
+}
+
+@media print {
+  .container-box {
+    .page-header {
+      a {
+        display: none;
+      }
+    }
+    .file-documentoadministrativo {
+      .link-texto, .text-ementa {
+        display: none;
+      }
+    }
+    .pt-4 {
+      padding: 0;
+    }
+  }
 }
