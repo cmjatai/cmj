@@ -1226,6 +1226,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 "title": title,
                 "filters": "<br>".join(filters),
                 "groups": [],
+                'quebrar_pagina': cd.get('quebrar_pagina', False),
             }
 
             def render_col_emenda(item):
@@ -1272,6 +1273,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 return col_emenda
 
             total = Decimal("0.00")
+            self.object_list = self.object_list.order_by("materia__numero")
             if not cd.get("agrupamento", []):
 
                 if not self.object_list.exists():
@@ -1333,6 +1335,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     agrupamento.append(agrupamento1[i])
                     agrupamento.append(agrupamento2[i])
 
+
+
                 # agrupamento terá itens strings como:
                 # ['despesa__programa__codigo', 'despesa__unidade__codigo']
                 # desmembre todos de modo que resulte: 'despesa', 'despesa__programa', 'despesa__programa__codigo'
@@ -1355,6 +1359,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     via = "<br>* Agrupado  - Via dotações de dedução."
                 else:
                     via = "<br>* Agrupado  - Via Entidades / Unidade Orçamentária."
+
                 context["title"] = context["title"].format(f"{via}")
 
                 groups = OrderedDict()
@@ -1428,7 +1433,14 @@ class EmendaLoaCrud(MasterDetailCrud):
                         groups[key]["emendas"][emenda.id] = emenda
                         groups[key]["soma_valor"] += emenda.valor
 
-                for key, cd_group in groups.items():
+                keys = list(groups.keys())
+                keys.sort(key=lambda x: x[::-1])
+                groups_completo = {key: groups[key] for key in keys if key[-1]}
+                groups_completo.update(
+                    {key: groups[key] for key in keys if not key[-1]}
+                )
+
+                for key, cd_group in groups_completo.items():
                     title_parts = []
                     for i in range(0, len(agrupamento), 2):
                         part = key[i]
@@ -1470,6 +1482,13 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                     movimentacao_valores = Decimal("0.00")
                     rows = []
+                    cd_group["emendas"] = dict(
+                        sorted(
+                            cd_group["emendas"].items(),
+                            key=lambda x: x[1].materia.numero if x[1].materia and x[1].materia.numero else 0,
+                            
+                        )
+                    )
                     for item in cd_group["emendas"].values():
                         cols = []
                         rows.append(cols)
@@ -1531,7 +1550,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     ) or Decimal("0.00")
 
                     params = dict(zip(agrupamento, key))
-                    params.pop("entidade")
+                    params.pop("entidade", None)
                     agrupset = list(
                         set(agrupamento)
                         - set(

@@ -122,7 +122,8 @@ export default class EmendaLoaList {
           sAgrup.filter('[value="despesa__unidade"], [value="entidade"]').prop('disabled', false).parent().removeClass('d-none')
           sAgrup.filter('[value="despesa__unidade"]').prop('checked', true)
         } else if (event.target.checked) {
-          sAgrup.prop('disabled', false).parent().removeClass('d-none')
+          sAgrup.not('[value="entidade"]').prop('disabled', false).parent().removeClass('d-none')
+          sAgrup.filter('[value="entidade"]').prop('disabled', true).prop('checked', false).parent().addClass('d-none')
           if (sAgrup.filter(':checked').length === 0) {
             if (sAgrup.length > 1) {
               $(sAgrup[1]).prop('checked', true)
@@ -131,7 +132,8 @@ export default class EmendaLoaList {
             }
           }
         } else {
-          sAgrup.prop('disabled', false).parent().removeClass('d-none')
+          sAgrup.not('[value="entidade"]').prop('disabled', false).parent().removeClass('d-none')
+          sAgrup.filter('[value="entidade"]').prop('disabled', true).prop('checked', false).parent().addClass('d-none')
         }
       }).change()
 

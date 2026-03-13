@@ -17,6 +17,7 @@ from django.template.base import Template
 from django.template.context import Context
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from django_filters import BooleanFilter
 from django_filters.filters import (
     CharFilter,
     ChoiceFilter,
@@ -1160,6 +1161,12 @@ class EmendaLoaFilterSet(FilterSet):
         method="filter_finalidade",
     )
 
+    quebrar_pagina = BooleanFilter(
+        label="Quebrar página a cada mudança de agrupamento",
+        widget=forms.CheckboxInput(attrs={"class": "small"}),
+        method="filter_quebrar_pagina",
+    )
+
     class Meta:
         class Form(forms.Form):
             crispy_field_template = (
@@ -1169,6 +1176,7 @@ class EmendaLoaFilterSet(FilterSet):
                 "finalidade",
                 "tipo_agrupamento",
                 "agrupamento",
+                "quebrar_pagina",
             )
 
         model = EmendaLoa
@@ -1180,6 +1188,7 @@ class EmendaLoaFilterSet(FilterSet):
             "finalidade",
             "tipo_agrupamento",
             "agrupamento",
+            "quebrar_pagina",
         ]
         form = Form
 
@@ -1242,6 +1251,9 @@ class EmendaLoaFilterSet(FilterSet):
         return queryset
 
     def filter_tipo_agrupamento(self, queryset, field_name, value):
+        return queryset
+
+    def filter_quebrar_pagina(self, queryset, field_name, value):
         return queryset
 
     def filter_finalidade(self, queryset, field_name, value):
@@ -1317,6 +1329,10 @@ class EmendaLoaFilterSet(FilterSet):
                                 (Fieldset(_("Listagem em PDF")), 12),
                                 ("agrupamento", 12),
                                 ("tipo_agrupamento", 12),
+                                (
+                                    "quebrar_pagina",
+                                    12,
+                                ),
                                 (
                                     HTML(
                                         """<small class="text-info font-italic">
