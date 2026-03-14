@@ -52,50 +52,5 @@ export const routes = [
         component: () => import('@/modules/loa/LoaDash')
       }
     ]
-  },
-  {
-    path: '/online/',
-    component: () => import('@/modules/online/OnlineLayout'),
-    name: 'online_index_link',
-    children: [
-      {
-        path: 'sessao', // list
-        name: '',
-        component: () => import('@/modules/online/sessao/SessaoPlenariaModule.vue'),
-        children: [
-          {
-            path: '',
-            name: 'sessao_list_link',
-            component: () => import('@/modules/online/sessao/SessaoList.vue')
-          },
-          {
-            path: ':id/',
-            name: 'sessao_plenaria_online_link',
-            component: () => import('@/modules/online/sessao/SessaoPlenariaOnline.vue')
-          }
-        ]
-      },
-      { path: 'painelset', // list
-        name: '',
-        component: () => import('@/modules/online/painelsetadmin/PainelSetModule.vue'),
-        children: [
-          {
-            path: '',
-            name: 'painelset_evento_list_link',
-            component: () => import('@/modules/online/painelsetadmin/PainelSetEventoList.vue')
-          },
-          {
-            path: ':id/admin',
-            name: 'painelset_admin_link',
-            component: () => import('@/modules/online/painelsetadmin/admin/PainelSetAdmin.vue')
-          },
-          {
-            path: ':id/:painel_id',
-            name: 'painelset_painel_link',
-            component: () => import('@/modules/online/painelsetadmin/painel/PainelSetPainel.vue')
-          }
-        ]
-      }
-    ]
   }
 ]
