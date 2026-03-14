@@ -15,7 +15,7 @@
   </div>
 </template>
 <script>
-import CronometroBase from '@/modules/online/painelset/components/cronometros/CronometroBase.vue'
+import CronometroBase from '@/modules/online/painelsetadmin/components/cronometros/CronometroBase.vue'
 export default {
   name: 'cronometro-palavra',
   components: {
