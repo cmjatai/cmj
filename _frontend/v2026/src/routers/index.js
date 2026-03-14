@@ -52,6 +52,34 @@ export const routes = [
             ]
           },
           {
+            path: 'arq',
+            name: 'arq_layout',
+            component: () => import('~@/modules/arq/ArqLayout.vue'),
+            meta: {
+              title: 'ArqView Module',
+              description: 'Módulo de Arquivos'
+            },
+            children: [
+              {
+                path: 'admin/:node',
+                name: 'arqadminroute',
+                component: () => import('~@/modules/arq/admin/AdminLayout.vue'),
+                children: [
+                  {
+                    path: ':nodechild',
+                    name: 'arqchildroute',
+                    component: () => import('~@/modules/arq/admin/DocListLayout.vue')
+                  }
+                ]
+              },
+              {
+                path: 'draft',
+                name: 'arq_draft',
+                component: () => import('~@/modules/arq/draft/DraftManage.vue')
+              }
+            ]
+          },
+          {
             path: 'painelsetadmin', // list
             name: 'painelsetadmin_module_admin_view',
             component: () => import('~@/modules/painelset/painelsetadmin/PainelSetModuleAdmin.vue'),
