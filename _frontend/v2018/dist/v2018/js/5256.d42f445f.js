@@ -1,1 +1,0 @@
-"use strict";(self["webpackChunkportalcmj_frontend"]=self["webpackChunkportalcmj_frontend"]||[]).push([[5256],{5256:function(n,t,e){e.r(t),e.d(t,{default:function(){return f}});var u=function(){var n=this,t=n._self._c;return t("div")},l=[],r={name:"loa-dash",methods:{},mounted:function(){}},o=r,a=e(1656),c=(0,a.A)(o,u,l,!1,null,null,null),f=c.exports}}]);
