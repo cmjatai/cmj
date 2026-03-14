@@ -1,15 +1,14 @@
-from builtins import property
 import collections
 import io
 import json
 import logging
 import re
+from builtins import property
 
 from django import template
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django_filters.views import FilterView
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
 from django.db.models import Q
@@ -21,42 +20,63 @@ from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import RedirectView, View, DetailView, ListView, TemplateView
+from django.views.generic import DetailView, ListView, RedirectView, TemplateView, View
 from django.views.static import serve as view_static_server
-from rest_framework import viewsets, mixins
-from rest_framework.authentication import SessionAuthentication, \
-    BasicAuthentication
+from django_filters.views import FilterView
+from rest_framework import mixins, viewsets
+from rest_framework.authentication import BasicAuthentication, SessionAuthentication
 from rest_framework.permissions import IsAuthenticated
 from weasyprint import HTML
 
-from cmj.core.forms import OperadorAreaTrabalhoForm, ImpressoEnderecamentoForm, AuditLogFilterSet
-from cmj.core.models import Cep, TipoLogradouro, Logradouro, RegiaoMunicipal, \
-    Distrito, Bairro, Trecho, AreaTrabalho, OperadorAreaTrabalho, \
-    ImpressoEnderecamento, groups_remove_user, groups_add_user, Notificacao, \
-    CertidaoPublicacao, Bi, AuditLog
+from cmj.core.forms import (
+    AuditLogFilterSet,
+    ImpressoEnderecamentoForm,
+    OperadorAreaTrabalhoForm,
+)
+from cmj.core.models import (
+    AreaTrabalho,
+    AuditLog,
+    Bairro,
+    Bi,
+    Cep,
+    CertidaoPublicacao,
+    Distrito,
+    ImpressoEnderecamento,
+    Logradouro,
+    Notificacao,
+    OperadorAreaTrabalho,
+    RegiaoMunicipal,
+    TipoLogradouro,
+    Trecho,
+    groups_add_user,
+    groups_remove_user,
+)
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.core.views_estatisticas import get_numeros
 from cmj.mixins import PluginSignMixin
-from cmj.utils import normalize, run_sql, make_pagination
+from cmj.utils import make_pagination, normalize, run_sql
 from sapl.compilacao.models import Dispositivo
-from sapl.crud.base import Crud, CrudAux, MasterDetailCrud, RP_DETAIL, RP_LIST, ListWithSearchForm
-from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
-from sapl.parlamentares.models import Partido, Filiacao
-from sapl.utils import get_mime_type_from_file_extension,\
-    show_results_filter_set
-
+from sapl.crud.base import (
+    RP_DETAIL,
+    RP_LIST,
+    Crud,
+    CrudAux,
+    ListWithSearchForm,
+    MasterDetailCrud,
+)
+from sapl.norma.models import AnexoNormaJuridica, NormaJuridica
+from sapl.parlamentares.models import Filiacao, Partido
+from sapl.utils import get_mime_type_from_file_extension, show_results_filter_set
 
 logger = logging.getLogger(__name__)
 
 
-CepCrud = CrudAux.build(Cep, 'cep')
-RegiaoMunicipalCrud = CrudAux.build(
-    RegiaoMunicipal, 'regiao_municipal')
-DistritoCrud = CrudAux.build(Distrito, 'distrito')
-BairroCrud = CrudAux.build(Bairro, '')
-TipoLogradouroCrud = CrudAux.build(
-    TipoLogradouro, 'tipo_logradouro')
-LogradouroCrud = CrudAux.build(Logradouro, 'logradouro')
+CepCrud = CrudAux.build(Cep, "cep")
+RegiaoMunicipalCrud = CrudAux.build(RegiaoMunicipal, "regiao_municipal")
+DistritoCrud = CrudAux.build(Distrito, "distrito")
+BairroCrud = CrudAux.build(Bairro, "")
+TipoLogradouroCrud = CrudAux.build(TipoLogradouro, "tipo_logradouro")
+LogradouroCrud = CrudAux.build(Logradouro, "logradouro")
 
 
 def template_render(request, template_name):
@@ -64,32 +84,31 @@ def template_render(request, template_name):
 
 
 def chanel_index(request):
-    return render(request, 'core/channel_index.html', {})
+    return render(request, "core/channel_index.html", {})
 
 
 def chanel_room(request, room_name):
-    return render(request, 'core/channel_room.html', {
-        'room_name_json': mark_safe(json.dumps(room_name))
-    })
+    return render(
+        request,
+        "core/channel_room.html",
+        {"room_name_json": mark_safe(json.dumps(room_name))},
+    )
 
 
 def time_refresh_log_test(request):
-    return render(request, 'core/time_refresh_log_test.html', {})
+    return render(request, "core/time_refresh_log_test.html", {})
 
-
-def app_vue_view_v2018(request, slug=None):
-    return render(request, 'app_vue_v2018.html')
 
 def app_vue_view_v2026(request, slug=None):
-    return render(request, 'app_vue_v2026.html')
+    return render(request, "app_vue_v2026.html")
+
 
 class TrechoCrud(CrudAux):
-    help_text = 'trecho'
+    help_text = "trecho"
     model = Trecho
 
     class BaseMixin(CrudAux.BaseMixin):
-        list_field_names = [
-            ('tipo', 'logradouro'), 'bairro', 'municipio', 'cep']
+        list_field_names = [("tipo", "logradouro"), "bairro", "municipio", "cep"]
 
     class ListView(CrudAux.ListView):
         form_search_class = ListWithSearchForm
@@ -99,20 +118,19 @@ class TrechoCrud(CrudAux):
             for t in trechos:
                 t.search = str(t)
                 t.save(auto_update_search=False)"""
-            return CrudAux.ListView.get(
-                self, request, *args, **kwargs)
+            return CrudAux.ListView.get(self, request, *args, **kwargs)
 
         def get_context_data(self, **kwargs):
-            context = CrudAux.ListView.get_context_data(
-                self, **kwargs)
-            context['title'] = _("Base de Cep's e Endereços")
+            context = CrudAux.ListView.get_context_data(self, **kwargs)
+            context["title"] = _("Base de Cep's e Endereços")
             return context
 
     class CreateView(CrudAux.CreateView):
 
         def post(self, request, *args, **kwargs):
             response = super(CrudAux.CreateView, self).post(
-                self, request, *args, **kwargs)
+                self, request, *args, **kwargs
+            )
 
             # FIXME: necessário enquanto o metodo save não tratar fields  m2m
             self.object.search = str(self.object)
@@ -124,7 +142,8 @@ class TrechoCrud(CrudAux):
 
         def post(self, request, *args, **kwargs):
             response = super(CrudAux.UpdateView, self).post(
-                self, request, *args, **kwargs)
+                self, request, *args, **kwargs
+            )
 
             # FIXME: necessário enquanto o metodo save não tratar fields  m2m
             self.object.search = str(self.object)
@@ -173,10 +192,10 @@ class TrechoJsonSearchView(mixins.ListModelMixin, viewsets.GenericViewSet):
         request = self.request
         queryset = Trecho.objects.all()
 
-        if request.GET.get('q') is not None:
-            query = normalize(str(request.GET.get('q')))
+        if request.GET.get("q") is not None:
+            query = normalize(str(request.GET.get("q")))
 
-            query = query.split(' ')
+            query = query.split(" ")
             if query:
                 q = Q()
                 for item in query:
@@ -199,61 +218,63 @@ class TrechoJsonView(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
 
 class AreaTrabalhoCrud(Crud):
     model = AreaTrabalho
-    model_set = 'operadorareatrabalho_set'
+    model_set = "operadorareatrabalho_set"
 
     class BaseMixin(Crud.BaseMixin):
 
-        list_field_names = ['nome', 'tipo', 'parlamentar',
-                            'ativo', 'operadores']
+        list_field_names = ["nome", "tipo", "parlamentar", "ativo", "operadores"]
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            if 'subnav_template_name' not in context:
-                context['subnav_template_name'] = 'core/subnav_areatrabalho.yaml'
+            if "subnav_template_name" not in context:
+                context["subnav_template_name"] = "core/subnav_areatrabalho.yaml"
             return context
 
     class DetailView(Crud.DetailView):
-        list_field_names_set = ['user_name', ]
+        list_field_names_set = [
+            "user_name",
+        ]
 
     class ListView(Crud.ListView):
         paginate_by = 100
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            context['subnav_template_name'] = ''
+            context["subnav_template_name"] = ""
             return context
 
         def hook_header_ativo(self):
             return "At. Ativa"
 
         def hook_operadores(self, *args, **kwargs):
-            lista_html = ''
+            lista_html = ""
             for u in args[0].operadores.all():
-                lista_html += '<li>{}<br><small>{}</small></li>'.format(
-                    u.get_full_name(), u.email)
+                lista_html += "<li>{}<br><small>{}</small></li>".format(
+                    u.get_full_name(), u.email
+                )
 
-            return '<ul>{}</ul>'.format(lista_html), ''
+            return "<ul>{}</ul>".format(lista_html), ""
 
 
 class OperadorAreaTrabalhoCrud(MasterDetailCrud):
-    parent_field = 'areatrabalho'
+    parent_field = "areatrabalho"
     model = OperadorAreaTrabalho
-    help_path = 'operadorareatrabalho'
+    help_path = "operadorareatrabalho"
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)
-            context[
-                'subnav_template_name'] = 'core/subnav_areatrabalho.yaml'
+            context["subnav_template_name"] = "core/subnav_areatrabalho.yaml"
             return context
 
     class ListView(MasterDetailCrud.ListView):
 
         def hook_user(self, *args, **kwargs):
             u = args[0].user
-            lista_html = '{}<br><small>{}</small></li>'.format(
-                u.get_full_name(), u.email)
+            lista_html = "{}<br><small>{}</small></li>".format(
+                u.get_full_name(), u.email
+            )
 
             return lista_html, args[2]
 
@@ -264,13 +285,12 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
         def form_valid(self, form):
             old = OperadorAreaTrabalho.objects.get(pk=self.object.pk)
 
-            groups = list(old.grupos_associados.values_list('name', flat=True))
+            groups = list(old.grupos_associados.values_list("name", flat=True))
             groups_remove_user(old.user, groups)
 
             response = super().form_valid(form)
 
-            groups = list(self.object.grupos_associados.values_list(
-                'name', flat=True))
+            groups = list(self.object.grupos_associados.values_list("name", flat=True))
             groups_add_user(self.object.user, groups)
 
             return response
@@ -283,20 +303,18 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
         def form_valid(self, form):
             self.object = form.save(commit=False)
             oper = OperadorAreaTrabalho.objects.filter(
-                user_id=self.object.user_id,
-                areatrabalho_id=self.object.areatrabalho_id
+                user_id=self.object.user_id, areatrabalho_id=self.object.areatrabalho_id
             ).first()
 
             if oper:
-                form._errors['user'] = ErrorList([_(
-                    'Este Operador já está registrado '
-                    'nesta Área de Trabalho.')])
+                form._errors["user"] = ErrorList(
+                    [_("Este Operador já está registrado " "nesta Área de Trabalho.")]
+                )
                 return self.form_invalid(form)
 
             response = super().form_valid(form)
 
-            groups = list(self.object.grupos_associados.values_list(
-                'name', flat=True))
+            groups = list(self.object.grupos_associados.values_list("name", flat=True))
             groups_add_user(self.object.user, groups)
 
             return response
@@ -306,27 +324,27 @@ class OperadorAreaTrabalhoCrud(MasterDetailCrud):
         def post(self, request, *args, **kwargs):
 
             self.object = self.get_object()
-            groups = list(
-                self.object.grupos_associados.values_list('name', flat=True))
+            groups = list(self.object.grupos_associados.values_list("name", flat=True))
             groups_remove_user(self.object.user, groups)
 
             self.object.user.notificacao_set.filter(
-                areatrabalho=self.object.areatrabalho,
-                read=False).delete()
+                areatrabalho=self.object.areatrabalho, read=False
+            ).delete()
 
-            return MasterDetailCrud.DeleteView.post(
-                self, request, *args, **kwargs)
+            return MasterDetailCrud.DeleteView.post(self, request, *args, **kwargs)
 
 
 class PartidoCrud(Crud):
-    help_text = 'partidos'
-    model_set = 'filiacaopartidaria_set'
+    help_text = "partidos"
+    model_set = "filiacaopartidaria_set"
     model = Partido
-    container_field_set = 'contato__workspace__operadores'
+    container_field_set = "contato__workspace__operadores"
     # container_field = 'filiacoes_partidarias_set__contato__workspace__operadores'
 
     class DetailView(Crud.DetailView):
-        list_field_names_set = ['contato_nome', ]
+        list_field_names_set = [
+            "contato_nome",
+        ]
 
     class ListView(Crud.ListView):
         paginate_by = 100
@@ -337,20 +355,19 @@ class PartidoCrud(Crud):
 
             if ws and ws.parlamentar:
                 filiacao_parlamentar = Filiacao.objects.filter(
-                    parlamentar=ws.parlamentar)
+                    parlamentar=ws.parlamentar
+                )
 
                 if filiacao_parlamentar.exists():
                     partido = filiacao_parlamentar.first().partido
                     return redirect(
-                        reverse(
-                            'sapl.parlamentares:partido_detail',
-                            args=(partido.pk,)))
+                        reverse("sapl.parlamentares:partido_detail", args=(partido.pk,))
+                    )
 
             """else:
                 self.kwargs['queryset_liberar_sem_container'] = True"""
 
-            return Crud.ListView.get(
-                self, request, *args, **kwargs)
+            return Crud.ListView.get(self, request, *args, **kwargs)
 
         """def get_queryset(self):
             queryset = CrudListView.get_queryset(self)
@@ -385,7 +402,7 @@ class NotificacaoRedirectView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
 
         try:
-            obj = Notificacao.objects.get(pk=kwargs['pk'])
+            obj = Notificacao.objects.get(pk=kwargs["pk"])
         except:
             raise Http404()
 
@@ -395,14 +412,14 @@ class NotificacaoRedirectView(RedirectView):
         obj.not_send_mail = True  # Não envia email no post_save
         obj.save()
 
-        self.pattern_name = '%s:%s_detail' % (
+        self.pattern_name = "%s:%s_detail" % (
             obj.content_object._meta.app_config.name,
-            obj.content_object._meta.model_name
+            obj.content_object._meta.model_name,
         )
-        kwargs['pk'] = obj.content_object.pk
+        kwargs["pk"] = obj.content_object.pk
         url = RedirectView.get_redirect_url(self, *args, **kwargs)
 
-        url += '#item-%s' % obj.content_object.pk
+        url += "#item-%s" % obj.content_object.pk
         return url
 
 
@@ -412,11 +429,11 @@ class SeloCertidaoMixin(PluginSignMixin):
 
         cert = self.object
 
-        compression = self.request.GET.get('compression', True)
+        compression = self.request.GET.get("compression", True)
 
         for field_file in cert.FIELDFILE_NAME:
             if original2copia:
-                paths = '{},{}'.format(
+                paths = "{},{}".format(
                     getattr(cert, field_file).original_path,
                     getattr(cert, field_file).path,
                 )
@@ -427,45 +444,41 @@ class SeloCertidaoMixin(PluginSignMixin):
             cmd = self.cmd_mask
 
             params = {
-                'plugin': self.plugin_path,
-                'comando': 'selo_certidao',
-                'in_file': paths,
-                'certificado': settings.CERT_PRIVATE_KEY_ID,
-                'password': settings.CERT_PRIVATE_KEY_ACCESS,
-                'data_ocorrencia': formats.date_format(
-                    timezone.localtime(cert.created),
-                    'd/m/Y'
+                "plugin": self.plugin_path,
+                "comando": "selo_certidao",
+                "in_file": paths,
+                "certificado": settings.CERT_PRIVATE_KEY_ID,
+                "password": settings.CERT_PRIVATE_KEY_ACCESS,
+                "data_ocorrencia": formats.date_format(
+                    timezone.localtime(cert.created), "d/m/Y"
                 ),
-                'hora_ocorrencia': formats.date_format(
-                    timezone.localtime(cert.created),
-                    'H:i'
+                "hora_ocorrencia": formats.date_format(
+                    timezone.localtime(cert.created), "H:i"
                 ),
-                'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
-                'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
-                'titulopre': 'Câmara Municipal de Jataí - Estado de Goiás',
-                'titulo': '___',
-                'titulopos': '___',
-                'x': int(self.request.GET.get('x', 80)),
-                'y': int(self.request.GET.get('y', 86)),
-                'w': 80,
-                'h': 20,
-                'cor': "0, 76, 64, 255",
-                'compression': compression,
-                'debug': False  # settings.DEBUG
+                "data_comando": formats.date_format(timezone.localtime(), "d/m/Y"),
+                "hora_comando": formats.date_format(timezone.localtime(), "H:i"),
+                "titulopre": "Câmara Municipal de Jataí - Estado de Goiás",
+                "titulo": "___",
+                "titulopos": "___",
+                "x": int(self.request.GET.get("x", 80)),
+                "y": int(self.request.GET.get("y", 86)),
+                "w": 80,
+                "h": 20,
+                "cor": "0, 76, 64, 255",
+                "compression": compression,
+                "debug": False,  # settings.DEBUG
             }
-            cmd = cmd.format(
-                **params
-            )
+            cmd = cmd.format(**params)
 
             self.run(cmd)
 
-            del params['plugin']
-            del params['in_file']
-            del params['certificado']
-            del params['password']
-            del params['debug']
-            del params['comando']
-            cert.metadata['selos'] = {'selo_certidao': params}
+            del params["plugin"]
+            del params["in_file"]
+            del params["certificado"]
+            del params["password"]
+            del params["debug"]
+            del params["comando"]
+            cert.metadata["selos"] = {"selo_certidao": params}
 
             # print(cmd)
             # return
@@ -481,20 +494,20 @@ class CertidaoPublicacaoCrud(Crud):
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = [
-            'id', 'created',
-            ('content_object', 'diariooficial'),
-            'signs',
-
+            "id",
+            "created",
+            ("content_object", "diariooficial"),
+            "signs",
         ]
 
         @property
         def create_url(self):
-            return ''
+            return ""
 
     class ListView(Crud.ListView):
 
         paginate_by = 100
-        ordering = ('-id')
+        ordering = "-id"
 
         def get_paginate_by(self, queryset):
             if self.request.user.is_superuser:
@@ -503,47 +516,48 @@ class CertidaoPublicacaoCrud(Crud):
 
         def get_context_data(self, **kwargs):
             ctx = super().get_context_data(**kwargs)
-            #ctx['fluid'] = '-fluid'
+            # ctx['fluid'] = '-fluid'
             return ctx
 
         def has_permission(self):
             return True
 
         def split_bylen(self, item, maxlen):
-            return [item[ind:ind + maxlen] for ind in range(0, len(item), maxlen)]
+            return [item[ind : ind + maxlen] for ind in range(0, len(item), maxlen)]
 
         def hook_header_diariooficial(self, **kwargs):
-            return 'Diário Oficial'
+            return "Diário Oficial"
 
         def hook_diariooficial(self, *args, **kwargs):
             obj = args[0].content_object
             if not obj.diariooficial:
                 return args[1], args[2]
             url = obj.diariooficial.arquivo.url
-            return '<hr class="divider"><a href="%s" target="_blank"><small>%s</small></a>' % (
-                url, obj.diariooficial), args[2]
-
+            return (
+                '<hr class="divider"><a href="%s" target="_blank"><small>%s</small></a>'
+                % (url, obj.diariooficial),
+                args[2],
+            )
 
         def hook_header_signs(self, **kwargs):
-            return 'Assinaturas Digitais'
+            return "Assinaturas Digitais"
 
         def hook_signs(self, *args, **kwargs):
 
             obj = args[0].content_object
             sig_tuples = []
             try:
-                signs = obj.metadata['signs']
+                signs = obj.metadata["signs"]
                 for fn, sigs in signs.items():
-                    for sig in sigs['signs']:
+                    for sig in sigs["signs"]:
                         sig_tuples.append(sig)
 
-                sign_template = template.loader.get_template(
-                    'core/sign_widget.html')
+                sign_template = template.loader.get_template("core/sign_widget.html")
                 context = {}
-                context['signs'] = sig_tuples
+                context["signs"] = sig_tuples
                 rendered = sign_template.render(context, self.request)
 
-                return rendered, ''
+                return rendered, ""
 
             except Exception as e:
                 return args[1], args[2]
@@ -553,30 +567,34 @@ class CertidaoPublicacaoCrud(Crud):
             hash = args[0].hash_code  # self.split_bylen(args[0].hash_code, 64)
 
             if args[0].revogado:
-                return f'''<span class="text-danger">Certidão Revogada</span>''', ''
+                return f"""<span class="text-danger">Certidão Revogada</span>""", ""
 
-            if hasattr(args[0].content_object, 'anexo_de') and\
-                    args[0].content_object.anexo_de.exists():
+            if (
+                hasattr(args[0].content_object, "anexo_de")
+                and args[0].content_object.anexo_de.exists()
+            ):
                 url = reverse(
-                    'sapl.%s:%s_detail' % (
+                    "sapl.%s:%s_detail"
+                    % (
                         args[0].content_object._meta.app_label,
-                        args[0].content_object._meta.model_name
+                        args[0].content_object._meta.model_name,
                     ),
-                    kwargs={'pk': args[0].content_object.anexo_de.first().id}
+                    kwargs={"pk": args[0].content_object.anexo_de.first().id},
                 )
                 vinculo = f'<a href="{url}">Vínculo com: {args[0].content_object.anexo_de.first()}</a>'
             else:
-                vinculo = ''
+                vinculo = ""
 
-            return """%s<br>
+            return (
+                """%s<br>
             <small>%s</small><br>
-            <small><i>%s</i></small>""" % (
-                args[1],
-                args[0].content_object.__descr__,
-                vinculo
-            ), ''
+            <small><i>%s</i></small>"""
+                % (args[1], args[0].content_object.__descr__, vinculo),
+                "",
+            )
 
-            return """
+            return (
+                """
             %s<br><small>%s</small><br>
             <button
             class="hash_code btn btn-info"
@@ -585,79 +603,87 @@ class CertidaoPublicacaoCrud(Crud):
             data-toggle="popover"
             data-placement="top"
             title="Hash 512"
-            data-content="%s">Hash 512</button>""" % (
-                args[1],
-                args[0].content_object.__descr__,
-                ''.join(hash)), ''
+            data-content="%s">Hash 512</button>"""
+                % (args[1], args[0].content_object.__descr__, "".join(hash)),
+                "",
+            )
 
         def hook_header_content_object(self, **kwargs):
-            return 'Documentos Certificados'
+            return "Documentos Certificados"
 
         def hook_header_content_type(self, **kwargs):
-            return 'Tipo do Documento'
+            return "Tipo do Documento"
 
         def hook_header_id(self, **kwargs):
-            return 'Certidão'
+            return "Certidão"
 
         def hook_id(self, *args, **kwargs):
-            cert = '%06d' % int(args[1])
+            cert = "%06d" % int(args[1])
             if args[0].revogado:
-                return f'''{cert}<br>
+                return (
+                    f"""{cert}<br>
                     Certidão Revogada<br>
-                    ''', ''
+                    """,
+                    "",
+                )
             if args[0].cancelado:
-                return f'''{cert}<br>
+                return (
+                    f"""{cert}<br>
                     Certidão Cancelada<br>
                     <small>Documento Substituído</small>
-                    ''', ''
+                    """,
+                    "",
+                )
             if not self.request.user.is_superuser or args[0].certificado:
                 return cert, args[2]
 
-            return f'''
+            return (
+                f"""
                 <a href="{args[2]}">{cert}</a>
                 <a href="{args[2]}?certificar" class="btn btn-link">Certificar</a>
-            ''', ''
+            """,
+                "",
+            )
 
         def hook_header_created(self, **kwargs):
-            return 'Data/Hora'
+            return "Data/Hora"
 
         def hook_created(self, *args, **kwargs):
-            return '{}'.format(
-                formats.date_format(
-                    timezone.template_localtime(args[0].created), r'd/m/Y \à\s H:i')
-            ), args[2]
+            return (
+                "{}".format(
+                    formats.date_format(
+                        timezone.template_localtime(args[0].created), r"d/m/Y \à\s H:i"
+                    )
+                ),
+                args[2],
+            )
 
     class DetailView(DetailView, SeloCertidaoMixin):
-        slug_field = 'hash_code'
+        slug_field = "hash_code"
 
         @classmethod
         def get_url_regex(cls):
-            return r'^/(?P<pk>\d+)$'
+            return r"^/(?P<pk>\d+)$"
 
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
             if self.object.revogado:
                 messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _('Certidão Revogada!'))
+                    self.request, messages.ERROR, _("Certidão Revogada!")
+                )
             elif self.object.cancelado:
                 messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _('Certidão Cancelada!'))
+                    self.request, messages.ERROR, _("Certidão Cancelada!")
+                )
 
             if self.object.revogado or self.object.cancelado:
-                return redirect(
-                    reverse('cmj.core:certidaopublicacao_list',
-                            kwargs={})
-                )
+                return redirect(reverse("cmj.core:certidaopublicacao_list", kwargs={}))
 
             context = self.get_context_data(object=self.object)
 
-            if 'certificar' in request.GET and request.user.is_superuser:
+            if "certificar" in request.GET and request.user.is_superuser:
                 return self.certidao_digital_de_publicacao(request, context)
-            elif 'revogar' in request.GET and request.user.is_superuser:
+            elif "revogar" in request.GET and request.user.is_superuser:
                 return self.revogar_certidao_digital_de_publicacao(request, context)
 
             return self.certidao_publicacao(request, context)
@@ -668,46 +694,49 @@ class CertidaoPublicacaoCrud(Crud):
             # self.split_bylen(args[0].hash_code, 64)
             hash = self.object.hash_code
 
-            if hasattr(self.object.content_object, 'anexo_de') and\
-                    self.object.content_object.anexo_de.exists():
+            if (
+                hasattr(self.object.content_object, "anexo_de")
+                and self.object.content_object.anexo_de.exists()
+            ):
                 url = reverse(
-                    'sapl.%s:%s_detail' % (
+                    "sapl.%s:%s_detail"
+                    % (
                         self.object.content_object._meta.app_label,
-                        self.object.content_object._meta.model_name
+                        self.object.content_object._meta.model_name,
                     ),
-                    kwargs={'pk': self.object.content_object.anexo_de.first().id}
+                    kwargs={"pk": self.object.content_object.anexo_de.first().id},
                 )
                 vinculo = f'<a href="{url}">Vínculo com: {self.object.content_object.anexo_de.first()}</a>'
             else:
-                vinculo = ''
+                vinculo = ""
             return vinculo
 
         def get_context_data(self, **kwargs):
             context = DetailView.get_context_data(self, **kwargs)
-            if 'print' not in self.request.GET:
-                context['print'] = ''
+            if "print" not in self.request.GET:
+                context["print"] = ""
             else:
-                print_value = self.request.GET.get('print', '1')
-                print_value = print_value or '1'
-                context['print'] = f"{print_value}cm"
-            context['content_object_url'] = self.content_object_url()
+                print_value = self.request.GET.get("print", "1")
+                print_value = print_value or "1"
+                context["print"] = f"{print_value}cm"
+            context["content_object_url"] = self.content_object_url()
             return context
 
         def revogar_certidao_digital_de_publicacao(self, request, context):
-            revogar = request.GET.get('revogar', '')
+            revogar = request.GET.get("revogar", "")
             if revogar:
                 md = self.object.metadata
                 if not md:
                     md = {}
                 try:
-                    md['revogacao'] = {
-                    'revogado': True,
-                    'revogacao': revogar,
-                    'revogacao_data': timezone.localtime(),
-                    'revogacao_user': request.user.id,
-                    'revogacao_user_name': request.user.get_full_name(),
-                    'documento__epigrafe': self.object.content_object.epigrafe,
-                    'documento__render_description': self.object.content_object.render_description,
+                    md["revogacao"] = {
+                        "revogado": True,
+                        "revogacao": revogar,
+                        "revogacao_data": timezone.localtime(),
+                        "revogacao_user": request.user.id,
+                        "revogacao_user_name": request.user.get_full_name(),
+                        "documento__epigrafe": self.object.content_object.epigrafe,
+                        "documento__render_description": self.object.content_object.render_description,
                     }
                 except:
                     pass
@@ -720,57 +749,62 @@ class CertidaoPublicacaoCrud(Crud):
                 self.object.modifier = request.user
                 self.object.save()
 
-            return redirect(
-                reverse('cmj.core:certidaopublicacao_list',
-                        kwargs={})
-            )
+            return redirect(reverse("cmj.core:certidaopublicacao_list", kwargs={}))
 
         def certidao_digital_de_publicacao(self, request, context):
             self.certidao_publicacao(
                 request,
                 context,
-                template='core/certidao_digital_publicacao.html',
-                only_persist=True
+                template="core/certidao_digital_publicacao.html",
+                only_persist=True,
             )
 
             self.add_selo_certidao()
 
             response = HttpResponse(
-                self.object.certificado, content_type='application/pdf;')
-            response['Content-Disposition'] = f'inline; filename=cert-cmj-{self.object.id}.pdf'
-            response['Content-Transfer-Encoding'] = 'binary'
+                self.object.certificado, content_type="application/pdf;"
+            )
+            response["Content-Disposition"] = (
+                f"inline; filename=cert-cmj-{self.object.id}.pdf"
+            )
+            response["Content-Transfer-Encoding"] = "binary"
 
             return response
 
-        def certidao_publicacao(self, request, context, template='', only_persist=False):
+        def certidao_publicacao(
+            self, request, context, template="", only_persist=False
+        ):
 
             if self.object.certificado:
                 if not only_persist:
-                    with open(self.object.certificado.path, 'rb') as f:
+                    with open(self.object.certificado.path, "rb") as f:
                         fpdf = f.read()
-                elif request.user.is_superuser and 'certificar' in request.GET:
+                elif request.user.is_superuser and "certificar" in request.GET:
                     self.object.certificado = None
 
             if not self.object.certificado:
                 base_url = request.build_absolute_uri()
                 html_template = render_to_string(
-                    template if template else 'core/certidao_publicacao.html',
-                    context)
+                    template if template else "core/certidao_publicacao.html", context
+                )
                 html = HTML(base_url=base_url, string=html_template)
                 main_doc = html.render(stylesheets=[])
                 fpdf = main_doc.write_pdf()
 
                 if only_persist:
                     self.object.certificado = ContentFile(
-                        fpdf, name=f'cert-cmj-{self.object.id}.pdf')
+                        fpdf, name=f"cert-cmj-{self.object.id}.pdf"
+                    )
 
                     self.object.modifier = request.user
                     self.object.save()
                     return
 
-            response = HttpResponse(fpdf, content_type='application/pdf;')
-            response['Content-Disposition'] = f'inline; filename=cert-cmj-{self.object.id}.pdf'
-            response['Content-Transfer-Encoding'] = 'binary'
+            response = HttpResponse(fpdf, content_type="application/pdf;")
+            response["Content-Disposition"] = (
+                f"inline; filename=cert-cmj-{self.object.id}.pdf"
+            )
+            response["Content-Transfer-Encoding"] = "binary"
 
             return response
 
@@ -779,18 +813,19 @@ class CertidaoPublicacaoCrud(Crud):
             co = cert.content_object
 
             link = reverse(
-                'sapl.api:%s_%s-%s' % (
+                "sapl.api:%s_%s-%s"
+                % (
                     co._meta.app_label,
                     co._meta.model_name,
-                    cert.field_name.replace('_', '-')
+                    cert.field_name.replace("_", "-"),
                 ),
-                kwargs={'pk': co.id}
+                kwargs={"pk": co.id},
             )
 
             urls = {
-                'original': '%s%s?original' % (settings.SITE_URL, link),
-                'ocr': '%s%s' % (settings.SITE_URL, link),
-                'cert': '%s%s' % (settings.SITE_URL, f'/cert/{cert.id}'),
+                "original": "%s%s?original" % (settings.SITE_URL, link),
+                "ocr": "%s%s" % (settings.SITE_URL, link),
+                "cert": "%s%s" % (settings.SITE_URL, f"/cert/{cert.id}"),
             }
 
             return urls
@@ -799,47 +834,51 @@ class CertidaoPublicacaoCrud(Crud):
 
         @classmethod
         def get_url_regex(cls):
-            return r'^/(?P<content_type>\d+)/create/(?P<pk>\d+)/(?P<field_name>\w+)$'
+            return r"^/(?P<content_type>\d+)/create/(?P<pk>\d+)/(?P<field_name>\w+)$"
 
         def get(self, request, *args, **kwargs):
 
             if self.certidao_generate():
                 return redirect(
-                    reverse('cmj.core:certidaopublicacao_detail',
-                            kwargs={'pk': self.content_object.certidao.pk})
+                    reverse(
+                        "cmj.core:certidaopublicacao_detail",
+                        kwargs={"pk": self.content_object.certidao.pk},
+                    )
                 )
 
             else:
                 messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _('Não foi possível gerar certidão!'))
+                    self.request, messages.ERROR, _("Não foi possível gerar certidão!")
+                )
 
                 return redirect(
-                    reverse('%s:%s_detail' % (
-                        self.content_object._meta.app_config.name,
-                        self.content_object._meta.model_name),
-                        kwargs={'pk': self.content_object.pk})
+                    reverse(
+                        "%s:%s_detail"
+                        % (
+                            self.content_object._meta.app_config.name,
+                            self.content_object._meta.model_name,
+                        ),
+                        kwargs={"pk": self.content_object.pk},
+                    )
                 )
 
         def certidao_generate(self):
 
             model = ContentType.objects.get_for_id(
-                self.kwargs['content_type']).model_class()
+                self.kwargs["content_type"]
+            ).model_class()
 
-            object = self.content_object = model.objects.get(
-                pk=self.kwargs['pk'])
+            object = self.content_object = model.objects.get(pk=self.kwargs["pk"])
 
             certidao = object.certidao
 
             if certidao and not self.request.user.is_superuser:
                 return True
 
-            if not getattr(object, self.kwargs['field_name']):
+            if not getattr(object, self.kwargs["field_name"]):
                 messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _('Documento sem Arquivo.'))
+                    self.request, messages.ERROR, _("Documento sem Arquivo.")
+                )
                 return False
 
             u = self.request.user
@@ -849,8 +888,7 @@ class CertidaoPublicacaoCrud(Crud):
                     certidao.cancelado = True
                     certidao.certificado = None
                     certidao.save()
-                CertidaoPublicacao.gerar_certidao(
-                    u, object, self.kwargs['field_name'])
+                CertidaoPublicacao.gerar_certidao(u, object, self.kwargs["field_name"])
             except Exception as e:
                 return False
 
@@ -863,24 +901,21 @@ class BiView(ListView):
 
     @property
     def title(self):
-        return 'B'
+        return "B"
 
     def get_context_data(self, **kwargs):
         context = ListView.get_context_data(self, **kwargs)
 
-        context['global'] = self.get_global()
-        context['producao_anual'] = self.get_producao_anual()
+        context["global"] = self.get_global()
+        context["producao_anual"] = self.get_producao_anual()
 
-        context['numeros'] = get_numeros()
+        context["numeros"] = get_numeros()
         return context
 
     def get_global(self):
         qs = self.get_queryset()
 
-        g = {'Páginas Digitalizadas': {
-            'count': 0,
-            'color': ''
-        }}
+        g = {"Páginas Digitalizadas": {"count": 0, "color": ""}}
 
         for i in qs:
 
@@ -891,19 +926,17 @@ class BiView(ListView):
                 for model, rm in ru.items():  # rm -> result model
                     if model not in g:
                         g[model] = {
-                            'count': 0,
-                            'color': re.sub(r'\s', '', normalize(model.lower()))
+                            "count": 0,
+                            "color": re.sub(r"\s", "", normalize(model.lower())),
                         }
                     for ano, ra in rm.items():  # rm -> result anos
                         try:
-                            g[model]['count'] += ra.get('total',
-                                                        ra.get('count', 0))
-                            g['Páginas Digitalizadas']['count'] += ra.get(
-                                'paginas', 0)
+                            g[model]["count"] += ra.get("total", ra.get("count", 0))
+                            g["Páginas Digitalizadas"]["count"] += ra.get("paginas", 0)
                         except Exception as e:
                             print(ra)
 
-        g = filter(lambda x: x[1]['count'] > 500, g.items())
+        g = filter(lambda x: x[1]["count"] > 500, g.items())
         return g
 
     def get_producao_anual(self):
@@ -913,11 +946,7 @@ class BiView(ListView):
 
         for i in qs:
             if i.ano not in pa:
-                pa[i.ano] = {
-                    'documentos': 0,
-                    'paginas': 0,
-                    'tramitacao': 0
-                }
+                pa[i.ano] = {"documentos": 0, "paginas": 0, "tramitacao": 0}
 
             results = i.results
 
@@ -925,42 +954,42 @@ class BiView(ListView):
 
                 for model, rm in ru.items():  # rm -> result model
                     for ano, ra in rm.items():  # rm -> result anos
-                        pa[i.ano]['documentos'] += ra.get('total', 0)
-                        pa[i.ano]['paginas'] += ra.get('paginas', 0)
-                        pa[i.ano]['tramitacao'] += ra.get('tramitacao', 0)
+                        pa[i.ano]["documentos"] += ra.get("total", 0)
+                        pa[i.ano]["paginas"] += ra.get("paginas", 0)
+                        pa[i.ano]["tramitacao"] += ra.get("tramitacao", 0)
 
         sum_documentos = 0
         sum_paginas = 0
         sum_tramitacao = 0
         for k, v in pa.items():
-            sum_documentos += v['documentos']
-            sum_paginas += v['paginas']
-            sum_tramitacao += v['tramitacao']
+            sum_documentos += v["documentos"]
+            sum_paginas += v["paginas"]
+            sum_tramitacao += v["tramitacao"]
 
         per_d_max = 0
         per_p_max = 0
         per_t_max = 0
         for k, v in pa.items():
-            v['largura'] = {
-                'documentos': v['documentos'] / sum_documentos * 100,
-                'paginas': v['paginas'] / sum_paginas * 100,
-                'tramitacao': v['tramitacao'] / sum_paginas * 100
+            v["largura"] = {
+                "documentos": v["documentos"] / sum_documentos * 100,
+                "paginas": v["paginas"] / sum_paginas * 100,
+                "tramitacao": v["tramitacao"] / sum_paginas * 100,
             }
 
-            if v['documentos'] > per_d_max:
-                per_d_max = v['documentos']
+            if v["documentos"] > per_d_max:
+                per_d_max = v["documentos"]
 
-            if v['paginas'] > per_p_max:
-                per_p_max = v['paginas']
+            if v["paginas"] > per_p_max:
+                per_p_max = v["paginas"]
 
-            if v['tramitacao'] > per_t_max:
-                per_t_max = v['tramitacao']
+            if v["tramitacao"] > per_t_max:
+                per_t_max = v["tramitacao"]
 
         for k, v in pa.items():
-            v['largura'] = {
-                'documentos': (v['documentos'] * (100 / per_d_max)) if per_d_max else 0,
-                'paginas': (v['paginas'] * (100 / per_p_max)) if per_p_max else 0,
-                'tramitacao': (v['tramitacao'] * (100 / per_t_max)) if per_t_max else 0
+            v["largura"] = {
+                "documentos": (v["documentos"] * (100 / per_d_max)) if per_d_max else 0,
+                "paginas": (v["paginas"] * (100 / per_p_max)) if per_p_max else 0,
+                "tramitacao": (v["tramitacao"] * (100 / per_t_max)) if per_t_max else 0,
             }
 
         pa = list(pa.items())
@@ -973,39 +1002,32 @@ class MediaPublicView(View):
 
     def get(self, request, *args, **kwargs):
 
-        path = kwargs['path']
+        path = kwargs["path"]
 
-        if 'private' in path:
+        if "private" in path:
             raise Http404
 
         if settings.DEBUG:
-            return view_static_server(
-                request,
-                path,
-                document_root=settings.MEDIA_ROOT
-            )
+            return view_static_server(request, path, document_root=settings.MEDIA_ROOT)
 
-        file_path = f'{settings.MEDIA_ROOT}/{path}'
-        file_name = path.split('/')[-1]
-        ext = file_name.split('.')[-1]
+        file_path = f"{settings.MEDIA_ROOT}/{path}"
+        file_name = path.split("/")[-1]
+        ext = file_name.split(".")[-1]
 
         mime = get_mime_type_from_file_extension(file_name)
 
         # if mime.endswith('ext') and :
 
-        mime = 'image/png'
+        mime = "image/png"
 
-        response = HttpResponse(content_type='')
-        response['Content-Disposition'] = (
-            'inline; filename="%s"' % file_name)
+        response = HttpResponse(content_type="")
+        response["Content-Disposition"] = 'inline; filename="%s"' % file_name
 
-        response['Cache-Control'] = 'no-cache'
-        response['Pragma'] = 'no-cache'
-        response['Expires'] = 0
+        response["Cache-Control"] = "no-cache"
+        response["Pragma"] = "no-cache"
+        response["Expires"] = 0
 
-        response['X-Accel-Redirect'] = "/mediaredirect/{0}".format(
-            path
-        )
+        response["X-Accel-Redirect"] = "/mediaredirect/{0}".format(path)
 
         return response
 
@@ -1015,60 +1037,56 @@ class PesquisarAuditLogView(PermissionRequiredMixin, FilterView):
     filterset_class = AuditLogFilterSet
     paginate_by = 20
 
-    permission_required = ('base.list_appconfig',)
+    permission_required = ("base.list_appconfig",)
 
     def get_filterset_kwargs(self, filterset_class):
-        super(PesquisarAuditLogView, self).get_filterset_kwargs(
-            filterset_class
-        )
+        super(PesquisarAuditLogView, self).get_filterset_kwargs(filterset_class)
 
-        return ({
+        return {
             "data": self.request.GET or None,
-            "queryset": self.get_queryset().order_by("-id")
-        })
+            "queryset": self.get_queryset().order_by("-id"),
+        }
 
     def get_context_data(self, **kwargs):
-        context = super(PesquisarAuditLogView, self).get_context_data(
-            **kwargs
-        )
+        context = super(PesquisarAuditLogView, self).get_context_data(**kwargs)
 
         paginator = context["paginator"]
         page_obj = context["page_obj"]
 
         qr = self.request.GET.copy()
-        if 'page' in qr:
-            del qr['page']
-        context['filter_url'] = ('&' + qr.urlencode()) if len(qr) > 0 else ''
-        context['show_results'] = show_results_filter_set(qr)
+        if "page" in qr:
+            del qr["page"]
+        context["filter_url"] = ("&" + qr.urlencode()) if len(qr) > 0 else ""
+        context["show_results"] = show_results_filter_set(qr)
 
-        context.update({
-            "page_range": make_pagination(
-                page_obj.number, paginator.num_pages
-            ),
-            "NO_ENTRIES_MSG": "Nenhum registro de log encontrado!",
-            "title": _("Pesquisar Logs de Auditoria")
-        })
+        context.update(
+            {
+                "page_range": make_pagination(page_obj.number, paginator.num_pages),
+                "NO_ENTRIES_MSG": "Nenhum registro de log encontrado!",
+                "title": _("Pesquisar Logs de Auditoria"),
+            }
+        )
 
         return context
 
     def get(self, request, *args, **kwargs):
-        timefilter = request.GET.get('timestamp', None)
+        timefilter = request.GET.get("timestamp", None)
 
         if not timefilter:
             newgetrequest = request.GET.copy()
-            newgetrequest['timestamp'] = 'week'
+            newgetrequest["timestamp"] = "week"
             request.GET = newgetrequest
 
         super(PesquisarAuditLogView, self).get(request)
 
         data = self.filterset.data
 
-        url = ''
+        url = ""
 
         if data:
-            url = '&' + str(self.request.META["QUERY_STRING"])
+            url = "&" + str(self.request.META["QUERY_STRING"])
             if url.startswith("&page"):
-                url = ''
+                url = ""
 
         resultados = self.object_list
         # if 'page' in self.request.META['QUERY_STRING']:
@@ -1076,13 +1094,13 @@ class PesquisarAuditLogView(PermissionRequiredMixin, FilterView):
         # else:
         #     resultados = []
 
-        context = self.get_context_data(filter=self.filterset,
-                                        object_list=resultados,
-                                        filter_url=url,
-                                        numero_res=len(resultados)
-                                        )
+        context = self.get_context_data(
+            filter=self.filterset,
+            object_list=resultados,
+            filter_url=url,
+            numero_res=len(resultados),
+        )
 
-        context['show_results'] = show_results_filter_set(
-            self.request.GET.copy())
+        context["show_results"] = show_results_filter_set(self.request.GET.copy())
 
         return self.render_to_response(context)
