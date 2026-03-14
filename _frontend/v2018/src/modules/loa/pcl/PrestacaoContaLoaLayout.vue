@@ -55,7 +55,7 @@ export default {
         unidade: null,
         parlamentares: null,
         situacao: [],
-        emendas: 'True',
+        emendas_tipos: ['0', '10', '99'],
         ajustes: 'True',
         search: ''
       },
@@ -63,7 +63,7 @@ export default {
         'unidade',
         'parlamentares',
         'situacao',
-        'emendas',
+        'emendas_tipos',
         'ajustes',
         'search'
       ],
@@ -124,10 +124,13 @@ export default {
             this.filters_value[f] !== undefined
           ) {
             const val = this.filters_value[f]
-            query[f] =
-              typeof val === 'object' && val !== null && !Array.isArray(val)
-                ? val.id
-                : val
+            if (Array.isArray(val)) {
+              query[f] = val.join(',')
+            } else if (typeof val === 'object' && val !== null) {
+              query[f] = val.id
+            } else {
+              query[f] = val
+            }
           }
         })
         this.$router.replace({ query })
@@ -141,7 +144,7 @@ export default {
         unidade: null,
         parlamentares: null,
         situacao: [],
-        emendas: 'True',
+        emendas_tipos: ['0', '10', '99'],
         ajustes: 'True',
         search: ''
       }
@@ -248,14 +251,15 @@ export default {
       this.fetching = true
 
       const promises = {}
+      const emendasTipos = this.filters_value.emendas_tipos
       const fetchEmendas =
-        (this.filters_value.emendas === 'True') |
+        (Array.isArray(emendasTipos) && emendasTipos.length > 0) ||
         (this.filters_value.ajustes === 'False' &&
-          this.filters_value.emendas === 'False')
+          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
       const fetchAjustes =
-        (this.filters_value.ajustes === 'True') |
+        (this.filters_value.ajustes === 'True') ||
         (this.filters_value.ajustes === 'False' &&
-          this.filters_value.emendas === 'False')
+          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
 
       if (fetchEmendas) {
         const params_emendas = {
@@ -281,6 +285,9 @@ export default {
         }
         if (this.filters_value.search) {
           params_emendas.search = this.filters_value.search
+        }
+        if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
+          params_emendas.tipo__in = emendasTipos.join(',')
         }
         promises.emendas = this.utils.fetch({
           app: 'loa',
@@ -373,6 +380,9 @@ export default {
                     t.filters_value[f] = found
                   }
                 }
+              } else if (f === 'emendas_tipos') {
+                t.filters_value[f] =
+                  typeof query[f] === 'string' ? query[f].split(',') : query[f]
               } else if (f === 'unidade') {
                 const uid = parseInt(query[f])
                 if (uid) {

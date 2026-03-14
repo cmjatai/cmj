@@ -48,14 +48,15 @@
     <div class="row align-items-end mt-2">
       <div class="col-auto">
         <label class="pcl-filtros-label">Documentos</label>
-        <div class="pcl-filtros-check-group d-flex">
-          <b-form-checkbox
-            class="mr-3"
-            :checked="value.emendas"
-            @change="val => updateFilter('emendas', val)"
-            value="True"
-            unchecked-value="False"
-          >Emendas Impositivas/Modificativas</b-form-checkbox>
+        <div class="pcl-filtros-check-group d-flex flex-wrap">
+          <b-form-checkbox-group
+            :checked="value.emendas_tipos"
+            @change="val => updateFilter('emendas_tipos', val)"
+          >
+            <b-form-checkbox class="mr-3" value="10">Impositivas da Saúde</b-form-checkbox>
+            <b-form-checkbox class="mr-3" value="99">Impositivas de Áreas Diversas</b-form-checkbox>
+            <b-form-checkbox class="mr-3" value="0">Modificativas</b-form-checkbox>
+          </b-form-checkbox-group>
           <b-form-checkbox
             :checked="value.ajustes"
             @change="val => updateFilter('ajustes', val)"
