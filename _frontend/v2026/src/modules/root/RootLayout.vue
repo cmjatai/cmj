@@ -60,15 +60,14 @@ const handleDisableAutoRolagem = (event) => {
 
 // 8. Functions
 </script>
+
 <style lang="scss">
 
 body {
   overflow-x: hidden;
-  --height-header: 3em;
   --width-sidebar-collapsed: 3em;
 }
 .root-layout {
-
   top: 0;
   right: 0;
   bottom: 0;
@@ -102,12 +101,12 @@ body {
     }
     .header-left {
       width: 2.4em;
-      height: var(--height-header);
+      height: var(--header-height);
       z-index: 1;
     }
     .header-right {
-      width: var(--height-header);
-      height: var(--height-header);
+      width: var(--header-height);
+      height: var(--header-height);
       z-index: 1;
     }
     .header-left {

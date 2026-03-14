@@ -1,5 +1,8 @@
 @import 'bootstrap/scss/root';
 
+:root {
+ --header-height: 4rem;
+}
 
 [data-bs-theme="light"] {
  --nav-bg-hover-color: #e9ecef;

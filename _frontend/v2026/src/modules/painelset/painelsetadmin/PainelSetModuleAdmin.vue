@@ -20,8 +20,8 @@ onMounted(() => {
 <style lang="scss">
 .painelset-module-admin {
   position: absolute;
-  top: 0;
-  left: 0;
+  top: var(--header-height);
+  left: var(--width-sidebar-collapsed);
   right: 0;
   bottom: 0;
   user-select: none;
