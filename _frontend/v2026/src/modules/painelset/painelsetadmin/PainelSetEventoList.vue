@@ -14,49 +14,39 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, onMounted, defineAsyncComponent } from 'vue'
+import { useSyncStore } from '~@/stores/SyncStore'
 
-export default {
-  name: 'painelset-evento-list',
-  components: {
-    'painel-set-evento-list-item': () => import('./PainelSetEventoListItem.vue')
-  },
-  data () {
-    return {
-    }
-  },
-  computed: {
-    eventos: {
-      get () {
-        if (this.data_cache?.painelset_evento) {
-          return _.orderBy(Object.values(this.data_cache.painelset_evento), ['end_real', 'start_real', 'start_previsto'], ['desc', 'desc', 'desc'])
-        }
-        return []
-      }
-    }
-  },
-  mounted: function () {
-    const t = this
-    t.fetchSync({
-      app: 'painelset',
-      model: 'evento',
-      params: { o: '-start_real,-start_previsto' }
-    })
-    t.registerModels({
-      app: 'sessao',
-      models: ['sessaoplenaria']
-    })
+const syncStore = useSyncStore()
 
-    t.fetchSync({
-      app: 'sessao',
-      model: 'sessaoplenaria',
-      params: {
-        o: '-data_inicio'
-      },
-      only_first_page: true
-    })
+const PainelSetEventoListItem = defineAsyncComponent(() => import('./PainelSetEventoListItem.vue'))
+
+const eventos = computed(() => {
+  if (syncStore.data_cache?.painelset_evento) {
+    return _.orderBy(Object.values(syncStore.data_cache.painelset_evento), ['end_real', 'start_real', 'start_previsto'], ['desc', 'desc', 'desc'])
   }
-}
+  return []
+})
+
+onMounted(() => {
+  syncStore.fetchSync({
+    app: 'painelset',
+    model: 'evento',
+    params: { o: '-start_real,-start_previsto' }
+  })
+  syncStore.registerModels('painelset', ['evento'])
+  syncStore.registerModels('sessao', ['sessaoplenaria'])
+
+  syncStore.fetchSync({
+    app: 'sessao',
+    model: 'sessaoplenaria',
+    params: {
+      o: '-data_inicio'
+    },
+    only_first_page: true
+  })
+})
 </script>
 
 <style lang="scss">

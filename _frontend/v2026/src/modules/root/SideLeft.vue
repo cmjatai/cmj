@@ -186,7 +186,7 @@ const links = ref([
   {
     icon: 'columns',
     route: '',
-    link: '/online/painelset/',
+    link: '/v2026/painelsetadmin',
     texto: 'Eventos e Painéis'
   },
   {

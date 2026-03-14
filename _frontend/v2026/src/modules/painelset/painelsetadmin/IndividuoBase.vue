@@ -1,16 +1,29 @@
 <template>
-  <div :class="[
-    'individuo-base',
-    individuo && individuo.status_microfone ? '' :  'muted',
-    individuo && individuo.parlamentar ? 'parlamentar' : '',
-    individuo && individuo.com_a_palavra ? 'com-a-palavra' : (individuo && individuo.microfone_sempre_ativo ? 'always-on' : 'active'),
-    individuo && individuo.aparteado ? 'aparteante' : ''
-    ]">
+  <div
+    :class="[
+      'individuo-base',
+      individuo && individuo.status_microfone ? '' : 'muted',
+      individuo && individuo.parlamentar ? 'parlamentar' : '',
+      individuo && individuo.com_a_palavra ? 'com-a-palavra' : (individuo && individuo.microfone_sempre_ativo ? 'always-on' : 'active'),
+      individuo && individuo.aparteado ? 'aparteante' : ''
+    ]"
+  >
     <div class="inner">
-      <div :class="['inner-individuo', fotografiaUrl ? '' : 'no-photo']" @click="clickIndividuo($event)" @dblclick="dblclickIndividuo($event)">
+      <div
+        :class="['inner-individuo', fotografiaUrl ? '' : 'no-photo']"
+        @click="clickIndividuo($event)"
+        @dblclick="dblclickIndividuo($event)"
+      >
         <div class="avatar">
-          <img v-if="fotografiaUrl" :src="fotografiaUrl" alt="Foto do individuo"/>
-          <i v-else class="fas fa-user"></i>
+          <img
+            v-if="fotografiaUrl"
+            :src="fotografiaUrl"
+            alt="Foto do individuo"
+          >
+          <FontAwesomeIcon
+            v-else
+            icon="user"
+          />
         </div>
         <div class="name">
           {{ individuo ? individuo.name : 'Carregando indivíduo...' }}
@@ -22,143 +35,165 @@
           v-if="individuo"
           class="btn-action btn-fone"
           :title="individuo && !individuo.status_microfone ? 'Ativar microfone' : 'Desativar microfone'"
-           @click="toggleMicrofone()"
+          @click="toggleMicrofone()"
         >
-          <i :class="individuo && individuo.status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
+          <FontAwesomeIcon
+            :icon="individuo && individuo.status_microfone ? 'microphone' : 'microphone-slash'"
+            size="2x"
+          />
         </button>
-        <button class="btn-action btn-aparte" @click.prevent="clickIndividuo($event)" title="Solicitar aparte">
-          <i class="fas fa-hand-rock"></i>
+        <button
+          class="btn-action btn-aparte"
+          @click.prevent="clickIndividuo($event)"
+          title="Solicitar aparte"
+        >
+          <FontAwesomeIcon icon="hand-rock" />
         </button>
-        <button class="btn-action btn-palavra" @click.stop="dblclickIndividuo($event)" title="Solicitar a palavra">
-          <i class="fas fa-hand-paper"></i>
+        <button
+          class="btn-action btn-palavra"
+          @click.stop="dblclickIndividuo($event)"
+          title="Solicitar a palavra"
+        >
+          <FontAwesomeIcon icon="hand-paper" />
         </button>
         <button
           v-if="false && individuo"
           class="btn-action btn-manage"
         >
-          <i class="fas fa-cog"></i>
+          <FontAwesomeIcon icon="cog" />
         </button>
       </div>
     </div>
   </div>
 </template>
-<script>
-import { EventBus } from '@/event-bus'
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount, inject } from 'vue'
+import { useSyncStore } from '~@/stores/SyncStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
+import Resources from '~@/utils/resources'
 
-export default {
-  name: 'individuo-base',
-  props: {
-    individuo_id: {
-      type: Number,
-      required: true
-    },
-    default_timer: {
-      type: Number,
-      required: false,
-      default: 300 // seconds
-    },
-    default_timer_aparteante: {
-      type: Number,
-      required: false,
-      default: 60 // seconds
-    }
+const syncStore = useSyncStore()
+const messageStore = useMessageStore()
+const EventBus = inject('EventBus')
+
+const props = defineProps({
+  individuo_id: {
+    type: Number,
+    required: true
   },
-  data () {
-    return {
-      click_timeout: null
-    }
+  default_timer: {
+    type: Number,
+    required: false,
+    default: 300
   },
-  computed: {
-    individuoComPalavra: {
-      get () {
-        if (this.data_cache?.painelset_individuo) {
-          return Object.values(this.data_cache.painelset_individuo).find(i => i.com_a_palavra && i.evento === this.individuo.evento) || null
-        }
-        return null
-      }
-    },
-    individuo: function () {
-      if (this.data_cache?.painelset_individuo && this.individuo_id) {
-        return this.data_cache.painelset_individuo[this.individuo_id] || null
-      }
-      return null
-    },
-    fotografiaUrl: function () {
-      if (this.individuo?.fotografia) {
-        return '/api/painelset/individuo/' + this.individuo.id + '/fotografia.c96.png'
-      } else if (this.individuo?.parlamentar) {
-        return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
-      }
-      return ''
-    }
-  },
-  mounted () {
-    console.debug('Individuo Base mounted', this.individuo_id)
-    EventBus.$on('toggle-microfone-individuo', (individuo_id) => {
-      if (individuo_id === this.individuo_id) {
-        this.toggleMicrofone()
-      }
+  default_timer_aparteante: {
+    type: Number,
+    required: false,
+    default: 60
+  }
+})
+
+const click_timeout = ref(null)
+
+const individuoComPalavra = computed(() => {
+  if (syncStore.data_cache?.painelset_individuo) {
+    return Object.values(syncStore.data_cache.painelset_individuo).find(i => i.com_a_palavra && i.evento === individuo.value.evento) || null
+  }
+  return null
+})
+
+const individuo = computed(() => {
+  if (syncStore.data_cache?.painelset_individuo && props.individuo_id) {
+    return syncStore.data_cache.painelset_individuo[props.individuo_id] || null
+  }
+  return null
+})
+
+const fotografiaUrl = computed(() => {
+  if (individuo.value?.fotografia) {
+    return '/api/painelset/individuo/' + individuo.value.id + '/fotografia.c96.png'
+  } else if (individuo.value?.parlamentar) {
+    return '/api/parlamentares/parlamentar/' + individuo.value.parlamentar + '/fotografia.c96.png'
+  }
+  return ''
+})
+
+const sendUpdate = (action, query_params) => {
+  return Resources.Utils
+    .patchModel({
+      app: 'painelset',
+      model: 'individuo',
+      id: props.individuo_id,
+      action: action,
+      form: query_params
     })
-  },
-  methods: {
-    toggleMicrofone: function () {
-      this.sendUpdate(
-        'toggle_microfone',
-        {
-          status_microfone: !this.individuo?.status_microfone ? 'on' : 'off',
-          default_timer: this.default_timer,
-          com_a_palavra: this.individuo?.com_a_palavra ? 1 : 0
-        }
-      )
-    },
-    clickIndividuo: function (event) {
-      const t = this
-      clearTimeout(t.click_timeout)
-      t.click_timeout = setTimeout(() => {
-        if (t.individuo?.com_a_palavra || !t.individuoComPalavra) {
-          if (t.individuo === t.individuoComPalavra) {
-            t.sendMessage({ alert: 'error', message: 'A palavra já está sendo utilizada por este indivíduo.', time: 7 })
-            return
-          }
-          this.sendMessage({ alert: 'error', message: 'A palavra não está sendo utilizada. Não é possível fazer aparte.', time: 7 })
-          return
-        }
-        t.sendUpdate(
-          'toggle_aparteante',
-          {
-            aparteante_status: !t.individuo.aparteado ? 1 : 0,
-            default_timer: t.default_timer_aparteante || 60
-          }
-        )
-      }, 600)
-    },
-    dblclickIndividuo: function (event) {
-      clearTimeout(this.click_timeout)
-      this.sendUpdate(
-        'toggle_microfone',
-        {
-          status_microfone: this.individuo?.status_microfone || !this.individuo?.com_a_palavra ? 'on' : 'off',
-          default_timer: this.default_timer,
-          com_a_palavra: !this.individuo?.com_a_palavra ? 1 : 0
-        }
-      )
-    },
-    sendUpdate (action, query_params) {
-      return this
-        .utils.patchModelAction(
-          'painelset', 'individuo', this.individuo_id, action,
-          query_params
-        )
-        .then(response => {
-          console.debug(this.individuo_id, action, response)
-        })
-        .catch(error => {
-          console.error(this.individuo_id, action, error)
-          this.sendMessage({ alert: 'error', message: 'Erro ao atualizar indivíduo: ' + error.response.data, time: 5 })
-        })
+    .then(response => {
+      console.debug(props.individuo_id, action, response)
+    })
+    .catch(error => {
+      console.error(props.individuo_id, action, error)
+      messageStore.addMessage({ type: 'danger', text: 'Erro ao atualizar indivíduo: ' + error.response.data, timeout: 5000 })
+    })
+}
+
+const toggleMicrofone = () => {
+  sendUpdate(
+    'toggle_microfone',
+    {
+      status_microfone: !individuo.value?.status_microfone ? 'on' : 'off',
+      default_timer: props.default_timer,
+      com_a_palavra: individuo.value?.com_a_palavra ? 1 : 0
     }
+  )
+}
+
+const clickIndividuo = (event) => {
+  clearTimeout(click_timeout.value)
+  click_timeout.value = setTimeout(() => {
+    if (individuo.value?.com_a_palavra || !individuoComPalavra.value) {
+      if (individuo.value === individuoComPalavra.value) {
+        messageStore.addMessage({ type: 'danger', text: 'A palavra já está sendo utilizada por este indivíduo.', timeout: 7000 })
+        return
+      }
+      messageStore.addMessage({ type: 'danger', text: 'A palavra não está sendo utilizada. Não é possível fazer aparte.', timeout: 7000 })
+      return
+    }
+    sendUpdate(
+      'toggle_aparteante',
+      {
+        aparteante_status: !individuo.value.aparteado ? 1 : 0,
+        default_timer: props.default_timer_aparteante || 60
+      }
+    )
+  }, 600)
+}
+
+const dblclickIndividuo = (event) => {
+  clearTimeout(click_timeout.value)
+  sendUpdate(
+    'toggle_microfone',
+    {
+      status_microfone: individuo.value?.status_microfone || !individuo.value?.com_a_palavra ? 'on' : 'off',
+      default_timer: props.default_timer,
+      com_a_palavra: !individuo.value?.com_a_palavra ? 1 : 0
+    }
+  )
+}
+
+const onToggleMicrofone = (individuo_id) => {
+  if (individuo_id === props.individuo_id) {
+    toggleMicrofone()
   }
 }
+
+onMounted(() => {
+  console.debug('Individuo Base mounted', props.individuo_id)
+  EventBus.on('toggle-microfone-individuo', onToggleMicrofone)
+})
+
+onBeforeUnmount(() => {
+  EventBus.off('toggle-microfone-individuo', onToggleMicrofone)
+})
 </script>
 <style lang="scss">
 .individuo-base {
