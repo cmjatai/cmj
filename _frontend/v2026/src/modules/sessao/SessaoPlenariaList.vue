@@ -26,24 +26,26 @@ import Resource from '~@/utils/resources'
 
 const pagination = ref({})
 const sessoes = ref([])
+const currentFilter = ref({})
 
 const changeFilter = (form_filter) => {
+  currentFilter.value = form_filter
   fetchSessaoPlenariaList(1, form_filter)
 }
 const currentPage = (value) => {
   console.debug('currentPage', value)
-  fetchSessaoPlenariaList(value)
+  fetchSessaoPlenariaList(value, currentFilter.value)
 }
 
 const nextPage = () => {
   if (pagination.value?.current_page < pagination.value?.total_pages) {
-    fetchSessaoPlenariaList(pagination.value.current_page + 1)
+    fetchSessaoPlenariaList(pagination.value.current_page + 1, currentFilter.value)
   }
 }
 
 const previousPage = () => {
   if (pagination.value?.current_page > 1) {
-    fetchSessaoPlenariaList(pagination.value.current_page - 1)
+    fetchSessaoPlenariaList(pagination.value.current_page - 1, currentFilter.value)
   }
 }
 const fetchSessaoPlenariaList = async (page = 1, form_filter = {}) => {
