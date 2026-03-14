@@ -79,6 +79,22 @@ export const routes = [
               title: '404 - Not Found',
               description: 'Page not found'
             }
+          },
+        ]
+      },
+      { path: 'painelsetadmin', // list
+        name: 'painelsetadmin_module_admin_view',
+        component: () => import('~@/modules/painelset/painelsetadmin/PainelSetModuleAdmin.vue'),
+        children: [
+          {
+            path: '',
+            name: 'painelsetadmin_evento_list_link',
+            component: () => import('~@/modules/painelset/painelsetadmin/PainelSetEventoList.vue')
+          },
+          {
+            path: ':id/admin',
+            name: 'painelsetadmin_admin_link',
+            component: () => import('~@/modules/painelset/painelsetadmin/PainelSetAdmin.vue')
           }
         ]
       },

@@ -77,22 +77,22 @@ export const routes = [
       },
       { path: 'painelset', // list
         name: '',
-        component: () => import('@/modules/online/painelset/PainelSetModule.vue'),
+        component: () => import('@/modules/online/painelsetadmin/PainelSetModule.vue'),
         children: [
           {
             path: '',
             name: 'painelset_evento_list_link',
-            component: () => import('@/modules/online/painelset/PainelSetEventoList.vue')
+            component: () => import('@/modules/online/painelsetadmin/PainelSetEventoList.vue')
           },
           {
             path: ':id/admin',
             name: 'painelset_admin_link',
-            component: () => import('@/modules/online/painelset/admin/PainelSetAdmin.vue')
+            component: () => import('@/modules/online/painelsetadmin/admin/PainelSetAdmin.vue')
           },
           {
             path: ':id/:painel_id',
             name: 'painelset_painel_link',
-            component: () => import('@/modules/online/painelset/painel/PainelSetPainel.vue')
+            component: () => import('@/modules/online/painelsetadmin/painel/PainelSetPainel.vue')
           }
         ]
       }
