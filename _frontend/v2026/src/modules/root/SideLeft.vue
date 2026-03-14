@@ -221,7 +221,7 @@ const closeOffCanvas = (selector) => {
 <style lang="scss">
   .sidebar {
     position: fixed;
-    top: var(--height-header);
+    top: var(--header-height);
     transition: all 0.2s;
     background-color: var(--cmj-background-color);
     // border-right: 1px solid var(--bs-border-color-translucent);
