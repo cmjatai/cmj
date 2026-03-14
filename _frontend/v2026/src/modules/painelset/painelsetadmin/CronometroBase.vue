@@ -306,7 +306,7 @@ const stopCronometro = () => {
 
 <style lang="scss">
 .cronometro-component {
-  z-index: 2;
+  z-index: 1000;
   .croncard {
     display: flex;
     flex-direction: column;
@@ -319,6 +319,7 @@ const stopCronometro = () => {
     padding: 5px 10px 3px;
     // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
+    z-index: 100000;
     .inner {
       line-height: 1;
       flex-direction: column;

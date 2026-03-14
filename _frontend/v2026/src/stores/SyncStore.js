@@ -22,11 +22,13 @@ export const useSyncStore = defineStore('syncStore', {
         return
       }
       this.wsManager = new WebSocketManager()
-      this.wsManager.on('open', () => {
+      this.wsManager.on('connected', () => {
         this.wsConnected = true
       })
-      this.wsManager.on('close', () => {
+      this.wsManager.on('disconnected', () => {
         this.wsConnected = false
+      })
+      this.wsManager.on('error', () => {
       })
       this.wsManager.on('message', (data) => {
         if (data.type === 'pong') {
