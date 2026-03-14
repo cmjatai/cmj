@@ -1,0 +1,1 @@
+import{o,g as t,q as r,z as n,f as a}from"./vendor-DLtOfYKb.js";const p={__name:"ArqLayout",setup(s){return o(()=>{}),(c,_)=>{const e=n("router-view");return a(),t("div",null,[r(e)])}}};export{p as default};
