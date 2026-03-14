@@ -93,6 +93,13 @@ class WebSocketManager {
   send (data) {
     if (this.ws.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify(data))
+    } else {
+      const delay = this.reconnectInterval * Math.pow(2, this.reconnectAttempts)
+      setTimeout(() => {
+        if (this.ws.readyState === WebSocket.OPEN) {
+          this.ws.send(JSON.stringify(data))
+        }
+      }, delay)
     }
   }
 
