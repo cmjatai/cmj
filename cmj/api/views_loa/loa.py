@@ -374,17 +374,17 @@ class LoaViewSet:
 
     @action(
         methods=[
-            "post",
+            "get",
         ],
         detail=True,
     )
     def espelho(self, request, *args, **kwargs):
         loa = self.get_object()
-        filters_data = request.data
+        filters_data = request.query_params
         return Response(self.run_espelho(filters_data, loa))
 
     def run_espelho(self, filters_data, loa):
-
+        filters_data = dict(filters_data)
         try:
             itens = filters_data.pop("itens")
             if itens != 1000:
@@ -604,9 +604,9 @@ class LoaViewSet:
             r[3] = r[3] or ""
 
             if len(r[0]) > 36:
-                r[0] = f'{"&nbsp;" * 20}{r[0][37:]}'
+                r[0] = f'{" " * 20}{r[0][37:]}'
             elif len(r[0]) > 23:
-                r[0] = f'{"&nbsp;" * 8}..{r[0][23:]}'  # 22 space - original
+                r[0] = f'{" " * 8}..{r[0][23:]}'  # 22 space - original
             else:
                 # r[0] = f'{r[0]}<div class="ident">{"&nbsp;" * (min(28, agrupamento) - len(r[0]) - 5)}</div>'
                 r[0] = f'{r[0]}{" " * (min(28, agrupamento_local) - len(r[0]) - 5)}'
