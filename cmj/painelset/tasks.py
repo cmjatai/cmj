@@ -143,7 +143,11 @@ def task_check_finished_cronometros_function():
 #@shared_task
 @cmj_celery_app.task(queue='cq_painelset', bind=True)
 def task_painelset_refresh_states(self):
+    # logger.info("Iniciando tarefa de atualização de estados das visões de painel")
 
     zero_time_cronometros, running_cronometros = task_check_finished_cronometros_function()
 
-    task_refresh_states_from_visaodepainel_function()
+    try:
+        task_refresh_states_from_visaodepainel_function()
+    except Exception as e:
+        logger_celery.error(f"Erro ao atualizar estados das visões de painel: {e}")
