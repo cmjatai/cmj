@@ -1,13 +1,7 @@
 <template>
   <div class="painelset-visoes-control">
     <div class="youtube_id">
-      <input type="text" v-model="youtube_id" @change="
-        utils.patchModel(
-          'painelset',
-          'evento',
-          evento.id,
-          { youtube_id: youtube_id }
-        )"/>
+      <input type="text" v-model="youtube_id" @change="patchYoutubeId"/>
     </div>
     <div class="inner" v-if="painel">
       <div class="checkbox-auto-select-visoes">
@@ -15,21 +9,14 @@
           type="checkbox"
           id="autoSelectVisoes"
           v-model="painel.auto_select_visoes"
-          @change="
-            utils.patchModel(
-              'painelset',
-              'painel',
-              painel.id,
-              { auto_select_visoes: painel.auto_select_visoes }
-            )
-          "
+          @change="patchAutoSelectVisoes"
         >
       </div>
       <div class="inner-visoes">
         <div class="title-visao-ativa">
           <div v-if="visoes.length > 0">
             <span v-for="visao in visoes" :key="`visao-ativa-${visao.id}`">
-              <span v-if="visao.active"><i class="fas fa-check-circle"></i>
+              <span v-if="visao.active"><FontAwesomeIcon icon="check-circle" />
                 {{ visao.name }}
               </span>
             </span>
@@ -50,107 +37,126 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'visoes-control',
-  props: {
-    evento: {
-      type: Object,
-      required: true
-    }
-  },
-  components: {
-  },
-  data () {
-    return {
-      evento_id: Number(this.$route.params.id),
-      youtube_id: ''
-    }
-  },
-  watch: {
-    'evento': {
-      handler (newVal) {
-        if (!this.finished && newVal && newVal.end_real) {
-          this.finished = true
-          this.sendMessage({ alert: 'danger', message: 'Evento já finalizado. Você pode copiá-lo para gerar um novo evento.', time: 10 })
-          this.$router.push({ name: 'painelset_evento_list_link' })
-        }
-        if (newVal) {
-          this.youtube_id = newVal.youtube_id || ''
-          this.fetchSync({
-            app: 'painelset',
-            model: 'painel',
-            params: {
-              evento: newVal.id,
-              principal: true
-            }
-          })
-            .then(() => {
-              this.fetchSync({
-                app: 'painelset',
-                model: 'visaodepainel',
-                params: { painel: this.painel.id }
-              })
-            })
-        }
-      },
-      immediate: true
-    }
-  },
-  computed: {
-    painel: function () {
-      if (this.evento && this.data_cache?.painelset_painel) {
-        return Object.values(this.data_cache?.painelset_painel).find(p => p.evento === this.evento.id) || null
-      }
-      return null
-    },
-    visoes: function () {
-      if (this.painel && this.data_cache?.painelset_visaodepainel) {
-        return _.orderBy(
-          _.filter(
-            Object.values(this.data_cache?.painelset_visaodepainel),
-            { painel: this.painel.id }
-          ),
-          ['position'],
-          ['asc']
-        )
-      }
-      return []
-    }
-  },
-  mounted: function () {
-    this.$nextTick(() => {
-      if (this.permissions.includes('painelset.change_evento')) {
-        this.registerModels({
-          app: 'painelset',
-          models: ['evento', 'painel', 'visaodepainel']
-        })
-        this.fetchSync({
-          app: 'painelset',
-          model: 'evento',
-          id: this.evento_id
-        })
-      } else {
-        this.$router.push({ name: 'online_index_link' })
-        this.sendMessage({ alert: 'danger', message: 'Você não tem permissão para acessar esta página. aqui1', time: 5 })
+<script setup>
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useSyncStore } from '~@/stores/SyncStore'
+import { useAuthStore } from '~@/stores/AuthStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
+import Resources from '~@/utils/resources'
+
+const route = useRoute()
+const router = useRouter()
+const syncStore = useSyncStore()
+const authStore = useAuthStore()
+const messageStore = useMessageStore()
+
+const props = defineProps({
+  evento: {
+    type: Object,
+    required: true
+  }
+})
+
+const evento_id = Number(route.params.id)
+const youtube_id = ref('')
+const finished = ref(false)
+
+const painel = computed(() => {
+  if (props.evento && syncStore.data_cache?.painelset_painel) {
+    return Object.values(syncStore.data_cache?.painelset_painel).find(p => p.evento === props.evento.id) || null
+  }
+  return null
+})
+
+const visoes = computed(() => {
+  if (painel.value && syncStore.data_cache?.painelset_visaodepainel) {
+    return _.orderBy(
+      _.filter(
+        Object.values(syncStore.data_cache?.painelset_visaodepainel),
+        { painel: painel.value.id }
+      ),
+      ['position'],
+      ['asc']
+    )
+  }
+  return []
+})
+
+watch(() => props.evento, (newVal) => {
+  if (!finished.value && newVal && newVal.end_real) {
+    finished.value = true
+    messageStore.addMessage({ type: 'danger', text: 'Evento já finalizado. Você pode copiá-lo para gerar um novo evento.', timeout: 10000 })
+    router.push({ name: 'painelsetadmin_evento_list_link' })
+  }
+  if (newVal) {
+    youtube_id.value = newVal.youtube_id || ''
+    syncStore.fetchSync({
+      app: 'painelset',
+      model: 'painel',
+      params: {
+        evento: newVal.id,
+        principal: true
       }
     })
-  },
-  methods: {
-    manualActiveVisao: function (visao_id) {
-      this
-        .utils.patchModelAction(
-          'painelset', 'visaodepainel', visao_id, 'activate'
-        )
-        .then(response => {
-
+      .then(() => {
+        syncStore.fetchSync({
+          app: 'painelset',
+          model: 'visaodepainel',
+          params: { painel: painel.value.id }
         })
-        .catch(error => {
-          console.error(this.evento.id, 'active', error)
-          this.sendMessage({ alert: 'error', message: 'Erro ao atualizar Visão Ativa: ' + error.response.data, time: 5 })
-        })
-    }
+      })
   }
+}, { immediate: true })
+
+onMounted(() => {
+  nextTick(() => {
+    if (authStore.permissions.includes('painelset.change_evento')) {
+      syncStore.registerModels('painelset', ['evento', 'painel', 'visaodepainel'])
+      syncStore.fetchSync({
+        app: 'painelset',
+        model: 'evento',
+        id: evento_id
+      })
+    } else {
+      router.push({ name: 'online_index_link' })
+      messageStore.addMessage({ type: 'danger', text: 'Você não tem permissão para acessar esta página. aqui1', timeout: 5000 })
+    }
+  })
+})
+
+const manualActiveVisao = (visao_id) => {
+  Resources.Utils
+    .patchModel({
+      app: 'painelset',
+      model: 'visaodepainel',
+      id: visao_id,
+      action: 'activate'
+    })
+    .then(response => {
+    })
+    .catch(error => {
+      console.error(props.evento.id, 'active', error)
+      messageStore.addMessage({ type: 'danger', text: 'Erro ao atualizar Visão Ativa: ' + error.response.data, timeout: 5000 })
+    })
+}
+
+const patchYoutubeId = () => {
+  Resources.Utils.patchModel({
+    app: 'painelset',
+    model: 'evento',
+    id: props.evento.id,
+    form: { youtube_id: youtube_id.value }
+  })
+}
+
+const patchAutoSelectVisoes = () => {
+  Resources.Utils.patchModel({
+    app: 'painelset',
+    model: 'painel',
+    id: painel.value.id,
+    form: { auto_select_visoes: painel.value.auto_select_visoes }
+  })
 }
 </script>
 

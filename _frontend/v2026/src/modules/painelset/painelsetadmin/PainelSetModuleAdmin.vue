@@ -4,25 +4,17 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'painelset-module-admin',
-  data () {
-    return {
-    }
-  },
-  mounted: function () {
-    const t = this
-    t.setSideleftVisivel(true)
-    t.setSiderightVisivel(false)
-    t.$nextTick(() => {
-      t.registerModels({
-        app: 'painelset',
-        models: ['evento', 'cronometro', 'individuo']
-      })
-    })
-  }
-}
+<script setup>
+import { onMounted, nextTick } from 'vue'
+import { useSyncStore } from '~@/stores/SyncStore'
+
+const syncStore = useSyncStore()
+
+onMounted(() => {
+  nextTick(() => {
+    syncStore.registerModels('painelset', ['evento', 'cronometro', 'individuo'])
+  })
+})
 </script>
 
 <style lang="scss">

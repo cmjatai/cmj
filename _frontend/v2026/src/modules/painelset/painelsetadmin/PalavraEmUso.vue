@@ -15,7 +15,7 @@
         <div class="individuo">
           <div class="avatar">
             <img v-if="fotografiaUrl" :src="fotografiaUrl" alt="Foto do indivíduo"/>
-            <i v-else class="fas fa-user-circle fa-2x"></i>
+            <FontAwesomeIcon v-else icon="user-circle" size="2x" />
           </div>
         </div>
         <div class="divide"></div>
@@ -26,8 +26,8 @@
           :cronometro_id="individuo.cronometro"
           ></cronometro-palavra>
           <div class="icon-status-microfone" @click="toggleMicrofone">
-            <i v-if="individuo && individuo.status_microfone" class="fas fa-microphone"></i>
-            <i v-else class="fas fa-microphone-slash"></i>
+            <FontAwesomeIcon v-if="individuo && individuo.status_microfone" icon="microphone" />
+            <FontAwesomeIcon v-else icon="microphone-slash" />
           </div>
         </div>
       </div>
@@ -40,50 +40,40 @@
       ></individuo-aparteante>
   </div>
 </template>
-<script>
+<script setup>
+import { computed, inject } from 'vue'
+import { useSyncStore } from '~@/stores/SyncStore'
 import CronometroPalavra from './CronometroPalavra.vue'
 import IndividuoAparteante from './IndividuoAparteante.vue'
-import { EventBus } from '@/event-bus'
 
-export default {
-  name: 'palavra-em-uso',
-  components: {
-    CronometroPalavra,
-    IndividuoAparteante
-  },
-  props: {
-    evento: {
-      type: Object,
-      required: true
-    }
-  },
-  data () {
-    return {
-    }
-  },
-  computed: {
-    individuo: {
-      get () {
-        if (this.evento && this.data_cache?.painelset_individuo) {
-          return Object.values(this.data_cache.painelset_individuo).find(i => i.com_a_palavra && i.evento === this.evento.id) || null
-        }
-        return null
-      }
-    },
-    fotografiaUrl: function () {
-      if (this.individuo?.fotografia) {
-        return '/api/painelset/individuo/' + this.individuo.id + '/fotografia.c96.png'
-      } else if (this.individuo?.parlamentar) {
-        return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
-      }
-      return ''
-    }
-  },
-  methods: {
-    toggleMicrofone: function () {
-      EventBus.$emit('toggle-microfone-individuo', this.individuo.id)
-    }
+const syncStore = useSyncStore()
+const EventBus = inject('EventBus')
+
+const props = defineProps({
+  evento: {
+    type: Object,
+    required: true
   }
+})
+
+const individuo = computed(() => {
+  if (props.evento && syncStore.data_cache?.painelset_individuo) {
+    return Object.values(syncStore.data_cache.painelset_individuo).find(i => i.com_a_palavra && i.evento === props.evento.id) || null
+  }
+  return null
+})
+
+const fotografiaUrl = computed(() => {
+  if (individuo.value?.fotografia) {
+    return '/api/painelset/individuo/' + individuo.value.id + '/fotografia.c96.png'
+  } else if (individuo.value?.parlamentar) {
+    return '/api/parlamentares/parlamentar/' + individuo.value.parlamentar + '/fotografia.c96.png'
+  }
+  return ''
+})
+
+const toggleMicrofone = () => {
+  EventBus.emit('toggle-microfone-individuo', individuo.value.id)
 }
 </script>
 <style lang="scss">

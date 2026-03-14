@@ -1,13 +1,15 @@
 <template>
   <div class="individuo-aparteante-component">
-    <div :class="['individuo-aparteante', ]"
+    <div
+      :class="['individuo-aparteante', ]"
       v-if="individuo"
       :key="`individuo-aparteante-${individuo.id}`"
-      :ref="`individuo-aparteante-${individuo.id}`">
+      :ref="`individuo-aparteante-${individuo.id}`"
+    >
       <div class="inner-individuo">
         <div class="individuo-header">
           <div class="name">
-          <strong>EM APARTE:</strong>
+            <strong>EM APARTE:</strong>
             {{ individuo ? individuo.name : 'Carregando indivíduo...' }}
           </div>
         </div>
@@ -15,76 +17,84 @@
       <div class="inner-individuo">
         <div class="individuo">
           <div class="avatar">
-            <img v-if="fotografiaUrl" :src="fotografiaUrl" alt="Foto do parlamentar"/>
-            <i v-else class="fas fa-user-circle fa-2x"></i>
+            <img
+              v-if="fotografiaUrl"
+              :src="fotografiaUrl"
+              alt="Foto do parlamentar"
+            >
+            <FontAwesomeIcon
+              v-else
+              icon="user-circle"
+              size="2x"
+            />
           </div>
         </div>
-        <div class="divide"></div>
-        <div class="cronometro" >
+        <div class="divide" />
+        <div class="cronometro">
           <cronometro-palavra
-          :key="`cronometro-com-a-palavra-${individuo.cronometro}`"
-          :ref="`cronometro-com-a-palavra-${individuo.cronometro}`"
-          :cronometro_id="individuo.cronometro"
-          :controls="[
-            // 'toggleDisplay',
-            'pause',
-            'resume',
-            'add30s',
-            'add1m'
-          ]"
-            ></cronometro-palavra>
-            <div class="icon-status-microfone" @click="toggleMicrofone">
-              <i v-if="individuo && individuo.status_microfone" class="fas fa-microphone"></i>
-              <i v-else class="fas fa-microphone-slash"></i>
-            </div>
+            :key="`cronometro-com-a-palavra-${individuo.cronometro}`"
+            :ref="`cronometro-com-a-palavra-${individuo.cronometro}`"
+            :cronometro_id="individuo.cronometro"
+            :controls="[
+              // 'toggleDisplay',
+              'pause',
+              'resume',
+              'add30s',
+              'add1m'
+            ]"
+          />
+          <div
+            class="icon-status-microfone"
+            @click="toggleMicrofone"
+          >
+            <FontAwesomeIcon
+              v-if="individuo && individuo.status_microfone"
+              icon="microphone"
+            />
+            <FontAwesomeIcon
+              v-else
+              icon="microphone-slash"
+            />
+          </div>
         </div>
       </div>
     </div>
-
   </div>
 </template>
-<script>
-import { EventBus } from '@/event-bus'
+<script setup>
+import { computed, inject } from 'vue'
+import { useSyncStore } from '~@/stores/SyncStore'
 import CronometroPalavra from './CronometroPalavra.vue'
-export default {
-  name: 'individuo-aparteante',
-  components: {
-    CronometroPalavra
-  },
-  props: {
-    individuo_id: {
-      type: Number,
-      required: false,
-      default: null
-    }
-  },
-  data () {
-    return {
-    }
-  },
-  computed: {
-    individuo: {
-      get () {
-        if (this.individuo_id && this.data_cache?.painelset_individuo) {
-          return this.data_cache.painelset_individuo[this.individuo_id] || null
-        }
-        return null
-      }
-    },
-    fotografiaUrl: function () {
-      if (this.individuo?.fotografia) {
-        return '/api/painelset/individuo/' + this.individuo.id + '/fotografia.c96.png'
-      } else if (this.individuo?.parlamentar) {
-        return '/api/parlamentares/parlamentar/' + this.individuo.parlamentar + '/fotografia.c96.png'
-      }
-      return ''
-    }
-  },
-  methods: {
-    toggleMicrofone: function () {
-      EventBus.$emit('toggle-microfone-individuo', this.individuo.id)
-    }
+
+const syncStore = useSyncStore()
+const EventBus = inject('EventBus')
+
+const props = defineProps({
+  individuo_id: {
+    type: Number,
+    required: false,
+    default: null
   }
+})
+
+const individuo = computed(() => {
+  if (props.individuo_id && syncStore.data_cache?.painelset_individuo) {
+    return syncStore.data_cache.painelset_individuo[props.individuo_id] || null
+  }
+  return null
+})
+
+const fotografiaUrl = computed(() => {
+  if (individuo.value?.fotografia) {
+    return '/api/painelset/individuo/' + individuo.value.id + '/fotografia.c96.png'
+  } else if (individuo.value?.parlamentar) {
+    return '/api/parlamentares/parlamentar/' + individuo.value.parlamentar + '/fotografia.c96.png'
+  }
+  return ''
+})
+
+const toggleMicrofone = () => {
+  EventBus.emit('toggle-microfone-individuo', individuo.value.id)
 }
 </script>
 <style lang="scss">

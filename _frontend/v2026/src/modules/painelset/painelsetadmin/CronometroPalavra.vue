@@ -14,41 +14,27 @@
     />
   </div>
 </template>
-<script>
-import CronometroBase from '@/modules/painelset/painelsetadmin/CronometroBase.vue'
-export default {
-  name: 'CronometroPalavra',
-  components: {
-    CronometroBase
+<script setup>
+import CronometroBase from '~@/modules/painelset/painelsetadmin/CronometroBase.vue'
+
+defineProps({
+  cronometro_id: {
+    type: Number,
+    required: true
   },
-  props: {
-    cronometro_id: {
-      type: Number,
-      required: true
-    },
-    controls: {
-      type: Array,
-      required: false,
-      default: function () {
-        return [
-          // 'start',
-          'pause',
-          'resume',
-          // 'stop',
-          'add30s',
-          'add1m',
-          'add3m',
-          'add5m'
-          // 'toggleDisplay'
-        ]
-      }
-    }
-  },
-  data () {
-    return {
-    }
+  controls: {
+    type: Array,
+    required: false,
+    default: () => [
+      'pause',
+      'resume',
+      'add30s',
+      'add1m',
+      'add3m',
+      'add5m'
+    ]
   }
-}
+})
 </script>
 <style lang="scss">
 .cronometro-palavra {

@@ -9,18 +9,18 @@
           title="Ativar/Desativar Todos os Microfones"
           @click="toggleAllMicrofones()"
         >
-          <i :class="status_microfone ? 'fas fa-2x fa-microphone' : 'fas fa-2x fa-microphone-slash'"></i>
+          <FontAwesomeIcon :icon="status_microfone ? 'microphone' : 'microphone-slash'" size="2x" />
         </button>
         </div>
         <div class="inner-individuo py-2">{{ individuos.length }} CANAIS</div>
         <div class="inner-individuo">
           <div class="default-timer">
             <button class="btn btn-link">
-              <i class="fas fa-arrow-down" @click="default_timer > 60 ? default_timer -= 60 : default_timer = 60"></i>
+              <FontAwesomeIcon icon="arrow-down" @click="default_timer > 60 ? default_timer -= 60 : default_timer = 60" />
             </button>
             Tempo Padrão: {{ (default_timer / 60).toFixed(0) }} min
             <button class="btn btn-link">
-              <i class="fas fa-arrow-up" @click="default_timer < 600 ? default_timer += 60 : default_timer = 600"></i>
+              <FontAwesomeIcon icon="arrow-up" @click="default_timer < 600 ? default_timer += 60 : default_timer = 600" />
             </button>
           </div>
         </div>
@@ -45,128 +45,127 @@
     </div>
   </div>
 </template>
-<script>
+<script setup>
+import { ref, computed, watch, onMounted } from 'vue'
+import { useSyncStore } from '~@/stores/SyncStore'
+import { useMessageStore } from '~@/modules/messages/store/MessageStore'
+import Resources from '~@/utils/resources'
 import IndividuoBase from './IndividuoBase.vue'
-export default {
-  name: 'individuo-list',
-  props: {
-    evento: {
-      type: Object,
-      required: true
-    },
-    pause_parent_on_start: {
-      type: Boolean,
-      required: false,
-      default: false
+
+const syncStore = useSyncStore()
+const messageStore = useMessageStore()
+
+const props = defineProps({
+  evento: {
+    type: Object,
+    required: true
+  },
+  pause_parent_on_start: {
+    type: Boolean,
+    required: false,
+    default: false
+  }
+})
+
+const status_microfone = ref(false)
+const pause_parent_on_aparte = ref(props.pause_parent_on_start)
+const default_timer = ref(300)
+
+const individuos = computed(() => {
+  if (syncStore.data_cache?.painelset_individuo) {
+    return _.orderBy(
+      _.filter(
+        Object.values(syncStore.data_cache.painelset_individuo),
+        { evento: props.evento.id }
+      ),
+      ['order'],
+      ['asc']
+    )
+  }
+  return []
+})
+
+const cronometros = computed(() => {
+  if (syncStore.data_cache?.painelset_individuo) {
+    const result = []
+    for (const individuo of Object.values(syncStore.data_cache.painelset_individuo)) {
+      if (individuo.evento === props.evento.id && individuo.cronometro) {
+        result.push(syncStore.data_cache.painelset_cronometro[individuo.cronometro])
+      }
     }
-  },
-  components: {
-    IndividuoBase
-  },
-  data () {
-    return {
-      init: false,
-      status_microfone: false,
-      pause_parent_on_aparte: this.pause_parent_on_start,
-      default_timer: 300 // segundos
-    }
-  },
-  computed: {
-    individuos: {
-      get () {
-        if (this.data_cache?.painelset_individuo) {
-          return _.orderBy(
-            _.filter(
-              Object.values(this.data_cache.painelset_individuo),
-              { evento: this.evento.id }
-            ),
-            ['order'],
-            ['asc']
-          )
-        }
-        return []
-      }
-    },
-    cronometros () {
-      if (this.data_cache?.painelset_individuo) {
-        const cronometros = []
-        for (const individuo of Object.values(this.data_cache.painelset_individuo)) {
-          if (individuo.evento === this.evento.id && individuo.cronometro) {
-            cronometros.push(this.data_cache.painelset_cronometro[individuo.cronometro])
-          }
-        }
-        return cronometros
-      }
-      return []
-    }
-  },
-  watch: {
-    individuos: {
-      handler (newVal, oldVal) {
-        // verifica se todos indivíduos estão com microfone ligado
-        this.status_microfone = this.individuos.every(
-          individuo => individuo.status_microfone === true)
-      },
-      deep: true
-    },
-    pause_parent_on_start: function (newVal, oldVal) {
-      this.pause_parent_on_aparte = newVal
-    },
-    pause_parent_on_aparte: function (newVal, oldVal) {
-      const t = this
-      if (t.cronometros && t.cronometros.length > 0) {
-        if (t.cronometros[0] && t.cronometros[0].pause_parent_on_start === newVal) {
-          return
-        }
-      }
-      const query_params = {
-        pause_parent_on_aparte: newVal ? 'on' : 'off'
-      }
-      t
-        .utils.patchModelAction(
-          'painelset', 'evento', this.evento.id, 'pause_parent_on_aparte',
-          query_params
-        )
-        .then(response => {
-          console.debug(this.evento, 'pause_parent_on_aparte', response)
-        })
-        .catch(error => {
-          console.error(this.evento.id, 'pause_parent_on_aparte', error)
-          this.sendMessage({ alert: 'error', message: 'Erro ao atualizar Configurar Pausa: ' + error.response.data, time: 5 })
-        })
-    }
-  },
-  mounted () {
-    console.debug('IndividuoList mounted', this.evento)
-    this.fetchSync({
-      app: 'painelset',
-      model: 'individuo',
-      params: { evento: this.evento.id }
-    })
-  },
-  methods: {
-    toggleAllMicrofones (inclui_microfone_sempre_ativo = true) {
-      const t = this
-      t.status_microfone = !t.status_microfone
-      const query_params = {
-        status_microfone: t.status_microfone ? 'on' : 'off',
-        inclui_microfone_sempre_ativo: inclui_microfone_sempre_ativo ? 'on' : 'off'
-      }
-      t
-        .utils.patchModelAction(
-          'painelset', 'evento', this.evento.id, 'toggle_microfones',
-          query_params
-        )
-        .then(response => {
-          console.debug(this.evento, 'toggle_microfones', response)
-        })
-        .catch(error => {
-          console.error(this.evento.id, 'toggle_microfones', error)
-          this.sendMessage({ alert: 'error', message: 'Erro ao atualizar Microfones: ' + error.response.data, time: 5 })
-        })
+    return result
+  }
+  return []
+})
+
+watch(individuos, () => {
+  status_microfone.value = individuos.value.every(
+    individuo => individuo.status_microfone === true)
+}, { deep: true })
+
+watch(() => props.pause_parent_on_start, (newVal) => {
+  pause_parent_on_aparte.value = newVal
+})
+
+watch(pause_parent_on_aparte, (newVal) => {
+  if (cronometros.value && cronometros.value.length > 0) {
+    if (cronometros.value[0] && cronometros.value[0].pause_parent_on_start === newVal) {
+      return
     }
   }
+  const query_params = {
+    pause_parent_on_aparte: newVal ? 'on' : 'off'
+  }
+  Resources.Utils
+    .patchModel({
+      app: 'painelset',
+      model: 'evento',
+      id: props.evento.id,
+      action: 'pause_parent_on_aparte',
+      form: query_params
+    })
+    .then(response => {
+      console.debug(props.evento, 'pause_parent_on_aparte', response)
+    })
+    .catch(error => {
+      console.error(props.evento.id, 'pause_parent_on_aparte', error)
+      messageStore.addMessage({ type: 'danger', text: 'Erro ao atualizar Configurar Pausa: ' + error.response.data, timeout: 5000 })
+    })
+})
+
+onMounted(() => {
+  console.debug('IndividuoList mounted', props.evento)
+  syncStore.fetchSync({
+    app: 'painelset',
+    model: 'individuo',
+    params: { evento: props.evento.id }
+  })
+})
+
+const toggleAllMicrofones = (inclui_microfone_sempre_ativo = true) => {
+  status_microfone.value = !status_microfone.value
+  const query_params = {
+    status_microfone: status_microfone.value ? 'on' : 'off',
+    inclui_microfone_sempre_ativo: inclui_microfone_sempre_ativo ? 'on' : 'off'
+  }
+  Resources.Utils
+    .patchModel({
+      app: 'painelset',
+      model: 'evento',
+      id: props.evento.id,
+      action: 'toggle_microfones',
+      form: query_params
+    })
+    .then(response => {
+      console.debug(props.evento, 'toggle_microfones', response)
+    })
+    .catch(error => {
+      console.error(props.evento.id, 'toggle_microfones', error)
+      messageStore.addMessage({ type: 'danger', text: 'Erro ao atualizar Microfones: ' + error.response.data, timeout: 5000 })
+    })
 }
+
+defineExpose({ status_microfone, toggleAllMicrofones })
 </script>
 <style lang="scss">
 .individuo-list {
