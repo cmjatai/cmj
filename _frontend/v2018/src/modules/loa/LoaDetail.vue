@@ -1,11 +1,15 @@
 <template>
   <div class="vue-loa-detail">
-    <h2 class="pt-4 legend">Resumo Gráfico das Despesas Orçamentárias da LOA<br><small>(Valores originais do projeto do Poder Executivo, sem aplicação das Emendas Impositivas)</small></h2>
-    <div class="container" v-if="!loa.ano || !chartDataLoa">
+    <h2 class="pt-4 legend d-none">Resumo Gráfico das Despesas Orçamentárias da LOA<br><small>(Valores originais do projeto do Poder Executivo, sem aplicação das Emendas Impositivas)</small></h2>
+    <div class="container d-none" v-if="!loa.ano || !chartDataLoa">
       <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
     </div>
     <div class="container" v-if="loa.ano && chartDataLoa">
-      <strong class="d-block mx-3 my-2">
+      <strong class="d-block my-2">
+        <i class="fa fa-filter"></i>
+        Filtrar Dados
+      </strong>
+      <strong class="mx-3 my-2 d-none">
         Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes,
         <span class="text-danger">o gráfico e tabela serão atualizados automaticamente</span>.
       </strong>
@@ -95,7 +99,7 @@
         </div>
       </div>
       <div class="row">
-        <div class="col-12 container-doughnut p-3 mt-3">
+        <div class="col-12 container-doughnut p-3 mt-3 d-none">
           <DoughnutChart v-if="chartDataLoa" :height="height" :plugins="pluginsDun" :chartDataUser="chartDataLoa"/>
           <b-table striped hover class="local_table" :items="despesas_agrupadas_table"></b-table>
         </div>

@@ -1,10 +1,15 @@
 {% load i18n common_tags%}
 - title: {% trans 'Resumo' %}
   url: loa_detail
-- title: {% trans 'Despesas' %}
-  url: despesa_list
+- title: {% trans 'Prestação de Contas' %}
+  url: prestacaocontaloa_list
 - title: {% trans 'Emendas Impositivas/Modificativas' %}
   url: emendaloa_list
+- title: {% trans 'Ajustes Técnicos' %}
+  url: oficioajusteloa_list
+- title: {% trans 'Despesas Orçamentárias' %}
+  url: despesa_list
+
 {% if perms.loa.emendaloa_full_editor %}
 - title: {% trans 'Agrupamentos' %}
   url: agrupamento_list
@@ -17,7 +22,3 @@
 - title: {% trans 'SF' %}
   url: subfuncao_list
 {% endif %}
-- title: {% trans 'Ajustes Técnicos' %}
-  url: oficioajusteloa_list
-- title: {% trans 'Prestação de Contas' %}
-  url: prestacaocontaloa_list

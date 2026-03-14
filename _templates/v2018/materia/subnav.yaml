@@ -14,12 +14,6 @@
   app_name: 'materia'
 - title: {% trans 'Assunto' %}
   url: materiaassunto_list
-- title: {% trans 'Despacho Inicial' %}
-  url: despachoinicial_list
-  check_permission: materia.add_materialegislativa
-- title: {% trans 'Numeração' %}
-  url: numeracao_list
-  check_permission: materia.add_materialegislativa
 - title: {% trans 'Relatoria' %}
   url: relatoria_list
   check_permission: materia.add_materialegislativa
@@ -29,4 +23,13 @@
 {% if 'texto_articulado_materia'|get_config_attr and object.texto_articulado.exists %}
 - title: {% trans 'Texto' %}
   url: materia_ta
+{% endif %}
+
+{% if False %}
+- title: {% trans 'Despacho Inicial' %}
+  url: despachoinicial_list
+  check_permission: materia.add_materialegislativa
+- title: {% trans 'Numeração' %}
+  url: numeracao_list
+  check_permission: materia.add_materialegislativa
 {% endif %}
