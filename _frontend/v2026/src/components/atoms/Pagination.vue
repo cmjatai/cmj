@@ -1,45 +1,77 @@
 <template>
-  <div v-if="pagination.total_entries !== 0" class="widget-pagination d-flex justify-content-between align-items-center">
-    <span :class="['arrow', pagination.previous_page !== null ? 'hover-circle' : 'disabled']" @click="previousPage">
-      <i class="fas fa-chevron-left"></i>
+  <div
+    v-if="pagination.total_entries"
+    class="widget-pagination d-flex justify-content-between align-items-center"
+  >
+    <span
+      :class="['arrow', pagination.previous_page != null ? 'hover-circle' : 'disabled']"
+      @click="previousPage"
+    >
+      <i class="fas fa-chevron-left" />
     </span>
     <div class="pages">
-      {{pagination.start_index}}–{{pagination.end_index}} de {{pagination.total_entries}}
+      {{ pagination.start_index }}–{{ pagination.end_index }} de {{ pagination.total_entries }}
       <div class="inner">
-        <b-pagination align="right" :total-rows="pagination.total_entries" v-model="currentPage" :per-page="18"/>
+        <BPagination
+          align="end"
+          :total-rows="pagination.total_entries"
+          v-model="currentPageModel"
+          :per-page="pageSize"
+        />
       </div>
     </div>
-    <span :class="['arrow', pagination.next_page !== null ? 'hover-circle' : 'disabled']"  @click="nextPage">
-      <i class="fas fa-chevron-right"></i>
+    <span
+      :class="['arrow', pagination.next_page != null ? 'hover-circle' : 'disabled']"
+      @click="nextPage"
+    >
+      <i class="fas fa-chevron-right" />
     </span>
   </div>
 </template>
-<script>
-export default {
-  name: 'pagination',
-  props: ['pagination'],
-  data () {
-    return {
-      currentPage: this.pagination.page
+
+<script setup>
+import { ref, watch } from 'vue'
+
+const props = defineProps({
+  pagination: {
+    type: Object,
+    default: () => ({})
+  },
+  pageSize: {
+    type: Number,
+    default: 10
+  }
+})
+
+const emit = defineEmits(['nextPage', 'previousPage', 'currentPage'])
+
+const currentPageModel = ref(props.pagination.page || 1)
+
+watch(
+  () => props.pagination,
+  (nv) => {
+    if (nv?.page) {
+      currentPageModel.value = nv.page
     }
   },
-  watch: {
-    currentPage: function (nv, ov) {
-      if (nv !== ov) {
-        this.$emit('currentPage', nv)
-      }
-    },
-    pagination: function (nv) {
-      this.currentPage = nv.page
-    }
-  },
-  methods: {
-    nextPage () {
-      if (this.pagination.next_page !== null) this.$emit('nextPage')
-    },
-    previousPage () {
-      if (this.pagination.previous_page !== null) this.$emit('previousPage')
-    }
+  { deep: true }
+)
+
+watch(currentPageModel, (nv, ov) => {
+  if (nv !== ov) {
+    emit('currentPage', nv)
+  }
+})
+
+function nextPage () {
+  if (props.pagination.next_page != null) {
+    emit('nextPage')
+  }
+}
+
+function previousPage () {
+  if (props.pagination.previous_page != null) {
+    emit('previousPage')
   }
 }
 </script>
@@ -68,11 +100,12 @@ export default {
     position: static;
     user-select: none;
     .inner {
-      z-index: 1;
+      z-index: 2;
       position: absolute;
       top: 100%;
       margin-top: -3px;
-      right: 20px;
+      right: 50%;
+      transform: translateX(50%);
       display: none;
       padding: 15px 15px 0;
       border: 1px #dddddd solid;

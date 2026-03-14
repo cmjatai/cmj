@@ -29,6 +29,7 @@
         </div>
         <Pagination
           :pagination="pagination"
+          :page-size="rows * cols"
           @next-page="nextPage"
           @previous-page="previousPage"
           @current-page="currentPage"
