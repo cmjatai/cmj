@@ -7,6 +7,7 @@ const FASE_VARIANTS = {
   30: 'success',
   40: 'danger',
   50: 'info',
+  25: 'secondary',
   20: 'secondary'
 }
 
