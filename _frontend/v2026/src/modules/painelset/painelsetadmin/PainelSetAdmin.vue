@@ -14,7 +14,7 @@
           <cronometro-base
             v-if="cronometro"
             :cronometro_id="cronometro.id"
-            css_class_controls="hover"
+            css_class_controls="hover bg-black rounded"
             css_class="cronometro-global"
             :controls="['start', 'pause', 'resume', 'toggleDisplay'] "
             @cronometro_start="startEvento()"
@@ -254,10 +254,10 @@ const pauseEvento = () => {
   }
   .overlay-paused {
     position: absolute;
-    top: 5.42em;
-    left: 41.6667%;
+    top: var(--header-height);
+    left: 37.5%;
     right: 0;
-    bottom: 3.5em;
+    bottom: 8em;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
