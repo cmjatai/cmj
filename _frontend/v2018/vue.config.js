@@ -50,6 +50,8 @@ module.exports = {
   },
 
   chainWebpack: config => {
+    config.resolve.alias.set('jquery', path.resolve(__dirname, 'node_modules/jquery'))
+
     config.output.crossOriginLoading('anonymous')
 
     config.optimization.runtimeChunk('single')
