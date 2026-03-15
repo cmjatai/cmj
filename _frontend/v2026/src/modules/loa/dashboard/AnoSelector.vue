@@ -1,5 +1,5 @@
 <template>
-  <div class="ano-selector d-flex gap-2 align-items-center">
+  <div class="ano-selector d-flex gap-1 align-items-center">
     <label
       v-for="loa in items"
       :key="loa.id"
@@ -51,8 +51,8 @@ const toggle = (ano) => {
   justify-content: center;
   cursor: pointer;
   user-select: none;
-  padding: 0.4rem 1rem;
-  border-radius: 2rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 1rem;
   font-weight: 600;
   font-size: 0.9rem;
   letter-spacing: 0.02em;
