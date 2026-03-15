@@ -1,103 +1,10 @@
-@import 'custom/variables';
+@import 'fonts';
 
+@import 'custom/variables';
+@import 'custom/keyframes';
 @import 'custom/bootstrap';
 
-@import url(https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap);
-
-@import 'header';
+@import 'globals';
 @import 'footer';
-@import 'root';
 
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px var(--bs-border-color) inset !important;
-    -webkit-text-fill-color: var(--bs-body-color) !important; /* Optional: Change text color */
-}
-
-a {
-  text-decoration: none;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.color-modes {
-  .dropdown-menu {
-    padding: .25rem;
-    li + li {
-      margin-top: .125rem;
-    }
-  }
-  .dropdown-item {
-    @include border-radius(.25rem);
-  }
-  .active {
-    font-weight: 600;
-    .bi {
-      display: block !important; // stylelint-disable-line declaration-no-important
-    }
-  }
-}
-
-
-@keyframes keyframe_rotate {
-  3% {
-    transform: rotate(135deg);
-  }
-  10% {
-    transform: rotate(855deg);
-  }
-  12% {
-    transform: scale(3) rotate(855deg);
-  }
-  14% {
-    transform: scale(1) rotate(855deg);
-  }
-  18% {
-    transform: rotate(135deg);
-  }
-  100% {
-    transform: rotate(135deg);
-  }
-}
-
-.animation-rotate {
-  transform: rotate(135deg);
-  animation: keyframe_rotate 30s ease-in-out infinite;
-}
-
-.avatar {
-  opacity: 0.75;
-  img {
-    border: 0px solid transparent;
-    border-radius: 50%;
-    width: 100%;
-  }
-
-  &:hover {
-    opacity: 1;
-  }
-}
-
-
-
-
-// ######### Dark Mode #########
-@include color-mode(dark) {
-}
-
-// ######### Media Queries #########
-
-@media (min-width: 768px) {
-}
-
-@media (min-width: 992px) {
-}
-
-@media (min-width: 1200px) {
-}
-@media print {
-}
+@import 'custom/compilacao';

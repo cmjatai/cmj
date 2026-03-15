@@ -65,7 +65,7 @@ app
   .use(router)
   .use(createPinia())
   .use(createBootstrap())
-  .mount('#cmj')
+  .mount('#cmj-app-root')
 
 // Registro manual do Service Worker para controle total da URL
 console.debug('Environment Mode:', import.meta.env.MODE)

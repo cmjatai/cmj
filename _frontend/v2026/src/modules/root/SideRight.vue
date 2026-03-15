@@ -3,88 +3,30 @@
     <div class="menu">
       <ul>
         <li>
-          <img
-            @click="toogleNormaDestaque"
-            src="/imgs/icon_normas_juridicas_destaque.png"
-          >
-          <ul>
-            <li
-              v-for="item in normasDeDestaque"
-              :key="`srmd${item.id}`"
-            >
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-toggle="modal"
-                data-target="#modal-norma"
-                @click="modalOpened=item"
-              >
-                {{ item.apelido }}
-              </button>
-            </li>
-          </ul>
+          <NormasDestaque />
         </li>
       </ul>
     </div>
-    <Teleport
-      v-if="modalOpened"
-      :to="`#modalCmj`"
-    >
-      <NormaSimpleModalView
-        :html-id="`modal-opened-${modalOpened.id}`"
-        :norma-id="modalOpened.id"
-        @close="modalOpened = null"
-      />
-    </Teleport>
   </div>
 </template>
 
 <script setup>
-import NormaSimpleModalView from '~@/components/NormaSimpleModalView.vue'
-import { ref, onMounted, computed } from 'vue'
-import { useSyncStore } from '~@/stores/SyncStore'
-const syncStore = useSyncStore()
-const modalOpened = ref(null)
-
-onMounted(() => {
-  syncStore.fetchSync({
-    app: 'norma',
-    model: 'normajuridica',
-    action: 'destaques',
-    params: {
-      get_all: true
-    }
-  })
-})
-
-const menuNormaDestaque = ref(false)
-const toogleNormaDestaque = () => {
-  menuNormaDestaque.value = !menuNormaDestaque.value
-}
-
-const normasDeDestaque = computed(() => {
-  return Object.values(syncStore.data_cache?.norma_normajuridica || {}).filter(
-    norma => norma.norma_de_destaque === true
-  ).sort((a, b) => {
-    if (a.apelido < b.apelido) return -1
-    if (a.apelido > b.apelido) return 1
-    return 0
-  })
-})
-
+import NormasDestaque from '~@/components/NormasDestaque.vue'
 </script>
 <style lang="scss">
 .side-right {
-  position: absolute;
-  top: var(--height-header);
-  bottom: 0;
-  width: 100%;
+  min-height: calc(100vh - var(--header-height));
   text-align: center;
+  
   background-color: var(--cmj-sideright-bg);
-  // border-left: 1px solid var(--bs-border-color-translucent);
+  &:hover {
+    background-color: var(--cmj-sideright-bg-hover);
+  }
   // box-shadow: -10px 0 20px var(--bs-body-bg);
 
   .menu {
+    //border-left: 1px solid var(--bs-border-color-translucent);
+    //padding-bottom: 1rem;
     ul {
       list-style-type: none;
       padding: 0;

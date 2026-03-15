@@ -130,7 +130,4 @@ const aumentarFonte = () => {
 // 8. Functions
 </script>
 <style lang="scss">
-.root-layout {
-  background-color: var(--cmj-background-color);
-}
 </style>

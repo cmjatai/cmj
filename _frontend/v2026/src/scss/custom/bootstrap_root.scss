@@ -1,0 +1,66 @@
+
+:root {
+  --header-height: 3rem;
+}
+
+[data-bs-theme="light"] {
+  --nav-bg-hover-color: #e9ecef;
+  --nav-text-hover-color: #fff;
+  --box-shadow-color: #e3e5e7;
+
+  --cmj-body-bg: #f5f5f5;
+  --cmj-main-bg: #f5f5f5;
+  --cmj-sideleft-bg: #f5f5f5;
+  --cmj-sideright-bg: #f5f5f5;
+
+  --cmj-sideleft-bg-hover: #dcdcdc;
+  --cmj-sideright-bg-hover: #dcdcdc;
+
+  --cmj-header-background-color: #114d81;
+
+  --cmj-expmat-background-color: #ffffcd;
+  --cmj-expmat-background-color-hover: #f5d576;
+
+  --cmj-ordemdia-background-color: #ffffff;
+  --cmj-ordemdia-background-color-hover: #4b7ec533;
+}
+
+[data-bs-theme="dark"] {
+  --nav-bg-hover-color: #495057;
+  --nav-text-hover-color: #ffffff;
+  --box-shadow-color: #30383f;
+
+  --cmj-body-bg: #212529;
+  --cmj-main-bg: #212529;
+
+  --cmj-sideleft-bg: #212529;
+  --cmj-sideright-bg: #212529;
+  --cmj-sideleft-bg-hover: #121212;
+  --cmj-sideright-bg-hover: #121212;
+
+  --cmj-header-background-color: #114d81;
+
+  --cmj-expmat-background-color: #000000;
+  --cmj-expmat-background-color-hover: #221902;
+
+  --cmj-ordemdia-background-color: #000000;
+  --cmj-ordemdia-background-color-hover: #02010c;
+}
+
+body {
+  --width-sidebar-collapsed: 0rem;
+  --width-sideright: 0rem;
+
+  overflow-x: hidden;
+  background-color: var(--cmj-body-bg);
+}
+
+@media screen and (min-width: 768px) {
+  :root {
+    --header-height: 4rem;
+  }
+  body {
+    --width-sidebar-collapsed: 4rem;
+    --width-sideright: 3rem;
+  }
+}
