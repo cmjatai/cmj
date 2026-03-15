@@ -164,7 +164,9 @@ const possuiRegistroVotacao = computed(() => {
     z-index: 1;
     background-color: var(--cmj-expmat-background-color);
     & > .item-content {
-      min-height: auto;
+      min-height: auto;&:hover {
+        background-color: var(--cmj-expmat-background-color-hover);
+      }
     }
     &.item-admin {
       &:hover {

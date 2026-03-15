@@ -2,21 +2,15 @@
   <div class="sessaoplenaria-module">
     <router-view />
     <PopoverPalavra />
-    <div
-      id="modalCmj"
-      ref="modalCmj"
-    />
   </div>
 </template>
 
 <script setup>
 import PopoverPalavra from '~@/modules/painelset/popovers/PopoverPalavra.vue'
 import { useSyncStore } from '~@/stores/SyncStore'
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 
 const syncStore = useSyncStore()
-
-const modalCmj = ref(null)
 
 const fetchInitialData = async () => {
   syncStore.registerModels('materia', [

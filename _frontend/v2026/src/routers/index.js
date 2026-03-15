@@ -15,6 +15,22 @@ export const routes = [
         component: () => import('~@/modules/root/RootPage.vue'),
         children: [
           {
+            path:'loa',
+            name: 'loa_module_view',
+            component: () => import('~@/modules/loa/LoaModule.vue'),
+            meta: {
+              title: 'LOA Module',
+              description: 'Home of LOA Module'
+            },
+            children: [
+              {
+                'path': 'dashboard',
+                name: 'loa_dashboard_link',
+                component: () => import('~@/modules/loa/dashboard/LoaDashboard.vue')
+              }
+            ]
+          },
+          {
             path: 'sessao',
             name: 'sessao_module_view',
             component: () => import('~@/modules/sessao/SessaoPlenariaModule.vue'),

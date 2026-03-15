@@ -7,10 +7,21 @@
     <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
-          <h5
-            class="modal-title"
-            v-html="norma ? (norma.apelido !== '' ? `${norma.apelido}<br>` : '') + norma.__str__ : 'Carregando...' "
-          />
+          <h5 class="modal-title">
+            <span v-html="props.normaObject.apelido" /><br>
+            <small v-html="props.normaObject.__str__" />
+          </h5>
+          <a
+            class="btn btn-success btn-open-external"
+            :href="`/norma/${props.normaObject.id}/ta`"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Abrir texto consolidado em nova aba"
+          >
+            <FontAwesomeIcon
+              :icon="['fas', 'external-link-alt']"
+            />
+          </a>
           <button
             type="button"
             class="btn-close"
@@ -22,7 +33,10 @@
           class="modal-body"
           v-html="normaRender"
         />
-        <div v-else class="modal-body">
+        <div
+          v-else
+          class="modal-body"
+        >
           Carregando texto...
         </div>
         <div class="modal-footer">
@@ -52,30 +66,25 @@ const props = defineProps({
     type: String,
     required: true
   },
-  normaId: {
-    type: [Number, null],
-    required: false,
-    default: null
+  normaObject: {
+    type: Object,
+    required: true
   }
 })
 
 const normaRender = ref(null)
 
-const norma = computed(() => {
-  return syncStore.data_cache?.norma_normajuridica?.[props.normaId] || null
-})
-
 onMounted(() => {
   syncStore.fetchSync({
     app: 'norma',
     model: 'normajuridica',
-    id: props.normaId,
+    id: props.normaObject.id,
     params: {},
     force_fetch: false
   }).then(() => {
 
     axios.get(
-      `/norma/${props.normaId}/ta?embedded`
+      `/norma/${props.normaObject.id}/ta?embedded`
     ).then((res) => {
       normaRender.value = res.data
       nextTick(() => {
@@ -96,12 +105,14 @@ onMounted(() => {
 
 <style lang="scss">
 
-@import '~@/scss/compilacao.scss';
-
 .norma-simple-modal-view {
   background-color: #000b;
   z-index: 10000;
   display: block;
+
+  .modal-header {
+    gap: 1em;
+  }
 
   .cp {
     line-height: 1.5em;

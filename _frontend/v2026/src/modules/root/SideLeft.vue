@@ -223,18 +223,23 @@ const closeOffCanvas = (selector) => {
     position: fixed;
     top: var(--header-height);
     transition: all 0.2s;
-    background-color: var(--cmj-background-color);
-    // border-right: 1px solid var(--bs-border-color-translucent);
     bottom: 0;
     z-index: 2;
 
+    background-color: var(--cmj-sideleft-bg);
+    &:hover {
+      border-right: 1px solid var(--bs-border-color-translucent);
+      background-color: var(--cmj-sideleft-bg-hover);
+    }
+
     .toggle-btn {
       cursor: pointer;
-      padding: 0.5em;
+      padding: 1em 1.5em;
       display: block;
+      text-align: left;
+
       &:hover {
         background-color: var(--nav-bg-hover-color);
-        color: var(--nav-text-hover-color);
       }
     }
   }
@@ -268,7 +273,6 @@ const closeOffCanvas = (selector) => {
 
       &:hover {
         background-color: var(--nav-bg-hover-color);
-        color: var(--nav-text-hover-color);
       }
     }
 

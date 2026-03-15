@@ -62,15 +62,9 @@ const handleDisableAutoRolagem = (event) => {
 </script>
 
 <style lang="scss">
-
-body {
-  overflow-x: hidden;
-  --width-sidebar-collapsed: 3em;
-}
 .root-layout {
   top: 0;
   right: 0;
-  bottom: 0;
   left: 0;
 
   font-size: 1rem;
@@ -82,7 +76,7 @@ body {
     "header header header"
     "sideleft main sideright";
   grid-template-rows: auto 1fr;
-  grid-template-columns: 0 1fr 0;
+  grid-template-columns: var(--width-sidebar-collapsed) 1fr var(--width-sideright);
 
   header {
     grid-area: header;
@@ -147,24 +141,26 @@ body {
         }
       }
     }
-
   }
 
   main {
     grid-area: main;
     // background-color: #eee;
-    margin-top: var(--height-header);
+    margin-top: var(--header-height);
+    min-height: calc(100vh - var(--header-height));
+    background-color: var(--cmj-main-bg);
   }
 
   aside {
     grid-area: sideleft;
     position: relative;
-
   }
+
   .sideright {
     grid-area: sideright;
     position: relative;
-    display: none;
+    margin-top: var(--header-height);
+    min-height: calc(100vh - var(--header-height));
   }
 }
 
@@ -175,7 +171,6 @@ body {
         flex-direction: row;
         align-items: center;
         justify-content: space-between;
-
         .btn {
           line-height: 1.5;
         }
@@ -188,18 +183,6 @@ body {
 }
 
 @media screen and (min-width: 768px) {
-  body {
-    --height-header: 4em;
-    --width-sidebar-collapsed: 4em;
-  }
-  .root-layout {
-    grid-template-columns: var(--width-sidebar-collapsed) 1fr 3em;
-    aside {
-      display: flex;
-    }
-    .sideright {
-      display: flex;
-    }
-  }
+
 }
 </style>

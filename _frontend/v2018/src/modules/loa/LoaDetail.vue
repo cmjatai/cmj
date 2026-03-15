@@ -131,7 +131,7 @@
               <tr v-for="(value, key) in espelho_filtered" :key="key" :class="[value[8] ? 'agrupamento text-blue': '']">
                 <td>
                   <div>
-                    <span class="dotacao" v-html="check_espec ? space2nbsp(value[0]) : value[0]"></span>
+                    <span class="dotacao" v-html="check_espec ? space2nbsp(value[0]) : spaceLeft2nbsp(value[0])"></span>
                     <span> - </span>
                     <span>{{ value[3] }}</span>
                   </div>
@@ -478,6 +478,11 @@ export default {
   methods: {
     space2nbsp (value) {
       return value.replace(/ /g, '&nbsp;')
+    },
+    spaceLeft2nbsp (value) {
+      // substitui todos os espaços iniciais por &nbsp;
+      value = value.replace(/^ +/g, (match) => '&nbsp;'.repeat(match.length))
+      return value
     },
     clearFilters (event) {
       const t = this
