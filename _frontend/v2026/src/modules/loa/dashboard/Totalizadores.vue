@@ -8,8 +8,8 @@
         <FontAwesomeIcon icon="coins" />
       </div>
       <div class="totalizador-info">
-        <span class="totalizador-label">Disponibilidade Global</span>
         <span class="totalizador-valor">{{ formatCurrency(totais.disp_total) }}</span>
+        <span class="totalizador-label">Disponibilidade Global</span>
       </div>
     </div>
 
@@ -18,8 +18,8 @@
         <FontAwesomeIcon icon="heart-pulse" />
       </div>
       <div class="totalizador-info">
-        <span class="totalizador-label">Disponibilidade na Saúde</span>
         <span class="totalizador-valor">{{ formatCurrency(totais.disp_saude) }}</span>
+        <span class="totalizador-label">Saúde</span>
       </div>
     </div>
 
@@ -28,8 +28,8 @@
         <FontAwesomeIcon icon="layer-group" />
       </div>
       <div class="totalizador-info">
-        <span class="totalizador-label">Disponibilidade Áreas Diversas</span>
         <span class="totalizador-valor">{{ formatCurrency(totais.disp_diversos) }}</span>
+        <span class="totalizador-label">Áreas Diversas</span>
       </div>
     </div>
   </div>
@@ -53,26 +53,21 @@ const formatCurrency = (value) => {
 </script>
 
 <style lang="scss" scoped>
-.totalizadores {
-  width: 100%;
-}
-
 .totalizador-card {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex: 1 1 0;
-  min-width: 200px;
-  padding: 0.5rem 1.25rem;
-  border-radius: 0.75rem;
-  background: rgba(var(--bs-body-bg-rgb), 0.8);
-  border: 1px solid var(--bs-border-color);
+  padding: 0.5rem;
+  //border-radius: 0.75rem;
+  // background: rgba(var(--bs-body-bg-rgb), 0.5);
+  //border: 1px solid var(--bs-border-color);
   transition: all 0.25s ease;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    background: rgba(var(--bs-body-bg-rgb), 0.4);
+  background: rgba(var(--bs-body-bg-rgb), 0.8);
   }
 
   [data-bs-theme="dark"] & {

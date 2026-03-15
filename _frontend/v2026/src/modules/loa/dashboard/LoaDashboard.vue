@@ -6,30 +6,32 @@
     <div class="header-area">
       <div class="inner-header d-flex flex-column gap-2">
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
-          <h3 class="dashboard-title mb-0">
-            <FontAwesomeIcon
-              icon="landmark"
-              class="me-2 title-icon"
-            />
-            Orçamento Impositivo
-          </h3>
-          <div class="d-flex align-items-center gap-2">
+          <div class="d-flex gap-2 flex-column">
+            <h3 class="dashboard-title mb-0">
+              <FontAwesomeIcon
+                icon="landmark"
+                class="me-2 title-icon"
+              />
+              Orçamento Impositivo - Jataí - GO
+            </h3>
             <AnoSelector
               v-model="anosSelecionados"
               :items="loaComOrcImp"
             />
-            <button
-              class="btn-fullscreen"
-              :title="isFullscreen ? 'Sair do fullscreen' : 'Fullscreen'"
-              @click="toggleFullscreen"
-            >
-              <FontAwesomeIcon :icon="isFullscreen ? 'compress' : 'expand'" />
-            </button>
           </div>
+          <Totalizadores :totais="totaisSelecionados" />
+
+          <button
+            class="btn-fullscreen"
+            :title="isFullscreen ? 'Sair do fullscreen' : 'Fullscreen'"
+            @click="toggleFullscreen"
+          >
+            <FontAwesomeIcon :icon="isFullscreen ? 'compress' : 'expand'" />
+          </button>
         </div>
-        <Totalizadores :totais="totaisSelecionados" />
       </div>
     </div>
+    <div class="cards" />
   </div>
 </template>
 
@@ -90,6 +92,10 @@ const totaisSelecionados = computed(() => {
     disp_saude: selecionadas.reduce((sum, loa) => sum + Number(loa.disp_saude), 0),
     disp_diversos: selecionadas.reduce((sum, loa) => sum + Number(loa.disp_diversos), 0)
   }
+})
+
+const loasSelecionados = computed(() => {
+  return loaComOrcImp.value.filter((loa) => anosSelecionados.value.includes(loa.ano))
 })
 
 watch(loaComOrcImp, (items) => {
