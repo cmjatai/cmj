@@ -1,36 +1,43 @@
 from django.apps.registry import apps
+from django.db import transaction
 from django.db.models import Q
 from django.utils.text import slugify
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.status import HTTP_201_CREATED, HTTP_409_CONFLICT
 
-from drfautoapi.drfautoapi import ApiViewSetConstrutor, \
-    customize, wrapper_queryset_response_for_drf_action
+from drfautoapi.drfautoapi import (
+    ApiViewSetConstrutor,
+    customize,
+    wrapper_queryset_response_for_drf_action,
+)
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
-from sapl.materia.models import TipoMateriaLegislativa, Tramitacao,\
-    MateriaLegislativa, Proposicao, TipoProposicao, DocumentoAcessorio
-
-
-ApiViewSetConstrutor.build_class(
-    [
-        apps.get_app_config('materia')
-    ]
+from sapl.materia.models import (
+    DocumentoAcessorio,
+    MateriaLegislativa,
+    Proposicao,
+    TipoMateriaLegislativa,
+    TipoProposicao,
+    Tramitacao,
 )
+
+ApiViewSetConstrutor.build_class([apps.get_app_config("materia")])
 
 
 @customize(TipoProposicao)
 class _TipoProposicaoViewset:
 
-    @action(detail=False, methods=['GET'])
+    @action(detail=False, methods=["GET"])
     def tipos_do_autor_contectado(self, request, *args, **kwargs):
         qs = self.get_queryset()
-        qs = qs.filter(
-            tipo_autores=request.user.autor_set.first().tipo)
+        qs = qs.filter(tipo_autores=request.user.autor_set.first().tipo)
 
-        if qs.exists() and qs[0].tipo_conteudo_related._meta.model == TipoMateriaLegislativa:
-            qs = qs.order_by(
-                'tipomaterialegislativa_set__sequencia_regimental')
+        if (
+            qs.exists()
+            and qs[0].tipo_conteudo_related._meta.model == TipoMateriaLegislativa
+        ):
+            qs = qs.order_by("tipomaterialegislativa_set__sequencia_regimental")
         self.queryset = qs
         return self.list(request, *args, **kwargs)
 
@@ -61,9 +68,10 @@ class _ProposicaoViewSet(ResponseFileMixin):
                 * Pode recuperar qualquer das proposições incorporadas
 
     """
+
     class ProposicaoPermission(SaplModelPermissions):
         def has_permission(self, request, view):
-            if request.method == 'GET':
+            if request.method == "GET":
                 return True
                 # se a solicitação é list ou detail, libera o teste de permissão
                 # e deixa o get_queryset filtrar de acordo com a regra de
@@ -76,7 +84,7 @@ class _ProposicaoViewSet(ResponseFileMixin):
                 # não é list ou detail, então passa pelas regras de permissão e,
                 # depois disso ainda passa pelo filtro de get_queryset
 
-    permission_classes = (ProposicaoPermission, )
+    permission_classes = (ProposicaoPermission,)
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -94,20 +102,20 @@ class _ProposicaoViewSet(ResponseFileMixin):
                 q = Q()
 
             # se é operador de protocolo, ve qualquer coisa enviada
-            if self.request.user.has_perm('protocoloadm.list_protocolo'):
-                q |= Q(data_envio__isnull=False) | Q(
-                    data_devolucao__isnull=False)
+            if self.request.user.has_perm("protocoloadm.list_protocolo"):
+                q |= Q(data_envio__isnull=False) | Q(data_devolucao__isnull=False)
 
         qs = qs.filter(q)
         return qs
 
     def custom_filename(self, item):
-        arcname = '{}-{}-{:03d}-proposicao-{}.{}'.format(
+        arcname = "{}-{}-{:03d}-proposicao-{}.{}".format(
             item.ano,
             slugify(item.autor),
             item.numero_proposicao,
             slugify(item.tipo),
-            item.texto_original.path.split('.')[-1])
+            item.texto_original.path.split(".")[-1],
+        )
         return arcname
 
     @action(detail=True)
@@ -123,19 +131,72 @@ class _ProposicaoViewSet(ResponseFileMixin):
 class _MateriaLegislativaViewSet(ResponseFileMixin):
 
     def custom_filename(self, item):
-        arcname = '{}-{:03d}-{}-{}.{}'.format(
+        arcname = "{}-{:03d}-{}-{}.{}".format(
             item.ano,
             item.numero,
             slugify(item.tipo.sigla),
             slugify(item.tipo.descricao),
-            item.texto_original.path.split('.')[-1])
+            item.texto_original.path.split(".")[-1],
+        )
         return arcname
 
     @action(detail=True)
     def texto_original(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
 
-    @action(detail=True, methods=['GET'])
+    @staticmethod
+    def _existe_materia(tipo, numero, ano):
+        """Verifica unicidade (tipo, numero, ano) via código."""
+        return MateriaLegislativa.objects.filter(
+            tipo_id=tipo, numero=numero, ano=ano
+        ).exists()
+
+    def create(self, request, *args, **kwargs):
+        data = dict(request.data)
+        tipo = data.get("tipo", None)
+        numero = data.get("numero", None)
+        ano = data.get("ano", None)
+
+        if tipo and not numero:
+            # Número não fornecido pelo cliente: auto-gerar próximo disponível.
+            # select_for_update() em get_proximo_numero previne race conditions.
+            with transaction.atomic():
+                numero_gerado, ano_gerado = MateriaLegislativa.get_proximo_numero(
+                    tipo=tipo, ano=ano
+                )
+                data["numero"] = numero_gerado
+                data["ano"] = ano_gerado
+
+                serializer = self.get_serializer(data=data)
+                serializer.is_valid(raise_exception=True)
+                self.perform_create(serializer)
+                headers = self.get_success_headers(serializer.data)
+                return Response(
+                    serializer.data, status=HTTP_201_CREATED, headers=headers
+                )
+
+        # Número fornecido pelo cliente (ou tipo ausente):
+        # validar unicidade (tipo, numero, ano) via código antes de criar.
+        if tipo and numero and ano:
+            if self._existe_materia(tipo, numero, ano):
+                return Response(
+                    {
+                        "numero": [
+                            "O número %s já está em uso para este tipo/ano. "
+                            'Remova o campo "numero" para auto-gerar o próximo disponível.'
+                            % numero
+                        ]
+                    },
+                    status=HTTP_409_CONFLICT,
+                )
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=HTTP_201_CREATED, headers=headers)
+
+    @action(detail=True, methods=["GET"])
     def ultima_tramitacao(self, request, *args, **kwargs):
 
         materia = self.get_object()
@@ -145,16 +206,17 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
         ultima_tramitacao = materia.tramitacao_set.first()
 
         serializer_class = ApiViewSetConstrutor.get_viewset_for_model(
-            Tramitacao).serializer_class(ultima_tramitacao)
+            Tramitacao
+        ).serializer_class(ultima_tramitacao)
 
         return Response(serializer_class.data)
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=["GET"])
     def anexadas(self, request, *args, **kwargs):
         self.queryset = self.get_object().anexadas.materias_anexadas()
         return self.list(request, *args, **kwargs)
 
-    @action(detail=True, methods=['GET'])
+    @action(detail=True, methods=["GET"])
     def desanexadas(self, request, *args, **kwargs):
         self.queryset = self.get_object().anexadas.materias_desanexadas()
         return self.list(request, *args, **kwargs)
@@ -163,24 +225,25 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
         for backend in list(self.filter_backends):
             queryset = backend().filter_queryset(request, self.queryset, self)
 
-        timestamp = queryset.order_by('-data_ultima_atualizacao').values_list('data_ultima_atualizacao', flat=True)[:1].first()
+        timestamp = (
+            queryset.order_by("-data_ultima_atualizacao")
+            .values_list("data_ultima_atualizacao", flat=True)[:1]
+            .first()
+        )
         return timestamp
 
 
 @customize(TipoMateriaLegislativa)
 class _TipoMateriaLegislativaViewSet:
 
-    @action(detail=True, methods=['POST'])
+    @action(detail=True, methods=["POST"])
     def change_position(self, request, *args, **kwargs):
-        result = {
-            'status': 200,
-            'message': 'OK'
-        }
+        result = {"status": 200, "message": "OK"}
         d = request.data
-        if 'pos_ini' in d and 'pos_fim' in d:
-            if d['pos_ini'] != d['pos_fim']:
-                pk = kwargs['pk']
-                TipoMateriaLegislativa.objects.reposicione(pk, d['pos_fim'])
+        if "pos_ini" in d and "pos_fim" in d:
+            if d["pos_ini"] != d["pos_fim"]:
+                pk = kwargs["pk"]
+                TipoMateriaLegislativa.objects.reposicione(pk, d["pos_fim"])
 
         return Response(result)
 

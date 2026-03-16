@@ -1,4 +1,3 @@
-
 import glob
 import hashlib
 import logging
@@ -7,13 +6,15 @@ import re
 import tempfile
 import zipfile
 from time import sleep
+
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models, transaction
-from django.db.models import Q, F
+from django.db.models import F, Max, Q
 from django.db.models.deletion import PROTECT
 from django.db.models.fields.json import JSONField
 from django.db.models.functions import Concat
@@ -24,30 +25,36 @@ from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.diarios.models import VinculoDocDiarioOficial, DiarioOficial
+from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin, PluginSignMixin
 from cmj.utils import media_cache_storage
-from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO, Autor, \
-    TipoAutor, Metadata, AppConfig as BaseAppConfig
-
+from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO
+from sapl.base.models import AppConfig as BaseAppConfig
+from sapl.base.models import Autor, Metadata, TipoAutor
 from sapl.comissoes.models import Comissao, Reuniao
-from sapl.compilacao.models import (PerfilEstruturalTextoArticulado,
-                                    TextoArticulado)
-from sapl.parlamentares.models import Parlamentar
-from sapl.utils import (RANGE_ANOS, YES_NO_CHOICES, SaplGenericForeignKey,
-                        SaplGenericRelation, gerar_hash_arquivo, restringe_tipos_de_arquivo_txt,
-                        texto_upload_path, get_settings_auth_user_model,
-                        OverwriteStorage, PortalFileField)
+from sapl.compilacao.models import PerfilEstruturalTextoArticulado, TextoArticulado
+from sapl.parlamentares.models import Legislatura, Parlamentar
+from sapl.utils import (
+    RANGE_ANOS,
+    YES_NO_CHOICES,
+    OverwriteStorage,
+    PortalFileField,
+    SaplGenericForeignKey,
+    SaplGenericRelation,
+    gerar_hash_arquivo,
+    get_settings_auth_user_model,
+    restringe_tipos_de_arquivo_txt,
+    texto_upload_path,
+)
 
 logger = logging.getLogger(__name__)
 
-EM_TRAMITACAO = [(1, 'Sim'),
-                 (0, 'Não')]
+EM_TRAMITACAO = [(1, "Sim"), (0, "Não")]
 
 
 def grupo_autor():
     try:
-        grupo = Group.objects.get(name='Autor')
+        grupo = Group.objects.get(name="Autor")
     except Group.DoesNotExist:
         return None
     return grupo.id
@@ -56,55 +63,67 @@ def grupo_autor():
 class TipoProposicao(models.Model):
     descricao = models.CharField(
         max_length=50,
-        verbose_name=_('Descrição'),
+        verbose_name=_("Descrição"),
         unique=True,
         error_messages={
-            'unique': _('Já existe um Tipo de Proposição com esta descrição.')
-        })
+            "unique": _("Já existe um Tipo de Proposição com esta descrição.")
+        },
+    )
 
     exige_assinatura_digital = models.BooleanField(
         default=True,
-        verbose_name=_('Exigir Assinatura Digital'),
+        verbose_name=_("Exigir Assinatura Digital"),
     )
 
     content_type = models.ForeignKey(
-        ContentType, default=None,
+        ContentType,
+        default=None,
         on_delete=models.PROTECT,
-        verbose_name=_('Conversão de Meta-Tipos'),
-        help_text=_("""
+        verbose_name=_("Conversão de Meta-Tipos"),
+        help_text=_(
+            """
         Quando uma proposição é incorporada, ela é convertida de proposição
         para outro elemento dentro do Sapl. Existem alguns elementos que
         uma proposição pode se tornar. Defina este meta-tipo e em seguida
         escolha um Tipo Correspondente!
-        """)
+        """
+        ),
     )
-    object_id = models.PositiveIntegerField(
-        blank=True, null=True, default=None)
+    object_id = models.PositiveIntegerField(blank=True, null=True, default=None)
     tipo_conteudo_related = SaplGenericForeignKey(
-        'content_type', 'object_id', verbose_name=_('Tipo Correspondente'))
+        "content_type", "object_id", verbose_name=_("Tipo Correspondente")
+    )
 
     tipo_autores = models.ManyToManyField(
         TipoAutor,
-        blank=True, verbose_name=_('Tipos de Autores'),
-        help_text=_("""
+        blank=True,
+        verbose_name=_("Tipos de Autores"),
+        help_text=_(
+            """
                     Tipo de Autores que pode enviar este tipo de Proposição.
-                    """))
+                    """
+        ),
+    )
     perfis = models.ManyToManyField(
         PerfilEstruturalTextoArticulado,
-        blank=True, verbose_name=_('Perfis Estruturais de Textos Articulados'),
-        help_text=_("""
+        blank=True,
+        verbose_name=_("Perfis Estruturais de Textos Articulados"),
+        help_text=_(
+            """
                     Mesmo que em Configurações da Aplicação nas
                     Tabelas Auxiliares esteja definido que Proposições possam
                     utilizar Textos Articulados, ao gerar uma proposição,
                     a solução de Textos Articulados será disponibilizada se
                     o Tipo escolhido para a Proposição estiver associado a ao
                     menos um Perfil Estrutural de Texto Articulado.
-                    """))
+                    """
+        ),
+    )
 
     class Meta:
-        verbose_name = _('Tipo de Proposição')
-        verbose_name_plural = _('Tipos de Proposições')
-        ordering = ['id']
+        verbose_name = _("Tipo de Proposição")
+        verbose_name_plural = _("Tipos de Proposições")
+        ordering = ["id"]
 
     def __str__(self):
         return self.descricao
@@ -123,132 +142,133 @@ class TipoMateriaManager(models.Manager):
     def reposicione(self, pk, idx):
         tipos = self.reordene(exclude_pk=pk)
 
-        self.get_queryset(
-        ).filter(
-            sequencia_regimental__gte=idx
-        ).update(
-            sequencia_regimental=models.F('sequencia_regimental') + 1
+        self.get_queryset().filter(sequencia_regimental__gte=idx).update(
+            sequencia_regimental=models.F("sequencia_regimental") + 1
         )
 
-        self.get_queryset(
-        ).filter(
-            pk=pk
-        ).update(
-            sequencia_regimental=idx
-        )
+        self.get_queryset().filter(pk=pk).update(sequencia_regimental=idx)
 
 
-AGRUPAMENTO_TIPOS_MATERIAS = (('1', _('Nível 1')),
-                              ('2', _('Nível 2')),
-                              ('3', _('Nível 3')),
-                              ('4', _('Nível 4')),
-                              ('5', _('Nível 5')),
-                              ('6', _('Nível 6')),
-                              ('7', _('Nível 7')),
-                              ('8', _('Nível 8')),
-                              ('9', _('Nível 9')))
+AGRUPAMENTO_TIPOS_MATERIAS = (
+    ("1", _("Nível 1")),
+    ("2", _("Nível 2")),
+    ("3", _("Nível 3")),
+    ("4", _("Nível 4")),
+    ("5", _("Nível 5")),
+    ("6", _("Nível 6")),
+    ("7", _("Nível 7")),
+    ("8", _("Nível 8")),
+    ("9", _("Nível 9")),
+)
 
 
 class TipoMateriaLegislativa(models.Model):
     objects = TipoMateriaManager()
-    sigla = models.CharField(max_length=5, verbose_name=_('Sigla'))
-    descricao = models.CharField(max_length=50, verbose_name=_('Descrição '))
+    sigla = models.CharField(max_length=5, verbose_name=_("Sigla"))
+    descricao = models.CharField(max_length=50, verbose_name=_("Descrição "))
     # XXX o que é isso ?
     num_automatica = models.BooleanField(default=False)
     # XXX o que é isso ?
     quorum_minimo_votacao = models.PositiveIntegerField(blank=True, null=True)
 
     limite_por_autor_tramitando = models.PositiveIntegerField(
-        blank=True, null=True,
+        blank=True,
+        null=True,
         default=0,
-        verbose_name=_('Limitar Protocolo por Autor'),
-        )
+        verbose_name=_("Limitar Protocolo por Autor"),
+    )
 
     limite_minimo_coletivo = models.PositiveIntegerField(
-        blank=True, null=True,
+        blank=True,
+        null=True,
         default=0,
-        verbose_name=_('Não Impõe Limites de Protocolo acima deste valor'),
-        )
+        verbose_name=_("Não Impõe Limites de Protocolo acima deste valor"),
+    )
 
     tipo_proposicao = SaplGenericRelation(
         TipoProposicao,
-        related_query_name='tipomaterialegislativa_set',
-        fields_search=(
-            ('descricao', '__icontains'),
-            ('sigla', '__icontains')
-        ))
+        related_query_name="tipomaterialegislativa_set",
+        fields_search=(("descricao", "__icontains"), ("sigla", "__icontains")),
+    )
 
     nivel_agrupamento = models.CharField(
         max_length=1,
         blank=True,
-        verbose_name=_('Nível de Agrupamento'),
-        choices=AGRUPAMENTO_TIPOS_MATERIAS)
+        verbose_name=_("Nível de Agrupamento"),
+        choices=AGRUPAMENTO_TIPOS_MATERIAS,
+    )
 
     sequencia_numeracao = models.CharField(
         max_length=1,
         blank=True,
-        verbose_name=_('Sequência de numeração'),
-        choices=SEQUENCIA_NUMERACAO_PROTOCOLO)
+        verbose_name=_("Sequência de numeração"),
+        choices=SEQUENCIA_NUMERACAO_PROTOCOLO,
+    )
 
     sequencia_regimental = models.PositiveIntegerField(
         default=0,
-        verbose_name=_('Sequência Regimental'),
-        help_text=_('A sequência regimental diz respeito ao que define '
-                    'o regimento da Casa Legislativa sobre qual a ordem '
-                    'de entrada das proposições nas Sessões Plenárias.'))
+        verbose_name=_("Sequência Regimental"),
+        help_text=_(
+            "A sequência regimental diz respeito ao que define "
+            "o regimento da Casa Legislativa sobre qual a ordem "
+            "de entrada das proposições nas Sessões Plenárias."
+        ),
+    )
 
     turnos_aprovacao = models.PositiveIntegerField(
         default=1,
-        verbose_name=_('Turnos para aprovação.'),)
+        verbose_name=_("Turnos para aprovação."),
+    )
 
-    prompt = models.TextField(
-        blank=True,
-        verbose_name=_('Prompt para Análise de IA.')
-        )
+    prompt = models.TextField(blank=True, verbose_name=_("Prompt para Análise de IA."))
 
     class Meta:
-        verbose_name = _('Tipo de Matéria Legislativa')
-        verbose_name_plural = _('Tipos de Matérias Legislativas')
-        ordering = ['sequencia_regimental', 'descricao']
+        verbose_name = _("Tipo de Matéria Legislativa")
+        verbose_name_plural = _("Tipos de Matérias Legislativas")
+        ordering = ["sequencia_regimental", "descricao"]
 
     def __str__(self):
         return self.descricao
 
 
 class RegimeTramitacao(models.Model):
-    descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
+    descricao = models.CharField(max_length=50, verbose_name=_("Descrição"))
 
     sequencia_regimental = models.PositiveIntegerField(
         default=0,
-        verbose_name=_('Sequência Regimental'),
-        help_text=_('A sequência regimental diz respeito ao que define '
-                    'o regimento da Casa Legislativa sobre qual a ordem '
-                    'de entrada das proposições nas Sessões Plenárias.'))
+        verbose_name=_("Sequência Regimental"),
+        help_text=_(
+            "A sequência regimental diz respeito ao que define "
+            "o regimento da Casa Legislativa sobre qual a ordem "
+            "de entrada das proposições nas Sessões Plenárias."
+        ),
+    )
 
     class Meta:
-        verbose_name = _('Regime de Tramitação')
-        verbose_name_plural = _('Regimes de Tramitação')
-        ordering = ['id']
+        verbose_name = _("Regime de Tramitação")
+        verbose_name_plural = _("Regimes de Tramitação")
+        ordering = ["id"]
 
     def __str__(self):
         return self.descricao
 
 
 class Origem(models.Model):
-    sigla = models.CharField(max_length=10, verbose_name=_('Sigla'))
-    nome = models.CharField(max_length=50, verbose_name=_('Nome'))
+    sigla = models.CharField(max_length=10, verbose_name=_("Sigla"))
+    nome = models.CharField(max_length=50, verbose_name=_("Nome"))
 
     class Meta:
-        verbose_name = _('Origem')
-        verbose_name_plural = _('Origens')
-        ordering = ['id']
+        verbose_name = _("Origem")
+        verbose_name_plural = _("Origens")
+        ordering = ["id"]
 
     def __str__(self):
         return self.nome
 
 
-TIPO_APRESENTACAO_CHOICES = Choices(('O', 'oral', _('Oral')),
-                                    ('E', 'escrita', _('Escrita')))
+TIPO_APRESENTACAO_CHOICES = Choices(
+    ("O", "oral", _("Oral")), ("E", "escrita", _("Escrita"))
+)
 
 
 def materia_upload_path(instance, filename):
@@ -264,210 +284,220 @@ class MateriaLegislativaManager(models.Manager):
     use_for_related_fields = True
 
     def materias_anexadas(self):
-        return self.get_anexacao('filter').annotate(data_anexacao=F('materia_anexada_set__data_anexacao'))
+        return self.get_anexacao("filter").annotate(
+            data_anexacao=F("materia_anexada_set__data_anexacao")
+        )
 
     def materias_desanexadas(self):
-        return self.get_anexacao('exclude').annotate(data_desanexacao=F('materia_anexada_set__data_desanexacao'))
+        return self.get_anexacao("exclude").annotate(
+            data_desanexacao=F("materia_anexada_set__data_desanexacao")
+        )
 
     def get_anexacao(self, type_select):
-        return getattr(
-            self.get_queryset(), type_select
-        )(
-            Q(
-                materia_anexada_set__data_desanexacao__isnull=True
-            ) | Q(
-                materia_anexada_set__data_desanexacao__gt=timezone.now()
-            )
+        return getattr(self.get_queryset(), type_select)(
+            Q(materia_anexada_set__data_desanexacao__isnull=True)
+            | Q(materia_anexada_set__data_desanexacao__gt=timezone.now())
         )
 
     def materias_anexadas_ordem_crescente(self):
-        return self.materias_anexadas().order_by('tipo__sequencia_regimental', 'ano', 'numero')
+        return self.materias_anexadas().order_by(
+            "tipo__sequencia_regimental", "ano", "numero"
+        )
 
 
 class MateriaLegislativa(CommonMixin):
 
     objects = MateriaLegislativaManager()
 
-    FIELDFILE_NAME = ('texto_original',)
+    FIELDFILE_NAME = ("texto_original",)
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     tipo = models.ForeignKey(
         TipoMateriaLegislativa,
         on_delete=models.PROTECT,
-        verbose_name=TipoMateriaLegislativa._meta.verbose_name)
-    numero = models.PositiveIntegerField(verbose_name=_('Número'))
-    ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'),
-                                           choices=RANGE_ANOS)
+        verbose_name=TipoMateriaLegislativa._meta.verbose_name,
+    )
+    numero = models.PositiveIntegerField(verbose_name=_("Número"))
+    ano = models.PositiveSmallIntegerField(verbose_name=_("Ano"), choices=RANGE_ANOS)
     numero_protocolo = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name=_('Número do Protocolo'))
-    data_apresentacao = models.DateField(
-        verbose_name=_('Data de Apresentação'))
+        blank=True, null=True, verbose_name=_("Número do Protocolo")
+    )
+    data_apresentacao = models.DateField(verbose_name=_("Data de Apresentação"))
     tipo_apresentacao = models.CharField(
-        max_length=1, blank=True,
-        verbose_name=_('Tipo de Apresentação'),
-        choices=TIPO_APRESENTACAO_CHOICES)
+        max_length=1,
+        blank=True,
+        verbose_name=_("Tipo de Apresentação"),
+        choices=TIPO_APRESENTACAO_CHOICES,
+    )
     regime_tramitacao = models.ForeignKey(
-        RegimeTramitacao,
-        on_delete=models.PROTECT,
-        verbose_name=_('Regime Tramitação'))
+        RegimeTramitacao, on_delete=models.PROTECT, verbose_name=_("Regime Tramitação")
+    )
     data_publicacao = models.DateField(
-        blank=True, null=True, verbose_name=_('Data de Publicação'))
+        blank=True, null=True, verbose_name=_("Data de Publicação")
+    )
     tipo_origem_externa = models.ForeignKey(
         TipoMateriaLegislativa,
         blank=True,
         null=True,
-        related_name='tipo_origem_externa_set',
+        related_name="tipo_origem_externa_set",
         on_delete=models.PROTECT,
-        verbose_name=_('Tipo'))
+        verbose_name=_("Tipo"),
+    )
     numero_origem_externa = models.CharField(
-        max_length=10, blank=True, verbose_name=_('Número'))
+        max_length=10, blank=True, verbose_name=_("Número")
+    )
     ano_origem_externa = models.PositiveSmallIntegerField(
-        blank=True, null=True, verbose_name=_('Ano'), choices=RANGE_ANOS)
+        blank=True, null=True, verbose_name=_("Ano"), choices=RANGE_ANOS
+    )
     data_origem_externa = models.DateField(
-        blank=True, null=True, verbose_name=_('Data'))
+        blank=True, null=True, verbose_name=_("Data")
+    )
     local_origem_externa = models.ForeignKey(
-        Origem, blank=True, null=True,
-        on_delete=models.PROTECT, verbose_name=_('Local de Origem'))
-    apelido = models.CharField(
-        max_length=50, blank=True, verbose_name=_('Apelido'))
+        Origem,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        verbose_name=_("Local de Origem"),
+    )
+    apelido = models.CharField(max_length=50, blank=True, verbose_name=_("Apelido"))
     dias_prazo = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name=_('Dias Prazo'))
+        blank=True, null=True, verbose_name=_("Dias Prazo")
+    )
     data_fim_prazo = models.DateField(
-        blank=True, null=True, verbose_name=_('Data Fim Prazo'))
+        blank=True, null=True, verbose_name=_("Data Fim Prazo")
+    )
     em_tramitacao = models.BooleanField(
-        verbose_name=_('Em Tramitação?'),
-        default=False,
-        choices=YES_NO_CHOICES)
-    polemica = models.BooleanField(null=True,
-                                   blank=True, verbose_name=_('Matéria Polêmica?'))
-    objeto = models.CharField(
-        max_length=150, blank=True, verbose_name=_('Objeto'))
-    complementar = models.BooleanField(null=True,
-                                       blank=True, verbose_name=_('É Complementar?'))
-    ementa = models.TextField(verbose_name=_('Ementa'))
-    indexacao = models.TextField(
-        blank=True, verbose_name=_('Indexação'))
-    observacao = models.TextField(
-        blank=True, verbose_name=_('Observação'))
+        verbose_name=_("Em Tramitação?"), default=False, choices=YES_NO_CHOICES
+    )
+    polemica = models.BooleanField(
+        null=True, blank=True, verbose_name=_("Matéria Polêmica?")
+    )
+    objeto = models.CharField(max_length=150, blank=True, verbose_name=_("Objeto"))
+    complementar = models.BooleanField(
+        null=True, blank=True, verbose_name=_("É Complementar?")
+    )
+    ementa = models.TextField(verbose_name=_("Ementa"))
+    indexacao = models.TextField(blank=True, verbose_name=_("Indexação"))
+    observacao = models.TextField(blank=True, verbose_name=_("Observação"))
     resultado = models.TextField(blank=True)
     # XXX novo
 
     anexadas = models.ManyToManyField(
-        'self',
+        "self",
         blank=True,
-        through='Anexada',
+        through="Anexada",
         symmetrical=False,
-        related_name='anexo_de',
-        through_fields=(
-            'materia_principal',
-            'materia_anexada'))
+        related_name="anexo_de",
+        through_fields=("materia_principal", "materia_anexada"),
+    )
 
     similaridades = models.ManyToManyField(
-        'self',
+        "self",
         blank=True,
-        through='AnaliseSimilaridade',
+        through="AnaliseSimilaridade",
         symmetrical=False,
-        related_name='similaridade_set',
-        through_fields=(
-            'materia_1',
-            'materia_2'))
+        related_name="similaridade_set",
+        through_fields=("materia_1", "materia_2"),
+    )
 
     assuntos = models.ManyToManyField(
-        'AssuntoMateria',
+        "AssuntoMateria",
         blank=True,
-        through='MateriaAssunto',
+        through="MateriaAssunto",
         symmetrical=False,
-        through_fields=(
-            'materia',
-            'assunto'))
+        through_fields=("materia", "assunto"),
+    )
     texto_original = PortalFileField(
         blank=True,
         null=True,
         upload_to=materia_upload_path,
-        verbose_name=_('Texto Original'),
+        verbose_name=_("Texto Original"),
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt],
-        max_length=512)
+        max_length=512,
+    )
 
     autores = models.ManyToManyField(
         Autor,
-        through='Autoria',
-        through_fields=('materia', 'autor'),
-        symmetrical=False,)
+        through="Autoria",
+        through_fields=("materia", "autor"),
+        symmetrical=False,
+    )
 
     data_ultima_atualizacao = models.DateTimeField(
-        blank=True, null=True,
-        auto_now=True,
-        verbose_name=_('Data'))
+        blank=True, null=True, auto_now=True, verbose_name=_("Data")
+    )
 
     user = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('Usuário'),
+        verbose_name=_("Usuário"),
         on_delete=models.PROTECT,
         null=True,
-        blank=True
-    )
-    ip = models.CharField(
-        verbose_name=_('IP'),
-        max_length=30,
         blank=True,
-        default=''
     )
+    ip = models.CharField(verbose_name=_("IP"), max_length=30, blank=True, default="")
 
     arquivado = models.BooleanField(
-        verbose_name=_('Arquivamento completo?'),
-        default=False,
-        choices=YES_NO_CHOICES)
+        verbose_name=_("Arquivamento completo?"), default=False, choices=YES_NO_CHOICES
+    )
 
     checkcheck = models.BooleanField(
-        verbose_name=_('Processo Legislativo Auditado?'),
+        verbose_name=_("Processo Legislativo Auditado?"),
         default=False,
-        choices=YES_NO_CHOICES)
+        choices=YES_NO_CHOICES,
+    )
 
     url_video = models.URLField(
-        max_length=150, blank=True,
-        verbose_name=_('URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)'))
+        max_length=150,
+        blank=True,
+        verbose_name=_("URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)"),
+    )
 
     texto_articulado = GenericRelation(
-        TextoArticulado, related_query_name='texto_articulado')
+        TextoArticulado, related_query_name="texto_articulado"
+    )
 
-    proposicao = GenericRelation(
-        'Proposicao', related_query_name='proposicao')
+    proposicao = GenericRelation("Proposicao", related_query_name="proposicao")
 
     protocolo_gr = GenericRelation(
-        'protocoloadm.Protocolo',
-        object_id_field='conteudo_object_id',
-        content_type_field='conteudo_content_type',
-        related_query_name='protocolo_gr')
+        "protocoloadm.Protocolo",
+        object_id_field="conteudo_object_id",
+        content_type_field="conteudo_content_type",
+        related_query_name="protocolo_gr",
+    )
 
     _certidao = GenericRelation(
-        CertidaoPublicacao, related_query_name='materialegislativa_cert')
+        CertidaoPublicacao, related_query_name="materialegislativa_cert"
+    )
 
     _metadata_model = GenericRelation(
-        Metadata, related_query_name='materialegislativa_metadata')
+        Metadata, related_query_name="materialegislativa_metadata"
+    )
 
     _diario = GenericRelation(
-        VinculoDocDiarioOficial,
-        related_query_name='materialegislativa_diario'
+        VinculoDocDiarioOficial, related_query_name="materialegislativa_diario"
     )
 
     class Meta:
-        verbose_name = _('Matéria Legislativa')
-        verbose_name_plural = _('Matérias Legislativas')
+        verbose_name = _("Matéria Legislativa")
+        verbose_name_plural = _("Matérias Legislativas")
         # unique_together = (("tipo", "numero", "ano"),)
-        ordering = ['-id']
+        ordering = ["-id"]
         permissions = (
             ("can_access_impressos", "Can access impressos"),
-
             ("can_check_complete", "Pode checar conclusão de processo"),
         )
         indexes = [
-            models.Index(fields=['-em_tramitacao']),
-            models.Index(fields=['-data_apresentacao']),
-            models.Index(fields=['-data_apresentacao', '-id'])
+            models.Index(fields=["-em_tramitacao"]),
+            models.Index(fields=["-data_apresentacao"]),
+            models.Index(fields=["-data_apresentacao", "-id"]),
         ]
 
     @property
@@ -480,11 +510,11 @@ class MateriaLegislativa(CommonMixin):
 
     @property
     def certidao(self):
-        return self._certidao.order_by('-id').first()
+        return self._certidao.order_by("-id").first()
 
     @property
     def metadata_model(self):
-        return self._metadata_model.order_by('-id').first()
+        return self._metadata_model.order_by("-id").first()
 
     @property
     def diariosoficiais(self):
@@ -498,42 +528,47 @@ class MateriaLegislativa(CommonMixin):
             return None
 
     def __str__(self):
-        return _('%(tipo)s nº %(numero)s de %(ano)s') % {
-            'tipo': self.tipo, 'numero': self.numero, 'ano': self.ano}
+        return _("%(tipo)s nº %(numero)s de %(ano)s") % {
+            "tipo": self.tipo,
+            "numero": self.numero,
+            "ano": self.ano,
+        }
 
     @property
     def is_signed(self):
         try:
-            return self.metadata and self.metadata['signs'] and \
-                self.metadata['signs']['texto_original'] and \
-                self.metadata['signs']['texto_original']['signs']
+            return (
+                self.metadata
+                and self.metadata["signs"]
+                and self.metadata["signs"]["texto_original"]
+                and self.metadata["signs"]["texto_original"]["signs"]
+            )
         except:
             return False
 
     @property
     def epigrafe(self):
-        return _('%(tipo)s nº %(numero)s de %(data)s') % {
-            'tipo': self.tipo,
-            'numero': self.numero,
-            'data': defaultfilters.date(
-                self.data_apresentacao,
-                r"d \d\e F \d\e Y"
-            )}
+        return _("%(tipo)s nº %(numero)s de %(data)s") % {
+            "tipo": self.tipo,
+            "numero": self.numero,
+            "data": defaultfilters.date(self.data_apresentacao, r"d \d\e F \d\e Y"),
+        }
 
     @property
     def epigrafe_short(self):
-        return '{} {:03d}/{}'.format(self.tipo.sigla, self.numero, self.ano)
+        return "{} {:03d}/{}".format(self.tipo.sigla, self.numero, self.ano)
 
     def data_entrada_protocolo(self):
-        '''
-           hack: recuperar a data de entrada do protocolo sem gerar
-           dependência circular
-        '''
+        """
+        hack: recuperar a data de entrada do protocolo sem gerar
+        dependência circular
+        """
         from sapl.protocoloadm.models import Protocolo
+
         if self.ano and self.numero_protocolo:
             protocolo = Protocolo.objects.filter(
-                ano=self.ano,
-                numero=self.numero_protocolo).first()
+                ano=self.ano, numero=self.numero_protocolo
+            ).first()
             if protocolo:
                 if protocolo.timestamp:
                     return protocolo.timestamp.date()
@@ -542,7 +577,7 @@ class MateriaLegislativa(CommonMixin):
                 elif protocolo.data:
                     return protocolo.data
 
-            return ''
+            return ""
 
     def delete(self, using=None, keep_parents=False):
         if self.texto_original:
@@ -557,28 +592,34 @@ class MateriaLegislativa(CommonMixin):
             p.conteudo_protocolado = None
             p.save()
 
-        return models.Model.delete(
-            self, using=using, keep_parents=keep_parents)
+        return models.Model.delete(self, using=using, keep_parents=keep_parents)
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
 
         if not self.pk and self.texto_original:
             texto_original = self.texto_original
             self.texto_original = None
-            models.Model.save(self, force_insert=force_insert,
-                              force_update=force_update,
-                              using=using,
-                              update_fields=update_fields)
+            models.Model.save(
+                self,
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
+            )
             self.texto_original = texto_original
 
         if self.texto_original:
             self.clear_cache()
 
-        return models.Model.save(self, force_insert=force_insert,
-                                 force_update=force_update,
-                                 using=using,
-                                 update_fields=update_fields)
+        return models.Model.save(
+            self,
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
     def autografos(self):
         return self.normajuridica_set.filter(tipo_id=27)
@@ -587,9 +628,11 @@ class MateriaLegislativa(CommonMixin):
         return self.normajuridica_set.exclude(tipo_id=27).first()
 
     def autografosvinculado_a_normajuridica(self):
-        nr = self.normajuridica_set.exclude(
-            tipo_id=27).first().norma_principal.filter(
-                norma_relacionada__tipo_id=27)
+        nr = (
+            self.normajuridica_set.exclude(tipo_id=27)
+            .first()
+            .norma_principal.filter(norma_relacionada__tipo_id=27)
+        )
         return nr
 
     @property
@@ -605,13 +648,15 @@ class MateriaLegislativa(CommonMixin):
 
     def autores_coautores(self):
         autorias = [
-            autoria.autor for autoria in Autoria.objects.autores_coautores().filter(materia=self)]
+            autoria.autor
+            for autoria in Autoria.objects.autores_coautores().filter(materia=self)
+        ]
         return autorias
 
     @transaction.atomic
     def homologar(self, compression=None, original2copia=False, x=193, y=50):
-        from sapl.sessao.tasks import task_add_selo_votacao_function
         from sapl.protocoloadm.models import Protocolo
+        from sapl.sessao.tasks import task_add_selo_votacao_function
 
         self.registrovotacao_set.all().update(selo_votacao=False)
 
@@ -619,7 +664,7 @@ class MateriaLegislativa(CommonMixin):
 
         autores = self.autores.all()
         if compression is None:
-            compression = all(autores.values_list('sign_compression', flat=True))
+            compression = all(autores.values_list("sign_compression", flat=True))
 
         if not protocolo:
             numeracao = BaseAppConfig.objects.last().sequencia_numeracao_protocolo
@@ -630,13 +675,17 @@ class MateriaLegislativa(CommonMixin):
             p.timestamp = timezone.now()
             p.tipo_protocolo = 1
             p.tipo_processo = 1
-            p.interessado = str(autores[0]) if autores else ''
-            p.email = ''
-            p.autor = autores[0] if autores else ''
+            p.interessado = str(autores[0]) if autores else ""
+            p.email = ""
+            p.autor = autores[0] if autores else ""
             p.assunto_ementa = self.ementa
-            p.tipo_content_type = ContentType.objects.get_for_model(TipoMateriaLegislativa)
+            p.tipo_content_type = ContentType.objects.get_for_model(
+                TipoMateriaLegislativa
+            )
             p.tipo_object_id = self.tipo_id
-            p.conteudo_content_type = ContentType.objects.get_for_model(MateriaLegislativa)
+            p.conteudo_content_type = ContentType.objects.get_for_model(
+                MateriaLegislativa
+            )
             p.conteudo_object_id = self.id
             p.numero_paginas = self.paginas
             p.save()
@@ -646,7 +695,7 @@ class MateriaLegislativa(CommonMixin):
 
         for field_file in self.FIELDFILE_NAME:
             if original2copia:
-                paths = '{},{}'.format(
+                paths = "{},{}".format(
                     getattr(self, field_file).original_path,
                     getattr(self, field_file).path,
                 )
@@ -658,60 +707,67 @@ class MateriaLegislativa(CommonMixin):
             cmd = psm.cmd_mask
 
             params = {
-                'plugin': psm.plugin_path,
-                'comando': 'cert_protocolo',
-                'in_file': paths,
-                'certificado': settings.CERT_PRIVATE_KEY_ID,
-                'password': settings.CERT_PRIVATE_KEY_ACCESS,
-                'data_ocorrencia': formats.date_format(
-                    timezone.localtime(
-                        protocolo.timestamp) if protocolo.timestamp else p.data,
-                    'd/m/Y'
+                "plugin": psm.plugin_path,
+                "comando": "cert_protocolo",
+                "in_file": paths,
+                "certificado": settings.CERT_PRIVATE_KEY_ID,
+                "password": settings.CERT_PRIVATE_KEY_ACCESS,
+                "data_ocorrencia": formats.date_format(
+                    (
+                        timezone.localtime(protocolo.timestamp)
+                        if protocolo.timestamp
+                        else p.data
+                    ),
+                    "d/m/Y",
                 ),
-                'hora_ocorrencia': formats.date_format(
-                    timezone.localtime(
-                        protocolo.timestamp) if protocolo.timestamp else protocolo.hora,
-                    'H:i'
+                "hora_ocorrencia": formats.date_format(
+                    (
+                        timezone.localtime(protocolo.timestamp)
+                        if protocolo.timestamp
+                        else protocolo.hora
+                    ),
+                    "H:i",
                 ),
-                'data_comando': formats.date_format(timezone.localtime(), 'd/m/Y'),
-                'hora_comando': formats.date_format(timezone.localtime(), 'H:i'),
-                'titulopre': 'Protocolo: {}/{}'.format(protocolo.numero, protocolo.ano),
-                'titulo': self.epigrafe_short,
-                'titulopos': '',
-                'x': x,
-                'y': y,
-                'w': 12,
-                'h': 60,
-                'cor': "0, 76, 64, 255",
-                'compression': compression,
-                'debug': False # settings.DEBUG
+                "data_comando": formats.date_format(timezone.localtime(), "d/m/Y"),
+                "hora_comando": formats.date_format(timezone.localtime(), "H:i"),
+                "titulopre": "Protocolo: {}/{}".format(protocolo.numero, protocolo.ano),
+                "titulo": self.epigrafe_short,
+                "titulopos": "",
+                "x": x,
+                "y": y,
+                "w": 12,
+                "h": 60,
+                "cor": "0, 76, 64, 255",
+                "compression": compression,
+                "debug": False,  # settings.DEBUG
             }
-            cmd = cmd.format(
-                **params
-            )
+            cmd = cmd.format(**params)
 
             psm.run(cmd)
 
-            del params['plugin']
-            del params['in_file']
-            del params['certificado']
-            del params['password']
-            del params['debug']
-            del params['comando']
-            self.metadata['selos'] = {'cert_protocolo': params}
+            del params["plugin"]
+            del params["in_file"]
+            del params["certificado"]
+            del params["password"]
+            del params["debug"]
+            del params["comando"]
+            self.metadata["selos"] = {"cert_protocolo": params}
 
             # print(cmd)
             # return
 
         self.save()
 
-        task_add_selo_votacao_function(list(self.registrovotacao_set.values_list('id', flat=True)))
+        task_add_selo_votacao_function(
+            list(self.registrovotacao_set.values_list("id", flat=True))
+        )
 
     def clear_cache(self, page=None, error=0):
         try:
             fcache = glob.glob(
-                f'{self.texto_original.path}-p{page:0>3}*'
-                if page else f'{self.texto_original.path}*.png'
+                f"{self.texto_original.path}-p{page:0>3}*"
+                if page
+                else f"{self.texto_original.path}*.png"
             )
 
             for f in fcache:
@@ -720,7 +776,7 @@ class MateriaLegislativa(CommonMixin):
         except Exception as e:
             if not error:
                 error = 1
-            logger.error(f'Erro ao limpar cache de: {self.texto_original.path}. {e}')
+            logger.error(f"Erro ao limpar cache de: {self.texto_original.path}. {e}")
 
         if error == 1:
             sleep(3)
@@ -728,24 +784,22 @@ class MateriaLegislativa(CommonMixin):
 
     def zip_process(self, original=False):
 
-        ff = 'original_path' if original else 'path'
+        ff = "original_path" if original else "path"
 
         m_paths = []
 
         principal = self
 
-        def get_anexadas_from(m, prefixo=''):
+        def get_anexadas_from(m, prefixo=""):
             p = getattr(m.texto_original, ff)
             m_paths.append((m, prefixo, p))
             for a in m.materia_principal_set.filter(
                 data_desanexacao__isnull=True
-            ).order_by('materia_anexada__tipo', 'data_anexacao'):
+            ).order_by("materia_anexada__tipo", "data_anexacao"):
                 manex = a.materia_anexada
-                p2 = f'Anexada-{manex.tipo.sigla}'
+                p2 = f"Anexada-{manex.tipo.sigla}"
 
-                get_anexadas_from(
-                    a.materia_anexada,
-                    prefixo=p2)
+                get_anexadas_from(a.materia_anexada, prefixo=p2)
 
             for d in m.documentoacessorio_set.all():
 
@@ -754,7 +808,7 @@ class MateriaLegislativa(CommonMixin):
         def get_docadm_anexados_from(d):
             if d.texto_integral:
                 p = getattr(d.texto_integral, ff)
-                m_paths.append((d, 'DocAdm', p))
+                m_paths.append((d, "DocAdm", p))
 
             for danex in d.anexados.all():
                 get_docadm_anexados_from(danex)
@@ -766,13 +820,15 @@ class MateriaLegislativa(CommonMixin):
             get_docadm_anexados_from(d)
 
         m_paths = list(set(m_paths))
-        m_paths.sort(key=lambda x: f'{x[1]}{x[2]}')
+        m_paths.sort(key=lambda x: f"{x[1]}{x[2]}")
 
         def calc_hash(paths):
-            hash_input = ''.join(
-                [f'{i.id}-{prefixo}-{os.path.getmtime(path)}'
-                 for i, prefixo, path in paths]
-            ).encode('utf-8')
+            hash_input = "".join(
+                [
+                    f"{i.id}-{prefixo}-{os.path.getmtime(path)}"
+                    for i, prefixo, path in paths
+                ]
+            ).encode("utf-8")
             md5 = hashlib.md5()
             md5.update(hash_input)
             return md5.hexdigest()
@@ -781,10 +837,10 @@ class MateriaLegislativa(CommonMixin):
 
         opt = self._meta
 
-        path_cache = '{}/{}/{}'.format(
+        path_cache = "{}/{}/{}".format(
             opt.app_label,
             opt.model_name,
-            f'cache-{self.ano}-{self.tipo.sigla}-{self.numero}-{self.id}-{hash_files}.zip'
+            f"cache-{self.ano}-{self.tipo.sigla}-{self.numero}-{self.id}-{hash_files}.zip",
         )
 
         if media_cache_storage.exists(path_cache):
@@ -792,51 +848,38 @@ class MateriaLegislativa(CommonMixin):
 
         with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
 
-            with zipfile.ZipFile(tmp, 'w') as file:
+            with zipfile.ZipFile(tmp, "w") as file:
 
                 for i, prefixo, path in m_paths:
 
                     if isinstance(i, DocumentoAcessorio):
-                        arcname = '{}-DA-{}-{}-{}-{}'.format(
-                            prefixo,
-                            i.ano,
-                            i.tipo.descricao,
-                            i.nome,
-                            i.id
+                        arcname = "{}-DA-{}-{}-{}-{}".format(
+                            prefixo, i.ano, i.tipo.descricao, i.nome, i.id
                         )
                         arcname = slugify(arcname)
                         arcname = f'{arcname}.{path.split(".")[-1] or "pdf"}'
 
-                    elif isinstance(i, MateriaLegislativa) and hasattr(i, 'emendaloa'):
-                        arcname = '{}-{}-{}--{}'.format(
-                            prefixo,
-                            i.ano,
-                            i.numero,
-                            i.id
-                        )
+                    elif isinstance(i, MateriaLegislativa) and hasattr(i, "emendaloa"):
+                        arcname = "{}-{}-{}--{}".format(prefixo, i.ano, i.numero, i.id)
                         arcname = slugify(arcname)
                         arcname = f'{arcname}.{path.split(".")[-1] or "pdf"}'
-                        unidade_orcamentaria = f'{i.emendaloa.unidade.codigo}-{i.emendaloa.unidade.especificacao}'
+                        unidade_orcamentaria = f"{i.emendaloa.unidade.codigo}-{i.emendaloa.unidade.especificacao}"
                         unidade_orcamentaria = slugify(unidade_orcamentaria)
-                        arcname = f'{unidade_orcamentaria}/{arcname}'
+                        arcname = f"{unidade_orcamentaria}/{arcname}"
                     else:
-                        arcname = '{}-{}-{}-{}-{}-{}-{}'.format(
+                        arcname = "{}-{}-{}-{}-{}-{}-{}".format(
                             prefixo,
-                            'ML' if isinstance(
-                                i, MateriaLegislativa) else 'DA',
+                            "ML" if isinstance(i, MateriaLegislativa) else "DA",
                             i.ano,
                             i.numero,
                             i.tipo.sigla,
                             i.tipo.descricao,
-                            i.id
+                            i.id,
                         )
                         arcname = slugify(arcname)
                         arcname = f'{arcname}.{path.split(".")[-1] or "pdf"}'
 
-                    file.write(
-                        path,
-                        arcname
-                    )
+                    file.write(path, arcname)
 
             tmp.seek(0)
 
@@ -844,22 +887,25 @@ class MateriaLegislativa(CommonMixin):
         return media_cache_storage.path(path_cache)
 
     @staticmethod
-    def get_proximo_numero(tipo, ano=None, numero_preferido=None):
+    def get_proximo_numero(tipo, ano=None, numero_candidato=None):
         """
         Retorna o próximo número disponível para uma MateriaLegislativa
         baseado no tipo e nas configurações de numeração.
 
+        IMPORTANTE: Este método utiliza select_for_update() e DEVE ser
+        chamado dentro de uma transação (transaction.atomic) para garantir
+        proteção contra race conditions em acessos concorrentes.
+
         Args:
-            tipo: TipoMateriaLegislativa - o tipo da matéria
+            tipo: TipoMateriaLegislativa ou int/str - o tipo da matéria
             ano: int - o ano da matéria (default: ano atual)
-            numero_preferido: int - número preferido/desejado (opcional)
+            numero_candidato: int - número candidato/desejado (opcional).
+                Se fornecido e disponível, será retornado. Caso contrário,
+                retorna o próximo sequencial.
 
         Returns:
-            int: O próximo número disponível para a matéria
+            tuple[int, int]: Uma tupla contendo (numero, ano) da matéria.
         """
-        from django.db.models import Max
-        from sapl.parlamentares.models import Legislatura
-        import sapl.base.models
 
         if ano is None:
             ano = timezone.now().year
@@ -867,47 +913,81 @@ class MateriaLegislativa(CommonMixin):
         # Obtém a configuração de numeração
         numeracao = None
         try:
-            numeracao = sapl.base.models.AppConfig.objects.last(
-            ).sequencia_numeracao_protocolo
+            numeracao = BaseAppConfig.objects.last().sequencia_numeracao_protocolo
         except AttributeError:
             pass
+
+        if not isinstance(tipo, TipoMateriaLegislativa):
+            if tipo is None:
+                raise ValidationError(_("O tipo é obrigatório."))
+
+            try:
+                tipo_id = int(tipo)
+            except (ValueError, TypeError):
+                raise ValidationError(_("Tipo inválido: '%s'") % tipo)
+
+            try:
+                tipo = TipoMateriaLegislativa.objects.get(pk=tipo_id)
+            except TipoMateriaLegislativa.DoesNotExist:
+                raise TipoMateriaLegislativa.DoesNotExist(
+                    _("TipoMateriaLegislativa with pk '%s' does not exist.") % tipo_id
+                )
+
+        # Lock na linha do TipoMateriaLegislativa para serializar
+        # gerações concorrentes de número do mesmo tipo.
+        # Requer que o chamador esteja dentro de transaction.atomic().
+        TipoMateriaLegislativa.objects.select_for_update().get(pk=tipo.pk)
 
         # O tipo pode sobrescrever a configuração global
         if tipo.sequencia_numeracao:
             numeracao = tipo.sequencia_numeracao
 
         # Calcula o próximo número baseado no tipo de numeração
-        if numeracao == 'A':  # Por ano
-            numero = MateriaLegislativa.objects.filter(
-                ano=ano, tipo=tipo).aggregate(Max('numero'))
-        elif numeracao == 'L':  # Por legislatura
+        materias_select_for_update = MateriaLegislativa.objects.select_for_update()
+        if numeracao == "A":  # Por ano
+            numero = materias_select_for_update.filter(ano=ano, tipo=tipo).aggregate(
+                Max("numero")
+            )
+        elif numeracao == "L":  # Por legislatura
             legislatura = Legislatura.objects.filter(
-                data_inicio__year__lte=ano,
-                data_fim__year__gte=ano).first()
+                data_inicio__year__lte=ano, data_fim__year__gte=ano
+            ).first()
             if legislatura:
                 data_inicio = legislatura.data_inicio
                 data_fim = legislatura.data_fim
-                numero = MateriaLegislativa.objects.filter(
+                numero = materias_select_for_update.filter(
                     data_apresentacao__gte=data_inicio,
                     data_apresentacao__lte=data_fim,
-                    tipo=tipo).aggregate(Max('numero'))
+                    tipo=tipo,
+                ).aggregate(Max("numero"))
             else:
-                numero = {'numero__max': 0}
-        elif numeracao == 'U':  # Único/Universal
-            numero = MateriaLegislativa.objects.filter(
-                tipo=tipo).aggregate(Max('numero'))
+                numero = {"numero__max": 0}
+        elif numeracao == "U":  # Único/Universal
+            numero = materias_select_for_update.filter(tipo=tipo).aggregate(
+                Max("numero")
+            )
         else:
-            numero = {'numero__max': 0}
+            numero = {"numero__max": 0}
 
-        # Verifica se o número preferido está disponível
-        if numero_preferido and not MateriaLegislativa.objects.filter(
-                tipo=tipo,
-                ano=ano,
-                numero=numero_preferido).exists():
-            return int(numero_preferido), ano
+        # Converte o número candidato para inteiro, se possível
+        numero_candidato_int = None
+        if numero_candidato is not None:
+            try:
+                numero_candidato_int = int(numero_candidato)
+            except (TypeError, ValueError):
+                numero_candidato_int = None
+
+        # Verifica se o número candidato está disponível
+        if (
+            numero_candidato_int is not None
+            and not materias_select_for_update.filter(
+                tipo=tipo, ano=ano, numero=numero_candidato_int
+            ).exists()
+        ):
+            return numero_candidato_int, ano
 
         # Retorna o próximo número sequencial
-        max_numero = numero['numero__max']
+        max_numero = numero["numero__max"]
         return ((max_numero + 1) if max_numero else 1), ano
 
 
@@ -916,124 +996,131 @@ class AutoriaManager(models.Manager):
     use_for_related_fields = True
 
     def autores_coautores(self):
-        return self.get_queryset().order_by('-primeiro_autor', 'autor__nome')
+        return self.get_queryset().order_by("-primeiro_autor", "autor__nome")
 
 
 class Autoria(models.Model):
 
     objects = AutoriaManager()
 
-    autor = models.ForeignKey(Autor,
-                              verbose_name=_('Autor'),
-                              on_delete=models.PROTECT)
+    autor = models.ForeignKey(Autor, verbose_name=_("Autor"), on_delete=models.PROTECT)
     materia = models.ForeignKey(
-        MateriaLegislativa, on_delete=models.CASCADE,
-        verbose_name=_('Matéria Legislativa'))
-    primeiro_autor = models.BooleanField(verbose_name=_('Primeiro Autor'),
-                                         choices=YES_NO_CHOICES,
-                                         default=False)
+        MateriaLegislativa,
+        on_delete=models.CASCADE,
+        verbose_name=_("Matéria Legislativa"),
+    )
+    primeiro_autor = models.BooleanField(
+        verbose_name=_("Primeiro Autor"), choices=YES_NO_CHOICES, default=False
+    )
 
     class Meta:
-        verbose_name = _('Autoria')
-        verbose_name_plural = _('Autorias')
-        unique_together = (('autor', 'materia'),)
-        ordering = ('-primeiro_autor', 'autor__nome')
+        verbose_name = _("Autoria")
+        verbose_name_plural = _("Autorias")
+        unique_together = (("autor", "materia"),)
+        ordering = ("-primeiro_autor", "autor__nome")
 
     def __str__(self):
-        return _('Autoria: %(autor)s - %(materia)s') % {
-            'autor': self.autor, 'materia': self.materia}
+        return _("Autoria: %(autor)s - %(materia)s") % {
+            "autor": self.autor,
+            "materia": self.materia,
+        }
 
 
 class AcompanhamentoMateria(models.Model):
     usuario = models.CharField(max_length=50)
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
-    email = models.EmailField(
-        max_length=100, verbose_name=_('E-mail'))
+    email = models.EmailField(max_length=100, verbose_name=_("E-mail"))
     data_cadastro = models.DateField(auto_now_add=True)
     hash = models.CharField(max_length=8)
     confirmado = models.BooleanField(default=False)
 
     class Meta:
-        verbose_name = _('Acompanhamento de Matéria')
-        verbose_name_plural = _('Acompanhamentos de Matéria')
-        ordering = ['id']
+        verbose_name = _("Acompanhamento de Matéria")
+        verbose_name_plural = _("Acompanhamentos de Matéria")
+        ordering = ["id"]
 
     def __str__(self):
         if self.data_cadastro is None:
-            return _('%(materia)s - %(email)s') % {
-                'materia': self.materia,
-                'email': self.email
+            return _("%(materia)s - %(email)s") % {
+                "materia": self.materia,
+                "email": self.email,
             }
         else:
-            return _('%(materia)s - %(email)s - Registrado em: %(data)s') % {
-                'materia': self.materia,
-                'email': self.email,
-                'data': str(self.data_cadastro.strftime('%d/%m/%Y'))
+            return _("%(materia)s - %(email)s - Registrado em: %(data)s") % {
+                "materia": self.materia,
+                "email": self.email,
+                "data": str(self.data_cadastro.strftime("%d/%m/%Y")),
             }
 
 
 class PautaReuniao(models.Model):
     reuniao = models.ForeignKey(
-        Reuniao, related_name='reuniao_set',
+        Reuniao,
+        related_name="reuniao_set",
         on_delete=models.CASCADE,
-        verbose_name=_('Reunião')
+        verbose_name=_("Reunião"),
     )
     materia = models.ForeignKey(
-        MateriaLegislativa, related_name='materia_set',
-        verbose_name=_('Matéria'),
-        on_delete=PROTECT)
+        MateriaLegislativa,
+        related_name="materia_set",
+        verbose_name=_("Matéria"),
+        on_delete=PROTECT,
+    )
 
     class Meta:
-        verbose_name = _('Matéria da Pauta')
-        verbose_name_plural = ('Matérias da Pauta')
-        ordering = ['id']
+        verbose_name = _("Matéria da Pauta")
+        verbose_name_plural = "Matérias da Pauta"
+        ordering = ["id"]
 
     def __str__(self):
-        return _('Reunião: %(reuniao)s'
-                 ' - Matéria: %(materia)s') % {
-                     'reuniao': self.reuniao,
-                     'materia': self.materia
+        return _("Reunião: %(reuniao)s" " - Matéria: %(materia)s") % {
+            "reuniao": self.reuniao,
+            "materia": self.materia,
         }
 
 
 class Anexada(models.Model):
     materia_principal = models.ForeignKey(
-        MateriaLegislativa, related_name='materia_principal_set',
+        MateriaLegislativa,
+        related_name="materia_principal_set",
         on_delete=models.CASCADE,
-        verbose_name=_('Matéria Principal'))
+        verbose_name=_("Matéria Principal"),
+    )
     materia_anexada = models.ForeignKey(
-        MateriaLegislativa, related_name='materia_anexada_set',
+        MateriaLegislativa,
+        related_name="materia_anexada_set",
         on_delete=models.CASCADE,
-        verbose_name=_('Matéria Anexada'))
-    data_anexacao = models.DateField(verbose_name=_('Data Anexação'))
+        verbose_name=_("Matéria Anexada"),
+    )
+    data_anexacao = models.DateField(verbose_name=_("Data Anexação"))
     data_desanexacao = models.DateField(
-        blank=True, null=True, verbose_name=_('Data Desanexação'))
+        blank=True, null=True, verbose_name=_("Data Desanexação")
+    )
 
     class Meta:
-        verbose_name = _('Anexada')
-        verbose_name_plural = _('Anexadas')
-        ordering = ['id']
+        verbose_name = _("Anexada")
+        verbose_name_plural = _("Anexadas")
+        ordering = ["id"]
 
     def __str__(self):
-        return _('Principal: %(materia_principal)s'
-                 ' - Anexada: %(materia_anexada)s') % {
-            'materia_principal': self.materia_principal,
-            'materia_anexada': self.materia_anexada}
+        return _(
+            "Principal: %(materia_principal)s" " - Anexada: %(materia_anexada)s"
+        ) % {
+            "materia_principal": self.materia_principal,
+            "materia_anexada": self.materia_anexada,
+        }
 
 
 class AssuntoMateria(models.Model):
-    assunto = models.CharField(
-        max_length=50,
-        verbose_name=_('Assunto'))
+    assunto = models.CharField(max_length=50, verbose_name=_("Assunto"))
     dispositivo = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name=_('Descrição do Dispositivo Legal'))
+        max_length=200, blank=True, verbose_name=_("Descrição do Dispositivo Legal")
+    )
 
     class Meta:
-        verbose_name = _('Assunto de Matéria')
-        verbose_name_plural = _('Assuntos de Matéria')
-        ordering = ['assunto']
+        verbose_name = _("Assunto de Matéria")
+        verbose_name_plural = _("Assuntos de Matéria")
+        ordering = ["assunto"]
 
     def __str__(self):
         return self.assunto
@@ -1041,95 +1128,99 @@ class AssuntoMateria(models.Model):
 
 class DespachoInicial(models.Model):
     materia = models.ForeignKey(
-        MateriaLegislativa, related_name="despachoinicial_set", on_delete=models.CASCADE)
+        MateriaLegislativa, related_name="despachoinicial_set", on_delete=models.CASCADE
+    )
     comissao = models.ForeignKey(
-        Comissao, on_delete=models.CASCADE, verbose_name="Comissão")
+        Comissao, on_delete=models.CASCADE, verbose_name="Comissão"
+    )
 
     class Meta:
-        verbose_name = _('Despacho Inicial')
-        verbose_name_plural = _('Despachos Iniciais')
-        ordering = ['id']
+        verbose_name = _("Despacho Inicial")
+        verbose_name_plural = _("Despachos Iniciais")
+        ordering = ["id"]
 
     def __str__(self):
-        return _('%(materia)s - %(comissao)s') % {
-            'materia': self.materia,
-            'comissao': self.comissao}
+        return _("%(materia)s - %(comissao)s") % {
+            "materia": self.materia,
+            "comissao": self.comissao,
+        }
 
 
 class TipoDocumento(models.Model):
-    descricao = models.CharField(
-        max_length=50, verbose_name=_('Tipo Documento'))
+    descricao = models.CharField(max_length=50, verbose_name=_("Tipo Documento"))
 
     tipo_proposicao = SaplGenericRelation(
         TipoProposicao,
-        related_query_name='tipodocumento_set',
-        fields_search=(
-            ('descricao', '__icontains'),
-        ))
+        related_query_name="tipodocumento_set",
+        fields_search=(("descricao", "__icontains"),),
+    )
 
     limite_por_autor_tramitando = models.PositiveIntegerField(
-        blank=True, null=True,
+        blank=True,
+        null=True,
         default=0,
-        verbose_name=_('Limitar Protocolo por Autor'),
-        )
+        verbose_name=_("Limitar Protocolo por Autor"),
+    )
 
     limite_minimo_coletivo = models.PositiveIntegerField(
-        blank=True, null=True,
+        blank=True,
+        null=True,
         default=0,
-        verbose_name=_('Não Impõe Limites de Protocolo acima deste valor'),
-        )
+        verbose_name=_("Não Impõe Limites de Protocolo acima deste valor"),
+    )
 
     class Meta:
-        verbose_name = _('Tipo de Documento')
-        verbose_name_plural = _('Tipos de Documento')
-        ordering = ['descricao']
+        verbose_name = _("Tipo de Documento")
+        verbose_name_plural = _("Tipos de Documento")
+        ordering = ["descricao"]
 
     def __str__(self):
         return self.descricao
 
 
 class DocumentoAcessorio(CommonMixin):
-    FIELDFILE_NAME = ('arquivo',)
+    FIELDFILE_NAME = ("arquivo",)
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
-    tipo = models.ForeignKey(TipoDocumento,
-                             on_delete=models.PROTECT,
-                             verbose_name=_('Tipo'))
-    nome = models.CharField(
-        max_length=50, verbose_name=_('Título do Documento'))
+    tipo = models.ForeignKey(
+        TipoDocumento, on_delete=models.PROTECT, verbose_name=_("Tipo")
+    )
+    nome = models.CharField(max_length=50, verbose_name=_("Título do Documento"))
 
-    data = models.DateField(blank=True, null=True,
-                            default=None, verbose_name=_('Data'))
-    autor = models.CharField(
-        max_length=200, blank=True, verbose_name=_('Autor'))
-    ementa = models.TextField(blank=True, verbose_name=_('Ementa'))
+    data = models.DateField(blank=True, null=True, default=None, verbose_name=_("Data"))
+    autor = models.CharField(max_length=200, blank=True, verbose_name=_("Autor"))
+    ementa = models.TextField(blank=True, verbose_name=_("Ementa"))
     indexacao = models.TextField(blank=True)
     arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=anexo_upload_path,
-        verbose_name=_('Texto Integral'),
+        verbose_name=_("Texto Integral"),
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt],
-        max_length=512)
+        max_length=512,
+    )
 
-    proposicao = GenericRelation(
-        'Proposicao', related_query_name='proposicao')
+    proposicao = GenericRelation("Proposicao", related_query_name="proposicao")
 
     protocolo_gr = GenericRelation(
-        'protocoloadm.Protocolo',
-        object_id_field='conteudo_object_id',
-        content_type_field='conteudo_content_type',
-        related_query_name='protocolo_gr')
+        "protocoloadm.Protocolo",
+        object_id_field="conteudo_object_id",
+        content_type_field="conteudo_content_type",
+        related_query_name="protocolo_gr",
+    )
 
     data_ultima_atualizacao = models.DateTimeField(
-        blank=True, null=True,
-        auto_now=True,
-        verbose_name=_('Data'))
+        blank=True, null=True, auto_now=True, verbose_name=_("Data")
+    )
 
     @property
     def ano(self):
@@ -1140,26 +1231,31 @@ class DocumentoAcessorio(CommonMixin):
         return self.nome
 
     class Meta:
-        verbose_name = _('Documento Acessório')
-        verbose_name_plural = _('Documentos Acessórios')
-        ordering = 'data', 'id'
+        verbose_name = _("Documento Acessório")
+        verbose_name_plural = _("Documentos Acessórios")
+        ordering = "data", "id"
 
     @property
     def is_signed(self):
         try:
-            return self.metadata and self.metadata['signs'] and \
-                self.metadata['signs']['arquivo'] and \
-                self.metadata['signs']['arquivo']['signs']
+            return (
+                self.metadata
+                and self.metadata["signs"]
+                and self.metadata["signs"]["arquivo"]
+                and self.metadata["signs"]["arquivo"]["signs"]
+            )
         except:
             return False
 
     def __str__(self):
-        return _('%(tipo)s - %(nome)s de %(data)s por %(autor)s') % {
-            'tipo': self.tipo,
-            'nome': self.nome,
-            'data': formats.date_format(
-                self.data, "SHORT_DATE_FORMAT") if self.data else '',
-            'autor': self.autor}
+        return _("%(tipo)s - %(nome)s de %(data)s por %(autor)s") % {
+            "tipo": self.tipo,
+            "nome": self.nome,
+            "data": (
+                formats.date_format(self.data, "SHORT_DATE_FORMAT") if self.data else ""
+            ),
+            "autor": self.autor,
+        }
 
     def delete(self, using=None, keep_parents=False):
 
@@ -1174,8 +1270,7 @@ class DocumentoAcessorio(CommonMixin):
         arquivo = self.arquivo
 
         try:
-            r = models.Model.delete(
-                self, using=using, keep_parents=keep_parents)
+            r = models.Model.delete(self, using=using, keep_parents=keep_parents)
         except Exception as e:
 
             for p in self.proposicao.all():
@@ -1188,42 +1283,49 @@ class DocumentoAcessorio(CommonMixin):
 
         return r
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
 
         if not self.pk and self.arquivo:
             arquivo = self.arquivo
             self.arquivo = None
-            models.Model.save(self, force_insert=force_insert,
-                              force_update=force_update,
-                              using=using,
-                              update_fields=update_fields)
+            models.Model.save(
+                self,
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
+            )
             self.arquivo = arquivo
 
-        return models.Model.save(self, force_insert=force_insert,
-                                 force_update=force_update,
-                                 using=using,
-                                 update_fields=update_fields)
+        return models.Model.save(
+            self,
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
 
 class MateriaAssunto(models.Model):
     assunto = models.ForeignKey(
-        AssuntoMateria,
-        on_delete=models.CASCADE,
-        verbose_name=_('Assunto'))
+        AssuntoMateria, on_delete=models.CASCADE, verbose_name=_("Assunto")
+    )
     materia = models.ForeignKey(
-        MateriaLegislativa,
-        on_delete=models.CASCADE,
-        verbose_name=_('Matéria'))
+        MateriaLegislativa, on_delete=models.CASCADE, verbose_name=_("Matéria")
+    )
 
     class Meta:
-        verbose_name = _('Relação Matéria - Assunto')
-        verbose_name_plural = _('Relações Matéria - Assunto')
-        ordering = ['assunto__assunto']
+        verbose_name = _("Relação Matéria - Assunto")
+        verbose_name_plural = _("Relações Matéria - Assunto")
+        ordering = ["assunto__assunto"]
 
     def __str__(self):
-        return _('%(materia)s - %(assunto)s') % {
-            'materia': self.materia, 'assunto': self.assunto}
+        return _("%(materia)s - %(assunto)s") % {
+            "materia": self.materia,
+            "assunto": self.assunto,
+        }
 
 
 class Numeracao(models.Model):
@@ -1231,65 +1333,63 @@ class Numeracao(models.Model):
     tipo_materia = models.ForeignKey(
         TipoMateriaLegislativa,
         on_delete=models.PROTECT,
-        verbose_name=_('Tipo de Matéria'))
-    numero_materia = models.CharField(max_length=5,
-                                      verbose_name=_('Número'))
-    ano_materia = models.PositiveSmallIntegerField(verbose_name=_('Ano'),
-                                                   choices=RANGE_ANOS)
-    data_materia = models.DateField(verbose_name=_('Data'), null=True)
+        verbose_name=_("Tipo de Matéria"),
+    )
+    numero_materia = models.CharField(max_length=5, verbose_name=_("Número"))
+    ano_materia = models.PositiveSmallIntegerField(
+        verbose_name=_("Ano"), choices=RANGE_ANOS
+    )
+    data_materia = models.DateField(verbose_name=_("Data"), null=True)
 
     class Meta:
-        verbose_name = _('Numeração')
-        verbose_name_plural = _('Numerações')
-        ordering = ('materia',
-                    'tipo_materia',
-                    'numero_materia',
-                    'ano_materia',
-                    'data_materia',)
+        verbose_name = _("Numeração")
+        verbose_name_plural = _("Numerações")
+        ordering = (
+            "materia",
+            "tipo_materia",
+            "numero_materia",
+            "ano_materia",
+            "data_materia",
+        )
 
     def __str__(self):
-        return _('%(numero)s/%(ano)s') % {
-            'numero': self.numero_materia,
-            'ano': self.ano_materia}
+        return _("%(numero)s/%(ano)s") % {
+            "numero": self.numero_materia,
+            "ano": self.ano_materia,
+        }
 
 
 class Orgao(models.Model):
-    nome = models.CharField(max_length=60, verbose_name=_('Nome'))
-    sigla = models.CharField(max_length=10, verbose_name=_('Sigla'))
+    nome = models.CharField(max_length=60, verbose_name=_("Nome"))
+    sigla = models.CharField(max_length=10, verbose_name=_("Sigla"))
     unidade_deliberativa = models.BooleanField(
-        choices=YES_NO_CHOICES,
-        verbose_name=(_('Unidade Deliberativa')),
-        default=False)
-    endereco = models.CharField(
-        max_length=100, blank=True, verbose_name=_('Endereço'))
-    telefone = models.CharField(
-        max_length=50, blank=True, verbose_name=_('Telefone'))
+        choices=YES_NO_CHOICES, verbose_name=(_("Unidade Deliberativa")), default=False
+    )
+    endereco = models.CharField(max_length=100, blank=True, verbose_name=_("Endereço"))
+    telefone = models.CharField(max_length=50, blank=True, verbose_name=_("Telefone"))
 
-    autor = SaplGenericRelation(Autor,
-                                related_query_name='orgao_set',
-                                fields_search=(
-                                    ('nome', '__icontains'),
-                                    ('sigla', '__icontains')
-                                ))
+    autor = SaplGenericRelation(
+        Autor,
+        related_query_name="orgao_set",
+        fields_search=(("nome", "__icontains"), ("sigla", "__icontains")),
+    )
 
     class Meta:
-        verbose_name = _('Órgão')
-        verbose_name_plural = _('Órgãos')
-        ordering = ['nome']
+        verbose_name = _("Órgão")
+        verbose_name_plural = _("Órgãos")
+        ordering = ["nome"]
 
     def __str__(self):
-        return _(
-            '%(nome)s - %(sigla)s') % {'nome': self.nome, 'sigla': self.sigla}
+        return _("%(nome)s - %(sigla)s") % {"nome": self.nome, "sigla": self.sigla}
 
 
 class TipoFimRelatoria(models.Model):
-    descricao = models.CharField(
-        max_length=50, verbose_name=_('Tipo Fim Relatoria'))
+    descricao = models.CharField(max_length=50, verbose_name=_("Tipo Fim Relatoria"))
 
     class Meta:
-        verbose_name = _('Tipo Fim de Relatoria')
-        verbose_name_plural = _('Tipos Fim de Relatoria')
-        ordering = ['id']
+        verbose_name = _("Tipo Fim de Relatoria")
+        verbose_name_plural = _("Tipos Fim de Relatoria")
+        ordering = ["id"]
 
     def __str__(self):
         return self.descricao
@@ -1297,38 +1397,45 @@ class TipoFimRelatoria(models.Model):
 
 class Relatoria(models.Model):
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
-    parlamentar = models.ForeignKey(Parlamentar,
-                                    on_delete=models.CASCADE,
-                                    verbose_name=_('Parlamentar'))
+    parlamentar = models.ForeignKey(
+        Parlamentar, on_delete=models.CASCADE, verbose_name=_("Parlamentar")
+    )
     tipo_fim_relatoria = models.ForeignKey(
         TipoFimRelatoria,
         blank=True,
         null=True,
         on_delete=models.PROTECT,
-        verbose_name=_('Motivo Fim Relatoria'))
+        verbose_name=_("Motivo Fim Relatoria"),
+    )
     comissao = models.ForeignKey(
-        Comissao, blank=True, null=True,
-        on_delete=models.CASCADE, verbose_name=_('Comissão'))
-    data_designacao_relator = models.DateField(
-        verbose_name=_('Data Designação'))
+        Comissao,
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        verbose_name=_("Comissão"),
+    )
+    data_designacao_relator = models.DateField(verbose_name=_("Data Designação"))
     data_destituicao_relator = models.DateField(
-        blank=True, null=True, verbose_name=_('Data Destituição'))
+        blank=True, null=True, verbose_name=_("Data Destituição")
+    )
 
     class Meta:
-        verbose_name = _('Relatoria')
-        verbose_name_plural = _('Relatorias')
-        ordering = ['id']
+        verbose_name = _("Relatoria")
+        verbose_name_plural = _("Relatorias")
+        ordering = ["id"]
 
     def __str__(self):
         if self.tipo_fim_relatoria:
-            return _('%(materia)s - %(tipo)s - %(data)s') % {
-                'materia': self.materia,
-                'tipo': self.tipo_fim_relatoria,
-                'data': self.data_designacao_relator.strftime("%d/%m/%Y")}
+            return _("%(materia)s - %(tipo)s - %(data)s") % {
+                "materia": self.materia,
+                "tipo": self.tipo_fim_relatoria,
+                "data": self.data_designacao_relator.strftime("%d/%m/%Y"),
+            }
         else:
-            return _('%(materia)s - %(data)s') % {
-                'materia': self.materia,
-                'data': self.data_designacao_relator.strftime("%d/%m/%Y")}
+            return _("%(materia)s - %(data)s") % {
+                "materia": self.materia,
+                "data": self.data_designacao_relator.strftime("%d/%m/%Y"),
+            }
 
 
 class Parecer(models.Model):
@@ -1336,64 +1443,74 @@ class Parecer(models.Model):
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
     tipo_conclusao = models.CharField(max_length=3, blank=True)
     tipo_apresentacao = models.CharField(
-        max_length=1, choices=TIPO_APRESENTACAO_CHOICES)
+        max_length=1, choices=TIPO_APRESENTACAO_CHOICES
+    )
     parecer = models.TextField(blank=True)
 
     class Meta:
-        verbose_name = _('Parecer')
-        verbose_name_plural = _('Pareceres')
-        ordering = ['id']
+        verbose_name = _("Parecer")
+        verbose_name_plural = _("Pareceres")
+        ordering = ["id"]
 
     def __str__(self):
-        return _('%(relatoria)s - %(tipo)s') % {
-            'relatoria': self.relatoria, 'tipo': self.tipo_apresentacao
+        return _("%(relatoria)s - %(tipo)s") % {
+            "relatoria": self.relatoria,
+            "tipo": self.tipo_apresentacao,
         }
 
 
 class Proposicao(CommonMixin):
 
-    FIELDFILE_NAME = ('texto_original',)
+    FIELDFILE_NAME = ("texto_original",)
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
-    autor = models.ForeignKey(Autor,
-                              null=True,
-                              blank=True,
-                              on_delete=models.PROTECT)
-    tipo = models.ForeignKey(TipoProposicao, on_delete=models.PROTECT,
-                             blank=False,
-                             null=True,
-                             verbose_name=_('Tipo'))
+    autor = models.ForeignKey(Autor, null=True, blank=True, on_delete=models.PROTECT)
+    tipo = models.ForeignKey(
+        TipoProposicao,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=True,
+        verbose_name=_("Tipo"),
+    )
 
     # XXX data_envio was not null, but actual data said otherwise!!!
     data_envio = models.DateTimeField(
-        blank=False, null=True, verbose_name=_('Data de Envio'))
+        blank=False, null=True, verbose_name=_("Data de Envio")
+    )
     data_recebimento = models.DateTimeField(
-        blank=True, null=True, verbose_name=_('Data de Recebimento'))
+        blank=True, null=True, verbose_name=_("Data de Recebimento")
+    )
     data_devolucao = models.DateTimeField(
-        blank=True, null=True, verbose_name=_('Data de Devolução'))
+        blank=True, null=True, verbose_name=_("Data de Devolução")
+    )
 
-    descricao = models.TextField(verbose_name=_('Descrição'))
+    descricao = models.TextField(verbose_name=_("Descrição"))
     justificativa_devolucao = models.CharField(
-        max_length=200,
-        blank=True,
-        verbose_name=_('Justificativa da Devolução'))
+        max_length=200, blank=True, verbose_name=_("Justificativa da Devolução")
+    )
 
-    ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'),
-                                           default=None, blank=True, null=True,
-                                           choices=RANGE_ANOS)
+    ano = models.PositiveSmallIntegerField(
+        verbose_name=_("Ano"), default=None, blank=True, null=True, choices=RANGE_ANOS
+    )
 
     numero_proposicao = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name=_('Número'))
+        blank=True, null=True, verbose_name=_("Número")
+    )
 
     numero_materia_futuro = models.PositiveIntegerField(
-        blank=True, null=True, verbose_name=_('Número Matéria'))
+        blank=True, null=True, verbose_name=_("Número Matéria")
+    )
 
-    hash_code = models.CharField(verbose_name=_('Código do Documento'),
-                                 max_length=200,
-                                 blank=True)
+    hash_code = models.CharField(
+        verbose_name=_("Código do Documento"), max_length=200, blank=True
+    )
 
     """
     FIXME Campo não é necessário na modelagem e implementação atual para o
@@ -1411,51 +1528,62 @@ class Proposicao(CommonMixin):
     sua proposição ou resolva excluir.
     """
     # ind_enviado and ind_devolvido collapsed as char field (status)
-    status = models.CharField(blank=True,
-                              max_length=1,
-                              choices=(('E', 'Enviada'),
-                                       ('R', 'Recebida'),
-                                       ('I', 'Incorporada')),
-                              verbose_name=_('Status Proposição'))
+    status = models.CharField(
+        blank=True,
+        max_length=1,
+        choices=(("E", "Enviada"), ("R", "Recebida"), ("I", "Incorporada")),
+        verbose_name=_("Status Proposição"),
+    )
 
     texto_original = PortalFileField(
         upload_to=materia_upload_path,
         blank=True,
         null=True,
-        verbose_name=_('Texto Original'),
+        verbose_name=_("Texto Original"),
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt],
-        max_length=512)
+        max_length=512,
+    )
 
     texto_articulado = GenericRelation(
-        TextoArticulado, related_query_name='texto_articulado')
+        TextoArticulado, related_query_name="texto_articulado"
+    )
 
     materia_de_vinculo = models.ForeignKey(
-        MateriaLegislativa, blank=True, null=True,
+        MateriaLegislativa,
+        blank=True,
+        null=True,
         on_delete=models.CASCADE,
-        verbose_name=_('Matéria anexadora'),
-        related_name=_('proposicao_set'))
+        verbose_name=_("Matéria anexadora"),
+        related_name=_("proposicao_set"),
+    )
 
     proposicao_vinculada = models.ForeignKey(
-        'self', blank=True, null=True,
+        "self",
+        blank=True,
+        null=True,
         on_delete=models.CASCADE,
-        verbose_name=_('Proposição Vinculada'),
-        related_name=_('proposicao_vinculada_set'))
+        verbose_name=_("Proposição Vinculada"),
+        related_name=_("proposicao_vinculada_set"),
+    )
 
     content_type = models.ForeignKey(
-        ContentType, default=None, blank=True, null=True,
-        verbose_name=_('Tipo de Material Gerado'),
-        on_delete=PROTECT)
-    object_id = models.PositiveIntegerField(
-        blank=True, null=True, default=None)
+        ContentType,
+        default=None,
+        blank=True,
+        null=True,
+        verbose_name=_("Tipo de Material Gerado"),
+        on_delete=PROTECT,
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True, default=None)
     conteudo_gerado_related = SaplGenericForeignKey(
-        'content_type', 'object_id', verbose_name=_('Conteúdo Gerado'))
+        "content_type", "object_id", verbose_name=_("Conteúdo Gerado")
+    )
 
-    observacao = models.TextField(
-        blank=True, verbose_name=_('Observação'))
-    cancelado = models.BooleanField(verbose_name=_('Cancelada ?'),
-                                    choices=YES_NO_CHOICES,
-                                    default=False)
+    observacao = models.TextField(blank=True, verbose_name=_("Observação"))
+    cancelado = models.BooleanField(
+        verbose_name=_("Cancelada ?"), choices=YES_NO_CHOICES, default=False
+    )
 
     """# Ao ser recebida, irá gerar uma nova matéria ou um documento acessorio
     # de uma já existente
@@ -1467,20 +1595,14 @@ class Proposicao(CommonMixin):
 
     user = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('Usuário'),
+        verbose_name=_("Usuário"),
         on_delete=models.PROTECT,
         null=True,
-        blank=True
-    )
-    ip = models.CharField(
-        verbose_name=_('IP'),
-        max_length=30,
         blank=True,
-        default=''
     )
+    ip = models.CharField(verbose_name=_("IP"), max_length=30, blank=True, default="")
     ultima_edicao = models.DateTimeField(
-        verbose_name=_('Data e Hora da Edição'),
-        blank=True, null=True
+        verbose_name=_("Data e Hora da Edição"), blank=True, null=True
     )
 
     @property
@@ -1489,315 +1611,375 @@ class Proposicao(CommonMixin):
 
     @property
     def title_type(self):
-        return '%s nº _____ %s' % (
-            self.tipo, formats.date_format(
+        return "%s nº _____ %s" % (
+            self.tipo,
+            formats.date_format(
                 self.data_envio if self.data_envio else timezone.now(),
-                r"\d\e d \d\e F \d\e Y"))
+                r"\d\e d \d\e F \d\e Y",
+            ),
+        )
 
     class Meta:
-        ordering = ['-data_recebimento']
-        verbose_name = _('Proposição')
-        verbose_name_plural = _('Proposições')
-        unique_together = (('content_type', 'object_id'),)
+        ordering = ["-data_recebimento"]
+        verbose_name = _("Proposição")
+        verbose_name_plural = _("Proposições")
+        unique_together = (("content_type", "object_id"),)
         permissions = (
-            ('detail_proposicao_enviada',
-             _('Pode acessar detalhes de uma proposição enviada.')),
-            ('detail_proposicao_devolvida',
-             _('Pode acessar detalhes de uma proposição devolvida.')),
-            ('detail_proposicao_incorporada',
-             _('Pode acessar detalhes de uma proposição incorporada.')),
+            (
+                "detail_proposicao_enviada",
+                _("Pode acessar detalhes de uma proposição enviada."),
+            ),
+            (
+                "detail_proposicao_devolvida",
+                _("Pode acessar detalhes de uma proposição devolvida."),
+            ),
+            (
+                "detail_proposicao_incorporada",
+                _("Pode acessar detalhes de uma proposição incorporada."),
+            ),
         )
 
     def __str__(self):
         if self.ano and self.numero_proposicao:
-            return '%s %s/%s' % (Proposicao._meta.verbose_name,
-                                 self.numero_proposicao,
-                                 self.ano)
+            return "%s %s/%s" % (
+                Proposicao._meta.verbose_name,
+                self.numero_proposicao,
+                self.ano,
+            )
         else:
             if len(self.descricao) < 30:
-                descricao = self.descricao[:28] + ' ...'
+                descricao = self.descricao[:28] + " ..."
             else:
                 descricao = self.descricao
 
-            return '%s %s/%s' % (Proposicao._meta.verbose_name,
-                                 self.id,
-                                 descricao)
+            return "%s %s/%s" % (Proposicao._meta.verbose_name, self.id, descricao)
 
     @property
     def epigrafe(self):
-        return _('%(tipo)s nº %(numero)s de %(data)s') % {
-            'tipo': self.tipo,
-            'numero': self.numero_proposicao,
-            'data': defaultfilters.date(
+        return _("%(tipo)s nº %(numero)s de %(data)s") % {
+            "tipo": self.tipo,
+            "numero": self.numero_proposicao,
+            "data": defaultfilters.date(
                 self.data_envio if self.data_envio else timezone.now(),
-                r"d \d\e F \d\e Y"
-            )}
+                r"d \d\e F \d\e Y",
+            ),
+        }
 
     def delete(self, using=None, keep_parents=False):
         if self.texto_original:
             self.texto_original.delete()
 
-        return models.Model.delete(
-            self, using=using, keep_parents=keep_parents)
+        return models.Model.delete(self, using=using, keep_parents=keep_parents)
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
 
         hash_code = self.hash_code
 
         if not self.pk and self.texto_original:
             texto_original = self.texto_original
             self.texto_original = None
-            models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+            models.Model.save(
+                self,
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
+            )
             self.texto_original = texto_original
 
-        models.Model.save(self, force_insert=force_insert,
-                                 force_update=force_update,
-                                 using=using,
-                                 update_fields=update_fields)
+        models.Model.save(
+            self,
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
         if self.texto_original:
-            hash = ''
+            hash = ""
             try:
                 hash = self.gerar_hash()
             except Exception as e:
-                logger.error(f'Erro ao gerar hash do arquivo: {self.texto_original.path}. {e}')
-                self.hash_code = ''
+                logger.error(
+                    f"Erro ao gerar hash do arquivo: {self.texto_original.path}. {e}"
+                )
+                self.hash_code = ""
 
             if hash_code != hash:
                 self.hash_code = hash
-                models.Model.save(self, force_insert=False, force_update=True, using=using, update_fields=['hash_code'])
-
+                models.Model.save(
+                    self,
+                    force_insert=False,
+                    force_update=True,
+                    using=using,
+                    update_fields=["hash_code"],
+                )
 
     def gerar_hash(self):
         hash = gerar_hash_arquivo(self.texto_original.path, str(self.pk))
-        return hash or ''
+        return hash or ""
+
 
 class StatusTramitacao(models.Model):
-    INDICADOR_CHOICES = Choices(('F', 'fim', _('Fim')),
-                                ('R', 'retorno', _('Retorno')))
+    INDICADOR_CHOICES = Choices(("F", "fim", _("Fim")), ("R", "retorno", _("Retorno")))
 
-    sigla = models.CharField(max_length=10, verbose_name=_('Sigla'))
-    descricao = models.CharField(max_length=60, verbose_name=_('Descrição'))
+    sigla = models.CharField(max_length=10, verbose_name=_("Sigla"))
+    descricao = models.CharField(max_length=60, verbose_name=_("Descrição"))
     indicador = models.CharField(
         blank=True,
-        max_length=1, verbose_name=_('Indicador da Tramitação'),
-        choices=INDICADOR_CHOICES)
+        max_length=1,
+        verbose_name=_("Indicador da Tramitação"),
+        choices=INDICADOR_CHOICES,
+    )
 
     css_class = models.CharField(
-        max_length=40, blank=True, default='',
-        verbose_name=_('Classe CSS'),
-        help_text=_('Classe CSS para estilização do status na listagem. '
-                    'Exemplo: "badge badge-success"'))
+        max_length=40,
+        blank=True,
+        default="",
+        verbose_name=_("Classe CSS"),
+        help_text=_(
+            "Classe CSS para estilização do status na listagem. "
+            'Exemplo: "badge badge-success"'
+        ),
+    )
 
     class Meta:
-        verbose_name = _('Status de Tramitação')
-        verbose_name_plural = _('Status de Tramitação')
-        ordering = ['descricao']
+        verbose_name = _("Status de Tramitação")
+        verbose_name_plural = _("Status de Tramitação")
+        ordering = ["descricao"]
 
     def __str__(self):
-        return _('%(descricao)s') % {
-            'descricao': self.descricao}
+        return _("%(descricao)s") % {"descricao": self.descricao}
 
 
 class UnidadeTramitacaoManager(models.Manager):
     """
-        Esta classe permite ordenar alfabeticamente a unidade de tramitacao
-        através da concatenação de 3 fields
+    Esta classe permite ordenar alfabeticamente a unidade de tramitacao
+    através da concatenação de 3 fields
     """
 
     def get_queryset(self):
-        return super(UnidadeTramitacaoManager, self).get_queryset().annotate(
-            nome_composto=Concat('orgao__nome',
-                                 'comissao__sigla',
-                                 'parlamentar__nome_parlamentar')
-        ).order_by('nome_composto')
+        return (
+            super(UnidadeTramitacaoManager, self)
+            .get_queryset()
+            .annotate(
+                nome_composto=Concat(
+                    "orgao__nome", "comissao__sigla", "parlamentar__nome_parlamentar"
+                )
+            )
+            .order_by("nome_composto")
+        )
 
 
 class UnidadeTramitacao(models.Model):
     comissao = models.ForeignKey(
-        Comissao, blank=True, null=True,
-        on_delete=models.PROTECT, verbose_name=_('Comissão'))
+        Comissao,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        verbose_name=_("Comissão"),
+    )
     orgao = models.ForeignKey(
-        Orgao, blank=True, null=True,
-        on_delete=models.PROTECT, verbose_name=_('Órgão'))
+        Orgao, blank=True, null=True, on_delete=models.PROTECT, verbose_name=_("Órgão")
+    )
     parlamentar = models.ForeignKey(
-        Parlamentar, blank=True, null=True,
-        on_delete=models.PROTECT, verbose_name=_('Parlamentar'))
+        Parlamentar,
+        blank=True,
+        null=True,
+        on_delete=models.PROTECT,
+        verbose_name=_("Parlamentar"),
+    )
 
     objects = UnidadeTramitacaoManager()
 
-    ativo = models.BooleanField(verbose_name=_('Ativo ?'),
-                                  choices=YES_NO_CHOICES,
-                                  default=True)
+    ativo = models.BooleanField(
+        verbose_name=_("Ativo ?"), choices=YES_NO_CHOICES, default=True
+    )
 
     class Meta:
-        verbose_name = _('Unidade de Tramitação')
-        verbose_name_plural = _('Unidades de Tramitação')
-        ordering = ['id']
+        verbose_name = _("Unidade de Tramitação")
+        verbose_name_plural = _("Unidades de Tramitação")
+        ordering = ["id"]
 
     def __str__(self):
         if self.orgao and self.comissao and self.parlamentar:
-            return _('%(comissao)s - %(orgao)s - %(parlamentar)s') % {
-                'comissao': self.comissao, 'orgao': self.orgao,
-                'parlamentar': self.parlamentar
+            return _("%(comissao)s - %(orgao)s - %(parlamentar)s") % {
+                "comissao": self.comissao,
+                "orgao": self.orgao,
+                "parlamentar": self.parlamentar,
             }
         elif self.orgao and self.comissao and not self.parlamentar:
-            return _('%(comissao)s - %(orgao)s') % {
-                'comissao': self.comissao, 'orgao': self.orgao
+            return _("%(comissao)s - %(orgao)s") % {
+                "comissao": self.comissao,
+                "orgao": self.orgao,
             }
         elif self.orgao and not self.comissao and self.parlamentar:
-            return _('%(orgao)s - %(parlamentar)s') % {
-                'orgao': self.orgao, 'parlamentar': self.parlamentar
+            return _("%(orgao)s - %(parlamentar)s") % {
+                "orgao": self.orgao,
+                "parlamentar": self.parlamentar,
             }
         elif not self.orgao and self.comissao and self.parlamentar:
-            return _('%(comissao)s - %(parlamentar)s') % {
-                'comissao': self.comissao, 'parlamentar': self.parlamentar
+            return _("%(comissao)s - %(parlamentar)s") % {
+                "comissao": self.comissao,
+                "parlamentar": self.parlamentar,
             }
         elif not self.orgao and self.comissao and not self.parlamentar:
-            return _('%(comissao)s') % {'comissao': self.comissao}
+            return _("%(comissao)s") % {"comissao": self.comissao}
         elif self.orgao and not self.comissao and not self.parlamentar:
-            return _('%(orgao)s') % {'orgao': self.orgao}
+            return _("%(orgao)s") % {"orgao": self.orgao}
         else:
-            return _('%(parlamentar)s') % {'parlamentar': self.parlamentar}
+            return _("%(parlamentar)s") % {"parlamentar": self.parlamentar}
 
 
 class Tramitacao(models.Model):
     TURNO_CHOICES = Choices(
-        ('P', 'primeiro', _('Primeiro')),
-        ('S', 'segundo', _('Segundo')),
-        ('U', 'unico', _('Único')),
+        ("P", "primeiro", _("Primeiro")),
+        ("S", "segundo", _("Segundo")),
+        ("U", "unico", _("Único")),
     )
 
-    status = models.ForeignKey(StatusTramitacao, on_delete=models.PROTECT,
-                               null=True,
-                               verbose_name=_('Status'))
+    status = models.ForeignKey(
+        StatusTramitacao, on_delete=models.PROTECT, null=True, verbose_name=_("Status")
+    )
     materia = models.ForeignKey(MateriaLegislativa, on_delete=models.CASCADE)
     timestamp = models.DateTimeField(default=timezone.now)
-    data_tramitacao = models.DateField(verbose_name=_('Data Tramitação'))
+    data_tramitacao = models.DateField(verbose_name=_("Data Tramitação"))
     unidade_tramitacao_local = models.ForeignKey(
         UnidadeTramitacao,
-        related_name='tramitacoes_origem',
+        related_name="tramitacoes_origem",
         on_delete=models.PROTECT,
-        verbose_name=_('Unidade Local'))
+        verbose_name=_("Unidade Local"),
+    )
     data_encaminhamento = models.DateField(
-        blank=True, null=True, verbose_name=_('Data Encaminhamento'))
+        blank=True, null=True, verbose_name=_("Data Encaminhamento")
+    )
     unidade_tramitacao_destino = models.ForeignKey(
         UnidadeTramitacao,
         null=True,
-        related_name='tramitacoes_destino',
+        related_name="tramitacoes_destino",
         on_delete=models.PROTECT,
-        verbose_name=_('Unidade Destino'))
-    urgente = models.BooleanField(verbose_name=_('Urgente ?'),
-                                  choices=YES_NO_CHOICES,
-                                  default=False)
+        verbose_name=_("Unidade Destino"),
+    )
+    urgente = models.BooleanField(
+        verbose_name=_("Urgente ?"), choices=YES_NO_CHOICES, default=False
+    )
     turno = models.CharField(
-        max_length=1, blank=True, verbose_name=_('Turno'),
-        choices=TURNO_CHOICES)
-    texto = models.TextField(verbose_name=_('Texto da Ação'))
+        max_length=1, blank=True, verbose_name=_("Turno"), choices=TURNO_CHOICES
+    )
+    texto = models.TextField(verbose_name=_("Texto da Ação"))
     data_fim_prazo = models.DateField(
-        blank=True, null=True, verbose_name=_('Data Fim Prazo'))
+        blank=True, null=True, verbose_name=_("Data Fim Prazo")
+    )
     user = models.ForeignKey(
         get_settings_auth_user_model(),
-        verbose_name=_('Usuário'),
+        verbose_name=_("Usuário"),
         on_delete=models.PROTECT,
         null=True,
-        blank=True
+        blank=True,
     )
-    ip = models.CharField(verbose_name=_('IP'),
-                          max_length=30,
-                          blank=True,
-                          default='')
+    ip = models.CharField(verbose_name=_("IP"), max_length=30, blank=True, default="")
 
     class Meta:
-        verbose_name = _('Tramitação')
-        verbose_name_plural = _('Tramitações')
-        ordering = ('-data_tramitacao', '-id',)
+        verbose_name = _("Tramitação")
+        verbose_name_plural = _("Tramitações")
+        ordering = (
+            "-data_tramitacao",
+            "-id",
+        )
 
     def __str__(self):
-        return _('%(materia)s | %(status)s | %(data)s') % {
-            'materia': self.materia,
-            'status': self.status,
-            'data': self.data_tramitacao.strftime("%d/%m/%Y")}
+        return _("%(materia)s | %(status)s | %(data)s") % {
+            "materia": self.materia,
+            "status": self.status,
+            "data": self.data_tramitacao.strftime("%d/%m/%Y"),
+        }
 
 
 class MateriaEmTramitacao(models.Model):
-    materia = models.ForeignKey(
-        MateriaLegislativa, on_delete=models.DO_NOTHING)
+    materia = models.ForeignKey(MateriaLegislativa, on_delete=models.DO_NOTHING)
     tramitacao = models.ForeignKey(
-        Tramitacao,
-        on_delete=models.DO_NOTHING,
-        related_name='materiaemtramitacao_set'
-        )
+        Tramitacao, on_delete=models.DO_NOTHING, related_name="materiaemtramitacao_set"
+    )
 
     unidade_tramitacao_atual = models.ForeignKey(
         UnidadeTramitacao,
         null=True,
-        related_name='materiasemtramitacao_set',
+        related_name="materiasemtramitacao_set",
         on_delete=models.PROTECT,
-        verbose_name=_('Unidade Atual'))
+        verbose_name=_("Unidade Atual"),
+    )
 
     em_tramitacao = models.BooleanField(
-        verbose_name=_('Em Tramitação ?'),
-        choices=YES_NO_CHOICES,
-        default=False)
+        verbose_name=_("Em Tramitação ?"), choices=YES_NO_CHOICES, default=False
+    )
 
     status = models.ForeignKey(
         StatusTramitacao,
         null=True,
-        related_name='materiasemtramitacao_set',
+        related_name="materiasemtramitacao_set",
         on_delete=models.PROTECT,
-        verbose_name=_('Status Atual'))
+        verbose_name=_("Status Atual"),
+    )
 
     class Meta:
         managed = False
         db_table = "materia_materiaemtramitacao"
-        ordering = ('-id',)
+        ordering = ("-id",)
 
     def __str__(self):
-        return '{}/{}'.format(self.materia, self.tramitacao)
+        return "{}/{}".format(self.materia, self.tramitacao)
+
 
 class AnaliseSimilaridade(models.Model):
     materia_1 = models.ForeignKey(
-        MateriaLegislativa, related_name='materia_1_set',
+        MateriaLegislativa,
+        related_name="materia_1_set",
         on_delete=models.CASCADE,
-        verbose_name=_('Matéria 1'))
+        verbose_name=_("Matéria 1"),
+    )
     materia_2 = models.ForeignKey(
-        MateriaLegislativa, related_name='materia_2_set',
+        MateriaLegislativa,
+        related_name="materia_2_set",
         on_delete=models.CASCADE,
-        verbose_name=_('Matéria 2'))
+        verbose_name=_("Matéria 2"),
+    )
 
     analise = models.TextField(
-        blank=True, null=True, verbose_name=_('Análise de Similaridade'))
+        blank=True, null=True, verbose_name=_("Análise de Similaridade")
+    )
     data_analise = models.DateTimeField(
-        blank=True, null=True, verbose_name=_('Data da Análise'))
+        blank=True, null=True, verbose_name=_("Data da Análise")
+    )
     ia_name = models.CharField(
-        max_length=50, blank=True, null=True,
-        verbose_name=_('Nome do Algoritmo de IA'))
+        max_length=50, blank=True, null=True, verbose_name=_("Nome do Algoritmo de IA")
+    )
 
     qtd_assuntos_comuns = models.SmallIntegerField(
-        verbose_name=_("Qtd de Assuntos Comuns"), default=-0)
+        verbose_name=_("Qtd de Assuntos Comuns"), default=-0
+    )
 
-    similaridade = models.SmallIntegerField(
-        verbose_name=_("Similaridade"), default=-1)
+    similaridade = models.SmallIntegerField(verbose_name=_("Similaridade"), default=-1)
 
     class Meta:
-        verbose_name = _('Análise de Similaridade')
-        verbose_name_plural = _('Análises de Similaridade')
-        ordering = ['-data_analise', '-qtd_assuntos_comuns']
+        verbose_name = _("Análise de Similaridade")
+        verbose_name_plural = _("Análises de Similaridade")
+        ordering = ["-data_analise", "-qtd_assuntos_comuns"]
         indexes = [
-            models.Index(fields=['-data_analise', '-qtd_assuntos_comuns']),
-            models.Index(fields=['materia_1', '-similaridade']),
-            models.Index(fields=['materia_2', '-similaridade']),
-            models.Index(fields=['similaridade']),
+            models.Index(fields=["-data_analise", "-qtd_assuntos_comuns"]),
+            models.Index(fields=["materia_1", "-similaridade"]),
+            models.Index(fields=["materia_2", "-similaridade"]),
+            models.Index(fields=["similaridade"]),
         ]
 
     def __str__(self):
-        return _('Matéria 1: %(materia_1)s'
-                 ' - Matéria 2: %(materia_2)s'
-                 ' - Similaridade: %(similaridade)s') % {
-            'materia_1': self.materia_1,
-            'materia_2': self.materia_2,
-            'similaridade': self.similaridade
+        return _(
+            "Matéria 1: %(materia_1)s"
+            " - Matéria 2: %(materia_2)s"
+            " - Similaridade: %(similaridade)s"
+        ) % {
+            "materia_1": self.materia_1,
+            "materia_2": self.materia_2,
+            "similaridade": self.similaridade,
         }
-
