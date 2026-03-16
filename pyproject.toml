@@ -4,6 +4,7 @@ python_files = ["test_*.py", "tests.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 testpaths = [
+    "drfautoapi",
     "sapl",
     "cmj",
     "_tests",
