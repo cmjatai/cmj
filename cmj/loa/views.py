@@ -1226,7 +1226,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 "title": title,
                 "filters": "<br>".join(filters),
                 "groups": [],
-                'quebrar_pagina': cd.get('quebrar_pagina', False),
+                "quebrar_pagina": cd.get("quebrar_pagina", False),
             }
 
             def render_col_emenda(item):
@@ -1334,8 +1334,6 @@ class EmendaLoaCrud(MasterDetailCrud):
                 for i in range(len(agrupamento1)):
                     agrupamento.append(agrupamento1[i])
                     agrupamento.append(agrupamento2[i])
-
-
 
                 # agrupamento terá itens strings como:
                 # ['despesa__programa__codigo', 'despesa__unidade__codigo']
@@ -1485,8 +1483,11 @@ class EmendaLoaCrud(MasterDetailCrud):
                     cd_group["emendas"] = dict(
                         sorted(
                             cd_group["emendas"].items(),
-                            key=lambda x: x[1].materia.numero if x[1].materia and x[1].materia.numero else 0,
-                            
+                            key=lambda x: (
+                                x[1].materia.numero
+                                if x[1].materia and x[1].materia.numero
+                                else 0
+                            ),
                         )
                     )
                     for item in cd_group["emendas"].values():
