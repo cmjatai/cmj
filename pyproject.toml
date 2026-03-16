@@ -1,0 +1,40 @@
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "cmj.settings"
+python_files = ["test_*.py", "tests.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+testpaths = [
+    "sapl",
+    "cmj",
+    "_tests",
+]
+norecursedirs = [
+    "cmj/legacy_cep",
+    "node_modules",
+    ".git",
+    "collected_static",
+    "_frontend",
+    "__notebooks",
+    "__notebooks_private",
+    "docker",
+    "solr",
+    "solr_old",
+    "fonts",
+    "logs",
+    "__pycache__",
+]
+addopts = [
+    "--strict-markers",
+    "--tb=short",
+    "-q",
+    "--no-migrations",
+    "--reuse-db",
+]
+markers = [
+    "django_db: mark test as requiring database access",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:model_mommy.*",
+    "ignore::PendingDeprecationWarning",
+]
