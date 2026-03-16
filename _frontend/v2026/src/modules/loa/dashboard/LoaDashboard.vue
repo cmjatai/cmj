@@ -33,9 +33,20 @@
     </div>
     <div class="cards container-fluid mt-2 mb-2">
       <div class="row">
-        <div class="col-md-8">
-          <EmendasChart
-            :emendas="emendasDiversasSelecionadas"
+        <div class="col-md-12">
+          <HorizontalChart
+            :object-list="emendasDiversasSelecionadasPorEntidadeSaude"
+            :ready="!!syncStore.data_cache?.loa_entidade"
+            :bar-height="20"
+            title="Emendas Impositivas - Saúde"
+            subtitle="Distribuição das emendas impositivas de saúde por entidade beneficiada."
+          />
+        </div>
+        <div class="col-md-12">
+          <HorizontalChart
+            :object-list="emendasDiversasSelecionadasPorIndicacao"
+            :ready="!!syncStore.data_cache?.loa_emendaloa"
+            :bar-height="20"
             title="Emendas Impositivas - Áreas Diversas"
             subtitle="Distribuição das emendas impositivas de áreas diversas por Unidade Orçamentária."
           />
@@ -50,7 +61,7 @@ import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
 import { useSyncStore } from '~@/stores/SyncStore'
 import AnoSelector from './AnoSelector.vue'
 import Totalizadores from './Totalizadores.vue'
-import EmendasChart from './EmendasChart.vue'
+import HorizontalChart from './HorizontalChart.vue'
 
 const syncStore = useSyncStore()
 const anosSelecionados = ref([])
@@ -100,11 +111,30 @@ const loaSelecionadas = computed(() => {
   return loaComOrcImp.value.filter((loa) => anosSelecionados.value.includes(loa.ano))
 })
 
-const emendasDiversasSelecionadas = computed(() => {
+const emendasDiversasSelecionadasPorIndicacao = computed(() => {
   if (!loaSelecionadas.value.length || !syncStore.data_cache?.loa_emendaloa) return []
   const emendas = Object.values(syncStore.data_cache.loa_emendaloa)
-  return emendas.filter((emenda) => loaSelecionadas.value.some(
-    (loa) => loa.id === emenda.loa && emenda.tipo === 99))
+  const emendasDiversas = emendas.filter((emenda) => loaSelecionadas.value.some(
+    (loa) => loa.id === emenda.loa && emenda.tipo === 99 && emenda.fase != 40))
+  // retornar emendasDiversas convertendo para nova lista de objetos com label e valor
+  const emendasDiversasFormatadas = emendasDiversas.map((emenda) => ({
+    label: emenda.indicacao || 'Sem Referência Registrada',
+    valor: emenda.valor
+  }))
+  return emendasDiversasFormatadas
+})
+
+const emendasDiversasSelecionadasPorEntidadeSaude = computed(() => {
+  if (!loaSelecionadas.value.length || !syncStore.data_cache?.loa_emendaloa) return []
+  const emendas = Object.values(syncStore.data_cache.loa_emendaloa)
+  const emendasDiversas = emendas.filter((emenda) => loaSelecionadas.value.some(
+    (loa) => loa.id === emenda.loa && emenda.tipo === 10 && emenda.entidade > 0 && emenda.fase != 40))
+  // retornar emendasDiversas convertendo para nova lista de objetos com label e valor
+  const emendasDiversasFormatadas = emendasDiversas.map((emenda) => ({
+    label: syncStore.data_cache.loa_entidade[emenda.entidade]?.nome_fantasia || 'Sem Referência Registrada',
+    valor: emenda.valor
+  }))
+  return emendasDiversasFormatadas
 })
 
 watch(loaComOrcImp, (items) => {
@@ -117,7 +147,9 @@ watch(loaComOrcImp, (items) => {
         params: {
           loa__in: items.map(item => item.id).join(','),
           tipo__in: '10,99',
-          get_all: true
+          get_all: true,
+          expand: 'entidade',
+          exclude: 'search'
         }
       })
   }
@@ -159,6 +191,11 @@ onUnmounted(() => {
     background: var(--bs-body-bg);
     overflow: auto;
   }
+  background: linear-gradient(135deg, #f1f3f5 30%, #e9ecef 50%, #f1f3f5 100%);
+
+  [data-bs-theme="dark"] & {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+  }
 }
 
 .btn-fullscreen {
@@ -186,9 +223,6 @@ onUnmounted(() => {
   .inner-header {
     padding: 0.5rem;
 
-    [data-bs-theme="dark"] & {
-       background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
-    }
     // border: 1px solid var(--bs-border-color);
     // box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 

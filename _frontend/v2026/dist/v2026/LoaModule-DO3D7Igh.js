@@ -1,1 +1,0 @@
-import{f as o,g as t,q as r,A as c}from"./vendor-CsVMWeVi.js";import{_ as s}from"./main-CslKVifQ.js";import"./vendor_fortawesome-BOzCBQL5.js";const n={},a={class:"loa-module"};function _(m,i){const e=c("router-view");return o(),t("div",a,[r(e)])}const p=s(n,[["render",_]]);export{p as default};
