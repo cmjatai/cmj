@@ -31,7 +31,17 @@
         </div>
       </div>
     </div>
-    <div class="cards" />
+    <div class="cards container-fluid mt-2 mb-2">
+      <div class="row">
+        <div class="col-md-8">
+          <EmendasChart
+            :emendas="emendasDiversasSelecionadas"
+            title="Emendas Impositivas - Áreas Diversas"
+            subtitle="Distribuição das emendas impositivas de áreas diversas por Unidade Orçamentária."
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -40,6 +50,7 @@ import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
 import { useSyncStore } from '~@/stores/SyncStore'
 import AnoSelector from './AnoSelector.vue'
 import Totalizadores from './Totalizadores.vue'
+import EmendasChart from './EmendasChart.vue'
 
 const syncStore = useSyncStore()
 const anosSelecionados = ref([])
@@ -58,15 +69,6 @@ const toggleFullscreen = () => {
 const onFullscreenChange = () => {
   isFullscreen.value = !!document.fullscreenElement
 }
-
-onMounted(() => {
-  document.addEventListener('fullscreenchange', onFullscreenChange)
-  syncLoa()
-})
-
-onUnmounted(() => {
-  document.removeEventListener('fullscreenchange', onFullscreenChange)
-})
 
 const loaComOrcImp = computed(() => {
   if (syncStore.data_cache?.loa_loa) {
@@ -94,25 +96,61 @@ const totaisSelecionados = computed(() => {
   }
 })
 
-const loasSelecionados = computed(() => {
+const loaSelecionadas = computed(() => {
   return loaComOrcImp.value.filter((loa) => anosSelecionados.value.includes(loa.ano))
+})
+
+const emendasDiversasSelecionadas = computed(() => {
+  if (!loaSelecionadas.value.length || !syncStore.data_cache?.loa_emendaloa) return []
+  const emendas = Object.values(syncStore.data_cache.loa_emendaloa)
+  return emendas.filter((emenda) => loaSelecionadas.value.some(
+    (loa) => loa.id === emenda.loa && emenda.tipo === 99))
 })
 
 watch(loaComOrcImp, (items) => {
   if (items.length && !anosSelecionados.value.length) {
     anosSelecionados.value = [items[0].ano]
+    syncStore
+      .fetchSync({
+        app: 'loa',
+        model: 'emendaloa',
+        params: {
+          loa__in: items.map(item => item.id).join(','),
+          tipo__in: '10,99',
+          get_all: true
+        }
+      })
   }
 }, { immediate: true })
 
+watch(loaSelecionadas, (val) => {
+  if (val.length) {
+    document.title = `LOA ${val.map(v => v.ano).join(', ')} - Jataí`
+  } else {
+    document.title = 'LOA - Jataí'
+  }
+})
+
 const syncLoa = async () => {
-  syncStore.fetchSync({
-    app: 'loa',
-    model: 'loa',
-    params: {
-      get_all: true
-    }
-  })
+  syncStore
+    .fetchSync({
+      app: 'loa',
+      model: 'loa',
+      params: {
+        get_all: true
+      }
+    })
 }
+
+onMounted(() => {
+  document.addEventListener('fullscreenchange', onFullscreenChange)
+  syncLoa()
+})
+
+onUnmounted(() => {
+  document.removeEventListener('fullscreenchange', onFullscreenChange)
+})
+
 </script>
 
 <style lang="scss" scoped>

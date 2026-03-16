@@ -619,7 +619,7 @@ export default {
               { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
         })
         .then(() => {
-          t.utils.getModelAction('loa', 'loa', t.loa.id, 'espelho', formFilter)
+          t.utils.postModelAction('loa', 'loa', t.loa.id, 'espelho', formFilter)
             .then((response) => {
               t.espelho = response.data
             })
