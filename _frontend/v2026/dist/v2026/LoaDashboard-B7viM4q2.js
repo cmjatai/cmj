@@ -1,1 +1,0 @@
-import{f as a,g as o,G as t}from"./vendor-BHbUpkHs.js";import{_ as e}from"./main-CqaqBG2m.js";import"./vendor_fortawesome-DAeW-wz1.js";const s={},b={class:"loa-dashboard"};function c(n,r){return a(),o("div",b,[...r[0]||(r[0]=[t(" a<br>a<br>a<br>a<br>a<br>a<br>a<br>a<br>a<br>a<br>a<br>",22)])])}const i=e(s,[["render",c]]);export{i as default};
