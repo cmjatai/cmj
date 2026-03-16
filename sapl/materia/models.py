@@ -1947,13 +1947,13 @@ class AnaliseSimilaridade(models.Model):
     )
 
     analise = models.TextField(
-        blank=True, null=True, verbose_name=_("Análise de Similaridade")
+        blank=True, default="", verbose_name=_("Análise de Similaridade")
     )
     data_analise = models.DateTimeField(
         blank=True, null=True, verbose_name=_("Data da Análise")
     )
     ia_name = models.CharField(
-        max_length=50, blank=True, null=True, verbose_name=_("Nome do Algoritmo de IA")
+        max_length=50, blank=True, default="", verbose_name=_("Nome do Algoritmo de IA")
     )
 
     qtd_assuntos_comuns = models.SmallIntegerField(
