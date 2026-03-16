@@ -25,6 +25,7 @@
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "bootstrap-vue-next": "^0.43.9",
+    "chart.js": "^4.5.1",
     "jquery": "^3.7.1",
     "jquery-mask-plugin": "^1.14.16",
     "js-yaml": "^4.1.1",
@@ -41,6 +42,7 @@
     "pinia": "^3.0.3",
     "split.js": "^1.6.5",
     "vue": "^3.5.24",
+    "vue-chartjs": "^5.3.3",
     "vue-json-pretty": "^2.6.0",
     "vue-router": "^4.6.3"
   },

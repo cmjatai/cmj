@@ -374,13 +374,13 @@ class LoaViewSet:
 
     @action(
         methods=[
-            "get",
+            "post",
         ],
         detail=True,
     )
     def espelho(self, request, *args, **kwargs):
         loa = self.get_object()
-        filters_data = request.query_params
+        filters_data = request.data
         return Response(self.run_espelho(filters_data, loa))
 
     def run_espelho(self, filters_data, loa):
