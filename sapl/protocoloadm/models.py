@@ -353,7 +353,7 @@ class DocumentoAdministrativo(CommonMixin):
 
     old_path = models.TextField(
         verbose_name=_('Path antigo para Sislegis - Publicações'),
-        blank=True, null=True, default=None)
+        blank=True, default='')
 
     old_json = JSONField(
         verbose_name=_('Json from origin import'),
@@ -388,15 +388,14 @@ class DocumentoAdministrativo(CommonMixin):
         choices=YES_NO_CHOICES,
         default=False)
     assunto = models.TextField(
-        blank=True,
-        null=True,
+        blank=True, default='',
         verbose_name=_('Assunto'))
     numero_externo = models.PositiveIntegerField(
         blank=True,
         null=True,
         verbose_name=_('Número Externo'))
     observacao = models.TextField(
-        blank = True, verbose_name = _('Outras Informações'))
+        blank = True, default='', verbose_name = _('Outras Informações'))
     texto_integral = PortalFileField(
         blank=True,
         null=True,
@@ -443,7 +442,7 @@ class DocumentoAdministrativo(CommonMixin):
     link_share = models.CharField(
         _('Link de Compartilhamento'),
         max_length=128,
-        blank=True, null=True, default=None)
+        blank=True, default='')
 
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True,
