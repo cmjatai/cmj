@@ -1,153 +1,183 @@
-from _decimal import ROUND_HALF_DOWN, ROUND_DOWN
+import csv
+import re
 from datetime import datetime
 from decimal import Decimal
 from io import StringIO
-import csv
-import re
-from django.contrib.postgres.indexes import GinIndex, OpClass
-from django.core.validators import RegexValidator
-from cmj.core.models import CmjSearchMixin
-from cmj.utils import valor_por_extenso
 
+from _decimal import ROUND_DOWN, ROUND_HALF_DOWN
 from bs4 import BeautifulSoup as bs
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.core.files import File
 from django.core.serializers.json import DjangoJSONEncoder
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models, transaction
-from django.db.models import manager, Max
+from django.db.models import Max, manager
 from django.db.models.aggregates import Sum
-from django.db.models.deletion import PROTECT, CASCADE, SET_NULL
+from django.db.models.deletion import CASCADE, PROTECT, SET_NULL
 from django.db.models.fields.json import JSONField
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import UF, run_sql, texto_upload_path, get_settings_auth_user_model
-from sapl.materia.models import EM_TRAMITACAO, MateriaLegislativa, Proposicao, TipoProposicao
+from cmj.core.models import CmjSearchMixin
+from cmj.utils import (
+    UF,
+    get_settings_auth_user_model,
+    run_sql,
+    texto_upload_path,
+    valor_por_extenso,
+)
+from sapl.materia.models import (
+    EM_TRAMITACAO,
+    MateriaLegislativa,
+    Proposicao,
+    TipoProposicao,
+)
 from sapl.parlamentares.models import Legislatura, Parlamentar
-from sapl.utils import PortalFileField, OverwriteStorage
-
+from sapl.utils import OverwriteStorage, PortalFileField
 
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]
 
 
-def quantize(value, decimal_places='0.01', rounding=ROUND_HALF_DOWN) -> Decimal:
-    return value.quantize(
-        Decimal(decimal_places),
-        rounding=rounding
-    )
+def quantize(value, decimal_places="0.01", rounding=ROUND_HALF_DOWN) -> Decimal:
+    return value.quantize(Decimal(decimal_places), rounding=rounding)
 
 
 class Loa(models.Model):
 
-    ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'))
+    ano = models.PositiveSmallIntegerField(verbose_name=_("Ano"))
 
     materia = models.OneToOneField(
         MateriaLegislativa,
-        blank=True, null=True, default=None,
-        verbose_name=_('Matéria Legislativa'),
-        related_name='loa',
-        on_delete=PROTECT)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Matéria Legislativa"),
+        related_name="loa",
+        on_delete=PROTECT,
+    )
 
     rcl_previa = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Receita Corrente Líquida - Prévia (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Receita Corrente Líquida - Prévia (R$)"),
     )
 
     receita_corrente_liquida = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Receita Corrente Líquida - RCL (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Receita Corrente Líquida - RCL (R$)"),
     )
 
     perc_disp_total = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal('0.00'),
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Global da RCL (%)'),
+        verbose_name=_("Disp. Global da RCL (%)"),
     )
 
     perc_disp_saude = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal('0.00'),
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Saúde da RCL (%)'),
+        verbose_name=_("Disp. Saúde da RCL (%)"),
     )
 
     perc_disp_diversos = models.DecimalField(
-        max_digits=5, decimal_places=2, default=Decimal('0.00'),
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Diversos da RCL (%)'),
+        verbose_name=_("Disp. Diversos da RCL (%)"),
     )
 
     disp_total = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Global da RCL (R$)'),
+        verbose_name=_("Disp. Global da RCL (R$)"),
     )
 
     disp_saude = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Saúde da RCL (R$)'),
+        verbose_name=_("Disp. Saúde da RCL (R$)"),
     )
 
     disp_diversos = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Diversos da RCL (R$)'),
+        verbose_name=_("Disp. Diversos da RCL (R$)"),
     )
 
     parlamentares = models.ManyToManyField(
         Parlamentar,
-        through='LoaParlamentar',
-        related_name='loa_set',
-
-        verbose_name=_('Parlamentares'),
-        through_fields=(
-            'loa',
-            'parlamentar'))
+        through="LoaParlamentar",
+        related_name="loa_set",
+        verbose_name=_("Parlamentares"),
+        through_fields=("loa", "parlamentar"),
+    )
 
     yaml_obs = models.TextField(
-        verbose_name=_('Observações de Rodapé (yaml format)'),
-        blank=True, null=True, default='')
+        verbose_name=_("Observações de Rodapé (yaml format)"),
+        blank=True,
+        null=True,
+        default="",
+    )
 
-    publicado = models.BooleanField(
-        default=False, verbose_name=_('Publicado?'))
+    publicado = models.BooleanField(default=False, verbose_name=_("Publicado?"))
 
-    #descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
+    # descricao = models.CharField(max_length=50, verbose_name=_('Descrição'))
 
     despesa_default_deducao_saude = models.ForeignKey(
-        'Despesa',
-        blank=True, null=True, default=None,
-        verbose_name=_('Despesa Default Dedução Saúde'),
-        related_name='loa_despesa_default_deducao_saude',
-        on_delete=PROTECT)
+        "Despesa",
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Despesa Default Dedução Saúde"),
+        related_name="loa_despesa_default_deducao_saude",
+        on_delete=PROTECT,
+    )
 
     despesa_default_deducao_diversos = models.ForeignKey(
-        'Despesa',
-        blank=True, null=True, default=None,
-        verbose_name=_('Despesa Default Dedução Diversos'),
-        related_name='loa_despesa_default_deducao_diversos',
-        on_delete=PROTECT)
+        "Despesa",
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Despesa Default Dedução Diversos"),
+        related_name="loa_despesa_default_deducao_diversos",
+        on_delete=PROTECT,
+    )
 
     despesa_default_deducao_educacao = models.ForeignKey(
-        'Despesa',
-        blank=True, null=True, default=None,
-        verbose_name=_('Despesa Default Dedução Educação'),
-        related_name='loa_despesa_default_deducao_educacao',
-        on_delete=PROTECT)
-
+        "Despesa",
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Despesa Default Dedução Educação"),
+        related_name="loa_despesa_default_deducao_educacao",
+        on_delete=PROTECT,
+    )
 
     class Meta:
-        verbose_name = _('LOA')
-        verbose_name_plural = _('LOAs')
-        ordering = ['-id']
-        permissions = (
-            ('view_despesasexecutadas', _('View Despesas Executadas')),
-        )
+        verbose_name = _("LOA")
+        verbose_name_plural = _("LOAs")
+        ordering = ["-id"]
+        permissions = (("view_despesasexecutadas", _("View Despesas Executadas")),)
 
     def __str__(self):
-        nj = self.materia.normajuridica() if self.materia else ''
-        descr = nj or (self.materia or '')
-        return f'LOA {self.ano} - {descr}'
+        nj = self.materia.normajuridica() if self.materia else ""
+        descr = nj or (self.materia or "")
+        return f"LOA {self.ano} - {descr}"
 
     def update_disponibilidades(self):
 
@@ -166,27 +196,39 @@ class Loa(models.Model):
         loa_in_legislatura_atual = True
 
         if self.materia:
-            materia_in_legislatura_atual = legislatura_atual['data_inicio'] <= self.materia.data_apresentacao <= legislatura_atual['data_fim']
-            loa_in_legislatura_atual = legislatura_atual['data_inicio'].year <= self.ano <= legislatura_atual['data_fim'].year
+            materia_in_legislatura_atual = (
+                legislatura_atual["data_inicio"]
+                <= self.materia.data_apresentacao
+                <= legislatura_atual["data_fim"]
+            )
+            loa_in_legislatura_atual = (
+                legislatura_atual["data_inicio"].year
+                <= self.ano
+                <= legislatura_atual["data_fim"].year
+            )
 
         lps = self.loaparlamentar_set.all()
         count_lps = lps.count()
 
-        if (loa_in_legislatura_atual and  materia_in_legislatura_atual) or (
+        if (loa_in_legislatura_atual and materia_in_legislatura_atual) or (
             not loa_in_legislatura_atual and not materia_in_legislatura_atual
         ):
             count_lps = lps.count()
             if count_lps:
                 for lp in lps:
-                    set_values_for_lp(lp, self.disp_total, self.disp_saude, self.disp_diversos, count_lps)
+                    set_values_for_lp(
+                        lp,
+                        self.disp_total,
+                        self.disp_saude,
+                        self.disp_diversos,
+                        count_lps,
+                    )
                     lp.save()
             return self
 
         parlamentares_ativos = {
-            p: list(
-                p.emendaloaparlamentar_set.filter(emendaloa__loa=self)
-            )
-                for p in Parlamentar.objects.filter(ativo=True)
+            p: list(p.emendaloaparlamentar_set.filter(emendaloa__loa=self))
+            for p in Parlamentar.objects.filter(ativo=True)
         }
         parlamentares_ativos_com_emendas = {
             p: emendas for p, emendas in parlamentares_ativos.items() if emendas
@@ -196,52 +238,76 @@ class Loa(models.Model):
         }
 
         parlamentares_inativos_com_emendas = {
-            p: list(
-                p.emendaloaparlamentar_set.filter(emendaloa__loa=self)
-            )
+            p: list(p.emendaloaparlamentar_set.filter(emendaloa__loa=self))
             for p in Parlamentar.objects.filter(
-                ativo=False,
-                emendaloaparlamentar_set__emendaloa__loa=self
+                ativo=False, emendaloaparlamentar_set__emendaloa__loa=self
             ).distinct()
         }
 
-
-
         count_parlamentares_ativos = Decimal(len(parlamentares_ativos))
-        count_parlamentares_ativos_com_emendas = Decimal(len(parlamentares_ativos_com_emendas))
-        count_parlamentares_ativos_sem_emendas = Decimal(len(parlamentares_ativos_sem_emendas))
-
-        count_parlamentares_inativos_com_emendas = Decimal(len(parlamentares_inativos_com_emendas))
-
-        count_parlamentares_com_emendas = Decimal(
-            count_parlamentares_ativos_com_emendas + count_parlamentares_inativos_com_emendas
+        count_parlamentares_ativos_com_emendas = Decimal(
+            len(parlamentares_ativos_com_emendas)
+        )
+        count_parlamentares_ativos_sem_emendas = Decimal(
+            len(parlamentares_ativos_sem_emendas)
         )
 
-        disp_previa_total = quantize(self.rcl_previa * self.perc_disp_total / Decimal(100), rounding=ROUND_DOWN)
-        disp_previa_saude = quantize(self.rcl_previa * self.perc_disp_saude / Decimal(100), rounding=ROUND_DOWN)
-        disp_previa_diversos = quantize(self.rcl_previa * self.perc_disp_diversos / Decimal(100), rounding=ROUND_DOWN)
+        count_parlamentares_inativos_com_emendas = Decimal(
+            len(parlamentares_inativos_com_emendas)
+        )
 
-        disp_previa_total = quantize(disp_previa_total / count_parlamentares_ativos, rounding=ROUND_DOWN) * count_parlamentares_ativos
-        disp_previa_saude = quantize(disp_previa_saude / count_parlamentares_ativos, rounding=ROUND_DOWN) * count_parlamentares_ativos
-        disp_previa_diversos = quantize(disp_previa_diversos / count_parlamentares_ativos, rounding=ROUND_DOWN) * count_parlamentares_ativos
+        count_parlamentares_com_emendas = Decimal(
+            count_parlamentares_ativos_com_emendas
+            + count_parlamentares_inativos_com_emendas
+        )
 
-        imp_inativos_saude = Decimal('0.00')
-        imp_inativos_diversos = Decimal('0.00')
+        disp_previa_total = quantize(
+            self.rcl_previa * self.perc_disp_total / Decimal(100), rounding=ROUND_DOWN
+        )
+        disp_previa_saude = quantize(
+            self.rcl_previa * self.perc_disp_saude / Decimal(100), rounding=ROUND_DOWN
+        )
+        disp_previa_diversos = quantize(
+            self.rcl_previa * self.perc_disp_diversos / Decimal(100),
+            rounding=ROUND_DOWN,
+        )
+
+        disp_previa_total = (
+            quantize(
+                disp_previa_total / count_parlamentares_ativos, rounding=ROUND_DOWN
+            )
+            * count_parlamentares_ativos
+        )
+        disp_previa_saude = (
+            quantize(
+                disp_previa_saude / count_parlamentares_ativos, rounding=ROUND_DOWN
+            )
+            * count_parlamentares_ativos
+        )
+        disp_previa_diversos = (
+            quantize(
+                disp_previa_diversos / count_parlamentares_ativos, rounding=ROUND_DOWN
+            )
+            * count_parlamentares_ativos
+        )
+
+        imp_inativos_saude = Decimal("0.00")
+        imp_inativos_diversos = Decimal("0.00")
         for lp in lps:
             if lp.parlamentar in parlamentares_inativos_com_emendas.keys():
                 soma_imp_saude = lp.parlamentar.emendaloaparlamentar_set.filter(
-                    emendaloa__loa = self,
-                    emendaloa__fase = EmendaLoa.IMPEDIMENTO_TECNICO,
-                    emendaloa__tipo = EmendaLoa.SAUDE
-                ).aggregate(Sum('valor'))
+                    emendaloa__loa=self,
+                    emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO,
+                    emendaloa__tipo=EmendaLoa.SAUDE,
+                ).aggregate(Sum("valor"))
                 soma_imp_diversos = lp.parlamentar.emendaloaparlamentar_set.filter(
-                    emendaloa__loa = self,
-                    emendaloa__fase = EmendaLoa.IMPEDIMENTO_TECNICO,
-                    emendaloa__tipo = EmendaLoa.DIVERSOS
-                ).aggregate(Sum('valor'))
+                    emendaloa__loa=self,
+                    emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO,
+                    emendaloa__tipo=EmendaLoa.DIVERSOS,
+                ).aggregate(Sum("valor"))
 
-                soma_imp_saude = soma_imp_saude['valor__sum'] or Decimal('0.00')
-                soma_imp_diversos = soma_imp_diversos['valor__sum'] or Decimal('0.00')
+                soma_imp_saude = soma_imp_saude["valor__sum"] or Decimal("0.00")
+                soma_imp_diversos = soma_imp_diversos["valor__sum"] or Decimal("0.00")
                 dps = disp_previa_saude
                 dpd = disp_previa_diversos
                 set_values_for_lp(
@@ -254,66 +320,74 @@ class Loa(models.Model):
                 imp_inativos_saude += soma_imp_saude
                 imp_inativos_diversos += soma_imp_diversos
 
-
-
         for lp in lps:
             if lp.parlamentar in parlamentares_ativos_com_emendas.keys():
                 set_values_for_lp(
-                    lp, self.disp_total + imp_inativos_saude + imp_inativos_diversos,
+                    lp,
+                    self.disp_total + imp_inativos_saude + imp_inativos_diversos,
                     self.disp_saude + imp_inativos_saude,
                     self.disp_diversos + imp_inativos_diversos,
-                    count_parlamentares_ativos
-                    )
+                    count_parlamentares_ativos,
+                )
             elif lp.parlamentar in parlamentares_ativos_sem_emendas.keys():
                 set_values_for_lp(
                     lp,
-                    self.disp_total - disp_previa_total + imp_inativos_saude + imp_inativos_diversos,
+                    self.disp_total
+                    - disp_previa_total
+                    + imp_inativos_saude
+                    + imp_inativos_diversos,
                     self.disp_saude - disp_previa_saude + imp_inativos_saude,
                     self.disp_diversos - disp_previa_diversos + imp_inativos_diversos,
-                    count_parlamentares_ativos
-                    )
+                    count_parlamentares_ativos,
+                )
             lp.save()
 
 
 class LoaParlamentar(models.Model):
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('LOA'),
-        related_name='loaparlamentar_set',
-        on_delete=CASCADE)
+        Loa, verbose_name=_("LOA"), related_name="loaparlamentar_set", on_delete=CASCADE
+    )
 
     parlamentar = models.ForeignKey(
         Parlamentar,
-        related_name='loaparlamentar_set',
-        verbose_name=_('Parlamentar - Emendas Impositivas'),
-        on_delete=CASCADE)
+        related_name="loaparlamentar_set",
+        verbose_name=_("Parlamentar - Emendas Impositivas"),
+        on_delete=CASCADE,
+    )
 
     disp_total = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Global da RCL (R$)'),
+        verbose_name=_("Disp. Global da RCL (R$)"),
     )
 
     disp_saude = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Saúde da RCL (R$)'),
+        verbose_name=_("Disp. Saúde da RCL (R$)"),
     )
 
     disp_diversos = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Disp. Diversos da RCL (R$)'),
+        verbose_name=_("Disp. Diversos da RCL (R$)"),
     )
 
     def __str__(self):
-        return f'{self.parlamentar} - {self.disp_total} - {self.disp_saude} - {self.disp_diversos}'
+        return f"{self.parlamentar} - {self.disp_total} - {self.disp_saude} - {self.disp_diversos}"
 
     class Meta:
-        verbose_name = _('Valores do Parlamentar')
-        verbose_name_plural = _('Valores dos Parlamentares')
-        ordering = ['id']
+        verbose_name = _("Valores do Parlamentar")
+        verbose_name_plural = _("Valores dos Parlamentares")
+        ordering = ["id"]
+
 
 class EmendaLoa(CmjSearchMixin):
 
@@ -321,9 +395,9 @@ class EmendaLoa(CmjSearchMixin):
     DIVERSOS = 99
     MODIFICATIVA = 0
     TIPOEMENDALOA_CHOICE = (
-        (SAUDE, _('Em.Imp. Saúde')),
-        (DIVERSOS, _('Em.Imp. Áreas Diversas')),
-        (MODIFICATIVA, _('Emenda Modificativa')),
+        (SAUDE, _("Em.Imp. Saúde")),
+        (DIVERSOS, _("Em.Imp. Áreas Diversas")),
+        (MODIFICATIVA, _("Emenda Modificativa")),
     )
 
     PROPOSTA = 10
@@ -336,168 +410,200 @@ class EmendaLoa(CmjSearchMixin):
     IMPEDIMENTO_TECNICO = 40
     IMPEDIMENTO_SANADO = 50
     FASE_CHOICE = (
-        (PROPOSTA, _('Proposta Legislativa')),
-        (PROPOSTA_LIBERADA, _('Proposta Liberada para Edição Contábil')),
-        (EDICAO_CONTABIL, _('Em edição pela Contabilidade')),
-        (LIBERACAO_CONTABIL, _('Liberado pela Contabilidade e/ou Aguardando Protocolo')),
-        (EM_TRAMITACAO, _('Matéria protocolada, em tramitação')),
-        (APROVACAO_LEGISLATIVA, _('Aprovada no Processo Legislativo')),
-        (APROVACAO_LEGAL, _('Aprovada')),
-        (IMPEDIMENTO_TECNICO, _('Impedimento Técnico')),
-        (IMPEDIMENTO_SANADO, _('Impedimento Técnico Sanado'))
+        (PROPOSTA, _("Proposta Legislativa")),
+        (PROPOSTA_LIBERADA, _("Proposta Liberada para Edição Contábil")),
+        (EDICAO_CONTABIL, _("Em edição pela Contabilidade")),
+        (
+            LIBERACAO_CONTABIL,
+            _("Liberado pela Contabilidade e/ou Aguardando Protocolo"),
+        ),
+        (EM_TRAMITACAO, _("Matéria protocolada, em tramitação")),
+        (APROVACAO_LEGISLATIVA, _("Aprovada no Processo Legislativo")),
+        (APROVACAO_LEGAL, _("Aprovada")),
+        (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
+        (IMPEDIMENTO_SANADO, _("Impedimento Técnico Sanado")),
+    )
+
+    IMPEDIMENTOS_CHOICE = (
+        (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
+        (IMPEDIMENTO_SANADO, _("Impedimento Técnico Sanado")),
     )
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=dict,
+        encoder=DjangoJSONEncoder,
+    )
 
     tipo = models.PositiveSmallIntegerField(
-        choices=TIPOEMENDALOA_CHOICE, default=99, verbose_name=_('Área de aplicação'))
+        choices=TIPOEMENDALOA_CHOICE, default=99, verbose_name=_("Área de aplicação")
+    )
 
     fase = models.PositiveSmallIntegerField(
-        choices=FASE_CHOICE,
-        default=10, verbose_name=_('Fase'))
+        choices=FASE_CHOICE, default=10, verbose_name=_("Fase")
+    )
 
     indicacao = models.TextField(
-        verbose_name=_('Indicação'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Indicação"), blank=True, null=True, default=None
+    )
 
     entidade = models.ForeignKey(
-        'Entidade',
-        verbose_name=_('Entidade'),
-        related_name='emendaloa_set',
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
+        "Entidade",
+        verbose_name=_("Entidade"),
+        related_name="emendaloa_set",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
 
     unidade = models.ForeignKey(
-        'UnidadeOrcamentaria',
-        verbose_name=_('Unidade Orçamentária'),
-        related_name='emendaloa_set',
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
+        "UnidadeOrcamentaria",
+        verbose_name=_("Unidade Orçamentária"),
+        related_name="emendaloa_set",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
 
-    finalidade = models.TextField(
-        verbose_name=_("Finalidade"))
+    finalidade = models.TextField(verbose_name=_("Finalidade"))
 
     prefixo_indicacao = models.CharField(
-        verbose_name=_('Prefixo da Indicação'), max_length=30,
-        blank=True, default='o(a)')
+        verbose_name=_("Prefixo da Indicação"),
+        max_length=30,
+        blank=True,
+        default="o(a)",
+    )
 
     prefixo_finalidade = models.CharField(
-        verbose_name=_("Prefixo da Finalidade"), max_length=30,
-        blank=True, default='destinado a')
+        verbose_name=_("Prefixo da Finalidade"),
+        max_length=30,
+        blank=True,
+        default="destinado a",
+    )
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('LOA'),
-        related_name='emendaloa_set',
-        on_delete=CASCADE)
+        Loa, verbose_name=_("LOA"), related_name="emendaloa_set", on_delete=CASCADE
+    )
 
     materia = models.OneToOneField(
         MateriaLegislativa,
-        blank=True, null=True, default=None,
-        verbose_name=_('Matéria Legislativa'),
-        related_name='emendaloa',
-        on_delete=PROTECT)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Matéria Legislativa"),
+        related_name="emendaloa",
+        on_delete=PROTECT,
+    )
 
     proposicao = models.OneToOneField(
         Proposicao,
-        blank=True, null=True, default=None,
-        verbose_name=_('Proposição Legislativa'),
-        related_name='emendaloa',
-        on_delete=SET_NULL)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Proposição Legislativa"),
+        related_name="emendaloa",
+        on_delete=SET_NULL,
+    )
 
     valor = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor Global da Emenda (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Global da Emenda (R$)"),
     )
 
     parlamentares = models.ManyToManyField(
         Parlamentar,
-        through='EmendaLoaParlamentar',
-        related_name='emendaloa_set',
-
-        verbose_name=_('Parlamentares'),
-        through_fields=(
-            'emendaloa',
-            'parlamentar'))
+        through="EmendaLoaParlamentar",
+        related_name="emendaloa_set",
+        verbose_name=_("Parlamentares"),
+        through_fields=("emendaloa", "parlamentar"),
+    )
 
     owner = models.ForeignKey(
         get_settings_auth_user_model(),
-        blank=True, null=True, default=None,
-        verbose_name=_('Cadastrado Por'),
-        related_name='+',
-        on_delete=PROTECT)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Cadastrado Por"),
+        related_name="+",
+        on_delete=PROTECT,
+    )
 
     _syncing = False
 
     class Meta:
-        verbose_name = _('Emenda Impositiva/Modificativa')
-        verbose_name_plural = _('Emendas Impositivas/Modificativas')
-        ordering = ['id']
+        verbose_name = _("Emenda Impositiva/Modificativa")
+        verbose_name_plural = _("Emendas Impositivas/Modificativas")
+        ordering = ["id"]
 
         indexes = [
             GinIndex(
-                OpClass('search', name='gin_trgm_ops'),
-                name='emendaloa_search_gin_trgm',
+                OpClass("search", name="gin_trgm_ops"),
+                name="emendaloa_search_gin_trgm",
             ),
         ]
 
         permissions = (
-            (
-                'emendaloa_full_editor',
-                _('Edição completa de Emendas Impositivas.')
-            ),
+            ("emendaloa_full_editor", _("Edição completa de Emendas Impositivas.")),
         )
+
+    @property
+    def has_ajustes(self):
+        return RegistroAjusteLoaParlamentar.objects.filter(registro__emendaloa=self).exists()
 
     @property
     def valor_computado(self):
         soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
             registro__emendaloa=self
-        ).aggregate(Sum('valor'))
-
-        valor = self.valor + (soma_ajustes['valor__sum'] or Decimal('0.00'))
+        ).aggregate(Sum("valor"))
+        soma_ajustes = soma_ajustes["valor__sum"] or Decimal("0.00")
+        valor = soma_ajustes if soma_ajustes else self.valor
         valor_str = formats.number_format(valor, force_grouping=True)
         return valor_str
 
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
-        materia = ''
+        materia = ""
         if self.materia:
-            materia = f'{self.materia.epigrafe_short} - '
-        return f'{materia}R$ {valor_str} - {self.finalidade_format}'
+            materia = f"{self.materia.epigrafe_short} - "
+        return f"{materia}R$ {valor_str} - {self.finalidade_format}"
 
     @property
     def ementa_format(self):
         if self.tipo:
-            ementa = f'''
+            ementa = f"""
                 Altera destinação de recursos orçamentários, indicando {self.prefixo_indicacao}
                 {self.indicacao or "XXXXXXX"}, para a recepção do valor de
                 R$ { self.str_valor} ({self.valor_por_extenso}), que será { self.prefixo_finalidade}
                 { self.finalidade_format or "XXXXXXX"}.
-            '''
+            """
         else:
-            ementa = f'''
+            ementa = f"""
                 Altera destinação de recursos orçamentários, indicando {self.prefixo_indicacao}
                 {self.indicacao or "XXXXXXX"}, para a recepção do valor de
                 R$ { self.str_valor} ({self.valor_por_extenso}), que será { self.prefixo_finalidade}
                 { self.finalidade_format or "XXXXXXX"}.
-            '''
+            """
 
-        ementa = ementa.strip().replace('\n', ' ')
-        ementa = re.sub(r'\s+', ' ', ementa)
+        ementa = ementa.strip().replace("\n", " ")
+        ementa = re.sub(r"\s+", " ", ementa)
         return ementa
 
     @property
     def fields_search(self):
-        return [
-            'artigos_search'
-        ]
+        return ["artigos_search"]
 
     @property
     def artigos_search(self):
-        _artigos_search = '\n'.join([art[1] for art in self.artigos])
-        _artigos_search = f'{self.materia.epigrafe_short if self.materia else ""}\n{_artigos_search}'
+        _artigos_search = "\n".join([art[1] for art in self.artigos])
+        _artigos_search = (
+            f'{self.materia.epigrafe_short if self.materia else ""}\n{_artigos_search}'
+        )
         return _artigos_search
 
     @property
@@ -511,29 +617,31 @@ class EmendaLoa(CmjSearchMixin):
 
         # ementa
         ementa = (
-            f'Altera destinação de recursos orçamentários, indicando '
+            f"Altera destinação de recursos orçamentários, indicando "
             f'{self.prefixo_indicacao} {self.indicacao or "XXXXXXX"}, '
-            f'para a recepção do valor de '
-            f'R$ {valor_str} ({extenso}), '
-            f'que será {self.prefixo_finalidade} '
+            f"para a recepção do valor de "
+            f"R$ {valor_str} ({extenso}), "
+            f"que será {self.prefixo_finalidade} "
             f'{self.finalidade_format or "XXXXXXX"}.'
         )
-        artigos.append(('ementa', ementa))
+        artigos.append(("ementa", ementa))
 
         # preâmbulo
-        art_def = 'A' if feminino else 'O'
+        art_def = "A" if feminino else "O"
         if plural:
-            art_def += 's'
-        subscritor = 'subscritora' if feminino else ('subscritores' if plural else 'subscritor')
-        if feminino and plural:
-            subscritor = 'subscritoras'
-        tipo_emenda = 'Impositiva' if self.tipo else 'Modificativa'
-        preambulo = (
-            f'{art_def} {subscritor} da presente Emenda {tipo_emenda}, '
-            f'propõem a seguinte modificação no Projeto de Lei '
-            f'Orçamentária Anual supracitado:'
+            art_def += "s"
+        subscritor = (
+            "subscritora" if feminino else ("subscritores" if plural else "subscritor")
         )
-        artigos.append(('preambulo', preambulo))
+        if feminino and plural:
+            subscritor = "subscritoras"
+        tipo_emenda = "Impositiva" if self.tipo else "Modificativa"
+        preambulo = (
+            f"{art_def} {subscritor} da presente Emenda {tipo_emenda}, "
+            f"propõem a seguinte modificação no Projeto de Lei "
+            f"Orçamentária Anual supracitado:"
+        )
+        artigos.append(("preambulo", preambulo))
 
         if self.tipo:
             # Art - Dedução
@@ -542,19 +650,21 @@ class EmendaLoa(CmjSearchMixin):
             partes_deducao = []
             for i, rc in enumerate(deducoes):
                 parte = (
-                    f'Unidade Orçamentária {rc.despesa.unidade.especificacao} / '
-                    f'Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / '
-                    f'Natureza da Despesa: {rc.despesa.consulta.cod_natureza}'
+                    f"Unidade Orçamentária {rc.despesa.unidade.especificacao} / "
+                    f"Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
+                    f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza}"
                 )
                 if deducoes.count() > 1:
-                    parte += f' - Valor: R$ {formats.number_format(rc.valor.copy_abs(), force_grouping=True)}'
+                    parte += f" - Valor: R$ {formats.number_format(rc.valor.copy_abs(), force_grouping=True)}"
                 partes_deducao.append(parte)
-            texto_deducoes = ' // '.join(partes_deducao) if partes_deducao else 'XXXXXXXXXX'
-            texto = (
-                f'Art {art_num}º - Deduz-se da {texto_deducoes}, '
-                f'o valor de R$ {valor_str} ({extenso}).'
+            texto_deducoes = (
+                " // ".join(partes_deducao) if partes_deducao else "XXXXXXXXXX"
             )
-            artigos.append(('artigo', texto))
+            texto = (
+                f"Art {art_num}º - Deduz-se da {texto_deducoes}, "
+                f"o valor de R$ {valor_str} ({extenso})."
+            )
+            artigos.append(("artigo", texto))
 
             # Art - Inserção
             art_num += 1
@@ -562,76 +672,88 @@ class EmendaLoa(CmjSearchMixin):
             partes_insercao = []
             for i, rc in enumerate(insercoes):
                 parte = (
-                    f'Unidade Orçamentária {rc.despesa.unidade.especificacao} / '
-                    f'Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / '
-                    f'Natureza da Despesa: {rc.despesa.consulta.cod_natureza}'
+                    f"Unidade Orçamentária {rc.despesa.unidade.especificacao} / "
+                    f"Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
+                    f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza}"
                 )
                 if insercoes.count() > 1:
-                    parte += f' - Valor: R$ {formats.number_format(rc.valor, force_grouping=True)}'
+                    parte += f" - Valor: R$ {formats.number_format(rc.valor, force_grouping=True)}"
                 partes_insercao.append(parte)
-            texto_insercoes = ' // '.join(partes_insercao) if partes_insercao else 'XXXXXXXXXX'
-            texto = (
-                f'Art {art_num}º - O valor deduzido de '
-                f'R$ {valor_str} ({extenso}), '
-                f'será inserido na {texto_insercoes}, '
-                f'{self.prefixo_finalidade} {self.finalidade_format}.'
+            texto_insercoes = (
+                " // ".join(partes_insercao) if partes_insercao else "XXXXXXXXXX"
             )
-            artigos.append(('artigo', texto))
+            texto = (
+                f"Art {art_num}º - O valor deduzido de "
+                f"R$ {valor_str} ({extenso}), "
+                f"será inserido na {texto_insercoes}, "
+                f"{self.prefixo_finalidade} {self.finalidade_format}."
+            )
+            artigos.append(("artigo", texto))
 
             # Art - Divisão entre parlamentares (se mais de 1 e impositiva)
             if plural:
                 art_num += 1
-                art_gen = 'as' if feminino else 'os'
-                vereador_gen = 'vereadoras' if feminino else 'vereadores'
-                subscritor_gen = 'subscritoras' if feminino else 'subscritores'
+                art_gen = "as" if feminino else "os"
+                vereador_gen = "vereadoras" if feminino else "vereadores"
+                subscritor_gen = "subscritoras" if feminino else "subscritores"
 
                 partes_parlamentares = []
                 for elp in self.emendaloaparlamentar_set.all():
-                    elp_valor_str = formats.number_format(elp.valor, force_grouping=True)
-                    elp_extenso = valor_por_extenso(elp.valor)
-                    gen_parl = 'a' if elp.parlamentar.sexo == 'F' else 'o'
-                    vereador_parl = 'Vereadora' if elp.parlamentar.sexo == 'F' else 'Vereador'
-                    partes_parlamentares.append(
-                        f'R$ {elp_valor_str} ({elp_extenso}), '
-                        f'd{gen_parl} {vereador_parl} {elp.parlamentar.nome_parlamentar}'
+                    elp_valor_str = formats.number_format(
+                        elp.valor, force_grouping=True
                     )
-                lista_parlamentares = '; '.join(partes_parlamentares[:-1])
+                    elp_extenso = valor_por_extenso(elp.valor)
+                    gen_parl = "a" if elp.parlamentar.sexo == "F" else "o"
+                    vereador_parl = (
+                        "Vereadora" if elp.parlamentar.sexo == "F" else "Vereador"
+                    )
+                    partes_parlamentares.append(
+                        f"R$ {elp_valor_str} ({elp_extenso}), "
+                        f"d{gen_parl} {vereador_parl} {elp.parlamentar.nome_parlamentar}"
+                    )
+                lista_parlamentares = "; ".join(partes_parlamentares[:-1])
                 if lista_parlamentares:
-                    lista_parlamentares += '; ' + partes_parlamentares[-1] + '.'
+                    lista_parlamentares += "; " + partes_parlamentares[-1] + "."
                 else:
-                    lista_parlamentares = partes_parlamentares[0] + '.' if partes_parlamentares else ''
+                    lista_parlamentares = (
+                        partes_parlamentares[0] + "." if partes_parlamentares else ""
+                    )
 
                 texto = (
-                    f'Art {art_num}º - O valor de '
-                    f'R$ {valor_str} ({extenso}), '
-                    f'será divido entre {art_gen} {vereador_gen} {subscritor_gen}, '
-                    f'sendo utilizado: {lista_parlamentares}'
+                    f"Art {art_num}º - O valor de "
+                    f"R$ {valor_str} ({extenso}), "
+                    f"será divido entre {art_gen} {vereador_gen} {subscritor_gen}, "
+                    f"sendo utilizado: {lista_parlamentares}"
                 )
-                artigos.append(('artigo', texto))
+                artigos.append(("artigo", texto))
 
         else:
             # Emenda Modificativa - artigo único de alteração
             art_num += 1
             texto = (
-                f'Art {art_num}º - Altera-se o Orçamento de {self.loa.ano}, '
-                f'incluindo o valor de R$ {valor_str} ({extenso}), '
-                f'{self.prefixo_finalidade} {self.finalidade_format}.'
+                f"Art {art_num}º - Altera-se o Orçamento de {self.loa.ano}, "
+                f"incluindo o valor de R$ {valor_str} ({extenso}), "
+                f"{self.prefixo_finalidade} {self.finalidade_format}."
             )
-            artigos.append(('artigo', texto))
+            artigos.append(("artigo", texto))
 
         # Art - Demais artigos inalterados
         art_num += 1
-        artigos.append((
-            'artigo',
-            f'Art {art_num}º - Os demais artigos e dispositivos da matéria acima permanecem inalterados.'
-        ))
+        artigos.append(
+            (
+                "artigo",
+                f"Art {art_num}º - Os demais artigos e dispositivos da matéria acima permanecem inalterados.",
+            )
+        )
 
         # Art - Parte integrante
         art_num += 1
-        artigos.append((
-            'artigo',
-            f'Art {art_num}º - A presente emenda fará parte integrante do Projeto de Lei em referência.'
-        ))
+        artigos.append(
+            (
+                "artigo",
+                f"Art {art_num}º - A presente emenda fará parte integrante do Projeto de Lei em referência.",
+            )
+        )
 
         return artigos
 
@@ -639,12 +761,12 @@ class EmendaLoa(CmjSearchMixin):
     def finalidade_format(self):
         try:
             finalidade = self.finalidade
-            chaves = re.findall(r'\{(.*?)\}', finalidade)
+            chaves = re.findall(r"\{(.*?)\}", finalidade)
 
             for chave in chaves:
                 chave_strip = chave.strip().lower()
-                if '__' in chave_strip:
-                    partes = chave_strip.split('__')
+                if "__" in chave_strip:
+                    partes = chave_strip.split("__")
                     obj = self
                     for parte in partes:
                         if hasattr(obj, parte):
@@ -652,15 +774,15 @@ class EmendaLoa(CmjSearchMixin):
                         else:
                             obj = None
                             break
-                    valor = str(obj) if obj else ''
+                    valor = str(obj) if obj else ""
                 elif hasattr(self, chave_strip):
-                    valor = getattr(self, chave_strip) or ''
+                    valor = getattr(self, chave_strip) or ""
                     if isinstance(valor, models.Model):
                         valor = str(valor)
                 valor = valor.upper() if valor and isinstance(valor, str) else valor
-                finalidade = finalidade.replace(f'{{{chave}}}', str(valor))
+                finalidade = finalidade.replace(f"{{{chave}}}", str(valor))
 
-            finalidade = finalidade if finalidade[-1] != '.' else finalidade[:-1]
+            finalidade = finalidade if finalidade[-1] != "." else finalidade[:-1]
             return finalidade
         except:
             return self.finalidade
@@ -673,52 +795,75 @@ class EmendaLoa(CmjSearchMixin):
     def valor_por_extenso(self):
         return valor_por_extenso(self.valor)
 
-
     def errors(self):
         erros = []
         if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.unidade:
-            erros.append('Emendas Impositivas devem ter Unidade Orçamentária.')
+            erros.append("Emendas Impositivas devem ter Unidade Orçamentária.")
 
-        #if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.entidade:
+        # if self.tipo in (self.SAUDE, self.DIVERSOS) and not self.entidade:
         #    erros.append('Emendas Impositivas devem ter Entidade.')
 
-        if self.tipo == self.SAUDE and self.unidade and self.unidade.area != UnidadeOrcamentaria.SAUDE_CHOICE:
-            erros.append('Emendas Impositivas da Saúde devem ter Unidade Orçamentária classificadas como sendo da Área da Saúde.')
+        if (
+            self.tipo == self.SAUDE
+            and self.unidade
+            and self.unidade.area != UnidadeOrcamentaria.SAUDE_CHOICE
+        ):
+            erros.append(
+                "Emendas Impositivas da Saúde devem ter Unidade Orçamentária classificadas como sendo da Área da Saúde."
+            )
             # existe registro com fonte diferente de 102?
 
-        if self.tipo == self.SAUDE and self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
+        if (
+            self.tipo == self.SAUDE
+            and self.unidade
+            and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE
+        ):
 
-            if self.entidade and self.entidade.tipo_entidade and self.entidade.tipo_entidade.tipo_geral != TipoEntidade.SAUDE_CHOICE:
-                erros.append('Emendas Impositivas da Saúde devem ter Entidade do Tipo Saúde.')
+            if (
+                self.entidade
+                and self.entidade.tipo_entidade
+                and self.entidade.tipo_entidade.tipo_geral != TipoEntidade.SAUDE_CHOICE
+            ):
+                erros.append(
+                    "Emendas Impositivas da Saúde devem ter Entidade do Tipo Saúde."
+                )
 
             registros = self.registrocontabil_set.all()
-            fontes_invalidas = registros.exclude(despesa__fonte__codigo='102')
+            fontes_invalidas = registros.exclude(despesa__fonte__codigo="102")
             if fontes_invalidas.exists():
-                erros.append('Emendas Impositivas da Saúde não podem ter registros com fonte diferente de 102.')
+                erros.append(
+                    "Emendas Impositivas da Saúde não podem ter registros com fonte diferente de 102."
+                )
 
-        #if self.tipo == self.DIVERSOS and self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
+        # if self.tipo == self.DIVERSOS and self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
         #    erros.append('Emendas Impositivas de Áreas Diversas não podem ter Unidade Orçamentária classificadas como sendo da Área da Saúde.')
 
-        if self.tipo == self.DIVERSOS and self.unidade and self.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE:
+        if (
+            self.tipo == self.DIVERSOS
+            and self.unidade
+            and self.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE
+        ):
             # existe registro com fonte diferente de 101?
             registros = self.registrocontabil_set.all()
-            fontes_invalidas = registros.exclude(despesa__fonte__codigo='101')
+            fontes_invalidas = registros.exclude(despesa__fonte__codigo="101")
             if fontes_invalidas.exists():
-                erros.append('Emendas Impositivas da Educação não podem ter registros com fonte diferente de 101.')
+                erros.append(
+                    "Emendas Impositivas da Educação não podem ter registros com fonte diferente de 101."
+                )
 
         return erros
 
     def sync(self):
-        registros = self.registrocontabil_set.all().order_by('valor')
+        registros = self.registrocontabil_set.all().order_by("valor")
         old_self = EmendaLoa.objects.filter(pk=self.pk).first()
         if self.tipo:
-            soma_dict = self.emendaloaparlamentar_set.aggregate(Sum('valor'))
-            self.valor = soma_dict['valor__sum'] or Decimal('0.00')
+            soma_dict = self.emendaloaparlamentar_set.aggregate(Sum("valor"))
+            self.valor = soma_dict["valor__sum"] or Decimal("0.00")
             self.save()
 
-            if hasattr(self, 'agrupamentoemendaloa'):
+            if hasattr(self, "agrupamentoemendaloa"):
                 registros.delete()
-                #self.agrupamentoemendaloa.save()
+                # self.agrupamentoemendaloa.save()
                 self.agrupamentoemendaloa.agrupamento.sync()
             else:
                 if old_self:
@@ -734,10 +879,19 @@ class EmendaLoa(CmjSearchMixin):
                     registros.delete()
 
                 if registros.exists():
-                    soma_registros_old = registros.aggregate(Sum('valor')).get('valor__sum', Decimal('0.00'))
-                    soma_registros = Decimal('0.00')
+                    soma_registros_old = registros.aggregate(Sum("valor")).get(
+                        "valor__sum", Decimal("0.00")
+                    )
+                    soma_registros = Decimal("0.00")
                     for r in registros:
-                        r.valor = quantize(r.valor * self.valor / valor_old, rounding=ROUND_HALF_DOWN) if valor_old else Decimal('0.00')
+                        r.valor = (
+                            quantize(
+                                r.valor * self.valor / valor_old,
+                                rounding=ROUND_HALF_DOWN,
+                            )
+                            if valor_old
+                            else Decimal("0.00")
+                        )
                         soma_registros = soma_registros + r.valor
                         r.save()
                     divergencia = soma_registros_old - soma_registros
@@ -747,10 +901,20 @@ class EmendaLoa(CmjSearchMixin):
                         r.save()
                 else:
                     # criar um registro contabil com o valor da emenda com base no tipo da unidade orcamentaria
-                    if self.loa.despesa_default_deducao_diversos or self.loa.despesa_default_deducao_educacao or self.loa.despesa_default_deducao_saude:
-                        if self.unidade and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE:
+                    if (
+                        self.loa.despesa_default_deducao_diversos
+                        or self.loa.despesa_default_deducao_educacao
+                        or self.loa.despesa_default_deducao_saude
+                    ):
+                        if (
+                            self.unidade
+                            and self.unidade.area == UnidadeOrcamentaria.SAUDE_CHOICE
+                        ):
                             despesa = self.loa.despesa_default_deducao_saude
-                        elif self.unidade and self.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE:
+                        elif (
+                            self.unidade
+                            and self.unidade.area == UnidadeOrcamentaria.EDUCACAO_CHOICE
+                        ):
                             despesa = self.loa.despesa_default_deducao_educacao
                         else:
                             despesa = self.loa.despesa_default_deducao_diversos
@@ -779,7 +943,8 @@ class EmendaLoa(CmjSearchMixin):
         return self
 
     def save(
-            self, force_insert=False, force_update=False, using=None, update_fields=None):
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
         if self.unidade:
             self.indicacao = self.unidade.especificacao
 
@@ -791,51 +956,60 @@ class EmendaLoa(CmjSearchMixin):
             self._syncing = False
             return r
 
-        r = super().save(force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        r = super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
         self.loa.update_disponibilidades()
         return r
 
-
     @property
     def totais_contabeis(self):
         deducoes = self.registrocontabil_set.filter(
-            valor__lt=Decimal('0.00')
-        ).aggregate(deducoes=Sum('valor'))
+            valor__lt=Decimal("0.00")
+        ).aggregate(deducoes=Sum("valor"))
 
         insercoes = self.registrocontabil_set.filter(
-            valor__gt=Decimal('0.00')
-        ).aggregate(insercoes=Sum('valor'))
+            valor__gt=Decimal("0.00")
+        ).aggregate(insercoes=Sum("valor"))
 
-        deducoes = deducoes['deducoes'] or Decimal('0.00')
-        insercoes = insercoes['insercoes'] or Decimal('0.00')
+        deducoes = deducoes["deducoes"] or Decimal("0.00")
+        insercoes = insercoes["insercoes"] or Decimal("0.00")
 
         divergencia_registros = insercoes + deducoes
         divergencia_emenda = self.valor - insercoes
 
         return {
-            'soma_deducoes': deducoes,
-            'soma_insercoes': insercoes,
-            'divergencia_registros': divergencia_registros,
-            'divergencia_emenda': divergencia_emenda,
-            'valor_emendaloa': self.valor
+            "soma_deducoes": deducoes,
+            "soma_insercoes": insercoes,
+            "divergencia_registros": divergencia_registros,
+            "divergencia_emenda": divergencia_emenda,
+            "valor_emendaloa": self.valor,
         }
 
     def retrieve_file_bytes(self):
 
-        base_url =  settings.SITE_URL.rstrip('/')
-        import requests
-        import fitz  # PyMuPDF
+        base_url = settings.SITE_URL.rstrip("/")
         import io
 
+        import fitz  # PyMuPDF
+        import requests
+
         pra_frente = True
-        arq_bytes, arq_name = None, ''
+        arq_bytes, arq_name = None, ""
         while True:
-            response = requests.get(f'{base_url}/api/loa/emendaloa/{self.id}/view/')
+            response = requests.get(f"{base_url}/api/loa/emendaloa/{self.id}/view/")
             if response.status_code != 200:
                 break
 
-            arq_name = response.headers.get('Content-Disposition', f'emenda_loa_{self.id}.pdf').split('filename=')[-1].strip('"')
+            arq_name = (
+                response.headers.get("Content-Disposition", f"emenda_loa_{self.id}.pdf")
+                .split("filename=")[-1]
+                .strip('"')
+            )
 
             arq_bytes = io.BytesIO(response.content)
             pdf = fitz.open(stream=arq_bytes, filetype="pdf")
@@ -847,12 +1021,15 @@ class EmendaLoa(CmjSearchMixin):
                 pra_frente = False
 
             md = self.metadata
-            md['style'] = md.get('style', {
-                'lineHeight': 150,
-                'espacoAssinatura': 0,
-            })
-            md['style']['espacoAssinatura'] = md['style'].get('espacoAssinatura', 0)
-            lineHeight = md['style']['lineHeight']
+            md["style"] = md.get(
+                "style",
+                {
+                    "lineHeight": 150,
+                    "espacoAssinatura": 0,
+                },
+            )
+            md["style"]["espacoAssinatura"] = md["style"].get("espacoAssinatura", 0)
+            lineHeight = md["style"]["lineHeight"]
 
             if lineHeight < 110:
                 break
@@ -868,7 +1045,7 @@ class EmendaLoa(CmjSearchMixin):
             else:
                 lineHeight -= 1
 
-            md['style']['lineHeight'] = lineHeight
+            md["style"]["lineHeight"] = lineHeight
             self.metadata = md
             self.save()
 
@@ -878,7 +1055,7 @@ class EmendaLoa(CmjSearchMixin):
             page2 = pdf.load_page(1)
             text = page2.get_text("text")
             text = text
-            if 'A presente emenda fará parte' in text:
+            if "A presente emenda fará parte" in text:
                 break
 
         return arq_bytes, arq_name
@@ -894,26 +1071,24 @@ class EmendaLoa(CmjSearchMixin):
             if not proposicao:
                 np_max = Proposicao.objects.filter(
                     autor=autor,
-                    ano=self.loa.materia.ano if self.loa.materia else timezone.now().year,
-                    ).aggregate(np=Max('numero_proposicao'))
+                    ano=(
+                        self.loa.materia.ano
+                        if self.loa.materia
+                        else timezone.now().year
+                    ),
+                ).aggregate(np=Max("numero_proposicao"))
 
                 proposicao = Proposicao()
-                proposicao.numero_proposicao = np_max.get('np', 0) + 1
+                proposicao.numero_proposicao = np_max.get("np", 0) + 1
                 created = True
             else:
                 metadata = self.metadata or {}
-                if metadata.get(
-                    'signs', {}
-                    ).get(
-                        'texto_original', {}
-                    ).get(
-                        'signs', []
-                    ):
+                if metadata.get("signs", {}).get("texto_original", {}).get("signs", []):
                     raise Exception(
-                                'Não é possível atualizar a Proposição Legislativa '
-                                'de uma Emenda LOA que já foi assinada digitalmente. '
-                                'É necessário realizar a substituição manual do arquivo no módulo de Proposições Legislativas.')
-
+                        "Não é possível atualizar a Proposição Legislativa "
+                        "de uma Emenda LOA que já foi assinada digitalmente. "
+                        "É necessário realizar a substituição manual do arquivo no módulo de Proposições Legislativas."
+                    )
 
             proposicao.autor = autor
 
@@ -932,45 +1107,51 @@ class EmendaLoa(CmjSearchMixin):
             self.proposicao = proposicao
 
             metadata = self.metadata or {}
-            metadata.pop('register_emendaloa_proposicao_task', None)
+            metadata.pop("register_emendaloa_proposicao_task", None)
             self.metadata = metadata
             self.save()
             return proposicao
         except Exception as e:
             metadata = self.metadata or {}
-            metadata.pop('register_emendaloa_proposicao_task', None)
+            metadata.pop("register_emendaloa_proposicao_task", None)
             self.metadata = metadata
             self.save()
-            raise Exception(f'Ocorreu um erro ao registrar a Proposição Legislativa: {e}')
+            raise Exception(
+                f"Ocorreu um erro ao registrar a Proposição Legislativa: {e}"
+            )
+
 
 class EmendaLoaParlamentar(models.Model):
 
     emendaloa = models.ForeignKey(
         EmendaLoa,
-        verbose_name=_('Emenda Impositiva'),
-        related_name='emendaloaparlamentar_set',
-        on_delete=CASCADE)
+        verbose_name=_("Emenda Impositiva"),
+        related_name="emendaloaparlamentar_set",
+        on_delete=CASCADE,
+    )
 
     parlamentar = models.ForeignKey(
         Parlamentar,
-        related_name='emendaloaparlamentar_set',
-        verbose_name=_('Parlamentar'),
-        on_delete=CASCADE)
+        related_name="emendaloaparlamentar_set",
+        verbose_name=_("Parlamentar"),
+        on_delete=CASCADE,
+    )
 
     valor = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor por Parlamentar (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor por Parlamentar (R$)"),
     )
 
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
-        return f'R$ {valor_str} - {self.parlamentar.nome_parlamentar}'
+        return f"R$ {valor_str} - {self.parlamentar.nome_parlamentar}"
 
     class Meta:
-        verbose_name = _('Participação Parlamentar na Emenda Impositiva')
-        verbose_name_plural = _(
-            'Participações Parlamentares na Emenda Impositiva')
-        ordering = ['id']
+        verbose_name = _("Participação Parlamentar na Emenda Impositiva")
+        verbose_name_plural = _("Participações Parlamentares na Emenda Impositiva")
+        ordering = ["id"]
 
 
 def ajuste_upload_path(instance, filename):
@@ -979,136 +1160,154 @@ def ajuste_upload_path(instance, filename):
 
 class OficioAjusteLoa(models.Model):
 
-    FIELDFILE_NAME = ('arquivo',)
+    FIELDFILE_NAME = ("arquivo",)
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('LOA'),
-        related_name='ajusteloa_set',
-        on_delete=PROTECT)
+        Loa, verbose_name=_("LOA"), related_name="ajusteloa_set", on_delete=PROTECT
+    )
 
-    epigrafe = models.CharField(
-        max_length=100,
-        verbose_name=_("Epígrafe"))
+    epigrafe = models.CharField(max_length=100, verbose_name=_("Epígrafe"))
 
     arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=ajuste_upload_path,
-        verbose_name=_('Ofício'),
+        verbose_name=_("Ofício"),
         storage=OverwriteStorage(),
-        max_length=512)
+        max_length=512,
+    )
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     parlamentares = models.ManyToManyField(
         Parlamentar,
-        related_name='oficioajusteloa_set',
-        verbose_name=_('Parlamentares'),)
+        related_name="oficioajusteloa_set",
+        verbose_name=_("Parlamentares"),
+    )
 
     class Meta:
-        verbose_name = _('Ofício de Ajuste Técnico')
-        verbose_name_plural = _(
-            'Ofícios de Ajuste Técnico')
-        ordering = ['id']
+        verbose_name = _("Ofício de Ajuste Técnico")
+        verbose_name_plural = _("Ofícios de Ajuste Técnico")
+        ordering = ["id"]
 
     def __str__(self):
         ps = map(lambda x: x.nome_parlamentar, self.parlamentares.all())
-        parlamentares = ' / '.join(ps)
-        return f'{self.epigrafe} - {parlamentares}'
+        parlamentares = " / ".join(ps)
+        return f"{self.epigrafe} - {parlamentares}"
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
 
         if not self.pk and self.arquivo:
             arquivo = self.arquivo
             self.arquivo = None
-            models.Model.save(self, force_insert=force_insert,
-                              force_update=force_update,
-                              using=using,
-                              update_fields=update_fields)
+            models.Model.save(
+                self,
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
+            )
             self.arquivo = arquivo
-            update_fields = ('arquivo', )
+            update_fields = ("arquivo",)
 
-        return models.Model.save(self, force_insert=force_insert,
-                                 force_update=force_update,
-                                 using=using,
-                                 update_fields=update_fields)
+        return models.Model.save(
+            self,
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
 
 class RegistroAjusteLoa(CmjSearchMixin):
 
     SAUDE = 10
     DIVERSOS = 99
-    TIPOEMENDALOA_CHOICE = (
-        (SAUDE, _('Saúde')),
-        (DIVERSOS, _('Áreas Diversas'))
-    )
+    TIPOEMENDALOA_CHOICE = ((SAUDE, _("Saúde")), (DIVERSOS, _("Áreas Diversas")))
 
     tipo = models.PositiveSmallIntegerField(
-        choices=TIPOEMENDALOA_CHOICE,
-        default=99, verbose_name=_('Área de aplicação'))
+        choices=TIPOEMENDALOA_CHOICE, default=99, verbose_name=_("Área de aplicação")
+    )
 
     oficio_ajuste_loa = models.ForeignKey(
         OficioAjusteLoa,
-        verbose_name=_('Ofício de Ajuste Técnico'),
-        related_name='registroajusteloa_set',
-        on_delete=PROTECT)
+        verbose_name=_("Ofício de Ajuste Técnico"),
+        related_name="registroajusteloa_set",
+        on_delete=PROTECT,
+    )
 
-    emendaloa = models.ForeignKey(
+    emendaloa_old = models.ForeignKey(
         EmendaLoa,
-        blank=True, null=True, default=None,
-        verbose_name=_('Emenda Impositiva'),
-        related_name='registroajusteloa_set',
-        on_delete=PROTECT)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Emenda Impositiva (old)"),
+        related_name="registroajusteloa_old_set",
+        db_column="emendaloa_id",
+        on_delete=PROTECT,
+    )
 
-    descricao = models.TextField(
-        verbose_name=_("Descrição"))
+    emendaloa = models.ManyToManyField(
+        EmendaLoa,
+        blank=True,
+        verbose_name=_("Emendas Impositivas"),
+        related_name="registroajusteloa_set",
+    )
+
+    descricao = models.TextField(verbose_name=_("Descrição"))
 
     unidade = models.ForeignKey(
-        'UnidadeOrcamentaria',
-        verbose_name=_('Unidade Orçamentária'),
-        related_name='registroajusteloa_set',
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
+        "UnidadeOrcamentaria",
+        verbose_name=_("Unidade Orçamentária"),
+        related_name="registroajusteloa_set",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
 
     parlamentares_valor = models.ManyToManyField(
         Parlamentar,
-        through='RegistroAjusteLoaParlamentar',
-        related_name='registroajusteloa_set',
-
-        verbose_name=_('Parlamentares'),
-        through_fields=(
-            'registro',
-            'parlamentar'))
+        through="RegistroAjusteLoaParlamentar",
+        related_name="registroajusteloa_set",
+        verbose_name=_("Parlamentares"),
+        through_fields=("registro", "parlamentar"),
+    )
 
     class Meta:
-        verbose_name = _('Registro do Ajuste Técnico')
-        verbose_name_plural = _(
-            'Registros do Ajuste Técnico')
-        ordering = ['id']
+        verbose_name = _("Registro do Ajuste Técnico")
+        verbose_name_plural = _("Registros do Ajuste Técnico")
+        ordering = ["id"]
 
         indexes = [
             GinIndex(
-                OpClass('search', name='gin_trgm_ops'),
-                name='loa_rjl_search_gin_trgm',
+                OpClass("search", name="gin_trgm_ops"),
+                name="loa_rjl_search_gin_trgm",
             ),
         ]
 
     @property
     def fields_search(self):
         return [
-            'emendaloa__search', 'descricao', 'oficio_ajuste_loa',
+            "emendaloa_old__search",
+            "descricao",
+            "oficio_ajuste_loa",
         ]
 
     @property
     def str_valor(self):
         soma = self.soma_valor
         str_v = formats.number_format(soma, force_grouping=True)
-        if '-' in str_v:
-            str_v = f'({str_v[1:]})'
+        if "-" in str_v:
+            str_v = f"({str_v[1:]})"
         return str_v
 
     @property
@@ -1116,253 +1315,276 @@ class RegistroAjusteLoa(CmjSearchMixin):
         soma = sum(
             list(
                 filter(
-                    lambda x: x, self.registroajusteloaparlamentar_set.values_list(
-                        'valor', flat=True)
+                    lambda x: x,
+                    self.registroajusteloaparlamentar_set.values_list(
+                        "valor", flat=True
+                    ),
                 )
             )
         )
         return soma
 
     def __str__(self):
-        return f'R$ {self.str_valor} - {self.oficio_ajuste_loa}'
+        return f"R$ {self.str_valor} - {self.oficio_ajuste_loa}"
 
 
 class RegistroAjusteLoaParlamentar(models.Model):
 
     registro = models.ForeignKey(
         RegistroAjusteLoa,
-        verbose_name=_('Registro de Ajuste'),
-        related_name='registroajusteloaparlamentar_set',
-        on_delete=PROTECT)
+        verbose_name=_("Registro de Ajuste"),
+        related_name="registroajusteloaparlamentar_set",
+        on_delete=CASCADE,
+    )
 
     parlamentar = models.ForeignKey(
         Parlamentar,
-        related_name='registroajusteloaparlamentar_set',
-        verbose_name=_('Parlamentar'),
-        on_delete=PROTECT)
+        related_name="registroajusteloaparlamentar_set",
+        verbose_name=_("Parlamentar"),
+        on_delete=PROTECT,
+    )
 
     valor = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor por Parlamentar (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor por Parlamentar (R$)"),
     )
 
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
-        return f'R$ {valor_str} - {self.parlamentar.nome_parlamentar}'
+        return f"R$ {valor_str} - {self.parlamentar.nome_parlamentar}"
 
     class Meta:
-        verbose_name = _(
-            'Participação Parlamentar no Registro de Ajuste Técnico')
+        verbose_name = _("Participação Parlamentar no Registro de Ajuste Técnico")
         verbose_name_plural = _(
-            'Participações Parlamentares no Registro de Ajuste Técnico')
-        ordering = ['id']
+            "Participações Parlamentares no Registro de Ajuste Técnico"
+        )
+        ordering = ["id"]
 
 
 def prestacaoconta_upload_path(instance, filename):
     return texto_upload_path(
-        instance,
-        filename,
-        subpath=instance.prestacao_conta.loa.ano
-        )
+        instance, filename, subpath=instance.prestacao_conta.loa.ano
+    )
 
 
 def prestacaocontaregistro_upload_path(instance, filename):
     return texto_upload_path(
-        instance,
-        filename,
-        subpath=instance.registro.prestacao_conta.loa.ano
-        )
+        instance, filename, subpath=instance.registro.prestacao_conta.loa.ano
+    )
 
 
 class PrestacaoContaLoa(models.Model):
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('LOA'),
-        related_name='prestacaoconta_set',
-        on_delete=PROTECT)
+        Loa, verbose_name=_("LOA"), related_name="prestacaoconta_set", on_delete=PROTECT
+    )
 
     data_envio = models.DateField(
-        verbose_name=_('Data de Envio'),
-        blank=True, null=True, default=None)
+        verbose_name=_("Data de Envio"), blank=True, null=True, default=None
+    )
 
-    epigrafe = models.CharField(
-        max_length=100,
-        verbose_name=_("Epígrafe"))
+    epigrafe = models.CharField(max_length=100, verbose_name=_("Epígrafe"))
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     class Meta:
-        verbose_name = _('Prestação de Contas do Orçamento Impositivo')
-        verbose_name_plural = _(
-            'Prestações de Contas do Orçamento Impositivo')
-        ordering = ['id']
+        verbose_name = _("Prestação de Contas do Orçamento Impositivo")
+        verbose_name_plural = _("Prestações de Contas do Orçamento Impositivo")
+        ordering = ["id"]
 
     def __str__(self):
-        return f'{self.epigrafe} - {self.loa.ano}'
+        return f"{self.epigrafe} - {self.loa.ano}"
 
 
 class ArquivoPrestacaoContaLoa(models.Model):
 
-    FIELDFILE_NAME = ('arquivo',)
+    FIELDFILE_NAME = ("arquivo",)
 
     prestacao_conta = models.ForeignKey(
         PrestacaoContaLoa,
-        verbose_name=_('Prestação de Conta LOA'),
-        related_name='arquivoprestacaocontaloa_set',
-        on_delete=PROTECT)
+        verbose_name=_("Prestação de Conta LOA"),
+        related_name="arquivoprestacaocontaloa_set",
+        on_delete=PROTECT,
+    )
 
     arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=prestacaoconta_upload_path,
-        verbose_name=_('Arquivo Anexo'),
-        max_length=512)
+        verbose_name=_("Arquivo Anexo"),
+        max_length=512,
+    )
 
     descricao = models.CharField(
-        max_length=256,
-        verbose_name=_("Descrição"), default='', blank=True)
+        max_length=256, verbose_name=_("Descrição"), default="", blank=True
+    )
 
     class Meta:
-        verbose_name = _('Arquivo da Prestação de Conta LOA')
-        verbose_name_plural = _(
-            'Arquivos da Prestação de Conta LOA')
-        ordering = ['id']
+        verbose_name = _("Arquivo da Prestação de Conta LOA")
+        verbose_name_plural = _("Arquivos da Prestação de Conta LOA")
+        ordering = ["id"]
 
     def __str__(self):
-        return f'{self.descricao} - {self.prestacao_conta.loa.ano}'
+        return f"{self.descricao} - {self.prestacao_conta.loa.ano}"
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
 
         if not self.pk and self.arquivo:
             arquivo = self.arquivo
             self.arquivo = None
-            models.Model.save(self, force_insert=force_insert,
-                              force_update=force_update,
-                              using=using,
-                              update_fields=update_fields)
+            models.Model.save(
+                self,
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
+            )
             self.arquivo = arquivo
-            update_fields = ('arquivo', )
+            update_fields = ("arquivo",)
 
-        return models.Model.save(self, force_insert=False,
-                                 force_update=force_update,
-                                 using=using,
-                                 update_fields=update_fields)
+        return models.Model.save(
+            self,
+            force_insert=False,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
 
 class PrestacaoContaRegistro(models.Model):
 
     class SituacaoChoices(models.TextChoices):
-        EM_TRAMITACAO = 'EM_TRAMITACAO', _('Em Tramitação')
-        FINALIZADO = 'FINALIZADO', _('Finalizado')
-        OUTRO = 'OUTRO', _('Outros (Detalhar)')
+        EM_TRAMITACAO = "EM_TRAMITACAO", _("Em Tramitação")
+        FINALIZADO = "FINALIZADO", _("Finalizado")
+        OUTRO = "OUTRO", _("Outros (Detalhar)")
 
     prestacao_conta = models.ForeignKey(
         PrestacaoContaLoa,
-        verbose_name=_('Prestação de Conta LOA'),
-        related_name='prestacaocontaregistro_set',
-        on_delete=PROTECT)
+        verbose_name=_("Prestação de Conta LOA"),
+        related_name="prestacaocontaregistro_set",
+        on_delete=PROTECT,
+    )
 
     registro_ajuste = models.ForeignKey(
         RegistroAjusteLoa,
-        verbose_name=_('Registro de Ajuste Técnico'),
-        related_name='prestacaocontaregistro_set',
+        verbose_name=_("Registro de Ajuste Técnico"),
+        related_name="prestacaocontaregistro_set",
         on_delete=PROTECT,
-        blank=True, null=True, default=None
-        )
+        blank=True,
+        null=True,
+        default=None,
+    )
 
     emendaloa = models.ForeignKey(
         EmendaLoa,
-        blank=True, null=True, default=None,
-        verbose_name=_('Emenda Impositiva'),
-        related_name='prestacaocontaregistro_set',
-        on_delete=PROTECT
-        )
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Emenda Impositiva"),
+        related_name="prestacaocontaregistro_set",
+        on_delete=PROTECT,
+    )
 
     detalhamento = models.TextField(
-        verbose_name=_("Detalhamento"),
-        blank=True, null=True, default=''
-        )
+        verbose_name=_("Detalhamento"), blank=True, null=True, default=""
+    )
 
     situacao = models.CharField(
         choices=SituacaoChoices.choices,
         max_length=20,
         default=SituacaoChoices.EM_TRAMITACAO,
-        verbose_name=_("Situação"))
+        verbose_name=_("Situação"),
+    )
 
     class Meta:
-        verbose_name = _('Registro de Prestação de Conta')
-        verbose_name_plural = _('Registros de Prestação de Conta')
-        ordering = ['id']
+        verbose_name = _("Registro de Prestação de Conta")
+        verbose_name_plural = _("Registros de Prestação de Conta")
+        ordering = ["id"]
 
     def __str__(self):
-        return f'{self.prestacao_conta.loa.ano} - {self.registro_ajuste or self.emendaloa}'
+        return (
+            f"{self.prestacao_conta.loa.ano} - {self.registro_ajuste or self.emendaloa}"
+        )
+
 
 class ArquivoPrestacaoContaRegistro(models.Model):
 
-    FIELDFILE_NAME = ('arquivo',)
+    FIELDFILE_NAME = ("arquivo",)
 
     registro = models.ForeignKey(
         PrestacaoContaRegistro,
-        verbose_name=_('Registro de Prestação de Conta'),
-        related_name='arquivoprestacaocontaregistro_set',
-        on_delete=PROTECT)
+        verbose_name=_("Registro de Prestação de Conta"),
+        related_name="arquivoprestacaocontaregistro_set",
+        on_delete=PROTECT,
+    )
 
     arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=prestacaocontaregistro_upload_path,
-        verbose_name=_('Arquivo Anexo'),
-        max_length=512)
+        verbose_name=_("Arquivo Anexo"),
+        max_length=512,
+    )
 
     descricao = models.CharField(
-        max_length=256,
-        verbose_name=_("Descrição"), default='', blank=True)
+        max_length=256, verbose_name=_("Descrição"), default="", blank=True
+    )
 
     class Meta:
-        verbose_name = _('Arquivo do Registro de Prestação de Conta')
-        verbose_name_plural = _(
-            'Arquivos do Registro de Prestação de Conta')
-        ordering = ['id']
+        verbose_name = _("Arquivo do Registro de Prestação de Conta")
+        verbose_name_plural = _("Arquivos do Registro de Prestação de Conta")
+        ordering = ["id"]
 
     def __str__(self):
-        return f'{self.descricao} - {self.registro.prestacao_conta.loa.ano}'
+        return f"{self.descricao} - {self.registro.prestacao_conta.loa.ano}"
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
 
         if not self.pk and self.arquivo:
             arquivo = self.arquivo
             self.arquivo = None
-            models.Model.save(self, force_insert=force_insert,
-                              force_update=force_update,
-                              using=using,
-                              update_fields=update_fields)
+            models.Model.save(
+                self,
+                force_insert=force_insert,
+                force_update=force_update,
+                using=using,
+                update_fields=update_fields,
+            )
             self.arquivo = arquivo
-            update_fields = ('arquivo', )
+            update_fields = ("arquivo",)
 
-        return models.Model.save(self, force_insert=False,
-                                 force_update=force_update,
-                                 using=using,
-                                 update_fields=update_fields)
+        return models.Model.save(
+            self,
+            force_insert=False,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
 
 class ElementoBase(models.Model):
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('Loa'),
-        related_name='+',
-        on_delete=PROTECT)
+        Loa, verbose_name=_("Loa"), related_name="+", on_delete=PROTECT
+    )
 
     codigo = models.TextField(verbose_name=_("Código"))
 
     especificacao = models.CharField(
-        max_length=256,
-        verbose_name=_("Especificação"), default='', blank=True)
+        max_length=256, verbose_name=_("Especificação"), default="", blank=True
+    )
 
     # metadata = JSONField(
     #    verbose_name=_('Metadados'),
@@ -1372,28 +1594,29 @@ class ElementoBase(models.Model):
         abstract = True
 
     def __str__(self):
-        return f'{self.codigo} - {self.especificacao}'
+        return f"{self.codigo} - {self.especificacao}"
 
 
 class Orgao(ElementoBase):
 
     class Meta:
-        verbose_name = _('Órgão')
-        verbose_name_plural = _('Órgãos')
-        ordering = ['codigo']
+        verbose_name = _("Órgão")
+        verbose_name_plural = _("Órgãos")
+        ordering = ["codigo"]
 
 
 class UnidadeOrcamentaria(ElementoBase):
 
     orgao = models.ForeignKey(
         Orgao,
-        verbose_name=_('Órgão'),
-        related_name='unidadeorcamentaria_set',
-        on_delete=CASCADE)
+        verbose_name=_("Órgão"),
+        related_name="unidadeorcamentaria_set",
+        on_delete=CASCADE,
+    )
 
     recebe_emenda_impositiva = models.BooleanField(
         default=False,
-        verbose_name=_('Recebe Verbas Emenda Impositiva'),
+        verbose_name=_("Recebe Verbas Emenda Impositiva"),
     )
 
     SAUDE_CHOICE = 10
@@ -1406,166 +1629,165 @@ class UnidadeOrcamentaria(ElementoBase):
 
     area = models.PositiveSmallIntegerField(
         choices=(
-            (SAUDE_CHOICE, _('Saúde')),
-            (EDUCACAO_CHOICE, _('Educação')),
-            (ASSISTENCIA_SOCIAL_CHOICE, _('Assistência Social')),
-            (SEGURANCA_PUBLICA_CHOICE, _('Segurança Pública')),
-            (CULTURA_CHOICE, _('Cultura')),
-            (ESPORTE_CHOICE, _('Esporte')),
-            (OUTROS_CHOICE, _('Outros')),
+            (SAUDE_CHOICE, _("Saúde")),
+            (EDUCACAO_CHOICE, _("Educação")),
+            (ASSISTENCIA_SOCIAL_CHOICE, _("Assistência Social")),
+            (SEGURANCA_PUBLICA_CHOICE, _("Segurança Pública")),
+            (CULTURA_CHOICE, _("Cultura")),
+            (ESPORTE_CHOICE, _("Esporte")),
+            (OUTROS_CHOICE, _("Outros")),
         ),
         default=OUTROS_CHOICE,
-        verbose_name=_('Tipo Geral'),
+        verbose_name=_("Tipo Geral"),
     )
 
-
-
     class Meta:
-        verbose_name = _('Unidade Orçamentária')
-        verbose_name_plural = _('Unidades Orçamentárias')
-        ordering = ['codigo']
+        verbose_name = _("Unidade Orçamentária")
+        verbose_name_plural = _("Unidades Orçamentárias")
+        ordering = ["codigo"]
 
 
 class Funcao(ElementoBase):
 
     class Meta:
-        verbose_name = _('Função')
-        verbose_name_plural = _('Funções')
-        ordering = ['codigo']
+        verbose_name = _("Função")
+        verbose_name_plural = _("Funções")
+        ordering = ["codigo"]
 
     def __str__(self):
-        return f'{self.codigo} - {self.especificacao} ({self.loa.ano})'
+        return f"{self.codigo} - {self.especificacao} ({self.loa.ano})"
 
 
 class SubFuncao(ElementoBase):
 
     funcao = models.ForeignKey(
-        Funcao,
-        verbose_name=_('Função'),
-        related_name='funcao_set',
-        on_delete=CASCADE)
+        Funcao, verbose_name=_("Função"), related_name="funcao_set", on_delete=CASCADE
+    )
 
     class Meta:
-        verbose_name = _('SubFunção')
-        verbose_name_plural = _('SubFunções')
-        ordering = ['codigo']
+        verbose_name = _("SubFunção")
+        verbose_name_plural = _("SubFunções")
+        ordering = ["codigo"]
 
 
 class Programa(ElementoBase):
 
     class Meta:
-        verbose_name = _('Programa')
-        verbose_name_plural = _('Programas')
-        ordering = ['codigo']
+        verbose_name = _("Programa")
+        verbose_name_plural = _("Programas")
+        ordering = ["codigo"]
 
 
 class Acao(ElementoBase):
 
     class Meta:
-        verbose_name = _('Ação')
-        verbose_name_plural = _('Ações')
-        ordering = ['codigo']
+        verbose_name = _("Ação")
+        verbose_name_plural = _("Ações")
+        ordering = ["codigo"]
 
 
 class Fonte(ElementoBase):
 
     class Meta:
-        verbose_name = _('Fonte')
-        verbose_name_plural = _('Fontes')
-        ordering = ['codigo']
+        verbose_name = _("Fonte")
+        verbose_name_plural = _("Fontes")
+        ordering = ["codigo"]
 
 
 class Natureza(ElementoBase):
 
     class Meta:
-        verbose_name = _('Natureza')
-        verbose_name_plural = _('Naturezas')
-        ordering = ['codigo']
+        verbose_name = _("Natureza")
+        verbose_name_plural = _("Naturezas")
+        ordering = ["codigo"]
 
 
 class Despesa(models.Model):
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('Loa'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        Loa, verbose_name=_("Loa"), related_name="despesa_set", on_delete=CASCADE
+    )
 
     orgao = models.ForeignKey(
-        Orgao,
-        verbose_name=_('Órgão'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        Orgao, verbose_name=_("Órgão"), related_name="despesa_set", on_delete=CASCADE
+    )
 
     unidade = models.ForeignKey(
         UnidadeOrcamentaria,
-        verbose_name=_('Unidade Orçamentária'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        verbose_name=_("Unidade Orçamentária"),
+        related_name="despesa_set",
+        on_delete=CASCADE,
+    )
 
     funcao = models.ForeignKey(
-        Funcao,
-        verbose_name=_('Função'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        Funcao, verbose_name=_("Função"), related_name="despesa_set", on_delete=CASCADE
+    )
 
     subfuncao = models.ForeignKey(
         SubFuncao,
-        verbose_name=_('SubFunção'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        verbose_name=_("SubFunção"),
+        related_name="despesa_set",
+        on_delete=CASCADE,
+    )
 
     programa = models.ForeignKey(
         Programa,
-        verbose_name=_('Programa'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        verbose_name=_("Programa"),
+        related_name="despesa_set",
+        on_delete=CASCADE,
+    )
 
     acao = models.ForeignKey(
-        Acao,
-        verbose_name=_('Ação'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        Acao, verbose_name=_("Ação"), related_name="despesa_set", on_delete=CASCADE
+    )
 
     fonte = models.ForeignKey(
         Fonte,
-        blank=True, null=True, default=None,
-        verbose_name=_('Fonte'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Fonte"),
+        related_name="despesa_set",
+        on_delete=CASCADE,
+    )
 
     natureza = models.ForeignKey(
         Natureza,
-        verbose_name=_('Natureza'),
-        related_name='despesa_set',
-        on_delete=CASCADE)
+        verbose_name=_("Natureza"),
+        related_name="despesa_set",
+        on_delete=CASCADE,
+    )
 
     valor_materia = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor Despesa Matéria (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Despesa Matéria (R$)"),
     )
 
     valor_norma = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor Despesa Norma (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Despesa Norma (R$)"),
     )
 
     class Meta:
-        verbose_name = _('Despesa')
-        verbose_name_plural = _('Despesas')
-        ordering = ['id']
+        verbose_name = _("Despesa")
+        verbose_name_plural = _("Despesas")
+        ordering = ["id"]
 
         unique_together = (
             (
-                'loa',
-                'orgao',
-                'unidade',
-                'funcao',
-                'subfuncao',
-                'programa',
-                'acao',
-                'fonte',
-                'natureza'
+                "loa",
+                "orgao",
+                "unidade",
+                "funcao",
+                "subfuncao",
+                "programa",
+                "acao",
+                "fonte",
+                "natureza",
             ),
         )
 
@@ -1577,12 +1799,19 @@ class Despesa(models.Model):
     def consulta(self):
         return DespesaConsulta.objects.get(pk=self.id)
 
-    def save(self, force_insert=False, force_update=False, using=None,
-             update_fields=None):
+    def save(
+        self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
 
         self.clean()
 
-        return models.Model.save(self, force_insert=force_insert, force_update=force_update, using=using, update_fields=update_fields)
+        return models.Model.save(
+            self,
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
     def clean(self):
 
@@ -1599,38 +1828,40 @@ class Despesa(models.Model):
             for field_name in field_tuple:
                 field_value = getattr(self, field_name)
                 if getattr(self, field_name) is None:
-                    unique_filter['%s__isnull' % field_name] = True
+                    unique_filter["%s__isnull" % field_name] = True
                     null_found = True
                 else:
-                    unique_filter['%s' % field_name] = field_value
+                    unique_filter["%s" % field_name] = field_value
                     unique_fields.append(field_name)
             if null_found:
-                unique_queryset = self.__class__.objects.filter(
-                    **unique_filter)
+                unique_queryset = self.__class__.objects.filter(**unique_filter)
                 if self.pk:
                     unique_queryset = unique_queryset.exclude(pk=self.pk)
                 if unique_queryset.exists():
                     msg = self.unique_error_message(
-                        self.__class__, tuple(unique_fields))
+                        self.__class__, tuple(unique_fields)
+                    )
                     raise ValidationError(msg)
 
 
 class DespesaConsulta(models.Model):
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('Loa'),
-        related_name='+',
-        on_delete=CASCADE)
+        Loa, verbose_name=_("Loa"), related_name="+", on_delete=CASCADE
+    )
 
     valor_materia = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor Despesa Matéria (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Despesa Matéria (R$)"),
     )
 
     valor_norma = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor Despesa Norma (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Despesa Norma (R$)"),
     )
 
     codigo = models.TextField(verbose_name=_("Código"))
@@ -1648,11 +1879,13 @@ class DespesaConsulta(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'loa_despesa_consulta'
-        ordering = ('cod_orgao', 'cod_unidade', 'codigo', 'cod_natureza')
+        db_table = "loa_despesa_consulta"
+        ordering = ("cod_orgao", "cod_unidade", "codigo", "cod_natureza")
 
     def __str__(self):
-        return f'{self.codigo}:{self.cod_natureza}/{self.cod_fonte} - {self.especificacao}'
+        return (
+            f"{self.codigo}:{self.cod_natureza}/{self.cod_fonte} - {self.especificacao}"
+        )
 
 
 class EmendaLoaRegistroContabilManager(manager.Manager):
@@ -1661,12 +1894,12 @@ class EmendaLoaRegistroContabilManager(manager.Manager):
 
     def all_deducoes(self):
         qs = self.get_queryset()
-        qs = qs.filter(valor__lt=Decimal('0.00'))
+        qs = qs.filter(valor__lt=Decimal("0.00"))
         return qs
 
     def all_insercoes(self):
         qs = self.get_queryset()
-        qs = qs.filter(valor__gt=Decimal('0.00'))
+        qs = qs.filter(valor__gt=Decimal("0.00"))
         return qs
 
 
@@ -1676,49 +1909,58 @@ class EmendaLoaRegistroContabil(models.Model):
 
     emendaloa = models.ForeignKey(
         EmendaLoa,
-        verbose_name=_('Emenda Impositiva'),
-        related_name='registrocontabil_set',
-        on_delete=CASCADE)
+        verbose_name=_("Emenda Impositiva"),
+        related_name="registrocontabil_set",
+        on_delete=CASCADE,
+    )
 
     despesa = models.ForeignKey(
         Despesa,
-        blank=True, null=True, default=None,
-        related_name='registrocontabil_set',
-        verbose_name=_('Despesa'),
-        on_delete=PROTECT)
+        blank=True,
+        null=True,
+        default=None,
+        related_name="registrocontabil_set",
+        verbose_name=_("Despesa"),
+        on_delete=PROTECT,
+    )
 
     valor = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor (R$)"),
     )
 
     def __str__(self):
-        return f'R$ {self.str_valor} - {self.despesa}'
+        return f"R$ {self.str_valor} - {self.despesa}"
 
     @property
     def str_valor(self):
         str_valor = formats.number_format(self.valor, force_grouping=True)
-        str_valor = ' ' * (self._meta.get_field('valor').max_digits - len(str_valor)) + str_valor
+        str_valor = (
+            " " * (self._meta.get_field("valor").max_digits - len(str_valor))
+            + str_valor
+        )
         return str_valor
 
     def delete(self, *args, **kwargs):
         # remove emenda de agrupamento que possa pertercer sem causar recursividade do agrupamentoemendaloa_pre_delete
-        run_sql(f'DELETE FROM loa_agrupamentoemendaloa WHERE emendaloa_id = {self.emendaloa.id}')
+        run_sql(
+            f"DELETE FROM loa_agrupamentoemendaloa WHERE emendaloa_id = {self.emendaloa.id}"
+        )
         # run_sql acima substitui: AgrupamentoEmendaLoa.objects.filter(emendaloa=self.emendaloa).delete()
 
         return super().delete(*args, **kwargs)
 
-
     class Meta:
-        verbose_name = _('Registro Contábil de Dedução e Inserção em Emendas')
-        verbose_name_plural = _(
-            'Registros Contábeis de Dedução e Inserção em Emendas')
-        ordering = ['id']
+        verbose_name = _("Registro Contábil de Dedução e Inserção em Emendas")
+        verbose_name_plural = _("Registros Contábeis de Dedução e Inserção em Emendas")
+        ordering = ["id"]
 
         unique_together = (
             (
-                'emendaloa',
-                'despesa',
+                "emendaloa",
+                "despesa",
             ),
         )
 
@@ -1726,37 +1968,31 @@ class EmendaLoaRegistroContabil(models.Model):
 class Agrupamento(models.Model):
 
     loa = models.ForeignKey(
-        Loa,
-        verbose_name=_('LOA'),
-        related_name='agrupamento_set',
-        on_delete=PROTECT)
+        Loa, verbose_name=_("LOA"), related_name="agrupamento_set", on_delete=PROTECT
+    )
 
-    nome = models.CharField(
-        verbose_name=_('Nome do Agrupamento'), max_length=256)
+    nome = models.CharField(verbose_name=_("Nome do Agrupamento"), max_length=256)
 
     emendas = models.ManyToManyField(
         EmendaLoa,
-        through='AgrupamentoEmendaLoa',
-        related_name='agrupamento_set',
-        verbose_name=_('Emendas Impositivas/Modificativas'),
-        through_fields=(
-            'agrupamento',
-            'emendaloa'))
+        through="AgrupamentoEmendaLoa",
+        related_name="agrupamento_set",
+        verbose_name=_("Emendas Impositivas/Modificativas"),
+        through_fields=("agrupamento", "emendaloa"),
+    )
 
     despesas = models.ManyToManyField(
         Despesa,
-        through='AgrupamentoRegistroContabil',
-        related_name='agrupamento_set',
-        verbose_name=_('Registro Contabeis Agrupamento'),
-        through_fields=(
-            'agrupamento',
-            'despesa'))
+        through="AgrupamentoRegistroContabil",
+        related_name="agrupamento_set",
+        verbose_name=_("Registro Contabeis Agrupamento"),
+        through_fields=("agrupamento", "despesa"),
+    )
 
     class Meta:
-        verbose_name = _('Agrupamento de Emenda Impositiva/Modificativas')
-        verbose_name_plural = _(
-            'Agrupamentos de Emendas Impositivas/Modificativas')
-        ordering = ['id']
+        verbose_name = _("Agrupamento de Emenda Impositiva/Modificativas")
+        verbose_name_plural = _("Agrupamentos de Emendas Impositivas/Modificativas")
+        ordering = ["id"]
 
     def __str__(self):
         return self.nome
@@ -1769,23 +2005,22 @@ class Agrupamento(models.Model):
 
             deducoes = []
             insercoes = []
-            soma_zero = Decimal('0.00')
+            soma_zero = Decimal("0.00")
             for r in registros:
                 elrc = EmendaLoaRegistroContabil()
                 elrc.emendaloa = emenda
                 elrc.despesa = r.despesa
-                elrc.valor = quantize(
-                    emenda.valor * r.percentual / Decimal(100))
+                elrc.valor = quantize(emenda.valor * r.percentual / Decimal(100))
                 elrc.save()
 
                 soma_zero += r.percentual
 
-                if r.percentual < Decimal('0.00'):
+                if r.percentual < Decimal("0.00"):
                     deducoes.append(elrc)
                 else:
                     insercoes.append(elrc)
 
-            if soma_zero == Decimal('0.00'):
+            if soma_zero == Decimal("0.00"):
                 sum_deducoes = sum(map(lambda x: x.valor, deducoes))
                 sum_insercoes = sum(map(lambda x: x.valor, insercoes))
 
@@ -1805,25 +2040,27 @@ class Agrupamento(models.Model):
 class AgrupamentoEmendaLoa(models.Model):
     agrupamento = models.ForeignKey(
         Agrupamento,
-        verbose_name=_('Agrupamento de Emenda Impositiva'),
-        related_name='agrupamentoemendaloa_set',
-        on_delete=CASCADE)
+        verbose_name=_("Agrupamento de Emenda Impositiva"),
+        related_name="agrupamentoemendaloa_set",
+        on_delete=CASCADE,
+    )
 
     emendaloa = models.OneToOneField(
         EmendaLoa,
-        verbose_name=_('Emenda Impositiva'),
-        related_name='agrupamentoemendaloa',
-        on_delete=CASCADE)
+        verbose_name=_("Emenda Impositiva"),
+        related_name="agrupamentoemendaloa",
+        on_delete=CASCADE,
+    )
 
     class Meta:
-        verbose_name = _('Agrupamento de Emenda Impositiva')
-        verbose_name_plural = _('Agrupamentos de Emendas Impositivas')
-        ordering = ['id']
+        verbose_name = _("Agrupamento de Emenda Impositiva")
+        verbose_name_plural = _("Agrupamentos de Emendas Impositivas")
+        ordering = ["id"]
 
         unique_together = (
             (
-                'agrupamento',
-                'emendaloa',
+                "agrupamento",
+                "emendaloa",
             ),
         )
 
@@ -1834,12 +2071,12 @@ class AgrupamentoRegistroContabilManager(manager.Manager):
 
     def all_deducoes(self):
         qs = self.get_queryset()
-        qs = qs.filter(percentual__lt=Decimal('0.00'))
+        qs = qs.filter(percentual__lt=Decimal("0.00"))
         return qs
 
     def all_insercoes(self):
         qs = self.get_queryset()
-        qs = qs.filter(percentual__gt=Decimal('0.00'))
+        qs = qs.filter(percentual__gt=Decimal("0.00"))
         return qs
 
 
@@ -1848,53 +2085,54 @@ class AgrupamentoRegistroContabil(models.Model):
     DEDUCAO = 10
     INSERCAO = 20
 
-    OPERACAO_CHOICE = (
-        (DEDUCAO, _('Dedução')),
-        (INSERCAO, _('Inserção'))
-    )
+    OPERACAO_CHOICE = ((DEDUCAO, _("Dedução")), (INSERCAO, _("Inserção")))
 
     objects = AgrupamentoRegistroContabilManager()
 
     agrupamento = models.ForeignKey(
         Agrupamento,
-        verbose_name=_('Agrupamento de Emenda Impositiva'),
-        related_name='agrupamentoregistrocontabil_set',
-        on_delete=CASCADE)
+        verbose_name=_("Agrupamento de Emenda Impositiva"),
+        related_name="agrupamentoregistrocontabil_set",
+        on_delete=CASCADE,
+    )
 
     despesa = models.ForeignKey(
         Despesa,
-        blank=True, null=True, default=None,
-        related_name='agrupamentoregistrocontabil_set',
-        verbose_name=_('Despesa'),
-        on_delete=CASCADE)
+        blank=True,
+        null=True,
+        default=None,
+        related_name="agrupamentoregistrocontabil_set",
+        verbose_name=_("Despesa"),
+        on_delete=CASCADE,
+    )
 
     operacao = models.PositiveSmallIntegerField(
-        choices=OPERACAO_CHOICE,
-        default=10, verbose_name=_('Operação'))
+        choices=OPERACAO_CHOICE, default=10, verbose_name=_("Operação")
+    )
 
     percentual = models.DecimalField(
-        max_digits=6, decimal_places=2, default=Decimal('100.00'),
+        max_digits=6,
+        decimal_places=2,
+        default=Decimal("100.00"),
         validators=PERCENTAGE_VALIDATOR,
-        verbose_name=_('Percentual do Valor da Emenda'),
+        verbose_name=_("Percentual do Valor da Emenda"),
     )
 
     class Meta:
-        verbose_name = _('Registro Contábil de Dedução e Inserção em Emendas')
-        verbose_name_plural = _(
-            'Registros Contábeis de Dedução e Inserção em Emendas')
-        ordering = ['id']
+        verbose_name = _("Registro Contábil de Dedução e Inserção em Emendas")
+        verbose_name_plural = _("Registros Contábeis de Dedução e Inserção em Emendas")
+        ordering = ["id"]
 
         unique_together = (
             (
-                'agrupamento',
-                'despesa',
+                "agrupamento",
+                "despesa",
             ),
         )
 
     def __str__(self):
-        percentual_str = formats.number_format(
-            self.percentual, force_grouping=True)
-        return f'{percentual_str}% - {self.despesa}'
+        percentual_str = formats.number_format(self.percentual, force_grouping=True)
+        return f"{percentual_str}% - {self.despesa}"
 
     @property
     def str_percentual(self):
@@ -1904,89 +2142,97 @@ class AgrupamentoRegistroContabil(models.Model):
 class DespesaPaga(models.Model):
 
     mapeamento = {
-        'Código:': 'codigo',
-        'Código': 'codigo',
-        'Data:': 'data',
-        'Data': 'data',
-        'Banco:': 'banco',
-        'Banco': 'banco',
-        'Agência:': 'agencia',
-        'Agência': 'agencia',
-        'Conta Bancária:': 'conta',
-        'Conta': 'conta',
-        'Tipo do Documento:': 'tipo',
-        'Tipo do Documento': 'tipo',
-        'Nº do Documento:': 'numero_documento',
-        'Número do Documento': 'numero_documento',
-        'Número da Licitação:': 'numero_licitacao',
-        'Código Empenho:': 'empenho',
-        'Elemento:': 'elemento',
-        'Sub Elemento:': 'subelemento',
-        'Unidade Financeira:': 'unidade',
-        'Unidade Financeira': 'unidade',
-        'Fonte de Recursos:': 'fonte',
-        'Fonte de Recursos': 'fonte',
-        'Historico:': 'historico',
-        'Número': 'numero_emissao',
-        'Série': 'serie',
-        'Data de Emissão': 'data_emissao',
-        'Tipo': 'tipo_emissao',
-        'Valor': 'valor'
+        "Código:": "codigo",
+        "Código": "codigo",
+        "Data:": "data",
+        "Data": "data",
+        "Banco:": "banco",
+        "Banco": "banco",
+        "Agência:": "agencia",
+        "Agência": "agencia",
+        "Conta Bancária:": "conta",
+        "Conta": "conta",
+        "Tipo do Documento:": "tipo",
+        "Tipo do Documento": "tipo",
+        "Nº do Documento:": "numero_documento",
+        "Número do Documento": "numero_documento",
+        "Número da Licitação:": "numero_licitacao",
+        "Código Empenho:": "empenho",
+        "Elemento:": "elemento",
+        "Sub Elemento:": "subelemento",
+        "Unidade Financeira:": "unidade",
+        "Unidade Financeira": "unidade",
+        "Fonte de Recursos:": "fonte",
+        "Fonte de Recursos": "fonte",
+        "Historico:": "historico",
+        "Número": "numero_emissao",
+        "Série": "serie",
+        "Data de Emissão": "data_emissao",
+        "Tipo": "tipo_emissao",
+        "Valor": "valor",
     }
 
     codigo = models.TextField(verbose_name=_("Código"))
 
     cpfcnpj = models.TextField(
-        verbose_name=_("CpfCNPJ"),
-        blank=True, null=True, default=None)
-    nome = models.TextField(
-        verbose_name=_("Nome"),
-        blank=True, null=True, default=None)
+        verbose_name=_("CpfCNPJ"), blank=True, null=True, default=None
+    )
+    nome = models.TextField(verbose_name=_("Nome"), blank=True, null=True, default=None)
     historico = models.TextField(
-        verbose_name=_("Histórico"),
-        blank=True, null=True, default=None)
-    tipo = models.TextField(
-        verbose_name=_("Tipo"),
-        blank=True, null=True, default=None)
+        verbose_name=_("Histórico"), blank=True, null=True, default=None
+    )
+    tipo = models.TextField(verbose_name=_("Tipo"), blank=True, null=True, default=None)
 
-    data = models.DateField(blank=True, null=True, verbose_name=_('Data'))
+    data = models.DateField(blank=True, null=True, verbose_name=_("Data"))
 
     orgao = models.ForeignKey(
         Orgao,
-        related_name='despesapaga_set',
-        verbose_name=_('Órgão'),
-        on_delete=CASCADE)
+        related_name="despesapaga_set",
+        verbose_name=_("Órgão"),
+        on_delete=CASCADE,
+    )
 
     unidade = models.ForeignKey(
         UnidadeOrcamentaria,
-        blank=True, null=True, default=None,
-        related_name='despesapaga_set',
-        verbose_name=_('Unidade Financeira'),
-        on_delete=CASCADE)
+        blank=True,
+        null=True,
+        default=None,
+        related_name="despesapaga_set",
+        verbose_name=_("Unidade Financeira"),
+        on_delete=CASCADE,
+    )
 
     natureza = models.ForeignKey(
         Natureza,
-        blank=True, null=True, default=None,
-        verbose_name=_('Natureza'),
-        related_name='despesapaga_set',
-        on_delete=CASCADE)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Natureza"),
+        related_name="despesapaga_set",
+        on_delete=CASCADE,
+    )
 
     fonte = models.ForeignKey(
         Fonte,
-        blank=True, null=True, default=None,
-        verbose_name=_('Fonte'),
-        related_name='despesapaga_set',
-        on_delete=CASCADE)
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Fonte"),
+        related_name="despesapaga_set",
+        on_delete=CASCADE,
+    )
 
     valor = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor (R$)"),
     )
 
     class Meta:
-        verbose_name = _('Despesa Paga')
-        verbose_name_plural = _('Despesas Pagas')
-        ordering = ['id']
+        verbose_name = _("Despesa Paga")
+        verbose_name_plural = _("Despesas Pagas")
+        ordering = ["id"]
 
 
 class ReceitaOrcamentaria(models.Model):
@@ -1994,141 +2240,153 @@ class ReceitaOrcamentaria(models.Model):
     codigo = models.TextField(verbose_name=_("Código"))
 
     historico = models.TextField(
-        verbose_name=_("Histórico"),
-        blank=True, null=True, default=None)
+        verbose_name=_("Histórico"), blank=True, null=True, default=None
+    )
 
     orgao = models.ForeignKey(
         Orgao,
-        related_name='receitaorcamentaria_set',
-        verbose_name=_('Órgão'),
-        on_delete=CASCADE)
+        related_name="receitaorcamentaria_set",
+        verbose_name=_("Órgão"),
+        on_delete=CASCADE,
+    )
 
     valor = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor (R$)"),
     )
 
     class Meta:
-        verbose_name = _('Receita Orçamentária')
-        verbose_name_plural = _('Receitas Orçamentárias')
-        ordering = ['id']
+        verbose_name = _("Receita Orçamentária")
+        verbose_name_plural = _("Receitas Orçamentárias")
+        ordering = ["id"]
 
 
 class ReceitaArrecadada(models.Model):
 
-    data = models.DateField(blank=True, null=True, verbose_name=_('Data'))
+    data = models.DateField(blank=True, null=True, verbose_name=_("Data"))
 
-    tipo = models.TextField(
-        verbose_name=_("Tipo"),
-        blank=True, null=True, default=None)
+    tipo = models.TextField(verbose_name=_("Tipo"), blank=True, null=True, default=None)
 
     historico = models.TextField(
-        verbose_name=_("Histórico"),
-        blank=True, null=True, default=None)
+        verbose_name=_("Histórico"), blank=True, null=True, default=None
+    )
 
     receita = models.ForeignKey(
         ReceitaOrcamentaria,
-        related_name='receitaarrecadada_set',
-        verbose_name=_('Receita Orçamentária'),
-        on_delete=CASCADE)
+        related_name="receitaarrecadada_set",
+        verbose_name=_("Receita Orçamentária"),
+        on_delete=CASCADE,
+    )
 
     valor = models.DecimalField(
-        max_digits=14, decimal_places=2, default=Decimal('0.00'),
-        verbose_name=_('Valor (R$)'),
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor (R$)"),
     )
 
     class Meta:
-        verbose_name = _('Receita Arrecadada')
-        verbose_name_plural = _('Receitas Arrecadadas')
-        ordering = ['id']
+        verbose_name = _("Receita Arrecadada")
+        verbose_name_plural = _("Receitas Arrecadadas")
+        ordering = ["id"]
 
 
 class ScrapRecord(models.Model):
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
-    mes = models.PositiveSmallIntegerField(verbose_name=_('Mes'))
-    ano = models.PositiveSmallIntegerField(verbose_name=_('Ano'))
+    mes = models.PositiveSmallIntegerField(verbose_name=_("Mes"))
+    ano = models.PositiveSmallIntegerField(verbose_name=_("Ano"))
     orgao = models.TextField(verbose_name=_("Órgão"))
 
-    codigo = models.TextField(verbose_name=_("Código"), default='')
+    codigo = models.TextField(verbose_name=_("Código"), default="")
 
     url = models.TextField(verbose_name=_("Órgão"), unique=True)
 
-    content = models.BinaryField(editable=True, default=b'')
+    content = models.BinaryField(editable=True, default=b"")
 
     modified = models.DateTimeField(
-        verbose_name=_('modified'), editable=False, auto_now=True)
+        verbose_name=_("modified"), editable=False, auto_now=True
+    )
 
     erro = models.BooleanField(default=False)
 
     parent = models.ForeignKey(
-        'self',
-        blank=True, null=True, default=None,
-        related_name='scrap_set',
-        on_delete=CASCADE)
+        "self",
+        blank=True,
+        null=True,
+        default=None,
+        related_name="scrap_set",
+        on_delete=CASCADE,
+    )
 
     class Meta:
-        verbose_name = 'ScrapRecord'
-        verbose_name_plural = 'ScrapRecord'
-        ordering = ['id']
+        verbose_name = "ScrapRecord"
+        verbose_name_plural = "ScrapRecord"
+        ordering = ["id"]
 
     def clean_text(self, text):
-        while '  ' in text:
-            text = text.replace('  ', ' ')
-        while ' \n' in text:
-            text = text.replace(' \n', '\n')
-        while '\n ' in text:
-            text = text.replace('\n ', '\n')
-        while '\r\n' in text:
-            text = text.replace('\r\n', '\n')
-        while '\n\n' in text:
-            text = text.replace('\n\n', '\n')
-        while '<td> ' in text:
-            text = text.replace('<td> ', '<td>')
-        while ' :</td>' in text:
-            text = text.replace(' :</td>', ':</td>')
-        while '\n</td>' in text:
-            text = text.replace('\n</td>', '</td>')
-        while ' </td>' in text:
-            text = text.replace(' </td>', '</td>')
-        while '<td>R$ ' in text:
-            text = text.replace('<td>R$ ', '<td>')
+        while "  " in text:
+            text = text.replace("  ", " ")
+        while " \n" in text:
+            text = text.replace(" \n", "\n")
+        while "\n " in text:
+            text = text.replace("\n ", "\n")
+        while "\r\n" in text:
+            text = text.replace("\r\n", "\n")
+        while "\n\n" in text:
+            text = text.replace("\n\n", "\n")
+        while "<td> " in text:
+            text = text.replace("<td> ", "<td>")
+        while " :</td>" in text:
+            text = text.replace(" :</td>", ":</td>")
+        while "\n</td>" in text:
+            text = text.replace("\n</td>", "</td>")
+        while " </td>" in text:
+            text = text.replace(" </td>", "</td>")
+        while "<td>R$ " in text:
+            text = text.replace("<td>R$ ", "<td>")
         return text
 
     def update_data_models(self):
 
         try:
             # with transaction.atomic():
-            if 'despesa' in self.metadata['url_dict']['name']:
-                if not self.codigo or self.codigo == 'TOTAL:':
+            if "despesa" in self.metadata["url_dict"]["name"]:
+                if not self.codigo or self.codigo == "TOTAL:":
                     return None
                 self._update_despesa_paga()
-            elif 'receita' in self.metadata['url_dict']['name']:
-                if not self.codigo or self.codigo == 'TOTAL:':
+            elif "receita" in self.metadata["url_dict"]["name"]:
+                if not self.codigo or self.codigo == "TOTAL:":
                     return None
                 self._update_receita_arrecadada()
-            elif 'transferencia' in self.metadata['url_dict']['name']:
+            elif "transferencia" in self.metadata["url_dict"]["name"]:
                 self._update_transferencia_recursos()
             if self.erro:
                 self.erro = False
-                self.save(update_fields=('erro', ))
+                self.save(update_fields=("erro",))
         except Exception as e:
             self.erro = True
-            self.save(update_fields=('erro', ))
+            self.save(update_fields=("erro",))
 
     def _update_transferencia_recursos(self):
 
-        if self.metadata['url_dict']['format'] != 'csv':
+        if self.metadata["url_dict"]["format"] != "csv":
             return None
         org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
 
         content = self.content
         if isinstance(content, memoryview):
             content = content.tobytes()
-        content = content.decode('utf-8-sig')
+        content = content.decode("utf-8-sig")
         file = StringIO(content)
         csv_data = csv.reader(file, delimiter=";")
 
@@ -2138,24 +2396,21 @@ class ScrapRecord(models.Model):
 
             dt = datetime.strptime(row[0], "%d/%m/%Y").date()
 
-            valor = Decimal(row[4].replace('.', '').replace(',', '.'))
+            valor = Decimal(row[4].replace(".", "").replace(",", "."))
 
             ro, created = ReceitaOrcamentaria.objects.get_or_create(
                 codigo=row[1], orgao=org
             )
 
-            if row[2] == 'Despesa':
+            if row[2] == "Despesa":
                 valor = quantize(valor * Decimal(-1))
 
             ra = ReceitaArrecadada.objects.get_or_create(
-                receita=ro,
-                data=dt,
-                historico=row[1],
-                tipo=row[2],
-                valor=valor)
+                receita=ro, data=dt, historico=row[1], tipo=row[2], valor=valor
+            )
 
     def _update_receita_arrecadada(self):
-        if self.metadata['url_dict']['format'] != 'csv':
+        if self.metadata["url_dict"]["format"] != "csv":
             return None
         org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
 
@@ -2166,15 +2421,15 @@ class ScrapRecord(models.Model):
         # if self.codigo != '11130311' or org.codigo != '03':
         #    return
 
-        item_list = self.metadata['item_list']
+        item_list = self.metadata["item_list"]
         ro.historico = item_list[1]
-        ro.valor = Decimal(item_list[2].replace('.', '').replace(',', '.'))
+        ro.valor = Decimal(item_list[2].replace(".", "").replace(",", "."))
         ro.save()
 
         content = self.content
         if isinstance(content, memoryview):
             content = content.tobytes()
-        content = content.decode('utf-8-sig')
+        content = content.decode("utf-8-sig")
         file = StringIO(content)
         csv_data = csv.reader(file, delimiter=";")
 
@@ -2188,12 +2443,7 @@ class ScrapRecord(models.Model):
         rows = lista[idx_init:]
 
         rows = sorted(
-            rows, key=lambda x:
-            [
-                tuple(map(int, x[0].split('/')[::-1])),
-                x[1],
-                x[3]
-            ]
+            rows, key=lambda x: [tuple(map(int, x[0].split("/")[::-1])), x[1], x[3]]
         )
 
         rows_filtered = []
@@ -2202,7 +2452,7 @@ class ScrapRecord(models.Model):
             # rows_filtered.append(row)
             # continue
 
-            if not idx or 'RETENÇÃO' not in row[2]:
+            if not idx or "RETENÇÃO" not in row[2]:
                 rows_filtered.append(row)
                 continue
 
@@ -2219,9 +2469,9 @@ class ScrapRecord(models.Model):
 
         for row in rows:
             dt = datetime.strptime(row[0], "%d/%m/%Y").date()
-            #print(self.codigo, row)
+            # print(self.codigo, row)
 
-            valor = Decimal(row[3].replace('.', '').replace(',', '.'))
+            valor = Decimal(row[3].replace(".", "").replace(",", "."))
 
             # if row[2] == 'RETENÇÃO DE EMPENHO':
             #    ra = ReceitaArrecadada.objects.filter(
@@ -2246,14 +2496,14 @@ class ScrapRecord(models.Model):
         org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
         dp = DespesaPaga.objects.filter(codigo=self.codigo, orgao=org).first()
 
-        item_list = self.metadata['item_list']
+        item_list = self.metadata["item_list"]
         dt = datetime.strptime(item_list[1], "%d/%m/%Y").date()
-        valor = Decimal(item_list[-1].replace('.', '').replace(',', '.'))
+        valor = Decimal(item_list[-1].replace(".", "").replace(",", "."))
 
         if dp and dp.valor == valor and dp.data == dt and dp.natureza:
             return dp
 
-        if dp and self.metadata['url_dict']['format'] == 'csv':
+        if dp and self.metadata["url_dict"]["format"] == "csv":
             return dp
 
         values = {}
@@ -2261,39 +2511,35 @@ class ScrapRecord(models.Model):
         natureza = None
         fonte = None
 
-        if self.metadata['url_dict']['format'] == 'html':
+        if self.metadata["url_dict"]["format"] == "html":
             content = self.content
             if not isinstance(content, bytes):
                 content = content.tobytes()
-            content = content.decode('utf-8-sig')
-            content = self.clean_text(
-                self.clean_text(self.clean_text(content)))
-            tables = bs(content, 'html.parser').findAll('table')
+            content = content.decode("utf-8-sig")
+            content = self.clean_text(self.clean_text(self.clean_text(content)))
+            tables = bs(content, "html.parser").findAll("table")
             if not tables:
                 return None
-            for row in tables[0].findAll('tr'):
-                cols = row.findAll('td')
+            for row in tables[0].findAll("tr"):
+                cols = row.findAll("td")
                 values[cols[0].text] = cols[1].text
             unidade = UnidadeOrcamentaria.objects.filter(
-                orgao=org,
-                loa__ano=self.ano,
-                codigo=values['Unidade Financeira:'][:2]
+                orgao=org, loa__ano=self.ano, codigo=values["Unidade Financeira:"][:2]
             ).first()
 
             try:
-                nat = values['Elemento:']
+                nat = values["Elemento:"]
                 natureza = Natureza.objects.filter(
                     loa__ano=self.ano,
-                    codigo=f'{nat[0]}.{nat[1]}.{nat[2:4]}.{nat[4:6]}.00'
+                    codigo=f"{nat[0]}.{nat[1]}.{nat[2:4]}.{nat[4:6]}.00",
                 ).first()
             except:
                 natureza = None
 
             try:
-                fontestr = values['Fonte de Recursos:']
+                fontestr = values["Fonte de Recursos:"]
                 fonte, created = Fonte.objects.get_or_create(
-                    loa_id=self.ano,
-                    codigo=fontestr[0:3]
+                    loa_id=self.ano, codigo=fontestr[0:3]
                 )
                 if fonte.especificacao != fontestr[6:]:
                     fonte.especificacao = fontestr[6:]
@@ -2308,7 +2554,7 @@ class ScrapRecord(models.Model):
         dp.cpfcnpj = item_list[3]
         dp.nome = item_list[2]
         dp.tipo = item_list[4]
-        dp.historico = values.get('Historico:', None)
+        dp.historico = values.get("Historico:", None)
 
         dp.unidade = unidade
         dp.natureza = natureza
@@ -2326,7 +2572,7 @@ class NaturezaJuridica(models.Model):
     codigo = models.CharField(
         max_length=4,
         verbose_name=_("Código"),
-        validators=[RegexValidator(r'^\d{4}$', _('Código inválido'))],
+        validators=[RegexValidator(r"^\d{4}$", _("Código inválido"))],
     )
 
     descricao = models.CharField(
@@ -2335,19 +2581,20 @@ class NaturezaJuridica(models.Model):
     )
 
     class Meta:
-        verbose_name = _('Natureza Jurídica')
-        verbose_name_plural = _('Naturezas Jurídicas')
-        ordering = ['codigo']
+        verbose_name = _("Natureza Jurídica")
+        verbose_name_plural = _("Naturezas Jurídicas")
+        ordering = ["codigo"]
 
     def __str__(self):
-        return f'{self.codigo} - {self.descricao}'
+        return f"{self.codigo} - {self.descricao}"
+
 
 class TipoEntidade(models.Model):
 
     codigo = models.CharField(
         max_length=3,
         verbose_name=_("Código"),
-        validators=[RegexValidator(r'^\d{3}$', _('Código inválido'))],
+        validators=[RegexValidator(r"^\d{3}$", _("Código inválido"))],
     )
 
     descricao = models.CharField(
@@ -2363,33 +2610,33 @@ class TipoEntidade(models.Model):
     ESPORTE_CHOICE = 60
     OUTROS_CHOICE = 70
 
-    #tipo_geral é uma classificação mais ampla que agrupa vários tipos de entidade
+    # tipo_geral é uma classificação mais ampla que agrupa vários tipos de entidade
     # será um choice com valores fixos definidos no código sendo: saúde, educação, assistência social, segurança pública, cultura, esporte, outros. criando através de números
     tipo_geral = models.PositiveSmallIntegerField(
         choices=(
-            (SAUDE_CHOICE, _('Saúde')),
-            (EDUCACAO_CHOICE, _('Educação')),
-            (ASSISTENCIA_SOCIAL_CHOICE, _('Assistência Social')),
-            (SEGURANCA_PUBLICA_CHOICE, _('Segurança Pública')),
-            (CULTURA_CHOICE, _('Cultura')),
-            (ESPORTE_CHOICE, _('Esporte')),
-            (OUTROS_CHOICE, _('Outros')),
+            (SAUDE_CHOICE, _("Saúde")),
+            (EDUCACAO_CHOICE, _("Educação")),
+            (ASSISTENCIA_SOCIAL_CHOICE, _("Assistência Social")),
+            (SEGURANCA_PUBLICA_CHOICE, _("Segurança Pública")),
+            (CULTURA_CHOICE, _("Cultura")),
+            (ESPORTE_CHOICE, _("Esporte")),
+            (OUTROS_CHOICE, _("Outros")),
         ),
         default=OUTROS_CHOICE,
-        verbose_name=_('Tipo Geral'),
+        verbose_name=_("Tipo Geral"),
     )
 
     class Meta:
-        verbose_name = _('Tipo de Entidade')
-        verbose_name_plural = _('Tipos de Entidades')
-        ordering = ['codigo']
+        verbose_name = _("Tipo de Entidade")
+        verbose_name_plural = _("Tipos de Entidades")
+        ordering = ["codigo"]
 
     def __str__(self):
-        return f'{self.codigo} - {self.descricao}'
+        return f"{self.codigo} - {self.descricao}"
+
 
 class Entidade(models.Model):
-    """ Entidades públicas ou privadas que recebem recursos de emendas impositivas/modificativas.
-    """
+    """Entidades públicas ou privadas que recebem recursos de emendas impositivas/modificativas."""
 
     nome_fantasia = models.CharField(
         max_length=256,
@@ -2403,50 +2650,60 @@ class Entidade(models.Model):
 
     cpfcnpj = models.CharField(
         max_length=18,
-        blank=True, null=True, default=None,
+        blank=True,
+        null=True,
+        default=None,
         verbose_name=_("CNPJ"),
-        #validators=[CNPJValidator()],
+        # validators=[CNPJValidator()],
     )
 
     cnes = models.CharField(
         max_length=7,
-        blank=True, null=True, default=None,
+        blank=True,
+        null=True,
+        default=None,
         verbose_name=_("CNES"),
-        validators=[RegexValidator(r'^\d{7}$', _('CNES inválido'))],
+        validators=[RegexValidator(r"^\d{7}$", _("CNES inválido"))],
     )
 
     natureza_juridica = models.ForeignKey(
         NaturezaJuridica,
-        blank=True, null=True, default=None,
+        blank=True,
+        null=True,
+        default=None,
         verbose_name=_("Natureza Jurídica"),
         on_delete=SET_NULL,
     )
 
     tipo_entidade = models.ForeignKey(
         TipoEntidade,
-        blank=True, null=True, default=None,
+        blank=True,
+        null=True,
+        default=None,
         verbose_name=_("Tipo de Entidade"),
         on_delete=SET_NULL,
     )
 
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=dict,
+        encoder=DjangoJSONEncoder,
+    )
 
     ativo = models.BooleanField(
         default=False,
-        verbose_name=_('Ativo'),
+        verbose_name=_("Ativo"),
     )
 
     class Meta:
-        verbose_name = _('Entidade')
-        verbose_name_plural = _('Entidades')
-        ordering = ['nome_fantasia']
-        unique_together = (
-            ('cpfcnpj', 'cnes'),
-        )
+        verbose_name = _("Entidade")
+        verbose_name_plural = _("Entidades")
+        ordering = ["nome_fantasia"]
+        unique_together = (("cpfcnpj", "cnes"),)
 
     def __str__(self):
         nf = self.nome_fantasia
-        tipo = self.tipo_entidade.descricao if self.tipo_entidade else ''
+        tipo = self.tipo_entidade.descricao if self.tipo_entidade else ""
         return f'{nf}{" - CNES:" if self.cnes else (" - CNPJ:" if self.cpfcnpj else "")} {self.cnes or self.cpfcnpj or ""}'
