@@ -993,13 +993,17 @@ class OficioAjusteLoaForm(FileFieldCheckMixin, ModelForm):
 
 class RegistroAjusteLoaForm(ModelForm):
 
-    emendaloa = forms.ModelChoiceField(
+    emendaloa = forms.ModelMultipleChoiceField(
         queryset=EmendaLoa.objects.all(),
         label="Emendas da LOA relacionadas ao Parlamentar do Oficio de Ajuste",
         required=False,
-        widget=forms.Select(
+        widget=forms.SelectMultiple(
             attrs={
-                "class": "selectpicker",
+                "title": "Selecione as emendas relacionadas ao parlamentar do oficio de ajuste",
+                "class": "selectpicker w-100",
+                "data-actions-box": "true",
+                "data-select-all-text": "Selecionar Todos",
+                "data-deselect-all-text": "Desmarcar Todos",
                 "data-live-search": "true",
                 "data-header": "Emendas Cadastradas",
                 "data-dropup-auto": "false",
@@ -1034,7 +1038,7 @@ class RegistroAjusteLoaForm(ModelForm):
         for p in self.parlamentares:
             emendas = p.emendaloaparlamentar_set.filter(
                 emendaloa__loa=self.oficioajusteloa.loa
-            ).order_by("emendaloa__materia")
+            ).order_by("-emendaloa__tipo", "emendaloa__materia")
             self.emendas.update(map(lambda e: e.emendaloa, emendas))
 
         self.fields["emendaloa"].choices = [("", "---------")] + [

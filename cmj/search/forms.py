@@ -217,11 +217,11 @@ class MateriaSearchForm(SearchForm):
         label=_('Tipos de Matéria Legislativa'),
         widget=forms.SelectMultiple(attrs={
             'title': _('Filtrar por um ou mais tipos de matéria?'),
+            'data-header': 'Tipos de Matéria Legislativa',
             'class': 'selectpicker',
             'data-actions-box': 'true',
             'data-select-all-text': 'Selecionar Todos',
             'data-deselect-all-text': 'Desmarcar Todos',
-            'data-header': 'Tipos de Matéria Legislativa',
             'data-dropup-auto': 'false'
         })
     )

@@ -59,9 +59,31 @@
   }
   .dropdown-menu {
     z-index: $zindex-selectbox;
+    // customiza scrollbar
+    scrollbar-width: thin;
+    scrollbar-color: $color_border_input transparent;
+     &::-webkit-scrollbar {
+      width: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: $color_border_input;
+      border-radius: 4px;
+      border: 0px solid transparent;
+    }
     li {
       a.opt {
         padding-left: 1em;
+      }
+      span.text {
+        font-size: 0.9em;
+        white-space: normal;
+        word-wrap: break-word;
+      }
+      &:nth-child(odd) {
+        background-color: #f5f5f5;
       }
     }
   }
