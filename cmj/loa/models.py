@@ -99,7 +99,6 @@ class Loa(models.Model):
         max_digits=14,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=PERCENTAGE_VALIDATOR,
         verbose_name=_("Disp. Global da RCL (R$)"),
     )
 
@@ -107,7 +106,6 @@ class Loa(models.Model):
         max_digits=14,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=PERCENTAGE_VALIDATOR,
         verbose_name=_("Disp. Saúde da RCL (R$)"),
     )
 
@@ -115,7 +113,6 @@ class Loa(models.Model):
         max_digits=14,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=PERCENTAGE_VALIDATOR,
         verbose_name=_("Disp. Diversos da RCL (R$)"),
     )
 
@@ -360,7 +357,6 @@ class LoaParlamentar(models.Model):
         max_digits=14,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=PERCENTAGE_VALIDATOR,
         verbose_name=_("Disp. Global da RCL (R$)"),
     )
 
@@ -368,7 +364,6 @@ class LoaParlamentar(models.Model):
         max_digits=14,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=PERCENTAGE_VALIDATOR,
         verbose_name=_("Disp. Saúde da RCL (R$)"),
     )
 
@@ -376,7 +371,6 @@ class LoaParlamentar(models.Model):
         max_digits=14,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=PERCENTAGE_VALIDATOR,
         verbose_name=_("Disp. Diversos da RCL (R$)"),
     )
 
@@ -554,7 +548,9 @@ class EmendaLoa(CmjSearchMixin):
 
     @property
     def has_ajustes(self):
-        return RegistroAjusteLoaParlamentar.objects.filter(registro__emendaloa=self).exists()
+        return RegistroAjusteLoaParlamentar.objects.filter(
+            registro__emendaloa=self
+        ).exists()
 
     @property
     def valor_computado(self):

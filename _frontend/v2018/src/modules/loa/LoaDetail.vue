@@ -107,7 +107,7 @@
         <div class="col-12 mt-3" v-html="loa.yaml_obs && loa.yaml_obs.GRAFICO_DESPESAS_MATERIA ? loa.yaml_obs.GRAFICO_DESPESAS_MATERIA : ''"></div>
 
         <div class="col-12 mt-3" v-if="espelho">
-          <h2 class="legend">Espelho das Despesas Orçamentárias da LOA<br><small>(Valores com Emendas Impositivas Aplicadas)</small></h2>
+          <h2 class="legend">Espelho das Despesas Orçamentárias da LOA<br><small>(Valores com Emendas Impositivas aplicadas na fase de aprovação legislativa)</small></h2>
           <div class="d-flex justify-content-between">
             <label for="check_espec" class="d-block text-blue">
               <input type="checkbox" id="check_espec" v-model="check_espec" />

@@ -73,7 +73,7 @@ class M2MFilter(django_filters.ModelMultipleChoiceFilter):
     class M2MFieldFormField(ModelMultipleChoiceField):
         def clean(self, value):
             if value in EMPTY_VALUES:
-                return None
+                return super().clean(value)
             values = list(map(lambda x: x.replace(" ", "").split(","), value))
             values = [v for subvalues in values for v in subvalues]
             cleaned_values = tuple(super().clean(values))
