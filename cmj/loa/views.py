@@ -440,8 +440,224 @@ class LoaCrud(Crud):
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
 
-            if l.ano <= 2025:
-                return self.resumo_emendas_impositivas_ate_2025(*args, **kwargs)
+            loaparlamentares = l.loaparlamentar_set.order_by(
+                "-parlamentar__ativo", "parlamentar__nome_parlamentar"
+            )
+
+            resumo_emendas_impositivas = []
+
+            totais = {}
+
+            for lp in loaparlamentares:
+                print(f"Calculando resumo para parlamentar {lp}...")
+
+                resumo_parlamentar = {"loaparlamentar": lp}
+                for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
+                    resumo_parlamentar[k] = {"name": v}
+                    if k not in totais:
+                        totais[k] = dict(
+                            ja_destinado=Decimal("0.00"),
+                            impedimento_tecnico=Decimal("0.00"),
+                            sem_destinacao=Decimal("0.00"),
+                        )
+
+                    # Inicia com o valor disponível para destinação, que é o valor total menos o que já foi destinado
+                    if k == EmendaLoa.SAUDE:
+                        resumo_parlamentar[k]["sem_destinacao"] = lp.disp_saude
+                    elif k == EmendaLoa.DIVERSOS:
+                        resumo_parlamentar[k]["sem_destinacao"] = lp.disp_diversos
+
+                    resumo_parlamentar[k]["impedimento_tecnico"] = 0
+                    resumo_parlamentar[k]["ja_destinado"] = 0
+
+                    params = dict(
+                        parlamentar=lp.parlamentar,
+                        emendaloa__loa=self.object,
+                        emendaloa__tipo=k,
+                    )
+
+                    # 1 - Soma todas as destinações feitas para o parlamentar na LOA e tipo de emenda
+                    # incluindo as que estão em fase de impedimento técnico
+                    totdb_ja_destinado = EmendaLoaParlamentar.objects.filter(
+                        **params
+                    ).aggregate(Sum("valor"))
+
+                    # 2 - Soma o valor que está em fase de impedimento técnico para o parlamentar, LOA e tipo de emenda
+                    totdb_imp_tecnico = (
+                        EmendaLoaParlamentar.objects.filter(**params)
+                        .filter(
+                            emendaloa__fase__in=[
+                                choice[0] for choice in EmendaLoa.IMPEDIMENTOS_CHOICE
+                            ]
+                        )
+                        .aggregate(Sum("valor"))
+                    )
+
+                    # 3 - Soma os ajustes feitos para aquele parlamentar, LOA e tipo de emenda, que podem ser positivos ou negativos
+                    totdb_reg_reaj_com_emenda = (
+                        RegistroAjusteLoaParlamentar.objects.filter(
+                            parlamentar=lp.parlamentar,
+                            registro__emendaloa__tipo=k,
+                            registro__oficio_ajuste_loa__loa=l,
+                            registro__tipo=k,
+                            valor__gt=0,
+                        )
+                        .distinct()
+                        .aggregate(Sum("valor"))
+                    )
+
+                    totdb_reg_reaj_sem_emenda = (
+                        RegistroAjusteLoaParlamentar.objects.filter(
+                            parlamentar=lp.parlamentar,
+                            registro__emendaloa__isnull=True,
+                            registro__oficio_ajuste_loa__loa=l,
+                            registro__tipo=k,
+                            valor__gt=0,
+                        )
+                        .distinct()
+                        .aggregate(Sum("valor"))
+                    )
+
+                    totdb_ja_destinado = totdb_ja_destinado["valor__sum"] or Decimal(
+                        "0.00"
+                    )
+                    totdb_imp_tecnico = totdb_imp_tecnico["valor__sum"] or Decimal(
+                        "0.00"
+                    )
+                    totdb_reg_reaj_com_emenda = totdb_reg_reaj_com_emenda[
+                        "valor__sum"
+                    ] or Decimal("0.00")
+                    totdb_reg_reaj_sem_emenda = totdb_reg_reaj_sem_emenda[
+                        "valor__sum"
+                    ] or Decimal("0.00")
+
+                    tot_remanescente = (
+                        resumo_parlamentar[k]["sem_destinacao"] - totdb_ja_destinado
+                    )
+
+                    # GRANDE FASE 1: Tramitação até a aprovação legislativa
+                    resumo_parlamentar[k]["sem_destinacao"] = (
+                        resumo_parlamentar[k]["sem_destinacao"] - totdb_ja_destinado
+                    )
+                    resumo_parlamentar[k]["ja_destinado"] = totdb_ja_destinado
+
+                    # GRANDE FASE 2: Impedimentos Técnicos
+                    resumo_parlamentar[k]["impedimento_tecnico"] = totdb_imp_tecnico
+                    resumo_parlamentar[k]["ja_destinado"] = (
+                        resumo_parlamentar[k]["ja_destinado"]
+                        - resumo_parlamentar[k]["impedimento_tecnico"]
+                    )
+                    resumo_parlamentar[k]["sem_destinacao"] = (
+                        resumo_parlamentar[k]["sem_destinacao"]
+                        + resumo_parlamentar[k]["impedimento_tecnico"]
+                    )
+
+                    # GRANDE FASE 3: Ajustes pós-aprovação legislativa
+                    resumo_parlamentar[k]["ja_destinado"] = (
+                        resumo_parlamentar[k]["ja_destinado"]
+                        + totdb_reg_reaj_com_emenda
+                        + totdb_reg_reaj_sem_emenda
+                    )
+                    resumo_parlamentar[k]["sem_destinacao"] = (
+                        resumo_parlamentar[k]["sem_destinacao"]
+                        - totdb_reg_reaj_com_emenda
+                        - totdb_reg_reaj_sem_emenda
+                    )
+                    resumo_parlamentar[k]["impedimento_tecnico"] = (
+                        resumo_parlamentar[k]["impedimento_tecnico"]
+                        - totdb_reg_reaj_com_emenda
+                    )
+
+                    if abs(resumo_parlamentar[k]["impedimento_tecnico"]) == abs(
+                        tot_remanescente
+                    ) and (totdb_reg_reaj_com_emenda or totdb_reg_reaj_sem_emenda):
+                        resumo_parlamentar[k]["impedimento_tecnico"] = Decimal("0.00")
+
+                    # TOTALIZAÇÃO - Acumula os totais para exibição no header da tabela
+                    totais[k]["ja_destinado"] += resumo_parlamentar[k]["ja_destinado"]
+                    totais[k]["impedimento_tecnico"] += resumo_parlamentar[k][
+                        "impedimento_tecnico"
+                    ]
+                    totais[k]["sem_destinacao"] += resumo_parlamentar[k][
+                        "sem_destinacao"
+                    ]
+
+                resumo_emendas_impositivas.append(resumo_parlamentar)
+
+            resumo_emendas_impositivas.sort(
+                key=lambda x: (
+                    not x["loaparlamentar"].parlamentar.ativo,
+                    # -x[10]['ja_destinado'],
+                    x["loaparlamentar"].parlamentar.nome_parlamentar,
+                )
+            )
+
+            is_us = self.request.user.is_superuser
+
+            t10 = EmendaLoa.SAUDE
+            t99 = EmendaLoa.DIVERSOS
+            # dsjd display_saude_ja_destinado
+            dsjd = 1 if totais[t10]["ja_destinado"] or is_us else 0
+            dsit = 1 if totais[t10]["impedimento_tecnico"] or is_us else 0
+            dssd = 1 if totais[t10]["sem_destinacao"] or is_us else 0
+
+            # ddjd display_diversos_ja_destinado
+            ddjd = 1 if totais[t99]["ja_destinado"] or is_us else 0
+            ddit = 1 if totais[t99]["impedimento_tecnico"] or is_us else 0
+            ddsd = 1 if totais[t99]["sem_destinacao"] or is_us else 0
+
+            context = dict(
+                resumo_emendas_impositivas=resumo_emendas_impositivas,
+                columns=dict(
+                    saude=dict(
+                        num_columns=dsjd + dsit + dssd,
+                        ja_destinado="Valores<br>Já Destinados" if dsjd else "",
+                        impedimento_tecnico="Impedimentos<br>Técnicos" if dsit else "",
+                        sem_destinacao=(
+                            (
+                                "Sem Destinação"
+                                if not l.materia
+                                or l.materia
+                                and not l.materia.normajuridica()
+                                else "Remanescente"
+                            )
+                            if dssd
+                            else ""
+                        ),
+                    ),
+                    diversos=dict(
+                        num_columns=ddjd + ddit + ddsd,
+                        ja_destinado="Valores<br>Já Destinados" if ddjd else "",
+                        impedimento_tecnico="Impedimentos<br>Técnicos" if ddit else "",
+                        sem_destinacao=(
+                            (
+                                "Sem Destinação"
+                                if not l.materia
+                                or l.materia
+                                and not l.materia.normajuridica()
+                                else "Remanescente"
+                            )
+                            if ddsd
+                            else ""
+                        ),
+                    ),
+                ),
+            )
+
+            # TODO: para o detail da LOA, parlamentar ativo e inativo deve ser mostrado
+            # sobre o contexto da legislatura vigente no ano de execução da LOA,
+            # e não pelo status no cadastro Parlamentar.
+            template = loader.get_template("loa/loaparlamentar_set_list.html")
+            rendered = template.render(context, self.request)
+            return "Resumo Geral das Emendas Impositivas Parlamentares", rendered
+
+        def hook_resumo_emendas_impositivas_atual_funcionando_para_2026(
+            self, *args, **kwargs
+        ):
+            l = args[0]
+
+            # if l.ano <= 2025:
+            #    return self.resumo_emendas_impositivas_ate_2025(*args, **kwargs)
 
             loaparlamentares = l.loaparlamentar_set.order_by(
                 "-parlamentar__ativo", "parlamentar__nome_parlamentar"
@@ -452,7 +668,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                print(lp)
+                print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -503,6 +719,7 @@ class LoaCrud(Crud):
                             registro__emendaloa__tipo=k,
                             registro__oficio_ajuste_loa__loa=l,
                             registro__tipo=k,
+                            valor__gt=0,
                         )
                         .distinct()
                         .aggregate(Sum("valor"))
@@ -514,6 +731,7 @@ class LoaCrud(Crud):
                             registro__emendaloa__isnull=True,
                             registro__oficio_ajuste_loa__loa=l,
                             registro__tipo=k,
+                            valor__gt=0,
                         )
                         .distinct()
                         .aggregate(Sum("valor"))
@@ -630,6 +848,9 @@ class LoaCrud(Crud):
                 ),
             )
 
+            # TODO: para o detail da LOA, parlamentar ativo e inativo deve ser mostrado
+            # sobre o contexto da legislatura vigente no ano de execução da LOA,
+            # e não pelo status no cadastro Parlamentar.
             template = loader.get_template("loa/loaparlamentar_set_list.html")
             rendered = template.render(context, self.request)
             return "Resumo Geral das Emendas Impositivas Parlamentares", rendered
@@ -1973,8 +2194,8 @@ class EmendaLoaCrud(MasterDetailCrud):
             ajustes = []
             for ajuste in args[0].registroajusteloa_set.all():
                 url = reverse_lazy(
-                    "cmj.loa:oficioajusteloa_detail",
-                    kwargs={"pk": ajuste.oficio_ajuste_loa.id},
+                    "cmj.loa:registroajusteloa_detail",
+                    kwargs={"pk": ajuste.id},
                 )
 
                 descr = ""
@@ -2608,7 +2829,9 @@ class EmendaLoaCrud(MasterDetailCrud):
                 "bg-light",
             )
 
-        def hook_registrocontabil_set(self, emendaloa, verbose_name="", field_display=""):
+        def hook_registrocontabil_set(
+            self, emendaloa, verbose_name="", field_display=""
+        ):
             # renderizar com ul e li
             rcs = []
             for rc in emendaloa.registrocontabil_set.all():
@@ -2629,9 +2852,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     {"".join(rcs)}
                 </ul>
                 """,
-                f"form-control-static"
+                f"form-control-static",
             )
-
 
         def hook_parlamentares(self, emendaloa, verbose_name="", field_display=""):
             pls = []
