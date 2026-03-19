@@ -440,6 +440,9 @@ class LoaCrud(Crud):
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
 
+            if l.ano <= 2024:
+                return self.resumo_emendas_impositivas_ate_2024(*args, **kwargs)
+
             loaparlamentares = l.loaparlamentar_set.order_by(
                 "-parlamentar__ativo", "parlamentar__nome_parlamentar"
             )
@@ -855,7 +858,7 @@ class LoaCrud(Crud):
             rendered = template.render(context, self.request)
             return "Resumo Geral das Emendas Impositivas Parlamentares", rendered
 
-        def resumo_emendas_impositivas_ate_2025(self, *args, **kwargs):
+        def resumo_emendas_impositivas_ate_2024(self, *args, **kwargs):
             l = args[0]
             loaparlamentares = l.loaparlamentar_set.order_by(
                 "-parlamentar__ativo", "parlamentar__nome_parlamentar"
