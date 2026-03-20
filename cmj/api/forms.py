@@ -49,9 +49,9 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
 
         # Regra 1: inclui IMPEDIMENTO apenas se selecionado
         if has_impedimento:
-            q &= Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q &= Q(fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
 
-        non_impedimento = ~Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+        non_impedimento = ~Q(fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
 
         if has_em_tramitacao and has_finalizado:
             # ambos selecionados (sem impedimento): todas as não-impedimento
@@ -134,9 +134,9 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
 
         # Regra 1: inclui IMPEDIMENTO apenas se selecionado
         if has_impedimento:
-            q &= Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q &= Q(emendaloa__fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
 
-        non_impedimento = ~Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+        non_impedimento = ~Q(emendaloa__fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
 
         if has_em_tramitacao and has_finalizado:
             # ambos selecionados (sem impedimento): todas as não-impedimento

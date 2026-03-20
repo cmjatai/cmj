@@ -415,12 +415,12 @@ class EmendaLoa(CmjSearchMixin):
         (APROVACAO_LEGISLATIVA, _("Aprovada no Processo Legislativo")),
         (APROVACAO_LEGAL, _("Aprovada")),
         (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
-        (IMPEDIMENTO_SANADO, _("Emenda Revisada/Reajustada")),
+        (IMPEDIMENTO_SANADO, _("Emenda Redefinida/Sanada")),
     )
 
     IMPEDIMENTOS_CHOICE = (
         (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
-        (IMPEDIMENTO_SANADO, _("Emenda Revisada/Reajustada")),
+        (IMPEDIMENTO_SANADO, _("Emenda Redefinida/Sanada")),
     )
 
     metadata = JSONField(
@@ -551,19 +551,6 @@ class EmendaLoa(CmjSearchMixin):
         return RegistroAjusteLoaParlamentar.objects.filter(
             registro__emendaloa=self
         ).exists()
-
-    @property
-    def valor_computado(self):
-        soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
-            registro__emendaloa=self
-        ).aggregate(Sum("valor"))
-        valor = (
-            soma_ajustes["valor__sum"]
-            if soma_ajustes["valor__sum"] is not None
-            else self.valor
-        )
-        valor_str = formats.number_format(valor, force_grouping=True)
-        return valor_str
 
     def __str__(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
@@ -789,6 +776,31 @@ class EmendaLoa(CmjSearchMixin):
     @property
     def str_valor(self):
         return formats.number_format(self.valor, force_grouping=True)
+
+    @property
+    def str_valor_computado(self):
+        soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
+            registro__emendaloa=self
+        ).aggregate(Sum("valor"))
+        valor = (
+            soma_ajustes["valor__sum"]
+            if soma_ajustes["valor__sum"] is not None
+            else self.valor
+        )
+        valor_str = formats.number_format(valor, force_grouping=True)
+        return valor_str
+
+    @property
+    def valor_computado(self):
+        soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
+            registro__emendaloa=self
+        ).aggregate(Sum("valor"))
+        valor = (
+            soma_ajustes["valor__sum"]
+            if soma_ajustes["valor__sum"] is not None
+            else self.valor
+        )
+        return valor
 
     @property
     def valor_por_extenso(self):

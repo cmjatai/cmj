@@ -185,7 +185,7 @@ export default {
       const params = {
         emendaloa: registro.id,
         get_all: 'True',
-        expand: 'oficio_ajuste_loa;unidade'
+        expand: 'oficio_ajuste_loa;unidade;materia'
       }
       this.utils
         .fetch({
