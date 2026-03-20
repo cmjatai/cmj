@@ -415,12 +415,12 @@ class EmendaLoa(CmjSearchMixin):
         (APROVACAO_LEGISLATIVA, _("Aprovada no Processo Legislativo")),
         (APROVACAO_LEGAL, _("Aprovada")),
         (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
-        (IMPEDIMENTO_SANADO, _("Impedimento Técnico Sanado")),
+        (IMPEDIMENTO_SANADO, _("Emenda Revisada/Reajustada")),
     )
 
     IMPEDIMENTOS_CHOICE = (
         (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
-        (IMPEDIMENTO_SANADO, _("Impedimento Técnico Sanado")),
+        (IMPEDIMENTO_SANADO, _("Emenda Revisada/Reajustada")),
     )
 
     metadata = JSONField(
