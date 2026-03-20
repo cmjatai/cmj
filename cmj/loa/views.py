@@ -1316,7 +1316,7 @@ class EmendaLoaCrud(MasterDetailCrud):
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [
             ("finalidade"),
-            "valor_computado",
+            "str_valor_computado",
             ("tipo", "fase"),
             "parlamentares",
         ]
@@ -2048,10 +2048,10 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return context
 
-        def hook_header_valor_computado(self, *args, **kwargs):
+        def hook_header_str_valor_computado(self, *args, **kwargs):
             return "Valor Final da Emenda" if self.loa.publicado else "Valor da Emenda"
 
-        def hook_valor_computado(self, *args, **kwargs):
+        def hook_str_valor_computado(self, *args, **kwargs):
             return f'<div class="text-nowrap text-center">R$ {args[1]}</div>', args[2]
 
         def hook_tipo(self, *args, **kwargs):
@@ -2684,7 +2684,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             context["title"] = title.replace("\n", "")
             return context
 
-        def hook_valor_computado(self, el, verbose_name="", field_display=""):
+        def hook_str_valor_computado(self, el, verbose_name="", field_display=""):
             if not el.materia:
                 return "", ""
 

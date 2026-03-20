@@ -71,7 +71,7 @@
           <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)">
             <b-form-checkbox class="mr-3" value="EM_TRAMITACAO">Em Tramitação</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="FINALIZADO">Finalizado</b-form-checkbox>
-            <b-form-checkbox value="IMPEDIMENTO">Impedimento Técnico</b-form-checkbox>
+            <b-form-checkbox value="IMPEDIMENTO">Imp. Técnico / Redefinição</b-form-checkbox>
           </b-form-checkbox-group>
         </div>
       </div>
