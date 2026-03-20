@@ -44,10 +44,10 @@
                 >{{ p.__str__ }}<template v-if="idx < registro.parlamentares.length - 1">, </template></span>
               </div>
             </div>
-            <h2 :class="['font-weight-bold', 'mb-0', 'ml-2', 'text-nowrap', 'text-' + faseVariant(registro.fase)]" v-if="emendaParts[1]">{{ emendaParts[1].trim() }}</h2>
+            <h2 :class="['font-weight-bold', 'mb-0', 'ml-2', 'text-nowrap', 'text-' + faseVariant(registro.fase)]" v-if="emendaParts[1]">R$ {{ registro.str_valor_computado }}</h2>
           </div>
           <p class="mb-2" v-if="isEmenda(registro)">
-            {{ emendaParts[2] ? emendaParts[2].trim() : registro.__str__ }}
+            {{ registro.finalidade }}
           </p>
           <p class="mb-2" v-else>
             {{ registro.descricao }}
