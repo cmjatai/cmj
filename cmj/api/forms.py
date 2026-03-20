@@ -33,33 +33,38 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
     def filter_situacao(self, queryset, name, value):
         situacao = value.split(",")
 
-        has_impedimento = "IMPEDIMENTO" in situacao
-        has_em_tramitacao = "EM_TRAMITACAO" in situacao
-        has_finalizado = "FINALIZADO" in situacao
+        incluir_impedidas = "IMPEDIMENTO" in situacao
+        incluir_em_execucao = "EM_EXECUCAO" in situacao
+        incluir_finalizadas = "FINALIZADO" in situacao
 
         # tudo selecionado, retorna sem filtro
-        if has_impedimento and has_em_tramitacao and has_finalizado:
+        if incluir_impedidas and incluir_em_execucao and incluir_finalizadas:
             return queryset
 
         # Nada selecionado, retorna sem filtro
-        if not has_impedimento and not has_em_tramitacao and not has_finalizado:
+        if not incluir_impedidas and not incluir_em_execucao and not incluir_finalizadas:
             return queryset
 
         q = Q()
 
         # Regra 1: inclui IMPEDIMENTO apenas se selecionado
-        if has_impedimento:
-            q &= Q(fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
+        if incluir_impedidas:
+            q &= Q(
+                fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO]
+            )
 
-        non_impedimento = ~Q(fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
+        non_impedimento = ~Q(
+            fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.EMENDA_REDEFINIDA]
+        )
 
-        if has_em_tramitacao and has_finalizado:
+        if incluir_em_execucao and incluir_finalizadas and not incluir_impedidas:
             # ambos selecionados (sem impedimento): todas as não-impedimento
-            q &= non_impedimento
-        elif has_em_tramitacao:
+            if not incluir_impedidas:
+                q &= non_impedimento
+        elif incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
             # Regra 2: exclui emendas que possuem registro FINALIZADO
             q &= non_impedimento & ~Q(prestacaocontaregistro_set__situacao="FINALIZADO")
-        elif has_finalizado:
+        elif incluir_finalizadas and not incluir_em_execucao and not incluir_impedidas:
             # Regra 3: apenas emendas que possuem registro FINALIZADO
             q &= non_impedimento & Q(prestacaocontaregistro_set__situacao="FINALIZADO")
 
@@ -111,12 +116,12 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
     def filter_situacao(self, queryset, name, value):
         situacao = value.split(",")
 
-        has_em_tramitacao = "EM_TRAMITACAO" in situacao
-        has_finalizado = "FINALIZADO" in situacao
-        has_impedimento = "IMPEDIMENTO" in situacao
+        incluir_em_execucao = "EM_EXECUCAO" in situacao
+        incluir_finalizadas = "FINALIZADO" in situacao
+        incluir_impedidas = "IMPEDIMENTO" in situacao
 
         q = Q()
-        if has_impedimento:
+        if incluir_impedidas:
             q &= Q(registroajusteloaparlamentar_set__valor__lt=0)
             q &= Q(emendaloa__isnull=False)
         else:
@@ -125,26 +130,36 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
             )
 
         # tudo selecionado, retorna sem filtro
-        if has_em_tramitacao and has_finalizado and has_impedimento:
+        if incluir_em_execucao and incluir_finalizadas and incluir_impedidas:
             return queryset.filter(q).distinct()
 
         # Nada selecionado, retorna sem filtro
-        if not has_em_tramitacao and not has_finalizado and not has_impedimento:
+        if not incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
             return queryset.filter(q).distinct()
 
         # Regra 1: inclui IMPEDIMENTO apenas se selecionado
-        if has_impedimento:
-            q &= Q(emendaloa__fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
+        if incluir_impedidas:
+            q &= Q(
+                emendaloa__fase__in=[
+                    EmendaLoa.IMPEDIMENTO_TECNICO,
+                    EmendaLoa.EMENDA_REDEFINIDA,
+                ]
+            )
 
-        non_impedimento = ~Q(emendaloa__fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.IMPEDIMENTO_SANADO])
+        non_impedimento = ~Q(
+            emendaloa__fase__in=[
+                EmendaLoa.IMPEDIMENTO_TECNICO,
+                EmendaLoa.EMENDA_REDEFINIDA,
+            ]
+        )
 
-        if has_em_tramitacao and has_finalizado:
+        if incluir_em_execucao and incluir_finalizadas and not incluir_impedidas:
             # ambos selecionados (sem impedimento): todas as não-impedimento
             q &= non_impedimento
-        elif has_em_tramitacao:
+        elif incluir_em_execucao:
             # Regra 2: exclui emendas que possuem registro FINALIZADO
             q &= non_impedimento & ~Q(prestacaocontaregistro_set__situacao="FINALIZADO")
-        elif has_finalizado:
+        elif incluir_finalizadas:
             # Regra 3: apenas emendas que possuem registro FINALIZADO
             q &= non_impedimento & Q(prestacaocontaregistro_set__situacao="FINALIZADO")
 

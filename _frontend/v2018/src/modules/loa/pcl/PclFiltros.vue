@@ -25,6 +25,7 @@
           :value="value.parlamentares"
           :options="parlamentaresChoice"
           size="sm"
+          :disabled="disabled"
         ></b-form-select>
       </div>
       <div class="col-md-4 mb-2">
@@ -69,9 +70,9 @@
         <label class="pcl-filtros-label">Situação</label>
         <div class="pcl-filtros-check-group d-flex">
           <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)">
-            <b-form-checkbox class="mr-3" value="EM_TRAMITACAO">Em Tramitação</b-form-checkbox>
+            <b-form-checkbox class="mr-3" value="EM_EXECUCAO">Em Execução</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="FINALIZADO">Finalizado</b-form-checkbox>
-            <b-form-checkbox value="IMPEDIMENTO">Imp. Técnico / Redefinição</b-form-checkbox>
+            <b-form-checkbox value="IMPEDIMENTO">Impedidas em definitivo</b-form-checkbox>
           </b-form-checkbox-group>
         </div>
       </div>
@@ -104,6 +105,10 @@ export default {
     qsLoa: {
       type: String,
       default: ''
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   },
   methods: {
