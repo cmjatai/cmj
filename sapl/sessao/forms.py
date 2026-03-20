@@ -1152,7 +1152,17 @@ class OcorrenciaSessaoForm(forms.ModelForm):
 
     class Meta:
         model = OcorrenciaSessao
-        fields = ["numero_ordem", "expediente", "ordemdia", "titulo", "conteudo"]
+        fields = [
+            "numero_ordem",
+            "expediente",
+            "ordemdia",
+            "titulo",
+            "conteudo",
+            "local",
+        ]
+        widgets = {
+            "local": forms.RadioSelect(attrs={"class": "radio-inline"}),
+        }
 
     def __init__(self, *args, **kwargs):
 

@@ -131,3 +131,10 @@ window.copyInputClipboard = function () {
   copyText.setSelectionRange(0, 99999)
   document.execCommand('copy')
 }
+
+window.dbClickRemoveQuebraLinha = function (event) {
+  // remove quebras de linha textuais \r\n \n e substitui por espaço
+  let value = event.target.value
+  value = value.replace(/(\r\n|\n|\r)/gm, ' ')
+  event.target.value = value
+}

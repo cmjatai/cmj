@@ -1091,8 +1091,6 @@ class RegistroAjusteLoaForm(ModelForm):
         pv = zip(self.parlamentares, self.cleaned_data["parlamentares__valor"])
 
         for p, v in pv:
-            if not v:
-                continue
             r = RegistroAjusteLoaParlamentar()
             r.registro = i
             r.parlamentar = p
