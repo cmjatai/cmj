@@ -569,7 +569,15 @@ class LoaCrud(Crud):
                     resumo_parlamentar[k]["impedimento_tecnico"] = (
                         resumo_parlamentar[k]["impedimento_tecnico"]
                         - totdb_reg_reaj_com_emenda
+                        # + (tot_remanescente - totdb_reg_reaj_sem_emenda)
                     )
+
+                    if lp.parlamentar.ativo:
+                        resumo_parlamentar[k][
+                            "impedimento_tecnico"
+                        ] = resumo_parlamentar[k]["impedimento_tecnico"] + (
+                            tot_remanescente - totdb_reg_reaj_sem_emenda
+                        )
 
                     if abs(resumo_parlamentar[k]["impedimento_tecnico"]) == abs(
                         tot_remanescente
