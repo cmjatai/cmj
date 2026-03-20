@@ -142,6 +142,6 @@ RetiradaPauta:
 
 OcorrenciaSessao:
   {% trans 'Ocorrência da Sessão' %}:
-  - numero_ordem:2 titulo
+  - numero_ordem:2 titulo:3 local
   - expediente ordemdia
   - conteudo

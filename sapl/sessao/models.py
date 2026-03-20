@@ -1092,10 +1092,23 @@ class RegistroLeitura(models.Model):
 
 
 class OcorrenciaSessao(models.Model):  # OcorrenciaSessaoPlenaria
+
+    class LocalChoices(models.IntegerChoices):
+        PROJETO = 10, _("Vinculada a Projeto")
+        INICIO = 20, _("Início da Sessão")
+        MEIO = 30, _("Entre Grande Expediente e Ordem do Dia")
+        FIM = 99, _("Fim da Sessão")
+
     sessao_plenaria = models.ForeignKey(SessaoPlenaria, on_delete=models.PROTECT)
 
     numero_ordem = models.PositiveIntegerField(
         verbose_name=_("Ordem de ocorrência"), default=1
+    )
+
+    local = models.PositiveIntegerField(
+        verbose_name=_("Local da Ocorrência"),
+        choices=LocalChoices.choices,
+        default=LocalChoices.PROJETO,
     )
 
     expediente = models.ForeignKey(
@@ -1117,7 +1130,7 @@ class OcorrenciaSessao(models.Model):  # OcorrenciaSessaoPlenaria
     )
 
     titulo = models.CharField(
-        max_length=255, default="", verbose_name=_("Título da Ocorrência")
+        max_length=255, default="", blank=True, verbose_name=_("Título da Ocorrência")
     )
     conteudo = models.TextField(verbose_name=_("Descrição da Ocorrência"))
 

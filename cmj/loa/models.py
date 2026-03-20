@@ -557,8 +557,11 @@ class EmendaLoa(CmjSearchMixin):
         soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
             registro__emendaloa=self
         ).aggregate(Sum("valor"))
-        soma_ajustes = soma_ajustes["valor__sum"] or Decimal("0.00")
-        valor = soma_ajustes if soma_ajustes else self.valor
+        valor = (
+            soma_ajustes["valor__sum"]
+            if soma_ajustes["valor__sum"] is not None
+            else self.valor
+        )
         valor_str = formats.number_format(valor, force_grouping=True)
         return valor_str
 

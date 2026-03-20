@@ -28,6 +28,16 @@ $(function () {
       window.initTextRichEditor('#texto-rico')
     }
 
+    if (document.getElementsByTagName('textarea') !== null) {
+      let textareas = document.getElementsByTagName('textarea')
+      for (let i = 0; i < textareas.length; i++) {
+        textareas[i].addEventListener(
+          'dblclick',
+          window.dbClickRemoveQuebraLinha
+        )
+      }
+    }
+
     $('[data-toggle="popover"]').popover({
       trigger: 'focus'
     })

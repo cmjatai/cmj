@@ -440,7 +440,7 @@ class LoaCrud(Crud):
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
 
-            if l.ano <= 2024:
+            if l.ano <= 2023:
                 return self.resumo_emendas_impositivas_ate_2024(*args, **kwargs)
 
             loaparlamentares = l.loaparlamentar_set.order_by(
@@ -503,7 +503,7 @@ class LoaCrud(Crud):
                             registro__emendaloa__tipo=k,
                             registro__oficio_ajuste_loa__loa=l,
                             registro__tipo=k,
-                            valor__gt=0,
+                            valor__gte=Decimal("0.00"),
                         )
                         .distinct()
                         .aggregate(Sum("valor"))
@@ -515,7 +515,7 @@ class LoaCrud(Crud):
                             registro__emendaloa__isnull=True,
                             registro__oficio_ajuste_loa__loa=l,
                             registro__tipo=k,
-                            valor__gt=0,
+                            valor__gte=Decimal("0.00"),
                         )
                         .distinct()
                         .aggregate(Sum("valor"))
