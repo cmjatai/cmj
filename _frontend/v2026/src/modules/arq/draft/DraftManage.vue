@@ -37,7 +37,7 @@
             </span>
             <BFormInput
               v-model="draftselected.descricao"
-              @change="changeDescricao"
+              @change="val => changeDescricao(draftselected.descricao)"
             />
           </div>
           <div class="drop-area">
