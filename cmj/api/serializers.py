@@ -397,8 +397,16 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
 
 class EmendaLoaSerializer(CmjSerializerMixin):
 
+    str_valor_computado = serializers.CharField(
+        read_only=True,
+        source="valor_computado",
+    )
+
     class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
+
+    def get_str_valor_computado(self, obj):
+        return obj.valor_computado
 
     def validate_valor(self, obj, *args, **kwargs):
 

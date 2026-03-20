@@ -452,7 +452,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                print(f"Calculando resumo para parlamentar {lp}...")
+                # print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -572,6 +572,10 @@ class LoaCrud(Crud):
                         # + (tot_remanescente - totdb_reg_reaj_sem_emenda)
                     )
 
+                    # EXTRAS:
+                    # - Se o parlamentar estiver ativo, o valor que está em fase de impedimento técnico
+                    #   é acrescido do remanescente, para mostrar o impacto total no valor disponível
+                    #   para destinação.
                     if lp.parlamentar.ativo:
                         resumo_parlamentar[k][
                             "impedimento_tecnico"
