@@ -10,6 +10,7 @@
             :value="value.search"
             @change="val => updateFilter('search', val)"
             placeholder="Filtre por termos nos Ajustes e Emendas"
+            :disabled="disabled"
           ></b-form-input>
           <b-input-group-append>
             <b-button class="btn-secondary" @click="$refs.searchInput.$el.blur()" title="Pesquisar">
@@ -40,6 +41,7 @@
           ref="unidadeSelect"
           :required="false"
           :extra_query="`${qsLoa}&recebe_emenda_impositiva=True`"
+          :disabled="disabled"
         ></model-select>
       </div>
       <div class="col-12 text-muted small mb-0">
@@ -53,6 +55,7 @@
           <b-form-checkbox-group
             :checked="value.emendas_tipos"
             @change="val => updateFilter('emendas_tipos', val)"
+            :disabled="disabled"
           >
             <b-form-checkbox class="mr-3" value="10">Impositivas da Saúde</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="99">Impositivas de Áreas Diversas</b-form-checkbox>
@@ -63,13 +66,14 @@
             @change="val => updateFilter('ajustes', val)"
             value="True"
             unchecked-value="False"
+            :disabled="disabled"
           >Registros de Ajustes</b-form-checkbox>
         </div>
       </div>
       <div class="col-auto">
         <label class="pcl-filtros-label">Situação</label>
         <div class="pcl-filtros-check-group d-flex">
-          <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)">
+          <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)" :disabled="disabled">
             <b-form-checkbox class="mr-3" value="EM_EXECUCAO">Em Execução</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="FINALIZADO">Finalizado</b-form-checkbox>
             <b-form-checkbox value="IMPEDIMENTO">Impedidas em definitivo</b-form-checkbox>
@@ -77,7 +81,7 @@
         </div>
       </div>
       <div class="col-auto ml-auto">
-        <button class="btn btn-sm btn-outline-secondary" @click="$emit('reset')" title="Limpar todos os filtros">
+        <button class="btn btn-sm btn-outline-secondary" @click="$emit('reset')" title="Limpar todos os filtros" :disabled="disabled">
           <i class="fas fa-times mr-1"></i>Limpar
         </button>
       </div>

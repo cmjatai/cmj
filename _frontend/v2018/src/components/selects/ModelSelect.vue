@@ -1,6 +1,6 @@
 <template>
   <div>
-    <b-form-select v-model="selected" :options="options" :select-size="height"/>
+    <b-form-select v-model="selected" :options="options" :select-size="height" :disabled="disabled"/>
   </div>
 </template>
 
@@ -13,7 +13,7 @@ export default {
     'label',
     'limit',
     'ordering',
-    'choice', 'height', 'extra_query', 'required'
+    'choice', 'height', 'extra_query', 'required', 'disabled'
   ],
   data () {
     return {
