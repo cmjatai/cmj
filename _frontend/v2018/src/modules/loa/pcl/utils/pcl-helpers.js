@@ -24,15 +24,13 @@ const FASE_LABELS = {
 }
 
 const SITUACAO_VARIANTS = {
-  EM_TRAMITACAO: 'info',
-  FINALIZADO: 'success',
-  OUTRO: 'secondary'
+  EM_EXECUCAO: 'info',
+  FINALIZADO: 'success'
 }
 
 const SITUACAO_LABELS = {
-  EM_TRAMITACAO: 'Em Tramitação',
-  FINALIZADO: 'Finalizado',
-  OUTRO: 'Outros'
+  EM_EXECUCAO: 'Em Execução',
+  FINALIZADO: 'Finalizado'
 }
 
 export function faseVariant (fase) {

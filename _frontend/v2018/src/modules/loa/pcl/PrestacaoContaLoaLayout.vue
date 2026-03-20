@@ -3,6 +3,7 @@
     <div v-if="loa.ano">
       <pcl-filtros
         ref="filtros"
+        :disabled="!ready || fetching"
         v-model="filters_value"
         :parlamentares-choice="parlamentares_choice"
         :qs-loa="qs_loa"
@@ -251,7 +252,7 @@ export default {
       this.fetching = true
 
       const promises = {}
-      const emendasTipos = this.filters_value.emendas_tipos
+      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
       const fetchEmendas =
         (Array.isArray(emendasTipos) && emendasTipos.length > 0) ||
         (this.filters_value.ajustes === 'False' &&

@@ -402,7 +402,11 @@ class EmendaLoa(CmjSearchMixin):
     APROVACAO_LEGISLATIVA = 25
     APROVACAO_LEGAL = 30
     IMPEDIMENTO_TECNICO = 40
-    IMPEDIMENTO_SANADO = 50
+    EMENDA_REDEFINIDA = 50
+
+    EMENDA_EM_EXECUCAO = 60
+    EMENDA_FINALIZADA = 99
+
     FASE_CHOICE = (
         (PROPOSTA, _("Proposta Legislativa")),
         (PROPOSTA_LIBERADA, _("Proposta Liberada para Edição Contábil")),
@@ -415,12 +419,14 @@ class EmendaLoa(CmjSearchMixin):
         (APROVACAO_LEGISLATIVA, _("Aprovada no Processo Legislativo")),
         (APROVACAO_LEGAL, _("Aprovada")),
         (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
-        (IMPEDIMENTO_SANADO, _("Emenda Redefinida/Sanada")),
+        (EMENDA_REDEFINIDA, _("Emenda Redefinida/Sanada")),
+        (EMENDA_EM_EXECUCAO, _("Em Execução")),
+        (EMENDA_FINALIZADA, _("Finalizada")),
     )
 
     IMPEDIMENTOS_CHOICE = (
         (IMPEDIMENTO_TECNICO, _("Impedimento Técnico")),
-        (IMPEDIMENTO_SANADO, _("Emenda Redefinida/Sanada")),
+        (EMENDA_REDEFINIDA, _("Emenda Redefinida/Sanada")),
     )
 
     metadata = JSONField(
@@ -1475,9 +1481,8 @@ class ArquivoPrestacaoContaLoa(models.Model):
 class PrestacaoContaRegistro(models.Model):
 
     class SituacaoChoices(models.TextChoices):
-        EM_TRAMITACAO = "EM_TRAMITACAO", _("Em Tramitação")
+        EM_EXECUCAO = "EM_EXECUCAO", _("Em Execução")
         FINALIZADO = "FINALIZADO", _("Finalizado")
-        OUTRO = "OUTRO", _("Outros (Detalhar)")
 
     prestacao_conta = models.ForeignKey(
         PrestacaoContaLoa,
@@ -1513,7 +1518,7 @@ class PrestacaoContaRegistro(models.Model):
     situacao = models.CharField(
         choices=SituacaoChoices.choices,
         max_length=20,
-        default=SituacaoChoices.EM_TRAMITACAO,
+        default=SituacaoChoices.EM_EXECUCAO,
         verbose_name=_("Situação"),
     )
 
