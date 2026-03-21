@@ -5,9 +5,8 @@
   {# ===== CABEÇALHO ===== #}
   <div class="card-header bg-white border-bottom-0 pb-0">
     <div class="d-flex align-items-start flex-wrap">
-
       {# Fotos dos parlamentares #}
-      <div class="emenda-parlamentares-fotos d-flex flex-wrap mr-3 mb-2">
+      <div class="emenda-parlamentares-fotos d-flex flex-wrap mr-3 mb-1">
         {% for parlamentar in emenda.parlamentares.all %}
           {% if parlamentar.fotografia %}
             <a class="emenda-avatar mr-1 mb-1"
@@ -21,15 +20,16 @@
 
       {# Título e badges #}
       <div class="flex-grow-1">
-        <h6 class="mb-1">
-          <a href="{% url 'cmj.loa:emendaloa_detail' emenda.id %}" class="text-dark">
+        <h4 class="mb-1 font-weight-bold">
+          <a href="{% url 'cmj.loa:emendaloa_detail' emenda.id %}">
             {% if emenda.materia %}
               {{emenda.materia.tipo.sigla}} {{emenda.materia.numero|stringformat:"03d"}}/{{emenda.materia.ano}} - {{emenda.materia.tipo}}
             {% else %}
               {{emenda.get_tipo_display}}
             {% endif %}
+            <i class="fas fa-external-link-alt fa-sm ml-1 text-muted"></i>
           </a>
-        </h6>
+        </h4>
         <div class="mb-2">
           <span class="badge badge-{% if emenda.tipo == 10 %}info{% elif emenda.tipo == 99 %}primary{% else %}secondary{% endif %} mr-1">
             {{emenda.get_tipo_display}}
@@ -41,18 +41,29 @@
       </div>
 
       {# Valor #}
-      <div class="text-right ml-auto">
-        <span class="emenda-valor font-weight-bold text-success">
-          R$ {{emenda.str_valor}}
-        </span>
-        {% if emenda.has_ajustes %}
+      <div class="d-flex emenda-valor-group text-center ml-auto hover p-2 rounded">
+        <div class="{% if emenda.has_ajustes %}zoom08{% endif %}">
+          <span class="emenda-valor font-weight-bold text-primary">
+            R$ {{emenda.str_valor}}
+          </span>
           <br>
-          <small class="text-muted">Computado: R$ {{emenda.str_valor_computado}}</small>
-        {% endif %}
+          <small class="text-muted">Valor Original da Emenda</small>
+        </div>
+        <div class="valor-computado">
+          {% if emenda.has_ajustes %}
+            <span class="emenda-valor font-weight-bold text-success">
+              R$ {{emenda.str_valor_computado}}
+            </span>
+            <br>
+            <small class="text-muted">Valor Final da Emenda após Ajustes</small>
+            <br>
+          {% endif %}
+        </div>
       </div>
 
     </div>
   </div>
+  <hr class="my-0">
 
   {# ===== DADOS PRINCIPAIS ===== #}
   <div class="card-body pt-2 pb-2">
@@ -71,44 +82,56 @@
         {% endif %}
       </div>
       <div class="col-md-6">
-        <small class="d-block text-muted"><strong>LOA:</strong> {{emenda.loa}}</small>
         {% if emenda.materia %}
-          <small class="d-block text-muted"><strong>Matéria:</strong> {{emenda.materia}}</small>
-        {% endif %}
-        {% if emenda.proposicao %}
-          <small class="d-block text-muted"><strong>Proposição:</strong> {{emenda.proposicao}}</small>
+          {% if emenda.loa and emenda.loa.materia and emenda.loa.materia.normajuridica %}
+            <small class="d-block text-muted"><strong>LOA:</strong>
+              <a href="{% url 'sapl.norma:normajuridica_detail' emenda.loa.materia.normajuridica.id %}">
+                  {{emenda.loa}}
+              </a>
+            </small>
+          {% endif %}
+          <small class="d-block text-muted"><strong>Matéria Legislativa:</strong>
+            <a href="{% url 'sapl.materia:materialegislativa_detail' emenda.materia.id %}">
+               {{emenda.materia.epigrafe}}
+            </a>
+          </small>
         {% endif %}
       </div>
     </div>
     {% if emenda.finalidade %}
-      <div class="mt-2 p-2 bg-light rounded">
-        <small><strong>Finalidade:</strong> {{emenda.finalidade_format}}</small>
+      <div class="mt-2 p-2 bg-light rounded border">
+        <small class="text-muted"><strong>Finalidade:</strong> {{emenda.ementa_format}}</small>
+        {% if emenda.registroajusteloa_set.exists %}
+          <br><small class="badge badge-warning text-wrap"><strong>Atenção:</strong> Esta emenda possui ajustes técnicos cadastrados. Verifique a aba "Ajustes Técnicos" para mais detalhes.</small>
+        {% endif %}
       </div>
     {% endif %}
   </div>
 
   {# ===== ABAS ===== #}
-  <div class="bg-white p-0">
+  <div class="bg-white p-0 mt-2">
     <ul class="nav nav-tabs nav-fill emenda-tabs" role="tablist">
 
-      <li class="nav-item">
-        <a class="nav-link active" data-toggle="tab" href="#tab-contabil-{{emenda.id}}" role="tab">
-          <small>Registros Contábeis</small>
-        </a>
-      </li>
-
-      {% if emenda.registroajusteloa_set.count %}
+      {% if emenda.prestacaocontaregistro_set.count %}
         <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#tab-ajustes-{{emenda.id}}" role="tab">
-            <small>Ajustes Técnicos</small>
+          <a class="nav-link {% if emenda.prestacaocontaregistro_set.count %}active{% endif %}" data-toggle="tab" href="#tab-prestacao-{{emenda.id}}" role="tab">
+            Prestação de Contas
           </a>
         </li>
       {% endif %}
 
-      {% if emenda.prestacaocontaregistro_set.count %}
+      {% if emenda.registroajusteloa_set.count %}
         <li class="nav-item">
-          <a class="nav-link" data-toggle="tab" href="#tab-prestacao-{{emenda.id}}" role="tab">
-            <small>Prestação de Contas</small>
+          <a class="nav-link {% if emenda.registroajusteloa_set.count and not emenda.prestacaocontaregistro_set.count %}active{% endif %}" data-toggle="tab" href="#tab-ajustes-{{emenda.id}}" role="tab">
+            Ajustes Técnicos
+          </a>
+        </li>
+      {% endif %}
+
+      {% if emenda.registrocontabil_set.count %}
+        <li class="nav-item">
+          <a class="nav-link {% if emenda.registrocontabil_set.count and not emenda.prestacaocontaregistro_set.count and not emenda.registroajusteloa_set.count %}active{% endif %}" data-toggle="tab" href="#tab-contabil-{{emenda.id}}" role="tab">
+            Registros Contábeis
           </a>
         </li>
       {% endif %}
@@ -116,31 +139,32 @@
       {% if emenda.materia %}
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-tramitacoes-{{emenda.id}}" role="tab">
-            <small>Tramitações</small>
+            Tramitações
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-docs-{{emenda.id}}" role="tab">
-            <small>Documentos Acessórios</small>
+            Documentos Acessórios
           </a>
         </li>
       {% endif %}
 
     </ul>
 
-    <div class="tab-content p-3">
-
+    <div class="tab-content p-0">
 
       {# ---- ABA PRESTAÇÃO DE CONTAS ---- #}
       {% if emenda.prestacaocontaregistro_set.count %}
         <div class="tab-pane fade show active" id="tab-prestacao-{{emenda.id}}" role="tabpanel">
           {% for pc in emenda.prestacaocontaregistro_set.all %}
-            <div class="py-2 {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="d-flex justify-content-between align-items-center">
+            <div class="hover {% if not forloop.last %}border-bottom{% endif %}">
+              <div class="d-flex justify-content-between align-items-center p-3">
                 <div>
+                  <a href="{% url 'cmj.loa:prestacaocontaregistro_detail' pc.id %}" target="_blank" rel="noopener">
                   <small class="font-weight-bold">{{pc.prestacao_conta.epigrafe}}</small>
+                  </a>
                   {% if pc.detalhamento %}
-                    <br><small class="text-muted">{{pc.detalhamento|truncatewords:25}}</small>
+                    <br><small class="text-muted">{{pc.detalhamento}}</small>
                   {% endif %}
                 </div>
                 <span class="badge badge-{% if pc.situacao == 'FINALIZADO' %}success{% else %}warning{% endif %}">
@@ -152,51 +176,22 @@
         </div>
       {% endif %}
 
-      {# ---- ABA REGISTROS CONTÁBEIS ---- #}
-      <div class="tab-pane fade {{ 'show active' if not emenda.prestacaocontaregistro_set.count else '' }}" id="tab-contabil-{{emenda.id}}" role="tabpanel">
-        {% with deducoes=emenda.registrocontabil_set.all %}
-          {% if deducoes %}
-            <div class="table-responsive">
-              <table class="table table-sm table-borderless mb-0">
-                <thead>
-                  <tr class="border-bottom">
-                    <th><small>Despesa</small></th>
-                    <th class="text-right"><small>Valor (R$)</small></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for rc in deducoes %}
-                    <tr>
-                      <td><small>{{rc.despesa}}</small></td>
-                      <td class="text-right text-nowrap">
-                        <small class="{% if rc.valor < 0 %}text-danger{% else %}text-success{% endif %}">
-                          {{rc.str_valor}}
-                        </small>
-                      </td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            </div>
-          {% else %}
-            <p class="text-muted mb-0"><small>Nenhum registro contábil cadastrado.</small></p>
-          {% endif %}
-        {% endwith %}
-      </div>
-
       {# ---- ABA AJUSTES TÉCNICOS ---- #}
       {% if emenda.registroajusteloa_set.count %}
-        <div class="tab-pane fade {{ 'show active' if not emenda.prestacaocontaregistro_set.count and not emenda.registrocontabil_set.count else '' }}" id="tab-ajustes-{{emenda.id}}" role="tabpanel">
+        <div class="tab-pane fade {% if not emenda.prestacaocontaregistro_set.count %}show active{% endif %}" id="tab-ajustes-{{emenda.id}}" role="tabpanel">
           {% for ajuste in emenda.registroajusteloa_set.all %}
-            <div class="py-2 {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="d-flex justify-content-between align-items-start">
+            <div class="hover {% if not forloop.last %}border-bottom{% endif %}">
+              <div class="d-flex justify-content-between align-items-start p-3">
                 <div>
+                  <a href="{% url 'cmj.loa:registroajusteloa_detail' ajuste.id %}" target="_blank" rel="noopener">
                   <small class="font-weight-bold">{{ajuste.oficio_ajuste_loa.epigrafe}}</small>
+                  </a>
                   <br>
-                  <small class="text-muted">{{ajuste.descricao|truncatewords:30}}</small>
                   {% if ajuste.unidade %}
-                    <br><small class="text-muted"><strong>Unidade:</strong> {{ajuste.unidade}}</small>
+                    <small class="text-muted"><strong>Unidade:</strong> {{ajuste.unidade}}</small>
+                    <br>
                   {% endif %}
+                  <small class="text-muted">{{ajuste.descricao}}</small>
                 </div>
                 <span class="badge badge-light font-weight-bold ml-2">R$ {{ajuste.str_valor}}</span>
               </div>
@@ -205,12 +200,27 @@
         </div>
       {% endif %}
 
+      {# ---- ABA REGISTROS CONTÁBEIS ---- #}
+      {% if emenda.registrocontabil_set.exists %}
+        <div class="tab-pane fade p-3 {% if not emenda.prestacaocontaregistro_set.count and not emenda.registroajusteloa_set.count %}show active{% endif %}" id="tab-contabil-{{emenda.id}}" role="tabpanel">
+          {% if emenda.registrocontabil_set.exists %}
+            <ul class="">
+              {% for rc in emenda.registrocontabil_set.all %}
+                <li class="courier small">{{rc}}</li>
+              {% endfor %}
+            </ul>
+            {% else %}
+              <p class="text-muted mb-0"><small>Nenhum registro contábil cadastrado.</small></p>
+          {% endif %}
+        </div>
+      {% endif %}
+
       {# ---- ABA TRAMITAÇÕES (da matéria) ---- #}
       {% if emenda.materia %}
-        <div class="tab-pane fade {{ 'show active' if not emenda.prestacaocontaregistro_set.count and not emenda.registrocontabil_set.count and not emenda.registroajusteloa_set.count else '' }}" id="tab-tramitacoes-{{emenda.id}}" role="tabpanel">
+        <div class="tab-pane fade" id="tab-tramitacoes-{{emenda.id}}" role="tabpanel">
           {% for tram in emenda.materia.tramitacao_set.all %}
-            <div class="py-2 {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="d-flex justify-content-between align-items-start flex-wrap">
+            <div class="p-3 hover {% if not forloop.last %}border-bottom{% endif %}">
+              <div class="d-flex justify-content-between align-items-start flex-wrap ">
                 <div class="mr-2">
                   <small class="font-weight-bold">{{tram.data_tramitacao|date:"d/m/Y"}}</small>
                   {% if tram.turno %}
@@ -248,10 +258,10 @@
         </div>
 
         {# ---- ABA DOCUMENTOS ACESSÓRIOS (da matéria) ---- #}
-        <div class="tab-pane fade {{ 'show active' if not emenda.prestacaocontaregistro_set.count and not emenda.registrocontabil_set.count and not emenda.registroajusteloa_set.count and not emenda.materia.documentoacessorio_set.count else '' }}" id="tab-docs-{{emenda.id}}" role="tabpanel">
+        <div class="tab-pane fade" id="tab-docs-{{emenda.id}}" role="tabpanel">
           {% for doc in emenda.materia.documentoacessorio_set.all %}
-            <div class="py-2 {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="d-flex justify-content-between align-items-start">
+            <div class="hover {% if not forloop.last %}border-bottom{% endif %}">
+              <div class="d-flex justify-content-between align-items-start p-3">
                 <div>
                   <small class="font-weight-bold">{{doc.nome}}</small>
                   <br>
