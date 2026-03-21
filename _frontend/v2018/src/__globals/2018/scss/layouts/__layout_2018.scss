@@ -77,8 +77,20 @@
   animation: keyframe_rotate 7s ease-in-out infinite;
 }
 
+.zoom08 {
+  zoom: 0.8;
+}
 .zoom-2 {
   zoom: 2;
+}
+
+.courier {
+  font-family: 'Courier New', Courier, monospace;
+}
+.hover {
+  &:hover {
+    background: darken($color_main_bg, 1%) $url_bg_png;
+  }
 }
 
 .container-box {
@@ -138,6 +150,15 @@
   margin: 0;
   border: 0;
   padding: 0;
+}
+.divider-vertical {
+  display: inline-block;
+  width: 1px;
+  height: auto;
+  margin: 0 10px;
+  border: 0;
+  padding: 0;
+  background-color: lighten($color-primary, 50%);
 }
 
 .text-ementa {

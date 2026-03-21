@@ -72,37 +72,11 @@
     .btn-outline-primary {
       text-wrap: nowrap;
     }
-    table {
-      tr {
-        td:nth-child(1) {
-          width: 50%;
-        }
-        td:last-child {
-          padding: 0;
-        }
-        td:nth-child(3) {
-          text-align: center;
-          font-size: 80%;
-        }
-        td:nth-child(4) {
-          width: 20%;
-          font-size: 85%;
-        }
-      }
-      table {
-        border: 0;
-        td {
-          border: 0;
-          padding: 1px 5px !important;
-        }
-      }
-    }
     form {
       $mp: 0.5em;
       background-color: white;
       margin: 0;
       padding: $mp;
-      border-radius: 5px;
 
       .custom-control-input, input[name=salvar] {
         display: none;
@@ -154,6 +128,13 @@
           flex-wrap: wrap;
         }
       }
+      .text-muted {
+        display: block;
+        font-size: 70%;
+        text-align: center;
+        margin-top: 0.5rem;
+        font-style: italic;
+      }
     }
     .container-avatar {
       align-items: center;
@@ -202,18 +183,58 @@
         // opacity: 0 !important;
       }
     }
+    .emenda-card {
+      transition: box-shadow .2s;
+      .card-header {
+        padding: 1rem;
+      }
+      &:hover {
+        box-shadow: 0 .25rem .75rem rgba(0,0,0,.12) !important;
+      }
+      .emenda-tabs {
+        padding: 0 0.5rem;
+      }
+      .emenda-avatar {
+        display: inline-block;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid #dee2e6;
+        transition: border-color .2s;
+      }
+      .emenda-avatar:hover {
+        border-color: #007bff;
+      }
+      .emenda-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .emenda-avatar-sm {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 1px solid #dee2e6;
+      }
+      .emenda-valor-group {
+        display: flex;
+        align-items: center;
+        gap: 3rem;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+      }
+      .emenda-valor {
+        font-size: 1.3rem;
+        white-space: nowrap;
+      }
+    }
     .btn-close {
       position: absolute;
       top: -5px;
       right: 0;
       color: green;
-    }
-    .text-muted {
-      display: block;
-      font-size: 70%;
-      text-align: center;
-      margin-top: 0.5rem;
-      font-style: italic;
     }
   }
   &.emendaloa-update, &.emendaloa-create {

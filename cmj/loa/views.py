@@ -1395,7 +1395,6 @@ class EmendaLoaCrud(MasterDetailCrud):
 
     class ListView(FilterView, MasterDetailCrud.ListView):
         filterset_class = EmendaLoaFilterSet
-        paginate_by = 10
 
         @property
         def extras_url(self):
