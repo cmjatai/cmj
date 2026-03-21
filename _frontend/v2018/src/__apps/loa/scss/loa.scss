@@ -135,16 +135,23 @@
         margin-top: 0.7rem;
         border-top: 1px solid #ddd;
         & > div {
-          // display: flex;
-          gap: 1rem;
           padding: 0px 0px 3px;
           font-size: 75%;
+          .custom-control {
+            label {
+              padding-top: 0.25rem;
+            }
+          }
         }
       }
       #div_id_tipo {
-        .custom-control {
-          display: inline-flex;
-          padding-right: 0.5em;
+        & > div {
+          gap: 1.5rem;
+          line-height: 1rem;
+          display: flex;
+          width: 100%;
+          justify-content: center;
+          flex-wrap: wrap;
         }
       }
     }

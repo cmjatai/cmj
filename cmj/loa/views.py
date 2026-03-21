@@ -452,7 +452,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                # print(f"Calculando resumo para parlamentar {lp}...")
+                #print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -2038,7 +2038,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             qs = super().get_queryset()
             if self.request.user.is_anonymous:
                 qs = qs.filter(loa__publicado=True)
-            return qs.order_by("fase", "-tipo", "materia__numero", "-id")
+            return qs.order_by("-tipo", "fase", "materia__numero", "-id")
 
         def get_context_data(self, **kwargs):
             context = MasterDetailCrud.ListView.get_context_data(self, **kwargs)
@@ -2691,7 +2691,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             return (
                 "Valor Final da Emenda (R$)",
                 field_display,
-                "form-control-static text-blue text-nowrap text-center font-weight-bold",
+                "form-control-static text-blue text-nowrap text-center font-weight-bold zoom-2",
             )
 
         def hook_tipo(self, el, verbose_name="", field_display=""):

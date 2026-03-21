@@ -58,7 +58,7 @@ EmendaLoaDetail:
       - indicacao
       col-md-4:
       - valor
-      - valor_computado
+      - str_valor_computado
       - parlamentares
       - owner
       col-md-12:
