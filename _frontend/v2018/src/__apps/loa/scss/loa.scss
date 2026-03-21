@@ -72,6 +72,22 @@
     .btn-outline-primary {
       text-wrap: nowrap;
     }
+    .emendaloa-item {
+      .btn-expand {
+        position: absolute;
+        top: 0;
+        right: 0;
+        color: #114d81;
+        opacity: 0.7;
+        transition: opacity .2s;
+        z-index: 1;
+      }
+      &:fullscreen {
+        background-color: #fff;
+        overflow: auto;
+        padding: 1rem;
+      }
+    }
     form {
       $mp: 0.5em;
       background-color: white;

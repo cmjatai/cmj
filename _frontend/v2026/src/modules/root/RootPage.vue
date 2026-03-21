@@ -103,7 +103,7 @@ document.addEventListener('fullscreenchange', () => {
 const clickFullscreen = () => {
   fullscreen.value = !fullscreen.value
   if (fullscreen.value) {
-     if (document.documentElement.requestFullscreen) {
+    if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen()
     } else if (document.documentElement.webkitRequestFullscreen) { /* Safari */
       document.documentElement.webkitRequestFullscreen()
