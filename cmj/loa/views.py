@@ -452,7 +452,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                #print(f"Calculando resumo para parlamentar {lp}...")
+                # print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -1314,12 +1314,13 @@ class EmendaLoaCrud(MasterDetailCrud):
     frontend = EmendaLoa._meta.app_label
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
-        list_field_names = [
+        list_field_names = [("id",)]
+        """list_field_names = [
             ("finalidade"),
             "str_valor_computado",
             ("tipo", "fase"),
             "parlamentares",
-        ]
+        ]"""
 
         @property
         def ordered_list(self):

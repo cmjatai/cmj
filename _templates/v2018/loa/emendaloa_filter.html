@@ -1,5 +1,5 @@
 {% extends "crud/list.html" %}
-{% load i18n %}
+{% load i18n cache %}
 {% load crispy_forms_tags cropping common_tags %}
 
 {% block title %}
@@ -39,8 +39,13 @@
   <div class="container">
     <div class="row">
       {% for emenda in object_list %}
-        <div class="col-12 pl-0 pr-0">
-          {% include "loa/emendaloa_filter_cache.html" %}
+        <div class="col-12 pl-0 pr-0 emendaloa-item">
+          <button class="btn btn-link btn-expand">
+            <i class="fas fa-expand"></i>
+          </button>
+          {% cache 604800 l.el.l emenda.id %}
+            {% include "loa/emendaloa_filter_cache.html" %}
+          {% endcache %}
         </div>
         {% comment %}
         {% cache 604800 l.el emenda.id %}
@@ -55,16 +60,43 @@
 
 {% block extra_js %}
 <script type="text/javascript">
-    $(document).ready(function() {
-        $('.btn-register-emendas-liberadas').on('click', function(e) {
-            e.preventDefault();
-            var url = $(this).attr('href');
-            if (confirm('Confirma a criação automatizada de proposições para suas emendas em fase "Liberado pela Contabilidade e/ou Aguardando Protocolo"? Você poderá acompanhar o andamento no módulo de proposições.')) {
-                window.location.href = url;
-            } else {
-                return false;
-            }
-        });
+  $(document).ready(function() {
+    $('.btn-register-emendas-liberadas').on('click', function(e) {
+        e.preventDefault();
+        var url = $(this).attr('href');
+        if (confirm('Confirma a criação automatizada de proposições para suas emendas em fase "Liberado pela Contabilidade e/ou Aguardando Protocolo"? Você poderá acompanhar o andamento no módulo de proposições.')) {
+            window.location.href = url;
+        } else {
+            return false;
+        }
     });
+
+    $('.btn-expand').on('click', function(e) {
+        e.preventDefault();
+        var $item = $(this).closest('.emendaloa-item');
+        var elem = $item[0];
+
+        if (!document.fullscreenElement) {
+            elem.requestFullscreen().then(function() {
+                $item.addClass('expanded');
+                $(e.currentTarget).find('i').removeClass('fa-expand').addClass('fa-compress');
+            });
+        } else {
+            document.exitFullscreen().then(function() {
+                $item.removeClass('expanded');
+                $(e.currentTarget).find('i').removeClass('fa-compress').addClass('fa-expand');
+            });
+        }
+    });
+
+    $(document).on('fullscreenchange', function() {
+        if (!document.fullscreenElement) {
+            var $expanded = $('.emendaloa-item.expanded');
+            $expanded.removeClass('expanded');
+            $expanded.find('.btn-expand i').removeClass('fa-compress').addClass('fa-expand');
+        }
+    });
+  });
+
 </script>
 {% endblock %}
