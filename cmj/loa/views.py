@@ -2192,6 +2192,13 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return "".join(render), url
 
+        def hook_acoes(self, *args, **kwargs):
+            emenda = args[0]
+            acoes = set()
+            for rc in emenda.registrocontabil_set.filter(valor__gt=Decimal("0.00")):
+                acoes.add(str(rc.despesa.acao))
+            return "<br>".join(acoes), args[2]
+
         def hook_parlamentares(self, *args, **kwargs):
             pls = []
 

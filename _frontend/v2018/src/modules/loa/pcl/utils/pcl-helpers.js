@@ -20,7 +20,9 @@ const FASE_LABELS = {
   25: 'Aprov. Legislativa',
   30: 'Aprovada',
   40: 'Impedimento',
-  50: 'Emenda Redefinida/Sanada'
+  50: 'Emenda Redefinida/Sanada',
+  60: 'Em Execução',
+  99: 'Finalizada'
 }
 
 const SITUACAO_VARIANTS = {
