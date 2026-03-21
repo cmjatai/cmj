@@ -1664,11 +1664,19 @@ class EmendaLoaCrud(MasterDetailCrud):
             def render_col_emenda(item):
 
                 materia = ""
-                if item.materia:
+                if not item.materia:
                     materia = f"""
                             <span class="materia">
-                                <a href="{reverse('sapl.materia:materialegislativa_detail',kwargs={'pk': item.materia.id})}">
+                                <a href="{reverse('cmj.loa:emendaloa_detail',kwargs={'pk': item.id})}">
                                 {item.materia.epigrafe_short}
+                                </a>
+                            </span>
+                    """
+                else:
+                    materia = f"""
+                            <span class="materia">
+                                <a href="{reverse('cmj.loa:emendaloa_detail',kwargs={'pk': item.id})}">
+                                Emenda Parlamentar em construção
                                 </a>
                             </span>
                     """
