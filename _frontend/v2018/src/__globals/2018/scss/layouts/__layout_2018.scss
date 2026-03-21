@@ -77,6 +77,10 @@
   animation: keyframe_rotate 7s ease-in-out infinite;
 }
 
+.zoom-2 {
+  zoom: 2;
+}
+
 .container-box {
   margin: 0 auto $grid-gutter-width;
   background: darken($color_main_bg, 3%) $url_bg_png;
