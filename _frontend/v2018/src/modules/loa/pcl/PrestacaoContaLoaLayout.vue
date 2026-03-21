@@ -362,7 +362,6 @@ export default {
           params: {
             expand: 'parlamentares',
             include: 'parlamentares.id,nome_parlamentar'
-
           }
         })
         .then((response) => {

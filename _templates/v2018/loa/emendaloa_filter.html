@@ -35,7 +35,13 @@
     Nenhuma Emenda Parlamentar encontrada com os critérios de busca acima!
   </div>
 {% else %}
-<div class="bg-white px-2 my-2 font-weight-bold">Foram encontradas {{ paginator.count }} Emendas Parlamentares </div>
+  <div class="bg-white px-2 my-3 font-weight-bold">
+    {% if paginator.count == 1%}
+      Foi encontrada uma Emenda Parlamentar
+    {% else %}
+      Foram encontradas {{ paginator.count }} Emendas Parlamentares
+    {% endif %}
+  </div>
   <div class="container">
     <div class="row">
       {% for emenda in object_list %}
