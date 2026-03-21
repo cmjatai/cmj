@@ -1,0 +1,44 @@
+{% extends "crud/list.html" %}
+{% load i18n %}
+{% load crispy_forms_tags cropping common_tags %}
+
+{% block more_buttons_left %}
+
+<div class="d-md-flex justify-content-end pr-2">
+  <div class="actions btn-group btn-exports" role="group">
+    <a class="btn btn-success btn-sm" href="{% url 'sapl.api:loa_emendaloa-list' %}" title="OpenAPI">OpenAPI</a>
+  </div>
+</div>
+{% if view.extras_url %}
+<div class="d-md-flex justify-content-end pr-2">
+    <div class="actions btn-group btn-group-sm" role="group">
+        {% for href, css_class, text in view.extras_url %}
+        <a href="{{href}}" class="btn {{css_class}}">
+            {{text|safe}}
+        </a>
+        {% endfor %}
+    </div>
+    </div>
+{% endif %}
+
+{% endblock more_buttons_left %}
+{% block extra_content %}
+<hr>
+{% crispy filter.form %}
+{% endblock %}
+
+{% block extra_js %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('.btn-register-emendas-liberadas').on('click', function(e) {
+            e.preventDefault();
+            var url = $(this).attr('href');
+            if (confirm('Confirma a criação automatizada de proposições para suas emendas em fase "Liberado pela Contabilidade e/ou Aguardando Protocolo"? Você poderá acompanhar o andamento no módulo de proposições.')) {
+                window.location.href = url;
+            } else {
+                return false;
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -169,18 +169,16 @@ const handleResync = (force_fetch_materias = true) => {
 
     // Sincroniza matérias relacionadas
     if (materiasDaSessao.size > 0) {
-      syncStore.fetchSync(
-        {
-          app: 'materia',
-          model: 'materialegislativa',
-          params: {
-            id__in: Array.from(materiasDaSessao),
-            exclude: 'metadata',
-            get_all: 'True'
-          },
-          force_fetch: force_fetch_materias
-        }
-      )
+      syncStore.fetchSync({
+        app: 'materia',
+        model: 'materialegislativa',
+        params: {
+          id__in: Array.from(materiasDaSessao),
+          exclude: 'metadata',
+          get_all: 'True'
+        },
+        force_fetch: force_fetch_materias
+      })
       syncStore.fetchSync({
         app: 'sessao',
         model: 'registroleitura',
@@ -198,6 +196,9 @@ const handleResync = (force_fetch_materias = true) => {
           expand: 'tipo_resultado_votacao'
         }
       })
+    }
+
+    if (ordemDiasIds.length > 0) {
       syncStore.fetchSync({
         app: 'sessao',
         model: 'votoparlamentar',
@@ -206,6 +207,9 @@ const handleResync = (force_fetch_materias = true) => {
           get_all: 'True'
         }
       })
+    }
+
+    if (expedientesIds.length > 0) {
       syncStore.fetchSync({
         app: 'sessao',
         model: 'votoparlamentar',
@@ -214,6 +218,9 @@ const handleResync = (force_fetch_materias = true) => {
           get_all: 'True'
         }
       })
+    }
+
+    if (materiasDaSessao.size > 0) {
       syncStore.fetchSync({
         app: 'materia',
         model: 'documentoacessorio',
@@ -232,33 +239,33 @@ const handleResync = (force_fetch_materias = true) => {
           get_all: 'True'
         }
       })
-
-      syncStore.fetchSync({
-        app: 'sessao',
-        model: 'tiporesultadovotacao',
-        params: {
-          get_all: 'True'
-        }
-      })
-      syncStore.fetchSync({
-        app: 'sessao',
-        model: 'sessaoplenariapresenca',
-        params: {
-          get_all: 'True',
-          sessao_plenaria: sessaoId.value,
-          expand: 'parlamentar'
-        }
-      })
-      syncStore.fetchSync({
-        app: 'sessao',
-        model: 'presencaordemdia',
-        params: {
-          get_all: 'True',
-          sessao_plenaria: sessaoId.value,
-          expand: 'parlamentar'
-        }
-      })
     }
+
+    syncStore.fetchSync({
+      app: 'sessao',
+      model: 'tiporesultadovotacao',
+      params: {
+        get_all: 'True'
+      }
+    })
+    syncStore.fetchSync({
+      app: 'sessao',
+      model: 'sessaoplenariapresenca',
+      params: {
+        get_all: 'True',
+        sessao_plenaria: sessaoId.value,
+        expand: 'parlamentar'
+      }
+    })
+    syncStore.fetchSync({
+      app: 'sessao',
+      model: 'presencaordemdia',
+      params: {
+        get_all: 'True',
+        sessao_plenaria: sessaoId.value,
+        expand: 'parlamentar'
+      }
+    })
     EventBus.emit('ordemDiaOnLoad')
     EventBus.emit('expMatOnLoad')
   })
