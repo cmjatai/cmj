@@ -1,13 +1,13 @@
 <template>
   <div
-    ref="dashboardEl"
-    class="loa-dashboard"
+    ref="pclEl"
+    class="loa-pcl"
   >
     <div class="header-area">
       <div class="inner-header d-flex flex-column gap-2">
         <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-2">
           <div class="d-flex gap-2 flex-column">
-            <h3 class="dashboard-title mb-0">
+            <h3 class="pcl-title mb-0">
               <FontAwesomeIcon
                 icon="landmark"
                 class="me-2 title-icon"
@@ -33,24 +33,8 @@
     </div>
     <div class="cards container-fluid mt-2 mb-2">
       <div class="row">
-        <div class="col-md-12">
-          <HorizontalChart
-            :object-list="emendasDiversasSelecionadasPorEntidadeSaude"
-            :ready="!!syncStore.data_cache?.loa_entidade"
-            :bar-height="20"
-            title="Emendas Impositivas - Saúde"
-            subtitle="Distribuição das emendas impositivas de saúde por entidade beneficiada."
-          />
-        </div>
-        <div class="col-md-12">
-          <HorizontalChart
-            :object-list="emendasDiversasSelecionadasPorIndicacao"
-            :ready="!!syncStore.data_cache?.loa_emendaloa"
-            :bar-height="20"
-            title="Emendas Impositivas - Áreas Diversas"
-            subtitle="Distribuição das emendas impositivas de áreas diversas por Unidade Orçamentária."
-          />
-        </div>
+        <div class="col-md-12" />
+        <div class="col-md-12" />
       </div>
     </div>
   </div>
@@ -59,19 +43,17 @@
 <script setup>
 import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
 import { useSyncStore } from '~@/stores/SyncStore'
-import AnoSelector from '../components/AnoSelector.vue'
-import Totalizadores from './Totalizadores.vue'
-import HorizontalChart from './HorizontalChart.vue'
+import AnoSelector from './AnoSelector.vue'
 
 const syncStore = useSyncStore()
 const anosSelecionados = ref([])
 
-const dashboardEl = ref(null)
+const pclEl = ref(null)
 const isFullscreen = ref(false)
 
 const toggleFullscreen = () => {
   if (!document.fullscreenElement) {
-    dashboardEl.value?.requestFullscreen()
+    pclEl.value?.requestFullscreen()
   } else {
     document.exitFullscreen()
   }
@@ -186,7 +168,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.loa-dashboard {
+.loa-pcl {
   &:fullscreen {
     background: var(--bs-body-bg);
     overflow: auto;
@@ -229,7 +211,7 @@ onUnmounted(() => {
   }
 }
 
-.dashboard-title {
+.pcl-title {
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--bs-body-color);

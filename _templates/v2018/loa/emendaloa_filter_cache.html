@@ -9,7 +9,7 @@
       <div class="emenda-parlamentares-fotos d-flex flex-wrap mr-3 mb-1">
         {% for parlamentar in emenda.parlamentares.all %}
           {% if parlamentar.fotografia %}
-            <a class="emenda-avatar mr-1 mb-1"
+            <a class="emenda-avatar"
               href="{% url 'cmj.loa:emendaloa_list' emenda.loa.id %}?parlamentares={{parlamentar.id}}"
               title="{{parlamentar.nome_parlamentar}}">
               <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}" alt="{{parlamentar.nome_parlamentar}}">
@@ -34,7 +34,7 @@
           <span class="badge badge-{% if emenda.tipo == 10 %}info{% elif emenda.tipo == 99 %}primary{% else %}secondary{% endif %} mr-1">
             {{emenda.get_tipo_display}}
           </span>
-          <span class="badge badge-{% if emenda.fase >= 60 %}success{% elif emenda.fase >= 40 %}warning{% elif emenda.fase >= 20 %}info{% else %}secondary{% endif %}">
+          <span class="badge badge-{% if emenda.fase > 60 %}success{% elif emenda.fase > 40 %}warning{% elif emenda.fase == 40 %}danger{% else %}info{% endif %}">
             {{emenda.get_fase_display}}
           </span>
         </div>
@@ -158,13 +158,18 @@
         <div class="tab-pane fade show active" id="tab-prestacao-{{emenda.id}}" role="tabpanel">
           {% for pc in emenda.prestacaocontaregistro_set.all %}
             <div class="hover {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="d-flex justify-content-between align-items-center p-3">
+              <div class="d-flex justify-content-between align-items-center px-3 py-1">
                 <div>
                   <a href="{% url 'cmj.loa:prestacaocontaregistro_detail' pc.id %}" target="_blank" rel="noopener">
                   <small class="font-weight-bold">{{pc.prestacao_conta.epigrafe}}</small>
                   </a>
+                  <br><strong><small>Encaminhado em: {{pc.prestacao_conta.data_envio|date:"d/m/Y"}}</small></strong>
                   {% if pc.detalhamento %}
                     <br><small class="text-muted">{{pc.detalhamento}}</small>
+                  {% endif %}
+                  {% if pc.registro_ajuste %}
+                    <hr class="p-0 m-0">
+                    <small class="text-muted">Relativo ao Ajuste Técnico: {{pc.registro_ajuste.descricao}}</small>
                   {% endif %}
                 </div>
                 <span class="badge badge-{% if pc.situacao == 'FINALIZADO' %}success{% else %}warning{% endif %}">

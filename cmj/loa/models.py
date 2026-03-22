@@ -1482,7 +1482,7 @@ class PrestacaoContaRegistro(models.Model):
 
     class SituacaoChoices(models.TextChoices):
         EM_EXECUCAO = "EM_EXECUCAO", _("Em Execução")
-        FINALIZADO = "FINALIZADO", _("Finalizado")
+        FINALIZADO = "FINALIZADO", _("Finalizada")
 
     prestacao_conta = models.ForeignKey(
         PrestacaoContaLoa,
@@ -1525,7 +1525,7 @@ class PrestacaoContaRegistro(models.Model):
     class Meta:
         verbose_name = _("Registro de Prestação de Conta")
         verbose_name_plural = _("Registros de Prestação de Conta")
-        ordering = ["id"]
+        ordering = ["prestacao_conta__data_envio", "id"]
 
     def __str__(self):
         return (

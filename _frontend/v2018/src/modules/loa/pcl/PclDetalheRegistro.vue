@@ -56,9 +56,9 @@
             class="row small text-muted mt-1"
             v-if="registro.unidade"
           >
-            <div class="col-12" v-if="registro.emendaloa">
+            <div class="col-12" v-if="emendasLoaFormatadas">
               <strong>Vinculado à Emenda:</strong>
-              {{ registro.emendaloa.__str__ }}
+              {{ emendasLoaFormatadas }}
             </div>
             <div class="col-12" v-if="registro.unidade">
               <i class="fas fa-building mr-1"></i>
@@ -226,6 +226,16 @@ export default {
       const i2 = str.indexOf('-', i1 + 1)
       if (i2 === -1) return [str.substring(0, i1), str.substring(i1 + 1), '']
       return [str.substring(0, i1), str.substring(i1 + 1, i2), str.substring(i2 + 1)]
+    },
+    emendasLoaFormatadas () {
+      if (!this.registro || !this.registro.emendaloa) return ''
+      const lista = Array.isArray(this.registro.emendaloa)
+        ? this.registro.emendaloa
+        : [this.registro.emendaloa]
+      return lista
+        .map(e => (e.__str__ || '').split('-')[0].trim())
+        .filter(s => s)
+        .join(', ')
     },
     orderedTabs () {
       const tabs = []

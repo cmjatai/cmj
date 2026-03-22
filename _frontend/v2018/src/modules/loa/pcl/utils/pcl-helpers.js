@@ -4,11 +4,13 @@
  */
 
 const FASE_VARIANTS = {
-  30: 'success',
+  20: 'secondary',
+  25: 'info',
+  30: 'info',
   40: 'danger',
-  50: 'info',
-  25: 'secondary',
-  20: 'secondary'
+  50: 'warning',
+  60: 'warning',
+  99: 'success'
 }
 
 const FASE_LABELS = {
@@ -26,7 +28,7 @@ const FASE_LABELS = {
 }
 
 const SITUACAO_VARIANTS = {
-  EM_EXECUCAO: 'info',
+  EM_EXECUCAO: 'warning',
   FINALIZADO: 'success'
 }
 
