@@ -57,7 +57,11 @@
         <div class="row">
           <div class="col-md-12">
             <small class="d-block text-muted" v-if="registro.unidade">
-              <strong>Unidade Orçamentária:</strong> {{ registro.unidade.__str__ }}
+              <strong>Unidade Orçamentária:</strong>
+              <button
+                class="btn btn-link btn-sm p-0 align-baseline"
+                @click="$emit('filter-unidade', registro.unidade)"
+              >{{ registro.unidade.__str__ }}</button>
             </small>
             <small class="d-block text-muted" v-if="emendasLoaList.length">
               <strong>Emendas vinculadas:</strong>
@@ -83,7 +87,7 @@
       <!-- ===== ABAS ===== -->
       <div class="bg-white p-0 mt-2" v-if="prestacaoItems && prestacaoItems.length">
         <b-tabs
-          nav-class="nav-fill emenda-tabs"
+          nav-class="emenda-tabs"
           content-class="p-0"
           small
         >

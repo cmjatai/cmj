@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.db.models import Q
 from django_filters import CharFilter, ModelChoiceFilter
 
-from cmj.loa.models import EmendaLoa, Loa, PrestacaoContaRegistro, RegistroAjusteLoa
+from cmj.loa.models import EmendaLoa, Entidade, Loa, PrestacaoContaRegistro, RegistroAjusteLoa
 from drfautoapi.drfautoapi import ApiFilterSetMixin
 
 logger = logging.getLogger(__name__)
@@ -13,6 +13,31 @@ logger = logging.getLogger(__name__)
 class CmjFilterSetMixin(ApiFilterSetMixin):
     pass
 
+
+class EntidadeFilterSet(CmjFilterSetMixin):
+
+    search = CharFilter(label="Busca", required=False, method="filter_search")
+
+    emendaloa_set__loa = ModelChoiceFilter(
+        label="LOA", queryset=Loa.objects.all(), method="filter_emendaloa_set__loa"
+    )
+
+    class Meta(CmjFilterSetMixin.Meta):
+        model = Entidade
+
+    def filter_emendaloa_set__loa(self, queryset, name, value):
+        return queryset.filter(emendaloa_set__loa=value).distinct()
+
+    def filter_search(self, queryset, name, value):
+        query = value.split(" ")
+
+        q = Q()
+        for termo in query:
+            q &= Q(nome_fantasia__unaccent__icontains=termo) | Q(
+                razao_social__unaccent__icontains=termo
+            )
+            continue
+        return queryset.filter(q)
 
 class EmendaLoaFilterSet(CmjFilterSetMixin):
 
@@ -121,7 +146,7 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
         return qs
 
     def filter_oficio_ajuste_loa__loa(self, queryset, name, value):
-        return queryset.filter(oficio_ajuste_loa__loa=value)
+        return queryset.filter(oficio_ajuste_loa__loa=value).distinct()
 
     def filter_search(self, queryset, name, value):
 

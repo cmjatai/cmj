@@ -67,11 +67,19 @@
         <div class="row">
           <div class="col-md-12">
             <small class="d-block text-muted" v-if="registro.unidade">
-              <strong>Unidade Orçamentária:</strong> {{ registro.unidade.__str__ }}
+              <strong>Unidade Orçamentária:</strong>
+              <button
+                class="btn btn-link btn-sm p-0 align-baseline"
+                @click="$emit('filter-unidade', registro.unidade)"
+              >{{ registro.unidade.__str__ }}</button>
             </small>
             <template v-if="registro.entidade">
               <small class="text-muted" v-if="registro.entidade.nome_fantasia">
-                <strong>Entidade:</strong> {{ registro.entidade.nome_fantasia }}
+                <strong>Entidade:</strong>
+                <button
+                  class="btn btn-link btn-sm p-0 align-baseline"
+                  @click="$emit('filter-entidade', registro.entidade)"
+                >{{ registro.entidade.nome_fantasia }}</button>
               </small>
               <small class="text-muted" v-if="registro.entidade.cnes">
                 <strong>- CNES:</strong> {{ registro.entidade.cnes }}

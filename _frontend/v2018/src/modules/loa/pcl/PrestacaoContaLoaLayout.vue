@@ -7,6 +7,7 @@
         v-model="filters_value"
         :parlamentares-choice="parlamentares_choice"
         :qs-loa="qs_loa"
+        :qs-emenda-loa="qs_emenda_loa__loa"
         :loas-choice="loas_choice"
         :loa-value="loa"
         :total-items="emendas_ajustes_list.length"
@@ -31,12 +32,15 @@
             v-if="item.__label__ === 'loa_emendaloa'"
             :key="`emenda_${item.id}`"
             :registro="item"
+            @filter-unidade="applyUnidadeFilter"
+            @filter-entidade="applyEntidadeFilter"
           />
           <pcl-detalhe-ajuste
             v-else
             :key="`ajuste_${item.id}`"
             :registro="item"
             @search-emenda="val => filters_value = { ...filters_value, search: val , ajustes: 'False', emendas_tipos: [] }"
+            @filter-unidade="applyUnidadeFilter"
           />
         </template>
       </div>
@@ -68,6 +72,7 @@ export default {
       ready: false,
       filters_value: {
         unidade: null,
+        entidade: null,
         parlamentares: null,
         situacao: [],
         emendas_tipos: [],
@@ -76,6 +81,7 @@ export default {
       },
       filters: [
         'unidade',
+        'entidade',
         'parlamentares',
         'situacao',
         'emendas_tipos',
@@ -95,6 +101,10 @@ export default {
     qs_loa () {
       const value = this.loa.id
       return value ? `&loa=${value}` : ''
+    },
+    qs_emenda_loa__loa () {
+      const value = this.loa.id
+      return value ? `&emendaloa_set__loa=${value}` : ''
     },
     loas_choice () {
       if (!this.loas_list.length) return []
@@ -163,10 +173,53 @@ export default {
     }
   },
   methods: {
+    applyUnidadeFilter (unidade) {
+      const uid = unidade && unidade.id
+      if (!uid) return
+      const unidadeSelect =
+        this.$refs.filtros && this.$refs.filtros.getUnidadeSelectRef()
+      if (unidadeSelect) {
+        const opt = unidadeSelect.options.find(
+          (o) => o.value && o.value.id === uid
+        )
+        if (opt) {
+          this.filters_value = { ...this.filters_value, unidade: opt.value }
+          return
+        }
+      }
+      this.filters_value = { ...this.filters_value, unidade: unidade }
+    },
+    applyEntidadeFilter (entidade) {
+      const eid = entidade && entidade.id
+      if (!eid) return
+      const entidadeSelect =
+        this.$refs.filtros && this.$refs.filtros.getEntidadeSelectRef()
+      if (entidadeSelect) {
+        const opt = entidadeSelect.options.find(
+          (o) => o.value && o.value.id === eid
+        )
+        if (opt) {
+          this.filters_value = {
+            ...this.filters_value,
+            entidade: opt.value,
+            emendas_tipos: ['10', '99'],
+            ajustes: 'False'
+          }
+          return
+        }
+      }
+      this.filters_value = {
+        ...this.filters_value,
+        entidade: entidade,
+        emendas_tipos: ['10', '99'],
+        ajustes: 'False'
+      }
+    },
     resetFilters () {
       this.currentPage = 1
       this.filters_value = {
         unidade: null,
+        entidade: null,
         parlamentares: null,
         situacao: [],
         emendas_tipos: ['10'],
@@ -283,6 +336,12 @@ export default {
           typeof this.filters_value.unidade === 'object'
         ) {
           params_emendas.unidade = this.filters_value.unidade.id
+        }
+        if (
+          this.filters_value.entidade &&
+          typeof this.filters_value.entidade === 'object'
+        ) {
+          params_emendas.entidade = this.filters_value.entidade.id
         }
         if (
           this.filters_value.parlamentares &&

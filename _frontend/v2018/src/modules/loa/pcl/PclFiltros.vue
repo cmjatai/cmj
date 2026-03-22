@@ -1,7 +1,7 @@
 <template>
   <div class="pcl-filtros card card-body bg-light pt-3 px-3 pb-2 mb-0">
     <div class="row">
-      <div v-if="loasChoice.length" class="col-md-2 pr-1">
+      <div v-if="loasChoice.length" class="col-md-1 pr-1">
         <label class="pcl-filtros-label">LOA</label>
         <b-form-select
           :value="selectedLoaId"
@@ -29,7 +29,7 @@
           </b-input-group-append>
         </b-input-group>
       </div>
-      <div class="col-md-3 mb-2 px-2">
+      <div class="col-md-2 mb-2 px-2">
         <label class="pcl-filtros-label">Parlamentares</label>
         <b-form-select
           @change="val => updateFilter('parlamentares', val)"
@@ -38,6 +38,21 @@
           size="sm"
           :disabled="filtersDisabled"
         ></b-form-select>
+      </div>
+      <div class="col-md-3 mb-2 pl-1">
+        <label class="pcl-filtros-label">Entidades</label>
+        <model-select
+          @change="val => updateFilter('entidade', val)"
+          :value="value.entidade"
+          app="loa"
+          model="entidade"
+          choice="__str__"
+          ordering="nome_fantasia"
+          ref="entidadeSelect"
+          :required="false"
+          :extra_query="`${qsEmendaLoa}&ativo=True`"
+          :disabled="filtersDisabled"
+        ></model-select>
       </div>
       <div class="col-md-3 mb-2 pl-1">
         <label class="pcl-filtros-label">Unidade Orçamentária</label>
@@ -54,12 +69,9 @@
           :disabled="filtersDisabled"
         ></model-select>
       </div>
-      <div class="col-12 text-muted small mb-0">
-        OBS: A não seleção de todos os filtros de cada categoria retorna todos os registros relacionados à LOA e, no caso de Emendas Modificativas, os filtros de situação são irrelevantes.
-      </div>
     </div>
     <div class="row align-items-end mt-2">
-      <div class="col-auto px-2">
+      <div class="col-auto pr-1 mb-1">
         <label class="pcl-filtros-label">Documentos</label>
         <div class="pcl-filtros-check-group d-flex flex-wrap">
           <b-form-checkbox-group
@@ -80,7 +92,7 @@
           >Registros de Ajustes</b-form-checkbox>
         </div>
       </div>
-      <div class="col-auto px-2">
+      <div class="col-auto pl-1 mb-1">
         <label class="pcl-filtros-label">Situação</label>
         <div class="pcl-filtros-check-group d-flex">
           <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)" :disabled="filtersDisabled">
@@ -166,6 +178,10 @@ export default {
       type: String,
       default: ''
     },
+    qsEmendaLoa: {
+      type: String,
+      default: ''
+    },
     disabled: {
       type: Boolean,
       default: false
@@ -230,7 +246,12 @@ export default {
   },
   methods: {
     updateFilter (key, val) {
-      this.$emit('input', { ...this.value, [key]: val })
+      const patch = { ...this.value, [key]: val }
+      if (key === 'entidade' && val) {
+        patch.emendas_tipos = ['10', '99']
+        patch.ajustes = 'False'
+      }
+      this.$emit('input', patch)
     },
     /**
      * Permite ao componente pai acessar o ref unidadeSelect
@@ -238,6 +259,9 @@ export default {
      */
     getUnidadeSelectRef () {
       return this.$refs.unidadeSelect
+    },
+    getEntidadeSelectRef () {
+      return this.$refs.entidadeSelect
     }
   }
 }
