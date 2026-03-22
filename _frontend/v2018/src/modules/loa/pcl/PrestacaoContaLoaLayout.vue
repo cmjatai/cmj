@@ -1,16 +1,20 @@
 <template>
-  <div class="prestacaocontaloa-layout pt-3">
-    <div v-if="loa.ano">
+  <div :class="['prestacaocontaloa-layout', 'pt-3', !has_pkloa ? 'container-fluid' : '']">
+    <h3 v-if="!has_pkloa">Prestação de Contas das Emendas Impositivas</h3>
+    <div v-if="loa.ano || (!has_pkloa && ready)">
       <pcl-filtros
         ref="filtros"
         :disabled="!ready || fetching"
         v-model="filters_value"
         :parlamentares-choice="parlamentares_choice"
         :qs-loa="qs_loa"
+        :loas-choice="loas_choice"
+        :loa-value="loa"
         @reset="resetFilters"
+        @loa-change="on_loa_change"
       />
 
-      <div class="row mt-3" v-if="emendas_ajustes_list.length || fetching">
+      <div class="row mt-3" v-if="loa.ano && (emendas_ajustes_list.length || fetching)">
         <div class="col-md-4">
           <pcl-lista-emendas-ajustes
             :items="emendas_ajustes_list"
@@ -29,7 +33,7 @@
           />
         </div>
       </div>
-      <div v-else-if="ready" class="text-muted text-center py-5">
+      <div v-else-if="ready && loa.ano" class="text-muted text-center py-5">
         Nenhum resultado encontrado para os filtros selecionados.
       </div>
     </div>
@@ -51,6 +55,7 @@ export default {
   data () {
     return {
       loa: { id: this.$route.params.pkloa },
+      loas_list: [],
       ready: false,
       filters_value: {
         unidade: null,
@@ -84,6 +89,19 @@ export default {
     qs_loa () {
       const value = this.loa.id
       return value ? `&loa=${value}` : ''
+    },
+    has_pkloa () {
+      return !!this.$route.params.pkloa
+    },
+    loas_choice () {
+      if (!this.loas_list.length) return []
+      return [
+        { value: null, text: 'Selecione uma LOA...' },
+        ...this.loas_list.map(l => ({
+          value: l.id,
+          text: `LOA ${l.ano}`
+        }))
+      ]
     },
     parlamentares_choice () {
       if (this.loa.parlamentares && this.loa.parlamentares.length > 1) {
@@ -119,6 +137,9 @@ export default {
         if (!this.ready) return
         // sincroniza parâmetros com o histórico de rotas
         const query = {}
+        if (!this.has_pkloa && this.loa.id) {
+          query.loa = this.loa.id
+        }
         this.filters.forEach((f) => {
           if (
             this.filters_value[f] !== null &&
@@ -149,6 +170,71 @@ export default {
         ajustes: 'True',
         search: ''
       }
+    },
+
+    on_loa_change (loaId) {
+      if (!loaId) {
+        this.loa = { id: null }
+        this.results = { emendas: {}, ajustes: {} }
+        this.registro_selecionado = null
+        this.prestacaocontaregistro = null
+        this.ajustes_emendas_selecionados = null
+        this.documentos_acessorios = null
+        this.tramitacoes = null
+        this.$router.replace({ query: {} })
+        return
+      }
+      const loa = this.loas_list.find(l => l.id === loaId)
+      if (loa) {
+        this.loa = loa
+        this.resetFilters()
+      }
+    },
+
+    applyQueryFilters () {
+      const query = this.$route.query
+      this.filters.forEach((f) => {
+        if (query[f] !== undefined) {
+          if (f === 'situacao') {
+            this.filters_value[f] =
+              typeof query[f] === 'string' ? query[f].split(',') : query[f]
+          } else if (f === 'parlamentares') {
+            const pid = parseInt(query[f])
+            if (pid && this.loa.parlamentares) {
+              const found = this.loa.parlamentares.find((p) => p.id === pid)
+              if (found) {
+                this.filters_value[f] = found
+              }
+            }
+          } else if (f === 'emendas_tipos') {
+            this.filters_value[f] =
+              typeof query[f] === 'string' ? query[f].split(',') : query[f]
+          } else if (f === 'unidade') {
+            const uid = parseInt(query[f])
+            if (uid) {
+              this.$nextTick(() => {
+                const unidadeSelect =
+                  this.$refs.filtros && this.$refs.filtros.getUnidadeSelectRef()
+                if (unidadeSelect) {
+                  const checkOptions = () => {
+                    const opt = unidadeSelect.options.find(
+                      (o) => o.value && o.value.id === uid
+                    )
+                    if (opt) {
+                      this.filters_value.unidade = opt.value
+                    } else {
+                      setTimeout(checkOptions, 100)
+                    }
+                  }
+                  checkOptions()
+                }
+              })
+            }
+          } else {
+            this.filters_value[f] = query[f]
+          }
+        }
+      })
     },
 
     fetch_prestacaocontaregistro (registro) {
@@ -244,6 +330,7 @@ export default {
     },
 
     fetch () {
+      if (!this.loa.id) return Promise.resolve()
       this.registro_selecionado = null
       this.prestacaocontaregistro = null
       this.ajustes_emendas_selecionados = null
@@ -352,66 +439,55 @@ export default {
   mounted () {
     const t = this
     t.removeAside()
-    const query = t.$route.query
     t.$nextTick().then(() => {
-      t.utils
-        .fetch({
-          app: 'loa',
-          model: 'loa',
-          id: t.loa.id,
-          params: {
-            expand: 'parlamentares',
-            include: 'parlamentares.id,nome_parlamentar'
-          }
-        })
-        .then((response) => {
-          t.loa = response.data
-          // aplica parâmetros da query string nos filtros
-          t.filters.forEach((f) => {
-            if (query[f] !== undefined) {
-              if (f === 'situacao') {
-                t.filters_value[f] =
-                  typeof query[f] === 'string' ? query[f].split(',') : query[f]
-              } else if (f === 'parlamentares') {
-                const pid = parseInt(query[f])
-                if (pid && t.loa.parlamentares) {
-                  const found = t.loa.parlamentares.find((p) => p.id === pid)
-                  if (found) {
-                    t.filters_value[f] = found
-                  }
-                }
-              } else if (f === 'emendas_tipos') {
-                t.filters_value[f] =
-                  typeof query[f] === 'string' ? query[f].split(',') : query[f]
-              } else if (f === 'unidade') {
-                const uid = parseInt(query[f])
-                if (uid) {
-                  t.$nextTick(() => {
-                    const unidadeSelect =
-                      t.$refs.filtros && t.$refs.filtros.getUnidadeSelectRef()
-                    if (unidadeSelect) {
-                      const checkOptions = () => {
-                        const opt = unidadeSelect.options.find(
-                          (o) => o.value && o.value.id === uid
-                        )
-                        if (opt) {
-                          t.filters_value.unidade = opt.value
-                        } else {
-                          setTimeout(checkOptions, 100)
-                        }
-                      }
-                      checkOptions()
-                    }
-                  })
-                }
-              } else {
-                t.filters_value[f] = query[f]
-              }
+      if (t.has_pkloa) {
+        // Modo 1: LOA definida na rota
+        t.utils
+          .fetch({
+            app: 'loa',
+            model: 'loa',
+            id: t.loa.id,
+            params: {
+              expand: 'parlamentares',
+              include: 'parlamentares.id,nome_parlamentar'
             }
           })
-          t.ready = true
-          t.fetch()
-        })
+          .then((response) => {
+            t.loa = response.data
+            t.applyQueryFilters()
+            t.ready = true
+            t.fetch()
+          })
+      } else {
+        // Modo 2: sem LOA na rota — exibe seletor com todas as LOAs
+        t.utils
+          .fetch({
+            app: 'loa',
+            model: 'loa',
+            params: {
+              expand: 'parlamentares',
+              include: 'parlamentares.id,nome_parlamentar',
+              get_all: 'True',
+              o: '-ano'
+            }
+          })
+          .then((response) => {
+            t.loas_list = response.data
+            const query = t.$route.query
+            if (query.loa) {
+              const loaId = parseInt(query.loa)
+              const found = t.loas_list.find((l) => l.id === loaId)
+              if (found) {
+                t.loa = found
+                t.applyQueryFilters()
+              }
+            }
+            t.ready = true
+            if (t.loa.ano) {
+              t.fetch()
+            }
+          })
+      }
     })
   }
 }

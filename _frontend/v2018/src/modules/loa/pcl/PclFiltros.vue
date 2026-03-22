@@ -1,7 +1,17 @@
 <template>
   <div class="pcl-filtros card card-body bg-light py-3 px-3 mb-0">
     <div class="row">
-      <div class="col-md-5 mb-2">
+      <div v-if="loasChoice.length" class="col-md-2 pr-1">
+        <label class="pcl-filtros-label">LOA</label>
+        <b-form-select
+          :value="selectedLoaId"
+          :options="loasChoice"
+          @change="val => $emit('loa-change', val)"
+          size="sm"
+          :disabled="disabled"
+        ></b-form-select>
+      </div>
+      <div class="col mb-2 px-2">
         <label class="pcl-filtros-label">Pesquisa</label>
         <b-input-group size="sm">
           <b-form-input
@@ -10,7 +20,7 @@
             :value="value.search"
             @change="val => updateFilter('search', val)"
             placeholder="Filtre por termos nos Ajustes e Emendas"
-            :disabled="disabled"
+            :disabled="filtersDisabled"
           ></b-form-input>
           <b-input-group-append>
             <b-button class="btn-secondary" @click="$refs.searchInput.$el.blur()" title="Pesquisar">
@@ -19,17 +29,17 @@
           </b-input-group-append>
         </b-input-group>
       </div>
-      <div class="col-md-3 mb-2">
+      <div class="col-md-3 mb-2 px-2">
         <label class="pcl-filtros-label">Parlamentares</label>
         <b-form-select
           @change="val => updateFilter('parlamentares', val)"
           :value="value.parlamentares"
           :options="parlamentaresChoice"
           size="sm"
-          :disabled="disabled"
+          :disabled="filtersDisabled"
         ></b-form-select>
       </div>
-      <div class="col-md-4 mb-2">
+      <div class="col-md-3 mb-2 pl-1">
         <label class="pcl-filtros-label">Unidade Orçamentária</label>
         <model-select
           @change="val => updateFilter('unidade', val)"
@@ -41,7 +51,7 @@
           ref="unidadeSelect"
           :required="false"
           :extra_query="`${qsLoa}&recebe_emenda_impositiva=True`"
-          :disabled="disabled"
+          :disabled="filtersDisabled"
         ></model-select>
       </div>
       <div class="col-12 text-muted small mb-0">
@@ -49,13 +59,13 @@
       </div>
     </div>
     <div class="row align-items-end mt-2">
-      <div class="col-auto">
+      <div class="col-auto px-2">
         <label class="pcl-filtros-label">Documentos</label>
         <div class="pcl-filtros-check-group d-flex flex-wrap">
           <b-form-checkbox-group
             :checked="value.emendas_tipos"
             @change="val => updateFilter('emendas_tipos', val)"
-            :disabled="disabled"
+            :disabled="filtersDisabled"
           >
             <b-form-checkbox class="mr-3" value="10">Impositivas da Saúde</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="99">Impositivas de Áreas Diversas</b-form-checkbox>
@@ -66,22 +76,22 @@
             @change="val => updateFilter('ajustes', val)"
             value="True"
             unchecked-value="False"
-            :disabled="disabled"
+            :disabled="filtersDisabled"
           >Registros de Ajustes</b-form-checkbox>
         </div>
       </div>
-      <div class="col-auto">
+      <div class="col-auto px-2">
         <label class="pcl-filtros-label">Situação</label>
         <div class="pcl-filtros-check-group d-flex">
-          <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)" :disabled="disabled">
+          <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)" :disabled="filtersDisabled">
             <b-form-checkbox class="mr-3" value="EM_EXECUCAO">Em Execução</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="FINALIZADO">Finalizado</b-form-checkbox>
             <b-form-checkbox value="IMPEDIMENTO">Impedidas em definitivo</b-form-checkbox>
           </b-form-checkbox-group>
         </div>
       </div>
-      <div class="col-auto ml-auto">
-        <button class="btn btn-sm btn-outline-secondary" @click="$emit('reset')" title="Limpar todos os filtros" :disabled="disabled">
+      <div class="col-auto ml-auto px-2">
+        <button class="btn btn-sm btn-outline-secondary" @click="$emit('reset')" title="Limpar todos os filtros" :disabled="filtersDisabled">
           <i class="fas fa-times mr-1"></i>Limpar
         </button>
       </div>
@@ -113,6 +123,25 @@ export default {
     disabled: {
       type: Boolean,
       default: false
+    },
+    loasChoice: {
+      type: Array,
+      default: () => []
+    },
+    loaValue: {
+      type: Object,
+      default: null
+    }
+  },
+  computed: {
+    selectedLoaId () {
+      return this.loaValue && this.loaValue.id ? this.loaValue.id : null
+    },
+    filtersDisabled () {
+      if (this.loasChoice.length && (!this.loaValue || !this.loaValue.id)) {
+        return true
+      }
+      return this.disabled
     }
   },
   methods: {
