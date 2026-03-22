@@ -6,38 +6,40 @@
     <div v-else-if="items.length === 0" class="text-muted small py-3 text-center">
       Nenhum documento acessório encontrado para a matéria vinculada.
     </div>
-    <b-table v-else
-      :items="items"
-      :fields="fields"
-      small striped hover
-      class="mb-0"
-    >
-      <template #cell(nome)="data">
-        <a v-if="data.value && data.item.link_detail_backend"
-           :href="data.item.link_detail_backend"
-           target="_blank"
-           class="small">
-          {{ data.value.__str__ || data.value }}
-        </a>
-        <span v-else class="small">{{ data.value ? (data.value.__str__ || data.value) : '—' }}</span>
-      </template>
-      <template #cell(tipo)="data">
-        <span class="small">{{ data.value ? (data.value.__str__ || data.value) : '—' }}</span>
-      </template>
-      <template #cell(data)="data">
-        <span class="small">{{ formatDateBR(data.value) }}</span>
-      </template>
-      <template #cell(ementa)="data">
-        <span class="small">{{ data.value || '—' }}</span>
-        <br>(<i class="small">{{ data.item.autor }}</i>)
-      </template>
-      <template #cell(arquivo)="data">
-        <a v-if="data.value" :href="data.value" target="_blank" class="btn btn-sm btn-outline-secondary">
-          <i class="fas fa-download mr-1"></i>Baixar
-        </a>
-        <span v-else class="small">—</span>
-      </template>
-    </b-table>
+    <template v-else>
+      <div
+        v-for="(doc, idx) in items"
+        :key="doc.id || idx"
+        :class="['hover', { 'border-bottom': idx < items.length - 1 }]"
+      >
+        <div class="d-flex justify-content-between align-items-start p-3">
+          <div>
+            <a
+              v-if="doc.arquivo"
+              :href="doc.arquivo"
+              class="btn btn-primary btn-sm mr-2"
+              target="_blank"
+              rel="noopener"
+            >
+              <i class="fas fa-file-pdf fa-sm"></i>
+            </a>
+            <small class="font-weight-bold">{{ doc.nome ? (doc.nome.__str__ || doc.nome) : '—' }}</small>
+            <br>
+            <small class="text-muted">
+              {{ doc.tipo ? (doc.tipo.__str__ || doc.tipo) : '' }}
+              &mdash;
+              {{ formatDateBR(doc.data) }}
+            </small>
+            <template v-if="doc.autor">
+              <br><small class="text-muted">Autor: {{ doc.autor }}</small>
+            </template>
+            <template v-if="doc.ementa">
+              <br><small class="text-muted">{{ truncate(doc.ementa, 30) }}</small>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -52,19 +54,14 @@ export default {
       default: null
     }
   },
-  computed: {
-    fields () {
-      return [
-        { key: 'nome', label: 'Nome' },
-        { key: 'tipo', label: 'Tipo' },
-        { key: 'data', label: 'Data' },
-        { key: 'ementa', label: 'Ementa' },
-        { key: 'arquivo', label: 'Arquivo' }
-      ]
-    }
-  },
   methods: {
-    formatDateBR
+    formatDateBR,
+    truncate (text, wordCount) {
+      if (!text) return ''
+      const words = text.split(/\s+/)
+      if (words.length <= wordCount) return text
+      return words.slice(0, wordCount).join(' ') + ' …'
+    }
   }
 }
 </script>

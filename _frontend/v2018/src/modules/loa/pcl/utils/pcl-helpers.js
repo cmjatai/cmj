@@ -3,6 +3,18 @@
  * Extraídos do PrestacaoContaLoaLayout para uso em componentes filhos.
  */
 
+const TIPO_LABELS = {
+  0: 'Emenda Modificativa',
+  10: 'Emenda Impositiva Saúde',
+  99: 'Emenda Impositiva Áreas Diversas'
+}
+
+const TIPO_VARIANTS = {
+  0: 'info',
+  10: 'success',
+  99: 'warning'
+}
+
 const FASE_VARIANTS = {
   20: 'secondary',
   25: 'info',
@@ -35,6 +47,14 @@ const SITUACAO_VARIANTS = {
 const SITUACAO_LABELS = {
   EM_EXECUCAO: 'Em Execução',
   FINALIZADO: 'Finalizado'
+}
+
+export function tipoVariant (tipo) {
+  return TIPO_VARIANTS[tipo] || 'light'
+}
+
+export function tipoLabel (tipo) {
+  return TIPO_LABELS[tipo] || `Tipo ${tipo}`
 }
 
 export function faseVariant (fase) {

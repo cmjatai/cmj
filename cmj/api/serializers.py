@@ -405,8 +405,19 @@ class EmendaLoaSerializer(CmjSerializerMixin):
         read_only=True,
     )
 
+    ementa_format = serializers.CharField(
+        read_only=True,
+    )
+
+    epigrafe_short = serializers.SerializerMethodField()
+
     class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
+
+    def get_epigrafe_short(self, obj):
+        if obj.materia and obj.materia.epigrafe_short:
+            return obj.materia.epigrafe_short
+        return ""
 
     def validate_valor(self, obj, *args, **kwargs):
 
