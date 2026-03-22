@@ -30,5 +30,17 @@ export const routes = [
         component: () => import('@/modules/loa/LoaDash')
       }
     ]
+  },
+  {
+    path: '/app/emendas-impositivas/',
+    component: () => import('@/modules/loa/LoaLayout'),
+    name: '',
+    children: [
+      {
+        path: 'prestacao-de-contas',
+        name: 'prestacaocontaloa__route',
+        component: () => import('@/modules/loa/pcl/PrestacaoContaLoaLayout')
+      }
+    ]
   }
 ]
