@@ -75,7 +75,7 @@ export default {
         entidade: null,
         parlamentares: null,
         situacao: [],
-        emendas_tipos: [],
+        emendas_tipos: ['10'],
         ajustes: 'False',
         search: ''
       },
