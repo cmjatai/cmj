@@ -1,5 +1,5 @@
 <template>
-  <div class="pcl-filtros card card-body bg-light py-3 px-3 mb-0">
+  <div class="pcl-filtros card card-body bg-light pt-3 px-3 pb-2 mb-0">
     <div class="row">
       <div v-if="loasChoice.length" class="col-md-2 pr-1">
         <label class="pcl-filtros-label">LOA</label>
@@ -96,6 +96,52 @@
         </button>
       </div>
     </div>
+    <div v-if="totalItems > 0" class="pcl-pagination d-flex align-items-center mt-2 pt-2 border-top">
+      <div class="d-flex align-items-center mr-3">
+        <small class="text-muted text-uppercase font-weight-bold mr-2" style="font-size:.7rem;letter-spacing:.03em;">Exibir</small>
+        <b-form-select
+          :value="pageSize"
+          :options="pageSizeOptions"
+          @change="val => $emit('update:page-size', Number(val))"
+          size="sm"
+          class="pcl-page-size-select"
+        ></b-form-select>
+      </div>
+      <small class="text-muted mr-auto" style="font-size:.8rem;">{{ paginationLabel }}</small>
+      <nav class="d-flex align-items-center">
+        <button
+          class="pcl-page-btn"
+          :disabled="currentPage <= 1"
+          @click="$emit('update:current-page', 1)"
+          title="Primeira página"
+        ><i class="fas fa-angle-double-left"></i></button>
+        <button
+          class="pcl-page-btn"
+          :disabled="currentPage <= 1"
+          @click="$emit('update:current-page', currentPage - 1)"
+          title="Página anterior"
+        ><i class="fas fa-chevron-left"></i></button>
+        <button
+          v-for="p in visiblePages"
+          :key="p"
+          class="pcl-page-btn"
+          :class="{ active: p === currentPage }"
+          @click="$emit('update:current-page', p)"
+        >{{ p }}</button>
+        <button
+          class="pcl-page-btn"
+          :disabled="currentPage >= totalPages"
+          @click="$emit('update:current-page', currentPage + 1)"
+          title="Próxima página"
+        ><i class="fas fa-chevron-right"></i></button>
+        <button
+          class="pcl-page-btn"
+          :disabled="currentPage >= totalPages"
+          @click="$emit('update:current-page', totalPages)"
+          title="Última página"
+        ><i class="fas fa-angle-double-right"></i></button>
+      </nav>
+    </div>
   </div>
 </template>
 
@@ -131,6 +177,18 @@ export default {
     loaValue: {
       type: Object,
       default: null
+    },
+    totalItems: {
+      type: Number,
+      default: 0
+    },
+    pageSize: {
+      type: Number,
+      default: 25
+    },
+    currentPage: {
+      type: Number,
+      default: 1
     }
   },
   computed: {
@@ -139,6 +197,35 @@ export default {
     },
     filtersDisabled () {
       return this.disabled
+    },
+    pageSizeOptions () {
+      return [
+        { value: 10, text: '10' },
+        { value: 25, text: '25' },
+        { value: 50, text: '50' },
+        { value: 100, text: '100' }
+      ]
+    },
+    totalPages () {
+      return Math.max(1, Math.ceil(this.totalItems / this.pageSize))
+    },
+    paginationLabel () {
+      const start = (this.currentPage - 1) * this.pageSize + 1
+      const end = Math.min(this.currentPage * this.pageSize, this.totalItems)
+      return `${start}–${end} de ${this.totalItems}`
+    },
+    visiblePages () {
+      const pages = []
+      const total = this.totalPages
+      const current = this.currentPage
+      let start = Math.max(1, current - 2)
+      let end = Math.min(total, current + 2)
+      if (end - start < 4) {
+        if (start === 1) end = Math.min(total, start + 4)
+        else start = Math.max(1, end - 4)
+      }
+      for (let i = start; i <= end; i++) pages.push(i)
+      return pages
     }
   },
   methods: {
@@ -186,5 +273,48 @@ export default {
 .pcl-filtros-check-group >>> .custom-control-label {
   font-size: 0.8rem;
   line-height: 1.6;
+}
+
+/* Pagination */
+.pcl-pagination {
+  gap: 0.25rem;
+}
+.pcl-page-size-select {
+  width: 4.5rem !important;
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+}
+.pcl-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.85rem;
+  height: 1.85rem;
+  padding: 0 0.35rem;
+  margin: 0 1px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #555;
+  background: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.pcl-page-btn:hover:not(:disabled):not(.active) {
+  background: #e9ecef;
+  border-color: #adb5bd;
+  color: #333;
+}
+.pcl-page-btn.active {
+  background: #6c757d;
+  border-color: #6c757d;
+  color: #fff;
+  font-weight: 600;
+}
+.pcl-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 </style>

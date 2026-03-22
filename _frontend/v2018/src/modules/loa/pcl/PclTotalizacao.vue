@@ -84,9 +84,20 @@ export default {
   },
   methods: {
     valorEfetivo (item) {
-      if (!isEmenda(item)) return item.valor || 0
+      if (!isEmenda(item)) {
+        if (!item.emendaloa || item.emendaloa.length === 0) {
+          return item.valor || 0
+        }
+        return 0
+        /* const emendasValorInicial = item.emendaloa.reduce((sum, em) => {
+          return sum + Number(em.valor_inicial || 0)
+        }, 0)
+        const valor = emendasValorInicial - Number(item.valor || 0)
+        return valor */
+      }
       const computado = Number(item.valor_computado || 0)
       const inicial = Number(item.valor_inicial || 0)
+      // return computado
       return computado !== inicial ? computado - inicial : computado
     },
     formatCurrency (value) {

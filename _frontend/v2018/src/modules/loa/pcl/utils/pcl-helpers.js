@@ -41,12 +41,14 @@ const FASE_LABELS = {
 
 const SITUACAO_VARIANTS = {
   EM_EXECUCAO: 'warning',
-  FINALIZADO: 'success'
+  FINALIZADO: 'success',
+  SEM_PRESTACAO_CONTAS: 'secondary'
 }
 
 const SITUACAO_LABELS = {
   EM_EXECUCAO: 'Em Execução',
-  FINALIZADO: 'Finalizado'
+  FINALIZADO: 'Finalizado',
+  SEM_PRESTACAO_CONTAS: 'Sem Prestação de Contas'
 }
 
 export function tipoVariant (tipo) {

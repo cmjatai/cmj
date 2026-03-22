@@ -9,19 +9,24 @@
         :qs-loa="qs_loa"
         :loas-choice="loas_choice"
         :loa-value="loa"
+        :total-items="emendas_ajustes_list.length"
+        :page-size="pageSize"
+        :current-page="currentPage"
+        @update:page-size="onPageSizeChange"
+        @update:current-page="onPageChange"
         @reset="resetFilters"
         @loa-change="on_loa_change"
       />
 
       <pcl-totalizacao
-        v-if="!fetching && emendas_ajustes_list.length"
+        v-if="false && !fetching && emendas_ajustes_list.length"
         :lista="emendas_ajustes_list"
         class="mt-3"
       />
 
       <div class="mt-3" v-if="emendas_ajustes_list.length || fetching">
         <b-spinner v-if="fetching" small variant="secondary" class="d-block mx-auto my-3"></b-spinner>
-        <template v-for="item in emendas_ajustes_list">
+        <template v-for="item in paginatedList">
           <pcl-detalhe-emenda
             v-if="item.__label__ === 'loa_emendaloa'"
             :key="`emenda_${item.id}`"
@@ -64,8 +69,8 @@ export default {
         unidade: null,
         parlamentares: null,
         situacao: [],
-        emendas_tipos: ['0', '10', '99'],
-        ajustes: 'True',
+        emendas_tipos: ['10'],
+        ajustes: 'False',
         search: ''
       },
       filters: [
@@ -80,7 +85,9 @@ export default {
         emendas: {},
         ajustes: {}
       },
-      fetching: false
+      fetching: false,
+      currentPage: 1,
+      pageSize: 10
     }
   },
   computed: {
@@ -120,6 +127,10 @@ export default {
         ? this.results.ajustes
         : []
       return [...emendas, ...ajustes]
+    },
+    paginatedList () {
+      const start = (this.currentPage - 1) * this.pageSize
+      return this.emendas_ajustes_list.slice(start, start + this.pageSize)
     }
   },
   watch: {
@@ -127,6 +138,7 @@ export default {
       deep: true,
       handler (nv, ov) {
         if (!this.ready) return
+        this.currentPage = 1
         // sincroniza parâmetros com o histórico de rotas
         const query = {}
         this.filters.forEach((f) => {
@@ -151,14 +163,23 @@ export default {
   },
   methods: {
     resetFilters () {
+      this.currentPage = 1
       this.filters_value = {
         unidade: null,
         parlamentares: null,
         situacao: [],
-        emendas_tipos: ['0', '10', '99'],
-        ajustes: 'True',
+        emendas_tipos: ['10'],
+        ajustes: 'False',
         search: ''
       }
+    },
+    onPageSizeChange (size) {
+      this.pageSize = size
+      this.currentPage = 1
+    },
+    onPageChange (page) {
+      const totalPages = Math.max(1, Math.ceil(this.emendas_ajustes_list.length / this.pageSize))
+      this.currentPage = Math.max(1, Math.min(page, totalPages))
     },
 
     on_loa_change (loaId) {
@@ -248,7 +269,8 @@ export default {
       if (fetchEmendas) {
         const params_emendas = {
           loa: this.loa.id,
-          o: '-tipo,fase,materia__tipo__sigla,materia__numero',
+          // o: '-tipo,fase,materia__tipo__sigla,materia__numero',
+          o: 'materia__tipo__sigla,materia__numero',
           exclude: 'search;metadata',
           include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
           expand: 'parlamentares;unidade;materia;entidade',

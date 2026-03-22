@@ -213,16 +213,36 @@ export default {
       prestacaoItems: null,
       ajustesItems: null,
       documentosItems: null,
-      tramitacoesItems: null
+      tramitacoesItems: null,
+      visible: false
     }
   },
   watch: {
     registro: {
       immediate: true,
       handler (reg) {
-        if (!reg) return
+        if (!reg || !this.visible) return
         this.fetchTabData(reg)
       }
+    },
+    visible (val) {
+      if (val && this.registro) {
+        this.fetchTabData(this.registro)
+      }
+    }
+  },
+  mounted () {
+    this._observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        this.visible = true
+        this._observer.disconnect()
+      }
+    }, { rootMargin: '200px' })
+    this._observer.observe(this.$el)
+  },
+  beforeDestroy () {
+    if (this._observer) {
+      this._observer.disconnect()
     }
   },
   computed: {

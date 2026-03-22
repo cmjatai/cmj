@@ -16,8 +16,8 @@
             <div class="mb-2">
               <span class="badge mr-1 badge-warning">Registro de Ajuste</span>
               <span
-                :class="['badge', 'badge-' + faseVariant(registro.fase)]"
-              >{{ faseLabel(registro.fase) }}</span>
+                :class="['badge', 'badge-' + situacaoVariant(registro.fase_prestacao_contas)]"
+              >{{ situacaoLabel(registro.fase_prestacao_contas) }}</span>
             </div>
           </div>
         </div>
@@ -75,7 +75,9 @@
 <script>
 import {
   faseVariant,
-  faseLabel
+  faseLabel,
+  situacaoLabel,
+  situacaoVariant
 } from './utils/pcl-helpers'
 import PclTabPrestacao from './tabs/PclTabPrestacao.vue'
 
@@ -92,16 +94,36 @@ export default {
   },
   data () {
     return {
-      prestacaoItems: null
+      prestacaoItems: null,
+      visible: false
     }
   },
   watch: {
     registro: {
       immediate: true,
       handler (reg) {
-        if (!reg) return
+        if (!reg || !this.visible) return
         this.fetchTabData(reg)
       }
+    },
+    visible (val) {
+      if (val && this.registro) {
+        this.fetchTabData(this.registro)
+      }
+    }
+  },
+  mounted () {
+    this._observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        this.visible = true
+        this._observer.disconnect()
+      }
+    }, { rootMargin: '200px' })
+    this._observer.observe(this.$el)
+  },
+  beforeDestroy () {
+    if (this._observer) {
+      this._observer.disconnect()
     }
   },
   computed: {
@@ -119,6 +141,8 @@ export default {
   methods: {
     faseVariant,
     faseLabel,
+    situacaoLabel,
+    situacaoVariant,
     fetchTabData (registro) {
       this.prestacaoItems = null
 

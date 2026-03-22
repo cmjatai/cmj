@@ -17,7 +17,7 @@ from rest_framework.relations import (
 
 from cmj.arq.models import ArqClasse, ArqDoc, DraftMidia
 from cmj.core.models import Bi
-from cmj.loa.models import EmendaLoa, RegistroAjusteLoa
+from cmj.loa.models import EmendaLoa, PrestacaoContaRegistro, RegistroAjusteLoa
 from cmj.sigad.models import (
     DOC_TEMPLATES_CHOICE,
     CMSMixin,
@@ -394,8 +394,18 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     # crie o campo valor como DecimalField chamanado método para calcular
     valor = serializers.SerializerMethodField()
 
+    fase_prestacao_contas = serializers.SerializerMethodField()
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa
+
+    def get_fase_prestacao_contas(self, obj):
+        if obj.prestacaocontaregistro_set.filter(situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO).exists():
+            return PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+        elif obj.prestacaocontaregistro_set.filter(situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO).exists():
+            return PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
+        else:
+            return 'SEM_PRESTACAO_CONTAS'
+
 
     def get_valor(self, obj):
         obj = obj.registroajusteloaparlamentar_set.aggregate(total=Max("valor"))

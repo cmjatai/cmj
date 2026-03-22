@@ -4,7 +4,7 @@ from decimal import Decimal
 from django.db.models import Q
 from django_filters import CharFilter, ModelChoiceFilter
 
-from cmj.loa.models import EmendaLoa, Loa, RegistroAjusteLoa
+from cmj.loa.models import EmendaLoa, Loa, PrestacaoContaRegistro, RegistroAjusteLoa
 from drfautoapi.drfautoapi import ApiFilterSetMixin
 
 logger = logging.getLogger(__name__)
@@ -41,34 +41,54 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
         if incluir_impedidas and incluir_em_execucao and incluir_finalizadas:
             return queryset
 
-        # Nada selecionado, retorna sem filtro
-        if not incluir_impedidas and not incluir_em_execucao and not incluir_finalizadas:
+        # se nada selecionado, retorna tudo
+        if (
+            not incluir_impedidas
+            and not incluir_em_execucao
+            and not incluir_finalizadas
+        ):
             return queryset
 
-        q = Q()
+        if incluir_impedidas and not incluir_em_execucao and not incluir_finalizadas:
+            return queryset.filter(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
 
-        # Regra 1: inclui IMPEDIMENTO apenas se selecionado
-        if incluir_impedidas:
-            q &= Q(
-                fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO]
+        if incluir_impedidas and incluir_em_execucao and not incluir_finalizadas:
+            q = Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q |= Q(prestacaocontaregistro_set__isnull=False) & ~Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
             )
+            return queryset.filter(q).distinct()
 
-        non_impedimento = ~Q(
-            fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.EMENDA_REDEFINIDA]
-        )
+        if incluir_impedidas and incluir_finalizadas and not incluir_em_execucao:
+            q = Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q |= Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+            )
+            return queryset.filter(q).distinct()
+
+        if incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
+            return queryset.filter(
+                prestacaocontaregistro_set__isnull=False,
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO,
+            ).distinct()
+
+        if incluir_finalizadas and not incluir_em_execucao and not incluir_impedidas:
+            return queryset.filter(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+            ).distinct()
 
         if incluir_em_execucao and incluir_finalizadas and not incluir_impedidas:
-            # ambos selecionados (sem impedimento): todas as não-impedimento
-            if not incluir_impedidas:
-                q &= non_impedimento
-        elif incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
-            # Regra 2: exclui emendas que possuem registro FINALIZADO
-            q &= non_impedimento & ~Q(prestacaocontaregistro_set__situacao="FINALIZADO")
-        elif incluir_finalizadas and not incluir_em_execucao and not incluir_impedidas:
-            # Regra 3: apenas emendas que possuem registro FINALIZADO
-            q &= non_impedimento & Q(prestacaocontaregistro_set__situacao="FINALIZADO")
+            q = Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+            )
+            q |= Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
+            )
+            
+            q &= ~Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            return queryset.filter(q).distinct()
 
-        return queryset.filter(q).distinct()
+        return queryset
 
     def filter_search(self, queryset, name, value):
         query = value.split(" ")
@@ -121,46 +141,43 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
         incluir_impedidas = "IMPEDIMENTO" in situacao
 
         q = Q()
-        if incluir_impedidas:
-            q &= Q(registroajusteloaparlamentar_set__valor__lt=0)
-            q &= Q(emendaloa__isnull=False)
-        else:
-            q &= Q(registroajusteloaparlamentar_set__valor__gte=Decimal(0)) | Q(
-                registroajusteloaparlamentar_set__isnull=True
-            )
-
         # tudo selecionado, retorna sem filtro
         if incluir_em_execucao and incluir_finalizadas and incluir_impedidas:
-            return queryset.filter(q).distinct()
+            return queryset
 
-        # Nada selecionado, retorna sem filtro
-        if not incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
-            return queryset.filter(q).distinct()
+        # se nada selecionado, retorna tudo
+        if (
+            not incluir_em_execucao
+            and not incluir_finalizadas
+            and not incluir_impedidas
+        ):
+            return queryset
 
-        # Regra 1: inclui IMPEDIMENTO apenas se selecionado
-        if incluir_impedidas:
-            q &= Q(
-                emendaloa__fase__in=[
-                    EmendaLoa.IMPEDIMENTO_TECNICO,
-                    EmendaLoa.EMENDA_REDEFINIDA,
-                ]
+        if incluir_impedidas and not incluir_em_execucao and not incluir_finalizadas:
+            return queryset.filter(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+
+        if incluir_impedidas and incluir_em_execucao and not incluir_finalizadas:
+            q |= Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q |= Q(prestacaocontaregistro_set__isnull=False) & ~Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
             )
+            return queryset.filter(q).distinct()
 
-        non_impedimento = ~Q(
-            emendaloa__fase__in=[
-                EmendaLoa.IMPEDIMENTO_TECNICO,
-                EmendaLoa.EMENDA_REDEFINIDA,
-            ]
-        )
+        if incluir_impedidas and incluir_finalizadas and not incluir_em_execucao:
+            q |= Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            q |= Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+            )
+            return queryset.filter(q).distinct()
 
-        if incluir_em_execucao and incluir_finalizadas and not incluir_impedidas:
-            # ambos selecionados (sem impedimento): todas as não-impedimento
-            q &= non_impedimento
-        elif incluir_em_execucao:
-            # Regra 2: exclui emendas que possuem registro FINALIZADO
-            q &= non_impedimento & ~Q(prestacaocontaregistro_set__situacao="FINALIZADO")
-        elif incluir_finalizadas:
-            # Regra 3: apenas emendas que possuem registro FINALIZADO
-            q &= non_impedimento & Q(prestacaocontaregistro_set__situacao="FINALIZADO")
+        if incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
+            return queryset.filter(
+                prestacaocontaregistro_set__isnull=False,
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO,
+            ).distinct()
+        if incluir_finalizadas and not incluir_em_execucao and not incluir_impedidas:
+            return queryset.filter(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+            ).distinct()
 
-        return queryset.filter(q).distinct()
+        return queryset.distinct()
