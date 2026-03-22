@@ -138,9 +138,6 @@ export default {
       return this.loaValue && this.loaValue.id ? this.loaValue.id : null
     },
     filtersDisabled () {
-      if (this.loasChoice.length && (!this.loaValue || !this.loaValue.id)) {
-        return true
-      }
       return this.disabled
     }
   },

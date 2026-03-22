@@ -140,7 +140,15 @@ export default class EmendaLoaList {
     form
       .find('#div_id_parlamentares input[type="checkbox"]')
       .change((event) => {
-        changeAction()
+        // fazer toggle com a classe active do span dentro do label
+        const checkbox = $(event.target)
+        // label é o irmao mais próximo do checkbox, ou seja, o label abaixo do checkbox
+        const labelSpan = checkbox.next('label').find('span')
+        if (checkbox.is(':checked')) {
+          labelSpan.addClass('active')
+        } else {
+          labelSpan.removeClass('active')
+        }
       })
     form
       .find('button[type="button"]')

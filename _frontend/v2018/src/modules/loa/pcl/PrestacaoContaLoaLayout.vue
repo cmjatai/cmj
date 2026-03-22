@@ -1,7 +1,6 @@
 <template>
-  <div :class="['prestacaocontaloa-layout', 'pt-3', !has_pkloa ? 'container-fluid' : '']">
-    <h3 v-if="!has_pkloa">Prestação de Contas das Emendas Impositivas</h3>
-    <div v-if="loa.ano || (!has_pkloa && ready)">
+  <div class="prestacaocontaloa-layout pt-3">
+    <div v-if="loa.ano">
       <pcl-filtros
         ref="filtros"
         :disabled="!ready || fetching"
@@ -14,7 +13,7 @@
         @loa-change="on_loa_change"
       />
 
-      <div class="row mt-3" v-if="loa.ano && (emendas_ajustes_list.length || fetching)">
+      <div class="row mt-3" v-if="emendas_ajustes_list.length || fetching">
         <div class="col-md-4">
           <pcl-lista-emendas-ajustes
             :items="emendas_ajustes_list"
@@ -33,7 +32,7 @@
           />
         </div>
       </div>
-      <div v-else-if="ready && loa.ano" class="text-muted text-center py-5">
+      <div v-else-if="ready" class="text-muted text-center py-5">
         Nenhum resultado encontrado para os filtros selecionados.
       </div>
     </div>
@@ -90,18 +89,12 @@ export default {
       const value = this.loa.id
       return value ? `&loa=${value}` : ''
     },
-    has_pkloa () {
-      return !!this.$route.params.pkloa
-    },
     loas_choice () {
       if (!this.loas_list.length) return []
-      return [
-        { value: null, text: 'Selecione uma LOA...' },
-        ...this.loas_list.map(l => ({
-          value: l.id,
-          text: `LOA ${l.ano}`
-        }))
-      ]
+      return this.loas_list.map(l => ({
+        value: l.id,
+        text: `LOA ${l.ano}`
+      }))
     },
     parlamentares_choice () {
       if (this.loa.parlamentares && this.loa.parlamentares.length > 1) {
@@ -137,9 +130,6 @@ export default {
         if (!this.ready) return
         // sincroniza parâmetros com o histórico de rotas
         const query = {}
-        if (!this.has_pkloa && this.loa.id) {
-          query.loa = this.loa.id
-        }
         this.filters.forEach((f) => {
           if (
             this.filters_value[f] !== null &&
@@ -173,22 +163,12 @@ export default {
     },
 
     on_loa_change (loaId) {
-      if (!loaId) {
-        this.loa = { id: null }
-        this.results = { emendas: {}, ajustes: {} }
-        this.registro_selecionado = null
-        this.prestacaocontaregistro = null
-        this.ajustes_emendas_selecionados = null
-        this.documentos_acessorios = null
-        this.tramitacoes = null
-        this.$router.replace({ query: {} })
-        return
-      }
-      const loa = this.loas_list.find(l => l.id === loaId)
-      if (loa) {
-        this.loa = loa
-        this.resetFilters()
-      }
+      if (!loaId || loaId === this.loa.id) return
+      const resolved = this.$router.resolve({
+        name: this.$route.name,
+        params: { ...this.$route.params, pkloa: loaId }
+      })
+      window.location.href = resolved.href
     },
 
     applyQueryFilters () {
@@ -440,54 +420,30 @@ export default {
     const t = this
     t.removeAside()
     t.$nextTick().then(() => {
-      if (t.has_pkloa) {
-        // Modo 1: LOA definida na rota
-        t.utils
-          .fetch({
-            app: 'loa',
-            model: 'loa',
-            id: t.loa.id,
-            params: {
-              expand: 'parlamentares',
-              include: 'parlamentares.id,nome_parlamentar'
-            }
-          })
-          .then((response) => {
-            t.loa = response.data
-            t.applyQueryFilters()
-            t.ready = true
-            t.fetch()
-          })
-      } else {
-        // Modo 2: sem LOA na rota — exibe seletor com todas as LOAs
-        t.utils
-          .fetch({
-            app: 'loa',
-            model: 'loa',
-            params: {
-              expand: 'parlamentares',
-              include: 'parlamentares.id,nome_parlamentar',
-              get_all: 'True',
-              o: '-ano'
-            }
-          })
-          .then((response) => {
-            t.loas_list = response.data
-            const query = t.$route.query
-            if (query.loa) {
-              const loaId = parseInt(query.loa)
-              const found = t.loas_list.find((l) => l.id === loaId)
-              if (found) {
-                t.loa = found
-                t.applyQueryFilters()
-              }
-            }
-            t.ready = true
-            if (t.loa.ano) {
-              t.fetch()
-            }
-          })
-      }
+      const fetchLoa = t.utils.fetch({
+        app: 'loa',
+        model: 'loa',
+        id: t.loa.id,
+        params: {
+          expand: 'parlamentares',
+          include: 'parlamentares.id,nome_parlamentar'
+        }
+      })
+      const fetchLoas = t.utils.fetch({
+        app: 'loa',
+        model: 'loa',
+        params: {
+          get_all: 'True',
+          o: '-ano'
+        }
+      })
+      Promise.all([fetchLoa, fetchLoas]).then(([loaResp, loasResp]) => {
+        t.loa = loaResp.data
+        t.loas_list = loasResp.data
+        t.applyQueryFilters()
+        t.ready = true
+        t.fetch()
+      })
     })
   }
 }

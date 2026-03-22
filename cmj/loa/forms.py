@@ -17,7 +17,7 @@ from django.template.base import Template
 from django.template.context import Context
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django_filters import BooleanFilter
+from django_filters import BooleanFilter, ModelChoiceFilter
 from django_filters.filters import (
     CharFilter,
     ChoiceFilter,
@@ -1154,7 +1154,7 @@ class EmendaLoaFilterSet(FilterSet):
     parlamentares = LoaParlModelMultipleChoiceFilter(
         queryset=Parlamentar.objects.all(),
         widget=forms.CheckboxSelectMultiple,
-        help_text="Clique nos parlamentares para adicionar ou remover do filtro.",
+        help_text="Clique nos parlamentares para selecionar. Nenhuma seleção irá considerar emendas de todos os parlamentares.",
     )
 
     finalidade = CharFilter(
@@ -1169,6 +1169,33 @@ class EmendaLoaFilterSet(FilterSet):
         method="filter_quebrar_pagina",
     )
 
+    entidade = ModelChoiceFilter(
+        label="Entidade",
+        queryset=Entidade.objects.filter(ativo=True).order_by("nome_fantasia"),
+        widget=forms.Select(
+            attrs={
+                "class": "selectpicker",
+                "data-live-search": "true",
+                "data-header": "Entidades Utilizadas em Emendas",
+                "data-dropup-auto": "false",
+            },
+        ),
+    )
+    unidade = ModelChoiceFilter(
+        label="Unidade Orçamentária",
+        queryset=UnidadeOrcamentaria.objects.filter(
+            recebe_emenda_impositiva=True
+        ).order_by("especificacao"),
+        widget=forms.Select(
+            attrs={
+                "class": "selectpicker",
+                "data-live-search": "true",
+                "data-header": "Unidades Utilizadas em Emendas",
+                "data-dropup-auto": "false",
+            },
+        ),
+    )
+
     class Meta:
         class Form(forms.Form):
             crispy_field_template = (
@@ -1179,6 +1206,8 @@ class EmendaLoaFilterSet(FilterSet):
                 "tipo_agrupamento",
                 "agrupamento",
                 "quebrar_pagina",
+                "entidade",
+                "unidade",
             )
 
         model = EmendaLoa
@@ -1191,6 +1220,8 @@ class EmendaLoaFilterSet(FilterSet):
             "tipo_agrupamento",
             "agrupamento",
             "quebrar_pagina",
+            "entidade",
+            "unidade",
         ]
         form = Form
 
@@ -1310,6 +1341,8 @@ class EmendaLoaFilterSet(FilterSet):
                         [
                             (Fieldset(_("Pesquisa de Emendas Parlamentares")), 12),
                             ("parlamentares", 12),
+                            ("entidade", 6),
+                            ("unidade", 6),
                             ("fase", 4),
                             (
                                 to_row(
@@ -1380,6 +1413,19 @@ class EmendaLoaFilterSet(FilterSet):
         else:
             self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[:5]
         self.form.fields["tipo"].choices = EmendaLoa.TIPOEMENDALOA_CHOICE
+
+        self.form.fields["entidade"].queryset = (
+            Entidade.objects.filter(emendaloa_set__loa=self.loa, ativo=True)
+            .order_by("nome_fantasia", "id")
+            .distinct()
+        )
+        self.form.fields["unidade"].queryset = (
+            UnidadeOrcamentaria.objects.filter(
+                emendaloa_set__loa=self.loa,
+            )
+            .order_by("codigo", "especificacao", "id")
+            .distinct()
+        )
 
 
 class PrestacaoContaLoaForm(ModelForm):

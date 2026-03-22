@@ -41,7 +41,7 @@
       </div>
 
       {# Valor #}
-      <div class="d-flex emenda-valor-group text-center ml-auto hover p-2 rounded">
+      <div class="d-flex emenda-valor-group text-center ml-auto hover p-2 mr-3 rounded">
         <div class="{% if emenda.has_ajustes %}zoom08{% endif %}">
           <span class="emenda-valor font-weight-bold text-primary">
             R$ {{emenda.str_valor}}
@@ -49,16 +49,16 @@
           <br>
           <small class="text-muted">Valor Original da Emenda</small>
         </div>
-        <div class="valor-computado">
-          {% if emenda.has_ajustes %}
+        {% if emenda.has_ajustes %}
+          <div class="valor-computado">
             <span class="emenda-valor font-weight-bold text-success">
               R$ {{emenda.str_valor_computado}}
             </span>
             <br>
             <small class="text-muted">Valor Final da Emenda após Ajustes</small>
             <br>
-          {% endif %}
-        </div>
+          </div>
+        {% endif %}
       </div>
 
     </div>
@@ -268,6 +268,11 @@
             <div class="hover {% if not forloop.last %}border-bottom{% endif %}">
               <div class="d-flex justify-content-between align-items-start p-3">
                 <div>
+                  {% if doc.arquivo %}
+                    <a href="{{doc.arquivo.url}}" class="btn btn-primary mr-2" target="_blank" rel="noopener">
+                      <i class="fas fa-file-pdf fa-sm"></i>
+                    </a>
+                  {% endif %}
                   <small class="font-weight-bold">{{doc.nome}}</small>
                   <br>
                   <small class="text-muted">{{doc.tipo}} &mdash; {{doc.data|date:"d/m/Y"}}</small>
@@ -278,11 +283,6 @@
                     <br><small class="text-muted">{{doc.ementa|truncatewords:30}}</small>
                   {% endif %}
                 </div>
-                {% if doc.arquivo %}
-                  <a href="{{doc.arquivo.url}}" class="btn btn-outline-primary btn-sm ml-2" target="_blank" rel="noopener">
-                    <small>Baixar</small>
-                  </a>
-                {% endif %}
               </div>
             </div>
           {% empty %}

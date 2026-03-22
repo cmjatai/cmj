@@ -49,11 +49,11 @@
           <button class="btn btn-link btn-expand">
             <i class="fas fa-expand"></i>
           </button>
+          {% cache 604800 l.el.l emenda.id %}
           {% include "loa/emendaloa_filter_cache.html" %}
+          {% endcache %}
         </div>
         {% comment %}
-        {% cache 604800 l.el.l emenda.id %}
-        {% endcache %}
         {% cache 604800 l.el emenda.id %}
         {% include "loa/emendaloa_filter_cache.html" %}
         {% endcache %}
