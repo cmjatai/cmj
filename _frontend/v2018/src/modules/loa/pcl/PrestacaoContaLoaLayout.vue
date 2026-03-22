@@ -13,24 +13,13 @@
         @loa-change="on_loa_change"
       />
 
-      <div class="row mt-3" v-if="emendas_ajustes_list.length || fetching">
-        <div class="col-md-4">
-          <pcl-lista-emendas-ajustes
-            :items="emendas_ajustes_list"
-            :registro-selecionado="registro_selecionado"
-            :fetching="fetching"
-            @select="fetch_prestacaocontaregistro"
-          />
-        </div>
-        <div class="col-md-8 pl-md-0">
-          <pcl-detalhe-registro
-            :registro="registro_selecionado"
-            :prestacao-items="prestacaocontaregistro"
-            :ajustes-items="ajustes_emendas_selecionados"
-            :documentos-items="documentos_acessorios"
-            :tramitacoes-items="tramitacoes"
-          />
-        </div>
+      <div class="mt-3" v-if="emendas_ajustes_list.length || fetching">
+        <b-spinner v-if="fetching" small variant="secondary" class="d-block mx-auto my-3"></b-spinner>
+        <pcl-detalhe-registro
+          v-for="item in emendas_ajustes_list"
+          :key="`${item.__label__}_${item.id}`"
+          :registro="item"
+        />
       </div>
       <div v-else-if="ready" class="text-muted text-center py-5">
         Nenhum resultado encontrado para os filtros selecionados.
@@ -41,14 +30,12 @@
 
 <script>
 import PclFiltros from './PclFiltros.vue'
-import PclListaEmendasAjustes from './PclListaEmendasAjustes.vue'
 import PclDetalheRegistro from './PclDetalheRegistro.vue'
 
 export default {
   name: 'prestacaocontaloa-layout',
   components: {
     PclFiltros,
-    PclListaEmendasAjustes,
     PclDetalheRegistro
   },
   data () {
@@ -76,11 +63,6 @@ export default {
         emendas: {},
         ajustes: {}
       },
-      registro_selecionado: null,
-      ajustes_emendas_selecionados: [],
-      prestacaocontaregistro: null,
-      documentos_acessorios: null,
-      tramitacoes: null,
       fetching: false
     }
   },
@@ -231,105 +213,8 @@ export default {
       })
     },
 
-    fetch_prestacaocontaregistro (registro) {
-      this.registro_selecionado = registro
-      this.prestacaocontaregistro = null
-      this.ajustes_emendas_selecionados = null
-      this.documentos_acessorios = null
-      this.tramitacoes = null
-
-      const params = {
-        [registro.__label__ === 'loa_emendaloa' ? 'emendaloa' : 'registro_ajuste']: registro.id,
-        get_all: 'True',
-        expand: 'prestacao_conta'
-      }
-      this.utils
-        .fetch({
-          app: 'loa',
-          model: 'prestacaocontaregistro',
-          params
-        })
-        .then((response) => {
-          this.prestacaocontaregistro = response.data
-        })
-
-      if (registro.__label__ === 'loa_emendaloa') {
-        this.fetch_registroajusteloa(registro)
-        if (registro.materia) {
-          this.fetch_documentos_acessorios(registro)
-          this.fetch_tramitacoes(registro)
-        }
-      }
-    },
-
-    fetch_registroajusteloa (registro) {
-      const params = {
-        emendaloa: registro.id,
-        get_all: 'True',
-        expand: 'oficio_ajuste_loa;unidade;materia'
-      }
-      this.utils
-        .fetch({
-          app: 'loa',
-          model: 'registroajusteloa',
-          params
-        })
-        .then((response) => {
-          this.ajustes_emendas_selecionados = response.data
-        })
-    },
-
-    fetch_documentos_acessorios (registro) {
-      const materiaId =
-        typeof registro.materia === 'object'
-          ? registro.materia.id
-          : registro.materia
-      const params = {
-        materia: materiaId,
-        get_all: 'True',
-        expand: 'tipo'
-      }
-      this.utils
-        .fetch({
-          app: 'materia',
-          model: 'documentoacessorio',
-          params
-        })
-        .then((response) => {
-          this.documentos_acessorios = response.data
-        })
-    },
-
-    fetch_tramitacoes (registro) {
-      const materiaId =
-        typeof registro.materia === 'object'
-          ? registro.materia.id
-          : registro.materia
-      const params = {
-        materia: materiaId,
-        get_all: 'True',
-        expand: 'unidade_tramitacao_destino;status',
-        include: 'status.id,__str__;unidade_tramitacao_destino.id,__str__'
-
-      }
-      this.utils
-        .fetch({
-          app: 'materia',
-          model: 'tramitacao',
-          params
-        })
-        .then((response) => {
-          this.tramitacoes = response.data
-        })
-    },
-
     fetch () {
       if (!this.loa.id) return Promise.resolve()
-      this.registro_selecionado = null
-      this.prestacaocontaregistro = null
-      this.ajustes_emendas_selecionados = null
-      this.documentos_acessorios = null
-      this.tramitacoes = null
       this.fetching = true
 
       const promises = {}
@@ -419,11 +304,6 @@ export default {
             newResults[key] = responses[i].data
           })
           this.results = newResults
-          this.$nextTick(() => {
-            if (this.emendas_ajustes_list.length > 0) {
-              this.fetch_prestacaocontaregistro(this.emendas_ajustes_list[0])
-            }
-          })
         })
         .finally(() => {
           this.fetching = false

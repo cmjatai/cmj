@@ -182,10 +182,6 @@
 
       </div>
     </template>
-    <div v-else class="text-muted text-center py-5">
-      Selecione uma emenda ou ajuste para ver os registros de prestação de
-      contas.
-    </div>
   </div>
 </template>
 
@@ -214,22 +210,23 @@ export default {
     registro: {
       type: Object,
       default: null
-    },
-    prestacaoItems: {
-      type: Array,
-      default: null
-    },
-    ajustesItems: {
-      type: Array,
-      default: null
-    },
-    documentosItems: {
-      type: Array,
-      default: null
-    },
-    tramitacoesItems: {
-      type: Array,
-      default: null
+    }
+  },
+  data () {
+    return {
+      prestacaoItems: null,
+      ajustesItems: null,
+      documentosItems: null,
+      tramitacoesItems: null
+    }
+  },
+  watch: {
+    registro: {
+      immediate: true,
+      handler (reg) {
+        if (!reg) return
+        this.fetchTabData(reg)
+      }
     }
   },
   computed: {
@@ -333,20 +330,84 @@ export default {
     cpfcnpjLimpo (val) {
       if (!val) return ''
       return val.replace(/[0\s]/g, '') ? val.trim() : ''
+    },
+    fetchTabData (registro) {
+      this.prestacaoItems = null
+      this.ajustesItems = null
+      this.documentosItems = null
+      this.tramitacoesItems = null
+
+      const paramKey = registro.__label__ === 'loa_emendaloa' ? 'emendaloa' : 'registro_ajuste'
+      this.utils
+        .fetch({
+          app: 'loa',
+          model: 'prestacaocontaregistro',
+          params: {
+            [paramKey]: registro.id,
+            get_all: 'True',
+            expand: 'prestacao_conta'
+          }
+        })
+        .then((response) => {
+          this.prestacaoItems = response.data
+        })
+
+      if (registro.__label__ === 'loa_emendaloa') {
+        this.utils
+          .fetch({
+            app: 'loa',
+            model: 'registroajusteloa',
+            params: {
+              emendaloa: registro.id,
+              get_all: 'True',
+              expand: 'oficio_ajuste_loa;unidade;materia'
+            }
+          })
+          .then((response) => {
+            this.ajustesItems = response.data
+          })
+
+        if (registro.materia) {
+          const materiaId = typeof registro.materia === 'object'
+            ? registro.materia.id
+            : registro.materia
+
+          this.utils
+            .fetch({
+              app: 'materia',
+              model: 'documentoacessorio',
+              params: {
+                materia: materiaId,
+                get_all: 'True',
+                expand: 'tipo'
+              }
+            })
+            .then((response) => {
+              this.documentosItems = response.data
+            })
+
+          this.utils
+            .fetch({
+              app: 'materia',
+              model: 'tramitacao',
+              params: {
+                materia: materiaId,
+                get_all: 'True',
+                expand: 'unidade_tramitacao_destino;status',
+                include: 'status.id,__str__;unidade_tramitacao_destino.id,__str__'
+              }
+            })
+            .then((response) => {
+              this.tramitacoesItems = response.data
+            })
+        }
+      }
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.pcl-detalhe-registro {
-  position: sticky;
-  top: 1rem;
-  align-self: flex-start;
-  max-height: calc(100vh - 2rem);
-  overflow-y: auto;
-}
-
 .pcl-detalhe-registro ::v-deep {
   .emenda-card {
     transition: box-shadow 0.2s;
