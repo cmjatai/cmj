@@ -16,7 +16,7 @@
           <div>
             <a
               v-if="ajuste.oficio_ajuste_loa && ajuste.oficio_ajuste_loa.link_detail_backend"
-              :href="ajuste.oficio_ajuste_loa.link_detail_backend"
+              :href="ajuste.link_detail_backend"
               target="_blank"
               rel="noopener"
             >

@@ -345,7 +345,7 @@ export default {
           params: {
             [paramKey]: registro.id,
             get_all: 'True',
-            expand: 'prestacao_conta'
+            expand: 'prestacao_conta;registro_ajuste'
           }
         })
         .then((response) => {

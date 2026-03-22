@@ -84,7 +84,7 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
             q |= Q(
                 prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
             )
-            
+
             q &= ~Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
             return queryset.filter(q).distinct()
 
@@ -179,5 +179,16 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
             return queryset.filter(
                 prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
             ).distinct()
+
+        if incluir_em_execucao and incluir_finalizadas and not incluir_impedidas:
+            q |= Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+            )
+            q |= Q(
+                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
+            )
+
+            q &= ~Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+            return queryset.filter(q).distinct()
 
         return queryset.distinct()

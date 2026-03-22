@@ -36,6 +36,7 @@
             v-else
             :key="`ajuste_${item.id}`"
             :registro="item"
+            @search-emenda="val => filters_value = { ...filters_value, search: val , ajustes: 'False', emendas_tipos: [] }"
           />
         </template>
       </div>
@@ -69,7 +70,7 @@ export default {
         unidade: null,
         parlamentares: null,
         situacao: [],
-        emendas_tipos: ['10'],
+        emendas_tipos: [],
         ajustes: 'False',
         search: ''
       },
@@ -306,7 +307,8 @@ export default {
         const params_ajustes = {
           oficio_ajuste_loa__loa: this.loa.id,
           exclude: 'search',
-          expand: 'emendaloa.id,__str__;unidade',
+          include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
+          expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
           o: 'parlamentares_valor__nome_parlamentar'
         }
         if (

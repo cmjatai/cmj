@@ -34,7 +34,7 @@
             <template v-if="pc.detalhamento">
               <br><small class="text-muted">{{ pc.detalhamento }}</small>
             </template>
-            <template v-if="pc.registro_ajuste">
+            <template v-if="pc.registro_ajuste && pc.registro_ajuste.id !== registro.id">
               <hr class="p-0 m-0">
               <small class="text-muted">Relativo ao Ajuste Técnico: {{ pc.registro_ajuste.descricao || pc.registro_ajuste.__str__ }}</small>
             </template>
