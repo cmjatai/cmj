@@ -391,8 +391,15 @@ class ArqDocSerializer(CmjSerializerMixin):
 class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     str_valor = serializers.CharField(read_only=True)
 
+    # crie o campo valor como DecimalField chamanado método para calcular
+    valor = serializers.SerializerMethodField()
+
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa
+
+    def get_valor(self, obj):
+        obj = obj.registroajusteloaparlamentar_set.aggregate(total=Max("valor"))
+        return obj["total"] if obj["total"] else 0
 
 
 class EmendaLoaSerializer(CmjSerializerMixin):
@@ -411,6 +418,9 @@ class EmendaLoaSerializer(CmjSerializerMixin):
 
     epigrafe_short = serializers.SerializerMethodField()
 
+    valor_inicial = serializers.SerializerMethodField()
+    valor_computado = serializers.FloatField(read_only=True)
+
     class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
 
@@ -418,6 +428,9 @@ class EmendaLoaSerializer(CmjSerializerMixin):
         if obj.materia and obj.materia.epigrafe_short:
             return obj.materia.epigrafe_short
         return ""
+
+    def get_valor_inicial(self, obj):
+        return obj.valor or Decimal("0.00")
 
     def validate_valor(self, obj, *args, **kwargs):
 
