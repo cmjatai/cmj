@@ -785,15 +785,7 @@ class EmendaLoa(CmjSearchMixin):
 
     @property
     def str_valor_computado(self):
-        soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
-            registro__emendaloa=self
-        ).aggregate(Sum("valor"))
-        valor = (
-            soma_ajustes["valor__sum"]
-            if soma_ajustes["valor__sum"] is not None
-            else self.valor
-        )
-        valor_str = formats.number_format(valor, force_grouping=True)
+        valor_str = formats.number_format(self.valor_computado, force_grouping=True)
         return valor_str
 
     @property
@@ -806,6 +798,13 @@ class EmendaLoa(CmjSearchMixin):
             if soma_ajustes["valor__sum"] is not None
             else self.valor
         )
+        #if valor != self.valor:
+        #    print(
+        #        self.id,
+        #        self.valor,
+        #        valor,
+        #        self.materia.epigrafe_short if self.materia else "",
+        #    )
         return valor
 
     @property

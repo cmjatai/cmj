@@ -13,13 +13,26 @@
         @loa-change="on_loa_change"
       />
 
+      <pcl-totalizacao
+        v-if="!fetching && emendas_ajustes_list.length"
+        :lista="emendas_ajustes_list"
+        class="mt-3"
+      />
+
       <div class="mt-3" v-if="emendas_ajustes_list.length || fetching">
         <b-spinner v-if="fetching" small variant="secondary" class="d-block mx-auto my-3"></b-spinner>
-        <pcl-detalhe-registro
-          v-for="item in emendas_ajustes_list"
-          :key="`${item.__label__}_${item.id}`"
-          :registro="item"
-        />
+        <template v-for="item in emendas_ajustes_list">
+          <pcl-detalhe-emenda
+            v-if="item.__label__ === 'loa_emendaloa'"
+            :key="`emenda_${item.id}`"
+            :registro="item"
+          />
+          <pcl-detalhe-ajuste
+            v-else
+            :key="`ajuste_${item.id}`"
+            :registro="item"
+          />
+        </template>
       </div>
       <div v-else-if="ready" class="text-muted text-center py-5">
         Nenhum resultado encontrado para os filtros selecionados.
@@ -30,13 +43,17 @@
 
 <script>
 import PclFiltros from './PclFiltros.vue'
-import PclDetalheRegistro from './PclDetalheRegistro.vue'
+import PclDetalheEmenda from './PclDetalheEmenda.vue'
+import PclDetalheAjuste from './PclDetalheAjuste.vue'
+import PclTotalizacao from './PclTotalizacao.vue'
 
 export default {
   name: 'prestacaocontaloa-layout',
   components: {
     PclFiltros,
-    PclDetalheRegistro
+    PclDetalheEmenda,
+    PclDetalheAjuste,
+    PclTotalizacao
   },
   data () {
     return {

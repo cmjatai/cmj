@@ -404,6 +404,10 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
 
 class EmendaLoaSerializer(CmjSerializerMixin):
 
+    str_valor = serializers.CharField(
+        read_only=True,
+    )
+
     str_valor_computado = serializers.CharField(
         read_only=True,
     )
