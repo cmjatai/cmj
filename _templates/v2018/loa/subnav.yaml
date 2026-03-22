@@ -3,24 +3,27 @@
   url: loa_detail
 - title: {% trans 'Prestação de Contas' %}
   url: prestacaocontaloa_list
-- title: {% trans 'Emendas Impositivas/Modificativas' %}
-  url: emendaloa_list
-- title: {% trans 'Ajustes Técnicos' %}
-  url: oficioajusteloa_list
-- title: {% trans 'Despesas Orçamentárias' %}
-  url: despesa_list
-
-{% if perms.loa.emendaloa_full_editor %}
-- title: {% trans 'Agrupamentos' %}
-  url: agrupamento_list
-{% endif %}
-{% if perms.loa.unidadeorcamentaria_list %}
-- title: {% trans 'U.O.' %}
-  url: unidadeorcamentaria_list
-{% endif %}
-{% if perms.loa.subfuncao_list %}
-- title: {% trans 'SF' %}
-  url: subfuncao_list
-{% endif %}
-{% if False %}
-{% endif %}
+- title: {% trans 'Registros' %}
+  children:
+  - title: {% trans 'Emendas Impositivas/Modificativas' %}
+    url: emendaloa_list
+  - title: {% trans 'Ajustes Técnicos' %}
+    url: oficioajusteloa_list
+  - title: {% trans 'Despesas Orçamentárias' %}
+    url: despesa_list
+  - title: ''
+    url: ''
+  {% if perms.loa.emendaloa_full_editor %}
+  - title: {% trans 'Agrupamentos' %}
+    url: agrupamento_list
+  {% endif %}
+  {% if perms.loa.unidadeorcamentaria_list %}
+  - title: {% trans 'U.O.' %}
+    url: unidadeorcamentaria_list
+  {% endif %}
+  {% if perms.loa.subfuncao_list %}
+  - title: {% trans 'SF' %}
+    url: subfuncao_list
+  {% endif %}
+  {% if False %}
+  {% endif %}

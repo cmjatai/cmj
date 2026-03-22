@@ -2,7 +2,7 @@
 
 - title: {% trans 'Abertura' %}
   children:
-    - title: {% trans 'Dados Básicos' %}
+    - title: {% trans 'Dados Básicos' %} 
       url: sessaoplenaria_detail
     - title: {% trans 'Mesa' %}
       url: mesa

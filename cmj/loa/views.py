@@ -295,6 +295,8 @@ class LoaCrud(Crud):
         def extras_list_url(self):
             btns = []
 
+            return btns
+
             btns.extend(
                 [
                     (
@@ -302,7 +304,7 @@ class LoaCrud(Crud):
                             "cmj.loa:emendaloa_list", kwargs={"pk": self.kwargs["pk"]}
                         ),
                         "btn-primary",
-                        _("Listas Emendas Impositivas"),
+                        _("Listar Emendas Impositivas"),
                     )
                 ]
             )
