@@ -664,7 +664,7 @@ class LoaCrud(Crud):
             # TODO: para o detail da LOA, parlamentar ativo e inativo deve ser mostrado
             # sobre o contexto da legislatura vigente no ano de execução da LOA,
             # e não pelo status no cadastro Parlamentar.
-            template = loader.get_template("loa/loaparlamentar_set_list.html")
+            template = loader.get_template("loa/widget_loaparlamentar_set_list.html")
             rendered = template.render(context, self.request)
             return "Resumo Geral das Emendas Impositivas Parlamentares", rendered
 
@@ -868,7 +868,7 @@ class LoaCrud(Crud):
             # TODO: para o detail da LOA, parlamentar ativo e inativo deve ser mostrado
             # sobre o contexto da legislatura vigente no ano de execução da LOA,
             # e não pelo status no cadastro Parlamentar.
-            template = loader.get_template("loa/loaparlamentar_set_list.html")
+            template = loader.get_template("loa/widget_loaparlamentar_set_list.html")
             rendered = template.render(context, self.request)
             return "Resumo Geral das Emendas Impositivas Parlamentares", rendered
 
@@ -1035,7 +1035,7 @@ class LoaCrud(Crud):
                 ),
             )
 
-            template = loader.get_template("loa/loaparlamentar_set_list.html")
+            template = loader.get_template("loa/widget_loaparlamentar_set_list.html")
             rendered = template.render(context, self.request)
 
             return "Resumo Geral das Emendas Impositivas Parlamentares", rendered

@@ -1,8 +1,8 @@
 {% load i18n common_tags%}
-- title: {% trans 'Resumo' %}
-  url: loa_detail
 - title: {% trans 'Prestação de Contas' %}
   url: prestacaocontaloa_list
+- title: {% trans 'Resumo' %}
+  url: loa_detail
 - title: {% trans 'Registros' %}
   children:
   - title: {% trans 'Emendas Impositivas/Modificativas' %}

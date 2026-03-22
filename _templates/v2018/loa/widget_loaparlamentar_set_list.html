@@ -25,7 +25,7 @@
     <tr>
       <th class="text-left font-weight-bold">
         <div class="d-flex justify-content-between">
-          <a href="{% url 'cmj.loa:emendaloa_list' lp.loaparlamentar.loa.id %}?parlamentares={{ lp.loaparlamentar.parlamentar.id }}">
+          <a href="{% url 'cmj.loa:prestacaocontaloa_list' lp.loaparlamentar.loa.id %}?parlamentares={{ lp.loaparlamentar.parlamentar.id }}">
             {{lp.loaparlamentar.parlamentar}} {% if lp.loaparlamentar.parlamentar.ativo %}<span class="ml-2 badge badge-success">Ativo</span>{% else %}<span class="ml-2 badge badge-danger">Inativo</span>{% endif %}</span>
           </a>
           <small title="Disponibidade Total = Saúde + Diversos">{{lp.loaparlamentar.disp_total|decimal2str}}</small>

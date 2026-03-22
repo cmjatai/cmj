@@ -164,9 +164,23 @@ export default {
 
     on_loa_change (loaId) {
       if (!loaId || loaId === this.loa.id) return
+      const query = {}
+      this.filters.forEach((f) => {
+        if (f === 'unidade') return
+        const val = this.filters_value[f]
+        if (val === null || val === undefined) return
+        if (Array.isArray(val)) {
+          query[f] = val.join(',')
+        } else if (typeof val === 'object') {
+          query[f] = val.id
+        } else {
+          query[f] = val
+        }
+      })
       const resolved = this.$router.resolve({
         name: this.$route.name,
-        params: { ...this.$route.params, pkloa: loaId }
+        params: { ...this.$route.params, pkloa: loaId },
+        query
       })
       window.location.href = resolved.href
     },
