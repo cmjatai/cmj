@@ -136,4 +136,36 @@ export default {
 .grupo-valor {
   color: #212529;
 }
+
+/* ===== Responsivo < 992px ===== */
+@media (max-width: 991.98px) {
+  .grupos-row .grupo-box {
+    flex: 1 1 auto;
+  }
+}
+
+/* ===== Responsivo < 768px ===== */
+@media (max-width: 767.98px) {
+  .total-geral-box {
+    font-size: 0.85rem;
+  }
+  .grupo-box {
+    font-size: 0.75rem;
+    white-space: normal;
+  }
+}
+
+/* ===== Responsivo < 425px ===== */
+@media (max-width: 425px) {
+  .pcl-totalizacao {
+    padding: 0.5rem 0.75rem;
+  }
+  .grupos-row {
+    flex-direction: column;
+  }
+  .grupo-box {
+    margin-right: 0 !important;
+    width: 100%;
+  }
+}
 </style>

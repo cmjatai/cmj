@@ -1,7 +1,7 @@
 <template>
   <div class="pcl-filtros card card-body bg-light pt-3 px-3 pb-2 mb-0">
     <div class="row">
-      <div v-if="loasChoice.length" class="col-md-1 pr-1">
+      <div v-if="loasChoice.length" class="col-lg-1 col-md-2 col-4 mb-2">
         <label class="pcl-filtros-label">LOA</label>
         <b-form-select
           :value="selectedLoaId"
@@ -11,7 +11,7 @@
           :disabled="disabled"
         ></b-form-select>
       </div>
-      <div class="col mb-2 px-2">
+      <div class="col-lg col-md-10 col-8 mb-2">
         <label class="pcl-filtros-label">Pesquisa</label>
         <b-input-group size="sm">
           <b-form-input
@@ -29,7 +29,7 @@
           </b-input-group-append>
         </b-input-group>
       </div>
-      <div class="col-md-2 mb-2 px-2">
+      <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
         <label class="pcl-filtros-label">Parlamentares</label>
         <b-form-select
           @change="val => updateFilter('parlamentares', val)"
@@ -39,7 +39,7 @@
           :disabled="filtersDisabled"
         ></b-form-select>
       </div>
-      <div class="col-md-3 mb-2 pl-1">
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
         <label class="pcl-filtros-label">Entidades</label>
         <model-select
           @change="val => updateFilter('entidade', val)"
@@ -54,7 +54,7 @@
           :disabled="filtersDisabled"
         ></model-select>
       </div>
-      <div class="col-md-3 mb-2 pl-1">
+      <div class="col-lg-3 col-md-4 mb-2">
         <label class="pcl-filtros-label">Unidade Orçamentária</label>
         <model-select
           @change="val => updateFilter('unidade', val)"
@@ -71,7 +71,7 @@
       </div>
     </div>
     <div class="row align-items-end mt-2">
-      <div class="col-auto pr-1 mb-1">
+      <div class="col-lg-auto col-12 mb-2">
         <label class="pcl-filtros-label">Documentos</label>
         <div class="pcl-filtros-check-group d-flex flex-wrap">
           <b-form-checkbox-group
@@ -92,9 +92,9 @@
           >Registros de Ajustes</b-form-checkbox>
         </div>
       </div>
-      <div class="col-auto pl-1 mb-1">
+      <div class="col-lg-auto col mb-2">
         <label class="pcl-filtros-label">Situação</label>
-        <div class="pcl-filtros-check-group d-flex">
+        <div class="pcl-filtros-check-group d-flex flex-wrap">
           <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)" :disabled="filtersDisabled">
             <b-form-checkbox class="mr-3" value="EM_EXECUCAO">Em Execução</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="FINALIZADO">Finalizado</b-form-checkbox>
@@ -345,5 +345,65 @@ export default {
 .pcl-page-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* ===== Responsivo < 992px ===== */
+@media (max-width: 991.98px) {
+  .pcl-filtros {
+    padding: 0.75rem 0.5rem 0.5rem;
+  }
+  .pcl-pagination {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+}
+
+/* ===== Responsivo < 768px ===== */
+@media (max-width: 767.98px) {
+  .pcl-filtros-label {
+    font-size: 0.7rem;
+  }
+  .pcl-filtros-check-group {
+    font-size: 0.8rem;
+    padding: 0.15rem 0.35rem;
+  }
+  .pcl-filtros-check-group >>> .custom-control-label {
+    font-size: 0.72rem;
+  }
+  .pcl-pagination {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 0.5rem;
+  }
+  .pcl-pagination nav {
+    justify-content: center;
+  }
+  .pcl-pagination > small {
+    text-align: center;
+  }
+}
+
+/* ===== Responsivo < 425px ===== */
+@media (max-width: 425px) {
+  .pcl-filtros {
+    padding: 0.5rem 0.35rem 0.35rem;
+  }
+  .pcl-filtros-check-group {
+    font-size: 0.75rem;
+    padding: 0.1rem 0.25rem;
+  }
+  .pcl-filtros-check-group >>> .custom-control-label {
+    font-size: 0.68rem;
+  }
+  .pcl-page-btn {
+    min-width: 1.6rem;
+    height: 1.6rem;
+    font-size: 0.7rem;
+    padding: 0 0.2rem;
+  }
+  .pcl-page-size-select {
+    width: 3.5rem !important;
+    font-size: 0.7rem;
+  }
 }
 </style>

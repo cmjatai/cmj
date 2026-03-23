@@ -67,12 +67,13 @@
             </small>
             <small class="d-block text-muted" v-if="emendasLoaList.length">
               <strong>Emendas vinculadas:</strong>
-              <button
-                v-for="(em, idx) in emendasLoaList"
-                :key="`emenda_${em.id}_${idx}`"
+              <template v-for="(em, idx) in emendasLoaList">
+                <button
+                  :key="`emenda_${em.id}_${idx}`"
                   class="btn btn-link btn-sm p-0 align-baseline"
                   @click="$emit('search-emenda', em.text)"
-                >{{ em.text }}</button><span v-if="idx < emendasLoaList.length - 1">, </span>
+                >{{ em.text }}</button><span :key="`sep_${idx}`" v-if="idx < emendasLoaList.length - 1">, </span>
+              </template>
             </small>
           </div>
         </div>
@@ -282,6 +283,80 @@ export default {
 
   .tab-content {
     border-top: none;
+  }
+}
+
+/* ===== Responsivo < 992px ===== */
+@media (max-width: 991.98px) {
+  .pcl-detalhe-ajuste ::v-deep {
+    .emenda-card .card-header .ml-auto {
+      flex: 0 0 100%;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      margin-top: 0.5rem;
+      text-align: center !important;
+    }
+  }
+}
+
+/* ===== Responsivo < 768px ===== */
+@media (max-width: 767.98px) {
+  .pcl-detalhe-ajuste ::v-deep {
+    .emenda-card {
+      .card-header {
+        padding: 0.75rem;
+      }
+      h4 {
+        font-size: 1rem;
+      }
+      .emenda-parlamentares-fotos .emenda-avatar {
+        width: 38px;
+        height: 38px;
+      }
+      .emenda-valor {
+        font-size: 1.05rem;
+      }
+    }
+    .nav-tabs .nav-link {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.5rem;
+    }
+    .tab-pane .d-flex.justify-content-between {
+      flex-direction: column;
+      align-items: center !important;
+      gap: 0.25rem;
+    }
+  }
+}
+
+/* ===== Responsivo < 425px ===== */
+@media (max-width: 425px) {
+  .pcl-detalhe-ajuste ::v-deep {
+    .emenda-card {
+      .card-header {
+        padding: 0.5rem;
+      }
+      h4 {
+        font-size: 0.9rem;
+      }
+      .emenda-parlamentares-fotos .emenda-avatar {
+        width: 32px;
+        height: 32px;
+      }
+      .emenda-valor {
+        font-size: 0.95rem;
+      }
+      .card-body {
+        padding: 0.5rem;
+      }
+    }
+    .nav-tabs .nav-link {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.4rem;
+    }
+    .tab-pane .p-3 {
+      padding: 0.5rem !important;
+    }
   }
 }
 </style>

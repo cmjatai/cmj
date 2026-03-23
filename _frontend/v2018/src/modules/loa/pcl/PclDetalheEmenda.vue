@@ -24,7 +24,7 @@
 
           <!-- Título e badges -->
           <div class="flex-grow-1">
-            <h4 class="mb-1 font-weight-bold">
+            <h4 class="mb-1 font-weight-bold text-wrap">
               <a :href="registro.link_detail_backend" target="_blank">
                 {{ tituloRegistro }}
                 <i class="fas fa-external-link-alt fa-sm ml-1 text-muted"></i>
@@ -526,6 +526,91 @@ export default {
 
   .tab-content {
     border-top: none;
+  }
+}
+
+/* ===== Responsivo < 992px ===== */
+@media (max-width: 991.98px) {
+  .pcl-detalhe-emenda ::v-deep {
+    .emenda-card .emenda-valor-group {
+      flex: 0 0 100%;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      margin-top: 0.5rem;
+      justify-content: flex-start;
+      gap: 1.5rem;
+      text-align: left;
+    }
+  }
+}
+
+/* ===== Responsivo < 768px ===== */
+@media (max-width: 767.98px) {
+  .pcl-detalhe-emenda ::v-deep {
+    .emenda-card {
+      .card-header {
+        padding: 0.75rem;
+      }
+      h4 {
+        font-size: 1rem;
+      }
+      .emenda-parlamentares-fotos .emenda-avatar {
+        width: 38px;
+        height: 38px;
+      }
+      .emenda-valor-group .emenda-valor {
+        font-size: 1.05rem;
+      }
+    }
+    .nav-tabs .nav-link {
+      font-size: 0.75rem;
+      padding: 0.3rem 0.5rem;
+    }
+    .tab-pane .d-flex.justify-content-between {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 0.25rem;
+    }
+  }
+}
+
+/* ===== Responsivo < 425px ===== */
+@media (max-width: 425px) {
+  .pcl-detalhe-emenda ::v-deep {
+    .emenda-card {
+      .card-header {
+        padding: 0.5rem;
+      }
+      h4 {
+        font-size: 0.9rem;
+      }
+      .emenda-parlamentares-fotos .emenda-avatar {
+        width: 32px;
+        height: 32px;
+      }
+      .emenda-valor-group {
+        flex-direction: column;
+        gap: 0.5rem !important;
+
+        .emenda-valor {
+          font-size: 0.95rem;
+        }
+      }
+      .card-body {
+        padding: 0.5rem;
+      }
+    }
+    .nav-tabs .nav-link {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.4rem;
+    }
+    .tab-pane .p-3 {
+      padding: 0.5rem !important;
+    }
+    .tab-pane .px-3 {
+      padding-left: 0.75rem !important;
+      padding-right: 0.75rem !important;
+    }
   }
 }
 </style>
