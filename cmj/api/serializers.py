@@ -17,7 +17,12 @@ from rest_framework.relations import (
 
 from cmj.arq.models import ArqClasse, ArqDoc, DraftMidia
 from cmj.core.models import Bi
-from cmj.loa.models import EmendaLoa, PrestacaoContaRegistro, RegistroAjusteLoa
+from cmj.loa.models import (
+    ArquivoPrestacaoContaRegistro,
+    EmendaLoa,
+    PrestacaoContaRegistro,
+    RegistroAjusteLoa,
+)
 from cmj.sigad.models import (
     DOC_TEMPLATES_CHOICE,
     CMSMixin,
@@ -395,17 +400,21 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     valor = serializers.SerializerMethodField()
 
     fase_prestacao_contas = serializers.SerializerMethodField()
+
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa
 
     def get_fase_prestacao_contas(self, obj):
-        if obj.prestacaocontaregistro_set.filter(situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO).exists():
+        if obj.prestacaocontaregistro_set.filter(
+            situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
+        ).exists():
             return PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-        elif obj.prestacaocontaregistro_set.filter(situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO).exists():
+        elif obj.prestacaocontaregistro_set.filter(
+            situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
+        ).exists():
             return PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
         else:
-            return 'SEM_PRESTACAO_CONTAS'
-
+            return "SEM_PRESTACAO_CONTAS"
 
     def get_valor(self, obj):
         obj = obj.registroajusteloaparlamentar_set.aggregate(total=Max("valor"))
@@ -477,3 +486,21 @@ class EmendaLoaSerializer(CmjSerializerMixin):
             )
 
         return obj
+
+
+class ArquivoPrestacaoContaRegistroSerializer(CmjSerializerMixin):
+
+    class Meta(CmjSerializerMixin.Meta):
+        model = ArquivoPrestacaoContaRegistro
+
+
+class PrestacaoContaRegistroSerializer(CmjSerializerMixin):
+
+    arquivos = ArquivoPrestacaoContaRegistroSerializer(
+        many=True,
+        read_only=True,
+        source="arquivoprestacaocontaregistro_set",
+    )
+
+    class Meta(CmjSerializerMixin.Meta):
+        model = PrestacaoContaRegistro

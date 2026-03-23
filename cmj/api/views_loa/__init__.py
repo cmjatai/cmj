@@ -2,6 +2,7 @@ import logging
 
 from django.apps.registry import apps
 
+from cmj.api.serializers import PrestacaoContaRegistroSerializer
 from cmj.api.views_loa.agrupamento import AgrupamentoViewSet
 from cmj.api.views_loa.agrupamentoemendaloa import AgrupamentoEmendaLoaViewSet
 from cmj.api.views_loa.agrupamentoregistrocontabil import (

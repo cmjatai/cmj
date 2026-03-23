@@ -28,12 +28,28 @@
               </small>
             </a>
             <br>
-            <strong>
+            <small class="text-muted">
               <small>Encaminhado em: {{ pc.prestacao_conta ? formatDateBR(pc.prestacao_conta.data_envio) : '—' }}</small>
-            </strong>
-            <template v-if="pc.detalhamento">
-              <br><small class="text-muted">{{ pc.detalhamento }}</small>
-            </template>
+            </small>
+            <small>
+
+              <small v-if="pc.detalhamento"><br>{{ pc.detalhamento }}</small>
+              <small v-else class="text-muted"> | Sem descrição de detalhamento</small>
+
+              <template v-if="pc.arquivos && pc.arquivos.length > 0">
+                <small class="text-muted">Arquivos:</small>
+                <ul class="mb-0">
+                  <li v-for="(arquivo, aidx) in pc.arquivos" :key="arquivo.id || aidx">
+                    <a :href="arquivo.arquivo" target="_blank" rel="noopener">
+                      {{ arquivo.descricao || arquivo.__str__ || 'Arquivo sem descrição' }}
+                    </a>
+                  </li>
+                </ul>
+              </template>
+              <template v-else>
+                <small class="text-muted"> | Nenhum arquivo anexado.</small>
+              </template>
+            </small>
             <template v-if="pc.registro_ajuste && pc.registro_ajuste.id !== registro.id">
               <hr class="p-0 m-0">
               <small class="text-muted">Relativo ao Ajuste Técnico: {{ pc.registro_ajuste.descricao || pc.registro_ajuste.__str__ }}</small>
