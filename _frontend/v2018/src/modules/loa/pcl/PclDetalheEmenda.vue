@@ -315,6 +315,8 @@ export default {
         hasData: Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0
       })
 
+      tabs.sort((a, b) => (b.hasData ? 1 : 0) - (a.hasData ? 1 : 0))
+
       if (this.registro.materia) {
         tabs.push({
           key: 'tramitacoes',
@@ -325,8 +327,7 @@ export default {
           hasData: Array.isArray(this.documentosItems) && this.documentosItems.length > 0
         })
       }
-
-      return tabs.sort((a, b) => (b.hasData ? 1 : 0) - (a.hasData ? 1 : 0))
+      return tabs
     }
   },
   methods: {

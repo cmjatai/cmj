@@ -36,7 +36,7 @@
             </template>
             <small class="text-muted">{{ ajuste.descricao }}</small>
           </div>
-          <span class="badge badge-light font-weight-bold ml-2 text-nowrap">R$ {{ ajuste.str_valor }}</span>
+          <h4 class="font-weight-bold ml-2 text-nowrap text-muted">R$ {{ ajuste.str_valor }}</h4>
         </div>
       </div>
     </template>

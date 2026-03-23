@@ -1412,8 +1412,8 @@ class PrestacaoContaLoa(models.Model):
     )
 
     class Meta:
-        verbose_name = _("Prestação de Contas do Orçamento Impositivo")
-        verbose_name_plural = _("Prestações de Contas do Orçamento Impositivo")
+        verbose_name = _("Prestação de Contas das Emendas Impositivas")
+        verbose_name_plural = _("Prestações de Contas das Emendas Impositivas")
         ordering = ["id"]
 
     def __str__(self):
