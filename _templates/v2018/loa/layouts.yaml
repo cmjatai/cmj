@@ -70,6 +70,7 @@ EmendaLoaDetail:
       - registroajusteloa_set
       - prestacaocontaregistro_set
       - documentos_acessorios
+      - emendaloahistoricofase_set
 {% if False %}
     {% trans 'Registro de Alterações' %}:
       col-md-12:

@@ -1137,6 +1137,29 @@ class EmendaLoa(CmjSearchMixin):
             )
 
 
+class EmendaLoaHistoricoFase(models.Model):
+
+    emendaloa = models.ForeignKey(
+        EmendaLoa,
+        verbose_name=_("Emenda Impositiva"),
+        related_name="emendaloahistoricofase_set",
+        on_delete=CASCADE,
+    )
+
+    fase = models.PositiveSmallIntegerField(
+        choices=EmendaLoa.FASE_CHOICE, default=10, verbose_name=_("Fase")
+    )
+
+    timestamp = models.DateTimeField(auto_now_add=True, verbose_name=_("Data e Hora"))
+
+    class Meta:
+        verbose_name = _("Histórico de Fase da Emenda Impositiva")
+        verbose_name_plural = _("Históricos de Fase das Emendas Impositivas")
+        ordering = ["timestamp"]
+
+    def __str__(self):
+        return f"{self.timestamp.strftime('%d/%m/%Y %H:%M:%S')} - {self.get_fase_display()}"
+
 class EmendaLoaParlamentar(models.Model):
 
     emendaloa = models.ForeignKey(

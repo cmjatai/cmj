@@ -11,13 +11,12 @@
           :value="selectedLoaId"
           :options="loasChoice"
           @change="val => $emit('loa-change', val)"
-          size="sm"
           :disabled="disabled"
         ></b-form-select>
       </div>
       <div class="col-lg col-md-10 col-8 mb-2 px-1">
         <label class="pcl-filtros-label">Pesquisa</label>
-        <b-input-group size="sm">
+        <b-input-group>
           <b-form-input
             ref="searchInput"
             type="search"
@@ -39,7 +38,6 @@
           @change="val => updateFilter('parlamentares', val)"
           :value="value.parlamentares"
           :options="parlamentaresChoice"
-          size="sm"
           :disabled="filtersDisabled"
         ></b-form-select>
       </div>
@@ -107,7 +105,7 @@
         </div>
       </div>
       <div class="col-auto ml-auto mb-1 px-1">
-        <button class="btn btn-sm btn-secondary" @click="$emit('reset')" title="Limpar todos os filtros" :disabled="filtersDisabled">
+        <button class="btn btn-sm btn-secondary" @click="$emit('reset')" title="Limpar todos os filtros">
           <i class="fas fa-times mr-1"></i>Limpar
         </button>
       </div>
@@ -123,7 +121,9 @@
           class="pcl-page-size-select"
         ></b-form-select>
       </div>
-      <small class="text-muted mr-auto" style="font-size:.8rem;">{{ paginationLabel }}</small>
+      <small class="text-muted mr-auto" style="font-size:.8rem;">{{ paginationLabel }}
+        <b-spinner v-if="fetching" small variant="secondary" class="ml-2" style="vertical-align:middle;"></b-spinner>
+      </small>
       <nav class="d-flex align-items-center">
         <button
           class="pcl-page-btn"

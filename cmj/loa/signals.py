@@ -8,10 +8,23 @@ from django.dispatch.dispatcher import receiver
 from cmj.loa.models import (
     AgrupamentoEmendaLoa,
     AgrupamentoRegistroContabil,
+    EmendaLoa,
     EmendaLoaRegistroContabil,
 )
 
 logger = logging.getLogger(__name__)
+
+
+@receiver(
+    post_save,
+    sender=EmendaLoa,
+    dispatch_uid="signal_postsave_emendaloa",
+)
+def signal_postsave_emendaloa(sender, instance, **kwargs):
+
+    historico_fase = instance.historicofase_set.last()
+    if not historico_fase or historico_fase.fase != instance.fase:
+        historico_fase = instance.historicofase_set.create(fase=instance.fase)
 
 
 @receiver(

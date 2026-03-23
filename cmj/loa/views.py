@@ -454,7 +454,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                # print(f"Calculando resumo para parlamentar {lp}...")
+                print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -487,14 +487,14 @@ class LoaCrud(Crud):
                         **params
                     ).aggregate(Sum("valor"))
 
-                    # 2 - Soma o valor que está em fase de impedimento técnico para o parlamentar, LOA e tipo de emenda
+                    # 2 - Soma o valor de emendas que já estiveram em fase de impedimento técnico, para mostrar o impacto total dos impedimentos técnicos
+
                     totdb_imp_tecnico = (
                         EmendaLoaParlamentar.objects.filter(**params)
                         .filter(
-                            emendaloa__fase__in=[
-                                choice[0] for choice in EmendaLoa.IMPEDIMENTOS_CHOICE
-                            ]
+                            emendaloa__emendaloahistoricofase_set__fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.EMENDA_REDEFINIDA]
                         )
+                        .distinct()
                         .aggregate(Sum("valor"))
                     )
 
@@ -2911,6 +2911,13 @@ class EmendaLoaCrud(MasterDetailCrud):
                 </div>
                 """,
             )
+
+        def hook_emendaloahistoricofase_set(
+            self, emendaloa, verbose_name="", field_display=""
+        ):
+            # if not self.request.user.is_superuser:
+            #    return "", ""
+            return verbose_name, field_display, "courier"
 
         def hook_auditlog(self, emendaloa, verbose_name="", field_display=""):
             if not self.request.user.is_superuser:

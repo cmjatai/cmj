@@ -3,7 +3,7 @@
     <div v-if="loa.ano">
       <pcl-filtros
         ref="filtros"
-        :disabled="!ready || fetching"
+        :disabled="!ready || !firstPageLoaded"
         v-model="filters_value"
         :parlamentares-choice="parlamentares_choice"
         :qs-loa="qs_loa"
@@ -27,7 +27,6 @@
       />
 
       <div class="pcldetalhe-list" v-if="emendas_ajustes_list.length || fetching">
-        <b-spinner v-if="fetching" small variant="secondary" class="d-block mx-auto my-3"></b-spinner>
         <template v-for="item in paginatedList">
           <pcl-detalhe-emenda
             v-if="item.__label__ === 'loa_emendaloa'"
@@ -47,7 +46,7 @@
           />
         </template>
       </div>
-      <div v-else-if="ready" class="text-muted text-center py-5">
+      <div v-else-if="ready" class="card text-muted text-center my-3 py-3 mx-5 font-weight-bold">
         Nenhum resultado encontrado para os filtros selecionados.
       </div>
     </div>
@@ -96,6 +95,7 @@ export default {
         ajustes: []
       },
       fetching: false,
+      firstPageLoaded: false,
       currentPage: 1,
       pageSize: 10
     }
@@ -348,6 +348,7 @@ export default {
             this.results = Object.assign({}, this.results, {
               [resultKey]: [...this.results[resultKey], ...items]
             })
+            this.firstPageLoaded = true
           }
 
           if (nextPage) {
@@ -365,6 +366,7 @@ export default {
       const currentFetchId = this._fetchId
 
       this.fetching = true
+      this.firstPageLoaded = false
       this.results = { emendas: [], ajustes: [] }
 
       const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
@@ -386,7 +388,7 @@ export default {
           exclude: 'search;metadata',
           include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
           expand: 'parlamentares;unidade;materia;entidade',
-          page_size: 50,
+          page_size: 20,
           situacao: this.filters_value.situacao.join(',')
         }
         if (
@@ -423,7 +425,7 @@ export default {
           include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
           expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
           o: 'parlamentares_valor__nome_parlamentar',
-          page_size: 50
+          page_size: 20
         }
         if (
           this.filters_value.unidade &&
@@ -448,12 +450,14 @@ export default {
 
       if (!pending.length) {
         this.fetching = false
+        this.firstPageLoaded = true
         return Promise.resolve()
       }
 
       return Promise.all(pending).finally(() => {
         if (this._fetchId === currentFetchId) {
           this.fetching = false
+          this.firstPageLoaded = true
         }
       })
     }
