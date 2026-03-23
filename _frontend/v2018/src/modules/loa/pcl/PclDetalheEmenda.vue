@@ -1,9 +1,9 @@
 <template>
   <div class="pcl-detalhe-emenda">
-    <div class="emenda-card card border-0 shadow-sm mb-3">
+    <div :class="['emenda-card', 'card', 'shadow-sm', 'mb-3', emendaTipoClass]">
 
       <!-- ===== CABEÇALHO ===== -->
-      <div class="card-header bg-white border-bottom-0 pb-0">
+      <div :class="['card-header', 'border-bottom-0', 'pb-0', emendaHeaderClass]">
         <div class="d-flex align-items-start flex-wrap">
           <!-- Fotos dos parlamentares -->
           <div
@@ -32,10 +32,12 @@
             </h4>
             <div class="mb-2">
               <span
-                :class="['badge', 'mr-1', 'badge-' + itemBadgeVariant(registro)]"
-              >{{ registroBadgeLabel(registro) }}</span>
+                :class="['badge', 'mr-1', 'badge-' + tipoVariant(registro.tipo)]"
+              >
+                <i :class="tipoIcon" class="mr-1"></i>{{ tipoLabel(registro.tipo) }}
+              </span>
               <span
-                :class="['badge', 'badge-' + faseVariant(registro.fase)]"
+                :class="['badge', 'mr-1', 'badge-' + faseVariant(registro.fase)]"
               >{{ faseLabel(registro.fase) }}</span>
             </div>
           </div>
@@ -69,7 +71,7 @@
         <div class="row">
           <div class="col-md-12">
             <small class="d-block text-muted" v-if="registro.unidade">
-              <strong><i class="fas fa-building mr-1"></i>Unidade Orçamentária:</strong>
+              <strong><i class="fas fa-building mr-1"></i>Unidade Orçamentária: </strong>
               <button
                 class="btn btn-link btn-sm p-0 align-baseline"
                 @click="$emit('filter-unidade', registro.unidade)"
@@ -77,17 +79,17 @@
             </small>
             <template v-if="registro.entidade">
               <small class="text-muted" v-if="registro.entidade.nome_fantasia">
-                <strong><i class="fas fa-hand-holding-heart mr-1"></i>Beneficiário:</strong>
+                <strong><i class="fas fa-hand-holding-heart mr-1"></i>Beneficiário: </strong>
                 <button
                   class="btn btn-link btn-sm p-0 align-baseline"
                   @click="$emit('filter-entidade', registro.entidade)"
                 >{{ registro.entidade.nome_fantasia }}</button>
               </small>
               <small class="text-muted" v-if="registro.entidade.cnes">
-                <strong>- CNES:</strong> {{ registro.entidade.cnes }}
+                <strong> - CNES:</strong> {{ registro.entidade.cnes }}
               </small>
               <small class="text-muted" v-else-if="cpfcnpjLimpo(registro.entidade.cpfcnpj)">
-                <strong>- CPF/CNPJ:</strong> {{ cpfcnpjLimpo(registro.entidade.cpfcnpj) }}
+                <strong> - CPF/CNPJ:</strong> {{ cpfcnpjLimpo(registro.entidade.cpfcnpj) }}
               </small>
             </template>
           </div>
@@ -100,9 +102,12 @@
             {{ registro.ementa_format }}
           </small>
           <template v-if="hasAjustes">
-            <br>
+            <hr class="my-2">
             <small class="badge badge-warning text-wrap">
-              <strong>Atenção:</strong> Esta emenda possui ajustes técnicos cadastrados.
+              <strong>Atenção!</strong>
+            </small>
+            <small class="text-muted  mt-1">
+              Esta emenda possui ajustes técnicos cadastrados.
               Verifique a aba "Ajustes Técnicos" para mais detalhes.
             </small>
           </template>
@@ -197,7 +202,9 @@ import {
   itemBadgeVariant,
   registroBadgeLabel,
   faseVariant,
-  faseLabel
+  faseLabel,
+  tipoVariant,
+  tipoLabel
 } from './utils/pcl-helpers'
 import PclTabPrestacao from './tabs/PclTabPrestacao.vue'
 import PclTabAjustes from './tabs/PclTabAjustes.vue'
@@ -256,6 +263,18 @@ export default {
     }
   },
   computed: {
+    emendaTipoClass () {
+      const v = tipoVariant(this.registro.tipo)
+      return `emenda-tipo-${v}`
+    },
+    emendaHeaderClass () {
+      const v = tipoVariant(this.registro.tipo)
+      return `emenda-header-${v}`
+    },
+    tipoIcon () {
+      const icons = { 0: 'fas fa-pen-fancy', 10: 'fas fa-heartbeat', 99: 'fas fa-th-large' }
+      return icons[this.registro.tipo] || 'fas fa-file-alt'
+    },
     tituloRegistro () {
       if (this.registro.materia) {
         const m = this.registro.materia
@@ -315,6 +334,8 @@ export default {
     registroBadgeLabel,
     faseVariant,
     faseLabel,
+    tipoLabel,
+    tipoVariant,
     fotoThumb (url) {
       if (!url) return ''
       return url.replace(/\.png$/, '.c128.png')
@@ -400,13 +421,42 @@ export default {
 .pcl-detalhe-emenda ::v-deep {
   .emenda-card {
     transition: box-shadow 0.2s;
+    border: 0px;
+    border-left: 2px solid transparent;
+    box-shadow: 0 0 0 0;
+
+    &.emenda-tipo-info {
+      border-left-color: #17a2b8;
+    }
+    &.emenda-tipo-success {
+      border-left-color: #28a745;
+    }
+    &.emenda-tipo-warning {
+      border-left-color: #ffc107;
+    }
+    &.emenda-tipo-light {
+      border-left-color: #dee2e6;
+    }
 
     &:hover {
-      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.12) !important;
+      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08) !important;
     }
 
     .card-header {
       padding: 1rem;
+
+      &.emenda-header-info {
+        background-color: rgba(23, 162, 184, 0.06);
+      }
+      &.emenda-header-success {
+        background-color: rgba(40, 167, 69, 0.06);
+      }
+      &.emenda-header-warning {
+        background-color: rgba(255, 193, 7, 0.08);
+      }
+      &.emenda-header-light {
+        background-color: #fff;
+      }
     }
 
     .emenda-parlamentares-fotos {

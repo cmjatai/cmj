@@ -102,7 +102,7 @@
           </b-form-checkbox-group>
         </div>
       </div>
-      <div class="col-auto ml-auto px-2">
+      <div class="col-auto ml-auto pr-3 mb-1">
         <button class="btn btn-sm btn-outline-secondary" @click="$emit('reset')" title="Limpar todos os filtros" :disabled="filtersDisabled">
           <i class="fas fa-times mr-1"></i>Limpar
         </button>
