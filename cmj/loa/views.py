@@ -454,7 +454,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                print(f"Calculando resumo para parlamentar {lp}...")
+                #print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -494,7 +494,7 @@ class LoaCrud(Crud):
                         .filter(
                             emendaloa__emendaloahistoricofase_set__fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.EMENDA_REDEFINIDA]
                         )
-                        .distinct()
+                        .order_by('emendaloa').distinct()
                         .aggregate(Sum("valor"))
                     )
 

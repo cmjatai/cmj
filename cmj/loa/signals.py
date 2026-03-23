@@ -22,9 +22,9 @@ logger = logging.getLogger(__name__)
 )
 def signal_postsave_emendaloa(sender, instance, **kwargs):
 
-    historico_fase = instance.historicofase_set.last()
+    historico_fase = instance.emendaloahistoricofase_set.first()
     if not historico_fase or historico_fase.fase != instance.fase:
-        historico_fase = instance.historicofase_set.create(fase=instance.fase)
+        historico_fase = instance.emendaloahistoricofase_set.create(fase=instance.fase)
 
 
 @receiver(

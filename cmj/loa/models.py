@@ -1155,7 +1155,7 @@ class EmendaLoaHistoricoFase(models.Model):
     class Meta:
         verbose_name = _("Histórico de Fase da Emenda Impositiva")
         verbose_name_plural = _("Históricos de Fase das Emendas Impositivas")
-        ordering = ["timestamp"]
+        ordering = ["-timestamp"]
 
     def __str__(self):
         return f"{self.timestamp.strftime('%d/%m/%Y %H:%M:%S')} - {self.get_fase_display()}"
