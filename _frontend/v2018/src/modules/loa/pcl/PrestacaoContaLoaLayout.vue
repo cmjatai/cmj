@@ -35,6 +35,7 @@
             :registro="item"
             @filter-unidade="applyUnidadeFilter"
             @filter-entidade="applyEntidadeFilter"
+            @filter-parlamentar="applyParlamentarFilter"
           />
           <pcl-detalhe-ajuste
             v-else
@@ -42,6 +43,7 @@
             :registro="item"
             @search-emenda="val => filters_value = { ...filters_value, search: val , ajustes: 'False', emendas_tipos: [] }"
             @filter-unidade="applyUnidadeFilter"
+            @filter-parlamentar="applyParlamentarFilter"
           />
         </template>
       </div>
@@ -191,6 +193,18 @@ export default {
         }
       }
       this.filters_value = { ...this.filters_value, unidade: unidade }
+    },
+    applyParlamentarFilter (parlamentar) {
+      const pid = parlamentar && parlamentar.id
+      if (!pid) return
+      const opt = this.parlamentares_choice.find(
+        (o) => o.value && o.value.id === pid
+      )
+      if (opt) {
+        this.filters_value = { ...this.filters_value, parlamentares: opt.value }
+      } else {
+        this.filters_value = { ...this.filters_value, parlamentares: parlamentar }
+      }
     },
     applyEntidadeFilter (entidade) {
       const eid = entidade && entidade.id
@@ -372,7 +386,7 @@ export default {
           exclude: 'search;metadata',
           include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
           expand: 'parlamentares;unidade;materia;entidade',
-          page_size: 25,
+          page_size: 50,
           situacao: this.filters_value.situacao.join(',')
         }
         if (
@@ -409,7 +423,7 @@ export default {
           include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
           expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
           o: 'parlamentares_valor__nome_parlamentar',
-          page_size: 25
+          page_size: 50
         }
         if (
           this.filters_value.unidade &&

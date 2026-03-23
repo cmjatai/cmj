@@ -15,6 +15,8 @@
               :key="p.id"
               class="emenda-avatar"
               :title="p.__str__"
+              href="#"
+              @click.prevent="$emit('filter-parlamentar', p)"
             >
               <img :src="fotoThumb(p.fotografia)" :alt="p.__str__">
             </a>
@@ -57,7 +59,7 @@
         <div class="row">
           <div class="col-md-12">
             <small class="d-block text-muted" v-if="registro.unidade">
-              <strong>Unidade Orçamentária:</strong>
+              <strong><i class="fas fa-building mr-1"></i>Unidade Orçamentária:</strong>
               <button
                 class="btn btn-link btn-sm p-0 align-baseline"
                 @click="$emit('filter-unidade', registro.unidade)"
