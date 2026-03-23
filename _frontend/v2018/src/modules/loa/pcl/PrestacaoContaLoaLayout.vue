@@ -13,6 +13,7 @@
         :total-items="emendas_ajustes_list.length"
         :page-size="pageSize"
         :current-page="currentPage"
+        :fetching="fetching"
         @update:page-size="onPageSizeChange"
         @update:current-page="onPageChange"
         @reset="resetFilters"
@@ -75,7 +76,7 @@ export default {
         entidade: null,
         parlamentares: null,
         situacao: [],
-        emendas_tipos: ['10'],
+        emendas_tipos: [],
         ajustes: 'False',
         search: ''
       },
@@ -167,7 +168,9 @@ export default {
             }
           }
         })
-        this.$router.replace({ query })
+        this.$router.replace({ query }).catch(err => {
+          if (err.name !== 'NavigationDuplicated') throw err
+        })
         this.fetch()
       }
     }
@@ -222,7 +225,7 @@ export default {
         entidade: null,
         parlamentares: null,
         situacao: [],
-        emendas_tipos: ['10'],
+        emendas_tipos: [],
         ajustes: 'False',
         search: ''
       }
@@ -305,11 +308,40 @@ export default {
       })
     },
 
+    _fetchAllPages (resultKey, model, params, fetchId) {
+      const fetchPage = (page) => {
+        if (this._fetchId !== fetchId) return Promise.resolve()
+
+        return this.utils.fetch({
+          app: 'loa',
+          model: model,
+          params: { ...params, page }
+        }).then((response) => {
+          if (this._fetchId !== fetchId) return
+
+          const data = response.data
+          if (data && data.pagination) {
+            this.$set(this.results, resultKey, [...this.results[resultKey], ...data.results])
+            if (data.pagination.next_page) {
+              return fetchPage(data.pagination.next_page)
+            }
+          } else if (Array.isArray(data)) {
+            this.$set(this.results, resultKey, data)
+          }
+        })
+      }
+      return fetchPage(1)
+    },
+
     fetch () {
       if (!this.loa.id) return Promise.resolve()
-      this.fetching = true
 
-      const promises = {}
+      this._fetchId = (this._fetchId || 0) + 1
+      const currentFetchId = this._fetchId
+
+      this.fetching = true
+      this.results = { emendas: [], ajustes: [] }
+
       const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
       const fetchEmendas =
         (Array.isArray(emendasTipos) && emendasTipos.length > 0) ||
@@ -320,15 +352,16 @@ export default {
         (this.filters_value.ajustes === 'False' &&
           (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
 
+      const pending = []
+
       if (fetchEmendas) {
         const params_emendas = {
           loa: this.loa.id,
-          // o: '-tipo,fase,materia__tipo__sigla,materia__numero',
           o: 'materia__tipo__sigla,materia__numero',
           exclude: 'search;metadata',
           include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
           expand: 'parlamentares;unidade;materia;entidade',
-          get_all: 'True',
+          page_size: 100,
           situacao: this.filters_value.situacao.join(',')
         }
         if (
@@ -355,11 +388,7 @@ export default {
         if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
           params_emendas.tipo__in = emendasTipos.join(',')
         }
-        promises.emendas = this.utils.fetch({
-          app: 'loa',
-          model: 'emendaloa',
-          params: params_emendas
-        })
+        pending.push(this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId))
       }
 
       if (fetchAjustes) {
@@ -368,7 +397,8 @@ export default {
           exclude: 'search',
           include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
           expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
-          o: 'parlamentares_valor__nome_parlamentar'
+          o: 'parlamentares_valor__nome_parlamentar',
+          page_size: 100
         }
         if (
           this.filters_value.unidade &&
@@ -387,27 +417,20 @@ export default {
             this.filters_value.parlamentares.id
         }
         params_ajustes.situacao = this.filters_value.situacao.join(',')
-        params_ajustes.get_all = 'True'
 
-        promises.ajustes = this.utils.fetch({
-          app: 'loa',
-          model: 'registroajusteloa',
-          params: params_ajustes
-        })
+        pending.push(this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId))
       }
 
-      const keys = Object.keys(promises)
-      return Promise.all(Object.values(promises))
-        .then((responses) => {
-          const newResults = { emendas: {}, ajustes: {} }
-          keys.forEach((key, i) => {
-            newResults[key] = responses[i].data
-          })
-          this.results = newResults
-        })
-        .finally(() => {
+      if (!pending.length) {
+        this.fetching = false
+        return Promise.resolve()
+      }
+
+      return Promise.all(pending).finally(() => {
+        if (this._fetchId === currentFetchId) {
           this.fetching = false
-        })
+        }
+      })
     }
   },
   mounted () {

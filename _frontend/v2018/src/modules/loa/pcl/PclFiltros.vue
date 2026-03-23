@@ -205,6 +205,10 @@ export default {
     currentPage: {
       type: Number,
       default: 1
+    },
+    fetching: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -228,7 +232,8 @@ export default {
     paginationLabel () {
       const start = (this.currentPage - 1) * this.pageSize + 1
       const end = Math.min(this.currentPage * this.pageSize, this.totalItems)
-      return `${start}–${end} de ${this.totalItems}`
+      const suffix = this.fetching ? ' (carregando...)' : ''
+      return `${start}–${end} de ${this.totalItems}${suffix}`
     },
     visiblePages () {
       const pages = []
