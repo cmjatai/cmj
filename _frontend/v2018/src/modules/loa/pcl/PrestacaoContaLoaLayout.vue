@@ -90,8 +90,8 @@ export default {
         'search'
       ],
       results: {
-        emendas: {},
-        ajustes: {}
+        emendas: [],
+        ajustes: []
       },
       fetching: false,
       currentPage: 1,
@@ -320,13 +320,24 @@ export default {
           if (this._fetchId !== fetchId) return
 
           const data = response.data
-          if (data && data.pagination) {
-            this.$set(this.results, resultKey, [...this.results[resultKey], ...data.results])
-            if (data.pagination.next_page) {
-              return fetchPage(data.pagination.next_page)
-            }
+          let items = []
+          let nextPage = null
+
+          if (data && data.pagination && Array.isArray(data.results)) {
+            items = data.results
+            nextPage = data.pagination.next_page
           } else if (Array.isArray(data)) {
-            this.$set(this.results, resultKey, data)
+            items = data
+          }
+
+          if (items.length) {
+            this.results = Object.assign({}, this.results, {
+              [resultKey]: [...this.results[resultKey], ...items]
+            })
+          }
+
+          if (nextPage) {
+            return fetchPage(nextPage)
           }
         })
       }
@@ -361,7 +372,7 @@ export default {
           exclude: 'search;metadata',
           include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
           expand: 'parlamentares;unidade;materia;entidade',
-          page_size: 100,
+          page_size: 25,
           situacao: this.filters_value.situacao.join(',')
         }
         if (
@@ -398,7 +409,7 @@ export default {
           include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
           expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
           o: 'parlamentares_valor__nome_parlamentar',
-          page_size: 100
+          page_size: 25
         }
         if (
           this.filters_value.unidade &&
