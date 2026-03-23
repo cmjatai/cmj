@@ -3,7 +3,7 @@
     <div :class="['emenda-card', 'card', 'shadow-sm', 'mb-3', emendaTipoClass]">
 
       <!-- ===== CABEÇALHO ===== -->
-      <div :class="['card-header', 'border-bottom-0', 'pb-0', emendaHeaderClass]">
+      <div :class="['card-header', 'border-bottom-0', 'pb-0']">
         <div class="d-flex align-items-start flex-wrap">
           <!-- Fotos dos parlamentares -->
           <div
@@ -24,12 +24,12 @@
 
           <!-- Título e badges -->
           <div class="flex-grow-1">
-            <h4 class="mb-1 font-weight-bold text-wrap">
+            <h3 class="mb-1 font-weight-bold text-wrap text-primary">
               <a :href="registro.link_detail_backend" target="_blank">
                 {{ tituloRegistro }}
                 <i class="fas fa-external-link-alt fa-sm ml-1 text-muted"></i>
               </a>
-            </h4>
+            </h3>
             <div class="mb-2">
               <span
                 :class="['badge', 'mr-1', 'badge-' + tipoVariant(registro.tipo)]"
@@ -64,7 +64,7 @@
         </div>
       </div>
 
-      <hr class="my-0">
+      <hr class="my-0 mx-2">
 
       <!-- ===== DADOS PRINCIPAIS ===== -->
       <div class="card-body pt-2 pb-2">
@@ -423,7 +423,6 @@ export default {
     transition: box-shadow 0.2s;
     border: 0px;
     border-left: 2px solid transparent;
-    box-shadow: 0 0 0 0;
 
     &.emenda-tipo-info {
       border-left-color: #17a2b8;
@@ -439,20 +438,21 @@ export default {
     }
 
     &:hover {
-      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.12) !important;
     }
 
     .card-header {
       padding: 1rem;
+      background-color: #fff;
 
       &.emenda-header-info {
-        background-color: rgba(23, 162, 184, 0.06);
+        background-color: rgba(23, 162, 184, 0.1);
       }
       &.emenda-header-success {
-        background-color: rgba(40, 167, 69, 0.06);
+        background-color: rgba(40, 167, 69, 0.1);
       }
       &.emenda-header-warning {
-        background-color: rgba(255, 193, 7, 0.08);
+        background-color: rgba(255, 193, 7, 0.1);
       }
       &.emenda-header-light {
         background-color: #fff;

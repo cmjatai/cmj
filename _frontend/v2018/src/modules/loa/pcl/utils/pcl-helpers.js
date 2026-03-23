@@ -10,9 +10,9 @@ const TIPO_LABELS = {
 }
 
 const TIPO_VARIANTS = {
-  0: 'info',
-  10: 'warning',
-  99: 'success'
+  0: 'secondary',
+  10: 'success',
+  99: 'info'
 }
 
 const FASE_VARIANTS = {

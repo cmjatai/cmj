@@ -26,7 +26,7 @@
         class="mt-3"
       />
 
-      <div class="mt-3" v-if="emendas_ajustes_list.length || fetching">
+      <div class="pcldetalhe-list" v-if="emendas_ajustes_list.length || fetching">
         <b-spinner v-if="fetching" small variant="secondary" class="d-block mx-auto my-3"></b-spinner>
         <template v-for="item in paginatedList">
           <pcl-detalhe-emenda
@@ -113,7 +113,7 @@ export default {
       if (!this.loas_list.length) return []
       return this.loas_list.map(l => ({
         value: l.id,
-        text: `LOA ${l.ano}`
+        text: l.ano
       }))
     },
     parlamentares_choice () {
@@ -490,3 +490,10 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.prestacaocontaloa-layout {
+  .pcldetalhe-list {
+    margin: 15px -15px 30px;
+  }
+}
+</style>

@@ -1,8 +1,12 @@
 <template>
-  <div class="pcl-filtros card card-body bg-light pt-3 px-3 pb-2 mb-0">
+  <div class="pcl-filtros">
     <div class="row">
-      <div v-if="loasChoice.length" class="col-lg-1 col-md-2 col-4 mb-2">
-        <label class="pcl-filtros-label">LOA</label>
+      <i class="fas fa-filter text-secondary mr-2"></i>
+      <h4><strong class="text-primary">Filtrar Dados</strong></h4>
+    </div>
+    <div class="row" >
+      <div v-if="loasChoice.length" class="col-xl-1 col-md-2 col-4 mb-2 px-1">
+        <label class="pcl-filtros-label">EXERCÍCIO</label>
         <b-form-select
           :value="selectedLoaId"
           :options="loasChoice"
@@ -11,7 +15,7 @@
           :disabled="disabled"
         ></b-form-select>
       </div>
-      <div class="col-lg col-md-10 col-8 mb-2">
+      <div class="col-lg col-md-10 col-8 mb-2 px-1">
         <label class="pcl-filtros-label">Pesquisa</label>
         <b-input-group size="sm">
           <b-form-input
@@ -29,7 +33,7 @@
           </b-input-group-append>
         </b-input-group>
       </div>
-      <div class="col-lg-2 col-md-4 col-sm-6 mb-2">
+      <div class="col-lg-2 col-md-4 col-sm-6 mb-2 px-1">
         <label class="pcl-filtros-label">Parlamentares</label>
         <b-form-select
           @change="val => updateFilter('parlamentares', val)"
@@ -39,7 +43,7 @@
           :disabled="filtersDisabled"
         ></b-form-select>
       </div>
-      <div class="col-lg-3 col-md-4 col-sm-6 mb-2">
+      <div class="col-lg-3 col-md-4 col-sm-6 mb-2 px-1">
         <label class="pcl-filtros-label">Entidades</label>
         <model-select
           @change="val => updateFilter('entidade', val)"
@@ -54,7 +58,7 @@
           :disabled="filtersDisabled"
         ></model-select>
       </div>
-      <div class="col-lg-3 col-md-4 mb-2">
+      <div class="col-lg-3 col-md-4 mb-2 px-1">
         <label class="pcl-filtros-label">Unidade Orçamentária</label>
         <model-select
           @change="val => updateFilter('unidade', val)"
@@ -71,7 +75,7 @@
       </div>
     </div>
     <div class="row align-items-end mt-2">
-      <div class="col-lg-auto col-12 mb-2">
+      <div class="col-lg-auto col-12 mb-2 px-1">
         <label class="pcl-filtros-label">Documentos</label>
         <div class="pcl-filtros-check-group d-flex flex-wrap">
           <b-form-checkbox-group
@@ -80,7 +84,7 @@
             :disabled="filtersDisabled"
           >
             <b-form-checkbox class="mr-3" value="10">Impositivas da Saúde</b-form-checkbox>
-            <b-form-checkbox class="mr-3" value="99">Impositivas de Áreas Diversas</b-form-checkbox>
+            <b-form-checkbox class="mr-3" value="99">Imp. de Áreas Diversas</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="0">Modificativas</b-form-checkbox>
           </b-form-checkbox-group>
           <b-form-checkbox
@@ -92,7 +96,7 @@
           >Registros de Ajustes</b-form-checkbox>
         </div>
       </div>
-      <div class="col-lg-auto col mb-2">
+      <div class="col-lg-auto col mb-2 px-1">
         <label class="pcl-filtros-label">Situação</label>
         <div class="pcl-filtros-check-group d-flex flex-wrap">
           <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)" :disabled="filtersDisabled">
@@ -102,14 +106,14 @@
           </b-form-checkbox-group>
         </div>
       </div>
-      <div class="col-auto ml-auto pr-3 mb-1">
-        <button class="btn btn-sm btn-outline-secondary" @click="$emit('reset')" title="Limpar todos os filtros" :disabled="filtersDisabled">
+      <div class="col-auto ml-auto mb-1 px-1">
+        <button class="btn btn-sm btn-secondary" @click="$emit('reset')" title="Limpar todos os filtros" :disabled="filtersDisabled">
           <i class="fas fa-times mr-1"></i>Limpar
         </button>
       </div>
     </div>
     <div v-if="totalItems > 0" class="pcl-pagination d-flex align-items-center mt-2 pt-2 border-top">
-      <div class="d-flex align-items-center mr-3">
+      <div class="d-flex align-items-center mr-3 px-1">
         <small class="text-muted text-uppercase font-weight-bold mr-2" style="font-size:.7rem;letter-spacing:.03em;">Exibir</small>
         <b-form-select
           :value="pageSize"
@@ -272,9 +276,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .pcl-filtros {
-  border-radius: 0.375rem;
+  border-radius: 0 0 0.25rem 0.25rem;
+  background-color: white;
+  margin: -16px -15px 0;
+  padding: 1rem 1.5rem 0.5rem;
+  border-bottom: 1px solid #dee2e6;
+  // box-shadow: 0rem 0.2rem 0.5rem rgba(0, 0, 0, 0.05);
 }
 .pcl-filtros-label {
   display: block;
@@ -350,7 +359,6 @@ export default {
 /* ===== Responsivo < 992px ===== */
 @media (max-width: 991.98px) {
   .pcl-filtros {
-    padding: 0.75rem 0.5rem 0.5rem;
   }
   .pcl-pagination {
     flex-wrap: wrap;
@@ -386,7 +394,6 @@ export default {
 /* ===== Responsivo < 425px ===== */
 @media (max-width: 425px) {
   .pcl-filtros {
-    padding: 0.5rem 0.35rem 0.35rem;
   }
   .pcl-filtros-check-group {
     font-size: 0.75rem;
