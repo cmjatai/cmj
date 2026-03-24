@@ -21,7 +21,7 @@
       />
 
       <pcl-totalizacao
-        v-if="false && !fetching && emendas_ajustes_list.length"
+        v-if="!fetching && emendas_ajustes_list.length"
         :lista="emendas_ajustes_list"
         class="mt-3"
       />

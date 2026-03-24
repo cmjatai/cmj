@@ -53,12 +53,13 @@
               <br>
               <small class="text-muted">Valor Original da Emenda</small>
             </div>
-            <div class="valor-computado" v-if="hasAjustes">
+            <div class="valor-computado" v-if="hasAjustes || !registro.valor_computado">
               <span class="emenda-valor font-weight-bold text-success">
                 R$ {{ registro.str_valor_computado }}
               </span>
               <br>
-              <small class="text-muted">Valor Final após Ajustes</small>
+              <small class="text-muted" v-if="registro.valor_computado">Valor Final após Ajustes</small>
+              <small class="text-muted" v-else>Emenda Redefinida nos Ajustes</small>
             </div>
           </div>
         </div>
@@ -95,11 +96,13 @@
           </div>
         </div>
 
-        <!-- Finalidade -->
+        <!-- Objeto -->
         <div class="mt-2 p-2 bg-light rounded border" v-if="registro.ementa_format">
           <small class="text-muted">
-            <strong>Finalidade:</strong>
-            {{ registro.ementa_format }}
+            <strong>Objeto Inicial:</strong>
+            <span :class="[hasAjustes && registro.valor_computado ? 'text-decoration-line-through' : '']">
+              {{ registro.ementa_format }}
+            </span>
           </small>
           <template v-if="hasAjustes">
             <hr class="my-2">

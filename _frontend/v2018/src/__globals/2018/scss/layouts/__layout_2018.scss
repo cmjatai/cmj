@@ -92,7 +92,9 @@
     background: darken($color_main_bg, 1%) $url_bg_png;
   }
 }
-
+.text-decoration-line-through {
+  text-decoration: line-through;
+}
 .container-box {
   margin: 0 auto $grid-gutter-width;
   background: darken($color_main_bg, 3%) $url_bg_png;

@@ -1,24 +1,44 @@
 <template>
-  <div class="pcl-totalizacao" v-if="lista.length">
-    <div class="d-flex align-items-center justify-content-between mb-2">
+  <div class="pcl-totalizacao mx-n3" v-if="lista.length">
+    <div class="d-flex align-items-center justify-content-between mb-2 ">
       <div class="d-flex align-items-center">
         <i class="fas fa-chart-bar text-primary mr-2"></i>
         <strong class="text-dark">Totalização</strong>
       </div>
-      <span class="text-muted small">
-        {{ lista.length }} {{ lista.length === 1 ? 'registro' : 'registros' }}
+      <span class="small text-info">
+        <em>
+          A Totalização é calculada sobre as emendas e ajustes listados conforme o filtro acima aplicado:
+        </em>
+        <strong>
+          {{ lista.length }} {{ lista.length === 1 ? 'registro' : 'registros' }}.
+        </strong>
       </span>
     </div>
 
     <div class="d-flex align-items-stretch total-geral-row mb-2">
-      <div class="total-geral-box flex-fill d-flex align-items-center px-3 py-2">
+      <div class="total-geral-box flex-fill d-flex align-items-center justify-content-center px-3 py-2">
         <i class="fas fa-coins text-success mr-2"></i>
         <span class="font-weight-bold mr-2">Total Geral:</span>
         <span class="font-weight-bold text-success">R$ {{ formatCurrency(totalGeral) }}</span>
       </div>
+      <div class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
+        <i class="fas fa-heartbeat text-success mr-1"></i>
+        <span class="font-weight-bold mr-1">Saúde:</span>
+        <span class="font-weight-bold text-success">R$ {{ formatCurrency(totalSaude) }}</span>
+      </div>
+      <div class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
+        <i class="fas fa-th-large text-info mr-1"></i>
+        <span class="font-weight-bold mr-1">Áreas Diversas:</span>
+        <span class="font-weight-bold text-info">R$ {{ formatCurrency(totalAreasDiversas) }}</span>
+      </div>
+      <div class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
+        <i class="fas fa-pen-fancy text-secondary mr-1"></i>
+        <span class="font-weight-bold mr-1">Modificativas:</span>
+        <span class="font-weight-bold text-secondary">R$ {{ formatCurrency(totalModificativas) }}</span>
+      </div>
     </div>
 
-    <div class="grupos-row d-flex flex-wrap">
+    <div class="grupos-row d-flex flex-wrap justify-content-center">
       <div
         v-for="g in grupos"
         :key="g.key"
@@ -54,6 +74,21 @@ export default {
         return sum + Number(this.valorEfetivo(item))
       }, 0)
     },
+    totalSaude () {
+      return this.lista
+        .filter(item => item.tipo === 10)
+        .reduce((sum, item) => sum + Number(this.valorEfetivo(item)), 0)
+    },
+    totalAreasDiversas () {
+      return this.lista
+        .filter(item => item.tipo === 99)
+        .reduce((sum, item) => sum + Number(this.valorEfetivo(item)), 0)
+    },
+    totalModificativas () {
+      return this.lista
+        .filter(item => item.tipo === 0)
+        .reduce((sum, item) => sum + Number(this.valorEfetivo(item)), 0)
+    },
     grupos () {
       const map = {}
       this.lista.forEach(item => {
@@ -85,20 +120,21 @@ export default {
   methods: {
     valorEfetivo (item) {
       if (!isEmenda(item)) {
-        if (!item.emendaloa || item.emendaloa.length === 0) {
+        return item.valor || 0
+        /* if (!item.emendaloa || item.emendaloa.length === 0) {
           return item.valor || 0
         }
         return 0
-        /* const emendasValorInicial = item.emendaloa.reduce((sum, em) => {
+        const emendasValorInicial = item.emendaloa.reduce((sum, em) => {
           return sum + Number(em.valor_inicial || 0)
         }, 0)
         const valor = emendasValorInicial - Number(item.valor || 0)
         return valor */
       }
       const computado = Number(item.valor_computado || 0)
-      const inicial = Number(item.valor_inicial || 0)
+      // const inicial = Number(item.valor_inicial || 0)
       // return computado
-      return computado !== inicial ? computado - inicial : computado
+      return computado
     },
     formatCurrency (value) {
       return Number(value).toLocaleString('pt-BR', {
@@ -123,6 +159,9 @@ export default {
   border-radius: 0.25rem;
   font-size: 0.95rem;
 }
+.sub-total-box {
+  font-size: 0.85rem;
+}
 .grupo-box {
   background: #fff;
   border: 1px solid;
@@ -146,6 +185,13 @@ export default {
 
 /* ===== Responsivo < 768px ===== */
 @media (max-width: 767.98px) {
+  .total-geral-row {
+    flex-direction: column;
+  }
+  .total-geral-row .sub-total-box {
+    margin-left: 0 !important;
+    margin-top: 0.25rem;
+  }
   .total-geral-box {
     font-size: 0.85rem;
   }

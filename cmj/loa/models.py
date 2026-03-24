@@ -790,21 +790,23 @@ class EmendaLoa(CmjSearchMixin):
 
     @property
     def valor_computado(self):
+        valor = Decimal("0.00")
+        num_ajustes = RegistroAjusteLoa.objects.filter(emendaloa=self).count()
+        if not num_ajustes and self.fase != self.IMPEDIMENTO_TECNICO:
+            valor = self.valor
+        #_print = f"""{"." * 20} - {self.id} - {self.materia.epigrafe_short if self.materia else ""} - {self.valor} - {self.fase} - {self.tipo} - {valor} """
+        #print(_print)
+        return valor
+
         soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
             registro__emendaloa=self
         ).aggregate(Sum("valor"))
+
         valor = (
             soma_ajustes["valor__sum"]
             if soma_ajustes["valor__sum"] is not None
             else self.valor
         )
-        #if valor != self.valor:
-        #    print(
-        #        self.id,
-        #        self.valor,
-        #        valor,
-        #        self.materia.epigrafe_short if self.materia else "",
-        #    )
         return valor
 
     @property
@@ -1159,6 +1161,7 @@ class EmendaLoaHistoricoFase(models.Model):
 
     def __str__(self):
         return f"{self.timestamp.strftime('%d/%m/%Y %H:%M:%S')} - {self.get_fase_display()}"
+
 
 class EmendaLoaParlamentar(models.Model):
 
