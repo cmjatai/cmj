@@ -1,6 +1,6 @@
 <template>
-  <div class="pcl-totalizacao mx-n3" v-if="lista.length">
-    <div class="d-flex align-items-center justify-content-between mb-2 ">
+  <div class="pcl-totalizacao mx-n3 px-2 py-1" v-if="lista.length">
+    <div class="d-flex align-items-center justify-content-between mb-1 ">
       <div class="d-flex align-items-center">
         <i class="fas fa-chart-bar text-primary mr-2"></i>
         <strong class="text-dark">Totalização</strong>
@@ -151,7 +151,6 @@ export default {
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 0.375rem;
-  padding: 0.75rem 1rem;
 }
 .total-geral-box {
   background: #fff;
@@ -203,9 +202,6 @@ export default {
 
 /* ===== Responsivo < 425px ===== */
 @media (max-width: 425px) {
-  .pcl-totalizacao {
-    padding: 0.5rem 0.75rem;
-  }
   .grupos-row {
     flex-direction: column;
   }
