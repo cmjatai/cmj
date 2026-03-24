@@ -124,7 +124,7 @@ export default {
         return item.valor || 0
       }
       const valor_computado = Number(item.valor_computado || 0)
-      if (item.has_ajustes) {
+      if (item.has_ajustes || item.fase === 40) {
         return valor_computado
       }
 
