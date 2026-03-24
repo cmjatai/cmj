@@ -23,6 +23,7 @@
       <pcl-totalizacao
         v-if="!fetching && emendas_ajustes_list.length"
         :lista="emendas_ajustes_list"
+        :parlamentar-selecionado="filters_value.parlamentares"
         class="mt-3"
       />
 
@@ -46,7 +47,7 @@
           />
         </template>
       </div>
-      <div v-else-if="ready" class="card text-muted text-center my-3 py-3 mx-5 font-weight-bold">
+      <div v-else-if="ready" class="card text-muted text-center my-3 p-3 mx-5 font-weight-bold">
         Nenhum resultado encontrado para os filtros selecionados.
       </div>
     </div>
@@ -433,6 +434,13 @@ export default {
         ) {
           params_ajustes.unidade = this.filters_value.unidade.id
         }
+        if (
+          this.filters_value.entidade &&
+          typeof this.filters_value.entidade === 'object'
+        ) {
+          params_ajustes.entidade = this.filters_value.entidade.id
+        }
+
         if (this.filters_value.search) {
           params_ajustes.search = this.filters_value.search
         }

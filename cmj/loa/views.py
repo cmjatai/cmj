@@ -442,8 +442,8 @@ class LoaCrud(Crud):
         def hook_resumo_emendas_impositivas(self, *args, **kwargs):
             l = args[0]
 
-            if l.ano <= 2023:
-                return self.resumo_emendas_impositivas_ate_2024(*args, **kwargs)
+            # if l.ano <= 2023:
+            #    return self.resumo_emendas_impositivas_ate_2024(*args, **kwargs)
 
             loaparlamentares = l.loaparlamentar_set.order_by(
                 "-parlamentar__ativo", "parlamentar__nome_parlamentar"
@@ -454,7 +454,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                #print(f"Calculando resumo para parlamentar {lp}...")
+                print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -492,9 +492,13 @@ class LoaCrud(Crud):
                     totdb_imp_tecnico = (
                         EmendaLoaParlamentar.objects.filter(**params)
                         .filter(
-                            emendaloa__emendaloahistoricofase_set__fase__in=[EmendaLoa.IMPEDIMENTO_TECNICO, EmendaLoa.EMENDA_REDEFINIDA]
+                            emendaloa__emendaloahistoricofase_set__fase__in=[
+                                EmendaLoa.IMPEDIMENTO_TECNICO,
+                                EmendaLoa.EMENDA_REDEFINIDA,
+                            ]
                         )
-                        .order_by('emendaloa').distinct()
+                        .order_by("emendaloa")
+                        .distinct()
                         .aggregate(Sum("valor"))
                     )
 
@@ -2693,7 +2697,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             title = f"""{self.object.materia.epigrafe_short + ' - ' if self.object.materia else ''}
             R$ { self.object.str_valor } -
             { self.object.entidade.nome_fantasia if self.object.entidade else ''}
-            {self.object.unidade.especificacao if not self.object.entidade else ''}
+            {self.object.unidade.especificacao if not self.object.entidade and self.object.unidade else ''}
             <small>{'<br>' + str(self.object) if not self.object.materia else ''}</small>
             <br><small>({self.object.loa})</small>
 
@@ -3066,6 +3070,12 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
                 emenda_epigrafe = f'<strong>Emendas:</strong> {emendas_epigrafe if emendas_epigrafe else "Ajuste sem ligação com emenda impositiva."}<br>'
                 unidade_orcamentaria = f'<strong>Unidade Orçamentária:</strong> {ajuste.unidade.especificacao if ajuste.unidade else ""}<br>'
 
+                entidade = (
+                    f"<strong>Entidade:</strong> {ajuste.entidade.nome_fantasia}<br>"
+                    if ajuste.entidade
+                    else ""
+                )
+
                 a_str = f"""
                     <tr>
                         <td align="right">
@@ -3077,6 +3087,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
                         </td>
                         <td>
                           {unidade_orcamentaria}
+                            {entidade}
                           {emenda_epigrafe}
                           <small>
                             <em>{ajuste.descricao}</em>

@@ -52,7 +52,7 @@
           ordering="nome_fantasia"
           ref="entidadeSelect"
           :required="false"
-          :extra_query="`${qsEmendaLoa}&ativo=True`"
+          :extra_query="`&ativo=True`"
           :disabled="filtersDisabled"
         ></model-select>
       </div>
@@ -258,10 +258,6 @@ export default {
   methods: {
     updateFilter (key, val) {
       const patch = { ...this.value, [key]: val }
-      if (key === 'entidade' && val) {
-        patch.emendas_tipos = ['10', '99']
-        patch.ajustes = 'False'
-      }
       this.$emit('input', patch)
     },
     /**

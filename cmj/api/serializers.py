@@ -444,8 +444,21 @@ class EmendaLoaSerializer(CmjSerializerMixin):
     valor_inicial = serializers.SerializerMethodField()
     valor_computado = serializers.FloatField(read_only=True)
 
+    valor_inicial_por_parlamentar = serializers.SerializerMethodField()
+    has_ajustes = serializers.BooleanField(read_only=True)
+
     class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
+
+    def get_valor_inicial_por_parlamentar(self, obj):
+        valores = {}
+        for registro in obj.emendaloaparlamentar_set.all():
+            parlamentar = registro.parlamentar
+            if parlamentar:
+                valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
+                    registro.valor or Decimal("0.00")
+                )
+        return valores
 
     def get_epigrafe_short(self, obj):
         if obj.materia and obj.materia.epigrafe_short:

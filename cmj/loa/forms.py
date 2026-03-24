@@ -1011,6 +1011,22 @@ class RegistroAjusteLoaForm(ModelForm):
         ),
     )
 
+    entidade = forms.ModelChoiceField(
+        queryset=Entidade.objects.all(),
+        label="Entidade Ativas",
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "title": "Selecione as entidades ativas",
+                "class": "selectpicker w-100",
+                "data-actions-box": "true",
+                "data-live-search": "true",
+                "data-header": "Entidades Ativas",
+                "data-dropup-auto": "false",
+            }
+        ),
+    )
+
     parlamentares__valor = SplitArrayField(
         DecimalField(
             required=False,
@@ -1025,7 +1041,14 @@ class RegistroAjusteLoaForm(ModelForm):
 
     class Meta:
         model = RegistroAjusteLoa
-        fields = ["parlamentares__valor", "tipo", "emendaloa", "unidade", "descricao"]
+        fields = [
+            "parlamentares__valor",
+            "tipo",
+            "emendaloa",
+            "unidade",
+            "entidade",
+            "descricao",
+        ]
 
     def __init__(self, *args, **kwargs):
 
@@ -1051,6 +1074,11 @@ class RegistroAjusteLoaForm(ModelForm):
             for u in UnidadeOrcamentaria.objects.filter(
                 loa=self.oficioajusteloa.loa, recebe_emenda_impositiva=True
             )
+        ]
+
+        self.fields["entidade"].choices = [("", "---------")] + [
+            (e.id, str(e))
+            for e in Entidade.objects.filter(ativo=True).order_by("nome_fantasia")
         ]
 
         initial_pv = []

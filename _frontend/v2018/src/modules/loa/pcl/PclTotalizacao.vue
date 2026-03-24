@@ -66,7 +66,8 @@ const TIPO_ICONS = {
 export default {
   name: 'pcl-totalizacao',
   props: {
-    lista: { type: Array, default: () => [] }
+    lista: { type: Array, default: () => [] },
+    parlamentarSelecionado: { type: Object, default: null }
   },
   computed: {
     totalGeral () {
@@ -121,20 +122,20 @@ export default {
     valorEfetivo (item) {
       if (!isEmenda(item)) {
         return item.valor || 0
-        /* if (!item.emendaloa || item.emendaloa.length === 0) {
-          return item.valor || 0
-        }
-        return 0
-        const emendasValorInicial = item.emendaloa.reduce((sum, em) => {
-          return sum + Number(em.valor_inicial || 0)
-        }, 0)
-        const valor = emendasValorInicial - Number(item.valor || 0)
-        return valor */
       }
-      const computado = Number(item.valor_computado || 0)
-      // const inicial = Number(item.valor_inicial || 0)
-      // return computado
-      return computado
+      const valor_computado = Number(item.valor_computado || 0)
+      if (item.has_ajustes) {
+        return valor_computado
+      }
+
+      let valor_inicial = Number(item.valor_inicial || 0)
+      if (this.parlamentarSelecionado && item.valor_inicial_por_parlamentar) {
+        const vid = item.valor_inicial_por_parlamentar[this.parlamentarSelecionado.id]
+        if (vid !== undefined) {
+          valor_inicial = Number(vid)
+        }
+      }
+      return valor_inicial
     },
     formatCurrency (value) {
       return Number(value).toLocaleString('pt-BR', {

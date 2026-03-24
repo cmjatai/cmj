@@ -1316,6 +1316,16 @@ class RegistroAjusteLoa(CmjSearchMixin):
         on_delete=PROTECT,
     )
 
+    entidade = models.ForeignKey(
+        "Entidade",
+        verbose_name=_("Entidade"),
+        related_name="registroajusteloa_set",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
+
     parlamentares_valor = models.ManyToManyField(
         Parlamentar,
         through="RegistroAjusteLoaParlamentar",
@@ -1339,9 +1349,11 @@ class RegistroAjusteLoa(CmjSearchMixin):
     @property
     def fields_search(self):
         return [
-            "emendaloa_old__search",
+            "emendaloa__search",
             "descricao",
             "oficio_ajuste_loa",
+            "entidade",
+            "unidade",
         ]
 
     @property

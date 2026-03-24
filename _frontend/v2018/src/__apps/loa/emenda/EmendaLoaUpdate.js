@@ -39,6 +39,14 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
 
   setupPreview () {
     const containerPreview = $('.container-preview')
+    let lineHeight = 100
+    if (this.pkObject && this.pkObject.metadata && this.pkObject.metadata.style && this.pkObject.metadata.style.lineHeight) {
+      lineHeight = this.pkObject.metadata.style.lineHeight
+    }
+    let espacoAssinatura = false
+    if (this.pkObject && this.pkObject.metadata && this.pkObject.metadata.style && this.pkObject.metadata.style.espacoAssinatura) {
+      espacoAssinatura = this.pkObject.metadata.style.espacoAssinatura
+    }
     containerPreview.html(`
       <div class="inner-preview">
         <a class="w-100" target="_blank" href="${this.urlBase}/view/">
@@ -50,7 +58,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
           <label for="id_lineHeight">
             <span>Entrelinha (%)</span>
             <input type="number"
-              name="lineHeight" value="${this.pkObject.metadata.style.lineHeight}"
+              name="lineHeight" value="${lineHeight}"
               step="5"
               min="100"
               max="350"
@@ -61,7 +69,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
         <div>
           <label for="id_espacoAssinatura">
           <input type="checkbox"
-            ${this.pkObject.metadata.style.espacoAssinatura ? 'checked' : ''}
+            ${espacoAssinatura ? 'checked' : ''}
             name="espacoAssinatura"
             class="form-check-input"
             id="id_espacoAssinatura">

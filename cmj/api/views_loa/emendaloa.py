@@ -309,7 +309,7 @@ class EmendaLoaViewSet:
         else:
             bresponse = doc.tobytes()
 
-        nome_autor = el.owner.operadorautor_set.first() or ""
+        nome_autor = (el.owner.operadorautor_set.first() or "") if el.owner else ""
         if nome_autor:
             nome_autor = nome_autor.autor.nome
 
