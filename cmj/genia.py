@@ -87,7 +87,7 @@ E. Direcione e aborde especificamente estes indicadores linguísticos:
 
 
 class IAGenaiBase:
-    ia_model_name = "gemini-3.1-flash-preview"
+    ia_model_name = "gemini-3-flash-preview"
     temperature = 0.1
     top_k = 40
     top_p = 0.95

@@ -20,11 +20,13 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
         Q(ta__id__in=ta_ids) | Q(ta_publicado__id__in=ta_ids)
     ).values_list('ta__id', flat=True).order_by('ta__id').distinct()
 
+    # Deleta embeddings de dispositivos que possuem dispositivo subsequente
     Embedding.objects.filter(
         dispositivo_set__dispositivo_subsequente__isnull=False,
         dispositivo_set__ta__id__in=ta_ids
         ).delete()
 
+    # Deleta embeddings de dispositivos relacionados a TAs revogados integralmente
     textos_revogados = TextoArticulado.objects.filter(
         texto_articulado__norma_relacionada__tipo_vinculo__revoga_integralmente=True
     ).values_list('id', flat=True).order_by('id').distinct()
