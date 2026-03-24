@@ -18,7 +18,7 @@
     <div class="d-flex align-items-stretch total-geral-row mb-2">
       <div class="total-geral-box flex-fill d-flex align-items-center justify-content-center px-3 py-2">
         <i class="fas fa-coins text-success mr-2"></i>
-        <span class="font-weight-bold mr-2">Total Geral:</span>
+        <span class="font-weight-bold mr-2">Total Impositivas:</span>
         <span class="font-weight-bold text-success">R$ {{ formatCurrency(totalGeral) }}</span>
       </div>
       <div class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
@@ -71,9 +71,11 @@ export default {
   },
   computed: {
     totalGeral () {
-      return this.lista.reduce((sum, item) => {
-        return sum + Number(this.valorEfetivo(item))
-      }, 0)
+      return this.lista
+        .filter(item => item.tipo !== 0)
+        .reduce((sum, item) => {
+          return sum + Number(this.valorEfetivo(item))
+        }, 0)
     },
     totalSaude () {
       return this.lista
@@ -98,6 +100,10 @@ export default {
         const prefix = emenda ? 'emenda' : 'ajuste'
         const key = `${prefix}_${tipo}`
 
+        if (tipo === 0) {
+          return
+        }
+
         if (!map[key]) {
           const label = emenda
             ? tipoLabel(tipo)
@@ -109,7 +115,7 @@ export default {
             icon: emenda ? (TIPO_ICONS[tipo] || 'fas fa-file-alt') : 'fas fa-exchange-alt',
             count: 0,
             total: 0,
-            order: emenda ? tipo : 1000 + tipo
+            order: (emenda && tipo !== 0) ? tipo : (!emenda ? 1000 + tipo : 10000)
           }
         }
         map[key].count++
