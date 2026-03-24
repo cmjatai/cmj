@@ -2002,30 +2002,27 @@ class ListMateriaOrdemDiaView(FormMixin, DetailView):
 
 def _get_dados_mesa(sessao):
     """Retorna composição, parlamentares disponíveis e cargos vagos da mesa."""
-    composicao = sessao.integrantemesa.select_related(
-        'cargo', 'parlamentar'
-    ).order_by('cargo_id')
-
-    cargos_ocupados = set(m.cargo_id for m in composicao)
-    cargos_vagos = list(
-        CargoMesa.objects.exclude(id__in=cargos_ocupados)
+    composicao = sessao.integrantemesa.select_related("cargo", "parlamentar").order_by(
+        "cargo_id"
     )
 
+    cargos_ocupados = set(m.cargo_id for m in composicao)
+    cargos_vagos = list(CargoMesa.objects.exclude(id__in=cargos_ocupados))
+
     parlamentares_ocupados = set(m.parlamentar_id for m in composicao)
-    mandatos = sessao.legislatura.mandato_set.select_related(
-        'parlamentar'
-    ).all()
+    mandatos = sessao.legislatura.mandato_set.select_related("parlamentar").all()
 
     parlamentares_vagos = sorted(
         [
-            m.parlamentar for m in mandatos
+            m.parlamentar
+            for m in mandatos
             if m.parlamentar_id not in parlamentares_ocupados
             and m.parlamentar.ativo
             and not verifica_afastamento_parlamentar(
                 m.parlamentar, sessao.data_inicio, sessao.data_fim
             )
         ],
-        key=lambda p: remover_acentos(p.nome_parlamentar)
+        key=lambda p: remover_acentos(p.nome_parlamentar),
     )
 
     if not cargos_vagos:
@@ -2046,11 +2043,13 @@ class MesaView(FormMixin, DetailView):
 
         composicao, parlamentares_vagos, cargos_vagos = _get_dados_mesa(sessao)
 
-        context.update({
-            "composicao_mesa": composicao,
-            "parlamentares": parlamentares_vagos,
-            "cargos_vagos": cargos_vagos,
-        })
+        context.update(
+            {
+                "composicao_mesa": composicao,
+                "parlamentares": parlamentares_vagos,
+                "cargos_vagos": cargos_vagos,
+            }
+        )
 
         return self.render_to_response(context)
 
@@ -2067,8 +2066,7 @@ class MesaView(FormMixin, DetailView):
 
 
 @permission_required(
-    f"{AppConfig.label}.add_{IntegranteMesa._meta.model_name}",
-    raise_exception=True
+    f"{AppConfig.label}.add_{IntegranteMesa._meta.model_name}", raise_exception=True
 )
 def atualizar_mesa(request):
     """Retorna JSON com a composição atualizada da mesa diretora."""
@@ -2080,23 +2078,23 @@ def atualizar_mesa(request):
 
     composicao, parlamentares_vagos, cargos_vagos = _get_dados_mesa(sessao)
 
-    return JsonResponse({
-        "lista_composicao": [
-            (c.id, str(c.parlamentar), str(c.cargo), c.assina_ata) for c in composicao
-        ],
-        "lista_parlamentares": [
-            (p.id, p.nome_parlamentar) for p in parlamentares_vagos
-        ],
-        "lista_cargos": [
-            (c.id, str(c)) for c in cargos_vagos
-        ],
-        "msg": ("", 1),
-    })
+    return JsonResponse(
+        {
+            "lista_composicao": [
+                (c.id, str(c.parlamentar), str(c.cargo), c.assina_ata)
+                for c in composicao
+            ],
+            "lista_parlamentares": [
+                (p.id, p.nome_parlamentar) for p in parlamentares_vagos
+            ],
+            "lista_cargos": [(c.id, str(c)) for c in cargos_vagos],
+            "msg": ("", 1),
+        }
+    )
 
 
 @permission_required(
-    f"{AppConfig.label}.add_{IntegranteMesa._meta.model_name}",
-    raise_exception=True
+    f"{AppConfig.label}.add_{IntegranteMesa._meta.model_name}", raise_exception=True
 )
 def insere_parlamentar_composicao(request):
     """Insere um parlamentar na composição da Mesa Diretora."""
@@ -2125,9 +2123,7 @@ def insere_parlamentar_composicao(request):
     except (ObjectDoesNotExist, ValueError):
         return JsonResponse({"msg": ("Nenhum cargo foi inserido!", 0)})
 
-    if IntegranteMesa.objects.filter(
-        sessao_plenaria=sessao, cargo=cargo
-    ).exists():
+    if IntegranteMesa.objects.filter(sessao_plenaria=sessao, cargo=cargo).exists():
         return JsonResponse({"msg": ("Parlamentar já inserido!", 0)})
 
     IntegranteMesa.objects.create(
@@ -2136,14 +2132,16 @@ def insere_parlamentar_composicao(request):
 
     logger.info(
         "user=%s. Parlamentar (id=%s) inserido na sessao_plenaria(id=%s), cargo(id=%s).",
-        request.user.username, parlamentar_id, sessao_id, cargo_id,
+        request.user.username,
+        parlamentar_id,
+        sessao_id,
+        cargo_id,
     )
     return JsonResponse({"msg": ("Parlamentar inserido com sucesso!", 1)})
 
 
 @permission_required(
-    f"{AppConfig.label}.delete_{IntegranteMesa._meta.model_name}",
-    raise_exception=True
+    f"{AppConfig.label}.delete_{IntegranteMesa._meta.model_name}", raise_exception=True
 )
 def remove_parlamentar_composicao(request):
     """Remove um parlamentar da composição da Mesa Diretora."""
@@ -2159,19 +2157,18 @@ def remove_parlamentar_composicao(request):
     try:
         IntegranteMesa.objects.get(id=int(composicao_id)).delete()
     except (ObjectDoesNotExist, ValueError):
-        return JsonResponse(
-            {"msg": ("Composição da Mesa não pôde ser removida!", 0)}
-        )
+        return JsonResponse({"msg": ("Composição da Mesa não pôde ser removida!", 0)})
 
     logger.info(
-        "user=%s. IntegranteMesa id=%s removido.", request.user.username, composicao_id,
+        "user=%s. IntegranteMesa id=%s removido.",
+        request.user.username,
+        composicao_id,
     )
     return JsonResponse({"msg": ("Parlamentar excluido com sucesso!", 1)})
 
 
 @permission_required(
-    f"{AppConfig.label}.change_{IntegranteMesa._meta.model_name}",
-    raise_exception=True
+    f"{AppConfig.label}.change_{IntegranteMesa._meta.model_name}", raise_exception=True
 )
 def toggle_assina_ata(request):
     """Alterna o campo assina_ata de um IntegranteMesa."""
@@ -2190,10 +2187,12 @@ def toggle_assina_ata(request):
     integrante.assina_ata = not integrante.assina_ata
     integrante.save(update_fields=["assina_ata"])
 
-    return JsonResponse({
-        "msg": ("", 1),
-        "assina_ata": integrante.assina_ata,
-    })
+    return JsonResponse(
+        {
+            "msg": ("", 1),
+            "assina_ata": integrante.assina_ata,
+        }
+    )
 
 
 def get_tupla(tupla_key):
@@ -4812,13 +4811,15 @@ class OcorrenciaSessaoCrud(MasterDetailCrud):
             return initial
 
     class ListView(MasterDetailCrud.ListView):
-        ordering = 'numero_ordem'
+        ordering = "local", "numero_ordem"
 
         def get(self, request, *args, **kwargs):
-            if 'renumerar_ordem' in request.GET and request.user.has_perm('sessao.change_ocorrenciasessao'):
+            if "renumerar_ordem" in request.GET and request.user.has_perm(
+                "sessao.change_ocorrenciasessao"
+            ):
                 ocorrencias = OcorrenciaSessao.objects.filter(
                     sessao_plenaria_id=self.kwargs["pk"]
-                ).order_by('numero_ordem')
+                ).order_by("local", "numero_ordem")
                 for index, ocorrencia in enumerate(ocorrencias):
                     ocorrencia.numero_ordem = index + 1
                     ocorrencia.save()

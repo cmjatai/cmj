@@ -1,3 +1,13 @@
+{% if ocorrencias_da_sessao_30 %}
+    <strong>|</strong>
+    {% for ocorrencia in ocorrencias_da_sessao_30 %}
+        {% if ocorrencia.titulo %}
+            <strong>{{ ocorrencia.titulo }}</strong>
+        {% endif %}
+        {{ ocorrencia.conteudo|safe|linebreaksbr }}
+        {% if not forloop.last %} // {% endif %}{% if check %}</br></br>{% endif %}
+    {% endfor %}
+{% endif %}
 {% if materias_ordem %}
     <strong>| MATÉRIAS DA ORDEM DO DIA: </strong>
     {% for m in materias_ordem %}

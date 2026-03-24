@@ -1137,7 +1137,7 @@ class OcorrenciaSessao(models.Model):  # OcorrenciaSessaoPlenaria
     class Meta:
         verbose_name = _("Ocorrência da Sessão Plenaria")
         verbose_name_plural = _("Ocorrências da Sessão Plenaria")
-        ordering = ["id"]
+        ordering = ["local", "numero_ordem"]
 
     def __str__(self):
         return "%s - %s" % (self.sessao_plenaria, self.conteudo)

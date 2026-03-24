@@ -145,7 +145,7 @@ class ResumoMixin:
 
             turno = tramitacao.get_turno_display() if tramitacao else ""
 
-            # Ocorrências da Sessão Ligadas a ordemdia (o)
+            # Ocorrências da Sessão Ligadas ao expendiente
             ocorrencias_exp = OcorrenciaSessao.objects.filter(
                 expediente=mat_exp
             ).order_by("numero_ordem")
@@ -268,13 +268,22 @@ class ResumoMixin:
             ]
             # join com ", " e " e " para o ultimo item
             if len(cargos_dos_assinantes) > 1:
-                texto_assinatura = ", ".join(cargos_dos_assinantes[:-1]) + " e " + cargos_dos_assinantes[-1]
+                texto_assinatura = (
+                    ", ".join(cargos_dos_assinantes[:-1])
+                    + " e "
+                    + cargos_dos_assinantes[-1]
+                )
             else:
                 texto_assinatura = cargos_dos_assinantes[0]
 
             # filtra mesa dia para conter apenas os cargos que assinam a ata
             mesa_dia = [m for m in mesa_dia if m["assina_ata"]]
-            context.update({"texto_assinatura": f"Assina{'m' if len(mesa_dia) > 1 else ''} %s" % texto_assinatura})
+            context.update(
+                {
+                    "texto_assinatura": f"Assina{'m' if len(mesa_dia) > 1 else ''} %s"
+                    % texto_assinatura
+                }
+            )
             context.update({"assinatura_mesa": mesa_dia})
             pass
         else:
@@ -461,12 +470,15 @@ class ResumoMixin:
 
     @classmethod
     def get_ocorrencias_da_sessao(cls, sessao_plenaria):
-        ocorrencias_sessao = OcorrenciaSessao.objects.filter(
-            sessao_plenaria_id=sessao_plenaria.id,
-            expediente__isnull=True,
-            ordemdia__isnull=True,
-        ).order_by("numero_ordem")
-        context = {"ocorrencias_da_sessao": ocorrencias_sessao}
+        context = {}
+        for local in OcorrenciaSessao.LocalChoices.values:
+            context[f"ocorrencias_da_sessao_{local}"] = OcorrenciaSessao.objects.filter(
+                sessao_plenaria_id=sessao_plenaria.id,
+                expediente__isnull=True,
+                ordemdia__isnull=True,
+                local=local,
+            ).order_by("numero_ordem")
+
         return context
 
     @classmethod
@@ -521,8 +533,8 @@ class ResumoView(ResumoMixin, DetailView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
 
-        if 'check' in self.request.GET and self.request.user.is_authenticated:
-             context.update({"check": True})
+        if "check" in self.request.GET and self.request.user.is_authenticated:
+            context.update({"check": True})
 
         # Votos de Votação Nominal de Matérias Expediente
         context.update(self.get_votos_nominais_materia_expediente(self.object))

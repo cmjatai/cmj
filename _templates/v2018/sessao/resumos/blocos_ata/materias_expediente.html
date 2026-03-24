@@ -1,3 +1,13 @@
+{% if ocorrencias_da_sessao_20 %}
+    <strong>|</strong>
+    {% for ocorrencia in ocorrencias_da_sessao_20 %}
+        {% if ocorrencia.titulo %}
+            <strong>{{ ocorrencia.titulo }}</strong>
+        {% endif %}
+        {{ ocorrencia.conteudo|safe|linebreaksbr }}
+        {% if not forloop.last %} // {% endif %}{% if check %}</br></br>{% endif %}
+    {% endfor %}
+{% endif %}
 {% if materia_expediente %}
     <strong>| MATÉRIAS DO EXPEDIENTE: </strong>
     {% for m in materia_expediente %}

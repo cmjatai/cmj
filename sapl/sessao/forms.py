@@ -1200,6 +1200,24 @@ class OcorrenciaSessaoForm(forms.ModelForm):
         if not self.is_valid():
             return cleaned_data
 
+        if (
+            cleaned_data["local"] == OcorrenciaSessao.LocalChoices.PROJETO
+            and not cleaned_data.get("expediente")
+            and not cleaned_data.get("ordemdia")
+        ):
+            raise ValidationError(
+                'Para Local de Ocorrência "Vinculada a Projeto" selecione ao menos uma Matéria no Expediente ou na Ordem do Dia.'
+            )
+
+        if cleaned_data["local"] in (
+            OcorrenciaSessao.LocalChoices.INICIO,
+            OcorrenciaSessao.LocalChoices.MEIO,
+            OcorrenciaSessao.LocalChoices.FIM,
+        ) and (cleaned_data.get("expediente") or cleaned_data.get("ordemdia")):
+            raise ValidationError(
+                f'Para Local de Ocorrência "{OcorrenciaSessao.LocalChoices(cleaned_data["local"]).label}" não pode haver matéria selecionada no Expediente e/ou Ordem do Dia'
+            )
+
         if cleaned_data.get("expediente") and cleaned_data.get("ordemdia"):
             raise ValidationError(
                 "Não é permitido selecionar uma matéria do Expediente e da Ordem do Dia ao mesmo tempo para registrar a ocorrência."
