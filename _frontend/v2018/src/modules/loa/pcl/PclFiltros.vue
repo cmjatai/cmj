@@ -110,20 +110,22 @@
         </button>
       </div>
     </div>
-    <div v-if="totalItems > 0" class="pcl-pagination d-flex align-items-center mt-2 pt-2 border-top">
-      <div class="d-flex align-items-center mr-3 px-1">
-        <small class="text-muted text-uppercase font-weight-bold mr-2" style="font-size:.7rem;letter-spacing:.03em;">Exibir</small>
-        <b-form-select
+    <div v-if="totalItems > 0" class="pcl-pagination d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
+      <div class="d-flex align-items-center">
+        <div class="d-flex align-items-center mr-3 px-1">
+          <small class="text-muted text-uppercase font-weight-bold mr-2" style="font-size:.7rem;letter-spacing:.03em;">Exibir</small>
+          <b-form-select
           :value="pageSize"
           :options="pageSizeOptions"
           @change="val => $emit('update:page-size', Number(val))"
           size="sm"
           class="pcl-page-size-select"
-        ></b-form-select>
+          ></b-form-select>
+        </div>
+        <small class="text-muted mr-auto" style="font-size:.8rem;">{{ paginationLabel }}
+          <b-spinner v-if="fetching" small variant="secondary" class="ml-2" style="vertical-align:middle;"></b-spinner>
+        </small>
       </div>
-      <small class="text-muted mr-auto" style="font-size:.8rem;">{{ paginationLabel }}
-        <b-spinner v-if="fetching" small variant="secondary" class="ml-2" style="vertical-align:middle;"></b-spinner>
-      </small>
       <nav class="d-flex align-items-center">
         <button
           class="pcl-page-btn"

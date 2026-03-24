@@ -1,11 +1,11 @@
 <template>
-  <div class="pcl-totalizacao mx-n3 px-2 py-1" v-if="lista.length">
+  <div class="pcl-totalizacao px-2 py-1" v-if="lista.length">
     <div class="d-flex align-items-center justify-content-between mb-1 ">
       <div class="d-flex align-items-center">
         <i class="fas fa-chart-bar text-primary mr-2"></i>
         <strong class="text-dark">Totalização</strong>
       </div>
-      <span class="small text-info">
+      <span class="small text-info ml-2 pl-2 border-left border-info">
         <em>
           A Totalização é calculada sobre as emendas e ajustes listados conforme o filtro acima aplicado:
         </em>
@@ -31,7 +31,7 @@
         <span class="font-weight-bold mr-1">Áreas Diversas:</span>
         <span class="font-weight-bold text-info">R$ {{ formatCurrency(totalAreasDiversas) }}</span>
       </div>
-      <div class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
+      <div v-if="totalModificativas > 0" class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
         <i class="fas fa-pen-fancy text-secondary mr-1"></i>
         <span class="font-weight-bold mr-1">Modificativas:</span>
         <span class="font-weight-bold text-secondary">R$ {{ formatCurrency(totalModificativas) }}</span>
@@ -151,6 +151,7 @@ export default {
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 0.375rem;
+  margin: 0 -15px;
 }
 .total-geral-box {
   background: #fff;
