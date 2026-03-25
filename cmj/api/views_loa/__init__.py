@@ -15,6 +15,7 @@ from cmj.api.views_loa.arquivoprestacaocontaregistro import (
 from cmj.api.views_loa.despesaconsulta import DespesaConsultaViewSet
 from cmj.api.views_loa.emendaloa import EmendaLoaViewSet
 from cmj.api.views_loa.emendaloaregistrocontabil import EmendaLoaRegistroContabilViewSet
+from cmj.api.views_loa.entidade import EntidadeViewSet
 from cmj.api.views_loa.loa import LoaViewSet
 from cmj.api.views_loa.oficioajusteloa import OficioAjusteLoaViewSet
 from cmj.api.views_loa.registroajusteloa import RegistroAjusteLoaViewSet
@@ -28,6 +29,7 @@ from cmj.loa.models import (
     DespesaConsulta,
     EmendaLoa,
     EmendaLoaRegistroContabil,
+    Entidade,
     Loa,
     OficioAjusteLoa,
     PrestacaoContaRegistro,
@@ -103,4 +105,9 @@ class _ArquivoPrestacaoContaRegistroViewSet(ArquivoPrestacaoContaRegistroViewSet
 
 @customize(PrestacaoContaRegistro)
 class _PrestacaoContaRegistroViewSet:
+    pass
+
+
+@customize(Entidade)
+class _EntidadeViewSet(EntidadeViewSet):
     pass

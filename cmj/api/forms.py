@@ -28,8 +28,19 @@ class EntidadeFilterSet(CmjFilterSetMixin):
         label="LOA", queryset=Loa.objects.all(), method="filter_emendaloa_set__loa"
     )
 
+    loa = ModelChoiceFilter(
+        label="LOA", queryset=Loa.objects.all(), method="filter_loa"
+    )
+
     class Meta(CmjFilterSetMixin.Meta):
         model = Entidade
+
+    def filter_loa(self, queryset, name, value):
+        return (
+            queryset.filter(emendaloa_set__loa=value)
+            .union(queryset.filter(registroajusteloa_set__oficio_ajuste_loa__loa=value))
+            .order_by("nome_fantasia")
+        )
 
     def filter_emendaloa_set__loa(self, queryset, name, value):
         return queryset.filter(emendaloa_set__loa=value).distinct()

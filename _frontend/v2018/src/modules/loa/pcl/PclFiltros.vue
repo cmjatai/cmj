@@ -52,7 +52,7 @@
           ordering="nome_fantasia"
           ref="entidadeSelect"
           :required="false"
-          :extra_query="`&ativo=True`"
+          :extra_query="`${qsLoa}${ qsLoa ? '&' : '' }ativo=True&page_size=100`"
           :disabled="filtersDisabled"
         ></model-select>
       </div>
@@ -67,7 +67,7 @@
           ordering="codigo"
           ref="unidadeSelect"
           :required="false"
-          :extra_query="`${qsLoa}&recebe_emenda_impositiva=True`"
+          :extra_query="`${qsLoa}${ qsLoa ? '&' : '' }recebe_emenda_impositiva=True&page_size=100`"
           :disabled="filtersDisabled"
         ></model-select>
       </div>

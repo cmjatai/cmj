@@ -9,16 +9,33 @@
 export default {
   name: 'model-select',
   props: ['value',
-    'app', 'model',
+    'app', 'model', 'action',
     'label',
     'limit',
     'ordering',
     'choice', 'height', 'extra_query', 'required', 'disabled'
+
   ],
   data () {
     return {
       selected: this.value,
-      options: []
+      options3: []
+    }
+  },
+  computed: {
+    options: function () {
+      let cache = _.orderBy(Object.values(
+        this.data_cache[`${this.app}_${this.model}`] || []
+      ), [this.ordering], ['asc'])
+      return _.filter([
+        !this.required ? { value: null, text: '----------------' } : null,
+        ...cache.map((item) => {
+          return {
+            value: item,
+            text: item[this.choice]
+          }
+        })
+      ], (item) => item !== null)
     }
   },
   watch: {
@@ -29,53 +46,16 @@ export default {
       this.selected = nv
     }
   },
-  methods: {
-    fetch (data) {
-      this.fetchModel()
-    },
-    fetchModel (next_page = 1) {
-      /**
-       * Busca lista completa do model
-       *   /api/[app]/[model]/
-       *
-       */
-      let _this = this
-      if (next_page === 1) {
-        if (!_this.height || this.height === 1) {
-          if (_this.required === undefined || !_this.required) {
-            _this.selected = _this.value ? _this.value : null
-            _this.options = [
-              { value: _this.selected, text: this.label ? this.label : '---------------' }
-            ]
-          }
-        } else {
-          _this.options = []
-        }
-      }
-
-      let query_string = _this.isString(_this.extra_query) ? _this.extra_query : ''
-
-      _this.utils.getModelOrderedList(_this.app, _this.model, _this.ordering, next_page, query_string)
-        .then((response) => {
-          _.each(response.data.results, function (item, idx) {
-            _this.options.push({ value: item, text: item[_this.choice] })
-            _this.fetchSync({
-              app: _this.app,
-              model: _this.model,
-              id: item.id
-            })
-          })
-          if (response.data.pagination.next_page !== null) {
-            _this.fetchModel(response.data.pagination.next_page)
-          }
-        })
-        .catch((response) => _this.sendMessage(
-          { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
-    }
-  },
-  created: function () {
-    this.fetchModel()
+  mounted: function () {
+    const _this = this
+    _this.fetchSync({
+      app: _this.app,
+      model: _this.model,
+      action: _this.action,
+      query_string: _this.extra_query ? _this.extra_query : ''
+    })
   }
+
 }
 </script>
 

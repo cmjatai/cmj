@@ -136,14 +136,21 @@ const syncStore = {
       id,
       action,
       params,
+      query_string,
       only_first_page = false,
       method = 'GET'
     }) {
       const _fetch = Resources.Utils.fetch
-      const metadata = { app, model }
+      const metadata = { app, model, params: params || {} }
       if (id) { metadata.id = id }
       if (action) { metadata.action = action }
-      if (params) { metadata.query_string = new URLSearchParams(params).toString() }
+      if (query_string) {
+        for (const [key, value] of new URLSearchParams(query_string)) {
+          metadata.params[key] = value
+        }
+      }
+      params = metadata.params
+      metadata.query_string = new URLSearchParams(params).toString()
       return _fetch(
         metadata, method
       ).then((response) => {

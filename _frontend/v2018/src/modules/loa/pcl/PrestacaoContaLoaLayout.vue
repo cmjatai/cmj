@@ -104,7 +104,7 @@ export default {
   computed: {
     qs_loa () {
       const value = this.loa.id
-      return value ? `&loa=${value}` : ''
+      return value ? `loa=${value}` : ''
     },
     qs_emenda_loa__loa () {
       const value = this.loa.id

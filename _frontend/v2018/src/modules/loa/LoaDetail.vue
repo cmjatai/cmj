@@ -24,7 +24,7 @@
             ordering="codigo"
             ref="orgaoSelect"
             :required="false"
-            :extra_query="`&loa=${qs_loa}&page_size=100`"
+            :extra_query="`${qs_loa}${ qs_loa ? '&' : '' }page_size=100`"
             ></model-select>
           Unidades Orçamentárias
           <model-select @change="value => despesa.unidadeselected=value"
@@ -35,7 +35,7 @@
             ordering="codigo"
             ref="unidadeSelect"
             :required="false"
-            :extra_query="`${qs_loa}${qs_orgao}`"
+            :extra_query="`${qs_loa}${ qs_loa ? '&' : '' }${qs_orgao}`"
             ></model-select>
         </div>
         <div class="col-md-3">
@@ -311,11 +311,11 @@ export default {
     },
     qs_loa: function () {
       const value = this.loa.id
-      return value ? `&loa=${value}&despesa_set__isnull=False` : ''
+      return value ? `loa=${value}&despesa_set__isnull=False` : ''
     },
     qs_orgao: function () {
       const value = this.despesa.orgaoselected
-      return value && value.id ? `&orgao=${value.id}` : ''
+      return value && value.id ? `orgao=${value.id}` : ''
     },
     agrupamentos__options: function () {
       const t = this

@@ -28,7 +28,7 @@
             ordering="codigo"
             ref="unidadeSelect"
             :required="false"
-            :extra_query="`${qs_loa}${qs_orgao}`"
+            :extra_query="`${qs_loa}${ qs_loa ? '&' : '' }${qs_orgao}`"
             ></model-select>
         </div>
         <div class="col-md-3">
