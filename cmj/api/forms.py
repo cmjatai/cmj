@@ -4,7 +4,13 @@ from decimal import Decimal
 from django.db.models import Q
 from django_filters import CharFilter, ModelChoiceFilter
 
-from cmj.loa.models import EmendaLoa, Entidade, Loa, PrestacaoContaRegistro, RegistroAjusteLoa
+from cmj.loa.models import (
+    EmendaLoa,
+    Entidade,
+    Loa,
+    PrestacaoContaRegistro,
+    RegistroAjusteLoa,
+)
 from drfautoapi.drfautoapi import ApiFilterSetMixin
 
 logger = logging.getLogger(__name__)
@@ -38,6 +44,7 @@ class EntidadeFilterSet(CmjFilterSetMixin):
             )
             continue
         return queryset.filter(q)
+
 
 class EmendaLoaFilterSet(CmjFilterSetMixin):
 
@@ -143,7 +150,7 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
         qs = super().qs
         if "situacao" not in self.data or not self.data.get("situacao"):
             qs = self.filter_situacao(qs, "situacao", "")
-        return qs
+        return qs.order_by("id").distinct()
 
     def filter_oficio_ajuste_loa__loa(self, queryset, name, value):
         return queryset.filter(oficio_ajuste_loa__loa=value).distinct()

@@ -7,6 +7,10 @@
       Nenhum ajuste vinculado a esta emenda.
     </div>
     <template v-else>
+      <div class="d-flex justify-content-end align-items-center px-3 pt-2">
+        <h3 class="mb-0 mr-2 font-italic border-bottom">Total dos Ajustes:</h3>
+        <h3 class="font-weight-bold mb-0 text-primary border-bottom">R$ {{ totalValor().toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</h3>
+      </div>
       <div
         v-for="(ajuste, idx) in items"
         :key="ajuste.id || idx"
@@ -50,6 +54,12 @@ export default {
     items: {
       type: Array,
       default: null
+    }
+  },
+  methods: {
+    totalValor () {
+      if (!this.items) return 0
+      return this.items.reduce((total, ajuste) => total + parseFloat(ajuste.valor || 0), 0)
     }
   }
 }

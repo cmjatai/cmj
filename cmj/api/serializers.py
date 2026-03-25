@@ -1,7 +1,7 @@
 import os
 from decimal import Decimal
 
-from django.db.models import Max
+from django.db.models import Max, Sum
 from django.forms.models import model_to_dict
 from django.urls.base import reverse
 from django.utils import timezone
@@ -417,8 +417,10 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
             return "SEM_PRESTACAO_CONTAS"
 
     def get_valor(self, obj):
-        obj = obj.registroajusteloaparlamentar_set.aggregate(total=Max("valor"))
-        return obj["total"] if obj["total"] else 0
+        total = obj.registroajusteloaparlamentar_set.order_by("parlamentar").aggregate(
+            total=Sum("valor")
+        )
+        return total["total"] if total["total"] else 0
 
 
 class EmendaLoaSerializer(CmjSerializerMixin):
