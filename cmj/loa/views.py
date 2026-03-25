@@ -454,7 +454,7 @@ class LoaCrud(Crud):
             totais = {}
 
             for lp in loaparlamentares:
-                print(f"Calculando resumo para parlamentar {lp}...")
+                # print(f"Calculando resumo para parlamentar {lp}...")
 
                 resumo_parlamentar = {"loaparlamentar": lp}
                 for k, v in EmendaLoa.TIPOEMENDALOA_CHOICE[:2]:
@@ -3098,7 +3098,7 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
                 ajustes.append(a_str)
 
-            return f'<table>{"".join(ajustes)}</table>', ""
+            return f'<table class="w-100">{"".join(ajustes)}</table>', ""
 
     class DetailView(MasterDetailCrud.DetailView):
         template_name = "loa/oficioajusteloa_detail.html"

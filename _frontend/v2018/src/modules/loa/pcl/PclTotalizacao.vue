@@ -127,7 +127,14 @@ export default {
   methods: {
     valorEfetivo (item) {
       if (!isEmenda(item)) {
-        return item.valor || 0
+        let valor = Number(item.valor || 0)
+        if (this.parlamentarSelecionado && item.valor_por_parlamentar) {
+          const vp = item.valor_por_parlamentar[this.parlamentarSelecionado.id]
+          if (vp !== undefined) {
+            valor = Number(vp)
+          }
+        }
+        return valor
       }
       const valor_computado = Number(item.valor_computado || 0)
       if (item.has_ajustes || item.fase === 40) {

@@ -794,8 +794,8 @@ class EmendaLoa(CmjSearchMixin):
         num_ajustes = RegistroAjusteLoa.objects.filter(emendaloa=self).count()
         if not num_ajustes and self.fase != self.IMPEDIMENTO_TECNICO:
             valor = self.valor
-        #_print = f"""{"." * 20} - {self.id} - {self.materia.epigrafe_short if self.materia else ""} - {self.valor} - {self.fase} - {self.tipo} - {valor} """
-        #print(_print)
+        # _print = f"""{"." * 20} - {self.id} - {self.materia.epigrafe_short if self.materia else ""} - {self.valor} - {self.fase} - {self.tipo} - {valor} """
+        # print(_print)
         return valor
 
         soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
@@ -1366,6 +1366,8 @@ class RegistroAjusteLoa(CmjSearchMixin):
 
     @property
     def soma_valor(self):
+        if self.pk is None:
+            return Decimal("0.00")
         soma = sum(
             list(
                 filter(

@@ -374,7 +374,10 @@ class CmjSearchMixin(models.Model):
                             _self = " ".join(_self)
                             break
                         else:
-                            _self = getattr(_self, field)
+                            try:
+                                _self = getattr(_self, field)
+                            except ValueError:
+                                break
                     if _self:
                         search += str(_self) + " "
             self.search = search

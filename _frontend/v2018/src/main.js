@@ -72,6 +72,7 @@ const app = new Vue({ // eslint-disable-line
   template: '<App/>'
 })
 
+/*
 Storage.prototype.addArrayOfIds = function (key, id) {
   let ids = this.getItem(key) || '[]'
   ids = JSON.parse(ids)
@@ -98,3 +99,4 @@ Storage.prototype.delItemArrayOfIds = function (key, id) {
 Storage.prototype.clearArrayOfIds = function (key) {
   this.removeItem(key)
 }
+*/

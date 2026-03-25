@@ -1107,8 +1107,7 @@ class RegistroAjusteLoaForm(ModelForm):
 
         i_init = self.instance
 
-        soma = sum(list(filter(lambda x: x, self.cleaned_data["parlamentares__valor"])))
-
+        # soma = sum(list(filter(lambda x: x, self.cleaned_data["parlamentares__valor"])))
         try:
             i = super().save(commit)
         except Exception as e:

@@ -398,6 +398,7 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
 
     # crie o campo valor como DecimalField chamanado método para calcular
     valor = serializers.SerializerMethodField()
+    valor_por_parlamentar = serializers.SerializerMethodField()
 
     fase_prestacao_contas = serializers.SerializerMethodField()
 
@@ -415,6 +416,16 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
             return PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
         else:
             return "SEM_PRESTACAO_CONTAS"
+
+    def get_valor_por_parlamentar(self, obj):
+        valores = {}
+        for registro in obj.registroajusteloaparlamentar_set.all():
+            parlamentar = registro.parlamentar
+            if parlamentar:
+                valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
+                    registro.valor or Decimal("0.00")
+                )
+        return valores
 
     def get_valor(self, obj):
         total = obj.registroajusteloaparlamentar_set.order_by("parlamentar").aggregate(

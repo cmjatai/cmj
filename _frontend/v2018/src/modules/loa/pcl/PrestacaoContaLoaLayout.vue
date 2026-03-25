@@ -98,7 +98,7 @@ export default {
       fetching: false,
       firstPageLoaded: false,
       currentPage: 1,
-      pageSize: 10
+      pageSize: Number(localStorage.getItem('portalcmj_page_size')) || 10
     }
   },
   computed: {
@@ -248,6 +248,7 @@ export default {
     onPageSizeChange (size) {
       this.pageSize = size
       this.currentPage = 1
+      localStorage.setItem('portalcmj_page_size', size)
     },
     onPageChange (page) {
       const totalPages = Math.max(1, Math.ceil(this.emendas_ajustes_list.length / this.pageSize))
@@ -487,6 +488,7 @@ export default {
         app: 'loa',
         model: 'loa',
         params: {
+          ano__gte: 2023,
           get_all: 'True',
           o: '-ano'
         }

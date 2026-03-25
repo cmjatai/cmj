@@ -59,10 +59,9 @@ export default {
         .then((response) => {
           _.each(response.data.results, function (item, idx) {
             _this.options.push({ value: item, text: item[_this.choice] })
-            _this.refreshState({
+            _this.fetchSync({
               app: _this.app,
               model: _this.model,
-              value: item,
               id: item.id
             })
           })
