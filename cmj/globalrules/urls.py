@@ -1,9 +1,14 @@
-from django.urls.conf import re_path, path
-from cmj.globalrules.views import service_worker_proxy, manifest, offline
+from django.urls.conf import path, re_path
+
+from cmj.globalrules.views import manifest, offline, service_worker_proxy
 
 urlpatterns = [
-     path('v2026/service-worker.js', service_worker_proxy, name='serviceworker_proxy_v2026'),
-     path('service-worker.js', service_worker_proxy, name='serviceworker_proxy_v2018'),
-     path('v2026/manifest.json', manifest, name='manifest'),
-#    re_path('^offline/$', offline, name='offline')
+    path(
+        "v6/service-worker.js",
+        service_worker_proxy,
+        name="serviceworker_proxy_v6",
+    ),
+    path("service-worker.js", service_worker_proxy, name="serviceworker_proxy_v2018"),
+    path("v6/manifest.json", manifest, name="manifest"),
+    #    re_path('^offline/$', offline, name='offline')
 ]

@@ -44,7 +44,7 @@ services:
       - "8080:8080"
   cmjfront2026:
     build:
-      context: ../_frontend/v2026/
+      context: ../_frontend/v6/
       dockerfile: ../../docker/DockerfileFront2026Dev
     #command: yarn build
     restart: no

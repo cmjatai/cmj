@@ -5,7 +5,7 @@
     <li><a class="text-yellow" style="font-weight: bold;" href="{% url 'cmj.cerimonial:visita_list'  %}">Registro de Entrada</a></li>
   {% endif %}
   {% if perms.arq.list_draft %}
-    <li><a class="text-yellow" style="font-weight: bold;" href="{% url 'cmj.core:app_vue_view_v2026_url' 'arq/draft' %}" target="_blank">Draft</a></li>
+    <li><a class="text-yellow" style="font-weight: bold;" href="{% url 'cmj.core:app_vue_view_v6_url' 'arq/draft' %}" target="_blank">Draft</a></li>
   {% endif %}
   {% if perms.core.menu_relatorios%}
     <li class="dropdown">

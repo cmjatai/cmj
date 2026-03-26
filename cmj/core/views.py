@@ -99,8 +99,9 @@ def time_refresh_log_test(request):
     return render(request, "core/time_refresh_log_test.html", {})
 
 
-def app_vue_view_v2026(request, slug=None):
-    return render(request, "app_vue_v2026.html")
+def app_vue_view_v6(request, slug=None):
+    return render(request, "base_v6.html")
+
 
 def app_vue_view_v2018(request, slug=None):
     return render(request, "app_vue_v2018.html")

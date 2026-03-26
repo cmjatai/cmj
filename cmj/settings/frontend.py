@@ -10,12 +10,12 @@ BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
 
 Fv2018 = "v2018"
-Fv2026 = "v2026"
+Fv6 = "v6"
 
 
 def front_version():
     return [
-        str(PROJECT_DIR.child("_templates").child(Fv2026)),
+        str(PROJECT_DIR.child("_templates").child(Fv6)),
         str(PROJECT_DIR.child("_templates").child(Fv2018)),
     ]
 
@@ -60,7 +60,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap4"
 CRISPY_FAIL_SILENTLY = not DEBUG
 
 PROJECT_DIR_FRONTEND_2018 = PROJECT_DIR.child("_frontend").child(Fv2018)
-PROJECT_DIR_FRONTEND_2026 = PROJECT_DIR.child("_frontend").child(Fv2026)
+PROJECT_DIR_FRONTEND_2026 = PROJECT_DIR.child("_frontend").child(Fv6)
 
 FRONTEND_BRASAO_PATH = {
     "32": PROJECT_DIR_FRONTEND_2018.child("public")
@@ -110,9 +110,7 @@ DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
 DJANGO_VITE = {
     "default": {
         "dev_mode": DJANGO_VITE_DEV_MODE,
-        "manifest_path": DJANGO_VITE_ASSETS_PATH.child(
-            Fv2026, ".vite", "manifest.json"
-        ),
+        "manifest_path": DJANGO_VITE_ASSETS_PATH.child(Fv6, ".vite", "manifest.json"),
     }
 }
 
