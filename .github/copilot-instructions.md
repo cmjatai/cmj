@@ -11,10 +11,10 @@ This project is a complex Django-based system for the "Câmara Municipal de Jata
 
 ### Frontend Architecture
 The project maintains two co-existing frontend stacks in `_frontend/`:
-1.  **`v2026` (Modern):** Vue 3, Vite, Pinia, Bootstrap 5. Used for new features and gradual migration.
+1.  **`v6` (Modern):** Vue 3, Vite, Pinia, Bootstrap 5. Used for new features and gradual migration.
 2.  **`v2018` (Legacy):** Vue 2, Webpack, Bootstrap 4. Contains the bulk of existing UI logic.
 
-**Guideline:** When implementing new UI features, prefer **`v2026`** (Vue 3). Only touch `v2018` for maintenance of legacy views.
+**Guideline:** When implementing new UI features, prefer **`v6`** (Vue 3). Only touch `v2018` for maintenance of legacy views.
 
 ## Development Workflow
 

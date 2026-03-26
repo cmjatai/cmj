@@ -9,7 +9,7 @@
     check_permission: arq.view_arqclasse
 {% comment %}
   - title: {% trans "ArqView" %}
-    url: /v2026/arq/admin/root
+    url: /v6/arq/admin/root
     check_permission: arq.view_arqclasse
 {% endcomment %}
   - title: ''
@@ -23,6 +23,6 @@
   - title: ''
     url: ''
   - title: {% trans "Draft" %}
-    url: /v2026/arq/draft
+    url: /v6/arq/draft
     check_permission: arq.list_draft
 {% endif%}
