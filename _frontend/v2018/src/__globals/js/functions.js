@@ -138,3 +138,15 @@ window.dbClickRemoveQuebraLinha = function (event) {
   value = value.replace(/(\r\n|\n|\r)/gm, ' ')
   event.target.value = value
 }
+
+window.activeDbClickRemoveQuebraLinha = function (element) {
+  if (document.getElementsByTagName('textarea') !== null) {
+    let textareas = document.getElementsByTagName('textarea')
+    for (let i = 0; i < textareas.length; i++) {
+      textareas[i].addEventListener(
+        'dblclick',
+        window.dbClickRemoveQuebraLinha
+      )
+    }
+  }
+}

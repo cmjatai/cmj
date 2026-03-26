@@ -1,11 +1,11 @@
-from collections import OrderedDict
-from datetime import timedelta
 import io
 import logging
 import os
 import sys
-from django_filters.views import FilterView
+from collections import OrderedDict
+from datetime import timedelta
 
+import pymupdf
 from braces.views import FormMessagesMixin
 from django import forms
 from django.apps.registry import apps
@@ -13,53 +13,86 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ValidationError, PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.files.base import File
 from django.core.signing import Signer
 from django.db import IntegrityError, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.http.response import (HttpResponse, HttpResponseRedirect,
-                                  JsonResponse, Http404)
+from django.http.response import (
+    Http404,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
-from django.urls.base import reverse_lazy, reverse
+from django.urls.base import reverse, reverse_lazy
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_str
 from django.utils.text import format_lazy, slugify
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import TemplateView, ContextMixin
+from django.views.generic.base import ContextMixin, TemplateView
 from django.views.generic.detail import DetailView
-from django.views.generic.edit import (CreateView, DeleteView, FormView,
-                                       UpdateView)
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.views.generic.list import ListView
-import pymupdf
+from django_filters.views import FilterView
 
-from cmj.search.tasks import task_sync_embeddings_textoarticulado, task_sync_embeddings_textoarticulado_function
+from cmj.search.tasks import (
+    task_sync_embeddings_textoarticulado,
+    task_sync_embeddings_textoarticulado_function,
+)
 from cmj.utils import media_cache_storage
 from sapl.compilacao.apps import AppConfig
-from sapl.compilacao.forms import (DispositivoDefinidorVigenciaForm,
-                                   DispositivoEdicaoAlteracaoForm,
-                                   DispositivoEdicaoBasicaForm,
-                                   DispositivoEdicaoVigenciaForm,
-                                   DispositivoRegistroAlteracaoForm,
-                                   DispositivoRegistroInclusaoForm,
-                                   DispositivoRegistroRevogacaoForm,
-                                   DispositivoSearchModalForm, NotaForm,
-                                   PublicacaoForm, TaForm,
-                                   TextNotificacoesForm, TipoTaForm, VideForm)
-from sapl.compilacao.models import (STATUS_TA_EDITION, STATUS_TA_PRIVATE,
-                                    STATUS_TA_PUBLIC, CitacaoDeReferencia, Dispositivo, Nota,
-                                    PerfilEstruturalTextoArticulado,
-                                    Publicacao, TextoArticulado,
-                                    TipoDispositivo, TipoNota, TipoPublicacao,
-                                    TipoTextoArticulado, TipoVide,
-                                    VeiculoPublicacao, Vide, UrlizeReferencia)
-from sapl.compilacao.utils import (DISPOSITIVO_SELECT_RELATED,
-                                   DISPOSITIVO_SELECT_RELATED_EDIT,
-                                   get_integrations_view_names)
-from sapl.crud.base import RP_DETAIL, RP_LIST, Crud, CrudAux, CrudListView, ListWithSearchForm, \
-    make_pagination
+from sapl.compilacao.forms import (
+    DispositivoDefinidorVigenciaForm,
+    DispositivoEdicaoAlteracaoForm,
+    DispositivoEdicaoBasicaForm,
+    DispositivoEdicaoVigenciaForm,
+    DispositivoRegistroAlteracaoForm,
+    DispositivoRegistroInclusaoForm,
+    DispositivoRegistroRevogacaoForm,
+    DispositivoSearchModalForm,
+    NotaForm,
+    PublicacaoForm,
+    TaForm,
+    TextNotificacoesForm,
+    TipoTaForm,
+    VideForm,
+)
+from sapl.compilacao.models import (
+    STATUS_TA_EDITION,
+    STATUS_TA_PRIVATE,
+    STATUS_TA_PUBLIC,
+    CitacaoDeReferencia,
+    Dispositivo,
+    Nota,
+    PerfilEstruturalTextoArticulado,
+    Publicacao,
+    TextoArticulado,
+    TipoDispositivo,
+    TipoNota,
+    TipoPublicacao,
+    TipoTextoArticulado,
+    TipoVide,
+    UrlizeReferencia,
+    VeiculoPublicacao,
+    Vide,
+)
+from sapl.compilacao.utils import (
+    DISPOSITIVO_SELECT_RELATED,
+    DISPOSITIVO_SELECT_RELATED_EDIT,
+    get_integrations_view_names,
+)
+from sapl.crud.base import (
+    RP_DETAIL,
+    RP_LIST,
+    Crud,
+    CrudAux,
+    CrudListView,
+    ListWithSearchForm,
+    make_pagination,
+)
 from sapl.norma.models import NormaJuridica
 
 TipoNotaCrud = CrudAux.build(TipoNota, 'tipo_nota')

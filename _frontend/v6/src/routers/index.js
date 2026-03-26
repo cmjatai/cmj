@@ -27,6 +27,11 @@ export const routes = [
                 'path': 'dashboard',
                 name: 'loa_dashboard_link',
                 component: () => import('~@/modules/loa/dashboard/LoaDashboard.vue')
+              },
+              {
+                'path': 'emendas-impositivas',
+                name: 'loa_pcl_link',
+                component: () => import('~@/modules/loa/pcl/LoaPrestacaoContas.vue')
               }
             ]
           },

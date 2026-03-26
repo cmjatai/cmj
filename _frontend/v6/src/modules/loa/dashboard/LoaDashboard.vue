@@ -20,7 +20,6 @@
             />
           </div>
           <Totalizadores :totais="totaisSelecionados" />
-
           <button
             class="btn-fullscreen"
             :title="isFullscreen ? 'Sair do fullscreen' : 'Fullscreen'"
@@ -57,12 +56,12 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
+import { onMounted, onUnmounted, computed, ref, watch, inject } from 'vue'
 import { useSyncStore } from '~@/stores/SyncStore'
 import AnoSelector from '../components/AnoSelector.vue'
-import Totalizadores from './Totalizadores.vue'
+import Totalizadores from '../components/Totalizadores.vue'
 import HorizontalChart from './HorizontalChart.vue'
-
+const EventBus = inject('EventBus')
 const syncStore = useSyncStore()
 const anosSelecionados = ref([])
 
@@ -175,6 +174,8 @@ const syncLoa = async () => {
 }
 
 onMounted(() => {
+  EventBus.emit('side:close-sideleft')
+  EventBus.emit('side:close-sideright')
   document.addEventListener('fullscreenchange', onFullscreenChange)
   syncLoa()
 })
