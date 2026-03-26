@@ -1,1 +1,0 @@
-import{f as o,g as t,q as r,A as c}from"./vendor-w2pDK3Iu.js";import{_ as s}from"./main-ktikG3-z.js";import"./vendor_fortawesome-BTr0CBsa.js";const n={},a={class:"loa-module"};function _(m,i){const e=c("router-view");return o(),t("div",a,[r(e)])}const p=s(n,[["render",_]]);export{p as default};
