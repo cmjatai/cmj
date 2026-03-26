@@ -5,7 +5,7 @@
         <i class="fas fa-chart-bar text-primary mr-2"></i>
         <strong class="text-dark">Totalização</strong>
       </div>
-      <span class="small text-info ml-2 pl-2 border-left border-info">
+      <span class="small text-info ml-2 pl-2">
         <em>
           A Totalização é calculada sobre as emendas e ajustes listados conforme o filtro acima aplicado:
         </em>
