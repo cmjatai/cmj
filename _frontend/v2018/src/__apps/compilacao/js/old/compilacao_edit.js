@@ -215,6 +215,8 @@ window.DispositivoEdit = function () {
       if (editortype === 'construct') {
         dpt.find('.btn-group-inserts').first().addClass('open show')
         dpt.find('.btn-group-inserts ul').first().addClass('show')
+      } else if (editortype === 'textarea') {
+        window.activeDbClickRemoveQuebraLinha()
       }
 
       dpt.find('.btn-group-inserts button').mouseenter(function (event) {

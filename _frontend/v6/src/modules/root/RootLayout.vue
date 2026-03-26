@@ -1,6 +1,6 @@
 <template>
-  <div :class="['root-layout',]">
-    <header>
+  <div :class="['root-layout', !headerVisible ? 'no-header' : '', !sideLeftVisible ? 'no-sideleft' : '', !siderightVisible ? 'no-sideright' : '']">
+    <header v-if="headerVisible">
       <div class="header-left d-md-none">
         <slot name="header-left" />
       </div>
@@ -19,7 +19,10 @@
       </div>
     </header>
 
-    <aside class="sideleft">
+    <aside
+      class="sideleft"
+      v-if="sideLeftVisible"
+    >
       <slot name="sideleft" />
     </aside>
 
@@ -27,7 +30,10 @@
       <slot name="main" />
     </main>
 
-    <div class="sideright">
+    <div
+      class="sideright"
+      v-if="siderightVisible"
+    >
       <slot name="sideright" />
     </div>
   </div>
@@ -35,9 +41,34 @@
 
 <script setup>
 // 1. Imports
-import { onMounted, inject } from 'vue'
+import { onMounted, inject, ref } from 'vue'
 
 const EventBus = inject('EventBus')
+
+const sideLeftVisible = ref(true)
+const siderightVisible = ref(true)
+const headerVisible = ref(true)
+
+EventBus.on('side:toggle-sideleft', () => {
+  sideLeftVisible.value = !sideLeftVisible.value
+})
+EventBus.on('side:close-sideleft', () => {
+  sideLeftVisible.value = false
+})
+
+EventBus.on('side:toggle-sideright', () => {
+  siderightVisible.value = !siderightVisible.value
+})
+EventBus.on('side:close-sideright', () => {
+  siderightVisible.value = false
+})
+
+EventBus.on('side:toggle-header', () => {
+  headerVisible.value = !headerVisible.value
+})
+EventBus.on('side:close-header', () => {
+  headerVisible.value = false
+})
 
 // 2. Composables
 
@@ -77,6 +108,30 @@ const handleDisableAutoRolagem = (event) => {
     "sideleft main sideright";
   grid-template-rows: auto 1fr;
   grid-template-columns: var(--width-sidebar-collapsed) 1fr var(--width-sideright);
+
+  &.no-header {
+    grid-template-areas:
+      "sideleft main sideright";
+    grid-template-rows: 1fr;
+  }
+  &.no-sideleft {
+    grid-template-areas:
+      "header header header"
+      "main main sideright";
+    grid-template-columns: 0 1fr var(--width-sideright);
+  }
+  &.no-sideright {
+    grid-template-areas:
+      "header header header"
+      "sideleft main main";
+    grid-template-columns: var(--width-sidebar-collapsed) 1fr 0;
+  }
+  &.no-sideleft.no-sideright {
+    grid-template-areas:
+      "header header header"
+      "main main main";
+    grid-template-columns: 0 1fr 0;
+  }
 
   header {
     grid-area: header;

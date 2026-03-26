@@ -12,7 +12,7 @@
                 icon="landmark"
                 class="me-2 title-icon"
               />
-              Orçamento Impositivo - Jataí - GO
+              Emendas Impositivas - Jataí - GO
             </h3>
             <AnoSelector
               v-model="anosSelecionados"
@@ -20,7 +20,6 @@
             />
           </div>
           <Totalizadores :totais="totaisSelecionados" />
-
           <button
             class="btn-fullscreen"
             :title="isFullscreen ? 'Sair do fullscreen' : 'Fullscreen'"
@@ -41,9 +40,12 @@
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed, ref, watch } from 'vue'
+import { onMounted, onUnmounted, computed, ref, watch, inject } from 'vue'
 import { useSyncStore } from '~@/stores/SyncStore'
-import AnoSelector from './AnoSelector.vue'
+import AnoSelector from '~@/modules/loa/components/AnoSelector.vue'
+import Totalizadores from '~@/modules/loa/components/Totalizadores.vue'
+
+const EventBus = inject('EventBus')
 
 const syncStore = useSyncStore()
 const anosSelecionados = ref([])
@@ -157,6 +159,9 @@ const syncLoa = async () => {
 }
 
 onMounted(() => {
+  EventBus.emit('side:close-sideleft')
+  EventBus.emit('side:close-sideright')
+
   document.addEventListener('fullscreenchange', onFullscreenChange)
   syncLoa()
 })
