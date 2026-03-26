@@ -1,7 +1,7 @@
 <template>
   <div
     ref="pclEl"
-    class="loa-pcl"
+    class="loa-pcl container"
   >
     <div class="header-area">
       <div class="inner-header d-flex flex-column gap-2">
@@ -14,12 +14,7 @@
               />
               Emendas Impositivas - Jataí - GO
             </h3>
-            <AnoSelector
-              v-model="anosSelecionados"
-              :items="loaComOrcImp"
-            />
           </div>
-          <Totalizadores :totais="totaisSelecionados" />
           <button
             class="btn-fullscreen"
             :title="isFullscreen ? 'Sair do fullscreen' : 'Fullscreen'"
@@ -30,29 +25,47 @@
         </div>
       </div>
     </div>
-    <div class="cards container-fluid mt-2 mb-2">
+    <PclFiltros
+      v-model="filtersValue"
+    />
+    <div class="container-fluid mt-2 mb-2">
       <div class="row">
-        <div class="col-md-12" />
-        <div class="col-md-12" />
+        <div class="col-md-12">
+          <div
+            v-for="emenda in emendasList"
+            :key="emenda.id"
+          >
+            <pre>{{ emenda }}</pre>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted, computed, ref, watch, inject } from 'vue'
+import { onMounted, onUnmounted, inject, ref, watch, computed } from 'vue'
+import PclFiltros from './PclFiltros.vue'
 import { useSyncStore } from '~@/stores/SyncStore'
-import AnoSelector from '~@/modules/loa/components/AnoSelector.vue'
-import Totalizadores from '~@/modules/loa/components/Totalizadores.vue'
-
-const EventBus = inject('EventBus')
 
 const syncStore = useSyncStore()
-const anosSelecionados = ref([])
 
+const EventBus = inject('EventBus')
 const pclEl = ref(null)
 const isFullscreen = ref(false)
 
+const filtersValue = ref({
+  loa: null,
+  unidade: null,
+  entidade: null,
+  parlamentar: null,
+  situacao: [],
+  emendas_tipos: [],
+  ajustes: 'False',
+  search: ''
+})
+
+// --- Fullscreen ---
 const toggleFullscreen = () => {
   if (!document.fullscreenElement) {
     pclEl.value?.requestFullscreen()
@@ -60,110 +73,60 @@ const toggleFullscreen = () => {
     document.exitFullscreen()
   }
 }
-
 const onFullscreenChange = () => {
   isFullscreen.value = !!document.fullscreenElement
 }
 
-const loaComOrcImp = computed(() => {
-  if (syncStore.data_cache?.loa_loa) {
-    return _.orderBy(
-      _.filter(
-        Object.values(syncStore.data_cache.loa_loa),
-        (loa) => {
-          return loa.disp_total > 0
-        }
-      ),
-      ['ano', 'disp_total'],
-      ['desc', 'desc']
-    )
-  }
-  return []
+const emendasList = computed(() => {
+  const emendas = Object.values(syncStore.data_cache?.loa_emendaloa || {})
+  return emendas.filter(e => {
+    if (filtersValue.value.loa && e.loa !== filtersValue.value.loa.id) return false
+    //if (filtersValue.value.unidade && e.unidade_orcamentaria?.id !== filtersValue.value.unidade.id) return false
+    //if (filtersValue.value.entidade && e.entidade?.id !== filtersValue.value.entidade.id) return false
+    return true
+  })
 })
 
-const totaisSelecionados = computed(() => {
-  if (!anosSelecionados.value.length || !loaComOrcImp.value.length) return null
-  const selecionadas = loaComOrcImp.value.filter((loa) => anosSelecionados.value.includes(loa.ano))
-  return {
-    disp_total: selecionadas.reduce((sum, loa) => sum + Number(loa.disp_total), 0),
-    disp_saude: selecionadas.reduce((sum, loa) => sum + Number(loa.disp_saude), 0),
-    disp_diversos: selecionadas.reduce((sum, loa) => sum + Number(loa.disp_diversos), 0)
-  }
+const ajustesList = computed(() => {
+  const ajustes = Object.values(syncStore.data_cache?.loa_registroajusteloa || {})
+  return ajustes.filter(a => {
+    if (filtersValue.value.loa && a.oficio_ajuste_loa__loa !== filtersValue.value.loa.id) return false
+    return true
+  })
 })
 
-const loaSelecionadas = computed(() => {
-  return loaComOrcImp.value.filter((loa) => anosSelecionados.value.includes(loa.ano))
-})
-
-const emendasDiversasSelecionadasPorIndicacao = computed(() => {
-  if (!loaSelecionadas.value.length || !syncStore.data_cache?.loa_emendaloa) return []
-  const emendas = Object.values(syncStore.data_cache.loa_emendaloa)
-  const emendasDiversas = emendas.filter((emenda) => loaSelecionadas.value.some(
-    (loa) => loa.id === emenda.loa && emenda.tipo === 99 && emenda.fase != 40))
-  // retornar emendasDiversas convertendo para nova lista de objetos com label e valor
-  const emendasDiversasFormatadas = emendasDiversas.map((emenda) => ({
-    label: emenda.indicacao || 'Sem Referência Registrada',
-    valor: emenda.valor
-  }))
-  return emendasDiversasFormatadas
-})
-
-const emendasDiversasSelecionadasPorEntidadeSaude = computed(() => {
-  if (!loaSelecionadas.value.length || !syncStore.data_cache?.loa_emendaloa) return []
-  const emendas = Object.values(syncStore.data_cache.loa_emendaloa)
-  const emendasDiversas = emendas.filter((emenda) => loaSelecionadas.value.some(
-    (loa) => loa.id === emenda.loa && emenda.tipo === 10 && emenda.entidade > 0 && emenda.fase != 40))
-  // retornar emendasDiversas convertendo para nova lista de objetos com label e valor
-  const emendasDiversasFormatadas = emendasDiversas.map((emenda) => ({
-    label: syncStore.data_cache.loa_entidade[emenda.entidade]?.nome_fantasia || 'Sem Referência Registrada',
-    valor: emenda.valor
-  }))
-  return emendasDiversasFormatadas
-})
-
-watch(loaComOrcImp, (items) => {
-  if (items.length && !anosSelecionados.value.length) {
-    anosSelecionados.value = [items[0].ano]
-    syncStore
-      .fetchSync({
+watch(
+  () => filtersValue.value,
+  (nf) => {
+    console.log('Filters changed:', nf)
+    Promise.all([
+      syncStore.fetchSync({
         app: 'loa',
         model: 'emendaloa',
         params: {
-          loa__in: items.map(item => item.id).join(','),
-          tipo__in: '10,99',
-          get_all: true,
-          expand: 'entidade',
-          exclude: 'search'
+          loa: nf.loa?.id,
+          unidade: nf.unidade?.id || '',
+          entidade: nf.entidade?.id || ''
+        }
+      }),
+      syncStore.fetchSync({
+        app: 'loa',
+        model: 'registroajusteloa',
+        params: {
+          oficio_ajuste_loa__loa: nf.loa?.id
         }
       })
-  }
-}, { immediate: true })
-
-watch(loaSelecionadas, (val) => {
-  if (val.length) {
-    document.title = `LOA ${val.map(v => v.ano).join(', ')} - Jataí`
-  } else {
-    document.title = 'LOA - Jataí'
-  }
-})
-
-const syncLoa = async () => {
-  syncStore
-    .fetchSync({
-      app: 'loa',
-      model: 'loa',
-      params: {
-        get_all: true
-      }
+    ]).then(() => {
+      // Lógica adicional após o fetch, se necessário
     })
-}
+  },
+  { deep: true }
+)
 
-onMounted(() => {
+onMounted(async () => {
   EventBus.emit('side:close-sideleft')
   EventBus.emit('side:close-sideright')
-
   document.addEventListener('fullscreenchange', onFullscreenChange)
-  syncLoa()
 })
 
 onUnmounted(() => {
@@ -175,7 +138,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .loa-pcl {
   &:fullscreen {
-    background: var(--bs-body-bg);
+    // background: var(--bs-body-bg);
     overflow: auto;
   }
   background: linear-gradient(135deg, #f1f3f5 30%, #e9ecef 50%, #f1f3f5 100%);
@@ -209,10 +172,6 @@ onUnmounted(() => {
 .header-area {
   .inner-header {
     padding: 0.5rem;
-
-    // border: 1px solid var(--bs-border-color);
-    // box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
-
   }
 }
 
@@ -225,5 +184,9 @@ onUnmounted(() => {
   .title-icon {
     color: var(--bs-primary);
   }
+}
+
+.pcldetalhe-list {
+  margin: 15px 0 30px;
 }
 </style>
