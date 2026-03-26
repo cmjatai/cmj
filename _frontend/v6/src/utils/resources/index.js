@@ -44,14 +44,14 @@ export default {
       url: `${basePath}/version`,
       method: 'GET'
     }),
-    fetch: (m) => {
+    fetch: (m, method = 'GET') => {
       if (m.params && !m.query_string) {
         const params = new URLSearchParams(m.params)
         m.query_string = params.toString()
       }
       return axios({
         url: `${basePath}/${m.app}/${m.model}/${m.id ? m.id + '/' : ''}${m.action ? m.action + '/' : ''}${m.query_string ? '?' : ''}${m.query_string ? m.query_string : ''}`,
-        method: 'GET'
+        method: method
       })
     },
     patchModel: (m) => axios.patch(

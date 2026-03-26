@@ -5,12 +5,14 @@
 </template>
 
 <script setup>
-import { onMounted, nextTick } from 'vue'
+import { onMounted, nextTick, inject } from 'vue'
 import { useSyncStore } from '~@/stores/SyncStore'
 
 const syncStore = useSyncStore()
+const EventBus = inject('EventBus')
 
 onMounted(() => {
+  EventBus.emit('side:close-sideright')
   nextTick(() => {
     syncStore.registerModels('painelset', ['evento', 'cronometro', 'individuo'])
   })
