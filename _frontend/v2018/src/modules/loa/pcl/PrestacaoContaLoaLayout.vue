@@ -152,12 +152,13 @@ export default {
       }))
     },
     emendas_ajustes_list () {
-      const emendas = Array.isArray(this.results.emendas)
+      const selectedIds = this.selected_loa_ids
+      const emendas = (Array.isArray(this.results.emendas)
         ? this.results.emendas
-        : []
-      const ajustes = Array.isArray(this.results.ajustes)
+        : []).filter(item => selectedIds.includes(item._loa_id))
+      const ajustes = (Array.isArray(this.results.ajustes)
         ? this.results.ajustes
-        : []
+        : []).filter(item => selectedIds.includes(item._loa_id))
       const all = [...emendas, ...ajustes]
       if (this.selected_loa_ids.length > 1) {
         const loaOrder = this.loas_list.map(l => l.id)
@@ -284,13 +285,29 @@ export default {
     },
 
     on_loas_change (loaIds) {
+      const prevIds = [...this.selected_loa_ids]
       this.selected_loa_ids = loaIds
-      if (loaIds.length > 1 && this.filters_value.unidade) {
-        this.filters_value = { ...this.filters_value, unidade: null }
+      this.currentPage = 1
+
+      const removedIds = prevIds.filter(id => !loaIds.includes(id))
+      const addedIds = loaIds.filter(id => !prevIds.includes(id))
+
+      if (!removedIds.length && !addedIds.length) return
+
+      // Remove itens das LOAs desmarcadas
+      if (removedIds.length) {
+        this.results = {
+          emendas: this.results.emendas.filter(item => !removedIds.includes(item._loa_id)),
+          ajustes: this.results.ajustes.filter(item => !removedIds.includes(item._loa_id))
+        }
       }
-      const newIds = loaIds.filter(id => !this.loas_data[id])
-      if (newIds.length) {
-        Promise.all(newIds.map(id =>
+
+      if (!addedIds.length) return
+
+      // Busca detalhes das novas LOAs e depois seus itens
+      const newDataIds = addedIds.filter(id => !this.loas_data[id])
+      const loadData = newDataIds.length
+        ? Promise.all(newDataIds.map(id =>
           this.utils.fetch({
             app: 'loa',
             model: 'loa',
@@ -302,14 +319,17 @@ export default {
           }).then(resp => {
             this.$set(this.loas_data, id, resp.data)
           })
-        )).then(() => {
-          this.currentPage = 1
-          this.fetch()
-        })
-      } else {
-        this.currentPage = 1
-        this.fetch()
-      }
+        ))
+        : Promise.resolve()
+
+      loadData.then(() => {
+        if (loaIds.length > 1 && this.filters_value.unidade) {
+          // Limpar unidade dispara o watcher que faz fetch() completo
+          this.filters_value = { ...this.filters_value, unidade: null }
+          return
+        }
+        this.fetch(addedIds)
+      })
     },
 
     applyQueryFilters () {
@@ -380,7 +400,7 @@ export default {
             items = data
           }
 
-          if (items.length) {
+          if (items.length && this.selected_loa_ids.includes(loaId)) {
             items = items.map(item => Object.assign({}, item, { _loa_id: loaId }))
             this.results = Object.assign({}, this.results, {
               [resultKey]: [...this.results[resultKey], ...items]
@@ -396,15 +416,21 @@ export default {
       return fetchPage(1)
     },
 
-    fetch () {
+    fetch (onlyLoaIds) {
       if (!this.selected_loa_ids.length) return Promise.resolve()
 
-      this._fetchId = (this._fetchId || 0) + 1
+      const isIncremental = Array.isArray(onlyLoaIds) && onlyLoaIds.length > 0
+
+      if (!isIncremental) {
+        this._fetchId = (this._fetchId || 0) + 1
+      }
       const currentFetchId = this._fetchId
 
       this.fetching = true
-      this.firstPageLoaded = false
-      this.results = { emendas: [], ajustes: [] }
+      if (!isIncremental) {
+        this.firstPageLoaded = false
+        this.results = { emendas: [], ajustes: [] }
+      }
 
       const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
       const fetchEmendas =
@@ -420,7 +446,7 @@ export default {
 
       const orderedLoaIds = this.loas_list
         .map(l => l.id)
-        .filter(id => this.selected_loa_ids.includes(id))
+        .filter(id => (isIncremental ? onlyLoaIds : this.selected_loa_ids).includes(id))
 
       orderedLoaIds.forEach(loaId => {
         if (fetchEmendas) {
