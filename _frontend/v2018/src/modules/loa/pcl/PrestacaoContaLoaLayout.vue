@@ -9,7 +9,8 @@
         :qs-loa="qs_loa"
         :qs-emenda-loa="qs_emenda_loa__loa"
         :loas-choice="loas_choice"
-        :loa-value="loa"
+        :selected-loa-ids="selected_loa_ids"
+        :locked-loa-id="loa.id"
         :total-items="emendas_ajustes_list.length"
         :page-size="pageSize"
         :current-page="currentPage"
@@ -17,7 +18,7 @@
         @update:page-size="onPageSizeChange"
         @update:current-page="onPageChange"
         @reset="resetFilters"
-        @loa-change="on_loa_change"
+        @loas-change="on_loas_change"
       />
 
       <pcl-totalizacao
@@ -72,6 +73,8 @@ export default {
     return {
       loa: { id: this.$route.params.pkloa },
       loas_list: [],
+      selected_loa_ids: [],
+      loas_data: {},
       ready: false,
       filters_value: {
         unidade: null,
@@ -103,12 +106,12 @@ export default {
   },
   computed: {
     qs_loa () {
-      const value = this.loa.id
-      return value ? `loa=${value}` : ''
+      if (this.selected_loa_ids.length === 1) return `loa=${this.selected_loa_ids[0]}`
+      return ''
     },
     qs_emenda_loa__loa () {
-      const value = this.loa.id
-      return value ? `&emendaloa_set__loa=${value}` : ''
+      if (this.selected_loa_ids.length === 1) return `&emendaloa_set__loa=${this.selected_loa_ids[0]}`
+      return ''
     },
     loas_choice () {
       if (!this.loas_list.length) return []
@@ -117,22 +120,34 @@ export default {
         text: l.ano
       }))
     },
+    all_parlamentares () {
+      const map = {}
+      this.selected_loa_ids.forEach(id => {
+        const loaData = this.loas_data[id]
+        if (loaData && loaData.parlamentares) {
+          loaData.parlamentares.forEach(p => {
+            if (!map[p.id]) map[p.id] = p
+          })
+        }
+      })
+      return Object.values(map).sort((a, b) =>
+        (a.nome_parlamentar || '').localeCompare(b.nome_parlamentar || '')
+      )
+    },
     parlamentares_choice () {
-      if (this.loa.parlamentares && this.loa.parlamentares.length > 1) {
+      if (this.all_parlamentares.length > 1) {
         return [
           { value: null, text: '----------------' },
-          ...this.loa.parlamentares.map((p) => ({
+          ...this.all_parlamentares.map((p) => ({
             value: p,
             text: p.nome_parlamentar
           }))
         ]
       }
-      return this.loa.parlamentares
-        ? this.loa.parlamentares.map((p) => ({
-          value: p,
-          text: p.nome_parlamentar
-        }))
-        : []
+      return this.all_parlamentares.map((p) => ({
+        value: p,
+        text: p.nome_parlamentar
+      }))
     },
     emendas_ajustes_list () {
       const emendas = Array.isArray(this.results.emendas)
@@ -235,6 +250,7 @@ export default {
     },
     resetFilters () {
       this.currentPage = 1
+      this.selected_loa_ids = [this.loa.id]
       this.filters_value = {
         unidade: null,
         entidade: null,
@@ -255,27 +271,30 @@ export default {
       this.currentPage = Math.max(1, Math.min(page, totalPages))
     },
 
-    on_loa_change (loaId) {
-      if (!loaId || loaId === this.loa.id) return
-      const query = {}
-      this.filters.forEach((f) => {
-        if (f === 'unidade') return
-        const val = this.filters_value[f]
-        if (val === null || val === undefined) return
-        if (Array.isArray(val)) {
-          query[f] = val.join(',')
-        } else if (typeof val === 'object') {
-          query[f] = val.id
-        } else {
-          query[f] = val
-        }
-      })
-      const resolved = this.$router.resolve({
-        name: this.$route.name,
-        params: { ...this.$route.params, pkloa: loaId },
-        query
-      })
-      window.location.href = resolved.href
+    on_loas_change (loaIds) {
+      this.selected_loa_ids = loaIds
+      const newIds = loaIds.filter(id => !this.loas_data[id])
+      if (newIds.length) {
+        Promise.all(newIds.map(id =>
+          this.utils.fetch({
+            app: 'loa',
+            model: 'loa',
+            id,
+            params: {
+              expand: 'parlamentares',
+              include: 'parlamentares.id,nome_parlamentar'
+            }
+          }).then(resp => {
+            this.$set(this.loas_data, id, resp.data)
+          })
+        )).then(() => {
+          this.currentPage = 1
+          this.fetch()
+        })
+      } else {
+        this.currentPage = 1
+        this.fetch()
+      }
     },
 
     applyQueryFilters () {
@@ -362,7 +381,7 @@ export default {
     },
 
     fetch () {
-      if (!this.loa.id) return Promise.resolve()
+      if (!this.selected_loa_ids.length) return Promise.resolve()
 
       this._fetchId = (this._fetchId || 0) + 1
       const currentFetchId = this._fetchId
@@ -383,79 +402,81 @@ export default {
 
       const pending = []
 
-      if (fetchEmendas) {
-        const params_emendas = {
-          loa: this.loa.id,
-          o: 'materia__tipo__sigla,materia__numero',
-          exclude: 'search;metadata',
-          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
-          expand: 'parlamentares;unidade;materia;entidade',
-          page_size: 20,
-          situacao: this.filters_value.situacao.join(',')
-        }
-        if (
-          this.filters_value.unidade &&
-          typeof this.filters_value.unidade === 'object'
-        ) {
-          params_emendas.unidade = this.filters_value.unidade.id
-        }
-        if (
-          this.filters_value.entidade &&
-          typeof this.filters_value.entidade === 'object'
-        ) {
-          params_emendas.entidade = this.filters_value.entidade.id
-        }
-        if (
-          this.filters_value.parlamentares &&
-          typeof this.filters_value.parlamentares === 'object'
-        ) {
-          params_emendas.parlamentares = this.filters_value.parlamentares.id
-        }
-        if (this.filters_value.search) {
-          params_emendas.search = this.filters_value.search
-        }
-        if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
-          params_emendas.tipo__in = emendasTipos.join(',')
-        }
-        pending.push(this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId))
-      }
-
-      if (fetchAjustes) {
-        const params_ajustes = {
-          oficio_ajuste_loa__loa: this.loa.id,
-          exclude: 'search',
-          include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
-          expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
-          o: 'parlamentares_valor__nome_parlamentar',
-          page_size: 20
-        }
-        if (
-          this.filters_value.unidade &&
-          typeof this.filters_value.unidade === 'object'
-        ) {
-          params_ajustes.unidade = this.filters_value.unidade.id
-        }
-        if (
-          this.filters_value.entidade &&
-          typeof this.filters_value.entidade === 'object'
-        ) {
-          params_ajustes.entidade = this.filters_value.entidade.id
+      this.selected_loa_ids.forEach(loaId => {
+        if (fetchEmendas) {
+          const params_emendas = {
+            loa: loaId,
+            o: 'materia__tipo__sigla,materia__numero',
+            exclude: 'search;metadata',
+            include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
+            expand: 'parlamentares;unidade;materia;entidade',
+            page_size: 20,
+            situacao: this.filters_value.situacao.join(',')
+          }
+          if (
+            this.filters_value.unidade &&
+            typeof this.filters_value.unidade === 'object'
+          ) {
+            params_emendas.unidade = this.filters_value.unidade.id
+          }
+          if (
+            this.filters_value.entidade &&
+            typeof this.filters_value.entidade === 'object'
+          ) {
+            params_emendas.entidade = this.filters_value.entidade.id
+          }
+          if (
+            this.filters_value.parlamentares &&
+            typeof this.filters_value.parlamentares === 'object'
+          ) {
+            params_emendas.parlamentares = this.filters_value.parlamentares.id
+          }
+          if (this.filters_value.search) {
+            params_emendas.search = this.filters_value.search
+          }
+          if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
+            params_emendas.tipo__in = emendasTipos.join(',')
+          }
+          pending.push(this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId))
         }
 
-        if (this.filters_value.search) {
-          params_ajustes.search = this.filters_value.search
-        }
-        if (
-          this.filters_value.parlamentares &&
-          typeof this.filters_value.parlamentares === 'object'
-        ) {
-          params_ajustes.parlamentares_valor =
-            this.filters_value.parlamentares.id
-        }
-        params_ajustes.situacao = this.filters_value.situacao.join(',')
+        if (fetchAjustes) {
+          const params_ajustes = {
+            oficio_ajuste_loa__loa: loaId,
+            exclude: 'search',
+            include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
+            expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
+            o: 'parlamentares_valor__nome_parlamentar',
+            page_size: 20
+          }
+          if (
+            this.filters_value.unidade &&
+            typeof this.filters_value.unidade === 'object'
+          ) {
+            params_ajustes.unidade = this.filters_value.unidade.id
+          }
+          if (
+            this.filters_value.entidade &&
+            typeof this.filters_value.entidade === 'object'
+          ) {
+            params_ajustes.entidade = this.filters_value.entidade.id
+          }
 
-        pending.push(this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId))
-      }
+          if (this.filters_value.search) {
+            params_ajustes.search = this.filters_value.search
+          }
+          if (
+            this.filters_value.parlamentares &&
+            typeof this.filters_value.parlamentares === 'object'
+          ) {
+            params_ajustes.parlamentares_valor =
+              this.filters_value.parlamentares.id
+          }
+          params_ajustes.situacao = this.filters_value.situacao.join(',')
+
+          pending.push(this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId))
+        }
+      })
 
       if (!pending.length) {
         this.fetching = false
@@ -496,6 +517,8 @@ export default {
       Promise.all([fetchLoa, fetchLoas]).then(([loaResp, loasResp]) => {
         t.loa = loaResp.data
         t.loas_list = loasResp.data
+        t.loas_data = { [t.loa.id]: t.loa }
+        t.selected_loa_ids = [t.loa.id]
         t.applyQueryFilters()
         t.ready = true
         t.fetch()
