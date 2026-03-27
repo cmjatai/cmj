@@ -34,6 +34,7 @@
             v-if="item.__label__ === 'loa_emendaloa'"
             :key="`emenda_${item.id}`"
             :registro="item"
+            :unidade-filter-disabled="selected_loa_ids.length > 1"
             @filter-unidade="applyUnidadeFilter"
             @filter-entidade="applyEntidadeFilter"
             @filter-parlamentar="applyParlamentarFilter"
@@ -42,6 +43,7 @@
             v-else
             :key="`ajuste_${item.id}`"
             :registro="item"
+            :unidade-filter-disabled="selected_loa_ids.length > 1"
             @search-emenda="val => filters_value = { ...filters_value, search: val , ajustes: 'False', emendas_tipos: [] }"
             @filter-unidade="applyUnidadeFilter"
             @filter-parlamentar="applyParlamentarFilter"
@@ -195,6 +197,7 @@ export default {
   },
   methods: {
     applyUnidadeFilter (unidade) {
+      if (this.selected_loa_ids.length > 1) return
       const uid = unidade && unidade.id
       if (!uid) return
       const unidadeSelect =
@@ -273,6 +276,9 @@ export default {
 
     on_loas_change (loaIds) {
       this.selected_loa_ids = loaIds
+      if (loaIds.length > 1 && this.filters_value.unidade) {
+        this.filters_value = { ...this.filters_value, unidade: null }
+      }
       const newIds = loaIds.filter(id => !this.loas_data[id])
       if (newIds.length) {
         Promise.all(newIds.map(id =>
