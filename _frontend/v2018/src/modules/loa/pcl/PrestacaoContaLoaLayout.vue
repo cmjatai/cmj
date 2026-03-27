@@ -158,7 +158,16 @@ export default {
       const ajustes = Array.isArray(this.results.ajustes)
         ? this.results.ajustes
         : []
-      return [...emendas, ...ajustes]
+      const all = [...emendas, ...ajustes]
+      if (this.selected_loa_ids.length > 1) {
+        const loaOrder = this.loas_list.map(l => l.id)
+        all.sort((a, b) => {
+          const ia = a._loa_id !== undefined ? loaOrder.indexOf(a._loa_id) : loaOrder.length
+          const ib = b._loa_id !== undefined ? loaOrder.indexOf(b._loa_id) : loaOrder.length
+          return ia - ib
+        })
+      }
+      return all
     },
     paginatedList () {
       const start = (this.currentPage - 1) * this.pageSize
@@ -349,7 +358,7 @@ export default {
       })
     },
 
-    _fetchAllPages (resultKey, model, params, fetchId) {
+    _fetchAllPages (resultKey, model, params, fetchId, loaId) {
       const fetchPage = (page) => {
         if (this._fetchId !== fetchId) return Promise.resolve()
 
@@ -372,6 +381,7 @@ export default {
           }
 
           if (items.length) {
+            items = items.map(item => Object.assign({}, item, { _loa_id: loaId }))
             this.results = Object.assign({}, this.results, {
               [resultKey]: [...this.results[resultKey], ...items]
             })
@@ -408,7 +418,11 @@ export default {
 
       const pending = []
 
-      this.selected_loa_ids.forEach(loaId => {
+      const orderedLoaIds = this.loas_list
+        .map(l => l.id)
+        .filter(id => this.selected_loa_ids.includes(id))
+
+      orderedLoaIds.forEach(loaId => {
         if (fetchEmendas) {
           const params_emendas = {
             loa: loaId,
@@ -443,7 +457,7 @@ export default {
           if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
             params_emendas.tipo__in = emendasTipos.join(',')
           }
-          pending.push(this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId))
+          pending.push(this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId, loaId))
         }
 
         if (fetchAjustes) {
@@ -480,7 +494,7 @@ export default {
           }
           params_ajustes.situacao = this.filters_value.situacao.join(',')
 
-          pending.push(this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId))
+          pending.push(this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId, loaId))
         }
       })
 
