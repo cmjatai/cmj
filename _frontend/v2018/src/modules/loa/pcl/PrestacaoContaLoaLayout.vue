@@ -181,31 +181,38 @@ export default {
       handler (nv, ov) {
         if (!this.ready) return
         this.currentPage = 1
-        // sincroniza parâmetros com o histórico de rotas
-        const query = {}
-        this.filters.forEach((f) => {
-          if (
-            this.filters_value[f] !== null &&
-            this.filters_value[f] !== undefined
-          ) {
-            const val = this.filters_value[f]
-            if (Array.isArray(val)) {
-              query[f] = val.join(',')
-            } else if (typeof val === 'object' && val !== null) {
-              query[f] = val.id
-            } else {
-              query[f] = val
-            }
-          }
-        })
-        this.$router.replace({ query }).catch(err => {
-          if (err.name !== 'NavigationDuplicated') throw err
-        })
+        this.syncQueryString()
         this.fetch()
       }
     }
   },
   methods: {
+    syncQueryString () {
+      const query = {}
+      this.filters.forEach((f) => {
+        if (
+          this.filters_value[f] !== null &&
+          this.filters_value[f] !== undefined
+        ) {
+          const val = this.filters_value[f]
+          if (Array.isArray(val)) {
+            query[f] = val.join(',')
+          } else if (typeof val === 'object' && val !== null) {
+            query[f] = val.id
+          } else {
+            query[f] = val
+          }
+        }
+      })
+      // LOAs extras (exclui a pk_loa que já está na rota)
+      const extraLoas = this.selected_loa_ids.filter(id => id !== this.loa.id)
+      if (extraLoas.length) {
+        query.loas = extraLoas.join(',')
+      }
+      this.$router.replace({ query }).catch(err => {
+        if (err.name !== 'NavigationDuplicated') throw err
+      })
+    },
     applyUnidadeFilter (unidade) {
       if (this.selected_loa_ids.length > 1) return
       const uid = unidade && unidade.id
@@ -301,6 +308,8 @@ export default {
           ajustes: this.results.ajustes.filter(item => !removedIds.includes(item._loa_id))
         }
       }
+
+      this.syncQueryString()
 
       if (!addedIds.length) return
 
@@ -565,9 +574,40 @@ export default {
         t.loas_list = loasResp.data
         t.loas_data = { [t.loa.id]: t.loa }
         t.selected_loa_ids = [t.loa.id]
-        t.applyQueryFilters()
-        t.ready = true
-        t.fetch()
+
+        // Restaura LOAs extras da query string
+        const qsLoas = t.$route.query.loas
+        if (qsLoas) {
+          const validIds = t.loas_list.map(l => l.id)
+          const extraIds = qsLoas.split(',').map(Number).filter(id => id && id !== t.loa.id && validIds.includes(id))
+          if (extraIds.length) {
+            t.selected_loa_ids = [t.loa.id, ...extraIds]
+          }
+        }
+
+        // Carrega dados das LOAs extras selecionadas
+        const missingDataIds = t.selected_loa_ids.filter(id => !t.loas_data[id])
+        const loadExtra = missingDataIds.length
+          ? Promise.all(missingDataIds.map(id =>
+            t.utils.fetch({
+              app: 'loa',
+              model: 'loa',
+              id,
+              params: {
+                expand: 'parlamentares',
+                include: 'parlamentares.id,nome_parlamentar'
+              }
+            }).then(resp => {
+              t.$set(t.loas_data, id, resp.data)
+            })
+          ))
+          : Promise.resolve()
+
+        loadExtra.then(() => {
+          t.applyQueryFilters()
+          t.ready = true
+          t.fetch()
+        })
       })
     })
   }
