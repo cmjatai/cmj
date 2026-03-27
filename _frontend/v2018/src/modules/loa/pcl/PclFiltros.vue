@@ -1,19 +1,25 @@
 <template>
   <div class="pcl-filtros">
     <div class="row">
-      <i class="fas fa-filter text-secondary mr-2"></i>
-      <h4><strong class="text-primary">Filtrar Dados</strong></h4>
+      <div class="col-auto d-flex">
+        <i class="fas fa-filter text-secondary mr-2"></i>
+        <h4><strong class="text-primary">Filtrar Dados</strong></h4>
+      </div>
+      <div v-if="loasChoice.length" class="col-auto d-flex align-items-center">
+        <label class="pcl-filtros-label pcl-filtro-exercicio mb-0 mr-2">EXERCÍCIO</label>
+        <div class="pcl-loa-toggles d-flex flex-wrap">
+          <span
+            v-for="loa in loasChoice"
+            :key="loa.value"
+            class="pcl-loa-toggle"
+            :class="{ active: isLoaSelected(loa.value), locked: loa.value === lockedLoaId }"
+            :title="loa.value === lockedLoaId ? 'Exercício principal (não pode ser removido)' : ''"
+            @click="toggleLoa(loa.value)"
+          >{{ loa.text }}</span>
+        </div>
+      </div>
     </div>
     <div class="row" >
-      <div v-if="loasChoice.length" class="col-xl-1 col-md-2 col-4 mb-2 px-1">
-        <label class="pcl-filtros-label">EXERCÍCIO</label>
-        <b-form-select
-          :value="selectedLoaId"
-          :options="loasChoice"
-          @change="val => $emit('loa-change', val)"
-          :disabled="disabled"
-        ></b-form-select>
-      </div>
       <div class="col-lg col-md-10 col-8 mb-2 px-1">
         <label class="pcl-filtros-label">Pesquisa</label>
         <b-input-group>
@@ -196,8 +202,12 @@ export default {
       type: Array,
       default: () => []
     },
-    loaValue: {
-      type: Object,
+    selectedLoaIds: {
+      type: Array,
+      default: () => []
+    },
+    lockedLoaId: {
+      type: [Number, String],
       default: null
     },
     totalItems: {
@@ -218,9 +228,6 @@ export default {
     }
   },
   computed: {
-    selectedLoaId () {
-      return this.loaValue && this.loaValue.id ? this.loaValue.id : null
-    },
     filtersDisabled () {
       return this.disabled
     },
@@ -269,6 +276,21 @@ export default {
     },
     getEntidadeSelectRef () {
       return this.$refs.entidadeSelect
+    },
+    isLoaSelected (id) {
+      return this.selectedLoaIds.includes(id)
+    },
+    toggleLoa (id) {
+      if (this.disabled) return
+      if (id === this.lockedLoaId) return
+      const ids = [...this.selectedLoaIds]
+      const idx = ids.indexOf(id)
+      if (idx >= 0) {
+        ids.splice(idx, 1)
+      } else {
+        ids.push(id)
+      }
+      this.$emit('loas-change', ids)
     }
   }
 }
@@ -291,6 +313,44 @@ export default {
   margin-bottom: 0.2rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  &.pcl-filtro-exercicio {
+    border-left: 1px solid #dee2e6;
+    padding-left: 0.5rem;
+  }
+}
+.pcl-loa-toggles {
+  gap: 0.3rem;
+}
+.pcl-loa-toggle {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #6c757d;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+  &:hover:not(.active) {
+    background: #e9ecef;
+    border-color: #adb5bd;
+  }
+  &.active {
+    background: #6c757d;
+    border-color: #6c757d;
+    color: #fff;
+    font-weight: 600;
+  }
+  &.locked {
+    cursor: default;
+    &.active {
+      background: #495057;
+      border-color: #495057;
+    }
+  }
 }
 .pcl-filtros .row > div >>> select,
 .pcl-filtros .row > div >>> input,
