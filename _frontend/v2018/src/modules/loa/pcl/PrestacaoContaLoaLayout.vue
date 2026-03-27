@@ -21,7 +21,7 @@
       />
 
       <pcl-totalizacao
-        v-if="!fetching && emendas_ajustes_list.length"
+        v-if="emendas_ajustes_list.length"
         :lista="emendas_ajustes_list"
         :parlamentar-selecionado="filters_value.parlamentares"
         class="mt-3"
