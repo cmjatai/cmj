@@ -75,6 +75,7 @@
               <strong><i class="fas fa-building mr-1"></i>Unidade Orçamentária: </strong>
               <button
                 class="btn btn-link btn-sm p-0 align-baseline"
+                :disabled="unidadeFilterDisabled"
                 @click="$emit('filter-unidade', registro.unidade)"
               >{{ registro.unidade.__str__ }}</button>
             </small>
@@ -226,6 +227,10 @@ export default {
     registro: {
       type: Object,
       required: true
+    },
+    unidadeFilterDisabled: {
+      type: Boolean,
+      default: false
     }
   },
   data () {

@@ -74,7 +74,7 @@
           ref="unidadeSelect"
           :required="false"
           :extra_query="`${qsLoa}${ qsLoa ? '&' : '' }recebe_emenda_impositiva=True&page_size=100`"
-          :disabled="filtersDisabled"
+          :disabled="filtersDisabled || multiLoaSelected"
         ></model-select>
       </div>
     </div>
@@ -230,6 +230,9 @@ export default {
   computed: {
     filtersDisabled () {
       return this.disabled
+    },
+    multiLoaSelected () {
+      return this.selectedLoaIds.length > 1
     },
     pageSizeOptions () {
       return [
