@@ -2464,6 +2464,27 @@ class Empenho(models.Model):
         verbose_name_plural = _("Empenhos")
         ordering = ["id"]
 
+class EmpenhosDeEmendaLoa(models.Model):
+
+    emendaloa = models.ForeignKey(
+        EmendaLoa,
+        verbose_name=_("Emenda Impositiva"),
+        related_name="empenhosdeemendaloa_set",
+        on_delete=CASCADE,
+    )
+
+    empenho = models.ForeignKey(
+        Empenho,
+        verbose_name=_("Empenho"),
+        related_name="empenhosdeemendaloa_set",
+        on_delete=CASCADE,
+    )
+
+    class Meta:
+        verbose_name = _("Empenho de Emenda Impositiva")
+        verbose_name_plural = _("Empenhos de Emendas Impositivas")
+        ordering = ["id"]
+
 
 class ReceitaOrcamentaria(models.Model):
 
