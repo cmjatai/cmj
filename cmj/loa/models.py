@@ -2,6 +2,7 @@ import csv
 import re
 from datetime import datetime
 from decimal import Decimal
+from importlib import metadata
 from io import StringIO
 
 from _decimal import ROUND_DOWN, ROUND_HALF_DOWN
@@ -2283,6 +2284,13 @@ class DespesaPaga(models.Model):
         default=Decimal("0.00"),
         verbose_name=_("Valor (R$)"),
     )
+    metadata = JSONField(
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=dict,
+        encoder=DjangoJSONEncoder,
+    )
 
     class Meta:
         verbose_name = _("Despesa Paga")
@@ -2459,10 +2467,19 @@ class Empenho(models.Model):
         verbose_name=_("Valor Pago (Bruto) (R$)"),
     )
 
+    metadata = JSONField(
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=dict,
+        encoder=DjangoJSONEncoder,
+    )
+
     class Meta:
         verbose_name = _("Empenho")
         verbose_name_plural = _("Empenhos")
         ordering = ["id"]
+
 
 class EmpenhosDeEmendaLoa(models.Model):
 
@@ -2689,6 +2706,9 @@ class ScrapRecord(models.Model):
                 for row in tables[0].findAll("tr"):
                     cols = row.findAll("td")
                     values[cols[0].text] = cols[1].text.strip()
+
+                empenho.metadata = empenho.metadata or {}
+                empenho.metadata["scrap"] = {"values": values}
 
                 # exemplo do conteúdo de values
                 # values = {'Código:': '401179', 'Data:': '30/03/2026', 'Fornecedor:': 'TOTAL SEGURANÇA EQUIPAMENTOS DE PROTEÇÃO E SERVIÇOS ESPECIALIZADOS LTDA - ME', 'Órgão:': '03 - PREFEITURA MUNICIPAL DE JATAI', 'Programa:': '1539 - AVANÇO NAS MELHORIAS DOS SERVIÇOS DE DESENVOLVIMENTO URBANO', 'Unidade:': '11 - SECRETARIA DE OBRAS E PLANEJAMENTO URBANO', 'Função:': '15 - URBANISMO', 'Dotação:': '1539.11.2039.15.451.339030', 'Sub-Função:': '451 - INFRA-ESTRUTURA URBANA', 'Projeto / Atividade:': '2039 - MANUTENÇÃO SECRETARIA DE OBRAS E PLANEJAMENTO URBANO', 'Elemento:': '339030 - MATERIAL DE CONSUMO', 'Sub-Elemento:': '28 - MATERIAL DE PROTECAO E SEGURANCA', 'Modalidade:': 'PREGÃO', 'Número da Licitação:': '76', 'Fonte de Recursos:': '100 - RECURSOS NÃO VINCULADOS DE IMPOSTOS', 'Histórico:': 'CONTRATAÇÃO DE EMPRESA VISANDO A AQUISIÇÃO DE TRAJES RETARDANTES COM FAIXA REFLEXIVA PARA ATENDIMENTO À DEMANDA DA SECRETARIA MUNICIPAL DE OBRAS E PLANEJAMENTO URBANO (ARP Nº 18/2025 - PREGÃO ELETRÔNICO Nº 76/2025 - PROC. ADM. Nº 32845/2025).'}
@@ -2949,6 +2969,7 @@ class ScrapRecord(models.Model):
             for row in tables[0].findAll("tr"):
                 cols = row.findAll("td")
                 values[cols[0].text] = cols[1].text
+
             unidade = UnidadeOrcamentaria.objects.filter(
                 orgao=org, loa__ano=self.ano, codigo=values["Unidade Financeira:"][:2]
             ).first()
@@ -2977,6 +2998,10 @@ class ScrapRecord(models.Model):
             codigo=self.codigo,
             orgao=org,
         )
+
+        dp.metadata = dp.metadata or {}
+        dp.metadata["scrap"] = {"values": values}
+
         dp.cpfcnpj = item_list[3]
         dp.nome = item_list[2]
         dp.tipo = item_list[4]
