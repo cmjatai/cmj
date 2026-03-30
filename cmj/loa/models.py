@@ -2290,6 +2290,181 @@ class DespesaPaga(models.Model):
         ordering = ["id"]
 
 
+class Empenho(models.Model):
+
+    mapeamento = {
+        "Código:": "codigo",
+        "Código": "codigo",
+        "Data:": "data",
+        "Data": "data",
+        "Fornecedor:": "nome",
+        "Fornecedor": "nome",
+        "Órgão:": "orgao",
+        "Órgão": "orgao",
+        "Unidade:": "unidade",
+        "Unidade": "unidade",
+        "Função:": "funcao",
+        "Função": "funcao",
+        "Sub-Função:": "subfuncao",
+        "Sub-Função": "subfuncao",
+        "Programa:": "programa",
+        "Programa": "programa",
+        "Projeto / Atividade:": "acao",
+        "Projeto / Atividade": "acao",
+        "Elemento:": "natureza",
+        "Sub-Elemento:": "natureza",
+        "Elemento": "natureza",
+        "Sub-Elemento": "natureza",
+        "Fonte de Recursos:": "fonte",
+        "Fonte de Recursos": "fonte",
+        "Modalidade:": "modalidade",
+        "Número da Licitação:": "numero_licitacao",
+        "Historico:": "historico",
+        "Dotação:": "dotacao",
+        "Valor Empenhado": "valor_empenhado",
+        "Valor Anulado": "valor_anulado",
+        "Valor Liquidado": "valor_liquidado",
+        "Valor Pago Bruto": "valor_pago_bruto",
+    }
+
+    codigo = models.PositiveIntegerField(verbose_name=_("Código"))
+
+    cpfcnpj = models.TextField(
+        verbose_name=_("CpfCNPJ"), blank=True, null=True, default=None
+    )
+    nome = models.TextField(verbose_name=_("Nome"), blank=True, null=True, default=None)
+    tipo = models.TextField(verbose_name=_("Tipo"), blank=True, null=True, default=None)
+
+    data = models.DateField(blank=True, null=True, verbose_name=_("Data"))
+
+    modalidade = models.TextField(
+        verbose_name=_("Modalidade"), blank=True, null=True, default=None
+    )
+    numero_licitacao = models.TextField(
+        verbose_name=_("Número da Licitação"), blank=True, null=True, default=None
+    )
+
+    historico = models.TextField(
+        verbose_name=_("Histórico"), blank=True, null=True, default=None
+    )
+    dotacao = models.TextField(
+        verbose_name=_("Dotação"), blank=True, null=True, default=None
+    )
+
+    processo = models.TextField(
+        verbose_name=_("Processo"), blank=True, null=True, default=None
+    )
+
+    orgao = models.ForeignKey(
+        Orgao,
+        related_name="empenho_set",
+        verbose_name=_("Órgão"),
+        on_delete=CASCADE,
+    )
+
+    unidade = models.ForeignKey(
+        UnidadeOrcamentaria,
+        blank=True,
+        null=True,
+        default=None,
+        related_name="empenho_set",
+        verbose_name=_("Unidade Financeira"),
+        on_delete=CASCADE,
+    )
+
+    funcao = models.ForeignKey(
+        Funcao,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Função"),
+        related_name="empenho_set",
+        on_delete=CASCADE,
+    )
+
+    subfuncao = models.ForeignKey(
+        SubFuncao,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Subfunção"),
+        related_name="empenho_set",
+        on_delete=CASCADE,
+    )
+
+    programa = models.ForeignKey(
+        Programa,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Programa"),
+        related_name="empenho_set",
+        on_delete=CASCADE,
+    )
+
+    acao = models.ForeignKey(
+        Acao,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Ação"),
+        related_name="empenho_set",
+        on_delete=CASCADE,
+    )
+
+    natureza = models.ForeignKey(
+        Natureza,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Natureza"),
+        related_name="empenho_set",
+        on_delete=CASCADE,
+    )
+
+    fonte = models.ForeignKey(
+        Fonte,
+        blank=True,
+        null=True,
+        default=None,
+        verbose_name=_("Fonte"),
+        related_name="empenho_set",
+        on_delete=CASCADE,
+    )
+
+    valor_empenhado = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Empenhado (R$)"),
+    )
+
+    valor_anulado = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Anulado (R$)"),
+    )
+    valor_liquidado = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Liquidado (R$)"),
+    )
+
+    valor_pago_bruto = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name=_("Valor Pago (Bruto) (R$)"),
+    )
+
+    class Meta:
+        verbose_name = _("Empenho")
+        verbose_name_plural = _("Empenhos")
+        ordering = ["id"]
+
+
 class ReceitaOrcamentaria(models.Model):
 
     codigo = models.TextField(verbose_name=_("Código"))
@@ -2415,6 +2590,11 @@ class ScrapRecord(models.Model):
 
         try:
             # with transaction.atomic():
+            if "empenhada" in self.metadata["url_dict"]["name"]:
+                if not self.codigo:
+                    return None
+                self._update_empenho()
+                return
             if "despesa" in self.metadata["url_dict"]["name"]:
                 if not self.codigo or self.codigo == "TOTAL:":
                     return None
@@ -2431,6 +2611,176 @@ class ScrapRecord(models.Model):
         except Exception as e:
             self.erro = True
             self.save(update_fields=("erro",))
+
+    def _update_empenho(self):
+        org = Orgao.objects.get(codigo=self.orgao, loa__ano=self.ano)
+        empenho = Empenho.objects.filter(codigo=self.codigo, orgao=org).first()
+
+        if not empenho:
+            empenho = Empenho()
+
+        item_list = self.metadata["item_list"]
+        dt = datetime.strptime(item_list[1], "%d/%m/%Y").date()
+
+        (
+            codigo,
+            data,
+            fornecedor,
+            cpfcnpj,
+            processo,
+            modalidade,
+            valor_empenhado,
+            valor_anulado,
+            valor_liquidado,
+            valor_pago_bruto,
+        ) = item_list
+
+        valor_empenhado = Decimal(valor_empenhado.replace(".", "").replace(",", "."))
+        valor_anulado = Decimal(valor_anulado.replace(".", "").replace(",", "."))
+        valor_liquidado = Decimal(valor_liquidado.replace(".", "").replace(",", "."))
+        valor_pago_bruto = Decimal(valor_pago_bruto.replace(".", "").replace(",", "."))
+
+        empenho.codigo = codigo
+        empenho.orgao = org
+
+        empenho.data = dt
+        empenho.nome = fornecedor
+        empenho.cpfcnpj = cpfcnpj
+        empenho.processo = processo
+        empenho.modalidade = modalidade
+        empenho.valor_empenhado = valor_empenhado
+        empenho.valor_anulado = valor_anulado
+        empenho.valor_liquidado = valor_liquidado
+        empenho.valor_pago_bruto = valor_pago_bruto
+
+        print(self.codigo, empenho.codigo, empenho.valor_empenhado)
+
+        values = {}
+        if self.metadata["url_dict"]["format"] == "html":
+            print("html")
+            content = self.content
+            if not isinstance(content, bytes):
+                content = content.tobytes()
+            content = content.decode("utf-8-sig")
+            content = self.clean_text(self.clean_text(self.clean_text(content)))
+            tables = bs(content, "html.parser").findAll("table")
+            if tables:
+                for row in tables[0].findAll("tr"):
+                    cols = row.findAll("td")
+                    values[cols[0].text] = cols[1].text.strip()
+
+                # exemplo do conteúdo de values
+                # values = {'Código:': '401179', 'Data:': '30/03/2026', 'Fornecedor:': 'TOTAL SEGURANÇA EQUIPAMENTOS DE PROTEÇÃO E SERVIÇOS ESPECIALIZADOS LTDA - ME', 'Órgão:': '03 - PREFEITURA MUNICIPAL DE JATAI', 'Programa:': '1539 - AVANÇO NAS MELHORIAS DOS SERVIÇOS DE DESENVOLVIMENTO URBANO', 'Unidade:': '11 - SECRETARIA DE OBRAS E PLANEJAMENTO URBANO', 'Função:': '15 - URBANISMO', 'Dotação:': '1539.11.2039.15.451.339030', 'Sub-Função:': '451 - INFRA-ESTRUTURA URBANA', 'Projeto / Atividade:': '2039 - MANUTENÇÃO SECRETARIA DE OBRAS E PLANEJAMENTO URBANO', 'Elemento:': '339030 - MATERIAL DE CONSUMO', 'Sub-Elemento:': '28 - MATERIAL DE PROTECAO E SEGURANCA', 'Modalidade:': 'PREGÃO', 'Número da Licitação:': '76', 'Fonte de Recursos:': '100 - RECURSOS NÃO VINCULADOS DE IMPOSTOS', 'Histórico:': 'CONTRATAÇÃO DE EMPRESA VISANDO A AQUISIÇÃO DE TRAJES RETARDANTES COM FAIXA REFLEXIVA PARA ATENDIMENTO À DEMANDA DA SECRETARIA MUNICIPAL DE OBRAS E PLANEJAMENTO URBANO (ARP Nº 18/2025 - PREGÃO ELETRÔNICO Nº 76/2025 - PROC. ADM. Nº 32845/2025).'}
+                empenho.nome = values.get("Fornecedor:", "") or values.get(
+                    "Fornecedor", ""
+                )
+                empenho.dotacao = values.get("Dotação:", "") or values.get(
+                    "Dotação", ""
+                )
+                empenho.historico = values.get("Histórico:", "") or values.get(
+                    "Histórico", ""
+                )
+                empenho.numero_licitacao = values.get(
+                    "Número da Licitação:", ""
+                ) or values.get("Número da Licitação", "")
+                empenho.modalidade = values.get("Modalidade:", "") or values.get(
+                    "Modalidade", ""
+                )
+
+                fks = {
+                    "Programa:": Programa,
+                    "Unidade:": UnidadeOrcamentaria,
+                    "Função:": Funcao,
+                    "Sub-Função:": SubFuncao,
+                    "Projeto / Atividade:": Acao,
+                    "Fonte de Recursos:": Fonte,
+                }
+                for key, model in fks.items():
+                    try:
+                        if key in values:
+                            codigo, especificacao = values[key].split(" - ", 1)
+                            params = {
+                                "loa": Loa.objects.get(ano=self.ano),
+                                "codigo": codigo,
+                            }
+                            if key == "Unidade:":
+                                params["orgao"] = Orgao.objects.get(
+                                    codigo=self.orgao, loa__ano=self.ano
+                                )
+                            if key == "Sub-Função:":
+                                params["funcao"] = Funcao.objects.get(
+                                    loa__ano=self.ano,
+                                    codigo=values.get("Função:", "").split(" - ")[0],
+                                )
+                            fk_instance = model.objects.get_or_create(
+                                **params,
+                                defaults={"especificacao": especificacao},
+                            )
+                            setattr(empenho, empenho.mapeamento[key], fk_instance[0])
+                    except Exception as e:
+                        print(f"Erro ao processar {key}: {e}")
+                        print(f"Valor problemático: {values.get(key, '')}")
+
+                try:
+                    elemento = values.get("Elemento:", "") or values.get("Elemento", "")
+                    subelemento = values.get("Sub-Elemento:", "") or values.get(
+                        "Sub-Elemento", ""
+                    )
+                    codigo_elemento, espec_elemento = (
+                        elemento.split(" - ")[0] if " - " in elemento else elemento,
+                        elemento.split(" - ")[1] if " - " in elemento else elemento,
+                    )
+                    codigo_subelemento, espec_subelemento = (
+                        (
+                            subelemento.split(" - ", 1)[0]
+                            if " - " in subelemento
+                            else subelemento
+                        ),
+                        (
+                            subelemento.split(" - ", 1)[1]
+                            if " - " in subelemento
+                            else subelemento
+                        ),
+                    )
+                    codigo_natureza = f"{codigo_elemento}{codigo_subelemento}"
+                    # formatar codigo_natureza para a mascara: 9.9.99.99.99
+                    codigo_natureza_formatado = f"{codigo_natureza[0]}.{codigo_natureza[1]}.{codigo_natureza[2:4]}.{codigo_natureza[4:6]}.{codigo_natureza[6:]}"
+
+                    if codigo_elemento and codigo_subelemento:
+                        natureza_instance = Natureza.objects.get_or_create(
+                            loa=Loa.objects.get(ano=self.ano),
+                            codigo=codigo_natureza_formatado,
+                            defaults={
+                                "especificacao": (
+                                    espec_subelemento
+                                    if espec_subelemento
+                                    else (espec_elemento or elemento)
+                                )
+                            },
+                        )
+                        empenho.natureza = natureza_instance[0]
+                except Exception as e:
+                    print(f"Erro ao processar Elemento/Sub-Elemento: {e}")
+                    print(
+                        f"Valor problemático: {values.get('Elemento:', '')} / {values.get('Sub-Elemento:', '')}"
+                    )
+        empenho.save()
+
+        return
+
+        if self.metadata["url_dict"]["format"] == "csv":
+            print("csv")
+
+            content = self.content
+            if not isinstance(content, bytes):
+                content = content.tobytes()
+
+            content = content.decode("utf-8-sig")
+            file = StringIO(content)
+            csv_data = csv.reader(file, delimiter=";")
+
+            lista = list(csv_data)
+            print(lista)
 
     def _update_transferencia_recursos(self):
 
