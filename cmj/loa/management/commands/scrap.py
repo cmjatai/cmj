@@ -56,17 +56,17 @@ urls = [
         "format": "csv",
         "params": ("orgao", "mes", "ano"),
         "subdomain": ("prefeituradejatai", "camaradejatai"),
-        "active": False,
+        "active": True,
         "childs": [
-            {
-                "name": "despesa_paga_detalhes_exportacao",
-                "url": "http://{subdomain}.sigepnet.com.br/transparencia/exportacao/"
-                "depesa_paga_detalhes.php?extensao=CSV&codigo={codigo}",
-                "type": "detail",
-                "format": "csv",
-                "params": ("codigo",),
-                "subdomain": ("prefeituradejatai", "camaradejatai"),
-            },
+            # {
+            #    "name": "despesa_paga_detalhes_exportacao",
+            #    "url": "http://{subdomain}.sigepnet.com.br/transparencia/exportacao/"
+            #    "depesa_paga_detalhes.php?extensao=CSV&codigo={codigo}",
+            #    "type": "detail",
+            #    "format": "csv",
+            #    "params": ("codigo",),
+            #    "subdomain": ("prefeituradejatai", "camaradejatai"),
+            # },
             {
                 "name": "despesa_paga_detalhes",
                 "url": "http://{subdomain}.sigepnet.com.br/transparencia/"
@@ -194,6 +194,10 @@ class Command(BaseCommand):
 
         for sd in subdomains:
             for url_dict in urls:
+
+                active = url_dict.get("active", False)
+                if not active:
+                    continue
 
                 if sd["subdomain"] not in url_dict["subdomain"]:
                     continue
