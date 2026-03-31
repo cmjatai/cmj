@@ -2501,6 +2501,12 @@ class EmpenhosDeEmendaLoa(models.Model):
         verbose_name = _("Empenho de Emenda Impositiva")
         verbose_name_plural = _("Empenhos de Emendas Impositivas")
         ordering = ["id"]
+        unique_together = (
+            (
+                "emendaloa",
+                "empenho",
+            ),
+        )
 
 
 class ReceitaOrcamentaria(models.Model):
@@ -2691,11 +2697,12 @@ class ScrapRecord(models.Model):
         empenho.valor_liquidado = valor_liquidado
         empenho.valor_pago_bruto = valor_pago_bruto
 
-        print(self.codigo, empenho.codigo, empenho.valor_empenhado)
 
         values = {}
-        if self.metadata["url_dict"]["format"] == "html":
-            print("html")
+        if self.metadata["url_dict"]["format"] != "html":
+            print('             ', timezone.localtime(), 'Empenho Create:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
+        else:
+            print('             ', timezone.localtime(), 'Empenho Update:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
             content = self.content
             if not isinstance(content, bytes):
                 content = content.tobytes()

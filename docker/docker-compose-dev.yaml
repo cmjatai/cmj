@@ -30,7 +30,7 @@ services:
   cmjfront2018:
     build:
       context: ../_frontend/v2018/
-      dockerfile: ../../docker/DockerfileFront2018Dev
+      dockerfile: ../../docker/Dockerfile.Front2018Dev
     #command: yarn build
     restart: no
     container_name: cmjfront2018
@@ -45,7 +45,7 @@ services:
   cmjfront2026:
     build:
       context: ../_frontend/v6/
-      dockerfile: ../../docker/DockerfileFront2026Dev
+      dockerfile: ../../docker/Dockerfile.Front2026Dev
     #command: yarn build
     restart: no
     container_name: cmjfront2026

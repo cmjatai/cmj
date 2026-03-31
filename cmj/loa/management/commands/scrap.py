@@ -126,6 +126,7 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--deep", action="store_true", default=False)
         parser.add_argument("--onlychilds", action="store_true", default=False)
+        parser.add_argument("--onlyoverlist", action="store_true", default=False)
         parser.add_argument("--outfile", action="store_true", default=False)
         parser.add_argument("--force", action="store_true", default=False)
         parser.add_argument("--timeexec", type=int, default=30000)
@@ -141,6 +142,7 @@ class Command(BaseCommand):
         self.force = force = options["force"]
         self.deep = deep = options["deep"]
         self.onlychilds = onlychilds = options["onlychilds"]
+        self.onlyoverlist = onlyoverlist = options["onlyoverlist"]
         outfile = options["outfile"]
         timeexec = options["timeexec"]
         self.ano_inicial = options["ano_inicial"]
@@ -173,9 +175,11 @@ class Command(BaseCommand):
         subdomains = [
             {
                 "subdomain": "prefeituradejatai",
-                "orgaos": models.Orgao.objects.exclude(
-                    Q(codigo="01") | Q(loa__ano__range=(self.ano_inicial, self.ano_final)),
-                ).order_by(*order_by),
+                "orgaos": models.Orgao.objects.filter(
+                    loa__ano__range=(self.ano_inicial, self.ano_final)
+                )
+                .exclude(Q(codigo="01"))
+                .order_by(*order_by),
             },
             {
                 "subdomain": "camaradejatai",
@@ -215,6 +219,7 @@ class Command(BaseCommand):
 
                     if interromper_orgao and orgao.codigo == orgao_atual.codigo:
                         continue
+
                     interromper_orgao = False
                     orgao_atual = orgao
 
@@ -276,7 +281,8 @@ class Command(BaseCommand):
         content_download = b""
 
         if not scrap or not scrap.content:
-            content_download = get_content(url)
+            if not self.onlyoverlist or not parent:
+                content_download = get_content(url)
         elif self.force:
             if self.onlychilds and parent:
                 content_download = get_content(url)
