@@ -130,6 +130,7 @@ class Command(BaseCommand):
         parser.add_argument("--force", action="store_true", default=False)
         parser.add_argument("--timeexec", type=int, default=30000)
         parser.add_argument("--ano_inicial", type=int, default=2023)
+        parser.add_argument("--ano_final", type=int, default=timezone.localtime().year)
 
     def handle(self, *args, **options):
         self.logger = logging.getLogger(__name__)
@@ -143,7 +144,7 @@ class Command(BaseCommand):
         outfile = options["outfile"]
         timeexec = options["timeexec"]
         self.ano_inicial = options["ano_inicial"]
-
+        self.ano_final = options["ano_final"]
         # deep=True buscas as listas e a partir das listas, busca os registros
         # deep=False buscas apenas as listas
         # onlychilds=True ignora deep e, a partir das listas já baixadas, busca
@@ -173,13 +174,13 @@ class Command(BaseCommand):
             {
                 "subdomain": "prefeituradejatai",
                 "orgaos": models.Orgao.objects.exclude(
-                    Q(codigo="01") | Q(loa__ano__lt=self.ano_inicial),
+                    Q(codigo="01") | Q(loa__ano__range=(self.ano_inicial, self.ano_final)),
                 ).order_by(*order_by),
             },
             {
                 "subdomain": "camaradejatai",
                 "orgaos": models.Orgao.objects.filter(
-                    codigo="01", loa__ano__gte=self.ano_inicial
+                    codigo="01", loa__ano__range=(self.ano_inicial, self.ano_final)
                 ).order_by(*order_by),
             },
         ]
