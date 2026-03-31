@@ -52,6 +52,9 @@
                 <strong>Modalidade:</strong> {{ item.empenho.modalidade }}
               </span>
             </small>
+            <small v-if="item.empenho.historico" class="text-muted d-block mt-1">
+              <strong>Histórico:</strong> {{ item.empenho.historico }}
+            </small>
           </div>
           <div class="text-right ml-2 text-nowrap">
             <h3 class="font-weight-bold text-success mb-0">
