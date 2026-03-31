@@ -56,7 +56,7 @@ urls = [
         "format": "csv",
         "params": ("orgao", "mes", "ano"),
         "subdomain": ("prefeituradejatai", "camaradejatai"),
-        "active": True,
+        "active": False,
         "childs": [
             # {
             #    "name": "despesa_paga_detalhes_exportacao",

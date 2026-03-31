@@ -193,6 +193,23 @@
               </template>
               <pcl-tab-tramitacoes :items="tramitacoesItems" />
             </b-tab>
+
+            <b-tab
+              v-if="tab.key === 'empenhos'"
+              :key="tab.key"
+              :active="index === 0"
+            >
+              <template #title>
+                Empenhos
+                <b-badge
+                  variant="secondary"
+                  pill
+                  class="ml-1"
+                  v-if="empenhosItems"
+                >{{ empenhosItems.length }}</b-badge>
+              </template>
+              <pcl-tab-empenhos :items="empenhosItems" />
+            </b-tab>
           </template>
         </b-tabs>
       </div>
@@ -214,6 +231,7 @@ import PclTabPrestacao from './tabs/PclTabPrestacao.vue'
 import PclTabAjustes from './tabs/PclTabAjustes.vue'
 import PclTabDocumentos from './tabs/PclTabDocumentos.vue'
 import PclTabTramitacoes from './tabs/PclTabTramitacoes.vue'
+import PclTabEmpenhos from './tabs/PclTabEmpenhos.vue'
 
 export default {
   name: 'pcl-detalhe-emenda',
@@ -221,7 +239,8 @@ export default {
     PclTabPrestacao,
     PclTabAjustes,
     PclTabDocumentos,
-    PclTabTramitacoes
+    PclTabTramitacoes,
+    PclTabEmpenhos
   },
   props: {
     registro: {
@@ -239,6 +258,7 @@ export default {
       ajustesItems: null,
       documentosItems: null,
       tramitacoesItems: null,
+      empenhosItems: null,
       visible: false
     }
   },
@@ -323,6 +343,11 @@ export default {
         hasData: Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0
       })
 
+      tabs.push({
+        key: 'empenhos',
+        hasData: Array.isArray(this.empenhosItems) && this.empenhosItems.length > 0
+      })
+
       tabs.sort((a, b) => (b.hasData ? 1 : 0) - (a.hasData ? 1 : 0))
 
       if (this.registro.materia) {
@@ -358,6 +383,7 @@ export default {
       this.ajustesItems = null
       this.documentosItems = null
       this.tramitacoesItems = null
+      this.empenhosItems = null
 
       this.utils
         .fetch({
@@ -385,6 +411,44 @@ export default {
         })
         .then((response) => {
           this.ajustesItems = response.data
+        })
+
+      // Fetch empenhos da emenda
+      this.utils
+        .fetch({
+          app: 'loa',
+          model: 'empenhosdeemendaloa',
+          params: {
+            emendaloa: registro.id,
+            get_all: 'True',
+            expand: 'empenho'
+          }
+        })
+        .then((response) => {
+          this.empenhosItems = response.data
+
+          // Fetch empenhos dos ajustes
+          if (Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0) {
+            const ajustePromises = this.ajustesItems.map((ajuste) =>
+              this.utils.fetch({
+                app: 'loa',
+                model: 'empenhosdeemendaloa',
+                params: {
+                  ajuste: ajuste.id,
+                  get_all: 'True',
+                  expand: 'empenho'
+                }
+              })
+            )
+            Promise.all(ajustePromises).then((responses) => {
+              const ajusteEmpenhos = responses.flatMap((r) => r.data || [])
+              if (ajusteEmpenhos.length > 0) {
+                const existingIds = new Set(this.empenhosItems.map((e) => e.id))
+                const novos = ajusteEmpenhos.filter((e) => !existingIds.has(e.id))
+                this.empenhosItems = [...this.empenhosItems, ...novos]
+              }
+            })
+          }
         })
 
       if (registro.materia) {

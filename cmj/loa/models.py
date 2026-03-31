@@ -2,7 +2,6 @@ import csv
 import re
 from datetime import datetime
 from decimal import Decimal
-from importlib import metadata
 from io import StringIO
 
 from _decimal import ROUND_DOWN, ROUND_HALF_DOWN
@@ -2490,6 +2489,16 @@ class EmpenhosDeEmendaLoa(models.Model):
         on_delete=CASCADE,
     )
 
+    ajuste = models.ForeignKey(
+        RegistroAjusteLoa,
+        verbose_name=_("Registro de Ajuste Técnico"),
+        related_name="empenhosdeemendaloa_set",
+        on_delete=CASCADE,
+        blank=True,
+        null=True,
+        default=None,
+    )
+
     empenho = models.ForeignKey(
         Empenho,
         verbose_name=_("Empenho"),
@@ -2504,6 +2513,7 @@ class EmpenhosDeEmendaLoa(models.Model):
         unique_together = (
             (
                 "emendaloa",
+                "ajuste",
                 "empenho",
             ),
         )
@@ -2700,9 +2710,11 @@ class ScrapRecord(models.Model):
 
         values = {}
         if self.metadata["url_dict"]["format"] != "html":
-            print('             ', timezone.localtime(), 'Empenho Create:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
+            if settings.DEBUG:
+                print('             ', timezone.localtime(), 'Empenho Create:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
         else:
-            print('             ', timezone.localtime(), 'Empenho Update:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
+            if settings.DEBUG:
+                print('             ', timezone.localtime(), 'Empenho Update:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
             content = self.content
             if not isinstance(content, bytes):
                 content = content.tobytes()
