@@ -89,13 +89,13 @@
       </div>
 
       <!-- ===== ABAS ===== -->
-      <div class="bg-white p-0 mt-2" v-if="prestacaoItems && prestacaoItems.length">
+      <div class="bg-white p-0 mt-2" v-if="hasTabs">
         <b-tabs
           nav-class="emenda-tabs"
           content-class="p-0"
           small
         >
-          <b-tab active>
+          <b-tab v-if="prestacaoItems && prestacaoItems.length" active>
             <template #title>
               Prestação de Contas
               <b-badge
@@ -105,6 +105,21 @@
               >{{ prestacaoItems.length }}</b-badge>
             </template>
             <pcl-tab-prestacao :items="prestacaoItems" :registro="registro" />
+          </b-tab>
+
+          <b-tab
+            :active="!(prestacaoItems && prestacaoItems.length)"
+          >
+            <template #title>
+              Empenhos
+              <b-badge
+                variant="secondary"
+                pill
+                class="ml-1"
+                v-if="empenhosItems"
+              >{{ empenhosItems.length }}</b-badge>
+            </template>
+            <pcl-tab-empenhos :items="empenhosItems" />
           </b-tab>
         </b-tabs>
       </div>
@@ -121,11 +136,13 @@ import {
   situacaoVariant
 } from './utils/pcl-helpers'
 import PclTabPrestacao from './tabs/PclTabPrestacao.vue'
+import PclTabEmpenhos from './tabs/PclTabEmpenhos.vue'
 
 export default {
   name: 'pcl-detalhe-ajuste',
   components: {
-    PclTabPrestacao
+    PclTabPrestacao,
+    PclTabEmpenhos
   },
   props: {
     registro: {
@@ -140,6 +157,7 @@ export default {
   data () {
     return {
       prestacaoItems: null,
+      empenhosItems: null,
       visible: false
     }
   },
@@ -172,6 +190,10 @@ export default {
     }
   },
   computed: {
+    hasTabs () {
+      return (Array.isArray(this.prestacaoItems) && this.prestacaoItems.length > 0) ||
+        (Array.isArray(this.empenhosItems) && this.empenhosItems.length > 0)
+    },
     emendasLoaList () {
       if (!this.registro.emendaloa) return []
       const lista = Array.isArray(this.registro.emendaloa)
@@ -197,6 +219,7 @@ export default {
     },
     fetchTabData (registro) {
       this.prestacaoItems = null
+      this.empenhosItems = null
 
       this.utils
         .fetch({
@@ -210,6 +233,20 @@ export default {
         })
         .then((response) => {
           this.prestacaoItems = response.data
+        })
+
+      this.utils
+        .fetch({
+          app: 'loa',
+          model: 'empenhoemendaajuste',
+          params: {
+            ajuste: registro.id,
+            get_all: 'True',
+            expand: 'empenho'
+          }
+        })
+        .then((response) => {
+          this.empenhosItems = response.data
         })
     }
   }

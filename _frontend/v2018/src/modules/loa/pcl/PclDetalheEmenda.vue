@@ -421,7 +421,7 @@ export default {
           params: {
             emendaloa: registro.id,
             get_all: 'True',
-            expand: 'empenho;ajuste'
+            expand: 'empenho'
           }
         })
         .then((response) => {
@@ -436,7 +436,7 @@ export default {
                 params: {
                   ajuste: ajuste.id,
                   get_all: 'True',
-                  expand: 'ajuste;empenho'
+                  expand: 'empenho'
                 }
               })
             )
