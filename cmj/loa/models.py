@@ -2479,6 +2479,22 @@ class Empenho(models.Model):
         verbose_name_plural = _("Empenhos")
         ordering = ["id"]
 
+    def __str__(self):
+        return f"{self.codigo} - {self.nome} - R$ {self.valor_empenhado}" 
+
+    @property
+    def str_valor_empenhado(self):
+        return formats.number_format(self.valor_empenhado, force_grouping=True)
+    @property
+    def str_valor_anulado(self):
+        return formats.number_format(self.valor_anulado, force_grouping=True)
+    @property
+    def str_valor_liquidado(self):
+        return formats.number_format(self.valor_liquidado, force_grouping=True)
+    @property
+    def str_valor_pago_bruto(self):
+        return formats.number_format(self.valor_pago_bruto, force_grouping=True)
+
 
 class EmpenhoEmendaAjuste(models.Model):
 

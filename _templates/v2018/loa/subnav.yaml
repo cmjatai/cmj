@@ -9,6 +9,8 @@
     url: emendaloa_list
   - title: {% trans 'Ajustes Técnicos' %}
     url: oficioajusteloa_list
+  - title: {% trans 'Empenhos' %}
+    url: empenho_list
   - title: {% trans 'Despesas Orçamentárias' %}
     url: despesa_list
   - title: ''

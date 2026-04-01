@@ -58,10 +58,10 @@
           </div>
           <div class="text-right ml-2 text-nowrap">
             <h3 class="font-weight-bold text-success mb-0">
-              R$ {{ item.empenho.valor_empenhado }}
+              R$ {{ formatCurrency(item.empenho.valor_empenhado) }}
             </h3>
             <small class="text-muted" v-if="parseFloat(item.empenho.valor_pago_bruto) > 0">
-              Pago: R$ {{ item.empenho.valor_pago_bruto }}
+              Pago: R$ {{ formatCurrency(item.empenho.valor_pago_bruto) }}
             </small>
           </div>
         </div>
@@ -83,25 +83,25 @@
             <div class="col-sm-3 text-center">
               <div class="border rounded p-2">
                 <small class="text-muted d-block">Empenhado</small>
-                <strong class="text-primary">R$ {{ selectedEmpenho.valor_empenhado }}</strong>
+                <strong class="text-primary">R$ {{ formatCurrency(selectedEmpenho.valor_empenhado) }}</strong>
               </div>
             </div>
             <div class="col-sm-3 text-center">
               <div class="border rounded p-2">
                 <small class="text-muted d-block">Liquidado</small>
-                <strong class="text-info">R$ {{ selectedEmpenho.valor_liquidado }}</strong>
+                <strong class="text-info">R$ {{ formatCurrency(selectedEmpenho.valor_liquidado) }}</strong>
               </div>
             </div>
             <div class="col-sm-3 text-center">
               <div class="border rounded p-2">
                 <small class="text-muted d-block">Pago</small>
-                <strong class="text-success">R$ {{ selectedEmpenho.valor_pago_bruto }}</strong>
+                <strong class="text-success">R$ {{ formatCurrency(selectedEmpenho.valor_pago_bruto) }}</strong>
               </div>
             </div>
             <div class="col-sm-3 text-center">
               <div class="border rounded p-2">
                 <small class="text-muted d-block">Anulado</small>
-                <strong class="text-danger">R$ {{ selectedEmpenho.valor_anulado }}</strong>
+                <strong class="text-danger">R$ {{ formatCurrency(selectedEmpenho.valor_anulado) }}</strong>
               </div>
             </div>
           </div>
@@ -196,6 +196,11 @@ export default {
         return `${parts[2]}/${parts[1]}/${parts[0]}`
       }
       return dateStr
+    },
+    formatCurrency (value) {
+      const num = parseFloat(value)
+      if (isNaN(num)) return '0,00'
+      return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
     },
     cleanKey (key) {
       return key.replace(/:+$/, '')

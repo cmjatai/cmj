@@ -70,6 +70,7 @@ EmendaLoaDetail:
       - registroajusteloa_set
       - prestacaocontaregistro_set
       - documentos_acessorios
+      - empenhoemendaajuste_set
       - emendaloahistoricofase_set
 {% if False %}
     {% trans 'Registro de Alterações' %}:
@@ -95,6 +96,7 @@ RegistroAjusteLoaDetail:
   - descricao
   - emendaloa
   - prestacaocontaregistro_set
+  - empenhoemendaajuste_set
 
 PrestacaoContaLoa:
   {% trans 'Dados Gerais' %}:
@@ -157,8 +159,20 @@ EntidadeDetail:
   - tipo_entidade:5 natureza_juridica:7
   - metadata__import_fields
 
+EmpenhoDetail:
+  {% trans 'Identificação' %}:
+  - codigo:2 data:2 processo:2 modalidade numero_licitacao:2
+  - orgao unidade
+  - dotacao:3 cpfcnpj:3 nome
+  - valor_empenhado:3 valor_anulado:3 valor_liquidado:3 valor_pago_bruto:3
+  - historico
+  - empenhoemendaajuste_set
 
-
+EmpenhoList:
+  {% trans 'Identificação' %}:
+  - codigo:2 data:2 detail
+  - valor_empenhado:3 valor_anulado:3 valor_liquidado:3 valor_pago_bruto:3
+  - emendas_ajustes
 
 
 {% comment %}
