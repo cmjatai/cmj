@@ -2480,19 +2480,22 @@ class Empenho(models.Model):
         ordering = ["id"]
 
 
-class EmpenhosDeEmendaLoa(models.Model):
+class EmpenhoEmendaAjuste(models.Model):
 
     emendaloa = models.ForeignKey(
         EmendaLoa,
         verbose_name=_("Emenda Impositiva"),
-        related_name="empenhosdeemendaloa_set",
+        related_name="empenhoemendaajuste_set",
         on_delete=CASCADE,
+        blank=True,
+        null=True,
+        default=None,
     )
 
     ajuste = models.ForeignKey(
         RegistroAjusteLoa,
         verbose_name=_("Registro de Ajuste Técnico"),
-        related_name="empenhosdeemendaloa_set",
+        related_name="empenhoemendaajuste_set",
         on_delete=CASCADE,
         blank=True,
         null=True,
@@ -2502,13 +2505,13 @@ class EmpenhosDeEmendaLoa(models.Model):
     empenho = models.ForeignKey(
         Empenho,
         verbose_name=_("Empenho"),
-        related_name="empenhosdeemendaloa_set",
+        related_name="empenhoemendaajuste_set",
         on_delete=CASCADE,
     )
 
     class Meta:
-        verbose_name = _("Empenho de Emenda Impositiva")
-        verbose_name_plural = _("Empenhos de Emendas Impositivas")
+        verbose_name = _("Empenho de Emenda e/ou Ajuste Técnico")
+        verbose_name_plural = _("Empenhos de Emendas e/ou Ajustes Técnicos")
         ordering = ["id"]
         unique_together = (
             (
@@ -2707,14 +2710,29 @@ class ScrapRecord(models.Model):
         empenho.valor_liquidado = valor_liquidado
         empenho.valor_pago_bruto = valor_pago_bruto
 
-
         values = {}
         if self.metadata["url_dict"]["format"] != "html":
             if settings.DEBUG:
-                print('             ', timezone.localtime(), 'Empenho Create:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
+                print(
+                    "             ",
+                    timezone.localtime(),
+                    "Empenho Create:",
+                    empenho.codigo,
+                    empenho.data,
+                    empenho.valor_empenhado,
+                    empenho.nome,
+                )
         else:
             if settings.DEBUG:
-                print('             ', timezone.localtime(), 'Empenho Update:', empenho.codigo, empenho.data, empenho.valor_empenhado, empenho.nome)
+                print(
+                    "             ",
+                    timezone.localtime(),
+                    "Empenho Update:",
+                    empenho.codigo,
+                    empenho.data,
+                    empenho.valor_empenhado,
+                    empenho.nome,
+                )
             content = self.content
             if not isinstance(content, bytes):
                 content = content.tobytes()

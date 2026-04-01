@@ -254,7 +254,7 @@ rules_loa_group_operador = {
         (loa_models.Entidade, __base__, __perms_publicas__),
         (loa_models.DespesaConsulta, __base__, __perms_publicas__),
         (loa_models.Empenho, __base__, __perms_publicas__),
-        (loa_models.EmpenhosDeEmendaLoa, __base__, __perms_publicas__),
+        (loa_models.EmpenhoEmendaAjuste, __base__, __perms_publicas__),
         (loa_models.Orgao, __base__, __perms_publicas__),
         (loa_models.UnidadeOrcamentaria, __base__, __perms_publicas__),
         (loa_models.Funcao, __base__, __perms_publicas__),

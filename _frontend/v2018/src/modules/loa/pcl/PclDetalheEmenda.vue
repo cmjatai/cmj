@@ -417,11 +417,11 @@ export default {
       this.utils
         .fetch({
           app: 'loa',
-          model: 'empenhosdeemendaloa',
+          model: 'empenhoemendaajuste',
           params: {
             emendaloa: registro.id,
             get_all: 'True',
-            expand: 'empenho'
+            expand: 'empenho;ajuste'
           }
         })
         .then((response) => {
@@ -432,11 +432,11 @@ export default {
             const ajustePromises = this.ajustesItems.map((ajuste) =>
               this.utils.fetch({
                 app: 'loa',
-                model: 'empenhosdeemendaloa',
+                model: 'empenhoemendaajuste',
                 params: {
                   ajuste: ajuste.id,
                   get_all: 'True',
-                  expand: 'empenho'
+                  expand: 'ajuste;empenho'
                 }
               })
             )
