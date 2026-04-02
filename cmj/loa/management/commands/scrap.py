@@ -5,7 +5,6 @@ import logging
 import sys
 from copy import deepcopy
 from io import StringIO
-from time import sleep
 
 import requests
 from django.conf import settings
@@ -280,69 +279,75 @@ class Command(BaseCommand):
         content_scrap = b""
         content_download = b""
 
-        if not scrap or not scrap.content:
-            if not self.onlyoverlist or not parent:
-                content_download = get_content(url)
-        elif self.force:
-            if self.onlychilds and parent:
-                content_download = get_content(url)
-            elif not self.onlychilds:
-                content_download = get_content(url)
-        else:
-            if not self.onlychilds and not parent:
-                content_download = get_content(url)
-
-        if isinstance(content_download, bool):
-            return True  # para o scrap para o órgão atual
-
         childs = url_dict.get("childs", [])
 
-        if scrap:
+        if not scrap:
+            scrap = ScrapRecord()
+            scrap.url = url
+            scrap.orgao = params["orgao"]
+            scrap.codigo = params.get("codigo", "")
+            scrap.ano = int(params["ano"])
+            scrap.mes = int(params["mes"])
+            scrap.metadata = {"url_dict": url_dict, "item_list": item_list}
+            scrap.parent = parent
 
-            if not self.force:
+            if not parent:
+                content_download = get_content(url)
+                if content_download:
+                    scrap.content = content_download
+                    scrap.save()
+                    scrap.update_data_models()
+                    if childs and deep:
+                        self.scrap_run_childs(scrap, childs, params, deep)
+                    return False
+                else:
+                    scrap.save()
+                    return False
 
+            if not self.onlyoverlist:
+                content_download = get_content(url)
+                if content_download:
+                    scrap.content = content_download
+            scrap.save()
+            scrap.update_data_models()
+            return False
+
+        if not parent:
+            if not self.onlychilds:
+                content_download = get_content(url)
                 content_scrap = (
                     scrap.content.tobytes()
                     if not isinstance(scrap.content, bytes)
                     else scrap.content
                 )
-
-                if scrap.metadata["item_list"] != item_list:
-                    scrap.metadata["item_list"] = item_list
-                    scrap.save(update_fields=("metadata",))
-                scrap.update_data_models()
-
-            if url_dict["format"] == "html":
-                if content_scrap == content_download:
+                if url_dict["format"] == "html":
                     return True
-            elif url_dict["format"] == "csv":
-                is_equals = self.compare_bytes_csv(content_scrap, content_download)
-                if is_equals and not self.onlychilds:
-                    return True
+                elif url_dict["format"] == "csv":
+                    if self.compare_bytes_csv(content_scrap, content_download):
+                        return True
 
-            if not self.onlychilds or content_download:
                 scrap.content = content_download
+                scrap.metadata["url_dict"] = url_dict
                 scrap.metadata["item_list"] = item_list
                 scrap.save(update_fields=("metadata", "content"))
                 scrap.update_data_models()
-
             if childs and deep:
                 self.scrap_run_childs(scrap, childs, params, deep)
             return False
 
-        scrap = ScrapRecord()
-        scrap.url = url
-        scrap.orgao = params["orgao"]
-        scrap.codigo = params.get("codigo", "")
-        scrap.ano = int(params["ano"])
-        scrap.mes = int(params["mes"])
-        scrap.metadata = {"url_dict": url_dict, "item_list": item_list}
-        scrap.parent = parent
+        if self.onlyoverlist:
+            if item_list and scrap.metadata.get("item_list", []) != item_list:
+                scrap.metadata["item_list"] = item_list
+                scrap.save(update_fields=("metadata",))
+                scrap.update_data_models()
+            return False
+
+        content_download = get_content(url)
         scrap.content = content_download
-        scrap.save()
-
+        scrap.metadata["url_dict"] = url_dict
+        scrap.metadata["item_list"] = item_list
+        scrap.save(update_fields=("metadata", "content"))
         scrap.update_data_models()
-
         if childs and deep:
             self.scrap_run_childs(scrap, childs, params, deep)
         return False
