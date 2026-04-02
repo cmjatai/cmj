@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.db import models
-from django.db.models.deletion import CASCADE, PROTECT
+from django.db.models.deletion import PROTECT
 from django.utils.translation import gettext_lazy as _
 
 
@@ -42,7 +42,7 @@ class UnidadeOrcamentaria(ElementoBase):
         Orgao,
         verbose_name=_("Órgão"),
         related_name="unidadeorcamentaria_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     recebe_emenda_impositiva = models.BooleanField(
@@ -92,7 +92,7 @@ class Funcao(ElementoBase):
 class SubFuncao(ElementoBase):
 
     funcao = models.ForeignKey(
-        Funcao, verbose_name=_("Função"), related_name="funcao_set", on_delete=CASCADE
+        Funcao, verbose_name=_("Função"), related_name="funcao_set", on_delete=PROTECT
     )
 
     class Meta:
@@ -136,40 +136,40 @@ class Natureza(ElementoBase):
 class Despesa(models.Model):
 
     loa = models.ForeignKey(
-        "loa.Loa", verbose_name=_("Loa"), related_name="despesa_set", on_delete=CASCADE
+        "loa.Loa", verbose_name=_("Loa"), related_name="despesa_set", on_delete=PROTECT
     )
 
     orgao = models.ForeignKey(
-        Orgao, verbose_name=_("Órgão"), related_name="despesa_set", on_delete=CASCADE
+        Orgao, verbose_name=_("Órgão"), related_name="despesa_set", on_delete=PROTECT
     )
 
     unidade = models.ForeignKey(
         UnidadeOrcamentaria,
         verbose_name=_("Unidade Orçamentária"),
         related_name="despesa_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     funcao = models.ForeignKey(
-        Funcao, verbose_name=_("Função"), related_name="despesa_set", on_delete=CASCADE
+        Funcao, verbose_name=_("Função"), related_name="despesa_set", on_delete=PROTECT
     )
 
     subfuncao = models.ForeignKey(
         SubFuncao,
         verbose_name=_("SubFunção"),
         related_name="despesa_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     programa = models.ForeignKey(
         Programa,
         verbose_name=_("Programa"),
         related_name="despesa_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     acao = models.ForeignKey(
-        Acao, verbose_name=_("Ação"), related_name="despesa_set", on_delete=CASCADE
+        Acao, verbose_name=_("Ação"), related_name="despesa_set", on_delete=PROTECT
     )
 
     fonte = models.ForeignKey(
@@ -179,14 +179,14 @@ class Despesa(models.Model):
         default=None,
         verbose_name=_("Fonte"),
         related_name="despesa_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     natureza = models.ForeignKey(
         Natureza,
         verbose_name=_("Natureza"),
         related_name="despesa_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     valor_materia = models.DecimalField(
@@ -278,7 +278,7 @@ class Despesa(models.Model):
 class DespesaConsulta(models.Model):
 
     loa = models.ForeignKey(
-        "loa.Loa", verbose_name=_("Loa"), related_name="+", on_delete=CASCADE
+        "loa.Loa", verbose_name=_("Loa"), related_name="+", on_delete=PROTECT
     )
 
     valor_materia = models.DecimalField(
@@ -331,7 +331,7 @@ class ReceitaOrcamentaria(models.Model):
         "loa.Orgao",
         related_name="receitaorcamentaria_set",
         verbose_name=_("Órgão"),
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     valor = models.DecimalField(

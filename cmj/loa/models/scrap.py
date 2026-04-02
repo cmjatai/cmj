@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup as bs
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -60,7 +60,7 @@ class ScrapRecord(models.Model):
         null=True,
         default=None,
         related_name="scrap_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     class Meta:
@@ -195,22 +195,20 @@ class ScrapRecord(models.Model):
                 empenho.metadata = empenho.metadata or {}
                 empenho.metadata["scrap"] = {"values": values}
 
-                # exemplo do conteúdo de values
-                # values = {'Código:': '401179', 'Data:': '30/03/2026', 'Fornecedor:': 'TOTAL SEGURANÇA EQUIPAMENTOS DE PROTEÇÃO E SERVIÇOS ESPECIALIZADOS LTDA - ME', 'Órgão:': '03 - PREFEITURA MUNICIPAL DE JATAI', 'Programa:': '1539 - AVANÇO NAS MELHORIAS DOS SERVIÇOS DE DESENVOLVIMENTO URBANO', 'Unidade:': '11 - SECRETARIA DE OBRAS E PLANEJAMENTO URBANO', 'Função:': '15 - URBANISMO', 'Dotação:': '1539.11.2039.15.451.339030', 'Sub-Função:': '451 - INFRA-ESTRUTURA URBANA', 'Projeto / Atividade:': '2039 - MANUTENÇÃO SECRETARIA DE OBRAS E PLANEJAMENTO URBANO', 'Elemento:': '339030 - MATERIAL DE CONSUMO', 'Sub-Elemento:': '28 - MATERIAL DE PROTECAO E SEGURANCA', 'Modalidade:': 'PREGÃO', 'Número da Licitação:': '76', 'Fonte de Recursos:': '100 - RECURSOS NÃO VINCULADOS DE IMPOSTOS', 'Histórico:': 'CONTRATAÇÃO DE EMPRESA VISANDO A AQUISIÇÃO DE TRAJES RETARDANTES COM FAIXA REFLEXIVA PARA ATENDIMENTO À DEMANDA DA SECRETARIA MUNICIPAL DE OBRAS E PLANEJAMENTO URBANO (ARP Nº 18/2025 - PREGÃO ELETRÔNICO Nº 76/2025 - PROC. ADM. Nº 32845/2025).'}
                 empenho.nome = values.get("Fornecedor:", "") or values.get(
-                    "Fornecedor", ""
+                    "Fornecedor", empenho.nome
                 )
                 empenho.dotacao = values.get("Dotação:", "") or values.get(
-                    "Dotação", ""
+                    "Dotação", empenho.dotacao
                 )
                 empenho.historico = values.get("Histórico:", "") or values.get(
-                    "Histórico", ""
+                    "Histórico", empenho.historico
                 )
                 empenho.numero_licitacao = values.get(
                     "Número da Licitação:", ""
-                ) or values.get("Número da Licitação", "")
+                ) or values.get("Número da Licitação", empenho.numero_licitacao)
                 empenho.modalidade = values.get("Modalidade:", "") or values.get(
-                    "Modalidade", ""
+                    "Modalidade", empenho.modalidade
                 )
 
                 fks = {

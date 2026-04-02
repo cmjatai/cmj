@@ -248,6 +248,14 @@ class AuditLogManager(models.Manager):
         qs = qs.filter(user__isnull=False)
         return qs
 
+    # registros para um objeto específico
+    def object_actions(self, obj):
+        # for_related_fields
+        qs = self.get_queryset()
+        content_type = ContentType.objects.get_for_model(obj)
+        qs = qs.filter(content_type=content_type, object_id=obj.pk)
+        return qs
+
 
 class AuditLog(models.Model):
     objects = AuditLogManager()

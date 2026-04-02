@@ -128,7 +128,7 @@ class EmendaLoa(CmjSearchMixin):
     )
 
     loa = models.ForeignKey(
-        Loa, verbose_name=_("LOA"), related_name="emendaloa_set", on_delete=CASCADE
+        Loa, verbose_name=_("LOA"), related_name="emendaloa_set", on_delete=PROTECT
     )
 
     materia = models.OneToOneField(
@@ -818,7 +818,7 @@ class EmendaLoaParlamentar(models.Model):
         "parlamentares.Parlamentar",
         related_name="emendaloaparlamentar_set",
         verbose_name=_("Parlamentar"),
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     valor = models.DecimalField(

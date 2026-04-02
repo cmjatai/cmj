@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
-from django.db.models.deletion import CASCADE
+from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -55,40 +55,40 @@ class DespesaPaga(models.Model):
     data = models.DateField(blank=True, null=True, verbose_name=_("Data"))
 
     orgao = models.ForeignKey(
-        'loa.Orgao',
+        "loa.Orgao",
         related_name="despesapaga_set",
         verbose_name=_("Órgão"),
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     unidade = models.ForeignKey(
-        'loa.UnidadeOrcamentaria',
+        "loa.UnidadeOrcamentaria",
         blank=True,
         null=True,
         default=None,
         related_name="despesapaga_set",
         verbose_name=_("Unidade Financeira"),
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     natureza = models.ForeignKey(
-        'loa.Natureza',
+        "loa.Natureza",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Natureza"),
         related_name="despesapaga_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     fonte = models.ForeignKey(
-        'loa.Fonte',
+        "loa.Fonte",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Fonte"),
         related_name="despesapaga_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     valor = models.DecimalField(
@@ -177,80 +177,80 @@ class Empenho(models.Model):
     )
 
     orgao = models.ForeignKey(
-        'loa.Orgao',
+        "loa.Orgao",
         related_name="empenho_set",
         verbose_name=_("Órgão"),
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     unidade = models.ForeignKey(
-        'loa.UnidadeOrcamentaria',
+        "loa.UnidadeOrcamentaria",
         blank=True,
         null=True,
         default=None,
         related_name="empenho_set",
         verbose_name=_("Unidade Financeira"),
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     funcao = models.ForeignKey(
-        'loa.Funcao',
+        "loa.Funcao",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Função"),
         related_name="empenho_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     subfuncao = models.ForeignKey(
-        'loa.SubFuncao',
+        "loa.SubFuncao",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Subfunção"),
         related_name="empenho_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     programa = models.ForeignKey(
-        'loa.Programa',
+        "loa.Programa",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Programa"),
         related_name="empenho_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     acao = models.ForeignKey(
-        'loa.Acao',
+        "loa.Acao",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Ação"),
         related_name="empenho_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     natureza = models.ForeignKey(
-        'loa.Natureza',
+        "loa.Natureza",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Natureza"),
         related_name="empenho_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     fonte = models.ForeignKey(
-        'loa.Fonte',
+        "loa.Fonte",
         blank=True,
         null=True,
         default=None,
         verbose_name=_("Fonte"),
         related_name="empenho_set",
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     valor_empenhado = models.DecimalField(
@@ -316,7 +316,7 @@ class Empenho(models.Model):
 class EmpenhoEmendaAjuste(models.Model):
 
     emendaloa = models.ForeignKey(
-        'loa.EmendaLoa',
+        "loa.EmendaLoa",
         verbose_name=_("Emenda Impositiva"),
         related_name="empenhoemendaajuste_set",
         on_delete=CASCADE,
@@ -326,7 +326,7 @@ class EmpenhoEmendaAjuste(models.Model):
     )
 
     ajuste = models.ForeignKey(
-        'loa.RegistroAjusteLoa',
+        "loa.RegistroAjusteLoa",
         verbose_name=_("Registro de Ajuste Técnico"),
         related_name="empenhoemendaajuste_set",
         on_delete=CASCADE,
@@ -336,7 +336,7 @@ class EmpenhoEmendaAjuste(models.Model):
     )
 
     empenho = models.ForeignKey(
-        'loa.Empenho',
+        "loa.Empenho",
         verbose_name=_("Empenho"),
         related_name="empenhoemendaajuste_set",
         on_delete=CASCADE,
@@ -366,10 +366,10 @@ class ReceitaArrecadada(models.Model):
     )
 
     receita = models.ForeignKey(
-        'loa.ReceitaOrcamentaria',
+        "loa.ReceitaOrcamentaria",
         related_name="receitaarrecadada_set",
         verbose_name=_("Receita Orçamentária"),
-        on_delete=CASCADE,
+        on_delete=PROTECT,
     )
 
     valor = models.DecimalField(
