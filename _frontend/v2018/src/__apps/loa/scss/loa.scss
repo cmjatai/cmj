@@ -209,7 +209,50 @@
       }
       .emenda-tabs {
         padding: 0 0.5rem;
-        
+      }
+      .tab-empenhos {
+        .empenhos-totais {
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid #dee2e6;
+
+          .valor-total {
+            font-size: 1.1rem;
+          }
+        }
+
+        .empenho-item {
+          transition: background-color 0.2s;
+
+          a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+
+            &:hover {
+              text-decoration: none;
+              background-color: #f8f9fa;
+            }
+          }
+
+          &:hover {
+            background-color: #f8f9fa;
+          }
+
+          .empenho-info {
+            flex: 1;
+
+            small {
+              line-height: 1.6;
+            }
+          }
+
+          .empenho-valores {
+            h3 {
+              font-size: 1.5rem;
+              line-height: 1.2;
+            }
+          }
+        }
       }
       .emenda-avatar {
         display: inline-block;

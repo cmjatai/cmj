@@ -1650,8 +1650,8 @@ class EmendaLoaCrud(MasterDetailCrud):
         def hook_emendaloahistoricofase_set(
             self, emendaloa, verbose_name="", field_display=""
         ):
-            # if not self.request.user.is_superuser:
-            #    return "", ""
+            if not self.request.user.is_superuser:
+                return "", ""
             return verbose_name, field_display, "courier"
 
         def hook_auditlog(self, emendaloa, verbose_name="", field_display=""):

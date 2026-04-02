@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
+from django.db.models import Sum
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils import formats
@@ -313,7 +314,22 @@ class Empenho(models.Model):
         return formats.number_format(self.valor_pago_bruto, force_grouping=True)
 
 
+class EmpenhoEmendaAjusteManager(models.Manager):
+    use_for_related_fields = True
+
+    def aggregate_sum_dos_empenhos(self):
+        se = self.aggregate(
+            valor_empenhado=Sum("empenho__valor_empenhado"),
+            valor_anulado=Sum("empenho__valor_anulado"),
+            valor_liquidado=Sum("empenho__valor_liquidado"),
+            valor_pago_bruto=Sum("empenho__valor_pago_bruto"),
+        )
+        return se
+
+
 class EmpenhoEmendaAjuste(models.Model):
+
+    objects = EmpenhoEmendaAjusteManager()
 
     emendaloa = models.ForeignKey(
         "loa.EmendaLoa",

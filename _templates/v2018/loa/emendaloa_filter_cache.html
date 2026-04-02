@@ -1,4 +1,4 @@
-{% load i18n sigad_filters cropping %}
+{% load i18n common_cmj_tags sigad_filters loa_filters cropping %}
 
 <div class="emenda-card card border-0 shadow-sm mb-3">
 
@@ -116,7 +116,7 @@
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-prestacao-{{emenda.id}}" role="tab">
             Prestação de Contas
-            <span class="badge badge-info">{{ emenda.prestacaocontaregistro_set.count }}</span>
+            <span class="badge ml-1 badge-secondary badge-pill">{{ emenda.prestacaocontaregistro_set.count }}</span>
           </a>
         </li>
       {% endif %}
@@ -125,7 +125,7 @@
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-empenhos-{{emenda.id}}" role="tab">
             Empenhos
-            <span class="badge badge-info">{{ emenda.empenhoemendaajuste_set.count }}</span>
+            <span class="badge ml-1 badge-secondary badge-pill">{{ emenda.empenhoemendaajuste_set.count }}</span>
           </a>
         </li>
       {% endif %}
@@ -134,7 +134,7 @@
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-ajustes-{{emenda.id}}" role="tab">
             Ajustes Técnicos
-            <span class="badge badge-info">{{ emenda.registroajusteloa_set.count }}</span>
+            <span class="badge ml-1 badge-secondary badge-pill">{{ emenda.registroajusteloa_set.count }}</span>
           </a>
         </li>
       {% endif %}
@@ -143,7 +143,7 @@
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-contabil-{{emenda.id}}" role="tab">
             Registros Contábeis
-            <span class="badge badge-info">{{ emenda.registrocontabil_set.count }}</span>
+            <span class="badge ml-1 badge-secondary badge-pill">{{ emenda.registrocontabil_set.count }}</span>
           </a>
         </li>
       {% endif %}
@@ -152,13 +152,13 @@
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-tramitacoes-{{emenda.id}}" role="tab">
             Tramitações
-            <span class="badge badge-info">{{ emenda.materia.tramitacao_set.count }}</span>
+            <span class="badge ml-1 badge-secondary badge-pill">{{ emenda.materia.tramitacao_set.count }}</span>
           </a>
         </li>
         <li class="nav-item">
           <a class="nav-link" data-toggle="tab" href="#tab-docs-{{emenda.id}}" role="tab">
             Documentos Acessórios
-            <span class="badge badge-info">{{ emenda.materia.documentoacessorio_set.count }}</span>
+            <span class="badge ml-1 badge-secondary badge-pill">{{ emenda.materia.documentoacessorio_set.count }}</span>
           </a>
         </li>
       {% endif %}
@@ -197,22 +197,70 @@
 
       {# ---- ABA EMPENHOS ---- #}
       {% if emenda.empenhoemendaajuste_set.exists %}
-        <div class="tab-pane fade" id="tab-empenhos-{{emenda.id}}" role="tabpanel">
+        <div class="tab-pane fade tab-empenhos" id="tab-empenhos-{{emenda.id}}" role="tabpanel">
+          {# Totais #}
+          {% with emenda.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sum_empenhos %}
+          <div class="row px-3 pt-2 empenhos-totais">
+            <div class="col-sm-3 text-center">
+              <small class="text-muted d-block">Total Empenhado</small>
+              <strong class="text-primary valor-total">R$ {{ sum_empenhos.valor_empenhado|decimal2str }}</strong>
+            </div>
+            <div class="col-sm-3 text-center">
+              <small class="text-muted d-block">Total Liquidado</small>
+              <strong class="text-info valor-total">R$ {{ sum_empenhos.valor_liquidado|decimal2str }}</strong>
+            </div>
+            <div class="col-sm-3 text-center">
+              <small class="text-muted d-block">Total Pago</small>
+              <strong class="text-success valor-total">R$ {{ sum_empenhos.valor_pago_bruto|decimal2str }}</strong>
+            </div>
+            <div class="col-sm-3 text-center">
+              <small class="text-muted d-block">Total Anulado</small>
+              <strong class="text-danger valor-total">R$ {{ sum_empenhos.valor_anulado|decimal2str }}</strong>
+            </div>
+          </div>
+          {% endwith %}
+
+          {# Lista de empenhos #}
           {% for emp in emenda.empenhoemendaajuste_set.all %}
-            <div class="hover {% if not forloop.last %}border-bottom{% endif %}">
-              <div class="d-flex justify-content-between align-items-start p-3">
-                <div>
-                  <a href="{% url 'cmj.loa:empenho_detail' emp.empenho.id %}" target="_blank" rel="noopener">
-                    <small class="font-weight-bold">{{emp.empenho}}</small>
-                  </a>
+            <div class="empenho-item hover {% if not forloop.last %}border-bottom{% endif %}">
+              <a href="{% url 'cmj.loa:empenho_detail' emp.empenho.id %}" target="_blank" rel="noopener" class="d-flex justify-content-between align-items-start p-3">
+                <div class="empenho-info">
+                  <small class="font-weight-bold">
+                    <i class="fas fa-file-invoice-dollar mr-1 text-primary"></i>
+                    Empenho {{ emp.empenho.codigo }}
+                  </small>
                   <br>
-                  <small class="text-muted">{{emp.empenho.unidade}}</small>
-                  {% if emp.empenho.entidade %}
-                    <br><small class="text-muted"><strong>Entidade:</strong> {{emp.empenho.entidade.nome_fantasia}}</small>
+                  <small class="text-muted">
+                    <strong>Fornecedor:</strong> {{ emp.empenho.nome }}
+                    {% if emp.empenho.cpfcnpj %} ({{ emp.empenho.cpfcnpj }}){% endif %}
+                  </small>
+                  <br>
+                  <small class="text-muted">
+                    <strong>Data:</strong> {{ emp.empenho.data|date:"d/m/Y" }}
+                    {% if emp.empenho.modalidade %}
+                      <span class="ml-2">
+                        <strong>Modalidade:</strong> {{ emp.empenho.modalidade }}
+                      </span>
+                    {% endif %}
+                  </small>
+                  {% if emp.empenho.historico %}
+                    <br>
+                    <small class="text-muted">
+                      <strong>Histórico:</strong> {{ emp.empenho.historico }}
+                    </small>
                   {% endif %}
                 </div>
-                <span class="badge badge-light font-weight-bold ml-2">R$ {{emp.empenho.str_valor_empenhado}}</span>
-              </div>
+                <div class="text-right ml-2 text-nowrap empenho-valores">
+                  <h3 class="font-weight-bold text-success mb-0">
+                    R$ {{ emp.empenho.str_valor_empenhado }}
+                  </h3>
+                  {% if emp.empenho.valor_pago_bruto and emp.empenho.valor_pago_bruto != '0.00' %}
+                    <small class="text-muted">
+                      Pago: R$ {{ emp.empenho.str_valor_pago_bruto }}
+                    </small>
+                  {% endif %}
+                </div>
+              </a>
             </div>
           {% endfor %}
         </div>

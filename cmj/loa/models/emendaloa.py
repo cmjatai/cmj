@@ -20,12 +20,15 @@ from cmj.loa.models.entidade import TipoEntidade
 from cmj.loa.models.financeiro_orcamento import UnidadeOrcamentaria
 from cmj.loa.models.loa import Loa
 from cmj.loa.models.registrocontabil import EmendaLoaRegistroContabil
+from cmj.loa.services.emendaloa import EmendaLoaService
 from cmj.utils import get_settings_auth_user_model, quantize, valor_por_extenso
 from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Parlamentar
 
 
 class EmendaLoa(CmjSearchMixin):
+
+    service = EmendaLoaService()
 
     SAUDE = 10
     DIVERSOS = 99
