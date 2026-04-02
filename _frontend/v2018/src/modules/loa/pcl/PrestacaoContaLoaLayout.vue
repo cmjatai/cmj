@@ -15,8 +15,10 @@
         :page-size="pageSize"
         :current-page="currentPage"
         :fetching="fetching"
+        :view-mode="viewMode"
         @update:page-size="onPageSizeChange"
         @update:current-page="onPageChange"
+        @update:view-mode="val => viewMode = val"
         @reset="resetFilters"
         @loas-change="on_loas_change"
       />
@@ -28,7 +30,7 @@
         class="mt-3"
       />
 
-      <div class="pcldetalhe-list" v-if="emendas_ajustes_list.length || fetching">
+      <div class="pcldetalhe-list" v-if="viewMode === 'list' && (emendas_ajustes_list.length || fetching)">
         <template v-for="item in paginatedList">
           <pcl-detalhe-emenda
             v-if="item.__label__ === 'loa_emendaloa'"
@@ -50,7 +52,12 @@
           />
         </template>
       </div>
-      <div v-else-if="ready" class="card text-muted text-center my-3 p-3 mx-5 font-weight-bold">
+      <pcl-dashboard
+        v-else-if="filters_value.dash_activated && viewMode === 'dashboard' && emendas_ajustes_list.length"
+        :lista="emendas_ajustes_list"
+        :parlamentar-selecionado="filters_value.parlamentares"
+      />
+      <div v-else-if="ready && viewMode === 'list'" class="card text-muted text-center my-3 p-3 mx-5 font-weight-bold">
         Nenhum resultado encontrado para os filtros selecionados.
       </div>
     </div>
@@ -62,6 +69,7 @@ import PclFiltros from './PclFiltros.vue'
 import PclDetalheEmenda from './PclDetalheEmenda.vue'
 import PclDetalheAjuste from './PclDetalheAjuste.vue'
 import PclTotalizacao from './PclTotalizacao.vue'
+import PclDashboard from './PclDashboard.vue'
 
 export default {
   name: 'prestacaocontaloa-layout',
@@ -69,7 +77,8 @@ export default {
     PclFiltros,
     PclDetalheEmenda,
     PclDetalheAjuste,
-    PclTotalizacao
+    PclTotalizacao,
+    PclDashboard
   },
   data () {
     return {
@@ -78,7 +87,9 @@ export default {
       selected_loa_ids: [],
       loas_data: {},
       ready: false,
+      viewMode: 'list',
       filters_value: {
+        dash_activated: false,
         unidade: null,
         entidade: null,
         parlamentares: null,

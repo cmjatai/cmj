@@ -47,7 +47,7 @@ const SITUACAO_VARIANTS = {
 
 const SITUACAO_LABELS = {
   EM_EXECUCAO: 'Em Execução',
-  FINALIZADO: 'Finalizado',
+  FINALIZADO: 'Finalizada',
   SEM_PRESTACAO_CONTAS: 'Sem Prestação de Contas'
 }
 

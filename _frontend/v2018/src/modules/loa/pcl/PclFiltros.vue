@@ -116,55 +116,71 @@
         </button>
       </div>
     </div>
-    <div v-if="totalItems > 0" class="pcl-pagination d-flex align-items-center justify-content-between mt-2 pt-2 border-top">
-      <div class="d-flex align-items-center">
-        <div class="d-flex align-items-center mr-3 px-1">
-          <small class="text-muted text-uppercase font-weight-bold mr-2" style="font-size:.7rem;letter-spacing:.03em;">Exibir</small>
-          <b-form-select
-          :value="pageSize"
-          :options="pageSizeOptions"
-          @change="val => $emit('update:page-size', Number(val))"
-          size="sm"
-          class="pcl-page-size-select"
-          ></b-form-select>
-        </div>
-        <small class="text-muted mr-auto" style="font-size:.8rem;">{{ paginationLabel }}
-          <b-spinner v-if="fetching" small variant="secondary" class="ml-2" style="vertical-align:middle;"></b-spinner>
-        </small>
+    <div class="pcl-filtros-rodape d-flex align-items-center mt-2 pt-2 border-top">
+      <div class="pcl-view-toggle d-flex mr-3" v-if="value.dash_activated">
+        <button
+          class="pcl-page-btn"
+          :class="{ active: viewMode === 'list' }"
+          title="Listagem em tabela"
+          @click="$emit('update:view-mode', 'list')"
+        ><i class="fas fa-list"></i></button>
+        <button
+          class="pcl-page-btn"
+          :class="{ active: viewMode === 'dashboard' }"
+          title="Dashboard"
+          @click="$emit('update:view-mode', 'dashboard')"
+        ><i class="fas fa-tachometer-alt"></i></button>
       </div>
-      <nav class="d-flex align-items-center">
-        <button
-          class="pcl-page-btn"
-          :disabled="currentPage <= 1"
-          @click="$emit('update:current-page', 1)"
-          title="Primeira página"
-        ><i class="fas fa-angle-double-left"></i></button>
-        <button
-          class="pcl-page-btn"
-          :disabled="currentPage <= 1"
-          @click="$emit('update:current-page', currentPage - 1)"
-          title="Página anterior"
-        ><i class="fas fa-chevron-left"></i></button>
-        <button
-          v-for="p in visiblePages"
-          :key="p"
-          class="pcl-page-btn"
-          :class="{ active: p === currentPage }"
-          @click="$emit('update:current-page', p)"
-        >{{ p }}</button>
-        <button
-          class="pcl-page-btn"
-          :disabled="currentPage >= totalPages"
-          @click="$emit('update:current-page', currentPage + 1)"
-          title="Próxima página"
-        ><i class="fas fa-chevron-right"></i></button>
-        <button
-          class="pcl-page-btn"
-          :disabled="currentPage >= totalPages"
-          @click="$emit('update:current-page', totalPages)"
-          title="Última página"
-        ><i class="fas fa-angle-double-right"></i></button>
-      </nav>
+      <div v-if="totalItems > 0 && viewMode === 'list'" class="pcl-pagination w-100 d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+          <div class="d-flex align-items-center mr-3 px-1">
+            <small class="text-muted text-uppercase font-weight-bold mr-2" style="font-size:.7rem;letter-spacing:.03em;">Exibir</small>
+            <b-form-select
+            :value="pageSize"
+            :options="pageSizeOptions"
+            @change="val => $emit('update:page-size', Number(val))"
+            size="sm"
+            class="pcl-page-size-select"
+            ></b-form-select>
+          </div>
+          <small class="text-muted mr-auto" style="font-size:.8rem;">{{ paginationLabel }}
+            <b-spinner v-if="fetching" small variant="secondary" class="ml-2" style="vertical-align:middle;"></b-spinner>
+          </small>
+        </div>
+        <nav class="d-flex align-items-center">
+          <button
+            class="pcl-page-btn"
+            :disabled="currentPage <= 1"
+            @click="$emit('update:current-page', 1)"
+            title="Primeira página"
+          ><i class="fas fa-angle-double-left"></i></button>
+          <button
+            class="pcl-page-btn"
+            :disabled="currentPage <= 1"
+            @click="$emit('update:current-page', currentPage - 1)"
+            title="Página anterior"
+          ><i class="fas fa-chevron-left"></i></button>
+          <button
+            v-for="p in visiblePages"
+            :key="p"
+            class="pcl-page-btn"
+            :class="{ active: p === currentPage }"
+            @click="$emit('update:current-page', p)"
+          >{{ p }}</button>
+          <button
+            class="pcl-page-btn"
+            :disabled="currentPage >= totalPages"
+            @click="$emit('update:current-page', currentPage + 1)"
+            title="Próxima página"
+          ><i class="fas fa-chevron-right"></i></button>
+          <button
+            class="pcl-page-btn"
+            :disabled="currentPage >= totalPages"
+            @click="$emit('update:current-page', totalPages)"
+            title="Última página"
+          ><i class="fas fa-angle-double-right"></i></button>
+        </nav>
+      </div>
     </div>
   </div>
 </template>
@@ -225,6 +241,10 @@ export default {
     fetching: {
       type: Boolean,
       default: false
+    },
+    viewMode: {
+      type: String,
+      default: 'list'
     }
   },
   computed: {
@@ -374,6 +394,13 @@ export default {
   line-height: 1.6;
 }
 
+/* View toggle */
+.pcl-view-toggle {
+  gap: 2px;
+  .pcl-page-btn {
+    font-size: 0.85rem;
+  }
+}
 /* Pagination */
 .pcl-pagination {
   gap: 0.25rem;
