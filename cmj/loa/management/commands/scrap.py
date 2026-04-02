@@ -342,12 +342,14 @@ class Command(BaseCommand):
                 scrap.update_data_models()
             return False
 
-        content_download = get_content(url)
-        scrap.content = content_download
-        scrap.metadata["url_dict"] = url_dict
-        scrap.metadata["item_list"] = item_list
-        scrap.save(update_fields=("metadata", "content"))
-        scrap.update_data_models()
+        if self.force or (item_list and scrap.metadata.get("item_list", []) != item_list):
+            content_download = get_content(url)
+            if content_download:
+                scrap.content = content_download
+            scrap.metadata["url_dict"] = url_dict
+            scrap.metadata["item_list"] = item_list
+            scrap.save(update_fields=("metadata", "content"))
+            scrap.update_data_models()
         if childs and deep:
             self.scrap_run_childs(scrap, childs, params, deep)
         return False
