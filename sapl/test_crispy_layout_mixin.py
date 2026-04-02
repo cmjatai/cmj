@@ -10,11 +10,11 @@ def test_read_layout_from_yaml(tmpdir):
     stub_content = '''
 ModelName:
   Cool Legend:
-  - name:9  place  tiny
-  - field  nature:2
-  - kind:1  date  unit:5 status
+  - name:9 place tiny
+  - field nature:2
+  - kind:1 date unit:5 status
   More data:
-  - equalA  equalB  equalC
+  - equalA equalB equalC
   - highlander '''
 
     with mock.patch('sapl.crispy_layout_mixin.read_yaml_from_file') as ryff:

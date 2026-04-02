@@ -1,59 +1,18 @@
 import logging
 from decimal import Decimal
 
-from django.apps.registry import apps
-from django.core.exceptions import ValidationError as DjangoValidationError
-from django.core.validators import RegexValidator
-from django.db import IntegrityError
-from django.db.models import F, Q
+from django.db.models import Q
 from django.db.models.aggregates import Sum
 from django.utils import formats
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
-from rest_framework.exceptions import ValidationError as DRFValidationError
-from rest_framework.fields import CharField, SerializerMethodField
-from rest_framework.response import Response
+from rest_framework.fields import SerializerMethodField
 
-from cmj.api.forms import EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
 from cmj.api.serializers import CmjSerializerMixin
-from cmj.api.views_loa.emendaloa import EmendaLoaViewSet
-from cmj.api.views_loa.loa import LoaViewSet
 from cmj.loa.models import (
-    Acao,
-    Agrupamento,
-    AgrupamentoEmendaLoa,
-    AgrupamentoRegistroContabil,
-    ArquivoPrestacaoContaLoa,
-    ArquivoPrestacaoContaRegistro,
-    Despesa,
     DespesaConsulta,
-    EmendaLoa,
-    EmendaLoaParlamentar,
     EmendaLoaRegistroContabil,
-    Fonte,
-    Funcao,
-    Loa,
-    Natureza,
-    OficioAjusteLoa,
-    Orgao,
-    PrestacaoContaRegistro,
-    Programa,
-    RegistroAjusteLoa,
-    SubFuncao,
-    UnidadeOrcamentaria,
-    quantize,
 )
-from cmj.utils import TimeExecution, decimal2str, run_sql
-from cmj.utils_report import make_pdf
-from drfautoapi.drfautoapi import (
-    ApiViewSetConstrutor,
-    customize,
-    wrapper_queryset_response_for_drf_action,
-)
-from sapl.api.mixins import ResponseFileMixin
-from sapl.api.permissions import SaplModelPermissions
-from sapl.parlamentares.models import Parlamentar
 
 logger = logging.getLogger(__name__)
 

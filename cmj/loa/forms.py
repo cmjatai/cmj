@@ -1,7 +1,6 @@
 import logging
 import re
-from decimal import ROUND_DOWN, ROUND_HALF_DOWN, Decimal
-from hmac import new
+from decimal import ROUND_DOWN, Decimal
 
 import yaml
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
@@ -12,7 +11,7 @@ from django.contrib.postgres.forms.array import SplitArrayField, SplitArrayWidge
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db.models import Q
 from django.forms.models import ModelForm
-from django.forms.widgets import HiddenInput, NumberInput, TextInput
+from django.forms.widgets import HiddenInput, TextInput
 from django.template.base import Template
 from django.template.context import Context
 from django.utils.safestring import mark_safe
@@ -25,18 +24,14 @@ from django_filters.filters import (
     MultipleChoiceFilter,
 )
 from django_filters.filterset import FilterSet
-from numpy import full
 
-from cmj import loa
 from cmj.loa.models import (
     Agrupamento,
     ArquivoPrestacaoContaLoa,
     ArquivoPrestacaoContaRegistro,
     Despesa,
-    DespesaConsulta,
     EmendaLoa,
     EmendaLoaParlamentar,
-    EmendaLoaRegistroContabil,
     Entidade,
     Loa,
     OficioAjusteLoa,
@@ -45,9 +40,8 @@ from cmj.loa.models import (
     RegistroAjusteLoa,
     RegistroAjusteLoaParlamentar,
     UnidadeOrcamentaria,
-    quantize,
 )
-from cmj.utils import DecimalField, normalize
+from cmj.utils import DecimalField, quantize
 from sapl.crispy_layout_mixin import (
     SaplFormHelper,
     SaplFormLayout,
@@ -56,7 +50,7 @@ from sapl.crispy_layout_mixin import (
 )
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
-from sapl.utils import FileFieldCheckMixin, parlamentares_ativos
+from sapl.utils import FileFieldCheckMixin
 
 logger = logging.getLogger(__name__)
 
