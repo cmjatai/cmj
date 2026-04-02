@@ -12,8 +12,8 @@ from django.db.models.fields.json import JSONField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.models.financeiro_execucao import DespesaPaga, Empenho, ReceitaArrecadada
-from cmj.loa.models.financeiro_orcamento import (
+from cmj.loa.models.m_financeiro_execucao import DespesaPaga, Empenho, ReceitaArrecadada
+from cmj.loa.models.m_financeiro_orcamento import (
     Acao,
     Fonte,
     Funcao,
@@ -24,7 +24,7 @@ from cmj.loa.models.financeiro_orcamento import (
     SubFuncao,
     UnidadeOrcamentaria,
 )
-from cmj.loa.models.loa import Loa
+from cmj.loa.models.m_loa import Loa
 from cmj.utils import quantize
 
 

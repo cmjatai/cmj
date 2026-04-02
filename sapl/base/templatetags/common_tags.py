@@ -1,31 +1,33 @@
 import re
 
 import markdown as md
-from markdown.extensions.toc import slugify_unicode
-from markdown.extensions.toc import TocExtension as makeTocExtension
-
 from django import template
 from django.template.defaultfilters import stringfilter
 from django.utils import timezone
 from django.utils.safestring import mark_safe
-from webpack_loader import utils
+from markdown.extensions.toc import TocExtension as makeTocExtension
+from markdown.extensions.toc import slugify_unicode
 
 from sapl.base.models import AppConfig
 from sapl.materia.models import Proposicao
 from sapl.parlamentares.models import Filiacao
-from sapl.utils import filiacao_data, SEPARADOR_HASH_PROPOSICAO
-
+from sapl.utils import SEPARADOR_HASH_PROPOSICAO, filiacao_data
 
 register = template.Library()
 
 
 def get_class(class_string):
-    if not hasattr(class_string, '__bases__'):
+    if not hasattr(class_string, "__bases__"):
         class_string = str(class_string)
-        dot = class_string.rindex('.')
-        mod_name, class_name = class_string[:dot], class_string[dot + 1:]
+        dot = class_string.rindex(".")
+        mod_name, class_name = class_string[:dot], class_string[dot + 1 :]
         if class_name:
-            return getattr(__import__(mod_name, {}, {}, [str('')]), class_name)
+            return getattr(__import__(mod_name, {}, {}, [str("")]), class_name)
+
+
+@register.filter(name="is_digit")
+def is_digit(value):
+    return str(value).isdigit()
 
 
 @register.simple_tag
@@ -61,7 +63,7 @@ def meta_model_value(instance, attr):
     try:
         return getattr(instance._meta, attr)
     except:
-        return ''
+        return ""
 
 
 @register.filter
@@ -73,29 +75,36 @@ def model_name(instance):
 def split(value, arg):
     return value.split(arg)
 
+
 @register.filter
 def to_str(arg):
     return str(arg)
+
 
 @register.filter
 def to_int(arg):
     return int(arg)
 
+
 @register.filter
 def calc_int_subtr(a, b):
     return int(a) - int(b)
+
 
 @register.filter
 def to_dict(arg):
     return arg.__dict__
 
+
 @register.filter
 def to_descr(arg):
     return arg.__descr__
 
+
 @register.filter
 def is_list(arg):
     return isinstance(arg, list)
+
 
 @register.filter
 def get_last_item_from_list(list, arg):
@@ -107,15 +116,16 @@ def sort_by_keys(value, key):
     transformed = []
     id_props = [x.id for x in value]
     qs = Proposicao.objects.filter(pk__in=id_props)
-    key_descricao = {'1': 'data_envio',
-                     '-1': '-data_envio',
-                     '2': 'tipo',
-                     '-2': '-tipo',
-                     '3': 'descricao',
-                     '-3': '-descricao',
-                     '4': 'autor',
-                     '-4': '-autor'
-                     }
+    key_descricao = {
+        "1": "data_envio",
+        "-1": "-data_envio",
+        "2": "tipo",
+        "-2": "-tipo",
+        "3": "descricao",
+        "-3": "-descricao",
+        "4": "autor",
+        "-4": "-autor",
+    }
 
     transformed = qs.order_by(key_descricao[key])
     return transformed
@@ -145,7 +155,7 @@ def isinst(value, class_str):
 @register.filter
 @stringfilter
 def strip_hash(value):
-    vet = value.split('/')
+    vet = value.split("/")
     if len(vet) == 2:
         return vet[0][1:]
     else:
@@ -162,7 +172,7 @@ def get_add_perm(value, arg):
     except AttributeError:
         return None
     nome_model = view.__class__.model.__name__.lower()
-    can_add = '.add_' + nome_model
+    can_add = ".add_" + nome_model
 
     return perm.__contains__(nome_app + can_add)
 
@@ -177,7 +187,7 @@ def get_change_perm(value, arg):
     except AttributeError:
         return None
     nome_model = view.__class__.model.__name__.lower()
-    can_change = '.change_' + nome_model
+    can_change = ".change_" + nome_model
 
     return perm.__contains__(nome_app + can_change)
 
@@ -192,7 +202,7 @@ def get_delete_perm(value, arg):
     except AttributeError:
         return None
     nome_model = view.__class__.model.__name__.lower()
-    can_delete = '.delete_' + nome_model
+    can_delete = ".delete_" + nome_model
 
     return perm.__contains__(nome_app + can_delete)
 
@@ -201,7 +211,7 @@ def get_delete_perm(value, arg):
 def has_perm_change_instance(instance, perms):
 
     nome_app = instance._meta.app_label
-    can_change = '.change_' + instance._meta.model_name
+    can_change = ".change_" + instance._meta.model_name
 
     return perms.__contains__(nome_app + can_change)
 
@@ -210,8 +220,9 @@ def has_perm_change_instance(instance, perms):
 def ultima_filiacao(value):
     parlamentar = value
 
-    ultima_filiacao = Filiacao.objects.filter(
-        parlamentar=parlamentar).order_by('-data').first()
+    ultima_filiacao = (
+        Filiacao.objects.filter(parlamentar=parlamentar).order_by("-data").first()
+    )
 
     if ultima_filiacao:
         return ultima_filiacao.partido
@@ -227,28 +238,28 @@ def get_config_attr(attribute):
 @register.filter
 def str2intabs(value):
     if not isinstance(value, str):
-        return ''
+        return ""
     try:
         v = int(value)
         v = abs(v)
         return v
     except:
-        return ''
+        return ""
 
 
 @register.filter
 def has_iframe(request):
 
-    iframe = request.session.get('iframe', False)
-    if not iframe and 'iframe' in request.GET:
-        ival = request.GET['iframe']
+    iframe = request.session.get("iframe", False)
+    if not iframe and "iframe" in request.GET:
+        ival = request.GET["iframe"]
         if ival and int(ival) == 1:
-            request.session['iframe'] = True
+            request.session["iframe"] = True
             return True
-    elif 'iframe' in request.GET:
-        ival = request.GET['iframe']
+    elif "iframe" in request.GET:
+        ival = request.GET["iframe"]
         if ival and int(ival) == 0:
-            del request.session['iframe']
+            del request.session["iframe"]
             return False
 
     return iframe
@@ -256,7 +267,7 @@ def has_iframe(request):
 
 @register.filter
 def url(value):
-    if value.startswith('http://') or value.startswith('https://'):
+    if value.startswith("http://") or value.startswith("https://"):
         return True
     return False
 
@@ -295,34 +306,38 @@ def youtube_url(value):
 @register.filter
 def facebook_url(value):
     value = value.lower()
-    facebook_pattern = r"^((https?://)?((www|pt-br)\.)?facebook\.com(\/.+)?\/videos(\/.*)?)"
+    facebook_pattern = (
+        r"^((https?://)?((www|pt-br)\.)?facebook\.com(\/.+)?\/videos(\/.*)?)"
+    )
     r = re.findall(facebook_pattern, value)
     return True if r else False
 
 
 @register.filter
 def youtube_id(value):
-    from urllib.parse import urlparse, parse_qs
+    from urllib.parse import parse_qs, urlparse
+
     u_pars = urlparse(value)
-    quer_v = parse_qs(u_pars.query).get('v')
-    quer_t = parse_qs(u_pars.query).get('t') or ('0', )
+    quer_v = parse_qs(u_pars.query).get("v")
+    quer_t = parse_qs(u_pars.query).get("t") or ("0",)
     if quer_v:
-        return '{}?start={}'.format(quer_v[0], quer_t[0])
-    return '{}?start={}'.format(u_pars.path[1:], quer_t[0])
+        return "{}?start={}".format(quer_v[0], quer_t[0])
+    return "{}?start={}".format(u_pars.path[1:], quer_t[0])
 
 
 @register.filter
 def file_extension(value):
     import pathlib
-    return pathlib.Path(value).suffix.replace('.', '')
+
+    return pathlib.Path(value).suffix.replace(".", "")
 
 
 @register.filter
 def cronometro_to_seconds(value):
-    if not AppConfig.attr('cronometro_' + value):
+    if not AppConfig.attr("cronometro_" + value):
         return 0
 
-    return AppConfig.attr('cronometro_' + value).seconds
+    return AppConfig.attr("cronometro_" + value).seconds
 
 
 @register.filter
@@ -345,14 +360,12 @@ def to_list_pk(object_list):
 
 @register.filter
 def urldetail_content_type(obj, value):
-    return '%s:%s_detail' % (
-        value._meta.app_config.name, obj.content_type.model)
+    return "%s:%s_detail" % (value._meta.app_config.name, obj.content_type.model)
 
 
 @register.filter
 def urldetail(obj):
-    return '%s:%s_detail' % (
-        obj._meta.app_config.name, obj._meta.model_name)
+    return "%s:%s_detail" % (obj._meta.app_config.name, obj._meta.model_name)
 
 
 @register.filter
@@ -360,7 +373,7 @@ def filiacao_data_filter(parlamentar, data_inicio):
     try:
         filiacao = filiacao_data(parlamentar, data_inicio)
     except Exception:
-        filiacao = ''
+        filiacao = ""
     return filiacao
 
 
@@ -369,7 +382,7 @@ def filiacao_intervalo_filter(parlamentar, date_range):
     try:
         filiacao = filiacao_data(parlamentar, date_range[0], date_range[1])
     except Exception:
-        filiacao = ''
+        filiacao = ""
     return filiacao
 
 
@@ -393,33 +406,45 @@ def dont_break_out(value):
 
 @register.filter
 def obfuscate_value(value, key):
-    if key in ["hash", "google_recaptcha_secret_key", "password", "google_recaptcha_site_key", "hash_code"]:
+    if key in [
+        "hash",
+        "google_recaptcha_secret_key",
+        "password",
+        "google_recaptcha_site_key",
+        "hash_code",
+    ]:
         return "***************"
     return value
 
 
-md_regex = re.compile(r'(.*)\[\[\[\[(.*)\]\]\]\](.*)', re.DOTALL)
+md_regex = re.compile(r"(.*)\[\[\[\[(.*)\]\]\]\](.*)", re.DOTALL)
+
 
 @register.filter
 def markdown(value):
     match = md_regex.match(value)
 
     if not match:
-        return md.markdown(value, extensions=[
-            'tables',
-            makeTocExtension(slugify=slugify_unicode), #TOC
-        ])
+        return md.markdown(
+            value,
+            extensions=[
+                "tables",
+                makeTocExtension(slugify=slugify_unicode),  # TOC
+            ],
+        )
 
     groups = match.groups()
     value = groups[1]
 
-    mv = md.markdown(value, extensions=[
-        'tables',
-        makeTocExtension(slugify=slugify_unicode), #TOC
-    ])
+    mv = md.markdown(
+        value,
+        extensions=[
+            "tables",
+            makeTocExtension(slugify=slugify_unicode),  # TOC
+        ],
+    )
 
-    return '{}{}{}'.format(groups[0], mv, groups[2])
-
+    return "{}{}{}".format(groups[0], mv, groups[2])
 
 
 @register.filter
@@ -429,4 +454,4 @@ def order_by(queryset, fields):
     """
     if not fields:
         return queryset
-    return queryset.order_by(*list(map(lambda x: x.strip(), fields.split(','))))
+    return queryset.order_by(*list(map(lambda x: x.strip(), fields.split(","))))

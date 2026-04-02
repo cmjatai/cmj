@@ -5,8 +5,7 @@ from decimal import Decimal
 import django.db.models.deletion
 from django.db import migrations, models
 
-import cmj.loa.models
-import cmj.loa.models.ajusteloa
+import cmj.loa.models.m_ajusteloa
 import sapl.utils
 
 
@@ -38,7 +37,7 @@ class Migration(migrations.Migration):
                         max_length=512,
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
-                        upload_to=cmj.loa.models.ajusteloa.ajuste_upload_path,
+                        upload_to=cmj.loa.models.m_ajusteloa.ajuste_upload_path,
                         verbose_name="Ofício",
                     ),
                 ),

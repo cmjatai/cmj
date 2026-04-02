@@ -161,7 +161,7 @@ EntidadeDetail:
 
 EmpenhoDetail:
   {% trans 'Identificação' %}:
-  - codigo:2 data:2 processo:2 modalidade numero_licitacao:2
+  - codigo:2 data:2 processo:2 modalidade:col numero_licitacao:col
   - orgao unidade
   - dotacao:3 cpfcnpj:3 nome
   - valor_empenhado:3 valor_anulado:3 valor_liquidado:3 valor_pago_bruto:3

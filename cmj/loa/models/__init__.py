@@ -1,28 +1,28 @@
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.models.agrupamento import (
+from cmj.loa.models.m_agrupamento import (
     Agrupamento,
     AgrupamentoEmendaLoa,
     AgrupamentoRegistroContabil,
 )
-from cmj.loa.models.ajusteloa import (
+from cmj.loa.models.m_ajusteloa import (
     OficioAjusteLoa,
     RegistroAjusteLoa,
     RegistroAjusteLoaParlamentar,
 )
-from cmj.loa.models.emendaloa import (
+from cmj.loa.models.m_emendaloa import (
     EmendaLoa,
     EmendaLoaHistoricoFase,
     EmendaLoaParlamentar,
 )
-from cmj.loa.models.entidade import Entidade, NaturezaJuridica, TipoEntidade
-from cmj.loa.models.financeiro_execucao import (
+from cmj.loa.models.m_entidade import Entidade, NaturezaJuridica, TipoEntidade
+from cmj.loa.models.m_financeiro_execucao import (
     DespesaPaga,
     Empenho,
     EmpenhoEmendaAjuste,
     ReceitaArrecadada,
 )
-from cmj.loa.models.financeiro_orcamento import (
+from cmj.loa.models.m_financeiro_orcamento import (
     Acao,
     Despesa,
     DespesaConsulta,
@@ -34,15 +34,15 @@ from cmj.loa.models.financeiro_orcamento import (
     SubFuncao,
     UnidadeOrcamentaria,
 )
-from cmj.loa.models.loa import Loa, LoaParlamentar
-from cmj.loa.models.prestacaoconta import (
+from cmj.loa.models.m_loa import Loa, LoaParlamentar
+from cmj.loa.models.m_prestacaoconta import (
     ArquivoPrestacaoContaLoa,
     ArquivoPrestacaoContaRegistro,
     PrestacaoContaLoa,
     PrestacaoContaRegistro,
 )
-from cmj.loa.models.registrocontabil import EmendaLoaRegistroContabil
-from cmj.loa.models.scrap import ScrapRecord
+from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
+from cmj.loa.models.m_scrap import ScrapRecord
 
 __all__ = [
     "Agrupamento",

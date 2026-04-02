@@ -295,7 +295,7 @@ class Empenho(models.Model):
         ordering = ["id"]
 
     def __str__(self):
-        return f"{self.codigo} - {self.nome} - R$ {self.valor_empenhado}"
+        return f"{self.codigo} - {self.nome} - R$ {self.str_valor_empenhado}"
 
     @property
     def str_valor_empenhado(self):

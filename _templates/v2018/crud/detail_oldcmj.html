@@ -34,7 +34,7 @@
       {% for row in fieldset.rows %}
         <div class="row">
           {% for column in row %}
-            <div class="col-sm-{{ column.span }}">
+            <div class="col-sm{% if column.span|divisibleby:1 %}-{{ column.span }}{% else %} {{ column.span }}{% endif %}">
               <div id="div_id_{{ column.id }}" class="form-group">
                 <p class="control-label">{{ column.verbose_name }}</p>
                 <div class="controls">

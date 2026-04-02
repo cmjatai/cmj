@@ -6,7 +6,7 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.models.registrocontabil import EmendaLoaRegistroContabil
+from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
 from cmj.utils import PERCENTAGE_VALIDATOR, quantize
 
 

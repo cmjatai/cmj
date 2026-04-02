@@ -25,12 +25,19 @@ class EmpenhoCrud(MasterDetailCrud):
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = "EmpenhoDetail"
 
+        def hook_numero_licitacao(self, empenho, verbose_name="", display_field=""):
+            if not empenho.numero_licitacao:
+                return "", ""
+            return verbose_name, display_field
+
         def hook_empenhoemendaajuste_set(
             self, empenho, verbose_name="", display_field=""
         ):
             emendas_ajustes = []
 
-            for ea in empenho.empenhoemendaajuste_set.all():
+            for ea in empenho.empenhoemendaajuste_set.order_by(
+                "emendaloa__materia__numero", "ajuste__oficio_ajuste_loa__loa__ano"
+            ):
                 if ea.emendaloa:
                     emendas_ajustes.append(
                         f"""

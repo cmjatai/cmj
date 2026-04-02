@@ -15,11 +15,11 @@ from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import CmjSearchMixin
-from cmj.loa.models.ajusteloa import RegistroAjusteLoa, RegistroAjusteLoaParlamentar
-from cmj.loa.models.entidade import TipoEntidade
-from cmj.loa.models.financeiro_orcamento import UnidadeOrcamentaria
-from cmj.loa.models.loa import Loa
-from cmj.loa.models.registrocontabil import EmendaLoaRegistroContabil
+from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa, RegistroAjusteLoaParlamentar
+from cmj.loa.models.m_entidade import TipoEntidade
+from cmj.loa.models.m_financeiro_orcamento import UnidadeOrcamentaria
+from cmj.loa.models.m_loa import Loa
+from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
 from cmj.loa.services.emendaloa import EmendaLoaService
 from cmj.utils import get_settings_auth_user_model, quantize, valor_por_extenso
 from sapl.materia.models import Proposicao, TipoProposicao

@@ -2,7 +2,7 @@
 
 from django.db import migrations
 
-import cmj.loa.models.prestacaoconta
+import cmj.loa.models.m_prestacaoconta
 import sapl.utils
 
 
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 max_length=512,
                 null=True,
-                upload_to=cmj.loa.models.prestacaoconta.prestacaocontaregistro_upload_path,
+                upload_to=cmj.loa.models.m_prestacaoconta.prestacaocontaregistro_upload_path,
                 verbose_name="Arquivo Anexo",
             ),
         ),

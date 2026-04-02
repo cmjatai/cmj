@@ -3,8 +3,7 @@
 import django.db.models.deletion
 from django.db import migrations, models
 
-import cmj.loa.models
-import cmj.loa.models.prestacaoconta
+import cmj.loa.models.m_prestacaoconta
 import sapl.utils
 
 
@@ -33,7 +32,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=512,
                         null=True,
-                        upload_to=cmj.loa.models.prestacaoconta.prestacaoconta_upload_path,
+                        upload_to=cmj.loa.models.m_prestacaoconta.prestacaoconta_upload_path,
                         verbose_name="Arquivo Anexo",
                     ),
                 ),

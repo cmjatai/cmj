@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="grupos-row d-flex flex-wrap justify-content-center">
+    <div class="grupos-row d-none flex-wrap justify-content-center">
       <div
         v-for="g in grupos"
         :key="g.key"

@@ -1,7 +1,8 @@
-
-from math import ceil
 import re
+from math import ceil
+
 import markdown as md
+import yaml
 from crispy_forms.bootstrap import FormActions
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Fieldset, Layout, Submit
@@ -11,25 +12,26 @@ from django.urls.base import reverse
 from django.utils import formats
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
-import yaml
 
-re_start_tag = re.compile('<[^>]*>')
+re_start_tag = re.compile("<[^>]*>")
 
-markdown_regex = re.compile(r'(.*)\[\[\[\[(.*)\]\]\]\](.*)', re.DOTALL)
+markdown_regex = re.compile(r"(.*)\[\[\[\[(.*)\]\]\]\](.*)", re.DOTALL)
+
 
 def to_column(name_span):
     fieldname, span = name_span
 
     if not isinstance(fieldname, list):
-        fieldname = [fieldname,
-                     ]
+        fieldname = [
+            fieldname,
+        ]
     if isinstance(span, int):
-        return Div(*fieldname, css_class='col-md-%s' % span)
+        return Div(*fieldname, css_class="col-md-%s" % span)
     else:
         return Div(*fieldname, css_class=span)
 
 
-def to_row(names_spans, css_class='row'):
+def to_row(names_spans, css_class="row"):
     return Div(*map(to_column, names_spans), css_class=css_class)
 
 
@@ -43,21 +45,29 @@ def to_fieldsets(fields):
             yield field
 
 
-def form_actions(more=[Div(css_class='clearfix')],
-                 label=_('Salvar'), name='salvar',
-                 css_class='float-right', disabled=True):
+def form_actions(
+    more=[Div(css_class="clearfix")],
+    label=_("Salvar"),
+    name="salvar",
+    css_class="float-right",
+    disabled=True,
+):
 
-    if disabled and not 'pesquisa' in force_str(label).lower():
-        doubleclick = 'this.form.submit();this.disabled=true;'
+    if disabled and not "pesquisa" in force_str(label).lower():
+        doubleclick = "this.form.submit();this.disabled=true;"
     else:
-        doubleclick = 'return true;' if not disabled is None else ''
+        doubleclick = "return true;" if not disabled is None else ""
 
     return FormActions(
         *more,
-        Submit(name, label, css_class=css_class,
-               # para impedir resubmissão do form
-               onclick=doubleclick),
-        css_class='justify-content-between'
+        Submit(
+            name,
+            label,
+            css_class=css_class,
+            # para impedir resubmissão do form
+            onclick=doubleclick,
+        ),
+        css_class="justify-content-between"
     )
 
 
@@ -92,15 +102,31 @@ class SaplFormHelper(FormHelper):
 
 class SaplFormLayout(Layout):
 
-    def __init__(self, *fields, cancel_label=_('Cancelar'),
-                 save_label=_('Salvar'), actions=None, disabled=False):
+    def __init__(
+        self,
+        *fields,
+        cancel_label=_("Cancelar"),
+        save_label=_("Salvar"),
+        actions=None,
+        disabled=False
+    ):
 
         buttons = actions
         if not buttons:
-            buttons = form_actions(label=save_label, more=[
-                HTML('<a href="{{ view.cancel_url }}"'
-                     ' class="btn btn-inverse">%s</a>' % cancel_label)
-                if cancel_label else None], disabled=disabled)
+            buttons = form_actions(
+                label=save_label,
+                more=[
+                    (
+                        HTML(
+                            '<a href="{{ view.cancel_url }}"'
+                            ' class="btn btn-inverse">%s</a>' % cancel_label
+                        )
+                        if cancel_label
+                        else None
+                    )
+                ],
+                disabled=disabled,
+            )
 
         _fields = list(to_fieldsets(fields))
         if buttons:
@@ -110,26 +136,25 @@ class SaplFormLayout(Layout):
 
 def get_field_display(obj, fieldname):
 
-    field = ''
+    field = ""
     try:
         field = obj._meta.get_field(fieldname)
     except Exception as e:
-        """ nos casos que o fieldname não é um field_model,
-            ele pode ser um aggregate, annotate, um property, um manager,
-            ou mesmo uma método no model.
+        """nos casos que o fieldname não é um field_model,
+        ele pode ser um aggregate, annotate, um property, um manager,
+        ou mesmo uma método no model.
         """
         value = getattr(obj, fieldname)
         try:
             verbose_name = value.model._meta.verbose_name
         except AttributeError:
-            verbose_name = ''
+            verbose_name = ""
 
     else:
-        verbose_name = str(field.verbose_name)\
-            if hasattr(field, 'verbose_name') else ''
+        verbose_name = str(field.verbose_name) if hasattr(field, "verbose_name") else ""
 
-        if hasattr(field, 'choices') and field.choices:
-            value = getattr(obj, 'get_%s_display' % fieldname)()
+        if hasattr(field, "choices") and field.choices:
+            value = getattr(obj, "get_%s_display" % fieldname)()
         else:
             value = getattr(obj, fieldname)
 
@@ -137,55 +162,57 @@ def get_field_display(obj, fieldname):
     str_type_from_field = str(type(field))
 
     if value is None:
-        display = ''
-    elif '.date' in str_type_from_value:
+        display = ""
+    elif ".date" in str_type_from_value:
         display = formats.date_format(value, "SHORT_DATE_FORMAT")
-    elif 'bool' in str_type_from_value:
-        display = _('Sim') if value else _('Não')
-    elif 'ImageFieldFile' in str(type(value)):
+    elif "bool" in str_type_from_value:
+        display = _("Sim") if value else _("Não")
+    elif "ImageFieldFile" in str(type(value)):
         if value:
             display = '<img src="{}" />'.format(value.url)
         else:
-            display = ''
-    elif 'FieldFile' in str_type_from_value:
+            display = ""
+    elif "FieldFile" in str_type_from_value:
         if value:
             display = '<a href="{}">{}</a>'.format(
-                value.url,
-                value.name.split('/')[-1:][0])
+                value.url, value.name.split("/")[-1:][0]
+            )
         else:
-            display = ''
-    elif 'ManyRelatedManager' in str_type_from_value\
-            or 'RelatedManager' in str_type_from_value\
-            or 'GenericRelatedObjectManager' in str_type_from_value:
-        display = '<ul>'
+            display = ""
+    elif (
+        "ManyRelatedManager" in str_type_from_value
+        or "RelatedManager" in str_type_from_value
+        or "GenericRelatedObjectManager" in str_type_from_value
+    ):
+        display = "<ul>"
         for v in value.all():
             v = str(v)
-            v = v.replace('  ', ' &nbsp;')
-            #v = v.replace('&nbsp;&nbsp;', ' &nbsp;')
-            display += '<li>%s</li>' % str(v)
-        display += '</ul>'
+            v = v.replace("  ", " &nbsp;")
+            # v = v.replace('&nbsp;&nbsp;', ' &nbsp;')
+            display += "<li>%s</li>" % str(v)
+        display += "</ul>"
         if not verbose_name:
-            if hasattr(field, 'related_model'):
-                verbose_name = str(
-                    field.related_model._meta.verbose_name_plural)
-            elif hasattr(field, 'model'):
+            if hasattr(field, "related_model"):
+                verbose_name = str(field.related_model._meta.verbose_name_plural)
+            elif hasattr(field, "model"):
                 verbose_name = str(field.model._meta.verbose_name_plural)
-    elif 'GenericForeignKey' in str_type_from_field:
+    elif "GenericForeignKey" in str_type_from_field:
         display = '<a href="{}">{}</a>'.format(
             reverse(
-                '%s:%s_detail' % (
-                    value._meta.app_config.name, obj.content_type.model),
-                args=(value.id,)),
-            value)
-    elif 'TextField' in str_type_from_field:
+                "%s:%s_detail" % (value._meta.app_config.name, obj.content_type.model),
+                args=(value.id,),
+            ),
+            value,
+        )
+    elif "TextField" in str_type_from_field:
         display = value
         has_html = re_start_tag.search(display)
         if not has_html:
-            display = display.replace('\n', '<br/>')
+            display = display.replace("\n", "<br/>")
         display = '<div class="dont-break-out">{}</div>'.format(display)
-    elif 'DecimalField' in str_type_from_field:
+    elif "DecimalField" in str_type_from_field:
         display = formats.number_format(value, force_grouping=True)
-    elif 'JSONField' in str_type_from_field:
+    elif "JSONField" in str_type_from_field:
         display = str(value)
     else:
         display = str(value)
@@ -194,11 +221,14 @@ def get_field_display(obj, fieldname):
 
 class CrispyLayoutFormMixin:
 
-    _layout_key = ''
+    _layout_key = ""
 
     @property
     def layout_key(self):
-        if hasattr(super(CrispyLayoutFormMixin, self), 'layout_key') and not self._layout_key:
+        if (
+            hasattr(super(CrispyLayoutFormMixin, self), "layout_key")
+            and not self._layout_key
+        ):
             return super(CrispyLayoutFormMixin, self).layout_key
         return self._layout_key or self.model.__name__
 
@@ -212,32 +242,36 @@ class CrispyLayoutFormMixin:
 
     @property
     def layout_key_set(self):
-        if hasattr(super(CrispyLayoutFormMixin, self), 'layout_key_set'):
+        if hasattr(super(CrispyLayoutFormMixin, self), "layout_key_set"):
             return super(CrispyLayoutFormMixin, self).layout_key_set
         else:
-            obj = self.crud if hasattr(self, 'crud') else self
-            return getattr(obj.model,
-                           obj.model_set).field.model.__name__
+            obj = self.crud if hasattr(self, "crud") else self
+            return getattr(obj.model, obj.model_set).field.model.__name__
 
     def get_layout(self):
-        yaml_layout = '%s/layouts.yaml' % self.model._meta.app_config.label
+        yaml_layout = "%s/layouts.yaml" % self.model._meta.app_config.label
         return read_layout_from_yaml(yaml_layout, self.layout_key)
 
     def get_layout_set(self):
-        obj = self.crud if hasattr(self, 'crud') else self
-        yaml_layout = '%s/layouts.yaml' % getattr(
-            obj.model, obj.model_set).field.model._meta.app_config.label
+        obj = self.crud if hasattr(self, "crud") else self
+        yaml_layout = (
+            "%s/layouts.yaml"
+            % getattr(obj.model, obj.model_set).field.model._meta.app_config.label
+        )
         return read_layout_from_yaml(yaml_layout, self.layout_key_set)
 
     @property
     def fields(self):
-        if hasattr(self, 'form_class') and self.form_class:
+        if hasattr(self, "form_class") and self.form_class:
             return None
         else:
-            '''Returns all fields in the layout'''
-            return [fieldname for legend_rows in self.get_layout()
-                    for row in legend_rows[1:]
-                    for fieldname, span in row]
+            """Returns all fields in the layout"""
+            return [
+                fieldname
+                for legend_rows in self.get_layout()
+                for row in legend_rows[1:]
+                for fieldname, span in row
+            ]
 
     def get_form(self, form_class=None):
         try:
@@ -256,16 +290,16 @@ class CrispyLayoutFormMixin:
 
     @property
     def list_field_names(self):
-        '''The list of field names to display on table
+        """The list of field names to display on table
 
         This base implementation returns the field names
         in the first fieldset of the layout.
-        '''
-        obj = self.crud if hasattr(self, 'crud') else self
-        if hasattr(obj, 'list_field_names') and obj.list_field_names:
+        """
+        obj = self.crud if hasattr(self, "crud") else self
+        if hasattr(obj, "list_field_names") and obj.list_field_names:
             return obj.list_field_names
 
-        if hasattr(super(CrispyLayoutFormMixin, self), 'list_field_names'):
+        if hasattr(super(CrispyLayoutFormMixin, self), "list_field_names"):
             return super(CrispyLayoutFormMixin, self).list_field_names
         else:
             rows = self.get_layout()[0][1:]
@@ -273,7 +307,7 @@ class CrispyLayoutFormMixin:
 
     @property
     def list_field_names_set(self):
-        if hasattr(super(CrispyLayoutFormMixin, self), 'list_field_names_set'):
+        if hasattr(super(CrispyLayoutFormMixin, self), "list_field_names_set"):
             return super(CrispyLayoutFormMixin, self).list_field_names_set
         else:
             rows = self.get_layout_set()[0][1:]
@@ -284,22 +318,24 @@ class CrispyLayoutFormMixin:
             obj = self.get_object()
 
         func = None
-        if '|' in fieldname:
-            fieldname, func = tuple(fieldname.split('|'))
+        if "|" in fieldname:
+            fieldname, func = tuple(fieldname.split("|"))
 
         try:
             verbose_name, field_display = get_field_display(obj, fieldname)
         except:
-            verbose_name, field_display = '', ''
+            verbose_name, field_display = "", ""
 
         if func:
             verbose_name, field_display = getattr(self, func)(obj, fieldname)
 
-        hook_fieldname = 'hook_%s' % fieldname
-        class_col = ''
+        hook_fieldname = "hook_%s" % fieldname
+        class_col = ""
         if hasattr(self, hook_fieldname):
             try:
-                r_hook = getattr(self, hook_fieldname)(obj, verbose_name=verbose_name, field_display=field_display)
+                r_hook = getattr(self, hook_fieldname)(
+                    obj, verbose_name=verbose_name, field_display=field_display
+                )
                 if isinstance(r_hook, (tuple, list)):
                     if len(r_hook) == 2:
                         verbose_name, field_display = r_hook
@@ -307,20 +343,20 @@ class CrispyLayoutFormMixin:
                         verbose_name, field_display, class_col = r_hook
             except:
                 try:
-                    verbose_name, field_display = getattr(
-                        self, hook_fieldname)(obj, verbose_name=verbose_name, field_display=field_display)
+                    verbose_name, field_display = getattr(self, hook_fieldname)(
+                        obj, verbose_name=verbose_name, field_display=field_display
+                    )
                 except:
-                    verbose_name, field_display = getattr(
-                        self, hook_fieldname)(obj)
+                    verbose_name, field_display = getattr(self, hook_fieldname)(obj)
         elif not func:
             verbose_name, field_display = get_field_display(obj, fieldname)
 
         return {
-            'id': fieldname,
-            'span': span,
-            'class_col': class_col,
-            'verbose_name': verbose_name,
-            'text': field_display,
+            "id": fieldname,
+            "span": span,
+            "class_col": class_col,
+            "verbose_name": verbose_name,
+            "text": field_display,
         }
 
     def fk_urlize_for_detail(self, obj, fieldname):
@@ -328,20 +364,21 @@ class CrispyLayoutFormMixin:
         field = obj._meta.get_field(fieldname)
         value = getattr(obj, fieldname)
         if not value:
-            return '', ''
+            return "", ""
 
         display = '<a href="{}">{}</a>'.format(
             reverse(
-                '%s:%s_detail' % (
-                    value._meta.app_config.name, value._meta.model_name),
-                args=(value.id,)),
-            value)
+                "%s:%s_detail" % (value._meta.app_config.name, value._meta.model_name),
+                args=(value.id,),
+            ),
+            value,
+        )
 
         return field.verbose_name, display
 
     def m2m_urlize_for_detail(self, obj, fieldname):
 
-        lookup_split = fieldname.split('__')
+        lookup_split = fieldname.split("__")
         fieldname = lookup_split[-1]
 
         manager = obj
@@ -359,35 +396,38 @@ class CrispyLayoutFormMixin:
         if l == lookup_split[-1]:
             fieldname = l
         else:
-            fieldname = ''
+            fieldname = ""
 
         verbose_name = obj._meta.verbose_name
-        display = ''
+        display = ""
         for item in manager():
 
-            obj_m2m = getattr(item, fieldname) if hasattr(
-                item, fieldname) else item
+            obj_m2m = getattr(item, fieldname) if hasattr(item, fieldname) else item
 
             if obj == obj_m2m:
                 continue
 
-            verbose_name = item._meta.get_field(
-                fieldname
-            ).verbose_name if hasattr(item, fieldname) else item._meta.verbose_name
+            verbose_name = (
+                item._meta.get_field(fieldname).verbose_name
+                if hasattr(item, fieldname)
+                else item._meta.verbose_name
+            )
 
             display += '<li><a href="{}">{}</a></li>'.format(
                 reverse(
-                    '%s:%s_detail' % (
-                        obj_m2m._meta.app_config.name, obj_m2m._meta.model_name),
-                    args=(obj_m2m.id,)),
-                obj_m2m)
+                    "%s:%s_detail"
+                    % (obj_m2m._meta.app_config.name, obj_m2m._meta.model_name),
+                    args=(obj_m2m.id,),
+                ),
+                obj_m2m,
+            )
 
-        display += ''
+        display += ""
 
         if display:
-            display = '<ul>%s</ul>' % display
+            display = "<ul>%s</ul>" % display
         else:
-            verbose_name = ''
+            verbose_name = ""
 
         return verbose_name, display
 
@@ -397,23 +437,26 @@ class CrispyLayoutFormMixin:
         match = markdown_regex.match(value)
 
         if not match:
-            return field.verbose_name, md.markdown(value, extensions=[
-                'markdown.extensions.fenced_code',
-                'markdown.extensions.codehilite'
-            ])
+            return field.verbose_name, md.markdown(
+                value,
+                extensions=[
+                    "markdown.extensions.fenced_code",
+                    "markdown.extensions.codehilite",
+                ],
+            )
 
         groups = match.groups()
         value = groups[1]
 
-        mv = md.markdown(value, extensions=[
-            'markdown.extensions.fenced_code',
-            'markdown.extensions.codehilite'
-        ])
+        mv = md.markdown(
+            value,
+            extensions=[
+                "markdown.extensions.fenced_code",
+                "markdown.extensions.codehilite",
+            ],
+        )
 
-        return field.verbose_name, '{}{}{}'.format(groups[0], mv, groups[2])
-
-
-
+        return field.verbose_name, "{}{}{}".format(groups[0], mv, groups[2])
 
     @property
     def layout_display(self):
@@ -427,30 +470,42 @@ class CrispyLayoutFormMixin:
         if version == 1:
             return [
                 {
-                    'legend': legend,
-                    'rows': [
-                        [
-                            self.get_column(fieldname, span)
-                            for fieldname, span in row
-                        ]
+                    "legend": legend,
+                    "rows": [
+                        [self.get_column(fieldname, span) for fieldname, span in row]
                         for row in rows
-                    ]
-                } for legend, rows in heads_and_tails(layout)]
+                    ],
+                }
+                for legend, rows in heads_and_tails(layout)
+            ]
 
         elif version == 2:
-            l = [{
-                'version': version,
-                'colgroups': [{
-                    'class_col': colg,
-                    'colfieldsets': [{
-                        'legend': legend,
-                        'class_col':  colf,
-                        'rows': [[self.get_column(fieldname, span)
-                                  for fieldname, span in row
-                                  ] for row in rows]
-                    } for colf, rows in heads_and_tails(cols)]
-                } for legend, cols in heads_and_tails(fieldsets)]
-            } for colg, fieldsets in heads_and_tails(layout)]
+            l = [
+                {
+                    "version": version,
+                    "colgroups": [
+                        {
+                            "class_col": colg,
+                            "colfieldsets": [
+                                {
+                                    "legend": legend,
+                                    "class_col": colf,
+                                    "rows": [
+                                        [
+                                            self.get_column(fieldname, span)
+                                            for fieldname, span in row
+                                        ]
+                                        for row in rows
+                                    ],
+                                }
+                                for colf, rows in heads_and_tails(cols)
+                            ],
+                        }
+                        for legend, cols in heads_and_tails(fieldsets)
+                    ],
+                }
+                for colg, fieldsets in heads_and_tails(layout)
+            ]
             return l
 
 
@@ -471,15 +526,20 @@ def read_yaml_from_file(yaml_layout):
 def read_layout_from_yaml(yaml_layout, key):
 
     def line_to_namespans(line):
-        split = [cell.split(':') for cell in line.split()]
-        namespans = [[s[0], int(s[1]) if len(s) > 1 else 0] for s in split]
-        remaining = 12 - sum(s for n, s in namespans)
-        nondefined = [ns for ns in namespans if not ns[1]]
-        while nondefined:
-            span = ceil(remaining / len(nondefined))
-            namespan = nondefined.pop(0)
-            namespan[1] = span
-            remaining = remaining - span
+        split = [cell.split(":") for cell in line.split()]
+        s1_all_is_digit = all(s[1].isdigit() for s in split if len(s) > 1)
+        namespans = [
+            [s[0], (int(s[1]) if s[1].isdigit() else s[1]) if len(s) > 1 else 0]
+            for s in split
+        ]
+        if s1_all_is_digit:
+            remaining = 12 - sum(s for n, s in namespans)
+            nondefined = [ns for ns in namespans if not ns[1]]
+            while nondefined:
+                span = ceil(remaining / len(nondefined))
+                namespan = nondefined.pop(0)
+                namespan[1] = span
+                remaining = remaining - span
         return list(map(tuple, namespans))
 
     try:
@@ -487,11 +547,13 @@ def read_layout_from_yaml(yaml_layout, key):
         yaml = read_yaml_from_file(yaml_layout)
         base = yaml[key]
 
-        version = base.pop('version', 1)
+        version = base.pop("version", 1)
 
         if version == 1:
-            return [[legend] + [line_to_namespans(l) for l in lines]
-                    for legend, lines in base.items()]
+            return [
+                [legend] + [line_to_namespans(l) for l in lines]
+                for legend, lines in base.items()
+            ]
         elif version == 2:
 
             r = []

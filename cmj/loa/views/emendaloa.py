@@ -1717,15 +1717,16 @@ class EmendaLoaCrud(MasterDetailCrud):
             self, emendaloa, verbose_name="", field_display=""
         ):
             empenhos = []
-            for eea in emendaloa.empenhoemendaajuste_set.all():
+            for eea in emendaloa.empenhoemendaajuste_set.order_by("-empenho__codigo").select_related("empenho"):
                 empenho = eea.empenho
                 url = reverse_lazy("cmj.loa:empenho_detail", kwargs={"pk": empenho.id})
                 empenhos.append(
                     f"""
                     <li>
                         <a href="{url}">{empenho.codigo}</a> |
-                            Data: {formats.date_format(empenho.data, "SHORT_DATE_FORMAT")} |
-                            Valor Empenhado: R$ {empenho.str_valor_empenhado} | {empenho.nome}
+                            {formats.date_format(empenho.data, "SHORT_DATE_FORMAT")} |
+                            R$ {empenho.str_valor_empenhado} |
+                            {empenho.nome}
                     </li>"""
                 )
             return (
