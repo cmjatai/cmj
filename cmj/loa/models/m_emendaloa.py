@@ -204,11 +204,15 @@ class EmendaLoa(CmjSearchMixin):
         ).exists()
 
     def __str__(self):
+        return f"{self.str_short} - {self.finalidade_format}"
+
+    @property
+    def str_short(self):
         valor_str = formats.number_format(self.valor, force_grouping=True)
         materia = ""
         if self.materia:
             materia = f"{self.materia.epigrafe_short} - "
-        return f"{materia}R$ {valor_str} - {self.finalidade_format}"
+        return f"{materia} R$ {valor_str}"
 
     @property
     def ementa_format(self):

@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.forms import AgrupamentoForm
+from cmj.loa.forms.f_agrupamento import AgrupamentoForm
 from cmj.loa.models import Agrupamento, Loa
 from cmj.loa.views.mixins import LoaContextDataMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud

@@ -149,7 +149,10 @@ class Empenho(models.Model):
         "Valor Pago Bruto": "valor_pago_bruto",
     }
 
-    codigo = models.PositiveIntegerField(verbose_name=_("Código"))
+    codigo = models.PositiveIntegerField(
+        verbose_name=_("Código"),
+        unique=True,
+        )
 
     cpfcnpj = models.TextField(
         verbose_name=_("CpfCNPJ"), blank=True, null=True, default=None
@@ -293,6 +296,9 @@ class Empenho(models.Model):
         verbose_name = _("Empenho")
         verbose_name_plural = _("Empenhos")
         ordering = ["id"]
+        indexes = [
+            models.Index(fields=["codigo"], name="idx_empenho_codigo"),
+        ]
 
     def __str__(self):
         return f"{self.codigo} - {self.nome} - R$ {self.str_valor_empenhado}"

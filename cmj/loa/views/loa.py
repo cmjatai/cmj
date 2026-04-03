@@ -9,7 +9,7 @@ from django.urls.base import reverse, reverse_lazy
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.forms import LoaForm
+from cmj.loa.forms.f_loa import LoaForm
 from cmj.loa.models import (
     EmendaLoa,
     EmendaLoaParlamentar,

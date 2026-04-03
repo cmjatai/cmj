@@ -2,7 +2,10 @@ from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.forms import PrestacaoContaLoaForm, PrestacaoContaRegistroForm
+from cmj.loa.forms.f_prestacaoconta import (
+    PrestacaoContaLoaForm,
+    PrestacaoContaRegistroForm,
+)
 from cmj.loa.models import PrestacaoContaLoa, PrestacaoContaRegistro
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 

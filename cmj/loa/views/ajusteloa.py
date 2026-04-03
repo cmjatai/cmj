@@ -4,7 +4,7 @@ from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.forms import OficioAjusteLoaForm, RegistroAjusteLoaForm
+from cmj.loa.forms.f_ajusteloa import OficioAjusteLoaForm, RegistroAjusteLoaForm
 from cmj.loa.models import Loa, OficioAjusteLoa, RegistroAjusteLoa
 from cmj.loa.views.mixins import LoaContextDataMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud

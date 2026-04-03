@@ -1,7 +1,9 @@
 from django.db.models import Q
+from django.http import Http404
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
+from cmj.loa.forms.f_financeiro_execucao import EmpenhoForm
 from cmj.loa.models import Empenho, Loa
 from cmj.loa.views.mixins import LoaContextDataMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
@@ -21,6 +23,30 @@ class EmpenhoCrud(MasterDetailCrud):
         @property
         def verbose_name_plural(self):
             return _("Empenhos do Orçamento Impositivo")
+
+
+    class UpdateView(MasterDetailCrud.UpdateView):
+        form_class = EmpenhoForm
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get("path", "")
+            context["path"] = f"{path} empenho-update"
+            return context
+
+        def get_initial(self):
+            initial = super().get_initial()
+            initial["loa"] = self.object.orgao.loa
+            initial["emendas"] = self.object.empenhoemendaajuste_set.filter(
+                emendaloa__isnull=False
+            ).values_list("emendaloa__pk", flat=True)
+            initial["ajustes"] = self.object.empenhoemendaajuste_set.filter(
+                ajuste__isnull=False
+            ).values_list("ajuste__pk", flat=True)
+            return initial
+
+        def get(self, request, *args, **kwargs):
+            return MasterDetailCrud.UpdateView.get(self, request, *args, **kwargs)
 
     class DetailView(MasterDetailCrud.DetailView):
         layout_key = "EmpenhoDetail"

@@ -159,6 +159,17 @@ EntidadeDetail:
   - tipo_entidade:5 natureza_juridica:7
   - metadata__import_fields
 
+Empenho:
+  {% trans 'Identificação' %}:
+  - codigo:2 data:2 processo:2 modalidade:4 numero_licitacao:2
+  - orgao unidade funcao subfuncao
+  - programa acao natureza fonte
+  - dotacao:3 cpfcnpj:3 nome
+  - valor_empenhado:3 valor_anulado:3 valor_liquidado:3 valor_pago_bruto:3
+  - emendas ajustes
+  - historico
+
+
 EmpenhoDetail:
   {% trans 'Identificação' %}:
   - codigo:2 data:2 processo:2 modalidade:col numero_licitacao:col

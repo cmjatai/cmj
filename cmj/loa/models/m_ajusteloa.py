@@ -170,7 +170,7 @@ class RegistroAjusteLoa(CmjSearchMixin):
     @property
     def fields_search(self):
         return [
-            "emendaloa__search",
+            "emendaloa__search", 
             "descricao",
             "oficio_ajuste_loa",
             "entidade",

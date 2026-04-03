@@ -27,7 +27,7 @@ from django_filters.views import FilterView
 
 from cmj.core.models import AuditLog
 from cmj.loa import tasks
-from cmj.loa.forms import EmendaLoaFilterSet, EmendaLoaForm
+from cmj.loa.forms.f_emendaloa import EmendaLoaFilterSet, EmendaLoaForm
 from cmj.loa.models import (
     Despesa,
     EmendaLoa,

@@ -55,7 +55,7 @@ class ScrapRecord(models.Model):
     erro = models.BooleanField(default=False)
 
     parent = models.ForeignKey(
-        "self",
+        "loa.ScrapRecord",
         blank=True,
         null=True,
         default=None,
@@ -123,6 +123,7 @@ class ScrapRecord(models.Model):
 
         if not empenho:
             empenho = Empenho()
+            empenho.id = self.codigo
 
         item_list = self.metadata["item_list"]
         dt = datetime.strptime(item_list[1], "%d/%m/%Y").date()
@@ -236,6 +237,10 @@ class ScrapRecord(models.Model):
                                     loa__ano=self.ano,
                                     codigo=values.get("Função:", "").split(" - ")[0],
                                 )
+                            if key == "Projeto / Atividade:":
+                                if '.' not in codigo:
+                                    codigo = f"{codigo[:1]}.{codigo[1:]}"
+                                    params["codigo"] = codigo
                             fk_instance = model.objects.get_or_create(
                                 **params,
                                 defaults={"especificacao": especificacao},
