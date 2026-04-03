@@ -128,6 +128,7 @@ class Command(BaseCommand):
         parser.add_argument("--onlyoverlist", action="store_true", default=False)
         parser.add_argument("--outfile", action="store_true", default=False)
         parser.add_argument("--force", action="store_true", default=False)
+        parser.add_argument("--parcial_force", action="store_true", default=False)
         parser.add_argument("--timeexec", type=int, default=30000)
         parser.add_argument("--ano_inicial", type=int, default=2023)
         parser.add_argument("--ano_final", type=int, default=timezone.localtime().year)
@@ -139,6 +140,7 @@ class Command(BaseCommand):
         m.desativa_signals()
 
         self.force = force = options["force"]
+        self.parcial_force = parcial_force = options["parcial_force"]
         self.deep = deep = options["deep"]
         self.onlychilds = onlychilds = options["onlychilds"]
         self.onlyoverlist = onlyoverlist = options["onlyoverlist"]
@@ -320,12 +322,14 @@ class Command(BaseCommand):
                     if not isinstance(scrap.content, bytes)
                     else scrap.content
                 )
+
                 if url_dict["format"] == "html":
                     return True
                 elif url_dict["format"] == "csv":
-                    if self.ano_atual < (self.time_start.year -1):
-                        if not self.force and self.compare_bytes_csv(content_scrap, content_download):
-                            return True
+                    if not self.parcial_force:
+                        if self.ano_atual < (self.time_start.year -1):
+                            if not self.force and self.compare_bytes_csv(content_scrap, content_download):
+                                return True
 
                 scrap.content = content_download
                 scrap.metadata["url_dict"] = url_dict
