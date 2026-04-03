@@ -107,19 +107,21 @@ class EmpenhoCrud(MasterDetailCrud):
         ordering = "-codigo"
 
         def get_queryset(self):
-            qs = super().get_queryset()
+            qs = Empenho.objects.all()
 
             if self.request.user.has_perm("loa.change_empenho"):
-                return (
-                    qs.filter(orgao__loa=self.loa)
-                    .distinct()
-                    .order_by("-empenhoemendaajuste_set", "-codigo")
+                return qs.order_by(
+                    "-empenhoemendaajuste_set__empenho__codigo", "-codigo"
                 )
 
-            return qs.filter(
-                Q(empenhoemendaajuste_set__ajuste__oficio_ajuste_loa__loa=self.loa)
-                | Q(empenhoemendaajuste_set__emendaloa__loa=self.loa)
-            ).distinct()
+            return (
+                qs.filter(
+                    Q(empenhoemendaajuste_set__ajuste__oficio_ajuste_loa__loa=self.loa)
+                    | Q(empenhoemendaajuste_set__emendaloa__loa=self.loa)
+                )
+                .order_by("-empenhoemendaajuste_set__empenho__codigo", "-codigo")
+                .distinct()
+            )
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs["pk"])
