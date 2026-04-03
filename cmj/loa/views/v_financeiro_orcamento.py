@@ -1,7 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.models import Despesa, Loa, SubFuncao, UnidadeOrcamentaria
-from cmj.loa.views.mixins import LoaContextDataMixin
+from cmj.loa.views.v_mixins import LoaContextDataMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 
 

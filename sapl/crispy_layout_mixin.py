@@ -112,7 +112,7 @@ class SaplFormLayout(Layout):
     ):
 
         buttons = actions
-        if not buttons:
+        if buttons is None:
             buttons = form_actions(
                 label=save_label,
                 more=[

@@ -1,11 +1,11 @@
 from django.db.models import Q
-from django.http import Http404
 from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django_filters.views import FilterView
 
-from cmj.loa.forms.f_financeiro_execucao import EmpenhoForm
+from cmj.loa.forms.f_financeiro_execucao import EmpenhoFilterSet, EmpenhoForm
 from cmj.loa.models import Empenho, Loa
-from cmj.loa.views.mixins import LoaContextDataMixin
+from cmj.loa.views.v_mixins import LoaContextDataMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 
 
@@ -14,8 +14,11 @@ class EmpenhoCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
     frontend = Empenho._meta.app_label
     parent_field = "orgao__loa"
+    ordered_list = False
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        ordered_list = False
+
         @property
         def verbose_name(self):
             return _("Empenho do Orçamento Impositivo")
@@ -23,7 +26,6 @@ class EmpenhoCrud(MasterDetailCrud):
         @property
         def verbose_name_plural(self):
             return _("Empenhos do Orçamento Impositivo")
-
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = EmpenhoForm
@@ -98,13 +100,22 @@ class EmpenhoCrud(MasterDetailCrud):
                 "<ul>" + "".join(emendas_ajustes) + "</ul>",
             )
 
-    class ListView(MasterDetailCrud.ListView):
+    class ListView(FilterView, MasterDetailCrud.ListView):
+        filterset_class = EmpenhoFilterSet
         layout_key = "EmpenhoList"
         paginate_by = 25
         ordering = "-codigo"
 
         def get_queryset(self):
             qs = super().get_queryset()
+
+            if self.request.user.has_perm("loa.change_empenho"):
+                return (
+                    qs.filter(orgao__loa=self.loa)
+                    .distinct()
+                    .order_by("-empenhoemendaajuste_set", "-codigo")
+                )
+
             return qs.filter(
                 Q(empenhoemendaajuste_set__ajuste__oficio_ajuste_loa__loa=self.loa)
                 | Q(empenhoemendaajuste_set__emendaloa__loa=self.loa)
@@ -112,7 +123,7 @@ class EmpenhoCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs["pk"])
-            return super().get(request, *args, **kwargs)
+            return FilterView.get(self, request, *args, **kwargs)
 
         def hook_header_detail(self):
             return "Processo / Fornecedor"
@@ -122,6 +133,8 @@ class EmpenhoCrud(MasterDetailCrud):
                 Processo: {empenho.processo} - {'Modalidade: ' if empenho.modalidade else ''}{empenho.modalidade} - {'Número de Licitação: ' if empenho.numero_licitacao else ''}{empenho.numero_licitacao}<br>
                 Dotação: {empenho.dotacao}<br>
                 {empenho.cpfcnpj}<br>{empenho.nome}
+                {("<hr>" + str(empenho.unidade)) if empenho.unidade and self.request.user.has_perm("loa.change_empenho") else ""}
+                {("<br>" + empenho.historico) if empenho.historico and self.request.user.has_perm("loa.change_empenho") else ""}
             """
 
         def hook_header_emendas_ajustes(self):

@@ -14,13 +14,13 @@ from django.db.models.fields.json import JSONField
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
-from cmj.core.models import CmjSearchMixin
 from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa, RegistroAjusteLoaParlamentar
 from cmj.loa.models.m_entidade import TipoEntidade
 from cmj.loa.models.m_financeiro_orcamento import UnidadeOrcamentaria
 from cmj.loa.models.m_loa import Loa
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
-from cmj.loa.services.emendaloa import EmendaLoaService
+from cmj.loa.services.s_emendaloa import EmendaLoaService
+from cmj.mixins import CmjSearchMixin
 from cmj.utils import get_settings_auth_user_model, quantize, valor_por_extenso
 from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Parlamentar

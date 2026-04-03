@@ -114,7 +114,16 @@
                   <td class="font-weight-bold text-muted bg-light" style="width: 30%">
                     {{ cleanKey(key) }}
                   </td>
-                  <td>{{ value }}</td>
+                  <td v-if="key === 'Código:'">
+                    <a
+                      class="font-weight-bold"
+                      :href="selectedEmpenho.link_detail_backend" target="_blank" rel="noopener">
+                      {{ value }}
+                    </a>
+                  </td>
+                  <td v-else>
+                    {{ value }}
+                  </td>
                 </tr>
               </tbody>
             </table>

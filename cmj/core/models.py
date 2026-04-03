@@ -1,10 +1,8 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import Group, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -16,15 +14,14 @@ from django.utils.translation import gettext_lazy as _
 from image_cropping import ImageCropField, ImageRatioField
 
 from cmj.globalrules import GROUP_SOCIAL_USERS, PERMS_FOR_USERS
-from cmj.mixins import CmjAuditoriaModelMixin, CmjChoices, CmjModelMixin
+from cmj.mixins import CmjAuditoriaModelMixin, CmjChoices, CmjModelMixin, CmjSearchMixin
 from cmj.utils import (
     UF,
     YES_NO_CHOICES,
     get_settings_auth_user_model,
-    normalize,
     texto_upload_path,
 )
-from sapl.utils import OverwriteStorage, PortalFileField, hash_sha512
+from sapl.utils import PortalFileField, hash_sha512
 
 
 def group_social_users_add_user(user):
@@ -344,58 +341,6 @@ class AuditLog(models.Model):
             self.app_name,
             self.model_name,
             self.user,
-        )
-
-
-class CmjSearchMixin(models.Model):
-
-    search = models.TextField(blank=True, default="")
-
-    class Meta:
-        abstract = True
-
-    def save(
-        self,
-        force_insert=False,
-        force_update=False,
-        using=None,
-        update_fields=None,
-        auto_update_search=True,
-    ):
-
-        if auto_update_search and hasattr(self, "fields_search"):
-            search = ""
-            for str_field in self.fields_search:
-                fields = str_field.split("__")
-                if len(fields) == 1:
-                    try:
-                        search += str(getattr(self, str_field)) + " "
-                    except:
-                        pass
-                else:
-                    _self = self
-                    for field in fields:
-                        if not _self:
-                            break
-                        if isinstance(_self, models.Manager):
-                            _self = _self.all().values_list(field, flat=True)
-                            _self = " ".join(_self)
-                            break
-                        else:
-                            try:
-                                _self = getattr(_self, field)
-                            except ValueError:
-                                break
-                    if _self:
-                        search += str(_self) + " "
-            self.search = search
-        self.search = normalize(self.search)
-
-        return super(CmjSearchMixin, self).save(
-            force_insert=force_insert,
-            force_update=force_update,
-            using=using,
-            update_fields=update_fields,
         )
 
 

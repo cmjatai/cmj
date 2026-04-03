@@ -16,7 +16,7 @@ from cmj.loa.models import (
     Loa,
     RegistroAjusteLoaParlamentar,
 )
-from cmj.loa.views.mixins import LoaContextDataMixin
+from cmj.loa.views.v_mixins import LoaContextDataMixin
 from cmj.utils import quantize
 from sapl.crud.base import RP_DETAIL, RP_LIST, Crud
 from sapl.parlamentares.models import Legislatura, Parlamentar

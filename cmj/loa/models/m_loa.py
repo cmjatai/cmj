@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models.deletion import CASCADE, PROTECT
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.services.loa import LoaService
+from cmj.loa.services.s_loa import LoaService
 from cmj.utils import PERCENTAGE_VALIDATOR
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar

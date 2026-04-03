@@ -12,19 +12,19 @@ urlpatterns = [
     re_path(
         r"^loa",
         include(
-            views.loa.LoaCrud.get_urls()
-            + views.agrupamento.AgrupamentoCrud.get_urls()
-            + views.ajusteloa.OficioAjusteLoaCrud.get_urls()
-            + views.ajusteloa.RegistroAjusteLoaCrud.get_urls()
-            + views.emendaloa.EmendaLoaCrud.get_urls()
-            + views.financeiro_execucao.EmpenhoCrud.get_urls()
-            + views.financeiro_orcamento.DespesaCrud.get_urls()
-            + views.financeiro_orcamento.UnidadeOrcamentariaCrud.get_urls()
-            + views.financeiro_orcamento.SubFuncaoCrud.get_urls()
-            + views.prestacaoconta.PrestacaoContaLoaCrud.get_urls()
-            + views.prestacaoconta.PrestacaoContaRegistroCrud.get_urls()
+            views.v_loa.LoaCrud.get_urls()
+            + views.v_agrupamento.AgrupamentoCrud.get_urls()
+            + views.v_ajusteloa.OficioAjusteLoaCrud.get_urls()
+            + views.v_ajusteloa.RegistroAjusteLoaCrud.get_urls()
+            + views.v_emendaloa.EmendaLoaCrud.get_urls()
+            + views.v_financeiro_execucao.EmpenhoCrud.get_urls()
+            + views.v_financeiro_orcamento.DespesaCrud.get_urls()
+            + views.v_financeiro_orcamento.UnidadeOrcamentariaCrud.get_urls()
+            + views.v_financeiro_orcamento.SubFuncaoCrud.get_urls()
+            + views.v_prestacaoconta.PrestacaoContaLoaCrud.get_urls()
+            + views.v_prestacaoconta.PrestacaoContaRegistroCrud.get_urls()
         ),
     ),
     re_path(r"^loa/dash", LoaDashboardView.as_view(), name="loa_dashboard"),
-    re_path(r"^sistema/entidade", include(views.entidade.EntidadeCrud.get_urls())),
+    re_path(r"^sistema/entidade", include(views.v_entidade.EntidadeCrud.get_urls())),
 ]

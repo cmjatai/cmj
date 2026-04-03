@@ -82,8 +82,6 @@ class Agrupamento(models.Model):
                     insercoes[-1].valor = insercoes[-1].valor + resto
                     insercoes[-1].save()
 
-            print()
-
 
 class AgrupamentoEmendaLoa(models.Model):
     agrupamento = models.ForeignKey(
@@ -138,7 +136,7 @@ class AgrupamentoRegistroContabil(models.Model):
     objects = AgrupamentoRegistroContabilManager()
 
     agrupamento = models.ForeignKey(
-        'loa.Agrupamento',
+        "loa.Agrupamento",
         verbose_name=_("Agrupamento de Emenda Impositiva"),
         related_name="agrupamentoregistrocontabil_set",
         on_delete=CASCADE,

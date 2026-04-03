@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import Sum
@@ -7,6 +8,8 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
+
+from cmj.mixins import CmjSearchMixin
 
 
 class DespesaPaga(models.Model):
@@ -112,7 +115,7 @@ class DespesaPaga(models.Model):
         ordering = ["id"]
 
 
-class Empenho(models.Model):
+class Empenho(CmjSearchMixin):
 
     mapeamento = {
         "Código:": "codigo",
@@ -152,7 +155,7 @@ class Empenho(models.Model):
     codigo = models.PositiveIntegerField(
         verbose_name=_("Código"),
         unique=True,
-        )
+    )
 
     cpfcnpj = models.TextField(
         verbose_name=_("CpfCNPJ"), blank=True, null=True, default=None
@@ -298,10 +301,41 @@ class Empenho(models.Model):
         ordering = ["id"]
         indexes = [
             models.Index(fields=["codigo"], name="idx_empenho_codigo"),
+            GinIndex(
+                OpClass("search", name="gin_trgm_ops"),
+                name="empenho_search_gin_trgm",
+            ),
         ]
 
     def __str__(self):
         return f"{self.codigo} - {self.nome} - R$ {self.str_valor_empenhado}"
+
+    @property
+    def fields_search(self):
+        return ["hook_search"]
+
+    def hook_search(self):
+        fields = set(map(lambda f: f.name, self._meta.get_fields()))
+        fields.remove("metadata")
+        fields.remove("search")
+        values = []
+        for field in fields:
+            try:
+                if field == "empenhoemendaajuste_set":
+                    emendas_ajustes = self.empenhoemendaajuste_set.all()
+                    emendas = [str(e.emendaloa) for e in emendas_ajustes if e.emendaloa]
+                    ajustes = [str(e.ajuste) for e in emendas_ajustes if e.ajuste]
+                    values.extend(emendas)
+                    values.extend(ajustes)
+                    continue
+
+                value = getattr(self, field)
+
+                if value is not None:
+                    values.append(str(value))
+            except Exception:
+                continue
+        return " ".join(values)
 
     @property
     def str_valor_empenhado(self):

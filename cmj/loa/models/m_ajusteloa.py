@@ -8,7 +8,7 @@ from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.core.models import CmjSearchMixin
+from cmj.mixins import CmjSearchMixin
 from cmj.utils import texto_upload_path
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import OverwriteStorage, PortalFileField
@@ -170,12 +170,16 @@ class RegistroAjusteLoa(CmjSearchMixin):
     @property
     def fields_search(self):
         return [
-            "emendaloa__search", 
+            "hook_emendaloa__search",
             "descricao",
             "oficio_ajuste_loa",
             "entidade",
             "unidade",
         ]
+
+    def hook_emendaloa__search(self):
+        emendas = self.emendaloa.all()
+        return " ".join(map(lambda x: x.search, emendas))
 
     @property
     def str_valor(self):

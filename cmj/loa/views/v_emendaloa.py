@@ -35,7 +35,7 @@ from cmj.loa.models import (
     EmendaLoaRegistroContabil,
     Loa,
 )
-from cmj.loa.views.mixins import LoaContextDataMixin
+from cmj.loa.views.v_mixins import LoaContextDataMixin
 from cmj.utils import TimeExecution
 from cmj.utils_report import make_pdf
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
