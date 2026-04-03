@@ -8,8 +8,6 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django_filters import CharFilter, FilterSet
 
-from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa
-from cmj.loa.models.m_emendaloa import EmendaLoa
 from cmj.loa.models.m_financeiro_execucao import Empenho
 from cmj.utils import DecimalField
 from sapl.crispy_layout_mixin import SaplFormLayout, to_row
@@ -62,38 +60,15 @@ class EmpenhoForm(forms.ModelForm):
         decimal_places=2,
     )
 
-    emendas = forms.ModelMultipleChoiceField(
-        queryset=EmendaLoa.objects.all(),
-        label="Emendas da LOA",
+    busca_emendas_ajustes = forms.CharField(
+        label="Associação de Emendas e Ajustes Técnicos",
         required=False,
-        widget=forms.SelectMultiple(
+        help_text="Informe termos para buscar emendas e ajustes relacionados a este empenho. A busca é feita em todos os campos dos Empenhos e a dados ligados às emendas e ajustes técnicos. Use o prefixo '-' para excluir termos da busca. Adições e exclusões são autosaves, ou seja, não é necessário clicar em salvar para que as alterações sejam aplicadas.",
+        widget=forms.TextInput(
             attrs={
-                "title": "Selecione as emendas relacionadas ao Empenho",
-                "class": "selectpicker w-100",
-                "data-actions-box": "true",
-                "data-select-all-text": "Selecionar Todos",
-                "data-deselect-all-text": "Desmarcar Todos",
-                "data-live-search": "true",
-                "data-header": "Emendas Cadastradas",
-                "data-dropup-auto": "true",
-            }
-        ),
-    )
-
-    ajustes = forms.ModelMultipleChoiceField(
-        queryset=RegistroAjusteLoa.objects.all(),
-        label="Registros de Ajuste da LOA",
-        required=False,
-        widget=forms.SelectMultiple(
-            attrs={
-                "title": "Selecione os registros de ajuste relacionados ao Empenho",
-                "class": "selectpicker w-100",
-                "data-actions-box": "true",
-                "data-select-all-text": "Selecionar Todos",
-                "data-deselect-all-text": "Desmarcar Todos",
-                "data-live-search": "true",
-                "data-header": "Registros de Ajuste Cadastrados",
-                "data-dropup-auto": "true",
+                "type": "search",
+                "placeholder": "Informe termos para buscar emendas e ajustes relacionados a este empenho",
+                "title": "Associação de Emendas e Ajustes Técnicos",
             }
         ),
     )
@@ -141,78 +116,6 @@ class EmpenhoForm(forms.ModelForm):
             (n.pk, f"{n.codigo} - {n.especificacao} ({n.codigo.replace('.', '')})")
             for n in self.fields["natureza"].queryset.order_by("codigo")
         ]
-
-        self.fields["emendas"].queryset = (
-            self.fields["emendas"]
-            .queryset.filter(loa=self.loa)
-            .exclude(tipo=EmendaLoa.MODIFICATIVA)
-            .order_by("materia__numero")
-        )
-        self.fields["ajustes"].queryset = self.fields["ajustes"].queryset.filter(
-            oficio_ajuste_loa__loa=self.loa
-        )
-
-        self.fields["emendas"].choices = (
-            [("", "---------")]
-            + [
-                (
-                    e.pk,
-                    f"{e.str_short} - {', '.join([p.nome_parlamentar.upper() for p in e.parlamentares.all()])} - {e.ementa_format}",
-                )
-                for e in self.fields["emendas"]
-                .queryset.filter(id__in=kwargs["initial"].get("emendas", []))
-                .order_by("materia__numero")
-            ]
-            + [
-                (
-                    e.pk,
-                    f"{e.str_short} - {', '.join([p.nome_parlamentar.upper() for p in e.parlamentares.all()])} - {e.ementa_format}",
-                )
-                for e in self.fields["emendas"]
-                .queryset.exclude(id__in=kwargs["initial"].get("emendas", []))
-                .order_by("materia__numero")
-            ]
-        )
-
-        self.fields["ajustes"].choices = (
-            [("", "---------")]
-            + [
-                (
-                    r.pk,
-                    f'{r.oficio_ajuste_loa.epigrafe if r.oficio_ajuste_loa else ""} - {r.str_valor} - {str(r.descricao)}',
-                )
-                for r in self.fields["ajustes"]
-                .queryset.filter(id__in=kwargs["initial"].get("ajustes", []))
-                .order_by("parlamentares_valor", "descricao")
-            ]
-            + [
-                (
-                    r.pk,
-                    f'{r.oficio_ajuste_loa.epigrafe if r.oficio_ajuste_loa else ""} - {r.str_valor} - {str(r.descricao)}',
-                )
-                for r in self.fields["ajustes"]
-                .queryset.exclude(id__in=kwargs["initial"].get("ajustes", []))
-                .order_by("parlamentares_valor", "descricao")
-            ]
-        )
-        if self.instance.pk:
-            self.fields["codigo"].widget.attrs["readonly"] = True
-
-    def save(self, commit=True):
-        instance = super().save(commit=False)
-
-        if not instance.id:
-            instance.id = instance.codigo
-        instance.save()
-
-        instance.empenhoemendaajuste_set.all().delete()
-
-        for emenda in self.cleaned_data["emendas"]:
-            instance.empenhoemendaajuste_set.create(emendaloa=emenda)
-        for ajuste in self.cleaned_data["ajustes"]:
-            instance.empenhoemendaajuste_set.create(ajuste=ajuste)
-
-        return instance
 
 
 class EmpenhoFilterSet(FilterSet):

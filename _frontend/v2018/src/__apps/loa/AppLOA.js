@@ -2,6 +2,7 @@
 
 import EmendaLoaCRUD from './emenda/EmendaLoaCRUD'
 import AgrupamentoCRUD from './agrupamento/AgrupamentoCRUD'
+import EmpenhoCRUD from './empenho/EmpenhoCRUD'
 
 class AppLOA {
   constructor () {
@@ -11,12 +12,14 @@ class AppLOA {
     }
     this.EmendaLoaCRUD = null
     this.AgrupamentoCRUD = null
+    this.EmpenhoCRUD = null
   }
 
   run () {
-    console.log('AppLOA inicializado')
+    console.debug('AppLOA inicializado')
     this.EmendaLoaCRUD = new EmendaLoaCRUD()
     this.AgrupamentoCRUD = new AgrupamentoCRUD()
+    this.EmpenhoCRUD = new EmpenhoCRUD()
   }
 
   // Exemplo de método convertido

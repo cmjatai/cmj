@@ -82,7 +82,7 @@ class EmpenhoCrud(MasterDetailCrud):
                         <li>
                         <a href="{reverse_lazy('cmj.loa:registroajusteloa_detail', kwargs={'pk': ea.ajuste.pk})}">
                             {ea.ajuste.oficio_ajuste_loa}
-                        </a> - {ea.ajuste.descricao}
+                        </a><br>R$ {ea.ajuste.str_valor} - {ea.ajuste.descricao}
                         </li>
                         """
                     )

@@ -11,6 +11,7 @@ axios.defaults.xsrfHeaderName = 'X-CSRFToken'
 
 // Inicializa a aplicação LOA quando o documento estiver pronto
 $(document).ready(function () {
+  console.log('Inicializando AppLOA...')
   if ($('.container-loa').length > 0) {
     AppLOA.run()
   }
