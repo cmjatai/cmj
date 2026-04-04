@@ -9,14 +9,12 @@ from datetime import date, datetime, timedelta
 from functools import wraps
 from unicodedata import normalize as unicodedata_normalize
 
-import magic
 from bs4 import BeautifulSoup as bs4
 from crispy_forms.bootstrap import Alert
 from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
-from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.backends.smtp import EmailBackend
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -50,12 +48,12 @@ logger = logging.getLogger(__name__)
 PERCENTAGE_VALIDATOR = [MinValueValidator(0), MaxValueValidator(100)]
 
 media_protected_storage = FileSystemStorage(
-    location=settings.MEDIA_PROTECTED_ROOT, base_url="DO_NOT_USE"
+    location=str(settings.MEDIA_PROTECTED_ROOT), base_url="DO_NOT_USE"
 )
 
 
 media_cache_storage = FileSystemStorage(
-    location=settings.MEDIA_CACHE_ROOT, base_url="DO_NOT_USE"
+    location=str(settings.MEDIA_CACHE_ROOT), base_url="DO_NOT_USE"
 )
 
 
@@ -368,73 +366,6 @@ RANGE_MESES = [
 ]
 
 RANGE_DIAS_MES = [(n, n) for n in range(1, 32)]
-
-
-TIPOS_MIDIAS_PERMITIDOS = {
-    "application/pdf": "pdf",
-    "application/x-pdf": "pdf",
-    "application/acrobat": "pdf",
-    "applications/vnd.pdf": "pdf",
-    "application/msword": "doc",
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
-    "application/vnd.oasis.opendocument.text": "odt",
-    "application/vnd.ms-excel": "xls",
-    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
-    "application/vnd.oasis.opendocument.spreadsheet": "ods",
-    "image/jpeg": "jpg",
-    "image/jpg": "jpg",
-    "image/jpe_": "jpg",
-    "image/pjpeg": "jpg",
-    "image/vnd.swiftview-jpeg": "jpg",
-    "application/jpg": "jpg",
-    "application/x-jpg": "jpg",
-    "image/pjpeg": "jpg",
-    "image/pipeg": "jpg",
-    "image/vnd.swiftview-jpeg": "jpg",
-    "image/gif": "gif",
-    "image/png": "png",
-    "application/png": "png",
-    "application/x-png": "png",
-    "image/tiff": "tiff",
-}
-
-TIPOS_IMG_PERMITIDOS = {
-    "image/jpeg",
-    "image/jpg",
-    "image/jpe_",
-    "image/pjpeg",
-    "image/vnd.swiftview-jpeg",
-    "application/jpg",
-    "application/x-jpg",
-    "image/pjpeg",
-    "image/pipeg",
-    "image/vnd.swiftview-jpeg",
-    "image/x-xbitmap",
-    "image/bmp",
-    "image/x-bmp",
-    "image/x-bitmap",
-    "image/png",
-    "application/png",
-    "application/x-png",
-}
-
-
-def fabrica_validador_de_tipos_de_arquivo(lista, nome):
-
-    def restringe_tipos_de_arquivo(value):
-        mime = magic.from_buffer(value.read(), mime=True)
-        if mime not in lista:
-            raise ValidationError(_("Tipo de arquivo não suportado"))
-        return mime, lista[mime]
-
-    # o nome é importante para as migrations
-    restringe_tipos_de_arquivo.__name__ = nome
-    return restringe_tipos_de_arquivo
-
-
-restringe_tipos_de_arquivo_midias = fabrica_validador_de_tipos_de_arquivo(
-    TIPOS_MIDIAS_PERMITIDOS, "restringe_tipos_de_arquivo_midias"
-)
 
 
 def intervalos_tem_intersecao(a_inicio, a_fim, b_inicio, b_fim):

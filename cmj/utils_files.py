@@ -1,9 +1,6 @@
-import os
-
 import magic
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-
 
 TIPOS_TEXTO_PERMITIDOS = (
     "application/vnd.oasis.opendocument.text",
@@ -40,7 +37,6 @@ TIPOS_IMG_PERMITIDOS = (
     "application/x-jpg",
     "image/pjpeg",
     "image/pipeg",
-    "image/vnd.swiftview-jpeg",
     "image/x-xbitmap",
     "image/bmp",
     "image/x-bmp",
@@ -51,34 +47,66 @@ TIPOS_IMG_PERMITIDOS = (
 )
 
 
+TIPOS_MIDIAS_PERMITIDOS = {
+    "application/pdf": "pdf",
+    "application/x-pdf": "pdf",
+    "application/acrobat": "pdf",
+    "applications/vnd.pdf": "pdf",
+    "application/msword": "doc",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "docx",
+    "application/vnd.oasis.opendocument.text": "odt",
+    "application/vnd.ms-excel": "xls",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+    "application/vnd.oasis.opendocument.spreadsheet": "ods",
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/jpe_": "jpg",
+    "image/pjpeg": "jpg",
+    "image/vnd.swiftview-jpeg": "jpg",
+    "application/jpg": "jpg",
+    "application/x-jpg": "jpg",
+    "image/pjpeg": "jpg",
+    "image/pipeg": "jpg",
+    "image/gif": "gif",
+    "image/png": "png",
+    "application/png": "png",
+    "application/x-png": "png",
+    "image/tiff": "tiff",
+}
+
+
 def fabrica_validador_de_tipos_de_arquivo(lista, nome):
 
     def restringe_tipos_de_arquivo(value):
-        name_file = (
-            value.path
-            if hasattr(value, "path")
-            else value.name if hasattr(value, "name") else ""
-        )
-
-        if not os.path.splitext(name_file)[1][:1]:
-            raise ValidationError(
-                _("Não é possível fazer upload de arquivos sem extensão.")
-            )
-        try:
-            mime = magic.from_buffer(value.read(), mime=True)
-            if mime not in lista:
-                raise ValidationError(_("Tipo de arquivo não suportado"))
-        except FileNotFoundError:
-            raise ValidationError(_("Arquivo não encontrado"))
+        mime = magic.from_buffer(value.read(), mime=True)
+        if mime not in lista:
+            raise ValidationError(_("Tipo de arquivo não suportado"))
+        return mime, lista[mime]
 
     # o nome é importante para as migrations
     restringe_tipos_de_arquivo.__name__ = nome
     return restringe_tipos_de_arquivo
 
 
-restringe_tipos_de_arquivo_txt = fabrica_validador_de_tipos_de_arquivo(
+restringe_tipos_de_arquivo_txt_function = fabrica_validador_de_tipos_de_arquivo(
     TIPOS_TEXTO_PERMITIDOS, "restringe_tipos_de_arquivo_txt"
 )
-restringe_tipos_de_arquivo_img = fabrica_validador_de_tipos_de_arquivo(
+restringe_tipos_de_arquivo_img_function = fabrica_validador_de_tipos_de_arquivo(
     TIPOS_IMG_PERMITIDOS, "restringe_tipos_de_arquivo_img"
 )
+
+restringe_tipos_de_arquivo_midias_function = fabrica_validador_de_tipos_de_arquivo(
+    TIPOS_MIDIAS_PERMITIDOS, "restringe_tipos_de_arquivo_midias"
+)
+
+
+def restringe_tipos_de_arquivo_txt(value):
+    return restringe_tipos_de_arquivo_txt_function(value)
+
+
+def restringe_tipos_de_arquivo_img(value):
+    return restringe_tipos_de_arquivo_img_function(value)
+
+
+def restringe_tipos_de_arquivo_midias(value):
+    return restringe_tipos_de_arquivo_midias_function(value)
