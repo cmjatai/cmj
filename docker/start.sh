@@ -2,7 +2,7 @@
 
 echo -e "\033[38;2;255;255;0;2m\033[1m====> StartPRD...\033[0m"
 
-/bin/bash wait-for-pg.sh "postgresql://cmj_st1:cmj_st1@cmjdb18:5432/cmj"
+/bin/bash wait-for-pg.sh "postgresql://cmj_dt1:cmj_dt1@cmjdb18:5432/cmj"
 
 yes yes | python3 manage.py migrate --fake
 
