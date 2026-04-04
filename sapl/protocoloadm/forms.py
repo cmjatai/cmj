@@ -286,7 +286,7 @@ class DocumentoAdministrativoFilterSet(django_filters.FilterSet):
 
         fields = [row1, row2, row3, ]
 
-        if workspace.tipo != 99:
+        if not workspace or workspace.tipo != 99:
             fields += [row4, ]
         fields += buttons
 

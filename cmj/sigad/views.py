@@ -13,7 +13,6 @@ from django.http.response import (
     Http404,
     HttpResponse,
     HttpResponseForbidden,
-    HttpResponsePermanentRedirect,
     HttpResponseRedirect,
 )
 from django.shortcuts import get_object_or_404, redirect
@@ -213,6 +212,9 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
 
     def get_noticias_dos_parlamentares(self):
         legislatura_atual = Legislatura.cache_legislatura_atual()
+
+        if not legislatura_atual:
+            return []
 
         docs = Documento.objects.qs_news()
 
