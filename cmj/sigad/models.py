@@ -1,19 +1,13 @@
 import io
 import os
-import tempfile
 import zipfile
-from datetime import datetime
 
 import qrcode
-from django import db
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.files.base import File
-from django.core.files.storage import FileSystemStorage
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import F, Q
@@ -36,12 +30,11 @@ from cmj import globalrules
 from cmj.core.models import AuditLog
 from cmj.mixins import CmjChoices
 from cmj.utils import (
-    TIPOS_IMG_PERMITIDOS,
     YES_NO_CHOICES,
     get_settings_auth_user_model,
     media_protected_storage,
-    restringe_tipos_de_arquivo_midias,
 )
+from cmj.utils_files import TIPOS_IMG_PERMITIDOS, restringe_tipos_de_arquivo_midias
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
@@ -68,7 +61,6 @@ DOC_TEMPLATES_CHOICE = CmjChoices(
     (1, "noticia", _("Notícia Pública")),
     (2, "galeria", _("Galeria de Imagens")),
     (501, "capa_subsite", _("Capa de Subsite")),
-
 )
 
 CLASSE_TEMPLATES_CHOICE_FILES = {
