@@ -1,5 +1,3 @@
-from functools import cached_property
-
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
@@ -10,9 +8,10 @@ from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
+from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin
 from cmj.utils import restringe_tipos_de_arquivo_midias
+from cmj.utils_files import restringe_tipos_de_arquivo_txt
 from sapl.base.models import Autor
 from sapl.compilacao.models import TextoArticulado
 from sapl.materia.models import MateriaLegislativa
@@ -22,7 +21,6 @@ from sapl.utils import (
     OverwriteStorage,
     PortalFileField,
     get_settings_auth_user_model,
-    restringe_tipos_de_arquivo_txt,
     texto_upload_path,
 )
 

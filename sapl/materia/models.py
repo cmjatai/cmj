@@ -2,7 +2,6 @@ import glob
 import hashlib
 import logging
 import os
-import re
 import tempfile
 import zipfile
 from time import sleep
@@ -25,9 +24,10 @@ from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
+from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin, PluginSignMixin
 from cmj.utils import media_cache_storage
+from cmj.utils_files import restringe_tipos_de_arquivo_txt
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO
 from sapl.base.models import AppConfig as BaseAppConfig
 from sapl.base.models import Autor, Metadata, TipoAutor
@@ -43,7 +43,6 @@ from sapl.utils import (
     SaplGenericRelation,
     gerar_hash_arquivo,
     get_settings_auth_user_model,
-    restringe_tipos_de_arquivo_txt,
     texto_upload_path,
 )
 
