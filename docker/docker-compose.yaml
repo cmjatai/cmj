@@ -83,7 +83,7 @@ services:
       - cmj_media:/var/cmjatai/cmj_media
       - cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
-      - cmjdb
+      - cmjdb18
       - cmjredis
       - cmjsolr
     ports:
