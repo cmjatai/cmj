@@ -45,6 +45,23 @@ services:
       - "5432:5432"
     networks:
       - cmj-net
+  cmjdb18:
+    image: pgvector/pgvector:0.8.2-pg18-bookworm
+    restart: always
+    container_name: cmjpostgres18
+    labels:
+        NAME: "cmjpostgres18"
+    environment:
+      POSTGRES_PASSWORD: cmj
+      POSTGRES_USER: cmj
+      POSTGRES_DB: cmj
+      PGDATA : /var/lib/postgresql/data/
+    volumes:
+      - cmjdb18_data:/var/lib/postgresql/data/
+    ports:
+      - "5433:5432"
+    networks:
+      - cmj-net
   cmj:
     build:
       context: ../
@@ -79,6 +96,7 @@ networks:
     driver: bridge
 volumes:
   cmjdb15_data:
+  cmjdb18_data:
   cmj_data:
   cmj_media:
   cmj_logs:
