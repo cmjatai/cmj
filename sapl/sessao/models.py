@@ -12,16 +12,15 @@ from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
 from cmj.core.models import CertidaoPublicacao
-from cmj.diarios.models import DiarioOficial, VinculoDocDiarioOficial
+from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CmjChoices
+from cmj.utils_files import restringe_tipos_de_arquivo_txt
 from cmj.videos.models import VideoParte
-from sapl.base.models import Autor
 from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.parlamentares.models import (
     CargoMesa,
     Legislatura,
     Parlamentar,
-    Partido,
     SessaoLegislativa,
 )
 from sapl.utils import (
@@ -30,7 +29,6 @@ from sapl.utils import (
     PortalFileField,
     SaplGenericRelation,
     get_settings_auth_user_model,
-    restringe_tipos_de_arquivo_txt,
     texto_upload_path,
 )
 
