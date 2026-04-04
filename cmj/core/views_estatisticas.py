@@ -1,18 +1,22 @@
+import markdown as md
 
 from cmj.arq.models import ArqDoc
 from cmj.diarios.models import DiarioOficial
-from cmj.sigad.models import VersaoDeMidia, Documento
+from cmj.sigad.models import Documento, VersaoDeMidia
 from cmj.utils import run_sql, time_of_period
 from cmj.videos.models import Video
 from sapl.compilacao.models import Dispositivo
-from sapl.materia.models import MateriaLegislativa, Tramitacao, \
-    DocumentoAcessorio, Proposicao
-from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
+from sapl.materia.models import (
+    DocumentoAcessorio,
+    MateriaLegislativa,
+    Proposicao,
+    Tramitacao,
+)
+from sapl.norma.models import AnexoNormaJuridica, NormaJuridica
 from sapl.protocoloadm.models import DocumentoAdministrativo
-from sapl.sessao.models import SessaoPlenaria, RegistroVotacao
-import markdown as md
+from sapl.sessao.models import RegistroVotacao, SessaoPlenaria
 
-markstyles = '''<style>
+markstyles = """<style>
 .container-show{
     font-size: 18pt;
     padding-bottom: 4em;
@@ -47,58 +51,58 @@ markstyles = '''<style>
     }
 }
 </style>
-'''
+"""
+
+
 def get_fields_name(model):
     return tuple(
         map(
             lambda f: f.name,
-            filter(
-                lambda f: hasattr(f, 'name'), model._meta.get_fields()
-            )
+            filter(lambda f: hasattr(f, "name"), model._meta.get_fields()),
         )
     )
 
 
-def get_size_models(models = [], s3 = 's3_aws'):
+def get_size_models(models=[], s3="s3_aws"):
     size_total = {}
     for model, extra_sql in models:
         size = 0
         count_regs = 0
         sum_pages = 0
-        FIELDFILE_NAME = getattr(model, 'FIELDFILE_NAME', tuple())
+        FIELDFILE_NAME = getattr(model, "FIELDFILE_NAME", tuple())
 
-        sum__paginas = ', sum(_paginas)' if '_paginas' in get_fields_name(model) else ''
+        sum__paginas = ", sum(_paginas)" if "_paginas" in get_fields_name(model) else ""
 
         for ffn in FIELDFILE_NAME:
-            sql = f'''SELECT
+            sql = f"""SELECT
                     count(id),
                     sum((metadata->'{s3}'->'{ffn}'->'size')::integer) + sum((metadata->'{s3}'->'{ffn}'->'original_size')::integer)
                     {sum__paginas}
                 FROM {model._meta.db_table}
                 { extra_sql if extra_sql else '' }
-                ;'''
+                ;"""
             # print(sql)
             r = run_sql(sql)
             if not count_regs:
                 count_regs = r[0][0]
-            size += (r[0][1] or 0)
+            size += r[0][1] or 0
             if len(r[0]) > 2:
-                sum_pages += r[0][2]
+                sum_pages += r[0][2] or 0
 
         if not FIELDFILE_NAME:
             count_regs = model.objects.count()
 
-        size_total[model] = {
-            'size': size,
-            'count': count_regs,
-            'paginas': sum_pages
-        }
+        size_total[model] = {"size": size, "count": count_regs, "paginas": sum_pages}
     return size_total
 
 
 def get_redessociais():
-    videos_sessao = Video.objects.filter(videoparte_set__content_type__app_label = 'sessao').order_by('videoparte_set__content_type__app_label').distinct()
-    videos_manha = Video.objects.filter(titulo__icontains = 'Manhã CMJ')
+    videos_sessao = (
+        Video.objects.filter(videoparte_set__content_type__app_label="sessao")
+        .order_by("videoparte_set__content_type__app_label")
+        .distinct()
+    )
+    videos_manha = Video.objects.filter(titulo__icontains="Manhã CMJ")
 
     video_count = Video.objects.count()
     video_sessao_count = videos_sessao.count()
@@ -119,10 +123,10 @@ def get_redessociais():
 
         j = v.json
 
-        if not j or 'contentDetails' not in j or 'duration' not in j['contentDetails']:
+        if not j or "contentDetails" not in j or "duration" not in j["contentDetails"]:
             continue
 
-        d = j['contentDetails']['duration']
+        d = j["contentDetails"]["duration"]
 
         tp = time_of_period(d)[1]
         video_duration += tp
@@ -132,17 +136,17 @@ def get_redessociais():
         if v in videos_manha:
             manha_duration += tp
 
-        s = j.get('statistics', {})
-        if 'likeCount' in s:
-            vc = int(s['likeCount'])
+        s = j.get("statistics", {})
+        if "likeCount" in s:
+            vc = int(s["likeCount"])
             likes_count += vc
 
             if vc > max_likes:
                 video_max_likes = v
                 max_likes = vc
 
-        if 'viewCount' in s:
-            vc = int(s['viewCount'])
+        if "viewCount" in s:
+            vc = int(s["viewCount"])
             views_count += vc
 
             if vc > max_views:
@@ -150,14 +154,14 @@ def get_redessociais():
                 max_views = vc
 
     size_models = get_size_models(
-        models = [
-            (VersaoDeMidia, ''),
+        models=[
+            (VersaoDeMidia, ""),
         ]
     )
 
-    mark0 = '# Publicações Institucionais no PortalCMJ e em Redes Sociais'
+    mark0 = "# Publicações Institucionais no PortalCMJ e em Redes Sociais"
 
-    mark1 = f'''
+    mark1 = f"""
 - **{ Documento.objects.filter(tipo=0).count() }** Notícias.
 - **{ video_count }** Vídeos.
 - **Imagens**
@@ -170,9 +174,9 @@ def get_redessociais():
 
 Matérias legislativas, notícias instituicionais e parlamentares, além de vídeos transmitidos e/ou adicionados no [Youtube](https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD)
 são enviados para o Canal da Câmara no [Telegram](http://t.me/cmjatai) de 10 a 60min após entrarem no PortalCMJ.
-'''
+"""
 
-    mark2 = f'''
+    mark2 = f"""
 ## [Youtube](https://www.youtube.com/C%C3%A2maraMunicipalJata%C3%AD)
 
 O PortalCMJ possui um algoritimo de integração com a API do Youtube
@@ -196,12 +200,12 @@ Atualmente os números no Youtube são:
 
 - Vídeo com maior número de visualizações:
     - {video_max_views} ({max_views} visualizações)
-'''
+"""
     return (mark0, 12), (mark1, 4), (mark2, 8)
 
 
 def get_estrutura_armazenamento():
-    mark = f'''
+    mark = f"""
 # Estrutura de Armazenamento e Processamento
 
 O PortalCMJ possui um servidor dedicado que conta com dois
@@ -243,19 +247,19 @@ Esses procedimentos foram adotados para cumprir o que rege a Lei 4178/2020.
 - **LOCAL 05:**
     Em um dia da semana, aleatoriamente, é conectado manualmente um HD externo e rodado uma ordem de cópia de todo o conteúdo de LOCAL 04 para esse HD externo, que é imediatamente desligado após o término da cópia. Portanto um HD muito pouco utilizado, conectado apenas uma vez por semana, por algumas horas.
 
-'''
-    return mark,
+"""
+    return (mark,)
 
 
 def get_legislacao_municipal():
     size_models = get_size_models(
-    models = [
-        (NormaJuridica, ''),
-        (AnexoNormaJuridica, ''),
+        models=[
+            (NormaJuridica, ""),
+            (AnexoNormaJuridica, ""),
         ]
     )
 
-    mark1 = f'''
+    mark1 = f"""
 # Legislação Municipal
 - **Normas**
     - **{ size_models[NormaJuridica]['count'] }** normas.
@@ -266,9 +270,9 @@ def get_legislacao_municipal():
     - **{ size_models[AnexoNormaJuridica]['count'] }** anexos.
     - **{ int(size_models[AnexoNormaJuridica]['size']/1024/1024/1024) } GB**.
     - **{ size_models[AnexoNormaJuridica]['paginas']}** páginas.
-'''
+"""
 
-    mark2 = f'''
+    mark2 = f"""
 - **Dispostivos das Normas Compiladas**
     - **{ Dispositivo.objects.filter(ta__privacidade=0, ta__clone__isnull=True).count()- Dispositivo.objects.filter(ta__privacidade=0, ta__clone__isnull=False).count() }** dispositivos.
 -------------------
@@ -276,17 +280,17 @@ O PortalCMJ possui o módulo de **Compilação de Leis**,
 desenvolvido integralmente pela CMJ, disponibiliza a base de leis
 do Município de Jataí e gerencia os vínculos de vigência,
 alteração, revogação e inclusão.
-'''
+"""
     return (mark1, 5), (mark2, 7)
 
 
 def get_arqdocs():
     size_models = get_size_models(
-        models = [
-            (ArqDoc, ''),
+        models=[
+            (ArqDoc, ""),
         ]
     )
-    mark = f'''
+    mark = f"""
 # Documentos digitalizados do Arquivo Administrativo
 - **ArqDocs**
     - **{ size_models[ArqDoc]['count'] }** itens.
@@ -305,32 +309,35 @@ Após catalogados e arquivados numa estrutura de classificação digital que esp
 mapeados em uma ferramenta de indexação (_Solr_). Esta ferramenta é uma poderosa solução de busca, que leva em consideração
 a semântica do texto na lingua portuguesa, vetoriza os termos em tokens e está a um passo de integração,
 em um futuro breve, com alguma I.A. generativa.
-'''
-    return mark,
+"""
+    return (mark,)
 
 
 def get_materialegislativa():
     # código para calcular os números abaixo
     size_models = get_size_models(
-        models = [
-            (MateriaLegislativa, ''),
-            (DocumentoAcessorio, ''),
-            (Tramitacao, ''),
-            (SessaoPlenaria, ''),
-            (RegistroVotacao, ''),
-            (NormaJuridica, 'where tipo_id=27'),
-            (Proposicao, 'where content_type_id=81'),
-            (DocumentoAdministrativo, 'where workspace_id = 21 and tipo_id = 150'),
+        models=[
+            (MateriaLegislativa, ""),
+            (DocumentoAcessorio, ""),
+            (Tramitacao, ""),
+            (SessaoPlenaria, ""),
+            (RegistroVotacao, ""),
+            (NormaJuridica, "where tipo_id=27"),
+            (Proposicao, "where content_type_id=81"),
+            (DocumentoAdministrativo, "where workspace_id = 21 and tipo_id = 150"),
         ]
     )
 
     size_outros_pareceres = get_size_models(
-        models = [
-            (DocumentoAdministrativo, 'where workspace_id = 21 and tipo_id in (120, 180, 170)'),
+        models=[
+            (
+                DocumentoAdministrativo,
+                "where workspace_id = 21 and tipo_id in (120, 180, 170)",
+            ),
         ]
     )
 
-    mark1 = f'''
+    mark1 = f"""
 # Processo Legislativo
 
 - **Proposições Legislativas**
@@ -343,9 +350,9 @@ Com a aprovação da Lei 4178/2020, foi instituído o
 Processo Legislativo Eletrônico em que as proposições legislativas passaram a
 serem assinadas com certificado digital e protocoladas diretamente no PortalCMJ,
 sem a necessidade de impressão.
-    '''
+    """
 
-    mark2 = f'''
+    mark2 = f"""
 - **Matérias Legislativas**
     - **{ size_models[MateriaLegislativa]['count'] }** itens.
     - **{ int(size_models[MateriaLegislativa]['size']/1024/1024/1024) } GB**.
@@ -358,9 +365,9 @@ sem a necessidade de impressão.
     - **{ size_models[DocumentoAcessorio]['count'] }** itens.
     - **{ int(size_models[DocumentoAcessorio]['size']/1024/1024/1024) } GB**.
     - **{ size_models[DocumentoAcessorio]['paginas']}** páginas.
-    '''
+    """
 
-    mark3 = f'''
+    mark3 = f"""
 - **Pareceres Jurídicos**
     - **{ size_models[DocumentoAdministrativo]['count'] }** Legislativos.
     - **{ size_outros_pareceres[DocumentoAdministrativo]['count'] }** Administrativos.
@@ -377,26 +384,26 @@ sem a necessidade de impressão.
 - **Autógrafos**
     - **{ size_models[NormaJuridica]['count'] }** autógrafos.
     - **{ size_models[NormaJuridica]['paginas']}** páginas.
-    '''
+    """
 
     return (mark1, 4), (mark2, 4), (mark3, 4)
 
 
 def get_documentos_administrativos():
     size_models = get_size_models(
-        models = [
-            (DocumentoAdministrativo, 'where workspace_id=22'),
+        models=[
+            (DocumentoAdministrativo, "where workspace_id=22"),
         ]
     )
-    mark1 = f'''
+    mark1 = f"""
 # Documentos Administrativos
 - **Documentos**
     - **{ size_models[DocumentoAdministrativo]['count'] }** itens.
     - **{ int(size_models[DocumentoAdministrativo]['size']/1024/1024/1024) } GB**.
     - **{ size_models[DocumentoAdministrativo]['paginas']}** páginas.
-'''
+"""
 
-    mark2 = '''
+    mark2 = """
 A Câmara possui um sistema de publicação de documentos administrativos
 com certificação de publicação pelo departamento responsável com a finalidade
 de dar segurança aos departamentos da CMJ como mecanismo de comprovação de
@@ -404,22 +411,22 @@ encaminhamento para publicação.
 
 Todos os documentos publicados são catalogados e disponibilizados para pesquisa
 integral em seu conteúdo.
-'''
+"""
     return (mark1, 5), (mark2, 7)
 
 
 def get_diarios_oficiais():
     size_diario_camara = get_size_models(
-        models = [
-            (DiarioOficial, 'where tipo_id=2'),
+        models=[
+            (DiarioOficial, "where tipo_id=2"),
         ]
     )
     size_diario_prefeitura = get_size_models(
-        models = [
-            (DiarioOficial, 'where tipo_id=1'),
+        models=[
+            (DiarioOficial, "where tipo_id=1"),
         ]
     )
-    mark1 = f'''
+    mark1 = f"""
 # Diários Oficiais
 - **Diários da Câmara de Jataí**
     - **{ size_diario_camara[DiarioOficial]['count'] }** itens.
@@ -428,31 +435,31 @@ def get_diarios_oficiais():
 - **Diários da Prefeitura de Jataí**
     - **{ size_diario_prefeitura[DiarioOficial]['count'] }** itens.
     - **{ size_diario_prefeitura[DiarioOficial]['paginas']}** páginas.
-'''
+"""
 
-    mark2 = '''
+    mark2 = """
 Desde 2013 e 2020, Prefeitura e Câmara, respectivamente, possuem Diário Oficial,
 onde publicam todos atos administrativos, legislativos e normativos.
 A Câmara, por publicar a Legislação de forma compilada e dar completude ao
 processo legislativo, publica também, não só os diários oficiais do executivo
 que possuem publicação de Leis, mas todos os seus diários, indexando esses textos
 e disponibilizando-os no sistema de pesquisa em ["Pesquisa Geral"](http://localhost:9000/pesquisar/).
-'''
+"""
 
     return (mark2, 6), (mark1, 6)
 
 
 def get_():
     size_models = get_size_models(
-        models = [
-            ('model', ''),
+        models=[
+            ("model", ""),
         ]
     )
-    mark1 = f'''
-'''
+    mark1 = f"""
+"""
 
-    mark2 = '''
-'''
+    mark2 = """
+"""
 
     return (mark1, 5), (mark2, 7)
 
@@ -472,16 +479,18 @@ def get_numeros():
     for mt in mark:
         cols = []
         for m in mt:
-            sm = ''
+            sm = ""
             if isinstance(m, tuple):
                 m, sm = m
-                sm = f'-{sm}'
+                sm = f"-{sm}"
             m = md.markdown(m)
             cols.append(f'<div class="col-md{sm}">{m}</div>')
         row = f'<div class="row page-break">{"".join(cols)}</div>'
         html.append(row)
 
-    mdr = [f'{markstyles}<div class="container container-bi container-show">{h}</div>' for h in html]
+    mdr = [
+        f'{markstyles}<div class="container container-bi container-show">{h}</div>'
+        for h in html
+    ]
 
-    return ''.join(mdr)
-
+    return "".join(mdr)
