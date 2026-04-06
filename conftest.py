@@ -11,6 +11,15 @@ collect_ignore_glob = [
 ]
 
 
+@pytest.fixture(autouse=True)
+def create_base_appconfig():
+    """Cria um registro de sapl.base.models.AppConfig para evitar erros de
+    em testes que importam AppConfig diretamente."""
+    from sapl.base.models import AppConfig
+
+    AppConfig.attr("id")
+
+
 @pytest.fixture(scope="session")
 def django_db_setup(
     request,
@@ -31,6 +40,12 @@ def django_db_setup(
     # Desabilita migrations se --no-migrations foi passado
     if not django_db_use_migrations:
         _disable_migrations()
+
+    if settings.DATABASE_URL_DEV == settings.DATABASE_URL_BLOCK:
+        raise RuntimeError(
+            "DATABASE_URL_DEV e DATABASE_URL_BLOCK não podem ser iguais. "
+            "Verifique as variáveis de ambiente."
+        )
 
     db = settings.DATABASES["default"]
     template_db = "template_cmj_test"

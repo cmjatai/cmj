@@ -21,3 +21,7 @@ if __name__ == "__main__":
             )
         raise
     execute_from_command_line(sys.argv)
+
+
+#for c in self.__class__.mro():
+#    print(c, hasattr(c, 'post'), hasattr(c, 'delete'))

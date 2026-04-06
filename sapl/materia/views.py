@@ -1800,6 +1800,12 @@ class TramitacaoCrud(MasterDetailCrud):
 
         logger = logging.getLogger(__name__)
 
+        def post(self, request, *args, **kwargs):
+            # TODO: Em alguma versão do django entre 2.2 e 5.2,
+            # o post de BaseDeleteView foi criado e parou de chamar o delete de DeletionMixin.
+            # verificar outros deletes de outros cruds.
+            return self.delete(request, *args, **kwargs)
+
         def delete(self, request, *args, **kwargs):
             tramitacao = Tramitacao.objects.get(id=self.kwargs['pk'])
             materia = tramitacao.materia

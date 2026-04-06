@@ -330,7 +330,7 @@ class NormaCrud(Crud):
                 return redirect(reverse('sapl.norma:norma_ta',
                                         kwargs={'pk': self.kwargs['pk']}))
 
-            estatisticas_acesso_normas = AppConfig.objects.first().estatisticas_acesso_normas
+            estatisticas_acesso_normas = AppConfig.attr('estatisticas_acesso_normas')
             if estatisticas_acesso_normas == 'S':
                 NormaEstatisticas.objects.create(usuario=str(self.request.user),
                                                  norma_id=kwargs['pk'],
@@ -373,8 +373,7 @@ class NormaCrud(Crud):
             try:
                 self.logger.debug(
                     'user=' + username + '. Tentando obter objeto de modelo da esfera da federação.')
-                esfera = sapl.base.models.AppConfig.objects.last(
-                ).esfera_federacao
+                esfera = sapl.base.models.AppConfig.attr('esfera_federacao')
                 initial['esfera_federacao'] = esfera
             except:
                 self.logger.error(

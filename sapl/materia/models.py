@@ -666,7 +666,7 @@ class MateriaLegislativa(CommonMixin):
             compression = all(autores.values_list("sign_compression", flat=True))
 
         if not protocolo:
-            numeracao = BaseAppConfig.objects.last().sequencia_numeracao_protocolo
+            numeracao = BaseAppConfig.attr('sequencia_numeracao_protocolo')
             p = Protocolo()
             p.numero = Protocolo.get_proximo_numero_protocolo(numeracao=numeracao)
             p.ano = self.ano
@@ -912,7 +912,7 @@ class MateriaLegislativa(CommonMixin):
         # Obtém a configuração de numeração
         numeracao = None
         try:
-            numeracao = BaseAppConfig.objects.last().sequencia_numeracao_protocolo
+            numeracao = BaseAppConfig.attr('sequencia_numeracao_protocolo')
         except AttributeError:
             pass
 

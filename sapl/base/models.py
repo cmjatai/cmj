@@ -279,20 +279,25 @@ class AppConfig(models.Model):
                 pass
 
     @classmethod
-    def attr(cls, attr):
+    def attr(cls, attr, _value=None, ignore_cache=False):
         value = cache.get(f"portalcmj_appconfig_{attr}")
-        if not value is None:
+        if not value is None and not ignore_cache:
             return value
 
         config = AppConfig.objects.first()
 
         if not config:
             config = AppConfig()
+            if _value is not None:
+                setattr(config, attr, _value)
+            config.save()
+        elif _value is not None:
+            setattr(config, attr, _value)
             config.save()
 
         value = getattr(config, attr)
-        # if not settings.DEBUG:
-        cache.set(f"portalcmj_appconfig_{attr}", value, 86400)
+        if not settings.DEBUG and not ignore_cache:
+            cache.set(f"portalcmj_appconfig_{attr}", value, 86400)
 
         return value
 

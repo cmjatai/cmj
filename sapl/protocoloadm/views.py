@@ -1,12 +1,10 @@
+import logging
+import tempfile
+import zipfile
 from datetime import datetime
 from distutils.util import strtobool
 from random import choice
 from string import ascii_letters, digits
-import hashlib
-import io
-import logging
-import tempfile
-import zipfile
 
 from braces.views import FormValidMessageMixin
 from django.conf import settings
@@ -14,67 +12,97 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
-from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db import transaction
 from django.db.models import Max, Q
-from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.http import Http404, HttpResponse, JsonResponse
-from django.http.response import HttpResponseRedirect, Http404
+from django.http.response import Http404, HttpResponseRedirect
 from django.shortcuts import redirect
-from django.template.loader import render_to_string
 from django.urls.base import reverse
-from django.utils import timezone, formats
+from django.utils import formats, timezone
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView, CreateView, UpdateView
-from django.views.generic.base import RedirectView, TemplateView, ContextMixin
+from django.views.generic import CreateView, ListView, UpdateView
+from django.views.generic.base import ContextMixin, RedirectView, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
 from cmj.core.models import AreaTrabalho
-from cmj.mixins import BtnCertMixin, PluginSignMixin, MultiFormatOutputMixin
+from cmj.mixins import BtnCertMixin, MultiFormatOutputMixin, PluginSignMixin
 from sapl.base.email_utils import do_envia_email_confirmacao
-from sapl.base.models import Autor, CasaLegislativa, AppConfig
+from sapl.base.models import AppConfig, Autor, CasaLegislativa
 from sapl.comissoes.models import Comissao
-from sapl.crud.base import (Crud, CrudAux, MasterDetailCrud, make_pagination,
-                            RP_LIST, RP_DETAIL,
-                            PermissionRequiredContainerCrudMixin, CrudListView,
-                            CrudDetailView)
-from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa, UnidadeTramitacao, \
-    DocumentoAcessorio
+from sapl.crud.base import (
+    RP_DETAIL,
+    RP_LIST,
+    Crud,
+    MasterDetailCrud,
+    PermissionRequiredContainerCrudMixin,
+    make_pagination,
+)
+from sapl.materia.models import (
+    DocumentoAcessorio,
+    MateriaLegislativa,
+    TipoMateriaLegislativa,
+    UnidadeTramitacao,
+)
 from sapl.materia.views import gerar_pdf_impressos
-from sapl.parlamentares.models import Legislatura, Parlamentar
-from sapl.protocoloadm.forms import ProtocoloDocumentoAcessorioForm, \
-    VinculoDocAdminMateriaEmLoteFilterSet, VinculoDocAdminMateriaForm
-from sapl.protocoloadm.models import Protocolo, DocumentoAdministrativo, \
-    VinculoDocAdminMateria
+from sapl.parlamentares.models import Parlamentar
+from sapl.protocoloadm.forms import (
+    ProtocoloDocumentoAcessorioForm,
+    VinculoDocAdminMateriaEmLoteFilterSet,
+    VinculoDocAdminMateriaForm,
+)
+from sapl.protocoloadm.models import (
+    DocumentoAdministrativo,
+    Protocolo,
+    VinculoDocAdminMateria,
+)
 from sapl.relatorios.views_old import relatorio_doc_administrativos
+from sapl.utils import (
+    create_barcode,
+    get_base_url,
+    get_client_ip,
+    lista_anexados,
+    mail_service_configured,
+    show_results_filter_set,
+)
 
-from sapl.utils import (create_barcode, get_base_url, get_client_ip,
-                        get_mime_type_from_file_extension, lista_anexados,
-                        show_results_filter_set, mail_service_configured,
-                        gerar_hash_arquivo, hash_sha512,
-                        from_date_to_datetime_utc)
-
-from .forms import (AcompanhamentoDocumentoForm, AnularProtocoloAdmForm,
-                    DocumentoAcessorioAdministrativoForm,
-                    DocumentoAdministrativoFilterSet,
-                    DocumentoAdministrativoForm, FichaPesquisaAdmForm, FichaSelecionaAdmForm, ProtocoloDocumentForm,
-                    ProtocoloFilterSet, ProtocoloMateriaForm,
-                    TramitacaoAdmEditForm, TramitacaoAdmForm,
-                    DesvincularDocumentoForm, DesvincularMateriaForm,
-                    filtra_tramitacao_adm_destino_and_status,
-                    filtra_tramitacao_adm_destino, filtra_tramitacao_adm_status,
-                    AnexadoForm, AnexadoEmLoteFilterSet,
-                    PrimeiraTramitacaoEmLoteAdmFilterSet,
-                    TramitacaoEmLoteAdmForm,
-                    TramitacaoEmLoteAdmFilterSet,
-                    compara_tramitacoes_doc)
-from .models import (AcompanhamentoDocumento, DocumentoAcessorioAdministrativo,
-                     DocumentoAdministrativo, StatusTramitacaoAdministrativo,
-                     TipoDocumentoAdministrativo, TramitacaoAdministrativo, Anexado)
+from .forms import (
+    AcompanhamentoDocumentoForm,
+    AnexadoEmLoteFilterSet,
+    AnexadoForm,
+    AnularProtocoloAdmForm,
+    DesvincularDocumentoForm,
+    DesvincularMateriaForm,
+    DocumentoAcessorioAdministrativoForm,
+    DocumentoAdministrativoFilterSet,
+    DocumentoAdministrativoForm,
+    FichaPesquisaAdmForm,
+    FichaSelecionaAdmForm,
+    PrimeiraTramitacaoEmLoteAdmFilterSet,
+    ProtocoloDocumentForm,
+    ProtocoloFilterSet,
+    ProtocoloMateriaForm,
+    TramitacaoAdmEditForm,
+    TramitacaoAdmForm,
+    TramitacaoEmLoteAdmFilterSet,
+    TramitacaoEmLoteAdmForm,
+    compara_tramitacoes_doc,
+    filtra_tramitacao_adm_destino,
+    filtra_tramitacao_adm_destino_and_status,
+    filtra_tramitacao_adm_status,
+)
+from .models import (
+    AcompanhamentoDocumento,
+    Anexado,
+    DocumentoAcessorioAdministrativo,
+    DocumentoAdministrativo,
+    StatusTramitacaoAdministrativo,
+    TipoDocumentoAdministrativo,
+    TramitacaoAdministrativo,
+)
 
 
 # ProtocoloDocumentoCrud = Crud.build(Protocolo, '')
@@ -1611,7 +1639,7 @@ class ProtocoloDocumentoView(PermissionRequiredMixin,
 
         self.logger.debug("user=" + username +
                           ". Tentando obter sequência de numeração.")
-        numeracao = AppConfig.objects.last().sequencia_numeracao_protocolo
+        numeracao = AppConfig.attr('sequencia_numeracao_protocolo')
         try:
             proximo_numero = Protocolo.get_proximo_numero_protocolo(numeracao)
         except ValueError as e:
@@ -1623,7 +1651,7 @@ class ProtocoloDocumentoView(PermissionRequiredMixin,
         protocolo.anulado = False
         if not protocolo.numero:
             protocolo.numero = proximo_numero
-            
+
         protocolo.ano = timezone.now().year
         protocolo.assunto_ementa = self.request.POST['assunto']
 
@@ -1675,7 +1703,7 @@ class ProtocoloDocumentoAcessorioView(PermissionRequiredMixin,
 
         self.logger.debug("user=" + username +
                           ". Tentando obter sequência de numeração.")
-        numeracao = AppConfig.objects.last().sequencia_numeracao_protocolo
+        numeracao = AppConfig.attr('sequencia_numeracao_protocolo')
         try:
             proximo_numero = Protocolo.get_proximo_numero_protocolo(numeracao)
         except ValueError as e:
@@ -1982,7 +2010,7 @@ class ProtocoloMateriaView(PermissionRequiredMixin, CreateView):
         username = self.request.user.username
         self.logger.debug("user=" + username +
                           ". Tentando obter sequência de numeração.")
-        numeracao = AppConfig.objects.last().sequencia_numeracao_protocolo
+        numeracao = AppConfig.attr('sequencia_numeracao_protocolo')
         try:
             proximo_numero = Protocolo.get_proximo_numero_protocolo(numeracao)
         except ValueError as e:
