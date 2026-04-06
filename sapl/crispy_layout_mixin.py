@@ -276,7 +276,7 @@ class CrispyLayoutFormMixin:
     def get_form(self, form_class=None):
         try:
             form = super(CrispyLayoutFormMixin, self).get_form(form_class)
-        except AttributeError:
+        except Exception as e:
             # simply return None if there is no get_form on super
             pass
         else:

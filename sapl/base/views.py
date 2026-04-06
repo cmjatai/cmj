@@ -322,7 +322,7 @@ class RelatoriosListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(TemplateView, self).get_context_data(**kwargs)
-        estatisticas_acesso_normas = AppConfig.objects.first().estatisticas_acesso_normas
+        estatisticas_acesso_normas = AppConfig.attr('estatisticas_acesso_normas')
         context['estatisticas_acesso_normas'] = True if estatisticas_acesso_normas == 'S' else False
 
         return context

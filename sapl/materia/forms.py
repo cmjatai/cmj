@@ -1,35 +1,24 @@
 import logging
 import os
-from distutils.command.clean import clean
 
 import django_filters
 from crispy_forms.bootstrap import Alert, InlineRadios
-from crispy_forms.layout import HTML, Button, Div, Field, Fieldset, Layout, Row
+from crispy_forms.layout import HTML, Button, Div, Fieldset, Layout, Row
 from django import forms
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.core.files.base import File
-from django.db import models, transaction
+from django.db import transaction
 from django.db.models import F, Max, Q
 from django.forms import ModelChoiceField, ModelForm, widgets
 from django.forms.fields import MultipleChoiceField
 from django.forms.forms import Form
 from django.forms.models import ModelMultipleChoiceField
-from django.forms.widgets import (
-    CheckboxInput,
-    CheckboxSelectMultiple,
-    HiddenInput,
-    Select,
-)
+from django.forms.widgets import CheckboxSelectMultiple, HiddenInput
 from django.urls.base import reverse
 from django.utils import timezone
-from django.utils.encoding import force_str
-from django.utils.html import format_html
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django_filters.filters import ModelMultipleChoiceFilter
-from django_filters.widgets import CSVWidget
 
 import sapl
 from cmj.loa.models import EmendaLoa
@@ -58,8 +47,8 @@ from sapl.materia.models import (
     UnidadeTramitacao,
 )
 from sapl.norma.models import LegislacaoCitada, NormaJuridica, TipoNormaJuridica
-from sapl.parlamentares.models import Legislatura, Parlamentar, Partido
-from sapl.protocoloadm.models import Anexado, DocumentoAdministrativo, Protocolo
+from sapl.parlamentares.models import Parlamentar, Partido
+from sapl.protocoloadm.models import Protocolo
 from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (
     SEPARADOR_HASH_PROPOSICAO,
@@ -68,7 +57,6 @@ from sapl.utils import (
     FileFieldCheckMixin,
     FilterOverridesMetaMixin,
     MateriaPesquisaOrderingFilter,
-    RangeWidgetOverride,
     autor_label,
     autor_modal,
     choice_anos_com_materias,
@@ -2600,7 +2588,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             to_row([("descricao", 8), ("observacao", 4)]),
         ]
 
-        if AppConfig.objects.last().escolher_numero_materia_proposicao:
+        if AppConfig.attr("escolher_numero_materia_proposicao"):
             fields.append(
                 to_column(("numero_materia_futuro", 12)),
             )
@@ -2883,7 +2871,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
     def save(self, commit=True):
         cd = self.cleaned_data
         inst = self.instance
-        receber_recibo = AppConfig.objects.last().receber_recibo_proposicao
+        receber_recibo = AppConfig.attr("receber_recibo_proposicao")
 
         if inst.pk:
             if "tipo_texto" in cd:

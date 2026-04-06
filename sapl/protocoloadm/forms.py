@@ -572,8 +572,8 @@ class ProtocoloDocumentForm(ModelForm):
                             row3,
                             css_id='protocolo_data_hora_manual')
 
-        config = AppConfig.objects.first()
-        if not config.protocolo_manual:
+        protocolo_manual = AppConfig.attr('protocolo_manual')
+        if not protocolo_manual:
             row3 = to_row([(HTML("&nbsp;"), 12)])
             fieldset = row3
 
@@ -694,8 +694,8 @@ class ProtocoloDocumentoAcessorioForm(ModelForm):
                             row3,
                             css_id='protocolo_data_hora_manual')
 
-        config = AppConfig.objects.first()
-        if not config.protocolo_manual:
+        protocolo_manual = AppConfig.attr('protocolo_manual')
+        if not protocolo_manual:
             row3 = to_row([(HTML("&nbsp;"), 12)])
             fieldset = row3
 
@@ -883,8 +883,8 @@ class ProtocoloMateriaForm(ModelForm):
                             row3,
                             css_id='protocolo_data_hora_manual')
 
-        config = AppConfig.objects.first()
-        if not config.protocolo_manual:
+        protocolo_manual = AppConfig.attr('protocolo_manual')
+        if not protocolo_manual:
             row3 = to_row([(HTML("&nbsp;"), 12)])
             fieldset = row3
 

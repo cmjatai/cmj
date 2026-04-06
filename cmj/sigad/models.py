@@ -1378,7 +1378,7 @@ class Documento(ShortUrl, CMSMixin):
             .values_list("midia__versions__content_type", flat=True)
         )
 
-        return not bool(s - TIPOS_IMG_PERMITIDOS)
+        return not bool(s - TIPOS_IMG_PERMITIDOS.keys())
 
     def build_container_file(self):
 

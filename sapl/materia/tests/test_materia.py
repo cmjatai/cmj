@@ -2,13 +2,13 @@ from datetime import date
 
 import pytest
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.db.models import Max
 from django.urls import reverse
 from model_mommy import mommy
 
-from sapl.base.models import AppConfig, Autor, TipoAutor
+from sapl.base.models import AppConfig, Autor, OperadorAutor, TipoAutor
 from sapl.comissoes.models import Comissao, TipoComissao
 from sapl.materia.forms import (
     TramitacaoForm,
@@ -126,7 +126,7 @@ def test_lista_materias_anexadas_ciclo():
 
 
 @pytest.mark.django_db(transaction=False)
-def make_unidade_tramitacao(descricao):
+def test_make_unidade_tramitacao(descricao="Unidade de Tramitação Teste"):
     # Cria uma comissão para ser a unidade de tramitação
     tipo_comissao = mommy.make(TipoComissao)
     comissao = mommy.make(
@@ -400,8 +400,12 @@ def test_tramitacao_submit(admin_client):
     response = admin_client.post(
         reverse("sapl.materia:tramitacao_create", kwargs={"pk": materia_principal.pk}),
         {
-            "unidade_tramitacao_local": make_unidade_tramitacao("Unidade Local").pk,
-            "unidade_tramitacao_destino": make_unidade_tramitacao("Unidade Destino").pk,
+            "unidade_tramitacao_local": test_make_unidade_tramitacao(
+                "Unidade Local"
+            ).pk,
+            "unidade_tramitacao_destino": test_make_unidade_tramitacao(
+                "Unidade Destino"
+            ).pk,
             "urgente": True,
             "status": status_tramitacao.pk,
             "data_tramitacao": "2016-03-21",
@@ -409,6 +413,7 @@ def test_tramitacao_submit(admin_client):
             "data_encaminhamento": "2016-03-22",
             "texto": "Texto_Teste",
             "salvar": "salvar",
+            "turno": "U",
         },
         follow=True,
     )
@@ -417,6 +422,9 @@ def test_tramitacao_submit(admin_client):
 
     # Testa se a tramitacao foi criada
     tramitacao = Tramitacao.objects.first()
+    assert tramitacao is not None
+    assert tramitacao.status == status_tramitacao
+    assert tramitacao.data_tramitacao == date(2016, 3, 21)
     assert tramitacao.unidade_tramitacao_local.comissao.nome == "Unidade Local"
     assert tramitacao.unidade_tramitacao_destino.comissao.nome == "Unidade Destino"
     assert tramitacao.urgente is True
@@ -586,25 +594,30 @@ def test_proposicao_submit(admin_client):
     tipo_autor = mommy.make(TipoAutor, descricao="Teste Tipo_Autor")
     user = get_user_model().objects.filter(is_active=True)[0]
 
-    autor = mommy.make(Autor, user=user, tipo=tipo_autor, nome="Autor Teste")
+    autor = mommy.make(Autor, tipo=tipo_autor, nome="Autor Teste")
+    operador = mommy.make(OperadorAutor, user=user, autor=autor)
+    # add o user ao grupo Autor
+    grupo_autor = Group.objects.get(name="Autor")
+    user.groups.add(grupo_autor)
 
     file_content = "file_content"
     texto = SimpleUploadedFile("file.txt", file_content.encode("UTF-8"))
 
     mcts = ContentType.objects.get_for_models(*models_with_gr_for_model(TipoProposicao))
 
-    for pk, mct in enumerate(mcts):
+    for pk, (mct, ct) in enumerate(mcts.items()):
         tipo_conteudo_related = mommy.make(mct, pk=pk + 1)
-
+        admin_client.force_login(user)
         response = admin_client.post(
             reverse("sapl.materia:proposicao_create"),
             {
+                "especie": ct.pk,
                 "tipo": mommy.make(
                     TipoProposicao, pk=3, tipo_conteudo_related=tipo_conteudo_related
                 ).pk,
                 "descricao": "Teste proposição",
                 "justificativa_devolucao": "  ",
-                "status": "E",
+                "status": "",
                 "autor": autor.pk,
                 "texto_original": texto,
                 "salvar": "salvar",
@@ -612,6 +625,8 @@ def test_proposicao_submit(admin_client):
             },
             follow=True,
         )
+        if "form" in response.context_data:
+            print(response.context_data["form"].errors)
 
         assert response.status_code == 200
 
@@ -626,10 +641,10 @@ def test_proposicao_submit(admin_client):
 @pytest.mark.django_db(transaction=False)
 def test_form_errors_proposicao(admin_client):
     tipo_autor = mommy.make(TipoAutor, descricao="Teste Tipo_Autor")
-
     user = get_user_model().objects.filter(is_active=True)[0]
 
-    autor = mommy.make(Autor, user=user, tipo=tipo_autor, nome="Autor Teste")
+    autor = mommy.make(Autor, tipo=tipo_autor, nome="Autor Teste")
+    operador = mommy.make(OperadorAutor, user=user, autor=autor)
 
     file_content = "file_content"
     texto = SimpleUploadedFile("file.txt", file_content.encode("UTF-8"))
@@ -645,6 +660,8 @@ def test_form_errors_proposicao(admin_client):
         follow=True,
     )
 
+    assert response.status_code == 200
+    assert "form" in response.context_data
     assert response.context_data["form"].errors["tipo"] == ["Este campo é obrigatório."]
     assert response.context_data["form"].errors["descricao"] == [
         "Este campo é obrigatório."
@@ -723,7 +740,8 @@ def test_numeracao_materia_legislativa_por_ano(admin_client):
 
 @pytest.mark.django_db(transaction=False)
 def test_tramitacoes_materias_anexadas(admin_client):
-    config = mommy.make(AppConfig, tramitacao_materia=True)
+    AppConfig.attr("tramitacao_materia", True, ignore_cache=True)
+    # config = mommy.make(AppConfig, tramitacao_materia=True)
 
     tipo_materia = mommy.make(TipoMateriaLegislativa, descricao="Tipo_Teste")
     materia_principal = mommy.make(
@@ -749,9 +767,9 @@ def test_tramitacoes_materias_anexadas(admin_client):
         data_anexacao="2020-11-05",
     )
 
-    unidade_tramitacao_local_1 = make_unidade_tramitacao(descricao="Teste 1")
-    unidade_tramitacao_destino_1 = make_unidade_tramitacao(descricao="Teste 2")
-    unidade_tramitacao_destino_2 = make_unidade_tramitacao(descricao="Teste 3")
+    unidade_tramitacao_local_1 = test_make_unidade_tramitacao(descricao="Teste 1")
+    unidade_tramitacao_destino_1 = test_make_unidade_tramitacao(descricao="Teste 2")
+    unidade_tramitacao_destino_2 = test_make_unidade_tramitacao(descricao="Teste 3")
 
     status = mommy.make(StatusTramitacao, indicador="R")
 
@@ -762,6 +780,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "unidade_tramitacao_local": unidade_tramitacao_local_1.pk,
         "unidade_tramitacao_destino": unidade_tramitacao_destino_1.pk,
         "status": status.pk,
+        "turno": "U",
         "urgente": False,
         "texto": "Texto de teste",
     }
@@ -797,6 +816,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "status": tramitacao_principal.status.pk,
         "urgente": tramitacao_principal.urgente,
         "texto": tramitacao_principal.texto,
+        "turno": tramitacao_principal.turno,
     }
     form.instance = tramitacao_principal
 
@@ -832,6 +852,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "status": status.pk,
         "urgente": False,
         "texto": "Texto de teste",
+        "turno": "U",
     }
     form.instance.materia_id = materia_principal.pk
 
@@ -850,6 +871,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "status": tramitacao_anexada.status.pk,
         "urgente": tramitacao_anexada.urgente,
         "texto": tramitacao_anexada.texto,
+        "turno": tramitacao_anexada.turno,
     }
     form.instance = tramitacao_anexada
 
@@ -875,8 +897,10 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "unidade_tramitacao_local": tramitacao_principal.unidade_tramitacao_local.pk,
         "unidade_tramitacao_destino": tramitacao_principal.unidade_tramitacao_destino.pk,
         "status": tramitacao_principal.status.pk,
+        "turno": tramitacao_principal.turno,
         "urgente": tramitacao_principal.urgente,
         "texto": "Testando a alteração",
+        "turno": tramitacao_principal.turno,
     }
     form.instance = tramitacao_principal
 
@@ -911,8 +935,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
 
     assert Tramitacao.objects.all().count() == 0
 
-    config.tramitacao_materia = False
-    config.save()
+    AppConfig.attr("tramitacao_materia", False, ignore_cache=True)
 
     # Teste criação de Tramitacao
     form = TramitacaoForm(data={})
@@ -923,6 +946,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "status": status.pk,
         "urgente": False,
         "texto": "Texto de teste",
+        "turno": "U",
     }
     form.instance.materia_id = materia_principal.pk
 
@@ -946,6 +970,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "status": status.pk,
         "urgente": False,
         "texto": "Texto de teste",
+        "turno": "U",
     }
     form.instance.materia_id = materia_anexada.pk
 
@@ -970,6 +995,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "status": tramitacao_principal.status.pk,
         "urgente": tramitacao_principal.urgente,
         "texto": tramitacao_principal.texto,
+        "turno": tramitacao_principal.turno,
     }
     form.instance = tramitacao_principal
 
@@ -994,6 +1020,7 @@ def test_tramitacoes_materias_anexadas(admin_client):
         "status": tramitacao_principal.status.pk,
         "urgente": tramitacao_principal.urgente,
         "texto": tramitacao_principal.texto,
+        "turno": tramitacao_principal.turno,
     }
     form.instance = tramitacao_anexada
 

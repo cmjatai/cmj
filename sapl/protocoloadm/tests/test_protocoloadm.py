@@ -533,7 +533,7 @@ def test_lista_documentos_anexados():
 
 
 @pytest.mark.django_db(transaction=False)
-def make_unidade_tramitacao(descricao):
+def test_make_unidade_tramitacao(descricao):
     # Cria uma comissão para ser a unidade de tramitação
     tipo_comissao = mommy.make(TipoComissao)
     comissao = mommy.make(
@@ -596,9 +596,9 @@ def test_tramitacoes_documentos_anexados(admin_client):
         data_anexacao="2020-11-05",
     )
 
-    unidade_tramitacao_local_1 = make_unidade_tramitacao(descricao="Teste 1")
-    unidade_tramitacao_destino_1 = make_unidade_tramitacao(descricao="Teste 2")
-    unidade_tramitacao_destino_2 = make_unidade_tramitacao(descricao="Teste 3")
+    unidade_tramitacao_local_1 = test_make_unidade_tramitacao(descricao="Teste 1")
+    unidade_tramitacao_destino_1 = test_make_unidade_tramitacao(descricao="Teste 2")
+    unidade_tramitacao_destino_2 = test_make_unidade_tramitacao(descricao="Teste 3")
 
     status = mommy.make(StatusTramitacaoAdministrativo, indicador="R")
 
@@ -924,8 +924,8 @@ def test_tramitacao_lote_documentos_form(admin_client):
         tipo=tipo_documento,
     )
 
-    unidade_tramitacao_local_1 = make_unidade_tramitacao(descricao="Teste 1")
-    unidade_tramitacao_destino_1 = make_unidade_tramitacao(descricao="Teste 2")
+    unidade_tramitacao_local_1 = test_make_unidade_tramitacao(descricao="Teste 1")
+    unidade_tramitacao_destino_1 = test_make_unidade_tramitacao(descricao="Teste 2")
 
     status = mommy.make(StatusTramitacaoAdministrativo, indicador="R")
 
@@ -1056,10 +1056,10 @@ def test_tramitacao_lote_documentos_views(admin_client):
         data_anexacao="2020-11-05",
     )
 
-    unidade_tramitacao_local_1 = make_unidade_tramitacao(descricao="Teste 1")
-    unidade_tramitacao_destino_1 = make_unidade_tramitacao(descricao="Teste 2")
-    unidade_tramitacao_destino_2 = make_unidade_tramitacao(descricao="Teste 3")
-    unidade_tramitacao_destino_3 = make_unidade_tramitacao(descricao="Teste 4")
+    unidade_tramitacao_local_1 = test_make_unidade_tramitacao(descricao="Teste 1")
+    unidade_tramitacao_destino_1 = test_make_unidade_tramitacao(descricao="Teste 2")
+    unidade_tramitacao_destino_2 = test_make_unidade_tramitacao(descricao="Teste 3")
+    unidade_tramitacao_destino_3 = test_make_unidade_tramitacao(descricao="Teste 4")
 
     status = mommy.make(StatusTramitacaoAdministrativo, indicador="R")
 

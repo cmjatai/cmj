@@ -142,13 +142,9 @@ class CheckCheckMixin:
                 "a edição é restrita ao gestor do sistema!"
             )
 
-    def get(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         self._checkcheck(request)
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self._checkcheck(request)
-        return super().post(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class BtnCertMixin:
