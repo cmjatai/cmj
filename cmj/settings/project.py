@@ -62,8 +62,8 @@ DATABASES = {
     )
 }
 
-DATABASE_URL_PRD = config("DATABASE_URL_PRD", cast=str)
-DATABASE_URL_DEV = config("DATABASE_URL_DEV", cast=str)
+DATABASE_URL_PRD = config("DATABASE_URL_PRD", cast=str, default="")
+DATABASE_URL_DEV = config("DATABASE_URL_DEV", cast=str, default="")
 DATABASE_URL_BLOCK = config("DATABASE_URL_BLOCK", cast=str, default=DATABASE_URL_PRD)
 
 if DEBUG and FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
