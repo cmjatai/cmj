@@ -1,16 +1,12 @@
 import logging
 import re
 
-from django.db.models import Q
-from django.http.response import HttpResponse, Http404, HttpResponseForbidden,\
-    HttpResponseRedirect
-from django.urls.base import resolve
-from django.utils import timezone
 import yaml
+from django.http.response import HttpResponseForbidden, HttpResponseRedirect
+from django.utils import timezone
 
 from cmj.utils import get_breadcrumb_classes
 from sapl.base.models import AppConfig
-
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +22,16 @@ class DisabledMiddleware:
         # vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 
         response = self.get_response(request)
+
+        # Captura qualquer erro (4xx ou 5xx)
+        if response.status_code >= 400:
+            msg = f"Status {response.status_code} em {request.path}"
+            if response.status_code >= 500:
+                logger.error(msg)
+            else:
+                logger.warning(msg)
+
+        return response
 
         # ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         # Aqui vai o código a ser executado
@@ -43,15 +49,15 @@ class DisabledMiddleware:
         path = request.path
         try:
 
-            if path == '/login' or path.startswith('/sistema/app'):
+            if path == "/login" or path.startswith("/sistema/app"):
                 return
 
-            self.periodos = yaml.full_load(AppConfig.attr('disabled'))
+            self.periodos = yaml.full_load(AppConfig.attr("disabled"))
 
             for pdict in self.periodos:
 
-                start = pdict.get('start', None)
-                end = pdict.get('end', None)
+                start = pdict.get("start", None)
+                end = pdict.get("end", None)
 
                 if start and end and (now < start or now > end):
                     continue
@@ -62,13 +68,13 @@ class DisabledMiddleware:
                 if end and now > end:
                     continue
 
-                urls = pdict.get('urls', [])
+                urls = pdict.get("urls", [])
                 for udict in urls:
                     if not udict:
                         continue
 
-                    url = udict.get('url', '/') or '/'
-                    url = url.split(',')
+                    url = udict.get("url", "/") or "/"
+                    url = url.split(",")
 
                     r = re.compile(url[0].strip(), re.I)
                     m = r.findall(path)
@@ -83,12 +89,19 @@ class DisabledMiddleware:
         except:
             self.periodos = []
             logger.error(
-                'Erro na carga e avaliação dos períodos e suas urls desativadas')
+                "Erro na carga e avaliação dos períodos e suas urls desativadas"
+            )
 
         # print(timezone.localtime() - now, path)
 
     def process_exception(self, request, exception):
-        pass
+        logger.error(
+            f"Erro crítico na view: {type(exception).__name__} em {request.path}",
+            exc_info=True,  # Isso anexa o Traceback automaticamente
+            extra={"user": request.user},
+        )
+
+        return None
 
     def process_template_response(self, request, response):
         return response
@@ -112,7 +125,7 @@ class BreadCrumbMiddleware:
         try:
             context = response.context_data
 
-            if request.path.startswith('/api/') or not context:
+            if request.path.startswith("/api/") or not context:
                 return response
 
             return get_breadcrumb_classes(context, request, response)
