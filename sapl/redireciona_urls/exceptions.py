@@ -10,4 +10,5 @@ class UnknownUrlNameError(Exception):
         return repr(
             _("Funcionalidade")
             + " '%s' " % (self.url_name)
-            + _("pode ter sido removida ou movida para outra url."))
+            + _("pode ter sido removida ou movida para outra url.")
+        )

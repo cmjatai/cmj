@@ -184,9 +184,7 @@ def test_permission_required_of_views_exists(url_item):
     key, url, var, app_name = url_item
     url = "/" + (url % {v: 1 for v in var})
 
-    assert (
-        "\n" not in url
-    ), """
+    assert "\n" not in url, """
         A url (%s) da app (%s) está mal formada.
     """ % (
         app_name,

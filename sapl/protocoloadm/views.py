@@ -2571,11 +2571,9 @@ class AcompanhamentoDocumentoView(CreateView):
                         usuario.username
                     )
                 )
-                msg = _(
-                    "Foi enviado um e-mail de confirmação. Confira sua caixa \
+                msg = _("Foi enviado um e-mail de confirmação. Confira sua caixa \
                          de mensagens e clique no link que nós enviamos para \
-                         confirmar o acompanhamento deste documento."
-                )
+                         confirmar o acompanhamento deste documento.")
                 messages.add_message(request, messages.SUCCESS, msg)
 
             # Se o elemento existir e o email não foi confirmado:
@@ -2605,11 +2603,9 @@ class AcompanhamentoDocumentoView(CreateView):
                     )
                 )
 
-                msg = _(
-                    "Foi enviado um e-mail de confirmação. Confira sua caixa \
+                msg = _("Foi enviado um e-mail de confirmação. Confira sua caixa \
                         de mensagens e clique no link que nós enviamos para \
-                        confirmar o acompanhamento deste documento."
-                )
+                        confirmar o acompanhamento deste documento.")
                 messages.add_message(request, messages.SUCCESS, msg)
 
             # Caso esse Acompanhamento já exista

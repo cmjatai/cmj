@@ -43,9 +43,7 @@ def test_booleanfield_configure():
             for field in model._meta.get_fields():
                 if not isinstance(field, BooleanField):
                     continue
-                assert isinstance(
-                    field.default, bool
-                ), """
+                assert isinstance(field.default, bool), """
                     atributo 'default' não definido em:
                     Campo: %s
                     Model: %s

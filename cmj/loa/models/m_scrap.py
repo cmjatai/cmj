@@ -238,7 +238,7 @@ class ScrapRecord(models.Model):
                                     codigo=values.get("Função:", "").split(" - ")[0],
                                 )
                             if key == "Projeto / Atividade:":
-                                if '.' not in codigo:
+                                if "." not in codigo:
                                     codigo = f"{codigo[:1]}.{codigo[1:]}"
                                     params["codigo"] = codigo
                             fk_instance = model.objects.get_or_create(

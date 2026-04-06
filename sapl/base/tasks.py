@@ -1,48 +1,57 @@
-from datetime import timedelta
-from IPython.display import Markdown, display
-
 import json
-from cmj.celery import app as cmj_celery_app
-from cmj.utils import start_task
-from sapl.base.email_utils import do_envia_email_tramitacao
-from sapl.materia.models import AnaliseSimilaridade, AssuntoMateria, MateriaAssunto, StatusTramitacao, UnidadeTramitacao, MateriaLegislativa
-from sapl.parlamentares.models import Legislatura
-from sapl.protocoloadm.models import StatusTramitacaoAdministrativo, DocumentoAdministrativo
-
-from cmj.genia import IAAnaliseSimilaridadeService, IAClassificacaoMateriaService
-from sapl.materia.models import MateriaLegislativa
-from sapl.base.models import Metadata
-from django.db.models import Q, F
-from django.utils import timezone
-from django.conf import settings
+from datetime import timedelta
 
 from celery.utils.log import get_task_logger
+from django.conf import settings
+from django.db.models import F, Q
+from django.utils import timezone
+from IPython.display import Markdown, display
+
+from cmj.celery import app as cmj_celery_app
+from cmj.genia import IAAnaliseSimilaridadeService, IAClassificacaoMateriaService
+from cmj.utils import start_task
+from sapl.base.email_utils import do_envia_email_tramitacao
+from sapl.base.models import Metadata
+from sapl.materia.models import (
+    AnaliseSimilaridade,
+    AssuntoMateria,
+    MateriaAssunto,
+    MateriaLegislativa,
+    StatusTramitacao,
+    UnidadeTramitacao,
+)
+from sapl.parlamentares.models import Legislatura
+from sapl.protocoloadm.models import (
+    DocumentoAdministrativo,
+    StatusTramitacaoAdministrativo,
+)
 
 logger = get_task_logger(__name__)
 
 
-@cmj_celery_app.task(queue='cq_core')
+@cmj_celery_app.task(queue="cq_core")
 def task_envia_email_tramitacao(kwargs):
-    logger.info(f'task_envia_email_tramitacao: {kwargs}')
+    logger.info(f"task_envia_email_tramitacao: {kwargs}")
 
     tipo = kwargs.get("tipo")
     doc_mat_id = kwargs.get("doc_mat_id")
     tramitacao_status_id = kwargs.get("tramitacao_status_id")
     tramitacao_unidade_tramitacao_destino_id = kwargs.get(
-        "tramitacao_unidade_tramitacao_destino_id")
+        "tramitacao_unidade_tramitacao_destino_id"
+    )
     base_url = kwargs.get("base_url")
 
-    if tipo == 'documento':
+    if tipo == "documento":
         doc_mat = DocumentoAdministrativo.objects.get(id=doc_mat_id)
-        status = StatusTramitacaoAdministrativo.objects.get(
-            id=tramitacao_status_id)
+        status = StatusTramitacaoAdministrativo.objects.get(id=tramitacao_status_id)
 
-    elif tipo == 'materia':
+    elif tipo == "materia":
         doc_mat = MateriaLegislativa.objects.get(id=doc_mat_id)
         status = StatusTramitacao.objects.get(id=tramitacao_status_id)
 
     unidade_destino = UnidadeTramitacao.objects.get(
-        id=tramitacao_unidade_tramitacao_destino_id)
+        id=tramitacao_unidade_tramitacao_destino_id
+    )
 
     do_envia_email_tramitacao(base_url, tipo, doc_mat, status, unidade_destino)
 
@@ -54,22 +63,28 @@ def task_classifica_materialegislativa_function():
     gen = IAClassificacaoMateriaService()
     gen.model = MateriaLegislativa
 
-    ultimo_metadata = Metadata.objects.filter(
-        content_type__model='materialegislativa').order_by('-id').first()
+    ultimo_metadata = (
+        Metadata.objects.filter(content_type__model="materialegislativa")
+        .order_by("-id")
+        .first()
+    )
     if ultimo_metadata:
         tempo = timezone.now() - ultimo_metadata.created
         if tempo.seconds < 60:
             return
 
     metadata_de_materias = Metadata.objects.filter(
-        content_type__model='materialegislativa').values_list('object_id', flat=True)
+        content_type__model="materialegislativa"
+    ).values_list("object_id", flat=True)
 
-    materias = MateriaLegislativa.objects.exclude(
-            Q(tipo__prompt='') | Q(tipo__prompt=None) | Q(id__in=metadata_de_materias),
-        ).filter(
-            ano__lte=2024
-        ).values_list('id', flat=True).order_by('-ano', '-numero')
-
+    materias = (
+        MateriaLegislativa.objects.exclude(
+            Q(tipo__prompt="") | Q(tipo__prompt=None) | Q(id__in=metadata_de_materias),
+        )
+        .filter(ano__lte=2024)
+        .values_list("id", flat=True)
+        .order_by("-ano", "-numero")
+    )
 
     md = None
     for mid in materias[:1]:
@@ -80,40 +95,38 @@ def task_classifica_materialegislativa_function():
         if analise:
             continue
 
-        md = gen.run(action='generate')
+        md = gen.run(action="generate")
 
         if md and md.metadata:
-            temas = md.metadata.get('genia', {}).get('temas', [])
+            temas = md.metadata.get("genia", {}).get("temas", [])
 
             obj = md.content_object
 
             for tema in temas:
-                assunto, created = AssuntoMateria.objects.get_or_create(
-                    assunto=tema
-                )
+                assunto, created = AssuntoMateria.objects.get_or_create(assunto=tema)
 
                 mass, created = MateriaAssunto.objects.get_or_create(
-                    assunto=assunto,
-                    materia=obj
+                    assunto=assunto, materia=obj
                 )
             obj.save()
 
         task_analise_similaridade_entre_materias_function(only_materia_id=mid)
 
 
-@cmj_celery_app.task(queue='cq_base', bind=True)
+@cmj_celery_app.task(queue="cq_base", bind=True)
 def task_classifica_materialegislativa(self, *args, **kwargs):
     # desativada, não sendo chamada - ja processou toda a base de antes de 2025.
     try:
         task_classifica_materialegislativa_function()
     except Exception as e:
-        logger.error(f'Erro ao executar task_classifica_materialegislativa: {e}')
+        logger.error(f"Erro ao executar task_classifica_materialegislativa: {e}")
 
     start_task(
-        'sapl.base.tasks.task_classifica_materialegislativa',
+        "sapl.base.tasks.task_classifica_materialegislativa",
         task_classifica_materialegislativa,
-        timezone.now() + timezone.timedelta(seconds=120)
+        timezone.now() + timezone.timedelta(seconds=120),
     )
+
 
 def task_analise_similaridade_entre_materias_function(only_materia_id=None):
     # Função para analisar a similaridade entre matérias
@@ -127,23 +140,32 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
     def gera_registros_de_analise_vazios():
         # gera registros de analise com similaridade -1
         # para todas as materias que não possuem analise
-        requerimentos = MateriaLegislativa.objects.filter(
-            tipo_id=3,
-            ano__gte=legislatura_atual['data_inicio'].year,
-            ano__lte=legislatura_atual['data_fim'].year
-        ).prefetch_related('autores', 'assuntos'
-                        ).order_by('-id').distinct()
+        requerimentos = (
+            MateriaLegislativa.objects.filter(
+                tipo_id=3,
+                ano__gte=legislatura_atual["data_inicio"].year,
+                ano__lte=legislatura_atual["data_fim"].year,
+            )
+            .prefetch_related("autores", "assuntos")
+            .order_by("-id")
+            .distinct()
+        )
 
         # cria uma lista de tuplas contendo o id do requerimento, uma tupla com os ids dos autores e uma tupla com os ids dos assuntos
         requerimentos_ids = []
         for requerimento in requerimentos:
             requerimentos_ids.append(
-                (requerimento.id, tuple(requerimento.autores.values_list('id', flat=True)),
-                tuple(requerimento.assuntos.values_list('id', flat=True)))
+                (
+                    requerimento.id,
+                    tuple(requerimento.autores.values_list("id", flat=True)),
+                    tuple(requerimento.assuntos.values_list("id", flat=True)),
+                )
             )
 
         # ordena a lista pela quantidade de assuntos
-        requerimentos_ids = sorted(requerimentos_ids, key=lambda x: (len(x[2]), len(x[1])), reverse=True)
+        requerimentos_ids = sorted(
+            requerimentos_ids, key=lambda x: (len(x[2]), len(x[1])), reverse=True
+        )
 
         # ordena internamente cada tupla e assuntos
         for i, r in enumerate(requerimentos_ids):
@@ -153,13 +175,17 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
         requerimentos_comparacao = {}
         for i, r1 in enumerate(requerimentos_ids):
             for j, r2 in enumerate(requerimentos_ids):
-                if i == j: # mesmo requerimento
+                if i == j:  # mesmo requerimento
                     continue
 
-                if r1[0] < r2[0]: # para evitar duplicidade, descarta matéria com id menor
+                if (
+                    r1[0] < r2[0]
+                ):  # para evitar duplicidade, descarta matéria com id menor
                     continue
 
-                if len(r1[1]) >=5 or len(r2[1]) >= 5: # de cinco autores para cima, não compara
+                if (
+                    len(r1[1]) >= 5 or len(r2[1]) >= 5
+                ):  # de cinco autores para cima, não compara
                     continue
 
                 # se existe interseção entre os autores, não compara
@@ -189,7 +215,9 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
             requerimentos_comparados[k] = v
 
         # ordena a comparação pela quantidade de elementos na interseção
-        requerimentos_comparados = sorted(requerimentos_comparados.items(), key=lambda x: len(x[1]), reverse=True)
+        requerimentos_comparados = sorted(
+            requerimentos_comparados.items(), key=lambda x: len(x[1]), reverse=True
+        )
 
         for i, r in enumerate(requerimentos_comparados):
             if only_materia_id and r[0][0] != only_materia_id:
@@ -208,22 +236,24 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
     q = Q()
     if only_materia_id:
         gera_registros_de_analise_vazios()
-        q = Q(
-            Q(materia_1_id=only_materia_id) | Q(materia_2_id=only_materia_id)
-        )
+        q = Q(Q(materia_1_id=only_materia_id) | Q(materia_2_id=only_materia_id))
 
     analises = AnaliseSimilaridade.objects.filter(
         q,
-        similaridade = -1,
+        similaridade=-1,
         qtd_assuntos_comuns__gt=0,
-        materia_1_id__gt=F('materia_2_id'), # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
-    ).order_by('-materia_1__ano',
-               '-data_analise__year',
-               '-data_analise__month',
-               '-qtd_assuntos_comuns',
-               '-materia_1_id',
-               '-materia_2_id',
-               '-id')
+        materia_1_id__gt=F(
+            "materia_2_id"
+        ),  # Analises agendadas em que materia_1_id > materia_2_id, ou seja, não checa com materia geradas depois de materia_1_id
+    ).order_by(
+        "-materia_1__ano",
+        "-data_analise__year",
+        "-data_analise__month",
+        "-qtd_assuntos_comuns",
+        "-materia_1_id",
+        "-materia_2_id",
+        "-id",
+    )
 
     gen = IAAnaliseSimilaridadeService()
     if only_materia_id:
@@ -233,28 +263,35 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
         gen.batch_run(analises, logger=logger)
 
 
-@cmj_celery_app.task(queue='cq_base', bind=True)
+@cmj_celery_app.task(queue="cq_base", bind=True)
 def task_analise_similaridade_entre_materias(self, *args, **kwargs):
     if settings.DEBUG:
         return
 
     only_materia_id = args[0] if args else None
-    logger.info(f'Executando... only_materia_id={only_materia_id}')
+    logger.info(f"Executando... only_materia_id={only_materia_id}")
 
     try:
-        task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
+        task_analise_similaridade_entre_materias_function(
+            only_materia_id=only_materia_id
+        )
     except Exception as e:
-        logger.error(f'Erro ao executar task_analise_similaridade_entre_materias: {e}')
+        logger.error(f"Erro ao executar task_analise_similaridade_entre_materias: {e}")
 
-@cmj_celery_app.task(queue='cq_core', bind=True)
+
+@cmj_celery_app.task(queue="cq_core", bind=True)
 def task_analise_similaridade_entre_materia_via_classificacao(self, *args, **kwargs):
     if settings.DEBUG:
         return
 
     only_materia_id = args[0] if args else None
-    logger.info(f'Executando... only_materia_id={only_materia_id}')
+    logger.info(f"Executando... only_materia_id={only_materia_id}")
 
     try:
-        task_analise_similaridade_entre_materias_function(only_materia_id=only_materia_id)
+        task_analise_similaridade_entre_materias_function(
+            only_materia_id=only_materia_id
+        )
     except Exception as e:
-        logger.error(f'Erro ao executar task_analise_similaridade_entre_materia_via_classificacao: {e}')
+        logger.error(
+            f"Erro ao executar task_analise_similaridade_entre_materia_via_classificacao: {e}"
+        )

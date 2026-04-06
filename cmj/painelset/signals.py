@@ -1,15 +1,13 @@
 import logging
 
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch.dispatcher import receiver
 
 from cmj.painelset.signals_sync_refresh import send_signal_for_websocket_sync_refresh
 
-
 logger = logging.getLogger(__name__)
 
 
-@receiver([post_save, post_delete], dispatch_uid='signal_post_syncrefresh')
+@receiver([post_save, post_delete], dispatch_uid="signal_post_syncrefresh")
 def signal_post_syncrefresh(sender, instance, **kwargs):
     send_signal_for_websocket_sync_refresh(instance, **kwargs)
-

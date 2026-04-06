@@ -2,7 +2,6 @@
 import os
 import sys
 
-
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cmj.settings")
     try:
@@ -23,5 +22,5 @@ if __name__ == "__main__":
     execute_from_command_line(sys.argv)
 
 
-#for c in self.__class__.mro():
+# for c in self.__class__.mro():
 #    print(c, hasattr(c, 'post'), hasattr(c, 'delete'))

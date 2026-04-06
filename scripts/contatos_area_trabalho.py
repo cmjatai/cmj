@@ -1,8 +1,7 @@
 import csv
 import os
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     import django
     from django.utils import formats
@@ -11,47 +10,62 @@ if __name__ == '__main__':
     django.setup()
 
 if True:
-    from cmj.core.models import AreaTrabalho
-    from cmj.cerimonial.models import Contato, Endereco, Telefone
-
     from django.db.models.fields import DateField
 
-if __name__ == '__main__':
+    from cmj.cerimonial.models import Contato, Endereco, Telefone
+    from cmj.core.models import AreaTrabalho
 
-    p = 'Mauro Bento Filho'
+if __name__ == "__main__":
+
+    p = "Mauro Bento Filho"
     at = AreaTrabalho.objects.filter(nome__icontains=p)
 
-    with open('/home/leandro/TEMP/AT-{}.csv'.format(p), 'w', newline='', encoding='utf-8') as cf:
+    with open(
+        "/home/leandro/TEMP/AT-{}.csv".format(p), "w", newline="", encoding="utf-8"
+    ) as cf:
 
-        writer = csv.writer(cf, delimiter=',',
-                            quotechar='"',
-                            quoting=csv.QUOTE_MINIMAL)
+        writer = csv.writer(cf, delimiter=",", quotechar='"', quoting=csv.QUOTE_MINIMAL)
 
-        contatos = Contato.objects.filter(
-            workspace=at).order_by(
-            'endereco_set__bairro__nome',
-            'endereco_set__endereco',
-            'nome')
-
-        excludes_fields = (
-            'id', 'search', 'modified', 'owner', 'modifier', 'created'
+        contatos = Contato.objects.filter(workspace=at).order_by(
+            "endereco_set__bairro__nome", "endereco_set__endereco", "nome"
         )
+
+        excludes_fields = ("id", "search", "modified", "owner", "modifier", "created")
 
         # COMPLETO
         contato_excludes_fields = (
-            'workspace', 'perfil_user',  'ativo', 'apelido', 'nome_social',
-            'identidade_genero', 'nivel_instrucao', 'titulo_eleitor',
-            'tipo_autoridade', 'pronome_tratamento'
+            "workspace",
+            "perfil_user",
+            "ativo",
+            "apelido",
+            "nome_social",
+            "identidade_genero",
+            "nivel_instrucao",
+            "titulo_eleitor",
+            "tipo_autoridade",
+            "pronome_tratamento",
         )
         telefone_excludes_fields = (
-            'contato', 'operadora', 'proprio', 'de_quem_e', 'preferencial',
-            'permissao', 'tipo', 'created'
+            "contato",
+            "operadora",
+            "proprio",
+            "de_quem_e",
+            "preferencial",
+            "permissao",
+            "tipo",
+            "created",
         )
 
         endereco_excludes_fields = (
-            'contato', 'trecho', 'preferencial', 'tipo',
-            'ponto_referencia', 'regiao_municipal',
-            'distrito', 'observacoes', 'created'
+            "contato",
+            "trecho",
+            "preferencial",
+            "tipo",
+            "ponto_referencia",
+            "regiao_municipal",
+            "distrito",
+            "observacoes",
+            "created",
         )
 
         """
@@ -90,17 +104,17 @@ if __name__ == '__main__':
                 continue
             row_title.append(field.verbose_name)
 
-            if field.name == 'nome':
-                row_title.append('Telefones')
+            if field.name == "nome":
+                row_title.append("Telefones")
 
         for field in get_model_fields(Endereco):
             if campo_excluido(field, (excludes_fields, endereco_excludes_fields)):
                 continue
             row_title.append(field.verbose_name)
 
-        row_title.append('Data')
-        row_title.append('Processos')
-        row_title.append('Observações')
+        row_title.append("Data")
+        row_title.append("Processos")
+        row_title.append("Observações")
 
         writer.writerow(row_title)
 
@@ -113,59 +127,59 @@ if __name__ == '__main__':
 
                 if getattr(c, field.name):
                     if field.__class__ == DateField:
-                        row.append(getattr(c, field.name).strftime('%d/%m/%Y'))
+                        row.append(getattr(c, field.name).strftime("%d/%m/%Y"))
                     else:
                         row.append(str(getattr(c, field.name)))
 
                 else:
-                    row.append('')
+                    row.append("")
 
-                if field.name == 'nome':
+                if field.name == "nome":
 
-                    telefones = ''
+                    telefones = ""
                     for telefone in c.telefone_set.all():
                         for field in get_model_fields(Telefone):
-                            if campo_excluido(field, (excludes_fields, telefone_excludes_fields)):
+                            if campo_excluido(
+                                field, (excludes_fields, telefone_excludes_fields)
+                            ):
                                 continue
 
                             if telefones:
-                                telefones += ' / '
+                                telefones += " / "
 
                             if getattr(telefone, field.name):
-                                telefones += str(getattr(telefone,
-                                                         field.name)).strip()
+                                telefones += str(getattr(telefone, field.name)).strip()
 
                     row.append(telefones)
 
             for endereco in c.endereco_set.all():
                 for field in get_model_fields(Endereco):
-                    if campo_excluido(field, (excludes_fields, endereco_excludes_fields)):
+                    if campo_excluido(
+                        field, (excludes_fields, endereco_excludes_fields)
+                    ):
                         continue
                     if getattr(endereco, field.name):
                         row.append(str(getattr(endereco, field.name)).strip())
                     else:
-                        row.append('')
+                        row.append("")
 
-            titulo_processos = ''
+            titulo_processos = ""
             if c.processo_set.exists():
-                pf = c.processo_set.order_by('data').first()
-                row.append(formats.date_format(
-                    pf.data, "DATE_FORMAT"))
+                pf = c.processo_set.order_by("data").first()
+                row.append(formats.date_format(pf.data, "DATE_FORMAT"))
 
-                for p in c.processo_set.order_by('data'):
+                for p in c.processo_set.order_by("data"):
                     if titulo_processos:
-                        titulo_processos += ' / '
+                        titulo_processos += " / "
                     titulo_processos += p.titulo
                     if p.status:
-                        titulo_processos += ' (%s)' % p.status.descricao
+                        titulo_processos += " (%s)" % p.status.descricao
                     if p.classificacoes.exists():
-                        titulo_processos += ' (%s)' % ''.join(
-                            p.classificacoes.values_list('descricao', flat=True
-                                                         )
+                        titulo_processos += " (%s)" % "".join(
+                            p.classificacoes.values_list("descricao", flat=True)
                         )
             else:
-                row.append(formats.date_format(
-                    c.created, "DATE_FORMAT"))
+                row.append(formats.date_format(c.created, "DATE_FORMAT"))
 
             row.append(titulo_processos)
 

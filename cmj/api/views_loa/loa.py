@@ -84,8 +84,7 @@ class LoaViewSet:
     )
     def despesas_executadas(self, request, *args, **kwargs):
         ano = kwargs["pk"]
-        result = run_sql(
-            f"""SELECT
+        result = run_sql(f"""SELECT
                 q1.cod as orgao,
                 q1.especificacao,
                 q1.valor as val_orc,
@@ -136,8 +135,7 @@ class LoaViewSet:
                         ORDER BY cod, especificacao
                 ) q3 on (q1.cod = q3.cod)
                 order by q2.valor desc nulls last;
-        """
-        )
+        """)
 
         return Response(result)
 

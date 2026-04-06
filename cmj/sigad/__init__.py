@@ -1,1 +1,1 @@
-default_app_config = 'cmj.sigad.apps.AppConfig'
+default_app_config = "cmj.sigad.apps.AppConfig"

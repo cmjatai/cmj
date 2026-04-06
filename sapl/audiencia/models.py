@@ -7,11 +7,7 @@ from model_utils import Choices
 
 from cmj.utils_files import restringe_tipos_de_arquivo_txt
 from sapl.materia.models import MateriaLegislativa
-from sapl.utils import (
-    YES_NO_CHOICES,
-    OverwriteStorage,
-    texto_upload_path,
-)
+from sapl.utils import YES_NO_CHOICES, OverwriteStorage, texto_upload_path
 
 
 def get_audiencia_media_path(instance, subpath, filename):

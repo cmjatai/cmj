@@ -48,7 +48,7 @@ def task_refresh_states_from_visaodepainel_function(*args, **kwargs):
             visao_ja_ativada = False
 
             for visao in visoes:
-                #logger.info(f"Avaliando visão de painel {visao.id}")
+                # logger.info(f"Avaliando visão de painel {visao.id}")
                 if visao_ja_ativada:
                     visoes_changed["deactivated"].append(visao)
                     continue
@@ -59,7 +59,7 @@ def task_refresh_states_from_visaodepainel_function(*args, **kwargs):
                 activates = visao.config.get("activates", []) or []
 
                 for activate in activates:
-                    #logger.info(f"Avaliando ativação {activate}")
+                    # logger.info(f"Avaliando ativação {activate}")
                     filter_match = []
                     for key, lookups in activate.items():
                         # print(key, lookups)

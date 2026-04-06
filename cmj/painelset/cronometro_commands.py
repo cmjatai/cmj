@@ -1,11 +1,13 @@
-
 from abc import ABC, abstractmethod
-from unittest import result
-from django.utils import timezone
 from datetime import timedelta
+from unittest import result
+
+from django.utils import timezone
 
 from cmj.api.serializers_painelset import CronometroTreeSerializer
-from .models import Cronometro, CronometroState, CronometroEvent
+
+from .models import Cronometro, CronometroEvent, CronometroState
+
 
 class CronometroCommand(ABC):
     """
@@ -26,9 +28,9 @@ class CronometroCommand(ABC):
             if self.parent_id:
                 self.parent = Cronometro.objects.get(id=self.parent_id)
             result = self._execute_command()
-            result['cronometro'] = CronometroTreeSerializer(self.cronometro).data
+            result["cronometro"] = CronometroTreeSerializer(self.cronometro).data
             if self.parent:
-                result['parent'] = CronometroTreeSerializer(self.cronometro.parent).data
+                result["parent"] = CronometroTreeSerializer(self.cronometro.parent).data
             return result
         except Cronometro.DoesNotExist:
             return {"error": "Cronômetro não encontrado"}
@@ -37,6 +39,7 @@ class CronometroCommand(ABC):
     def _execute_command(self):
         """Implementação específica do comando"""
         pass
+
 
 class StartCronometroCommand(CronometroCommand):
     """Comando para iniciar cronômetro"""
@@ -56,23 +59,22 @@ class StartCronometroCommand(CronometroCommand):
             self.cronometro.duration = self.duration
         self.cronometro.save()
 
-        #if self.cronometro.parent and self.cronometro.pause_parent_on_start:
+        # if self.cronometro.parent and self.cronometro.pause_parent_on_start:
         #    if self.cronometro.parent.state == CronometroState.RUNNING:
         #        PauseCronometroCommand(self.cronometro.parent.id).execute()
 
         # Criar evento
-        CronometroEvent.objects.create(
-            cronometro=self.cronometro,
-            event_type='started'
-        )
+        CronometroEvent.objects.create(cronometro=self.cronometro, event_type="started")
 
         if self.cronometro.parent:
             # Chain of Responsibility: propagar efeitos para cronômetro pai
             from .cronometro_chain import CronometroEventChain
+
             chain = CronometroEventChain()
             chain.handle_cronometro_started(self.cronometro)
 
         return {"success": True, "message": "Cronômetro iniciado"}
+
 
 class PauseCronometroCommand(CronometroCommand):
     """Comando para pausar cronômetro"""
@@ -91,12 +93,10 @@ class PauseCronometroCommand(CronometroCommand):
         self.cronometro.save()
 
         # Criar evento
-        CronometroEvent.objects.create(
-            cronometro=self.cronometro,
-            event_type='paused'
-        )
+        CronometroEvent.objects.create(cronometro=self.cronometro, event_type="paused")
 
         return {"success": True, "message": "Cronômetro pausado"}
+
 
 class ResumeCronometroCommand(CronometroCommand):
     """Comando para retomar cronômetro pausado"""
@@ -111,12 +111,10 @@ class ResumeCronometroCommand(CronometroCommand):
         self.cronometro.save()
 
         # Criar evento
-        CronometroEvent.objects.create(
-            cronometro=self.cronometro,
-            event_type='resumed'
-        )
+        CronometroEvent.objects.create(cronometro=self.cronometro, event_type="resumed")
 
         return {"success": True, "message": "Cronômetro retomado"}
+
 
 class StopCronometroCommand(CronometroCommand):
     """Comando para parar cronômetro"""
@@ -139,12 +137,10 @@ class StopCronometroCommand(CronometroCommand):
         self.cronometro.save()
 
         # Criar evento
-        CronometroEvent.objects.create(
-            cronometro=self.cronometro,
-            event_type='stopped'
-        )
+        CronometroEvent.objects.create(cronometro=self.cronometro, event_type="stopped")
 
         return {"success": True, "message": "Cronômetro parado"}
+
 
 class AddTimeCronometroCommand(CronometroCommand):
     """Comando para adicionar tempo a um cronômetro"""
@@ -155,7 +151,9 @@ class AddTimeCronometroCommand(CronometroCommand):
 
     def _execute_command(self):
         if self.cronometro.state == CronometroState.FINISHED:
-            return {"error": "Não é possível adicionar tempo a um cronômetro finalizado"}
+            return {
+                "error": "Não é possível adicionar tempo a um cronômetro finalizado"
+            }
 
         self.cronometro.duration += timedelta(seconds=self.seconds)
         self.cronometro.save()
@@ -163,15 +161,15 @@ class AddTimeCronometroCommand(CronometroCommand):
         # Criar evento
         CronometroEvent.objects.create(
             cronometro=self.cronometro,
-            event_type='time_added',
-            metadata={
-                'extra_fields': {
-                    'seconds_added': self.seconds
-                }
-            }
+            event_type="time_added",
+            metadata={"extra_fields": {"seconds_added": self.seconds}},
         )
 
-        return {"success": True, "message": f"{self.seconds} segundos adicionados ao cronômetro"}
+        return {
+            "success": True,
+            "message": f"{self.seconds} segundos adicionados ao cronômetro",
+        }
+
 
 class FinishCronometroCommand(CronometroCommand):
     """Comando para finalizar cronômetro (quando tempo acaba)"""
@@ -186,12 +184,12 @@ class FinishCronometroCommand(CronometroCommand):
 
         # Criar evento
         CronometroEvent.objects.create(
-            cronometro=self.cronometro,
-            event_type='finished'
+            cronometro=self.cronometro, event_type="finished"
         )
 
         # Chain of Responsibility: propagar efeitos para cronômetro pai
         from .cronometro_chain import CronometroEventChain
+
         chain = CronometroEventChain()
         chain.handle_cronometro_finished(self.cronometro)
 

@@ -15,4 +15,4 @@ class Command(BaseCommand):
         for d in drafts:
             if d.created < data_clear:
                 d.delete()
-                #print(d.id, f'{str(d.owner): <50}', d.created)
+                # print(d.id, f'{str(d.owner): <50}', d.created)

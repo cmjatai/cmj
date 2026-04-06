@@ -1,11 +1,9 @@
-from django.urls.conf import re_path, include
+from django.urls.conf import include, re_path
 
 from .apps import AppConfig
-
 
 app_name = AppConfig.name
 
 urlpatterns = [
-    #url(r'^video/', include(urlpatterns_sigad))
-
+    # url(r'^video/', include(urlpatterns_sigad))
 ]

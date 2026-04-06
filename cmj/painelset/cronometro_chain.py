@@ -1,8 +1,9 @@
-
 from abc import ABC, abstractmethod
 
 from cmj.api.serializers_painelset import CronometroTreeSerializer
-from .models import Cronometro, CronometroState, CronometroEvent
+
+from .models import Cronometro, CronometroEvent, CronometroState
+
 
 class CronometroEventHandler(ABC):
     """
@@ -24,53 +25,59 @@ class CronometroEventHandler(ABC):
             return self._next_handler.handle(cronometro, event_data)
         return None
 
+
 class PauseParentHandler(CronometroEventHandler):
     """Handler para pausar cronômetro pai quando filho iniciar"""
 
     def handle(self, cronometro, event_data=None):
-        if cronometro.parent and \
-            cronometro.pause_parent_on_start and \
-            event_data and event_data.get('event') == 'started':
+        if (
+            cronometro.parent
+            and cronometro.pause_parent_on_start
+            and event_data
+            and event_data.get("event") == "started"
+        ):
             # Importação local para evitar circular import
             from .cronometro_commands import PauseCronometroCommand
 
             result = PauseCronometroCommand(cronometro.parent.id).execute()
 
             # Registrar que foi causado pelo filho
-            if result.get('success'):
+            if result.get("success"):
                 CronometroEvent.objects.create(
                     cronometro=cronometro.parent,
-                    event_type='paused',
-                    triggered_by_child=cronometro
+                    event_type="paused",
+                    triggered_by_child=cronometro,
                 )
         return super().handle(cronometro, event_data)
+
 
 class ResumeHandler(CronometroEventHandler):
 
     def handle(self, cronometro, event_data=None):
-        if event_data and event_data.get('event') == 'resumed':
+        if event_data and event_data.get("event") == "resumed":
             if cronometro and cronometro.state == CronometroState.PAUSED:
                 from .cronometro_commands import ResumeCronometroCommand
 
                 result = ResumeCronometroCommand(cronometro).execute()
 
-                if result.get('success'):
+                if result.get("success"):
                     CronometroEvent.objects.create(
                         cronometro=cronometro,
-                        event_type='resumed',
-                        triggered_by_child=None
+                        event_type="resumed",
+                        triggered_by_child=None,
                     )
 
         # Continuar cadeia
         return super().handle(cronometro, event_data)
+
 
 class NotificationHandler(CronometroEventHandler):
     """Handler para enviar notificações via WebSocket"""
 
     def handle(self, cronometro, event_data=None):
         # Importação local para evitar circular import
-        from channels.layers import get_channel_layer
         from asgiref.sync import async_to_sync
+        from channels.layers import get_channel_layer
 
         channel_layer = get_channel_layer()
 
@@ -79,11 +86,9 @@ class NotificationHandler(CronometroEventHandler):
             f"cronometro_{cronometro.id}",
             {
                 "type": "command_result",
-                "command": 'get',
-                "result": {
-                    'cronometro': CronometroTreeSerializer(cronometro).data
-                }
-            }
+                "command": "get",
+                "result": {"cronometro": CronometroTreeSerializer(cronometro).data},
+            },
         )
 
         # Se tem pai, notificar também sobre mudanças na hierarquia
@@ -92,15 +97,16 @@ class NotificationHandler(CronometroEventHandler):
                 f"cronometro_{cronometro.parent.id}",
                 {
                     "type": "command_result",
-                    "command": 'get',
+                    "command": "get",
                     "result": {
-                        'cronometro':CronometroTreeSerializer(cronometro.parent).data
-                    }
-                }
+                        "cronometro": CronometroTreeSerializer(cronometro.parent).data
+                    },
+                },
             )
 
         # Continuar cadeia
         return super().handle(cronometro, event_data)
+
 
 class CronometroEventChain:
     """

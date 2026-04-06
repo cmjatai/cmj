@@ -1,11 +1,13 @@
 import inspect
+from collections import OrderedDict, defaultdict
 from importlib import import_module
-from collections import defaultdict, OrderedDict
+
 from django import forms
 from django.apps import apps
-from django.forms.widgets import MediaDefiningClass, Media
+from django.forms.widgets import Media, MediaDefiningClass
 from django.utils.module_loading import module_has_submodule
 from django.utils.safestring import mark_safe
+
 from .dashboard import Dashcard, GridDashboard
 
 DEFAULT_CHARTJS_URL = (
@@ -55,7 +57,11 @@ class Dashboard(metaclass=MediaDefiningClass):
                     dash_grids[name.lower()] = dash_grid
 
                     for card in klass.cards:
-                        card.filterset = dash_grid.filterset if card.filterset is None else card.filterset
+                        card.filterset = (
+                            dash_grid.filterset
+                            if card.filterset is None
+                            else card.filterset
+                        )
                         card.grids.add(dash_grid)
                         obj = tuple(dash_lists[card.__name__].items())[0]
                         dash_grid.cards.update({obj[1].dash_name: obj})

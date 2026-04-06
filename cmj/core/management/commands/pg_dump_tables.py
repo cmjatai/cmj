@@ -1,7 +1,7 @@
-from datetime import datetime, timedelta
 import logging
 import os
 import subprocess
+from datetime import datetime, timedelta
 from time import sleep
 
 import boto3
@@ -20,7 +20,7 @@ from sapl.utils import hash_sha512
 
 
 def _get_registration_key(model):
-    return '%s_%s' % (model._meta.app_label, model._meta.model_name)
+    return "%s_%s" % (model._meta.app_label, model._meta.model_name)
 
 
 class Command(BaseCommand):
@@ -29,23 +29,23 @@ class Command(BaseCommand):
         m = Manutencao()
         m.desativa_auto_now()
 
-        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
-
-
+        post_save.disconnect(dispatch_uid="timerefresh_post_signal")
 
         for app in apps.get_app_configs():
-            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+            if not app.name.startswith("cmj") and not app.name.startswith("sapl"):
                 continue
 
             for m in app.get_models():
 
                 table = m._meta.db_table
-                cmd = ['/usr/bin/pg_dump --username "readonly" --host "10.3.163.254" ',
-                       '--format=c --compress="9" -d cmj -t ',
-                       table,
-                       '--file="~/bd_cmj/' + table + '.backup"']
+                cmd = [
+                    '/usr/bin/pg_dump --username "readonly" --host "10.3.163.254" ',
+                    '--format=c --compress="9" -d cmj -t ',
+                    table,
+                    '--file="~/bd_cmj/' + table + '.backup"',
+                ]
 
                 try:
-                    subprocess.run(' '.join(cmd), shell=True)
+                    subprocess.run(" ".join(cmd), shell=True)
                 except Exception as e:
                     print(m, e)

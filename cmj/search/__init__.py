@@ -1,1 +1,1 @@
-default_app_config = 'cmj.search.apps.AppConfig'
+default_app_config = "cmj.search.apps.AppConfig"

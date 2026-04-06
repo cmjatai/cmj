@@ -10,10 +10,9 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
-from cmj.ouvidoria.models import Solicitacao, MensagemSolicitacao
+from cmj.ouvidoria.models import MensagemSolicitacao, Solicitacao
 from cmj.utils import AlertSafe
-from sapl.crispy_layout_mixin import SaplFormLayout, to_row, form_actions, \
-    to_column
+from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_column, to_row
 
 
 class DenunciaForm(ModelForm):
@@ -33,22 +32,35 @@ class DenunciaForm(ModelForm):
 
     class Meta:
         model = Solicitacao
-        fields = ('titulo', 'descricao',)
-        widgets = {
-            'descricao': forms.Textarea()}
+        fields = (
+            "titulo",
+            "descricao",
+        )
+        widgets = {"descricao": forms.Textarea()}
 
     def __init__(self, *args, **kwargs):
 
-        rows = [Div(
-            to_column((
-                to_row([
-                    ('titulo', 8),
-                    (Div(
-                        css_class="g-recaptcha" if not settings.DEBUG else '',
-                        data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY
-                    ), 4),
-                    ('descricao', 12),
-                    (AlertSafe(content = SafeString("""<strong>Aviso!</strong><br>
+        rows = [
+            Div(
+                to_column(
+                    (
+                        to_row(
+                            [
+                                ("titulo", 8),
+                                (
+                                    Div(
+                                        css_class=(
+                                            "g-recaptcha" if not settings.DEBUG else ""
+                                        ),
+                                        data_sitekey=settings.GOOGLE_RECAPTCHA_SITE_KEY,
+                                    ),
+                                    4,
+                                ),
+                                ("descricao", 12),
+                                (
+                                    AlertSafe(
+                                        content=SafeString(
+                                            """<strong>Aviso!</strong><br>
                             Ao enviar uma Denúncia Anônima, você receberá
                             um link para acompanhar sua denúncia.<br>
                             Só será
@@ -59,47 +71,56 @@ class DenunciaForm(ModelForm):
                             no entanto, se você compartilhar esse link,
                             quem possuí-lo verá sua denúncia
                             e poderá interagir também.
-                            """),
-                           css_class="alert-warning",
-                           dismiss=False), 12)
-                ]),
-                12)),
+                            """
+                                        ),
+                                        css_class="alert-warning",
+                                        dismiss=False,
+                                    ),
+                                    12,
+                                ),
+                            ]
+                        ),
+                        12,
+                    )
+                ),
+                # to_column((
+                #    to_row([('areatrabalho_parlamentar', 12)]),
+                #    4)),
+                css_class="row",
+            )
+        ]
 
-            # to_column((
-            #    to_row([('areatrabalho_parlamentar', 12)]),
-            #    4)),
-
-            css_class="row"
-        )]
-
-        if 'logged_user' in kwargs['initial'] and \
-                kwargs['initial']['logged_user']:
+        if "logged_user" in kwargs["initial"] and kwargs["initial"]["logged_user"]:
             rows.insert(
-                0, AlertSafe(
-                    _('<strong>Atenção, você foi desconectado!!!</strong><br>'
-                      'Ao escolher fazer uma denúncia anônima, '
-                      'o Portal da Câmara Municipal de Jataí desconectou seu '
-                      'usuário para que sua manifestação não tenha nenhuma '
-                      'relação com você. '
-                      'Assim podemos garantir que sua denûncia é anônima '
-                      'e não mantemos registro sobre você.<br>'
-                      'Para voltar a utilizar das funções que você possuia '
-                      'ao estar logado, é só se conectar novamente.'),
-                    css_class="alert-info"))
+                0,
+                AlertSafe(
+                    _(
+                        "<strong>Atenção, você foi desconectado!!!</strong><br>"
+                        "Ao escolher fazer uma denúncia anônima, "
+                        "o Portal da Câmara Municipal de Jataí desconectou seu "
+                        "usuário para que sua manifestação não tenha nenhuma "
+                        "relação com você. "
+                        "Assim podemos garantir que sua denûncia é anônima "
+                        "e não mantemos registro sobre você.<br>"
+                        "Para voltar a utilizar das funções que você possuia "
+                        "ao estar logado, é só se conectar novamente."
+                    ),
+                    css_class="alert-info",
+                ),
+            )
 
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            *rows,
-            actions=form_actions(label=_('Enviar'))
+            *rows, actions=form_actions(label=_("Enviar"))
         )
 
     def save(self, commit=True):
 
         cd = self.cleaned_data
 
-        #at_list = cd['areatrabalho_parlamentar']
+        # at_list = cd['areatrabalho_parlamentar']
 
         # if not at_list.exists():
         at_list = AreaTrabalho.objects.areatrabalho_da_instituicao()
@@ -127,35 +148,34 @@ class DenunciaForm(ModelForm):
         if settings.DEBUG:
             return cd
 
-        recaptcha = self.data.get('g-recaptcha-response', '')
+        recaptcha = self.data.get("g-recaptcha-response", "")
         if not recaptcha:
-            raise ValidationError(
-                _('Verificação do reCAPTCHA não efetuada.'))
+            raise ValidationError(_("Verificação do reCAPTCHA não efetuada."))
 
-        import urllib3
         import json
 
-        #encoded_data = json.dumps(fields).encode('utf-8')
+        import urllib3
 
-        url = ('https://www.google.com/recaptcha/api/siteverify?'
-               'secret=%s'
-               '&response=%s' % (settings.GOOGLE_RECAPTCHA_SECRET_KEY,
-                                 recaptcha))
+        # encoded_data = json.dumps(fields).encode('utf-8')
+
+        url = (
+            "https://www.google.com/recaptcha/api/siteverify?"
+            "secret=%s"
+            "&response=%s" % (settings.GOOGLE_RECAPTCHA_SECRET_KEY, recaptcha)
+        )
 
         http = urllib3.PoolManager()
         try:
-            r = http.request('POST', url)
-            data = r.data.decode('utf-8')
+            r = http.request("POST", url)
+            data = r.data.decode("utf-8")
             jdata = json.loads(data)
         except Exception as e:
-            raise ValidationError(
-                _('Ocorreu um erro na validação do reCAPTCHA.'))
+            raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
 
-        if jdata['success']:
+        if jdata["success"]:
             return cd
         else:
-            raise ValidationError(
-                _('Ocorreu um erro na validação do reCAPTCHA.'))
+            raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
 
         return cd
 
@@ -184,32 +204,38 @@ class SolicitacaoForm(ModelForm):
 
     class Meta:
         model = Solicitacao
-        fields = ('titulo', 'descricao', 'tipo')
-        widgets = {
-            'tipo': forms.HiddenInput()
-        }
+        fields = ("titulo", "descricao", "tipo")
+        widgets = {"tipo": forms.HiddenInput()}
 
     def __init__(self, *args, **kwargs):
 
         row = Div(
-            to_column((
-                to_row([('titulo', 10), ('tipo', 2),
-                        ('descricao', 12), ]),
-                12)),
+            to_column(
+                (
+                    to_row(
+                        [
+                            ("titulo", 10),
+                            ("tipo", 2),
+                            ("descricao", 12),
+                        ]
+                    ),
+                    12,
+                )
+            ),
             # to_column((
             #    to_row([('areatrabalho_parlamentar', 12)]),
             #    4)),
-            css_class="row")
+            css_class="row",
+        )
 
         super().__init__(*args, **kwargs)
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            row,
-            actions=form_actions(label=_('Enviar'))
+            row, actions=form_actions(label=_("Enviar"))
         )
 
-        self.instance.owner = kwargs['initial']['owner']
+        self.instance.owner = kwargs["initial"]["owner"]
 
     def save(self, commit=True):
 
@@ -244,30 +270,31 @@ class SolicitacaoForm(ModelForm):
 
 class MensagemSolicitacaoForm(ModelForm):
 
-    descricao = forms.CharField(
-        label='',
-        widget=forms.Textarea())
+    descricao = forms.CharField(label="", widget=forms.Textarea())
 
     status = forms.ChoiceField(
-        label = Solicitacao._meta.get_field('status').verbose_name,
-        required = False,
-        choices = Solicitacao.TIPO_STATUS)
+        label=Solicitacao._meta.get_field("status").verbose_name,
+        required=False,
+        choices=Solicitacao.TIPO_STATUS,
+    )
 
     class Meta:
         model = MensagemSolicitacao
-        fields = ('descricao', 'anexo')
+        fields = ("descricao", "anexo")
 
     def __init__(self, *args, **kwargs):
 
-        self.is_operador = kwargs['initial'].pop('is_operador')
+        self.is_operador = kwargs["initial"].pop("is_operador")
 
-        rows = [('descricao', 12), ]
+        rows = [
+            ("descricao", 12),
+        ]
 
-        if kwargs['initial']['owner']:
-            rows.append(('anexo', 9))
+        if kwargs["initial"]["owner"]:
+            rows.append(("anexo", 9))
 
         if self.is_operador:
-            rows.append(('status', 3))
+            rows.append(("status", 3))
 
         rows = to_row(rows)
 
@@ -275,28 +302,28 @@ class MensagemSolicitacaoForm(ModelForm):
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            rows,
-            actions=form_actions(label=_('Enviar'))
+            rows, actions=form_actions(label=_("Enviar"))
         )
 
-        self.fields['status'].initial = kwargs['initial']['status']
+        self.fields["status"].initial = kwargs["initial"]["status"]
 
-        self.instance.owner = kwargs['initial']['owner']
-        self.instance.solicitacao = kwargs['initial']['solicitacao']
+        self.instance.owner = kwargs["initial"]["owner"]
+        self.instance.solicitacao = kwargs["initial"]["solicitacao"]
 
     def save(self, commit=True):
         inst = super().save(commit)
 
         if self.is_operador:
-            inst.solicitacao.status = self.cleaned_data.get('status', Solicitacao.STATUS_A_RECEBER)
+            inst.solicitacao.status = self.cleaned_data.get(
+                "status", Solicitacao.STATUS_A_RECEBER
+            )
         elif inst.solicitacao.status == Solicitacao.STATUS_CONCLUIDA:
             inst.solicitacao.status = Solicitacao.STATUS_PENDENTE
 
         inst.solicitacao.save()
 
         # o dono da solicitação é notificado se ele não é o dono da mensagem
-        if inst.owner != inst.solicitacao.owner and \
-                not inst.solicitacao.owner is None:
+        if inst.owner != inst.solicitacao.owner and not inst.solicitacao.owner is None:
             nt = Notificacao()
             nt.content_object = inst
             nt.user = inst.solicitacao.owner
@@ -307,8 +334,7 @@ class MensagemSolicitacaoForm(ModelForm):
         # houve interação de um membro da área de trabalho ou do dono da solic
 
         areatrabalho = inst.solicitacao.areatrabalho
-        for operador in areatrabalho.operadorareatrabalho_set.exclude(
-                user=inst.owner):
+        for operador in areatrabalho.operadorareatrabalho_set.exclude(user=inst.owner):
             nt = Notificacao()
             nt.content_object = inst
             nt.user = operador.user

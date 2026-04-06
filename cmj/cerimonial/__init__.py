@@ -1,1 +1,1 @@
-default_app_config = 'cmj.cerimonial.apps.AppConfig'
+default_app_config = "cmj.cerimonial.apps.AppConfig"

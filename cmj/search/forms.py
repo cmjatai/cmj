@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Div, Field, Layout, HTML, Button, Fieldset
+from crispy_forms.layout import HTML, Button, Div, Field, Fieldset, Layout
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -13,19 +13,32 @@ from haystack.backends import SQ
 from haystack.forms import ModelSearchForm, SearchForm
 from haystack.inputs import Raw
 from haystack.models import SearchResult
-from haystack.utils.app_loading import haystack_get_model
 from haystack.query import EmptySearchQuerySet, SearchQuerySet
+from haystack.utils.app_loading import haystack_get_model
 
 from cmj.core.models import AreaTrabalho
 from cmj.utils import NONE_YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_row
-from sapl.materia.forms import CHOICE_TRAMITACAO, MateriaLegislativaFilterSet, \
-    CHOICE_TIPO_LISTAGEM
-from sapl.materia.models import TipoMateriaLegislativa, UnidadeTramitacao, \
-    StatusTramitacao, MateriaLegislativa, AssuntoMateria
-from sapl.norma.models import TipoNormaJuridica, NormaJuridica, AssuntoNorma
-from sapl.utils import RangeWidgetNumber, choice_anos_com_materias, autor_label, \
-    autor_modal, choice_anos_com_normas
+from sapl.materia.forms import (
+    CHOICE_TIPO_LISTAGEM,
+    CHOICE_TRAMITACAO,
+    MateriaLegislativaFilterSet,
+)
+from sapl.materia.models import (
+    AssuntoMateria,
+    MateriaLegislativa,
+    StatusTramitacao,
+    TipoMateriaLegislativa,
+    UnidadeTramitacao,
+)
+from sapl.norma.models import AssuntoNorma, NormaJuridica, TipoNormaJuridica
+from sapl.utils import (
+    RangeWidgetNumber,
+    autor_label,
+    autor_modal,
+    choice_anos_com_materias,
+    choice_anos_com_normas,
+)
 
 
 class RangeIntegerField(forms.IntegerField):
@@ -43,100 +56,113 @@ class CmjSearchForm(ModelSearchForm):
 
     ano_i = RangeIntegerField(
         required=False,
-        label=_('Incluir filtro por ano?'),
-        help_text=_('''É opcional limitar a busca em um período específico.<br>
-        Você pode informar simultaneamente, formando um período específico, os campos Inicial e Final, ou apenas um, ou nenhum deles.'''),
-        widget=RangeWidgetNumber()
+        label=_("Incluir filtro por ano?"),
+        help_text=_(
+            """É opcional limitar a busca em um período específico.<br>
+        Você pode informar simultaneamente, formando um período específico, os campos Inicial e Final, ou apenas um, ou nenhum deles."""
+        ),
+        widget=RangeWidgetNumber(),
     )
 
     fix_model = forms.CharField(
-        required=False, label=_('FixModel'),
-        widget=forms.HiddenInput())
+        required=False, label=_("FixModel"), widget=forms.HiddenInput()
+    )
 
     def no_query_found(self):
-        return self.searchqueryset.order_by('-data_dt')
+        return self.searchqueryset.order_by("-data_dt")
 
     def __init__(self, *args, **kwargs):
 
-        self.workspaces = kwargs.pop('workspaces')
-        self.user = kwargs.pop('user')
+        self.workspaces = kwargs.pop("workspaces")
+        self.user = kwargs.pop("user")
 
         q_field = Div(
-            'fix_model',
+            "fix_model",
             FieldWithButtons(
-                Field('q',
-                      placeholder=_('O que você procura?'),
-                      type='search',),
+                Field(
+                    "q",
+                    placeholder=_("O que você procura?"),
+                    type="search",
+                ),
                 StrictButton(
                     '<i class="fas fa-2x fa-search"></i>',
-                    css_class='btn-outline-primary',
-                    type='submit'),
-                css_class='div-search'
+                    css_class="btn-outline-primary",
+                    type="submit",
+                ),
+                css_class="div-search",
             ),
         )
 
-        row = to_row([
-            (Div(), 2),
-            (q_field, 8),
-            ('ano_i', 4),
-            (Div(Field('models')), 8),
-        ])
+        row = to_row(
+            [
+                (Div(), 2),
+                (q_field, 8),
+                ("ano_i", 4),
+                (Div(Field("models")), 8),
+            ]
+        )
 
         self.helper = FormHelper()
         self.helper.form_tag = False
-        self.helper.form_method = 'post'
+        self.helper.form_method = "post"
         self.helper.layout = Layout(*row)
 
         super().__init__(*args, **kwargs)
 
-        choices = self.fields['models'].choices
+        choices = self.fields["models"].choices
         for i, v in enumerate(choices):
-            if v[0] == 'sigad.documento':
-                choices[i] = (v[0], _('Notícias'))
-            elif v[0] == 'materia.documentoacessorio':
+            if v[0] == "sigad.documento":
+                choices[i] = (v[0], _("Notícias"))
+            elif v[0] == "materia.documentoacessorio":
                 choices[i] = (
-                    v[0], _('Documentos Acessórios vinculados a Matérias Legislativas'))
-            elif v[0] == 'protocoloadm.documentoadministrativo':
+                    v[0],
+                    _("Documentos Acessórios vinculados a Matérias Legislativas"),
+                )
+            elif v[0] == "protocoloadm.documentoadministrativo":
                 if not self.workspaces:
                     choices[i] = (None, None)
                 else:
-                    if not self.user.is_anonymous and \
-                            self.user.areatrabalho_set.exists() and \
-                            not self.user.has_perm('protocoloadm.list_documentoadministrativo'):
+                    if (
+                        not self.user.is_anonymous
+                        and self.user.areatrabalho_set.exists()
+                        and not self.user.has_perm(
+                            "protocoloadm.list_documentoadministrativo"
+                        )
+                    ):
 
                         self.workspaces = AreaTrabalho.objects.areatrabalho_publica()
-                        #choices[i] = (None, None)
+                        # choices[i] = (None, None)
                         # continue
 
-                    choices[i] = (v[0], '%s (%s)' % (
-                        v[1], ', '.join(map(str, self.workspaces))
-                    ))
+                    choices[i] = (
+                        v[0],
+                        "%s (%s)" % (v[1], ", ".join(map(str, self.workspaces))),
+                    )
 
-        self.fields['models'].choices = sorted(
-            filter(lambda x: x[0], choices),
+        self.fields["models"].choices = sorted(
+            filter(lambda x: x[0], choices), key=lambda x: x[1]
+        )
 
-            key=lambda x: x[1])
-
-        self.fields['models'].label = _('Buscar em conteúdos específicos?')
-        self.fields['q'].label = ''
+        self.fields["models"].label = _("Buscar em conteúdos específicos?")
+        self.fields["q"].label = ""
 
         if args and isinstance(args[0], QueryDict):
             query_dict = args[0]
-            fix_model = query_dict.get('fix_model', '')
+            fix_model = query_dict.get("fix_model", "")
             if fix_model:
-                self.fields['models'].widget = forms.MultipleHiddenInput()
+                self.fields["models"].widget = forms.MultipleHiddenInput()
 
     def search(self):
         sqs = super().search()
 
         if self.workspaces:
-            at__in = list(self.workspaces.values_list('id', flat=True))
+            at__in = list(self.workspaces.values_list("id", flat=True))
             at__in.append(0)
             sqs = sqs.filter(at__in=at__in)
         else:
             sqs = sqs.filter(at=0)
 
-        a = self.cleaned_data.get('ano_i', None)
+        a = self.cleaned_data.get("ano_i", None)
 
         if a and a[0] and a[1]:
             sqs = sqs.filter(ano_i__range=a)
@@ -146,11 +172,11 @@ class CmjSearchForm(ModelSearchForm):
             sqs = sqs.filter(ano_i__lte=a[1])
 
         kwargs = {
-            'hl.simple.pre': '<span class="highlighted">',
-            'hl.simple.post': '</span>',
-            'hl.fragsize': 512
+            "hl.simple.pre": '<span class="highlighted">',
+            "hl.simple.post": "</span>",
+            "hl.fragsize": 512,
         }
-        s = sqs.highlight(**kwargs).order_by('-data_dt', '-last_update')
+        s = sqs.highlight(**kwargs).order_by("-data_dt", "-last_update")
 
         # print(str(s.query))
         return s
@@ -160,8 +186,8 @@ class CmjSearchForm(ModelSearchForm):
         search_models = []
 
         if self.is_valid():
-            for model in self.cleaned_data['models']:
-                search_models.append(haystack_get_model(*model.split('.')))
+            for model in self.cleaned_data["models"]:
+                search_models.append(haystack_get_model(*model.split(".")))
 
         return search_models
 
@@ -170,9 +196,9 @@ class CmjSearchForm(ModelSearchForm):
 
 def CHOICE_ORDENACAO():
     return [
-            ('D', 'Mais Recentes'),
-            ('R', 'Relevância'),
-            ]
+        ("D", "Mais Recentes"),
+        ("R", "Relevância"),
+    ]
 
 
 class MateriaSearchForm(SearchForm):
@@ -181,102 +207,109 @@ class MateriaSearchForm(SearchForm):
 
     numero_i = forms.IntegerField(
         required=False,
-        label=_('Número'),
+        label=_("Número"),
     )
 
     em_tramitacao_b = forms.TypedChoiceField(
-        required=False,
-        label=_('Em tramitação'),
-        choices=CHOICE_TRAMITACAO
+        required=False, label=_("Em tramitação"), choices=CHOICE_TRAMITACAO
     )
 
     ordenacao = forms.TypedChoiceField(
-        required=False,
-        label=_('Ordenação'),
-        choices=CHOICE_ORDENACAO
+        required=False, label=_("Ordenação"), choices=CHOICE_ORDENACAO
     )
 
     ano_i = forms.MultipleChoiceField(
         required=False,
-        label=_('Anos das Matérias'),
+        label=_("Anos das Matérias"),
         choices=choice_anos_com_materias(),
-        widget=forms.SelectMultiple(attrs={
-            'title': _('Filtrar por um ou mais anos de matéria?'),
-            'class': 'selectpicker',
-            'data-actions-box': 'true',
-            'data-select-all-text': 'Selecionar Todos',
-            'data-deselect-all-text': 'Desmarcar Todos',
-            'data-header': 'Anos de Matéria Legislativa',
-            'data-dropup-auto': 'false'
-        })
+        widget=forms.SelectMultiple(
+            attrs={
+                "title": _("Filtrar por um ou mais anos de matéria?"),
+                "class": "selectpicker",
+                "data-actions-box": "true",
+                "data-select-all-text": "Selecionar Todos",
+                "data-deselect-all-text": "Desmarcar Todos",
+                "data-header": "Anos de Matéria Legislativa",
+                "data-dropup-auto": "false",
+            }
+        ),
     )
 
     tipo_i = forms.ModelMultipleChoiceField(
         required=False,
         queryset=TipoMateriaLegislativa.objects.all(),
-        label=_('Tipos de Matéria Legislativa'),
-        widget=forms.SelectMultiple(attrs={
-            'title': _('Filtrar por um ou mais tipos de matéria?'),
-            'data-header': 'Tipos de Matéria Legislativa',
-            'class': 'selectpicker',
-            'data-actions-box': 'true',
-            'data-select-all-text': 'Selecionar Todos',
-            'data-deselect-all-text': 'Desmarcar Todos',
-            'data-dropup-auto': 'false'
-        })
+        label=_("Tipos de Matéria Legislativa"),
+        widget=forms.SelectMultiple(
+            attrs={
+                "title": _("Filtrar por um ou mais tipos de matéria?"),
+                "data-header": "Tipos de Matéria Legislativa",
+                "class": "selectpicker",
+                "data-actions-box": "true",
+                "data-select-all-text": "Selecionar Todos",
+                "data-deselect-all-text": "Desmarcar Todos",
+                "data-dropup-auto": "false",
+            }
+        ),
     )
 
     uta_i = forms.ModelMultipleChoiceField(
         required=False,
         queryset=UnidadeTramitacao.objects.all(),
-        label=_('Unidade de tramitação atual'),
-        widget=forms.SelectMultiple(attrs={
-            'title': _('Filtrar por uma ou mais unidades?'),
-            'class': 'selectpicker',
-            'data-actions-box': 'true',
-            'data-select-all-text': 'Selecionar Todos',
-            'data-deselect-all-text': 'Desmarcar Todos',
-            'data-header': 'Unidade de tramitação atual',
-            'data-dropup-auto': 'false'
-        })
+        label=_("Unidade de tramitação atual"),
+        widget=forms.SelectMultiple(
+            attrs={
+                "title": _("Filtrar por uma ou mais unidades?"),
+                "class": "selectpicker",
+                "data-actions-box": "true",
+                "data-select-all-text": "Selecionar Todos",
+                "data-deselect-all-text": "Desmarcar Todos",
+                "data-header": "Unidade de tramitação atual",
+                "data-dropup-auto": "false",
+            }
+        ),
     )
 
     sta_i = forms.ModelMultipleChoiceField(
         required=False,
         queryset=StatusTramitacao.objects.all(),
-        label=_('Status da tramitação atual'),
-        widget=forms.SelectMultiple(attrs={
-            'title': _('Filtrar por um ou mais Status?'),
-            'class': 'selectpicker',
-            'data-actions-box': 'true',
-            'data-select-all-text': 'Selecionar Todos',
-            'data-deselect-all-text': 'Desmarcar Todos',
-            'data-header': 'Status da tramitação atual',
-            'data-dropup-auto': 'false',
-            'data-dropdown-align-right': 'auto'
-        })
+        label=_("Status da tramitação atual"),
+        widget=forms.SelectMultiple(
+            attrs={
+                "title": _("Filtrar por um ou mais Status?"),
+                "class": "selectpicker",
+                "data-actions-box": "true",
+                "data-select-all-text": "Selecionar Todos",
+                "data-deselect-all-text": "Desmarcar Todos",
+                "data-header": "Status da tramitação atual",
+                "data-dropup-auto": "false",
+                "data-dropdown-align-right": "auto",
+            }
+        ),
     )
 
     assuntos_is = forms.ModelMultipleChoiceField(
         required=False,
         queryset=AssuntoMateria.objects.all(),
-        label=_('Assuntos'),
-        widget=forms.SelectMultiple(attrs={
-            'title': _('Filtrar por um ou mais Assuntos?'),
-            'class': 'selectpicker',
-            'data-actions-box': 'true',
-            'data-select-all-text': 'Selecionar Todos',
-            'data-deselect-all-text': 'Desmarcar Todos',
-            'data-header': 'Assuntos',
-            'data-dropup-auto': 'false',
-            'data-dropdown-align-right': 'auto'
-        })
+        label=_("Assuntos"),
+        widget=forms.SelectMultiple(
+            attrs={
+                "title": _("Filtrar por um ou mais Assuntos?"),
+                "class": "selectpicker",
+                "data-actions-box": "true",
+                "data-select-all-text": "Selecionar Todos",
+                "data-deselect-all-text": "Desmarcar Todos",
+                "data-header": "Assuntos",
+                "data-dropup-auto": "false",
+                "data-dropdown-align-right": "auto",
+            }
+        ),
     )
 
     autoria_is = forms.CharField(
         required=False,
-        label=_('Autor'),
-        widget=forms.HiddenInput(attrs={'id': 'id_autoria__autor'}))
+        label=_("Autor"),
+        widget=forms.HiddenInput(attrs={"id": "id_autoria__autor"}),
+    )
 
     def no_query_found(self):
         if not self.data:
@@ -288,86 +321,107 @@ class MateriaSearchForm(SearchForm):
 
         q_field = Div(
             FieldWithButtons(
-                Field('q',
-                      placeholder=_(
-                          'O que você procura? '),
-                      type='search',),
+                Field(
+                    "q",
+                    placeholder=_("O que você procura? "),
+                    type="search",
+                ),
                 StrictButton(
                     '<i class="fas fa-2x fa-search"></i>',
-                    css_class='btn-outline-primary',
-                    type='submit'),
-                css_class='div-search'
+                    css_class="btn-outline-primary",
+                    type="submit",
+                ),
+                css_class="div-search",
             ),
         )
 
-        row1 = to_row([
-            (HTML('''
+        row1 = to_row(
+            [
+                (
+                    HTML("""
                 <small class="text-blue">
                   <strong>
                     O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... <br>
                     Clique na lupa após definir seus critérios de pesquisa.
                   </strong>
-                </small>'''), 12),
+                </small>"""),
+                    12,
+                ),
+                (Div(), 1),
+                (q_field, 10),
+                (Div(), 1),
+                ("tipo_i", 7),
+                ("numero_i", 2),
+                (
+                    "ano_i",
+                    3,
+                ),
+            ]
+        )
 
-            (Div(), 1),
-            (q_field, 10),
-            (Div(), 1),
+        row2 = to_row(
+            [
+                ("em_tramitacao_b", 3),
+                ("uta_i", 5),
+                ("sta_i", 4),
+            ]
+        )
 
-            ('tipo_i', 7),
-            ('numero_i', 2),
-            ('ano_i', 3,),
-        ])
-
-        row2 = to_row([
-            ('em_tramitacao_b', 3),
-            ('uta_i', 5),
-            ('sta_i', 4),
-        ])
-
-
-
-        row3 = to_row([
-            (Div(
-                HTML(autor_label),
-                HTML(autor_modal),
-                to_row([
-                    ('autoria_is', 0),
-                    (Button('pesquisar',
-                            'Selecionar Autor',
-                            css_class='btn btn-secondary btn-sm mt-1 w-100'), 12),
-                    (Button('limpar',
-                            'Limpar Autor',
-                            css_class='btn btn-secondary btn-sm mt-1 p-0 w-100'), 12),
-                ], css_class='row flex-column'),
-                css_class="form-group"
-            ), 4),
-            ('assuntos_is', 5),
-            ('ordenacao', 3),
-        ])
+        row3 = to_row(
+            [
+                (
+                    Div(
+                        HTML(autor_label),
+                        HTML(autor_modal),
+                        to_row(
+                            [
+                                ("autoria_is", 0),
+                                (
+                                    Button(
+                                        "pesquisar",
+                                        "Selecionar Autor",
+                                        css_class="btn btn-secondary btn-sm mt-1 w-100",
+                                    ),
+                                    12,
+                                ),
+                                (
+                                    Button(
+                                        "limpar",
+                                        "Limpar Autor",
+                                        css_class="btn btn-secondary btn-sm mt-1 p-0 w-100",
+                                    ),
+                                    12,
+                                ),
+                            ],
+                            css_class="row flex-column",
+                        ),
+                        css_class="form-group",
+                    ),
+                    4,
+                ),
+                ("assuntos_is", 5),
+                ("ordenacao", 3),
+            ]
+        )
 
         self.helper = FormHelper()
-        self.helper.form_method = 'get'
-        self.helper.attrs['role'] = 'chart-global-filter'
-        self.helper.attrs['data-chart-target'] = 'materiasearchdashboard'
-        self.helper.layout = Layout(
-            Fieldset('',
-                     row1,
-                     row2,
-                     row3)
-        )
+        self.helper.form_method = "get"
+        self.helper.attrs["role"] = "chart-global-filter"
+        self.helper.attrs["data-chart-target"] = "materiasearchdashboard"
+        self.helper.layout = Layout(Fieldset("", row1, row2, row3))
 
         super().__init__(*args, **kwargs)
 
         if self.data:
             return
 
-        self.fields['q'].label = ''
+        self.fields["q"].label = ""
 
         grupos_de_tipos = (
-            ('1', 'Mais Acessadas'),
-            ('3', ' '),
-            ('7', 'Matérias Acessórias'),
-            ('9', '  ')
+            ("1", "Mais Acessadas"),
+            ("3", " "),
+            ("7", "Matérias Acessórias"),
+            ("9", "  "),
         )
         gtd = dict(grupos_de_tipos)  # {k: v for k, v in grupos_de_tipos}
 
@@ -376,23 +430,35 @@ class MateriaSearchForm(SearchForm):
             if valor not in grupo_choices:
                 grupo_choices[valor] = []
 
-        for tml in TipoMateriaLegislativa.objects.order_by('nivel_agrupamento', 'sequencia_regimental'):
+        for tml in TipoMateriaLegislativa.objects.order_by(
+            "nivel_agrupamento", "sequencia_regimental"
+        ):
             grupo_choices[gtd[tml.nivel_agrupamento]].append(
-                (tml.id, f'{tml.sigla} - {tml.descricao}'))
+                (tml.id, f"{tml.sigla} - {tml.descricao}")
+            )
 
         choices = []
         for g, items in grupo_choices.items():
-            choices.append((' ', items,))
-        self.fields['tipo_i'].choices = choices
+            choices.append(
+                (
+                    " ",
+                    items,
+                )
+            )
+        self.fields["tipo_i"].choices = choices
 
         uta_choices = OrderedDict()
 
-        for uta in UnidadeTramitacao.objects.filter(
-            ativo=True,
-            # tramitacoes_destino__isnull=False
-            materiasemtramitacao_set__isnull=False
-            ).select_related('comissao', 'orgao', 'parlamentar'
-            ).order_by('comissao', 'orgao', 'parlamentar').distinct():
+        for uta in (
+            UnidadeTramitacao.objects.filter(
+                ativo=True,
+                # tramitacoes_destino__isnull=False
+                materiasemtramitacao_set__isnull=False,
+            )
+            .select_related("comissao", "orgao", "parlamentar")
+            .order_by("comissao", "orgao", "parlamentar")
+            .distinct()
+        ):
             uta_obj = uta.comissao or uta.orgao or uta.parlamentar
 
             grupo = uta_obj._meta.verbose_name_plural
@@ -401,62 +467,63 @@ class MateriaSearchForm(SearchForm):
 
             uta_choices[grupo].append((uta.id, str(uta)))
 
-        self.fields['uta_i'].choices = uta_choices.items()
+        self.fields["uta_i"].choices = uta_choices.items()
 
         sta_choices = OrderedDict()
-        sta_choices[('Status da Tramitação')] = []
-        for sta in StatusTramitacao.objects.filter(
-            materiasemtramitacao_set__isnull=False
-            ).order_by('descricao').distinct():
-            sta_choices[('Status da Tramitação')].append((sta.id, str(sta)))
-        self.fields['sta_i'].choices = sta_choices.items()
+        sta_choices[("Status da Tramitação")] = []
+        for sta in (
+            StatusTramitacao.objects.filter(materiasemtramitacao_set__isnull=False)
+            .order_by("descricao")
+            .distinct()
+        ):
+            sta_choices[("Status da Tramitação")].append((sta.id, str(sta)))
+        self.fields["sta_i"].choices = sta_choices.items()
 
     def clean_tipo_i(self, *args, **kwargs):
-        tipo_i = self.cleaned_data['tipo_i']
-        return tipo_i.values_list('id', flat=True)
+        tipo_i = self.cleaned_data["tipo_i"]
+        return tipo_i.values_list("id", flat=True)
         if tipo_i:
             return tipo_i.id
 
     def clean_em_tramitacao_b(self, *args, **kwargs):
-        em_tramitacao_b = self.cleaned_data['em_tramitacao_b']
+        em_tramitacao_b = self.cleaned_data["em_tramitacao_b"]
 
         if em_tramitacao_b:
-            return em_tramitacao_b == '1'
+            return em_tramitacao_b == "1"
         return None
 
     def clean_uta_i(self, *args, **kwargs):
-        uta_i = self.cleaned_data['uta_i']
-        return uta_i.values_list('id', flat=True)
+        uta_i = self.cleaned_data["uta_i"]
+        return uta_i.values_list("id", flat=True)
 
         if uta_i:
             return uta_i.id
 
     def clean_sta_i(self, *args, **kwargs):
-        sta_i = self.cleaned_data['sta_i']
-        return sta_i.values_list('id', flat=True)
+        sta_i = self.cleaned_data["sta_i"]
+        return sta_i.values_list("id", flat=True)
 
         if sta_i:
             return sta_i.id
 
     def clean_ordenacao(self, *args, **kwargs):
-        o = self.cleaned_data['ordenacao']
+        o = self.cleaned_data["ordenacao"]
         return o
 
     def clean_ano_i(self, *args, **kwargs):
-        anos = self.cleaned_data['ano_i']
+        anos = self.cleaned_data["ano_i"]
         if not anos:
             return
         try:
             anos = [int(a) for a in anos]
             return anos
         except:
-            raise ValidationError(
-                _('O campo "ano da matéria" deve ser um número.'))
+            raise ValidationError(_('O campo "ano da matéria" deve ser um número.'))
 
     def clean_assuntos_is(self, *args, **kwargs):
-        assuntos_is = self.cleaned_data['assuntos_is']
+        assuntos_is = self.cleaned_data["assuntos_is"]
 
-        return assuntos_is.values_list('id', flat=True)
+        return assuntos_is.values_list("id", flat=True)
 
         if assuntos_is:
             return assuntos_is.id
@@ -468,53 +535,50 @@ class MateriaSearchForm(SearchForm):
     def search(self):
         sqs = super().search().models(MateriaLegislativa)
 
-        remove = ('q', 'tipo_listagem')
+        remove = ("q", "tipo_listagem")
 
         params = {
             key: self.cleaned_data.get(key, None)
-            for key in self.changed_data if key not in remove
+            for key in self.changed_data
+            if key not in remove
         }
 
-        if params and 'ano_i' in params:
-            params['ano_i__in'] = params['ano_i']
-            del params['ano_i']
+        if params and "ano_i" in params:
+            params["ano_i__in"] = params["ano_i"]
+            del params["ano_i"]
 
-        if params and 'tipo_i' in params:
-            params['tipo_i__in'] = params['tipo_i']
-            del params['tipo_i']
+        if params and "tipo_i" in params:
+            params["tipo_i__in"] = params["tipo_i"]
+            del params["tipo_i"]
 
-        if params and 'uta_i' in params:
-            params['uta_i__in'] = params['uta_i']
-            del params['uta_i']
+        if params and "uta_i" in params:
+            params["uta_i__in"] = params["uta_i"]
+            del params["uta_i"]
 
-        if params and 'sta_i' in params:
-            params['sta_i__in'] = params['sta_i']
-            del params['sta_i']
+        if params and "sta_i" in params:
+            params["sta_i__in"] = params["sta_i"]
+            del params["sta_i"]
 
-        if params and 'assuntos_is' in params:
-            params['assuntos_is__in'] = params['assuntos_is']
-            del params['assuntos_is']
+        if params and "assuntos_is" in params:
+            params["assuntos_is__in"] = params["assuntos_is"]
+            del params["assuntos_is"]
 
-        ord = '-data_dt'
-        if params and 'ordenacao' in params:
-            ord = self.cleaned_data.get('ordenacao', 'D')
-            ord = '-data_dt' if ord == 'D' else '-score'
-            del params['ordenacao']
+        ord = "-data_dt"
+        if params and "ordenacao" in params:
+            ord = self.cleaned_data.get("ordenacao", "D")
+            ord = "-data_dt" if ord == "D" else "-score"
+            del params["ordenacao"]
 
         if params:
             sqs = sqs.filter(**params)
 
         kwargs = {
-            'hl.simple.pre': '<span class="highlighted">',
-            'hl.simple.post': '</span>',
-            'hl.fragsize': 512
+            "hl.simple.pre": '<span class="highlighted">',
+            "hl.simple.post": "</span>",
+            "hl.fragsize": 512,
         }
 
-        s = sqs.highlight(**kwargs).order_by(
-            ord,
-            '-pk_i',
-            '-last_update'
-        )
+        s = sqs.highlight(**kwargs).order_by(ord, "-pk_i", "-last_update")
 
         return s
 
@@ -525,143 +589,143 @@ class NormaSearchForm(SearchForm):
 
     ano_i = forms.ChoiceField(
         required=False,
-        label=_('Ano da Norma'),
-        choices=[(None, _('---------')), ] + choice_anos_com_normas())
+        label=_("Ano da Norma"),
+        choices=[
+            (None, _("---------")),
+        ]
+        + choice_anos_com_normas(),
+    )
 
     numero_s = forms.CharField(
         required=False,
-        label=_('Número'),
+        label=_("Número"),
     )
 
     tipo_i = forms.ModelChoiceField(
         required=False,
         queryset=TipoNormaJuridica.objects.all(),
-        label=_('Tipo de Norma Jurídica'),
+        label=_("Tipo de Norma Jurídica"),
     )
 
     assuntos_is = forms.ModelChoiceField(
         required=False,
         queryset=AssuntoNorma.objects.all(),
-        label=_('Assuntos'),
+        label=_("Assuntos"),
     )
 
     ordenacao = forms.TypedChoiceField(
-        required=False,
-        label=_('Ordenação'),
-        choices=CHOICE_ORDENACAO
+        required=False, label=_("Ordenação"), choices=CHOICE_ORDENACAO
     )
 
     def no_query_found(self):
         if not self.data:
             return super().no_query_found()
 
-        return self.searchqueryset.order_by('-data_dt')
+        return self.searchqueryset.order_by("-data_dt")
 
     def __init__(self, *args, **kwargs):
 
         q_field = Div(
             FieldWithButtons(
-                Field('q',
-                      placeholder=_(
-                          'O que você procura? '),
-                      type='search',),
+                Field(
+                    "q",
+                    placeholder=_("O que você procura? "),
+                    type="search",
+                ),
                 StrictButton(
                     '<i class="fas fa-2x fa-search"></i>',
-                    css_class='btn-outline-primary',
-                    type='submit'),
-                css_class='div-search'
+                    css_class="btn-outline-primary",
+                    type="submit",
+                ),
+                css_class="div-search",
             ),
         )
 
-        row1 = to_row([
-            (HTML('''
+        row1 = to_row(
+            [
+                (
+                    HTML("""
                 <small class="text-blue">
                   <strong>
                     O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... &nbsp;&nbsp;
                     Clique na lupa após definir seus critérios de pesquisa.
                   </strong>
-                </small>'''), 12),
-
-            (Div(), 2),
-            (q_field, 8),
-            (Div(), 2),
-
-            ('tipo_i', 3),
-            ('numero_s', 2),
-            ('ano_i', 2),
-            ('assuntos_is', 3),
-            ('ordenacao', 2),
-        ])
+                </small>"""),
+                    12,
+                ),
+                (Div(), 2),
+                (q_field, 8),
+                (Div(), 2),
+                ("tipo_i", 3),
+                ("numero_s", 2),
+                ("ano_i", 2),
+                ("assuntos_is", 3),
+                ("ordenacao", 2),
+            ]
+        )
 
         self.helper = FormHelper()
-        self.helper.form_method = 'get'
-        self.helper.layout = Layout(
-            Fieldset('',
-                     row1)
-        )
+        self.helper.form_method = "get"
+        self.helper.layout = Layout(Fieldset("", row1))
 
         super().__init__(*args, **kwargs)
 
-        self.fields['q'].label = ''
-        #self.fields['models'].widget = forms.MultipleHiddenInput()
+        self.fields["q"].label = ""
+        # self.fields['models'].widget = forms.MultipleHiddenInput()
 
     def clean_tipo_i(self, *args, **kwargs):
-        tipo_i = self.cleaned_data['tipo_i']
+        tipo_i = self.cleaned_data["tipo_i"]
 
         if tipo_i:
             return tipo_i.id
 
     def clean_numero_s(self, *args, **kwargs):
-        numero_s = self.cleaned_data['numero_s']
+        numero_s = self.cleaned_data["numero_s"]
 
         if numero_s:
-            return f'{numero_s:>06}'
+            return f"{numero_s:>06}"
 
     def clean_assuntos_is(self, *args, **kwargs):
-        assuntos_is = self.cleaned_data['assuntos_is']
+        assuntos_is = self.cleaned_data["assuntos_is"]
 
         if assuntos_is:
             return assuntos_is.id
 
     def clean_ano_i(self, *args, **kwargs):
-        a = self.cleaned_data['ano_i']
+        a = self.cleaned_data["ano_i"]
         if not a:
             return
         try:
             a = int(a)
             return a
         except:
-            raise ValidationError(
-                _('O campo "Ano da Norma" deve ser um número.'))
+            raise ValidationError(_('O campo "Ano da Norma" deve ser um número.'))
 
     def search(self):
         sqs = super().search().models(NormaJuridica)
 
-        remove = ('q',)
+        remove = ("q",)
 
         params = {
             key: self.cleaned_data.get(key, None)
-            for key in self.changed_data if key not in remove
+            for key in self.changed_data
+            if key not in remove
         }
 
-        ord = '-data_dt'
-        if params and 'ordenacao' in params:
-            ord = self.cleaned_data.get('ordenacao', 'D')
-            ord = '-data_dt' if ord == 'D' else '-score'
-            del params['ordenacao']
+        ord = "-data_dt"
+        if params and "ordenacao" in params:
+            ord = self.cleaned_data.get("ordenacao", "D")
+            ord = "-data_dt" if ord == "D" else "-score"
+            del params["ordenacao"]
 
         if params:
             sqs = sqs.filter(**params)
 
         kwargs = {
-            'hl.simple.pre': '<span class="highlighted">',
-            'hl.simple.post': '</span>',
-            'hl.fragsize': 512
+            "hl.simple.pre": '<span class="highlighted">',
+            "hl.simple.post": "</span>",
+            "hl.fragsize": 512,
         }
 
-        s = sqs.highlight(**kwargs).order_by(
-            ord,
-            '-numero_s',
-            '-last_update'
-        )
+        s = sqs.highlight(**kwargs).order_by(ord, "-numero_s", "-last_update")
         return s

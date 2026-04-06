@@ -3,50 +3,71 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F
-from django.http.response import HttpResponseRedirect, JsonResponse, Http404
+from django.http.response import Http404, HttpResponseRedirect, JsonResponse
 from django.urls.base import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.clickjacking import xframe_options_exempt
-from django.views.generic import ListView, CreateView, DeleteView
+from django.views.generic import CreateView, DeleteView, ListView
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin, UpdateView
 
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.comissoes.apps import AppConfig
-from sapl.comissoes.forms import (ComissaoForm, ComposicaoForm,
-                                  DocumentoAcessorioCreateForm,
-                                  DocumentoAcessorioEditForm,
-                                  ParticipacaoCreateForm, ParticipacaoEditForm,
-                                  PeriodoForm, ReuniaoForm, PautaReuniaoForm)
-from sapl.crud.base import (RP_DETAIL, RP_LIST, Crud, CrudAux,
-                            MasterDetailCrud,
-                            PermissionRequiredForAppCrudMixin)
-from sapl.materia.models import MateriaLegislativa, Tramitacao, PautaReuniao
+from sapl.comissoes.forms import (
+    ComissaoForm,
+    ComposicaoForm,
+    DocumentoAcessorioCreateForm,
+    DocumentoAcessorioEditForm,
+    ParticipacaoCreateForm,
+    ParticipacaoEditForm,
+    PautaReuniaoForm,
+    PeriodoForm,
+    ReuniaoForm,
+)
+from sapl.crud.base import (
+    RP_DETAIL,
+    RP_LIST,
+    Crud,
+    CrudAux,
+    MasterDetailCrud,
+    PermissionRequiredForAppCrudMixin,
+)
+from sapl.materia.models import MateriaLegislativa, PautaReuniao, Tramitacao
 
-from .models import (CargoComissao, Comissao, Composicao, DocumentoAcessorio,
-                     Participacao, Periodo, Reuniao, TipoComissao)
+from .models import (
+    CargoComissao,
+    Comissao,
+    Composicao,
+    DocumentoAcessorio,
+    Participacao,
+    Periodo,
+    Reuniao,
+    TipoComissao,
+)
 
 
 def pegar_url_composicao(pk):
     participacao = Participacao.objects.get(id=pk)
     comp_pk = participacao.composicao.pk
-    url = reverse('sapl.comissoes:composicao_detail', kwargs={'pk': comp_pk})
+    url = reverse("sapl.comissoes:composicao_detail", kwargs={"pk": comp_pk})
     return url
 
 
 def pegar_url_reuniao(pk):
     documentoacessorio = DocumentoAcessorio.objects.get(id=pk)
     r_pk = documentoacessorio.reuniao.pk
-    url = reverse('sapl.comissoes:reuniao_detail', kwargs={'pk': r_pk})
+    url = reverse("sapl.comissoes:reuniao_detail", kwargs={"pk": r_pk})
     return url
 
 
-CargoCrud = CrudAux.build(CargoComissao, 'cargo_comissao')
+CargoCrud = CrudAux.build(CargoComissao, "cargo_comissao")
 
 TipoComissaoCrud = CrudAux.build(
-    TipoComissao, 'tipo_comissao', list_field_names=[
-        'sigla', 'nome', 'natureza', 'dispositivo_regimental'])
+    TipoComissao,
+    "tipo_comissao",
+    list_field_names=["sigla", "nome", "natureza", "dispositivo_regimental"],
+)
 
 
 class PeriodoComposicaoCrud(CrudAux):
@@ -63,47 +84,56 @@ class PeriodoComposicaoCrud(CrudAux):
 
 class ParticipacaoCrud(MasterDetailCrud):
     model = Participacao
-    parent_field = 'composicao__comissao'
-    public = [RP_DETAIL, ]
+    parent_field = "composicao__comissao"
+    public = [
+        RP_DETAIL,
+    ]
     ListView = None
     link_return_to_parent_field = True
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['composicao', 'parlamentar', 'cargo']
+        list_field_names = ["composicao", "parlamentar", "cargo"]
 
         def redir_composicao(self):
             composicao_comissao_id = self.object.composicao.comissao_id
             composicao_pk = self.object.composicao.pk
-            return '{}?pk={}'.format(reverse('sapl.comissoes:composicao_list',
-                                             args=[composicao_comissao_id]),
-                                     composicao_pk)
+            return "{}?pk={}".format(
+                reverse(
+                    "sapl.comissoes:composicao_list", args=[composicao_comissao_id]
+                ),
+                composicao_pk,
+            )
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = ParticipacaoCreateForm
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['parent_pk'] = self.kwargs['pk']
+            initial["parent_pk"] = self.kwargs["pk"]
             return initial
 
         @property
         def cancel_url(self):
             try:
-                composicao = Composicao.objects.get(pk=self.kwargs['pk'])
+                composicao = Composicao.objects.get(pk=self.kwargs["pk"])
             except Exception as e:
                 username = self.request.user
                 self.logger.error(
-                    'user=' + username + '. Erro ao obter composição.' + str(e))
+                    "user=" + username + ". Erro ao obter composição." + str(e)
+                )
                 raise Http404
 
             composicao_comissao_id = composicao.comissao_id
             composicao_pk = composicao.pk
-            return '{}?pk={}'.format(reverse('sapl.comissoes:composicao_list',
-                                             args=[composicao_comissao_id]),
-                                     composicao_pk)
+            return "{}?pk={}".format(
+                reverse(
+                    "sapl.comissoes:composicao_list", args=[composicao_comissao_id]
+                ),
+                composicao_pk,
+            )
 
     class UpdateView(MasterDetailCrud.UpdateView):
-        layout_key = 'ParticipacaoEdit'
+        layout_key = "ParticipacaoEdit"
         form_class = ParticipacaoEditForm
 
     class DetailView(MasterDetailCrud.DetailView):
@@ -120,16 +150,19 @@ class ParticipacaoCrud(MasterDetailCrud):
 
 class ComposicaoCrud(MasterDetailCrud):
     model = Composicao
-    parent_field = 'comissao'
-    model_set = 'participacao_set'
-    public = [RP_LIST, RP_DETAIL, ]
+    parent_field = "comissao"
+    model_set = "participacao_set"
+    public = [
+        RP_LIST,
+        RP_DETAIL,
+    ]
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = ComposicaoForm
 
         def get_initial(self):
-            comissao = Comissao.objects.get(id=self.kwargs['pk'])
-            return {'comissao': comissao}
+            comissao = Comissao.objects.get(id=self.kwargs["pk"])
+            return {"comissao": comissao}
 
     class ListView(MasterDetailCrud.ListView):
         logger = logging.getLogger(__name__)
@@ -140,12 +173,17 @@ class ComposicaoCrud(MasterDetailCrud):
 
             username = self.request.user.username
             try:
-                self.logger.debug('user=' + username +
-                                  '. Tentando obter pk da composição.')
-                return int(self.request.GET.get('pk', 0))
+                self.logger.debug(
+                    "user=" + username + ". Tentando obter pk da composição."
+                )
+                return int(self.request.GET.get("pk", 0))
             except Exception as e:
                 self.logger.error(
-                    'user=' + username + '. Erro ao obter pk da composição. Retornado 0. ' + str(e))
+                    "user="
+                    + username
+                    + ". Erro ao obter pk da composição. Retornado 0. "
+                    + str(e)
+                )
                 return 0
 
         def get_context_data(self, **kwargs):
@@ -156,29 +194,38 @@ class ComposicaoCrud(MasterDetailCrud):
             if composicao_pk == 0:
                 # Composicao eh ordenada por Periodo, que por sua vez esta em
                 # ordem descrescente de data de inicio (issue #1920)
-                ultima_composicao = context['composicao_list'].first()
+                ultima_composicao = context["composicao_list"].first()
                 if ultima_composicao:
-                    context['composicao_pk'] = ultima_composicao.pk
+                    context["composicao_pk"] = ultima_composicao.pk
                 else:
-                    context['composicao_pk'] = 0
+                    context["composicao_pk"] = 0
             else:
-                context['composicao_pk'] = composicao_pk
+                context["composicao_pk"] = composicao_pk
 
-            context['participacao_set'] = Participacao.objects.filter(
-                composicao__pk=context['composicao_pk']
-            ).order_by('id')
+            context["participacao_set"] = Participacao.objects.filter(
+                composicao__pk=context["composicao_pk"]
+            ).order_by("id")
             return context
 
 
 class ComissaoCrud(Crud):
     model = Comissao
-    help_topic = 'modulo_comissoes'
-    public = [RP_LIST, RP_DETAIL, ]
+    help_topic = "modulo_comissoes"
+    public = [
+        RP_LIST,
+        RP_DETAIL,
+    ]
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = ['nome', 'sigla', 'tipo',
-                            'data_criacao', 'data_extincao', 'ativa']
-        ordering = '-ativa', 'sigla'
+        list_field_names = [
+            "nome",
+            "sigla",
+            "tipo",
+            "data_criacao",
+            "data_extincao",
+            "ativa",
+        ]
+        ordering = "-ativa", "sigla"
 
     class CreateView(Crud.CreateView):
         form_class = ComissaoForm
@@ -194,15 +241,18 @@ class ComissaoCrud(Crud):
 
 
 def lista_materias_comissao(comissao_pk):
-    ts = Tramitacao.objects.order_by(
-        'materia_id', '-data_tramitacao', '-id').annotate(
-        comissao=F('unidade_tramitacao_destino__comissao')).distinct(
-            'materia').values_list('materia', 'comissao')
+    ts = (
+        Tramitacao.objects.order_by("materia_id", "-data_tramitacao", "-id")
+        .annotate(comissao=F("unidade_tramitacao_destino__comissao"))
+        .distinct("materia")
+        .values_list("materia", "comissao")
+    )
 
     ts = [m for (m, c) in ts if c == int(comissao_pk)]
 
-    materias = MateriaLegislativa.objects.filter(
-        pk__in=ts).order_by('tipo', '-ano', '-numero')
+    materias = MateriaLegislativa.objects.filter(pk__in=ts).order_by(
+        "tipo", "-ano", "-numero"
+    )
 
     return materias
 
@@ -212,24 +262,26 @@ class MateriasTramitacaoListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return lista_materias_comissao(self.kwargs['pk'])
+        return lista_materias_comissao(self.kwargs["pk"])
 
     def get_context_data(self, **kwargs):
-        context = super(
-            MateriasTramitacaoListView, self).get_context_data(**kwargs)
-        context['object'] = Comissao.objects.get(id=self.kwargs['pk'])
-        context['qtde'] = self.object_list.count()
+        context = super(MateriasTramitacaoListView, self).get_context_data(**kwargs)
+        context["object"] = Comissao.objects.get(id=self.kwargs["pk"])
+        context["qtde"] = self.object_list.count()
         return context
 
 
 class ReuniaoCrud(MasterDetailCrud):
     model = Reuniao
-    parent_field = 'comissao'
-    public = [RP_LIST, RP_DETAIL, ]
+    parent_field = "comissao"
+    public = [
+        RP_LIST,
+        RP_DETAIL,
+    ]
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['data', 'nome', 'tema', 'upload_ata']
-        ordering = '-data'
+        list_field_names = ["data", "nome", "tema", "upload_ata"]
+        ordering = "-data"
 
     class DetailView(MasterDetailCrud.DetailView):
         template_name = "comissoes/reuniao_detail.html"
@@ -239,24 +291,23 @@ class ReuniaoCrud(MasterDetailCrud):
 
             docs = []
             documentos = DocumentoAcessorio.objects.filter(
-                reuniao=self.kwargs['pk']).order_by('nome')
+                reuniao=self.kwargs["pk"]
+            ).order_by("nome")
             docs.extend(documentos)
 
-            context['docs'] = docs
-            context['num_docs'] = len(docs)
+            context["docs"] = docs
+            context["num_docs"] = len(docs)
 
             mats = []
-            materias_pauta = PautaReuniao.objects.filter(
-                reuniao=self.kwargs['pk'])
-            materias_pk = [
-                materia_pauta.materia.pk for materia_pauta in materias_pauta]
+            materias_pauta = PautaReuniao.objects.filter(reuniao=self.kwargs["pk"])
+            materias_pk = [materia_pauta.materia.pk for materia_pauta in materias_pauta]
 
-            context['mats'] = MateriaLegislativa.objects.filter(
+            context["mats"] = MateriaLegislativa.objects.filter(
                 pk__in=materias_pk
-            ).order_by('tipo', '-ano', '-numero')
-            context['num_mats'] = len(context['mats'])
+            ).order_by("tipo", "-ano", "-numero")
+            context["num_mats"] = len(context["mats"])
 
-            context['reuniao_pk'] = self.kwargs['pk']
+            context["reuniao_pk"] = self.kwargs["pk"]
 
             return context
 
@@ -268,12 +319,17 @@ class ReuniaoCrud(MasterDetailCrud):
 
             username = self.request.user.username
             try:
-                self.logger.debug('user=' + username +
-                                  '. Tentando obter pk da reunião.')
-                return int(self.request.GET['pk'])
+                self.logger.debug(
+                    "user=" + username + ". Tentando obter pk da reunião."
+                )
+                return int(self.request.GET["pk"])
             except Exception as e:
                 self.logger.error(
-                    'user=' + username + '. Erro ao obter pk da reunião. Retornado 0. ' + str(e))
+                    "user="
+                    + username
+                    + ". Erro ao obter pk da reunião. Retornado 0. "
+                    + str(e)
+                )
                 return 0
 
         def get_context_data(self, **kwargs):
@@ -282,79 +338,76 @@ class ReuniaoCrud(MasterDetailCrud):
             reuniao_pk = self.take_reuniao_pk()
 
             if reuniao_pk == 0:
-                ultima_reuniao = list(context['reuniao_list'])
+                ultima_reuniao = list(context["reuniao_list"])
                 if len(ultima_reuniao) > 0:
                     ultimo = ultima_reuniao[-1]
-                    context['reuniao_pk'] = ultimo.pk
+                    context["reuniao_pk"] = ultimo.pk
                 else:
-                    context['reuniao_pk'] = 0
+                    context["reuniao_pk"] = 0
             else:
-                context['reuniao_pk'] = reuniao_pk
+                context["reuniao_pk"] = reuniao_pk
 
-            context['documentoacessorio_set'] = DocumentoAcessorio.objects.filter(
-                reuniao__pk=context['reuniao_pk']
-            ).order_by('id')
+            context["documentoacessorio_set"] = DocumentoAcessorio.objects.filter(
+                reuniao__pk=context["reuniao_pk"]
+            ).order_by("id")
             return context
 
     class UpdateView(MasterDetailCrud.UpdateView):
         form_class = ReuniaoForm
 
         def get_initial(self):
-            return {'comissao': self.object.comissao}
+            return {"comissao": self.object.comissao}
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = ReuniaoForm
 
         def get_initial(self):
-            comissao = Comissao.objects.get(id=self.kwargs['pk'])
+            comissao = Comissao.objects.get(id=self.kwargs["pk"])
 
-            return {'comissao': comissao}
+            return {"comissao": comissao}
 
 
 class RemovePautaView(PermissionRequiredMixin, CreateView):
     model = PautaReuniao
     form_class = PautaReuniaoForm
-    template_name = 'comissoes/pauta.html'
-    permission_required = ('comissoes.add_reuniao', )
+    template_name = "comissoes/pauta.html"
+    permission_required = ("comissoes.add_reuniao",)
 
     def get_context_data(self, **kwargs):
-        context = super(
-            RemovePautaView, self
-        ).get_context_data(**kwargs)
+        context = super(RemovePautaView, self).get_context_data(**kwargs)
 
         # Remove = 0; Adiciona = 1
-        context['opcao'] = 0
+        context["opcao"] = 0
 
-        context['object'] = Reuniao.objects.get(pk=self.kwargs['pk'])
-        context['root_pk'] = context['object'].comissao.pk
+        context["object"] = Reuniao.objects.get(pk=self.kwargs["pk"])
+        context["root_pk"] = context["object"].comissao.pk
 
-        materias_pauta = PautaReuniao.objects.filter(reuniao=context['object'])
-        materias_pk = [
-            materia_pauta.materia.pk for materia_pauta in materias_pauta]
+        materias_pauta = PautaReuniao.objects.filter(reuniao=context["object"])
+        materias_pk = [materia_pauta.materia.pk for materia_pauta in materias_pauta]
 
-        context['materias'] = MateriaLegislativa.objects.filter(
+        context["materias"] = MateriaLegislativa.objects.filter(
             pk__in=materias_pk
-        ).order_by('tipo', '-ano', '-numero')
-        context['num_materias'] = len(context['materias'])
+        ).order_by("tipo", "-ano", "-numero")
+        context["num_materias"] = len(context["materias"])
 
         return context
 
     def post(self, request, *args, **kwargs):
-        success_url = reverse('sapl.comissoes:reuniao_detail', kwargs={
-                              'pk': kwargs['pk']})
-        marcadas = request.POST.getlist('materia_id')
+        success_url = reverse(
+            "sapl.comissoes:reuniao_detail", kwargs={"pk": kwargs["pk"]}
+        )
+        marcadas = request.POST.getlist("materia_id")
 
         if not marcadas:
-            msg = _('Nenhuma matéria foi selecionada.')
+            msg = _("Nenhuma matéria foi selecionada.")
             messages.add_message(request, messages.WARNING, msg)
             return HttpResponseRedirect(success_url)
 
-        reuniao = Reuniao.objects.get(pk=kwargs['pk'])
+        reuniao = Reuniao.objects.get(pk=kwargs["pk"])
         for materia in MateriaLegislativa.objects.filter(id__in=marcadas):
-            PautaReuniao.objects.filter(
-                reuniao=reuniao, materia=materia).delete()
+            PautaReuniao.objects.filter(reuniao=reuniao, materia=materia).delete()
 
-        msg = _('Matéria(s) removida(s) com sucesso!')
+        msg = _("Matéria(s) removida(s) com sucesso!")
         messages.add_message(request, messages.SUCCESS, msg)
         return HttpResponseRedirect(success_url)
 
@@ -362,41 +415,39 @@ class RemovePautaView(PermissionRequiredMixin, CreateView):
 class AdicionaPautaView(PermissionRequiredMixin, CreateView):
     model = PautaReuniao
     form_class = PautaReuniaoForm
-    template_name = 'comissoes/pauta.html'
-    permission_required = ('comissoes.add_reuniao', )
+    template_name = "comissoes/pauta.html"
+    permission_required = ("comissoes.add_reuniao",)
 
     def get_context_data(self, **kwargs):
-        context = super(
-            AdicionaPautaView, self
-        ).get_context_data(**kwargs)
+        context = super(AdicionaPautaView, self).get_context_data(**kwargs)
 
         # Adiciona = 1; Remove = 0
-        context['opcao'] = 1
+        context["opcao"] = 1
 
-        context['object'] = Reuniao.objects.get(pk=self.kwargs['pk'])
-        context['root_pk'] = context['object'].comissao.pk
+        context["object"] = Reuniao.objects.get(pk=self.kwargs["pk"])
+        context["root_pk"] = context["object"].comissao.pk
 
-        materias_comissao = lista_materias_comissao(
-            context['object'].comissao.pk)
-        materias_pauta = PautaReuniao.objects.filter(reuniao=context['object'])
+        materias_comissao = lista_materias_comissao(context["object"].comissao.pk)
+        materias_pauta = PautaReuniao.objects.filter(reuniao=context["object"])
 
         nao_listar = [mp.materia.pk for mp in materias_pauta]
-        context['materias'] = materias_comissao.exclude(pk__in=nao_listar)
-        context['num_materias'] = len(context['materias'])
+        context["materias"] = materias_comissao.exclude(pk__in=nao_listar)
+        context["num_materias"] = len(context["materias"])
 
         return context
 
     def post(self, request, *args, **kwargs):
-        success_url = reverse('sapl.comissoes:reuniao_detail', kwargs={
-                              'pk': kwargs['pk']})
-        marcadas = request.POST.getlist('materia_id')
+        success_url = reverse(
+            "sapl.comissoes:reuniao_detail", kwargs={"pk": kwargs["pk"]}
+        )
+        marcadas = request.POST.getlist("materia_id")
 
         if not marcadas:
-            msg = _('Nenhuma máteria foi selecionada.')
+            msg = _("Nenhuma máteria foi selecionada.")
             messages.add_message(request, messages.WARNING, msg)
             return HttpResponseRedirect(success_url)
 
-        reuniao = Reuniao.objects.get(pk=kwargs['pk'])
+        reuniao = Reuniao.objects.get(pk=kwargs["pk"])
         pautas = []
         for materia in MateriaLegislativa.objects.filter(id__in=marcadas):
             pauta = PautaReuniao()
@@ -405,31 +456,33 @@ class AdicionaPautaView(PermissionRequiredMixin, CreateView):
             pautas.append(pauta)
         PautaReuniao.objects.bulk_create(pautas)
 
-        msg = _('Matéria(s) adicionada(s) com sucesso!')
+        msg = _("Matéria(s) adicionada(s) com sucesso!")
         messages.add_message(request, messages.SUCCESS, msg)
         return HttpResponseRedirect(success_url)
 
 
 class DocumentoAcessorioCrud(MasterDetailCrud):
     model = DocumentoAcessorio
-    parent_field = 'reuniao__comissao'
-    public = [RP_DETAIL, ]
+    parent_field = "reuniao__comissao"
+    public = [
+        RP_DETAIL,
+    ]
     ListView = None
     link_return_to_parent_field = True
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
-        list_field_names = ['nome', 'tipo', 'data', 'autor', 'arquivo']
+        list_field_names = ["nome", "tipo", "data", "autor", "arquivo"]
 
     class CreateView(MasterDetailCrud.CreateView):
         form_class = DocumentoAcessorioCreateForm
 
         def get_initial(self):
             initial = super().get_initial()
-            initial['parent_pk'] = self.kwargs['pk']
+            initial["parent_pk"] = self.kwargs["pk"]
             return initial
 
     class UpdateView(MasterDetailCrud.UpdateView):
-        layout_key = 'DocumentoAcessorioEdit'
+        layout_key = "DocumentoAcessorioEdit"
         form_class = DocumentoAcessorioEditForm
 
     class DeleteView(MasterDetailCrud.DeleteView):
@@ -438,17 +491,20 @@ class DocumentoAcessorioCrud(MasterDetailCrud):
             obj = self.get_object()
             obj.delete()
             return HttpResponseRedirect(
-                reverse('sapl.comissoes:reuniao_detail',
-                        kwargs={'pk': obj.reuniao.pk}))
+                reverse("sapl.comissoes:reuniao_detail", kwargs={"pk": obj.reuniao.pk})
+            )
 
 
 def get_participacoes_comissao(request):
     parlamentares = []
 
-    composicao_id = request.GET.get('composicao_id')
+    composicao_id = request.GET.get("composicao_id")
     if composicao_id:
-        parlamentares = [{'nome': p.parlamentar.nome_parlamentar, 'id': p.parlamentar.id} for p in
-                         Participacao.objects.filter(composicao_id=composicao_id).order_by(
-                             'parlamentar__nome_parlamentar')]
+        parlamentares = [
+            {"nome": p.parlamentar.nome_parlamentar, "id": p.parlamentar.id}
+            for p in Participacao.objects.filter(composicao_id=composicao_id).order_by(
+                "parlamentar__nome_parlamentar"
+            )
+        ]
 
     return JsonResponse(parlamentares, safe=False)

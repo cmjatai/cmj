@@ -79,14 +79,12 @@ class TipoProposicao(models.Model):
         default=None,
         on_delete=models.PROTECT,
         verbose_name=_("Conversão de Meta-Tipos"),
-        help_text=_(
-            """
+        help_text=_("""
         Quando uma proposição é incorporada, ela é convertida de proposição
         para outro elemento dentro do Sapl. Existem alguns elementos que
         uma proposição pode se tornar. Defina este meta-tipo e em seguida
         escolha um Tipo Correspondente!
-        """
-        ),
+        """),
     )
     object_id = models.PositiveIntegerField(blank=True, null=True, default=None)
     tipo_conteudo_related = SaplGenericForeignKey(
@@ -97,26 +95,22 @@ class TipoProposicao(models.Model):
         TipoAutor,
         blank=True,
         verbose_name=_("Tipos de Autores"),
-        help_text=_(
-            """
+        help_text=_("""
                     Tipo de Autores que pode enviar este tipo de Proposição.
-                    """
-        ),
+                    """),
     )
     perfis = models.ManyToManyField(
         PerfilEstruturalTextoArticulado,
         blank=True,
         verbose_name=_("Perfis Estruturais de Textos Articulados"),
-        help_text=_(
-            """
+        help_text=_("""
                     Mesmo que em Configurações da Aplicação nas
                     Tabelas Auxiliares esteja definido que Proposições possam
                     utilizar Textos Articulados, ao gerar uma proposição,
                     a solução de Textos Articulados será disponibilizada se
                     o Tipo escolhido para a Proposição estiver associado a ao
                     menos um Perfil Estrutural de Texto Articulado.
-                    """
-        ),
+                    """),
     )
 
     class Meta:
@@ -666,7 +660,7 @@ class MateriaLegislativa(CommonMixin):
             compression = all(autores.values_list("sign_compression", flat=True))
 
         if not protocolo:
-            numeracao = BaseAppConfig.attr('sequencia_numeracao_protocolo')
+            numeracao = BaseAppConfig.attr("sequencia_numeracao_protocolo")
             p = Protocolo()
             p.numero = Protocolo.get_proximo_numero_protocolo(numeracao=numeracao)
             p.ano = self.ano
@@ -912,7 +906,7 @@ class MateriaLegislativa(CommonMixin):
         # Obtém a configuração de numeração
         numeracao = None
         try:
-            numeracao = BaseAppConfig.attr('sequencia_numeracao_protocolo')
+            numeracao = BaseAppConfig.attr("sequencia_numeracao_protocolo")
         except AttributeError:
             pass
 

@@ -163,13 +163,11 @@ class TipoTextoArticulado(models.Model):
         PerfilEstruturalTextoArticulado,
         blank=True,
         verbose_name=_("Perfis Estruturais de Textos Articulados"),
-        help_text=_(
-            """
+        help_text=_("""
                     Apenas os perfis selecionados aqui estarão disponíveis
                     para o editor de Textos Articulados cujo Tipo seja este
                     em edição.
-                    """
-        ),
+                    """),
     )
 
     rodape_global = models.TextField(

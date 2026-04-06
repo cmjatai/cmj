@@ -249,26 +249,22 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 url_emenda = reverse_lazy(
                     "cmj.loa:emendaloa_detail", kwargs={"pk": obj.emendaloa.id}
                 )
-                links.append(
-                    f"""
+                links.append(f"""
                     <a href="{url_emenda}">
                         {obj.emendaloa.materia.epigrafe_short}
                     </a>
-                """
-                )
+                """)
 
             if obj.registro_ajuste:
                 url_ajuste = reverse_lazy(
                     "cmj.loa:registroajusteloa_detail",
                     kwargs={"pk": obj.registro_ajuste.id},
                 )
-                links.append(
-                    f"""
+                links.append(f"""
                     <a href="{url_ajuste}">
                         {obj.registro_ajuste.oficio_ajuste_loa.epigrafe}
                     </a>
-                """
-                )
+                """)
 
             return verbose_name, "<br>".join(links)
 

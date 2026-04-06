@@ -9,10 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.fields import SerializerMethodField
 
 from cmj.api.serializers import CmjSerializerMixin
-from cmj.loa.models import (
-    DespesaConsulta,
-    EmendaLoaRegistroContabil,
-)
+from cmj.loa.models import DespesaConsulta, EmendaLoaRegistroContabil
 
 logger = logging.getLogger(__name__)
 

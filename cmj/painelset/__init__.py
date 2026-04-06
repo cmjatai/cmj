@@ -1,1 +1,1 @@
-default_app_config = 'cmj.painelset.apps.AppConfig'
+default_app_config = "cmj.painelset.apps.AppConfig"

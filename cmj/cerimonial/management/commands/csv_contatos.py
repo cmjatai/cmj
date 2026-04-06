@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 from django.db.models.fields import DateField
 from django.utils import formats
 
-from cmj.cerimonial.models import Endereco, Telefone, Contato
+from cmj.cerimonial.models import Contato, Endereco, Telefone
 from cmj.core.models import AreaTrabalho
 
 
@@ -12,23 +12,28 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         return
-        p = ''
+        p = ""
         at = AreaTrabalho.objects.filter(nome__icontains=p).first()
 
-        with open('/home/leandro/TEMP/AT-{}.csv'.format(p), 'w', newline='', encoding='utf-8') as cf:
+        with open(
+            "/home/leandro/TEMP/AT-{}.csv".format(p), "w", newline="", encoding="utf-8"
+        ) as cf:
 
-            writer = csv.writer(cf, delimiter=',',
-                                quotechar='"',
-                                quoting=csv.QUOTE_NONNUMERIC)
+            writer = csv.writer(
+                cf, delimiter=",", quotechar='"', quoting=csv.QUOTE_NONNUMERIC
+            )
 
-            contatos = Contato.objects.filter(
-                workspace=at).order_by(
-                'endereco_set__bairro__nome',
-                'endereco_set__endereco',
-                'nome')
+            contatos = Contato.objects.filter(workspace=at).order_by(
+                "endereco_set__bairro__nome", "endereco_set__endereco", "nome"
+            )
 
             excludes_fields = (
-                'id', 'search', 'modified', 'owner', 'modifier', 'created'
+                "id",
+                "search",
+                "modified",
+                "owner",
+                "modifier",
+                "created",
             )
             """
             # COMPLETO
@@ -51,22 +56,51 @@ class Command(BaseCommand):
 
             # SIMPLIFICADO
             contato_excludes_fields = (
-                'workspace', 'perfil_user',  'ativo', 'observacoes',
-                'nome_social', 'apelido', 'identidade_genero', 'tem_filhos',
-                'quantos_filhos', 'nivel_instrucao', 'numero_sus',
-                'titulo_eleitor', 'profissao', 'tipo_autoridade',
-                'cargo', 'pronome_tratamento', 'nome_pai', 'nome_mae',
-                'cpf', 'rg', 'rg_orgao_expedidor', 'rg_data_expedicao', 'observacoes'
+                "workspace",
+                "perfil_user",
+                "ativo",
+                "observacoes",
+                "nome_social",
+                "apelido",
+                "identidade_genero",
+                "tem_filhos",
+                "quantos_filhos",
+                "nivel_instrucao",
+                "numero_sus",
+                "titulo_eleitor",
+                "profissao",
+                "tipo_autoridade",
+                "cargo",
+                "pronome_tratamento",
+                "nome_pai",
+                "nome_mae",
+                "cpf",
+                "rg",
+                "rg_orgao_expedidor",
+                "rg_data_expedicao",
+                "observacoes",
             )
             telefone_excludes_fields = (
-                'contato', 'operadora', 'proprio', 'de_quem_e', 'preferencial',
-                'permissao', 'tipo', 'created'
+                "contato",
+                "operadora",
+                "proprio",
+                "de_quem_e",
+                "preferencial",
+                "permissao",
+                "tipo",
+                "created",
             )
 
             endereco_excludes_fields = (
-                'contato', 'trecho', 'preferencial', 'tipo',
-                'ponto_referencia', 'regiao_municipal',
-                'distrito', 'observacoes', 'created'
+                "contato",
+                "trecho",
+                "preferencial",
+                "tipo",
+                "ponto_referencia",
+                "regiao_municipal",
+                "distrito",
+                "observacoes",
+                "created",
             )
 
             def get_model_fields(model):
@@ -84,8 +118,8 @@ class Command(BaseCommand):
                     continue
                 row_title.append(field.verbose_name)
 
-                if field.name == 'nome':
-                    row_title.append('Telefones')
+                if field.name == "nome":
+                    row_title.append("Telefones")
 
             for field in get_model_fields(Endereco):
                 if campo_excluido(field, (excludes_fields, endereco_excludes_fields)):
@@ -102,45 +136,50 @@ class Command(BaseCommand):
                 row = []
 
                 for field in get_model_fields(Contato):
-                    if campo_excluido(field, (excludes_fields, contato_excludes_fields)):
+                    if campo_excluido(
+                        field, (excludes_fields, contato_excludes_fields)
+                    ):
                         continue
 
                     if getattr(c, field.name):
                         if field.__class__ == DateField:
-                            row.append(
-                                getattr(c, field.name).strftime('%d/%m/%Y'))
+                            row.append(getattr(c, field.name).strftime("%d/%m/%Y"))
                         else:
                             row.append(str(getattr(c, field.name)))
 
                     else:
-                        row.append('')
+                        row.append("")
 
-                    if field.name == 'nome':
+                    if field.name == "nome":
 
-                        telefones = ''
+                        telefones = ""
                         for telefone in c.telefone_set.all():
                             for field in get_model_fields(Telefone):
-                                if campo_excluido(field, (excludes_fields, telefone_excludes_fields)):
+                                if campo_excluido(
+                                    field, (excludes_fields, telefone_excludes_fields)
+                                ):
                                     continue
 
                                 if telefones:
-                                    telefones += ' / '
+                                    telefones += " / "
 
                                 if getattr(telefone, field.name):
-                                    telefones += str(getattr(telefone,
-                                                             field.name)).strip()
+                                    telefones += str(
+                                        getattr(telefone, field.name)
+                                    ).strip()
 
                         row.append(telefones)
 
                 for endereco in c.endereco_set.all():
                     for field in get_model_fields(Endereco):
-                        if campo_excluido(field, (excludes_fields, endereco_excludes_fields)):
+                        if campo_excluido(
+                            field, (excludes_fields, endereco_excludes_fields)
+                        ):
                             continue
                         if getattr(endereco, field.name):
-                            row.append(
-                                str(getattr(endereco, field.name)).strip())
+                            row.append(str(getattr(endereco, field.name)).strip())
                         else:
-                            row.append('')
+                            row.append("")
                     break
 
                 """titulo_processos = ''

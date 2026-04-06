@@ -1,9 +1,7 @@
-
-
-from copy import deepcopy
-from datetime import timedelta
 import json
 import logging
+from copy import deepcopy
+from datetime import timedelta
 
 from dateutil.relativedelta import relativedelta
 from django import template
@@ -13,8 +11,7 @@ from django.core.cache import cache
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.template.defaultfilters import stringfilter
-from django.utils import formats
-from django.utils import timezone
+from django.utils import formats, timezone
 from django.utils.dateparse import parse_datetime as django_parse_datetime
 from django.utils.formats import date_format
 from django.utils.safestring import mark_safe
@@ -77,58 +74,54 @@ def render_chunk_vendors(extension=None):
         return ''"""
 
 
-
-@register.filter('decimal2str')
+@register.filter("decimal2str")
 def decimal2str(value):
     return formats.number_format(value, force_grouping=True)
 
 
-@register.filter('startswith')
+@register.filter("startswith")
 def startswith(text, starts):
     if isinstance(text, str):
         return text.startswith(starts)
     return False
 
 
-@register.filter('jsonify')
+@register.filter("jsonify")
 def jsonify(object):
     if isinstance(object, QuerySet):
-        return mark_safe(serialize('json', object))
+        return mark_safe(serialize("json", object))
     return mark_safe(json.dumps(object))
 
 
-@register.filter('to_dict')
+@register.filter("to_dict")
 def to_dict(object):
     return object.__dict__
 
 
-@register.filter('islist')
+@register.filter("islist")
 def islist(object):
     return isinstance(object, list)
 
 
 @register.filter
 def transmissao_ao_vivo(obj):
-    return Video.objects.filter(
-        json__snippet__liveBroadcastContent__exact='live'
-    )
+    return Video.objects.filter(json__snippet__liveBroadcastContent__exact="live")
 
 
 def get_class(class_string):
-    if not hasattr(class_string, '__bases__'):
+    if not hasattr(class_string, "__bases__"):
         class_string = str(class_string)
-        dot = class_string.rindex('.')
-        mod_name, class_name = class_string[:dot], class_string[dot + 1:]
+        dot = class_string.rindex(".")
+        mod_name, class_name = class_string[:dot], class_string[dot + 1 :]
 
         try:
-            ct = ContentType.objects.get_by_natural_key(
-                mod_name, class_name.lower())
+            ct = ContentType.objects.get_by_natural_key(mod_name, class_name.lower())
             if ct:
                 return ct.model_class()
             return None
         except:
             if class_name:
-                return getattr(__import__(mod_name, {}, {}, [str('')]), class_name)
+                return getattr(__import__(mod_name, {}, {}, [str("")]), class_name)
             return None
 
 
@@ -154,15 +147,15 @@ def model_verbose_name_plural(class_name):
     model = get_class(class_name)
     if model:
         return model._meta.verbose_name_plural
-    return ''
+    return ""
 
 
 @register.filter
 def meta_model_value(instance, attr):
     try:
-        return getattr(instance._meta, attr) if instance else ''
+        return getattr(instance._meta, attr) if instance else ""
     except:
-        return ''
+        return ""
 
 
 @register.filter
@@ -179,12 +172,12 @@ def map_field_from_queryset(qs, field):
 @register.filter
 def search_value(request):
     try:
-        q = getattr(request, request.method).get('q', '')
+        q = getattr(request, request.method).get("q", "")
         return q
     except Exception as e:
         logger.error(e)
 
-    return ''
+    return ""
 
 
 @register.filter
@@ -197,10 +190,10 @@ def isinst(value, class_str):
 def age(data, max_age=0):
 
     if not data:
-        return ''
+        return ""
     now = timezone.localtime()
     today = deepcopy(now)
-    if not hasattr(data, 'tzinfo') or not data.tzinfo:
+    if not hasattr(data, "tzinfo") or not data.tzinfo:
         data = now.replace(year=data.year, month=data.month, day=data.day)
 
     idade = relativedelta(today, data)
@@ -208,44 +201,50 @@ def age(data, max_age=0):
     if max_age:
         td = today - data
         if td.total_seconds() > max_age * 86400:
-            return date_format(data, r'd \d\e M \d\e Y')
+            return date_format(data, r"d \d\e M \d\e Y")
 
     if idade.years or idade.months or idade.days > 2:
-        years = '%s %s%s' % (
-            idade.years if idade.years else '',
-            _('ano') if idade.years else '',
-            's' if idade.years > 1 else '')
+        years = "%s %s%s" % (
+            idade.years if idade.years else "",
+            _("ano") if idade.years else "",
+            "s" if idade.years > 1 else "",
+        )
 
-        months = '%s%s %s%s' % (
-            ', ' if idade.years and idade.months else '',
-            idade.months if idade.months else '',
-            _('mes') if idade.months else '',
-            'es' if idade.months > 1 else '')
-        days = '%s%s %s%s' % (
-            ', ' if idade.days and (idade.months or idade.years) else '',
-            idade.days if idade.days else '',
-            _('dia') if idade.days else '',
-            's' if idade.days > 1 else '')
-        return '%s%s%s' % (years.strip(), months.strip(), days.strip())
+        months = "%s%s %s%s" % (
+            ", " if idade.years and idade.months else "",
+            idade.months if idade.months else "",
+            _("mes") if idade.months else "",
+            "es" if idade.months > 1 else "",
+        )
+        days = "%s%s %s%s" % (
+            ", " if idade.days and (idade.months or idade.years) else "",
+            idade.days if idade.days else "",
+            _("dia") if idade.days else "",
+            "s" if idade.days > 1 else "",
+        )
+        return "%s%s%s" % (years.strip(), months.strip(), days.strip())
 
-    days = '%s %s%s' % (
-        idade.days if idade.days else '',
-        _('dia') if idade.days else '',
-        's' if idade.days > 1 else '')
+    days = "%s %s%s" % (
+        idade.days if idade.days else "",
+        _("dia") if idade.days else "",
+        "s" if idade.days > 1 else "",
+    )
 
-    hours = '%s%s %s%s' % (
-        ', ' if idade.hours and idade.days else '',
-        idade.hours if idade.hours else '',
-        _('hora') if idade.hours else '',
-        's' if idade.hours > 1 else '')
+    hours = "%s%s %s%s" % (
+        ", " if idade.hours and idade.days else "",
+        idade.hours if idade.hours else "",
+        _("hora") if idade.hours else "",
+        "s" if idade.hours > 1 else "",
+    )
 
-    minutes = '%s%s %s%s' % (
-        ', ' if idade.minutes and (idade.hours or idade.days) else '',
-        idade.minutes if idade.minutes else '',
-        _('minuto') if idade.minutes else '',
-        's' if idade.minutes > 1 else '')
+    minutes = "%s%s %s%s" % (
+        ", " if idade.minutes and (idade.hours or idade.days) else "",
+        idade.minutes if idade.minutes else "",
+        _("minuto") if idade.minutes else "",
+        "s" if idade.minutes > 1 else "",
+    )
 
-    return '%s%s%s' % (days.strip(), hours.strip(), minutes.strip())
+    return "%s%s%s" % (days.strip(), hours.strip(), minutes.strip())
 
 
 @register.filter
@@ -258,7 +257,7 @@ def get_add_perm(value, arg):
     except AttributeError:
         return None
     nome_model = view.__class__.model.__name__.lower()
-    can_add = '.add_' + nome_model
+    can_add = ".add_" + nome_model
 
     return perm.__contains__(nome_app + can_add)
 
@@ -273,7 +272,7 @@ def get_change_perm(value, arg):
     except AttributeError:
         return None
     nome_model = view.__class__.model.__name__.lower()
-    can_change = '.change_' + nome_model
+    can_change = ".change_" + nome_model
 
     return perm.__contains__(nome_app + can_change)
 
@@ -288,7 +287,7 @@ def get_delete_perm(value, arg):
     except AttributeError:
         return None
     nome_model = view.__class__.model.__name__.lower()
-    can_delete = '.delete_' + nome_model
+    can_delete = ".delete_" + nome_model
 
     return perm.__contains__(nome_app + can_delete)
 
@@ -297,8 +296,9 @@ def get_delete_perm(value, arg):
 def ultima_filiacao(value):
     parlamentar = value
 
-    ultima_filiacao = Filiacao.objects.filter(
-        parlamentar=parlamentar).order_by('-data').first()
+    ultima_filiacao = (
+        Filiacao.objects.filter(parlamentar=parlamentar).order_by("-data").first()
+    )
 
     if ultima_filiacao:
         return ultima_filiacao.partido
@@ -314,46 +314,50 @@ def get_config_attr(attribute):
 @register.filter
 def str2intabs(value):
     if not isinstance(value, str):
-        return ''
+        return ""
     try:
         v = int(value)
         v = abs(v)
         return v
     except:
-        return ''
+        return ""
 
 
 @register.filter
 def url(value):
-    if value.startswith('http://') or value.startswith('https://'):
+    if value.startswith("http://") or value.startswith("https://"):
         return True
     return False
 
 
-@register.inclusion_tag('core/notificacoes_unread.html', takes_context=True)
+@register.inclusion_tag("core/notificacoes_unread.html", takes_context=True)
 def notificacoes_unread(context):
 
     try:
-        request = context['request']
+        request = context["request"]
 
         if request.user.is_anonymous:
-            return {'notificacoes_anonimas': [],
-                    'notificacoes_usuarios': [],
-                    'notificacoes': 0, }
+            return {
+                "notificacoes_anonimas": [],
+                "notificacoes_usuarios": [],
+                "notificacoes": 0,
+            }
 
-        result = {'notificacoes_anonimas':
-                  request.user.notificacao_set.unread().filter(
-                      user_origin__isnull=True).order_by('-created'),
-                  'notificacoes_usuarios':
-                  request.user.notificacao_set.unread().filter(
-                      user_origin__isnull=False).order_by('-created')
-                  }
+        result = {
+            "notificacoes_anonimas": request.user.notificacao_set.unread()
+            .filter(user_origin__isnull=True)
+            .order_by("-created"),
+            "notificacoes_usuarios": request.user.notificacao_set.unread()
+            .filter(user_origin__isnull=False)
+            .order_by("-created"),
+        }
 
         result.update(
             {
-                'notificacoes': (
-                    result['notificacoes_anonimas'].count() +
-                    result['notificacoes_usuarios'].count()),
+                "notificacoes": (
+                    result["notificacoes_anonimas"].count()
+                    + result["notificacoes_usuarios"].count()
+                ),
             }
         )
         return result
@@ -372,9 +376,11 @@ def notificacoes_unread_count(user):
 @register.filter
 def notificacoes_unread_in_obj(obj, user):
 
-    notificacoes = [obj.notificacoes.unread().filter(user = user).exists(), ]
+    notificacoes = [
+        obj.notificacoes.unread().filter(user=user).exists(),
+    ]
     for ms in obj.mensagemsolicitacao_set.all():
-        notificacoes.append(ms.notificacoes.unread().filter(user = user).exists())
+        notificacoes.append(ms.notificacoes.unread().filter(user=user).exists())
     notificacoes = filter(lambda n: n, notificacoes)
 
     return len(list(notificacoes)) > 0
@@ -389,11 +395,10 @@ def data_de_leitura(obj, user):
     return qs.first().modified
 
 
-@register.inclusion_tag('core/user/avatar.html')
+@register.inclusion_tag("core/user/avatar.html")
 def avatar_user(user_render=None):
-    return {
-        'user_render': user_render
-    }
+    return {"user_render": user_render}
+
 
 @register.simple_tag
 def settings_key_tag(var_name):
@@ -412,9 +417,9 @@ def yaml_render(context, template_name, increment_space=0):
     if not increment_space:
         return r
 
-    r = r.split('\n')
-    r = ['%s%s' % (' ' * increment_space, line) for line in r]
-    return mark_safe('\n'.join(r))
+    r = r.split("\n")
+    r = ["%s%s" % (" " * increment_space, line) for line in r]
+    return mark_safe("\n".join(r))
 
 
 @register.filter(is_safe=True)
@@ -432,12 +437,12 @@ def sidebar_tipos_de_normas(obj):
 
 @register.filter
 def sidebar_tipos_de_materias(obj):
-    return TipoMateriaLegislativa.objects.all().order_by('sequencia_regimental')
+    return TipoMateriaLegislativa.objects.all().order_by("sequencia_regimental")
 
 
 @register.filter
 def normas_de_destaque(obj):
-    return NormaJuridica.objects.filter(norma_de_destaque=True).order_by('id')
+    return NormaJuridica.objects.filter(norma_de_destaque=True).order_by("id")
 
 
 @register.filter
@@ -465,7 +470,7 @@ def conteudo_protocolado_homologado(protocolo):
     if not cp:
         return False
 
-    if not hasattr(cp, 'FIELDFILE_NAME'):
+    if not hasattr(cp, "FIELDFILE_NAME"):
         return False
 
     fieldfile_name = cp.FIELDFILE_NAME
@@ -474,7 +479,7 @@ def conteudo_protocolado_homologado(protocolo):
     for fn in fieldfile_name:
 
         try:
-            homologado = not not cp.metadata['signs'][fn]['hom']
+            homologado = not not cp.metadata["signs"][fn]["hom"]
         except:
             return False
 
@@ -485,21 +490,18 @@ def conteudo_protocolado_homologado(protocolo):
 
 @register.filter
 def params_search_to_api(items):
-    gd = {
-        k: v
-        for k, v in items if v and k not in ('tipo_listagem', )
-    }
-    furl = '&'.join(map(lambda kv: f'{kv[0]}={kv[1]}', gd.items()))
-    u = furl.replace('_b=', '=')
-    u = u.replace('_i=', '=')
-    u = u.replace('_is=', '=')
-    u = u.replace('autoria', 'autores')
+    gd = {k: v for k, v in items if v and k not in ("tipo_listagem",)}
+    furl = "&".join(map(lambda kv: f"{kv[0]}={kv[1]}", gd.items()))
+    u = furl.replace("_b=", "=")
+    u = u.replace("_i=", "=")
+    u = u.replace("_is=", "=")
+    u = u.replace("autoria", "autores")
     return u
 
 
 @register.filter
 def valor_por_extenso(valor):
-    return num2words(valor,  to='currency', lang='pt_BR')
+    return num2words(valor, to="currency", lang="pt_BR")
 
 
 @register.filter
@@ -515,7 +517,7 @@ def valor_abs_str(valor):
 @register.filter
 def sessaoplenarias_futuras(limite=0):
 
-    sessoes_futuras = cache.get('portalcmj_sessoes_futuras')
+    sessoes_futuras = cache.get("portalcmj_sessoes_futuras")
 
     if sessoes_futuras is not None:
         if limite > 0:
@@ -534,16 +536,16 @@ def sessaoplenarias_futuras(limite=0):
 
     sessoes_da_semana = SessaoPlenaria.objects.filter(
         data_inicio__range=(inicio_semana, fim_semana),
-    ).order_by('data_inicio')
+    ).order_by("data_inicio")
 
     sessoes_futuras = SessaoPlenaria.objects.filter(
         data_inicio__gt=fim_semana,
-    ).order_by('data_inicio')
+    ).order_by("data_inicio")
 
     sessoes_futuras = list(sessoes_da_semana) + list(sessoes_futuras)
     sessoes_futuras = sorted(sessoes_futuras, key=lambda x: x.data_inicio)
 
-    cache.set('portalcmj_sessoes_futuras', sessoes_futuras, 1800)
+    cache.set("portalcmj_sessoes_futuras", sessoes_futuras, 1800)
 
     if limite > 0:
         sessoes_futuras = list(sessoes_futuras[:limite])

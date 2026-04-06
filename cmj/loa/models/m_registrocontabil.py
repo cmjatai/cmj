@@ -6,9 +6,7 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import (
-    run_sql,
-)
+from cmj.utils import run_sql
 
 
 class EmendaLoaRegistroContabilManager(manager.Manager):
@@ -31,14 +29,14 @@ class EmendaLoaRegistroContabil(models.Model):
     objects = EmendaLoaRegistroContabilManager()
 
     emendaloa = models.ForeignKey(
-        'loa.EmendaLoa',
+        "loa.EmendaLoa",
         verbose_name=_("Emenda Impositiva"),
         related_name="registrocontabil_set",
         on_delete=CASCADE,
     )
 
     despesa = models.ForeignKey(
-        'loa.Despesa',
+        "loa.Despesa",
         blank=True,
         null=True,
         default=None,

@@ -10,16 +10,16 @@ class CustomSplitDateTimeWidget(SplitDateTimeWidget):
     def render(self, name, value, attrs=None, renderer=None):
         rendered_widgets = []
         for i, x in enumerate(self.widgets):
-            x.attrs['class'] += ' form-control'
+            x.attrs["class"] += " form-control"
             rendered_widgets.append(
                 x.render(
-                    '%s_%d' % (name, i), self.decompress(
-                        value)[i] if value else ''
+                    "%s_%d" % (name, i), self.decompress(value)[i] if value else ""
                 )
             )
 
-        html = '<div class="col-6">%s</div><div class="col-6">%s</div>'\
-            % tuple(rendered_widgets)
+        html = '<div class="col-6">%s</div><div class="col-6">%s</div>' % tuple(
+            rendered_widgets
+        )
         return '<div class="row">%s</div>' % html
 
 
@@ -29,4 +29,4 @@ class EventoForm(ModelForm):
 
     class Meta:
         model = Evento
-        exclude = ('workspace', )
+        exclude = ("workspace",)

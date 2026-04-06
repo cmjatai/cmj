@@ -1,14 +1,23 @@
-from _functools import reduce
-from datetime import date, timedelta
 import datetime
 import decimal
 import logging
 import operator
+from datetime import date, timedelta
 
-from crispy_forms.bootstrap import InlineRadios, FieldWithButtons, StrictButton
+from _functools import reduce
+from crispy_forms.bootstrap import FieldWithButtons, InlineRadios, StrictButton
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field, Row, Layout, Fieldset, Div, Button, \
-    Submit, BaseInput, HTML
+from crispy_forms.layout import (
+    HTML,
+    BaseInput,
+    Button,
+    Div,
+    Field,
+    Fieldset,
+    Layout,
+    Row,
+    Submit,
+)
 from crispy_forms.templatetags.crispy_forms_field import css_class
 from crispy_forms.utils import get_template_pack
 from dateutil.relativedelta import relativedelta
@@ -22,26 +31,58 @@ from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
 from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
-from django_filters.filters import CharFilter, ChoiceFilter, NumberFilter, \
-    ModelChoiceFilter, RangeFilter, \
-    MultipleChoiceFilter, ModelMultipleChoiceFilter, Filter
+from django_filters.filters import (
+    CharFilter,
+    ChoiceFilter,
+    Filter,
+    ModelChoiceFilter,
+    ModelMultipleChoiceFilter,
+    MultipleChoiceFilter,
+    NumberFilter,
+    RangeFilter,
+)
 from django_filters.filterset import FilterSet
 
 from cmj import settings
-from cmj.cerimonial.models import LocalTrabalho, Endereco, \
-    TipoAutoridade, PronomeTratamento, Contato, Perfil, Processo, \
-    IMPORTANCIA_CHOICE, AssuntoProcesso, StatusProcesso, ProcessoContato, \
-    GrupoDeContatos, TopicoProcesso, Visita, Visitante, ClassificacaoProcesso, \
-    AnexoProcesso
-from cmj.core.models import Municipio, Trecho, ImpressoEnderecamento, \
-    AreaTrabalho, Bairro
+from cmj.cerimonial.models import (
+    IMPORTANCIA_CHOICE,
+    AnexoProcesso,
+    AssuntoProcesso,
+    ClassificacaoProcesso,
+    Contato,
+    Endereco,
+    GrupoDeContatos,
+    LocalTrabalho,
+    Perfil,
+    Processo,
+    ProcessoContato,
+    PronomeTratamento,
+    StatusProcesso,
+    TipoAutoridade,
+    TopicoProcesso,
+    Visita,
+    Visitante,
+)
+from cmj.core.models import (
+    AreaTrabalho,
+    Bairro,
+    ImpressoEnderecamento,
+    Municipio,
+    Trecho,
+)
 from cmj.settings.medias import MAX_DOC_UPLOAD_SIZE
-from cmj.utils import normalize, YES_NO_CHOICES, NONE_YES_NO_CHOICES
-from sapl.crispy_layout_mixin import to_column, SaplFormLayout, to_fieldsets, \
-    form_actions, to_row, SaplFormHelper
-from sapl.utils import RangeWidgetNumber, FileFieldCheckMixin
-
+from cmj.utils import NONE_YES_NO_CHOICES, YES_NO_CHOICES, normalize
+from sapl.crispy_layout_mixin import (
+    SaplFormHelper,
+    SaplFormLayout,
+    form_actions,
+    to_column,
+    to_fieldsets,
+    to_row,
+)
 from sapl.crud.base import ListWithSearchForm
+from sapl.utils import FileFieldCheckMixin, RangeWidgetNumber
+
 
 class ListTextWidget(forms.TextInput):
 
@@ -49,39 +90,41 @@ class ListTextWidget(forms.TextInput):
         super(ListTextWidget, self).__init__(*args, **kwargs)
         self._name = name
         self._list = data_list
-        self.attrs.update({'list': 'list__%s' % self._name})
+        self.attrs.update({"list": "list__%s" % self._name})
 
     def render(self, name, value, attrs=None):
-        text_html = super(ListTextWidget, self).render(
-            name, value, attrs=attrs)
+        text_html = super(ListTextWidget, self).render(name, value, attrs=attrs)
         data_list = '<datalist id="list__%s">' % self._name
         for item in self._list:
             data_list += '<option value="%s">' % item
-        data_list += '</datalist>'
+        data_list += "</datalist>"
 
-        return (text_html + data_list)
+        return text_html + data_list
 
 
 class LocalTrabalhoPerfilForm(ModelForm):
 
     class Meta:
         model = LocalTrabalho
-        fields = ['nome',
-                  'nome_social',
-                  'data_inicio',
-                  'data_fim',
-                  'tipo',
-                  'trecho',
-                  'endereco',
-                  'numero',
-                  'complemento',
-                  'distrito',
-                  'regiao_municipal',
-                  'cep',
-                  'bairro',
-                  'municipio',
-                  'uf',
-                  'preferencial', 'cargo']
+        fields = [
+            "nome",
+            "nome_social",
+            "data_inicio",
+            "data_fim",
+            "tipo",
+            "trecho",
+            "endereco",
+            "numero",
+            "complemento",
+            "distrito",
+            "regiao_municipal",
+            "cep",
+            "bairro",
+            "municipio",
+            "uf",
+            "preferencial",
+            "cargo",
+        ]
 
     def __init__(self, *args, **kwargs):
 
@@ -92,19 +135,20 @@ class LocalTrabalhoPerfilForm(ModelForm):
             instance = self.instance
 
         if not instance:
-            self.fields['uf'].initial = settings.INITIAL_VALUE_FORMS_UF
-            self.fields['cep'].initial = settings.INITIAL_VALUE_FORMS_CEP
-            self.fields['municipio'].initial = Municipio.objects.get(
-                pk=settings.INITIAL_VALUE_FORMS_MUNICIPIO)
+            self.fields["uf"].initial = settings.INITIAL_VALUE_FORMS_UF
+            self.fields["cep"].initial = settings.INITIAL_VALUE_FORMS_CEP
+            self.fields["municipio"].initial = Municipio.objects.get(
+                pk=settings.INITIAL_VALUE_FORMS_MUNICIPIO
+            )
 
-        self.fields['cep'].widget.attrs['class'] = 'cep'
-        self.fields['endereco'].widget.attrs['autocomplete'] = 'off'
-        self.fields['trecho'].queryset = Trecho.objects.all()
-        self.fields['trecho'].widget = forms.HiddenInput()
+        self.fields["cep"].widget.attrs["class"] = "cep"
+        self.fields["endereco"].widget.attrs["autocomplete"] = "off"
+        self.fields["trecho"].queryset = Trecho.objects.all()
+        self.fields["trecho"].widget = forms.HiddenInput()
 
         # Utilizando template bootstrap3 customizado
-        self.fields['preferencial'].widget = forms.RadioSelect()
-        self.fields['preferencial'].inline_class = True
+        self.fields["preferencial"].widget = forms.RadioSelect()
+        self.fields["preferencial"].inline_class = True
 
 
 class LocalTrabalhoForm(ModelForm):
@@ -117,23 +161,25 @@ class LocalTrabalhoForm(ModelForm):
 
     class Meta:
         model = LocalTrabalho
-        fields = ['nome',
-                  'nome_social',
-                  'data_inicio',
-                  'data_fim',
-                  'tipo',
-                  'trecho',
-                  'endereco',
-                  'numero',
-                  'complemento',
-                  'distrito',
-                  'regiao_municipal',
-                  'cep',
-                  'bairro',
-                  'municipio',
-                  'uf',
-                  'preferencial',
-                  'cargo']
+        fields = [
+            "nome",
+            "nome_social",
+            "data_inicio",
+            "data_fim",
+            "tipo",
+            "trecho",
+            "endereco",
+            "numero",
+            "complemento",
+            "distrito",
+            "regiao_municipal",
+            "cep",
+            "bairro",
+            "municipio",
+            "uf",
+            "preferencial",
+            "cargo",
+        ]
 
     def __init__(self, *args, **kwargs):
 
@@ -144,54 +190,56 @@ class LocalTrabalhoForm(ModelForm):
             instance = self.instance
 
         if not instance:
-            self.fields['uf'].initial = settings.INITIAL_VALUE_FORMS_UF
-            self.fields['cep'].initial = settings.INITIAL_VALUE_FORMS_CEP
-            self.fields['municipio'].initial = Municipio.objects.get(
-                pk=settings.INITIAL_VALUE_FORMS_MUNICIPIO)
+            self.fields["uf"].initial = settings.INITIAL_VALUE_FORMS_UF
+            self.fields["cep"].initial = settings.INITIAL_VALUE_FORMS_CEP
+            self.fields["municipio"].initial = Municipio.objects.get(
+                pk=settings.INITIAL_VALUE_FORMS_MUNICIPIO
+            )
 
-        self.fields['cep'].widget.attrs['class'] = 'cep'
-        self.fields['endereco'].widget.attrs['autocomplete'] = 'off'
-        self.fields['trecho'].queryset = Trecho.objects.all()
-        self.fields['trecho'].widget = forms.HiddenInput()
+        self.fields["cep"].widget.attrs["class"] = "cep"
+        self.fields["endereco"].widget.attrs["autocomplete"] = "off"
+        self.fields["trecho"].queryset = Trecho.objects.all()
+        self.fields["trecho"].widget = forms.HiddenInput()
 
 
 class ContatoForm(ModelForm):
 
     class Meta:
         model = Contato
-        fields = ['nome',
-                  'nome_social',
-                  'apelido',
-                  'data_nascimento',
-                  'estado_civil',
-                  'sexo',
-                  'identidade_genero',
-                  'nivel_instrucao',
-                  'naturalidade',
-                  'tem_filhos',
-                  'quantos_filhos',
-                  'profissao',
-                  'pronome_tratamento',
-                  'tipo_autoridade',
-                  'nome_pai',
-                  'nome_mae',
-                  'numero_sus',
-                  'cpf',
-                  'titulo_eleitor',
-                  'rg',
-                  'rg_orgao_expedidor',
-                  'rg_data_expedicao',
-                  'ativo',
-                  'observacoes',
-                  'cargo',
-                  'grupodecontatos_set'
-                  ]
+        fields = [
+            "nome",
+            "nome_social",
+            "apelido",
+            "data_nascimento",
+            "estado_civil",
+            "sexo",
+            "identidade_genero",
+            "nivel_instrucao",
+            "naturalidade",
+            "tem_filhos",
+            "quantos_filhos",
+            "profissao",
+            "pronome_tratamento",
+            "tipo_autoridade",
+            "nome_pai",
+            "nome_mae",
+            "numero_sus",
+            "cpf",
+            "titulo_eleitor",
+            "rg",
+            "rg_orgao_expedidor",
+            "rg_data_expedicao",
+            "ativo",
+            "observacoes",
+            "cargo",
+            "grupodecontatos_set",
+        ]
 
     grupodecontatos_set = ModelMultipleChoiceField(
         queryset=GrupoDeContatos.objects.all(),
         required=False,
-        label='',
-        widget=FilteredSelectMultiple('grupodecontatos_set', False),
+        label="",
+        widget=FilteredSelectMultiple("grupodecontatos_set", False),
     )
 
     def __init__(self, *args, **kwargs):
@@ -202,118 +250,136 @@ class ContatoForm(ModelForm):
         if isinstance(self.instance, Contato):
             instance = self.instance
 
-        if 'tipo_autoridade' in self.fields:
-            self.fields['tipo_autoridade'].widget.attrs.update(
-                {'onchange': 'atualizaPronomes(event)'})
+        if "tipo_autoridade" in self.fields:
+            self.fields["tipo_autoridade"].widget.attrs.update(
+                {"onchange": "atualizaPronomes(event)"}
+            )
 
-        self.fields['pronome_tratamento'].widget = forms.RadioSelect()
-        self.fields['pronome_tratamento'].queryset = \
-            PronomeTratamento.objects.order_by(
-                'prefixo_nome_singular_m', 'nome_por_extenso')
+        self.fields["pronome_tratamento"].widget = forms.RadioSelect()
+        self.fields["pronome_tratamento"].queryset = PronomeTratamento.objects.order_by(
+            "prefixo_nome_singular_m", "nome_por_extenso"
+        )
 
-        if 'tipo_autoridade' in self.fields and\
-                instance and instance.tipo_autoridade:
+        if "tipo_autoridade" in self.fields and instance and instance.tipo_autoridade:
             pronomes_choice = instance.tipo_autoridade.pronomes.order_by(
-                'prefixo_nome_singular_m', 'nome_por_extenso')
+                "prefixo_nome_singular_m", "nome_por_extenso"
+            )
         else:
-            pronomes_choice = self.fields['pronome_tratamento'].queryset
+            pronomes_choice = self.fields["pronome_tratamento"].queryset
 
-        self.fields['pronome_tratamento'].choices = [
-            (p.pk, '%s, %s - %s - %s - %s - %s - %s - %s' % (
-                p.prefixo_nome_singular_m,
-                p.prefixo_nome_singular_f,
-                p.nome_por_extenso,
-                p.abreviatura_singular_m,
-                p.abreviatura_plural_m,
-                p.vocativo_direto_singular_m,
-                p.vocativo_indireto_singular_m,
-                p.enderecamento_singular_m))
-            for p in pronomes_choice]
+        self.fields["pronome_tratamento"].choices = [
+            (
+                p.pk,
+                "%s, %s - %s - %s - %s - %s - %s - %s"
+                % (
+                    p.prefixo_nome_singular_m,
+                    p.prefixo_nome_singular_f,
+                    p.nome_por_extenso,
+                    p.abreviatura_singular_m,
+                    p.abreviatura_plural_m,
+                    p.vocativo_direto_singular_m,
+                    p.vocativo_indireto_singular_m,
+                    p.enderecamento_singular_m,
+                ),
+            )
+            for p in pronomes_choice
+        ]
 
-        self.fields[
-            'grupodecontatos_set'].widget = forms.CheckboxSelectMultiple()
-        self.fields['grupodecontatos_set'].inline_class = True
-        self.fields['grupodecontatos_set'].queryset = \
-            GrupoDeContatos.objects.filter(workspace=self.initial['workspace'])
+        self.fields["grupodecontatos_set"].widget = forms.CheckboxSelectMultiple()
+        self.fields["grupodecontatos_set"].inline_class = True
+        self.fields["grupodecontatos_set"].queryset = GrupoDeContatos.objects.filter(
+            workspace=self.initial["workspace"]
+        )
         if self.instance and self.instance.pk:
-            self.fields['grupodecontatos_set'].initial = list(
-                self.instance.grupodecontatos_set.all())
+            self.fields["grupodecontatos_set"].initial = list(
+                self.instance.grupodecontatos_set.all()
+            )
 
     def clean(self):
-        pronome = self.cleaned_data['pronome_tratamento']
-        if 'tipo_autoridade' in self.cleaned_data:
-            tipo_autoridade = self.cleaned_data['tipo_autoridade']
+        pronome = self.cleaned_data["pronome_tratamento"]
+        if "tipo_autoridade" in self.cleaned_data:
+            tipo_autoridade = self.cleaned_data["tipo_autoridade"]
 
             if tipo_autoridade and not pronome:
-                self._errors['pronome_tratamento'] = [
-                    _('Tendo sido selecionado um tipo de autoridade, \
-                    o campo pronome de tratamento se torna obrigatório.')]
+                self._errors["pronome_tratamento"] = [
+                    _("Tendo sido selecionado um tipo de autoridade, \
+                    o campo pronome de tratamento se torna obrigatório.")
+                ]
 
 
 class PerfilForm(ContatoForm):
 
     class Meta:
         model = Perfil
-        fields = ['nome',
-                  'nome_social',
-                  'apelido',
-                  'data_nascimento',
-                  'estado_civil',
-                  'sexo',
-                  'identidade_genero',
-                  'nivel_instrucao',
-                  'naturalidade',
-                  'tem_filhos',
-                  'quantos_filhos',
-                  'profissao',
-                  'pronome_tratamento',
-                  'cargo'
-                  ]
+        fields = [
+            "nome",
+            "nome_social",
+            "apelido",
+            "data_nascimento",
+            "estado_civil",
+            "sexo",
+            "identidade_genero",
+            "nivel_instrucao",
+            "naturalidade",
+            "tem_filhos",
+            "quantos_filhos",
+            "profissao",
+            "pronome_tratamento",
+            "cargo",
+        ]
 
     def __init__(self, *args, **kwargs):
 
         super(PerfilForm, self).__init__(*args, **kwargs)
-        self.fields['pronome_tratamento'].help_text = ''
+        self.fields["pronome_tratamento"].help_text = ""
 
 
 class ContatoFragmentPronomesForm(forms.Form):
 
     pronome_tratamento = forms.ModelChoiceField(
-        label=Contato._meta.get_field('pronome_tratamento').verbose_name,
+        label=Contato._meta.get_field("pronome_tratamento").verbose_name,
         queryset=PronomeTratamento.objects.all(),
-        required=False)
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
 
-        super(ContatoFragmentPronomesForm, self).__init__(
-            *args, **kwargs)
+        super(ContatoFragmentPronomesForm, self).__init__(*args, **kwargs)
 
-        self.fields['pronome_tratamento'].widget = forms.RadioSelect()
+        self.fields["pronome_tratamento"].widget = forms.RadioSelect()
 
-        if 'instance' in self.initial:
-            self.fields['pronome_tratamento'].queryset = self.initial[
-                'instance'].pronomes.order_by(
-                'prefixo_nome_singular_m', 'nome_por_extenso')
+        if "instance" in self.initial:
+            self.fields["pronome_tratamento"].queryset = self.initial[
+                "instance"
+            ].pronomes.order_by("prefixo_nome_singular_m", "nome_por_extenso")
         else:
-            self.fields['pronome_tratamento'].queryset = \
+            self.fields["pronome_tratamento"].queryset = (
                 PronomeTratamento.objects.order_by(
-                'prefixo_nome_singular_m', 'nome_por_extenso')
+                    "prefixo_nome_singular_m", "nome_por_extenso"
+                )
+            )
 
-        self.fields['pronome_tratamento'].choices = [
-            (p.pk, '%s, %s - %s - %s - %s - %s - %s - %s' % (
-                p.prefixo_nome_singular_m,
-                p.prefixo_nome_singular_f,
-                p.nome_por_extenso,
-                p.abreviatura_singular_m,
-                p.abreviatura_plural_m,
-                p.vocativo_direto_singular_m,
-                p.vocativo_indireto_singular_m,
-                p.enderecamento_singular_m))
-            for p in self.fields['pronome_tratamento'].queryset]
+        self.fields["pronome_tratamento"].choices = [
+            (
+                p.pk,
+                "%s, %s - %s - %s - %s - %s - %s - %s"
+                % (
+                    p.prefixo_nome_singular_m,
+                    p.prefixo_nome_singular_f,
+                    p.nome_por_extenso,
+                    p.abreviatura_singular_m,
+                    p.abreviatura_plural_m,
+                    p.vocativo_direto_singular_m,
+                    p.vocativo_indireto_singular_m,
+                    p.enderecamento_singular_m,
+                ),
+            )
+            for p in self.fields["pronome_tratamento"].queryset
+        ]
 
-        self.fields['pronome_tratamento'].help_text = _('O pronome de \
+        self.fields["pronome_tratamento"].help_text = _("O pronome de \
         tratamento é opcional, mas será \
-        obrigatório caso seja selecionado um tipo de autoridade.')
+        obrigatório caso seja selecionado um tipo de autoridade.")
 
         self.helper = FormHelper()
         self.helper.form_tag = False
@@ -330,64 +396,70 @@ class EnderecoForm(ModelForm):
 
     class Meta:
         model = Endereco
-        fields = ['tipo',
-                  'trecho',
-                  'endereco',
-                  'numero',
-                  'complemento',
-                  'distrito',
-                  'regiao_municipal',
-                  'cep',
-                  'bairro',
-                  'municipio',
-                  'uf',
-                  'preferencial',
-                  'observacoes',
-                  'ponto_referencia']
+        fields = [
+            "tipo",
+            "trecho",
+            "endereco",
+            "numero",
+            "complemento",
+            "distrito",
+            "regiao_municipal",
+            "cep",
+            "bairro",
+            "municipio",
+            "uf",
+            "preferencial",
+            "observacoes",
+            "ponto_referencia",
+        ]
 
     def __init__(self, *args, **kwargs):
 
         super(EnderecoForm, self).__init__(*args, **kwargs)
 
-        self.fields['uf'].initial = settings.INITIAL_VALUE_FORMS_UF
-        self.fields[
-            'municipio'].initial = Municipio.objects.get(
-            pk=settings.INITIAL_VALUE_FORMS_MUNICIPIO)
+        self.fields["uf"].initial = settings.INITIAL_VALUE_FORMS_UF
+        self.fields["municipio"].initial = Municipio.objects.get(
+            pk=settings.INITIAL_VALUE_FORMS_MUNICIPIO
+        )
 
-        self.fields['cep'].widget.attrs['class'] = 'cep'
-        self.fields['endereco'].widget.attrs['autocomplete'] = 'off'
+        self.fields["cep"].widget.attrs["class"] = "cep"
+        self.fields["endereco"].widget.attrs["autocomplete"] = "off"
 
-        self.fields['trecho'].queryset = Trecho.objects.all()
-        self.fields['trecho'].widget = forms.HiddenInput()
+        self.fields["trecho"].queryset = Trecho.objects.all()
+        self.fields["trecho"].widget = forms.HiddenInput()
 
 
 class TipoAutoridadeForm(ModelForm):
 
     class Meta:
         model = TipoAutoridade
-        fields = ['descricao',
-                  'pronomes']
+        fields = ["descricao", "pronomes"]
 
     def __init__(self, *args, **kwargs):
 
         super(TipoAutoridadeForm, self).__init__(*args, **kwargs)
 
-        self.fields[
-            'pronomes'].widget = forms.CheckboxSelectMultiple()
+        self.fields["pronomes"].widget = forms.CheckboxSelectMultiple()
 
-        self.fields['pronomes'].choices = [
-            (p.pk, '%s, %s - %s - %s - %s - %s - %s - %s' % (
-                p.prefixo_nome_singular_m,
-                p.prefixo_nome_singular_f,
-                p.nome_por_extenso,
-                p.abreviatura_singular_m,
-                p.abreviatura_plural_m,
-                p.vocativo_direto_singular_m,
-                p.vocativo_indireto_singular_m,
-                p.enderecamento_singular_m))
-            for p in self.fields[
-                'pronomes'].queryset.order_by(
-                'prefixo_nome_singular_m', 'nome_por_extenso')]
+        self.fields["pronomes"].choices = [
+            (
+                p.pk,
+                "%s, %s - %s - %s - %s - %s - %s - %s"
+                % (
+                    p.prefixo_nome_singular_m,
+                    p.prefixo_nome_singular_f,
+                    p.nome_por_extenso,
+                    p.abreviatura_singular_m,
+                    p.abreviatura_plural_m,
+                    p.vocativo_direto_singular_m,
+                    p.vocativo_indireto_singular_m,
+                    p.enderecamento_singular_m,
+                ),
+            )
+            for p in self.fields["pronomes"].queryset.order_by(
+                "prefixo_nome_singular_m", "nome_por_extenso"
+            )
+        ]
         """
         self.fields['pronomes'] = Field(
             'pronomes',
@@ -398,153 +470,170 @@ class TipoAutoridadeForm(ModelForm):
 class ProcessoForm(ModelForm):
     q = forms.CharField(
         required=False,
-        label='Busca por Contatos',
-        widget=forms.TextInput(
-            attrs={'type': 'search'}))
+        label="Busca por Contatos",
+        widget=forms.TextInput(attrs={"type": "search"}),
+    )
 
     class Meta:
         model = Processo
-        fields = ['data',
-                  'titulo',
-                  'importancia',
-                  'status',
-                  'descricao',
-                  'classificacoes',
-                  'observacoes',
-                  'solucao',
-                  'q',
-                  'contatos',
-                  'topicos',
-                  'assuntos']
+        fields = [
+            "data",
+            "titulo",
+            "importancia",
+            "status",
+            "descricao",
+            "classificacoes",
+            "observacoes",
+            "solucao",
+            "q",
+            "contatos",
+            "topicos",
+            "assuntos",
+        ]
 
     def __init__(self, *args, **kwargs):
-        yaml_layout = kwargs.pop('yaml_layout')
+        yaml_layout = kwargs.pop("yaml_layout")
 
         q_field = Div(
             FieldWithButtons(
-                Field('q',
-                      placeholder=_('Filtrar Lista'),
-                      autocomplete='off',
-                      type='search',
-                      onkeypress='atualizaContatos(event)'),
+                Field(
+                    "q",
+                    placeholder=_("Filtrar Lista"),
+                    autocomplete="off",
+                    type="search",
+                    onkeypress="atualizaContatos(event)",
+                ),
                 StrictButton(
-                    _('Filtrar'), css_class='btn-outline-primary',
-                    type='button', onclick='atualizaContatos(event)')),
-            Div(css_class='form-group-contato-search '
-                'controls-radio-checkbox')
+                    _("Filtrar"),
+                    css_class="btn-outline-primary",
+                    type="button",
+                    onclick="atualizaContatos(event)",
+                ),
+            ),
+            Div(css_class="form-group-contato-search " "controls-radio-checkbox"),
         )
 
-        q = [_('Seleção de Contatos'),
-             [(q_field, 5),
-              (Div(Field('contatos'), css_class='form-group-contatos'), 7)]
-             ]
+        q = [
+            _("Seleção de Contatos"),
+            [
+                (q_field, 5),
+                (Div(Field("contatos"), css_class="form-group-contatos"), 7),
+            ],
+        ]
         yaml_layout.append(q)
 
         for fieldset in yaml_layout:
             for linha in fieldset:
                 for idx, field in enumerate(linha):
-                    if field[0] == 'importancia':
-                        linha[idx] = (InlineRadios('importancia'), field[1])
+                    if field[0] == "importancia":
+                        linha[idx] = (InlineRadios("importancia"), field[1])
 
         self.helper = FormHelper()
 
-        self.helper.field_class = 'controls'
+        self.helper.field_class = "controls"
         self.helper.layout = SaplFormLayout(*yaml_layout)
 
         super(ProcessoForm, self).__init__(*args, **kwargs)
 
         if not self.instance.pk:
-            self.fields['data'].initial = date.today()
+            self.fields["data"].initial = date.today()
 
-        self.fields['q'].help_text = _('Digite parte do nome, nome social ou '
-                                       'apelido do Contato que você procura.')
+        self.fields["q"].help_text = _(
+            "Digite parte do nome, nome social ou "
+            "apelido do Contato que você procura."
+        )
 
-        self.fields['topicos'].widget = forms.SelectMultiple(
-            attrs={'size': '8'})
-        self.fields['topicos'].queryset = TopicoProcesso.objects.all()
+        self.fields["topicos"].widget = forms.SelectMultiple(attrs={"size": "8"})
+        self.fields["topicos"].queryset = TopicoProcesso.objects.all()
 
-        self.fields['assuntos'].widget = forms.SelectMultiple(
-            attrs={'size': '8'})
-        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
-            workspace=self.initial['workspace'])
+        self.fields["assuntos"].widget = forms.SelectMultiple(attrs={"size": "8"})
+        self.fields["assuntos"].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial["workspace"]
+        )
 
-        self.fields['importancia'].widget = forms.RadioSelect()
-        self.fields['importancia'].choices = IMPORTANCIA_CHOICE
+        self.fields["importancia"].widget = forms.RadioSelect()
+        self.fields["importancia"].choices = IMPORTANCIA_CHOICE
 
-        self.fields['status'].widget = forms.RadioSelect()
+        self.fields["status"].widget = forms.RadioSelect()
         # self.fields['status'].inline_class = True
-        self.fields['status'].choices = [
-            (ass.pk, ass) for ass in StatusProcesso.objects.order_by('id')]
+        self.fields["status"].choices = [
+            (ass.pk, ass) for ass in StatusProcesso.objects.order_by("id")
+        ]
 
-        self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
-        self.fields['classificacoes'].choices = [
-            (ass.pk, ass) for ass in ClassificacaoProcesso.objects.order_by('id')]
+        self.fields["classificacoes"].widget = forms.CheckboxSelectMultiple()
+        self.fields["classificacoes"].choices = [
+            (ass.pk, ass) for ass in ClassificacaoProcesso.objects.order_by("id")
+        ]
 
-        self.fields['contatos'].widget = forms.CheckboxSelectMultiple()
-        self.fields['contatos'].queryset = Contato.objects.all()
-        self.fields['contatos'].choices = [
-            (c.pk, c) for c in self.instance.contatos.order_by('nome')]\
-            if self.instance.pk else []
-        self.fields['contatos'].help_text = _(
-            'Procure por Contatos na caixa de buscas e arraste '
-            'para esta caixa os Contatos interessados neste Processo.')
+        self.fields["contatos"].widget = forms.CheckboxSelectMultiple()
+        self.fields["contatos"].queryset = Contato.objects.all()
+        self.fields["contatos"].choices = (
+            [(c.pk, c) for c in self.instance.contatos.order_by("nome")]
+            if self.instance.pk
+            else []
+        )
+        self.fields["contatos"].help_text = _(
+            "Procure por Contatos na caixa de buscas e arraste "
+            "para esta caixa os Contatos interessados neste Processo."
+        )
 
 
 class ProcessoContatoForm(ModelForm):
 
     class Meta:
         model = ProcessoContato
-        fields = ['data',
-                  'titulo',
-                  'importancia',
-                  'status',
-                  'descricao',
-                  'classificacoes',
-                  'observacoes',
-                  'solucao',
-                  'topicos',
-                  'assuntos']
+        fields = [
+            "data",
+            "titulo",
+            "importancia",
+            "status",
+            "descricao",
+            "classificacoes",
+            "observacoes",
+            "solucao",
+            "topicos",
+            "assuntos",
+        ]
 
     def __init__(self, *args, **kwargs):
         super(ProcessoContatoForm, self).__init__(*args, **kwargs)
 
         if not self.instance.pk:
-            self.fields['data'].initial = date.today()
+            self.fields["data"].initial = date.today()
 
-        self.fields['topicos'].widget = forms.SelectMultiple(
-            attrs={'size': '8'})
-        self.fields['topicos'].queryset = TopicoProcesso.objects.all()
+        self.fields["topicos"].widget = forms.SelectMultiple(attrs={"size": "8"})
+        self.fields["topicos"].queryset = TopicoProcesso.objects.all()
 
-        self.fields['assuntos'].widget = forms.SelectMultiple(
-            attrs={'size': '8'})
-        self.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
-            workspace=self.initial['workspace'])
+        self.fields["assuntos"].widget = forms.SelectMultiple(attrs={"size": "8"})
+        self.fields["assuntos"].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial["workspace"]
+        )
 
         # Utilizando template bootstrap3 customizado
-        self.fields['importancia'].widget = forms.RadioSelect()
-        self.fields['importancia'].inline_class = True
-        self.fields['importancia'].choices = IMPORTANCIA_CHOICE
+        self.fields["importancia"].widget = forms.RadioSelect()
+        self.fields["importancia"].inline_class = True
+        self.fields["importancia"].choices = IMPORTANCIA_CHOICE
 
-        self.fields['status'].widget = forms.RadioSelect()
+        self.fields["status"].widget = forms.RadioSelect()
         # self.fields['status'].inline_class = True
-        self.fields['status'].choices = [
-            (ass.pk, ass) for ass in StatusProcesso.objects.order_by('id')]
+        self.fields["status"].choices = [
+            (ass.pk, ass) for ass in StatusProcesso.objects.order_by("id")
+        ]
 
-        self.fields['classificacoes'].widget = forms.CheckboxSelectMultiple()
+        self.fields["classificacoes"].widget = forms.CheckboxSelectMultiple()
         # self.fields['classificacoes'].inline_class = True
 
 
 class ContatoFragmentSearchForm(forms.Form):
     """q = forms.CharField(
-        required=False,
-        label='Busca por Contatos',
-        widget=forms.TextInput(
-            attrs={'type': 'search'}))"""
+    required=False,
+    label='Busca por Contatos',
+    widget=forms.TextInput(
+        attrs={'type': 'search'}))"""
 
     contatos_search = forms.ModelChoiceField(
-        label='',
-        queryset=Contato.objects.all(),
-        required=False)
+        label="", queryset=Contato.objects.all(), required=False
+    )
 
     def __init__(self, *args, **kwargs):
 
@@ -558,16 +647,15 @@ class ContatoFragmentSearchForm(forms.Form):
                 _('Filtrar'), css_class='btn-outline-primary',
                 type='button', onclick='atualizaContatos(event)'))"""
 
-        self.fields['contatos_search'].widget = forms.CheckboxSelectMultiple(
+        self.fields["contatos_search"].widget = forms.CheckboxSelectMultiple()
+
+        queryset = Contato.objects.filter(workspace=self.initial["workspace"]).exclude(
+            pk__in=self.initial["pks_exclude"]
         )
 
-        queryset = Contato.objects.filter(
-            workspace=self.initial['workspace']).exclude(
-            pk__in=self.initial['pks_exclude'])
+        query = normalize(self.initial["q"])
 
-        query = normalize(self.initial['q'])
-
-        query = query.split(' ')
+        query = query.split(" ")
         if query:
             q = Q()
             for item in query:
@@ -579,17 +667,18 @@ class ContatoFragmentSearchForm(forms.Form):
                 queryset = queryset.filter(q)
 
         queryset = queryset[:10]
-        self.fields['contatos_search'].queryset = queryset
+        self.fields["contatos_search"].queryset = queryset
 
-        self.fields['contatos_search'].choices = [(c.pk, c) for c in queryset]
+        self.fields["contatos_search"].choices = [(c.pk, c) for c in queryset]
 
         self.helper = FormHelper()
-        self.helper.field_class = 'controls'
+        self.helper.field_class = "controls"
         self.helper.layout = Layout(
             Div(
-                Field('contatos_search'),
-                css_class='form-group-contatos-search '
-                'controls-radio-checkbox'))
+                Field("contatos_search"),
+                css_class="form-group-contatos-search " "controls-radio-checkbox",
+            )
+        )
         self.helper.form_tag = False
         self.helper.disable_csrf = True
 
@@ -597,12 +686,16 @@ class ContatoFragmentSearchForm(forms.Form):
 class RangeWidgetOverride(forms.MultiWidget):
 
     def __init__(self, attrs=None):
-        widgets = (forms.DateInput(format='%d/%m/%Y',
-                                   attrs={'class': 'dateinput form-control',
-                                          'placeholder': 'Inicial'}),
-                   forms.DateInput(format='%d/%m/%Y',
-                                   attrs={'class': 'dateinput form-control',
-                                          'placeholder': 'Final'}))
+        widgets = (
+            forms.DateInput(
+                format="%d/%m/%Y",
+                attrs={"class": "dateinput form-control", "placeholder": "Inicial"},
+            ),
+            forms.DateInput(
+                format="%d/%m/%Y",
+                attrs={"class": "dateinput form-control", "placeholder": "Final"},
+            ),
+        )
         super(RangeWidgetOverride, self).__init__(widgets, attrs)
 
     def decompress(self, value):
@@ -614,22 +707,21 @@ class RangeWidgetOverride(forms.MultiWidget):
         rendered_widgets = []
         for i, x in enumerate(self.widgets):
             rendered_widgets.append(
-                x.render(
-                    '%s_%d' % (name, i), value[i] if value else ''
-                )
+                x.render("%s_%d" % (name, i), value[i] if value else "")
             )
 
-        html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>'\
-            % tuple(rendered_widgets)
+        html = '<div class="col-sm-6">%s</div><div class="col-sm-6">%s</div>' % tuple(
+            rendered_widgets
+        )
         return '<div class="row">%s</div>' % html
 
 
 class SubmitFilterPrint(BaseInput):
 
-    input_type = 'submit'
+    input_type = "submit"
 
     def __init__(self, *args, **kwargs):
-        self.field_classes = 'btn'
+        self.field_classes = "btn"
         super(SubmitFilterPrint, self).__init__(*args, **kwargs)
 
 
@@ -646,8 +738,7 @@ class DataRangeFilter(Filter):
         if inicial > final:
             inicial, final = final, inicial
 
-        params = {
-            self.field_name + '__range': [inicial, final]}
+        params = {self.field_name + "__range": [inicial, final]}
 
         range_select = Q(**params)
 
@@ -657,74 +748,84 @@ class DataRangeFilter(Filter):
 
 class ImpressoEnderecamentoContatoFilterSet(FilterSet):
 
-    FEMININO = 'F'
-    MASCULINO = 'M'
-    AMBOS = ''
-    SEXO_CHOICE = ((AMBOS, _('Ambos')),
-                   (FEMININO, _('Feminino')),
-                   (MASCULINO, _('Masculino')))
+    FEMININO = "F"
+    MASCULINO = "M"
+    AMBOS = ""
+    SEXO_CHOICE = (
+        (AMBOS, _("Ambos")),
+        (FEMININO, _("Feminino")),
+        (MASCULINO, _("Masculino")),
+    )
 
-    DEPOIS_PRONOME = 'DP'
-    LINHA_NOME = 'LN'
-    DEPOIS_NOME = 'DN'
-    LOCAL_CARGO_CHOICE = ((DEPOIS_PRONOME, _('Depois do Pronome '
-                                             'de tratamento')),
-                          (LINHA_NOME, _('Antes do Nome do Contato')),
-                          (DEPOIS_NOME, _('Entre o Nome do Contato '
-                                          'e seu Endereço')))
+    DEPOIS_PRONOME = "DP"
+    LINHA_NOME = "LN"
+    DEPOIS_NOME = "DN"
+    LOCAL_CARGO_CHOICE = (
+        (DEPOIS_PRONOME, _("Depois do Pronome " "de tratamento")),
+        (LINHA_NOME, _("Antes do Nome do Contato")),
+        (DEPOIS_NOME, _("Entre o Nome do Contato " "e seu Endereço")),
+    )
 
-    FILHOS_CHOICE = [(None, _('Ambos'))] + YES_NO_CHOICES
+    FILHOS_CHOICE = [(None, _("Ambos"))] + YES_NO_CHOICES
 
-    search = CharFilter(method='filter_search')
+    search = CharFilter(method="filter_search")
     sexo = ChoiceFilter(choices=SEXO_CHOICE)
-    tem_filhos = ChoiceFilter(
-        label=_('Com filhos?'),
-        choices=FILHOS_CHOICE)
+    tem_filhos = ChoiceFilter(label=_("Com filhos?"), choices=FILHOS_CHOICE)
 
     idade = RangeFilter(
-        label=_('Idade entre:'),
-        widget=RangeWidgetNumber,
-        method='filter_idade')
+        label=_("Idade entre:"), widget=RangeWidgetNumber, method="filter_idade"
+    )
 
     impresso = ModelChoiceFilter(
         label=ImpressoEnderecamento._meta.verbose_name_plural,
         required=True,
         queryset=ImpressoEnderecamento.objects.all(),
-        method='filter_impresso')
+        method="filter_impresso",
+    )
 
     grupo = ChoiceFilter(
-        label=_('Contatos Agrupados'),
-        required=False,
-        method='filter_grupo')
+        label=_("Contatos Agrupados"), required=False, method="filter_grupo"
+    )
 
     imprimir_pronome = ChoiceFilter(
-        label=_('Imprimir Pronome?'),
+        label=_("Imprimir Pronome?"),
         choices=YES_NO_CHOICES,
         required=True,
         initial=False,
-        method='filter_imprimir_pronome')
+        method="filter_imprimir_pronome",
+    )
     imprimir_cargo = ChoiceFilter(
-        label=_('Imprimir Cargo?'),
+        label=_("Imprimir Cargo?"),
         required=True,
         empty_label=None,
-        choices=YES_NO_CHOICES, initial=False,
-        method='filter_imprimir_cargo')
+        choices=YES_NO_CHOICES,
+        initial=False,
+        method="filter_imprimir_cargo",
+    )
 
     fontsize = NumberFilter(
-        label=_('Tamanho da Fonte'), initial='',
-        max_value=100, min_value=0, max_digits=3, decimal_places=0,
-        method='filter_fontsize'
+        label=_("Tamanho da Fonte"),
+        initial="",
+        max_value=100,
+        min_value=0,
+        max_digits=3,
+        decimal_places=0,
+        method="filter_fontsize",
     )
 
     nome_maiusculo = ChoiceFilter(
-        label=_('Nome Maiúsculo'),
-        choices=YES_NO_CHOICES, initial=False,
-        method='filter_nome_maiusculo')
+        label=_("Nome Maiúsculo"),
+        choices=YES_NO_CHOICES,
+        initial=False,
+        method="filter_nome_maiusculo",
+    )
 
     local_cargo = ChoiceFilter(
-        label=_('Local para imprimir o Cargo'),
-        choices=LOCAL_CARGO_CHOICE, initial=False,
-        method='filter_local_cargo')
+        label=_("Local para imprimir o Cargo"),
+        choices=LOCAL_CARGO_CHOICE,
+        initial=False,
+        method="filter_local_cargo",
+    )
 
     def filter_impresso(self, queryset, field_name, value):
         return queryset
@@ -733,9 +834,9 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         return queryset
 
     def filter_grupo(self, queryset, field_name, value):
-        if value == '0':
+        if value == "0":
             queryset = queryset.filter(grupodecontatos_set__isnull=True)
-        elif value != '':
+        elif value != "":
             queryset = queryset.filter(grupodecontatos_set=value)
         return queryset
 
@@ -753,8 +854,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
 
     def filter_idade(self, queryset, field_name, value):
         idi = int(value.start) if value.start is not None else 0
-        idf = int(
-            value.stop) if value.stop is not None else date.today().year - 2
+        idf = int(value.stop) if value.stop is not None else date.today().year - 2
 
         if idi > idf:
             a = idi
@@ -766,14 +866,13 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         # lim final - dt. mais nova
         lf = date.today() - relativedelta(years=idi)
 
-        return queryset.filter(data_nascimento__gt=li,
-                               data_nascimento__lte=lf)
+        return queryset.filter(data_nascimento__gt=li, data_nascimento__lte=lf)
 
     def filter_search(self, queryset, field_name, value):
 
         query = normalize(value)
 
-        query = query.split(' ')
+        query = query.split(" ")
         if query:
             q = Q()
             for item in query:
@@ -786,7 +885,7 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
         return queryset
 
     def filter_data_nascimento(self, queryset, field_name, value):
-        #_where = "date_part('year', age(timestamp '%s', data_nascimento)) != date_part('year', age(timestamp '%s', data_nascimento))"
+        # _where = "date_part('year', age(timestamp '%s', data_nascimento)) != date_part('year', age(timestamp '%s', data_nascimento))"
         # return queryset.extra(where=_where, params=value)
 
         if not value[0] or not value[1]:
@@ -806,29 +905,33 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
             now += timedelta(days=1)
 
         # Tranform each into queryset keyword args.
-        monthdays = (dict(zip(("data_nascimento__month",
-                               "data_nascimento__day"), t))
-                     for t in monthdays)
+        monthdays = (
+            dict(zip(("data_nascimento__month", "data_nascimento__day"), t))
+            for t in monthdays
+        )
 
         # Compose the djano.db.models.Q objects together for a single query.
         query = reduce(operator.or_, (Q(**d) for d in monthdays))
 
         # Run the query.
-        return queryset.extra(select={
-            'month': 'extract( month from data_nascimento )',
-            'day': 'extract( day from data_nascimento )', }
-        ).order_by('month', 'day', 'nome').filter(query)
+        return (
+            queryset.extra(
+                select={
+                    "month": "extract( month from data_nascimento )",
+                    "day": "extract( day from data_nascimento )",
+                }
+            )
+            .order_by("month", "day", "nome")
+            .filter(query)
+        )
 
-    data_nascimento = DataRangeFilter(widget=RangeWidgetOverride,
-                                      method='filter_data_nascimento')
+    data_nascimento = DataRangeFilter(
+        widget=RangeWidgetOverride, method="filter_data_nascimento"
+    )
 
     class Meta:
         model = Contato
-        fields = ['search',
-                  'sexo',
-                  'tem_filhos',
-                  'data_nascimento',
-                  'tipo_autoridade']
+        fields = ["search", "sexo", "tem_filhos", "data_nascimento", "tipo_autoridade"]
         """filter_overrides = {
             models.DateField: {
                 'filter_class': DataRangeFilter,
@@ -839,117 +942,144 @@ class ImpressoEnderecamentoContatoFilterSet(FilterSet):
             }
         }"""
 
-    def __init__(self, data=None,
-                 queryset=None, prefix=None, **kwargs):
+    def __init__(self, data=None, queryset=None, prefix=None, **kwargs):
 
-        workspace = kwargs.pop('workspace')
+        workspace = kwargs.pop("workspace")
 
         super(ImpressoEnderecamentoContatoFilterSet, self).__init__(
-            data=data,
-            queryset=queryset, prefix=prefix, **kwargs)
+            data=data, queryset=queryset, prefix=prefix, **kwargs
+        )
 
-        col1 = to_row([
-            ('search', 6),
-            ('sexo', 3),
-            ('tem_filhos', 3),
-            ('data_nascimento', 6),
-            ('idade', 6),
-            ('tipo_autoridade', 6),
-            ('grupo', 6),
-        ])
+        col1 = to_row(
+            [
+                ("search", 6),
+                ("sexo", 3),
+                ("tem_filhos", 3),
+                ("data_nascimento", 6),
+                ("idade", 6),
+                ("tipo_autoridade", 6),
+                ("grupo", 6),
+            ]
+        )
 
-        col2 = to_row([
-            ('impresso', 12),
-            ('fontsize', 4),
-            ('nome_maiusculo', 4),
-            ('imprimir_pronome', 4),
-            ('imprimir_cargo', 5),
-            ('local_cargo', 7),
-
-        ])
+        col2 = to_row(
+            [
+                ("impresso", 12),
+                ("fontsize", 4),
+                ("nome_maiusculo", 4),
+                ("imprimir_pronome", 4),
+                ("imprimir_cargo", 5),
+                ("local_cargo", 7),
+            ]
+        )
 
         row = to_row(
-            [(Fieldset(
-                _('Informações para Seleção de Contatos'),
-                col1,
-                to_row([(SubmitFilterPrint(
-                    'filter',
-                    value=_('Filtrar'), css_class='btn-outline-primary pull-right',
-                    type='submit'), 12)])), 6),
-             (Fieldset(
-                 _('Informações para Impressão'),
-                 col2,
-                 to_row([(SubmitFilterPrint(
-                     'print',
-                     value=_('Imprimir'), css_class='btn-primary pull-right',
-                     type='submit'), 12)])), 6)])
+            [
+                (
+                    Fieldset(
+                        _("Informações para Seleção de Contatos"),
+                        col1,
+                        to_row(
+                            [
+                                (
+                                    SubmitFilterPrint(
+                                        "filter",
+                                        value=_("Filtrar"),
+                                        css_class="btn-outline-primary pull-right",
+                                        type="submit",
+                                    ),
+                                    12,
+                                )
+                            ]
+                        ),
+                    ),
+                    6,
+                ),
+                (
+                    Fieldset(
+                        _("Informações para Impressão"),
+                        col2,
+                        to_row(
+                            [
+                                (
+                                    SubmitFilterPrint(
+                                        "print",
+                                        value=_("Imprimir"),
+                                        css_class="btn-primary pull-right",
+                                        type="submit",
+                                    ),
+                                    12,
+                                )
+                            ]
+                        ),
+                    ),
+                    6,
+                ),
+            ]
+        )
 
         self.form.helper = FormHelper()
-        self.form.helper.form_method = 'GET'
+        self.form.helper.form_method = "GET"
         self.form.helper.layout = Layout(
             row,
         )
 
-        self.form.fields['search'].label = _(
-            'Nome/Nome Social/Apelido')
-        self.form.fields['data_nascimento'].label = '%s (%s)' % (
-            _('Aniversário'), _('Inicial - Final'))
+        self.form.fields["search"].label = _("Nome/Nome Social/Apelido")
+        self.form.fields["data_nascimento"].label = "%s (%s)" % (
+            _("Aniversário"),
+            _("Inicial - Final"),
+        )
 
-        self.form.fields['tem_filhos'].choices.choices[0] = (None, _('Ambos'))
+        self.form.fields["tem_filhos"].choices.choices[0] = (None, _("Ambos"))
 
-        self.form.fields['grupo'].choices = [
-            ('0', _('Apenas Contatos sem Grupo')),
-        ] + [(g.pk, str(g)) for g in GrupoDeContatos.objects.filter(
-            workspace=workspace)]
+        self.form.fields["grupo"].choices = [
+            ("0", _("Apenas Contatos sem Grupo")),
+        ] + [
+            (g.pk, str(g)) for g in GrupoDeContatos.objects.filter(workspace=workspace)
+        ]
 
 
 class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
 
-    AGRUPADO_POR_NADA = 'sem_agrupamento'
-    AGRUPADO_POR_TITULO = 'titulo'
-    AGRUPADO_POR_IMPORTANCIA = 'importancia'
-    AGRUPADO_POR_TOPICO = 'topicos__descricao'
-    AGRUPADO_POR_ASSUNTO = 'assuntos__descricao'
-    AGRUPADO_POR_STATUS = 'status__descricao'
-    AGRUPADO_POR_CLASSIFICACAO = 'classificacoes__descricao'
+    AGRUPADO_POR_NADA = "sem_agrupamento"
+    AGRUPADO_POR_TITULO = "titulo"
+    AGRUPADO_POR_IMPORTANCIA = "importancia"
+    AGRUPADO_POR_TOPICO = "topicos__descricao"
+    AGRUPADO_POR_ASSUNTO = "assuntos__descricao"
+    AGRUPADO_POR_STATUS = "status__descricao"
+    AGRUPADO_POR_CLASSIFICACAO = "classificacoes__descricao"
 
     AGRUPAMENTO_CHOICE = (
-        (AGRUPADO_POR_NADA, _('Sem Agrupamento')),
-        (AGRUPADO_POR_TITULO, _('Por Título de Processos')),
-        (AGRUPADO_POR_IMPORTANCIA,
-         _('Por Importância')),
-        (AGRUPADO_POR_TOPICO,
-         _('Por Tópicos')),
-        (AGRUPADO_POR_ASSUNTO,
-         _('Por Assuntos')),
-        (AGRUPADO_POR_STATUS,
-         _('Por Status')),
-        (AGRUPADO_POR_CLASSIFICACAO,
-         _('Por Classificação')),
+        (AGRUPADO_POR_NADA, _("Sem Agrupamento")),
+        (AGRUPADO_POR_TITULO, _("Por Título de Processos")),
+        (AGRUPADO_POR_IMPORTANCIA, _("Por Importância")),
+        (AGRUPADO_POR_TOPICO, _("Por Tópicos")),
+        (AGRUPADO_POR_ASSUNTO, _("Por Assuntos")),
+        (AGRUPADO_POR_STATUS, _("Por Status")),
+        (AGRUPADO_POR_CLASSIFICACAO, _("Por Classificação")),
     )
 
-    search = CharFilter(method='filter_search')
+    search = CharFilter(method="filter_search")
 
     agrupamento = ChoiceFilter(
         required=False,
         empty_label=None,
         choices=AGRUPAMENTO_CHOICE,
-        method='filter_agrupamento')
+        method="filter_agrupamento",
+    )
 
     importancia = MultipleChoiceFilter(
-        required=False,
-        choices=IMPORTANCIA_CHOICE,
-        method='filter_importancia')
+        required=False, choices=IMPORTANCIA_CHOICE, method="filter_importancia"
+    )
 
     status = ModelMultipleChoiceFilter(
-        required=False,
-        queryset=StatusProcesso.objects.all(),
-        method='filter_status')
+        required=False, queryset=StatusProcesso.objects.all(), method="filter_status"
+    )
 
     def filter_agrupamento(self, queryset, field_name, value):
         return queryset
 
-    def filter_importancia(self, queryset, field_name,  value):
+    def filter_importancia(self, queryset, field_name, value):
         if not value:
             return queryset
 
@@ -958,7 +1088,7 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
             q = q | Q(importancia=i) if q else Q(importancia=i)
         return queryset.filter(q)
 
-    def filter_status(self, queryset, field_name,  value):
+    def filter_status(self, queryset, field_name, value):
         if not value:
             return queryset
 
@@ -967,11 +1097,11 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
             q = q | Q(status=sta) if q else Q(status=sta)
         return queryset.filter(q)
 
-    def filter_search(self, queryset, field_name,  value):
+    def filter_search(self, queryset, field_name, value):
 
         query = normalize(value)
 
-        query = query.split(' ')
+        query = query.split(" ")
         if query:
             q = Q()
             for item in query:
@@ -985,175 +1115,205 @@ class ContatoAgrupadoPorProcessoFilterSet(FilterSet):
 
     class Meta:
         model = Processo
-        fields = ['search',
-                  'data',
-                  'topicos',
-                  'importancia',
-                  'classificacoes',
-                  'assuntos',
-                  'status', ]
-        filter_overrides = {models.DateField: {
-            'filter_class': DataRangeFilter,
-            'extra': lambda f: {
-                'label': '%s (%s)' % (f.verbose_name, _('Inicial - Final')),
-                'widget': RangeWidgetOverride}
-        }}
+        fields = [
+            "search",
+            "data",
+            "topicos",
+            "importancia",
+            "classificacoes",
+            "assuntos",
+            "status",
+        ]
+        filter_overrides = {
+            models.DateField: {
+                "filter_class": DataRangeFilter,
+                "extra": lambda f: {
+                    "label": "%s (%s)" % (f.verbose_name, _("Inicial - Final")),
+                    "widget": RangeWidgetOverride,
+                },
+            }
+        }
 
-    def __init__(self, data=None,
-                 queryset=None, prefix=None, **kwargs):
+    def __init__(self, data=None, queryset=None, prefix=None, **kwargs):
 
-        workspace = kwargs.pop('workspace')
+        workspace = kwargs.pop("workspace")
 
         super(ContatoAgrupadoPorProcessoFilterSet, self).__init__(
-            data=data,
-            queryset=queryset, prefix=prefix,  **kwargs)
-
-        c1_row1 = to_row([
-            ('search', 7),
-            ('data', 5),
-            ('importancia', 4),
-            ('status', 4),
-            ('classificacoes', 4),
-            ('topicos', 6),
-            ('assuntos', 6),
-        ])
-
-        col1 = Fieldset(
-            _('Informações para Seleção de Processos'),
-            c1_row1,
-            to_row([
-                (SubmitFilterPrint(
-                    'filter',
-                    value=_('Filtrar'),
-                    css_class='btn-outline-primary pull-right',
-                    type='submit'), 12)
-            ]))
-
-        col2 = Fieldset(
-            _('Inf p/ Impressão'),
-            'agrupamento',
-
-            SubmitFilterPrint(
-                'print',
-                value=_('Imprimir'),
-                css_class='btn-primary pull-right',
-                type='submit')
+            data=data, queryset=queryset, prefix=prefix, **kwargs
         )
 
-        rows = to_row([
-            (col1, 9),
-            (col2, 3),
-        ])
+        c1_row1 = to_row(
+            [
+                ("search", 7),
+                ("data", 5),
+                ("importancia", 4),
+                ("status", 4),
+                ("classificacoes", 4),
+                ("topicos", 6),
+                ("assuntos", 6),
+            ]
+        )
+
+        col1 = Fieldset(
+            _("Informações para Seleção de Processos"),
+            c1_row1,
+            to_row(
+                [
+                    (
+                        SubmitFilterPrint(
+                            "filter",
+                            value=_("Filtrar"),
+                            css_class="btn-outline-primary pull-right",
+                            type="submit",
+                        ),
+                        12,
+                    )
+                ]
+            ),
+        )
+
+        col2 = Fieldset(
+            _("Inf p/ Impressão"),
+            "agrupamento",
+            SubmitFilterPrint(
+                "print",
+                value=_("Imprimir"),
+                css_class="btn-primary pull-right",
+                type="submit",
+            ),
+        )
+
+        rows = to_row(
+            [
+                (col1, 9),
+                (col2, 3),
+            ]
+        )
 
         self.form.helper = FormHelper()
-        self.form.helper.form_method = 'GET'
+        self.form.helper.form_method = "GET"
         self.form.helper.layout = Layout(
             rows,
         )
 
-        self.form.fields['search'].label = _('Filtrar Títulos de Processos')
+        self.form.fields["search"].label = _("Filtrar Títulos de Processos")
 
-        self.form.fields['topicos'].widget = forms.SelectMultiple(
-            attrs={'size': '7'})
-        self.form.fields['topicos'].queryset = TopicoProcesso.objects.all()
+        self.form.fields["topicos"].widget = forms.SelectMultiple(attrs={"size": "7"})
+        self.form.fields["topicos"].queryset = TopicoProcesso.objects.all()
 
-        self.form.fields['assuntos'].widget = forms.SelectMultiple(
-            attrs={'size': '7'})
-        self.form.fields['assuntos'].queryset = AssuntoProcesso.objects.filter(
-            workspace=workspace)
+        self.form.fields["assuntos"].widget = forms.SelectMultiple(attrs={"size": "7"})
+        self.form.fields["assuntos"].queryset = AssuntoProcesso.objects.filter(
+            workspace=workspace
+        )
 
-        self.form.fields['importancia'].widget = forms.CheckboxSelectMultiple()
-        #self.form.fields['importancia'].inline_class = True
+        self.form.fields["importancia"].widget = forms.CheckboxSelectMultiple()
+        # self.form.fields['importancia'].inline_class = True
 
-        self.form.fields[
-            'classificacoes'].widget = forms.CheckboxSelectMultiple()
+        self.form.fields["classificacoes"].widget = forms.CheckboxSelectMultiple()
 
-        self.form.fields['status'].widget = forms.CheckboxSelectMultiple()
+        self.form.fields["status"].widget = forms.CheckboxSelectMultiple()
         """#self.form.fields['status'].inline_class = True
         self.form.fields['status'].choices = list(
             self.form.fields['status'].choices)
         del self.form.fields['status'].choices[0]"""
 
-        self.form.fields['agrupamento'].label = _(
-            'Agrupar Contatos')
-        self.form.fields['agrupamento'].widget = forms.RadioSelect()
+        self.form.fields["agrupamento"].label = _("Agrupar Contatos")
+        self.form.fields["agrupamento"].widget = forms.RadioSelect()
 
 
 class ListWithSearchProcessoForm(ListWithSearchForm):
 
     assunto = forms.ModelChoiceField(
-        label=_('Filtrar por Assunto'),
+        label=_("Filtrar por Assunto"),
         queryset=AssuntoProcesso.objects.all(),
-        required=False)
+        required=False,
+    )
 
     class Meta(ListWithSearchForm.Meta):
-        fields = ['q', 'o', 'assunto']
+        fields = ["q", "o", "assunto"]
         pass
 
     def __init__(self, *args, **kwargs):
         super(ListWithSearchProcessoForm, self).__init__(*args, **kwargs)
 
-        self.helper.layout.fields.append(Field('assunto'))
+        self.helper.layout.fields.append(Field("assunto"))
 
-        self.fields['assunto'].queryset = AssuntoProcesso.objects.filter(
-            workspace=self.initial['workspace'])
+        self.fields["assunto"].queryset = AssuntoProcesso.objects.filter(
+            workspace=self.initial["workspace"]
+        )
 
 
 class GrupoDeContatosForm(ModelForm):
     q = forms.CharField(
         required=False,
-        label='Busca por Contatos',
-        widget=forms.TextInput(
-            attrs={'type': 'search'}))
+        label="Busca por Contatos",
+        widget=forms.TextInput(attrs={"type": "search"}),
+    )
 
     class Meta:
         model = GrupoDeContatos
-        fields = ['nome',
-                  'q',
-                  'contatos', ]
+        fields = [
+            "nome",
+            "q",
+            "contatos",
+        ]
 
     def __init__(self, *args, **kwargs):
-        yaml_layout = kwargs.pop('yaml_layout')
+        yaml_layout = kwargs.pop("yaml_layout")
 
         q_field = Div(
             FieldWithButtons(
-                Field('q',
-                      placeholder=_('Filtrar Lista'),
-                      autocomplete='off',
-                      type='search',
-                      onkeypress='atualizaContatos(event)'),
+                Field(
+                    "q",
+                    placeholder=_("Filtrar Lista"),
+                    autocomplete="off",
+                    type="search",
+                    onkeypress="atualizaContatos(event)",
+                ),
                 StrictButton(
-                    _('Filtrar'), css_class='btn-outline-primary',
-                    type='button', onclick='atualizaContatos(event)')),
-            Div(css_class='form-group-contato-search')
+                    _("Filtrar"),
+                    css_class="btn-outline-primary",
+                    type="button",
+                    onclick="atualizaContatos(event)",
+                ),
+            ),
+            Div(css_class="form-group-contato-search"),
         )
 
-        q = [_('Seleção de Contatos'),
-             [(q_field, 5),
-              (Div(Field('contatos'), css_class='form-group-contatos'), 7)]
-             ]
+        q = [
+            _("Seleção de Contatos"),
+            [
+                (q_field, 5),
+                (Div(Field("contatos"), css_class="form-group-contatos"), 7),
+            ],
+        ]
         yaml_layout.append(q)
 
         self.helper = FormHelper()
-        self.helper.field_class = 'controls'
+        self.helper.field_class = "controls"
         self.helper.layout = SaplFormLayout(*yaml_layout)
 
         super(GrupoDeContatosForm, self).__init__(*args, **kwargs)
 
-        self.fields['q'].help_text = _('Digite parte do nome, nome social ou '
-                                       'apelido do Contato que você procura.')
+        self.fields["q"].help_text = _(
+            "Digite parte do nome, nome social ou "
+            "apelido do Contato que você procura."
+        )
 
-        self.fields['contatos'].widget = forms.CheckboxSelectMultiple()
+        self.fields["contatos"].widget = forms.CheckboxSelectMultiple()
 
-        self.fields['contatos'].queryset = Contato.objects.all()
+        self.fields["contatos"].queryset = Contato.objects.all()
 
-        self.fields['contatos'].choices = [
-            (c.pk, c) for c in self.instance.contatos.order_by('nome')]\
-            if self.instance.pk else []
+        self.fields["contatos"].choices = (
+            [(c.pk, c) for c in self.instance.contatos.order_by("nome")]
+            if self.instance.pk
+            else []
+        )
 
-        self.fields['contatos'].help_text = _(
-            'Procure por Contatos na caixa de buscas e arraste '
-            'para esta caixa os Contatos interessados neste Processo.')
+        self.fields["contatos"].help_text = _(
+            "Procure por Contatos na caixa de buscas e arraste "
+            "para esta caixa os Contatos interessados neste Processo."
+        )
 
 
 class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
@@ -1162,76 +1322,89 @@ class ContatoAgrupadoPorGrupoFilterSet(FilterSet):
         required=False,
         label=Municipio._meta.verbose_name,
         queryset=Municipio.objects.all(),
-        method='filter_municipio')
+        method="filter_municipio",
+    )
 
     grupo = ModelMultipleChoiceFilter(
         required=False,
         label=GrupoDeContatos._meta.verbose_name_plural,
         queryset=GrupoDeContatos.objects.all(),
-        method='filter_grupo')
+        method="filter_grupo",
+    )
 
-    def filter_municipio(self, queryset, field_name,  value):
+    def filter_municipio(self, queryset, field_name, value):
         queryset = queryset.filter(endereco_set__municipio=value)
         return queryset
 
     def filter_grupo(self, queryset, field_name, value):
         queryset = queryset.filter(grupodecontatos_set__in=value)
 
-        return queryset.order_by('grupodecontatos_set__nome', 'nome')
+        return queryset.order_by("grupodecontatos_set__nome", "nome")
 
     class Meta:
         model = Contato
-        fields = ('municipio', 'grupo')
+        fields = ("municipio", "grupo")
 
-    def __init__(self, data=None,
-                 queryset=None, prefix=None, strict=None, **kwargs):
+    def __init__(self, data=None, queryset=None, prefix=None, strict=None, **kwargs):
 
-        workspace = kwargs.pop('workspace')
+        workspace = kwargs.pop("workspace")
 
         super(ContatoAgrupadoPorGrupoFilterSet, self).__init__(
-            data=data,
-            queryset=queryset, prefix=prefix, **kwargs)
-
-        c1_row1 = to_row([
-            ('municipio', 7),
-            ('grupo', 7),
-        ])
-
-        col1 = Fieldset(
-            _('Informações para Seleção de Contados'),
-            c1_row1,
-            to_row([
-                (SubmitFilterPrint(
-                    'filter',
-                    value=_('Filtrar'),
-                    css_class='btn-outline-primary pull-right',
-                    type='submit'), 12)
-            ]))
-
-        col2 = Fieldset(
-            _('Inf p/ Impressão'),
-
-            SubmitFilterPrint(
-                'print',
-                value=_('Imprimir'),
-                css_class='btn-primary pull-right',
-                type='submit')
+            data=data, queryset=queryset, prefix=prefix, **kwargs
         )
 
-        rows = to_row([
-            (col1, 9),
-            (col2, 3),
-        ])
+        c1_row1 = to_row(
+            [
+                ("municipio", 7),
+                ("grupo", 7),
+            ]
+        )
+
+        col1 = Fieldset(
+            _("Informações para Seleção de Contados"),
+            c1_row1,
+            to_row(
+                [
+                    (
+                        SubmitFilterPrint(
+                            "filter",
+                            value=_("Filtrar"),
+                            css_class="btn-outline-primary pull-right",
+                            type="submit",
+                        ),
+                        12,
+                    )
+                ]
+            ),
+        )
+
+        col2 = Fieldset(
+            _("Inf p/ Impressão"),
+            SubmitFilterPrint(
+                "print",
+                value=_("Imprimir"),
+                css_class="btn-primary pull-right",
+                type="submit",
+            ),
+        )
+
+        rows = to_row(
+            [
+                (col1, 9),
+                (col2, 3),
+            ]
+        )
 
         self.form.helper = FormHelper()
-        self.form.helper.form_method = 'GET'
+        self.form.helper.form_method = "GET"
         self.form.helper.layout = Layout(
             rows,
         )
 
-        self.form.fields['grupo'].queryset = GrupoDeContatos.objects.filter(
-            workspace=workspace)
-        self.form.fields['municipio'].queryset = Municipio.objects.all()
+        self.form.fields["grupo"].queryset = GrupoDeContatos.objects.filter(
+            workspace=workspace
+        )
+        self.form.fields["municipio"].queryset = Municipio.objects.all()
 
 
 class VisitaForm(ModelForm):
@@ -1242,75 +1415,80 @@ class VisitaForm(ModelForm):
                 AreaTrabalho.TIPO_GABINETE,
                 AreaTrabalho.TIPO_ADMINISTRATIVO,
                 AreaTrabalho.TIPO_PROCURADORIA,
-                AreaTrabalho.TIPO_INSTITUCIONAL
+                AreaTrabalho.TIPO_INSTITUCIONAL,
             ),
-            ativo=True
-        ).order_by('tipo', 'nome'),
+            ativo=True,
+        ).order_by("tipo", "nome"),
         required=False,
-        label='Setores a Visitar',
+        label="Setores a Visitar",
         widget=forms.CheckboxSelectMultiple(),
     )
 
     documento = forms.CharField(
-        required=True,
-        label='RG / CPF / CNH',
-        widget=forms.TextInput())
+        required=True, label="RG / CPF / CNH", widget=forms.TextInput()
+    )
 
     telefone = forms.CharField(
-        required=False,
-        label='Telefone',
-        widget=forms.TextInput())
+        required=False, label="Telefone", widget=forms.TextInput()
+    )
 
-    nome = forms.CharField(
-        required=True,
-        label='Nome',
-        widget=forms.TextInput())
+    nome = forms.CharField(required=True, label="Nome", widget=forms.TextInput())
 
     bairro = forms.ModelChoiceField(
-        queryset=Bairro.objects.order_by('nome'),
-        required=False,
-        label='Bairro'
+        queryset=Bairro.objects.order_by("nome"), required=False, label="Bairro"
     )
 
     data_nascimento = forms.DateField(
-        label='Data de Nascimento',
+        label="Data de Nascimento",
         required=False,
-        widget=forms.DateInput(format='%d/%m/%Y')
+        widget=forms.DateInput(format="%d/%m/%Y"),
     )
 
     observacoes = forms.CharField(
         required=False,
-        label=Visita._meta.get_field(
-            'observacoes').verbose_name,
-        widget=forms.Textarea(attrs={'rows': 5}))
+        label=Visita._meta.get_field("observacoes").verbose_name,
+        widget=forms.Textarea(attrs={"rows": 5}),
+    )
 
     class Meta:
         model = Visita
-        fields = ('setores', 'fotografia', 'observacoes')
+        fields = ("setores", "fotografia", "observacoes")
 
     def __init__(self, *args, **kwargs):
 
         layout_form = [
-            to_row([
-                (to_row([
-                    ('documento', 5), ('nome', 7),
-                    (HTML('''
+            to_row(
+                [
+                    (
+                        to_row(
+                            [
+                                ("documento", 5),
+                                ("nome", 7),
+                                (
+                                    HTML("""
                             <div id="div-busca" class="d-flex align-items-center h-100"></div>
-                    '''), 8),
-                    (HTML('''
+                    """),
+                                    8,
+                                ),
+                                (
+                                    HTML("""
                             <div class="text-center"><img id="img_select"/></div>
-                    '''), 4),
-                    (HTML('<hr>'), 12),
-                    ('telefone', 4),
-                    ('data_nascimento', 4),
-                    ('bairro', 4),
-                    ('fotografia', 12),
-                    ('setores', 7),
-                    ('observacoes', 5),
-
-                ]), 8),
-                (HTML(
-                    '''
+                    """),
+                                    4,
+                                ),
+                                (HTML("<hr>"), 12),
+                                ("telefone", 4),
+                                ("data_nascimento", 4),
+                                ("bairro", 4),
+                                ("fotografia", 12),
+                                ("setores", 7),
+                                ("observacoes", 5),
+                            ]
+                        ),
+                        8,
+                    ),
+                    (
+                        HTML("""
                     <div class="container-camera">
                         <video id="video-visita"></video>
                         <canvas id="canvas"></canvas>
@@ -1332,21 +1510,21 @@ class VisitaForm(ModelForm):
                         </div>
                     </div>
                     <ul class="container-ultimas-visitas"</ul>
-                '''), 4),
-
-            ]),
-
-            to_row([
-
-            ]),
+                """),
+                        4,
+                    ),
+                ]
+            ),
+            to_row([]),
         ]
 
         self.helper = SaplFormHelper()
         self.helper.layout = SaplFormLayout(
-            *layout_form, save_label=_('Registrar'), disabled=None)
+            *layout_form, save_label=_("Registrar"), disabled=None
+        )
 
         for i, k in enumerate(self.helper.layout.fields):
-            k.css_class = f'row row{i}'
+            k.css_class = f"row row{i}"
 
         super().__init__(*args, **kwargs)
 
@@ -1357,16 +1535,16 @@ class VisitaForm(ModelForm):
         cd = self.cleaned_data
 
         visita = self.instance
-        visitante = Visitante.objects.filter(documento=cd['documento']).first()
+        visitante = Visitante.objects.filter(documento=cd["documento"]).first()
 
         if not visitante:
             visitante = Visitante()
 
-        visitante.documento = cd['documento']
-        visitante.nome = cd['nome']
-        visitante.data_nascimento = cd['data_nascimento']
-        visitante.bairro = cd['bairro'] if cd['bairro'] else None
-        visitante.telefone = cd['telefone']
+        visitante.documento = cd["documento"]
+        visitante.nome = cd["nome"]
+        visitante.data_nascimento = cd["data_nascimento"]
+        visitante.bairro = cd["bairro"] if cd["bairro"] else None
+        visitante.telefone = cd["telefone"]
         visitante.modifier = self.instance.modifier
         visitante.owner = self.instance.owner
 
@@ -1390,9 +1568,12 @@ class AnexoProcessoForm(FileFieldCheckMixin, ModelForm):
 
     class Meta:
         model = AnexoProcesso
-        fields = ['processo', 'arquivo', ]
+        fields = [
+            "processo",
+            "arquivo",
+        ]
         widgets = {
-            'processo': forms.HiddenInput(),
+            "processo": forms.HiddenInput(),
         }
 
     logger = logging.getLogger(__name__)
@@ -1403,17 +1584,20 @@ class AnexoProcessoForm(FileFieldCheckMixin, ModelForm):
         if not self.is_valid():
             return cleaned_data
 
-        arquivo = self.cleaned_data.get('arquivo', False)
+        arquivo = self.cleaned_data.get("arquivo", False)
 
         if arquivo and arquivo.size > MAX_DOC_UPLOAD_SIZE:
-            raise ValidationError("O Arquivo Anexo deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb"
-                                  .format((MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (arquivo.size / 1024) / 1024))
+            raise ValidationError(
+                "O Arquivo Anexo deve ser menor que {0:.1f} mb, o tamanho atual desse arquivo é {1:.1f} mb".format(
+                    (MAX_DOC_UPLOAD_SIZE / 1024) / 1024, (arquivo.size / 1024) / 1024
+                )
+            )
 
         return cleaned_data
 
     def save(self, commit=False):
         anexo = self.instance
-        anexo.processo = self.cleaned_data['processo']
-        anexo.arquivo = self.cleaned_data['arquivo']
+        anexo.processo = self.cleaned_data["processo"]
+        anexo.arquivo = self.cleaned_data["arquivo"]
         anexo = super(AnexoProcessoForm, self).save(commit=True)
         return anexo

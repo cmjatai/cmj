@@ -1,29 +1,32 @@
-
-from datetime import timedelta, datetime
 import json
 import logging
-from random import random
 import re
+from datetime import datetime, timedelta
+from random import random
 
 import dateutil.parser
+import requests as rq
 from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.management.base import BaseCommand
-from django.db.models import Q, F
+from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
 from django.utils import timezone
 
 from cmj.sigad.models import Documento
 from cmj.utils import Manutencao
-from cmj.videos.functions import pull_youtube_metadata_video, pull_youtube,\
-    vincular_sistema_aos_videos, video_documento_na_galeria
-from cmj.videos.models import Video, PullYoutube, VideoParte, PullExec
-import requests as rq
+from cmj.videos.functions import (
+    pull_youtube,
+    pull_youtube_metadata_video,
+    video_documento_na_galeria,
+    vincular_sistema_aos_videos,
+)
+from cmj.videos.models import PullExec, PullYoutube, Video, VideoParte
 
 
 def _get_registration_key(model):
-    return '%s_%s' % (model._meta.app_label, model._meta.model_name)
+    return "%s_%s" % (model._meta.app_label, model._meta.model_name)
 
 
 class Command(BaseCommand):
@@ -37,8 +40,7 @@ class Command(BaseCommand):
 
         # PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
-        videos = Video.objects.filter(
-            json__snippet__liveBroadcastContent='upcoming')
+        videos = Video.objects.filter(json__snippet__liveBroadcastContent="upcoming")
         for v in videos[:50]:
             print(v.execucao, v.created, v)
             pull_youtube_metadata_video(v)
@@ -50,7 +52,7 @@ class Command(BaseCommand):
         # video_documento_na_galeria()
         # pull_youtube_metadata_video(Video.objects.first())
 
-        for v in Video.objects.order_by('-id')[:40]:
+        for v in Video.objects.order_by("-id")[:40]:
 
             print(v.id, v)
             if v.id == 1273:
@@ -104,13 +106,12 @@ class Command(BaseCommand):
         self.video_documento_na_galeria()
 
     def get_full_metadata_video(self):
-        videos = Video.objects.all(
-        ).order_by('execucao', '-created')
+        videos = Video.objects.all().order_by("execucao", "-created")
         #    json__snippet__liveBroadcastContent__in=('upcoming', 'live')
 
         videos = videos[:100]
 
-        #now = timezone.now()
+        # now = timezone.now()
 
         for v in videos:
             print(v.id, v.vid, v)
@@ -150,8 +151,8 @@ class Command(BaseCommand):
                             continue
 
                         if r.user.id == 76:
-                            d.titulo = r.obj[0]['fields']['titulo']
-                            d.descricao = r.obj[0]['fields']['descricao']
+                            d.titulo = r.obj[0]["fields"]["titulo"]
+                            d.descricao = r.obj[0]["fields"]["descricao"]
                             d.save()
                             print(r.id, r.user.id, r.user, d.id, d)
                             break

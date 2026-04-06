@@ -10,19 +10,18 @@ from pdfrw.pdfreader import PdfReader
 from cmj.arq.models import ArqDoc
 from cmj.core.models import Bi
 from cmj.diarios.models import DiarioOficial
-from cmj.sigad.models import VersaoDeMidia, Documento, Midia
+from cmj.sigad.models import Documento, Midia, VersaoDeMidia
 from cmj.utils import run_sql
 from sapl.materia.models import MateriaLegislativa, Tramitacao
-from sapl.norma.models import NormaJuridica, AnexoNormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo,\
-    TramitacaoAdministrativo
+from sapl.norma.models import AnexoNormaJuridica, NormaJuridica
+from sapl.protocoloadm.models import DocumentoAdministrativo, TramitacaoAdministrativo
 
 
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
+        post_save.disconnect(dispatch_uid="timerefresh_post_signal")
 
         self.logger = logging.getLogger(__name__)
 
@@ -35,94 +34,91 @@ class Command(BaseCommand):
         reset_errors_count_page = False
         models = [
             {
-                'model': ArqDoc,
-                'hook': 'run_bi_arqdoc',
-                'reset_errors_count_page': reset_errors_count_page,
-                'results': {},
+                "model": ArqDoc,
+                "hook": "run_bi_arqdoc",
+                "reset_errors_count_page": reset_errors_count_page,
+                "results": {},
             },
             {
-                'model': MateriaLegislativa,
-                'file_field': 'texto_original',
-                'hook': 'run_bi_materias_legislativas',
-                'results': {},
-                'reset_errors_count_page': reset_errors_count_page
+                "model": MateriaLegislativa,
+                "file_field": "texto_original",
+                "hook": "run_bi_materias_legislativas",
+                "results": {},
+                "reset_errors_count_page": reset_errors_count_page,
             },
             {
-                'model': NormaJuridica,
-                'file_field': 'texto_integral',
-                'hook': 'run_bi_normajuridica',
-                'results': {},
-                'reset_errors_count_page': reset_errors_count_page
+                "model": NormaJuridica,
+                "file_field": "texto_integral",
+                "hook": "run_bi_normajuridica",
+                "results": {},
+                "reset_errors_count_page": reset_errors_count_page,
             },
             {
-                'model': AnexoNormaJuridica,
-                'file_field': 'anexo_arquivo',
-                'hook': '',
-                'reset_errors_count_page': reset_errors_count_page
+                "model": AnexoNormaJuridica,
+                "file_field": "anexo_arquivo",
+                "hook": "",
+                "reset_errors_count_page": reset_errors_count_page,
             },
             {
-                'model': DocumentoAdministrativo,
-                'file_field': 'texto_integral',
-                'hook': 'run_bi_documentoadministrativo',
-                'results': {},
-                'reset_errors_count_page': reset_errors_count_page
+                "model": DocumentoAdministrativo,
+                "file_field": "texto_integral",
+                "hook": "run_bi_documentoadministrativo",
+                "results": {},
+                "reset_errors_count_page": reset_errors_count_page,
             },
             {
-                'model': DiarioOficial,
-                'file_field': 'arquivo',
-                'hook': 'run_bi_diariooficial',
-                'results': {},
-                'reset_errors_count_page': reset_errors_count_page
+                "model": DiarioOficial,
+                "file_field": "arquivo",
+                "hook": "run_bi_diariooficial",
+                "results": {},
+                "reset_errors_count_page": reset_errors_count_page,
             },
             {
-                'model': VersaoDeMidia,
-                'file_field': 'file',
-                'hook': 'run_bi_midias_imagens',
-                'results': {},
-                'reset_errors_count_page': reset_errors_count_page
+                "model": VersaoDeMidia,
+                "file_field": "file",
+                "hook": "run_bi_midias_imagens",
+                "results": {},
+                "reset_errors_count_page": reset_errors_count_page,
             },
             {
-                'model': Documento,
-                'hook': 'run_bi_sigad_documento',
-                'reset_errors_count_page': reset_errors_count_page,
-                'results': {},
+                "model": Documento,
+                "hook": "run_bi_sigad_documento",
+                "reset_errors_count_page": reset_errors_count_page,
+                "results": {},
             },
             {
-                'model': Tramitacao,
-                'hook': 'run_bi_tramitacao',
-                'reset_errors_count_page': reset_errors_count_page,
-                'results': {},
+                "model": Tramitacao,
+                "hook": "run_bi_tramitacao",
+                "reset_errors_count_page": reset_errors_count_page,
+                "results": {},
             },
         ]
 
         # Bi.objects.all().delete()
 
         for mt in models:  # mt = metadata
-            if not mt['hook']:
+            if not mt["hook"]:
                 continue
 
             # if mt['hook'] != 'run_bi_tramitacao':
             #    continue
 
-            if mt['reset_errors_count_page']:
+            if mt["reset_errors_count_page"]:
                 run_sql(
-                    '''update {}
+                    """update {}
                             set _paginas = 0
-                            where _paginas = -1;'''.format(
-                        '%s_%s' % (mt['model']._meta.app_label,
-                                   mt['model']._meta.model_name)
+                            where _paginas = -1;""".format(
+                        "%s_%s"
+                        % (mt["model"]._meta.app_label, mt["model"]._meta.model_name)
                     )
                 )
 
-            getattr(self, mt['hook'])(mt)
+            getattr(self, mt["hook"])(mt)
 
-            for ano, value in mt['results'].items():
+            for ano, value in mt["results"].items():
 
                 bi, created = Bi.objects.get_or_create(
-                    ano=ano,
-                    content_type=ContentType.objects.get_for_model(
-                        mt['model']
-                    )
+                    ano=ano, content_type=ContentType.objects.get_for_model(mt["model"])
                 )
 
                 bi.results = value
@@ -144,7 +140,7 @@ class Command(BaseCommand):
             return count_pages
 
     def run_bi_tramitacao(self, mt):
-        trm = Tramitacao.objects.all().order_by('id')
+        trm = Tramitacao.objects.all().order_by("id")
 
         r = {}
         for t in trm:
@@ -153,11 +149,13 @@ class Command(BaseCommand):
             if t.data_tramitacao.year in r:
                 r[t.data_tramitacao.year].append(t)
                 continue
-            r[t.data_tramitacao.year] = [t, ]
+            r[t.data_tramitacao.year] = [
+                t,
+            ]
 
         trm = TramitacaoAdministrativo.objects.filter(
             documento__workspace_id=22
-        ).order_by('id')
+        ).order_by("id")
 
         for t in trm:
             if not t.data_tramitacao:
@@ -165,10 +163,12 @@ class Command(BaseCommand):
             if t.data_tramitacao.year in r:
                 r[t.data_tramitacao.year].append(t)
                 continue
-            r[t.data_tramitacao.year] = [t, ]
+            r[t.data_tramitacao.year] = [
+                t,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():
             if k not in results:
                 results[k] = {}
@@ -183,17 +183,18 @@ class Command(BaseCommand):
 
                 y = t.data_tramitacao.year
 
-                if 'Tramitações' not in ru:
-                    ru['Tramitações'] = {}
+                if "Tramitações" not in ru:
+                    ru["Tramitações"] = {}
 
-                if y not in ru['Tramitações']:
-                    ru['Tramitações'][y] = {'count': 0}
+                if y not in ru["Tramitações"]:
+                    ru["Tramitações"][y] = {"count": 0}
 
-                ru['Tramitações'][y]['count'] += 1
+                ru["Tramitações"][y]["count"] += 1
 
     def run_bi_midias_imagens(self, mt):
-        midias = Midia.objects.filter(
-            documento__tipo=Documento.TPD_IMAGE).order_by('id')
+        midias = Midia.objects.filter(documento__tipo=Documento.TPD_IMAGE).order_by(
+            "id"
+        )
 
         r = {}
         for m in midias:
@@ -202,10 +203,12 @@ class Command(BaseCommand):
             if m.documento.created.year in r:
                 r[m.documento.created.year].append(m)
                 continue
-            r[m.documento.created.year] = [m, ]
+            r[m.documento.created.year] = [
+                m,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():
             if k not in results:
                 results[k] = {}
@@ -222,19 +225,18 @@ class Command(BaseCommand):
 
                 tipo = m.documento.get_tipo_display()
                 if m.documento.tipo == 900:
-                    tipo = 'Imagens'
+                    tipo = "Imagens"
 
                 if tipo not in ru:
                     ru[tipo] = {}
 
                 if y not in ru[tipo]:
-                    ru[tipo][y] = {'count': 0}
+                    ru[tipo][y] = {"count": 0}
 
-                ru[tipo][y]['count'] += 1
+                ru[tipo][y]["count"] += 1
 
     def run_bi_sigad_documento(self, mt):
-        docs = Documento.objects.filter(
-            tipo__in=Documento.TDs).order_by('id')
+        docs = Documento.objects.filter(tipo__in=Documento.TDs).order_by("id")
 
         r = {}
         for d in docs:
@@ -243,10 +245,12 @@ class Command(BaseCommand):
             if d.public_date.year in r:
                 r[d.public_date.year].append(d)
                 continue
-            r[d.public_date.year] = [d, ]
+            r[d.public_date.year] = [
+                d,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():
             if k not in results:
                 results[k] = {}
@@ -263,20 +267,20 @@ class Command(BaseCommand):
 
                 tipo = doc.get_tipo_display()
                 if doc.tipo == 0:
-                    tipo = 'Notícias'
+                    tipo = "Notícias"
 
                 if tipo not in ru:
                     ru[tipo] = {}
 
                 if y not in ru[tipo]:
-                    ru[tipo][y] = {'total': 0}
+                    ru[tipo][y] = {"total": 0}
 
-                ru[tipo][y]['total'] += 1
+                ru[tipo][y]["total"] += 1
 
     def run_bi_documentoadministrativo(self, mt):
         docs = DocumentoAdministrativo.objects.filter(
             workspace_id=22  # área pública
-        ).order_by('id')
+        ).order_by("id")
 
         ano_cadastro = 2008
         r = {}
@@ -285,59 +289,65 @@ class Command(BaseCommand):
                 r[ano_cadastro].append(d)
                 continue
             ano_cadastro = d.ano
-            r[ano_cadastro] = [d, ]
+            r[ano_cadastro] = [
+                d,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():  # ano, lista de materias cadastradas no ano
             if k not in results:
                 results[k] = {}
-                #results[k]['tramitacao'] = 0
+                # results[k]['tramitacao'] = 0
 
             for doc in v:
 
                 u = 0
                 if u not in results[k]:
                     results[k][u] = {}
-                    results[k][u]['Documentos Administrativos'] = {}
-                    results[k][u]['Documentos Acessórios'] = {}
+                    results[k][u]["Documentos Administrativos"] = {}
+                    results[k][u]["Documentos Acessórios"] = {}
 
                 ru = results[k][u]
 
-                if doc.ano not in ru['Documentos Administrativos']:
-                    ru['Documentos Administrativos'][doc.ano] = {
-                        'total': 0,
-                        'tramitacao': 0,
-                        'paginas': 0,
-                        'ep': []
+                if doc.ano not in ru["Documentos Administrativos"]:
+                    ru["Documentos Administrativos"][doc.ano] = {
+                        "total": 0,
+                        "tramitacao": 0,
+                        "paginas": 0,
+                        "ep": [],
                     }
 
-                ru['Documentos Administrativos'][doc.ano]['total'] += 1
-                ru['Documentos Administrativos'][doc.ano]['tramitacao'] += doc.tramitacaoadministrativo_set.count()
+                ru["Documentos Administrativos"][doc.ano]["total"] += 1
+                ru["Documentos Administrativos"][doc.ano][
+                    "tramitacao"
+                ] += doc.tramitacaoadministrativo_set.count()
 
-                if doc.ano not in ru['Documentos Acessórios']:
-                    ru['Documentos Acessórios'][doc.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []
+                if doc.ano not in ru["Documentos Acessórios"]:
+                    ru["Documentos Acessórios"][doc.ano] = {
+                        "total": 0,
+                        "paginas": 0,
+                        "ep": [],
                     }
 
                 if doc.documentoacessorioadministrativo_set.exists():
-                    ru['Documentos Acessórios'][doc.ano]['total'] += doc.documentoacessorioadministrativo_set.count()
+                    ru["Documentos Acessórios"][doc.ano][
+                        "total"
+                    ] += doc.documentoacessorioadministrativo_set.count()
 
                 try:
-                    ru['Documentos Administrativos'][doc.ano]['paginas'] += doc.paginas
+                    ru["Documentos Administrativos"][doc.ano]["paginas"] += doc.paginas
                 except:
-                    ru['Documentos Administrativos'][doc.ano]['ep'].append(
-                        doc.id)
+                    ru["Documentos Administrativos"][doc.ano]["ep"].append(doc.id)
 
                 for da in doc.documentoacessorioadministrativo_set.all():
                     try:
-                        ru['Documentos Acessórios'][doc.ano]['paginas'] += da.paginas
+                        ru["Documentos Acessórios"][doc.ano]["paginas"] += da.paginas
                     except:
-                        ru['Documentos Acessórios'][doc.ano]['ep'].append(
-                            da.id)
+                        ru["Documentos Acessórios"][doc.ano]["ep"].append(da.id)
 
     def run_bi_materias_legislativas(self, mt):
-        materias = MateriaLegislativa.objects.order_by('id')
+        materias = MateriaLegislativa.objects.order_by("id")
 
         ano_cadastro = 2008
         r = {}
@@ -346,58 +356,72 @@ class Command(BaseCommand):
                 r[ano_cadastro].append(m)
                 continue
             ano_cadastro = m.ano
-            r[ano_cadastro] = [m, ]
+            r[ano_cadastro] = [
+                m,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():  # ano, lista de materias cadastradas no ano
             if k not in results:
                 results[k] = {}
 
             for materia in v:
 
-                u = materia.user_id if materia.ano == 2020 else (
-                    materia.user_id if materia.user_id else 0)
+                u = (
+                    materia.user_id
+                    if materia.ano == 2020
+                    else (materia.user_id if materia.user_id else 0)
+                )
                 if u not in results[k]:
                     results[k][u] = {}
-                    results[k][u]['Matérias Legislativas'] = {}
-                    results[k][u]['Documentos Acessórios'] = {}
+                    results[k][u]["Matérias Legislativas"] = {}
+                    results[k][u]["Documentos Acessórios"] = {}
 
                 ru = results[k][u]
 
-                if materia.ano not in ru['Matérias Legislativas']:
-                    ru['Matérias Legislativas'][materia.ano] = {
-                        'total': 0,
-                        'paginas': 0,
-                        'tramitacao': 0,
-                        'ep': []
+                if materia.ano not in ru["Matérias Legislativas"]:
+                    ru["Matérias Legislativas"][materia.ano] = {
+                        "total": 0,
+                        "paginas": 0,
+                        "tramitacao": 0,
+                        "ep": [],
                     }
 
-                ru['Matérias Legislativas'][materia.ano]['total'] += 1
-                ru['Matérias Legislativas'][materia.ano]['tramitacao'] += materia.tramitacao_set.count()
+                ru["Matérias Legislativas"][materia.ano]["total"] += 1
+                ru["Matérias Legislativas"][materia.ano][
+                    "tramitacao"
+                ] += materia.tramitacao_set.count()
 
-                if materia.ano not in ru['Documentos Acessórios']:
-                    ru['Documentos Acessórios'][materia.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                if materia.ano not in ru["Documentos Acessórios"]:
+                    ru["Documentos Acessórios"][materia.ano] = {
+                        "total": 0,
+                        "paginas": 0,
+                        "ep": [],
+                    }
 
                 if materia.documentoacessorio_set.exists():
-                    ru['Documentos Acessórios'][materia.ano]['total'] += materia.documentoacessorio_set.count()
+                    ru["Documentos Acessórios"][materia.ano][
+                        "total"
+                    ] += materia.documentoacessorio_set.count()
 
                 try:
-                    ru['Matérias Legislativas'][materia.ano]['paginas'] += materia.paginas
+                    ru["Matérias Legislativas"][materia.ano][
+                        "paginas"
+                    ] += materia.paginas
                 except:
-                    ru['Matérias Legislativas'][materia.ano]['ep'].append(
-                        materia.id)
+                    ru["Matérias Legislativas"][materia.ano]["ep"].append(materia.id)
 
                 for da in materia.documentoacessorio_set.all():
                     try:
-                        ru['Documentos Acessórios'][materia.ano]['paginas'] += da.paginas
+                        ru["Documentos Acessórios"][materia.ano][
+                            "paginas"
+                        ] += da.paginas
                     except:
-                        ru['Documentos Acessórios'][materia.ano]['ep'].append(
-                            da.id)
+                        ru["Documentos Acessórios"][materia.ano]["ep"].append(da.id)
 
     def run_bi_diariooficial(self, mt):
-        diarios = DiarioOficial.objects.order_by('id')
+        diarios = DiarioOficial.objects.order_by("id")
 
         ano_cadastro = 2016
         r = {ano_cadastro: []}
@@ -407,10 +431,12 @@ class Command(BaseCommand):
                 r[ano_cadastro].append(d)
                 continue
             ano_cadastro = d.ano
-            r[ano_cadastro] = [d, ]
+            r[ano_cadastro] = [
+                d,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():  # ano, lista de diarios cadastrados no ano
             if k not in results:
                 results[k] = {}
@@ -420,24 +446,22 @@ class Command(BaseCommand):
                 u = 0
                 if u not in results[k]:
                     results[k][u] = {}
-                    results[k][u]['Diários Oficiais'] = {}
+                    results[k][u]["Diários Oficiais"] = {}
 
                 ru = results[k][u]
 
-                if d.ano not in ru['Diários Oficiais']:
-                    ru['Diários Oficiais'][d.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                if d.ano not in ru["Diários Oficiais"]:
+                    ru["Diários Oficiais"][d.ano] = {"total": 0, "paginas": 0, "ep": []}
 
-                ru['Diários Oficiais'][d.ano]['total'] += 1
+                ru["Diários Oficiais"][d.ano]["total"] += 1
 
                 try:
-                    ru['Diários Oficiais'][d.ano]['paginas'] += d.paginas
+                    ru["Diários Oficiais"][d.ano]["paginas"] += d.paginas
                 except:
-                    ru['Diários Oficiais'][d.ano]['ep'].append(
-                        d.id)
+                    ru["Diários Oficiais"][d.ano]["ep"].append(d.id)
 
     def run_bi_arqdoc(self, mt):
-        arqdocs = ArqDoc.objects.order_by('id')
+        arqdocs = ArqDoc.objects.order_by("id")
 
         ano_cadastro = 2023
         r = {ano_cadastro: []}
@@ -447,10 +471,12 @@ class Command(BaseCommand):
                 r[ano_cadastro].append(d)
                 continue
             ano_cadastro = d.data.year
-            r[ano_cadastro] = [d, ]
+            r[ano_cadastro] = [
+                d,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():  # ano, lista de diarios cadastrados no ano
             if k not in results:
                 results[k] = {}
@@ -461,24 +487,22 @@ class Command(BaseCommand):
                 u = 0
                 if u not in results[k]:
                     results[k][u] = {}
-                    results[k][u]['ArqDocumentos'] = {}
+                    results[k][u]["ArqDocumentos"] = {}
 
                 ru = results[k][u]
 
-                if d.data.year not in ru['ArqDocumentos']:
-                    ru['ArqDocumentos'][ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                if d.data.year not in ru["ArqDocumentos"]:
+                    ru["ArqDocumentos"][ano] = {"total": 0, "paginas": 0, "ep": []}
 
-                ru['ArqDocumentos'][ano]['total'] += 1
+                ru["ArqDocumentos"][ano]["total"] += 1
 
                 try:
-                    ru['ArqDocumentos'][ano]['paginas'] += d.paginas
+                    ru["ArqDocumentos"][ano]["paginas"] += d.paginas
                 except:
-                    ru['ArqDocumentos'][ano]['ep'].append(
-                        d.id)
+                    ru["ArqDocumentos"][ano]["ep"].append(d.id)
 
     def run_bi_normajuridica(self, mt):
-        nj = NormaJuridica.objects.order_by('id')
+        nj = NormaJuridica.objects.order_by("id")
 
         ano_cadastro = 2009
         r = {ano_cadastro: []}
@@ -487,10 +511,12 @@ class Command(BaseCommand):
                 r[ano_cadastro].append(n)
                 continue
             ano_cadastro = n.ano
-            r[ano_cadastro] = [n, ]
+            r[ano_cadastro] = [
+                n,
+            ]
 
         total = 0
-        results = mt['results']
+        results = mt["results"]
         for k, v in r.items():  # ano, lista de normas cadastradas no ano
             if k not in results:
                 results[k] = {}
@@ -500,41 +526,40 @@ class Command(BaseCommand):
                 u = 0
                 if u not in results[k]:
                     results[k][u] = {}
-                    results[k][u]['Normas Jurídicas'] = {}
-                    results[k][u]['Anexos a Normas'] = {}
-                    results[k][u]['Dispositivos'] = {}
+                    results[k][u]["Normas Jurídicas"] = {}
+                    results[k][u]["Anexos a Normas"] = {}
+                    results[k][u]["Dispositivos"] = {}
 
                 ru = results[k][u]
 
-                if n.ano not in ru['Normas Jurídicas']:
-                    ru['Normas Jurídicas'][n.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                if n.ano not in ru["Normas Jurídicas"]:
+                    ru["Normas Jurídicas"][n.ano] = {"total": 0, "paginas": 0, "ep": []}
 
-                if n.ano not in ru['Dispositivos']:
-                    ru['Dispositivos'][n.ano] = {
-                        'count': 0, }
+                if n.ano not in ru["Dispositivos"]:
+                    ru["Dispositivos"][n.ano] = {
+                        "count": 0,
+                    }
 
-                ru['Normas Jurídicas'][n.ano]['total'] += 1
+                ru["Normas Jurídicas"][n.ano]["total"] += 1
 
-                if n.ano not in ru['Anexos a Normas']:
-                    ru['Anexos a Normas'][n.ano] = {
-                        'total': 0, 'paginas': 0, 'ep': []}
+                if n.ano not in ru["Anexos a Normas"]:
+                    ru["Anexos a Normas"][n.ano] = {"total": 0, "paginas": 0, "ep": []}
 
                 if n.texto_articulado.exists():
-                    ru['Dispositivos'][n.ano]['count'] += n.texto_articulado.first().dispositivos_set.count()
+                    ru["Dispositivos"][n.ano][
+                        "count"
+                    ] += n.texto_articulado.first().dispositivos_set.count()
 
                 if n.anexos_set.exists():
-                    ru['Anexos a Normas'][n.ano]['total'] += n.anexos_set.count()
+                    ru["Anexos a Normas"][n.ano]["total"] += n.anexos_set.count()
 
                 try:
-                    ru['Normas Jurídicas'][n.ano]['paginas'] += n.paginas
+                    ru["Normas Jurídicas"][n.ano]["paginas"] += n.paginas
                 except:
-                    ru['Normas Jurídicas'][n.ano]['ep'].append(
-                        n.id)
+                    ru["Normas Jurídicas"][n.ano]["ep"].append(n.id)
 
                 for anx in n.anexos_set.all():
                     try:
-                        ru['Anexos a Normas'][n.ano]['paginas'] += anx.paginas
+                        ru["Anexos a Normas"][n.ano]["paginas"] += anx.paginas
                     except:
-                        ru['Anexos a Normas'][n.ano]['ep'].append(
-                            anx.id)
+                        ru["Anexos a Normas"][n.ano]["ep"].append(anx.id)

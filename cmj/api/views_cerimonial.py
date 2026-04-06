@@ -7,10 +7,9 @@ from django.http.response import Http404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from cmj.cerimonial.models import Visitante, Visita
+from cmj.cerimonial.models import Visita, Visitante
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
-
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +17,7 @@ ApiViewSetConstrutor.build_class(
     [
         # apps.get_app_config('cerimonial')
         Visitante,
-        Visita
+        Visita,
     ]
 )
 

@@ -325,9 +325,7 @@ def api_client_autenticado(db):
     from django.contrib.auth import get_user_model
 
     User = get_user_model()
-    user = User.objects.create_superuser(
-        password="secret123", email="a@b.com"
-    )
+    user = User.objects.create_superuser(password="secret123", email="a@b.com")
     # create_auth_token signal cria o Token automaticamente no post_save
     token = user.auth_token
     client = APIClient()

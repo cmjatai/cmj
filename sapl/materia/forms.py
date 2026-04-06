@@ -83,6 +83,7 @@ from .models import (
 
 logger = logging.getLogger(__name__)
 
+
 def CHOICE_TRAMITACAO():
     return [("", "Ambos"), (1, "Sim"), (0, "Não")]
 
@@ -1652,14 +1653,12 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
         self.form.helper.form_method = "GET"
         self.form.helper.layout = Layout(
             Fieldset(
-                _(
-                    """
+                _("""
                 Pesquisa Parametrizada<br>
                 <small>
                 <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
                 </small>
-                """
-                ),
+                """),
                 row1,
                 to_row(
                     [
@@ -1683,14 +1682,12 @@ class MateriaLegislativaFilterSet(django_filters.FilterSet):
             #         row10, row11
             #         ),
             Fieldset(
-                _(
-                    """
+                _("""
                 Pesquisa Avançada<br>
                 <small>
                 <strong class="text-red">TODOS OS CAMPOS SÃO OPCIONAIS!</strong>
                 </small>
-                """
-                ),
+                """),
                 HTML(autor_label),
                 HTML(autor_modal),
                 row4,
@@ -2909,7 +2906,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             self.gerar_hash(inst, receber_recibo)
             inst.save()
         except Exception as e:
-            tb = ''.join(traceback.format_tb(e.__traceback__))
+            tb = "".join(traceback.format_tb(e.__traceback__))
             logger.error("Erro ao salvar Proposição: {}".format(e))
             logger.error(str(tb))
             raise ValidationError(_("Erro ao salvar Proposição: {}".format(e)))
