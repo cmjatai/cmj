@@ -141,6 +141,10 @@ class EmpenhoFilterSet(FilterSet):
 
         terms = value.split()
         if terms:
+            if len(terms) == 1 and terms[0].isdigit():
+                # Se for um único termo numérico, buscar por número do empenho
+                return queryset.filter(codigo=terms[0])
+
             fq = Q()
             for term in terms:
                 if term.startswith("-") and len(term) > 1:
