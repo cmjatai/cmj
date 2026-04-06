@@ -55,6 +55,12 @@ export default class EmpenhoUpdate extends EmpenhoForm {
       this.containerListaBusca = container.find('.container-lista-busca')
     })
 
+    this.inputBuscas.on('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+      }
+    })
+
     // Configura eventos de busca para emendas e ajustes
     this.inputBuscas.on('input', () => {
       clearTimeout(this._debounceTimer)
