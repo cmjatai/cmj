@@ -1,5 +1,6 @@
 import logging
 import os
+import traceback
 
 import django_filters
 from crispy_forms.bootstrap import Alert, InlineRadios
@@ -80,6 +81,7 @@ from .models import (
     UnidadeTramitacao,
 )
 
+logger = logging.getLogger(__name__)
 
 def CHOICE_TRAMITACAO():
     return [("", "Ambos"), (1, "Sim"), (0, "Não")]
@@ -2478,8 +2480,6 @@ class TramitacaoEmLoteForm(ModelForm):
 
 class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
-    logger = logging.getLogger(__name__)
-
     TIPO_TEXTO_CHOICE = [("D", _("Arquivo Digital")), ("T", _("Texto Articulado"))]
 
     tipo_materia = forms.ModelChoiceField(
@@ -2797,7 +2797,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
 
         if tm and am and nm:
             try:
-                self.logger.debug(
+                logger.debug(
                     "Tentando obter objeto MateriaLegislativa (tipo_id={}, ano={}, numero={}).".format(
                         tm, am, nm
                     )
@@ -2810,14 +2810,14 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                 if not materia_de_vinculo:
                     raise ObjectDoesNotExist
             except ObjectDoesNotExist:
-                self.logger.error(
+                logger.error(
                     "Objeto MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) não existe!".format(
                         tm, am, nm
                     )
                 )
                 raise ValidationError(_("Matéria Vinculada não existe!"))
             else:
-                self.logger.info(
+                logger.info(
                     "MateriaLegislativa vinculada (tipo_id={}, ano={}, numero={}) com sucesso.".format(
                         tm, am, nm
                     )
@@ -2833,7 +2833,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                         "Não é possível vincular a uma proposição e a uma matéria ao mesmo tempo!"
                     )
                 )
-            self.logger.debug(
+            logger.debug(
                 "Tentando obter objeto Proposição (numero={}, ano={}).".format(vn, va)
             )
 
@@ -2853,7 +2853,7 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             if not proposicao_vinculada:
                 raise ValidationError(_("Proposição Vinculada não existe!"))
             else:
-                self.logger.info(
+                logger.info(
                     "Proposição vinculada (ano={}, numero={}) com sucesso.".format(
                         va, vn
                     )
@@ -2905,10 +2905,14 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
         numero__max = numero__max["numero_proposicao__max"]
         inst.numero_proposicao = (numero__max + 1) if numero__max else 1
 
-        self.gerar_hash(inst, receber_recibo)
-
-        inst.save()
-
+        try:
+            self.gerar_hash(inst, receber_recibo)
+            inst.save()
+        except Exception as e:
+            tb = ''.join(traceback.format_tb(e.__traceback__))
+            logger.error("Erro ao salvar Proposição: {}".format(e))
+            logger.error(str(tb))
+            raise ValidationError(_("Erro ao salvar Proposição: {}".format(e)))
         return inst
 
 
