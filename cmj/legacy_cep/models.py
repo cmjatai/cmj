@@ -20,7 +20,7 @@ class Ac(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ac'
+        db_table = "ac"
 
 
 class Al(models.Model):
@@ -33,7 +33,7 @@ class Al(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'al'
+        db_table = "al"
 
 
 class Am(models.Model):
@@ -46,7 +46,7 @@ class Am(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'am'
+        db_table = "am"
 
 
 class Ap(models.Model):
@@ -59,7 +59,7 @@ class Ap(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ap'
+        db_table = "ap"
 
 
 class Ba(models.Model):
@@ -72,7 +72,7 @@ class Ba(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ba'
+        db_table = "ba"
 
 
 class Ce(models.Model):
@@ -85,7 +85,7 @@ class Ce(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ce'
+        db_table = "ce"
 
 
 class CepLogIndex(models.Model):
@@ -94,19 +94,27 @@ class CepLogIndex(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'cep_log_index'
+        db_table = "cep_log_index"
 
 
 class CepUnico(models.Model):
-    seq = models.BigIntegerField(db_column='Seq', primary_key=True)  # Field name made lowercase.
-    nome = models.CharField(db_column='Nome', max_length=50)  # Field name made lowercase.
-    nomesemacento = models.CharField(db_column='NomeSemAcento', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    cep = models.CharField(db_column='Cep', max_length=9, blank=True, null=True)  # Field name made lowercase.
-    uf = models.CharField(db_column='UF', max_length=2)  # Field name made lowercase.
+    seq = models.BigIntegerField(
+        db_column="Seq", primary_key=True
+    )  # Field name made lowercase.
+    nome = models.CharField(
+        db_column="Nome", max_length=50
+    )  # Field name made lowercase.
+    nomesemacento = models.CharField(
+        db_column="NomeSemAcento", max_length=50, blank=True, null=True
+    )  # Field name made lowercase.
+    cep = models.CharField(
+        db_column="Cep", max_length=9, blank=True, null=True
+    )  # Field name made lowercase.
+    uf = models.CharField(db_column="UF", max_length=2)  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'cep_unico'
+        db_table = "cep_unico"
 
 
 class Df(models.Model):
@@ -119,7 +127,7 @@ class Df(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'df'
+        db_table = "df"
 
 
 class Es(models.Model):
@@ -132,7 +140,7 @@ class Es(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'es'
+        db_table = "es"
 
 
 class Go(models.Model):
@@ -145,7 +153,7 @@ class Go(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'go'
+        db_table = "go"
 
 
 class Ma(models.Model):
@@ -158,7 +166,7 @@ class Ma(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ma'
+        db_table = "ma"
 
 
 class Mg(models.Model):
@@ -171,7 +179,7 @@ class Mg(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'mg'
+        db_table = "mg"
 
 
 class Ms(models.Model):
@@ -184,7 +192,7 @@ class Ms(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ms'
+        db_table = "ms"
 
 
 class Mt(models.Model):
@@ -197,7 +205,7 @@ class Mt(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'mt'
+        db_table = "mt"
 
 
 class Pa(models.Model):
@@ -210,7 +218,7 @@ class Pa(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pa'
+        db_table = "pa"
 
 
 class Pb(models.Model):
@@ -223,7 +231,7 @@ class Pb(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pb'
+        db_table = "pb"
 
 
 class Pe(models.Model):
@@ -236,7 +244,7 @@ class Pe(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pe'
+        db_table = "pe"
 
 
 class Pi(models.Model):
@@ -249,7 +257,7 @@ class Pi(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pi'
+        db_table = "pi"
 
 
 class Pr(models.Model):
@@ -262,7 +270,7 @@ class Pr(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'pr'
+        db_table = "pr"
 
 
 class Rj(models.Model):
@@ -275,7 +283,7 @@ class Rj(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'rj'
+        db_table = "rj"
 
 
 class Rn(models.Model):
@@ -288,7 +296,7 @@ class Rn(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'rn'
+        db_table = "rn"
 
 
 class Ro(models.Model):
@@ -301,7 +309,7 @@ class Ro(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'ro'
+        db_table = "ro"
 
 
 class Rr(models.Model):
@@ -314,7 +322,7 @@ class Rr(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'rr'
+        db_table = "rr"
 
 
 class Rs(models.Model):
@@ -327,7 +335,7 @@ class Rs(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'rs'
+        db_table = "rs"
 
 
 class Sc(models.Model):
@@ -340,7 +348,7 @@ class Sc(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sc'
+        db_table = "sc"
 
 
 class Se(models.Model):
@@ -353,7 +361,7 @@ class Se(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'se'
+        db_table = "se"
 
 
 class Sp(models.Model):
@@ -366,7 +374,7 @@ class Sp(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'sp'
+        db_table = "sp"
 
 
 class To(models.Model):
@@ -379,15 +387,23 @@ class To(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'to'
+        db_table = "to"
 
 
 class Uf(models.Model):
-    uf = models.CharField(db_column='UF', primary_key=True, max_length=2)  # Field name made lowercase.
-    nome = models.CharField(db_column='Nome', max_length=72)  # Field name made lowercase.
-    cep1 = models.CharField(db_column='Cep1', max_length=5)  # Field name made lowercase.
-    cep2 = models.CharField(db_column='Cep2', max_length=5)  # Field name made lowercase.
+    uf = models.CharField(
+        db_column="UF", primary_key=True, max_length=2
+    )  # Field name made lowercase.
+    nome = models.CharField(
+        db_column="Nome", max_length=72
+    )  # Field name made lowercase.
+    cep1 = models.CharField(
+        db_column="Cep1", max_length=5
+    )  # Field name made lowercase.
+    cep2 = models.CharField(
+        db_column="Cep2", max_length=5
+    )  # Field name made lowercase.
 
     class Meta:
         managed = False
-        db_table = 'uf'
+        db_table = "uf"

@@ -1,17 +1,18 @@
 from collections import OrderedDict
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.postgres.search import SearchVectorField
 from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils.datastructures import OrderedSet
 from django.utils.translation import gettext_lazy as _
-from pgvector.django.vector import VectorField
-from pgvector.django.halfvec import HalfVectorField
 from pgvector.django import CosineDistance, HnswIndex
+from pgvector.django.halfvec import HalfVectorField
+from pgvector.django.vector import VectorField
 
 from cmj.genia import IAGenaiBase
 from cmj.mixins import CmjModelMixin
@@ -48,28 +49,34 @@ class Embedding(CmjModelMixin):
 
     # --- Campos de Metadados e Relacionamento Genérico ---
     metadata = JSONField(
-        verbose_name=_('Metadados'),
-        blank=True, null=True, default=dict, encoder=DjangoJSONEncoder)
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=dict,
+        encoder=DjangoJSONEncoder,
+    )
 
     # GenericForeignKey: permite vincular embedding a qualquer modelo Django
     content_type = models.ForeignKey(
-        ContentType,
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
-    object_id = models.PositiveIntegerField(
-        blank=True, null=True, default=None)
-    content_object = GenericForeignKey('content_type', 'object_id')
+        ContentType, blank=True, null=True, default=None, on_delete=PROTECT
+    )
+    object_id = models.PositiveIntegerField(blank=True, null=True, default=None)
+    content_object = GenericForeignKey("content_type", "object_id")
 
     # --- Campos de Conteúdo e Tokenização ---
     chunk = models.TextField(
-        verbose_name=_('Chunk de texto'),
-        default='',
-        blank=True, null=False,)
+        verbose_name=_("Chunk de texto"),
+        default="",
+        blank=True,
+        null=False,
+    )
 
     total_tokens = models.PositiveIntegerField(
-        verbose_name=_('Número de tokens'),
+        verbose_name=_("Número de tokens"),
         default=0,
-        blank=True, null=False,)
+        blank=True,
+        null=False,
+    )
 
     # --- Campo Vetorial (pgvector) ---
     # 3072 dimensões: compatível com text-embedding-3-large (OpenAI)
@@ -79,7 +86,7 @@ class Embedding(CmjModelMixin):
         default=None,
         null=True,
         blank=True,
-        verbose_name=_('Vetor de embedding')
+        verbose_name=_("Vetor de embedding"),
     )
 
     vetor1536 = HalfVectorField(
@@ -87,31 +94,33 @@ class Embedding(CmjModelMixin):
         default=None,
         null=True,
         blank=True,
-        verbose_name=_('Vetor de embedding 1536')
+        verbose_name=_("Vetor de embedding 1536"),
     )
 
-    search_vector = SearchVectorField(null=True, blank=True, default=None, verbose_name=_('Vetor de busca full-text') )
+    search_vector = SearchVectorField(
+        null=True, blank=True, default=None, verbose_name=_("Vetor de busca full-text")
+    )
 
     class Meta:
-        verbose_name = _('Embedding')
-        verbose_name_plural = _('Embeddings')
-        ordering = ('-id', )
+        verbose_name = _("Embedding")
+        verbose_name_plural = _("Embeddings")
+        ordering = ("-id",)
 
         indexes = [
             # Índice composto para otimizar buscas por objeto relacionado
-            models.Index(fields=['content_type', 'object_id']),
+            models.Index(fields=["content_type", "object_id"]),
             # Índice HNSW para busca por similaridade em vetor1536
             HnswIndex(
-                name='embedding_vetor1536_hnsw',
-                fields=['vetor1536'],
+                name="embedding_vetor1536_hnsw",
+                fields=["vetor1536"],
                 m=16,
                 ef_construction=64,
-                opclasses=['halfvec_cosine_ops'],
+                opclasses=["halfvec_cosine_ops"],
             ),
             # Índice GIN para busca de texto completo no campo chunk
             GinIndex(
-                name='embedding_search_vector_gin',
-                fields=['search_vector'],
+                name="embedding_search_vector_gin",
+                fields=["search_vector"],
             ),
         ]
 
@@ -152,10 +161,11 @@ class Embedding(CmjModelMixin):
         o tsvector adequado para busca full-text em português.
         """
         from django.contrib.postgres.search import SearchVector
+
         Embedding.objects.filter(pk=self.pk).update(
-            search_vector=SearchVector('chunk', config='portuguese')
+            search_vector=SearchVector("chunk", config="portuguese")
         )
-        self.refresh_from_db(fields=['search_vector'])
+        self.refresh_from_db(fields=["search_vector"])
 
     @classmethod
     def update_all_search_vectors(cls):
@@ -166,9 +176,8 @@ class Embedding(CmjModelMixin):
         pois executa um único UPDATE no banco.
         """
         from django.contrib.postgres.search import SearchVector
-        cls.objects.update(
-            search_vector=SearchVector('chunk', config='portuguese')
-        )
+
+        cls.objects.update(search_vector=SearchVector("chunk", config="portuguese"))
 
     @classmethod
     def make_context(cls, search_query, query_embedding, top_k=60):
@@ -179,20 +188,19 @@ class Embedding(CmjModelMixin):
         # 1. Busca semântica via pgvector (distância do cosseno)
         semantic_ids = list(
             Embedding.objects.annotate(
-                distance=CosineDistance('vetor1536', query_embedding)
-            ).order_by('distance')[:top_k]
-            .values_list('id', flat=True)
+                distance=CosineDistance("vetor1536", query_embedding)
+            )
+            .order_by("distance")[:top_k]
+            .values_list("id", flat=True)
         )
 
         # 2. Busca por palavra-chave via Full-Text Search (PostgreSQL)
-        fts_query = SearchQuery(search_query, config='portuguese')
+        fts_query = SearchQuery(search_query, config="portuguese")
         text_ids = list(
-            Embedding.objects.filter(
-                search_vector=fts_query
-            ).annotate(
-                fts_rank=SearchRank('search_vector', fts_query)
-            ).order_by('-fts_rank')[:top_k]
-            .values_list('id', flat=True)
+            Embedding.objects.filter(search_vector=fts_query)
+            .annotate(fts_rank=SearchRank("search_vector", fts_query))
+            .order_by("-fts_rank")[:top_k]
+            .values_list("id", flat=True)
         )
 
         # 3. Reciprocal Rank Fusion (RRF)
@@ -209,16 +217,18 @@ class Embedding(CmjModelMixin):
 
         # 5. Busca os embeddings completos preservando a ordem RRF
         embeddings_map = Embedding.objects.in_bulk(sorted_ids)
-        embeddings = [embeddings_map[eid] for eid in sorted_ids if eid in embeddings_map]
+        embeddings = [
+            embeddings_map[eid] for eid in sorted_ids if eid in embeddings_map
+        ]
 
         tas = OrderedSet()
         for embed in embeddings:
-            if embed.content_object and hasattr(embed.content_object, 'ta_id'):
+            if embed.content_object and hasattr(embed.content_object, "ta_id"):
                 tas.add(embed.content_object.ta_id)
 
         ta_dict = {}
         for embed in embeddings:
-            ta_id = getattr(embed.content_object, 'ta_id', None)
+            ta_id = getattr(embed.content_object, "ta_id", None)
             if ta_id and ta_id in tas:
                 if ta_id not in ta_dict:
                     ta_dict[ta_id] = []
@@ -228,7 +238,12 @@ class Embedding(CmjModelMixin):
         for ta_id in tas:
             ta_dict[ta_id].sort(key=lambda e: e.content_object.ordem)
             for embed in ta_dict[ta_id]:
-                context.append((embed.content_object, list(map(str.strip, embed.chunk.split('\n')))))
+                context.append(
+                    (
+                        embed.content_object,
+                        list(map(str.strip, embed.chunk.split("\n"))),
+                    )
+                )
 
         context_list_of_list = []
         for item in context:
@@ -254,26 +269,26 @@ class Embedding(CmjModelMixin):
                 break
             context_list_of_str.append(item_str)
 
-        return '\n'.join(context_list_of_str)
+        return "\n".join(context_list_of_str)
 
     @classmethod
     def make_context__20260225(cls, query_embedding, top_k=50):
         # Busca os top_k embeddings mais próximos usando distância do cosseno
         # CosineDistance retorna valores entre 0 (idêntico) e 2 (oposto)
         embeddings = Embedding.objects.annotate(
-                distance=CosineDistance('vetor1536', query_embedding)
-            ).order_by('distance')[:top_k]
+            distance=CosineDistance("vetor1536", query_embedding)
+        ).order_by("distance")[:top_k]
 
         embeddings = list(embeddings)
 
         tas = OrderedSet()
         for embed in embeddings:
-            if embed.content_object and hasattr(embed.content_object, 'ta_id'):
+            if embed.content_object and hasattr(embed.content_object, "ta_id"):
                 tas.add(embed.content_object.ta_id)
 
         ta_dict = {}
         for embed in embeddings:
-            ta_id = getattr(embed.content_object, 'ta_id', None)
+            ta_id = getattr(embed.content_object, "ta_id", None)
             if ta_id and ta_id in tas:
                 if ta_id not in ta_dict:
                     ta_dict[ta_id] = []
@@ -283,7 +298,12 @@ class Embedding(CmjModelMixin):
         for ta_id in tas:
             ta_dict[ta_id].sort(key=lambda e: e.content_object.ordem)
             for embed in ta_dict[ta_id]:
-                context.append((embed.content_object, list(map(str.strip, embed.chunk.split('\n')))))
+                context.append(
+                    (
+                        embed.content_object,
+                        list(map(str.strip, embed.chunk.split("\n"))),
+                    )
+                )
 
         context_list_of_list = []
         for item in context:
@@ -309,7 +329,7 @@ class Embedding(CmjModelMixin):
                 break
             context_list_of_str.append(item_str)
 
-        return '\n'.join(context_list_of_str)
+        return "\n".join(context_list_of_str)
 
     @classmethod
     def make_context__old(cls, query_embedding, top_k=50):
@@ -341,21 +361,23 @@ class Embedding(CmjModelMixin):
         # Busca os top_k embeddings mais próximos usando distância do cosseno
         # CosineDistance retorna valores entre 0 (idêntico) e 2 (oposto)
         embeddings = Embedding.objects.annotate(
-                distance=CosineDistance('vetor1536', query_embedding)
-            ).order_by('distance')[:top_k]
+            distance=CosineDistance("vetor1536", query_embedding)
+        ).order_by("distance")[:top_k]
 
         # Extrai chunks e objetos relacionados
         context = []
         for embed in embeddings:
             # Cada item é uma tupla: (objeto_fonte, lista_de_linhas_do_chunk)
 
-            #similarity_score = 1 - embed.distance
-            #print(f"Item ID: {embed.id}, Similarity: {similarity_score:.4f}, Tokens: {embed.total_tokens}")
+            # similarity_score = 1 - embed.distance
+            # print(f"Item ID: {embed.id}, Similarity: {similarity_score:.4f}, Tokens: {embed.total_tokens}")
             ##print(embed.content_object)
-            #print(embed.chunk)
-            #print('---'*10)
+            # print(embed.chunk)
+            # print('---'*10)
 
-            context.append((embed.content_object, list(map(str.strip, embed.chunk.split('\n')))))
+            context.append(
+                (embed.content_object, list(map(str.strip, embed.chunk.split("\n"))))
+            )
 
         # Preserva a ordem original de aparição das chaves (primeira linha de cada chunk)
         # para manter relevância semântica no resultado final
@@ -396,9 +418,10 @@ class Embedding(CmjModelMixin):
             item[0] = f'\nFonte: <a href="/ta/{d.ta_id}/text">{item[0]}</a>'
             context_final.extend(item)
 
-        context_final = '\n'.join(context_final)
+        context_final = "\n".join(context_final)
 
         return context_final
+
 
 class ChatSession(models.Model):
     user = models.ForeignKey(get_settings_auth_user_model(), on_delete=models.CASCADE)
@@ -408,32 +431,31 @@ class ChatSession(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-updated_at']
+        ordering = ["-updated_at"]
         indexes = [
-            models.Index(fields=['user', '-updated_at']),
+            models.Index(fields=["user", "-updated_at"]),
         ]
         permissions = [
-            (
-                'can_use_chat_module',
-                'Usuário pode usar o módulo de chat'
-            ),
+            ("can_use_chat_module", "Usuário pode usar o módulo de chat"),
         ]
+
 
 class ChatMessage(models.Model):
     ROLE_CHOICES = [
-        ('user', 'User'),
-        ('model', 'Model'),
+        ("user", "User"),
+        ("model", "Model"),
     ]
 
-    chat = models.ForeignKey(ChatSession, on_delete=models.CASCADE, related_name='messages')
+    chat = models.ForeignKey(
+        ChatSession, on_delete=models.CASCADE, related_name="messages"
+    )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     metadata = models.JSONField(default=dict)
 
     class Meta:
-        ordering = ['timestamp']
+        ordering = ["timestamp"]
         indexes = [
-            models.Index(fields=['chat', 'timestamp']),
+            models.Index(fields=["chat", "timestamp"]),
         ]
-

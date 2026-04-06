@@ -476,9 +476,7 @@ def customize_link_materia(context, pk, has_permission, user=None):
         ):
             title_materia += """
                 <a href="%s?add_anexadas"><small>Adicionar emendas nesta sessão</small></a>
-            """ % (
-                row[0][1],
-            )
+            """ % (row[0][1],)
 
         # Na linha abaixo, o segundo argumento é None para não colocar
         # url em toda a string de title_materia
@@ -514,18 +512,14 @@ def customize_link_materia(context, pk, has_permission, user=None):
                                         <input type="submit" class="btn btn-primary"
                                         value="Registrar Votação" />
 
-                                    </form>""" % (
-                            url
-                        )
+                                    </form>""" % (url)
                     else:
                         btn_registrar = """
                                         <form action="%s">
                                         <input type="submit" class="btn btn-primary"
                                         value="Registrar Leitura" />
 
-                                    </form>""" % (
-                            url
-                        )
+                                    </form>""" % (url)
 
                     resultado = btn_registrar
                 else:
@@ -1789,10 +1783,8 @@ class PainelView(PermissionRequiredForAppCrudMixin, TemplateView):
                 "user=" + username + ". Você precisa primeiro configurar os cronômetros"
                 " nas Configurações da Aplicação"
             )
-            msg = _(
-                "Você precisa primeiro configurar os cronômetros \
-                nas Configurações da Aplicação"
-            )
+            msg = _("Você precisa primeiro configurar os cronômetros \
+                nas Configurações da Aplicação")
             messages.add_message(self.request, messages.ERROR, msg)
 
         else:

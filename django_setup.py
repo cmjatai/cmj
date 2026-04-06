@@ -1,9 +1,8 @@
-from pathlib import Path
 import os
 import sys
+from pathlib import Path
 
 import django
-
 
 PROJECT_ROOT_DIR = Path(os.path.abspath(__file__)).parents[1]
 DJANGO_ROOT_DIR = PROJECT_ROOT_DIR / "cmj"
@@ -18,12 +17,10 @@ def django_setup() -> None:
 
     # The DJANGO_SETTINGS_MODULE has to be set to allow us to access django
     # imports
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'cmj.settings'
+    os.environ["DJANGO_SETTINGS_MODULE"] = "cmj.settings"
 
     # This is for setting up django
     django.setup()
 
 
 django_setup()
-
-

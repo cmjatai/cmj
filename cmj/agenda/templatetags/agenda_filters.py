@@ -1,22 +1,16 @@
-
-
 from datetime import datetime
 
 from django import template
 
 from cmj.agenda.models import Evento
 
-
 register = template.Library()
 
 
 @register.filter
 def proximos_eventos(qtd):
-    today = datetime.today().replace(hour=0,
-                                     minute=0,
-                                     second=0,
-                                     microsecond=0)
-    r = Evento.objects.filter(inicio__gte=today).order_by('inicio')[:qtd]
+    today = datetime.today().replace(hour=0, minute=0, second=0, microsecond=0)
+    r = Evento.objects.filter(inicio__gte=today).order_by("inicio")[:qtd]
 
     return r
 

@@ -7,11 +7,8 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 
 logger = logging.getLogger(__name__)
 
-ApiViewSetConstrutor.build_class(
-    [
-        apps.get_app_config('search')
-    ]
-)
+ApiViewSetConstrutor.build_class([apps.get_app_config("search")])
+
 
 @customize(ChatSession)
 class ChatSessionViewSet:

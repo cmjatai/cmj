@@ -6,6 +6,7 @@ logger = logging.getLogger(__name__)
 
 register = template.Library()
 
+
 @register.simple_tag
 def dash_grid(dash_name, dash_grid, **kwargs):
     """

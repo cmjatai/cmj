@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-default_app_config = 'sapl.rules.apps.AppConfig'
+default_app_config = "sapl.rules.apps.AppConfig"
 
 """
 Os cinco radicais de permissão completa são:
@@ -14,8 +14,13 @@ completa, sendo apenas um radical, a permissão completa é montada com base
 no model associado.
 """
 
-RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE =\
-    '.list_', '.detail_', '.add_', '.change_', '.delete_',
+RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE = (
+    ".list_",
+    ".detail_",
+    ".add_",
+    ".change_",
+    ".delete_",
+)
 
 
 SAPL_GROUP_ADMINISTRATIVO = _("Operador Administrativo")
@@ -37,7 +42,7 @@ SAPL_GROUP_LOGIN_SOCIAL = _("Usuários com Login Social")
 # ANONYMOUS não é um grupo mas é uma variável usadas nas rules para anotar
 # explicitamente models que podem ter ação de usuários anônimos
 # como por exemplo AcompanhamentoMateria
-SAPL_GROUP_ANONYMOUS = ''
+SAPL_GROUP_ANONYMOUS = ""
 
 SAPL_GROUPS = [
     SAPL_GROUP_ADMINISTRATIVO,

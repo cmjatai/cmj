@@ -1,4 +1,3 @@
-
 class EmendaLoaService:
 
     _instance = None

@@ -1,9 +1,11 @@
-from . import v_agrupamento
-from . import v_ajusteloa
-from . import v_emendaloa
-from . import v_entidade
-from . import v_financeiro_execucao
-from . import v_financeiro_orcamento
-from . import v_loa
-from . import v_prestacaoconta
-from . import v_registrocontabil
+from . import (
+    v_agrupamento,
+    v_ajusteloa,
+    v_emendaloa,
+    v_entidade,
+    v_financeiro_execucao,
+    v_financeiro_orcamento,
+    v_loa,
+    v_prestacaoconta,
+    v_registrocontabil,
+)

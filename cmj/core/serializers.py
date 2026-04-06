@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from cmj.core.models import Trecho
 
 
@@ -21,10 +22,8 @@ class UfListingField(serializers.RelatedField):
 
 
 class TrechoSerializer(serializers.Serializer):
-    tipo_descricao = serializers.StringRelatedField(
-        source='tipo')
-    logradouro_descricao = serializers.StringRelatedField(
-        source='logradouro')
+    tipo_descricao = serializers.StringRelatedField(source="tipo")
+    logradouro_descricao = serializers.StringRelatedField(source="logradouro")
 
     bairro_id = serializers.IntegerField()
     distrito_id = serializers.IntegerField()
@@ -32,7 +31,7 @@ class TrechoSerializer(serializers.Serializer):
     municipio_id = serializers.IntegerField()
 
     cep = serializers.StringRelatedField(many=True)
-    uf = UfListingField(source='municipio', read_only=True)
+    uf = UfListingField(source="municipio", read_only=True)
 
     class Meta:
         model = Trecho

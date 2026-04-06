@@ -327,8 +327,10 @@ class Command(BaseCommand):
                     return True
                 elif url_dict["format"] == "csv":
                     if not self.parcial_force:
-                        if self.ano_atual < (self.time_start.year -1):
-                            if not self.force and self.compare_bytes_csv(content_scrap, content_download):
+                        if self.ano_atual < (self.time_start.year - 1):
+                            if not self.force and self.compare_bytes_csv(
+                                content_scrap, content_download
+                            ):
                                 return True
 
                 scrap.content = content_download
@@ -347,7 +349,11 @@ class Command(BaseCommand):
                 scrap.update_data_models()
             return False
 
-        if self.force or not scrap.content or (item_list and scrap.metadata.get("item_list", []) != item_list):
+        if (
+            self.force
+            or not scrap.content
+            or (item_list and scrap.metadata.get("item_list", []) != item_list)
+        ):
             content_download = get_content(url)
             if content_download:
                 scrap.content = content_download

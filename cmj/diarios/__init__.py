@@ -1,1 +1,1 @@
-default_app_config = 'cmj.diarios.apps.AppConfig'
+default_app_config = "cmj.diarios.apps.AppConfig"

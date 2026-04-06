@@ -905,15 +905,13 @@ class EmendaLoaCrud(MasterDetailCrud):
                         f'<li>{ajuste}<small class="text-gray"><br>{descr}</small></li>'
                     )
                 ajustes = "".join(ajustes)
-                render.append(
-                    f"""
+                render.append(f"""
                     <hr class="my-1">
                     <small class="px-2 d-block">
                         <strong>Registros de Ajuste Técnico</strong>
                         <ul class="pl-3  m-0">{ajustes}</ul>
                     </small>
-                    """
-                )
+                    """)
                 return "".join(render), url
 
             registrocontabil_insercao_set = emenda.registrocontabil_set.filter(
@@ -1569,16 +1567,14 @@ class EmendaLoaCrud(MasterDetailCrud):
                 pc_url = reverse_lazy(
                     "cmj.loa:prestacaocontaregistro_detail", kwargs={"pk": pc.id}
                 )
-                pcs.append(
-                    f"""<li>
+                pcs.append(f"""<li>
                         <span class="badge badge-secondary">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
                         <span class="badge badge-secondary">{pc.situacao}</span>
                         <a href="{ pc_url}" class="d-inline-block font-weight-bold pt-1">
                         {pc.prestacao_conta}
                         </a>
                         <span class="text-gray d-block">{pc.detalhamento}</span>
-                    </li>"""
-                )
+                    </li>""")
 
             if not pcs:
                 return (
@@ -1717,18 +1713,18 @@ class EmendaLoaCrud(MasterDetailCrud):
             self, emendaloa, verbose_name="", field_display=""
         ):
             empenhos = []
-            for eea in emendaloa.empenhoemendaajuste_set.order_by("-empenho__codigo").select_related("empenho"):
+            for eea in emendaloa.empenhoemendaajuste_set.order_by(
+                "-empenho__codigo"
+            ).select_related("empenho"):
                 empenho = eea.empenho
                 url = reverse_lazy("cmj.loa:empenho_detail", kwargs={"pk": empenho.id})
-                empenhos.append(
-                    f"""
+                empenhos.append(f"""
                     <li>
                         <a href="{url}">{empenho.codigo}</a> |
                             {formats.date_format(empenho.data, "SHORT_DATE_FORMAT")} |
                             R$ {empenho.str_valor_empenhado} |
                             {empenho.nome}
-                    </li>"""
-                )
+                    </li>""")
             return (
                 "Empenhos da Emenda",
                 f'<ul class="small courier">{"".join(empenhos)}</ul>',

@@ -4,9 +4,7 @@ from django.db.models.deletion import PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import (
-    texto_upload_path,
-)
+from cmj.utils import texto_upload_path
 from sapl.utils import PortalFileField
 
 
@@ -25,7 +23,10 @@ def prestacaocontaregistro_upload_path(instance, filename):
 class PrestacaoContaLoa(models.Model):
 
     loa = models.ForeignKey(
-        'loa.Loa', verbose_name=_("LOA"), related_name="prestacaoconta_set", on_delete=PROTECT
+        "loa.Loa",
+        verbose_name=_("LOA"),
+        related_name="prestacaoconta_set",
+        on_delete=PROTECT,
     )
 
     data_envio = models.DateField(
@@ -56,7 +57,7 @@ class ArquivoPrestacaoContaLoa(models.Model):
     FIELDFILE_NAME = ("arquivo",)
 
     prestacao_conta = models.ForeignKey(
-        'loa.PrestacaoContaLoa',
+        "loa.PrestacaoContaLoa",
         verbose_name=_("Prestação de Conta LOA"),
         related_name="arquivoprestacaocontaloa_set",
         on_delete=PROTECT,
@@ -115,14 +116,14 @@ class PrestacaoContaRegistro(models.Model):
         FINALIZADO = "FINALIZADO", _("Finalizada")
 
     prestacao_conta = models.ForeignKey(
-        'loa.PrestacaoContaLoa',
+        "loa.PrestacaoContaLoa",
         verbose_name=_("Prestação de Conta LOA"),
         related_name="prestacaocontaregistro_set",
         on_delete=PROTECT,
     )
 
     registro_ajuste = models.ForeignKey(
-        'loa.RegistroAjusteLoa',
+        "loa.RegistroAjusteLoa",
         verbose_name=_("Registro de Ajuste Técnico"),
         related_name="prestacaocontaregistro_set",
         on_delete=PROTECT,
@@ -132,7 +133,7 @@ class PrestacaoContaRegistro(models.Model):
     )
 
     emendaloa = models.ForeignKey(
-        'loa.EmendaLoa',
+        "loa.EmendaLoa",
         blank=True,
         null=True,
         default=None,
@@ -168,7 +169,7 @@ class ArquivoPrestacaoContaRegistro(models.Model):
     FIELDFILE_NAME = ("arquivo",)
 
     registro = models.ForeignKey(
-        'loa.PrestacaoContaRegistro',
+        "loa.PrestacaoContaRegistro",
         verbose_name=_("Registro de Prestação de Conta"),
         related_name="arquivoprestacaocontaregistro_set",
         on_delete=PROTECT,

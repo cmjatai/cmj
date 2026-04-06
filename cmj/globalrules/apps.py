@@ -7,21 +7,23 @@ from django.utils.translation import gettext_lazy as _
 
 
 class AppConfig(apps.AppConfig):
-    name = 'cmj.globalrules'
-    label = 'globalrules'
-    verbose_name = _('Regras e Permissões para o Portal')
+    name = "cmj.globalrules"
+    label = "globalrules"
+    verbose_name = _("Regras e Permissões para o Portal")
 
 
-@receiver(post_migrate, dispatch_uid='signal_post_migrate_update_groups_cmj')
-def signal_post_migrate_update_groups_cmj(app_config, verbosity=2, interactive=True,
-                      using=DEFAULT_DB_ALIAS, **kwargs):
+@receiver(post_migrate, dispatch_uid="signal_post_migrate_update_groups_cmj")
+def signal_post_migrate_update_groups_cmj(
+    app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs
+):
 
     if app_config != AppConfig and not isinstance(app_config, AppConfig):
         return
 
-    from cmj.globalrules.map_rules import rules_patterns
     from django.contrib.auth.models import Group, Permission
     from django.contrib.contenttypes.models import ContentType
+
+    from cmj.globalrules.map_rules import rules_patterns
 
     class Rules:
 
@@ -31,16 +33,19 @@ def signal_post_migrate_update_groups_cmj(app_config, verbosity=2, interactive=T
         def associar(self, g, model, tipo):
             for t in tipo:
                 content_type = ContentType.objects.get_by_natural_key(
-                    app_label=model._meta.app_label,
-                    model=model._meta.model_name)
+                    app_label=model._meta.app_label, model=model._meta.model_name
+                )
 
-                codename = (t[1:] + model._meta.model_name)\
-                    if t[0] == '.' and t[-1] == '_' else t
+                codename = (
+                    (t[1:] + model._meta.model_name)
+                    if t[0] == "." and t[-1] == "_"
+                    else t
+                )
 
                 try:
                     p = Permission.objects.get(
-                        content_type=content_type,
-                        codename=codename)
+                        content_type=content_type, codename=codename
+                    )
                     g.permissions.add(p)
                 except Permission.DoesNotExist:
                     pass
@@ -54,22 +59,25 @@ def signal_post_migrate_update_groups_cmj(app_config, verbosity=2, interactive=T
             group.permissions.clear()
 
             try:
-                print(' ', group_name)
+                print(" ", group_name)
                 for model, perms, perms_publicas in rules_list:
                     self.associar(group, model, perms)
             except Exception as e:
                 print(group_name, e)
 
         def update_groups(self):
-            print('')
+            print("")
             print(
                 format_lazy(
-                    '{}{}{}', '\033[93m\033[1m',
-                    _('Atualizando grupos do Portal CMJ:'),
-                    '\033[0m'))
+                    "{}{}{}",
+                    "\033[93m\033[1m",
+                    _("Atualizando grupos do Portal CMJ:"),
+                    "\033[0m",
+                )
+            )
             for rules_group in self.rules_patterns:
-                group_name = rules_group['group']
-                rules_list = rules_group['rules']
+                group_name = rules_group["group"]
+                rules_list = rules_group["rules"]
                 self._config_group(group_name, rules_list)
 
     rules = Rules(rules_patterns)

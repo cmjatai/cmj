@@ -1,9 +1,8 @@
-from pathlib import Path
 import os
 import sys
+from pathlib import Path
 
 import django
-
 
 PROJECT_ROOT_DIR = Path(os.path.abspath(__file__)).parents[2]
 

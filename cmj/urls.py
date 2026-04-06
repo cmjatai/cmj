@@ -28,30 +28,28 @@ re_path(r'^sapl/', include(sapl.base.urls)),"""
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls.conf import re_path, include
+from django.urls.conf import include, re_path
 from django.views.generic.base import TemplateView
-from cmj.dashboard.registry import dashboard
-
 
 import cmj.agenda.urls
 import cmj.arq.urls
 import cmj.cerimonial.urls
 import cmj.core.urls
-from cmj.core.views_short import ShortRedirectView
 import cmj.diarios.urls
 import cmj.globalrules.urls
 import cmj.loa.urls
 import cmj.ouvidoria.urls
+import cmj.painelset.urls
 import cmj.search.urls
 import cmj.sigad.urls
 import cmj.videos.urls
-import cmj.painelset.urls
 import sapl.api.urls
 import sapl.audiencia.urls
 import sapl.base.urls
 import sapl.comissoes.urls
 import sapl.compilacao.urls
-#import sapl.lexml.urls
+
+# import sapl.lexml.urls
 import sapl.materia.urls
 import sapl.norma.urls
 import sapl.painel.urls
@@ -60,70 +58,64 @@ import sapl.protocoloadm.urls
 import sapl.redireciona_urls.urls
 import sapl.relatorios.urls
 import sapl.sessao.urls
-
+from cmj.core.views_short import ShortRedirectView
+from cmj.dashboard.registry import dashboard
 
 urlpatterns_all = [
-    re_path(r'^j(?P<short>[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)$',
-            ShortRedirectView.as_view(), name='short_view'),
-
-    re_path(r'^admin/', admin.site.urls),
-
-    re_path(r'^message$', TemplateView.as_view(template_name='base.html')),
-
-    re_path('', include('social_django.urls', namespace='social')),
-
-    re_path(r'', include(cmj.globalrules.urls)),
-
-    re_path(r'', include(cmj.core.urls)),
-    re_path(r'', include(cmj.cerimonial.urls)),
-    re_path(r'', include(cmj.diarios.urls)),
-    re_path(r'', include(cmj.loa.urls)),
-    re_path(r'', include(cmj.arq.urls)),
-    re_path(r'', include(cmj.ouvidoria.urls)),
-    re_path(r'', include(cmj.agenda.urls)),
-    re_path(r'', include(cmj.videos.urls)),
-    re_path(r'', include(cmj.painelset.urls)),
-
-    re_path(r'', include(sapl.audiencia.urls)),
-    re_path(r'', include(sapl.comissoes.urls)),
-    re_path(r'', include(sapl.sessao.urls)),
-    re_path(r'', include(sapl.parlamentares.urls)),
-    re_path(r'', include(sapl.materia.urls)),
-    re_path(r'', include(sapl.norma.urls)),
-    #re_path(r'', include(sapl.lexml.urls)),
-    re_path(r'', include(sapl.painel.urls)),
-    re_path(r'', include(sapl.protocoloadm.urls)),
-    re_path(r'', include(sapl.compilacao.urls)),
-    re_path(r'', include(sapl.relatorios.urls)),
-    re_path(r'', include(sapl.base.urls)),
-
-    re_path(r'', include(sapl.redireciona_urls.urls)),
-
+    re_path(
+        r"^j(?P<short>[0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ]*)$",
+        ShortRedirectView.as_view(),
+        name="short_view",
+    ),
+    re_path(r"^admin/", admin.site.urls),
+    re_path(r"^message$", TemplateView.as_view(template_name="base.html")),
+    re_path("", include("social_django.urls", namespace="social")),
+    re_path(r"", include(cmj.globalrules.urls)),
+    re_path(r"", include(cmj.core.urls)),
+    re_path(r"", include(cmj.cerimonial.urls)),
+    re_path(r"", include(cmj.diarios.urls)),
+    re_path(r"", include(cmj.loa.urls)),
+    re_path(r"", include(cmj.arq.urls)),
+    re_path(r"", include(cmj.ouvidoria.urls)),
+    re_path(r"", include(cmj.agenda.urls)),
+    re_path(r"", include(cmj.videos.urls)),
+    re_path(r"", include(cmj.painelset.urls)),
+    re_path(r"", include(sapl.audiencia.urls)),
+    re_path(r"", include(sapl.comissoes.urls)),
+    re_path(r"", include(sapl.sessao.urls)),
+    re_path(r"", include(sapl.parlamentares.urls)),
+    re_path(r"", include(sapl.materia.urls)),
+    re_path(r"", include(sapl.norma.urls)),
+    # re_path(r'', include(sapl.lexml.urls)),
+    re_path(r"", include(sapl.painel.urls)),
+    re_path(r"", include(sapl.protocoloadm.urls)),
+    re_path(r"", include(sapl.compilacao.urls)),
+    re_path(r"", include(sapl.relatorios.urls)),
+    re_path(r"", include(sapl.base.urls)),
+    re_path(r"", include(sapl.redireciona_urls.urls)),
     re_path("dash/", dashboard.urls),
 ]
 
-admin.site.site_header = 'PortalCMJ'
+admin.site.site_header = "PortalCMJ"
 
 if settings.DEBUG_TOOLBAR_ACTIVE:
     urlpatterns_all += [
-        re_path('silk/', include('silk.urls', namespace='silk')),
-        re_path('__debug__/', include('debug_toolbar.urls')),
+        re_path("silk/", include("silk.urls", namespace="silk")),
+        re_path("__debug__/", include("debug_toolbar.urls")),
     ]
 
 if settings.DEBUG:
     urlpatterns_all.append(
-        re_path(r'^debug.html$', TemplateView.as_view(template_name='debug.html')))
+        re_path(r"^debug.html$", TemplateView.as_view(template_name="debug.html"))
+    )
 
-    urlpatterns_all += static(settings.STATIC_URL,
-                              document_root=settings.STATIC_ROOT)
+    urlpatterns_all += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns_all += [
-    re_path(r'', include(sapl.api.urls)),
-
-    re_path(r'', include(cmj.search.urls)),
-
+    re_path(r"", include(sapl.api.urls)),
+    re_path(r"", include(cmj.search.urls)),
     # urls não tratadas até aqui será capturada por PathView de cmj.sigad
-    re_path(r'', include(cmj.sigad.urls)),
+    re_path(r"", include(cmj.sigad.urls)),
 ]
 
 urlpatterns = urlpatterns_all
@@ -133,11 +125,12 @@ urlpatterns = urlpatterns_all
 def custom_permission_denied_view(request, exception=None):
     from django.http import HttpResponse, HttpResponseForbidden
     from django_ratelimit.exceptions import Ratelimited
+
     if isinstance(exception, Ratelimited):
-        resp = HttpResponse('Too many requests', status=429)
-        resp['Retry-After'] = settings.RATELIMIT_RETRY_AFTER
+        resp = HttpResponse("Too many requests", status=429)
+        resp["Retry-After"] = settings.RATELIMIT_RETRY_AFTER
         return resp
-    return HttpResponseForbidden('Forbidden')
+    return HttpResponseForbidden("Forbidden")
 
 
 handler403 = custom_permission_denied_view

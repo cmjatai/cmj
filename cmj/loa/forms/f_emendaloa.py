@@ -283,16 +283,14 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     ("despesa_especificacao", "col-4"),
                     (
                         Div(
-                            HTML(
-                                """
+                            HTML("""
                     <button type="button" id="clean_form_search" class="btn btn-secondary" title="Limpar Formulário de Busca">
                         <i class="fas fa-backspace"></i>
                     </button>
                     <button type="button" id="add_registro" class="btn btn-primary" title="Adicionar Registro Contábil">
                         <i class="fas fa-plus-circle"></i>
                     </button>
-                """
-                            ),
+                """),
                             css_class="btn-group btn-group",
                         ),
                         "col-2",
@@ -855,15 +853,13 @@ class EmendaLoaFilterSet(FilterSet):
                                     12,
                                 ),
                                 (
-                                    HTML(
-                                        """<small class="text-info font-italic">
+                                    HTML("""<small class="text-info font-italic">
                                             Primeiro filtre como preferir
                                             nos controles à esquerda,
                                             depois selecione como totalizar e,
                                             aí sim, clique em "Gerar PDF".
                                         </small>
-                                    """
-                                    ),
+                                    """),
                                     8,
                                 ),
                                 (

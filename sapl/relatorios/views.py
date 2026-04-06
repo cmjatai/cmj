@@ -4,6 +4,6 @@ from sapl.relatorios.view_reports import RelatorioGestao, RelatorioMateriasPorAu
 class RelatorioGestaoView(RelatorioGestao.View):
     pass
 
+
 class RelatorioMateriasPorAutorView(RelatorioMateriasPorAutor.View):
     pass
-

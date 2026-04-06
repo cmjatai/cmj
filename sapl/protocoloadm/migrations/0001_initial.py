@@ -3,9 +3,10 @@
 import django.core.serializers.json
 import django.db.models.deletion
 import django.utils.timezone
-import sapl.utils
 from django.conf import settings
 from django.db import migrations, models
+
+import sapl.utils
 
 
 class Migration(migrations.Migration):

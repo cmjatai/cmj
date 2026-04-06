@@ -1,5 +1,3 @@
-
-from datetime import datetime, timedelta
 import logging
 import math
 import os
@@ -8,30 +6,29 @@ import stat
 import subprocess
 import sys
 import time
+from datetime import datetime, timedelta
 
-from PIL import Image
-from PyPDF4.generic import ByteStringObject
-from PyPDF4.generic import IndirectObject
-from PyPDF4.pdf import PdfFileReader
 from asn1crypto import cms
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from django.db import connection
 from django.db.models import F, Q
 from django.db.models.signals import post_delete, post_save
-from django.utils import timezone, formats
+from django.utils import formats, timezone
 from endesive import pdf
+from PIL import Image
+from PyPDF4.generic import ByteStringObject, IndirectObject
+from PyPDF4.pdf import PdfFileReader
 
 from cmj.core.models import OcrMyPDF
-from cmj.utils import Manutencao
-from cmj.utils import ProcessoExterno
+from cmj.utils import Manutencao, ProcessoExterno
 from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import MateriaLegislativa
 from sapl.protocoloadm.models import DocumentoAdministrativo
 
 
 def _get_registration_key(model):
-    return '%s_%s' % (model._meta.app_label, model._meta.model_name)
+    return "%s_%s" % (model._meta.app_label, model._meta.model_name)
 
 
 class Command(BaseCommand):
@@ -41,19 +38,17 @@ class Command(BaseCommand):
         # m.desativa_signals()
         m.desativa_auto_now()
 
-        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
-
-
-
+        post_save.disconnect(dispatch_uid="timerefresh_post_signal")
 
     def run_add_selo_protocolo(self):
 
-        plugin_path = settings.PROJECT_DIR.child(
-            'scripts').child(
-            'java').child(
-            'PluginSignPortalCMJ').child(
-            'jar').child(
-            'PluginSignPortalCMJ.jar')
+        plugin_path = (
+            settings.PROJECT_DIR.child("scripts")
+            .child("java")
+            .child("PluginSignPortalCMJ")
+            .child("jar")
+            .child("PluginSignPortalCMJ.jar")
+        )
 
         m = MateriaLegislativa.objects.get(pk=17857)
         p = m.protocolo_gr.first()
@@ -64,9 +59,9 @@ class Command(BaseCommand):
 
         cmd = [
             'java -jar "{plugin}"',
-            '{command}',
-            '{x}',
-            '{y}',
+            "{command}",
+            "{x}",
+            "{y}",
             '"{protocolo}"',
             '"{data_protocolo}"',
             '"{hora_protocolo}"',
@@ -77,29 +72,27 @@ class Command(BaseCommand):
             '"{data_selo}"',
             '"{hora_selo}"',
         ]
-        cmd = ' '.join(cmd)
+        cmd = " ".join(cmd)
 
         cmd = cmd.format(
             **{
-                'plugin': plugin_path,
-                'command': 'cert_protocolo',
-                'x': 0,
-                'y': 0,
-                'protocolo': 'Protocolo: {}/{}'.format(p.numero, p.ano),
-                'data_protocolo': formats.date_format(
-                    timezone.localtime(p.timestamp if p.timestamp else p.data),
-                    'd/m/Y'
+                "plugin": plugin_path,
+                "command": "cert_protocolo",
+                "x": 0,
+                "y": 0,
+                "protocolo": "Protocolo: {}/{}".format(p.numero, p.ano),
+                "data_protocolo": formats.date_format(
+                    timezone.localtime(p.timestamp if p.timestamp else p.data), "d/m/Y"
                 ),
-                'hora_protocolo': formats.date_format(
-                    timezone.localtime(p.timestamp if p.timestamp else p.hora),
-                    'H:i'
+                "hora_protocolo": formats.date_format(
+                    timezone.localtime(p.timestamp if p.timestamp else p.hora), "H:i"
                 ),
-                'sigla': '{} {:03d}/{}'.format(m.tipo.sigla, m.numero, m.ano),
-                'file': file_path,
-                'certificado': settings.CERT_PRIVATE_KEY_ID,
-                'password': settings.CERT_PRIVATE_KEY_ACCESS,
-                'data_selo': formats.date_format(timezone.localtime(), 'd/m/Y'),
-                'hora_selo': formats.date_format(timezone.localtime(), 'H:i'),
+                "sigla": "{} {:03d}/{}".format(m.tipo.sigla, m.numero, m.ano),
+                "file": file_path,
+                "certificado": settings.CERT_PRIVATE_KEY_ID,
+                "password": settings.CERT_PRIVATE_KEY_ACCESS,
+                "data_selo": formats.date_format(timezone.localtime(), "d/m/Y"),
+                "hora_selo": formats.date_format(timezone.localtime(), "H:i"),
             }
         )
 
@@ -123,39 +116,34 @@ class Command(BaseCommand):
         print(m.texto_original.original_path)
 
         date = timezone.localtime()
-        date = date.strftime('%Y%m%d%H%M%S+00\'00\'')
-        img = Image.open('/home/leandro/Câmara/logo/logo_256.jpg')
+        date = date.strftime("%Y%m%d%H%M%S+00'00'")
+        img = Image.open("/home/leandro/Câmara/logo/logo_256.jpg")
         dct = {
-            b'sigflags': 3,
+            b"sigflags": 3,
             # b'sigpage': 0,
-            b'sigbutton': True,
-            b'signature_img': img,
-            b'contact': b'leandro@jatai.go.leg.br',
-            b'location': b'CMJ',
-            b'signingdate': date.encode(),
-            b'reason': b'Certificar Protocolo',
-            b'signature': b'Leandro Roberto da Silva',
-            b'signaturebox': (100, 100, 100, 100),
+            b"sigbutton": True,
+            b"signature_img": img,
+            b"contact": b"leandro@jatai.go.leg.br",
+            b"location": b"CMJ",
+            b"signingdate": date.encode(),
+            b"reason": b"Certificar Protocolo",
+            b"signature": b"Leandro Roberto da Silva",
+            b"signaturebox": (100, 100, 100, 100),
         }
-        with open(settings.CERT_PRIVATE_KEY_ID, 'rb') as fp:
+        with open(settings.CERT_PRIVATE_KEY_ID, "rb") as fp:
             p12 = pkcs12.load_key_and_certificates(
                 fp.read(),
                 settings.CERT_PRIVATE_KEY_ACCESS.encode(),
-                backends.default_backend()
+                backends.default_backend(),
             )
 
-        #fname = m.texto_original.original_path
-        fname = '/home/leandro/Downloads/ed_020_assinado.pdf'
+        # fname = m.texto_original.original_path
+        fname = "/home/leandro/Downloads/ed_020_assinado.pdf"
 
-        datau = open(fname, 'rb').read()
-        datas = pdf.cms.sign(datau, dct,
-                             p12[0],
-                             p12[1],
-                             p12[2],
-                             'sha256'
-                             )
-        fname = '/home/leandro/TEMP/teste.pdf'
-        with open(fname, 'wb') as fp:
+        datau = open(fname, "rb").read()
+        datas = pdf.cms.sign(datau, dct, p12[0], p12[1], p12[2], "sha256")
+        fname = "/home/leandro/TEMP/teste.pdf"
+        with open(fname, "wb") as fp:
             fp.write(datau)
             fp.write(datas)
 
@@ -166,55 +154,60 @@ class Command(BaseCommand):
         def tree_print(field_name, fields):
             global sss
             ss = " "
-            print(ss * sss, field_name, '.............')
+            print(ss * sss, field_name, ".............")
             if not isinstance(fields, dict):
                 ByteStringObject
-                if field_name == '/Contents':
+                if field_name == "/Contents":
                     try:
-                        signed_data = cms.ContentInfo.load(fields)['content']
+                        signed_data = cms.ContentInfo.load(fields)["content"]
 
-                        for cert in signed_data['certificates']:
-                            print('cert.issuer:',
-                                  cert.native['tbs_certificate']['issuer'])
-                            print('cert.subject:',
-                                  cert.native['tbs_certificate']['subject'])
+                        for cert in signed_data["certificates"]:
+                            print(
+                                "cert.issuer:", cert.native["tbs_certificate"]["issuer"]
+                            )
+                            print(
+                                "cert.subject:",
+                                cert.native["tbs_certificate"]["subject"],
+                            )
 
                     except Exception as e:
                         pass
 
-                    with open('/home/leandro/Downloads/content{}.ext'.format(sss), 'wb') as f:
+                    with open(
+                        "/home/leandro/Downloads/content{}.ext".format(sss), "wb"
+                    ) as f:
                         f.write(fields)
                         f.close()
                     return
                 else:
-                    print(' ' * sss, fields)
+                    print(" " * sss, fields)
                     return
             for field_name, value in fields.items():
                 sss += 2
                 tree_print(field_name, value)
                 sss -= 2
 
-        ifile = '/home/leandro/Downloads/016 - Projeto da LDO 2021_Assinado.pdf'
-        ifile = '/home/leandro/Downloads/plol_violencia_nas_escolas.pdf'
+        ifile = "/home/leandro/Downloads/016 - Projeto da LDO 2021_Assinado.pdf"
+        ifile = "/home/leandro/Downloads/plol_violencia_nas_escolas.pdf"
 
-        (hashok, signatureok, certok) = pdf.verify(open(ifile, 'rb').read())
-        print('signature ok?', signatureok)
-        print('hash ok?', hashok)
-        print('cert ok?', certok)
+        hashok, signatureok, certok = pdf.verify(open(ifile, "rb").read())
+        print("signature ok?", signatureok)
+        print("hash ok?", hashok)
+        print("cert ok?", certok)
 
         r = PdfFileReader(open(ifile, "rb"))
 
         fields = r.getFields()
 
-        tree_print('file', fields)
+        tree_print("file", fields)
 
-        #self.get_all_images_sign(r, o_path)
+        # self.get_all_images_sign(r, o_path)
 
     def get_all_images_sign(self, r, o_path):
         global img_count
 
         img_count = 0
-        o_path = o_path + 'img{}{}'
+        o_path = o_path + "img{}{}"
 
         def busca_imagem(node):
             global img_count
@@ -225,32 +218,36 @@ class Command(BaseCommand):
             if not isinstance(node, dict):
                 return
 
-            if '/Type' in node and node['/Type'] == '/XObject' and\
-                    '/Subtype' in node and node['/Subtype'] == '/Image':
-                size = (node['/Width'], node['/Height'])
+            if (
+                "/Type" in node
+                and node["/Type"] == "/XObject"
+                and "/Subtype" in node
+                and node["/Subtype"] == "/Image"
+            ):
+                size = (node["/Width"], node["/Height"])
                 data = node.getData()
 
-                if node['/ColorSpace'] == '/DeviceRGB':
+                if node["/ColorSpace"] == "/DeviceRGB":
                     mode = "RGB"
-                elif node['/ColorSpace'] == '/DeviceGray':
+                elif node["/ColorSpace"] == "/DeviceGray":
                     return
                 else:
                     mode = "P"
 
                 try:
-                    if '/Filter' in node:
-                        if node['/Filter'] == '/FlateDecode':
+                    if "/Filter" in node:
+                        if node["/Filter"] == "/FlateDecode":
                             img = Image.frombytes(mode, size, data)
                             img.save(o_path.format(img_count, ".png"))
-                        elif node['/Filter'] == '/DCTDecode':
-                            img = open(o_path .format(img_count, ".jpg"), "wb")
+                        elif node["/Filter"] == "/DCTDecode":
+                            img = open(o_path.format(img_count, ".jpg"), "wb")
                             img.write(data)
                             img.close()
-                        elif node['/Filter'] == '/JPXDecode':
+                        elif node["/Filter"] == "/JPXDecode":
                             img = open(o_path.format(img_count, ".jp2"), "wb")
                             img.write(data)
                             img.close()
-                        elif node['/Filter'] == '/CCITTFaxDecode':
+                        elif node["/Filter"] == "/CCITTFaxDecode":
                             img = open(o_path.format(img_count, ".tiff"), "wb")
                             img.write(data)
                             img.close()
@@ -265,20 +262,20 @@ class Command(BaseCommand):
                 busca_imagem(value)
 
         pageNo = 0
-        while (pageNo < r.numPages):
+        while pageNo < r.numPages:
             page = r.getPage(pageNo)
 
-            if '/Annots' not in page:
+            if "/Annots" not in page:
                 pageNo += 1
                 continue
 
-            for annot in page['/Annots']:
+            for annot in page["/Annots"]:
 
                 obj_annot = annot.getObject()
-                if '/AP' not in obj_annot or '/N' not in obj_annot['/AP']:
+                if "/AP" not in obj_annot or "/N" not in obj_annot["/AP"]:
                     continue
 
-                node = obj_annot['/AP']['/N'].getObject()
+                node = obj_annot["/AP"]["/N"].getObject()
 
                 busca_imagem(node)
 
@@ -286,36 +283,35 @@ class Command(BaseCommand):
 
     def get_all_images(self, r, o_path):
         pageNo = 0
-        while (pageNo < r.numPages):
+        while pageNo < r.numPages:
             page = r.getPage(pageNo)
 
-            if '/XObject' in page['/Resources']:
-                xObject = page['/Resources']['/XObject'].getObject()
+            if "/XObject" in page["/Resources"]:
+                xObject = page["/Resources"]["/XObject"].getObject()
 
                 for obj in xObject:
-                    if xObject[obj]['/Subtype'] == '/Image':
-                        size = (xObject[obj]['/Width'],
-                                xObject[obj]['/Height'])
+                    if xObject[obj]["/Subtype"] == "/Image":
+                        size = (xObject[obj]["/Width"], xObject[obj]["/Height"])
                         data = xObject[obj].getData()
 
-                        if xObject[obj]['/ColorSpace'] == '/DeviceRGB':
+                        if xObject[obj]["/ColorSpace"] == "/DeviceRGB":
                             mode = "RGB"
                         else:
                             mode = "P"
 
-                        if '/Filter' in xObject[obj]:
-                            if xObject[obj]['/Filter'] == '/FlateDecode':
+                        if "/Filter" in xObject[obj]:
+                            if xObject[obj]["/Filter"] == "/FlateDecode":
                                 img = Image.frombytes(mode, size, data)
                                 img.save(o_path + obj[1:] + ".png")
-                            elif xObject[obj]['/Filter'] == '/DCTDecode':
+                            elif xObject[obj]["/Filter"] == "/DCTDecode":
                                 img = open(o_path + obj[1:] + ".jpg", "wb")
                                 img.write(data)
                                 img.close()
-                            elif xObject[obj]['/Filter'] == '/JPXDecode':
+                            elif xObject[obj]["/Filter"] == "/JPXDecode":
                                 img = open(o_path + obj[1:] + ".jp2", "wb")
                                 img.write(data)
                                 img.close()
-                            elif xObject[obj]['/Filter'] == '/CCITTFaxDecode':
+                            elif xObject[obj]["/Filter"] == "/CCITTFaxDecode":
                                 img = open(o_path + obj[1:] + ".tiff", "wb")
                                 img.write(data)
                                 img.close()
@@ -331,10 +327,8 @@ class Command(BaseCommand):
 
     def run_invalida_checkcheck_projeto_com_norma_nao_viculada_a_autografo(self):
         materias = MateriaLegislativa.objects.filter(
-            normajuridica__tipo_id=1,
-            normajuridica__ano__gte=2014
-        ).exclude(
-            normajuridica__norma_relacionada__norma_relacionada__tipo_id=27)
+            normajuridica__tipo_id=1, normajuridica__ano__gte=2014
+        ).exclude(normajuridica__norma_relacionada__norma_relacionada__tipo_id=27)
 
         # print(materias.count())
         for m in materias:
@@ -346,15 +340,16 @@ class Command(BaseCommand):
             # print(m.normajuridica())
 
     def delete_itens_tmp_folder(self):
-        list = os.scandir('/home/leandro/desenvolvimento/envs/cmj/tmp/')
+        list = os.scandir("/home/leandro/desenvolvimento/envs/cmj/tmp/")
 
         now = time.time()
         for i in list:
             age = now - os.stat(i.path)[stat.ST_MTIME]
 
             if age > 86400:
-                if i.name.startswith('pymp') or\
-                        i.name.startswith('com.github.ocrmypdf'):
+                if i.name.startswith("pymp") or i.name.startswith(
+                    "com.github.ocrmypdf"
+                ):
                     shutil.rmtree(i.path, ignore_errors=True)
 
     def reset_id_model(self, model):
@@ -362,9 +357,7 @@ class Command(BaseCommand):
         query = """SELECT setval(pg_get_serial_sequence('"%(app_model_name)s"','id'),
                     coalesce(max("id"), 1), max("id") IS NOT null)
                     FROM "%(app_model_name)s";
-                """ % {
-            'app_model_name': _get_registration_key(model)
-        }
+                """ % {"app_model_name": _get_registration_key(model)}
 
         with connection.cursor() as cursor:
             cursor.execute(query)
@@ -373,7 +366,7 @@ class Command(BaseCommand):
             print(rows)
 
     def run_distibui_ocr_ao_longo_do_ano(self):
-        ocrs = OcrMyPDF.objects.all().order_by('id')
+        ocrs = OcrMyPDF.objects.all().order_by("id")
 
         c = ocrs.count()
         d = timezone.now() - timedelta(days=365, seconds=120)
@@ -392,17 +385,16 @@ class Command(BaseCommand):
         file_path = m.texto_original.file.name
 
         p = CompressPDF()
-        p.compress(0, file_path, file_path + '__0__new.pdf')
-        #p.compress(1, file_path, file_path + '__1__new.pdf')
-        #p.compress(2, file_path, file_path + '__2__new.pdf')
-        #p.compress(3, file_path, file_path + '__3__new.pdf')
-        #p.compress(4, file_path, file_path + '__4__new.pdf')
+        p.compress(0, file_path, file_path + "__0__new.pdf")
+        # p.compress(1, file_path, file_path + '__1__new.pdf')
+        # p.compress(2, file_path, file_path + '__2__new.pdf')
+        # p.compress(3, file_path, file_path + '__3__new.pdf')
+        # p.compress(4, file_path, file_path + '__4__new.pdf')
 
     def run_ajusta_datas_de_edicao_com_certidoes(self):
 
         # Área de trabalho pública
-        docs = DocumentoAdministrativo.objects.filter(
-            workspace_id=22).order_by('-id')
+        docs = DocumentoAdministrativo.objects.filter(workspace_id=22).order_by("-id")
 
         for d in docs:
             c = d.certidao
@@ -426,12 +418,11 @@ class Command(BaseCommand):
     def run_ajusta_datas_de_edicao_com_data_doc(self):
 
         # Áreas de trabalho específicas
-        docs = DocumentoAdministrativo.objects.filter(
-            workspace_id=21).order_by('-id')
+        docs = DocumentoAdministrativo.objects.filter(workspace_id=21).order_by("-id")
 
         for d in docs:
 
-            #v = Version.objects.get_for_object(d)
+            # v = Version.objects.get_for_object(d)
 
             # if v.exists():
             #    d.data_ultima_atualizacao = v[0].revision.date_created
@@ -451,8 +442,9 @@ class Command(BaseCommand):
     def run_busca_desordem_de_dispositivos(self):
         init = datetime.now()
 
-        nodelist = Dispositivo.objects.filter(
-            dispositivo_pai__isnull=True).order_by('ta', 'ordem')
+        nodelist = Dispositivo.objects.filter(dispositivo_pai__isnull=True).order_by(
+            "ta", "ordem"
+        )
 
         def busca(nl):
             numero = []
@@ -469,8 +461,12 @@ class Command(BaseCommand):
                     continue
 
                 if nd.get_numero_completo() < numero:
-                    print(nd.ta_id, nd.ordem, nd.id, ', '.join(
-                        map(str, nd.get_parents_asc())))
+                    print(
+                        nd.ta_id,
+                        nd.ordem,
+                        nd.id,
+                        ", ".join(map(str, nd.get_parents_asc())),
+                    )
 
                 numero = nd.get_numero_completo()
 
@@ -479,44 +475,39 @@ class Command(BaseCommand):
 
 class CompressPDF:
 
-    quality = {
-        0: '/default',
-        1: '/prepress',
-        2: '/printer',
-        3: '/ebook',
-        4: '/screen'
-    }
+    quality = {0: "/default", 1: "/prepress", 2: "/printer", 3: "/ebook", 4: "/screen"}
 
     def compress(self, compress_level, file=None, new_file=None):
 
         try:
             initial_size = os.path.getsize(file)
 
-            r = subprocess.call([
-                'gs',
-                '-sDEVICE=pdfwrite',
-                '-dCompatibilityLevel=1.4',
-                '-dPDFSETTINGS=/prepress',
-                '-dNOPAUSE',
-                '-dQUIET',
-                '-dBATCH',
-                '-dAutoRotatePages=/None',
-                '-dCompressPages=true',
-                '-dColorImageResolution=96',
-                #'-dColorImageDownsampleType=/Bicubic',
-                '-sOutputFile={}'.format(new_file),
-                file]
+            r = subprocess.call(
+                [
+                    "gs",
+                    "-sDEVICE=pdfwrite",
+                    "-dCompatibilityLevel=1.4",
+                    "-dPDFSETTINGS=/prepress",
+                    "-dNOPAUSE",
+                    "-dQUIET",
+                    "-dBATCH",
+                    "-dAutoRotatePages=/None",
+                    "-dCompressPages=true",
+                    "-dColorImageResolution=96",
+                    #'-dColorImageDownsampleType=/Bicubic',
+                    "-sOutputFile={}".format(new_file),
+                    file,
+                ]
             )
 
             final_size = os.path.getsize(new_file)
             ratio = 1 - (final_size / initial_size)
             print("Compression by {0:.0%}.".format(ratio))
-            print("Final file size is {0:.1f}MB".format(
-                final_size / 1000000))
+            print("Final file size is {0:.1f}MB".format(final_size / 1000000))
             return True
 
         except Exception as error:
-            print('Caught this error: ' + repr(error))
+            print("Caught this error: " + repr(error))
         except subprocess.CalledProcessError as e:
             print("Unexpected error:".format(e.output))
             return False

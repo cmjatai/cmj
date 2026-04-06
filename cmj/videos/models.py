@@ -1,17 +1,17 @@
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 from random import random
 
 import dateutil.parser
+import pytz
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import manager
 from django.db.models.aggregates import Sum
-from django.db.models.deletion import PROTECT, CASCADE
+from django.db.models.deletion import CASCADE, PROTECT
+from django.db.models.fields.json import JSONField
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-import pytz
 
 from cmj.mixins import CmjAuditoriaModelMixin
 from sapl.utils import SaplGenericForeignKey, from_date_to_datetime_utc
@@ -19,27 +19,26 @@ from sapl.utils import SaplGenericForeignKey, from_date_to_datetime_utc
 
 class Video(CmjAuditoriaModelMixin):
 
-    vid = models.CharField(
-        max_length=30,
-        verbose_name=_('Video Id '),
-        unique=True)
+    vid = models.CharField(max_length=30, verbose_name=_("Video Id "), unique=True)
 
     json = JSONField(
-        verbose_name=_('Object'),
-        blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+        verbose_name=_("Object"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     titulo = models.CharField(
-        verbose_name=_('Título'),
-        max_length=250,
-        blank=True, null=True, default='')
+        verbose_name=_("Título"), max_length=250, blank=True, null=True, default=""
+    )
 
-    execucao = models.PositiveIntegerField(
-        verbose_name=_('Execução'), default=0)
+    execucao = models.PositiveIntegerField(verbose_name=_("Execução"), default=0)
 
     class Meta:
-        verbose_name = _('Vídeo')
+        verbose_name = _("Vídeo")
         verbose_name_plural = _("Vídeos")
-        ordering = ('-created',)
+        ordering = ("-created",)
 
     def __str__(self):
         return self.titulo
@@ -47,7 +46,7 @@ class Video(CmjAuditoriaModelMixin):
 
 class PullYoutubeManager(manager.Manager):
 
-    data_min = dateutil.parser.parse('2013-11-01T00:00:00Z')
+    data_min = dateutil.parser.parse("2013-11-01T00:00:00Z")
 
     def construct_pulls(self):
 
@@ -82,15 +81,18 @@ class PullYoutubeManager(manager.Manager):
         if not data_base:
             data_base = now
         elif not self.data_min < data_base < now:
-            raise Exception(f'A data_base: {data_base} deve '
-                            f'estar entre {self.data_min}  e {now}')
+            raise Exception(
+                f"A data_base: {data_base} deve "
+                f"estar entre {self.data_min}  e {now}"
+            )
 
         pull = None
         while not pull:
-            pull = self.get_queryset().filter(
-                published_before__gte=data_base,
-                published_after__lte=data_base
-            ).first()
+            pull = (
+                self.get_queryset()
+                .filter(published_before__gte=data_base, published_after__lte=data_base)
+                .first()
+            )
 
             if pull:
                 return pull
@@ -102,19 +104,19 @@ class PullYoutube(models.Model):
 
     objects = PullYoutubeManager()
 
-    published_before = models.DateTimeField(verbose_name=_('published_before'))
-    published_after = models.DateTimeField(verbose_name=_('published_after'))
+    published_before = models.DateTimeField(verbose_name=_("published_before"))
+    published_after = models.DateTimeField(verbose_name=_("published_after"))
 
     last_run = models.DateTimeField(
-        verbose_name=_('last_run'), editable=False, auto_now=True)
+        verbose_name=_("last_run"), editable=False, auto_now=True
+    )
 
-    execucao = models.PositiveIntegerField(
-        verbose_name=_('Execução'), default=0)
+    execucao = models.PositiveIntegerField(verbose_name=_("Execução"), default=0)
 
     class Meta:
-        verbose_name = _('PullYoutube')
+        verbose_name = _("PullYoutube")
         verbose_name_plural = _("PullYoutube")
-        ordering = ('id',)
+        ordering = ("id",)
 
 
 class PullExecManager(manager.Manager):
@@ -122,7 +124,7 @@ class PullExecManager(manager.Manager):
     def timedelta_quota_pull(self):
         qs = self.get_queryset()
 
-        pacific_timezone = pytz.timezone('US/Pacific')
+        pacific_timezone = pytz.timezone("US/Pacific")
         pacific_time = timezone.localtime(timezone=pacific_timezone)
 
         st = datetime.combine(pacific_time, datetime.min.time())
@@ -136,13 +138,12 @@ class PullExecManager(manager.Manager):
 
         interval = st, et
 
-        qu = qs.filter(
-            data_exec__gte=interval[0],
-            data_exec__lt=interval[1]
-        ).aggregate(Sum('quota'))
+        qu = qs.filter(data_exec__gte=interval[0], data_exec__lt=interval[1]).aggregate(
+            Sum("quota")
+        )
 
-        if isinstance(qu, dict) and 'quota__sum' in qu:
-            qu = qu['quota__sum'] or 0
+        if isinstance(qu, dict) and "quota__sum" in qu:
+            qu = qu["quota__sum"] or 0
         else:
             qu = 0
 
@@ -162,10 +163,7 @@ class PullExecManager(manager.Manager):
         elif chamada_livre > 50:
             return timedelta(seconds=600)
 
-        seconds_entre_chamadas = max(
-            seconds_final_day / chamada_livre,
-            maxs
-        )
+        seconds_entre_chamadas = max(seconds_final_day / chamada_livre, maxs)
 
         return timedelta(seconds=seconds_entre_chamadas)
 
@@ -174,46 +172,44 @@ class PullExec(models.Model):
     objects = PullExecManager()
 
     pull = models.ForeignKey(
-        PullYoutube, verbose_name=_('PullYoutube'),
-        related_name='pullyoutube_set',
-        on_delete=CASCADE)
+        PullYoutube,
+        verbose_name=_("PullYoutube"),
+        related_name="pullyoutube_set",
+        on_delete=CASCADE,
+    )
 
     data_exec = models.DateTimeField(
-        verbose_name=_('data_exec'), editable=False, auto_now_add=True)
+        verbose_name=_("data_exec"), editable=False, auto_now_add=True
+    )
 
-    quota = models.PositiveIntegerField(
-        verbose_name=_('Quota'), default=1)
+    quota = models.PositiveIntegerField(verbose_name=_("Quota"), default=1)
 
     class Meta:
-        verbose_name = _('PullExec')
+        verbose_name = _("PullExec")
         verbose_name_plural = _("PullExec")
-        ordering = ('id',)
+        ordering = ("id",)
 
 
 class VideoParte(models.Model):
 
     video = models.ForeignKey(
-        Video, verbose_name=_('Vídeo'),
-        related_name='videoparte_set',
-        on_delete=PROTECT)
+        Video, verbose_name=_("Vídeo"), related_name="videoparte_set", on_delete=PROTECT
+    )
 
     content_type = models.ForeignKey(
-        ContentType,
-        blank=True, null=True, default=None,
-        on_delete=PROTECT)
+        ContentType, blank=True, null=True, default=None, on_delete=PROTECT
+    )
 
-    object_id = models.PositiveIntegerField(
-        blank=True, null=True, default=None)
+    object_id = models.PositiveIntegerField(blank=True, null=True, default=None)
 
-    content_object = SaplGenericForeignKey('content_type', 'object_id')
+    content_object = SaplGenericForeignKey("content_type", "object_id")
 
     time_start = models.PositiveIntegerField(default=0)
 
-    fieldname = models.CharField(
-        max_length=250, blank=True, null=True, default='')
+    fieldname = models.CharField(max_length=250, blank=True, null=True, default="")
 
     class Meta:
-        verbose_name = _('VideoParte')
+        verbose_name = _("VideoParte")
         verbose_name_plural = _("Video Partes")
 
-        ordering = ('id',)
+        ordering = ("id",)

@@ -8,8 +8,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            """
+        migrations.RunSQL("""
                 drop view if exists loa_despesa_consulta;
                 create or replace view loa_despesa_consulta as
                     select
@@ -51,6 +50,5 @@ class Migration(migrations.Migration):
                         inner join loa_unidadeorcamentaria    u on (d.unidade_id = u.id)
 
 
-            ;"""
-        ),
+            ;"""),
     ]

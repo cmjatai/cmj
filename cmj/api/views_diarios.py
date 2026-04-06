@@ -12,25 +12,21 @@ from cmj.diarios.models import DiarioOficial
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 
-
 logger = logging.getLogger(__name__)
 
-ApiViewSetConstrutor.build_class(
-    [
-        apps.get_app_config('diarios')
-    ]
-)
+ApiViewSetConstrutor.build_class([apps.get_app_config("diarios")])
 
 
 @customize(DiarioOficial)
 class _DiarioOficialViewSet(ResponseFileMixin):
 
     def custom_filename(self, item):
-        arcname = '{}-{:03d}-{}.{}'.format(
+        arcname = "{}-{:03d}-{}.{}".format(
             item.data.year,
             item.edicao,
             slugify(item.tipo.descricao),
-            item.arquivo.path.split('.')[-1])
+            item.arquivo.path.split(".")[-1],
+        )
         return arcname
 
     @action(detail=True)

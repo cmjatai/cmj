@@ -1,5 +1,5 @@
-from datetime import timedelta
 import logging
+from datetime import timedelta
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
@@ -16,7 +16,7 @@ from cmj.utils import Manutencao, run_sql
 
 
 class Array(Subquery):
-    template = 'ARRAY(%(subquery)s)'
+    template = "ARRAY(%(subquery)s)"
 
 
 class Command(BaseCommand):
@@ -25,7 +25,7 @@ class Command(BaseCommand):
         m = Manutencao()
         m.desativa_auto_now()
 
-        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
+        post_save.disconnect(dispatch_uid="timerefresh_post_signal")
 
         self.logger = logging.getLogger(__name__)
 
@@ -36,7 +36,7 @@ class Command(BaseCommand):
 
     def count_registers(self, full=True):
 
-        print('--------- CountRegisters ----------')
+        print("--------- CountRegisters ----------")
 
         for app in apps.get_app_configs():
             for m in app.get_models():
@@ -49,14 +49,13 @@ class Command(BaseCommand):
 
     def clean_task_result(self):
         data = timezone.localtime() - timedelta(days=5)
-        TaskResult.objects.filter(
-            date_done__lt=data).order_by('-date_done').delete()
+        TaskResult.objects.filter(date_done__lt=data).order_by("-date_done").delete()
 
     def clean_blank_audit_log(self):
 
         # 1) apaga auditlog de bots de buscas que nada foi filtrado,
         # senão apenas páginas variadas
-        run_sql('''
+        run_sql("""
             delete from core_auditlog where id in (select id from (select id, count(p)
                 from core_auditlog
                     left join lateral jsonb_object_keys(obj->'params') p on true
@@ -67,41 +66,37 @@ class Command(BaseCommand):
                 having count(p) = 1
             order by id desc) as auditlog_bots_get_only_pages)
             ;
-        ''')
+        """)
         return
         # refatorar algoritmo abaixo para remover exclusões que não devem
         # acontecer
 
-        run_sql('delete from core_auditlog where obj_id=0;')
-        #run_sql('delete from core_auditlog where content_type_id = 266;')
-        run_sql('delete from core_auditlog where content_type_id is null;')
+        run_sql("delete from core_auditlog where obj_id=0;")
+        # run_sql('delete from core_auditlog where content_type_id = 266;')
+        run_sql("delete from core_auditlog where content_type_id is null;")
 
         logs = AuditLog.objects.filter(
-            email__exact='',
-            content_type=OuterRef('content_type_id'),
-            obj_id=OuterRef('obj_id')
-        ).order_by('-id')
+            email__exact="",
+            content_type=OuterRef("content_type_id"),
+            obj_id=OuterRef("obj_id"),
+        ).order_by("-id")
 
-        group_logs = AuditLog.objects.filter(
-            email__exact=''
-        ).annotate(
-            objs=Array(logs.values('id'))
-        ).values(
-            'content_type_id', 'obj_id', 'objs'
-        ).distinct(
-            'content_type_id', 'obj_id'
-        ).order_by(
-            'content_type_id', '-obj_id'
+        group_logs = (
+            AuditLog.objects.filter(email__exact="")
+            .annotate(objs=Array(logs.values("id")))
+            .values("content_type_id", "obj_id", "objs")
+            .distinct("content_type_id", "obj_id")
+            .order_by("content_type_id", "-obj_id")
         )
 
         blank_len = 2
 
         logs_a_deletar = []
         for gl in group_logs:
-            logs_a_deletar += gl['objs'][blank_len:]
+            logs_a_deletar += gl["objs"][blank_len:]
 
         for i in range(0, len(logs_a_deletar), 1000):
-            chunk = logs_a_deletar[i:i + 1000]
+            chunk = logs_a_deletar[i : i + 1000]
 
             dd = AuditLog.objects.filter(id__in=chunk)
             dd.delete()
@@ -110,15 +105,13 @@ class Command(BaseCommand):
 
         blank_len = 2
 
-        group_logs = AuditLog.objects.filter(
-            email=''
-        ).values(
-            'content_type_id', 'obj_id'
-        ).annotate(
-            count_tipos_obj=Count('obj_id')
-        ).filter(
-            count_tipos_obj__gt=blank_len
-        ).order_by('content_type_id', '-obj_id')
+        group_logs = (
+            AuditLog.objects.filter(email="")
+            .values("content_type_id", "obj_id")
+            .annotate(count_tipos_obj=Count("obj_id"))
+            .filter(count_tipos_obj__gt=blank_len)
+            .order_by("content_type_id", "-obj_id")
+        )
 
         # print(group_logs.query)
         # print(group_logs.count())
@@ -126,26 +119,24 @@ class Command(BaseCommand):
         logs_a_deletar = []
         for gl in group_logs:  # [:10000]:
 
-            if gl['content_type_id']:
-                ct = ContentType.objects.get(pk=gl['content_type_id'])
+            if gl["content_type_id"]:
+                ct = ContentType.objects.get(pk=gl["content_type_id"])
             else:
                 ct = None
 
             print(gl, ct)
 
             logs = AuditLog.objects.filter(
-                email='',
-                content_type=ct,
-                obj_id=gl['obj_id']
-            ).order_by('-id')
+                email="", content_type=ct, obj_id=gl["obj_id"]
+            ).order_by("-id")
 
-            logs_a_deletar += list(logs[blank_len:].values_list('id', flat=True))
+            logs_a_deletar += list(logs[blank_len:].values_list("id", flat=True))
 
             # print(logs.count())
             # print(logs.values_list('id', flat=True))
 
         for i in range(0, len(logs_a_deletar), 1000):
-            chunk = logs_a_deletar[i:i + 1000]
+            chunk = logs_a_deletar[i : i + 1000]
 
             dd = AuditLog.objects.filter(id__in=chunk)
             dd.delete()

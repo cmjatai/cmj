@@ -1,13 +1,20 @@
-
-from django.utils import timezone
 from datetime import timedelta
+
 from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+
 from cmj.api.serializers_painelset import CronometroSerializer, CronometroTreeSerializer
-from .models import Cronometro, CronometroState, Individuo
+
 from .cronometro_commands import (
-    AddTimeCronometroCommand, StartCronometroCommand, PauseCronometroCommand,
-    ResumeCronometroCommand, StopCronometroCommand, FinishCronometroCommand
+    AddTimeCronometroCommand,
+    FinishCronometroCommand,
+    PauseCronometroCommand,
+    ResumeCronometroCommand,
+    StartCronometroCommand,
+    StopCronometroCommand,
 )
+from .models import Cronometro, CronometroState, Individuo
+
 
 class CronometroManager:
     """
@@ -43,22 +50,21 @@ class CronometroManager:
                 return {"error": "Cronômetro pai não encontrado"}
 
         cronometro = Cronometro.objects.create(
-            name=name,
-            duration=duration,
-            parent=parent,
-            **kwargs
+            name=name, duration=duration, parent=parent, **kwargs
         )
 
-        self.notify_observers(cronometro, 'created')
+        self.notify_observers(cronometro, "created")
         return {"success": True, "cronometro_id": cronometro.id}
 
     def start_cronometro(self, cronometro_id, parent_id=None, duration=None, **kwargs):
         """Inicia um cronômetro usando Command Pattern"""
-        command = StartCronometroCommand(cronometro_id, parent_id=parent_id, duration=duration)
+        command = StartCronometroCommand(
+            cronometro_id, parent_id=parent_id, duration=duration
+        )
         result = command.execute()
 
-        if result.get('success'):
-            self.notify_observers(command.cronometro, 'started')
+        if result.get("success"):
+            self.notify_observers(command.cronometro, "started")
 
         return result
 
@@ -67,8 +73,8 @@ class CronometroManager:
         command = PauseCronometroCommand(cronometro_id)
         result = command.execute()
 
-        if result.get('success'):
-            self.notify_observers(command.cronometro, 'paused')
+        if result.get("success"):
+            self.notify_observers(command.cronometro, "paused")
 
         return result
 
@@ -77,8 +83,8 @@ class CronometroManager:
         command = ResumeCronometroCommand(cronometro_id)
         result = command.execute()
 
-        if result.get('success'):
-            self.notify_observers(command.cronometro, 'resumed')
+        if result.get("success"):
+            self.notify_observers(command.cronometro, "resumed")
 
         return result
 
@@ -87,8 +93,8 @@ class CronometroManager:
         command = StopCronometroCommand(cronometro_id)
         result = command.execute()
 
-        if result.get('success'):
-            self.notify_observers(command.cronometro, 'stopped')
+        if result.get("success"):
+            self.notify_observers(command.cronometro, "stopped")
 
         return result
 
@@ -97,8 +103,8 @@ class CronometroManager:
         command = FinishCronometroCommand(cronometro_id)
         result = command.execute()
 
-        if result.get('success'):
-            self.notify_observers(command.cronometro, 'finished')
+        if result.get("success"):
+            self.notify_observers(command.cronometro, "finished")
 
         return result
 
@@ -106,17 +112,17 @@ class CronometroManager:
         command = AddTimeCronometroCommand(cronometro_id, seconds)
         result = command.execute()
 
-        if result.get('success'):
-            self.notify_observers(command.cronometro, 'time_added')
+        if result.get("success"):
+            self.notify_observers(command.cronometro, "time_added")
 
         return result
 
     def check_zero_timer(self):
         running_cronometros = Cronometro.objects.filter(
             state=CronometroState.RUNNING,
-            content_type__app_label='painelset',
-            content_type__model='individuo'
-            )
+            content_type__app_label="painelset",
+            content_type__model="individuo",
+        )
         zero_time_cronometros = []
         for cronometro in running_cronometros:
             if cronometro.remaining_time <= timedelta():
@@ -136,9 +142,9 @@ class CronometroManager:
                 command = FinishCronometroCommand(cronometro.id)
                 result = command.execute()
 
-                if result.get('success'):
+                if result.get("success"):
                     finished_cronometros.append(command.cronometro)
-                    self.notify_observers(command.cronometro, 'finished')
+                    self.notify_observers(command.cronometro, "finished")
 
         return finished_cronometros
 
@@ -149,9 +155,7 @@ class CronometroManager:
         try:
             if not isinstance(cronometro, Cronometro):
                 cronometro = Cronometro.objects.get(id=cronometro)
-            return {
-                "cronometro": CronometroTreeSerializer(cronometro).data
-            }
+            return {"cronometro": CronometroTreeSerializer(cronometro).data}
         except Cronometro.DoesNotExist:
             return None
 
@@ -165,6 +169,7 @@ class CronometroLogger:
         if data:
             print(f"  Data: {data}")
 
+
 # Observer concreto para métricas
 class CronometroMetrics:
     """Observer concreto para coletar métricas de cronômetros"""
@@ -176,11 +181,11 @@ class CronometroMetrics:
         cronometro_id = str(cronometro.id)
         if cronometro_id not in self.metrics:
             self.metrics[cronometro_id] = {
-                'starts': 0,
-                'pauses': 0,
-                'resumes': 0,
-                'stops': 0,
-                'finishes': 0
+                "starts": 0,
+                "pauses": 0,
+                "resumes": 0,
+                "stops": 0,
+                "finishes": 0,
             }
 
         if event_type in self.metrics[cronometro_id]:

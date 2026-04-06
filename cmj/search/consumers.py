@@ -1,18 +1,20 @@
-import logging
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer
+import logging
+
 from asgiref.sync import sync_to_async
-from google import genai
+from channels.generic.websocket import AsyncWebsocketConsumer
 from django.conf import settings
 from django.utils.html import escape
-
+from google import genai
 
 logger = logging.getLogger(__name__)
+
 
 class ChatConsumer(AsyncWebsocketConsumer):
 
     def __init__(self, *args, **kwargs):
         from .chat_manager import ChatManager
+
         super().__init__(*args, **kwargs)
         self.user = None
         self.session_id = None
@@ -20,10 +22,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
         from django.contrib.auth.models import AnonymousUser
-        self.user = self.scope['user']
-        self.session_id = self.scope['url_route']['kwargs']['session_id']
 
-        has_perm = await sync_to_async(self.user.has_perm)('search.can_use_chat_module')
+        self.user = self.scope["user"]
+        self.session_id = self.scope["url_route"]["kwargs"]["session_id"]
+
+        has_perm = await sync_to_async(self.user.has_perm)("search.can_use_chat_module")
         if self.user == AnonymousUser() or not has_perm:
             await self.close()
             return
@@ -31,14 +34,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # Controle de Concorrência: Derruba conexões anteriores na mesma sessão
         # Envia sinal para o grupo ANTES de entrar nele, para não desconectar a si mesmo
         await self.channel_layer.group_send(
-            f"chat_{self.session_id}",
-            {"type": "disconnect_old_connection"}
+            f"chat_{self.session_id}", {"type": "disconnect_old_connection"}
         )
 
-        await self.channel_layer.group_add(
-            f"chat_{self.session_id}",
-            self.channel_name
-        )
+        await self.channel_layer.group_add(f"chat_{self.session_id}", self.channel_name)
         await self.accept()
 
         # Recupera histórico formatado para o frontend
@@ -48,22 +47,27 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if self.user.is_superuser:
             max_length = 10000
 
-        await self.send(json.dumps({
-            "type": "connection_established",
-            "session_id": self.session_id,
-            "history": history,
-            "max_length": max_length
-        }))
+        await self.send(
+            json.dumps(
+                {
+                    "type": "connection_established",
+                    "session_id": self.session_id,
+                    "history": history,
+                    "max_length": max_length,
+                }
+            )
+        )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
-            f"chat_{self.session_id}",
-            self.channel_name
+            f"chat_{self.session_id}", self.channel_name
         )
 
     async def disconnect_old_connection(self, event):
         """Fecha a conexão se receber sinal de nova conexão na mesma sessão"""
-        await self.close(code=4001)  # 4001: Código personalizado para "Substituído por nova conexão"
+        await self.close(
+            code=4001
+        )  # 4001: Código personalizado para "Substituído por nova conexão"
 
     @sync_to_async
     def get_formatted_history(self):
@@ -72,13 +76,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         return [
             {
                 "role": msg["role"],
-                "content": f'{msg["parts"][0]["text"]}' + (f'\n\n_(LLM: {msg["ia_model_name"]})_' if "ia_model_name" in msg and msg["ia_model_name"] else "")
+                "content": f'{msg["parts"][0]["text"]}'
+                + (
+                    f'\n\n_(LLM: {msg["ia_model_name"]})_'
+                    if "ia_model_name" in msg and msg["ia_model_name"]
+                    else ""
+                ),
             }
             for msg in history
         ]
 
     async def receive(self, text_data):
-        has_perm = await sync_to_async(self.user.has_perm)('search.can_use_chat_module')
+        has_perm = await sync_to_async(self.user.has_perm)("search.can_use_chat_module")
         if not self.user.is_authenticated or not has_perm:
             await self.send_error("Authentication required")
             await self.close()
@@ -86,20 +95,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         try:
             data = json.loads(text_data)
-            user_message = data.get('message', '').strip()
+            user_message = data.get("message", "").strip()
 
             max_length = self.context_manager.MAX_LENGTH_USER_MESSAGE
             if self.user.is_superuser:
                 max_length = 10000
 
             if len(user_message) > max_length:
-                await self.send_error(f"Mensagem muito longa. O limite é de {max_length} caracteres.")
+                await self.send_error(
+                    f"Mensagem muito longa. O limite é de {max_length} caracteres."
+                )
                 return
 
             user_message = escape(user_message)
             user_message = user_message.split()
-            user_message = ' '.join(user_message)
-
+            user_message = " ".join(user_message)
 
             # Processa mensagem e obtém resposta
             msg = await sync_to_async(self.context_manager.process_user_message)(
@@ -110,24 +120,31 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_send(
                 f"chat_{self.session_id}",
                 {
-                    'type': 'chat_message',
-                    'message': msg.content + (f'\n\n_(LLM: {msg.metadata.get("ia_model_name", "")})_' if "ia_model_name" in msg.metadata and msg.metadata["ia_model_name"] else ""),
-                    'role': 'model'
-                }
+                    "type": "chat_message",
+                    "message": msg.content
+                    + (
+                        f'\n\n_(LLM: {msg.metadata.get("ia_model_name", "")})_'
+                        if "ia_model_name" in msg.metadata
+                        and msg.metadata["ia_model_name"]
+                        else ""
+                    ),
+                    "role": "model",
+                },
             )
 
         except Exception as e:
             await self.send_error(str(e))
 
     async def chat_message(self, event):
-        await self.send(json.dumps({
-            'type': 'chat_message',
-            'message': event['message'],
-            'role': event['role']
-        }))
+        await self.send(
+            json.dumps(
+                {
+                    "type": "chat_message",
+                    "message": event["message"],
+                    "role": event["role"],
+                }
+            )
+        )
 
     async def send_error(self, error_msg):
-        await self.send(json.dumps({
-            'type': 'error',
-            'message': error_msg
-        }))
+        await self.send(json.dumps({"type": "error", "message": error_msg}))

@@ -1,19 +1,19 @@
 import datetime
-from django.apps import apps
-import pandas as pd
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from random import randint, seed
+
+import pandas as pd
+from django.apps import apps
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models import F
-from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import MediaDefiningClass
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.urls import path, reverse
 from django.utils.decorators import classonlymethod
 from django.views import View
-
 
 same_func = lambda x: x
 getcolor = lambda label=None: (
@@ -101,7 +101,9 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         return self.filterset(data=data, queryset=queryset)
 
     def apply_filters(self, request, queryset):
-        filter = self.get_filter(data=request.GET if hasattr(request, 'GET') else request, queryset=queryset)
+        filter = self.get_filter(
+            data=request.GET if hasattr(request, "GET") else request, queryset=queryset
+        )
         if filter is not None:
             queryset = filter.qs
         return queryset
@@ -118,9 +120,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
             queryset = self.get_queryset(request)
         if isinstance(self.label_field, tuple):
             label_getter = self.label_field[1](self.label_field[0])
-            fmt_func = (
-                self.label_field[2] if len(self.label_field) > 2 else same_func
-            )
+            fmt_func = self.label_field[2] if len(self.label_field) > 2 else same_func
         else:
             label_getter = F(self.label_field)
             fmt_func = same_func
@@ -145,9 +145,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
             queryset = self.get_queryset(request)
         if isinstance(self.label_field, tuple):
             label_getter = self.label_field[1](self.label_field[0])
-            label_fmt = (
-                self.label_field[2] if len(self.label_field) > 2 else same_func
-            )
+            label_fmt = self.label_field[2] if len(self.label_field) > 2 else same_func
         else:
             label_getter = F(self.label_field)
             label_fmt = same_func
@@ -158,9 +156,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
                 data_field = dataset.pop("data_field")
                 if isinstance(data_field, tuple):
                     data_getter = data_field[1](data_field[0])
-                    fmt_func = (
-                        data_field[2] if len(data_field) > 2 else same_func
-                    )
+                    fmt_func = data_field[2] if len(data_field) > 2 else same_func
                 else:
                     data_getter = F(data_field)
                     fmt_func = same_func
@@ -168,29 +164,23 @@ class Dashcard(View, metaclass=MediaDefiningClass):
                 label_field = dataset.pop("label_field")
                 if isinstance(label_field, tuple):
                     ds_label_getter = label_field[1](label_field[0])
-                    dl_formatter = (
-                        label_field[3] if len(label_field) > 2 else same_func
-                    )
+                    dl_formatter = label_field[3] if len(label_field) > 2 else same_func
                 else:
                     ds_label_getter = F(label_field)
                     dl_formatter = same_func
                 data_values = (
-                    queryset.values(
-                        ds_label=ds_label_getter, label=label_getter
-                    )
+                    queryset.values(ds_label=ds_label_getter, label=label_getter)
                     .order_by("ds_label", "label")
                     .annotate(value=data_getter)
                 )
                 subdatasets = defaultdict(OrderedDict)
                 for r in data_values:
-                    subdatasets[r["ds_label"]][label_fmt(r["label"])] = (
-                        fmt_func(r["value"])
+                    subdatasets[r["ds_label"]][label_fmt(r["label"])] = fmt_func(
+                        r["value"]
                     )
                 for label, values in subdatasets.items():
                     subdataset = dataset.copy()
-                    subdataset.update(
-                        {"label": dl_formatter(label), "data": values}
-                    )
+                    subdataset.update({"label": dl_formatter(label), "data": values})
                     bgcolor = self.get_dataset_color(subdataset["label"])
                     if bgcolor is not None:
                         subdataset["backgroundColor"] = bgcolor
@@ -202,9 +192,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
                     .order_by("label")
                 )
                 dataset["data"] = [fmt_func(r["value"]) for r in data_values]
-                bgcolor = [
-                    self.get_dataset_color(r["label"]) for r in data_values
-                ]
+                bgcolor = [self.get_dataset_color(r["label"]) for r in data_values]
                 if any(bgcolor):
                     dataset["backgroundColor"] = bgcolor
                 datasets.append(dataset)
@@ -238,7 +226,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         if self.template_name:
             template_names = [self.template_name]
         else:
-            default_name = 'dashboard_card' if self.grids else 'dashcard'
+            default_name = "dashboard_card" if self.grids else "dashcard"
             template_names = [
                 f"dashboard/{self.app_config.label}/{self.dash_name}.html",
                 f"dashboard/{self.app_config.label}/{default_name}.html",
@@ -251,7 +239,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
             "render_filterset": self.render_filterset,
             "previous_page": self.get_prev_page(),
             "next_page": self.get_next_page(),
-            'rodape': self.rodape if hasattr(self, 'rodape') else None,
+            "rodape": self.rodape if hasattr(self, "rodape") else None,
         }
 
         context.update(self.get_extra_context())
@@ -265,7 +253,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         config = {
             "type": self.chart_type,
             "data": {"labels": labels, "datasets": datasets},
-            "querystr": request.GET.urlencode() if hasattr(request, 'GET') else '',
+            "querystr": request.GET.urlencode() if hasattr(request, "GET") else "",
         }
         if self.chart_type == Dashcard.TYPE_HTML:
             context = config.pop("data")
@@ -348,7 +336,7 @@ class Dashcard(View, metaclass=MediaDefiningClass):
         if self.template_html:
             template_names = [self.template_html]
         else:
-            default_name = 'dashboard_card_html' if self.grids else 'dashcard_html'
+            default_name = "dashboard_card_html" if self.grids else "dashcard_html"
             template_names = [
                 f"dashboard/{self.app_config.label}/{self.dash_name}.html",
                 f"dashboard/{self.app_config.label}/{default_name}.html",
@@ -375,6 +363,7 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
     Pode ser utilizada para dashboards que possuem cards com filtros
     diferentes, mas que compartilham o mesmo conjunto de filtros.
     """
+
     cards = []
     grid = {}
     template_name = None
@@ -382,12 +371,11 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
     render_filterset = True
     app_config = None
 
-
     def get_filter(self, data=None, queryset=None):
         if self.filterset is None:
             return None
         data = data or {}
-        #self.kwargs = {}  # Clear kwargs after using them
+        # self.kwargs = {}  # Clear kwargs after using them
         filter = self.filterset(data=data, queryset=queryset)
         return filter
 
@@ -400,9 +388,7 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
     def __init__(self, app_config=None, **kwargs):
         if app_config is None:
             if self.app_config is None:
-                raise ImproperlyConfigured(
-                    "The app_config property must be defined"
-                )
+                raise ImproperlyConfigured("The app_config property must be defined")
             app_config = apps.get_app_config(self.app_config)
         self.app_config = app_config
         self.cards = defaultdict(dict)
@@ -433,14 +419,13 @@ class GridDashboard(View, metaclass=MediaDefiningClass):
 
         context = {
             "dash": self,
-            "rows": self.grid['rows'],
+            "rows": self.grid["rows"],
             "cards": {k: v[1] for k, v in self.cards.items()},
             "filter": self.get_filter(data=kwargs),
-            'render_filterset': self.render_filterset,
-            #"previous_page": self.get_prev_page(),
-            #"next_page": self.get_next_page(),
+            "render_filterset": self.render_filterset,
+            # "previous_page": self.get_prev_page(),
+            # "next_page": self.get_next_page(),
         }
 
         context.update(self.get_extra_context())
         return render_to_string(template_names, context)
-

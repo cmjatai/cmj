@@ -11,8 +11,4 @@ from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 
 logger = logging.getLogger(__name__)
 
-ApiViewSetConstrutor.build_class(
-    [
-        apps.get_app_config('agenda')
-    ]
-)
+ApiViewSetConstrutor.build_class([apps.get_app_config("agenda")])

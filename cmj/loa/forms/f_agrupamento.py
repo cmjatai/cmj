@@ -100,16 +100,14 @@ class AgrupamentoForm(ModelForm):
                 ("despesa_especificacao", "col-4"),
                 (
                     Div(
-                        HTML(
-                            """
+                        HTML("""
                 <button type="button" id="clean_form_search" class="btn btn-secondary" title="Limpar Formulário de Busca">
                     <i class="fas fa-backspace"></i>
                 </button>
                 <button type="button" id="add_registro" class="btn btn-primary" title="Adicionar Registro Contábil">
                     <i class="fas fa-plus-circle"></i>
                 </button>
-            """
-                        ),
+            """),
                         css_class="btn-group btn-group",
                     ),
                     "col-2",

@@ -1109,12 +1109,10 @@ class OrdemExpedienteLeituraForm(forms.ModelForm):
         self.helper.layout = Layout(
             Fieldset(
                 _("Leitura de Matéria"),
-                HTML(
-                    """
+                HTML("""
                         <b>Matéria:</b> {{materia}}<br>
                         <b>Ementa:</b> {{materia.ementa}} <br>
-                    """
-                ),
+                    """),
                 row1,
                 form_actions(more=actions),
             )

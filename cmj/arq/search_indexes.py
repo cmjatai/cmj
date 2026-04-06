@@ -1,6 +1,7 @@
 from celery_haystack.indexes import CelerySearchIndex
 from haystack.constants import Indexable
 from haystack.fields import CharField, DateTimeField, IntegerField
+
 from cmj.arq.models import ArqDoc
 from cmj.search.search_indexes import TextExtractField
 
@@ -13,18 +14,19 @@ class ArqTextExtractField(TextExtractField):
 
 class ArqDocIndex(CelerySearchIndex, Indexable):
     model = ArqDoc
-    data = DateTimeField(model_attr='data')
+    data = DateTimeField(model_attr="data")
 
-    conta_classe_logica = CharField(model_attr='conta_classe_logica')
-    conta_classe_estrutural = CharField(model_attr='conta_classe_estrutural')
+    conta_classe_logica = CharField(model_attr="conta_classe_logica")
+    conta_classe_estrutural = CharField(model_attr="conta_classe_estrutural")
 
     text = ArqTextExtractField(
-        document=True, use_template=True,
+        document=True,
+        use_template=True,
         model_attr=(
-            ('titulo', 'string_extractor'),
-            ('descricao', 'string_extractor'),
-            ('arquivo', 'file_extractor'),
-        )
+            ("titulo", "string_extractor"),
+            ("descricao", "string_extractor"),
+            ("arquivo", "file_extractor"),
+        ),
     )
 
     def __init__(self, **kwargs):
@@ -38,4 +40,4 @@ class ArqDocIndex(CelerySearchIndex, Indexable):
         return self.get_model().objects.all()
 
     def get_updated_field(self):
-        return 'modified'
+        return "modified"

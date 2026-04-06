@@ -1,24 +1,25 @@
-
-from datetime import timedelta
 import json
 import logging
-from random import random
 import re
+from datetime import timedelta
+from random import random
 
 import dateutil.parser
+import requests as rq
 from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
+
 from cmj.sigad.models import Documento
-from cmj.videos.models import PullYoutube, Video, VideoParte, PullExec
-import requests as rq
+from cmj.videos.models import PullExec, PullYoutube, Video, VideoParte
 
 logger = logging.getLogger(__name__)
 
 DEBUG_TASKS = settings.DEBUG
 
-CHANNEL_ID = 'UCZXKjzKW2n1w4JQ3bYlrA-w'  # Câmara Municipal Jataí
+CHANNEL_ID = "UCZXKjzKW2n1w4JQ3bYlrA-w"  # Câmara Municipal Jataí
+
 
 def pull_youtube_metadata_video(v, force=False):
 
@@ -28,38 +29,39 @@ def pull_youtube_metadata_video(v, force=False):
     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     headers = {}
     headers["Referer"] = settings.SITE_URL
-    headers['Content-Type'] = 'application/json'
+    headers["Content-Type"] = "application/json"
 
-    url_search = ('https://www.googleapis.com/youtube/v3/videos'
-                  '?key={}'
-                  '&id={}'
-                  '&part=snippet,id,contentDetails,statistics,liveStreamingDetails')
+    url_search = (
+        "https://www.googleapis.com/youtube/v3/videos"
+        "?key={}"
+        "&id={}"
+        "&part=snippet,id,contentDetails,statistics,liveStreamingDetails"
+    )
 
     #'&channelId=UCZXKjzKW2n1w4JQ3bYlrA-w'
 
-    channelId = v.json.get('snippet', {}).get('channelId', '')
+    channelId = v.json.get("snippet", {}).get("channelId", "")
     if channelId != CHANNEL_ID:
-        print(f'Video {v.vid} is not from the expected channel, skipping metadata pull.')
+        print(
+            f"Video {v.vid} is not from the expected channel, skipping metadata pull."
+        )
         return v, False
 
-    url = url_search.format(
-        settings.GOOGLE_URL_API_NEW_KEY,
-        v.vid
-    )
+    url = url_search.format(settings.GOOGLE_URL_API_NEW_KEY, v.vid)
 
     rr = rq.get(url, headers=headers)
 
-    data = rr._content.decode('utf-8')
+    data = rr._content.decode("utf-8")
     if rr.status_code != 200:
         print(rr.status_code)
         return v, False
 
     r = json.loads(data)
-    if 'items' not in r:
+    if "items" not in r:
         print(r)
         return v, False
 
-    if rr.status_code == 200 and not r['items']:
+    if rr.status_code == 200 and not r["items"]:
 
         for vp in v.videoparte_set.all():
             if isinstance(vp.content_object, Documento):
@@ -71,7 +73,7 @@ def pull_youtube_metadata_video(v, force=False):
         v.delete()
         return v, False
 
-    v.json = r['items'][0]
+    v.json = r["items"][0]
 
     now = timezone.now()
 
@@ -87,7 +89,7 @@ def pull_youtube_metadata_video(v, force=False):
         peso = 1
 
     v.execucao += peso
-    v.titulo = v.json['snippet']['title']
+    v.titulo = v.json["snippet"]["title"]
     v.save()
 
     for vp in v.videoparte_set.all():
@@ -102,15 +104,21 @@ def pull_youtube_metadata_video(v, force=False):
 
                 if dp == d:
                     d.extra_data = v.json
-                    d.descricao = v.json['snippet']['description']
+                    d.descricao = v.json["snippet"]["description"]
 
-                    d.public_date = timezone.localtime(dateutil.parser.parse(
-                        v.json['snippet']['publishedAt']))
+                    d.public_date = timezone.localtime(
+                        dateutil.parser.parse(v.json["snippet"]["publishedAt"])
+                    )
 
-                    if 'liveStreamingDetails' in v.json and \
-                            'actualStartTime' in v.json['liveStreamingDetails']:
-                        d.public_date = timezone.localtime(dateutil.parser.parse(
-                            v.json['liveStreamingDetails']['actualStartTime']))
+                    if (
+                        "liveStreamingDetails" in v.json
+                        and "actualStartTime" in v.json["liveStreamingDetails"]
+                    ):
+                        d.public_date = timezone.localtime(
+                            dateutil.parser.parse(
+                                v.json["liveStreamingDetails"]["actualStartTime"]
+                            )
+                        )
 
                     d.save()
                 elif dp.tipo == Documento.TPD_VIDEO:
@@ -126,18 +134,18 @@ def update_auto_now(m, disabled=True):
         dua = f
 
         if disabled:
-            if hasattr(dua, 'auto_now'):
+            if hasattr(dua, "auto_now"):
                 dua._auto_now = dua.auto_now
                 dua.auto_now = False
 
-            if hasattr(dua, 'auto_now_add'):
+            if hasattr(dua, "auto_now_add"):
                 dua._auto_now_add = dua.auto_now_add
                 dua.auto_now_add = False
         else:
-            if hasattr(dua, '_auto_now'):
+            if hasattr(dua, "_auto_now"):
                 dua.auto_now = dua._auto_now
 
-            if hasattr(dua, '_auto_now_add'):
+            if hasattr(dua, "_auto_now_add"):
                 dua.auto_now_add = dua._auto_now_add
 
 
@@ -149,22 +157,27 @@ def pull_youtube(force=False):
     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     headers = {}
     headers["Referer"] = settings.SITE_URL
-    headers['Content-Type'] = 'application/json'
+    headers["Content-Type"] = "application/json"
 
-    url_search = ('https://www.googleapis.com/youtube/v3/search'
-                  '?key={}'
-                  '&pageToken={}'
-                  '&publishedAfter={}'
-                  '&publishedBefore={}'
-                  '&channelId={}'
-                  '&part=snippet,id&order=date&type=video&maxResults=50')
+    url_search = (
+        "https://www.googleapis.com/youtube/v3/search"
+        "?key={}"
+        "&pageToken={}"
+        "&publishedAfter={}"
+        "&publishedBefore={}"
+        "&channelId={}"
+        "&part=snippet,id&order=date&type=video&maxResults=50"
+    )
 
     now = timezone.now()
 
     pull_atual = PullYoutube.objects.pull_from_date()
 
-    pulls = [PullYoutube.objects.exclude(
-        id=pull_atual.id).order_by('execucao', '-id').first(), ]
+    pulls = [
+        PullYoutube.objects.exclude(id=pull_atual.id)
+        .order_by("execucao", "-id")
+        .first(),
+    ]
 
     if pull_atual not in pulls:
         pulls.insert(0, pull_atual)
@@ -173,12 +186,12 @@ def pull_youtube(force=False):
 
     for pull in pulls:
 
-        pageToken = ''
+        pageToken = ""
 
-        publishedBefore = pull.published_before.isoformat('T')[:19] + 'Z'
-        publishedAfter = pull.published_after.isoformat('T')[:19] + 'Z'
+        publishedBefore = pull.published_before.isoformat("T")[:19] + "Z"
+        publishedAfter = pull.published_after.isoformat("T")[:19] + "Z"
 
-        logger.info(f'pull new video {publishedBefore} {publishedAfter}')
+        logger.info(f"pull new video {publishedBefore} {publishedAfter}")
 
         while pageToken is not None:
 
@@ -195,12 +208,12 @@ def pull_youtube(force=False):
                 pageToken,
                 publishedAfter,
                 publishedBefore,
-                CHANNEL_ID
+                CHANNEL_ID,
             )
 
             r = rq.get(url, headers=headers)
 
-            data = r._content.decode('utf-8')
+            data = r._content.decode("utf-8")
 
             r = json.loads(data)
 
@@ -209,42 +222,39 @@ def pull_youtube(force=False):
             if not r:
                 continue
 
-            if 'nextPageToken' in r:
-                pageToken = r['nextPageToken']
+            if "nextPageToken" in r:
+                pageToken = r["nextPageToken"]
 
-            if not 'items' in r:
+            if not "items" in r:
                 continue
 
-            for i in r['items']:
+            for i in r["items"]:
 
-                if not 'videoId' in i['id']:
+                if not "videoId" in i["id"]:
                     continue
 
-                if not 'snippet' in i:
+                if not "snippet" in i:
                     continue
 
-
-                ichannelId = i['snippet'].get('channelId', '')
+                ichannelId = i["snippet"].get("channelId", "")
 
                 if ichannelId != CHANNEL_ID:
                     continue
 
-                qs = Video.objects.filter(vid=i['id']['videoId'])
+                qs = Video.objects.filter(vid=i["id"]["videoId"])
 
                 if qs.exists():
                     continue
 
                 v = Video()
                 v.json = i
-                v.vid = i['id']['videoId']
-                v.titulo = i['snippet']['title']
+                v.vid = i["id"]["videoId"]
+                v.titulo = i["snippet"]["title"]
                 v.owner_id = 1
                 v.modifier_id = 1
 
-                v.created = dateutil.parser.parse(
-                    i['snippet']['publishedAt'])
-                v.modified = dateutil.parser.parse(
-                    i['snippet']['publishedAt'])
+                v.created = dateutil.parser.parse(i["snippet"]["publishedAt"])
+                v.modified = dateutil.parser.parse(i["snippet"]["publishedAt"])
 
                 v.save()
 
@@ -264,32 +274,29 @@ def vincular_sistema_aos_videos(force=False):
     if not force and DEBUG_TASKS:
         return
 
-    videos = Video.objects.order_by('-created')
+    videos = Video.objects.order_by("-created")
 
     ct_doc = ContentType.objects.get_for_model(Documento)
     for v in videos:
 
         for app in apps.get_app_configs():
-            if not app.name.startswith('cmj') and not app.name.startswith('sapl'):
+            if not app.name.startswith("cmj") and not app.name.startswith("sapl"):
                 continue
 
-            if app.name not in ('cmj.sigad', 'sapl.sessao', 'sapl.materia'):
+            if app.name not in ("cmj.sigad", "sapl.sessao", "sapl.materia"):
                 continue
 
             for m in app.get_models():
                 ct = ContentType.objects.get_for_model(m)
-                fields_name = tuple(
-                    map(lambda x: x.name, m._meta.get_fields()
-                        )
-                )
+                fields_name = tuple(map(lambda x: x.name, m._meta.get_fields()))
 
                 if m != Documento:
-                    if 'url_video' not in fields_name:
+                    if "url_video" not in fields_name:
                         continue
 
-                f = 'texto' if m == Documento else 'url_video'
+                f = "texto" if m == Documento else "url_video"
 
-                p = {f'{f}__contains': v.vid}
+                p = {f"{f}__contains": v.vid}
 
                 for item in m.objects.filter(**p):
                     try:
@@ -298,27 +305,27 @@ def vincular_sistema_aos_videos(force=False):
                         i = item if m != Documento else item.raiz
 
                         vp = VideoParte.objects.filter(
-                            video=v,
-                            content_type=ct,
-                            object_id=i.id
+                            video=v, content_type=ct, object_id=i.id
                         )
 
                         if vp.exists():
                             """if hasattr(i, 'titulo') and i.titulo != v.titulo:
-                                if hasattr(i, 'classe_id') and i.classe_id == 233:
-                                    i.titulo = v.titulo
-                                    i.descricao = v.json['snippet']['description']
-                                    i.save()"""
+                            if hasattr(i, 'classe_id') and i.classe_id == 233:
+                                i.titulo = v.titulo
+                                i.descricao = v.json['snippet']['description']
+                                i.save()"""
 
                             if isinstance(i, Documento):
-                                if i.visibilidade == Documento.STATUS_PRIVATE and i.classe_id == 233:
+                                if (
+                                    i.visibilidade == Documento.STATUS_PRIVATE
+                                    and i.classe_id == 233
+                                ):
                                     time_created = timezone.localtime() - i.created
                                     if time_created < timedelta(days=3):
                                         continue
                                     i.delete()
                                     vp.delete()
                                     v.delete()
-
 
                             continue
 
@@ -327,7 +334,7 @@ def vincular_sistema_aos_videos(force=False):
                         vp.content_object = i
                         vp.fieldname = f
 
-                        r = re.findall(r'http.+youtu.+\?.*t=(\d+)', vf)
+                        r = re.findall(r"http.+youtu.+\?.*t=(\d+)", vf)
 
                         if r:
                             vp.time_start = int(r[-1])
@@ -344,7 +351,7 @@ def video_documento_na_galeria(force=False):
 
     update_auto_now(Documento, disabled=False)
 
-    videos = Video.objects.order_by('-created')
+    videos = Video.objects.order_by("-created")
 
     ct_doc = ContentType.objects.get_for_model(Documento)
     created = False
@@ -355,21 +362,20 @@ def video_documento_na_galeria(force=False):
         docs = tuple(
             filter(
                 lambda o: o and o.classe_id == 233,
-                map(
-                    lambda vp: vp.content_object,
-                    vps)
+                map(lambda vp: vp.content_object, vps),
             )
         )
         if docs:
             continue
 
-        video_dict = v.json['snippet']
+        video_dict = v.json["snippet"]
 
         documento = Documento()
-        documento.titulo = video_dict['title']
-        documento.descricao = video_dict['description']
-        documento.public_date = timezone.localtime(dateutil.parser.parse(
-            video_dict['publishedAt']))
+        documento.titulo = video_dict["title"]
+        documento.descricao = video_dict["description"]
+        documento.public_date = timezone.localtime(
+            dateutil.parser.parse(video_dict["publishedAt"])
+        )
         documento.classe_id = 233
         documento.tipo = Documento.TD_VIDEO_NEWS
         documento.template_doc = 1
@@ -383,8 +389,8 @@ def video_documento_na_galeria(force=False):
 
         container = Documento()
         container.raiz = documento
-        container.titulo = ''
-        container.descricao = ''
+        container.titulo = ""
+        container.descricao = ""
         container.classe_id = 233
         container.tipo = Documento.TPD_CONTAINER_SIMPLES
         container.owner_id = 1
@@ -395,8 +401,8 @@ def video_documento_na_galeria(force=False):
 
         video = Documento()
         video.raiz = documento
-        video.titulo = ''
-        video.descricao = ''
+        video.titulo = ""
+        video.descricao = ""
         video.classe_id = 233
         video.tipo = Documento.TPD_VIDEO
         video.owner_id = 1
@@ -410,7 +416,8 @@ def video_documento_na_galeria(force=False):
             'src="https://www.youtube.com/embed/%s" '
             'frameborder="0" '
             'allow="autoplay; encrypted-media" allowfullscreen>'
-            '</iframe>' % v.vid)
+            "</iframe>" % v.vid
+        )
 
         video.save()
         created = True

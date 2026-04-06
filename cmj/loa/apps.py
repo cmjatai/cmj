@@ -3,9 +3,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 class AppConfig(apps.AppConfig):
-    name = 'cmj.loa'
-    label = 'loa'
-    verbose_name = _('Loa')
+    name = "cmj.loa"
+    label = "loa"
+    verbose_name = _("Loa")
 
     def ready(self):
         from . import signals

@@ -27,9 +27,11 @@ class PautaSessaoView(TemplateView):
     template_name = "sessao/pauta_inexistente.html"
 
     def get_sessao_mais_recente(self, tipo__tipogeral):
-        sessao = SessaoPlenaria.objects.filter(
-            tipo__tipogeral=tipo__tipogeral
-        ).order_by("-data_inicio", "-id").first()
+        sessao = (
+            SessaoPlenaria.objects.filter(tipo__tipogeral=tipo__tipogeral)
+            .order_by("-data_inicio", "-id")
+            .first()
+        )
         return sessao
 
     def get(self, request, *args, **kwargs):
@@ -38,7 +40,8 @@ class PautaSessaoView(TemplateView):
             return self.render_to_response({})
 
         return HttpResponseRedirect(
-            reverse('sapl.sessao:pauta_sessao_detail', kwargs={'pk': sessao.pk}))
+            reverse("sapl.sessao:pauta_sessao_detail", kwargs={"pk": sessao.pk})
+        )
 
 
 class PautaComissaoView(PautaSessaoView):
@@ -49,7 +52,8 @@ class PautaComissaoView(PautaSessaoView):
             return self.render_to_response({})
 
         return HttpResponseRedirect(
-            reverse('sapl.sessao:pauta_comissao_detail', kwargs={'pk': sessao.pk}))
+            reverse("sapl.sessao:pauta_comissao_detail", kwargs={"pk": sessao.pk})
+        )
 
 
 class PautaSessaoDetailView(DetailView):
@@ -58,7 +62,7 @@ class PautaSessaoDetailView(DetailView):
 
     @property
     def search_url(self):
-        return reverse('sapl.sessao:pesquisar_pauta')
+        return reverse("sapl.sessao:pesquisar_pauta")
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -66,24 +70,27 @@ class PautaSessaoDetailView(DetailView):
 
         # =====================================================================
         # Identificação Básica
-        abertura = self.object.data_inicio.strftime('%d/%m/%Y')
+        abertura = self.object.data_inicio.strftime("%d/%m/%Y")
         if self.object.data_fim:
-            encerramento = self.object.data_fim.strftime('%d/%m/%Y')
+            encerramento = self.object.data_fim.strftime("%d/%m/%Y")
         else:
             encerramento = ""
 
-        context.update({'basica': [
-            _('Tipo de Sessão: %(tipo)s') % {'tipo': self.object.tipo},
-            _('Abertura: %(abertura)s') % {'abertura': abertura},
-            _('Encerramento: %(encerramento)s') % {
-                'encerramento': encerramento},
-        ]})
+        context.update(
+            {
+                "basica": [
+                    _("Tipo de Sessão: %(tipo)s") % {"tipo": self.object.tipo},
+                    _("Abertura: %(abertura)s") % {"abertura": abertura},
+                    _("Encerramento: %(encerramento)s")
+                    % {"encerramento": encerramento},
+                ]
+            }
+        )
         # =====================================================================
         # Matérias Expediente
         materias = ExpedienteMateria.objects.filter(
-            sessao_plenaria_id=self.object.id,
-            parent__isnull=True
-        ).order_by('numero_ordem', 'materia', 'resultado')
+            sessao_plenaria_id=self.object.id, parent__isnull=True
+        ).order_by("numero_ordem", "materia", "resultado")
 
         materias_expediente = []
         for m in materias:
@@ -101,57 +108,56 @@ class PautaSessaoDetailView(DetailView):
             if situacao is None:
                 situacao = _("Não informada")
             else:
-                situacao = f'{situacao.status}<br><em>{situacao.texto}</em>'
+                situacao = f"{situacao.status}<br><em>{situacao.texto}</em>"
             rv = m.registrovotacao_set.all()
             if rv:
                 resultado = rv[0].tipo_resultado_votacao.nome
                 resultado_observacao = rv[0].observacao
             else:
-                resultado = _('Matéria não votada')
-                resultado_observacao = _(' ')
+                resultado = _("Matéria não votada")
+                resultado_observacao = _(" ")
 
             autoria = Autoria.objects.filter(materia_id=m.materia_id)
             autor = [str(x.autor) for x in autoria]
 
-            mat = {'id': m.materia_id,
-                   'ementa': ementa,
-                   'observacao': m.observacao,
-                   'titulo': titulo,
-                   'numero': numero,
-                   'resultado': resultado,
-                   'resultado_observacao': resultado_observacao,
-                   'situacao': situacao,
-                   'autor': autor
-                   }
+            mat = {
+                "id": m.materia_id,
+                "ementa": ementa,
+                "observacao": m.observacao,
+                "titulo": titulo,
+                "numero": numero,
+                "resultado": resultado,
+                "resultado_observacao": resultado_observacao,
+                "situacao": situacao,
+                "autor": autor,
+            }
             materias_expediente.append(mat)
 
-        context.update({'materia_expediente': materias_expediente})
+        context.update({"materia_expediente": materias_expediente})
         # =====================================================================
         # Expedientes
-        expediente = ExpedienteSessao.objects.filter(
-            sessao_plenaria_id=self.object.id)
+        expediente = ExpedienteSessao.objects.filter(sessao_plenaria_id=self.object.id)
 
         expedientes = []
         for e in expediente:
             tipo = e.tipo
-            conteudo = sub(
-                '&nbsp;', ' ', strip_tags(e.conteudo.replace('<br/>', '\n')))
+            conteudo = sub("&nbsp;", " ", strip_tags(e.conteudo.replace("<br/>", "\n")))
 
-            ex = {'tipo': tipo, 'conteudo': conteudo}
+            ex = {"tipo": tipo, "conteudo": conteudo}
             expedientes.append(ex)
 
-        context.update({'expedientes': expedientes})
+        context.update({"expedientes": expedientes})
         # =====================================================================
         # Orador Expediente
         oradores = OradorExpediente.objects.filter(
-            sessao_plenaria_id=self.object.id).order_by('numero_ordem')
-        context.update({'oradores': oradores})
+            sessao_plenaria_id=self.object.id
+        ).order_by("numero_ordem")
+        context.update({"oradores": oradores})
         # =====================================================================
         # Matérias Ordem do Dia
         ordem = OrdemDia.objects.filter(
-            sessao_plenaria_id=self.object.id,
-            parent__isnull=True
-        ).order_by('numero_ordem', 'materia', 'resultado')
+            sessao_plenaria_id=self.object.id, parent__isnull=True
+        ).order_by("numero_ordem", "materia", "resultado")
 
         materias_ordem = []
         for o in ordem:
@@ -174,104 +180,108 @@ class PautaSessaoDetailView(DetailView):
                 resultado = rv[0].tipo_resultado_votacao.nome
                 resultado_observacao = rv[0].observacao
             else:
-                resultado = _('Matéria não votada')
-                resultado_observacao = _(' ')
+                resultado = _("Matéria não votada")
+                resultado_observacao = _(" ")
 
-            autoria = Autoria.objects.filter(
-                materia_id=o.materia_id)
+            autoria = Autoria.objects.filter(materia_id=o.materia_id)
             autor = [str(x.autor) for x in autoria]
 
-            mat = {'id': o.materia_id,
-                   'ementa': ementa,
-                   'observacao': o.observacao,
-                   'titulo': titulo,
-                   'numero': numero,
-                   'resultado': resultado,
-                   'resultado_observacao': resultado_observacao,
-                   'situacao': situacao,
-                   'autor': autor,
-                   'materia': o.materia
-                   }
+            mat = {
+                "id": o.materia_id,
+                "ementa": ementa,
+                "observacao": o.observacao,
+                "titulo": titulo,
+                "numero": numero,
+                "resultado": resultado,
+                "resultado_observacao": resultado_observacao,
+                "situacao": situacao,
+                "autor": autor,
+                "materia": o.materia,
+            }
             materias_ordem.append(mat)
 
-        context.update({'materias_ordem': materias_ordem})
-        context.update({'subnav_template_name': ''})
+        context.update({"materias_ordem": materias_ordem})
+        context.update({"subnav_template_name": ""})
 
         return self.render_to_response(context)
+
 
 class PautaComissaoDetailView(PautaSessaoDetailView):
 
     @property
     def search_url(self):
-        return reverse('sapl.sessao:pesquisar_comissao_pauta')
+        return reverse("sapl.sessao:pesquisar_comissao_pauta")
 
 
 class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
     filterset_class = PautaSessaoFilterSet
-    template_name = 'sessao/pauta_sessao_filter.html'
+    template_name = "sessao/pauta_sessao_filter.html"
 
-    viewname = 'sapl.sessao:pesquisar_pauta'
+    viewname = "sapl.sessao:pesquisar_pauta"
 
     fields_base_report = [
-        'id',
-        'data_inicio',
-        'hora_inicio',
-        'data_fim',
-        'hora_fim',
-        'url_pauta',
-        '',
+        "id",
+        "data_inicio",
+        "hora_inicio",
+        "data_fim",
+        "hora_fim",
+        "url_pauta",
+        "",
     ]
 
     fields_report = {
-        'csv': fields_base_report,
-        'xlsx': fields_base_report,
-        'json': fields_base_report,
+        "csv": fields_base_report,
+        "xlsx": fields_base_report,
+        "json": fields_base_report,
     }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = _('Pesquisar Pauta de Sessão')
-        context['bg_title'] = ''
+        context["title"] = _("Pesquisar Pauta de Sessão")
+        context["bg_title"] = ""
         return context
 
     def hook_header_url_pauta(self):
-        return 'Link para a Pauta'
+        return "Link para a Pauta"
 
     def hook_url_pauta(self, obj):
-        url_reverse = reverse('sapl.sessao:pauta_sessao_detail', kwargs={'pk': obj.pk})
-        return f'{settings.SITE_URL}{url_reverse}'
+        url_reverse = reverse("sapl.sessao:pauta_sessao_detail", kwargs={"pk": obj.pk})
+        return f"{settings.SITE_URL}{url_reverse}"
+
 
 class PesquisarPautaComissaoView(PesquisarSessaoPlenariaView):
     filterset_class = PautaComissaoFilterSet
-    template_name = 'sessao/pauta_comissao_filter.html'
+    template_name = "sessao/pauta_comissao_filter.html"
 
-    viewname = 'sapl.sessao:pesquisar_comissao_pauta'
+    viewname = "sapl.sessao:pesquisar_comissao_pauta"
 
     fields_base_report = [
-        'id',
-        'data_inicio',
-        'hora_inicio',
-        'data_fim',
-        'hora_fim',
-        'url_pauta',
-        '',
+        "id",
+        "data_inicio",
+        "hora_inicio",
+        "data_fim",
+        "hora_fim",
+        "url_pauta",
+        "",
     ]
 
     fields_report = {
-        'csv': fields_base_report,
-        'xlsx': fields_base_report,
-        'json': fields_base_report,
+        "csv": fields_base_report,
+        "xlsx": fields_base_report,
+        "json": fields_base_report,
     }
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = _('Pesquisar Pauta das Comissões')
-        context['bg_title'] = ''
+        context["title"] = _("Pesquisar Pauta das Comissões")
+        context["bg_title"] = ""
         return context
 
     def hook_header_url_pauta(self):
-        return 'Link para a Pauta'
+        return "Link para a Pauta"
 
     def hook_url_pauta(self, obj):
-        url_reverse = reverse('sapl.sessao:pauta_comissao_detail', kwargs={'pk': obj.pk})
-        return f'{settings.SITE_URL}{url_reverse}'
+        url_reverse = reverse(
+            "sapl.sessao:pauta_comissao_detail", kwargs={"pk": obj.pk}
+        )
+        return f"{settings.SITE_URL}{url_reverse}"

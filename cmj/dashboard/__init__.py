@@ -1,6 +1,6 @@
-from .dashboard import GridDashboard, Dashcard, getcolor
+from .dashboard import Dashcard, GridDashboard, getcolor
 
-default_app_config = 'dashboard.apps.DashboardConfig'
+default_app_config = "dashboard.apps.DashboardConfig"
 
 __all__ = ["Dashcard", "getcolor", "GridDashboard"]
 

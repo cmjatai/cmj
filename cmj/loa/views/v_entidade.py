@@ -1,8 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.models import (
-    Entidade,
-)
+from cmj.loa.models import Entidade
 from sapl.crud.base import RP_DETAIL, RP_LIST, CrudAux
 
 

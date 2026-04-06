@@ -15,11 +15,7 @@ from sapl.api.mixins import ResponseFileMixin
 
 logger = logging.getLogger(__name__)
 
-ApiViewSetConstrutor.build_class(
-    [
-        apps.get_app_config('core')
-    ]
-)
+ApiViewSetConstrutor.build_class([apps.get_app_config("core")])
 
 
 @customize(Bi)
@@ -31,12 +27,11 @@ class _BiViewSet:
 class _CertidaoPublicacaoViewSet(ResponseFileMixin):
 
     def custom_filename__(self, item):
-        arcname = '{}-{}.{}'.format(
-            item.loa.ano,
-            slugify(item.epigrafe),
-            item.arquivo.path.split('.')[-1])
+        arcname = "{}-{}.{}".format(
+            item.loa.ano, slugify(item.epigrafe), item.arquivo.path.split(".")[-1]
+        )
         return arcname
 
-    @action(detail = True)
+    @action(detail=True)
     def certificado(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)

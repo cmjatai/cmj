@@ -209,16 +209,14 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
                 pc_url = reverse_lazy(
                     "cmj.loa:prestacaocontaregistro_detail", kwargs={"pk": pc.id}
                 )
-                pcs.append(
-                    f"""<li>
+                pcs.append(f"""<li>
                         <span class="badge badge-secondary p-2">{formats.date_format(pc.prestacao_conta.data_envio, "SHORT_DATE_FORMAT")}</span>
                         <span class="badge badge-secondary p-2">{pc.situacao}</span>
                         <a href="{ pc_url}" class="d-inline-block p-2 font-weight-bold">
                         {pc.prestacao_conta}
                         </a>
                         <span class="text-gray d-block">{pc.detalhamento}</span>
-                    </li>"""
-                )
+                    </li>""")
 
             return (
                 verbose_name,
@@ -236,15 +234,13 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
             for eea in ajuste.empenhoemendaajuste_set.all():
                 empenho = eea.empenho
                 url = reverse_lazy("cmj.loa:empenho_detail", kwargs={"pk": empenho.id})
-                empenhos.append(
-                    f"""
+                empenhos.append(f"""
                     <li>
                         <a href="{url}">
                             {empenho.codigo}</a> |
                             Data: {formats.date_format(empenho.data, "SHORT_DATE_FORMAT")} |
                             Valor Empenhado: R$ {empenho.str_valor_empenhado} | {empenho.nome}
-                    </li>"""
-                )
+                    </li>""")
             return (
                 "Empenhos do Registro de Ajuste",
                 f'<ul class="small courier">{"".join(empenhos)}</ul>',

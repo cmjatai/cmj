@@ -105,16 +105,12 @@ def test_crudaux_formato_inicio_urls_associadas(url_item):
     for string_class in list(map(str, type.mro(view_class.crud))):
 
         if "CrudAux" in string_class:
-            assert url.startswith(
-                "/sistema"
-            ), """
+            assert url.startswith("/sistema"), """
                         A url (%s) foi gerada a partir de um CrudAux,
                         o que diz que está é uma implementação de uma
                         tabela auxiliar, porém a url em questão, está fora
                         do padrão, que é iniciar com /sistema.
-                    """ % (
-                url
-            )
+                    """ % (url)
 
 
 @pytest.mark.parametrize("url_item", _lista_urls)
@@ -147,9 +143,7 @@ def test_crudaux_list_do_crud_esta_na_pagina_sistema(url_item, admin_client):
                 # verifica se o link para manutenção do crud está em /sistema
                 if "ListView" in string_view_class:
                     response = admin_client.get("/sistema", {}, follow=True)
-                    assert url in str(
-                        response.content
-                    ), """
+                    assert url in str(response.content), """
                         A url (%s) não consta nas Tabelas Auxiliares,
                         porem é uma implementação de ListView de CrudAux.
                         Se encontra em %s.urls
@@ -279,9 +273,7 @@ def test_urlpatterns(url_item, admin_client):
     key, url, var, app_name = url_item
     url = "/" + (url % {v: 1 for v in var})
 
-    assert (
-        "\n" not in url
-    ), """
+    assert "\n" not in url, """
         A url (%s) da app (%s) está mal formada.
     """ % (
         app_name,
@@ -290,9 +282,7 @@ def test_urlpatterns(url_item, admin_client):
 
     app_name = app_name[5:]
     if app_name != "redireciona_urls":
-        assert (
-            app_name in apps_url_patterns_prefixs_and_users
-        ), """
+        assert app_name in apps_url_patterns_prefixs_and_users, """
             A app (%s) da url (%s) não consta na lista de prefixos do teste
         """ % (
             app_name,
@@ -480,9 +470,7 @@ def test_permissions_urls_for_users_by_apps(url_item, client):
 
     for app in app_labels:
 
-        assert (
-            app in apps_url_patterns_prefixs_and_users
-        ), """
+        assert app in apps_url_patterns_prefixs_and_users, """
             O app_label (%s) associado a url (%s) não está na base de testes.
             """ % (
             app_name,
@@ -542,9 +530,7 @@ def test_permissions_urls_for_users_by_apps(url_item, client):
 
                 def _assert_login(_in):
                     if _in:
-                        assert (
-                            btn_login in content
-                        ), """
+                        assert btn_login in content, """
             No teste de requisição "%s" a url (%s). App (%s)
             O usuário (%s) deveria ser redirecionado para tela de login.
             Observe que o teste é suspenso no primeiro usuário que o erro
@@ -561,9 +547,7 @@ def test_permissions_urls_for_users_by_apps(url_item, client):
                             username,
                         )
                     else:
-                        assert (
-                            btn_login not in content
-                        ), """
+                        assert btn_login not in content, """
             No teste de requisição "%s" a url (%s). App (%s)
             O usuário (%s) não deveria ser redirecionado para tela de login.
             Observe que o teste é suspenso no primeiro usuário que o erro

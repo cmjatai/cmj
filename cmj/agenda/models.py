@@ -1,12 +1,12 @@
 from django.db import models
-from django.db.models.deletion import SET_NULL, PROTECT, CASCADE
+from django.db.models.deletion import CASCADE, PROTECT, SET_NULL
 from django.db.models.fields.related import ManyToManyField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
-from sapl.base.models import Autor
-from sapl.parlamentares.models import Partido, Parlamentar
 
 from cmj.core.models import AreaTrabalho
+from sapl.base.models import Autor
+from sapl.parlamentares.models import Parlamentar, Partido
 
 
 class TipoEvento(models.Model):
@@ -17,17 +17,16 @@ class TipoEvento(models.Model):
         return self.titulo
 
     class Meta:
-        verbose_name = _('Tipo de Evento')
-        verbose_name_plural = _('Tipos de Eventos')
-        ordering = ['id']
+        verbose_name = _("Tipo de Evento")
+        verbose_name_plural = _("Tipos de Eventos")
+        ordering = ["id"]
 
 
 class Evento(models.Model):
 
     EVENTO = 0
     FERIADO = 1
-    CARACTERISTICA_CHOICE = ((EVENTO, _('Eventos Diversos')),
-                             (FERIADO, _('Feriado')))
+    CARACTERISTICA_CHOICE = ((EVENTO, _("Eventos Diversos")), (FERIADO, _("Feriado")))
 
     inicio = models.DateTimeField(_("Início"))
     fim = models.DateTimeField(_("Fim"), blank=True, null=True)
@@ -36,32 +35,35 @@ class Evento(models.Model):
 
     tipo = models.ForeignKey(
         TipoEvento,
-        verbose_name=_('Tipo de Evento'),
-        related_name='+', on_delete=PROTECT)
+        verbose_name=_("Tipo de Evento"),
+        related_name="+",
+        on_delete=PROTECT,
+    )
 
     caracteristica = models.PositiveSmallIntegerField(
-        choices=CARACTERISTICA_CHOICE,
-        default=0, verbose_name=_('Caracteristica?'))
+        choices=CARACTERISTICA_CHOICE, default=0, verbose_name=_("Caracteristica?")
+    )
 
-    link_externo = models.URLField(_('Url Externa'), default='', blank=True)
+    link_externo = models.URLField(_("Url Externa"), default="", blank=True)
 
     workspace = models.ForeignKey(
         AreaTrabalho,
-        verbose_name=_('Área de Trabalho'),
-        related_name='evento_set', on_delete=PROTECT)
+        verbose_name=_("Área de Trabalho"),
+        related_name="evento_set",
+        on_delete=PROTECT,
+    )
 
-    solicitante = models.CharField(_("Solicitante"),
-                                   blank=True, max_length=255)
+    solicitante = models.CharField(_("Solicitante"), blank=True, max_length=255)
 
     class Meta:
-        ordering = ('-inicio', )
-        verbose_name = _('Evento')
-        verbose_name_plural = _('Eventos')
+        ordering = ("-inicio",)
+        verbose_name = _("Evento")
+        verbose_name_plural = _("Eventos")
 
     def __str__(self):
-        return '{} - {}'.format(
-            formats.date_format(self.inicio, 'd/m/Y - H:i'),
-            self.titulo)
+        return "{} - {}".format(
+            formats.date_format(self.inicio, "d/m/Y - H:i"), self.titulo
+        )
 
 
 class Programacao(models.Model):
@@ -73,8 +75,10 @@ class Programacao(models.Model):
 
     evento = models.ForeignKey(
         Evento,
-        verbose_name=_('Programacao do Evento'),
-        related_name='programacao_set', on_delete=CASCADE)
+        verbose_name=_("Programacao do Evento"),
+        related_name="programacao_set",
+        on_delete=CASCADE,
+    )
 
     class Meta:
-        ordering = ['id']
+        ordering = ["id"]

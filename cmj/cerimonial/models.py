@@ -345,10 +345,8 @@ class Contato(CmjSearchMixin, CmjAuditoriaModelMixin):
         blank=True,
         null=True,
         on_delete=SET_NULL,
-        help_text=_(
-            "O pronome de tratamento é opcional, mas será \
-        obrigatório caso seja selecionado um tipo de autoridade."
-        ),
+        help_text=_("O pronome de tratamento é opcional, mas será \
+        obrigatório caso seja selecionado um tipo de autoridade."),
     )
 
     observacoes = models.TextField(
@@ -441,10 +439,8 @@ class Telefone(CmjAuditoriaModelMixin):
         choices=YES_NO_CHOICES,
         default=True,
         verbose_name=_("Permissão:"),
-        help_text=_(
-            "Permite que nossa instituição entre em contato \
-        com você neste telefone?"
-        ),
+        help_text=_("Permite que nossa instituição entre em contato \
+        com você neste telefone?"),
     )
 
     @property
@@ -491,10 +487,8 @@ class Email(CmjAuditoriaModelMixin):
         choices=YES_NO_CHOICES,
         default=True,
         verbose_name=_("Permissão:"),
-        help_text=_(
-            "Permite que nossa instituição envie informações \
-        para este email?"
-        ),
+        help_text=_("Permite que nossa instituição envie informações \
+        para este email?"),
     )
 
     class Meta:

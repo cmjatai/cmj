@@ -62,6 +62,7 @@ class MateriaLegislativaSerializer(CmjSerializerMixin):
 
         return serializer_class.data
 
+
 class ParlamentarSerializerPublic(CmjSerializerMixin):
 
     class Meta:

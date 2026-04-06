@@ -1,9 +1,9 @@
-from functools import partial
 import re
+from functools import partial
 
 from django.core.exceptions import ImproperlyConfigured
 from django.urls.conf import _path
-from django.urls.resolvers import RoutePattern, RegexPattern, _route_to_regex
+from django.urls.resolvers import RegexPattern, RoutePattern, _route_to_regex
 
 
 class IRoutePattern(RoutePattern):
@@ -24,5 +24,5 @@ class IRegexPattern(RegexPattern):
             ) from e
 
 
-ipath = partial(_path, Pattern = IRoutePattern)
-re_ipath = partial(_path, Pattern = IRegexPattern)
+ipath = partial(_path, Pattern=IRoutePattern)
+re_ipath = partial(_path, Pattern=IRegexPattern)

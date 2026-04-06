@@ -475,12 +475,8 @@ def get_espelho(mats):
         dic["ultima_acao"] = txt_tramitacao
         dic["data_ultima_acao"] = data_ultima_acao
 
-        dic["norma_juridica_vinculada"] = str(
-            _(
-                "Não há nenhuma \
-                                           norma jurídica vinculada"
-            )
-        )
+        dic["norma_juridica_vinculada"] = str(_("Não há nenhuma \
+                                           norma jurídica vinculada"))
         # TODO
         # for norma in context.zsql.materia_buscar_norma_juridica_zsql(
         #       cod_materia=materia.cod_materia):
@@ -1524,7 +1520,7 @@ def relatorio_pauta_sessao(request, pk):
         )
         raise Http404("Essa página não existe")
 
-    (lst_expediente_materia, lst_votacao, inf_basicas_dic, expedientes) = (
+    lst_expediente_materia, lst_votacao, inf_basicas_dic, expedientes = (
         get_pauta_sessao(sessao, casa)
     )
 

@@ -8,8 +8,9 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.mixins import CmjCleanMixin, CommonMixin
 from cmj.utils import texto_upload_path
-from sapl.utils import OverwriteStorage, PortalFileField
 from cmj.utils_files import restringe_tipos_de_arquivo_txt
+from sapl.utils import OverwriteStorage, PortalFileField
+
 
 class TipoDeDiario(models.Model):
     descricao = models.CharField(max_length=50, verbose_name=_("Descrição"))

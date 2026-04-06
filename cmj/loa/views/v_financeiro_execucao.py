@@ -67,25 +67,21 @@ class EmpenhoCrud(MasterDetailCrud):
                 "emendaloa__materia__numero", "ajuste__oficio_ajuste_loa__loa__ano"
             ):
                 if ea.emendaloa:
-                    emendas_ajustes.append(
-                        f"""
+                    emendas_ajustes.append(f"""
                         <li>
                         <a href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': ea.emendaloa.pk})}">
                             {ea.emendaloa.materia.epigrafe_short}
                         </a> - {ea.emendaloa.ementa_format}
                         </li>
-                        """
-                    )
+                        """)
                 elif ea.ajuste:
-                    emendas_ajustes.append(
-                        f"""
+                    emendas_ajustes.append(f"""
                         <li>
                         <a href="{reverse_lazy('cmj.loa:registroajusteloa_detail', kwargs={'pk': ea.ajuste.pk})}">
                             {ea.ajuste.oficio_ajuste_loa}
                         </a><br>R$ {ea.ajuste.str_valor} - {ea.ajuste.descricao}
                         </li>
-                        """
-                    )
+                        """)
 
             if not emendas_ajustes:
                 return (
@@ -147,24 +143,20 @@ class EmpenhoCrud(MasterDetailCrud):
 
             for ea in empenho.empenhoemendaajuste_set.all():
                 if ea.emendaloa:
-                    emendas_ajustes.append(
-                        f"""
+                    emendas_ajustes.append(f"""
                         <li>
                         <a href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': ea.emendaloa.pk})}">
                             {ea.emendaloa.materia.epigrafe_short}
                         </a></li>
-                        """
-                    )
+                        """)
                 elif ea.ajuste:
-                    emendas_ajustes.append(
-                        f"""
+                    emendas_ajustes.append(f"""
                         <li>
                         <a href="{reverse_lazy('cmj.loa:registroajusteloa_detail', kwargs={'pk': ea.ajuste.pk})}">
                             Ajuste à LOA {ea.ajuste.oficio_ajuste_loa.loa.ano} - {ea.ajuste.get_tipo_display()}
                         </a>
                         </li>
-                        """
-                    )
+                        """)
 
             if not emendas_ajustes:
                 return _(

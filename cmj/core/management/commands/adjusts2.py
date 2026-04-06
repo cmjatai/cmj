@@ -1,36 +1,37 @@
-import cv2
 import glob
 import logging
 import os
 import subprocess
 import sys
 
-from PIL import Image, ImageFilter
+import cv2
+import fitz
+import numpy as np
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import File
 from django.core.management.base import BaseCommand
 from django.db.models import Q
 from django.db.models.signals import post_delete, post_save
-import fitz
+from PIL import Image, ImageFilter
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj.core.models import OcrMyPDF
 from cmj.diarios.models import DiarioOficial
-from cmj.utils import Manutencao
-from cmj.utils import ProcessoExterno
-import numpy as np
-from sapl.compilacao.models import TextoArticulado, Dispositivo
-from sapl.materia.models import MateriaLegislativa, DocumentoAcessorio
+from cmj.utils import Manutencao, ProcessoExterno
+from sapl.compilacao.models import Dispositivo, TextoArticulado
+from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
 from sapl.norma.models import NormaJuridica
-from sapl.protocoloadm.models import DocumentoAdministrativo,\
-    DocumentoAcessorioAdministrativo
+from sapl.protocoloadm.models import (
+    DocumentoAcessorioAdministrativo,
+    DocumentoAdministrativo,
+)
 from sapl.sessao.models import SessaoPlenaria
 
 
 def _get_registration_key(model):
-    return '%s_%s' % (model._meta.app_label, model._meta.model_name)
+    return "%s_%s" % (model._meta.app_label, model._meta.model_name)
 
 
 class Command(BaseCommand):
@@ -39,27 +40,27 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
         m = Manutencao()
         m.desativa_auto_now()
-        post_save.disconnect(dispatch_uid='timerefresh_post_signal')
+        post_save.disconnect(dispatch_uid="timerefresh_post_signal")
         self.logger = logging.getLogger(__name__)
 
         # self.transformar_pdfs_em_imagens()
         self.criar_pdfs()
 
     def transformar_pdfs_em_imagens(self, *args, **options):
-        folder_raiz = '/home/leandro/TEMP/scanners/'
+        folder_raiz = "/home/leandro/TEMP/scanners/"
 
-        folder_in_pdfs = folder_raiz + 'in_pdfs/'
-        folder_in_images = folder_raiz + 'in_images/'
+        folder_in_pdfs = folder_raiz + "in_pdfs/"
+        folder_in_images = folder_raiz + "in_images/"
 
         os.makedirs(folder_in_images, exist_ok=True)
 
-        lfpdf = glob.glob(glob.escape(folder_in_pdfs) + '**', recursive=True)
+        lfpdf = glob.glob(glob.escape(folder_in_pdfs) + "**", recursive=True)
         lfpdf.sort()
 
         for f in lfpdf:
 
-            fimg_out = f.replace('in_pdfs', 'in_images')
-            if not f.endswith('.pdf'):
+            fimg_out = f.replace("in_pdfs", "in_images")
+            if not f.endswith(".pdf"):
                 os.makedirs(fimg_out, exist_ok=True)
                 continue
 
@@ -67,23 +68,23 @@ class Command(BaseCommand):
 
             for index, page in enumerate(doc):
                 pix = page.get_pixmap(dpi=300)
-                pix.save(f'{fimg_out}-{index:0>6}.png')
+                pix.save(f"{fimg_out}-{index:0>6}.png")
         return
 
     def criar_pdfs(self, *args, **options):
-        folder_raiz = '/home/leandro/TEMP/scanners/'
+        folder_raiz = "/home/leandro/TEMP/scanners/"
 
-        folder_in_images = folder_raiz + 'in_images/'
+        folder_in_images = folder_raiz + "in_images/"
 
         os.makedirs(folder_in_images, exist_ok=True)
 
-        lfpdf = glob.glob(glob.escape(folder_in_pdfs) + '**', recursive=True)
+        lfpdf = glob.glob(glob.escape(folder_in_pdfs) + "**", recursive=True)
         lfpdf.sort()
 
         for f in lfpdf:
 
-            fimg_out = f.replace('in_pdfs', 'in_images')
-            if not f.endswith('.pdf'):
+            fimg_out = f.replace("in_pdfs", "in_images")
+            if not f.endswith(".pdf"):
                 os.makedirs(fimg_out, exist_ok=True)
                 continue
 
@@ -91,12 +92,12 @@ class Command(BaseCommand):
 
             for index, page in enumerate(doc):
                 pix = page.get_pixmap(dpi=300)
-                pix.save(f'{fimg_out}-{index:0>6}.png')
+                pix.save(f"{fimg_out}-{index:0>6}.png")
         return
         flist_out = []
 
         composicao = [
-            ['out-0451', 'out-0538'],
+            ["out-0451", "out-0538"],
             # ['out-0533', 'out-0538']
         ]
 
@@ -104,20 +105,21 @@ class Command(BaseCommand):
             for f in lf:
                 if c[0] and c[0] not in f:
                     continue
-                c[0] = ''
+                c[0] = ""
 
                 flist_out.append(f)
                 if c[1] in f:
                     break
 
         doc = SimpleDocTemplate(
-            folder_out + 'out.pdf',
+            folder_out + "out.pdf",
             rightMargin=0,
             leftMargin=0,
             topMargin=0,
-            bottomMargin=0)
+            bottomMargin=0,
+        )
 
-        c = canvas.Canvas(folder_out + 'out.pdf')
+        c = canvas.Canvas(folder_out + "out.pdf")
 
         """def get_white_noise_image(w, h):
             pil_map = Image.fromarray(np.random.randint(
@@ -131,14 +133,14 @@ class Command(BaseCommand):
             # if '.png' not in f:
             #    continue
 
-            if '.jpeg' not in f.lower() and '.jpg' not in f.lower():
+            if ".jpeg" not in f.lower() and ".jpg" not in f.lower():
                 continue
 
             f_out = f.split(folder_in)
             f_out = folder_out.join(f_out)
             print(f, f_out)
 
-            #f_out = f_out.replace('.png', '.jpeg')
+            # f_out = f_out.replace('.png', '.jpeg')
 
             try:
                 """i = Image.open(f)
@@ -149,22 +151,25 @@ class Command(BaseCommand):
                 i = Image.fromarray(np.uint8(i))
                 i.save(f_out, optimize=True, quality=5)"""
 
-                #img = Image.open(f)
-                #img = img.convert("L")
+                # img = Image.open(f)
+                # img = img.convert("L")
                 # img.save(f_out)  # , optimize=True, quality=10)"""
 
                 i = cv2.imread(f)
                 ig = cv2.cvtColor(i, cv2.COLOR_RGB2GRAY)
-                #ig = cv2.inRange(ig, 200, 255)
+                # ig = cv2.inRange(ig, 200, 255)
                 cv2.imwrite(
-                    f_out, ig, [
-                        int(cv2.IMWRITE_JPEG_QUALITY), 20,
-                        int(cv2.IMWRITE_JPEG_PROGRESSIVE), 1,
-                    ])
+                    f_out,
+                    ig,
+                    [
+                        int(cv2.IMWRITE_JPEG_QUALITY),
+                        20,
+                        int(cv2.IMWRITE_JPEG_PROGRESSIVE),
+                        1,
+                    ],
+                )
 
-                c.drawImage(f_out, 0, 0,
-                            width=595,
-                            height=841)
+                c.drawImage(f_out, 0, 0, width=595, height=841)
                 c.showPage()
             except Exception as e:
                 continue
@@ -185,31 +190,31 @@ class Command(BaseCommand):
             save_all=True,
             append_images=flist_out_img_obj)"""
 
-        cmd = ["{}/ocrmypdf".format('/'.join(sys.executable.split('/')[:-1])),
-               "-q",                  # Execução silenciosa
-               "-l por",              # tesseract portugues
-               "-j {}".format(8),     # oito threads
-               "--fast-web-view 0",   # não inclui fast web view
-               "--image-dpi 300",
-               #"--rotate-pages",
-               "--remove-background",
+        cmd = [
+            "{}/ocrmypdf".format("/".join(sys.executable.split("/")[:-1])),
+            "-q",  # Execução silenciosa
+            "-l por",  # tesseract portugues
+            "-j {}".format(8),  # oito threads
+            "--fast-web-view 0",  # não inclui fast web view
+            "--image-dpi 300",
+            # "--rotate-pages",
+            "--remove-background",
+            "--optimize 3",
+            "--jpeg-quality 5",
+            # "--deskew",
+            # "--clean-final",
+            "--pdfa-image-compression jpeg",  # jpeg
+            "--output-type pdfa-1",
+            # "--tesseract-timeout 0",
+            folder_out + "out.pdf",
+            folder_out + "out_ocr.pdf",
+        ]
 
-               "--optimize 3",
-               "--jpeg-quality 5",
-
-               # "--deskew",
-               #"--clean-final",
-               "--pdfa-image-compression jpeg",  # jpeg
-               "--output-type pdfa-1",
-               #"--tesseract-timeout 0",
-               folder_out + 'out.pdf',
-               folder_out + 'out_ocr.pdf']
-
-        print(' '.join(cmd))
+        print(" ".join(cmd))
         # subprocess.Popen(
         #    ' '.join(cmd), shell=True, stdout=subprocess.PIPE)
         try:
-            p = ProcessoExterno(' '.join(cmd), self.logger)
+            p = ProcessoExterno(" ".join(cmd), self.logger)
             r = p.run(timeout=300)
 
             if r is None:
@@ -235,112 +240,111 @@ class Command(BaseCommand):
     def transforma_imagens_armazenadas_em_pdf(self):
         models = [
             {
-                'model': MateriaLegislativa,
-                'file_field': ('texto_original',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data_apresentacao',
-                'years_priority': 0
+                "model": MateriaLegislativa,
+                "file_field": ("texto_original",),
+                "count": 0,
+                "count_base": 2,
+                "order_by": "-data_apresentacao",
+                "years_priority": 0,
             },
             {
-                'model': DocumentoAdministrativo,
-                'file_field': ('texto_integral',),
-                'count': 0,
-                'count_base': 9,
-                'order_by': '-data',
-                'years_priority': 0
+                "model": DocumentoAdministrativo,
+                "file_field": ("texto_integral",),
+                "count": 0,
+                "count_base": 9,
+                "order_by": "-data",
+                "years_priority": 0,
             },
             {
-                'model': DocumentoAcessorioAdministrativo,
-                'file_field': ('arquivo',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
+                "model": DocumentoAcessorioAdministrativo,
+                "file_field": ("arquivo",),
+                "count": 0,
+                "count_base": 2,
+                "order_by": "-data",
+                "years_priority": 0,
             },
             {
-                'model': NormaJuridica,
-                'file_field': ('texto_integral',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
+                "model": NormaJuridica,
+                "file_field": ("texto_integral",),
+                "count": 0,
+                "count_base": 2,
+                "order_by": "-data",
+                "years_priority": 0,
             },
             {
-                'model': DocumentoAcessorio,
-                'file_field': ('arquivo',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
+                "model": DocumentoAcessorio,
+                "file_field": ("arquivo",),
+                "count": 0,
+                "count_base": 2,
+                "order_by": "-data",
+                "years_priority": 0,
             },
             {
-                'model': DiarioOficial,
-                'file_field': ('arquivo',),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data',
-                'years_priority': 0
+                "model": DiarioOficial,
+                "file_field": ("arquivo",),
+                "count": 0,
+                "count_base": 2,
+                "order_by": "-data",
+                "years_priority": 0,
             },
             {
-                'model': SessaoPlenaria,
-                'file_field': ('upload_pauta', 'upload_ata', 'upload_anexo'),
-                'count': 0,
-                'count_base': 2,
-                'order_by': '-data_inicio',
-                'years_priority': 0
+                "model": SessaoPlenaria,
+                "file_field": ("upload_pauta", "upload_ata", "upload_anexo"),
+                "count": 0,
+                "count_base": 2,
+                "order_by": "-data_inicio",
+                "years_priority": 0,
             },
-
         ]
 
         for md in models:
 
-            m = md['model']
+            m = md["model"]
 
             q = Q()
-            for f in md['file_field']:
-                param = {f'{f}__iendswith': '.jpeg'}
+            for f in md["file_field"]:
+                param = {f"{f}__iendswith": ".jpeg"}
                 q |= Q(**param)
-                param = {f'{f}__iendswith': '.jpg'}
+                param = {f"{f}__iendswith": ".jpg"}
                 q |= Q(**param)
-                param = {f'{f}__iendswith': '.png'}
+                param = {f"{f}__iendswith": ".png"}
                 q |= Q(**param)
 
             qs = m.objects.filter(q)
 
             ct = ContentType.objects.get_for_model(m)
             for i in qs:
-                if not OcrMyPDF.objects.filter(content_type=ct, object_id=i.id).exists():
-                    OcrMyPDF.objects.filter(
-                        content_type=ct, object_id=i.id).delete()
+                if not OcrMyPDF.objects.filter(
+                    content_type=ct, object_id=i.id
+                ).exists():
+                    OcrMyPDF.objects.filter(content_type=ct, object_id=i.id).delete()
 
-                for f in md['file_field']:
+                for f in md["file_field"]:
                     p = getattr(i, f)
                     if p:
                         print(i.id, f, p.path)
 
-                        inn = p.path.replace(
-                            'media/sapl/', 'media/original__sapl/')
-                        inn = inn.replace('media/cmj/', 'media/original__cmj/')
+                        inn = p.path.replace("media/sapl/", "media/original__sapl/")
+                        inn = inn.replace("media/cmj/", "media/original__cmj/")
 
-                        out = inn.split('.')
-                        out[-1] = 'pdf'
-                        out = '.'.join(out)
+                        out = inn.split(".")
+                        out[-1] = "pdf"
+                        out = ".".join(out)
 
                         temp_out = f'/tmp/{out.split("/")[-1]}'
 
                         img = Image.open(inn)
                         try:
-                            dx, dy = img.info['dpi']
+                            dx, dy = img.info["dpi"]
                         except:
                             dx, dy = 100, 100
 
-                        img.convert('RGB')
+                        img.convert("RGB")
                         img.save(temp_out, resolution=dx)
 
                         destino = os.path.basename(temp_out)
 
-                        with open(temp_out, 'rb') as f_in:
+                        with open(temp_out, "rb") as f_in:
                             p.save(destino, File(f_in), save=True)
 
                         print(p.path)
