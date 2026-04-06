@@ -50,6 +50,7 @@ from cmj.mixins import (
     CheckCheckMixin,
     MultiFormatOutputMixin,
 )
+from cmj.utils_report import render_pdf_to_response
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import AppConfig as BaseAppConfig
 from sapl.base.models import Autor, CasaLegislativa
@@ -98,7 +99,6 @@ from sapl.utils import (
     autor_label,
     autor_modal,
     gerar_hash_arquivo,
-    gerar_pdf_impressos,
     get_base_url,
     get_client_ip,
     get_mime_type_from_file_extension,
@@ -3819,7 +3819,7 @@ class EtiquetaPesquisaView(PermissionRequiredMixin, FormView):
 
         context["materias"] = materias
 
-        return gerar_pdf_impressos(
+        return render_pdf_to_response(
             self.request, context, "materia/impressos/etiqueta_pdf.html"
         )
 
@@ -3939,7 +3939,7 @@ class FichaSelecionaView(PermissionRequiredMixin, FormView):
             "comissao__nome", flat=True
         )
 
-        return gerar_pdf_impressos(
+        return render_pdf_to_response(
             self.request, context, "materia/impressos/ficha_pdf.html"
         )
 
@@ -4003,7 +4003,7 @@ class MateriaPesquisaSimplesView(PermissionRequiredMixin, FormView):
             "materias": materias,
         }
 
-        return gerar_pdf_impressos(self.request, context, template_materia)
+        return render_pdf_to_response(self.request, context, template_materia)
 
 
 class TipoMateriaCrud(CrudAux):

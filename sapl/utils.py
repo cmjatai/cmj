@@ -10,7 +10,6 @@ from unicodedata import normalize as unicodedata_normalize
 import django_filters
 import markdown as md
 import six
-import weasyprint
 from crispy_forms.layout import HTML, Button
 from django import forms
 from django.apps import apps
@@ -30,8 +29,6 @@ from django.db.models import Q
 from django.db.models.fields.files import FieldFile, ImageFieldFile
 from django.forms import BaseForm
 from django.forms.widgets import ClearableFileInput, SplitDateTimeWidget
-from django.http.response import HttpResponse
-from django.template import loader
 from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -1343,20 +1340,6 @@ def from_date_to_datetime_utc(data):
     dt_unware = datetime.combine(data, datetime.min.time())
     dt_utc = pytz.utc.localize(dt_unware)
     return dt_utc
-
-
-def gerar_pdf_impressos(request, context, template_name):
-    template = loader.get_template(template_name)
-    html = template.render(context, request)
-    pdf = weasyprint.HTML(
-        string=html, base_url=request.build_absolute_uri()
-    ).write_pdf()
-
-    response = HttpResponse(pdf, content_type="application/pdf")
-    response["Content-Disposition"] = 'inline; filename="relatorio_impressos.pdf"'
-    response["Content-Transfer-Encoding"] = "binary"
-
-    return response
 
 
 def parseString(data, fout=None):
