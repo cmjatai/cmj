@@ -128,10 +128,12 @@ class EmpenhoCrud(MasterDetailCrud):
 
         def hook_detail(self, empenho, *args, **kwargs):
             return f"""
-                Processo: {empenho.processo} - {'Modalidade: ' if empenho.modalidade else ''}{empenho.modalidade} - {'Número de Licitação: ' if empenho.numero_licitacao else ''}{empenho.numero_licitacao}<br>
-                Dotação: {empenho.dotacao}<br>
-                {empenho.cpfcnpj}<br>{empenho.nome}
-                {("<hr>" + str(empenho.unidade)) if empenho.unidade and self.request.user.has_perm("loa.change_empenho") else ""}
+                Processo: {empenho.processo}
+                - {'Modalidade: ' if empenho.modalidade else ''}{empenho.modalidade}
+                <br>- {'Nº Licitação: ' if empenho.numero_licitacao else ''}{empenho.numero_licitacao}
+                - {'Dotação: ' if empenho.dotacao else ''}{empenho.dotacao}
+                <br>{empenho.cpfcnpj} - {empenho.nome}
+                {('<hr class="divider">' + str(empenho.unidade)) if empenho.unidade and self.request.user.has_perm("loa.change_empenho") else ""}
                 {("<br>" + empenho.historico) if empenho.historico and self.request.user.has_perm("loa.change_empenho") else ""}
             """
 
