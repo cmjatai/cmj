@@ -5,16 +5,25 @@
       <strong class="d-block mx-5 my-5">Carregando Dados Gráficos...</strong>
     </div>
     <div class="container" v-if="loa.ano && chartDataLoa">
-      <strong class="d-block my-2">
-        <i class="fa fa-filter"></i>
-        Filtrar Dados
-      </strong>
-      <strong class="mx-3 my-2 d-none">
-        Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes,
-        <span class="text-danger">o gráfico e tabela serão atualizados automaticamente</span>.
-      </strong>
+      <div class="row pt-2">
+        <div class="col">
+          <strong class="d-block my-2">
+            <i class="fa fa-filter"></i>
+            Filtrar Dados
+          </strong>
+          <strong class="mx-3 my-2 d-none">
+            Utilize os filtros abaixo e/ou aplique agrupamentos para visões diferentes,
+            <span class="text-danger">o gráfico e tabela serão atualizados automaticamente</span>.
+          </strong>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+          <strong>Agrupamento:</strong>
+          <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos__options" :select-size="1"/>
+          <b-button class="bg-secondary text-nowrap" size="sm" @click="clearFilters(event)">Limpar Pesquisa</b-button>
+        </div>
+      </div>
       <div class="row c-fields">
-        <div class="col-md-3">
+        <div class="col-md-2">
           Órgãos
           <model-select @change="value => despesa.orgaoselected=value"
             v-model="despesa.orgaoselected"
@@ -26,6 +35,8 @@
             :required="false"
             :extra_query="`${qs_loa}${ qs_loa ? '&' : '' }page_size=100`"
             ></model-select>
+        </div>
+        <div class="col-md-2">
           Unidades Orçamentárias
           <model-select @change="value => despesa.unidadeselected=value"
             v-model="despesa.unidadeselected"
@@ -38,7 +49,7 @@
             :extra_query="`${qs_loa}${ qs_loa ? '&' : '' }${qs_orgao}`"
             ></model-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           Funções
           <model-select @change="value => despesa.funcaoselected=value"
             v-model="despesa.funcaoselected"
@@ -50,6 +61,8 @@
             :required="false"
             :extra_query="`${qs_loa}`"
             ></model-select>
+        </div>
+        <div class="col-md-2">
           Subfunções
           <model-select @change="value => despesa.subfuncaoselected=value"
             v-model="despesa.subfuncaoselected"
@@ -62,7 +75,7 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
           Programas
           <model-select @change="value => despesa.programaselected=value"
             v-model="despesa.programaselected"
@@ -74,6 +87,8 @@
             :required="false"
             :extra_query="`${qs_loa}`"
             ></model-select>
+        </div>
+        <div class="col-md-2">
           Ações
           <model-select @change="value => despesa.acaoselected=value"
             v-model="despesa.acaoselected"
@@ -86,21 +101,10 @@
             :extra_query="`${qs_loa}`"
             ></model-select>
         </div>
-        <div class="col-md-3 c-groups pl-4">
-          <div class="">
-            <strong>Agrupamentos</strong>
-            <b-form-select v-model="despesa.agrupamentoselected" :options="agrupamentos__options" :select-size="1"/>
-            <strong>Máximo de Itens</strong>
-            <b-form-select v-model="despesa.itensselected" :options="itens" :select-size="1"/>
-          </div>
-          <div class="col mt-1 text-right">
-            <b-button class="bg-secondary" size="sm" @click="clearFilters(event)">Limpar Pesquisa</b-button>
-          </div>
-        </div>
       </div>
       <div class="row">
         <div class="col-12 container-doughnut p-3 mt-3 d-none">
-          <DoughnutChart v-if="chartDataLoa" :height="height" :plugins="pluginsDun" :chartDataUser="chartDataLoa"/>
+          <DoughnutChart v-if="false && chartDataLoa" :height="height" :plugins="pluginsDun" :chartDataUser="chartDataLoa"/>
           <b-table striped hover class="local_table" :items="despesas_agrupadas_table"></b-table>
         </div>
 
@@ -250,11 +254,11 @@ export default {
         subfuncao: 'SubFunções',
         programa: 'Programas',
         acao: 'Ações',
-        natureza_1: 'Natureza - Nível 1',
-        natureza_2: 'Natureza - Nível 2',
-        natureza_3: 'Natureza - Nível 3',
-        natureza_4: 'Natureza - Nível 4',
-        natureza_5: 'Natureza - Nível 5',
+        // natureza_1: 'Natureza - Nível 1',
+        // natureza_2: 'Natureza - Nível 2',
+        // natureza_3: 'Natureza - Nível 3',
+        // natureza_4: 'Natureza - Nível 4',
+        natureza_5: 'Natureza da Despesa',
         fonte: 'Fonte de Recurso'
       },
       tipos_agrups: [
@@ -493,7 +497,7 @@ export default {
         subfuncaoselected: null,
         programaselected: null,
         acaoselected: null,
-        agrupamentoselected: 'funcao',
+        agrupamentoselected: 'unidade',
         itensselected: 20
       }
     },
