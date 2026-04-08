@@ -25,6 +25,23 @@ from cmj.sigad.models import Documento, Midia, ReferenciaEntreDocumentos, Versao
 from drfautoapi.drfautoapi import ApiViewSetConstrutor
 from sapl.api.views import LastModifiedDecorator
 
+CmjApiViewSetConstrutor = ApiViewSetConstrutor
+CmjApiViewSetConstrutor.last_modified_class(LastModifiedDecorator)
+CmjApiViewSetConstrutor.import_modules(
+    [
+        "cmj.api.loa.views",
+        "cmj.api.views_core",
+        "cmj.api.views_agenda",
+        "cmj.api.views_videos",
+        "cmj.api.views_sigad",
+        "cmj.api.views_arq",
+        "cmj.api.views_cerimonial",
+        "cmj.api.views_diarios",
+        "cmj.api.views_painelset",
+        "cmj.api.views_search",
+    ]
+)
+
 
 class AppVersionView(APIView):
     permission_classes = (AllowAny,)
@@ -119,23 +136,6 @@ class AppSessionAuthView(ObtainAuthToken):
             )
         return super().options(request, *args, **kwargs)
 
-
-CmjApiViewSetConstrutor = ApiViewSetConstrutor
-CmjApiViewSetConstrutor.last_modified_class(LastModifiedDecorator)
-CmjApiViewSetConstrutor.import_modules(
-    [
-        "cmj.api.views_core",
-        "cmj.api.views_agenda",
-        "cmj.api.views_videos",
-        "cmj.api.views_sigad",
-        "cmj.api.views_arq",
-        "cmj.api.views_cerimonial",
-        "cmj.api.views_diarios",
-        "cmj.api.views_loa",
-        "cmj.api.views_painelset",
-        "cmj.api.views_search",
-    ]
-)
 
 # class BiViewSet(viewsets.ModelViewSet):
 #    queryset = Bi.objects.all()

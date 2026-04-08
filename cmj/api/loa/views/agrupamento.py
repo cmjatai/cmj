@@ -1,6 +1,6 @@
 from rest_framework.decorators import action
 
-from cmj.api.views_loa.emendaloa import EmendaLoaSearchSerializer, EmendaLoaViewSet
+from cmj.api.loa.views.emendaloa import EmendaLoaSearchSerializer, EmendaLoaViewSet
 from cmj.loa.models import EmendaLoa
 from drfautoapi.drfautoapi import wrapper_queryset_response_for_drf_action
 

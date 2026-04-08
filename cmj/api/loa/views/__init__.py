@@ -2,24 +2,24 @@ import logging
 
 from django.apps.registry import apps
 
-from cmj.api.serializers import PrestacaoContaRegistroSerializer
-from cmj.api.views_loa.agrupamento import AgrupamentoViewSet
-from cmj.api.views_loa.agrupamentoemendaloa import AgrupamentoEmendaLoaViewSet
-from cmj.api.views_loa.agrupamentoregistrocontabil import (
+from cmj.api.loa.views.agrupamento import AgrupamentoViewSet
+from cmj.api.loa.views.agrupamentoemendaloa import AgrupamentoEmendaLoaViewSet
+from cmj.api.loa.views.agrupamentoregistrocontabil import (
     AgrupamentoRegistroContabilViewSet,
 )
-from cmj.api.views_loa.arquivoprestacaocontaloa import ArquivoPrestacaoContaLoaViewSet
-from cmj.api.views_loa.arquivoprestacaocontaregistro import (
+from cmj.api.loa.views.arquivoprestacaocontaloa import ArquivoPrestacaoContaLoaViewSet
+from cmj.api.loa.views.arquivoprestacaocontaregistro import (
     ArquivoPrestacaoContaRegistroViewSet,
 )
-from cmj.api.views_loa.despesaconsulta import DespesaConsultaViewSet
-from cmj.api.views_loa.emendaloa import EmendaLoaViewSet
-from cmj.api.views_loa.emendaloaregistrocontabil import EmendaLoaRegistroContabilViewSet
-from cmj.api.views_loa.entidade import EntidadeViewSet
-from cmj.api.views_loa.loa import LoaViewSet
-from cmj.api.views_loa.oficioajusteloa import OficioAjusteLoaViewSet
-from cmj.api.views_loa.registroajusteloa import RegistroAjusteLoaViewSet
-from cmj.api.views_loa.subfuncao import SubFuncaoViewSet
+from cmj.api.loa.views.despesaconsulta import DespesaConsultaViewSet
+from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
+from cmj.api.loa.views.emendaloaregistrocontabil import EmendaLoaRegistroContabilViewSet
+from cmj.api.loa.views.empenho import EmpenhoViewSet
+from cmj.api.loa.views.entidade import EntidadeViewSet
+from cmj.api.loa.views.loa import LoaViewSet
+from cmj.api.loa.views.oficioajusteloa import OficioAjusteLoaViewSet
+from cmj.api.loa.views.registroajusteloa import RegistroAjusteLoaViewSet
+from cmj.api.loa.views.subfuncao import SubFuncaoViewSet
 from cmj.loa.models import (
     Agrupamento,
     AgrupamentoEmendaLoa,
@@ -36,11 +36,17 @@ from cmj.loa.models import (
     RegistroAjusteLoa,
     SubFuncao,
 )
+from cmj.loa.models.m_financeiro_execucao import Empenho
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 
 logger = logging.getLogger(__name__)
 
-ApiViewSetConstrutor.build_class([apps.get_app_config("loa")])
+ApiViewSetConstrutor.build_class(
+    [apps.get_app_config("loa")],
+    SERIALIZER_MODULE=[
+        "cmj.api.loa.serializers",
+    ]
+)
 
 
 @customize(SubFuncao)
@@ -110,4 +116,9 @@ class _PrestacaoContaRegistroViewSet:
 
 @customize(Entidade)
 class _EntidadeViewSet(EntidadeViewSet):
+    pass
+
+
+@customize(Empenho)
+class _EmpenhoViewSet(EmpenhoViewSet):
     pass

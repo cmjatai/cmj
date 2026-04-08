@@ -1,7 +1,6 @@
 import os
-from decimal import Decimal
 
-from django.db.models import Max, Sum
+from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.urls.base import reverse
 from django.utils import timezone
@@ -18,12 +17,6 @@ from rest_framework.relations import (
 
 from cmj.arq.models import ArqClasse, ArqDoc, DraftMidia
 from cmj.core.models import Bi
-from cmj.loa.models import (
-    ArquivoPrestacaoContaRegistro,
-    EmendaLoa,
-    PrestacaoContaRegistro,
-    RegistroAjusteLoa,
-)
 from cmj.sigad.models import (
     DOC_TEMPLATES_CHOICE,
     CMSMixin,
@@ -392,142 +385,3 @@ class ArqDocSerializer(CmjSerializerMixin):
 
     class Meta(CmjSerializerMixin.Meta):
         model = ArqDoc
-
-
-class RegistroAjusteLoaSerializer(CmjSerializerMixin):
-    str_valor = serializers.CharField(read_only=True)
-
-    # crie o campo valor como DecimalField chamanado método para calcular
-    valor = serializers.SerializerMethodField()
-    valor_por_parlamentar = serializers.SerializerMethodField()
-
-    fase_prestacao_contas = serializers.SerializerMethodField()
-
-    class Meta(CmjSerializerMixin.Meta):
-        model = RegistroAjusteLoa
-
-    def get_fase_prestacao_contas(self, obj):
-        if obj.prestacaocontaregistro_set.filter(
-            situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-        ).exists():
-            return PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-        elif obj.prestacaocontaregistro_set.filter(
-            situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
-        ).exists():
-            return PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
-        else:
-            return "SEM_PRESTACAO_CONTAS"
-
-    def get_valor_por_parlamentar(self, obj):
-        valores = {}
-        for registro in obj.registroajusteloaparlamentar_set.all():
-            parlamentar = registro.parlamentar
-            if parlamentar:
-                valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
-                    registro.valor or Decimal("0.00")
-                )
-        return valores
-
-    def get_valor(self, obj):
-        total = obj.registroajusteloaparlamentar_set.order_by("parlamentar").aggregate(
-            total=Sum("valor")
-        )
-        return total["total"] if total["total"] else 0
-
-
-class EmendaLoaSerializer(CmjSerializerMixin):
-
-    str_valor = serializers.CharField(
-        read_only=True,
-    )
-
-    str_valor_computado = serializers.CharField(
-        read_only=True,
-    )
-
-    finalidade_format = serializers.CharField(
-        read_only=True,
-    )
-
-    ementa_format = serializers.CharField(
-        read_only=True,
-    )
-
-    epigrafe_short = serializers.SerializerMethodField()
-
-    valor_inicial = serializers.SerializerMethodField()
-    valor_computado = serializers.FloatField(read_only=True)
-
-    valor_inicial_por_parlamentar = serializers.SerializerMethodField()
-    has_ajustes = serializers.BooleanField(read_only=True)
-
-    class Meta(CmjSerializerMixin.Meta):
-        model = EmendaLoa
-
-    def get_valor_inicial_por_parlamentar(self, obj):
-        valores = {}
-        for registro in obj.emendaloaparlamentar_set.all():
-            parlamentar = registro.parlamentar
-            if parlamentar:
-                valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
-                    registro.valor or Decimal("0.00")
-                )
-        return valores
-
-    def get_epigrafe_short(self, obj):
-        if obj.materia and obj.materia.epigrafe_short:
-            return obj.materia.epigrafe_short
-        return ""
-
-    def get_valor_inicial(self, obj):
-        return obj.valor or Decimal("0.00")
-
-    def validate_valor(self, obj, *args, **kwargs):
-
-        obj = obj or "0.00"
-
-        try:
-            if obj and "." in obj and "," in obj:
-                if obj.rindex(",") > obj.rindex("."):
-                    obj = obj.replace(".", "").replace(",", ".")
-                else:
-                    obj = obj.replace(",", "")
-            elif obj and "," in obj:
-                obj = obj.replace(",", ".")
-
-            obj = Decimal(obj)
-        except:
-            raise DRFValidationError(
-                _(
-                    'O campo "Valor Global da Emenda" deve ser prenchido e '
-                    "seguir o formado 999.999.999,99. "
-                )
-            )
-
-        if obj == Decimal("0.00"):
-            raise DRFValidationError(
-                _(
-                    'O campo "Valor Global da Emenda" deve ser prenchido e '
-                    "seguir o formado 999.999.999,99. "
-                )
-            )
-
-        return obj
-
-
-class ArquivoPrestacaoContaRegistroSerializer(CmjSerializerMixin):
-
-    class Meta(CmjSerializerMixin.Meta):
-        model = ArquivoPrestacaoContaRegistro
-
-
-class PrestacaoContaRegistroSerializer(CmjSerializerMixin):
-
-    arquivos = ArquivoPrestacaoContaRegistroSerializer(
-        many=True,
-        read_only=True,
-        source="arquivoprestacaocontaregistro_set",
-    )
-
-    class Meta(CmjSerializerMixin.Meta):
-        model = PrestacaoContaRegistro
