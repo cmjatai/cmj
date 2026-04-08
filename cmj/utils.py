@@ -474,12 +474,16 @@ def get_breadcrumb_classes(context, request=None, response=None):
     from cmj.sigad.models import Classe, Documento
 
     try:
+        head_title_sufix = context.get("head_title_sufix", "")
+        if not head_title_sufix and "title" in context:
+            title = context.get("title", "")
+            if "<" in title or ">" in title:
+                head_title = bs4(title, "html.parser").get_text()
+            else:
+                head_title = title
         context.update(
             {
-                "head_title_sufix": context.get(
-                    "head_title_sufix",
-                    bs4(context.get("title", ""), "html.parser").get_text(),
-                ),
+                "head_title_sufix": head_title_sufix or head_title or "",
             }
         )
     except:
