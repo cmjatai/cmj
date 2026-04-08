@@ -54,22 +54,8 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     valor = serializers.SerializerMethodField()
     valor_por_parlamentar = serializers.SerializerMethodField()
 
-    fase_prestacao_contas = serializers.SerializerMethodField()
-
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa
-
-    def get_fase_prestacao_contas(self, obj):
-        if obj.prestacaocontaregistro_set.filter(
-            situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-        ).exists():
-            return PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-        elif obj.prestacaocontaregistro_set.filter(
-            situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
-        ).exists():
-            return PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
-        else:
-            return "SEM_PRESTACAO_CONTAS"
 
     def get_valor_por_parlamentar(self, obj):
         valores = {}

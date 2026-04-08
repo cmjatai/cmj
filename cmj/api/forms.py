@@ -1,5 +1,4 @@
 import logging
-from decimal import Decimal
 
 from django.db.models import Q
 from django_filters import CharFilter, ModelChoiceFilter
@@ -8,7 +7,6 @@ from cmj.loa.models import (
     EmendaLoa,
     Entidade,
     Loa,
-    PrestacaoContaRegistro,
     RegistroAjusteLoa,
 )
 from drfautoapi.drfautoapi import ApiFilterSetMixin
@@ -92,46 +90,16 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
         ):
             return queryset
 
-        if incluir_impedidas and not incluir_em_execucao and not incluir_finalizadas:
-            return queryset.filter(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+        q = Q()
 
-        if incluir_impedidas and incluir_em_execucao and not incluir_finalizadas:
-            q = Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
-            q |= Q(prestacaocontaregistro_set__isnull=False) & ~Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            )
-            return queryset.filter(q).distinct()
+        if incluir_impedidas:
+            q |= Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+        if incluir_em_execucao:
+            q |= Q(fase=EmendaLoa.EMENDA_EM_EXECUCAO)
+        if incluir_finalizadas:
+            q |= Q(fase=EmendaLoa.EMENDA_FINALIZADA)
 
-        if incluir_impedidas and incluir_finalizadas and not incluir_em_execucao:
-            q = Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
-            q |= Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            )
-            return queryset.filter(q).distinct()
-
-        if incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
-            return queryset.filter(
-                prestacaocontaregistro_set__isnull=False,
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO,
-            ).distinct()
-
-        if incluir_finalizadas and not incluir_em_execucao and not incluir_impedidas:
-            return queryset.filter(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            ).distinct()
-
-        if incluir_em_execucao and incluir_finalizadas and not incluir_impedidas:
-            q = Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            )
-            q |= Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
-            )
-
-            q &= ~Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
-            return queryset.filter(q).distinct()
-
-        return queryset
+        return queryset.filter(q)
 
     def filter_search(self, queryset, name, value):
         query = value.split(" ")
@@ -183,7 +151,6 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
         incluir_finalizadas = "FINALIZADO" in situacao
         incluir_impedidas = "IMPEDIMENTO" in situacao
 
-        q = Q()
         # tudo selecionado, retorna sem filtro
         if incluir_em_execucao and incluir_finalizadas and incluir_impedidas:
             return queryset
@@ -196,42 +163,12 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
         ):
             return queryset
 
-        if incluir_impedidas and not incluir_em_execucao and not incluir_finalizadas:
-            return queryset.filter(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
+        q = Q()
+        if incluir_impedidas:
+            q |= Q(fase=RegistroAjusteLoa.AJUSTE_IMPEDIDO)
+        if incluir_em_execucao:
+            q |= Q(fase=RegistroAjusteLoa.AJUSTE_EM_EXECUCAO)
+        if incluir_finalizadas:
+            q |= Q(fase=RegistroAjusteLoa.AJUSTE_FINALIZADO)
 
-        if incluir_impedidas and incluir_em_execucao and not incluir_finalizadas:
-            q |= Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
-            q |= Q(prestacaocontaregistro_set__isnull=False) & ~Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            )
-            return queryset.filter(q).distinct()
-
-        if incluir_impedidas and incluir_finalizadas and not incluir_em_execucao:
-            q |= Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
-            q |= Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            )
-            return queryset.filter(q).distinct()
-
-        if incluir_em_execucao and not incluir_finalizadas and not incluir_impedidas:
-            return queryset.filter(
-                prestacaocontaregistro_set__isnull=False,
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO,
-            ).distinct()
-        if incluir_finalizadas and not incluir_em_execucao and not incluir_impedidas:
-            return queryset.filter(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            ).distinct()
-
-        if incluir_em_execucao and incluir_finalizadas and not incluir_impedidas:
-            q |= Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.FINALIZADO
-            )
-            q |= Q(
-                prestacaocontaregistro_set__situacao=PrestacaoContaRegistro.SituacaoChoices.EM_EXECUCAO
-            )
-
-            q &= ~Q(emendaloa__fase=EmendaLoa.IMPEDIMENTO_TECNICO)
-            return queryset.filter(q).distinct()
-
-        return queryset.distinct()
+        return queryset.filter(q)

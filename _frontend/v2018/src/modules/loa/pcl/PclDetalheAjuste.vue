@@ -31,10 +31,12 @@
               </a>
             </h4>
             <div class="mb-2">
-              <span class="badge mr-1 badge-warning">Registro de Ajuste</span>
+              <span :class="['badge', 'mr-1', 'badge-' + tipoVariant(registro.tipo, true)]">
+                <i :class="[registro.tipo === 99 ? 'fas fa-th-large' : 'fas fa-heartbeat']"></i>
+                {{ tipoLabel(registro.tipo, true) }}</span>
               <span
-                :class="['badge', 'badge-' + situacaoVariant(registro.fase_prestacao_contas)]"
-              >{{ situacaoLabel(registro.fase_prestacao_contas) }}</span>
+                :class="['badge', 'badge-' + faseVariant(registro.fase, true)]"
+              >{{ faseLabel(registro.fase, true) }}</span>
             </div>
           </div>
 
@@ -130,6 +132,8 @@
 
 <script>
 import {
+  tipoVariant,
+  tipoLabel,
   faseVariant,
   faseLabel,
   situacaoLabel,
@@ -209,6 +213,8 @@ export default {
     }
   },
   methods: {
+    tipoVariant,
+    tipoLabel,
     faseVariant,
     faseLabel,
     situacaoLabel,

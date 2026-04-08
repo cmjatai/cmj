@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.utils.translation import gettext_lazy as _
 
+from cmj.loa.forms.f_emendaloa import EmendaLoaValorWidget
 from cmj.loa.models import (
     EmendaLoa,
     Entidade,
@@ -94,6 +95,7 @@ class RegistroAjusteLoaForm(ModelForm):
             "unidade",
             "entidade",
             "descricao",
+            'fase'
         ]
 
     def __init__(self, *args, **kwargs):

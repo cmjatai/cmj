@@ -107,17 +107,6 @@ class RegistroAjusteLoa(CmjSearchMixin):
         on_delete=PROTECT,
     )
 
-    emendaloa_old = models.ForeignKey(
-        "loa.EmendaLoa",
-        blank=True,
-        null=True,
-        default=None,
-        verbose_name=_("Emenda Impositiva (old)"),
-        related_name="registroajusteloa_old_set",
-        db_column="emendaloa_id",
-        on_delete=PROTECT,
-    )
-
     emendaloa = models.ManyToManyField(
         "loa.EmendaLoa",
         blank=True,
@@ -153,6 +142,22 @@ class RegistroAjusteLoa(CmjSearchMixin):
         related_name="registroajusteloa_set",
         verbose_name=_("Parlamentares"),
         through_fields=("registro", "parlamentar"),
+    )
+
+    AJUSTE_REGISTRADO = 10
+    AJUSTE_IMPEDIDO = 40
+    AJUSTE_EM_EXECUCAO = 60
+    AJUSTE_FINALIZADO = 99
+
+    FASE_CHOICE = (
+        (AJUSTE_REGISTRADO, _("Registrado")),
+        (AJUSTE_IMPEDIDO, _("Impedimento Técnico")),
+        (AJUSTE_EM_EXECUCAO, _("Em Execução")),
+        (AJUSTE_FINALIZADO, _("Finalizado")),
+    )
+
+    fase = models.PositiveSmallIntegerField(
+        choices=FASE_CHOICE, default=AJUSTE_REGISTRADO, verbose_name=_("Fase")
     )
 
     class Meta:
