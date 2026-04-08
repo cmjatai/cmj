@@ -157,7 +157,7 @@
                   v-if="ajustesItems"
                 >{{ ajustesItems.length }}</b-badge>
               </template>
-              <pcl-tab-ajustes :items="ajustesItems" />
+              <pcl-tab-ajustes :items="ajustesItems" @search-emenda="val => $emit('search-emenda', val)" />
             </b-tab>
 
             <b-tab
