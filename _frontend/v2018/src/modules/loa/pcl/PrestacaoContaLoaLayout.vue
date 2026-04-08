@@ -40,6 +40,7 @@
             @filter-unidade="applyUnidadeFilter"
             @filter-entidade="applyEntidadeFilter"
             @filter-parlamentar="applyParlamentarFilter"
+            @search-emenda="val => filters_value = { ...filters_value, search: val, ajustes: 'False', emendas_tipos: [] }"
           />
           <pcl-detalhe-ajuste
             v-else

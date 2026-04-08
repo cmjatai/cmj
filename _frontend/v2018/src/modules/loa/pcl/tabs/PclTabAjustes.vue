@@ -38,7 +38,13 @@
               <small class="text-muted"><strong>Unidade:</strong> {{ ajuste.unidade.__str__ || ajuste.unidade }}</small>
               <br>
             </template>
-            <small class="text-muted">{{ ajuste.descricao }}</small>
+            <small
+              v-if="ajuste.descricao"
+              class="text-muted text-decoration-underline"
+              style="cursor: pointer;"
+              title="Clique para pesquisar por esta descrição"
+              @click="$emit('search-emenda', ajuste.descricao)"
+            >{{ ajuste.descricao }}</small>
           </div>
           <h3 class="font-weight-bold ml-2 text-nowrap text-success">R$ {{ ajuste.str_valor }}</h3>
         </div>
@@ -64,3 +70,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+  .text-decoration-underline:hover {
+    text-decoration: underline;
+  }
+</style>
