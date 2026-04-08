@@ -10,47 +10,16 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError as DRFValidationError
-from rest_framework.fields import SerializerMethodField
 from rest_framework.response import Response
 
 from cmj.api.forms import EmendaLoaFilterSet
-from cmj.api.serializers import CmjSerializerMixin
+from cmj.api.loa.serializers import EmendaLoaSearchSerializer
 from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, Loa
 from cmj.utils_report import make_pdf
 from sapl.api.permissions import SaplModelPermissions
 from sapl.parlamentares.models import Parlamentar
 
 logger = logging.getLogger(__name__)
-
-
-class EmendaLoaSearchSerializer(CmjSerializerMixin):
-
-    str_valor = SerializerMethodField()
-    str_parlamentares = SerializerMethodField()
-
-    finalidade = SerializerMethodField()
-
-    str_fase = SerializerMethodField()
-
-    class Meta(CmjSerializerMixin.Meta):
-        model = EmendaLoa
-
-    def get_finalidade(self, obj):
-        return obj.finalidade_format
-
-    def get_str_fase(self, obj):
-        return obj.get_fase_display()
-
-    def get_str_valor(self, obj):
-        return formats.number_format(obj.valor, force_grouping=True)
-
-    def get_str_parlamentares(self, obj):
-        elps = obj.emendaloaparlamentar_set.all()
-
-        r = []
-        for elp in elps:
-            r.append(str(elp))
-        return r
 
 
 class EmendaLoaViewSet:
@@ -345,7 +314,7 @@ class EmendaLoaViewSet:
 
     @action(detail=False)
     def search(self, request, *args, **kwargs):
-
+        #TODO: refatorar para usar filterset e o serializer de listagem, ao invés de criar um serializer específico para a busca e uma função de filtro específica
         def filter_queryset(qs):
             ano = request.GET.get("ano", None)
             query = request.GET.get("q", "")

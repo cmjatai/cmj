@@ -40,6 +40,7 @@
               <i class="fas fa-file-invoice-dollar mr-1 text-primary"></i>
               Empenho {{ item.empenho.codigo }}
             </small>
+            <small class="badge zoom08 badge-warning ml-2" v-if="item.empenho.multiplos_registros">Refere-se a várias emendas e/ou ajustes</small>
             <br>
             <small class="text-muted">
               <strong>Fornecedor:</strong> {{ item.empenho.nome }}

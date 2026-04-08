@@ -2,7 +2,7 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.response import Response
 
-from cmj.api.views_loa.emendaloa import EmendaLoaViewSet
+from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
 from cmj.loa.models import AgrupamentoEmendaLoa, EmendaLoa
 
 

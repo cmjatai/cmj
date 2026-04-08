@@ -10,7 +10,7 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.fields import CharField
 
 from cmj.api.serializers import CmjSerializerMixin
-from cmj.api.views_loa.emendaloa import EmendaLoaViewSet
+from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
 from cmj.loa.models import (
     Acao,
     AgrupamentoRegistroContabil,
