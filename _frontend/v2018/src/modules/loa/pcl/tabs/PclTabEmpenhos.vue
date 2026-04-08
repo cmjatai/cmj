@@ -61,7 +61,13 @@
             <h3 class="font-weight-bold text-success mb-0">
               R$ {{ formatCurrency(item.empenho.valor_empenhado) }}
             </h3>
-            <small class="text-muted" v-if="parseFloat(item.empenho.valor_pago_bruto) > 0">
+            <small class="text-info" v-if="parseFloat(item.empenho.valor_liquidado) > 0">
+              Liquidado: R$ {{ formatCurrency(item.empenho.valor_liquidado) }}
+            </small>
+            <small class="text-danger" v-if="parseFloat(item.empenho.valor_anulado) > 0">
+              Anulado: R$ {{ formatCurrency(item.empenho.valor_anulado) }}
+            </small>
+            <small class="text-success" v-if="parseFloat(item.empenho.valor_pago_bruto) > 0">
               Pago: R$ {{ formatCurrency(item.empenho.valor_pago_bruto) }}
             </small>
           </div>
