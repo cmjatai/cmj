@@ -3,8 +3,14 @@ from unipath import Path
 
 config = AutoConfig()
 DEBUG = config("DEBUG", default=False, cast=bool)
-DEV_HOST_NAME = config("DEV_HOST_NAME", default="localhost", cast=str)
-DEV_BACKENDPORT = config("DEV_BACKENDPORT", default="8000", cast=int)
+
+if DEBUG:
+    DEV_HOST_NAME = config("DEV_HOST_NAME", default="localhost", cast=str)
+    DEV_BACKENDPORT = config("DEV_BACKENDPORT", default=8000, cast=int)
+    DEV_V2018PORT = config(
+        "DEV_V2018PORT", default=8080, cast=int
+    )
+    DEV_V6PORT = config("DEV_V6PORT", default=5173, cast=int)
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)

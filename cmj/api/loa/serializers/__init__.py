@@ -185,12 +185,12 @@ class PrestacaoContaRegistroSerializer(CmjSerializerMixin):
     class Meta(CmjSerializerMixin.Meta):
         model = PrestacaoContaRegistro
 
+
 class EmpenhoSerializer(CmjSerializerMixin):
 
-    multiplos_registros = serializers.BooleanField(
-        read_only=True,
-        source="empenhoemendaajuste_set.exists",
-        )
-    
+    total_registros = serializers.IntegerField(
+        source="empenhoemendaajuste_set.count", read_only=True
+    )
+
     class Meta(CmjSerializerMixin.Meta):
         model = Empenho

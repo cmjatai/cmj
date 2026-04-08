@@ -29,7 +29,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls.conf import include, re_path
-from django.views.generic.base import TemplateView
+from django.views.generic.base import RedirectView, TemplateView
 
 import cmj.agenda.urls
 import cmj.arq.urls
@@ -109,6 +109,17 @@ if settings.DEBUG:
         re_path(r"^debug.html$", TemplateView.as_view(template_name="debug.html"))
     )
 
+    # redireciona /favicon.ico
+    urlpatterns_all += [
+        re_path(
+            r"^favicon\.ico$",
+            RedirectView.as_view(
+                url=f"http://{settings.DEV_HOST_NAME}:{settings.DEV_V2018PORT}/favicon.ico",
+                permanent=False,
+            ),
+            name="favicon",
+        )
+    ]
     urlpatterns_all += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 urlpatterns_all += [
