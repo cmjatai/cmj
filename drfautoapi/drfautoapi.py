@@ -6,7 +6,6 @@ from collections import OrderedDict
 from functools import cached_property
 
 import django_filters
-from django.apps import apps
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models.base import ModelBase
@@ -15,7 +14,6 @@ from django.db.models.fields.files import FileField
 from django.db.models.fields.json import JSONField
 from django.db.models.fields.related import ManyToManyField
 from django.template.defaultfilters import capfirst
-from django.urls import reverse
 from django.urls.conf import path
 from django.utils.translation import gettext_lazy as _
 from django_filters.constants import ALL_FIELDS, EMPTY_VALUES
@@ -292,7 +290,14 @@ class ApiViewSetConstrutor:
         return router
 
     @classmethod
-    def build_class(cls, apps_or_models):
+    def build_class(
+        cls,
+        apps_or_models,
+        SERIALIZER_MODULE=None,
+        FILTER_MODULE=None,
+        SERIALIZER_MIXIN=None,
+        FILTERSET_MIXIN=None,
+    ):
 
         DRFAUTOAPI = settings.DRFAUTOAPI
 
@@ -303,46 +308,59 @@ class ApiViewSetConstrutor:
         global_filter_class = ApiFilterSetMixin
 
         try:
-            if DRFAUTOAPI:
-                if "DEFAULT_SERIALIZER_MODULE" in DRFAUTOAPI:
-                    modules = DRFAUTOAPI["DEFAULT_SERIALIZER_MODULE"].split(",")
-                    for ms in modules:
-                        module = importlib.import_module(ms)
-                        imported_classes = inspect.getmembers(module)
-                        serializers_classes.update(
-                            {
-                                i[0]: i[1]
-                                for i in filter(
-                                    lambda x: x[0].endswith("Serializer"),
-                                    imported_classes,
-                                )
-                            }
-                        )
+            SERIALIZER_MODULE = SERIALIZER_MODULE or (
+                DRFAUTOAPI and DRFAUTOAPI.get("DEFAULT_SERIALIZER_MODULE", None)
+            )
+            FILTER_MODULE = FILTER_MODULE or (
+                DRFAUTOAPI and DRFAUTOAPI.get("DEFAULT_FILTER_MODULE", None)
+            )
 
-                if "DEFAULT_FILTER_MODULE" in DRFAUTOAPI:
-                    filters = DRFAUTOAPI["DEFAULT_FILTER_MODULE"].split(",")
-                    for mf in filters:
-                        module = importlib.import_module(mf)
-                        imported_classes = inspect.getmembers(module)
-                        filters_classes.update(
-                            {
-                                i[0]: i[1]
-                                for i in filter(
-                                    lambda x: x[0].endswith("FilterSet"),
-                                    imported_classes,
-                                )
-                            }
-                        )
+            SERIALIZER_MIXIN = SERIALIZER_MIXIN or (
+                DRFAUTOAPI and DRFAUTOAPI.get("GLOBAL_SERIALIZER_MIXIN", None)
+            )
+            FILTERSET_MIXIN = FILTERSET_MIXIN or (
+                DRFAUTOAPI and DRFAUTOAPI.get("GLOBAL_FILTERSET_MIXIN", None)
+            )
 
-                if "GLOBAL_SERIALIZER_MIXIN" in DRFAUTOAPI:
-                    cs = DRFAUTOAPI["GLOBAL_SERIALIZER_MIXIN"].split(".")
-                    module = importlib.import_module(".".join(cs[0:-1]))
-                    global_serializer_mixin = getattr(module, cs[-1])
+            if SERIALIZER_MODULE:
+                modules = SERIALIZER_MODULE.split(",") if isinstance(SERIALIZER_MODULE, str) else SERIALIZER_MODULE
+                for ms in modules:
+                    module = importlib.import_module(ms.strip())
+                    imported_classes = inspect.getmembers(module)
+                    serializers_classes.update(
+                        {
+                            i[0]: i[1]
+                            for i in filter(
+                                lambda x: x[0].endswith("Serializer"),
+                                imported_classes,
+                            )
+                        }
+                    )
 
-                if "GLOBAL_FILTERSET_MIXIN" in DRFAUTOAPI:
-                    cs = DRFAUTOAPI["GLOBAL_FILTERSET_MIXIN"].split(".")
-                    m = importlib.import_module(".".join(cs[0:-1]))
-                    global_filter_class = getattr(m, cs[-1])
+            if FILTER_MODULE:
+                modules = FILTER_MODULE.split(",") if isinstance(FILTER_MODULE, str) else FILTER_MODULE
+                for mf in modules:
+                    module = importlib.import_module(mf.strip())
+                    imported_classes = inspect.getmembers(module)
+                    filters_classes.update(
+                        {
+                            i[0]: i[1]
+                            for i in filter(
+                                lambda x: x[0].endswith("FilterSet"),
+                                imported_classes,
+                            )
+                        }
+                    )
+
+            if FILTERSET_MIXIN:
+                cs = FILTERSET_MIXIN.split(".")
+                m = importlib.import_module(".".join(cs[0:-1]))
+                global_filter_class = getattr(m, cs[-1])
+
+            if SERIALIZER_MIXIN:
+                cs = SERIALIZER_MIXIN.split(".")
+                module = importlib.import_module(".".join(cs[0:-1]))
+                global_serializer_mixin = getattr(module, cs[-1])
 
         except Exception as e:
             logger.error(e)
