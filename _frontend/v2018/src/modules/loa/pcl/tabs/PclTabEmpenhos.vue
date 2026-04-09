@@ -62,10 +62,10 @@
               R$ {{ formatCurrency(item.empenho.valor_empenhado) }}
             </h3>
             <small class="text-info" v-if="parseFloat(item.empenho.valor_liquidado) > 0">
-              Liquidado: R$ {{ formatCurrency(item.empenho.valor_liquidado) }}
+              Liquidado: R$ {{ formatCurrency(item.empenho.valor_liquidado) }}<br>
             </small>
             <small class="text-danger" v-if="parseFloat(item.empenho.valor_anulado) > 0">
-              Anulado: R$ {{ formatCurrency(item.empenho.valor_anulado) }}
+              Anulado: R$ {{ formatCurrency(item.empenho.valor_anulado) }}<br>
             </small>
             <small class="text-success" v-if="parseFloat(item.empenho.valor_pago_bruto) > 0">
               Pago: R$ {{ formatCurrency(item.empenho.valor_pago_bruto) }}

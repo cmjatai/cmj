@@ -3,7 +3,6 @@ import os
 from .project import *
 
 DEBUG = False
-DJANGO_VITE_DEV_MODE = False
 
 
 DATABASES = {
@@ -13,11 +12,11 @@ DATABASES = {
     }
 }
 
-DJANGO_VITE_DEV_MODE = False
+_DJANGO_VITE_DEV_MODE = False
 DJANGO_VITE = {
     "default": {
-        "dev_mode": DJANGO_VITE_DEV_MODE,
-        "manifest_path": DJANGO_VITE_ASSETS_PATH.child(Fv6, ".vite", "manifest.json"),
+        "dev_mode": _DJANGO_VITE_DEV_MODE,
+        "manifest_path": _DJANGO_VITE_ASSETS_PATH.child(Fv6, ".vite", "manifest.json"),
     }
 }
 

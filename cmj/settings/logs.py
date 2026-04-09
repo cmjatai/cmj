@@ -1,6 +1,7 @@
 import inspect
 import logging
 import sys
+import traceback
 import warnings
 
 import yaml
@@ -11,6 +12,17 @@ LOGGING_ROOT_LEVEL = config("LOGGING_ROOT_LEVEL", default="INFO", cast=str)
 
 logging.captureWarnings(True)
 yaml.warnings({"YAMLLoadWarning": False})
+
+
+def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
+    log = file if file else sys.stderr
+    logger = logging.getLogger(__name__)
+    error_msg = " ".join(traceback.format_tb(log))
+    logger.warning(f" {filename}:{lineno}: {category.__name__}: {message}")
+    logger.warning(error_msg)
+
+
+warnings.showwarning = warn_with_traceback
 
 
 class MyFormatter(logging.Formatter):
@@ -26,7 +38,7 @@ class MyFormatter(logging.Formatter):
             if r:
                 try:
                     url = r.path
-                except:
+                except Exception as e:
                     url = ""
                 return f"{s} - {url}"
         return s
@@ -107,7 +119,7 @@ def uncaught_exceptions(type, value, error_traceback):
     logger = logging.getLogger(__name__)
     error_msg = "".join(traceback.format_tb(error_traceback))
     logger.error(f"{type}\n{value}\n{error_msg}")
-    print(f"{type}\n{value}\n{error_msg}")
+    print(f" {type}\n{value}\n{error_msg}")
 
 
 # captura exceções que não foram tratadas

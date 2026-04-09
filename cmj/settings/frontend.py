@@ -7,9 +7,7 @@ DEBUG = config("DEBUG", default=False, cast=bool)
 if DEBUG:
     DEV_HOST_NAME = config("DEV_HOST_NAME", default="localhost", cast=str)
     DEV_BACKENDPORT = config("DEV_BACKENDPORT", default=8000, cast=int)
-    DEV_V2018PORT = config(
-        "DEV_V2018PORT", default=8080, cast=int
-    )
+    DEV_V2018PORT = config("DEV_V2018PORT", default=8080, cast=int)
     DEV_V6PORT = config("DEV_V6PORT", default=5173, cast=int)
 
 BASE_DIR = Path(__file__).ancestor(2)
@@ -108,15 +106,15 @@ WEBPACK_LOADER = {
 }
 
 
-DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2026.child("dist")
+_DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2026.child("dist")
 
-DJANGO_VITE_DEV_MODE = config("DJANGO_VITE_DEV_MODE", default=False, cast=bool)
-DJANGO_VITE_DEV_MODE = DJANGO_VITE_DEV_MODE and DEBUG
+_DJANGO_VITE_DEV_MODE = config("DJANGO_VITE_DEV_MODE", default=False, cast=bool)
+_DJANGO_VITE_DEV_MODE = _DJANGO_VITE_DEV_MODE and DEBUG
 
 DJANGO_VITE = {
     "default": {
-        "dev_mode": DJANGO_VITE_DEV_MODE,
-        "manifest_path": DJANGO_VITE_ASSETS_PATH.child(Fv6, ".vite", "manifest.json"),
+        "dev_mode": _DJANGO_VITE_DEV_MODE,
+        "manifest_path": _DJANGO_VITE_ASSETS_PATH.child(Fv6, ".vite", "manifest.json"),
     }
 }
 
@@ -152,7 +150,7 @@ elif DEBUG:
         PROJECT_DIR_FRONTEND_2026.child("src", "assets"),
     ]
 
-if DEBUG and not DJANGO_VITE_DEV_MODE:
+if DEBUG and not _DJANGO_VITE_DEV_MODE:
     STATICFILES_DIRS += [PROJECT_DIR_FRONTEND_2026.child("dist")]
 
 # apenas para debug - na produção nginx deve entregar sw
