@@ -433,11 +433,12 @@ export default {
         agrupamento: recursive === '' ? t.despesa.agrupamentoselected : recursive,
         itens: t.despesa.itensselected
       }
-      t.$nextTick()
-        .then(() => {
-          formFilter.hist = 1
+      setTimeout(() => {
+        formFilter.hist = 1
+        if (t || (t.loa && t.loa.id)) {
           t.utils.postModelAction('loa', 'loa', t.loa.id, 'despesas_agrupadas', formFilter)
             .then((response) => {
+              console.log(t.loa.id)
               let labels = response.data.labels.slice(t.barchart_offset, t.barchart_offset + t.barchart_max_items)
               let cor = t.barchart_colors // t.build_colors(response.data.anos.length, 'a0')
               let datasets = []
@@ -491,7 +492,8 @@ export default {
             })
             .catch((response) => t.sendMessage(
               { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
-        })
+        }
+      }, 1000)
     },
     build_colors (n, alpha = '') {
       const colors = []

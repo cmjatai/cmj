@@ -2,6 +2,7 @@ import logging
 import re
 
 import yaml
+from django.http import Http404
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect
 from django.utils import timezone
 
@@ -24,12 +25,12 @@ class DisabledMiddleware:
         response = self.get_response(request)
 
         # Captura qualquer erro (4xx ou 5xx)
-        if response.status_code >= 400:
-            msg = f"Status {response.status_code} em {request.path}"
-            if response.status_code >= 500:
-                logger.error(msg)
-            else:
-                logger.warning(msg)
+        #if response.status_code >= 400:
+        #    msg = f"Status {response.status_code} em {request.path}"
+        #    if response.status_code >= 500:
+        #        logger.error(msg)
+        #    else:
+        #        logger.warning(msg)
 
         return response
 
@@ -95,6 +96,9 @@ class DisabledMiddleware:
         # print(timezone.localtime() - now, path)
 
     def process_exception(self, request, exception):
+        if isinstance(exception, Http404):
+            return None  # Deixa o Django lidar com 404 normalmente
+
         logger.error(
             f"Erro crítico na view: {type(exception).__name__} em {request.path}",
             exc_info=True,  # Isso anexa o Traceback automaticamente
