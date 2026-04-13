@@ -1169,14 +1169,12 @@ class EstatisticasAcessoNormas(TemplateView):
         query = """
                 select norma_id, ano, extract(month from horario_acesso) as mes, count(*)
                 from norma_normaestatisticas
-                where ano = {}
+                where ano = %s
                 group by mes, ano, norma_id
                 order by mes desc;
-                """.format(
-            context["ano"]
-        )
+                """
         cursor = connection.cursor()
-        cursor.execute(query)
+        cursor.execute(query, [context["ano"]])
         rows = cursor.fetchall()
 
         normas_mes = collections.OrderedDict()
