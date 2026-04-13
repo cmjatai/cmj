@@ -15,6 +15,9 @@
 <div class="text-ementa">
   {{n.ementa}}
 </div>
+<small class="text-muted">
+  {% for assunto in n.assuntos.all %}{{ assunto }}{% if not forloop.last %}, {% endif %}{% endfor %}
+</small>
 
 {% if perms.norma.change_normajuridica %}
   <div class="bg-white d-flex flex-column mt-2">

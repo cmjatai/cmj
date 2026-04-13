@@ -13,10 +13,17 @@
       font-style: italic;
       color: #444;
     }
+
+    @bottom-right {
+      content: "";
+    }
   }
 {% endblock head_page_counter_css %}
 
 {% block header_content %}
+  <header>
+    <img src="{% webpack_static '/img/pdf_cabec.jpg' %}">
+  </header>
   <section class="fullpage">
     <img src="{% webpack_static '/img/foto_chao_camara_retrato.jpg' %}">
     <div class="relatorio-gestao relatorio-gestao-pdf ">
@@ -24,9 +31,6 @@
     </div>
   </section>
 
-  <header>
-    <img src="{% webpack_static '/img/pdf_cabec.jpg' %}">
-  </header>
 {% endblock header_content %}
 
 {% block body_content %}

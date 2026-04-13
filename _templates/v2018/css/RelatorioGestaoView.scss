@@ -17,7 +17,7 @@
   }
   ul {
     margin: 0;
-    padding-left: 0.7cm;
+    padding-left: 1cm;
     li {
       line-height: 1.3;
     }
@@ -26,7 +26,8 @@
   h1, h2, h3, h4 {
     padding: 0;
     margin: 0;
-    color: #004455;
+    color: #2a6099;
+    font-variant: small-caps;
   }
   h1 {
     margin: 0.4cm 0 0cm 0.5cm;
@@ -36,9 +37,21 @@
   }
   h3 {
     margin: 0.2cm 0 0.1cm 0.5cm;
+    color: #000;
   }
   h4 {
     margin: 0.2cm 0 0cm 0cm;
+  }
+
+  .text-justify {
+    text-align: justify;
+  }
+
+  .paragraph {
+    margin-left: 1.3cm;
+    margin-right: 1.3cm;
+    text-indent: 2cm;
+    line-height: 1.3;
   }
 
   .new-page {
