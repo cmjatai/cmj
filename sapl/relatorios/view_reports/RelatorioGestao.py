@@ -6,8 +6,7 @@ from django.views.generic import TemplateView
 from markdown.extensions.toc import TocExtension as makeTocExtension
 from markdown.extensions.toc import slugify_unicode
 
-from cmj.core.views_estatisticas import get_redessociais
-from sapl.comissoes.models import Composicao, Participacao
+from sapl.comissoes.models import Participacao
 from sapl.materia.models import AssuntoMateria, TipoMateriaLegislativa
 from sapl.norma.models import AssuntoNorma, TipoNormaJuridica
 from sapl.parlamentares.models import ComposicaoMesa, Legislatura, Parlamentar
@@ -38,6 +37,7 @@ class View(RelatorioMixin, TemplateView):
                 self.get_normas(),
                 self.get_materias(),
                 self.get_sessoes(),
+                self.get_analise_conclusiva(),
             ]
         )
         return context
@@ -116,7 +116,9 @@ class View(RelatorioMixin, TemplateView):
             id__in=self.legislatura.mandato_set.values_list("parlamentar", flat=True)
         ).order_by("nome_parlamentar")
         for p in self.parlamentares:
-            mark2.append(f"* **{p}**")
+            mark2.append(
+                f"* [**{p}**](https://www.jatai.go.leg.br/{p.classe_set.first().slug})"
+            )
 
         return (
             (html0, "col-md-12 capa-titulo", "html"),
@@ -128,7 +130,7 @@ class View(RelatorioMixin, TemplateView):
         """
         Retorna a página de comissões do relatório
         """
-        mark0 = [f"# 6. Comissões"]
+        mark0 = [f"## 6. Comissões"]
 
         participacoes = Participacao.objects.filter(
             composicao__periodo__data_inicio__year__lte=self.ano,
@@ -189,7 +191,7 @@ class View(RelatorioMixin, TemplateView):
 
     def get_normas(self):
 
-        mark = [f"# 7. Atos Normativos/Legislativos de {self.ano}"]
+        mark = [f"## 7. Atos Normativos/Legislativos de {self.ano}"]
         tipos = (
             TipoNormaJuridica.objects.filter(normajuridica_set__data__year=self.ano)
             .annotate(Count("normajuridica_set"))
@@ -198,7 +200,7 @@ class View(RelatorioMixin, TemplateView):
         for t in tipos:
             mark.append(
                 f"* [{t.descricao} ({t.normajuridica_set__count})]"
-                f"(http://www.jatai.go.leg.br/pesquisar/norma?tipo_i={t.pk}&ano_i={self.ano})"
+                f"(https://www.jatai.go.leg.br/pesquisar/norma?tipo_i={t.pk}&ano_i={self.ano})"
             )
 
         mark2 = []
@@ -216,7 +218,7 @@ class View(RelatorioMixin, TemplateView):
         for i, a in enumerate(assuntos):
             text = (
                 f"* [{a.assunto} ({a.normajuridica__count})]"
-                f"(http://www.jatai.go.leg.br/pesquisar/norma?assuntos_is={a.pk}&ano_i={self.ano})"
+                f"(https://www.jatai.go.leg.br/pesquisar/norma?assuntos_is={a.pk}&ano_i={self.ano})"
             )
 
             mark21.append(text)
@@ -228,7 +230,7 @@ class View(RelatorioMixin, TemplateView):
 
     def get_materias(self):
 
-        mark = [f"# 8. Matérias Legislativas no ano de {self.ano}"]
+        mark = [f"## 8. Matérias Legislativas no ano de {self.ano}"]
         tipos = (
             TipoMateriaLegislativa.objects.filter(
                 materialegislativa__ano=self.ano,
@@ -240,7 +242,7 @@ class View(RelatorioMixin, TemplateView):
         for t in tipos:
             mark.append(
                 f"* [{t.descricao} ({t.materialegislativa__count})]"
-                f"(http://www.jatai.go.leg.br/pesquisar/materia?tipo_i={t.pk}&ano_i={self.ano})"
+                f"(https://www.jatai.go.leg.br/pesquisar/materia?tipo_i={t.pk}&ano_i={self.ano})"
             )
 
         mark2 = []
@@ -258,7 +260,7 @@ class View(RelatorioMixin, TemplateView):
                 mark2.append(f"### Assuntos dos Requerimentos de {self.ano}")
             mark2.append(
                 f"* [{a.assunto} ({a.materialegislativa__count})]"
-                f"(http://www.jatai.go.leg.br/pesquisar/materia?assuntos_is={a.pk}&ano_i={self.ano})"
+                f"(https://www.jatai.go.leg.br/pesquisar/materia?assuntos_is={a.pk}&ano_i={self.ano})"
             )
 
         return (
@@ -271,7 +273,7 @@ class View(RelatorioMixin, TemplateView):
         """
         Retorna a página de produção parlamentar por parlamentar
         """
-        mark0 = [f"# 5. Produção Legislativa em {self.ano}"]
+        mark0 = [f"## 5. Produção Legislativa em {self.ano}"]
         marks = []
 
         cols = []
@@ -292,7 +294,7 @@ class View(RelatorioMixin, TemplateView):
             for t in tipos_de_materia_do_parlamentar:
                 col.append(
                     f"* [{t.descricao} ({t.materialegislativa__count})]"
-                    f"(http://www.jatai.go.leg.br/pesquisar/materia?tipo_i={t.pk}&ano_i={self.ano}&autoria_is={autor.pk})"
+                    f"(https://www.jatai.go.leg.br/pesquisar/materia?tipo_i={t.pk}&ano_i={self.ano}&autoria_is={autor.pk})"
                 )
 
             html_col = '<div class="col-md-6 inside-columns">{}</div>'.format(
@@ -317,12 +319,46 @@ class View(RelatorioMixin, TemplateView):
             sessaoplenaria__data_inicio__year=self.ano,
         ).annotate(Count("sessaoplenaria"))
 
-        mark = [f"# 9. Sessões Plenárias de {self.ano}"]
+        mark = [f"## 9. Sessões Plenárias de {self.ano}"]
 
         for t in tipos_de_sessao:
             mark.append(
                 f"* [{t.nome} ({t.sessaoplenaria__count})]"
-                f"(http://www.jatai.go.leg.br/sessao/pesquisar-sessao?tipo={t.pk}&data_inicio__year={self.ano})"
+                f"(https://www.jatai.go.leg.br/sessao/pesquisar-sessao?tipo={t.pk}&data_inicio__year={self.ano})"
             )
 
         return (("\n".join(mark), "col-md-12", "markdown"),)
+
+    def get_analise_conclusiva(self):
+        mark = ["\n\n", f"## 10. Análise Conclusiva"]
+
+        mark.append(
+            f"A partir dos dados apresentados, verifica-se que a Câmara Municipal de Jataí,"
+            f" no exercício de {self.ano}, realizou uma gestão responsável,"
+            f" transparente e alinhada com a legislação vigente."
+            f" A execução orçamentária demonstrou equilíbrio entre os recursos recebidos"
+            f" e as despesas realizadas, com devolução significativa de valores ao Poder Executivo,"
+            f" evidenciando o uso consciente do duodécimo. No aspecto financeiro,"
+            f" a Câmara encerrou o exercício com disponibilidade de caixa suficiente"
+            f" para cobrir todas as suas obrigações, inclusive com apuração de superávit"
+            f" financeiro, atendendo às exigências da Lei de Responsabilidade Fiscal."
+        )
+
+        mark.append("\n\n")
+
+        mark.append(
+            f"Em relação aos gastos com pessoal, foi observado o pleno cumprimento dos limites"
+            f" legais e constitucionais, mantendo-se os percentuais bem abaixo dos limites"
+            f" estabelecidos, o que demonstra controle e planejamento na gestão dos recursos"
+            f" públicos. Além disso, os registros contábeis refletem adequadamente a situação"
+            f" patrimonial da instituição, com investimentos realizados e manutenção dos bens"
+            f" públicos. Dessa forma, conclui-se que a Câmara Municipal atuou de forma eficiente,"
+            f" responsável e comprometida com a boa aplicação dos recursos públicos,"
+            f" colocando-se à disposição para prestar os esclarecimentos e informações"
+            f" necessárias à análise das contas apresentadas."
+        )
+
+        return (
+            ("\n".join(mark[:2]), "col-md-12", "markdown"),
+            ("\n".join(mark[2:]), "col-md-12 text-justify paragraph", "markdown"),
+        )
