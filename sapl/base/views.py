@@ -5,18 +5,15 @@ import json
 import logging
 import os
 
-from _collections import OrderedDict
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
-from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
 from django.core.mail import send_mail
 from django.db import connection
 from django.db.models import Count, ProtectedError, Q
-from django.db.models.expressions import Case
 from django.forms.utils import ErrorList
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -82,7 +79,6 @@ from sapl.utils import (
     intervalos_tem_intersecao,
     mail_service_configured,
     parlamentares_ativos,
-    remover_acentos,
     show_results_filter_set,
 )
 
@@ -1176,7 +1172,9 @@ class EstatisticasAcessoNormas(TemplateView):
                 where ano = {}
                 group by mes, ano, norma_id
                 order by mes desc;
-                """.format(context["ano"])
+                """.format(
+            context["ano"]
+        )
         cursor = connection.cursor()
         cursor.execute(query)
         rows = cursor.fetchall()
