@@ -223,11 +223,17 @@ def tipos_autores_materias(user=None, restricao_regimental=True):
 
         for a in m.autores.all():
             if a not in r[m.tipo]:
-                r[m.tipo][a] = {"individual": set(), "coletivo": set()}
+                r[m.tipo][a] = {
+                    "individual": set(),
+                    "coletivo": set(),
+                    "individual_votado": set(),
+                }
 
             key = "coletivo" if coletivo else "individual"
-
             r[m.tipo][a][key].add(m)
+
+            if m.registrovotacao_set.exists() and key == "individual":
+                r[m.tipo][a]["individual_votado"].add(m)
 
     if restricao_regimental:
         for p in proposicoes_enviadas_sem_recebimento:
@@ -250,6 +256,7 @@ def tipos_autores_materias(user=None, restricao_regimental=True):
                 r[tipo_correspondente][p.autor] = {
                     "individual": set(),
                     "coletivo": set(),
+                    "individual_votado": set(),
                 }
 
             key = "coletivo" if coletivo else "individual"
@@ -1248,11 +1255,13 @@ class ProposicaoCrud(Crud):
                         msg_error = _("Documento não possui assinatura digital.")
                     else:
                         tcr = p.tipo.tipo_conteudo_related
-                        msg_pre_error = _(f"""Limite Regimental atingido.
+                        msg_pre_error = _(
+                            f"""Limite Regimental atingido.
                             O envio só será possível quando a quantidade
                             de Requerimentos em tramitação for inferior
                             a {tcr.limite_por_autor_tramitando}
-                            Requerimentos.""")
+                            Requerimentos."""
+                        )
 
                         impedimentos = self.impedimentos_de_envio()
 
@@ -1680,7 +1689,9 @@ class ProposicaoCrud(Crud):
             return (
                 """
                 <strong>{}</strong><br>{}<br><small><i>Registrado por: {}</i></small>
-            """.format(args[0], args[0].descricao, args[0].user),
+            """.format(
+                    args[0], args[0].descricao, args[0].user
+                ),
                 args[2],
             )
 
@@ -3347,9 +3358,11 @@ class AcompanhamentoMateriaView(CreateView):
                                 de mensagens e clique no link que nós enviamos para \
                                 confirmar o acompanhamento desta matéria."
                 )
-                msg = _("Foi enviado um e-mail de confirmação. Confira sua caixa \
+                msg = _(
+                    "Foi enviado um e-mail de confirmação. Confira sua caixa \
                          de mensagens e clique no link que nós enviamos para \
-                         confirmar o acompanhamento desta matéria.")
+                         confirmar o acompanhamento desta matéria."
+                )
                 messages.add_message(request, messages.SUCCESS, msg)
 
             # Se o elemento existir e o email não foi confirmado:
@@ -3379,9 +3392,11 @@ class AcompanhamentoMateriaView(CreateView):
                                   confirmar o acompanhamento desta matéria."
                 )
 
-                msg = _("Foi enviado um e-mail de confirmação. Confira sua caixa \
+                msg = _(
+                    "Foi enviado um e-mail de confirmação. Confira sua caixa \
                         de mensagens e clique no link que nós enviamos para \
-                        confirmar o acompanhamento desta matéria.")
+                        confirmar o acompanhamento desta matéria."
+                )
                 messages.add_message(request, messages.SUCCESS, msg)
 
             # Caso esse Acompanhamento já exista
