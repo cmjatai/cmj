@@ -831,6 +831,10 @@ class Classe(ShortUrl, CMSMixin):
         _("Listar no Menu Geral"), choices=YES_NO_CHOICES, default=False
     )
 
+    list_in_menu_sapl = models.BooleanField(
+        _("Listar no Menu SAPL"), choices=YES_NO_CHOICES, default=False
+    )
+
     menu_lateral = models.BooleanField(
         _("Montar Menu Lateral"), choices=YES_NO_CHOICES, default=False
     )

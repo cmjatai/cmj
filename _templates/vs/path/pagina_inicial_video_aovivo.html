@@ -1,0 +1,22 @@
+{% load i18n  common_cmj_tags%}
+
+{% with ""|transmissao_ao_vivo as aovivo %}
+{% if aovivo.exists %}
+  <div class="container-videos portlet-aovivo">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-12 col-sm-8" id="aovivo_content">
+          <h2 class="title-container">TV Câmara - Ao Vivo</h2>
+          <div class="embed-responsive embed-responsive-16by9">
+            <iframe
+              width="560" height="315" frameborder="0" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"
+              src="https://www.youtube.com/embed/{{aovivo.first.json.id.videoId|default:aovivo.first.json.id }}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            ></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+{% endwith %}

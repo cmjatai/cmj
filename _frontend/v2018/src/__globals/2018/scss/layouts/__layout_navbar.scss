@@ -273,9 +273,26 @@
     align-items: center;
   }
 
+
   .row-2 {
-    margin: 7px 0 20px 0;
+    margin: 0px 0 20px 0;
     align-items: stretch;
+
+
+    .brand-sistema {
+      font-size: 1em;
+      color: $color_text_menu;
+      //font-family: "Roboto Condensed", Helvetica, sans-serif;
+      font-weight: 400;
+      text-align: center;
+      margin-top: 10px;
+      margin-bottom: -20px;
+      margin-right: 20px;
+      padding: 0 10px;
+      background: darken($color_primary, 7%) $url_bg_png;
+      border-radius: 10px 10px 0 0;
+    }
+
 
     .icon_selo_atricon {
       $size_selo: 5.5em;
@@ -385,7 +402,6 @@
     padding: 0;
     margin: 0;
     align-items: center;
-
     // font-family: 'Graduate';
     img {
       padding-right: 16px;
@@ -895,6 +911,10 @@
       margin: 0 0 10px 0;
       gap: 10px;
       flex-direction: column;
+
+      .brand-sistema {
+        margin-bottom: -14px;
+      }
 
       .form-search {
         margin-left: 0;

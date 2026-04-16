@@ -1,0 +1,45 @@
+{% load i18n static menus common_cmj_tags cropping %}
+{% load webpack_static from webpack_loader %}
+{% load render_bundle from webpack_loader %}
+
+<nav class="navbar navbar-menu navbar-expand-lg navbar-dark">
+  <div class="container{{fluid}}">
+    <div class="navbar-collapse collapse" id="navbar-menu">
+
+      <ul class="navbar-nav" id="menu_content">
+
+        {% sigad_navbar 'list_in_menu_sapl' %}
+
+        {% if user.is_superuser %}
+          {% navbar 'navbar2/navbar_superuser.yaml' %}
+        {% elif not user.is_anonymous and not user.is_only_socialuser %}
+          {% navbar 'navbar2/navbar_restrict.yaml' %}
+        {% endif %}
+      </ul>
+
+      {% include "base_menu_right.html" %}
+
+      {% if user.is_anonymous %}
+        <ul class="navbar-nav justify-content-end">
+          <li>
+            <a  class="menu-intranet"  href="#linkMenu" role="button" aria-haspopup="true" aria-expanded="false" title="{% trans 'Acessar' %}"><i class="fas fa-sign-in-alt"></i>&nbsp;</a>
+            <ul class="dropdown-menu">
+
+              <li><a href="{% url 'cmj.core:login' %}">{% trans "Portal" %}</a></li>
+
+              <li class="text-right">
+                <a href="#linkMenu"  role="button" aria-haspopup="true" aria-expanded="false">{% trans "Intranet" %}<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li class="text-right"><a href="https://webmail-seguro.com.br/jatai.go.leg.br">{% trans "Webmail" %}</a></li>
+                  <li class="text-right"><a href="https://camarajatai.sigep.com.br">{% trans "Gestão Pública" %}</a></li>
+                  <li class="text-right"><a href="https://cmjatai.1doc.com.br">{% trans "1Doc" %}</a></li>
+                  <li class="text-right"><a href="https://cmjatai.1doc.com.br/b.php?pg=o/wp">Central de Atendimento</a></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+</nav>

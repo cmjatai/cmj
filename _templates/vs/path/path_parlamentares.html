@@ -1,0 +1,224 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters  social_utils cropping thumbnail%}
+{% load webpack_static from webpack_loader %}
+
+{% block main_container_class %}container-fluid container-legislaturas{% endblock %}
+{% block base_functions %}{% endblock %}
+{% block base_header %}{% endblock %}
+
+{% block base_content %}
+
+  <div class="row inner-topo">
+    <div class="col-md-4 inner-legis">
+      <div class="float-right">
+        <a class="btn btn-outline-info" href="{% url 'sapl.parlamentares:parlamentar_list' %}" title="Listagem de Parlamentares por Legislatura">
+          <i class="fas fa-list"></i>
+        </a>
+        <a class="btn btn-outline-info" href="{% url 'cmj.sigad:path_parlamentar_view' '' '' '' '' ''%}" title="Legislaturas, Mesa, Parlamentares e Comissões">
+          <i class="fas fa-users"></i>
+        </a>
+      </div>
+
+      {% if perms.parlamentares.change_parlamentar %}
+        <div class="btn-group">
+          <a class="btn btn-outline-primary" href="{% url 'sapl.parlamentares:parlamentar_list' %}">[ Editar ]
+          </a>
+        </div>
+      {% endif %}
+
+      <div class="tags w-50">
+        Legislaturas
+      </div>
+
+      <a class="inner-titulo">
+        <span class="active">
+          {{legislatura_selecionada.numero}}º<br>
+          ({{legislatura_selecionada.data_inicio.year}} - {{legislatura_selecionada.data_fim.year}})
+        </span>
+      </a>
+
+      {% for leg in legislaturas %}
+        <a href="?l={{leg.legislatura.pk}}" title="{{leg.legislatura}}" class="col-2 col-md-3 {% if leg.legislatura == legislatura_selecionada%}selected{% endif %}">
+          {{leg.legislatura.numero}}º
+        </a>
+      {% endfor %}
+      <div class="clearfix"></div>
+    </div>
+    <div class="col-md-8">
+      <div class="row inner-sessoes">
+        <div class="col-xs-12">
+          <div class="tags">Sessões Legislativas</div>
+          {% for leg in legislaturas %}
+            {% if leg.legislatura == legislatura_selecionada %}
+              {% for sessao in leg.sessoes %}
+                  <a href="?sl={{sessao.sessao.pk}}" class="{% if sessao.sessao == sessaolegislativa_selecionada %}active{% endif %}">{{sessao.sessao}}</a>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      <div class="row container-avatar inner-mesa">
+        <div class="tags w-100">Mesa Diretora<span><i> - Saiba mais sobre o parlamentar clicando em sua foto.</i></span></div>
+        <div class="inner-parla w-100">
+          {% for leg in legislaturas %}
+            {% if leg.legislatura == legislatura_selecionada %}
+              {% for sessao in leg.sessoes %}
+                {% if sessao.sessao == sessaolegislativa_selecionada %}
+                  {% for parlamentar in sessao.mesa %}
+                    {% comment %}
+                      <a class="avatar avatar2" href="{% url 'sapl.parlamentares:parlamentar_detail' parlamentar.id %}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                    {% endcomment %}
+
+                    <a class="avatar avatar2" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+
+                      {% if parlamentar.fotografia %}
+                        <img src="{% thumbnail parlamentar.fotografia 1000x1000 box=parlamentar.fotografia_cropping crop detail %}">
+                      {% else %}
+                          <img src="{% webpack_static '/img/perfil.jpg' %}">
+                      {% endif %}
+                      <span>{{parlamentar}}</span>
+                      <small>{{parlamentar.cargo_mesa}}</small>
+                    </a>
+                  {% endfor %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="row inner-parlamentares">
+    <div class="col-xs-12 container-avatar inner-ativos w-100">
+      {% for leg in legislaturas %}
+        {% if leg.legislatura == legislatura_selecionada %}
+          {% for sessao in leg.sessoes %}
+            {% if sessao.sessao == sessaolegislativa_selecionada %}
+              {% for parlamentar in sessao.parlamentares.titular %}
+                {% if forloop.first %}
+                  <div class="tags w-100 pl-3">Parlamentares Titulares <span><i> - Saiba mais sobre o parlamentar clicando em sua foto.</i></span></div>
+                {% endif %}
+                  {% comment %}
+                    <a class="avatar avatar3" href="{% url 'sapl.parlamentares:parlamentar_detail' parlamentar.id %}"class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% endcomment %}
+
+                  <a class="avatar avatar3" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+
+                    {% if parlamentar.fotografia %}
+                        <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
+                    {% else %}
+                        <img src="{% webpack_static '/img/perfil.jpg' %}">
+                    {% endif %}
+
+                    <span>{{parlamentar}}</span>
+                  </a>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="row inner-extra">
+    <div class="col-6 container-avatar inner-suplentes">
+      {% for leg in legislaturas %}
+        {% if leg.legislatura == legislatura_selecionada %}
+          {% for sessao in leg.sessoes %}
+            {% if sessao.sessao == sessaolegislativa_selecionada %}
+              {% for parlamentar in sessao.parlamentares.suplente %}
+                {% if forloop.first %}
+                  <div class="tags">Parlamentares Suplentes</div>
+                {% endif %}
+
+                  {% if parlamentar.classe_set.first %}
+                    <a class="avatar avatar4" href="/{{parlamentar.classe_set.first.absolute_slug}}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% else %}
+                    <a class="avatar avatar4" href="{% url 'sapl.parlamentares:parlamentar_detail' parlamentar.id %}" class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% endif %}
+
+                  {% if parlamentar.fotografia %}
+                      <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
+                  {% else %}
+                      <img src="{% webpack_static '/img/perfil.jpg' %}">
+                  {% endif %}
+                    <span>{{parlamentar}}</span>
+                  </a>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+    <div class="col-6 container-avatar inner-inativos ">
+      {% for leg in legislaturas %}
+        {% if leg.legislatura == legislatura_selecionada %}
+          {% for sessao in leg.sessoes %}
+            {% if sessao.sessao == sessaolegislativa_selecionada %}
+              {% for parlamentar in sessao.parlamentares.afastado %}
+                {% if forloop.first %}
+                  <div class="tags">Parlamentares Inativos</div>
+                {% endif %}
+                  <a class="avatar avatar4" href="{% url 'sapl.parlamentares:parlamentar_detail' parlamentar.id %}"class="{% if parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% if parlamentar.fotografia %}
+                      <img src="{% cropped_thumbnail parlamentar "fotografia_cropping" %}">
+                  {% else %}
+                      <img src="{% webpack_static '/img/perfil.jpg' %}">
+                  {% endif %}
+                    <span>{{parlamentar}}</span>
+                  </a>
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  <div class="row inner-extra justify-content-center">
+    <div class="col-12">
+      <h1 class="text-left">
+          <a name="comissoes">
+          Comissões
+        </a>
+      </h1>
+    </div>
+
+    {% for leg in legislaturas %}
+      {% if leg.legislatura == legislatura_selecionada %}
+        {% for sessao in leg.sessoes %}
+          {% if sessao.sessao == sessaolegislativa_selecionada %}
+            {% for comissao, composicao, participacoes in sessao.comissoes %}
+              <div class="col-md-6 container-avatar hover_background_05p">
+                  <hr>
+                  <a class="d-flex" href="{% url 'sapl.comissoes:composicao_detail' composicao.id %}">
+                    <div class="tags">
+                    {{comissao}}
+                    </div>
+                  </a>
+                {% for part in participacoes %}
+                  {% if part.parlamentar.classe_set.first %}
+                    <a class="avatar avatar4" href="/{{part.parlamentar.classe_set.first.absolute_slug}}" class="{% if part.parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% else %}
+                    <a class="avatar avatar4" href="{% url 'sapl.parlamentares:parlamentar_detail' part.parlamentar.id %}" class="{% if part.parlamentar == parlamentar_ativo %}active{% endif %}">
+                  {% endif %}
+                  {% if part.parlamentar.fotografia %}
+                      <img src="{% cropped_thumbnail part.parlamentar "fotografia_cropping" %}">
+                  {% else %}
+                      <img src="{% webpack_static '/img/perfil.jpg' %}">
+                  {% endif %}
+                    <span>{{part.parlamentar}}</span>
+                    <small>{{part.cargo}}</small>
+                  </a>
+                {% endfor %}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endblock %}
+
+{% block cmj_extra_content %}
+{% endblock %}

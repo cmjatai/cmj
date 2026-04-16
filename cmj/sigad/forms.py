@@ -88,6 +88,7 @@ class ClasseForm(ModelForm):
             "list_in_mapa",
             "list_in_inf",
             "list_in_menu",
+            "list_in_menu_sapl",
             "menu_lateral",
             "url_redirect",
             "styles",
@@ -116,9 +117,10 @@ class ClasseForm(ModelForm):
         )
         row3 = to_row(
             [
-                ("perfil", 4),
-                ("url_redirect", 5),
+                ("perfil", 3),
+                ("url_redirect", 3),
                 ("list_in_menu", 3),
+                ("list_in_menu_sapl", 3),
             ]
         )
         row4 = to_row(

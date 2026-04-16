@@ -1,0 +1,23 @@
+{% load i18n sigad_filters common_cmj_tags%}
+
+<ul class="{% if not obj_list.first.parent %}col-12{%else%}submapa{% endif %}">
+{% for item in obj_list %}
+  <li>
+    {% if item.parent  %}
+      {% if item.url_redirect == '#' %}
+        <span class="title">
+          {{item.apelido|default:item.titulo}}
+        </span>
+      {% else %}
+        <a class="title" href="{{item.url_redirect|default:item.absolute_slug}}">
+          {{item.apelido|default:item.titulo}}
+        </a>
+      {% endif %}
+    {% endif %}
+
+    {% with item.childs.all as obj_list %}
+      {% include "path/path_mapa_site_sub.html" %}
+    {% endwith %}
+  </li>
+{% endfor %}
+</ul>

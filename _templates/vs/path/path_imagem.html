@@ -1,0 +1,58 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters social_utils %}
+
+{% block main_container_class %}container container-path{% endblock %}
+
+{% block base_functions %}
+{% endblock %}
+
+{% block base_container_header %}
+{% endblock %}
+
+{% block base_content %}
+  {% block controls_content %}{% endblock %}
+  {% block render_content %}
+
+      <div style="position:relative;">
+        <div class="path-title-classe">
+          {% if object.referente %}
+            {{object.referente.raiz.classe}} - <small><a href="/{{object.referente.raiz.absolute_slug}}">Ir para: {{object.referente.raiz}}</a></small>
+
+          {% else %}
+            {{object.raiz.classe}} - <small><a href="/{{object.raiz.absolute_slug}}">Ir para: {{object.raiz}}</a></small>
+          {% endif %}
+        </div>
+        <div class="path-data-pub">
+          {% block historico_publicacao %}
+          {% endblock %}
+        </div>
+
+      </div>
+    {% block title %}
+      <span class="path-title">
+          {% if object.referenciado.titulo %}
+            {{ object.referenciado.titulo|safe|linebreaksbr }}
+          {% else %}
+            {{ object.referente.parents.0.titulo|safe|linebreaksbr }}
+          {% endif %}
+      </span>
+    {% endblock %}
+
+    <span class="path-description">
+      {% block descricao %}
+        {% if object.referenciado.descricao %}
+          {{object.referenciado.descricao|striptags|safe}}
+        {% else %}
+          {{ object.referente.parents.0.descricao|striptags|safe }}
+        {% endif %}
+      {% endblock %}
+      {% social_link_share object 'top-right block'%}
+    </span>
+
+    <a href="/{{object.absolute_slug}}" target="_blank">
+        <img width="100%" src="/{{object.absolute_slug}}.1024" alt="" />
+    </a>
+    <br>
+    <br>
+  {% endblock %}
+{% endblock %}

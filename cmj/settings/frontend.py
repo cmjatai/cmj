@@ -17,11 +17,23 @@ Fv2018 = "v2018"
 Fv6 = "v6"
 
 
+TEMPLATE_MODE = config("TEMPLATE_MODE", default=Fv2018, cast=str)
+
+
 def front_version():
-    return [
-        str(PROJECT_DIR.child("_templates").child(Fv6)),
-        str(PROJECT_DIR.child("_templates").child(Fv2018)),
-    ]
+    return (
+        [
+            str(PROJECT_DIR.child("_templates").child(Fv6)),
+        ]
+        + (
+            [str(PROJECT_DIR.child("_templates").child(TEMPLATE_MODE))]
+            if TEMPLATE_MODE != Fv2018
+            else []
+        )
+        + [
+            str(PROJECT_DIR.child("_templates").child(Fv2018)),
+        ]
+    )
 
 
 FORM_RENDERER = "django.forms.renderers.TemplatesSetting"

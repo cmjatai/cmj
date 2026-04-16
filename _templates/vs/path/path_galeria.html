@@ -1,0 +1,118 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters social_utils %}
+{% block main_container_class %}container container-path container-albuns {% endblock %}
+{% block historico_publicacao %}{% endblock %}
+{% block title %}
+
+{% endblock %}
+
+{% block controls_content %}
+  {% if perms.sigad.change_classe %}
+    <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
+  {% endif %}
+  {% if perms.sigad.add_documento %}
+    <a class="btn btn-outline-primary" href="{% url create_doc_url object.id %}">{% trans "Adicionar item a" %} {{object }}</a>
+  {% endif %}
+{% endblock %}
+
+{% block base_content %}
+  {% for galeria in object_list %}
+    {% if forloop.first and galeria.tipo != galeria.TD_BI %}
+      <div class="albuns-show-gallery invisible"></div>
+      <form class="invisible" method="post" id="form-galeria-ajax">{% csrf_token %}</form>
+    {% endif %}
+    {% if forloop.first %}
+      <div class="row">
+    {% endif %}
+    <div class="col-6 col-lg-4">
+      <div class="album-item-list">
+        <div class="album-inner">
+          <div class="album-show">
+            <div class="show-image">
+              {% social_link_share galeria.raiz 'absolute-right' %}
+              {% if galeria.cita.first %}
+                <div class="image" style="background-image: url('/{{galeria.cita.first.slug}}.512')">
+                </div>
+              {% else %}
+                <div class="image" style="background-image: url('/{{galeria.imagem_representativa.slug}}.512')">
+                </div>
+              {% endif %}
+            </div>
+            <div class="show-contexto">
+              <a href="/{{galeria.absolute_slug}}">
+                <div class="show-texto">
+                  <div class="show-titulo">
+                    {% if galeria.raiz %}
+                      {{galeria.raiz.titulo}}
+                    {% else %}
+                      {{galeria.titulo}}
+                    {% endif %}
+                    <small>
+                      {% if galeria.tipo == galeria.TD_BI %}
+                        {{galeria.nodes.count_images}} fotos
+                      {% else %}
+                        {{galeria.documentos_citados.count}} fotos
+                      {% endif %}
+                    </small>
+                  </div>
+                  <div class="show-descricao">
+                    {% if galeria.raiz %}
+                      {{galeria.raiz.descricao}}
+                    {% else %}
+                      {{galeria.descricao}}
+                    {% endif %}
+                  </div>
+                </div>
+              </a>
+                <div class="btn-actions">
+
+                    {% if perms.sigad.change_documento %}
+                      {% if galeria.raiz %}
+                        <a href="{% url 'cmj.sigad:documento_construct' galeria.raiz.pk %}" title="{% trans "Editar Galeria" %}">
+                      {% else %}
+                        <a href="{% url 'cmj.sigad:documento_construct' galeria.pk %}" title="{% trans "Editar Galeria" %}">
+                      {% endif %}
+                        <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                      </a>
+                    {% endif %}
+                  {% if galeria.raiz %}
+                    <a href="/{{galeria.absolute_slug}}?zipfile" title="{% trans "Baixar fotos do Album" %}">
+                      <i class="fa fa-download fa-2" aria-hidden="true"></i>
+                    </a>
+                  {% endif %}
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% if forloop.last %}
+      </div>
+    {% endif %}
+  {% endfor %}
+  {% include "paginacao.html" %}
+{% endblock %}
+
+{% block extra_js  %}
+  <script type="text/javascript">
+    $(document).ready(function (){
+      var csrfmiddlewaretoken = $('#form-galeria-ajax input[name="csrfmiddlewaretoken"]')
+      if (csrfmiddlewaretoken.length > 0) {
+        var form_data = {
+          'csrfmiddlewaretoken': csrfmiddlewaretoken[0].value
+        }
+        $('.container-albuns .show-contexto > a').click(function () {
+          $.post(this.href, form_data)
+            .done(function (data) {
+            $('.albuns-show-gallery').removeClass('invisible').html(data);
+            $('.albuns-show-gallery .btn-close').removeClass('invisible').click(function () {
+              $('.albuns-show-gallery').html('').addClass('invisible');
+            });
+            Gallery().init();
+          });
+          return false;
+        });
+      }
+    });
+  </script>
+{% endblock %}

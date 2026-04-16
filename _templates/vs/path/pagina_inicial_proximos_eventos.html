@@ -1,0 +1,17 @@
+{% load i18n agenda_filters social_utils%}
+<div class="panel-agenda">
+  <div class="heading">
+    <strong>Agenda Pública</strong>
+    <span class="ag-comp">  <a href="{% url 'cmj.agenda:evento_list'%}" title="Abrir Agenda Completa">+</a>
+    </span>
+  </div>
+  <div class="panel-body">
+    {% for evento in 20|proximos_eventos %}
+      <div class="item-agenda">
+        <span class="data">{{evento.inicio|date:"d/m/Y - H:i"}}</span>
+        <a {% if evento.link_externo %}href="{{evento.link_externo}}"{% endif %} class="titulo">{{evento.titulo}}</a>
+        <span class="descricao">{{evento.descricao}}</span>
+      </div>
+    {% endfor %}
+  </div>
+</div>

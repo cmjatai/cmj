@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load i18n cache common_cmj_tags %}
+{% block body_class %}body-initial{% endblock body_class %}
+{% block base_header %}{% endblock %}
+{% block second_header %}{% endblock %}
+{% block base_functions %}{% endblock %}
+{% block main_container_class %}container-fluid p-0 container{{fluid}}{{path}}{% endblock %}
+{% block content_container %}{{ block.super }}{% endblock %}
+{% block base_content %}
+
+{% include "path/index.html" %}
+
+{% endblock %}
