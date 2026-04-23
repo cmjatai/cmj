@@ -61,6 +61,19 @@ def valor_por_extenso(valor):
     return num2words(valor, to="currency", lang="pt_BR")
 
 
+def clear_redis_key_contains(key, contain):
+    import redis
+
+    r = redis.Redis.from_url(settings.CELERY_BROKER_URL)
+    items = r.lrange(key, 0, -1)
+    removeds = 0
+    for i, v in enumerate(items):
+        if contain.encode() in v:
+            r.lrem(key, 0, v)
+            removeds += 1
+    return removeds
+
+
 def get_celery_worker_status():
     i = celery_app.control.inspect()
     reserved = i.reserved()
