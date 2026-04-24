@@ -19,8 +19,7 @@ import 'popper.js'
 
 import { routes } from './routers'
 
-import App from './App'
-
+import './RegisterComponents'
 import './mixins'
 
 import './registerServiceWorker'
@@ -65,11 +64,10 @@ const router = new Router({
 sync(store, router)
 
 const app = new Vue({ // eslint-disable-line
+  delimiters: ['[[', ']]'],
   router,
   store,
-  el: '#app',
-  components: { App },
-  template: '<App/>'
+  el: '#app'
 })
 
 /*
