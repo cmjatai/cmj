@@ -19,7 +19,7 @@ import 'popper.js'
 
 import { routes } from './routers'
 
-import './RegisterComponents'
+import './registerComponents'
 import './mixins'
 
 import './registerServiceWorker'

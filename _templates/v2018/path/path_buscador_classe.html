@@ -16,8 +16,13 @@
 {% block appvue_content %}
   <div id="app">
     <div class="row container-buscador">
-      <div class="col-12">
-        {% sigad_menu 'list_in_mapa' %}
+      <div class="col-3">[[ 'teste' ]]
+        <buscador-classe :classe_id="{{object.id}}">
+          [[ 'teste' ]]
+          {% sigad_menu 'list_in_mapa' %}
+        </buscador-classe>
+      </div>
+      <div class="col-9">
       </div>
     </div>
   </div>
