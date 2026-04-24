@@ -38,6 +38,7 @@ class View(RelatorioMixin, TemplateView):
                 self.get_materias(),
                 self.get_sessoes(),
                 self.get_analise_conclusiva(),
+                self.get_assinaturas(),
             ]
         )
         return context
@@ -362,3 +363,25 @@ class View(RelatorioMixin, TemplateView):
             ("\n".join(mark[:2]), "col-md-12", "markdown"),
             ("\n".join(mark[2:]), "col-md-12 text-justify paragraph", "markdown"),
         )
+
+    def get_assinaturas(self):
+
+        mark1 = [
+            "",
+            "",
+            f"Jataí, {timezone.now().day} de {timezone.now().strftime('%B')} de {timezone.now().year}.",
+            "",
+            "",
+        ]
+
+        mark2 = [
+            f"##### Assinam Eletronicamente:",
+            f"* Simone Roveda - Controladora Interna",
+            f"* Leandro Roberto da Silva - DDE",
+        ]
+
+        r = []
+        r.append(("\n".join(mark1), "col-md-12 text-right", "markdown"))
+        r.append(("\n".join(mark2), "col-md-12", "markdown"))
+
+        return r

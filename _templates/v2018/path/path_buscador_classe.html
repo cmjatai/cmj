@@ -1,0 +1,31 @@
+{% extends "base_path.html" %}
+{% load i18n sigad_filters menus common_cmj_tags%}
+{% block historico_publicacao %}{% endblock %}
+{% block main_container_class %}container{% endblock %}
+{% block title %}
+
+{% endblock title %}
+{% block controls_content %}
+  {% if perms.sigad.change_classe %}
+    <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
+  {% endif %}
+  {% if perms.sigad.add_documento %}
+    <a class="btn btn-outline-primary" href="{% url create_doc_url object.id %}">{% trans "Adicionar item a" %} {{object }}</a>
+  {% endif %}
+{% endblock %}
+{% block appvue_content %}
+  <div id="app">
+    <div class="row container-buscador">
+      <div class="col-12">
+        {% sigad_menu 'list_in_mapa' %}
+      </div>
+    </div>
+  </div>
+{% endblock appvue_content %}
+
+{% block base_content %}
+
+{% endblock %}
+
+{% block cmj_extra_content %}
+{% endblock %}

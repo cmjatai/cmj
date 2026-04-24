@@ -89,6 +89,7 @@ class ClasseForm(ModelForm):
             "list_in_inf",
             "list_in_menu",
             "list_in_menu_sapl",
+            "buscador_classes",
             "menu_lateral",
             "url_redirect",
             "styles",
@@ -125,9 +126,10 @@ class ClasseForm(ModelForm):
         )
         row4 = to_row(
             [
-                ("titulo", 4),
-                ("apelido", 5),
+                ("titulo", 3),
+                ("apelido", 3),
                 ("menu_lateral", 3),
+                ("buscador_classes", 3),
                 ("descricao", 12),
                 ("subtitle", 12),
                 ("styles", 12),

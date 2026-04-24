@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <router-view></router-view>
+    <slot />
     <message></message>
   </div>
 </template>

@@ -4,11 +4,7 @@ import yaml
 from django import template
 from django.conf import settings
 from django.core.cache import cache
-from django.core.handlers.asgi import ASGIRequest
-from django.db.models import Q
-from django.shortcuts import render
 from django.urls.base import reverse
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.sigad.models import Classe, Documento
@@ -87,7 +83,7 @@ def sigad_navbar(context, field=None):
             return [{"title": _("Portal"), "url": "", "children": menu}]
 
     if not user.is_superuser:
-        menu = cache.get("portalcmj_menu_publico")
+        menu = cache.get(f"portalcmj_menu_publico_{field}")
         if menu:
             return {"menu": encapsule_menu_em_dropdown_portal(menu)}
 
@@ -118,7 +114,9 @@ def sigad_navbar(context, field=None):
 
     menu = get_how_menu(raizes)
     if not user.is_superuser:
-        cache.set("portalcmj_menu_publico", menu, 86400)
+        cache.set(
+            f"portalcmj_menu_publico_{field}", menu, 86400 if not settings.DEBUG else 10
+        )
 
     menu = encapsule_menu_em_dropdown_portal(menu)
 
