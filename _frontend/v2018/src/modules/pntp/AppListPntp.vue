@@ -3,11 +3,11 @@
     <h5 class="app-list-pntp__titulo">
       <a :href="'/' + selected.slug" class="app-list-pntp__titulo-link">{{ selected.titulo }}</a>
     </h5>
-    <div v-if="childItems.length" class="row">
+    <div v-if="childItems.length" class="row mt-4">
       <div
         v-for="child in childItems"
         :key="child.id"
-        class="col-12 col-sm-6 col-lg-4 mb-3"
+        class="col-12 col-sm-12 mb-3"
       >
         <pntp-list-item :item="child"></pntp-list-item>
       </div>
