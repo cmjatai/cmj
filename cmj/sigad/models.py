@@ -74,7 +74,7 @@ CLASSE_TEMPLATES_CHOICE_FILES = {
     99: "path/path_documento.html",
     500: "path/path_subsite.html",
     501: "path/path_subsite_capa.html",
-    998: "path/path_buscador_classe.html",
+    998: "path/path_pntp.html",
     999: "path/path_mapa_site.html",
 }
 
@@ -88,7 +88,7 @@ CLASSE_DOC_MANAGER_CHOICE = {
     7: "qs_video_news",
     99: None,
     500: "qs_news",
-    998: "qs_buscador_classes",
+    998: "qs_pntp",
     999: "qs_mapa_site",
 }
 
@@ -102,7 +102,7 @@ CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (7, "galeria_video", _("Galeria de Vídeos")),
     (99, "documento_especifico", _("Documento Específico")),
     (500, "subsites", _("Subsites")),
-    (998, "buscador_classes", _("Buscador de Classes")),
+    (998, "qs_pntp", _("Classe do PTNP ")),
     (999, "mapa_site", _("Mapa do Site")),
 )
 
@@ -740,9 +740,9 @@ class ShortUrl(Slugged):
 class ClasseManager(models.Manager):
     use_for_related_fields = True
 
-    def qs_buscador_classes(self, user=None):
+    def qs_pntp(self, user=None):
         qs = self.get_queryset()
-        qs = qs.filter(visibilidade=Classe.STATUS_PUBLIC, buscador_classes__gt=0)
+        qs = qs.filter(visibilidade=Classe.STATUS_PUBLIC, ptnp=True)
 
         return qs.order_by("-parent", "parent__codigo", "codigo")
 
@@ -780,14 +780,6 @@ class Classe(ShortUrl, CMSMixin):
         (CLASSE_MISTA, _("Classe Mista")),
         (CLASSE_REDIRECT, _("Classe de Redirecionamento via URL")),
         (CLASSE_REDIRECT_VIEWS, _("Classe de Redirecionamento via Views")),
-    )
-
-    TIPOS_BUSCADOR_CHOICE = (
-        (0, _("Não Pertence ao Buscador de Classes")),
-        (10, _("Pertence ao Buscador de Classes")),
-        (20, _("Pertence e mostra SubClasses imediatas")),
-        (30, _("Pertence e mostra toda a hierarquia de SubClasses")),
-        (99, _("Buscador Global de Classes")),
     )
 
     codigo = models.PositiveIntegerField(verbose_name=_("Código"), default=0)
@@ -852,8 +844,8 @@ class Classe(ShortUrl, CMSMixin):
         _("Listar no Menu SAPL"), choices=YES_NO_CHOICES, default=False
     )
 
-    buscador_classes = models.PositiveSmallIntegerField(
-        _("Buscador de Classes"), choices=TIPOS_BUSCADOR_CHOICE, default=0
+    ptnp = models.BooleanField(
+        _("Classe do PNTP"), choices=YES_NO_CHOICES, default=False
     )
 
     menu_lateral = models.BooleanField(

@@ -1,6 +1,10 @@
 import Vue from 'vue'
 import App from './App'
-import BuscadorClasse from './components/sigad/BuscadorClasse.vue'
+import AppPntp from './modules/pntp/AppPntp.vue'
+import AppMenuPntp from './modules/pntp/AppMenuPntp.vue'
+import PntpMenuItem from './modules/pntp/PntpMenuItem.vue'
 
 Vue.component('App', App)
-Vue.component('BuscadorClasse', BuscadorClasse)
+Vue.component('AppPntp', AppPntp)
+Vue.component('AppMenuPntp', AppMenuPntp)
+Vue.component('PntpMenuItem', PntpMenuItem)

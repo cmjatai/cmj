@@ -2,6 +2,15 @@
 {% load i18n sigad_filters menus common_cmj_tags%}
 {% block historico_publicacao %}{% endblock %}
 {% block main_container_class %}container{% endblock %}
+
+{% block head_content %}
+  {% with request.GET.categoria|default:"" as categoria %}
+    {% with object|app_pntp_content:categoria as pntp_data %}
+      {{ pntp_data|json_script:"pntp-data" }}
+    {% endwith %}
+  {% endwith %}
+{% endblock %}
+
 {% block title %}
 
 {% endblock title %}
@@ -14,16 +23,10 @@
   {% endif %}
 {% endblock %}
 {% block appvue_content %}
-  <div id="app">
-    <div class="row container-buscador">
-      <div class="col-3">[[ 'teste' ]]
-        <buscador-classe :classe_id="{{object.id}}">
-          [[ 'teste' ]]
-          {% sigad_menu 'list_in_mapa' %}
-        </buscador-classe>
-      </div>
-      <div class="col-9">
-      </div>
+  <div class="container-app-pntp">
+    <div id="app">
+      <app-pntp :classe_id="{{object.id}}">
+      </app-pntp>
     </div>
   </div>
 {% endblock appvue_content %}

@@ -293,3 +293,42 @@ def resolve_urls_inplace(menu, pk, rm, context):
         if "children" in menu:
             menu["active"] = resolve_urls_inplace(menu["children"], pk, rm, context)
         return menu["active"]
+
+
+@register.filter
+def app_pntp_content(classe_atual, categoria):
+
+    if not classe_atual or not isinstance(classe_atual, Classe):
+        return ""
+
+    if not classe_atual.ptnp:
+        return ""
+
+    active_item = None
+    if not categoria:
+        categoria = classe_atual.id
+
+    items = {}
+
+    def recursive_classes(classe, parent):
+        item = {
+            "parent": parent.id if parent else None,
+            "titulo": classe.apelido or classe.titulo,
+            "slug": classe.absolute_slug,
+            "active": "active" if classe.id == categoria else "",
+            "id": classe.id,
+            "childs": [],
+        }
+        items[classe.id] = item
+        if classe.id == categoria:
+            nonlocal active_item
+            active_item = item
+
+        for child in classe.childs.qs_pntp():
+            item_child = recursive_classes(child, classe)
+            item["childs"].append(child.id)
+        return item
+
+    _items = recursive_classes(classe_atual, None)
+
+    return {"items": items, "root": _items, "active_item": active_item}
