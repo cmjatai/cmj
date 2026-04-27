@@ -1,11 +1,22 @@
 <template>
-  <div class="app-pntp container mt-5">
+  <div class="app-pntp container mt-4 mb-4">
     <slot></slot>
-    <div class="row">
-      <div class="col-4">
-        <app-menu-pntp v-bind:items="ptnp_data.items" v-bind:active_item="ptnp_data.active_item"></app-menu-pntp>
+    <div v-if="ptnp_data" class="row">
+      <div class="col-md-4">
+        <app-menu-pntp
+          v-bind:items="ptnp_data.items"
+          v-bind:selected_id="selected_id"
+          v-bind:parent_slug="ptnp_data.parent_slug"
+          v-bind:parent_title="ptnp_data.parent_title"
+          @select="onSelect"
+        ></app-menu-pntp>
       </div>
-      <div class="col-8"></div>
+      <div class="col-md-8">
+        <app-list-pntp
+          v-bind:items="ptnp_data.items"
+          v-bind:selected_id="selected_id"
+        ></app-list-pntp>
+      </div>
     </div>
   </div>
 </template>
@@ -20,14 +31,21 @@ export default {
   },
   data () {
     return {
-      ptnp_data: null
+      ptnp_data: null,
+      selected_id: null
+    }
+  },
+  methods: {
+    onSelect (id) {
+      this.selected_id = id
     }
   },
   mounted () {
-    // le na página o <script id="pntp-data" type="application/json">
-    let t = this
     let data = JSON.parse(document.getElementById('pntp-data').textContent)
-    t.ptnp_data = data
+    this.ptnp_data = data
+    this.selected_id = data.active_item
+      ? data.active_item.id
+      : (Object.values(data.items).find(i => i.parent === null) || {}).id || null
   }
 }
 </script>

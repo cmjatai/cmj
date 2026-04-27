@@ -1,15 +1,15 @@
 <template>
-  <li :class="['pntp-menu__item', { 'pntp-menu__item--active': item.active === 'active' }]">
+  <li :class="['pntp-menu__item', { 'pntp-menu__item--active': isActive }]">
     <div class="pntp-menu__item-header d-flex align-items-center justify-content-between">
-      <a
-        :href="'/' + item.slug"
-        :class="['pntp-menu__link', 'flex-grow-1', { 'active font-weight-bold': item.active === 'active' }]"
-      >{{ item.titulo }}</a>
+      <span
+        :class="['pntp-menu__link', 'flex-grow-1', { 'active font-weight-bold': isActive }]"
+        @click="onSelect"
+      >{{ item.titulo }}</span>
       <button
         v-if="item.childs && item.childs.length"
         class="pntp-menu__toggle btn btn-link btn-sm p-0 ml-2 text-secondary"
         :title="open ? 'Recolher' : 'Expandir'"
-        @click.prevent="open = !open"
+        @click.stop="open = !open"
       >
         <i :class="open ? 'fa fa-chevron-up' : 'fa fa-chevron-down'"></i>
       </button>
@@ -23,7 +23,8 @@
         :key="childId"
         :item="items[childId]"
         :items="items"
-        :active_item="active_item"
+        :selected_id="selected_id"
+        @select="$emit('select', $event)"
       ></pntp-menu-item>
     </ul>
   </li>
@@ -41,8 +42,8 @@ export default {
       type: Object,
       required: true
     },
-    active_item: {
-      type: Object,
+    selected_id: {
+      type: [Number, String],
       default: null
     }
   },
@@ -52,19 +53,27 @@ export default {
     }
   },
   computed: {
-    isInActivePath () {
-      if (!this.active_item) return false
-      let current = this.active_item
+    isActive () {
+      return this.selected_id !== null && String(this.item.id) === String(this.selected_id)
+    },
+    isInSelectedPath () {
+      if (!this.selected_id) return false
+      let current = this.items[this.selected_id]
       while (current) {
-        if (current.id === this.item.id) return true
+        if (String(current.id) === String(this.item.id)) return true
         if (current.parent === null || current.parent === undefined) break
         current = this.items[current.parent]
       }
       return false
     }
   },
+  methods: {
+    onSelect () {
+      this.$emit('select', this.item.id)
+    }
+  },
   created () {
-    this.open = this.isInActivePath || this.item.active === 'active'
+    this.open = this.isInSelectedPath
   }
 }
 </script>
@@ -90,10 +99,10 @@ export default {
   font-size: 0.9rem;
   color: #343a40;
   text-decoration: none;
+  cursor: pointer;
 
   &:hover {
     color: var(--primary, #007bff);
-    text-decoration: none;
   }
 }
 

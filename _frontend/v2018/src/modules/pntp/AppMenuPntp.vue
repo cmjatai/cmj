@@ -1,5 +1,13 @@
 <template>
   <nav v-if="root" class="pntp-menu">
+    <div v-if="parent_slug" class="pntp-menu__back">
+      <a :href="'/' + parent_slug" class="pntp-menu__back-link">
+        <i class="fa fa-chevron-left"></i>
+        <span v-if="parent_title">
+          {{ parent_title }}
+        </span>
+      </a>
+    </div>
     <h5 class="pntp-menu__titulo">
       <a :href="'/' + root.slug" class="pntp-menu__titulo-link">{{ root.titulo }}</a>
     </h5>
@@ -9,7 +17,8 @@
         :key="childId"
         :item="items[childId]"
         :items="items"
-        :active_item="active_item"
+        :selected_id="selected_id"
+        @select="$emit('select', $event)"
       ></pntp-menu-item>
     </ul>
   </nav>
@@ -23,8 +32,16 @@ export default {
       type: Object,
       required: true
     },
-    active_item: {
-      type: Object,
+    selected_id: {
+      type: [Number, String],
+      default: null
+    },
+    parent_slug: {
+      type: String,
+      default: null
+    },
+    parent_title: {
+      type: String,
       default: null
     }
   },
@@ -59,6 +76,28 @@ export default {
   &:hover {
     color: var(--primary, #007bff);
     text-decoration: none;
+  }
+}
+
+.pntp-menu__back {
+  // border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: -1.1rem;
+  margin-left: -0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.pntp-menu__back-link {
+  font-size: 0.8rem;
+  color: #6c757d;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--primary, #007bff);
+    text-decoration: none;
+  }
+
+  i {
+    font-size: 0.7rem;
   }
 }
 

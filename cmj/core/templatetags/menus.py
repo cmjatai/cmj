@@ -331,4 +331,17 @@ def app_pntp_content(classe_atual, categoria):
 
     _items = recursive_classes(classe_atual, None)
 
-    return {"items": items, "root": _items, "active_item": active_item}
+    parent_slug = classe_atual.parent.absolute_slug if classe_atual.parent else None
+    parent_title = (
+        (classe_atual.parent.apelido or classe_atual.parent.titulo)
+        if classe_atual.parent
+        else None
+    )
+
+    return {
+        "items": items,
+        "root": _items,
+        "active_item": active_item,
+        "parent_slug": parent_slug,
+        "parent_title": parent_title,
+    }
