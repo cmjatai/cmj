@@ -11,7 +11,10 @@
         :key="child.id"
         class="col-12 col-sm-12 mb-3"
       >
-        <pntp-list-item :item="child"></pntp-list-item>
+        <pntp-list-item
+          :item="child"
+          :parent_titulo="items[child.parent] ? items[child.parent].titulo : null"
+        ></pntp-list-item>
       </div>
     </div>
   </div>
@@ -49,7 +52,7 @@ export default {
           if (hasRenderableChilds) {
             collect(item.childs)
           } else {
-            result.push(item)
+            result.push({ ...item, _parent_titulo: item.parent ? (this.items[item.parent] ? this.items[item.parent].titulo : null) : null })
           }
         })
       }

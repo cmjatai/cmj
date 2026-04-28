@@ -90,6 +90,7 @@ class ClasseForm(ModelForm):
             "list_in_menu",
             "list_in_menu_sapl",
             "pntp",
+            "icon_classe",
             "menu_lateral",
             "url_redirect",
             "styles",
@@ -128,8 +129,9 @@ class ClasseForm(ModelForm):
             [
                 ("titulo", 3),
                 ("apelido", 3),
-                ("menu_lateral", 3),
-                ("pntp", 3),
+                ("menu_lateral", 2),
+                ("pntp", 2),
+                ("icon_classe", 2),
                 ("descricao", 12),
                 ("subtitle", 12),
                 ("styles", 12),
@@ -238,6 +240,7 @@ class DocumentoForm(ModelForm):
             "styles",
             "classes_relacionadas",
             "pntp",
+            "icon_doc",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -249,8 +252,9 @@ class DocumentoForm(ModelForm):
                 [
                     ("tipo", 3),
                     ("template_doc", 3),
-                    ("capa", 3),
-                    ("pntp", 3),
+                    ("capa", 2),
+                    ("pntp", 2),
+                    ("icon_doc", 2),
                 ]
             ),
             to_row([("descricao", 8), ("parlamentares", 4)]),

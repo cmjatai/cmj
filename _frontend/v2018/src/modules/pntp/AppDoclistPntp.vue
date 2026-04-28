@@ -6,7 +6,10 @@
         :key="doc.id"
         class="col-12 col-sm-12 mb-3"
       >
-        <pntp-doclist-item :doc="doc"></pntp-doclist-item>
+        <pntp-doclist-item
+          :doc="doc"
+          :parent_titulo="doc._parent_titulo || null"
+        ></pntp-doclist-item>
       </div>
     </div>
   </div>
@@ -39,7 +42,9 @@ export default {
       const collect = (item) => {
         const hasChilds = item.childs && item.childs.length > 0
         if (!hasChilds) {
-          if (item.documentos && item.documentos.length) result.push(...item.documentos)
+          if (item.documentos && item.documentos.length) {
+            item.documentos.forEach(doc => result.push({ ...doc, _parent_titulo: item.titulo }))
+          }
         } else {
           item.childs.forEach(id => {
             const child = this.items[id]

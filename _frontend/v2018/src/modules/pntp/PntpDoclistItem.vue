@@ -3,6 +3,7 @@
     <a :href="'/' + doc.slug" class="pntp-doclist-item__link">
       <div class="pntp-doclist-item__card card h-100">
         <div class="card-body">
+          <small v-if="parent_titulo" class="pntp-doclist-item__parent text-muted d-block mb-1">{{ parent_titulo }}</small>
           <h6 class="pntp-doclist-item__titulo card-title mb-0">{{ doc.titulo }}</h6>
         </div>
       </div>
@@ -17,6 +18,10 @@ export default {
     doc: {
       type: Object,
       required: true
+    },
+    parent_titulo: {
+      type: String,
+      default: null
     }
   }
 }
