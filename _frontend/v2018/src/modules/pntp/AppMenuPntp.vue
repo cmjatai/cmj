@@ -11,9 +11,9 @@
     <h5 class="pntp-menu__titulo">
       <a :href="'/' + root.slug" class="pntp-menu__titulo-link">{{ root.titulo }}</a>
     </h5>
-    <ul v-if="rootChildsWithChildren.length" class="pntp-menu__list list-unstyled mt-2 mb-0">
+    <ul v-if="rootChildsRenderable.length" class="pntp-menu__list list-unstyled mt-2 mb-0">
       <pntp-menu-item
-        v-for="childId in rootChildsWithChildren"
+        v-for="childId in rootChildsRenderable"
         :key="childId"
         :item="items[childId]"
         :items="items"
@@ -49,11 +49,14 @@ export default {
     root () {
       return Object.values(this.items).find(item => item.parent === null) || null
     },
-    rootChildsWithChildren () {
+    rootChildsRenderable () {
       if (!this.root || !this.root.childs) return []
       return this.root.childs.filter(id => {
         const child = this.items[id]
-        return child && child.childs && child.childs.length > 0
+        return child && (
+          (child.childs && child.childs.length > 0) ||
+          (child.documentos && child.documentos.length > 0)
+        )
       })
     }
   }

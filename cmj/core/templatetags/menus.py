@@ -318,6 +318,9 @@ def app_pntp_content(classe_atual, categoria):
             "active": "active" if classe.id == categoria else "",
             "id": classe.id,
             "childs": [],
+            "documentos": list(
+                classe.documento_set.public_all_docs().values("id", "titulo", "slug")
+            ),
         }
         items[classe.id] = item
         if classe.id == categoria:

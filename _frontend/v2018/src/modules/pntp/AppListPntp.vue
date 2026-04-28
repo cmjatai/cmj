@@ -1,18 +1,9 @@
 <template>
   <div v-if="selected" class="app-list-pntp">
-    <div class="app-list-pntp__header d-flex align-items-center mb-3">
-      <h5 class="app-list-pntp__titulo mb-0 flex-grow-1">
+    <div class="app-list-pntp__header mb-3">
+      <h5 class="app-list-pntp__titulo mb-0">
         <a :href="'/' + selected.slug" class="app-list-pntp__titulo-link">{{ selected.titulo }}</a>
       </h5>
-      <div class="app-list-pntp__search-wrap ml-3">
-        <input
-          v-model="search"
-          type="search"
-          class="form-control form-control-sm app-list-pntp__search"
-          placeholder="Buscar..."
-        />
-        <i class="fa fa-search app-list-pntp__search-icon"></i>
-      </div>
     </div>
     <div v-if="displayItems.length" class="row mt-2">
       <div
@@ -38,11 +29,10 @@ export default {
     selected_id: {
       type: [Number, String],
       default: null
-    }
-  },
-  data () {
-    return {
-      search: ''
+    },
+    search: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -70,6 +60,8 @@ export default {
   border-bottom: 2px solid var(--primary, #007bff);
   padding-bottom: 0.5rem;
   padding-top: 0.3rem;
+  display: flex;
+  align-items: center;
 }
 
 .app-list-pntp__titulo {
@@ -87,22 +79,4 @@ export default {
   }
 }
 
-.app-list-pntp__search-wrap {
-  position: relative;
-  max-width: 200px;
-}
-
-.app-list-pntp__search {
-  padding-right: 1.8rem;
-}
-
-.app-list-pntp__search-icon {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 0.75rem;
-  color: #adb5bd;
-  pointer-events: none;
-}
 </style>

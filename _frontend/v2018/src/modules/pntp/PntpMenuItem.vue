@@ -6,7 +6,7 @@
         @click="onSelect"
       >{{ item.titulo }}</span>
       <button
-        v-if="childsWithChildren.length"
+        v-if="childsRenderable.length"
         class="pntp-menu__toggle btn btn-link btn-sm p-0 ml-2 text-secondary"
         :title="open ? 'Recolher' : 'Expandir'"
         @click.stop="open = !open"
@@ -15,11 +15,11 @@
       </button>
     </div>
     <ul
-      v-if="item.childs && item.childs.length && open"
+      v-if="childsRenderable.length && open"
       class="pntp-menu__sublist list-unstyled pl-3 mt-1"
     >
       <pntp-menu-item
-        v-for="childId in childsWithChildren"
+        v-for="childId in childsRenderable"
         :key="childId"
         :item="items[childId]"
         :items="items"
@@ -56,11 +56,14 @@ export default {
     isActive () {
       return this.selected_id !== null && String(this.item.id) === String(this.selected_id)
     },
-    childsWithChildren () {
+    childsRenderable () {
       if (!this.item.childs) return []
       return this.item.childs.filter(id => {
         const child = this.items[id]
-        return child && child.childs && child.childs.length > 0
+        return child && (
+          (child.childs && child.childs.length > 0) ||
+          (child.documentos && child.documentos.length > 0)
+        )
       })
     },
     isInSelectedPath () {
