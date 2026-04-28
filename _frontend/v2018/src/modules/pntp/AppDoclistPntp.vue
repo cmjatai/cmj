@@ -34,8 +34,24 @@ export default {
       if (!this.selected_id) return null
       return this.items[this.selected_id] || null
     },
+    allDescendantDocs () {
+      const result = []
+      const collect = (item) => {
+        if (item.documentos && item.documentos.length) result.push(...item.documentos)
+        if (item.childs && item.childs.length) {
+          item.childs.forEach(id => {
+            const child = this.items[id]
+            if (child) collect(child)
+          })
+        }
+      }
+      if (this.selected) collect(this.selected)
+      return result
+    },
     selectedDocuments () {
-      return this.selected && this.selected.documentos ? this.selected.documentos : []
+      if (!this.selected) return []
+      if (this.selected.parent === null) return this.allDescendantDocs
+      return this.selected.documentos || []
     },
     displayDocs () {
       const term = this.search.trim().toLowerCase()

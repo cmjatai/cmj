@@ -39,8 +39,24 @@ export default {
       if (!this.selected_id) return null
       return this.items[this.selected_id] || null
     },
+    allDescendants () {
+      const result = []
+      const collect = (ids) => {
+        ids.forEach(id => {
+          const item = this.items[id]
+          if (item) {
+            result.push(item)
+            if (item.childs && item.childs.length) collect(item.childs)
+          }
+        })
+      }
+      if (this.selected && this.selected.childs) collect(this.selected.childs)
+      return result
+    },
     childItems () {
-      if (!this.selected || !this.selected.childs || !this.selected.childs.length) return []
+      if (!this.selected) return []
+      if (this.selected.parent === null) return this.allDescendants
+      if (!this.selected.childs || !this.selected.childs.length) return []
       return this.selected.childs.map(id => this.items[id]).filter(Boolean)
     },
     displayItems () {
