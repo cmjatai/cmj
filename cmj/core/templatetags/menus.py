@@ -311,8 +311,8 @@ def app_pntp_content(classe_atual, categoria):
     items = {}
 
     def recursive_classes(classe, parent):
-        if classe.url_redirect.startswith("__") or classe.titulo.startswith("__"):
-            return None
+        # if classe.url_redirect.startswith("__") or classe.titulo.startswith("__"):
+        #    return None
 
         docs = list(
             classe.documento_set.public_all_docs().values("id", "titulo", "slug")
