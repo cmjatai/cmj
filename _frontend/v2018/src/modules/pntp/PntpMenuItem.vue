@@ -114,7 +114,7 @@ export default {
 }
 
 .pntp-menu__sublist {
-  border-left: 2px solid rgba(0, 0, 0, 0.08);
+  border-left: 1px solid rgba(0, 0, 0, 0.08);
   padding-left: 0.75rem !important;
 }
 

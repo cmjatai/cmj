@@ -1,5 +1,5 @@
 <template>
-  <div class="app-pntp container mt-4 mb-4">
+  <div class="app-pntp mt-4 mb-4">
     <slot></slot>
     <div v-if="ptnp_data" class="row">
       <div class="col-md-4">

@@ -65,15 +65,15 @@ export default {
   background: #fff;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .pntp-menu__titulo {
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid var(--primary, #007bff);
+  margin-bottom: 0.2rem;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--primary, #007bff);
 }
 
 .pntp-menu__titulo-link {
@@ -88,9 +88,10 @@ export default {
 
 .pntp-menu__back {
   // border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-top: -1.1rem;
-  margin-left: -0.9rem;
-  margin-bottom: 0.5rem;
+  margin-top: -0.8rem;
+  margin-left: -0.3rem;
+  margin-bottom: 0.3rem;
+  font-variant: small-caps;
 }
 
 .pntp-menu__back-link {
