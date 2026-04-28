@@ -301,7 +301,7 @@ def app_pntp_content(classe_atual, categoria):
     if not classe_atual or not isinstance(classe_atual, Classe):
         return ""
 
-    if not classe_atual.ptnp:
+    if not classe_atual.pntp:
         return ""
 
     active_item = None
@@ -311,6 +311,28 @@ def app_pntp_content(classe_atual, categoria):
     items = {}
 
     def recursive_classes(classe, parent):
+        if classe.url_redirect.startswith("__") or classe.titulo.startswith("__"):
+            return None
+
+        docs = list(
+            classe.documento_set.public_all_docs().values("id", "titulo", "slug")
+        )
+
+        if classe.url_redirect and classe.url_redirect.startswith("/"):
+            classe_url = classe.url_redirect
+            classe_redirect = Classe.objects.filter(
+                slug=classe.url_redirect.strip("/"),
+                pntp=True,
+            ).first()
+            if classe_redirect:
+                docs.extend(
+                    list(
+                        classe_redirect.documento_set.public_all_docs().values(
+                            "id", "titulo", "slug"
+                        )
+                    )
+                )
+
         item = {
             "parent": parent.id if parent else None,
             "titulo": classe.apelido or classe.titulo,
@@ -318,9 +340,7 @@ def app_pntp_content(classe_atual, categoria):
             "active": "active" if classe.id == categoria else "",
             "id": classe.id,
             "childs": [],
-            "documentos": list(
-                classe.documento_set.public_all_docs().values("id", "titulo", "slug")
-            ),
+            "documentos": docs,
         }
         items[classe.id] = item
         if classe.id == categoria:
@@ -329,7 +349,8 @@ def app_pntp_content(classe_atual, categoria):
 
         for child in classe.childs.qs_pntp():
             item_child = recursive_classes(child, classe)
-            item["childs"].append(child.id)
+            if item_child:
+                item["childs"].append(child.id)
         return item
 
     _items = recursive_classes(classe_atual, None)

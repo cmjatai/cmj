@@ -7,7 +7,7 @@
       >{{ item.titulo }}</span>
       <button
         v-if="childsRenderable.length"
-        class="pntp-menu__toggle btn btn-link btn-sm p-0 ml-2 text-secondary"
+        class="pntp-menu__toggle btn btn-link btn-sm ml-2 text-secondary"
         :title="open ? 'Recolher' : 'Expandir'"
         @click.stop="open = !open"
       >

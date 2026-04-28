@@ -14,7 +14,6 @@
         <pntp-list-item :item="child"></pntp-list-item>
       </div>
     </div>
-    <p v-else class="text-muted small">Nenhum item disponível.</p>
   </div>
 </template>
 
@@ -58,7 +57,7 @@ export default {
 <style lang="scss" scoped>
 .app-list-pntp__header {
   border-bottom: 2px solid var(--primary, #007bff);
-  padding-bottom: 0.5rem;
+  padding-bottom: 1rem;
   padding-top: 0.3rem;
   display: flex;
   align-items: center;

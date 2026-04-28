@@ -9,7 +9,6 @@
         <pntp-doclist-item :doc="doc"></pntp-doclist-item>
       </div>
     </div>
-    <p v-else class="text-muted small">Nenhum documento disponível.</p>
   </div>
 </template>
 

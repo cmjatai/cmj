@@ -1,13 +1,13 @@
 <template>
   <div class="app-pntp mt-4 mb-4">
     <slot></slot>
-    <div v-if="ptnp_data" class="row">
+    <div v-if="pntp_data" class="row">
       <div class="col-md-4">
         <app-menu-pntp
-          v-bind:items="ptnp_data.items"
+          v-bind:items="pntp_data.items"
           v-bind:selected_id="selected_id"
-          v-bind:parent_slug="ptnp_data.parent_slug"
-          v-bind:parent_title="ptnp_data.parent_title"
+          v-bind:parent_slug="pntp_data.parent_slug"
+          v-bind:parent_title="pntp_data.parent_title"
           @select="onSelect"
         ></app-menu-pntp>
       </div>
@@ -22,15 +22,16 @@
           <i class="fa fa-search app-pntp__search-icon"></i>
         </div>
         <app-list-pntp
-          v-bind:items="ptnp_data.items"
+          v-bind:items="pntp_data.items"
           v-bind:selected_id="selected_id"
           v-bind:search="search"
         ></app-list-pntp>
         <app-doclist-pntp
-          v-bind:items="ptnp_data.items"
+          v-bind:items="pntp_data.items"
           v-bind:selected_id="selected_id"
           v-bind:search="search"
         ></app-doclist-pntp>
+        <p v-if="selectedIsEmpty" class="text-muted small mt-2">Nenhum item disponível.</p>
       </div>
     </div>
   </div>
@@ -46,9 +47,19 @@ export default {
   },
   data () {
     return {
-      ptnp_data: null,
+      pntp_data: null,
       selected_id: null,
       search: ''
+    }
+  },
+  computed: {
+    selectedIsEmpty () {
+      if (!this.pntp_data || !this.selected_id) return false
+      const item = this.pntp_data.items[this.selected_id]
+      if (!item) return false
+      const hasChilds = item.childs && item.childs.length > 0
+      const hasDocs = item.documentos && item.documentos.length > 0
+      return !hasChilds && !hasDocs
     }
   },
   methods: {
@@ -62,7 +73,7 @@ export default {
   },
   mounted () {
     let data = JSON.parse(document.getElementById('pntp-data').textContent)
-    this.ptnp_data = data
+    this.pntp_data = data
 
     const params = new URLSearchParams(window.location.search)
     const categoriaParam = params.get('categoria')
@@ -79,7 +90,7 @@ export default {
       const id = e.state && e.state.categoria
         ? e.state.categoria
         : new URLSearchParams(window.location.search).get('categoria')
-      if (id && this.ptnp_data.items[id]) {
+      if (id && this.pntp_data.items[id]) {
         this.selected_id = Number(id)
       }
     })
@@ -88,7 +99,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .app-pntp__search-wrap {
-  position: relative;
+  position: absolute;
+  right: 1rem;
 }
 
 .app-pntp__search {
@@ -104,4 +116,5 @@ export default {
   color: #adb5bd;
   pointer-events: none;
 }
+
 </style>

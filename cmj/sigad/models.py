@@ -102,7 +102,7 @@ CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (7, "galeria_video", _("Galeria de Vídeos")),
     (99, "documento_especifico", _("Documento Específico")),
     (500, "subsites", _("Subsites")),
-    (998, "qs_pntp", _("Classe do PTNP ")),
+    (998, "qs_pntp", _("Classe do pntp ")),
     (999, "mapa_site", _("Mapa do Site")),
 )
 
@@ -742,7 +742,7 @@ class ClasseManager(models.Manager):
 
     def qs_pntp(self, user=None):
         qs = self.get_queryset()
-        qs = qs.filter(visibilidade=Classe.STATUS_PUBLIC, ptnp=True)
+        qs = qs.filter(visibilidade=Classe.STATUS_PUBLIC, pntp=True)
 
         return qs.order_by("-parent", "parent__codigo", "codigo")
 
@@ -844,7 +844,7 @@ class Classe(ShortUrl, CMSMixin):
         _("Listar no Menu SAPL"), choices=YES_NO_CHOICES, default=False
     )
 
-    ptnp = models.BooleanField(
+    pntp = models.BooleanField(
         _("Classe do PNTP"), choices=YES_NO_CHOICES, default=False
     )
 
@@ -1189,6 +1189,10 @@ class Documento(ShortUrl, CMSMixin):
 
     texto = models.TextField(
         verbose_name=_("Texto"), blank=True, null=True, default=None
+    )
+
+    pntp = models.BooleanField(
+        _("Listar no PNTP"), choices=YES_NO_CHOICES, default=False
     )
 
     old_path = models.TextField(
