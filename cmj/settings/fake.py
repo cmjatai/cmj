@@ -12,11 +12,13 @@ DATABASES = {
     }
 }
 
-_DJANGO_VITE_DEV_MODE = False
+V6_DJANGO_VITE_DEV_MODE = False
 DJANGO_VITE = {
     "default": {
-        "dev_mode": _DJANGO_VITE_DEV_MODE,
-        "manifest_path": _DJANGO_VITE_ASSETS_PATH.child(Fv6, ".vite", "manifest.json"),
+        "dev_mode": V6_DJANGO_VITE_DEV_MODE,
+        "manifest_path": V6_DJANGO_VITE_ASSETS_PATH.child(
+            Fv6, ".vite", "manifest.json"
+        ),
     }
 }
 

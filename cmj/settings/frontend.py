@@ -118,15 +118,17 @@ WEBPACK_LOADER = {
 }
 
 
-_DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2026.child("dist")
+V6_DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2026.child("dist")
 
-_DJANGO_VITE_DEV_MODE = config("DJANGO_VITE_DEV_MODE", default=False, cast=bool)
-_DJANGO_VITE_DEV_MODE = _DJANGO_VITE_DEV_MODE and DEBUG
+V6_DJANGO_VITE_DEV_MODE = config("DJANGO_VITE_DEV_MODE", default=False, cast=bool)
+V6_DJANGO_VITE_DEV_MODE = V6_DJANGO_VITE_DEV_MODE and DEBUG
 
 DJANGO_VITE = {
     "default": {
-        "dev_mode": _DJANGO_VITE_DEV_MODE,
-        "manifest_path": _DJANGO_VITE_ASSETS_PATH.child(Fv6, ".vite", "manifest.json"),
+        "dev_mode": V6_DJANGO_VITE_DEV_MODE,
+        "manifest_path": V6_DJANGO_VITE_ASSETS_PATH.child(
+            Fv6, ".vite", "manifest.json"
+        ),
     }
 }
 
@@ -162,7 +164,7 @@ elif DEBUG:
         PROJECT_DIR_FRONTEND_2026.child("src", "assets"),
     ]
 
-if DEBUG and not _DJANGO_VITE_DEV_MODE:
+if DEBUG and not V6_DJANGO_VITE_DEV_MODE:
     STATICFILES_DIRS += [PROJECT_DIR_FRONTEND_2026.child("dist")]
 
 # apenas para debug - na produção nginx deve entregar sw
