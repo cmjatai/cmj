@@ -9,7 +9,10 @@
       </a>
     </div>
     <h5 class="pntp-menu__titulo">
-      <a :href="'/' + root.slug" class="pntp-menu__titulo-link">{{ root.titulo }}</a>
+      <span
+        :class="['pntp-menu__titulo-link', { 'active': isRootSelected }]"
+        @click="$emit('select', root.id)"
+      >{{ root.titulo }}</span>
     </h5>
     <ul v-if="rootChildsRenderable.length" class="pntp-menu__list list-unstyled mt-2 mb-0">
       <pntp-menu-item
@@ -58,6 +61,9 @@ export default {
           (child.documentos && child.documentos.length > 0)
         )
       })
+    },
+    isRootSelected () {
+      return this.root && String(this.selected_id) === String(this.root.id)
     }
   }
 }
@@ -82,6 +88,11 @@ export default {
 .pntp-menu__titulo-link {
   color: #343a40;
   text-decoration: none;
+  cursor: pointer;
+
+  &.active {
+    color: var(--primary, #007bff);
+  }
 
   &:hover {
     color: var(--primary, #007bff);

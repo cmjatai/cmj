@@ -37,8 +37,10 @@ export default {
     allDescendantDocs () {
       const result = []
       const collect = (item) => {
-        if (item.documentos && item.documentos.length) result.push(...item.documentos)
-        if (item.childs && item.childs.length) {
+        const hasChilds = item.childs && item.childs.length > 0
+        if (!hasChilds) {
+          if (item.documentos && item.documentos.length) result.push(...item.documentos)
+        } else {
           item.childs.forEach(id => {
             const child = this.items[id]
             if (child) collect(child)

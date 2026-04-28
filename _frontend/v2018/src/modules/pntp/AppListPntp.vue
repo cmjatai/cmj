@@ -44,9 +44,12 @@ export default {
       const collect = (ids) => {
         ids.forEach(id => {
           const item = this.items[id]
-          if (item) {
+          if (!item) return
+          const hasRenderableChilds = item.childs && item.childs.length > 0
+          if (hasRenderableChilds) {
+            collect(item.childs)
+          } else {
             result.push(item)
-            if (item.childs && item.childs.length) collect(item.childs)
           }
         })
       }
