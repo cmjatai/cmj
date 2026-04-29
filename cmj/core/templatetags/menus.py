@@ -95,7 +95,7 @@ def sigad_navbar(context, field=None):
     def get_how_menu(classes):
         item_list = []
         for classe in classes:
-            #if "Transparência" in classe.titulo:
+            # if "Transparência" in classe.titulo:
             #    print(classe.titulo)
             item = {
                 "title": classe.apelido or classe.titulo,
@@ -318,7 +318,7 @@ def app_pntp_content(classe_atual, categoria):
 
         docs = list(
             classe.documento_set.public_all_docs().values(
-                "id", "titulo", "slug", "icon_doc"
+                "id", "titulo", "slug", "icon_doc", "texto", "descricao"
             )
         )
 
@@ -332,7 +332,7 @@ def app_pntp_content(classe_atual, categoria):
                 docs.extend(
                     list(
                         classe_redirect.documento_set.public_all_docs().values(
-                            "id", "titulo", "slug", "icon_doc"
+                            "id", "titulo", "slug", "icon_doc", "texto", "descricao"
                         )
                     )
                 )

@@ -9,6 +9,7 @@
         <pntp-doclist-item
           :doc="doc"
           :parent_titulo="doc._parent_titulo || null"
+          :parent_slug="doc._parent_slug || ''"
         ></pntp-doclist-item>
       </div>
     </div>
@@ -43,7 +44,7 @@ export default {
         const hasChilds = item.childs && item.childs.length > 0
         if (!hasChilds) {
           if (item.documentos && item.documentos.length) {
-            item.documentos.forEach(doc => result.push({ ...doc, _parent_titulo: item.titulo }))
+            item.documentos.forEach(doc => result.push({ ...doc, _parent_titulo: item.titulo, _parent_slug: item.slug }))
           }
         } else {
           item.childs.forEach(id => {
