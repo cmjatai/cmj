@@ -1,8 +1,6 @@
 import inspect
 import logging
 import sys
-import traceback
-import warnings
 
 import yaml
 from decouple import AutoConfig
@@ -14,7 +12,7 @@ logging.captureWarnings(True)
 yaml.warnings({"YAMLLoadWarning": False})
 
 
-def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
+"""def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
     log = file if file else sys.stderr
     logger = logging.getLogger(__name__)
     error_msg = " ".join(traceback.format_tb(log))
@@ -22,7 +20,7 @@ def warn_with_traceback(message, category, filename, lineno, file=None, line=Non
     logger.warning(error_msg)
 
 
-warnings.showwarning = warn_with_traceback
+warnings.showwarning = warn_with_traceback"""
 
 
 class MyFormatter(logging.Formatter):
