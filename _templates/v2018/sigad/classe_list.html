@@ -1,5 +1,19 @@
 {% extends "crud/detail.html" %}
 {% load i18n common_cmj_tags %}
+{% block base_container_header %}
+{{ block.super }}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    {% for parent in object.parents%}
+      <li class="breadcrumb-item ">
+        <a href="{% url 'cmj.sigad:subclasse_list' parent.id %}">
+            {{parent.apelido|default:parent.titulo}}
+        </a>
+      </li>
+    {% endfor %}
+  </ol>
+</nav>
+{% endblock base_container_header %}
 
 {% block extra_actions %}
   <div class="actions btn-group-sm" role="group">
@@ -19,7 +33,9 @@
 {% endblock extra_actions %}
 
 {% block detail_content %}
+
 {% if object and object_list or not object and object_list%}
+    <br>
     <table class="table table-hover" width="100%">
         <caption></caption>
         <thead>

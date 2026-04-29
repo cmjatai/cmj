@@ -22,6 +22,15 @@
         <a href="/parlamentar" class="">Parlamentares</a>
       </div>
     </div>
+    <div class="box box-transparencia">
+      <a onclick="return false;" class="d-none d-lg-block icon icon-transparencia" href="/transparencia" >
+      </a>
+      <a class="d-lg-none icon icon-transparencia" href="/transparencia" >
+      </a>
+      <div class="inner">
+        <a href="/transparencia" class="">Transparência</a>
+      </div>
+    </div>
     <div class="box box-documento-administrativo">
       <a onclick="return false;" class="d-none d-lg-block icon icon-licitacao" href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}?o" >
       </a>
@@ -155,15 +164,6 @@
       </a>
       <div class="inner">
         <a href="{% url 'sapl.comissoes:comissao_list' %}" class="">Comissões</a>
-      </div>
-    </div>
-    <div class="box box-transparencia">
-      <a onclick="return false;" class="d-none d-lg-block icon icon-transparencia" href="http://camaradejatai.sigepnet.com.br/?portal=1" >
-      </a>
-      <a class="d-lg-none icon icon-transparencia" href="http://camaradejatai.sigepnet.com.br/?portal=1" >
-      </a>
-      <div class="inner">
-        <a href="http://camaradejatai.sigepnet.com.br/?portal=1" class="">Prestação de Contas</a>
       </div>
     </div>
   </div>

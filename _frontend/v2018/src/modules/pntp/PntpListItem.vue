@@ -46,7 +46,7 @@ export default {
   }
   .icon-item {
     display: flex;
-    min-width: 2.5rem;
+    min-width: 2rem;
     min-height: 2.5rem;
     justify-content: center;
     align-items: center;
@@ -74,7 +74,7 @@ export default {
 .pntp-list-item__parent {
   position: absolute;
   top: 0;
-  left: 0.2rem;
+  left: 0.35rem;
   line-height: 1;
   small {
     font-variant: small-caps;

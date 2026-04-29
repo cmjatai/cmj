@@ -12,7 +12,7 @@
         ></app-menu-pntp>
       </div>
       <div class="col-md-8">
-        <div class="app-pntp__search-wrap mb-3">
+        <div class="app-pntp__search-wrap mt-1 mt-md-0">
           <input
             v-model="search"
             type="search"
