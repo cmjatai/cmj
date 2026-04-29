@@ -1,6 +1,6 @@
 {% extends "crud/detail.html" %}
 {% load i18n common_cmj_tags %}
-{% block base_container_header %}
+{% block subtitle %}
 {{ block.super }}
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
@@ -13,7 +13,7 @@
     {% endfor %}
   </ol>
 </nav>
-{% endblock base_container_header %}
+{% endblock subtitle %}
 
 {% block extra_actions %}
   <div class="actions btn-group-sm" role="group">

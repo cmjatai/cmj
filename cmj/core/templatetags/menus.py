@@ -322,7 +322,7 @@ def app_pntp_content(classe_atual, categoria):
             )
         )
 
-        if classe.url_redirect and classe.url_redirect.startswith("/"):
+        """if classe.url_redirect and classe.url_redirect.startswith("/"):
             classe_url = classe.url_redirect
             classe_redirect = Classe.objects.filter(
                 slug=classe.url_redirect.strip("/"),
@@ -335,11 +335,13 @@ def app_pntp_content(classe_atual, categoria):
                             "id", "titulo", "slug", "icon_doc", "texto", "descricao"
                         )
                     )
-                )
+                )"""
 
         item = {
             "parent": parent.id if parent else None,
             "titulo": classe.apelido or classe.titulo,
+            "subtitle": classe.subtitle,
+            "descricao": classe.descricao,
             "slug": classe.absolute_slug,
             "active": "active" if classe.id == categoria else "",
             "id": classe.id,

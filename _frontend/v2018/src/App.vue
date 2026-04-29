@@ -13,7 +13,7 @@ export default {
   components: {
     Message
   },
-  created: function () {
+  mounted: function () {
     this.loginStatus()
   }
 }

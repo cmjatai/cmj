@@ -1,6 +1,6 @@
 <template>
   <div class="pntp-doclist-item">
-    <a :href="'#'" class="pntp-doclist-item__link">
+    <a :href="href" class="pntp-doclist-item__link">
       <div class="pntp-doclist-item__card card h-100">
         <div class="card-body">
           <div class="body-title d-flex">
@@ -13,9 +13,9 @@
             <div class="pntp-doclist-item__content">
               <h6 class="pntp-doclist-item__titulo card-title mb-0">{{ doc.titulo }}</h6>
               <p v-if="doc.descricao" class="pntp-doclist-item__descricao text-muted mb-0 mt-1">{{ doc.descricao }}</p>
-              <div v-if="doc.texto" class="pntp-doclist-item__texto mt-2" v-html="renderedTexto"></div>
             </div>
           </div>
+          <div v-if="doc.texto" class="pntp-doclist-item__texto mt-2" v-html="renderedTexto"></div>
         </div>
       </div>
     </a>
@@ -38,12 +38,18 @@ export default {
       type: String,
       default: null
     },
-    parent_slug: {
+    root_slug: {
       type: String,
       default: ''
     }
   },
   computed: {
+    href () {
+      return '/' + this.doc.slug
+      /* if (this.root_slug && this.doc.slug && this.doc.slug.includes(this.root_slug)) {
+        return '/' + this.root_slug + '?categoria=' + (this.doc._parent_id || this.doc.id)
+      } */
+    },
     renderedTexto () {
       if (!this.doc.texto) return ''
       return md.render(this.doc.texto)

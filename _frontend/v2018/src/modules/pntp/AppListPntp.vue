@@ -1,11 +1,11 @@
 <template>
   <div v-if="selected" class="app-list-pntp">
     <div class="app-list-pntp__header mb-3">
-      <h5 class="app-list-pntp__titulo mb-0">
+      <h3 class="app-list-pntp__titulo mb-0">
         <a :href="'/' + selected.slug" class="app-list-pntp__titulo-link">{{ selected.titulo }}</a>
-      </h5>
+      </h3>
     </div>
-    <div v-if="displayItems.length" class="row mt-2">
+    <div v-if="displayItems.length" class="row mt-4">
       <div
         v-for="child in displayItems"
         :key="child.id"
@@ -14,6 +14,7 @@
         <pntp-list-item
           :item="child"
           :parent_titulo="items[child.parent] ? items[child.parent].titulo : null"
+          :root_slug="root_slug"
         ></pntp-list-item>
       </div>
     </div>
@@ -33,6 +34,10 @@ export default {
       default: null
     },
     search: {
+      type: String,
+      default: ''
+    },
+    root_slug: {
       type: String,
       default: ''
     }

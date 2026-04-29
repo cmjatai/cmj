@@ -9,7 +9,7 @@
         <pntp-doclist-item
           :doc="doc"
           :parent_titulo="doc._parent_titulo || null"
-          :parent_slug="doc._parent_slug || ''"
+          :root_slug="root_slug"
         ></pntp-doclist-item>
       </div>
     </div>
@@ -31,6 +31,10 @@ export default {
     search: {
       type: String,
       default: ''
+    },
+    root_slug: {
+      type: String,
+      default: ''
     }
   },
   computed: {
@@ -44,7 +48,7 @@ export default {
         const hasChilds = item.childs && item.childs.length > 0
         if (!hasChilds) {
           if (item.documentos && item.documentos.length) {
-            item.documentos.forEach(doc => result.push({ ...doc, _parent_titulo: item.titulo, _parent_slug: item.slug }))
+            item.documentos.forEach(doc => result.push({ ...doc, _parent_titulo: item.titulo, _parent_slug: item.slug, _parent_id: item.id }))
           }
         } else {
           item.childs.forEach(id => {

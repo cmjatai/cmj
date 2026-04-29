@@ -82,6 +82,7 @@ export default {
   font-weight: 600;
   margin-bottom: 0.2rem;
   padding-bottom: 0.2rem;
+  margin-top: 1rem;
   border-bottom: 1px solid var(--primary, #007bff);
 }
 
@@ -102,7 +103,7 @@ export default {
 
 .pntp-menu__back {
   // border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-  margin-top: -0.8rem;
+  margin-top: -0.5rem;
   margin-left: -0.3rem;
   margin-bottom: 0.3rem;
   font-variant: small-caps;

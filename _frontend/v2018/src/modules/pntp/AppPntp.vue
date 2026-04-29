@@ -1,5 +1,6 @@
 <template>
   <div class="app-pntp mt-4 mb-4">
+    <message></message>
     <slot></slot>
     <div v-if="pntp_data" class="row">
       <div class="col-md-4">
@@ -25,11 +26,13 @@
           v-bind:items="pntp_data.items"
           v-bind:selected_id="selected_id"
           v-bind:search="search"
+          v-bind:root_slug="pntp_data.root ? pntp_data.root.slug : ''"
         ></app-list-pntp>
         <app-doclist-pntp
           v-bind:items="pntp_data.items"
           v-bind:selected_id="selected_id"
           v-bind:search="search"
+          v-bind:root_slug="pntp_data.root ? pntp_data.root.slug : ''"
         ></app-doclist-pntp>
         <p v-if="selectedIsEmpty" class="text-muted small mt-2">Nenhum item disponível.</p>
       </div>
@@ -37,8 +40,12 @@
   </div>
 </template>
 <script>
+import Message from '@/components/utils/message/Message'
 export default {
   name: 'app-pntp',
+  components: {
+    Message
+  },
   props: {
     classe_id: {
       type: [Number, String],
@@ -72,6 +79,7 @@ export default {
     }
   },
   mounted () {
+    this.loginStatus()
     let data = JSON.parse(document.getElementById('pntp-data').textContent)
     this.pntp_data = data
 

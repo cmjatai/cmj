@@ -554,7 +554,7 @@ def get_breadcrumb_classes(context, request=None, response=None):
 
     for type_path, path in paths:
         classes_redirect = list(
-            Classe.objects.filter(url_redirect__istartswith=path).order_by(
+            Classe.objects.filter(url_redirect__istartswith=path, pntp=False).order_by(
                 "raiz__codigo", "codigo"
             )
         )
