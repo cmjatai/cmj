@@ -856,9 +856,7 @@ class Classe(ShortUrl, CMSMixin):
         _("URL de redirecionamento"), max_length=1024, db_index=True, default=""
     )
 
-    icon_classe = models.CharField(
-        _("Ícone da Classe"), max_length=50, default=""
-    )
+    icon_classe = models.CharField(_("Ícone da Classe"), max_length=50, default="")
 
     class Meta:
         ordering = (
@@ -1198,9 +1196,7 @@ class Documento(ShortUrl, CMSMixin):
     pntp = models.BooleanField(
         _("Listar no PNTP"), choices=YES_NO_CHOICES, default=False
     )
-    icon_doc = models.CharField(
-        _("Ícone do Documento"), max_length=100, default=""
-    )
+    icon_doc = models.CharField(_("Ícone do Documento"), max_length=50, default="")
 
     old_path = models.TextField(
         verbose_name=_("Path no Portal Modelo 1.0"), blank=True, null=True, default=None

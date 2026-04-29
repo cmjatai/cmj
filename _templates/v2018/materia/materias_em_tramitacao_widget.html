@@ -23,9 +23,11 @@
         <em class="text-light-blue">
           <small>
             <small title="A contagem individual é feita de acordo com o que rege o R.I.">
-              {% if False and user.is_superuser %}
+              {% comment %}
+                {% if False and user.is_superuser %}
                 Individuais já votadas: <strong>({{formatos.individual_votado|length|stringformat:"02d" }})</strong> -
-              {% endif %}
+                {% endif %}
+              {% endcomment %}
               Individuais: <strong>({{formatos.individual|length|stringformat:"02d" }})</strong> - Coletivos: <strong>({{formatos.coletivo|length}})</strong>
             </small>
           </small>
