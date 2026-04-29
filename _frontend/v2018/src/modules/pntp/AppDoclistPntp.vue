@@ -57,8 +57,7 @@ export default {
     },
     selectedDocuments () {
       if (!this.selected) return []
-      if (this.selected.parent === null) return this.allDescendantDocs
-      return this.selected.documentos || []
+      return this.allDescendantDocs
     },
     displayDocs () {
       const term = this.search.trim().toLowerCase()

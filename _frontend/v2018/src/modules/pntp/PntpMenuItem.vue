@@ -80,6 +80,9 @@ export default {
   methods: {
     onSelect () {
       this.$emit('select', this.item.id)
+      if (this.childsRenderable.length) {
+        this.open = !this.open
+      }
     }
   },
   created () {

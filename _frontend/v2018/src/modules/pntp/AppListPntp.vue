@@ -61,9 +61,8 @@ export default {
     },
     childItems () {
       if (!this.selected) return []
-      if (this.selected.parent === null) return this.allDescendants
       if (!this.selected.childs || !this.selected.childs.length) return []
-      return this.selected.childs.map(id => this.items[id]).filter(Boolean)
+      return this.allDescendants
     },
     displayItems () {
       const term = this.search.trim().toLowerCase()
