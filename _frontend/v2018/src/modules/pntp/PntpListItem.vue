@@ -7,7 +7,9 @@
             <span v-if="parent_titulo" class="pntp-list-item__parent text-muted d-block">
               <small>{{ parent_titulo }}</small>
             </span>
-            <i :class="['fa', 'fa-lg', item.icon_classe || 'fa-info']"></i>
+            <span class="icon-item">
+              <i :class="['fa', 'fa-lg', item.icon_classe || 'fa-info']"></i>
+            </span>
             <h6 class="pntp-list-item__titulo card-title mb-0">{{ item.titulo }}</h6>
           </div>
         </div>
@@ -42,6 +44,13 @@ export default {
       color: #6c757d77;
     }
   }
+  .icon-item {
+    display: flex;
+    min-width: 2.5rem;
+    min-height: 2.5rem;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 .pntp-list-item__link {
@@ -56,6 +65,9 @@ export default {
   }
 
   &:hover .pntp-list-item__titulo {
+    color: var(--primary, #007bff);
+  }
+  &:hover i {
     color: var(--primary, #007bff);
   }
 }
@@ -74,13 +86,16 @@ export default {
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  .card-body {
+    padding-bottom: 0.5rem;
+  }
 }
 
 .pntp-list-item__titulo {
   font-size: 1.2rem;
   font-weight: 700;
   color: #21578d;
-  line-height: 1.4;
+  line-height: 1;
   transition: color 0.15s ease;
 }
 </style>
