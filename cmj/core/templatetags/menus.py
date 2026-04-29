@@ -95,6 +95,8 @@ def sigad_navbar(context, field=None):
     def get_how_menu(classes):
         item_list = []
         for classe in classes:
+            if "Transparência" in classe.titulo:
+                print(classe.titulo)
             item = {
                 "title": classe.apelido or classe.titulo,
                 "children": [],

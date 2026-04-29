@@ -165,124 +165,135 @@ logger = logging.getLogger(__name__)
 
 def tipos_autores_materias(user=None, restricao_regimental=True):
 
-    noww = timezone.localdate()
+    try:
+        noww = timezone.localdate()
 
-    data_ini = noww - timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
+        data_ini = noww - timedelta(days=noww.day - (1 if noww.day <= 15 else 16))
 
-    data_fim = noww + timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
+        data_fim = noww + timedelta(days=-noww.day + (15 if noww.day <= 15 else 31))
 
-    while data_fim.day <= data_ini.day:
-        data_fim -= timedelta(days=1)
+        while data_fim.day <= data_ini.day:
+            data_fim -= timedelta(days=1)
 
-    sq = SessaoPlenaria.objects.filter(data_fim__range=(data_ini, data_fim)).order_by(
-        "data_fim", "id"
-    )
+        sq = SessaoPlenaria.objects.filter(
+            data_fim__range=(data_ini, data_fim)
+        ).order_by("data_fim", "id")
 
-    q = Q(em_tramitacao=True)
+        q = Q(em_tramitacao=True)
 
-    if sq.exists():
-        if sq.count() < 3 or (noww - sq.last().data_fim).days == 0:
-            q |= Q(
-                tipo__turnos_aprovacao=1,
-                registrovotacao__ordem__sessao_plenaria__finalizada=False,
-                registrovotacao__data_hora__gte=data_ini,
-                registrovotacao__data_hora__lte=data_fim,
-            ) | Q(
-                tipo__turnos_aprovacao=1,
-                registrovotacao__expediente__sessao_plenaria__finalizada=False,
-                registrovotacao__data_hora__gte=data_ini,
-                registrovotacao__data_hora__lte=data_fim,
-            )
+        if sq.exists():
+            if sq.count() < 3 or (noww - sq.last().data_fim).days == 0:
+                q |= Q(
+                    tipo__turnos_aprovacao=1,
+                    registrovotacao__ordem__sessao_plenaria__finalizada=False,
+                    registrovotacao__data_hora__gte=data_ini,
+                    registrovotacao__data_hora__lte=data_fim,
+                ) | Q(
+                    tipo__turnos_aprovacao=1,
+                    registrovotacao__expediente__sessao_plenaria__finalizada=False,
+                    registrovotacao__data_hora__gte=data_ini,
+                    registrovotacao__data_hora__lte=data_fim,
+                )
 
-    if user:
-        q &= Q(autores__operadores=user)
+        if user:
+            q &= Q(autores__operadores=user)
 
-    materias_em_tramitacao = (
-        MateriaLegislativa.objects.filter(q)
-        .order_by("-tipo__limite_minimo_coletivo", "id")
-        .distinct()
-    )
-
-    proposicoes_enviadas_sem_recebimento = []
-    if user:
-        q = Q(data_envio__isnull=False, data_recebimento__isnull=True)
-
-        q &= Q(autor__operadores=user)
-        proposicoes_enviadas_sem_recebimento = Proposicao.objects.filter(q).distinct()
-
-    r = {}
-    for m in materias_em_tramitacao:
-
-        if m.tipo not in r:
-            r[m.tipo] = {}
-
-        coletivo = (
-            m.tipo.limite_minimo_coletivo
-            and m.autores.count() >= m.tipo.limite_minimo_coletivo
+        materias_em_tramitacao = (
+            MateriaLegislativa.objects.filter(q)
+            .order_by("-tipo__limite_minimo_coletivo", "id")
+            .distinct()
         )
 
-        for a in m.autores.all():
-            if a not in r[m.tipo]:
-                r[m.tipo][a] = {
-                    "individual": set(),
-                    "coletivo": set(),
-                    "individual_votado": set(),
-                }
+        proposicoes_enviadas_sem_recebimento = []
+        if user:
+            q = Q(data_envio__isnull=False, data_recebimento__isnull=True)
 
-            key = "coletivo" if coletivo else "individual"
-            r[m.tipo][a][key].add(m)
+            q &= Q(autor__operadores=user)
+            proposicoes_enviadas_sem_recebimento = Proposicao.objects.filter(
+                q
+            ).distinct()
 
-            if m.registrovotacao_set.exists() and key == "individual":
-                r[m.tipo][a]["individual_votado"].add(m)
+        r = {}
+        for m in materias_em_tramitacao:
 
-    if restricao_regimental:
-        for p in proposicoes_enviadas_sem_recebimento:
-
-            tipo_correspondente = p.tipo.tipo_conteudo_related
-
-            len_signs = len(
-                p.metadata.get("signs", {}).get("texto_original", {}).get("signs", [])
-            )
+            if m.tipo not in r:
+                r[m.tipo] = {}
 
             coletivo = (
-                tipo_correspondente.limite_minimo_coletivo
-                and len_signs >= tipo_correspondente.limite_minimo_coletivo
+                m.tipo.limite_minimo_coletivo
+                and m.autores.count() >= m.tipo.limite_minimo_coletivo
             )
 
-            if tipo_correspondente not in r:
-                r[tipo_correspondente] = {}
+            for a in m.autores.all():
+                if a not in r[m.tipo]:
+                    r[m.tipo][a] = {
+                        "individual": set(),
+                        "coletivo": set(),
+                        "individual_votado": set(),
+                    }
 
-            if p.autor not in r[tipo_correspondente]:
-                r[tipo_correspondente][p.autor] = {
-                    "individual": set(),
-                    "coletivo": set(),
-                    "individual_votado": set(),
-                }
+                key = "coletivo" if coletivo else "individual"
+                r[m.tipo][a][key].add(m)
 
-            key = "coletivo" if coletivo else "individual"
-            r[tipo_correspondente][p.autor][key].add(p)
+                if m.registrovotacao_set.exists() and key == "individual":
+                    r[m.tipo][a]["individual_votado"].add(m)
 
-    sorted_r = dict(
-        map(
-            lambda a: (
-                a[0],
-                dict(  # 4 - Retorna para dicionário
-                    sorted(  # 3 - Ordena por nome do autor
-                        a[1].items(), key=lambda b: b[0].nome
-                    )
+        if restricao_regimental:
+            for p in proposicoes_enviadas_sem_recebimento:
+
+                tipo_correspondente = p.tipo.tipo_conteudo_related
+
+                len_signs = len(
+                    p.metadata.get("signs", {})
+                    .get("texto_original", {})
+                    .get("signs", [])
+                )
+
+                coletivo = (
+                    tipo_correspondente.limite_minimo_coletivo
+                    and len_signs >= tipo_correspondente.limite_minimo_coletivo
+                )
+
+                if tipo_correspondente not in r:
+                    r[tipo_correspondente] = {}
+
+                if p.autor not in r[tipo_correspondente]:
+                    r[tipo_correspondente][p.autor] = {
+                        "individual": set(),
+                        "coletivo": set(),
+                        "individual_votado": set(),
+                    }
+
+                key = "coletivo" if coletivo else "individual"
+                r[tipo_correspondente][p.autor][key].add(p)
+
+        sorted_r = dict(
+            map(
+                lambda a: (
+                    a[0],
+                    dict(  # 4 - Retorna para dicionário
+                        sorted(  # 3 - Ordena por nome do autor
+                            a[1].items(), key=lambda b: b[0].nome
+                        )
+                    ),
                 ),
-            ),
-            sorted(  # 2 - Ordena por sequencia_regimental
-                filter(  # 1 - Filtra tipos que não possuem campo sequencia_regimental
-                    lambda c: hasattr(c[0], "sequencia_regimental"),
-                    r.items(),  # 0 - Converte em tupla de tipos e autores
+                sorted(  # 2 - Ordena por sequencia_regimental
+                    filter(  # 1 - Filtra tipos que não possuem campo sequencia_regimental
+                        lambda c: hasattr(c[0], "sequencia_regimental"),
+                        r.items(),  # 0 - Converte em tupla de tipos e autores
+                    ),
+                    key=lambda d: d[0].sequencia_regimental,
                 ),
-                key=lambda d: d[0].sequencia_regimental,
-            ),
+            )
         )
-    )
 
-    return sorted_r
+        return sorted_r
+
+    except Exception as e:
+        tb = "".join(traceback.format_tb(e.__traceback__))
+        logger.error("Erro ao obter tipos de autores de matérias: " + str(e))
+        logger.error(str(tb))
+        return {}
 
 
 OrigemCrud = CrudAux.build(Origem, "")
@@ -1255,13 +1266,11 @@ class ProposicaoCrud(Crud):
                         msg_error = _("Documento não possui assinatura digital.")
                     else:
                         tcr = p.tipo.tipo_conteudo_related
-                        msg_pre_error = _(
-                            f"""Limite Regimental atingido.
+                        msg_pre_error = _(f"""Limite Regimental atingido.
                             O envio só será possível quando a quantidade
                             de Requerimentos em tramitação for inferior
                             a {tcr.limite_por_autor_tramitando}
-                            Requerimentos."""
-                        )
+                            Requerimentos.""")
 
                         impedimentos = self.impedimentos_de_envio()
 
@@ -1689,9 +1698,7 @@ class ProposicaoCrud(Crud):
             return (
                 """
                 <strong>{}</strong><br>{}<br><small><i>Registrado por: {}</i></small>
-            """.format(
-                    args[0], args[0].descricao, args[0].user
-                ),
+            """.format(args[0], args[0].descricao, args[0].user),
                 args[2],
             )
 
@@ -3358,11 +3365,9 @@ class AcompanhamentoMateriaView(CreateView):
                                 de mensagens e clique no link que nós enviamos para \
                                 confirmar o acompanhamento desta matéria."
                 )
-                msg = _(
-                    "Foi enviado um e-mail de confirmação. Confira sua caixa \
+                msg = _("Foi enviado um e-mail de confirmação. Confira sua caixa \
                          de mensagens e clique no link que nós enviamos para \
-                         confirmar o acompanhamento desta matéria."
-                )
+                         confirmar o acompanhamento desta matéria.")
                 messages.add_message(request, messages.SUCCESS, msg)
 
             # Se o elemento existir e o email não foi confirmado:
@@ -3392,11 +3397,9 @@ class AcompanhamentoMateriaView(CreateView):
                                   confirmar o acompanhamento desta matéria."
                 )
 
-                msg = _(
-                    "Foi enviado um e-mail de confirmação. Confira sua caixa \
+                msg = _("Foi enviado um e-mail de confirmação. Confira sua caixa \
                         de mensagens e clique no link que nós enviamos para \
-                        confirmar o acompanhamento desta matéria."
-                )
+                        confirmar o acompanhamento desta matéria.")
                 messages.add_message(request, messages.SUCCESS, msg)
 
             # Caso esse Acompanhamento já exista
