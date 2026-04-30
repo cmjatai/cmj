@@ -2,8 +2,9 @@
   <div class="app-pntp mt-4 mb-4">
     <message></message>
     <slot></slot>
+    <div ref="stickysentinel" class="app-pntp__sentinel"></div>
     <div v-if="pntp_data" class="row">
-      <div class="col-md-4 app-pntp__menu-col">
+      <div class="col-md-auto app-pntp__menu-col" ref="menuCol">
         <app-menu-pntp
           v-bind:items="pntp_data.items"
           v-bind:selected_id="selected_id"
@@ -12,13 +13,13 @@
           @select="onSelect"
         ></app-menu-pntp>
       </div>
-      <div class="col-md-8">
+      <div class="col bg_mobile">
         <div class="app-pntp__search-wrap mt-1 mt-md-0">
           <input
             v-model="search"
             type="search"
             class="form-control form-control-sm app-pntp__search"
-            placeholder="Buscar..."
+            :placeholder="`Buscar em ${pntp_data.root.titulo}...`"
           />
           <i class="fa fa-search app-pntp__search-icon"></i>
         </div>
@@ -102,21 +103,43 @@ export default {
         this.selected_id = Number(id)
       }
     })
+
+    this._stickyObserver = new IntersectionObserver(
+      ([entry]) => {
+        this.$refs.menuCol.classList.toggle('app-pntp__menu-col--stuck', !entry.isIntersecting)
+      },
+      { threshold: 0 }
+    )
+    this._stickyObserver.observe(this.$refs.stickysentinel)
+  },
+  beforeDestroy () {
+    if (this._stickyObserver) this._stickyObserver.disconnect()
   }
 }
 </script>
 <style lang="scss" scoped>
+.app-pntp__sentinel {
+  height: 0;
+  visibility: hidden;
+}
+
 .app-pntp__menu-col {
   position: sticky;
   top: 0;
   align-self: flex-start;
   max-height: 100vh;
-  overflow-y: auto;
+  overflow-y: hidden;
+
+  &.app-pntp__menu-col--stuck {
+    overflow-y: auto;
+  }
 }
 
 .app-pntp__search-wrap {
   position: absolute;
+  top: 0.25rem;
   right: 1rem;
+  min-width: 30vw;
 }
 
 .app-pntp__search {
@@ -131,6 +154,28 @@ export default {
   font-size: 0.75rem;
   color: #adb5bd;
   pointer-events: none;
+}
+
+@media screen and (max-width: 767.98px) {
+  .app-pntp__search-wrap {
+    position: static;
+    margin-bottom: 0.75rem;
+  }
+  .bg_mobile {
+    background: #f7f7f7 url(~@/assets/img/bg.png);
+    padding: 1rem 0.75rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 1rem;
+  }
+  .app-pntp__menu-col {
+    position: relative;
+    max-height: 200vh;
+    overflow-y: hidden;
+    &.app-pntp__menu-col--stuck {
+      overflow-y: hidden;
+    }
+  }
 }
 
 </style>

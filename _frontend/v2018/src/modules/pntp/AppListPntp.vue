@@ -1,11 +1,11 @@
 <template>
   <div v-if="selected" class="app-list-pntp">
     <div class="app-list-pntp__header mb-3">
-      <h3 class="app-list-pntp__titulo mb-0">
+      <h3 class="app-list-pntp__titulo mb-0 pr-5">
         <a :href="'/' + selected.slug" class="app-list-pntp__titulo-link">{{ selected.titulo }}</a>
       </h3>
     </div>
-    <div v-if="displayItems.length" class="row mt-4">
+    <div v-if="displayItems.length" class="row mt-3">
       <div
         v-for="child in displayItems"
         :key="child.id"
@@ -82,11 +82,10 @@ export default {
 
 <style lang="scss" scoped>
 .app-list-pntp__header {
-  border-bottom: 2px solid var(--primary, #007bff);
-  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--primary, #007bff);
+  padding-bottom: 0.3rem;
   padding-top: 0.3rem;
-  display: flex;
-  align-items: center;
+  display: inline-flex;
 }
 
 .app-list-pntp__titulo {
@@ -95,7 +94,7 @@ export default {
 }
 
 .app-list-pntp__titulo-link {
-  color: #343a40;
+  color: var(--primary, #007bff);
   text-decoration: none;
 
   &:hover {

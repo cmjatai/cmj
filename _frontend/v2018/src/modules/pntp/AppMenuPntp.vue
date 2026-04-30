@@ -12,7 +12,7 @@
       <span
         :class="['pntp-menu__titulo-link', { 'active': isRootSelected }]"
         @click="$emit('select', root.id)"
-      >{{ root.titulo }}</span>
+      >Categorias em {{ root.titulo }}</span>
     </h5>
     <ul v-if="rootChildsRenderable.length" class="pntp-menu__list list-unstyled mt-2 mb-0">
       <pntp-menu-item
@@ -87,7 +87,7 @@ export default {
 }
 
 .pntp-menu__titulo-link {
-  color: #343a40;
+  color: var(--primary, #007bff);
   text-decoration: none;
   cursor: pointer;
 
