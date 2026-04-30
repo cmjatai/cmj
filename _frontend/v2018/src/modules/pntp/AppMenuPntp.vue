@@ -71,10 +71,10 @@ export default {
 
 <style lang="scss" scoped>
 .pntp-menu {
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  // background: #fff;
+  // border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 4px;
-  padding: 0.5rem;
+  padding: 0.3rem;
 }
 
 .pntp-menu__titulo {
@@ -123,7 +123,6 @@ export default {
     font-size: 0.7rem;
   }
 }
-
 .pntp-menu__list {
   margin: 0;
   padding: 0;

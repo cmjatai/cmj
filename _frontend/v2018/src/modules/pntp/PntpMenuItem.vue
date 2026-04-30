@@ -113,6 +113,7 @@ export default {
   color: #343a40;
   text-decoration: none;
   cursor: pointer;
+  font-weight: 700;
 
   &:hover {
     color: var(--primary, #007bff);
