@@ -1,9 +1,10 @@
 <template>
   <div v-if="selected" class="app-list-pntp">
     <div class="app-list-pntp__header mb-3">
-      <h3 class="app-list-pntp__titulo mb-0 pr-5">
+      <i :class="['fa', selected.icon_classe || '']"></i>
+      <h2 class="app-list-pntp__titulo mb-0 pr-5">
         <a :href="'/' + selected.slug" class="app-list-pntp__titulo-link">{{ selected.titulo }}</a>
-      </h3>
+      </h2>
     </div>
     <div v-if="displayItems.length" class="row mt-3">
       <div
@@ -83,15 +84,33 @@ export default {
 
 <style lang="scss" scoped>
 .app-list-pntp__header {
-  border-bottom: 1px solid var(--primary, #007bff);
-  padding-bottom: 0.3rem;
   padding-top: 0.3rem;
   display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  i {
+    color: var(--primary, #007bff);
+    font-size: 1.5rem;
+  }
+  .icon {
+    height: 2rem;
+    width: 2rem;
+    border-radius: 4px;
+    padding: 0.5rem;
+    &.icon-transparencia {
+      background-color: var(--primary, #007bff);
+      i {
+        color: #fff;
+      }
+    }
+  }
 }
 
 .app-list-pntp__titulo {
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 700;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--primary, #007bff);
 }
 
 .app-list-pntp__titulo-link {

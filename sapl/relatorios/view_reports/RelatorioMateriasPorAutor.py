@@ -150,7 +150,6 @@ class View(RelatorioMixin, FilterView):
         for a in qs_autores:
             if a["autoria__autor__id"]:
                 autores[a["autoria__autor__id"]] = a["autoria__autor__nome"]
-
         contagem = 0
         for m in context["object_list"]:
             if autor_seleted:

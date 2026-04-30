@@ -1322,7 +1322,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
                 mult = 2 - c.nivel
                 mult = 0 if mult < 0 else mult
 
-                if mult and renumere.isdigit():
+                if renumere.isdigit() and 0 < int(renumere) < 5:
                     mult += 1
                 c.codigo = i * 10**mult
                 c.save()
