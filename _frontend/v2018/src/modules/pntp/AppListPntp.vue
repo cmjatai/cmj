@@ -72,9 +72,10 @@ export default {
     displayItems () {
       const term = this.search.trim().toLowerCase()
       if (!term) return this.childItems
-      return Object.values(this.items).filter(item =>
-        item.titulo && item.titulo.toLowerCase().includes(term)
-      )
+      return Object.values(this.items).filter(item => {
+        const isLeaf = !item.childs || item.childs.length === 0
+        return isLeaf && item.titulo && item.titulo.toLowerCase().includes(term)
+      })
     }
   }
 }
