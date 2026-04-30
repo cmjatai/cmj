@@ -17,13 +17,16 @@
       <div class="pntp-list-item__card card h-100">
         <div class="card-body">
           <div class="body-title d-flex ">
-            <span v-if="parent_titulo" class="pntp-list-item__parent text-muted d-block">
-              <small>{{ parent_titulo }}</small>
-            </span>
-            <span class="icon-item">
-              <i :class="['fa', 'fa-lg', item.icon_classe || 'fa-info']"></i>
-            </span>
-            <h6 class="pntp-list-item__titulo card-title mb-0">{{ item.titulo }}</h6>
+            <div class="body-title__parts d-flex">
+              <span v-if="parent_titulo" class="pntp-list-item__parent text-muted d-block">
+                <small>{{ parent_titulo }}</small>
+              </span>
+              <span class="icon-item">
+                <i :class="['fa', 'fa-lg', item.icon_classe || 'fa-info']"></i>
+              </span>
+              <h6 class="pntp-list-item__titulo card-title mb-0">{{ item.titulo }}</h6>
+              <i class="fa fa-chevron-right"></i>
+            </div>
           </div>
           <small v-if="item.subtitle" class="pntp-list-item__subtitle text-muted mb-0 mt-1" v-html="item.subtitle"></small>
           <div v-if="item.descricao" class="pntp-list-item__descricao mt-2" v-html="renderedDescricao"></div>
@@ -88,18 +91,33 @@ export default {
 .pntp-list-item {
   height: 100%;
   .body-title {
-    gap: 1rem;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+    i {
+      color: #6c757d99;
+    }
+  }
+  .body-title__parts {
+    gap: 0.5rem;
     align-items: center;
     i {
-      color: #6c757d77;
+      color: #6c757d55;
+    }
+    i.fa-chevron-right {
+      margin-left: auto;
+      color: #6c757d00;
     }
   }
   .icon-item {
     display: flex;
-    min-width: 2rem;
-    min-height: 2.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-left: -0.66rem;
     justify-content: center;
     align-items: center;
+    background: #f0f0f0 url(~@/assets/img/bg.png);
+    border-radius: 4px;
   }
 }
 
@@ -119,6 +137,10 @@ export default {
   }
   &:hover i {
     color: var(--primary, #007bff);
+  }
+   &:hover i.fa-chevron-right {
+    margin-top: 3px;
+    color: var(--primary, #007bff55);
   }
 }
 .pntp-list-item__parent {
