@@ -1310,6 +1310,7 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
 
         if not renumere is None:
 
+
             childs = self.object.childs if self.object else self.model.objects
 
             if not self.object:
@@ -1320,6 +1321,9 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
             for i, c in enumerate(childs, 1):
                 mult = 2 - c.nivel
                 mult = 0 if mult < 0 else mult
+
+                if mult and renumere.isdigit():
+                    mult += 1
                 c.codigo = i * 10**mult
                 c.save()
 

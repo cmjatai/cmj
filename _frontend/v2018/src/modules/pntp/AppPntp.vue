@@ -18,7 +18,8 @@
           <input
             v-model="search"
             type="search"
-            class="form-control form-control-sm app-pntp__search"
+            name="search"
+            class="form-control app-pntp__search"
             :placeholder="`Buscar em ${pntp_data.root.titulo}...`"
           />
           <i class="fa fa-search app-pntp__search-icon"></i>
@@ -70,13 +71,29 @@ export default {
       return !hasChilds && !hasDocs
     }
   },
+  watch: {
+    search (val) {
+      const url = new URL(window.location.href)
+      if (val) {
+        url.searchParams.set('search', val)
+      } else {
+        url.searchParams.delete('search')
+      }
+      window.history.replaceState(
+        { categoria: this.selected_id, search: val },
+        '',
+        url.toString()
+      )
+    }
+  },
   methods: {
     onSelect (id) {
       this.selected_id = id
       this.search = ''
       const url = new URL(window.location.href)
       url.searchParams.set('categoria', id)
-      window.history.pushState({ categoria: id }, '', url.toString())
+      url.searchParams.delete('search')
+      window.history.pushState({ categoria: id, search: '' }, '', url.toString())
     }
   },
   mounted () {
@@ -86,6 +103,7 @@ export default {
 
     const params = new URLSearchParams(window.location.search)
     const categoriaParam = params.get('categoria')
+    const searchParam = params.get('search')
 
     if (categoriaParam && data.items[categoriaParam]) {
       this.selected_id = Number(categoriaParam)
@@ -95,6 +113,10 @@ export default {
         : (Object.values(data.items).find(i => i.parent === null) || {}).id || null
     }
 
+    if (searchParam) {
+      this.search = searchParam
+    }
+
     window.addEventListener('popstate', (e) => {
       const id = e.state && e.state.categoria
         ? e.state.categoria
@@ -102,6 +124,10 @@ export default {
       if (id && this.pntp_data.items[id]) {
         this.selected_id = Number(id)
       }
+      const s = e.state && e.state.search !== undefined
+        ? e.state.search
+        : (new URLSearchParams(window.location.search).get('search') || '')
+      this.search = s
     })
 
     this._stickyObserver = new IntersectionObserver(
@@ -143,6 +169,7 @@ export default {
 }
 
 .app-pntp__search {
+  padding: 0.5rem 0.75rem;
   padding-right: 1.8rem;
 }
 

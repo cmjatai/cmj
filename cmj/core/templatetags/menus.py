@@ -37,8 +37,8 @@ def breadcrumb_function(context):
             if isinstance(ult, Documento) and hasattr(ult, "capa"):
                 breadcrumb_classes = breadcrumb_classes[:-1]
         rcontext["classes"] = breadcrumb_classes
-    except:
-        pass
+    except Exception as e:
+        logger.error(f"Error in breadcrumb_function: {e}")
     filter_classes = list(filter(lambda x: hasattr(x, "subtitle"), rcontext["classes"]))
     context.update(
         {"breadcrumb_subtitle": filter_classes[-1].subtitle if filter_classes else ""}

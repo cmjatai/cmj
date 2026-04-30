@@ -1,5 +1,3 @@
-import collections
-import io
 import json
 import logging
 import re
@@ -20,7 +18,7 @@ from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DetailView, ListView, RedirectView, TemplateView, View
+from django.views.generic import DetailView, ListView, RedirectView, View
 from django.views.static import serve as view_static_server
 from django_filters.views import FilterView
 from rest_framework import mixins, viewsets
@@ -54,8 +52,7 @@ from cmj.core.models import (
 from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.core.views_estatisticas import get_numeros
 from cmj.mixins import PluginSignMixin
-from cmj.utils import make_pagination, normalize, run_sql
-from sapl.compilacao.models import Dispositivo
+from cmj.utils import make_pagination, normalize
 from sapl.crud.base import (
     RP_DETAIL,
     RP_LIST,
@@ -64,7 +61,6 @@ from sapl.crud.base import (
     ListWithSearchForm,
     MasterDetailCrud,
 )
-from sapl.norma.models import AnexoNormaJuridica, NormaJuridica
 from sapl.parlamentares.models import Filiacao, Partido
 from sapl.utils import get_mime_type_from_file_extension, show_results_filter_set
 
@@ -537,6 +533,11 @@ class CertidaoPublicacaoCrud(Crud):
             if not obj.diariooficial:
                 return args[1], args[2]
             url = obj.diariooficial.arquivo.url
+            if not url:
+                url = reverse(
+                    "cmj.diarios:diariooficial_detail",
+                    kwargs={"pk": obj.diariooficial.pk},
+                )
             return (
                 '<hr class="divider"><a href="%s" target="_blank"><small>%s</small></a>'
                 % (url, obj.diariooficial),
