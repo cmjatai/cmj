@@ -34,6 +34,50 @@ $fator-xl: 1.06;
   }
 }
 
+.icon {
+  width: 100%;
+  height: 100%;
+
+  flex: 0 0 $width-wrapper-closed;
+  align-self: center;
+
+  background-size: 100% auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+
+
+  &.icon-busca-textual {
+    background-image: url(~@/assets/img/search_box_icon36.png);
+  }
+  &.icon-parlamentares {
+    background-image: url(~@/assets/img/icon_parlamentares.png);
+  }
+  &.icon-atividade-legislativa {
+    background-image: url(~@/assets/img/icon_materia_legislativa.png);
+  }
+  &.icon-diario-oficial {
+    background-image: url(~@/assets/img/icon_diario_oficial.png);
+  }
+  &.icon-sessao-plenaria {
+    background-image: url(~@/assets/img/icon_plenarias.png);
+  }
+  &.icon-norma-juridica {
+    background-image: url(~@/assets/img/icon_normas_juridicas.png);
+  }
+  &.icon-norma-juridica-destaque {
+    background-image: url(~@/assets/img/icon_normas_juridicas_destaque.png);
+  }
+  &.icon-licitacao {
+    background-image: url(~@/assets/img/icon_licitacao.png);
+  }
+  &.icon-transparencia {
+    background-image: url(~@/assets/img/icon_transparencia.png);
+  }
+  &.icon-comissoes {
+    background-image: url(~@/assets/img/icon_comissoes.png);
+  }
+}
+
 #wrapper {
   padding-left: $width-wrapper-closed;
 
@@ -188,37 +232,6 @@ $fator-xl: 1.06;
       background-position: center center;
 
       opacity: 0.7;
-
-      &.icon-busca-textual {
-        background-image: url(~@/assets/img/search_box_icon36.png);
-      }
-      &.icon-parlamentares {
-        background-image: url(~@/assets/img/icon_parlamentares.png);
-      }
-      &.icon-atividade-legislativa {
-        background-image: url(~@/assets/img/icon_materia_legislativa.png);
-      }
-      &.icon-diario-oficial {
-        background-image: url(~@/assets/img/icon_diario_oficial.png);
-      }
-      &.icon-sessao-plenaria {
-        background-image: url(~@/assets/img/icon_plenarias.png);
-      }
-      &.icon-norma-juridica {
-        background-image: url(~@/assets/img/icon_normas_juridicas.png);
-      }
-      &.icon-norma-juridica-destaque {
-        background-image: url(~@/assets/img/icon_normas_juridicas_destaque.png);
-      }
-      &.icon-licitacao {
-        background-image: url(~@/assets/img/icon_licitacao.png);
-      }
-      &.icon-transparencia {
-        background-image: url(~@/assets/img/icon_transparencia.png);
-      }
-      &.icon-comissoes {
-        background-image: url(~@/assets/img/icon_comissoes.png);
-      }
     }
 
     .box {

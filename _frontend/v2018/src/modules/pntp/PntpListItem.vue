@@ -118,6 +118,12 @@ export default {
     align-items: center;
     background: #f0f0f0 url(~@/assets/img/bg.png);
     border-radius: 4px;
+    &:hover {
+      background-color: var(--primary, #007bff);
+      i {
+        color: #fff;
+      }
+    }
   }
 }
 
@@ -143,6 +149,7 @@ export default {
     color: var(--primary, #007bff55);
   }
 }
+
 .pntp-list-item__parent {
   position: absolute;
   top: 0;
