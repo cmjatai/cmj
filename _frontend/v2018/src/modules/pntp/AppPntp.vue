@@ -3,7 +3,7 @@
     <message></message>
     <slot></slot>
     <div v-if="pntp_data" class="row">
-      <div class="col-md-4">
+      <div class="col-md-4 app-pntp__menu-col">
         <app-menu-pntp
           v-bind:items="pntp_data.items"
           v-bind:selected_id="selected_id"
@@ -106,6 +106,14 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
+.app-pntp__menu-col {
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
 .app-pntp__search-wrap {
   position: absolute;
   right: 1rem;
