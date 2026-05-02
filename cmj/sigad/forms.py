@@ -93,6 +93,7 @@ class ClasseForm(ModelForm):
             "icon_classe",
             "menu_lateral",
             "url_redirect",
+            "col_in_inf",
             "styles",
         ]
 
@@ -113,8 +114,9 @@ class ClasseForm(ModelForm):
             [
                 ("template_classe", 3),
                 ("tipo_doc_padrao", 3),
-                ("template_doc_padrao", 3),
-                ("list_in_inf", 3),
+                ("template_doc_padrao", 2),
+                ("list_in_inf", 2),
+                ("col_in_inf", 2),
             ]
         )
         row3 = to_row(

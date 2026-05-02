@@ -835,6 +835,9 @@ class Classe(ShortUrl, CMSMixin):
     list_in_inf = models.BooleanField(
         _("Listar no Acesso à Informação"), choices=YES_NO_CHOICES, default=False
     )
+    col_in_inf = models.PositiveSmallIntegerField(
+        _("Coluna no Acesso à Informação"), default=1
+    )
 
     list_in_menu = models.BooleanField(
         _("Listar no Menu Geral"), choices=YES_NO_CHOICES, default=False
