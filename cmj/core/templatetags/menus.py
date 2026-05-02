@@ -343,6 +343,7 @@ def app_pntp_content(classe_atual, categoria):
             "subtitle": classe.subtitle,
             "descricao": classe.descricao,
             "slug": classe.absolute_slug,
+            "atricon": classe.atricon,
             "active": "active" if classe.id == categoria else "",
             "id": classe.id,
             "icon_classe": classe.icon_classe,

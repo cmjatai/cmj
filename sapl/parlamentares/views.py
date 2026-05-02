@@ -434,7 +434,7 @@ class ParticipacaoParlamentarCrud(CrudBaseForListAndDetailExternalAppView):
             return "%s_parlamentar_%s" % (cls.model._meta.model_name, suffix)
 
     class ListView(CrudBaseForListAndDetailExternalAppView.ListView):
-        ordering = "-composicao__periodo"
+        ordering = "composicao__periodo"
 
         def get_rows(self, object_list):
             """
@@ -451,13 +451,15 @@ class ParticipacaoParlamentarCrud(CrudBaseForListAndDetailExternalAppView):
                             "sapl.comissoes:comissao_detail",
                             kwargs={"pk": p.composicao.comissao.pk},
                         ),
+                        "",
                     ),
-                    (p.cargo.nome, None),
+                    (p.cargo.nome, None, ""),
                     (
                         p.composicao.periodo.data_inicio.strftime("%d/%m/%Y")
                         + " a "
                         + p.composicao.periodo.data_fim.strftime("%d/%m/%Y"),
                         None,
+                        "",
                     ),
                 ]
                 comissoes.append(comissao)

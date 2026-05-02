@@ -15,6 +15,7 @@
     </div>
     <a :href="href" class="pntp-list-item__link">
       <div class="pntp-list-item__card card h-100">
+        <div class="card-atricon">{{ item.atricon }}</div>
         <div class="card-body">
           <div class="body-title d-flex ">
             <div class="body-title__parts d-flex">
@@ -132,22 +133,35 @@ export default {
   height: 100%;
   text-decoration: none;
   color: inherit;
-
-  &:hover .pntp-list-item__card {
-    border-color: var(--primary, #007bff);
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+  .card-atricon {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.5rem;
+    font-size: 1.5rem;
+    color: #6c757d22;
   }
 
-  &:hover .pntp-list-item__titulo {
-    color: var(--primary, #007bff);
+  &:hover {
+    .pntp-list-item__card {
+      border-color: var(--primary, #007bff);
+      box-shadow: 0 2px 8px rgba(0, 123, 255, 0.15);
+    }
+    .pntp-list-item__titulo {
+      color: var(--primary, #007bff);
+    }
+    i {
+      color: var(--primary, #007bff);
+    }
+    i.fa-chevron-right {
+      margin-top: 3px;
+      color: var(--primary, #007bff55);
+    }
+    .card-atricon {
+      color: var(--primary, #007bff44);
+    }
+
   }
-  &:hover i {
-    color: var(--primary, #007bff);
-  }
-   &:hover i.fa-chevron-right {
-    margin-top: 3px;
-    color: var(--primary, #007bff55);
-  }
+
 }
 
 .pntp-list-item__parent {
@@ -177,14 +191,21 @@ export default {
   line-height: 1;
   transition: color 0.15s ease;
 }
+.pntp-list-item__subtitle {
+  font-size: 0.8rem;
+  color: #6c757d;
+  line-height: 1.2;
+  font-style: italic;
+}
 .pntp-list-item__descricao {
   font-size: 0.95rem;
   color: #343a40;
   line-height: 1.4;
+  font-style: italic;
 }
 .pntp-list-item__actions {
   position: absolute;
-  top: 0.25rem;
+  bottom: 0.25rem;
   right: 1.1rem;
   display: flex;
   gap: 0.25rem;
