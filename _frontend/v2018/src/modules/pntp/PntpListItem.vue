@@ -171,7 +171,7 @@ export default {
   line-height: 1;
   small {
     font-variant: small-caps;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
   }
 }
 

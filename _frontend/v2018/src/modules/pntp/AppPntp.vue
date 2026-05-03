@@ -190,10 +190,10 @@ export default {
   }
   .bg_mobile {
     background: #f7f7f7 url(~@/assets/img/bg.png);
-    padding: 1rem 0.75rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin: 1rem;
   }
   .app-pntp__menu-col {
     position: relative;
