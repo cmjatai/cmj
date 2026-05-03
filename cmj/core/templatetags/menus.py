@@ -317,7 +317,7 @@ def app_pntp_content(classe_atual, categoria):
         #    return None
 
         docs = list(
-            classe.documento_set.public_all_docs().values(
+            classe.documento_set.public_all_docs().filter(pntp=True).values(
                 "id", "titulo", "slug", "icon_doc", "texto", "descricao"
             )
         )
@@ -331,7 +331,7 @@ def app_pntp_content(classe_atual, categoria):
             if classe_redirect:
                 docs.extend(
                     list(
-                        classe_redirect.documento_set.public_all_docs().values(
+                        classe_redirect.documento_set.public_all_docs().filter(pntp=True).values(
                             "id", "titulo", "slug", "icon_doc", "texto", "descricao"
                         )
                     )
