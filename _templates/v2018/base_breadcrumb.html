@@ -4,7 +4,7 @@
       <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="/" title="Página Inicial"><i class="fas fa-home"></i></a></li>
   {% endif %}
-  {% if forloop.last %}
+  {% if forloop.last %} 
     <li class="breadcrumb-item {% if p == object %}active{% endif %}">
 
       <a href="{% if p.absolute_slug %}/{{p.absolute_slug}}{% endif %}" aria-current="page">

@@ -24,33 +24,35 @@
         {% endif %}
       </h1>
       <div class="path-data-pub">
+        {% if object.classe and not object.classe.pntp %}
         {% block historico_publicacao %}
-          <div class="container-versions">
-            <a href="#list-revisoes" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="list-revisoes">
-              {% comment %}
-                FIXME tratar histórico de revisão e publicação/privacidade
-              {% endcomment %}
-              <i class="fas fa-clock" aria-hidden="true"></i>
-              {% if object.public_date %}
-                {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"|lower}} {% trans "de" %} {{object.public_date|date:"Y"}}
+        <div class="container-versions">
+          <a href="#list-revisoes" role="button" data-toggle="collapse" aria-expanded="false" aria-controls="list-revisoes">
+            {% comment %}
+            FIXME tratar histórico de revisão e publicação/privacidade
+            {% endcomment %}
+            <i class="fas fa-clock" aria-hidden="true"></i>
+            {% if object.public_date %}
+            {% trans "Publicado em" %} {{object.public_date|date:"d"}} {% trans "de" %} {{object.public_date|date:"F"|lower}} {% trans "de" %} {{object.public_date|date:"Y"}}
               {% else %}
-                {% trans "Criado em" %} {{object.created|date:"d"}} {% trans "de" %} {{object.created|date:"F"|lower}} {% trans "de" %} {{object.created|date:"Y"}}
+              {% trans "Criado em" %} {{object.created|date:"d"}} {% trans "de" %} {{object.created|date:"F"|lower}} {% trans "de" %} {{object.created|date:"Y"}}
               {% endif %}
             </a>
             <div class="collapse" id="list-revisoes">
               {% for rev in object.revisoes.all %}
-                  {% if rev.user %}
-                    <span class="">
-                      {{rev.get_visibilidade_display}} - {{rev.timestamp}} - {% trans "por:" %}
-                        {{rev.user|default:''}}
-                    </span>
-                  {% endif %}
+              {% if rev.user %}
+              <span class="">
+                {{rev.get_visibilidade_display}} - {{rev.timestamp}} - {% trans "por:" %}
+                {{rev.user|default:''}}
+              </span>
+              {% endif %}
               {% endfor %}
             </div>
           </div>
-        {% endblock %}
+          {% endblock %}
+          {% endif %}
+        </div>
       </div>
-    </div>
 
     {% block title %}
       <h1  id="main_content" class="path-title" tabindex="{{view.tabindex}}">
@@ -113,7 +115,7 @@
             {% endif %}
           {% endif %}
           <hr>
-          
+
           {{object}}
 
 

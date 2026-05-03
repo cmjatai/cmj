@@ -557,7 +557,7 @@ def get_breadcrumb_classes(context, request=None, response=None):
             Classe.objects.qs_classes_publicas()
             .filter(
                 url_redirect__istartswith=path,
-                pntp=False,
+                # pntp=False,
             )
             .order_by("raiz__codigo", "codigo")
         )

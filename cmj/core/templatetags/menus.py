@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 register = template.Library()
 
 
-def breadcrumb_function(context):
+def breadcrumb_function(context): 
 
     rcontext = {"classes": [], "request": context["request"], "user": context["user"]}
 
