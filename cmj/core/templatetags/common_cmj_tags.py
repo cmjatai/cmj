@@ -17,8 +17,6 @@ from django.utils.formats import date_format
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from num2words import num2words
-from webpack_loader import utils
-from webpack_loader.utils import _get_bundle, get_files
 
 from cmj.videos.models import Video
 from sapl.base.models import AppConfig
@@ -530,9 +528,12 @@ def sessaoplenarias_futuras(limite=0):
 
     hoje = timezone.localdate()
 
-    # dado a data de hoje, cria duas variáveis com o inicio e o fim da semana atual
+    # dado a data de hoje, cria duas variáveis com o inicio e o fim da semana atual de domingo a sábado, para buscar as sessões plenárias da semana atual e das próximas semanas
     inicio_semana = hoje - timedelta(days=hoje.weekday())
     fim_semana = inicio_semana + timedelta(days=6)
+    if hoje == fim_semana:
+        inicio_semana += timedelta(days=7)
+        fim_semana += timedelta(days=7)
 
     sessoes_da_semana = SessaoPlenaria.objects.filter(
         data_inicio__range=(inicio_semana, fim_semana),

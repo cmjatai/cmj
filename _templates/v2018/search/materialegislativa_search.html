@@ -48,7 +48,7 @@
 
 <div class="container-search">
   {% if not show_results %}
-    {% cache 60 portalcmj_pesquisar_materia %}
+    {% cache 604800 portalcmj_pesquisar_materia %}
       {% include 'search/search_help_text.html' %}
       <div class="row">
         <div class="col-12">

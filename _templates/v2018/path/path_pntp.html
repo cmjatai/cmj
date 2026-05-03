@@ -4,11 +4,13 @@
 {% block main_container_class %}container{% endblock %}
 
 {% block head_content %}
+  {% cache 604800 portalcmj_transparencia %}{% endcache %}
   {% with request.GET.categoria|default:"" as categoria %}
     {% with object|app_pntp_content:categoria as pntp_data %}
       {{ pntp_data|json_script:"pntp-data" }}
     {% endwith %}
   {% endwith %}
+
 {% endblock %}
 
 {% block title %}
