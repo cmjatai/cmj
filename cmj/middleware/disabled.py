@@ -6,7 +6,6 @@ from django.http import Http404
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect
 from django.utils import timezone
 
-from cmj.utils import get_breadcrumb_classes
 from sapl.base.models import AppConfig
 
 logger = logging.getLogger(__name__)
@@ -25,7 +24,7 @@ class DisabledMiddleware:
         response = self.get_response(request)
 
         # Captura qualquer erro (4xx ou 5xx)
-        #if response.status_code >= 400:
+        # if response.status_code >= 400:
         #    msg = f"Status {response.status_code} em {request.path}"
         #    if response.status_code >= 500:
         #        logger.error(msg)
@@ -109,29 +108,3 @@ class DisabledMiddleware:
 
     def process_template_response(self, request, response):
         return response
-
-
-class BreadCrumbMiddleware:
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request):
-        response = self.get_response(request)
-        return response
-
-    def process_view(self, request, func, args, kwargs):
-        pass
-
-    def process_exception(self, request, exception):
-        pass
-
-    def process_template_response(self, request, response):
-        try:
-            context = response.context_data
-
-            if request.path.startswith("/api/") or not context:
-                return response
-
-            return get_breadcrumb_classes(context, request, response)
-        except:
-            return response

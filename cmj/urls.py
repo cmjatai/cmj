@@ -58,6 +58,7 @@ import sapl.protocoloadm.urls
 import sapl.redireciona_urls.urls
 import sapl.relatorios.urls
 import sapl.sessao.urls
+from cmj.api.views_health import AppzVersionView, HealthzView, ReadyzView
 from cmj.core.views_short import ShortRedirectView
 from cmj.dashboard.registry import dashboard
 
@@ -94,6 +95,11 @@ urlpatterns_all = [
     re_path(r"", include(sapl.base.urls)),
     re_path(r"", include(sapl.redireciona_urls.urls)),
     re_path("dash/", dashboard.urls),
+    # Health and Readiness
+    re_path(r"^version/$", AppzVersionView.as_view(), name="version"),
+    re_path(r"^health/$", HealthzView.as_view(), name="health"),
+    re_path(r"^ready/$", ReadyzView.as_view(), name="ready"),
+    re_path(r"", include("django_prometheus.urls")),
 ]
 
 admin.site.site_header = "PortalCMJ"
