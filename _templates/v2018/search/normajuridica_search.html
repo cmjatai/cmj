@@ -33,16 +33,8 @@
     {% include 'search/search_help_text.html' %}
     {% crispy form %}
 
-    <small class="d-none text-red text-right">
-      O botão "Processar Pesquisa" foi removido. Pequisas de Normas, Textual e Parametrizada, foram unificadas.
-      <br> Clique na lupa para pesquisar.
-    </small>
-
-
     <div class="container-table">
-
       {% for result in page.object_list %}
-
         {% if forloop.first %}
           <div class="result-count">Foram encontrados {{ page.paginator.count }} registros </div>
         {% endif %}
