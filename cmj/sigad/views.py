@@ -859,8 +859,14 @@ class PathParlamentarView(PathView):
 
         slug = kwargs.get("slug", "")
 
-        if slug:
-            self._pre_dispatch(request, *args, **kwargs)
+        try:
+            if slug:
+                self._pre_dispatch(request, *args, **kwargs)
+        except Http404:
+            try:
+                self.classe = Classe.objects.get(slug__iexact=request.path.strip("/"))
+            except Exception as e:
+                raise Http404()
 
         classe = self.classe
         # recupera classe de parlamentar avaliando permissões
@@ -1309,7 +1315,6 @@ class ClasseListView(ClasseParentMixin, PermissionRequiredMixin, ListView):
         renumere = request.GET.get("renumere", None)
 
         if not renumere is None:
-
 
             childs = self.object.childs if self.object else self.model.objects
 
