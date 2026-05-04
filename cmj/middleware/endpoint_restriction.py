@@ -1,6 +1,9 @@
+import ipaddress
 import logging
 
 from django.http import HttpResponseForbidden
+
+from cmj.utils import get_client_ip
 
 # lista de IPs permitidos (localhost, redes locais, etc)
 # https://en.wikipedia.org/wiki/Reserved_IP_addresses
@@ -32,13 +35,21 @@ class EndpointRestrictionMiddleware:
 
     def __call__(self, request):
         # IP do cliente
-        client_ip = request.META.get("REMOTE_ADDR")
-
         # bloqueia acesso a endpoints restritos para IPs nao permitidos
-        if request.path in RESTRICTED_ENDPOINTS and client_ip not in ALLOWED_IPS:
-            logger.warning(
-                f"Acesso proibido ao endpoint {request.path} para o IP {client_ip}"
-            )
-            return HttpResponseForbidden("Acesso proibido")
+        if request.path in RESTRICTED_ENDPOINTS:
+            client_ip = get_client_ip(request) or request.META.get("REMOTE_ADDR")
+
+            try:
+                for allowed_ip in ALLOWED_IPS:
+                    if ipaddress.ip_address(client_ip) in ipaddress.ip_network(allowed_ip):
+                        break
+                else:
+                    logger.warning(
+                        f"Acesso proibido ao endpoint {request.path} para o IP {client_ip}"
+                    )
+                    return HttpResponseForbidden("Acesso proibido")
+            except ValueError:
+                logger.error(f"IP inválido: {client_ip}")
+                return HttpResponseForbidden("Acesso proibido")
 
         return self.get_response(request)
