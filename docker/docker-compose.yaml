@@ -1,5 +1,37 @@
 name: portalcmj
 services:
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: always
+    labels:
+       NAME: "prometheus"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - cmj-net
+
+  grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    restart: 'no'
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - 3000:3000
+    depends_on:
+      - prometheus
+    container_name: grafana
+    labels:
+      NAME: "grafana"
+    networks:
+      - cmj-net
+
   cmjredis:
     image: redis:alpine
     container_name: cmjredis
@@ -103,3 +135,5 @@ volumes:
   csolr9_data:
   csolr9_configsets:
   credis_data:
+  prometheus_data:
+  grafana_data:

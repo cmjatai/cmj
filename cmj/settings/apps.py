@@ -1,7 +1,6 @@
 import sys
 
 from decouple import AutoConfig
-from unipath import Path
 
 config = AutoConfig()
 DEBUG = config("DEBUG", default=False, cast=bool)
@@ -35,6 +34,7 @@ INSTALLED_APPS = (
     "django_celery_results",
     "celery_haystack",
     "django_celery_beat",
+    "django_prometheus",
 )
 
 INSTALLED_APPS += (

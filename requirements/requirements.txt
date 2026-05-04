@@ -34,7 +34,7 @@ git+https://github.com/LeandroJatai/celery-haystack.git
 #git+https://github.com/LeandroJatai/django-dashboard.git@main_jatai
 pandas
 
-#django_prometheus==2.3.1
+django_prometheus==2.4.1
 
 django-debug-toolbar==6.1.0
 django-silk==5.4.3
