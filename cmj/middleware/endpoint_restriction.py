@@ -22,9 +22,10 @@ ALLOWED_IPS = [
 
 RESTRICTED_ENDPOINTS = ["/metrics", "/health", "/ready", "/version"]
 
+logger = logging.getLogger(__name__)
+
 
 class EndpointRestrictionMiddleware:
-    logging.getLogger(__name__)
 
     def __init__(self, get_response):
         self.get_response = get_response
@@ -35,6 +36,9 @@ class EndpointRestrictionMiddleware:
 
         # bloqueia acesso a endpoints restritos para IPs nao permitidos
         if request.path in RESTRICTED_ENDPOINTS and client_ip not in ALLOWED_IPS:
+            logger.warning(
+                f"Acesso proibido ao endpoint {request.path} para o IP {client_ip}"
+            )
             return HttpResponseForbidden("Acesso proibido")
 
         return self.get_response(request)
