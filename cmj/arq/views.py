@@ -10,10 +10,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls.base import reverse_lazy
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
-from haystack.views import SearchView
 
 from cmj.arq import forms
 from cmj.arq.models import ArqClasse, ArqDoc

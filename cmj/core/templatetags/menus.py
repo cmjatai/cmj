@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 register = template.Library()
 
 
-def breadcrumb_function(context): 
+def breadcrumb_function(context):
 
     rcontext = {"classes": [], "request": context["request"], "user": context["user"]}
 
@@ -317,9 +317,9 @@ def app_pntp_content(classe_atual, categoria):
         #    return None
 
         docs = list(
-            classe.documento_set.public_all_docs().filter(pntp=True).values(
-                "id", "titulo", "slug", "icon_doc", "texto", "descricao"
-            )
+            classe.documento_set.public_all_docs()
+            .filter(pntp=True)
+            .values("id", "titulo", "slug", "icon_doc", "texto", "descricao")
         )
 
         """if classe.url_redirect and classe.url_redirect.startswith("/"):
@@ -354,6 +354,11 @@ def app_pntp_content(classe_atual, categoria):
         if classe.id == categoria:
             nonlocal active_item
             active_item = item
+
+        for classe_relacionada in classe.related_classes.qs_pntp():
+            item_child = recursive_classes(classe_relacionada, classe)
+            if item_child:
+                item["childs"].append(classe_relacionada.id)
 
         for child in classe.childs.qs_pntp():
             item_child = recursive_classes(child, classe)

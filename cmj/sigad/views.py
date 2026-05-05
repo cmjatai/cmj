@@ -1137,7 +1137,7 @@ class ClasseCreateView(
     permission_required = "sigad.add_classe"
     form_valid_message = _("Classe criada com sucesso!")
     form_invalid_message = _("Existem erros no formulário de cadastro!")
-    template_name = "crud/form.html"
+    template_name = "sigad/classe_form.html"
     form_class = forms.ClasseForm
     model = Classe
 
@@ -1176,7 +1176,7 @@ class ClasseUpdateView(
     permission_required = "sigad.change_classe"
     form_valid_message = _("Classe Alterada com sucesso!")
     form_invalid_message = _("Existem erros no formulário!")
-    template_name = "crud/form.html"
+    template_name = "sigad/classe_form.html"
     form_class = forms.ClasseForm
     model = Classe
 

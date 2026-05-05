@@ -130,7 +130,11 @@ class Parent(models.Model):
     )
 
     related_classes = models.ManyToManyField(
-        "self", blank=True, verbose_name=_("Classes Relacionadas")
+        "self",
+        blank=True,
+        symmetrical=False,
+        related_name="related_classes_rel",
+        verbose_name=_("Classes Relacionadas"),
     )
 
     metadata = JSONField(
@@ -859,7 +863,9 @@ class Classe(ShortUrl, CMSMixin):
         _("URL de redirecionamento"), max_length=1024, db_index=True, default=""
     )
 
-    icon_classe = models.CharField(_("Ícone da Classe"), max_length=50, default="", blank=True)
+    icon_classe = models.CharField(
+        _("Ícone da Classe"), max_length=50, default="", blank=True
+    )
 
     class Meta:
         ordering = (
@@ -1199,7 +1205,9 @@ class Documento(ShortUrl, CMSMixin):
     pntp = models.BooleanField(
         _("Listar no PNTP"), choices=YES_NO_CHOICES, default=False
     )
-    icon_doc = models.CharField(_("Ícone do Documento"), max_length=50, default="", blank=True)
+    icon_doc = models.CharField(
+        _("Ícone do Documento"), max_length=50, default="", blank=True
+    )
 
     old_path = models.TextField(
         verbose_name=_("Path no Portal Modelo 1.0"), blank=True, null=True, default=None

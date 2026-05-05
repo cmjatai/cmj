@@ -69,6 +69,24 @@ class ClasseForm(ModelForm):
         required=False,
     )
 
+    related_classes = forms.ModelMultipleChoiceField(
+        queryset=Classe.objects.all(),
+        label=_("Classes Relacionadas"),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={
+                "title": "Selecione as Classes Relacionadas",
+                "class": "selectpicker w-100",
+                "data-actions-box": "true",
+                "data-select-all-text": "Selecionar Todos",
+                "data-deselect-all-text": "Desmarcar Todos",
+                "data-live-search": "true",
+                "data-header": "Classes Relacionadas",
+                "data-dropup-auto": "false",
+            }
+        ),
+    )
+
     class Meta:
         model = Classe
         fields = [
@@ -95,6 +113,7 @@ class ClasseForm(ModelForm):
             "url_redirect",
             "col_in_inf",
             "styles",
+            "related_classes",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -134,6 +153,7 @@ class ClasseForm(ModelForm):
                 ("menu_lateral", 2),
                 ("pntp", 2),
                 ("icon_classe", 2),
+                ("related_classes", 12),
                 ("descricao", 12),
                 ("subtitle", 12),
                 ("styles", 12),
@@ -166,10 +186,41 @@ class ClasseForm(ModelForm):
 
         get_pc_order_by()
         self.fields["parent"].choices = pc
-        l = list(self.fields["parent"].choices)
+        self.fields["related_classes"].choices = pc[1:]
+        # l = list(self.fields["parent"].choices)
 
         if self.instance.pk and isinstance(self.instance.metadata, dict):
             self.fields["styles"].initial = self.instance.metadata.get("styles", "")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        parent = cleaned_data.get("parent")
+        if self.instance.pk and parent:
+            if parent == self.instance:
+                raise forms.ValidationError(
+                    _("A classe não pode ser parente de si mesma.")
+                )
+
+            # Verificar se o parent é um descendente da instância para evitar ciclos
+            def is_descendant(descendant, ancestor):
+                if descendant == ancestor:
+                    return True
+                for child in descendant.childs.all():
+                    if is_descendant(child, ancestor):
+                        return True
+                return False
+
+            if is_descendant(self.instance, parent):
+                raise forms.ValidationError(
+                    _("A classe não pode ser parente de um de seus descendentes.")
+                )
+
+        related_classes = cleaned_data.get("related_classes", [])
+        if self.instance.pk and self.instance in related_classes:
+            raise forms.ValidationError(
+                _("A classe não pode ser relacionada a ela mesma.")
+            )
+        return cleaned_data
 
     def save(self, commit=True):
         data = self.cleaned_data
