@@ -9,8 +9,8 @@ services:
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
-    ports:
-      - "9090:9090"
+    #ports:
+    #  - "9090:9090"
     networks:
       - cmj-net
 
