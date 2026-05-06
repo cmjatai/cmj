@@ -4,16 +4,14 @@ import django_filters
 from crispy_forms.layout import Fieldset, Layout
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import models
 from django.db.models import Q
 from django.forms import ModelChoiceField, ModelForm, widgets
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.utils import CHOICE_SIGNEDS
-from sapl.base.models import Autor, TipoAutor
+from sapl.base.models import TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper, form_actions, to_row
-from sapl.materia.forms import choice_anos_com_materias
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 from sapl.settings import MAX_DOC_UPLOAD_SIZE
 from sapl.utils import (
@@ -21,7 +19,6 @@ from sapl.utils import (
     FileFieldCheckMixin,
     FilterOverridesMetaMixin,
     NormaPesquisaOrderingFilter,
-    RangeWidgetOverride,
     choice_anos_com_normas,
 )
 
@@ -56,7 +53,6 @@ class NormaFilterSet(django_filters.FilterSet):
 
     ementa = django_filters.CharFilter(
         label=_("Pesquisar expressões na ementa"),
-        help_text=_('"Para busca no conteúdo das normas, use a Pesquisa Textual"'),
         method="filter_ementa",
     )
 
@@ -96,11 +92,10 @@ class NormaFilterSet(django_filters.FilterSet):
     def __init__(self, *args, **kwargs):
         super(NormaFilterSet, self).__init__(*args, **kwargs)
 
-        row1 = to_row([("tipo", 4), ("numero", 4), ("ano", 4)])
-        row2 = to_row([("ementa", 6), ("assuntos", 6)])
-        row3 = to_row([("data", 6), ("data_publicacao", 6)])
+        row1 = to_row([("tipo", 4), ("assuntos", 4), ("numero", 2), ("ano", 2)])
+        row2 = to_row([("ementa", 4), ("data", 4), ("data_publicacao", 4)])
         # row4 = to_row([('data_vigencia', 10), ('vigencia', 2)])
-        row5 = to_row([("o", 4), ("signeds", 4), ("apelido", 4)])
+        # row5 = to_row([("o", 4), ("signeds", 4), ("apelido", 4)])
 
         self.form.helper = SaplFormHelper()
         self.form.helper.form_method = "GET"
@@ -114,11 +109,17 @@ class NormaFilterSet(django_filters.FilterSet):
                 """),
                 row1,
                 row2,
-                row3,
-                row5,  # row4,
+                # row5,  # row4,
                 form_actions(label="Pesquisar"),
             )
         )
+
+        """data = self.form.data
+        if data.get("tipo", None) and data.get("assuntos", None):
+            self.form.fields["assuntos"].disabled = True
+            self.form.fields["assuntos"].readonly = True
+            self.form.fields["tipo"].disabled = True
+            self.form.fields["tipo"].readonly = True"""
 
     def filter_ementa(self, queryset, name, value):
         texto = value.split()

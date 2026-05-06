@@ -33,12 +33,13 @@
 
 
 {% block detail_content %}
-
+  {% crispy filter.form %}
+{% comment %}
   {% if not show_results %}
-    {% include 'search/search_widget.html' %}
-    <hr>
-    {% crispy filter.form %}
+  {% include 'search/search_widget.html' %}
+  <hr>
   {% endif %}
+{% endcomment %}
 {% endblock detail_content %}
 
 {% block table_content %}
