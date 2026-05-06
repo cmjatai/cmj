@@ -10,10 +10,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.core.mail import send_mail
 from django.db import connection
-from django.db.models import Count, ProtectedError, Q
+from django.db.models import Count, ProtectedError
 from django.forms.utils import ErrorList
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
@@ -51,13 +51,11 @@ from sapl.materia.models import (
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.forms import FiliacaoForm
 from sapl.parlamentares.models import (
-    AfastamentoParlamentar,
     Bancada,
     Filiacao,
     Legislatura,
     Mandato,
     Parlamentar,
-    SessaoLegislativa,
 )
 from sapl.protocoloadm.models import (
     Anexado,
@@ -67,18 +65,13 @@ from sapl.protocoloadm.models import (
     TipoDocumentoAdministrativo,
 )
 from sapl.sessao.models import (
-    OrdemDia,
-    PresencaOrdemDia,
     SessaoPlenaria,
-    SessaoPlenariaPresenca,
-    TipoSessaoPlenaria,
 )
 from sapl.utils import (
     SEPARADOR_HASH_PROPOSICAO,
     gerar_hash_arquivo,
     intervalos_tem_intersecao,
     mail_service_configured,
-    parlamentares_ativos,
     show_results_filter_set,
 )
 
@@ -97,7 +90,6 @@ from .forms import (
     RelatorioNormasMesFilterSet,
     RelatorioNormasPorAutorFilterSet,
     RelatorioNormasVigenciaFilterSet,
-    RelatorioPresencaSessaoFilterSet,
     RelatorioReuniaoFilterSet,
     UsuarioCreateForm,
     UsuarioEditForm,
@@ -449,263 +441,6 @@ class RelatorioAtasView(FilterView):
             + " - "
             + self.request.GET["data_inicio_1"]
         )
-
-        return context
-
-
-class RelatorioPresencaSessaoView(FilterView):
-    logger = logging.getLogger(__name__)
-    model = SessaoPlenaria
-    filterset_class = RelatorioPresencaSessaoFilterSet
-    template_name = "base/RelatorioPresencaSessao_filter.html"
-
-    def get_context_data(self, **kwargs):
-
-        context = super(RelatorioPresencaSessaoView, self).get_context_data(**kwargs)
-        context["title"] = _("Presença dos parlamentares nas sessões")
-
-        # Verifica se os campos foram preenchidos
-        if not self.filterset.form.is_valid():
-            return context
-
-        cd = self.filterset.form.cleaned_data
-        if (
-            not cd["data_inicio"]
-            and not cd["sessao_legislativa"]
-            and not cd["legislatura"]
-        ):
-            msg = _(
-                "Formulário inválido! Preencha pelo menos algum dos campos Período, Legislatura ou Sessão Legislativa."
-            )
-            messages.error(self.request, msg)
-            return context
-
-        # Caso a data tenha sido preenchida, verifica se foi preenchida
-        # corretamente
-        if self.request.GET.get("data_inicio_0") and not self.request.GET.get(
-            "data_inicio_1"
-        ):
-            msg = _("Formulário inválido! Preencha a data do Período Final.")
-            messages.error(self.request, msg)
-            return context
-
-        if not self.request.GET.get("data_inicio_0") and self.request.GET.get(
-            "data_inicio_1"
-        ):
-            msg = _("Formulário inválido! Preencha a data do Período Inicial.")
-            messages.error(self.request, msg)
-            return context
-
-        param0 = {}
-
-        legislatura_pk = self.request.GET.get("legislatura")
-        if legislatura_pk:
-            param0["sessao_plenaria__legislatura_id"] = legislatura_pk
-            legislatura = Legislatura.objects.get(id=legislatura_pk)
-            context["legislatura"] = legislatura
-
-        sessao_legislativa_pk = self.request.GET.get("sessao_legislativa")
-        if sessao_legislativa_pk:
-            param0["sessao_plenaria__sessao_legislativa_id"] = sessao_legislativa_pk
-            sessao_legislativa = SessaoLegislativa.objects.get(id=sessao_legislativa_pk)
-            context["sessao_legislativa"] = sessao_legislativa
-
-        tipo_sessao_plenaria_pk = self.request.GET.get("tipo")
-        context["tipo"] = ""
-        if tipo_sessao_plenaria_pk:
-            param0["sessao_plenaria__tipo_id"] = tipo_sessao_plenaria_pk
-            context["tipo"] = TipoSessaoPlenaria.objects.get(id=tipo_sessao_plenaria_pk)
-
-        _range = []
-
-        if (
-            ("data_inicio_0" in self.request.GET)
-            and self.request.GET["data_inicio_0"]
-            and ("data_inicio_1" in self.request.GET)
-            and self.request.GET["data_inicio_1"]
-        ):
-            where = context["object_list"].query.where
-            _range = where.children[0].rhs
-
-        elif legislatura_pk and not sessao_legislativa_pk:
-            _range = [legislatura.data_inicio, legislatura.data_fim]
-
-        elif sessao_legislativa_pk:
-            _range = [sessao_legislativa.data_inicio, sessao_legislativa.data_fim]
-
-        param0.update({"sessao_plenaria__data_inicio__range": _range})
-
-        # Parlamentares com Mandato no intervalo de tempo (Ativos)
-        parlamentares_qs = parlamentares_ativos(_range[0], _range[1]).order_by(
-            "nome_parlamentar"
-        )
-        parlamentares_id = parlamentares_qs.values_list("id", flat=True)
-
-        # Presenças de cada Parlamentar em Sessões
-        presenca_sessao = (
-            SessaoPlenariaPresenca.objects.filter(**param0)
-            .values_list("parlamentar_id")
-            .annotate(sessao_count=Count("id"))
-        )
-
-        # Presenças de cada Ordem do Dia
-        presenca_ordem = (
-            PresencaOrdemDia.objects.filter(**param0)
-            .values_list("parlamentar_id")
-            .annotate(sessao_count=Count("id"))
-        )
-
-        total_ordemdia = (
-            PresencaOrdemDia.objects.filter(**param0)
-            .distinct("sessao_plenaria__id")
-            .order_by("sessao_plenaria__id")
-            .count()
-        )
-
-        context["object_list"] = context["object_list"].filter(iniciada=True)
-        total_sessao = context["object_list"].count()
-
-        username = self.request.user.username
-
-        # Completa o dicionario as informacoes parlamentar/sessao/ordem
-        parlamentares_presencas = []
-        for i, p in enumerate(parlamentares_qs):
-            m = p.mandato_set.filter(
-                Q(data_inicio_mandato__lte=_range[0], data_fim_mandato__gte=_range[1])
-                | Q(data_inicio_mandato__lte=_range[0], data_fim_mandato__isnull=True)
-                | Q(data_inicio_mandato__gte=_range[0], data_fim_mandato__lte=_range[1])
-            )
-
-            afastamentos = AfastamentoParlamentar.objects.filter(
-                Q(parlamentar=p)
-                & (
-                    Q(data_inicio__range=_range)
-                    | Q(data_inicio__gte=_range[0], data_fim__isnull=True)
-                )
-            )
-
-            afast_parl_sessao = 0
-            afast_parl_ordem = 0
-            for afastamento in afastamentos:
-                if afastamento.data_fim:
-                    afast_parl_sessao += SessaoPlenaria.objects.filter(
-                        data_inicio__range=[
-                            afastamento.data_inicio,
-                            afastamento.data_fim,
-                        ]
-                    ).count()
-                    afast_parl_ordem += (
-                        OrdemDia.objects.filter(
-                            sessao_plenaria__data_inicio__range=[
-                                afastamento.data_inicio,
-                                afastamento.data_fim,
-                            ]
-                        )
-                        .order_by("sessao_plenaria__id")
-                        .distinct("sessao_plenaria__id")
-                        .count()
-                    )
-                else:
-                    afast_parl_sessao += SessaoPlenaria.objects.filter(
-                        data_inicio__gte=afastamento.data_inicio
-                    ).count()
-                    afast_parl_ordem += (
-                        OrdemDia.objects.filter(
-                            sessao_plenaria__data_inicio__gte=afastamento.data_inicio
-                        )
-                        .order_by("sessao_plenaria__id")
-                        .distinct("sessao_plenaria__id")
-                        .count()
-                    )
-
-            m = m.last()
-            parlamentares_presencas.append(
-                {
-                    "parlamentar": p,
-                    "titular": m.titular if m else False,
-                    "sessao_porc": 0,
-                    "ordemdia_porc": 0,
-                    "sessao_afast": afast_parl_sessao,
-                    "ordem_afast": afast_parl_ordem,
-                }
-            )
-            try:
-                self.logger.debug(
-                    "user="
-                    + username
-                    + ". Tentando obter presença do parlamentar (pk={}).".format(p.id)
-                )
-                sessao_count = presenca_sessao.get(parlamentar_id=p.id)[1]
-            except ObjectDoesNotExist as e:
-                self.logger.error(
-                    "user="
-                    + username
-                    + ". Erro ao obter presença do parlamentar (pk={}). Definido como 0. ".format(
-                        p.id
-                    )
-                    + str(e)
-                )
-                sessao_count = 0
-            try:
-                # Presenças de cada Ordem do Dia
-                self.logger.info(
-                    "user="
-                    + username
-                    + ". Tentando obter PresencaOrdemDia para o parlamentar pk={}.".format(
-                        p.id
-                    )
-                )
-                ordemdia_count = presenca_ordem.get(parlamentar_id=p.id)[1]
-            except ObjectDoesNotExist:
-                self.logger.error(
-                    "user="
-                    + username
-                    + ". Erro ao obter PresencaOrdemDia para o parlamentar pk={}. "
-                    "Definido como 0.".format(p.id)
-                )
-                ordemdia_count = 0
-
-            parlamentares_presencas[i].update(
-                {"sessao_count": sessao_count, "ordemdia_count": ordemdia_count}
-            )
-
-            if total_sessao != 0:
-                porc = round(sessao_count * 100 / (total_sessao - afast_parl_sessao), 2)
-                parlamentares_presencas[i].update(
-                    {"sessao_porc": porc if porc <= 100 else 100}
-                )
-            if total_ordemdia != 0:
-                porc = round(
-                    ordemdia_count * 100 / (total_ordemdia - afast_parl_ordem), 2
-                )
-                parlamentares_presencas[i].update(
-                    {"ordemdia_porc": porc if porc <= 100.0 else 100.0}
-                )
-
-        context["date_range"] = _range
-        context["total_ordemdia"] = total_ordemdia
-        context["total_sessao"] = context["object_list"].count()
-        context["parlamentares"] = parlamentares_presencas
-        context["periodo"] = (
-            self.request.GET["data_inicio_0"]
-            + " - "
-            + self.request.GET["data_inicio_1"]
-        )
-        context["sessao_legislativa"] = ""
-        context["legislatura"] = ""
-        context["exibir_ordem"] = self.request.GET.get("exibir_ordem_dia") == "on"
-
-        if sessao_legislativa_pk:
-            context["sessao_legislativa"] = SessaoLegislativa.objects.get(
-                id=sessao_legislativa_pk
-            )
-        if legislatura_pk:
-            context["legislatura"] = Legislatura.objects.get(id=legislatura_pk)
-        # =====================================================================
-        qr = self.request.GET.copy()
-        context["filter_url"] = ("&" + qr.urlencode()) if len(qr) > 0 else ""
-
-        context["show_results"] = show_results_filter_set(qr)
 
         return context
 

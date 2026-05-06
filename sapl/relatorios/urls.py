@@ -1,6 +1,10 @@
 from django.urls.conf import re_path
 
-from sapl.relatorios.views import RelatorioGestaoView, RelatorioMateriasPorAutorView
+from sapl.relatorios.views import (
+    RelatorioGestaoView,
+    RelatorioMateriasPorAutorView,
+    RelatorioPresencaSessaoView,
+)
 
 from .apps import AppConfig
 from .views_old import (
@@ -26,6 +30,11 @@ urlpatterns = [
         r"^sistema/relatorios/materia-por-autor$",
         RelatorioMateriasPorAutorView.as_view(),
         name="materia_por_autor",
+    ),
+    re_path(
+        r"^sistema/relatorios/presenca$",
+        RelatorioPresencaSessaoView.as_view(),
+        name="relatorio_presenca_sessao",
     ),
     re_path(
         r"^gestao/(?P<ano>[0-9]+)\.?(?P<format>pdf)?$",

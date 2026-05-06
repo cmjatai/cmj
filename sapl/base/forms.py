@@ -12,7 +12,6 @@ from django.contrib.auth.forms import (
     SetPasswordForm,
 )
 from django.contrib.auth.models import Group
-from django.contrib.postgres.aggregates.general import ArrayAgg
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
@@ -39,7 +38,6 @@ from sapl.materia.models import (
 from sapl.norma.models import NormaJuridica
 from sapl.parlamentares.models import (
     HistoricoPartido,
-    Legislatura,
     Partido,
     SessaoLegislativa,
 )
@@ -822,64 +820,6 @@ class RelatorioNormasVigenciaFilterSet(django_filters.FilterSet):
         self.form.helper.layout = Layout(
             Fieldset(
                 _("Normas por vigência."), row1, row2, form_actions(label="Pesquisar")
-            )
-        )
-
-    @property
-    def qs(self):
-        return qs_override_django_filter(self)
-
-
-class RelatorioPresencaSessaoFilterSet(django_filters.FilterSet):
-
-    class Meta(FilterOverridesMetaMixin):
-        model = SessaoPlenaria
-        fields = ["data_inicio", "sessao_legislativa", "tipo", "legislatura"]
-
-    def __init__(self, *args, **kwargs):
-        super(RelatorioPresencaSessaoFilterSet, self).__init__(*args, **kwargs)
-
-        self.form.fields["exibir_ordem_dia"] = forms.BooleanField(
-            required=False, label="Exibir presença das Ordens do Dia"
-        )
-        self.form.initial["exibir_ordem_dia"] = True
-
-        self.filters["data_inicio"].label = "Período (Inicial - Final)"
-
-        now = timezone.now()
-        self.form.initial["legislatura"] = Legislatura.objects.filter(
-            data_inicio__lte=now, data_fim__gte=now
-        ).first()
-
-        if self.form.initial["legislatura"]:
-            self.form.initial["sessao_legislativa"] = SessaoLegislativa.objects.filter(
-                legislatura=self.form.initial["legislatura"],
-                data_inicio__lte=now,
-                data_fim__gte=now,
-            ).first()
-
-        self.form.initial["tipo"] = (
-            self.filters["tipo"].queryset.filter(nome__endswith=" Ordinária").first()
-        )
-
-        row1 = to_row([("data_inicio", 12)])
-        row2 = to_row([("legislatura", 4), ("sessao_legislativa", 4), ("tipo", 4)])
-        row3 = to_row([("exibir_ordem_dia", 12)])
-
-        self.form.fields["legislatura"].required = True
-        # self.form.fields['data_inicio'].required = True
-        self.form.fields["tipo"].required = True
-        self.form.fields["sessao_legislativa"].required = True
-
-        self.form.helper = SaplFormHelper()
-        self.form.helper.form_method = "GET"
-        self.form.helper.layout = Layout(
-            Fieldset(
-                _("Presença dos parlamentares nas sessões plenárias"),
-                row1,
-                row2,
-                row3,
-                form_actions(label="Pesquisar"),
             )
         )
 

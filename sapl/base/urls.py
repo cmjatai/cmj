@@ -1,11 +1,9 @@
 import os
 
-from django.contrib.auth import views
 from django.contrib.auth.decorators import permission_required
 from django.urls.conf import include, re_path
 from django.views.generic.base import RedirectView, TemplateView
 
-from sapl import base
 from sapl.base.views import (
     AutorCrud,
     ConfirmarEmailView,
@@ -13,7 +11,7 @@ from sapl.base.views import (
     TipoAutorCrud,
     get_estatistica,
 )
-from sapl.settings import EMAIL_SEND_USER, MEDIA_URL
+from sapl.settings import MEDIA_URL
 
 from .apps import AppConfig
 from .views import (
@@ -52,7 +50,6 @@ from .views import (
     RelatorioNormasPorAutorView,
     RelatorioNormasPublicadasMesView,
     RelatorioNormasVigenciaView,
-    RelatorioPresencaSessaoView,
     RelatorioReuniaoView,
     RelatoriosListView,
 )
@@ -139,11 +136,6 @@ urlpatterns = [
         r"^sistema/relatorios/data-fim-prazo-tramitacoes$",
         RelatorioDataFimPrazoTramitacaoView.as_view(),
         name="data_fim_prazo_tramitacoes",
-    ),
-    re_path(
-        r"^sistema/relatorios/presenca$",
-        RelatorioPresencaSessaoView.as_view(),
-        name="presenca_sessao",
     ),
     re_path(r"^sistema/relatorios/atas$", RelatorioAtasView.as_view(), name="atas"),
     re_path(
