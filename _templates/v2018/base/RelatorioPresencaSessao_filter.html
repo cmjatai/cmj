@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 {% load common_tags %}
 
-{% block base_content %}
+{% block base_content %}<br>
   {% if not show_results %}
     {% crispy filter.form %}
   {% endif %}
