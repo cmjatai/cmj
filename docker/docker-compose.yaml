@@ -22,8 +22,8 @@ services:
     restart: 'no'
     volumes:
       - grafana_data:/var/lib/grafana
-    ports:
-      - 3000:3000
+    #ports:
+    #  - 3000:3000
     depends_on:
       - prometheus
     container_name: grafana
@@ -73,8 +73,8 @@ services:
       PGDATA : /var/lib/postgresql/data/
     volumes:
       - cmjdb15_data:/var/lib/postgresql/data/
-    ports:
-      - "5432:5432"
+    #ports:
+    #  - "5432:5432"
     networks:
       - cmj-net
   cmjdb18:
@@ -90,8 +90,8 @@ services:
       PGDATA : /var/lib/postgresql/data/
     volumes:
       - cmjdb18_data:/var/lib/postgresql/data/
-    ports:
-      - "5433:5432"
+    #ports:
+    #  - "5433:5432"
     networks:
       - cmj-net
   cmj:
