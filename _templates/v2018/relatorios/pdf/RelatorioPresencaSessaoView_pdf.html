@@ -1,0 +1,55 @@
+{% extends "base_pdf.html" %}
+
+{% load crispy_forms_tags %}
+{% load common_tags %}
+
+{% block head_extra_css %}
+  {% include "css/base_table.css" %}
+  table {
+    font-size: 11pt;
+  }
+  table td {
+    padding: 10px;
+  }
+{% endblock head_extra_css %}
+
+{% block body_content %}
+  <b>PERÍODO: {{periodo}}</b><br />
+  <b>Legislatura: {{legislatura}}</b><br />
+  <b>Sessão Legislativa: {{sessao_legislativa}}</b><br />
+  <b>Tipo Sessão Plenária: {{tipo}}<br /> </b>
+  <b>TOTAIS NO PERÍODO - SESSÕES: {{total_sessao}} - ORDENS DO DIA: {{total_ordemdia}}</b><br />
+  <br>
+  <table class="table table-bordered table-hover presenca_table">
+    <thead class="thead-default" align="center">
+      <tr class="active">
+        <th rowspan="2">Nome Parlamentar / Partido</th>
+        <th rowspan="2">Titular?</th>
+        <th rowspan="2">Ativo?</th>
+        <th colspan="2">Sessão</th>
+        <th colspan="2">Ordem do Dia</th>
+        <th rowspan="2">Ausências Justificadas em Sessão</th>
+      </tr>
+      <tr class="active">
+        <th>(Qtd)</th>
+        <th>( % )</th>
+        <th>(Qtd)</th>
+        <th>( % )</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in parlamentares %}
+        <tr>
+          <td><b> {{p.parlamentar}}</b><br><small>({{p.parlamentar|filiacao_intervalo_filter:date_range|default:"Sem Partido"}})</small></td>
+          <td>{% if p.titular %} Sim {% else %} Não {% endif %}</td>
+          <td>{% if p.parlamentar.ativo %} Sim {% else %} Não {% endif %}</td>
+          <td>{{p.sessao_count}}</td>
+          <td>{{p.sessao_porc}}</td>
+          <td>{{p.ordemdia_count}}</td>
+          <td>{{p.ordemdia_porc}}</td>
+          <td>{{p.ausencia_justificada_count}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock body_content %}

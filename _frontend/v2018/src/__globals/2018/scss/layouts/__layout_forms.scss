@@ -82,6 +82,9 @@ form {
       }
     }
   }
+  .invalid-feedback {
+    display: inline-block;
+  }
 }
 
 .form-control-static {
