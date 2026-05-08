@@ -51,6 +51,11 @@ class ClasseForm(ModelForm):
         required=False,
     )
 
+    titulo = forms.CharField(
+        label=Classe._meta.get_field("titulo").verbose_name,
+        required=True,
+    )
+
     parent = forms.ModelChoiceField(
         queryset=Classe.objects.all(), label=_("Classe Ascendente"), required=False
     )

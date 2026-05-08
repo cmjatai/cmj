@@ -1,5 +1,4 @@
 from django import template
-from django.db.models import Max
 
 from cmj.sigad.models import CaixaPublicacao, Classe, Documento
 from cmj.utils import time_of_period
@@ -179,21 +178,21 @@ def list_in_informacao(node):
         )
 
         classes = Classe.objects.filter(list_in_inf=True, parent=classe_first).order_by(
-            "codigo"
+            "col_in_inf"
         )
 
         if not classes.exists():
             return []
 
-        classes_max_col = classes.aggregate(max_col=Max("col_in_inf"))["max_col"] or 1
-
-        items = [[] for m in range(classes_max_col)]
+        items = [[] for m in range(10)]
 
         try:
             for i in classes:
                 if not i.col_in_inf:
                     i.col_in_inf = 1
-                items[i.col_in_inf - 1].append(i)
+                items[(i.col_in_inf % 10) - 1].append(i)
+
+            items = list(filter(lambda x: len(x) > 0, items))
         except:
             pass
         classes = items
