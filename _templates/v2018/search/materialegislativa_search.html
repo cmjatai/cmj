@@ -9,11 +9,13 @@
 
 {% block title %}
   <h1 class="page-header d-flex bg-red text-white container-search justify-content-between" >
-    Pesquisar Matérias Legislativas
     {% if not show_results %}
+      Pesquisar Matérias - Atividade Legislativa
       <a class="btn btn-warning btn-ajuda" data-toggle="collapse" href="#collapseAjudaBuscaTextual" role="button" aria-expanded="false" aria-controls="collapseAjudaBuscaTextual">
         ?
       </a>
+    {% else %}
+    Resultados de sua Pesquisa - Atividade Legislativa
     {% endif %}
   </h1>
 {% endblock title %}
