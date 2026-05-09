@@ -374,15 +374,17 @@ def app_pntp_content(classe_atual, categoria):
             nonlocal active_item
             active_item = item
 
-
-        for classe_referenciada in classe.classes_referenciadas.qs_classes_publicas().order_by(
-            'referente_set__ordem'):
+        for (
+            classe_referenciada
+        ) in classe.classes_referenciadas.qs_classes_publicas().order_by(
+            "referente_set__ordem"
+        ):
             item_child = recursive_classes(classe_referenciada, classe)
             if item_child:
                 item["childs"].append(classe_referenciada.id)
 
         order = "codigo"  # "titulo" if classe == classe_atual else "codigo"
-        for child in classe.childs.qs_classes_publicas().order_by(order):
+        for child in classe.childs.qs_pntp().order_by(order):
             item_child = recursive_classes(child, classe)
             if item_child:
                 item["childs"].append(child.id)

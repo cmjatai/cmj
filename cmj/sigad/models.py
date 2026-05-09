@@ -925,7 +925,7 @@ class RelacionamentoEntreClasses(models.Model):
         on_delete=PROTECT,
     )
 
-    ordem = models.PositiveIntegerField(verbose_name=_("Ordem"), default=0)
+    ordem = models.PositiveIntegerField(verbose_name=_("Ordem"), default=999)
 
     class Meta:
         ordering = ("ordem",)
