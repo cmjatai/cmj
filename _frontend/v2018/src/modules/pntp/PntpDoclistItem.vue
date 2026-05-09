@@ -8,7 +8,7 @@
               <small>{{ parent_titulo }}</small>
             </span>
             <span class="icon-item">
-              <i :class="[doc.icon_doc || 'fa-solid fa-file-text']"></i>
+              <i :class="['fa-xl', doc.icon_doc || 'fa-solid fa-file-text']"></i>
             </span>
             <div class="pntp-doclist-item__content">
               <h6 class="pntp-doclist-item__titulo card-title mb-0">{{ doc.titulo }}</h6>

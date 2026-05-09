@@ -120,7 +120,7 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
             for arquivo in qs_arquivos:
                 arq_template = f"""
                     <a class="d-flex align-items-center" href="{arquivo.arquivo.url}">
-                        <i class="far fa-2x fa-file-pdf"></i>
+                        <i class="fa-solid fa-file-pdf fa-2x "></i>
                         <span class="pb-3">{arquivo.descricao}</span>
                     </a>
                 """
@@ -277,7 +277,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             for arquivo in qs_arquivos:
                 arq_template = f"""
                     <a class="d-flex align-items-center" href="{arquivo.arquivo.url}">
-                        <i class="far fa-2x fa-file-pdf"></i>
+                        <i class="fa-solid fa-file-pdf fa-2x "></i>
                         <span class="p-2">{arquivo.descricao}</span>
                     </a>
                 """

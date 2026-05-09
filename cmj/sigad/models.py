@@ -129,14 +129,6 @@ class Parent(models.Model):
         on_delete=PROTECT,
     )
 
-    related_classes = models.ManyToManyField(
-        "self",
-        blank=True,
-        symmetrical=False,
-        related_name="related_classes_rel",
-        verbose_name=_("Classes Relacionadas"),
-    )
-
     metadata = JSONField(
         verbose_name=_("Metadados"),
         blank=True,
@@ -867,6 +859,16 @@ class Classe(ShortUrl, CMSMixin):
         _("Ícone da Classe"), max_length=50, default="", blank=True
     )
 
+    classes_referenciadas = models.ManyToManyField(
+        "self",
+        blank=True,
+        symmetrical=False,
+        through="RelacionamentoEntreClasses",
+        through_fields=("referente", "referenciada"),
+        related_name="classes_referenciadoras",
+        verbose_name=_("Classes Referenciadas"),
+    )
+
     class Meta:
         ordering = (
             "codigo",
@@ -907,6 +909,28 @@ class Classe(ShortUrl, CMSMixin):
     @property
     def absolute_slug(self):
         return self.slug
+
+
+class RelacionamentoEntreClasses(models.Model):
+    referente = models.ForeignKey(
+        Classe,
+        related_name="referenciada_set",
+        verbose_name=_("Classe Referente"),
+        on_delete=PROTECT,
+    )
+    referenciada = models.ForeignKey(
+        Classe,
+        related_name="referente_set",
+        verbose_name=_("Classe Referenciada"),
+        on_delete=PROTECT,
+    )
+
+    ordem = models.PositiveIntegerField(verbose_name=_("Ordem"), default=0)
+
+    class Meta:
+        ordering = ("ordem",)
+        verbose_name = _("Relação entre Classes")
+        verbose_name_plural = _("Relações entre Classes")
 
 
 class PermissionsUserClasse(CMSMixin):

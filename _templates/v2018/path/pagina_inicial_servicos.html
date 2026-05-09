@@ -11,7 +11,7 @@
           {% for tab_id in pntp_data.root.childs %}
             {% with tab=pntp_data.items|get_item:tab_id %}
               {% if tab %}
-                <li class="nav-item">
+                <li class="nav-item d-flex">
                   <a class="nav-link {% if forloop.first %}active{% endif %}"
                     id="servicos-tab-{{ tab.id }}"
                     data-toggle="tab"
@@ -22,6 +22,9 @@
                     {% if tab.icon_classe %}<i class="{{ tab.icon_classe }} mr-1"></i>{% endif %}
                     {{ tab.titulo }}
                   </a>
+                  {% if user.is_superuser %}
+                    <a class="btn-edit-classe" href="{% url "cmj.sigad:subclasse_list" tab.id %}"><i class="fas fa-edit"></i></a>
+                  {% endif %}
                 </li>
               {% endif %}
             {% endwith %}
@@ -44,13 +47,16 @@
                               <a href="/{{ item.slug }}" class="link-servico">
                                 <div class="inner-link">
                                   {% if item.icon_classe %}
-                                  <i class="{{ item.icon_classe }} fa-2x mb-2"></i>
-                                  
+                                  <i class="{{ item.icon_classe }}"></i>
                                   {% endif %}
                                   <span class="font-weight-bold mb-auto">{{ item.titulo }}</span>
+
                                 </div>
                               </a>
                             </div>
+                            {% if user.is_superuser %}
+                              <a class="btn-edit-classe" href="{% url "cmj.sigad:subclasse_list" item.id %}"><i class="fas fa-edit"></i></a>
+                            {% endif %}
                           </div>
                         {% endif %}
                       {% endwith %}

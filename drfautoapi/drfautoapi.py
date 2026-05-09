@@ -323,7 +323,11 @@ class ApiViewSetConstrutor:
             )
 
             if SERIALIZER_MODULE:
-                modules = SERIALIZER_MODULE.split(",") if isinstance(SERIALIZER_MODULE, str) else SERIALIZER_MODULE
+                modules = (
+                    SERIALIZER_MODULE.split(",")
+                    if isinstance(SERIALIZER_MODULE, str)
+                    else SERIALIZER_MODULE
+                )
                 for ms in modules:
                     module = importlib.import_module(ms.strip())
                     imported_classes = inspect.getmembers(module)
@@ -338,7 +342,11 @@ class ApiViewSetConstrutor:
                     )
 
             if FILTER_MODULE:
-                modules = FILTER_MODULE.split(",") if isinstance(FILTER_MODULE, str) else FILTER_MODULE
+                modules = (
+                    FILTER_MODULE.split(",")
+                    if isinstance(FILTER_MODULE, str)
+                    else FILTER_MODULE
+                )
                 for mf in modules:
                     module = importlib.import_module(mf.strip())
                     imported_classes = inspect.getmembers(module)

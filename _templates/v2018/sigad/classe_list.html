@@ -1,5 +1,5 @@
 {% extends "crud/detail.html" %}
-{% load i18n common_cmj_tags %}
+{% load i18n common_cmj_tags common_tags %}
 {% block subtitle %}
 {{ block.super }}
 <nav aria-label="breadcrumb">
@@ -34,9 +34,9 @@
 
 {% block detail_content %}
 
-{% if object and object_list or not object and object_list%}
+  {% if object and object_list or not object and object_list%}
     <br>
-    <table class="table table-hover" width="100%">
+    <table class="table table-hover childs" width="100%">
         <caption></caption>
         <thead>
             <tr>
@@ -59,14 +59,48 @@
             {% endfor %}
         </tbody>
     </table>
+  {% endif %}
+
+{% if object and object.classes_referenciadas.qs_pntp.exists %}
+  <br>
+  <hr>
+  <h2>
+    Classe Referenciadas
+  </h2>
+  <table class="table table-hover referenciadas" width="100%">
+    <caption></caption>
+    <thead>
+        <tr>
+          <th>Slug</th>
+          <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'titulo' %}</th>
+          <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'visibilidade' %}</th>
+          <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'perfil' %}</th>
+          <th>{% fieldclass_verbose_name 'cmj.sigad.models.Classe' 'codigo' %}</th>
+          <th>Ordem</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for cref in object.referenciada_set.all %}
+          {% with cref.referenciada as referenciada %}
+          <tr data-id={{cref.id}}>
+            <td><a href="/{{referenciada.slug}}">Slug</a></td>
+            <td><a href="{% url 'cmj.sigad:subclasse_list' referenciada.pk %}">{{ referenciada.titulo }}</a></td>
+            <td>{{ referenciada.get_visibilidade_display }}</td>
+            <td>{{ referenciada.get_perfil_display }}</td>
+            <td>{{ referenciada.conta }}</td>
+            <td>{{ cref.ordem }}
+          </tr>
+          {% endwith %}
+        {% endfor %}
+    </tbody>
+  </table>
 {% endif %}
 
-  {% if object %}
+  {% if object and object.documento_set.all_docs.exists %}
       <br>
       <hr>
       <h2>
         Documentos da Classe {{object.nome}}<br>Conta: {{object.conta}}
-
       </h2>
       <table class="table table-hover" width="100%">
           <caption>Quantidade: {{object.documento_set.all_docs.count}}</caption>
@@ -90,5 +124,37 @@
 
   {% endif %}
 
-
 {% endblock %}
+
+{% block extra_js %}
+  <script type="text/javascript">
+    {% if user.is_superuser %} {# DJANGO template perms.sessao.add_ordemdia #}
+      $('.referenciadas tbody').sortable({
+        start: function(event, ui) {
+          ui.item.startPos = ui.item.index();
+        },
+        stop: function(event, ui) {
+          var pos_ini = ui.item.startPos;
+          var pos_fim = ui.item.index();
+          var pk_ref = ui.item[0].dataset.id
+
+          console.log(pos_ini, pos_fim)
+
+          fetch(
+            `/api/sigad/relacionamentoentreclasses/${pk_ref}/`, {
+              method: 'PATCH',
+              headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+            },
+              body: JSON.stringify({ordem: pos_fim})
+            }
+          ).then(response => response.json())
+          .catch(error => console.error('Error:', error));
+
+          setTimeout(function(){ window.location.reload(true) }, 500);
+        }
+      });
+    {% endif %}
+  </script>
+  {% endblock %}

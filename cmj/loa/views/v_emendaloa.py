@@ -823,7 +823,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia:
 
                 url = reverse_lazy("sapl.api:loa_emendaloa-view", kwargs={"pk": el.id})
-                link_pdf = f'<a href="{url}" target="_blank"><i class="far fa-2x fa-file-pdf"></i></a>'
+                link_pdf = f'<a href="{url}" target="_blank"><i class="fa-solid fa-file-pdf fa-2x "></i></a>'
 
                 """params = dict(
                     descricao=el.ementa_format,
@@ -870,7 +870,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     "data"
                 ).first()
                 if doc_acessorio:
-                    link_pdf = f'<a title="Acesse Impedimento Técnico" href="{doc_acessorio.arquivo.url}"><i class="far fa-2x fa-file-pdf"></i></a>'
+                    link_pdf = f'<a title="Acesse Impedimento Técnico" href="{doc_acessorio.arquivo.url}"><i class="fa-solid fa-file-pdf fa-2x "></i></a>'
                 return f"{fase_display}<br>{link_pdf}", args[2]
 
             return fase_display, args[2]
@@ -1481,7 +1481,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             return (
                 "Processo Legislativo da Emenda Impositiva",
                 f"""
-                Arquivo PDF: <a href="{el.materia.texto_original.url}" class="btn btn-link" title="Arquivo PDF da Emenda no Processo Legislativo"><i class="fas fa-file-pdf"></i></a>
+                Arquivo PDF: <a href="{el.materia.texto_original.url}" class="btn btn-link" title="Arquivo PDF da Emenda no Processo Legislativo"><i class="fa-solid fa-file-pdf "></i></a>
                 | Processo Legislativo: <a href="{reverse_lazy('sapl.materia:materialegislativa_detail', kwargs={'pk': el.materia.id})}">
                     {field_display}
                 </a>""",

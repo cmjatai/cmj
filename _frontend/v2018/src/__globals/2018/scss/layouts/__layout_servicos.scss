@@ -30,10 +30,20 @@
     font-family: "Roboto Condensed", Helvetica, sans-serif;
     justify-content: center;
 
+    .btn-edit-classe {
+      position: absolute;
+      top:0;
+      right: 0;
+      opacity: 0.5;
+      &:hover {
+        opacity: 1;
+      }
+    }
 
     & > [class*="col-"] {
       padding: 0;
       display: flex;
+      position: relative;
     }
 
     .inner-servico {
@@ -43,12 +53,15 @@
       margin: 1px;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: stretch;
     }
     .link-servico {
       width: 100%;
       padding: 1em 0.5rem;
       text-decoration: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
     .inner-link {
       display: flex;
@@ -57,6 +70,10 @@
       align-items: center;
       line-height: 1.2em;
       font-size: 0.8em;
+      gap: 0.7em;
+      i {
+        font-size: 1.8em;
+      }
 
       span {
         color: #777;

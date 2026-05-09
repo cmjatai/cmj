@@ -74,19 +74,19 @@ class ClasseForm(ModelForm):
         required=False,
     )
 
-    related_classes = forms.ModelMultipleChoiceField(
+    classes_referenciadas = forms.ModelMultipleChoiceField(
         queryset=Classe.objects.all(),
-        label=_("Classes Relacionadas"),
+        label=_("Classes Referenciadas"),
         required=False,
         widget=forms.SelectMultiple(
             attrs={
-                "title": "Selecione as Classes Relacionadas",
+                "title": "Selecione as Classes Referenciadas",
                 "class": "selectpicker w-100",
                 "data-actions-box": "true",
                 "data-select-all-text": "Selecionar Todos",
                 "data-deselect-all-text": "Desmarcar Todos",
                 "data-live-search": "true",
-                "data-header": "Classes Relacionadas",
+                "data-header": "Classes Referenciadas",
                 "data-dropup-auto": "false",
             }
         ),
@@ -118,7 +118,7 @@ class ClasseForm(ModelForm):
             "url_redirect",
             "col_in_inf",
             "styles",
-            "related_classes",
+            "classes_referenciadas",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -158,7 +158,7 @@ class ClasseForm(ModelForm):
                 ("menu_lateral", 2),
                 ("pntp", 2),
                 ("icon_classe", 2),
-                ("related_classes", 12),
+                ("classes_referenciadas", 12),
                 ("descricao", 12),
                 ("subtitle", 12),
                 ("styles", 12),
@@ -191,7 +191,7 @@ class ClasseForm(ModelForm):
 
         get_pc_order_by()
         self.fields["parent"].choices = pc
-        self.fields["related_classes"].choices = pc[1:]
+        self.fields["classes_referenciadas"].choices = pc[1:]
         # l = list(self.fields["parent"].choices)
 
         if self.instance.pk and isinstance(self.instance.metadata, dict):
@@ -220,11 +220,22 @@ class ClasseForm(ModelForm):
                     _("A classe não pode ser parente de um de seus descendentes.")
                 )
 
-        related_classes = cleaned_data.get("related_classes", [])
-        if self.instance.pk and self.instance in related_classes:
+        classes_referenciadas = cleaned_data.get("classes_referenciadas", [])
+        if self.instance.pk and self.instance in classes_referenciadas:
             raise forms.ValidationError(
-                _("A classe não pode ser relacionada a ela mesma.")
+                _("A classe não pode ser referenciada a ela mesma.")
             )
+
+        # Verificar se alguma das classes referenciadas é um descendente da instância para evitar ciclos
+        for classe in classes_referenciadas:
+            if is_descendant(self.instance, classe):
+                raise forms.ValidationError(
+                    _(
+                        "A classe não pode referenciar uma de suas classes descendentes: %s."
+                        % classe
+                    )
+                )
+
         return cleaned_data
 
     def save(self, commit=True):

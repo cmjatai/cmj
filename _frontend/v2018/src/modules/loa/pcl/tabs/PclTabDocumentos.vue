@@ -21,7 +21,7 @@
               target="_blank"
               rel="noopener"
             >
-              <i class="fas fa-file-pdf fa-sm"></i>
+              <i class="fa-solid fa-file-pdf  fa-sm"></i>
             </a>
             <small class="font-weight-bold">{{ doc.nome ? (doc.nome.__str__ || doc.nome) : '—' }}</small>
             <br>

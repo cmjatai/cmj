@@ -376,10 +376,10 @@ def app_pntp_content(classe_atual, categoria):
 
         order = "codigo"  # "titulo" if classe == classe_atual else "codigo"
 
-        for classe_relacionada in classe.related_classes.qs_pntp().order_by(order):
-            item_child = recursive_classes(classe_relacionada, classe)
+        for classe_referenciada in classe.classes_referenciadas.qs_pntp().order_by(order):
+            item_child = recursive_classes(classe_referenciada, classe)
             if item_child:
-                item["childs"].append(classe_relacionada.id)
+                item["childs"].append(classe_referenciada.id)
 
         for child in classe.childs.qs_pntp().order_by(order):
             item_child = recursive_classes(child, classe)
