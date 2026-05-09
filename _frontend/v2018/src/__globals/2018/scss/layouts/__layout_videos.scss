@@ -51,18 +51,19 @@
           position: absolute;
           width: 100%;
           height: 100%;
-          background-color: #0005;
-
+          background-color: transparent;
         }
 
         &:hover {
           .fa-play {
             color: #f5f5f5ff;
             border: .15rem solid rgba(white, 1);
+            zoom: 1.5;
+            transition: all 1s ease;
           }
 
           &::after {
-            background-color: transparent;
+            background-color: #0044;
           }
         }
       }
@@ -130,30 +131,37 @@
   }
 
   &.pagina-inicial {
-    // background: darken($color_main_bg, 10%) $url_bg_png;
+    background: darken($color_main_bg, 100%) $url_bg_png;
     ///min-height: 90vh;
     //margin: 1em 0 0;
     padding: 15px 0;
 
+    a, span {
+      color: #ccc !important;
+    }
+
     .title-container {
       padding: 0 1em;
       margin-bottom: 1.1em;
+      color: white;
+      border-bottom: 1px solid #777;
     }
 
     .video-list {
       margin: 0;
-      gap: 5px;
+      gap: 0.2em;
       justify-content: stretch;
       .item {
         flex: 1 1 24%;
         padding:0;
         margin: 0;
+
       }
     }
   }
 
   &.portlet-aovivo {
-    background: darken($color_main_bg, 10%) $url_bg_png;
+    background: darken($color_main_bg, 30%) $url_bg_png;
     padding: 1rem 0 1rem;
     //min-height: 70vmin;
     //min-height: calc(100vh - 100px);

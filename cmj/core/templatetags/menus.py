@@ -298,9 +298,28 @@ def resolve_urls_inplace(menu, pk, rm, context):
 
 
 @register.filter
+def get_item(dictionary, key):
+    if not isinstance(dictionary, dict):
+        return None
+    result = dictionary.get(key)
+    if result is None:
+        try:
+            result = dictionary.get(int(key))
+        except (ValueError, TypeError):
+            pass
+    return result
+
+
+@register.filter
 def app_pntp_content(classe_atual, categoria):
 
-    if not classe_atual or not isinstance(classe_atual, Classe):
+    if not classe_atual:
+        return ""
+
+    if not isinstance(classe_atual, Classe):
+        classe_atual = Classe.objects.filter(slug=classe_atual).first()
+
+    if not classe_atual:
         return ""
 
     if not classe_atual.pntp:

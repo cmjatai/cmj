@@ -4,7 +4,7 @@
 {% block main_container_class %}container{% endblock %}
 
 {% block head_content %}
-  {% cache 604800 portalcmj_transparencia %}{% endcache %}
+  {% comment %}{% cache 604800 portalcmj_transparencia %}{% endcache %}{% endcomment %}
   {% with request.GET.categoria|default:"" as categoria %}
     {% with object|app_pntp_content:categoria as pntp_data %}
       {{ pntp_data|json_script:"pntp-data" }}
@@ -13,9 +13,8 @@
 
 {% endblock %}
 
-{% block title %}
+{% block title %}{% endblock title %}
 
-{% endblock title %}
 {% block controls_content %}
   {% if perms.sigad.change_classe %}
     <a class="btn btn-outline-primary" href="{% url 'cmj.sigad:subclasse_list' object.id %}">{% trans "Admin" %}</a>
