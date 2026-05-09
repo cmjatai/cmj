@@ -15,9 +15,24 @@
     li {
       background-color: #fff;
       padding: 5px;
+      transition: all 0.3s ease;
+      &:first-child {
+        border-radius: 20px 0 0 20px;
+      }
+      &:last-child {
+        border-radius: 0 20px 20px 0;
+      }
+      &:active, &:link, &:visited, &:hover {
+        color: #fff;
+      }
     }
     li .active {
-      border-radius: 0px;
+      transition: all 0.3s ease;
+      border-radius: 15px;
+      box-shadow: 2px 2px 5px 0.5px rgba(0, 0, 0, 0.3);
+      &:hover {
+        color: #fff;
+      }
     }
   }
 
@@ -25,10 +40,13 @@
     padding-top: 1rem;
     margin-top: 1rem;
   }
+
   .row-servicos {
     overflow: hidden;
     font-family: "Roboto Condensed", Helvetica, sans-serif;
     justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
 
     .btn-edit-classe {
       position: absolute;
@@ -38,12 +56,6 @@
       &:hover {
         opacity: 1;
       }
-    }
-
-    & > [class*="col-"] {
-      padding: 0;
-      display: flex;
-      position: relative;
     }
 
     .inner-servico {
@@ -83,18 +95,36 @@
     .inner-servico {
       &:hover {
         background: darken($color_primary, 7%) $url_bg_png;
+        // box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+        box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
         span, i {
           color: #fff;
         }
       }
     }
   }
+  .col-servicos {
+    padding: 0;
+    display: flex;
+    position: relative;
+    width: 100%;
+  }
 }
 
-@media screen and (max-width: 991px) {
+@media screen and (max-width: 1199px) {
   .container-servicos {
     .title-container {
       float: none;
+    }
+    .row-servicos {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+}
+@media screen and (max-width: 767px) {
+  .container-servicos {
+    .row-servicos {
+      grid-template-columns: repeat(2, 1fr);
     }
   }
 }
