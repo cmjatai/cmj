@@ -23,7 +23,7 @@
                 <small>{{ parent_titulo }}</small>
               </span>
               <span class="icon-item">
-                <i :class="['fa', 'fa-lg', item.icon_classe || 'fa-info']"></i>
+                <i :class="[item.icon_classe || 'fa fa-lg fa-info']"></i>
               </span>
               <h6 class="pntp-list-item__titulo card-title mb-0">{{ item.titulo }}</h6>
               <i class="fa fa-chevron-right"></i>
