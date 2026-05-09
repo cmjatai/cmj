@@ -1,11 +1,81 @@
 .container-servicos {
-    .servico-card {
-        transition: box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+  margin-top: 1em;
+  padding-top: 1em;
+  padding-bottom: 2em;
+  background: darken($color_main_bg, 5%) $url_bg_png;
+  min-height: 65vh;
 
-        &:hover {
-            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
-            border-color: #adb5bd;
-            text-decoration: none;
-        }
+  .title-container {
+    float: left;
+  }
+
+  .nav {
+    margin-right: 0em;
+    flex-wrap: nowrap;
+    li {
+      background-color: #fff;
+      padding: 5px;
     }
+    li .active {
+      border-radius: 0px;
+    }
+  }
+
+  .servicos-tab-content {
+    padding-top: 1rem;
+    margin-top: 1rem;
+  }
+  .row-servicos {
+    overflow: hidden;
+    font-family: "Roboto Condensed", Helvetica, sans-serif;
+
+
+    & > [class*="col-"] {
+      padding: 0;
+      display: flex;
+    }
+
+    .inner-servico {
+      width: 100%;
+      min-height: 6em;
+      background: #fff;
+      margin: 1px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .link-servico {
+      width: 100%;
+      padding: 1em 0.5rem;
+      text-decoration: none;
+    }
+    .inner-link {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      line-height: 1.2em;
+      font-size: 0.8em;
+
+      span {
+        color: #777;
+      }
+    }
+
+    .inner-servico {
+      &:hover {
+        background: darken($color_primary, 7%) $url_bg_png;
+        span, i {
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 991px) {
+  .container-servicos {
+    .title-container {
+      float: none;
+    }
+  }
 }
