@@ -1,17 +1,36 @@
 .container-servicos {
-  margin-top: 1em;
+  // margin-top: 1em;
   padding-top: 1em;
-  padding-bottom: 2em;
-  background: darken($color_main_bg, 5%) $url_bg_png;
-  min-height: 65vh;
+  padding-bottom: 1em;
+  background: darken($color_main_bg, 7%) $url_bg_png;
+  .header-servicos {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 
   .title-container {
-    float: left;
+    min-width: auto;
+    padding-right: 1em;
+  }
+
+  .servicos-tab-content {
+    margin-top: 1em;
   }
 
   .nav {
+    margin-left: 1em;
     margin-right: 0em;
     flex-wrap: nowrap;
+    a {
+      text-decoration: none;
+      color: #777;
+      font-family: "Roboto Condensed", Helvetica, sans-serif;
+      font-size: 0.9em;
+      transition: all 0.3s ease;
+      padding: 0.1em 1em 0;
+    }
     li {
       background-color: #fff;
       padding: 5px;
@@ -29,16 +48,11 @@
     li .active {
       transition: all 0.3s ease;
       border-radius: 15px;
-      box-shadow: 2px 2px 5px 0.5px rgba(0, 0, 0, 0.3);
+      box-shadow: 1px 2px 5px 1px rgba(0, 0, 0, 0.3);
       &:hover {
         color: #fff;
       }
     }
-  }
-
-  .servicos-tab-content {
-    padding-top: 1rem;
-    margin-top: 1rem;
   }
 
   .row-servicos {
@@ -60,7 +74,6 @@
 
     .inner-servico {
       width: 100%;
-      min-height: 6em;
       background: #fff;
       margin: 1px;
       display: flex;
@@ -69,7 +82,7 @@
     }
     .link-servico {
       width: 100%;
-      padding: 1em 0.5rem;
+      padding: 0.7em 0.5em;
       text-decoration: none;
       display: flex;
       justify-content: center;
@@ -108,23 +121,80 @@
     display: flex;
     position: relative;
     width: 100%;
+    min-height: 5.4em;
   }
 }
 
+@media screen and (max-width: 1279px) {
+  .container-servicos {
+    .row-servicos {
+      grid-template-columns: repeat(6, 1fr);
+    }
+  }
+}
 @media screen and (max-width: 1199px) {
   .container-servicos {
-    .title-container {
-      float: none;
-    }
     .row-servicos {
       grid-template-columns: repeat(4, 1fr);
     }
   }
 }
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 991px) {
   .container-servicos {
     .row-servicos {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+}
+@media screen and (max-width: 767px) {
+  .container-servicos {
+
+    padding: 0.5em;
+    margin: 0;
+
+    .container {
+      padding: 0;
+    }
+
+    .row-servicos {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      justify-content: flex-start;
+      .col-servicos {
+        flex: 0 0 22vw;
+      }
+    }
+    .servicos-tab-content {
+      margin-top: 0.6em;
+    }
+  }
+}
+@media screen and (max-width: 480px) {
+  .container-servicos {
+    padding: 0.5em;
+    margin: 0;
+    .title-container {
+      padding-right: 0.3em;
+      font-size: 1.3em;
+      margin-bottom: 0.5em;
+    }
+    .container {
+      padding: 0;
+    }
+    .nav {
+      margin: 0;
+      a {
+        padding: 0.1em 0.5em 0.1em;
+      }
+    }
+    .row-servicos {
+      .col-servicos {
+        flex: 0 0 36vw;
+      }
+    }
+    .servicos-tab-content {
+      margin-top: 0.5em;
     }
   }
 }

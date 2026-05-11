@@ -1,36 +1,36 @@
 {% load i18n menus %}
 
 <div class="container-fluid container-servicos">
-
   <div class="container">
-    <h1 class="title-container ">Acesso Rápido aos Serviços CMJ</h1>
-
     {% with 'servicos'|app_pntp_content:'' as pntp_data %}
       {% if pntp_data %}
-        <ol class="nav nav-pills justify-content-end" id="servicosTabs" role="tablist">
-          {% for tab_id in pntp_data.root.childs %}
-            {% with tab=pntp_data.items|get_item:tab_id %}
-              {% if tab %}
-                <li class="nav-item d-flex">
-                  <a class="nav-link {% if forloop.first %}active{% endif %}"
-                    id="servicos-tab-{{ tab.id }}"
-                    data-toggle="tab"
-                    href="#servicos-pane-{{ tab.id }}"
-                    role="tab"
-                    aria-controls="servicos-pane-{{ tab.id }}"
-                    aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
-                    {% if tab.icon_classe %}<i class="{{ tab.icon_classe }} mr-1"></i>{% endif %}
-                    {{ tab.titulo }}
-                  </a>
-                  {% if user.is_superuser %}
-                    <a class="btn-edit-classe" href="{% url "cmj.sigad:subclasse_list" tab.id %}"><i class="fas fa-edit"></i></a>
-                  {% endif %}
-                </li>
-              {% endif %}
-            {% endwith %}
-          {% endfor %}
-        </ol>
-        <div class="tab-content servicos-tab-content pt-2" id="servicosTabContent">
+        <div class="header-servicos">
+          <h1 class="title-container ">Acesso Rápido aos Serviços CMJ</h1>
+          <ol class="nav nav-pills justify-content-end" id="servicosTabs" role="tablist">
+            {% for tab_id in pntp_data.root.childs %}
+              {% with tab=pntp_data.items|get_item:tab_id %}
+                {% if tab %}
+                  <li class="nav-item d-flex">
+                    <a class="nav-link {% if forloop.first %}active{% endif %}"
+                      id="servicos-tab-{{ tab.id }}"
+                      data-toggle="tab"
+                      href="#servicos-pane-{{ tab.id }}"
+                      role="tab"
+                      aria-controls="servicos-pane-{{ tab.id }}"
+                      aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">
+                      {% if tab.icon_classe %}<i class="{{ tab.icon_classe }} mr-1"></i>{% endif %}
+                      {{ tab.titulo }}
+                    </a>
+                    {% if user.is_superuser %}
+                      <a class="btn-edit-classe" href="{% url "cmj.sigad:subclasse_list" tab.id %}"><i class="fas fa-edit"></i></a>
+                    {% endif %}
+                  </li>
+                {% endif %}
+              {% endwith %}
+            {% endfor %}
+          </ol>
+        </div>
+        <div class="tab-content servicos-tab-content" id="servicosTabContent">
           {% for tab_id in pntp_data.root.childs %}
             {% with tab=pntp_data.items|get_item:tab_id %}
               {% if tab %}

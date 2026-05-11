@@ -134,7 +134,7 @@
     background: darken($color_main_bg, 100%) $url_bg_png;
     ///min-height: 90vh;
     //margin: 1em 0 0;
-    padding: 15px 0;
+    padding: 1em;
 
     a, span {
       color: #ccc !important;
@@ -281,7 +281,7 @@
 @media screen and (max-width: 575.98px) {
   .container-videos {
     &.pagina-inicial {
-      padding: 0;
+      padding: 0.5em;
 
       .video-list {
         .item {

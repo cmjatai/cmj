@@ -162,7 +162,9 @@
 
   .carousel-custom {
     .imagem {
-      height: 350px;
+      min-height: 50vh;
+      max-height: 55vh;
+
     }
   }
 }
