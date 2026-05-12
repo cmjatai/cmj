@@ -21,12 +21,9 @@
   {% endblock more_buttons %}
   </div>
 
-  {% if show_results %}
     {% with 'sapl.sessao:pesquisar_sessao' as url_reverse %}
       {% include "crud/format_options.html" %}
     {% endwith %}
-  {% endif %}
-
 
   <div class="actions btn-group btn-group-lg" role="group">
     {% if perms.sessao %}
@@ -40,7 +37,6 @@
 {% block table_content %}
   {% crispy filter.form %}
 
-  {% if show_results %}
 
     <div class="container-table">
       <div class="result-count">Total de Sessões: <strong>{{paginator.count}}</strong></div>
@@ -127,8 +123,6 @@
       {% include "paginacao.html" %}
 
     </div>
-  {% endif %}
-
     {% comment %}
 
     <br><br><br>

@@ -698,9 +698,6 @@ class NormaSearchForm(SearchForm):
     )
 
     def no_query_found(self):
-        if not self.data:
-            return super().no_query_found()
-
         return self.searchqueryset.order_by("-data_dt")
 
     def __init__(self, *args, **kwargs):

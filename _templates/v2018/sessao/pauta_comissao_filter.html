@@ -10,22 +10,15 @@
 
   {% block actions %}
 
-    {% if filter_url %}
       <div class="py-2">
         {% with 'sapl.sessao:pesquisar_comissao_pauta' as url_reverse %}
-        {% include "crud/format_options.html" %}
+          {% include "crud/format_options.html" %}
         {% endwith %}
       </div>
-    {% endif %}
   {% endblock %}
 
   {% crispy filter.form %}
 
-  {% if not filter_url %}
-  {% endif %}
-
-  {% if filter_url %}
-    <p></p>
     <table class="table table-striped table-hover">
       <thead class="thead-default">
         <tr>
@@ -60,5 +53,4 @@
       </tbody>
     </table>
     {% include "paginacao.html" %}
-  {% endif %}
 {% endblock base_content %}

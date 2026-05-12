@@ -6,11 +6,11 @@
   {% include "css/base_table.css" %}
 
   table {
-    font-size: 11pt;
+    font-size: 8pt;
     width: 196mm;
   }
   table td {
-    padding: 3px 7px;
+    padding: 2px 7px;
   }
   ul {
     padding-top: 0;
@@ -32,7 +32,13 @@
   <thead>
     <tr>
       {% for head in json_results.headers.items %}
-        <th>{{ head.1 }}</th>
+        {% if not head.1.1 %}
+        <th>{{ head.1.0 }}</th>
+        {% else %}
+          <th class="{{head.1.1}}">
+            {{head.1.0}}
+          </th>
+        {% endif %}
       {% endfor %}
     </tr>
   </thead>
@@ -40,17 +46,25 @@
     {% for row in json_results.results %}
       <tr>
         {% for field, value in row.items %}
-          <td>
-            {% if value|is_list %}
+        {% if value|is_list %}
+          <td class="">
               <ul>
                 {% for item in value %}
                   <li>{{ item|safe }}</li>
                 {% endfor %}
               </ul>
-            {% else %}
-              {{ value|safe }}
-            {% endif %}
           </td>
+        {% else %}
+          <td class="{{value.2}}">
+              {% if value.1 %}
+                <a class="{{value.2}}" href="{{value.1}}">
+                  {{value.0}}
+                </a>
+              {% else %}
+                {{ value.0|safe }}
+              {% endif %}
+              </td>
+        {% endif %}
         {% endfor %}
       </tr>
     {% endfor %}

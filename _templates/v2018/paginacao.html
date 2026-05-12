@@ -1,5 +1,5 @@
 {% if is_paginated %}
-  <nav class="nav-pagination {{ type_pagination|default:'pagination-sticky'}}">
+  <nav class="nav-pagination {{ type_pagination|default:'pagination-static'}}">
     <ul class="pagination justify-content-center">
       {% if page_obj.has_previous %}
         <li class="page-item">

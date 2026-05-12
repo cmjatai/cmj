@@ -3,7 +3,6 @@
 {% load common_cmj_tags highlight %}
 {% load common_tags sigad_filters  %}
 
-
 {% block title %}
   <h1 class="page-header bg-green text-white container-search" >
     Pesquisar Legislação Municipal - Atos Normativos
@@ -13,22 +12,35 @@
   </h1>
 {% endblock title %}
 
-{% block extra_actions %}
-  {% if show_results %}
-    {% with 'cmj.search:norma_haystack_search' as url_reverse %}
-      {% include "crud/format_options.html" %}
-    {% endwith %}
-  {% endif %}
-{% endblock %}
+{% block container_actions %}
+    {% if view.create_url %}
+      <div class="context-actions justify-content-between">
+        <div class="actions btn-group btn-group-sm" role="group">
+          <a href="{{ view.create_url }}" class="btn btn-outline-primary">
+             Adicionar Norma Jurídica
+          </a>
+        </div>
+      </div>
+    {% endif %}
+    {% endblock %}
 
-{% block extra_content %} {% endblock %}
-{% block detail_content %} {% endblock %}
+    {% block detail_content %} {% endblock %}
 
-{% block table_content %}
+    {% block table_content %}
 
-<div class="container-search">
-    {% include 'search/search_help_text.html' %}
-    {% crispy form %}
+    <div class="container-search">
+      {% include 'search/search_help_text.html' %}
+      {% crispy form %}
+      <div class="d-flex justify-content-between">
+        <div>
+          {{infofilter|safe|default:""}}
+        </div>
+        <div>
+          {% with 'cmj.search:norma_haystack_search' as url_reverse %}
+          {% include "crud/format_options.html" %}
+          {% endwith %}
+        </div>
+      </div>
 
     <div class="container-table">
       {% for result in page.object_list %}

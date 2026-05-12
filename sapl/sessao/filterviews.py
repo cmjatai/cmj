@@ -1,10 +1,12 @@
 import logging
 
 from crispy_forms.layout import Fieldset
+from django.conf import settings
 from django.contrib import messages
 from django.forms import ValidationError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.utils import formats
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from django_filters import ChoiceFilter, FilterSet
@@ -167,6 +169,8 @@ class PesquisarSessaoPlenariaView(
 
     viewname = "sapl.sessao:pesquisar_sessao"
 
+    formats_export = "csv", "xlsx", "json", "pdf"
+
     queryset_values_for_formats = {
         "csv": False,
         "xlsx": False,
@@ -174,31 +178,63 @@ class PesquisarSessaoPlenariaView(
         "pdf": False,
     }
 
-    fields_base_report = [
-        "id",
-        "data_inicio",
-        "hora_inicio",
-        "data_fim",
-        "hora_fim",
-        "",
-    ]
+    fields_base_report = ["id", "data_inicio", "data_fim", "__str__", "url"]
     fields_report = {
         "csv": fields_base_report,
         "xlsx": fields_base_report,
         "json": fields_base_report,
+        "pdf": fields_base_report[:-1],  # Remove 'url' do relatório em PDF
     }
 
-    def hook_header_(self):
+    detail_view = "sapl.sessao:sessaoplenaria_detail"
+
+    def hook_id(self, obj):
+        return (
+            obj.id,
+            reverse(self.detail_view, kwargs={"pk": obj.id}),
+            "",
+        )
+
+    def hook_header___str__(self):
         return force_str(_("Título"))
 
-    def hook_(self, obj):
-        return str(obj)
+    def hook_header_data_inicio(self):
+        return force_str(_("Data e Hora de Início")), "l3cm"
+
+    def hook_header_data_fim(self):
+        return force_str(_("Data e Hora de Fim")), "l3cm"
+
+    def hook___str__(self, obj):
+        return str(obj), ""
 
     def hook_data_inicio(self, obj):
-        return str(obj.data_inicio or "")
+        return (
+            "%s às %s"
+            % (
+                formats.date_format(obj.data_inicio, "SHORT_DATE_FORMAT"),
+                obj.hora_inicio if obj.data_inicio else "",
+            ),
+            "",
+            "text-center ",
+        )
 
     def hook_data_fim(self, obj):
-        return str(obj.data_fim or "")
+        return (
+            "%s às %s"
+            % (
+                formats.date_format(obj.data_fim, "SHORT_DATE_FORMAT"),
+                obj.hora_fim if obj.data_fim else "",
+            ),
+            "",
+            "text-center",
+        )
+
+    def hook_header_url(self):
+        return force_str(_("Link de Acesso")), ""
+
+    def hook_url(self, obj):
+        url_reverse = reverse(self.detail_view, kwargs={"pk": obj.pk})
+        return f"{settings.SITE_URL}{url_reverse}", ""
 
     def get_queryset(self):
         qs = FilterView.get_queryset(self)
@@ -238,13 +274,3 @@ class PesquisarSessaoPlenariaView(
         context["numero_res"] = len(self.object_list)
 
         return context
-
-    def get(self, request, *args, **kwargs):
-
-        r = super().get(request)
-
-        data = self.filterset.data
-        if not data:
-            return HttpResponseRedirect(reverse(self.viewname) + f"?pesquisar=")
-
-        return r

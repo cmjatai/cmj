@@ -34,3 +34,31 @@ td, th {
   /* break-inside: avoid; /* */
   /* page-break-inside: avoid; /* */
 }
+
+.l1cm {
+  width: 1cm;
+}
+.l2cm {
+  width: 2cm;
+}
+.l3cm {
+  width: 3cm;
+}
+.l4cm {
+  width: 4cm;
+}
+.l5cm {
+  width: 5cm;
+}
+.l6cm {
+  width: 6cm;
+}
+.l7cm {
+  width: 7cm;
+}
+.l8cm {
+  width: 8cm;
+}
+.l9cm {
+  width: 9cm;
+}

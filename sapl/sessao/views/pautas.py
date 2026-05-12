@@ -1,6 +1,5 @@
 from re import sub
 
-from django.conf import settings
 from django.http.response import HttpResponseRedirect
 from django.urls.base import reverse
 from django.utils.html import strip_tags
@@ -219,20 +218,15 @@ class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
 
     viewname = "sapl.sessao:pesquisar_pauta"
 
-    fields_base_report = [
-        "id",
-        "data_inicio",
-        "hora_inicio",
-        "data_fim",
-        "hora_fim",
-        "url_pauta",
-        "",
-    ]
+    detail_view = "sapl.sessao:pauta_sessao_detail"
+
+    fields_base_report = ["id", "data_inicio", "__str__", "url"]
 
     fields_report = {
         "csv": fields_base_report,
         "xlsx": fields_base_report,
         "json": fields_base_report,
+        "pdf": fields_base_report[:-1],  # Remove 'url' do relatório em PDF
     }
 
     def get_context_data(self, **kwargs):
@@ -241,13 +235,6 @@ class PesquisarPautaSessaoView(PesquisarSessaoPlenariaView):
         context["bg_title"] = ""
         return context
 
-    def hook_header_url_pauta(self):
-        return "Link para a Pauta"
-
-    def hook_url_pauta(self, obj):
-        url_reverse = reverse("sapl.sessao:pauta_sessao_detail", kwargs={"pk": obj.pk})
-        return f"{settings.SITE_URL}{url_reverse}"
-
 
 class PesquisarPautaComissaoView(PesquisarSessaoPlenariaView):
     filterset_class = PautaComissaoFilterSet
@@ -255,20 +242,15 @@ class PesquisarPautaComissaoView(PesquisarSessaoPlenariaView):
 
     viewname = "sapl.sessao:pesquisar_comissao_pauta"
 
-    fields_base_report = [
-        "id",
-        "data_inicio",
-        "hora_inicio",
-        "data_fim",
-        "hora_fim",
-        "url_pauta",
-        "",
-    ]
+    detail_view = "sapl.sessao:pauta_comissao_detail"
+
+    fields_base_report = ["id", "data_inicio", "__str__", "url"]
 
     fields_report = {
         "csv": fields_base_report,
         "xlsx": fields_base_report,
         "json": fields_base_report,
+        "pdf": fields_base_report[:-1],  # Remove 'url' do relatório em PDF
     }
 
     def get_context_data(self, **kwargs):
@@ -276,12 +258,3 @@ class PesquisarPautaComissaoView(PesquisarSessaoPlenariaView):
         context["title"] = _("Pesquisar Pauta das Comissões")
         context["bg_title"] = ""
         return context
-
-    def hook_header_url_pauta(self):
-        return "Link para a Pauta"
-
-    def hook_url_pauta(self, obj):
-        url_reverse = reverse(
-            "sapl.sessao:pauta_comissao_detail", kwargs={"pk": obj.pk}
-        )
-        return f"{settings.SITE_URL}{url_reverse}"

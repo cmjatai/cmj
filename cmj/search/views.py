@@ -103,9 +103,52 @@ class CmjSearchView(AudigLogFilterMixin, SearchView):
         return context
 
 
+class InfoFilterMixin:
+
+    def infofilter(self, data):
+        cd = self.form.cleaned_data if self.form.is_valid() else {}
+
+        filters = []
+
+        for k, v in cd.items():
+
+            if not v:
+                continue
+
+            if k in ("ordenacao", "tipo_listagem"):
+                continue
+
+            label = self.form.fields[k].label if k in self.form.fields else k
+
+            queryset = getattr(self.form.fields[k], "queryset", None)
+
+            if k == "autoria_is":
+                filtro = f"<strong>{label}:</strong> {Autor.objects.get(id=v).nome}"
+            elif queryset is not None:
+                if not isinstance(v, (list, tuple)):
+                    v = [v]
+                items = queryset.filter(id__in=v)
+                filtro = (
+                    f'<strong>{label}:</strong> {" / ".join([str(x) for x in items])}'
+                )
+            elif isinstance(v, bool):
+                filtro = f'<strong>{label}:</strong> {"Sim" if v else ("Não")}'
+            else:
+                filtro = f"<strong>{label}:</strong> {v}"
+
+            filters.append(filtro)
+
+        if filters:
+            filters.insert(0, "<strong>FILTROS APLICADOS</strong>")
+            filters.append("")
+
+        return "<br>".join(filters)
+
+
 class MateriaSearchView(
     AudigLogFilterMixin,
     MultiFormatOutputMixin,
+    InfoFilterMixin,
     SearchView,
 ):
     results_per_page = 20
@@ -201,42 +244,6 @@ class MateriaSearchView(
         context["filter_url"] = ("&" + data.urlencode()) if len(data) > 0 else ""
 
         return context
-
-    def infofilter(self, data):
-        cd = self.form.cleaned_data if self.form.is_valid() else {}
-
-        filters = []
-
-        for k, v in cd.items():
-
-            if not v:
-                continue
-
-            if k in ("ordenacao", "tipo_listagem"):
-                continue
-
-            label = self.form.fields[k].label if k in self.form.fields else k
-
-            if k == "autoria_is":
-                filtro = f"<strong>{label}:</strong> {Autor.objects.get(id=v).nome}"
-            elif isinstance(v, (list, tuple)):
-                filtro = f'<strong>{label}:</strong> {" / ".join([str(x) for x in v])}'
-            elif isinstance(v, bool):
-                filtro = f'<strong>{label}:</strong> {"Sim" if v else ("Não")}'
-            elif not isinstance(v, QuerySet):
-                filtro = f"<strong>{label}:</strong> {v}"
-            else:
-                items = self.form.fields[k].queryset.filter(id__in=v)
-                filtro = (
-                    f'<strong>{label}:</strong> {" / ".join([str(x) for x in items])}'
-                )
-            filters.append(filtro)
-
-        if filters:
-            filters.insert(0, "<strong>FILTROS APLICADOS</strong>")
-            filters.append("")
-
-        return "<br>".join(filters)
 
     def build_form(self, form_kwargs=None):
 
@@ -364,12 +371,23 @@ class MateriaSearchView(
 class NormaSearchView(
     AudigLogFilterMixin,
     MultiFormatOutputMixin,
+    InfoFilterMixin,
     SearchView,
 ):
     results_per_page = 50
     template = "search/normajuridica_search.html"
 
     model = NormaJuridica
+
+    formats_export = "csv", "xlsx", "json", "pdf"
+
+    queryset_values_for_formats = {
+        "csv": True,
+        "xlsx": True,
+        "json": True,
+        "pdf": False,
+    }
+
     fields_base_report = [
         "id",
         "ano",
@@ -383,6 +401,11 @@ class NormaSearchView(
         "csv": fields_base_report,
         "xlsx": fields_base_report,
         "json": fields_base_report,
+        "pdf": [
+            "ano",
+            "numero",
+            "epigrafe_ementa",
+        ],
     }
 
     def hook_header_texto_integral(self):
@@ -391,6 +414,15 @@ class NormaSearchView(
     def hook_texto_integral(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
         return f"{settings.SITE_URL}/norma/{id}"
+
+    def hook_header_epigrafe_ementa(self):
+        return force_str(_("Epígrafe / Ementa"))
+
+    def hook_epigrafe_ementa(self, obj):
+        html = f"""
+                <a href="{self.hook_texto_integral(obj)}">{obj.epigrafe}</a><br>
+                {obj.ementa}"""
+        return html
 
     def __call__(self, request):
         self.log(request)
@@ -426,6 +458,10 @@ class NormaSearchView(
         if self.searchqueryset is not None:
             kwargs["searchqueryset"] = self.searchqueryset
 
+        if data and "q" not in data:
+            data = data.copy()
+            data.update({"q": ""})
+
         return self.form_class(data, **kwargs)
 
     def urls(self):
@@ -447,6 +483,7 @@ class NormaSearchView(
         context["show_results"] = len(data) > 0
         context["view"] = self.urls()
 
+        context["infofilter"] = self.infofilter(data)
         if not data:
             del context["view"]["search_url"]
             return context

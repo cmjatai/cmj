@@ -9,21 +9,16 @@
 
 {% block base_content %}
   {% block actions %}
-    {% if  filter_url %}
       <div class="py-2">
         {% with 'sapl.sessao:pesquisar_pauta' as url_reverse %}
         {% include "crud/format_options.html" %}
         {% endwith %}
       </div>
-    {% endif %}
   {% endblock %}
 
   {% crispy filter.form %}
 
 
-
-  {% if filter_url %}
-    <p></p>
     <table class="table table-striped table-hover">
       <thead class="thead-default"><tr><td><h3>Resultados</h3></td></tr></thead>
       {% if page_obj|length %}
@@ -45,5 +40,4 @@
       {% endif %}
     </table>
     {% include "paginacao.html" %}
-  {% endif %}
 {% endblock base_content %}

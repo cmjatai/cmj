@@ -701,7 +701,7 @@ class MultiFormatOutputMixin:
         json_results = {
             "headers": dict(
                 map(
-                    lambda i, j: (i, j),
+                    lambda i, j: (i, j if isinstance(j, tuple) else (j,)),
                     self.fields_report[for_format],
                     self._headers(for_format),
                 )
@@ -743,22 +743,26 @@ class MultiFormatOutputMixin:
         ]
         for obj in object_list:
             wr = list(self._write_row(obj, "csv"))
-            if wr[0] != data[-1][0][0]:
+            if wr[0][0] != data[-1][0][0][0]:
                 data.append([wr])
             else:
                 data[-1].append(wr)
 
         for mri, multirows in enumerate(data):
-            if len(multirows) == 1:
-                writer.writerow(multirows[0])
+            if len(multirows[0]) == 1:
+                writer.writerow(multirows[0][0])
             else:
                 v = multirows[0]
                 for ri, cols in enumerate(multirows[1:]):
-                    for rc, cell in enumerate(cols):
+                    for rc, cell in enumerate(cols[0]):
                         if v[rc] != cell:
                             v[rc] = f"{v[rc]}\r\n{cell}"
 
-                writer.writerow(v)
+                row = list(
+                    map(lambda i: i[0] if isinstance(i, tuple) else i, multirows[0])
+                )
+
+                writer.writerow(row)
 
         return response
 
@@ -774,7 +778,7 @@ class MultiFormatOutputMixin:
         ]
         for obj in object_list:
             wr = list(self._write_row(obj, "xlsx"))
-            if wr[0] != data[-1][0][0]:
+            if wr[0][0] != data[-1][0][0][0]:
                 data.append([wr])
             else:
                 data[-1].append(wr)
@@ -785,18 +789,18 @@ class MultiFormatOutputMixin:
         ws = wb.add_worksheet()
 
         for mri, multirows in enumerate(data):
-            if len(multirows) == 1:
-                for rc, cell in enumerate(multirows[0]):
+            if len(multirows[0]) == 1:
+                for rc, cell in enumerate(multirows[0][0]):
                     ws.write(mri, rc, cell)
             else:
                 v = multirows[0]
                 for ri, cols in enumerate(multirows[1:]):
-                    for rc, cell in enumerate(cols):
+                    for rc, cell in enumerate(cols[0]):
                         if v[rc] != cell:
                             v[rc] = f"{v[rc]}\r\n{cell}"
 
                 for rc, cell in enumerate(v):
-                    ws.write(mri, rc, cell)
+                    ws.write(mri, rc, cell[0])
         ws.autofit()
         wb.close()
 
@@ -823,11 +827,14 @@ class MultiFormatOutputMixin:
 
             if hasattr(self, f"hook_{fname}"):
                 v = getattr(self, f"hook_{fname}")(obj)
-                yield v
+                if isinstance(v, (tuple, list)):
+                    yield v
+                else:
+                    yield (v, "", "")
                 continue
 
             if isinstance(obj, dict):
-                yield obj[fname]
+                yield (obj[fname], "", "")
                 continue
 
             fname = fname.split("__")
@@ -841,7 +848,7 @@ class MultiFormatOutputMixin:
                 if hasattr(v, "all"):
                     v = " - ".join(map(lambda x: str(x), v.all()))
 
-            yield v
+            yield (v, "", "")
 
     def _headers(self, format_result):
 
@@ -874,7 +881,7 @@ class MultiFormatOutputMixin:
                 verbose_name.append(vn.strip())
 
             verbose_name = "/".join(verbose_name).strip()
-            yield f"{verbose_name}"
+            yield (f"{verbose_name}", "")
 
     def render_to_pdf(self, context):
         base_url = self.request.build_absolute_uri()
