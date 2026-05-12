@@ -1,5 +1,3 @@
-import logging
-
 from django.conf import settings
 from django.contrib import messages
 from django.db.models.query import QuerySet
@@ -8,7 +6,6 @@ from django.http import HttpResponseRedirect
 from django.urls.base import reverse
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from haystack.models import SearchResult
 from haystack.views import SearchView
 
 from cmj.core.models import AreaTrabalho
@@ -198,6 +195,8 @@ class MateriaSearchView(
         paginator = context["paginator"]
         context["page_range"] = make_pagination(page.number, paginator.num_pages)
         context["is_paginated"] = True
+
+        context["path"] = f" materialegislativa-search"
 
         context["filter_url"] = ("&" + data.urlencode()) if len(data) > 0 else ""
 

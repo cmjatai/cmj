@@ -6,11 +6,7 @@
       bottom: -15px;
     }
   }
-}
-
-.container-search {
   .div-search {
-
     input {
       font-size: 2em;
       line-height: 1em;
@@ -32,7 +28,6 @@
   .form-group {
     padding-top: 1em;
   }
-
   .collapse {
     margin: 10px 0;
   }
@@ -42,8 +37,47 @@
     line-height: 1;
     padding: 5px 15px 3px;
   }
-}
 
+}
+.materialegislativa-search {
+  .context-actions {
+    margin: 0.5em 0;
+  }
+  .container-btn-exports {
+    border: 1px solid $color_border_input;
+  }
+  form {
+    margin: 0 0 0.5em;
+  }
+
+  .form-materia-result {
+    padding: 0 0.5em;
+    [class*="col-"] {
+      padding: 0 0.5em;
+    }
+    .text-blue {
+      display: none;
+    }
+    .form-group {
+      margin: 0.2em 0 0;
+      padding: 0em;
+      label {
+        margin: 0;
+      }
+    }
+    .div-search {
+      margin: 1.7em 0 0;
+      padding: 0;
+      input {
+        font-size: 1em;
+        line-height: 1em;
+      }
+    }
+  }
+}
+.ui-widget {
+  z-index: 10000 !important;
+}
 .bootstrap-select {
   width: 100% !important;
   border: 0;

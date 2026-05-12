@@ -5,24 +5,15 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Button, Div, Field, Fieldset, Layout
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.http.request import QueryDict
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from haystack.backends import SQ
 from haystack.forms import ModelSearchForm, SearchForm
-from haystack.inputs import Raw
-from haystack.models import SearchResult
-from haystack.query import EmptySearchQuerySet, SearchQuerySet
 from haystack.utils.app_loading import haystack_get_model
 
 from cmj.core.models import AreaTrabalho
-from cmj.utils import NONE_YES_NO_CHOICES
 from sapl.crispy_layout_mixin import to_row
 from sapl.materia.forms import (
-    CHOICE_TIPO_LISTAGEM,
     CHOICE_TRAMITACAO,
-    MateriaLegislativaFilterSet,
 )
 from sapl.materia.models import (
     AssuntoMateria,
@@ -319,6 +310,8 @@ class MateriaSearchForm(SearchForm):
 
     def __init__(self, *args, **kwargs):
 
+        data = args[0] if args and isinstance(args[0], QueryDict) else None
+
         q_field = Div(
             FieldWithButtons(
                 Field(
@@ -335,85 +328,172 @@ class MateriaSearchForm(SearchForm):
             ),
         )
 
-        row1 = to_row(
-            [
-                (
-                    HTML("""
-                <small class="text-blue">
-                  <strong>
-                    O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... <br>
-                    Clique na lupa após definir seus critérios de pesquisa.
-                  </strong>
-                </small>"""),
-                    12,
-                ),
-                (Div(), 1),
-                (q_field, 10),
-                (Div(), 1),
-                ("tipo_i", 7),
-                ("numero_i", 2),
-                (
-                    "ano_i",
-                    3,
-                ),
-            ]
-        )
-
-        row2 = to_row(
-            [
-                ("em_tramitacao_b", 3),
-                ("uta_i", 5),
-                ("sta_i", 4),
-            ]
-        )
-
-        row3 = to_row(
-            [
-                (
-                    Div(
-                        HTML(autor_label),
-                        HTML(autor_modal),
-                        to_row(
-                            [
-                                ("autoria_is", 0),
-                                (
-                                    Button(
-                                        "pesquisar",
-                                        "Selecionar Autor",
-                                        css_class="btn btn-secondary btn-sm mt-1 w-100",
-                                    ),
-                                    12,
-                                ),
-                                (
-                                    Button(
-                                        "limpar",
-                                        "Limpar Autor",
-                                        css_class="btn btn-secondary btn-sm mt-1 p-0 w-100",
-                                    ),
-                                    12,
-                                ),
-                            ],
-                            css_class="row flex-column",
-                        ),
-                        css_class="form-group",
+        if not data:
+            q_field = Div(
+                FieldWithButtons(
+                    Field(
+                        "q",
+                        placeholder=_("O que você procura? "),
+                        type="search",
                     ),
-                    4,
+                    StrictButton(
+                        '<i class="fas fa-2x fa-search"></i>',
+                        css_class="btn-outline-primary",
+                        type="submit",
+                    ),
+                    css_class="div-search",
                 ),
-                ("assuntos_is", 5),
-                ("ordenacao", 3),
-            ]
-        )
+            )
+
+            row1 = to_row(
+                [
+                    (
+                        HTML("""
+                    <small class="text-blue">
+                    <strong>
+                        O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... <br>
+                        Clique na lupa após definir seus critérios de pesquisa.
+                    </strong>
+                    </small>"""),
+                        12,
+                    ),
+                    (Div(), 1),
+                    (q_field, 10),
+                    (Div(), 1),
+                    ("tipo_i", 7),
+                    ("numero_i", 2),
+                    (
+                        "ano_i",
+                        3,
+                    ),
+                ]
+            )
+
+            row2 = to_row(
+                [
+                    ("em_tramitacao_b", 3),
+                    ("uta_i", 5),
+                    ("sta_i", 4),
+                ]
+            )
+
+            row3 = to_row(
+                [
+                    (
+                        Div(
+                            HTML(autor_label),
+                            HTML(autor_modal),
+                            to_row(
+                                [
+                                    ("autoria_is", 0),
+                                    (
+                                        Button(
+                                            "pesquisar",
+                                            "Selecionar Autor",
+                                            css_class="btn btn-secondary btn-sm mt-1 w-100",
+                                        ),
+                                        12,
+                                    ),
+                                    (
+                                        Button(
+                                            "limpar",
+                                            "Remover Autor",
+                                            css_class="btn btn-secondary btn-sm mt-1 p-0 w-100",
+                                        ),
+                                        12,
+                                    ),
+                                ],
+                                css_class="row flex-column",
+                            ),
+                            css_class="form-group",
+                        ),
+                        4,
+                    ),
+                    ("assuntos_is", 5),
+                    ("ordenacao", 3),
+                ]
+            )
+
+        else:
+
+            q_field = Div(
+                FieldWithButtons(
+                    Field(
+                        "q",
+                        placeholder=_("O que você procura? "),
+                        type="search",
+                    ),
+                    StrictButton(
+                        '<i class="fas fa-search"></i>',
+                        css_class="btn-outline-primary",
+                        type="submit",
+                    ),
+                    css_class="div-search",
+                ),
+            )
+
+            row1 = to_row(
+                [
+                    (q_field, 3),
+                    ("tipo_i", 4),
+                    ("numero_i", 1),
+                    (
+                        "ano_i",
+                        2,
+                    ),
+                    ("em_tramitacao_b", 2),
+                    (
+                        Div(
+                            HTML(autor_label),
+                            HTML(autor_modal),
+                            to_row(
+                                [
+                                    ("autoria_is", 12),
+                                    (
+                                        Button(
+                                            "pesquisar",
+                                            "Selecionar",
+                                            css_class="btn btn-secondary btn-sm p-0 w-100",
+                                        ),
+                                        6,
+                                    ),
+                                    (
+                                        Button(
+                                            "limpar",
+                                            "Remover",
+                                            css_class="btn btn-secondary btn-sm p-0 w-100",
+                                        ),
+                                        6,
+                                    ),
+                                ],
+                                css_class="row no-gutters",
+                            ),
+                            css_class="form-group",
+                        ),
+                        3,
+                    ),
+                    ("assuntos_is", 3),
+                    ("uta_i", 3),
+                    ("sta_i", 3),
+                ]
+            )
 
         self.helper = FormHelper()
         self.helper.form_method = "get"
         self.helper.attrs["role"] = "chart-global-filter"
         self.helper.attrs["data-chart-target"] = "materiasearchdashboard"
-        self.helper.layout = Layout(Fieldset("", row1, row2, row3))
+
+        if not data:
+            self.helper.layout = Layout(Fieldset("", row1, row2, row3))
+        else:
+            self.helper.layout = Layout(
+                Fieldset(
+                    "",
+                    row1,
+                )
+            )
 
         super().__init__(*args, **kwargs)
-
-        if self.data:
-            return
 
         self.fields["q"].label = ""
 

@@ -1,22 +1,27 @@
 {% load i18n common_cmj_tags %}
 
 
-<div class="d-md-flex justify-content-end">
-  <div class="actions btn-group btn-exports" role="group">
-    {% if 'csv' in formats_export and url_reverse %}
-      <a class="btn btn-success" href="{% url url_reverse %}?format=csv{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em CSV."><i class="fas fa-file-csv"></i></a>
-    {% endif %}
-    {% if 'xlsx' in formats_export and url_reverse %}
-      <a class="btn btn-success" href="{% url url_reverse %}?format=xlsx{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em XLSX."><i class="fas fa-file-excel"></i></a>
-    {% endif %}
-    {% if 'json' in formats_export and url_reverse %}
-      <a class="btn btn-success" href="{% url url_reverse %}?format=json{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em JSON."><i class="far fa-file-code"></i></a>
-    {% endif %}
-    {% if 'pdf' in formats_export and url_reverse %}
-      <a class="btn btn-success" href="{% url url_reverse %}?format=pdf{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em PDF."><i class="far fa-file-pdf"></i></a>
-    {% endif %}
-    {% if url_openapi and not request.GET.q %}
+  <div class="d-flex flex-column bg-white rounded-lg container-btn-exports">
+    <small><strong class="pl-2 pr-2">Exportar</strong></small>
+    <div class="actions btn-group btn-group-sm btn-exports pb-1 pl-1 pr-1" role="group">
+      {% if 'csv' in formats_export and url_reverse %}
+      <a class="btn btn-success" href="{% url url_reverse %}?format=csv{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em CSV.">
+        CSV</a>
+      {% endif %}
+      {% if 'xlsx' in formats_export and url_reverse %}
+      <a class="btn btn-success" href="{% url url_reverse %}?format=xlsx{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em XLSX.">
+        XLSX</a>
+      {% endif %}
+      {% if 'json' in formats_export and url_reverse %}
+      <a class="btn btn-success" href="{% url url_reverse %}?format=json{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em JSON.">
+        JSON</a>
+      {% endif %}
+      {% if 'pdf' in formats_export and url_reverse %}
+      <a class="btn btn-success" href="{% url url_reverse %}?format=pdf{{ filter_url }}" title="Download sem paginação do resultado da pesquisa em PDF.">
+        PDF</a>
+      {% endif %}
+      {% if url_openapi and not request.GET.q %}
       <a class="btn btn-success" href="{% url url_openapi %}?{{ request.GET.items|params_search_to_api }}" title="OpenAPI">OpenAPI</a>
-    {% endif %}
+      {% endif %}
+    </div>
   </div>
-</div>
