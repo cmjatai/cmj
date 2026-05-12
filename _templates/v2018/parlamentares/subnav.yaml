@@ -1,12 +1,15 @@
 {% load i18n %}
 - title: {% trans 'Parlamentar' %}
   url: sapl.parlamentares:parlamentar_detail
+  css_class_li: mr-2
 {% if object.parlamentar %}
-- title: {% trans 'Matérias' %}
+- title: {% trans 'Atividade Legislativa' %}
   url: /pesquisar/materia?autoria_is={{object.parlamentar.autor.first.id}}
+  css_class_li: mr-2
 {% else %}
 - title: {% trans 'Matérias' %}
   url: sapl.parlamentares:parlamentar_materias
+  css_class_li: mr-2
 {% endif %}
 - title: {% trans 'Comissões' %}
   url: sapl.parlamentares:participacao_parlamentar_list
