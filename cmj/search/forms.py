@@ -434,7 +434,6 @@ class MateriaSearchForm(SearchForm):
 
             row1 = to_row(
                 [
-                    (q_field, 3),
                     ("tipo_i", 4),
                     ("numero_i", 1),
                     (
@@ -475,6 +474,7 @@ class MateriaSearchForm(SearchForm):
                     ("assuntos_is", 3),
                     ("uta_i", 3),
                     ("sta_i", 3),
+                    (q_field, 3),
                 ]
             )
 

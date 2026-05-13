@@ -26,6 +26,10 @@ class _NormaJuridicaViewset(ResponseFileMixin):
         )
         return arcname
 
+    @action(detail=True)
+    def texto_integral(self, request, *args, **kwargs):
+        return self.response_file(request, *args, **kwargs)
+
     @action(detail=False, methods=["GET"])
     def destaques(self, request, *args, **kwargs):
         self.queryset = (
@@ -35,10 +39,6 @@ class _NormaJuridicaViewset(ResponseFileMixin):
         )
 
         return self.list(request, *args, **kwargs)
-
-    @action(detail=True)
-    def texto_integral(self, request, *args, **kwargs):
-        return self.response_file(request, *args, **kwargs)
 
 
 @customize(AnexoNormaJuridica)

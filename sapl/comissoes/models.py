@@ -10,6 +10,7 @@ from sapl.parlamentares.models import Parlamentar
 from sapl.utils import (
     YES_NO_CHOICES,
     OverwriteStorage,
+    PortalFileField,
     SaplGenericRelation,
     texto_upload_path,
 )
@@ -259,7 +260,7 @@ class Reuniao(models.Model):
         blank=True,
         verbose_name=_("URL do Arquivo de Vídeo (Formatos MP4 / FLV / WebM)"),
     )
-    upload_pauta = models.FileField(
+    upload_pauta = PortalFileField(
         blank=True,
         null=True,
         upload_to=pauta_upload_path,
@@ -267,7 +268,7 @@ class Reuniao(models.Model):
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt],
     )
-    upload_ata = models.FileField(
+    upload_ata = PortalFileField(
         blank=True,
         null=True,
         upload_to=ata_upload_path,
@@ -275,7 +276,7 @@ class Reuniao(models.Model):
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt],
     )
-    upload_anexo = models.FileField(
+    upload_anexo = PortalFileField(
         blank=True,
         null=True,
         upload_to=anexo_upload_path,
@@ -355,7 +356,7 @@ class DocumentoAcessorio(models.Model):
     autor = models.CharField(max_length=100, verbose_name=_("Autor"))
     ementa = models.TextField(blank=True, verbose_name=_("Ementa"))
     indexacao = models.TextField(blank=True)
-    arquivo = models.FileField(
+    arquivo = PortalFileField(
         blank=True,
         null=True,
         upload_to=anexo_upload_path,

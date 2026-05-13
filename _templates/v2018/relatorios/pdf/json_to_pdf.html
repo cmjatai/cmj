@@ -27,7 +27,6 @@
 {% endblock head_extra_css %}
 
 {% block body_content %}
-
 <table>
   <thead>
     <tr>
@@ -45,7 +44,7 @@
   <tbody>
     {% for row in json_results.results %}
       <tr>
-        {% for field, value in row.items %}
+        {% for value in row %}
         {% if value|is_list %}
           <td class="">
               <ul>

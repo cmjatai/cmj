@@ -674,29 +674,7 @@ class MultiFormatOutputMixin:
         data = []
         for obj in object_list:
             wr = list(self._write_row(obj, for_format))
-
-            if not data:
-                data.append([wr])
-                continue
-
-            if wr[0] != data[-1][0][0]:
-                data.append([wr])
-            else:
-                data[-1].append(wr)
-
-        for mri, multirows in enumerate(data):
-            if len(multirows) == 1:
-                v = multirows[0]
-            else:
-                v = multirows[0]
-                for ri, cols in enumerate(multirows[1:]):
-                    for rc, cell in enumerate(cols):
-                        if v[rc] != cell:
-                            v[rc] = f"{v[rc]}\r\n{cell}"
-
-            data[mri] = dict(
-                map(lambda i, j: (i, j), self.fields_report[for_format], v)
-            )
+            data.append(wr)
 
         json_results = {
             "headers": dict(

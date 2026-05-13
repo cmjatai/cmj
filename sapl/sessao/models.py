@@ -602,7 +602,7 @@ class AbstractOrador(models.Model):  # Oradores
     observacao = models.CharField(
         max_length=150, blank=True, verbose_name=_("Observação")
     )
-    upload_anexo = models.FileField(
+    upload_anexo = PortalFileField(
         blank=True,
         null=True,
         storage=OverwriteStorage(),
@@ -950,7 +950,7 @@ class JustificativaAusencia(models.Model):
         OrdemDia, blank=True, verbose_name=_("Matérias do Ordem do Dia")
     )
 
-    upload_anexo = models.FileField(
+    upload_anexo = PortalFileField(
         blank=True,
         null=True,
         storage=OverwriteStorage(),

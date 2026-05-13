@@ -7,7 +7,12 @@ from model_utils import Choices
 
 from cmj.utils_files import restringe_tipos_de_arquivo_txt
 from sapl.materia.models import MateriaLegislativa
-from sapl.utils import YES_NO_CHOICES, OverwriteStorage, texto_upload_path
+from sapl.utils import (
+    YES_NO_CHOICES,
+    OverwriteStorage,
+    PortalFileField,
+    texto_upload_path,
+)
 
 
 def get_audiencia_media_path(instance, subpath, filename):
@@ -108,7 +113,7 @@ class AudienciaPublica(models.Model):
         blank=True,
         verbose_name=_("URL Arquivo Vídeo (Formatos MP4 / FLV / WebM)"),
     )
-    upload_pauta = models.FileField(
+    upload_pauta = PortalFileField(
         blank=True,
         null=True,
         upload_to=pauta_upload_path,
@@ -116,7 +121,7 @@ class AudienciaPublica(models.Model):
         verbose_name=_("Pauta da Audiência Pública"),
         validators=[restringe_tipos_de_arquivo_txt],
     )
-    upload_ata = models.FileField(
+    upload_ata = PortalFileField(
         blank=True,
         null=True,
         upload_to=ata_upload_path,
@@ -124,7 +129,7 @@ class AudienciaPublica(models.Model):
         storage=OverwriteStorage(),
         validators=[restringe_tipos_de_arquivo_txt],
     )
-    upload_anexo = models.FileField(
+    upload_anexo = PortalFileField(
         blank=True,
         null=True,
         upload_to=anexo_upload_path,
@@ -197,7 +202,7 @@ class AnexoAudienciaPublica(models.Model):
     )
 
     audiencia = models.ForeignKey(AudienciaPublica, on_delete=models.PROTECT)
-    arquivo = models.FileField(
+    arquivo = PortalFileField(
         upload_to=texto_upload_path,
         storage=OverwriteStorage(),
         verbose_name=_("Arquivo"),
