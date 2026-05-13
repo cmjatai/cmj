@@ -369,19 +369,22 @@ class View(RelatorioMixin, TemplateView):
         mark1 = [
             "",
             "",
-            f"Jataí, {timezone.now().day} de {timezone.now().strftime('%B')} de {timezone.now().year}.",
+            "",  # data por extenso
             "",
             "",
         ]
 
         mark2 = [
-            f"##### Assinam Eletronicamente:",
-            f"* Simone Roveda - Controladora Interna",
-            f"* Leandro Roberto da Silva - DDE",
+            "<br>",
+            "<br>",
+            "<br>",
+            "<br>",
+            f"",  # nome
+            "Presidente",
         ]
 
         r = []
-        r.append(("\n".join(mark1), "col-md-12 text-right", "markdown"))
-        r.append(("\n".join(mark2), "col-md-12", "markdown"))
+        r.append(("\n".join(mark1), "col-md-12 text-right paragraph", "markdown"))
+        r.append(("\n".join(mark2), "col-md-12 text-center", "html"))
 
         return r
