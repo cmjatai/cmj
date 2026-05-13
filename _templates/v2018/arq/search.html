@@ -80,7 +80,7 @@
 
                 <div class="links-texto">
                   {% if arqdoc.arquivo %}
-                    <a class="link-texto" href="{{arqdoc.arquivo.url}}?u={% now "u"%}" title="Documento ArqDoc">
+                    <a class="link-texto" href="{{arqdoc.arquivo.url}}" title="Documento ArqDoc">
                       <i class="far fa-2x fa-file-{% if '.pdf' in arqdoc.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
                     </a>
                   {% endif %}

@@ -6,7 +6,7 @@
 
 <div class="links-texto">
   {% if object.arquivo %}
-    <a class="link-texto" href="{{object.arquivo.url}}?u={% now "u"%}" title="Texto Original">
+    <a class="link-texto" href="{{object.arquivo.url}}" title="Texto Original">
       <i class="far fa-2x fa-file-{% if '.pdf' in object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
     </a>
   {% endif %}
@@ -14,7 +14,7 @@
 
 
 <strong>
-  <a href="{% if perms.materia.change_documentoacessorio %}{% url "sapl.materia:documentoacessorio_detail" object.id %}{% else %}{{object.arquivo.url}}?u={% now "u"%}{% endif %}" >
+  <a href="{% if perms.materia.change_documentoacessorio %}{% url "sapl.materia:documentoacessorio_detail" object.id %}{% else %}{{object.arquivo.url}}{% endif %}" >
       {% if object.is_signed %}
         <i class="fas fa-1x fa-certificate" title="Documento possui versão com Assinatura Digital, entre nos detalhes do documento para abrir o Arquivo Original"></i>
       {% endif %}

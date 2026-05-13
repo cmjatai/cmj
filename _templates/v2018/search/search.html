@@ -75,7 +75,7 @@
                   {% with result.object as m %}
                     <div class="links-texto">
                       {% if m.texto_original %}
-                        <a class="link-texto" href="{{m.texto_original.url}}?u={% now "u"%}" title="Texto Original">
+                        <a class="link-texto" href="{{m.texto_original.url}}" title="Texto Original">
                           <i class="far fa-2x fa-file-{% if '.pdf' in m.texto_original.path %}pdf{% else %}archive{% endif %}"></i>
                         </a>
                       {% endif %}
@@ -127,7 +127,7 @@
                 {% elif result.model_name == 'documentoacessorio' %}
                   <div class="links-texto">
                     {% if result.object.arquivo %}
-                      <a class="link-texto" href="{{result.object.arquivo.url}}?u={% now "u"%}" title="Documento Acessório">
+                      <a class="link-texto" href="{{result.object.arquivo.url}}" title="Documento Acessório">
                         <i class="far fa-2x fa-file-{% if '.pdf' in result.object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
                       </a>
                     {% endif %}
@@ -147,7 +147,7 @@
                 {% elif result.model_name == 'diariooficial' %}
                     <div class="links-texto">
                       {% if result.object.arquivo %}
-                        <a class="link-texto" href="{{result.object.arquivo.url}}?u={% now "u"%}" title="Arquivo do Diários Oficial">
+                        <a class="link-texto" href="{{result.object.arquivo.url}}" title="Arquivo do Diários Oficial">
                           <i class="far fa-2x fa-file-{% if '.pdf' in result.object.arquivo.path %}pdf{% else %}archive{% endif %}"></i>
                         </a>
                       {% endif %}
@@ -169,7 +169,7 @@
 
                     <br><strong>Data:</strong> {{result.object.data_inicio}}
                     {% if result.object.upload_ata %}
-                      <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}?u={% now "u"%}">Clique aqui</a>
+                      <br><strong>Ata da Sessão:</strong><a href="{{result.object.upload_ata.url}}">Clique aqui</a>
                     {% endif %}
 
                 {% elif result.model_name == 'documento' %}
