@@ -118,10 +118,23 @@ services:
       - cmjdb18
       - cmjredis
       - cmjsolr
-    ports:
-      - "8001:80"
+    #ports:
+    #  - "8001:80"
     networks:
       - cmj-net
+  waf:
+    image: ghcr.io/coreruleset/coraza-crs:4.25.0-nginx-lts
+    ports:
+      - "8001:8080" # Ele vai escutar na porta 8001 do seu host
+    environment:
+      - BACKEND=http://cmj # Aponta para o nome do seu container Django interno
+      - PARANOIA=1
+      - EXECUTING_PARANOIA=1
+      - ENFORCE_BODYPROC_URLENCODED=1
+    networks:
+      - cmj-net
+    depends_on:
+      - cmj
 networks:
   cmj-net:
     name: cmj-net
