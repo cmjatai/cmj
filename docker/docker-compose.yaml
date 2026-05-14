@@ -118,19 +118,30 @@ services:
       - cmjdb18
       - cmjredis
       - cmjsolr
-    #ports:
-    #  - "8001:80"
+    # Sem exposição direta ao host — tráfego entra apenas via WAF
     networks:
       - cmj-net
   waf:
     image: ghcr.io/coreruleset/coraza-crs:4.25.0-nginx-lts
+    container_name: cmjwaf
+    restart: always
+    labels:
+      NAME: "cmjwaf"
+    # Host nginx (SSL) → :8001 → WAF (8080 interno) → cmj:80 (rede interna)
     ports:
-      - "8001:8080" # Ele vai escutar na porta 8001 do seu host
+      - "8001:8080"
     environment:
-      - BACKEND=http://cmj # Aponta para o nome do seu container Django interno
+      # URL completa obrigatória para o proxy reverso interno
+      - BACKEND=http://cmj:80
+      # Nível de paranoia das regras CRS (1=conservador, 4=agressivo)
       - PARANOIA=1
       - EXECUTING_PARANOIA=1
+      # Thresholds de anomalia (soma de scores antes de bloquear)
+      - ANOMALY_INBOUND=5
+      - ANOMALY_OUTBOUND=4
       - ENFORCE_BODYPROC_URLENCODED=1
+      # Métodos permitidos pela aplicação
+      - ALLOWED_METHODS=GET HEAD POST OPTIONS PUT PATCH DELETE
     networks:
       - cmj-net
     depends_on:
