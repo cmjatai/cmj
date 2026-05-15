@@ -537,14 +537,16 @@ def sessaoplenarias_futuras(limite=0):
 
     sessoes_da_semana = SessaoPlenaria.objects.filter(
         data_inicio__range=(inicio_semana, fim_semana),
-    ).order_by("data_inicio")
+    ).order_by("data_inicio", "hora_inicio", "id")
 
     sessoes_futuras = SessaoPlenaria.objects.filter(
         data_inicio__gt=fim_semana,
-    ).order_by("data_inicio")
+    ).order_by("data_inicio", "hora_inicio", "id")
 
     sessoes_futuras = list(sessoes_da_semana) + list(sessoes_futuras)
-    sessoes_futuras = sorted(sessoes_futuras, key=lambda x: x.data_inicio)
+    sessoes_futuras = sorted(
+        sessoes_futuras, key=lambda x: (x.data_inicio, x.hora_inicio, x.id)
+    )
 
     cache.set("portalcmj_sessoes_futuras", sessoes_futuras, 1800)
 
