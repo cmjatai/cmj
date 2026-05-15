@@ -23,6 +23,9 @@ class DisabledMiddleware:
 
         response = self.get_response(request)
 
+        if not request.user.is_authenticated and "u" in request.GET:
+            return HttpResponseForbidden()
+
         # Captura qualquer erro (4xx ou 5xx)
         # if response.status_code >= 400:
         #    msg = f"Status {response.status_code} em {request.path}"
