@@ -55,7 +55,12 @@ class ShortAdminCrud(Crud):
     ordered_list = False
 
     class BaseMixin(Crud.BaseMixin):
-        list_field_names = "url_short", "url_long", "created", "acessos_set", "qrcode"
+        list_field_names = (
+            "url_short",
+            "url_long",
+            "created",
+            "acessos_set",
+        )
 
         @property
         def update_url(self):
@@ -141,7 +146,7 @@ class ShortAdminCrud(Crud):
 
         def hook_url_short(self, obj):
             return (
-                "ShorLink",
+                "ShortLink",
                 """
                 <div class="text-center">
                     <a class="d-block" href="{}">{}</a>

@@ -2,7 +2,7 @@ import logging
 import re
 
 import yaml
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect
 from django.utils import timezone
 
@@ -24,7 +24,7 @@ class DisabledMiddleware:
         response = self.get_response(request)
 
         if not request.user.is_authenticated and "u" in request.GET:
-            return Http404()
+            return HttpResponse(status=444)
             # return HttpResponseForbidden()
 
         # Captura qualquer erro (4xx ou 5xx)

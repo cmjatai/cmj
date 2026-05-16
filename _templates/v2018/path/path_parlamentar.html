@@ -125,20 +125,7 @@
           {% dash_grid 'materiaparlamentardashboard' dashboard.dash_grids autoria_is=object.parlamentar.autor.first.id %}
 
           {{object.parlamentar.equipe|markdown|safe}}
-          <hr>
-          {% if object.parlamentar.composicaomesa_set.exists %}
-            {% with object.parlamentar as parlamentar %}
-              {% include "parlamentares/parlamentar_composicaomesa_widget.html" %}
-            {% endwith %}
-            <hr>
-          {% endif %}
 
-          {% if object.parlamentar.participacao_set.exists %}
-            {% with object.parlamentar as parlamentar %}
-              {% include "comissoes/parlamentar_participacao_widget.html" %}
-            {% endwith %}
-            <hr>
-          {% endif %}
 
           {% if object.parlamentar.biografia %}
             <div class="container-biografia">
@@ -150,6 +137,22 @@
               {{object.parlamentar.biografia|safe}}
             </div>
           {% endif %}
+
+          <hr>
+          {% if object.parlamentar.composicaomesa_set.exists and object.parlamentar.id != 7  %}
+            {% with object.parlamentar as parlamentar %}
+              {% include "parlamentares/parlamentar_composicaomesa_widget.html" %}
+            {% endwith %}
+            <hr>
+          {% endif %}
+
+          {% if object.parlamentar.participacao_set.exists and object.parlamentar.id != 7 %}
+            {% with object.parlamentar as parlamentar %}
+              {% include "comissoes/parlamentar_participacao_widget.html" %}
+            {% endwith %}
+            <hr>
+          {% endif %}
+
         </div>
         <div class="col-12 col-lg-7">
           {% with 0 as split_row %}

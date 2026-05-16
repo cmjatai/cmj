@@ -5,11 +5,14 @@
 
 {% block head_content %}
   {% comment %}{% cache 604800 portalcmj_transparencia %}{% endcache %}{% endcomment %}
-  {% with request.GET.categoria|default:"" as categoria %}
-    {% with object|app_pntp_content:categoria as pntp_data %}
-      {{ pntp_data|json_script:"pntp-data" }}
+   
+  {% cache 360 portalcmj_transparencia object.id %}
+    {% with request.GET.categoria|default:"" as categoria %}
+      {% with object|app_pntp_content:categoria as pntp_data %}
+        {{ pntp_data|json_script:"pntp-data" }}
+      {% endwith %}
     {% endwith %}
-  {% endwith %}
+  {% endcache %}
 
 {% endblock %}
 

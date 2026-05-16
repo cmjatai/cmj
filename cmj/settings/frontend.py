@@ -79,28 +79,35 @@ PROJECT_DIR_FRONTEND_2018 = PROJECT_DIR.child("_frontend").child(Fv2018)
 PROJECT_DIR_FRONTEND_2026 = PROJECT_DIR.child("_frontend").child(Fv6)
 
 FRONTEND_BRASAO_PATH = {
-    "32": PROJECT_DIR_FRONTEND_2018.child("public")
+    "32": PROJECT_DIR_FRONTEND_2018.child("src")
+    .child("assets")
     .child("brasao")
     .child("brasao_32.png"),
-    "64": PROJECT_DIR_FRONTEND_2018.child("public")
+    "64": PROJECT_DIR_FRONTEND_2018.child("src")
+    .child("assets")
     .child("brasao")
     .child("brasao_64.png"),
-    "128": PROJECT_DIR_FRONTEND_2018.child("public")
+    "128": PROJECT_DIR_FRONTEND_2018.child("src")
+    .child("assets")
     .child("brasao")
     .child("brasao_128.png"),
-    "256": PROJECT_DIR_FRONTEND_2018.child("public")
+    "256": PROJECT_DIR_FRONTEND_2018.child("src")
+    .child("assets")
     .child("brasao")
     .child("brasao_256.png"),
-    "512": PROJECT_DIR_FRONTEND_2018.child("public")
+    "512": PROJECT_DIR_FRONTEND_2018.child("src")
+    .child("assets")
     .child("brasao")
     .child("brasao_512.png"),
-    "1024": PROJECT_DIR_FRONTEND_2018.child("public")
+    "1024": PROJECT_DIR_FRONTEND_2018.child("src")
+    .child("assets")
     .child("brasao")
     .child("brasao_1024.png"),
 }
 
 FRONTEND_ESCOLA_PATH = {
-    "1024": PROJECT_DIR_FRONTEND_2018.child("public")
+    "1024": PROJECT_DIR_FRONTEND_2018.child("src")
+    .child("assets")
     .child("brasao")
     .child("escola_1024.png")
 }
