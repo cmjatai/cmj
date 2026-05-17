@@ -559,7 +559,7 @@ def get_breadcrumb_classes(context, request=None, response=None):
                 url_redirect__istartswith=path,
                 # pntp=False,
             )
-            .order_by("raiz__codigo", "codigo")
+            .order_by("-pntp", "raiz__codigo", "codigo")
         )
 
         full_redirects = list(
