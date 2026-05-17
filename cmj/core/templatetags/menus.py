@@ -22,24 +22,38 @@ def breadcrumb_function(context):
     try:
         if "breadcrumb_classes" in context:
             breadcrumb_classes = context.get("breadcrumb_classes", [])
-            # if breadcrumb_classes:
-            #    last = breadcrumb_classes[-1]
-            #    breadcrumb_classes = list(filter(
-            #        lambda x: not hasattr(x, 'perfil') or hasattr(
-            #            x, 'perfil') and x.perfil != CLASSE_REDIRECT_VIEWS,
-            #        breadcrumb_classes[:-1]))
-            #    breadcrumb_classes.append(last)
         else:
             get_breadcrumb_classes(context, request=context["request"])
             breadcrumb_classes = context.get("breadcrumb_classes", [])
+
         if breadcrumb_classes:
+            # Remove o último item se for um Documento que é capa de alguma
+            # Classe (reverse OneToOne). O hasattr retorna False quando a
+            # relação não existe, pois Django levanta RelatedObjectDoesNotExist
+            # (subclasse de AttributeError) ao acessar um reverse-OneToOne vazio.
             ult = breadcrumb_classes[-1]
             if isinstance(ult, Documento) and hasattr(ult, "capa"):
                 breadcrumb_classes = breadcrumb_classes[:-1]
+
+        # Classes com perfil CLASSE_REDIRECT_VIEWS são redirecionadores para
+        # views Django — não têm página própria e não devem ocupar posições
+        # intermediárias na trilha. O item final (página atual) é sempre mantido.
+        if len(breadcrumb_classes) > 1:
+            last = breadcrumb_classes[-1]
+            breadcrumb_classes = [
+                x
+                for x in breadcrumb_classes[:-1]
+                if not (
+                    hasattr(x, "perfil") and x.perfil == Classe.CLASSE_REDIRECT_VIEWS
+                )
+            ]
+            breadcrumb_classes.append(last)
+
         rcontext["classes"] = breadcrumb_classes
     except Exception as e:
         logger.error(f"Error in breadcrumb_function: {e}")
-    filter_classes = list(filter(lambda x: hasattr(x, "subtitle"), rcontext["classes"]))
+
+    filter_classes = [x for x in rcontext["classes"] if hasattr(x, "subtitle")]
     context.update(
         {"breadcrumb_subtitle": filter_classes[-1].subtitle if filter_classes else ""}
     )

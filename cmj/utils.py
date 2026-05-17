@@ -486,20 +486,26 @@ def get_breadcrumb_classes(context, request=None, response=None):
 
     from cmj.sigad.models import Classe, Documento
 
+    # Fix: head_title deve ser inicializado antes do bloco condicional para
+    # evitar NameError quando head_title_sufix já está presente no contexto.
+    head_title = ""
     try:
         head_title_sufix = context.get("head_title_sufix", "")
         if not head_title_sufix and "title" in context:
             title = context.get("title", "")
-            if "<" in title or ">" in title:
-                head_title = bs4(title, "html.parser").get_text()
+            if isinstance(title, str):
+                if "<" in title or ">" in title:
+                    head_title = bs4(title, "html.parser").get_text()
+                else:
+                    head_title = title
             else:
-                head_title = title
+                head_title = str(title)
         context.update(
             {
                 "head_title_sufix": head_title_sufix or head_title or "",
             }
         )
-    except:
+    except Exception:
         pass
 
     obj = context.get("object", None)
@@ -523,49 +529,57 @@ def get_breadcrumb_classes(context, request=None, response=None):
             return response
 
     path = request.path
-    paths = [("fpath", request.get_full_path())]
+    full_path = request.get_full_path()
 
-    if path != paths[0][1]:
-        paths.append(("path", path))
+    # Coleta candidatos de busca com deduplicação via set.
+    # paths contém tanto caminhos de URL quanto nomes de view,
+    # pois url_redirect suporta ambos os formatos.
+    seen_candidates = set()
+    paths = []
+
+    def _add_candidate(type_path, candidate):
+        if candidate and candidate not in seen_candidates:
+            seen_candidates.add(candidate)
+            paths.append((type_path, candidate))
+
+    _add_candidate("fpath", full_path)
+    _add_candidate("path", path)
 
     try:
         resolve_match = resolve(path)
-        view_master = str(resolve_match.view_name)
-        paths.append(("view_master", view_master))
-    except:
-        view_master = ""
+        _add_candidate("view_master", str(resolve_match.view_name))
+    except Exception:
+        pass
 
+    # Fix: a variável p era reutilizada como segmento E como subpath,
+    # e a checagem `p in paths` comparava string contra lista de tuplas.
+    # Agora percorre de trás para frente removendo o último segmento a cada
+    # iteração e deduplica via seen_candidates.
     path_parts = path.split("/")
-    for i, p in enumerate(path_parts):
-        if not p or p in paths:
+    for i in range(1, len(path_parts)):
+        sub_path = "/".join(path_parts[: len(path_parts) - i])
+        if not sub_path:
             continue
-
-        p = "/".join(path_parts[: len(path_parts) - i])
         try:
-            resolve_match = resolve(p)
-            view_slave = str(resolve_match.view_name)
-        except:
-            view_slave = ""
+            resolve_match = resolve(sub_path)
+            _add_candidate("view_slave", str(resolve_match.view_name))
+        except Exception:
+            pass
 
-        if not view_slave:
-            continue
-
-        paths.append(("view_slave", view_slave))
-
-    for type_path, path in paths:
+    for type_path, candidate in paths:
         classes_redirect = list(
             Classe.objects.qs_classes_publicas()
-            .filter(
-                url_redirect__istartswith=path,
-                # pntp=False,
+            .filter(url_redirect__istartswith=candidate)
+            .select_related(
+                "parent",
+                "parent__parent",
+                "parent__parent__parent",
+                "raiz",
             )
             .order_by("-pntp", "raiz__codigo", "codigo")
         )
 
-        full_redirects = list(
-            filter(lambda x: x.url_redirect == path, classes_redirect)
-        )
-        # full_redirects = sorted(full_redirects, key=lambda x: len(x.slug))
+        full_redirects = [x for x in classes_redirect if x.url_redirect == candidate]
 
         if full_redirects:
             classes_redirect = full_redirects
