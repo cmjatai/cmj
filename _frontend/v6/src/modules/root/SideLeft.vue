@@ -244,9 +244,6 @@ const closeOffCanvas = (selector) => {
     }
   }
 
-  .offcanvas-sidebar {
-  }
-
   .sidebar, .offcanvas-sidebar {
 
     .nav-item {
@@ -287,6 +284,22 @@ const closeOffCanvas = (selector) => {
       transition: all 0.2s;
       font-size: 1em;
       padding-right: 1em;
+    }
+  }
+
+  .offcanvas-sidebar {
+    z-index: 10000;
+    .offcanvas-body {
+      padding: 0;
+    }
+    .nav-link {
+      img {
+        width: 2em;
+        padding: 0;
+      }
+      svg {
+        width: 2em;
+      }
     }
   }
 </style>

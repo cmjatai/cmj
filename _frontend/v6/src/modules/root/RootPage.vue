@@ -2,7 +2,7 @@
   <root-layout>
     <template #header-left>
       <button
-        class="d-md-none"
+        class="d-md-none btn btn-link"
         type="button"
         data-bs-toggle="offcanvas"
         data-bs-target="#menuSideLeft"
