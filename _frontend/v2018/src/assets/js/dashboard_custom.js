@@ -96,9 +96,15 @@ $(function () {
     var form = $(item)
     // lê query string e aplica no filtro
     let qs = new URLSearchParams(window.location.search)
-    for (const [key, value] of qs.entries()) {
-      form.find(`[name="${key}"]`).val(value).trigger('change')
+    let processedKeys = new Set()
+    for (const key of qs.keys()) {
+      if (processedKeys.has(key)) continue
+      processedKeys.add(key)
+      let values = qs.getAll(key)
+      let field = form.find(`[name="${key}"]`)
+      field.val(values.length > 1 ? values : values[0]).trigger('change')
     }
+    form.find('select.selectpicker').selectpicker('refresh')
     plot_charts(form)
   })
 })
