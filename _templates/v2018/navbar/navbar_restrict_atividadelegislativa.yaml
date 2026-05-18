@@ -1,0 +1,27 @@
+{% load i18n common_cmj_tags %}
+- title: {% trans 'Atividade Legislativa' %}
+  children:
+  - title: {% trans 'Matérias Legislativas' %}
+    url: {% url 'cmj.search:materia_haystack_search' %}
+  - title: {% trans 'Orçamento Impositivo' %}
+    url: {% url 'cmj.loa:loa_list' %}
+  - title: {% trans 'Análise de Similaridade de Requerimentos' %}
+    url: {% url 'sapl.materia:analisesimilaridaderanking_list' %}?lm=50
+  - title: {% trans 'Sessões Plenárias' %}
+    url: {% url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}
+  - title: {% trans 'Pautas das Sessões' %}
+    url: sapl.sessao:pesquisar_pauta
+  - title: {% trans 'Pautas das Comissões' %}
+    url: sapl.sessao:pesquisar_comissao_pauta
+  - title: {% trans 'Votações' %}
+    url: sapl.sessao:votacoes_pesquisa
+  - title: {% trans 'Relatórios' %}
+    url: sapl.base:relatorios_list
+  - title: {% trans 'Sessão OnLine' %}
+    url: /v6/
+  - title: {% trans 'Tramitação em Lote' %}
+    url: sapl.materia:primeira_tramitacao_em_lote
+    check_permission: materia.change_tramitacao {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}
+  - title: {% trans 'Excluir Tramitação em Lote' %}
+    url: sapl.materia:excluir_tramitacao_em_lote
+    check_permission: materia.change_tramitacao {% comment %} FIXME transformar para checagens de menu_[funcionalidade]{% endcomment%}

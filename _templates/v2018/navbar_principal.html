@@ -11,9 +11,9 @@
         {% sigad_navbar 'list_in_menu' %}
 
         {% if user.is_superuser %}
-          {% navbar 'navbar2/navbar_superuser.yaml' %}
+          {% navbar 'navbar/navbar_superuser.yaml' %}
         {% elif not user.is_anonymous and not user.is_only_socialuser %}
-          {% navbar 'navbar2/navbar_restrict.yaml' %}
+          {% navbar 'navbar/navbar_restrict.yaml' %}
         {% endif %}
       </ul>
 
