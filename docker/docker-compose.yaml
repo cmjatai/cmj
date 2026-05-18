@@ -60,23 +60,6 @@ services:
     #  - "8983:8983"
     networks:
       - cmj-net
-  cmjdb:
-    image: pgvector/pgvector:0.8.1-pg15  #postgres:14.5-alpine
-    restart: always
-    container_name: cmjpostgres
-    labels:
-        NAME: "cmjpostgres"
-    environment:
-      POSTGRES_PASSWORD: cmj
-      POSTGRES_USER: cmj
-      POSTGRES_DB: cmj
-      PGDATA : /var/lib/postgresql/data/
-    volumes:
-      - cmjdb15_data:/var/lib/postgresql/data/
-    #ports:
-    #  - "5432:5432"
-    networks:
-      - cmj-net
   cmjdb18:
     image: pgvector/pgvector:0.8.2-pg18-bookworm
     restart: always

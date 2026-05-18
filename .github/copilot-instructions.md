@@ -1,61 +1,42 @@
 # GitHub Copilot Instructions for CMJ Portal
 
-## Architecture Overview
+Django system for the Câmara Municipal de Jataí (CMJ). Two backend packages (`cmj/`, `sapl/`) + dual Vue frontend.
 
-This project is a complex Django-based system for the "Câmara Municipal de Jataí" (CMJ). It consists of two main backend components and a dual-stack frontend.
+## Commands
 
-### Backend Components
-- **`cmj/` (Portal):** The main Django project containing modern apps (`agenda`, `ouvidoria`, `diarios`, etc.) and project configuration.
-- **`sapl/` (Legislative Core):** A massive, legacy-heavy application handling legislative processes (`materia`, `sessao`, `norma`, `parlamentares`). This is the core business logic.
-- **Integration:** `sapl` is integrated as a folder within the workspace but functions like a standalone app suite.
+| Task | Command |
+|------|---------|
+| Start dev env | `./ddev.sh` |
+| Run tests | `pytest` (config in `pyproject.toml`) |
+| Frontend v6 dev | `cd _frontend/v6 && yarn dev` (Vite, port 5173) |
+| Frontend v2018 dev | `cd _frontend/v2018 && yarn serve` (Webpack, port 8080) |
 
-### Frontend Architecture
-The project maintains two co-existing frontend stacks in `_frontend/`:
-1.  **`v6` (Modern):** Vue 3, Vite, Pinia, Bootstrap 5. Used for new features and gradual migration.
-2.  **`v2018` (Legacy):** Vue 2, Webpack, Bootstrap 4. Contains the bulk of existing UI logic.
+- Tests use `--no-migrations --reuse-db`; settings: `cmj/settings/fake.py`
+- Notebooks: use `django_setup.py` to initialize Django (`__notebooks/`, `__notebooks_private/`)
 
-**Guideline:** When implementing new UI features, prefer **`v6`** (Vue 3). Only touch `v2018` for maintenance of legacy views.
+## Architecture
 
-## Development Workflow
+### Backend
+- **`cmj/`** — Portal apps: `agenda`, `arq`, `cerimonial`, `core`, `dashboard`, `diarios`, `loa`, `ouvidoria`, `painelset`, `search`, `sigad`, `videos`
+- **`sapl/`** — Legislative core (legacy-heavy): `materia`, `sessao`, `norma`, `parlamentares`, `compilacao`, `comissoes`, `audiencia`, `base`, `painel`, `protocoloadm`
+- URLs: `cmj/urls.py` aggregates all routes; `sapl` prefixed at `/sapl/`
 
-### Environment Management
-- **Entry Point:** `ddev.sh` is the primary script for managing the dev environment.
-    - Usage: `./ddev.sh` (starts/restarts services).
-    - It wraps `docker compose -f docker/docker-compose-dev.yaml`.
-- **Docker Services:**
-    - `cmjredis`: Redis for caching and Celery.
-    - `cmjsolr`: Solr 9.5 for search indexing.
-    - `cmjfront2018` & `cmjfront2026`: Frontend dev servers.
+### Frontend (`_frontend/`)
+- **`v6/`** ← **Prefer for new features**: Vue 3, Vite, Pinia, Bootstrap 5
+- **`v2018/`** — Maintenance only: Vue 2, Webpack, Bootstrap 4
+- Built assets served from `collected_static/`; Django templates act as shell for Vue apps
 
-### Jupyter Notebooks
-- **Location:** `__notebooks/` and `__notebooks_private/`.
-- **Usage:** Heavily used for data migration, analysis, prototyping, and one-off scripts.
-- **Pattern:** Use `django_setup.py` in notebooks to initialize the Django environment.
+## Configuration
 
-## Configuration & Settings
+- Settings split across `cmj/settings/`: `project.py` (entry point), `apps.py`, `drf.py`, `auth.py`, `middleware.py`, `email.py`, `medias.py`, `fake.py` (tests)
+- Env vars via `python-decouple` → `security.json`
 
-- **Modular Settings:** Settings are NOT in a single `settings.py`. They are split into modules in `cmj/settings/`:
-    - `project.py`: Main entry point, imports others.
-    - `apps.py`: `INSTALLED_APPS` definition.
-    - `drf.py`: Django Rest Framework settings.
-- **Environment Variables:** Uses `python-decouple`. See `security.json` or `.env` (if present) for keys like `SECRET_KEY`, `DEBUG`.
+## Key Patterns
 
-## Key Patterns & Conventions
-
-### Search (Solr)
-- **Haystack:** Used for Solr integration (`cmj/haystack.py`).
-- **Indexing:** `sapl` content is heavily indexed. Check `search_indexes.py` in apps to understand what data is searchable.
-
-### API
-- **DRF:** Django Rest Framework is used (`cmj/api/`, `sapl/api/`).
-- **URLs:** `cmj/urls.py` aggregates routes. `sapl` URLs are included via `re_path(r'^sapl/', include(...))`.
-
-### Frontend Integration
-- Frontend assets are built from `_frontend/` and collected into `collected_static/`.
-- Django templates often serve as the entry point (shell) for Vue apps.
-
-## Critical Files
-- `ddev.sh`: Dev environment controller.
-- `cmj/settings/project.py`: Main settings aggregator.
-- `docker/docker-compose-dev.yaml`: Service definition.
-- `cmj/urls.py`: Main URL routing.
+- **CRUD base classes**: `sapl/crud/` — used across sapl apps
+- **Search**: Haystack + Solr (`cmj/haystack.py`); check `search_indexes.py` per app
+- **API**: DRF in `cmj/api/` and `sapl/api/`
+- **PDF reports**: `cmj/utils_report.py`
+- **Form layouts**: `sapl/crispy_layout_mixin.py`
+- **Frontend stores** (v6): `SyncStore` (data cache + WebSocket), `AuthStore`, `MessageStore` — see [`/memories/repo/v6_frontend_patterns.md`](/memories/repo/v6_frontend_patterns.md)
+- **Test infrastructure details**: see [`/memories/repo/test_infrastructure.md`](/memories/repo/test_infrastructure.md)
