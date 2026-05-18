@@ -238,6 +238,7 @@ class MateriaSearchForm(SearchForm):
                 "data-actions-box": "true",
                 "data-select-all-text": "Selecionar Todos",
                 "data-deselect-all-text": "Desmarcar Todos",
+                "data-live-search": "true",
                 "data-dropup-auto": "false",
             }
         ),
@@ -480,10 +481,10 @@ class MateriaSearchForm(SearchForm):
 
         self.helper = FormHelper()
         self.helper.form_method = "get"
-        self.helper.attrs["role"] = "chart-global-filter"
-        self.helper.attrs["data-chart-target"] = "materiasearchdashboard"
 
         if not data:
+            self.helper.attrs["role"] = "chart-global-filter"
+            self.helper.attrs["data-chart-target"] = "materiasearchdashboard"
             self.helper.layout = Layout(Fieldset("", row1, row2, row3))
         else:
             self.helper.layout = Layout(
@@ -521,7 +522,7 @@ class MateriaSearchForm(SearchForm):
         for g, items in grupo_choices.items():
             choices.append(
                 (
-                    " ",
+                    g,
                     items,
                 )
             )
