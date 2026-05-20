@@ -7,6 +7,14 @@
   url: sapl.materia:proposicao_list
   check_permission: materia.add_proposicao
 
+- title: {% trans 'Protocolo' %}
+  url: sapl.protocoloadm:protocolo
+  check_permission: protocoloadm.list_protocolo
+
+- title: {% trans 'Receber Proposições' %}
+  url: sapl.materia:proposicao-pendente
+  check_permission: protocoloadm.list_protocolo
+
 - title: {% trans 'Controle de Paineis e Eventos' %}
   url: cmj.painelset:evento_list
   check_permission: painelset.add_evento
