@@ -9,7 +9,7 @@ $(function () {
     let href = event.currentTarget.getAttribute('href')
 
     window.setCookie('popup_closed', '1', 0.006944444) // Caso o usuário clique em um popup, fica 10min sem mostrar popups
-    window.setCookie(`popup_viewed_${pk}`, pk, 1.1) // Caso o usuário clique em um popup, fica 2h24min sem mostrar esse popup
+    window.setCookie(`popup_viewed_${pk}`, pk, 1.1) // Caso o usuário clique em um popup, fica 26.4h sem mostrar o mesmo popup
 
     setTimeout(() => {
       document.location = `${href}?popup=1`
