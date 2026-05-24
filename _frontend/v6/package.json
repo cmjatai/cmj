@@ -1,6 +1,6 @@
 {
   "name": "portalcmj-plenario-frontend",
-  "version": "v6.26.05.06.1",
+  "version": "v6.26.05.24.1",
   "type": "module",
   "description": "CMJ Frontend Plenario Project",
   "author": "Leandro Roberto <leandroroberto.br@gmail.com>",
@@ -29,7 +29,7 @@
     "jquery": "^3.7.1",
     "jquery-mask-plugin": "^1.14.16",
     "js-yaml": "^4.1.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "markdown-it": "^14.1.0",
     "markdown-it-abbr": "^2.0.0",
     "markdown-it-anchor": "^9.2.0",
@@ -41,7 +41,7 @@
     "markdown-it-toc-done-right": "^4.2.0",
     "pinia": "^3.0.3",
     "split.js": "^1.6.5",
-    "vue": "^3.5.24",
+    "vue": "^3.5.34",
     "vue-chartjs": "^5.3.3",
     "vue-json-pretty": "^2.6.0",
     "vue-router": "^4.6.3"
