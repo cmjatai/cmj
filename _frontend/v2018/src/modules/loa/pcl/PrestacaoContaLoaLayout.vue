@@ -479,7 +479,7 @@ export default {
             exclude: 'search;metadata',
             include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
             expand: 'parlamentares;unidade;materia;entidade',
-            page_size: 20,
+            page_size: 25,
             situacao: this.filters_value.situacao.join(',')
           }
           if (
@@ -516,7 +516,7 @@ export default {
             include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
             expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
             o: 'parlamentares_valor__nome_parlamentar',
-            page_size: 20
+            page_size: 25
           }
           if (
             this.filters_value.unidade &&
