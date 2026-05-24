@@ -38,6 +38,25 @@
       </div>
     </div>
 
+    <div class="row mx-0 mb-1" v-if="permissionEdit && mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
+      <div class="col-md-3 text-center py-1 border-right">
+        <small class="text-muted d-block">Empenhado</small>
+        <strong class="text-primary">R$ {{ formatCurrency(totalEmpenhado) }}</strong>
+      </div>
+      <div class="col-md-3 text-center py-1 border-right">
+        <small class="text-muted d-block">Liquidado</small>
+        <strong class="text-info">R$ {{ formatCurrency(totalLiquidado) }}</strong>
+      </div>
+      <div class="col-md-3 text-center py-1 border-right">
+        <small class="text-muted d-block">Pago</small>
+        <strong class="text-success">R$ {{ formatCurrency(totalPago) }}</strong>
+      </div>
+      <div class="col-md-3 text-center py-1">
+        <small class="text-muted d-block">Anulado</small>
+        <strong class="text-danger">R$ {{ formatCurrency(totalAnulado) }}</strong>
+      </div>
+    </div>
+
     <div class="grupos-row d-none flex-wrap justify-content-center">
       <div
         v-for="g in grupos"
@@ -67,9 +86,14 @@ export default {
   name: 'pcl-totalizacao',
   props: {
     lista: { type: Array, default: () => [] },
-    parlamentarSelecionado: { type: Object, default: null }
+    parlamentarSelecionado: { type: Object, default: null },
+    loasChoice: { type: Array, default: () => [] },
+    selectedLoaIds: { type: Array, default: () => [] }
   },
   computed: {
+    permissionEdit () {
+      return this.permissions.includes('loa.change_empenho')
+    },
     totalGeral () {
       return this.lista
         .filter(item => item.tipo !== 0)
@@ -91,6 +115,25 @@ export default {
       return this.lista
         .filter(item => item.tipo === 0)
         .reduce((sum, item) => sum + Number(this.valorEfetivo(item)), 0)
+    },
+    mostrarExecucao () {
+      if (!this.loasChoice.length || !this.selectedLoaIds.length) return true
+      return this.selectedLoaIds.every(id => {
+        const loa = this.loasChoice.find(l => l.value === id)
+        return loa ? Number(loa.text) >= 2026 : true
+      })
+    },
+    totalEmpenhado () {
+      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_empenhado || 0), 0)
+    },
+    totalLiquidado () {
+      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_liquidado || 0), 0)
+    },
+    totalPago () {
+      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_pago_bruto || 0), 0)
+    },
+    totalAnulado () {
+      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_anulado || 0), 0)
     },
     grupos () {
       const map = {}
