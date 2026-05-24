@@ -513,7 +513,7 @@ def valor_abs_str(valor):
 
 
 @register.filter
-def sessaoplenarias_futuras(limite=0):
+def sessaoplenaria_semanal(limite=0):
 
     sessoes_futuras = cache.get("portalcmj_c_sessoes_futuras")
 
@@ -554,3 +554,37 @@ def sessaoplenarias_futuras(limite=0):
         sessoes_futuras = list(sessoes_futuras[:limite])
 
     return sessoes_futuras
+
+@register.filter
+def sessaoplenaria_quinzena(limite=0):
+
+    sessoes_quinzena = cache.get("portalcmj_c_sessoes_quinzena")
+
+    if sessoes_quinzena is not None:
+        if limite > 0:
+            return sessoes_quinzena[:limite]
+        return sessoes_quinzena
+
+    hoje = timezone.localdate()
+
+    # se dia de hoje for menor ou igual a 15, busca as sessões plenárias do dia 1 ao dia 15 do mês atual, caso contrário, busca as sessões plenárias do dia 16 ao dia 30 do mês atual
+    if hoje.day <= 15:
+        inicio_quinzena = hoje.replace(day=1)
+        fim_quinzena = hoje.replace(day=15)
+    else:
+        inicio_quinzena = hoje.replace(day=16)
+        fim_quinzena = inicio_quinzena + timedelta(days=16)
+        fim_quinzena = fim_quinzena.replace(day=1) - timedelta(days=1)
+
+
+
+    sessoes_quinzena = SessaoPlenaria.objects.filter(
+        data_inicio__range=(inicio_quinzena, fim_quinzena),
+    ).order_by("data_inicio", "hora_inicio", "id")
+
+    cache.set("portalcmj_c_sessoes_quinzena", sessoes_quinzena, 1800)
+
+    if limite > 0:
+        sessoes_quinzena = list(sessoes_quinzena[:limite])
+
+    return sessoes_quinzena
