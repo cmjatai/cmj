@@ -27,6 +27,8 @@
         v-if="emendas_ajustes_list.length"
         :lista="emendas_ajustes_list"
         :parlamentar-selecionado="filters_value.parlamentares"
+        :loas-choice="loas_choice"
+        :selected-loa-ids="selected_loa_ids"
         class="mt-3"
       />
 
