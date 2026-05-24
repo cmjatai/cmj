@@ -15,6 +15,7 @@ from django import forms
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
+from django.core.cache import cache
 from django.core.files.storage import FileSystemStorage
 from django.core.mail.backends.smtp import EmailBackend
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -72,6 +73,21 @@ def clear_redis_key_contains(key, contain):
             r.lrem(key, 0, v)
             removeds += 1
     return removeds
+
+
+def delete_django_cache_pattern(pattern: str):
+    client = cache._cache.get_client()
+
+    pattern = pattern.strip("*")
+    full_pattern = f"*{pattern}*"
+
+    cursor = 0
+    while True:
+        cursor, keys = client.scan(cursor, match=full_pattern, count=100)
+        if keys:
+            client.unlink(*keys)
+        if cursor == 0:
+            break
 
 
 def get_celery_worker_status():

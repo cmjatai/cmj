@@ -4,9 +4,7 @@
 {% block main_container_class %}container{% endblock %}
 
 {% block head_content %}
-  {% comment %}{% cache 604800 portalcmj_transparencia %}{% endcache %}{% endcomment %}
-   
-  {% cache 360 portalcmj_transparencia object.id %}
+  {% cache 604800 portalcmj_tc_transparencia object.id %}
     {% with request.GET.categoria|default:"" as categoria %}
       {% with object|app_pntp_content:categoria as pntp_data %}
         {{ pntp_data|json_script:"pntp-data" }}

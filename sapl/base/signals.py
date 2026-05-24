@@ -28,7 +28,7 @@ def signal_materia_materialegislativa_disable_cache(sender, **kwargs):
 
                 # keys com cache semanal
 
-                key = make_template_fragment_key("portalcmj_pesquisar_materia")
+                key = make_template_fragment_key("portalcmj_tc_pesquisar_materia")
                 cache.delete(key)
 
                 inst = kwargs.get("instance", {})

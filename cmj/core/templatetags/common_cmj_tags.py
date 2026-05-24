@@ -515,7 +515,7 @@ def valor_abs_str(valor):
 @register.filter
 def sessaoplenarias_futuras(limite=0):
 
-    sessoes_futuras = cache.get("portalcmj_sessoes_futuras")
+    sessoes_futuras = cache.get("portalcmj_c_sessoes_futuras")
 
     if sessoes_futuras is not None:
         if limite > 0:
@@ -548,7 +548,7 @@ def sessaoplenarias_futuras(limite=0):
         sessoes_futuras, key=lambda x: (x.data_inicio, x.hora_inicio, x.id)
     )
 
-    cache.set("portalcmj_sessoes_futuras", sessoes_futuras, 1800)
+    cache.set("portalcmj_c_sessoes_futuras", sessoes_futuras, 1800)
 
     if limite > 0:
         sessoes_futuras = list(sessoes_futuras[:limite])
