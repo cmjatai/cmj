@@ -1,7 +1,7 @@
 {% load i18n %}
 {% load compilacao_filters %}
 {% load common_cmj_tags common_tags%}
-
+<div class="clearfix"></div>
 <strong>
   <a class="text-epigrafe text-{{ cert.content_object|meta_model_value:'model_name' }}"
       href="{{ n.urlize }}">
@@ -12,6 +12,18 @@
   </a>
 </strong>
 <br>
+<div class="links-texto d-flex flex-row">
+  {% if n.texto_integral and '.pdf' in n.texto_integral.path %}
+    <a class="link-texto" href="{{n.texto_integral.url}}" title="Documento Original em PDF ">
+      <i class="far fa-file-pdf"></i>
+    </a>
+  {% endif %}
+  {% if n.texto_articulado.exists %}
+    <a class="link-texto" href="{% url 'sapl.norma:norma_ta' n.id %}" title="Texto Compilado em Formato Articulado">
+       <i class="fas fa-file-alt"></i>
+    </a>
+  {% endif %}
+</div>
 <div class="text-ementa">
   {{n.ementa}}
 </div>
@@ -33,4 +45,6 @@
     {% endif %}
   </div>
 {% endif %}
+
+<div class="clearfix"></div>
 
