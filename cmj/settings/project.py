@@ -146,11 +146,11 @@ CACHES = {
     }
 }
 
-if DEBUG:
+if False and DEBUG:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-            #"BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            # "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
             "LOCATION": "unique-snowflake",
         }
     }

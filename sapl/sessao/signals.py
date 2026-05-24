@@ -38,8 +38,8 @@ def signal_sessao_registrovotacao(sender, instance, **kwargs):
 @receiver([post_save, post_delete], sender=SessaoPlenaria)
 def signal_sessao_sessaoplenaria(sender, **kwargs):
     keys = [
-        make_template_fragment_key("portalcmj_pagina_inicial_parte1"),
-        make_template_fragment_key("portalcmj_sessoes_futuras"),
+        make_template_fragment_key("portalcmj_tc_pagina_inicial_parte1"),
+        "portalcmj_c_sessoes_futuras",
     ]
     for key in keys:
         cache.delete(key)
