@@ -88,7 +88,16 @@ export default {
     lista: { type: Array, default: () => [] },
     parlamentarSelecionado: { type: Object, default: null },
     loasChoice: { type: Array, default: () => [] },
-    selectedLoaIds: { type: Array, default: () => [] }
+    selectedLoaIds: { type: Array, default: () => [] },
+    totaisEmpenhos: {
+      type: Object,
+      default: () => ({
+        total_empenhado: 0,
+        total_liquidado: 0,
+        total_pago_bruto: 0,
+        total_anulado: 0
+      })
+    }
   },
   computed: {
     permissionEdit () {
@@ -120,20 +129,20 @@ export default {
       if (!this.loasChoice.length || !this.selectedLoaIds.length) return true
       return this.selectedLoaIds.every(id => {
         const loa = this.loasChoice.find(l => l.value === id)
-        return loa ? Number(loa.text) >= 2026 : true
+        return loa ? Number(loa.text) >= 2025 : true
       })
     },
     totalEmpenhado () {
-      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_empenhado || 0), 0)
+      return Number(this.totaisEmpenhos.total_empenhado || 0)
     },
     totalLiquidado () {
-      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_liquidado || 0), 0)
+      return Number(this.totaisEmpenhos.total_liquidado || 0)
     },
     totalPago () {
-      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_pago_bruto || 0), 0)
+      return Number(this.totaisEmpenhos.total_pago_bruto || 0)
     },
     totalAnulado () {
-      return this.lista.reduce((sum, item) => sum + Number(item.soma_valor_anulado || 0), 0)
+      return Number(this.totaisEmpenhos.total_anulado || 0)
     },
     grupos () {
       const map = {}
