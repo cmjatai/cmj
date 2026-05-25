@@ -29,6 +29,7 @@
         :parlamentar-selecionado="filters_value.parlamentares"
         :loas-choice="loas_choice"
         :selected-loa-ids="selected_loa_ids"
+        :totais-empenhos="totais_empenhos"
         class="mt-3"
       />
 
@@ -113,6 +114,12 @@ export default {
       results: {
         emendas: [],
         ajustes: []
+      },
+      totais_empenhos: {
+        total_empenhado: 0,
+        total_liquidado: 0,
+        total_pago_bruto: 0,
+        total_anulado: 0
       },
       fetching: false,
       firstPageLoaded: false,
@@ -201,6 +208,163 @@ export default {
     }
   },
   methods: {
+    emptyTotaisEmpenhos () {
+      return {
+        total_empenhado: 0,
+        total_liquidado: 0,
+        total_pago_bruto: 0,
+        total_anulado: 0
+      }
+    },
+    normalizeTotaisEmpenhos (totais) {
+      return {
+        total_empenhado: Number(totais && totais.total_empenhado ? totais.total_empenhado : 0),
+        total_liquidado: Number(totais && totais.total_liquidado ? totais.total_liquidado : 0),
+        total_pago_bruto: Number(totais && totais.total_pago_bruto ? totais.total_pago_bruto : 0),
+        total_anulado: Number(totais && totais.total_anulado ? totais.total_anulado : 0)
+      }
+    },
+    somarTotaisEmpenhos (listaTotais) {
+      return listaTotais.reduce((acc, totais) => {
+        const normalized = this.normalizeTotaisEmpenhos(totais)
+        acc.total_empenhado += normalized.total_empenhado
+        acc.total_liquidado += normalized.total_liquidado
+        acc.total_pago_bruto += normalized.total_pago_bruto
+        acc.total_anulado += normalized.total_anulado
+        return acc
+      }, this.emptyTotaisEmpenhos())
+    },
+    getSharedFilterParams () {
+      const params = {
+        situacao: this.filters_value.situacao.join(',')
+      }
+
+      if (
+        this.filters_value.unidade &&
+        typeof this.filters_value.unidade === 'object'
+      ) {
+        params.unidade = this.filters_value.unidade.id
+      }
+
+      if (
+        this.filters_value.entidade &&
+        typeof this.filters_value.entidade === 'object'
+      ) {
+        params.entidade = this.filters_value.entidade.id
+      }
+
+      if (this.filters_value.search) {
+        params.search = this.filters_value.search
+      }
+
+      return params
+    },
+    getEmendaParams (loaId, options = {}) {
+      const params = {
+        ...this.getSharedFilterParams(),
+        loa: loaId
+      }
+
+      if (
+        this.filters_value.parlamentares &&
+        typeof this.filters_value.parlamentares === 'object'
+      ) {
+        params.parlamentares = this.filters_value.parlamentares.id
+      }
+
+      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
+      if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
+        params.tipo__in = emendasTipos.join(',')
+      }
+
+      if (options.withListOptions) {
+        Object.assign(params, {
+          o: 'materia__tipo__sigla,materia__numero',
+          exclude: 'search;metadata',
+          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
+          expand: 'parlamentares;unidade;materia;entidade',
+          page_size: 25
+        })
+      }
+
+      return params
+    },
+    getAjusteParams (loaId, options = {}) {
+      const params = {
+        ...this.getSharedFilterParams(),
+        oficio_ajuste_loa__loa: loaId
+      }
+
+      if (
+        this.filters_value.parlamentares &&
+        typeof this.filters_value.parlamentares === 'object'
+      ) {
+        params.parlamentares_valor = this.filters_value.parlamentares.id
+      }
+
+      if (options.withListOptions) {
+        Object.assign(params, {
+          exclude: 'search',
+          include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
+          expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
+          o: 'parlamentares_valor__nome_parlamentar',
+          page_size: 25
+        })
+      }
+
+      return params
+    },
+    fetchTotaisEmpenhos (fetchId, loaIds = this.selected_loa_ids) {
+      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
+      const fetchEmendas =
+        (Array.isArray(emendasTipos) && emendasTipos.length > 0) ||
+        (this.filters_value.ajustes === 'False' &&
+          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
+      const fetchAjustes =
+        (this.filters_value.ajustes === 'True') ||
+        (this.filters_value.ajustes === 'False' &&
+          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
+
+      const pending = []
+      loaIds.forEach(loaId => {
+        if (fetchEmendas) {
+          pending.push(
+            this.utils.fetch({
+              app: 'loa',
+              model: 'emendaloa',
+              action: 'totalize_empenhos',
+              params: this.getEmendaParams(loaId)
+            })
+          )
+        }
+
+        if (fetchAjustes) {
+          pending.push(
+            this.utils.fetch({
+              app: 'loa',
+              model: 'registroajusteloa',
+              action: 'totalize_empenhos',
+              params: this.getAjusteParams(loaId)
+            })
+          )
+        }
+      })
+
+      if (!pending.length) {
+        this.totais_empenhos = this.emptyTotaisEmpenhos()
+        return Promise.resolve()
+      }
+
+      return Promise.all(pending).then((responses) => {
+        if (this._fetchId !== fetchId) return
+        this.totais_empenhos = this.somarTotaisEmpenhos(
+          responses.map(response => response.data || {})
+        )
+      }).catch(() => {
+        if (this._fetchId !== fetchId) return
+        this.totais_empenhos = this.emptyTotaisEmpenhos()
+      })
+    },
     syncQueryString () {
       const query = {}
       this.filters.forEach((f) => {
@@ -325,7 +489,10 @@ export default {
 
       this.syncQueryString()
 
-      if (!addedIds.length) return
+      if (!addedIds.length) {
+        this._fetchId = (this._fetchId || 0) + 1
+        return this.fetchTotaisEmpenhos(this._fetchId)
+      }
 
       // Busca detalhes das novas LOAs e depois seus itens
       const newDataIds = addedIds.filter(id => !this.loas_data[id])
@@ -450,6 +617,7 @@ export default {
       const currentFetchId = this._fetchId
 
       this.fetching = true
+      this.totais_empenhos = this.emptyTotaisEmpenhos()
       if (!isIncremental) {
         this.firstPageLoaded = false
         this.results = { emendas: [], ajustes: [] }
@@ -465,7 +633,7 @@ export default {
         (this.filters_value.ajustes === 'False' &&
           (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
 
-      const pending = []
+      const pending = [this.fetchTotaisEmpenhos(currentFetchId, this.selected_loa_ids)]
 
       const orderedLoaIds = this.loas_list
         .map(l => l.id)
@@ -473,76 +641,12 @@ export default {
 
       orderedLoaIds.forEach(loaId => {
         if (fetchEmendas) {
-          const params_emendas = {
-            loa: loaId,
-            o: 'materia__tipo__sigla,materia__numero',
-            exclude: 'search;metadata',
-            include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
-            expand: 'parlamentares;unidade;materia;entidade',
-            page_size: 25,
-            situacao: this.filters_value.situacao.join(',')
-          }
-          if (
-            this.filters_value.unidade &&
-            typeof this.filters_value.unidade === 'object'
-          ) {
-            params_emendas.unidade = this.filters_value.unidade.id
-          }
-          if (
-            this.filters_value.entidade &&
-            typeof this.filters_value.entidade === 'object'
-          ) {
-            params_emendas.entidade = this.filters_value.entidade.id
-          }
-          if (
-            this.filters_value.parlamentares &&
-            typeof this.filters_value.parlamentares === 'object'
-          ) {
-            params_emendas.parlamentares = this.filters_value.parlamentares.id
-          }
-          if (this.filters_value.search) {
-            params_emendas.search = this.filters_value.search
-          }
-          if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
-            params_emendas.tipo__in = emendasTipos.join(',')
-          }
+          const params_emendas = this.getEmendaParams(loaId, { withListOptions: true })
           pending.push(this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId, loaId))
         }
 
         if (fetchAjustes) {
-          const params_ajustes = {
-            oficio_ajuste_loa__loa: loaId,
-            exclude: 'search',
-            include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
-            expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
-            o: 'parlamentares_valor__nome_parlamentar',
-            page_size: 25
-          }
-          if (
-            this.filters_value.unidade &&
-            typeof this.filters_value.unidade === 'object'
-          ) {
-            params_ajustes.unidade = this.filters_value.unidade.id
-          }
-          if (
-            this.filters_value.entidade &&
-            typeof this.filters_value.entidade === 'object'
-          ) {
-            params_ajustes.entidade = this.filters_value.entidade.id
-          }
-
-          if (this.filters_value.search) {
-            params_ajustes.search = this.filters_value.search
-          }
-          if (
-            this.filters_value.parlamentares &&
-            typeof this.filters_value.parlamentares === 'object'
-          ) {
-            params_ajustes.parlamentares_valor =
-              this.filters_value.parlamentares.id
-          }
-          params_ajustes.situacao = this.filters_value.situacao.join(',')
-
+          const params_ajustes = this.getAjusteParams(loaId, { withListOptions: true })
           pending.push(this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId, loaId))
         }
       })
