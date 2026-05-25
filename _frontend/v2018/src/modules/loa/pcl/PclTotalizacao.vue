@@ -38,7 +38,7 @@
       </div>
     </div>
 
-    <div class="row mx-0 mb-1" v-if="permissionEdit && mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
+    <div class="row mx-0 mb-1" v-if="mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
       <div class="col-md-3 text-center py-1 border-right">
         <small class="text-muted d-block">Empenhado</small>
         <strong class="text-primary">R$ {{ formatCurrency(totalEmpenhado) }}</strong>
@@ -54,6 +54,11 @@
       <div class="col-md-3 text-center py-1">
         <small class="text-muted d-block">Anulado</small>
         <strong class="text-danger">R$ {{ formatCurrency(totalAnulado) }}</strong>
+      </div>
+    </div>
+    <div class="row mx-0 mb-1" v-else-if="!mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
+      <div class="col-md-12 text-center py-1">
+        <small class="text-muted d-block">Totais de Empenho, Liquidação, Pagamento e Anulação computados apenas a partir da LOA 2026.</small>
       </div>
     </div>
 
@@ -129,7 +134,7 @@ export default {
       if (!this.loasChoice.length || !this.selectedLoaIds.length) return true
       return this.selectedLoaIds.every(id => {
         const loa = this.loasChoice.find(l => l.value === id)
-        return loa ? Number(loa.text) >= 2025 : true
+        return loa ? Number(loa.text) >= 2026 : true
       })
     },
     totalEmpenhado () {
