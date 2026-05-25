@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from cmj.api.forms import RegistroAjusteLoaFilterSet
+from cmj.loa.models import Empenho
 
 
 class RegistroAjusteLoaViewSet:
@@ -15,11 +16,14 @@ class RegistroAjusteLoaViewSet:
             return qs
 
         qs = filter_queryset()
-        totals = qs.aggregate(
-            total_empenhado=Sum("empenhoemendaajuste_set__empenho__valor_empenhado"),
-            total_liquidado=Sum("empenhoemendaajuste_set__empenho__valor_liquidado"),
-            total_pago_bruto=Sum("empenhoemendaajuste_set__empenho__valor_pago_bruto"),
-            total_anulado=Sum("empenhoemendaajuste_set__empenho__valor_anulado"),
+        empenho_ids = qs.values_list(
+            "empenhoemendaajuste_set__empenho_id", flat=True
+        ).distinct()
+        totals = Empenho.objects.filter(id__in=empenho_ids).aggregate(
+            total_empenhado=Sum("valor_empenhado"),
+            total_liquidado=Sum("valor_liquidado"),
+            total_pago_bruto=Sum("valor_pago_bruto"),
+            total_anulado=Sum("valor_anulado"),
         )
 
         return Response(totals)

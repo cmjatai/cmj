@@ -358,11 +358,12 @@ class EmpenhoEmendaAjusteManager(models.Manager):
     use_for_related_fields = True
 
     def aggregate_sum_dos_empenhos(self):
-        se = self.aggregate(
-            valor_empenhado=Sum("empenho__valor_empenhado"),
-            valor_anulado=Sum("empenho__valor_anulado"),
-            valor_liquidado=Sum("empenho__valor_liquidado"),
-            valor_pago_bruto=Sum("empenho__valor_pago_bruto"),
+        empenho_ids = self.values_list("empenho_id", flat=True).distinct()
+        se = Empenho.objects.filter(id__in=empenho_ids).aggregate(
+            valor_empenhado=Sum("valor_empenhado"),
+            valor_anulado=Sum("valor_anulado"),
+            valor_liquidado=Sum("valor_liquidado"),
+            valor_pago_bruto=Sum("valor_pago_bruto"),
         )
         return se
 
