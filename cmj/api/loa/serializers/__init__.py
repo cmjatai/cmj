@@ -62,25 +62,20 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa
 
+    def get_soma_empenhos(self, obj):
+        return obj.empenhoemendaajuste_set.aggregate_sum_dos_empenhos()
+
     def get_soma_valor_empenhado(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_empenhado")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_empenhado"] or Decimal("0.00")
 
     def get_soma_valor_liquidado(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_liquidado")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_liquidado"] or Decimal("0.00")
 
     def get_soma_valor_pago_bruto(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_pago_bruto")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_pago_bruto"] or Decimal("0.00")
 
     def get_soma_valor_anulado(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_anulado")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_anulado"] or Decimal("0.00")
 
     def get_valor_por_parlamentar(self, obj):
         valores = {}
@@ -133,25 +128,20 @@ class EmendaLoaSerializer(CmjSerializerMixin):
     class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
 
+    def get_soma_empenhos(self, obj):
+        return obj.empenhoemendaajuste_set.aggregate_sum_dos_empenhos()
+
     def get_soma_valor_empenhado(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_empenhado")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_empenhado"] or Decimal("0.00")
 
     def get_soma_valor_liquidado(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_liquidado")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_liquidado"] or Decimal("0.00")
 
     def get_soma_valor_pago_bruto(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_pago_bruto")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_pago_bruto"] or Decimal("0.00")
 
     def get_soma_valor_anulado(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate(
-            total=Sum("empenho__valor_anulado")
-        )["total"] or Decimal("0.00")
+        return self.get_soma_empenhos(obj)["valor_anulado"] or Decimal("0.00")
 
     def get_valor_inicial_por_parlamentar(self, obj):
         valores = {}
