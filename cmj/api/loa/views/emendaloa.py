@@ -2,7 +2,7 @@ import logging
 from decimal import Decimal
 
 import pymupdf
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
 from django.utils import formats
@@ -314,7 +314,7 @@ class EmendaLoaViewSet:
 
     @action(detail=False)
     def search(self, request, *args, **kwargs):
-        #TODO: refatorar para usar filterset e o serializer de listagem, ao invés de criar um serializer específico para a busca e uma função de filtro específica
+        # TODO: refatorar para usar filterset e o serializer de listagem, ao invés de criar um serializer específico para a busca e uma função de filtro específica
         def filter_queryset(qs):
             ano = request.GET.get("ano", None)
             query = request.GET.get("q", "")
@@ -334,3 +334,19 @@ class EmendaLoaViewSet:
         self.filter_queryset = filter_queryset
 
         return self.list(request, *args, **kwargs)
+
+    @action(detail=False)
+    def totalize_empenhos(self, request, pk=None):
+        def filter_queryset():
+            qs = self.filter_queryset(self.get_queryset())
+            return qs
+
+        qs = filter_queryset()
+        totals = qs.aggregate(
+            total_empenhado=Sum("empenhoemendaajuste_set__empenho__valor_empenhado"),
+            total_liquidado=Sum("empenhoemendaajuste_set__empenho__valor_liquidado"),
+            total_pago_bruto=Sum("empenhoemendaajuste_set__empenho__valor_pago_bruto"),
+            total_anulado=Sum("empenhoemendaajuste_set__empenho__valor_anulado"),
+        )
+
+        return Response(totals)
