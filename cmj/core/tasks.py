@@ -402,7 +402,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
 
         return signs
 
-    def signed_name_and_date_extract(file):
+    def signed_name_and_date_extract(file, isola_hom=True):
 
         try:
             signs = run_signed_name_and_date_extract(file)
@@ -449,7 +449,7 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
 
         for s in signs:
             cn = settings.CERT_PRIVATE_KEY_NAME
-            meta_signs["hom" if s[0] == cn else "signs"].append(s)
+            meta_signs["hom" if s[0] == cn and isola_hom else "signs"].append(s)
         return meta_signs
 
     model = apps.get_model(app_label, model_name)
@@ -458,6 +458,11 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
         instance = model.objects.get(pk=pk)
     except:
         return
+
+    isola_hom = model_name in (
+        "MateriaLegislativa",
+        "DocumentoAcessorio",
+    )
 
     if not hasattr(instance, "FIELDFILE_NAME") or not hasattr(instance, "metadata"):
         return
@@ -491,18 +496,18 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
             if not isinstance(ff.file, InMemoryUploadedFile):
                 original_absolute_path = ff.original_path
                 with open(original_absolute_path, "rb") as file:
-                    meta_signs = signed_name_and_date_extract(file)
+                    meta_signs = signed_name_and_date_extract(file, isola_hom=isola_hom)
                     file.close()
 
                 absolute_path = ff.path
                 with open(absolute_path, "rb") as file:
-                    sign_hom = signed_name_and_date_extract(file)
+                    sign_hom = signed_name_and_date_extract(file, isola_hom=isola_hom)
                     file.close()
                     meta_signs["hom"] = sign_hom["hom"]
 
             else:
                 file.seek(0)
-                meta_signs = signed_name_and_date_extract(file)
+                meta_signs = signed_name_and_date_extract(file, isola_hom=isola_hom)
 
             if not meta_signs:
                 continue
