@@ -305,64 +305,60 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             return context
 
         def print(self, request, *args, **kwargs):
-            filterset_classes = EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
-
-            pk = self.kwargs.get("pk")
-            if pk:
-                filterset_classes = {
-                    EmendaLoaFilterSet: EmendaLoaFilterSet._meta.model.objects.filter(
-                        loa=pk
-                    )
-                    .distinct()
-                    .select_related(
-                        "unidade",
-                        "entidade",
-                        "materia__tipo",
-                    )
-                    .prefetch_related(
-                        "parlamentares",
-                        "prestacaocontaregistro_set__prestacao_conta",
-                        "prestacaocontaregistro_set__registro_ajuste",
-                        "empenhoemendaajuste_set__empenho",
-                        "registroajusteloa_set__oficio_ajuste_loa",
-                        "registroajusteloa_set__unidade",
-                        "registroajusteloa_set__entidade",
-                        "registrocontabil_set",
-                        "materia__tramitacao_set__status",
-                        "materia__tramitacao_set__unidade_tramitacao_local",
-                        "materia__tramitacao_set__unidade_tramitacao_destino",
-                        "materia__documentoacessorio_set",
-                        "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
-                        "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
-                    )
-                    .annotate(
-                        ann_has_ajustes=Exists(
-                            RegistroAjusteLoaParlamentar.objects.filter(
-                                registro__in=RegistroAjusteLoa.objects.filter(
-                                    emendaloa=OuterRef("pk")
-                                )
+            pk = self.kwargs["pk"]
+            filterset_classes = {
+                EmendaLoaFilterSet: EmendaLoaFilterSet._meta.model.objects.filter(
+                    loa=pk
+                )
+                .distinct()
+                .select_related(
+                    "unidade",
+                    "entidade",
+                    "materia__tipo",
+                )
+                .prefetch_related(
+                    "parlamentares",
+                    "prestacaocontaregistro_set__prestacao_conta",
+                    "prestacaocontaregistro_set__registro_ajuste",
+                    "empenhoemendaajuste_set__empenho",
+                    "registroajusteloa_set__oficio_ajuste_loa",
+                    "registroajusteloa_set__unidade",
+                    "registroajusteloa_set__entidade",
+                    "registrocontabil_set",
+                    "materia__tramitacao_set__status",
+                    "materia__tramitacao_set__unidade_tramitacao_local",
+                    "materia__tramitacao_set__unidade_tramitacao_destino",
+                    "materia__documentoacessorio_set",
+                    "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
+                    "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
+                )
+                .annotate(
+                    ann_has_ajustes=Exists(
+                        RegistroAjusteLoaParlamentar.objects.filter(
+                            registro__in=RegistroAjusteLoa.objects.filter(
+                                emendaloa=OuterRef("pk")
                             )
                         )
-                    ),
-                    RegistroAjusteLoaFilterSet: RegistroAjusteLoaFilterSet._meta.model.objects.filter(
-                        oficio_ajuste_loa__loa=pk
                     )
-                    .distinct()
-                    .select_related(
-                        "oficio_ajuste_loa",
-                        "unidade",
-                        "entidade",
-                    )
-                    .prefetch_related(
-                        "oficio_ajuste_loa__parlamentares",
-                        "registroajusteloaparlamentar_set__parlamentar",
-                        "emendaloa",
-                        "prestacaocontaregistro_set__prestacao_conta",
-                        "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
-                        "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
-                        "empenhoemendaajuste_set__empenho",
-                    ),
-                }
+                ),
+                RegistroAjusteLoaFilterSet: RegistroAjusteLoaFilterSet._meta.model.objects.filter(
+                    oficio_ajuste_loa__loa=pk
+                )
+                .distinct()
+                .select_related(
+                    "oficio_ajuste_loa",
+                    "unidade",
+                    "entidade",
+                )
+                .prefetch_related(
+                    "oficio_ajuste_loa__parlamentares",
+                    "emendaloa",
+                    "prestacaocontaregistro_set__prestacao_conta",
+                    "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
+                    "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
+                    "empenhoemendaajuste_set__empenho",
+                ),
+            }
 
             filtersets = []
 

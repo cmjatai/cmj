@@ -1,0 +1,237 @@
+{# ================================================================ #}
+{# SEÇÃO 1 — EMENDAS IMPOSITIVAS / MODIFICATIVAS                    #}
+{# ================================================================ #}
+{% load i18n common_cmj_tags %}
+
+{% if emendaloa_list %}
+<h2 class="secao-titulo">Emendas Impositivas / Modificativas</h2>
+
+{% for emenda in emendaloa_list.all %}
+<div class="emenda-item">
+
+  {# --- Cabeçalho do bloco --- #}
+  <h3 class="item-titulo">
+    {{ forloop.counter }}.
+    {% if emenda.materia %}{{ emenda.materia.epigrafe }} &mdash; {% endif %}
+    {{ emenda.get_tipo_display }} &mdash; <em>{{ emenda.get_fase_display }}</em>
+  </h3>
+
+  <dl class="dados-gerais">
+    <dt>Parlamentares:</dt>
+    <dd>
+      {% for parl in emenda.parlamentares.all %}
+        {{ parl.nome_parlamentar }}{% if not forloop.last %} / {% endif %}
+      {% empty %}<em>Não informado</em>{% endfor %}
+    </dd>
+    <dt>Valor Original:</dt>
+    <dd>R$ {{ emenda.str_valor }}</dd>
+    {% if emenda.has_ajustes %}
+    <dt>Valor Redefinido:</dt>
+    <dd>R$ {{ emenda.str_valor_computado }}</dd>
+    {% endif %}
+    {% if emenda.unidade %}
+    <dt>Unid. Orçamentária:</dt>
+    <dd>{{ emenda.unidade }}</dd>
+    {% endif %}
+    {% if emenda.entidade %}
+    <dt>Entidade:</dt>
+    <dd>{{ emenda.entidade.nome_fantasia }}{% if emenda.entidade.cnes %} &mdash; CNES: {{ emenda.entidade.cnes }}{% elif emenda.entidade.cpfcnpj %} &mdash; CPF/CNPJ: {{ emenda.entidade.cpfcnpj }}{% endif %}</dd>
+    {% endif %}
+    <dt>Finalidade:</dt>
+    <dd>{{ emenda.ementa_format }}</dd>
+  </dl>
+
+  {# --- Prestação de Contas --- #}
+  {% if emenda.prestacaocontaregistro_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Prestação de Contas ({{ emenda.prestacaocontaregistro_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Epígrafe</th>
+          <th>Data de Envio</th>
+          <th>Situação</th>
+          <th>Detalhamento</th>
+          <th>Ajuste Técnico Ref.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pc in emenda.prestacaocontaregistro_set.all %}
+        <tr>
+          <td>{{ pc.prestacao_conta.epigrafe }}</td>
+          <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
+          <td>{{ pc.get_situacao_display }}</td>
+          <td>{{ pc.detalhamento|default:"—" }}</td>
+          <td>{% if pc.registro_ajuste %}{{ pc.registro_ajuste.descricao|truncatewords:15 }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Empenhos --- #}
+  {% if emenda.empenhoemendaajuste_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Empenhos ({{ emenda.empenhoemendaajuste_set.count }})</h4>
+    {% with emenda.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
+    <table>
+      <thead>
+        <tr>
+          <th class="text-right">Total Empenhado (R$)</th>
+          <th class="text-right">Total Liquidado (R$)</th>
+          <th class="text-right">Total Pago (R$)</th>
+          <th class="text-right">Total Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="totais-linha">
+          <td class="text-right">{{ sums.valor_empenhado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_liquidado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_pago_bruto|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_anulado|decimal2str }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endwith %}
+    <table style="margin-top:4px">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Data</th>
+          <th>Fornecedor</th>
+          <th>CPF/CNPJ</th>
+          <th>Modalidade</th>
+          <th>Histórico / Dotação</th>
+          <th class="text-right">Empenhado (R$)</th>
+          <th class="text-right">Liquidado (R$)</th>
+          <th class="text-right">Pago (R$)</th>
+          <th class="text-right">Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in emenda.empenhoemendaajuste_set.all %}
+        <tr>
+          <td>{{ emp.empenho.codigo }}</td>
+          <td>{{ emp.empenho.data|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ emp.empenho.nome|default:"—" }}</td>
+          <td>{{ emp.empenho.cpfcnpj|default:"—" }}</td>
+          <td>{{ emp.empenho.modalidade|default:"—" }}</td>
+          <td>
+            {{ emp.empenho.historico|default:"" }}{% if emp.empenho.historico and emp.empenho.dotacao %}<br>{% endif %}{% if emp.empenho.dotacao %}<small>Dotação: {{ emp.empenho.dotacao }}</small>{% endif %}{% if not emp.empenho.historico and not emp.empenho.dotacao %}—{% endif %}
+          </td>
+          <td class="text-right">{{ emp.empenho.str_valor_empenhado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_liquidado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_pago_bruto }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_anulado }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Ajustes Técnicos relacionados --- #}
+  {% if emenda.registroajusteloa_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Ajustes Técnicos ({{ emenda.registroajusteloa_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Ofício</th>
+          <th>Fase</th>
+          <th>Unidade</th>
+          <th>Descrição</th>
+          <th class="text-right">Valor (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ajuste in emenda.registroajusteloa_set.all %}
+        <tr>
+          <td>{{ ajuste.oficio_ajuste_loa.epigrafe }}</td>
+          <td>{{ ajuste.get_fase_display }}</td>
+          <td>{{ ajuste.unidade|default:"—" }}</td>
+          <td>{{ ajuste.descricao }}</td>
+          <td class="text-right">{{ ajuste.str_valor }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Registros Contábeis --- #}
+  {% if emenda.registrocontabil_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Registros Contábeis ({{ emenda.registrocontabil_set.count }})</h4>
+    <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
+      {% for rc in emenda.registrocontabil_set.all %}
+      <li>{{ rc }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# --- Tramitações --- #}
+  {% if emenda.materia %}
+  {% if emenda.materia.tramitacao_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Tramitações ({{ emenda.materia.tramitacao_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Status</th>
+          <th>Unidade Local → Destino</th>
+          <th>Texto</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tram in emenda.materia.tramitacao_set.all %}
+        <tr>
+          <td>{{ tram.data_tramitacao|date:"d/m/Y" }}</td>
+          <td>{{ tram.status }}</td>
+          <td>{{ tram.unidade_tramitacao_local }}{% if tram.unidade_tramitacao_destino %} &rarr; {{ tram.unidade_tramitacao_destino }}{% endif %}</td>
+          <td>{{ tram.texto|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Documentos Acessórios --- #}
+  {% if emenda.materia.documentoacessorio_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Documentos Acessórios ({{ emenda.materia.documentoacessorio_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Tipo</th>
+          <th>Data</th>
+          <th>Autor</th>
+          <th>Ementa</th>
+          <th>Arquivo (URL)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for doc in emenda.materia.documentoacessorio_set.all %}
+        <tr>
+          <td>{{ doc.nome }}</td>
+          <td>{{ doc.tipo }}</td>
+          <td>{{ doc.data|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ doc.autor|default:"—" }}</td>
+          <td>{{ doc.ementa|default:"—" }}</td>
+          <td><small>{% if doc.arquivo %}{{ doc.arquivo.url }}{% else %}—{% endif %}</small></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% endif %}{# /emenda.materia #}
+
+</div>
+{% endfor %}
+{% endif %}{# /emendaloa_list #}

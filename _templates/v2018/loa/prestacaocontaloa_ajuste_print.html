@@ -1,0 +1,163 @@
+{# ================================================================ #}
+{# SEÇÃO 2 — AJUSTES TÉCNICOS                                       #}
+{# ================================================================ #}
+{% load i18n common_cmj_tags %}
+
+{% if registroajusteloa_list %}
+<h2 class="secao-titulo" style="margin-top:2rem;">Ajustes Técnicos</h2>
+
+{% for ajuste in registroajusteloa_list.all %}
+<div class="ajuste-item">
+
+  {# --- Cabeçalho do bloco --- #}
+  <h3 class="item-titulo">
+    {{ forloop.counter }}. {{ ajuste.oficio_ajuste_loa.epigrafe }}
+    &mdash; {{ ajuste.get_tipo_display }} &mdash; <em>{{ ajuste.get_fase_display }}</em>
+  </h3>
+
+  <dl class="dados-gerais">
+    <dt>Parlamentares (Ofício):</dt>
+    <dd>
+      {% for parl in ajuste.oficio_ajuste_loa.parlamentares.all %}
+        {{ parl.nome_parlamentar }}{% if not forloop.last %} / {% endif %}
+      {% empty %}<em>Não informado</em>{% endfor %}
+    </dd>
+    <dt>Valor Total:</dt>
+    <dd>R$ {{ ajuste.str_valor }}</dd>
+    {% if ajuste.unidade %}
+    <dt>Unid. Orçamentária:</dt>
+    <dd>{{ ajuste.unidade }}</dd>
+    {% endif %}
+    {% if ajuste.entidade %}
+    <dt>Entidade:</dt>
+    <dd>{{ ajuste.entidade.nome_fantasia }}{% if ajuste.entidade.cnes %} &mdash; CNES: {{ ajuste.entidade.cnes }}{% elif ajuste.entidade.cpfcnpj %} &mdash; CPF/CNPJ: {{ ajuste.entidade.cpfcnpj }}{% endif %}</dd>
+    {% endif %}
+    <dt>Descrição:</dt>
+    <dd>{{ ajuste.descricao }}</dd>
+  </dl>
+
+  {# --- Emendas relacionadas --- #}
+  {% if ajuste.emendaloa.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Emendas Impositivas Relacionadas</h4>
+    <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;">
+      {% for em in ajuste.emendaloa.all %}
+      <li>{{ em.str_short }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# --- Prestação de Contas --- #}
+  {% if ajuste.prestacaocontaregistro_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Prestação de Contas ({{ ajuste.prestacaocontaregistro_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Epígrafe</th>
+          <th>Data de Envio</th>
+          <th>Situação</th>
+          <th>Detalhamento</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pc in ajuste.prestacaocontaregistro_set.all %}
+        <tr>
+          <td>{{ pc.prestacao_conta.epigrafe }}</td>
+          <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
+          <td>{{ pc.get_situacao_display }}</td>
+          <td>{{ pc.detalhamento|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% for pc in ajuste.prestacaocontaregistro_set.all %}
+    {% if pc.arquivoprestacaocontaregistro_set.exists %}
+    <div style="margin-top:4px;font-size:0.82rem;">
+      <strong>Arq. do Registro ({{ pc.prestacao_conta.epigrafe }}):</strong>
+      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
+        {% for arq in pc.arquivoprestacaocontaregistro_set.all %}
+        <li>{{ arq.descricao }}{% if arq.arquivo %} &mdash; <small>{{ arq.arquivo.url }}</small>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if pc.prestacao_conta.arquivoprestacaocontaloa_set.exists %}
+    <div style="margin-top:4px;font-size:0.82rem;">
+      <strong>Arq. da {{ pc.prestacao_conta.epigrafe }}:</strong>
+      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
+        {% for arq in pc.prestacao_conta.arquivoprestacaocontaloa_set.all %}
+        <li>{{ arq.descricao }}{% if arq.arquivo %} &mdash; <small>{{ arq.arquivo.url }}</small>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {# --- Empenhos --- #}
+  {% if ajuste.empenhoemendaajuste_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Empenhos ({{ ajuste.empenhoemendaajuste_set.count }})</h4>
+    {% with ajuste.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
+    <table>
+      <thead>
+        <tr>
+          <th class="text-right">Total Empenhado (R$)</th>
+          <th class="text-right">Total Liquidado (R$)</th>
+          <th class="text-right">Total Pago (R$)</th>
+          <th class="text-right">Total Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="totais-linha">
+          <td class="text-right">{{ sums.valor_empenhado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_liquidado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_pago_bruto|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_anulado|decimal2str }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endwith %}
+    <table style="margin-top:4px">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Data</th>
+          <th>Fornecedor</th>
+          <th>CPF/CNPJ</th>
+          <th>Modalidade</th>
+          <th>Histórico / Dotação</th>
+          <th class="text-right">Empenhado (R$)</th>
+          <th class="text-right">Liquidado (R$)</th>
+          <th class="text-right">Pago (R$)</th>
+          <th class="text-right">Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in ajuste.empenhoemendaajuste_set.all %}
+        <tr>
+          <td>{{ emp.empenho.codigo }}</td>
+          <td>{{ emp.empenho.data|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ emp.empenho.nome|default:"—" }}</td>
+          <td>{{ emp.empenho.cpfcnpj|default:"—" }}</td>
+          <td>{{ emp.empenho.modalidade|default:"—" }}</td>
+          <td>
+            {{ emp.empenho.historico|default:"" }}{% if emp.empenho.historico and emp.empenho.dotacao %}<br>{% endif %}{% if emp.empenho.dotacao %}<small>Dotação: {{ emp.empenho.dotacao }}</small>{% endif %}{% if not emp.empenho.historico and not emp.empenho.dotacao %}—{% endif %}
+          </td>
+          <td class="text-right">{{ emp.empenho.str_valor_empenhado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_liquidado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_pago_bruto }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_anulado }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+</div>
+{% endfor %}
+{% endif %}{# /registroajusteloa_list #}
