@@ -51,7 +51,7 @@
               > | Sem descrição de detalhamento</small>
 
               <template v-if="pc.arquivos && pc.arquivos.length > 0">
-                <small class="text-muted">Arquivos:</small>
+                <br><small class="text-muted">Arquivos específicos desta Emenda/Ajuste enviados nesta prestação de contas:</small>
                 <ul class="mb-0">
                   <li
                     v-for="(arquivo, aidx) in pc.arquivos"
