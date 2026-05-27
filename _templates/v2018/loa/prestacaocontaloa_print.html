@@ -1,0 +1,570 @@
+{% extends "base.html" %}
+{% load webpack_static from webpack_loader %}
+{% load i18n common_cmj_tags %}
+
+{% block appvue_content %}
+{% endblock appvue_content %}
+
+{% block base_content %}
+<style type="text/css">
+
+  /* ---- Tela ---- */
+  @media screen {
+    .emenda-item,
+    .ajuste-item {
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-bottom: 2rem;
+      padding: 1rem;
+    }
+  }
+
+  /* ---- Impressão ---- */
+  @media print {
+    nav, header, footer,
+    .navbar, .breadcrumb, .btn,
+    .col-2, .no-print {
+      display: none !important;
+    }
+    body {
+      font-size: 10pt;
+      color: #000;
+    }
+    .emenda-item,
+    .ajuste-item {
+      page-break-inside: avoid;
+      margin-bottom: 1.5rem;
+      border-top: 2px solid #333;
+      padding-top: 0.4rem;
+    }
+    .sub-secao {
+      page-break-inside: avoid;
+      margin-top: 0.4rem;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 9pt;
+    }
+    th, td {
+      border: 1px solid #aaa;
+      padding: 2px 5px;
+      vertical-align: top;
+    }
+    th {
+      background: #eee !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      font-weight: bold;
+    }
+    .totais-linha td {
+      font-weight: bold;
+      background: #f5f5f5 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .secao-titulo {
+      font-size: 13pt;
+      border-bottom: 2px solid #000;
+      margin-top: 1.5rem;
+    }
+    .item-titulo { font-size: 11pt; }
+    .sub-titulo {
+      font-size: 10pt;
+      border-bottom: 1px solid #bbb;
+      margin-top: 0.5rem;
+    }
+    dl.dados-gerais dt {
+      font-weight: bold;
+      float: left;
+      clear: left;
+      width: 160px;
+    }
+    dl.dados-gerais dd { margin-left: 165px; }
+  }
+
+  /* ---- Compartilhado ---- */
+  .secao-titulo {
+    font-size: 1.25rem;
+    font-weight: bold;
+    border-bottom: 2px solid #333;
+    margin-top: 1.5rem;
+    padding-bottom: 4px;
+  }
+  .item-titulo {
+    font-size: 1.05rem;
+    font-weight: bold;
+    margin-bottom: 0.4rem;
+  }
+  .sub-titulo {
+    font-size: 0.95rem;
+    font-weight: bold;
+    margin: 0.6rem 0 0.2rem 0;
+    border-bottom: 1px solid #ccc;
+  }
+  .sub-secao { margin-top: 0.6rem; }
+  .sub-secao table {
+    width: 100%;
+    font-size: 0.87rem;
+    border-collapse: collapse;
+  }
+  .sub-secao th,
+  .sub-secao td {
+    border: 1px solid #ccc;
+    padding: 3px 6px;
+    vertical-align: top;
+  }
+  .sub-secao th {
+    background: #f2f2f2;
+    font-weight: bold;
+  }
+  .totais-linha td { font-weight: bold; background: #fafafa; }
+  .text-right { text-align: right; }
+  dl.dados-gerais {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+    overflow: hidden;
+  }
+  dl.dados-gerais dt {
+    font-weight: bold;
+    float: left;
+    clear: left;
+    width: 160px;
+    padding-right: 4px;
+  }
+  dl.dados-gerais dd {
+    margin-left: 165px;
+    margin-bottom: 2px;
+  }
+</style>
+
+{# ===== CABEÇALHO ===== #}
+<div class="row mt-2 mb-3">
+  <div class="col-2 no-print"></div>
+  <div class="col-auto">
+    <img
+      height="80"
+      src="{% webpack_static '/brasao/brasao_256.png' %}"
+      alt="Brasão da Câmara Municipal de Jataí">
+  </div>
+  <div class="col d-flex flex-column justify-content-center align-items-center">
+    <h1>
+      <strong>
+        {% if nome %}{{ nome }}{% else %}{% trans 'Sem Nome Cadastrado' %}{% endif %}
+      </strong>
+    </h1>
+    <h2>Poder Legislativo</h2>
+  </div>
+  <div class="col-2 no-print"></div>
+</div>
+
+{# ================================================================ #}
+{# SEÇÃO 1 — EMENDAS IMPOSITIVAS / MODIFICATIVAS                    #}
+{# ================================================================ #}
+
+{% if emendaloa_list %}
+<h2 class="secao-titulo">Emendas Impositivas / Modificativas</h2>
+
+{% for emenda in emendaloa_list.all %}
+<div class="emenda-item">
+
+  {# --- Cabeçalho do bloco --- #}
+  <h3 class="item-titulo">
+    {{ forloop.counter }}.
+    {% if emenda.materia %}{{ emenda.materia.epigrafe }} &mdash; {% endif %}
+    {{ emenda.get_tipo_display }} &mdash; <em>{{ emenda.get_fase_display }}</em>
+  </h3>
+
+  <dl class="dados-gerais">
+    <dt>Parlamentares:</dt>
+    <dd>
+      {% for parl in emenda.parlamentares.all %}
+        {{ parl.nome_parlamentar }}{% if not forloop.last %} / {% endif %}
+      {% empty %}<em>Não informado</em>{% endfor %}
+    </dd>
+    <dt>Valor Original:</dt>
+    <dd>R$ {{ emenda.str_valor }}</dd>
+    {% if emenda.has_ajustes %}
+    <dt>Valor Redefinido:</dt>
+    <dd>R$ {{ emenda.str_valor_computado }}</dd>
+    {% endif %}
+    {% if emenda.unidade %}
+    <dt>Unid. Orçamentária:</dt>
+    <dd>{{ emenda.unidade }}</dd>
+    {% endif %}
+    {% if emenda.entidade %}
+    <dt>Entidade:</dt>
+    <dd>{{ emenda.entidade.nome_fantasia }}{% if emenda.entidade.cnes %} &mdash; CNES: {{ emenda.entidade.cnes }}{% elif emenda.entidade.cpfcnpj %} &mdash; CPF/CNPJ: {{ emenda.entidade.cpfcnpj }}{% endif %}</dd>
+    {% endif %}
+    <dt>Finalidade:</dt>
+    <dd>{{ emenda.ementa_format }}</dd>
+  </dl>
+
+  {# --- Prestação de Contas --- #}
+  {% if emenda.prestacaocontaregistro_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Prestação de Contas ({{ emenda.prestacaocontaregistro_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Epígrafe</th>
+          <th>Data de Envio</th>
+          <th>Situação</th>
+          <th>Detalhamento</th>
+          <th>Ajuste Técnico Ref.</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pc in emenda.prestacaocontaregistro_set.all %}
+        <tr>
+          <td>{{ pc.prestacao_conta.epigrafe }}</td>
+          <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
+          <td>{{ pc.get_situacao_display }}</td>
+          <td>{{ pc.detalhamento|default:"—" }}</td>
+          <td>{% if pc.registro_ajuste %}{{ pc.registro_ajuste.descricao|truncatewords:15 }}{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Empenhos --- #}
+  {% if emenda.empenhoemendaajuste_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Empenhos ({{ emenda.empenhoemendaajuste_set.count }})</h4>
+    {% with emenda.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
+    <table>
+      <thead>
+        <tr>
+          <th class="text-right">Total Empenhado (R$)</th>
+          <th class="text-right">Total Liquidado (R$)</th>
+          <th class="text-right">Total Pago (R$)</th>
+          <th class="text-right">Total Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="totais-linha">
+          <td class="text-right">{{ sums.valor_empenhado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_liquidado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_pago_bruto|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_anulado|decimal2str }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endwith %}
+    <table style="margin-top:4px">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Data</th>
+          <th>Fornecedor</th>
+          <th>CPF/CNPJ</th>
+          <th>Modalidade</th>
+          <th>Histórico / Dotação</th>
+          <th class="text-right">Empenhado (R$)</th>
+          <th class="text-right">Liquidado (R$)</th>
+          <th class="text-right">Pago (R$)</th>
+          <th class="text-right">Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in emenda.empenhoemendaajuste_set.all %}
+        <tr>
+          <td>{{ emp.empenho.codigo }}</td>
+          <td>{{ emp.empenho.data|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ emp.empenho.nome|default:"—" }}</td>
+          <td>{{ emp.empenho.cpfcnpj|default:"—" }}</td>
+          <td>{{ emp.empenho.modalidade|default:"—" }}</td>
+          <td>
+            {{ emp.empenho.historico|default:"" }}{% if emp.empenho.historico and emp.empenho.dotacao %}<br>{% endif %}{% if emp.empenho.dotacao %}<small>Dotação: {{ emp.empenho.dotacao }}</small>{% endif %}{% if not emp.empenho.historico and not emp.empenho.dotacao %}—{% endif %}
+          </td>
+          <td class="text-right">{{ emp.empenho.str_valor_empenhado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_liquidado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_pago_bruto }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_anulado }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Ajustes Técnicos relacionados --- #}
+  {% if emenda.registroajusteloa_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Ajustes Técnicos ({{ emenda.registroajusteloa_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Ofício</th>
+          <th>Fase</th>
+          <th>Unidade</th>
+          <th>Descrição</th>
+          <th class="text-right">Valor (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ajuste in emenda.registroajusteloa_set.all %}
+        <tr>
+          <td>{{ ajuste.oficio_ajuste_loa.epigrafe }}</td>
+          <td>{{ ajuste.get_fase_display }}</td>
+          <td>{{ ajuste.unidade|default:"—" }}</td>
+          <td>{{ ajuste.descricao }}</td>
+          <td class="text-right">{{ ajuste.str_valor }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Registros Contábeis --- #}
+  {% if emenda.registrocontabil_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Registros Contábeis ({{ emenda.registrocontabil_set.count }})</h4>
+    <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;">
+      {% for rc in emenda.registrocontabil_set.all %}
+      <li>{{ rc }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# --- Tramitações --- #}
+  {% if emenda.materia %}
+  {% if emenda.materia.tramitacao_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Tramitações ({{ emenda.materia.tramitacao_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Turno</th>
+          <th>Urgente</th>
+          <th>Status</th>
+          <th>Unidade Local → Destino</th>
+          <th>Texto</th>
+          <th>Dt. Encaminhamento</th>
+          <th>Dt. Fim Prazo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for tram in emenda.materia.tramitacao_set.all %}
+        <tr>
+          <td>{{ tram.data_tramitacao|date:"d/m/Y" }}</td>
+          <td>{% if tram.turno %}{{ tram.get_turno_display }}{% else %}—{% endif %}</td>
+          <td>{% if tram.urgente %}Sim{% else %}—{% endif %}</td>
+          <td>{{ tram.status }}</td>
+          <td>{{ tram.unidade_tramitacao_local }}{% if tram.unidade_tramitacao_destino %} &rarr; {{ tram.unidade_tramitacao_destino }}{% endif %}</td>
+          <td>{{ tram.texto|default:"—" }}</td>
+          <td>{{ tram.data_encaminhamento|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ tram.data_fim_prazo|date:"d/m/Y"|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Documentos Acessórios --- #}
+  {% if emenda.materia.documentoacessorio_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Documentos Acessórios ({{ emenda.materia.documentoacessorio_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Tipo</th>
+          <th>Data</th>
+          <th>Autor</th>
+          <th>Ementa</th>
+          <th>Arquivo (URL)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for doc in emenda.materia.documentoacessorio_set.all %}
+        <tr>
+          <td>{{ doc.nome }}</td>
+          <td>{{ doc.tipo }}</td>
+          <td>{{ doc.data|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ doc.autor|default:"—" }}</td>
+          <td>{{ doc.ementa|default:"—" }}</td>
+          <td><small>{% if doc.arquivo %}{{ doc.arquivo.url }}{% else %}—{% endif %}</small></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% endif %}{# /emenda.materia #}
+
+</div>
+{% endfor %}
+{% endif %}{# /emendaloa_list #}
+
+{# ================================================================ #}
+{# SEÇÃO 2 — AJUSTES TÉCNICOS                                       #}
+{# ================================================================ #}
+
+{% if registroajusteloa_list %}
+<h2 class="secao-titulo" style="margin-top:2rem;">Ajustes Técnicos</h2>
+
+{% for ajuste in registroajusteloa_list.all %}
+<div class="ajuste-item">
+
+  {# --- Cabeçalho do bloco --- #}
+  <h3 class="item-titulo">
+    {{ forloop.counter }}. {{ ajuste.oficio_ajuste_loa.epigrafe }}
+    &mdash; {{ ajuste.get_tipo_display }} &mdash; <em>{{ ajuste.get_fase_display }}</em>
+  </h3>
+
+  <dl class="dados-gerais">
+    <dt>Parlamentares (Ofício):</dt>
+    <dd>
+      {% for parl in ajuste.oficio_ajuste_loa.parlamentares.all %}
+        {{ parl.nome_parlamentar }}{% if not forloop.last %} / {% endif %}
+      {% empty %}<em>Não informado</em>{% endfor %}
+    </dd>
+    <dt>Valor Total:</dt>
+    <dd>R$ {{ ajuste.str_valor }}</dd>
+    {% if ajuste.unidade %}
+    <dt>Unid. Orçamentária:</dt>
+    <dd>{{ ajuste.unidade }}</dd>
+    {% endif %}
+    {% if ajuste.entidade %}
+    <dt>Entidade:</dt>
+    <dd>{{ ajuste.entidade.nome_fantasia }}{% if ajuste.entidade.cnes %} &mdash; CNES: {{ ajuste.entidade.cnes }}{% elif ajuste.entidade.cpfcnpj %} &mdash; CPF/CNPJ: {{ ajuste.entidade.cpfcnpj }}{% endif %}</dd>
+    {% endif %}
+    <dt>Descrição:</dt>
+    <dd>{{ ajuste.descricao }}</dd>
+  </dl>
+
+  {# --- Participação Parlamentar --- #}
+  {% if ajuste.registroajusteloaparlamentar_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Participação Parlamentar</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Parlamentar</th>
+          <th class="text-right">Valor (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rp in ajuste.registroajusteloaparlamentar_set.all %}
+        <tr>
+          <td>{{ rp.parlamentar.nome_parlamentar }}</td>
+          <td class="text-right">{{ rp.valor|decimal2str }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Emendas relacionadas --- #}
+  {% if ajuste.emendaloa.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Emendas Impositivas Relacionadas</h4>
+    <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;">
+      {% for em in ajuste.emendaloa.all %}
+      <li>{{ em.str_short }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+
+  {# --- Prestação de Contas --- #}
+  {% if ajuste.prestacaocontaregistro_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Prestação de Contas ({{ ajuste.prestacaocontaregistro_set.count }})</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Epígrafe</th>
+          <th>Data de Envio</th>
+          <th>Situação</th>
+          <th>Detalhamento</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for pc in ajuste.prestacaocontaregistro_set.all %}
+        <tr>
+          <td>{{ pc.prestacao_conta.epigrafe }}</td>
+          <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
+          <td>{{ pc.get_situacao_display }}</td>
+          <td>{{ pc.detalhamento|default:"—" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {# --- Empenhos --- #}
+  {% if ajuste.empenhoemendaajuste_set.exists %}
+  <div class="sub-secao">
+    <h4 class="sub-titulo">Empenhos ({{ ajuste.empenhoemendaajuste_set.count }})</h4>
+    {% with ajuste.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
+    <table>
+      <thead>
+        <tr>
+          <th class="text-right">Total Empenhado (R$)</th>
+          <th class="text-right">Total Liquidado (R$)</th>
+          <th class="text-right">Total Pago (R$)</th>
+          <th class="text-right">Total Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="totais-linha">
+          <td class="text-right">{{ sums.valor_empenhado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_liquidado|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_pago_bruto|decimal2str }}</td>
+          <td class="text-right">{{ sums.valor_anulado|decimal2str }}</td>
+        </tr>
+      </tbody>
+    </table>
+    {% endwith %}
+    <table style="margin-top:4px">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Data</th>
+          <th>Fornecedor</th>
+          <th>CPF/CNPJ</th>
+          <th>Modalidade</th>
+          <th>Histórico / Dotação</th>
+          <th class="text-right">Empenhado (R$)</th>
+          <th class="text-right">Liquidado (R$)</th>
+          <th class="text-right">Pago (R$)</th>
+          <th class="text-right">Anulado (R$)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for emp in ajuste.empenhoemendaajuste_set.all %}
+        <tr>
+          <td>{{ emp.empenho.codigo }}</td>
+          <td>{{ emp.empenho.data|date:"d/m/Y"|default:"—" }}</td>
+          <td>{{ emp.empenho.nome|default:"—" }}</td>
+          <td>{{ emp.empenho.cpfcnpj|default:"—" }}</td>
+          <td>{{ emp.empenho.modalidade|default:"—" }}</td>
+          <td>
+            {{ emp.empenho.historico|default:"" }}{% if emp.empenho.historico and emp.empenho.dotacao %}<br>{% endif %}{% if emp.empenho.dotacao %}<small>Dotação: {{ emp.empenho.dotacao }}</small>{% endif %}{% if not emp.empenho.historico and not emp.empenho.dotacao %}—{% endif %}
+          </td>
+          <td class="text-right">{{ emp.empenho.str_valor_empenhado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_liquidado }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_pago_bruto }}</td>
+          <td class="text-right">{{ emp.empenho.str_valor_anulado }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+</div>
+{% endfor %}
+{% endif %}{# /registroajusteloa_list #}
+
+{% endblock base_content %}
