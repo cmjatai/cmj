@@ -212,18 +212,16 @@
           <th>Data</th>
           <th>Autor</th>
           <th>Ementa</th>
-          <th>Arquivo (URL)</th>
         </tr>
       </thead>
       <tbody>
         {% for doc in emenda.materia.documentoacessorio_set.all %}
         <tr>
-          <td>{{ doc.nome }}</td>
+          <td><a href="{{ doc.arquivo.url }}" target="_blank">{{ doc.nome }}</a></td>
           <td>{{ doc.tipo }}</td>
           <td>{{ doc.data|date:"d/m/Y"|default:"—" }}</td>
           <td>{{ doc.autor|default:"—" }}</td>
           <td>{{ doc.ementa|default:"—" }}</td>
-          <td><small>{% if doc.arquivo %}{{ doc.arquivo.url }}{% else %}—{% endif %}</small></td>
         </tr>
         {% endfor %}
       </tbody>
