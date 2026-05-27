@@ -358,6 +358,35 @@ class EmpenhoEmendaAjusteManager(models.Manager):
     use_for_related_fields = True
 
     def aggregate_sum_dos_empenhos(self):
+        # Usa prefetch cache quando disponível (evita query extra por emenda/ajuste)
+        instance = getattr(self, "instance", None)
+        if instance is not None:
+            prefetch_cache = getattr(instance, "_prefetched_objects_cache", {})
+            cached = prefetch_cache.get("empenhoemendaajuste_set")
+            if cached is not None:
+                seen = set()
+                totals = {
+                    "valor_empenhado": Decimal("0.00"),
+                    "valor_anulado": Decimal("0.00"),
+                    "valor_liquidado": Decimal("0.00"),
+                    "valor_pago_bruto": Decimal("0.00"),
+                }
+                for obj in cached:
+                    if obj.empenho_id not in seen:
+                        seen.add(obj.empenho_id)
+                        e = obj.empenho
+                        totals["valor_empenhado"] += e.valor_empenhado or Decimal(
+                            "0.00"
+                        )
+                        totals["valor_anulado"] += e.valor_anulado or Decimal("0.00")
+                        totals["valor_liquidado"] += e.valor_liquidado or Decimal(
+                            "0.00"
+                        )
+                        totals["valor_pago_bruto"] += e.valor_pago_bruto or Decimal(
+                            "0.00"
+                        )
+                return totals
+        # Fallback: agrega via DB (comportamento original)
         empenho_ids = self.values_list("empenho_id", flat=True).distinct()
         se = Empenho.objects.filter(id__in=empenho_ids).aggregate(
             valor_empenhado=Sum("valor_empenhado"),

@@ -199,6 +199,10 @@ class EmendaLoa(CmjSearchMixin):
 
     @property
     def has_ajustes(self):
+        # Usa anotação pré-computada no queryset quando disponível (evita query extra)
+        ann = getattr(self, "ann_has_ajustes", None)
+        if ann is not None:
+            return ann
         return RegistroAjusteLoaParlamentar.objects.filter(
             registro__emendaloa=self
         ).exists()

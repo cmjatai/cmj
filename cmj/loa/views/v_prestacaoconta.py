@@ -1,3 +1,4 @@
+from django.db.models import Exists, OuterRef
 from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +8,12 @@ from cmj.loa.forms.f_prestacaoconta import (
     PrestacaoContaLoaForm,
     PrestacaoContaRegistroForm,
 )
-from cmj.loa.models import PrestacaoContaLoa, PrestacaoContaRegistro
+from cmj.loa.models import (
+    PrestacaoContaLoa,
+    PrestacaoContaRegistro,
+    RegistroAjusteLoa,
+    RegistroAjusteLoaParlamentar,
+)
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 
 
@@ -326,6 +332,17 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                         "materia__tramitacao_set__unidade_tramitacao_local",
                         "materia__tramitacao_set__unidade_tramitacao_destino",
                         "materia__documentoacessorio_set",
+                        "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
+                        "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
+                    )
+                    .annotate(
+                        ann_has_ajustes=Exists(
+                            RegistroAjusteLoaParlamentar.objects.filter(
+                                registro__in=RegistroAjusteLoa.objects.filter(
+                                    emendaloa=OuterRef("pk")
+                                )
+                            )
+                        )
                     ),
                     RegistroAjusteLoaFilterSet: RegistroAjusteLoaFilterSet._meta.model.objects.filter(
                         oficio_ajuste_loa__loa=pk
@@ -341,6 +358,8 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                         "registroajusteloaparlamentar_set__parlamentar",
                         "emendaloa",
                         "prestacaocontaregistro_set__prestacao_conta",
+                        "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
+                        "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
                         "empenhoemendaajuste_set__empenho",
                     ),
                 }

@@ -323,7 +323,7 @@
   {% if emenda.registrocontabil_set.exists %}
   <div class="sub-secao">
     <h4 class="sub-titulo">Registros Contábeis ({{ emenda.registrocontabil_set.count }})</h4>
-    <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;">
+    <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
       {% for rc in emenda.registrocontabil_set.all %}
       <li>{{ rc }}</li>
       {% endfor %}
@@ -340,26 +340,18 @@
       <thead>
         <tr>
           <th>Data</th>
-          <th>Turno</th>
-          <th>Urgente</th>
           <th>Status</th>
           <th>Unidade Local → Destino</th>
           <th>Texto</th>
-          <th>Dt. Encaminhamento</th>
-          <th>Dt. Fim Prazo</th>
         </tr>
       </thead>
       <tbody>
         {% for tram in emenda.materia.tramitacao_set.all %}
         <tr>
           <td>{{ tram.data_tramitacao|date:"d/m/Y" }}</td>
-          <td>{% if tram.turno %}{{ tram.get_turno_display }}{% else %}—{% endif %}</td>
-          <td>{% if tram.urgente %}Sim{% else %}—{% endif %}</td>
           <td>{{ tram.status }}</td>
           <td>{{ tram.unidade_tramitacao_local }}{% if tram.unidade_tramitacao_destino %} &rarr; {{ tram.unidade_tramitacao_destino }}{% endif %}</td>
           <td>{{ tram.texto|default:"—" }}</td>
-          <td>{{ tram.data_encaminhamento|date:"d/m/Y"|default:"—" }}</td>
-          <td>{{ tram.data_fim_prazo|date:"d/m/Y"|default:"—" }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -499,6 +491,28 @@
         {% endfor %}
       </tbody>
     </table>
+    {% for pc in ajuste.prestacaocontaregistro_set.all %}
+    {% if pc.arquivoprestacaocontaregistro_set.exists %}
+    <div style="margin-top:4px;font-size:0.82rem;">
+      <strong>Arq. do Registro ({{ pc.prestacao_conta.epigrafe }}):</strong>
+      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
+        {% for arq in pc.arquivoprestacaocontaregistro_set.all %}
+        <li>{{ arq.descricao }}{% if arq.arquivo %} &mdash; <small>{{ arq.arquivo.url }}</small>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% if pc.prestacao_conta.arquivoprestacaocontaloa_set.exists %}
+    <div style="margin-top:4px;font-size:0.82rem;">
+      <strong>Arq. da {{ pc.prestacao_conta.epigrafe }}:</strong>
+      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
+        {% for arq in pc.prestacao_conta.arquivoprestacaocontaloa_set.all %}
+        <li>{{ arq.descricao }}{% if arq.arquivo %} &mdash; <small>{{ arq.arquivo.url }}</small>{% endif %}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    {% endfor %}
   </div>
   {% endif %}
 
