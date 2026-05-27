@@ -78,7 +78,7 @@
       <strong>Arq. do Registro ({{ pc.prestacao_conta.epigrafe }}):</strong>
       <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
         {% for arq in pc.arquivoprestacaocontaregistro_set.all %}
-        <li>{{ arq.descricao }}{% if arq.arquivo %} &mdash; <small>{{ arq.arquivo.url }}</small>{% endif %}</li>
+        <li>{% if arq.arquivo %}<a href="{{ arq.arquivo.url }}" target="_blank">{{ arq.descricao }}</a>{% else %}{{ arq.descricao }}{% endif %}</li>
         {% endfor %}
       </ul>
     </div>
@@ -88,7 +88,7 @@
       <strong>Arq. da {{ pc.prestacao_conta.epigrafe }}:</strong>
       <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
         {% for arq in pc.prestacao_conta.arquivoprestacaocontaloa_set.all %}
-        <li>{{ arq.descricao }}{% if arq.arquivo %} &mdash; <small>{{ arq.arquivo.url }}</small>{% endif %}</li>
+        <li>{% if arq.arquivo %}<a href="{{ arq.arquivo.url }}" target="_blank">{{ arq.descricao }}</a>{% else %}{{ arq.descricao }}{% endif %}</li>
         {% endfor %}
       </ul>
     </div>
