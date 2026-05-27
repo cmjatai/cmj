@@ -131,6 +131,12 @@
           @click="$emit('update:view-mode', 'dashboard')"
         ><i class="fas fa-tachometer-alt"></i></button>
       </div>
+      <a
+        class="pcl-page-btn mr-3"
+        :href="printUrl"
+        target="_blank"
+        title="Versão para impressão"
+      ><i class="fas fa-print"></i></a>
       <div v-if="totalItems > 0 && viewMode === 'list'" class="pcl-pagination w-100 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
           <div class="d-flex align-items-center mr-3 px-1">
@@ -283,6 +289,11 @@ export default {
       }
       for (let i = start; i <= end; i++) pages.push(i)
       return pages
+    },
+    printUrl () {
+      const url = new URL(window.location.href)
+      url.searchParams.set('print', 'true')
+      return url.toString()
     }
   },
   methods: {
@@ -442,6 +453,9 @@ export default {
 .pcl-page-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+a.pcl-page-btn {
+  text-decoration: none;
 }
 
 /* ===== Responsivo < 992px ===== */

@@ -2,6 +2,7 @@ from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
+from cmj.api.forms import EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
 from cmj.loa.forms.f_prestacaoconta import (
     PrestacaoContaLoaForm,
     PrestacaoContaRegistroForm,
@@ -163,21 +164,6 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
     frontend = PrestacaoContaLoa._meta.app_label
 
-    class ListView(MasterDetailCrud.ListView):
-        ordering = "-data_envio"
-        paginate_by = 25
-
-        def get(self, request, *args, **kwargs):
-            if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
-                self.template_name = "loa/prestacaocontaloa_list_public.html"
-            return super().get(request, *args, **kwargs)
-
-        def get_context_data(self, **kwargs):
-            context = super().get_context_data(**kwargs)
-            path = context.get("path", "")
-            context["path"] = f"{path} prestacaocontaloa-list"
-            return context
-
     class CreateView(MasterDetailCrud.CreateView):
         def get_success_url(self):
             return self.update_url
@@ -292,4 +278,62 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                     </table>
                 </div>
                 """,
+            )
+
+    class ListView(MasterDetailCrud.ListView):
+        ordering = "-data_envio"
+        paginate_by = 25
+
+        def get(self, request, *args, **kwargs):
+            self.selected_print = request.GET.get("print", None)
+            if self.selected_print == "true":
+                return self.print(request, *args, **kwargs)
+            if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
+                self.template_name = "loa/prestacaocontaloa_list_public.html"
+            return super().get(request, *args, **kwargs)
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get("path", "")
+            context["path"] = f"{path} prestacaocontaloa-list"
+            return context
+
+        def print(self, request, *args, **kwargs):
+            filterset_classes = EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
+
+            pk = self.kwargs.get("pk")
+            if pk:
+                filterset_classes = {
+                    EmendaLoaFilterSet: EmendaLoaFilterSet._meta.model.objects.filter(
+                        loa=pk
+                    ).distinct(),
+                    RegistroAjusteLoaFilterSet: RegistroAjusteLoaFilterSet._meta.model.objects.filter(
+                        oficio_ajuste_loa__loa=pk
+                    ).distinct(),
+                }
+
+            filtersets = []
+
+            for filterset_class, queryset in filterset_classes.items():
+                filterset = filterset_class(
+                    data=self.request.GET or None,
+                    request=self.request,
+                    queryset=queryset,
+                )
+                if (
+                    not filterset.is_bound
+                    or filterset.is_valid()
+                    or not self.get_strict()
+                ):
+                    filtersets.append(filterset)
+
+            context = {}
+            for filterset in filtersets:
+                context[f"{filterset._meta.model._meta.model_name}_list"] = filterset.qs
+
+            return self.response_class(
+                request=self.request,
+                template=["loa/prestacaocontaloa_print.html"],
+                context=context,
+                using=self.template_engine,
             )
