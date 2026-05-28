@@ -12,8 +12,10 @@
   {# --- Cabeçalho do bloco --- #}
   <h3 class="item-titulo">
     {{ forloop.counter }}.
+    <a href="{% url 'cmj.loa:emendaloa_detail' emenda.id %}" target="_blank">
     {% if emenda.materia %}{{ emenda.materia.epigrafe }} &mdash; {% endif %}
-    {{ emenda.get_tipo_display }} &mdash; <em>{{ emenda.get_fase_display }}</em>
+      {{ emenda.get_tipo_display }} &mdash; <em>{{ emenda.get_fase_display }}</em>
+    </a>
   </h3>
 
   <dl class="dados-gerais">
@@ -44,7 +46,7 @@
   {# --- Prestação de Contas --- #}
   {% if emenda.prestacaocontaregistro_set.exists %}
   <div class="sub-secao">
-    <h4 class="sub-titulo">Prestação de Contas ({{ emenda.prestacaocontaregistro_set.count }})</h4>
+    <h4 class="sub-titulo-tabela">Prestação de Contas ({{ emenda.prestacaocontaregistro_set.count }})</h4>
     <table>
       <thead>
         <tr>
@@ -58,7 +60,7 @@
       <tbody>
         {% for pc in emenda.prestacaocontaregistro_set.all %}
         <tr>
-          <td>{{ pc.prestacao_conta.epigrafe }}</td>
+          <td><a href="{% url 'cmj.loa:prestacaocontaregistro_detail' pc.id %}" target="_blank">{{ pc.prestacao_conta.epigrafe }}</a></td>
           <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
           <td>{{ pc.get_situacao_display }}</td>
           <td>{{ pc.detalhamento|default:"—" }}</td>
@@ -67,35 +69,13 @@
         {% endfor %}
       </tbody>
     </table>
-    {% for pc in emenda.prestacaocontaregistro_set.all %}
-    {% if pc.arquivoprestacaocontaregistro_set.exists %}
-    <div style="margin-top:4px;font-size:0.82rem;">
-      <strong>Arq. do Registro ({{ pc.prestacao_conta.epigrafe }}):</strong>
-      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
-        {% for arq in pc.arquivoprestacaocontaregistro_set.all %}
-        <li>{% if arq.arquivo %}<a href="{{ arq.arquivo.url }}" target="_blank">{{ arq.descricao }}</a>{% else %}{{ arq.descricao }}{% endif %}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-    {% if pc.prestacao_conta.arquivoprestacaocontaloa_set.exists %}
-    <div style="margin-top:4px;font-size:0.82rem;">
-      <strong>Arq. da {{ pc.prestacao_conta.epigrafe }}:</strong>
-      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
-        {% for arq in pc.prestacao_conta.arquivoprestacaocontaloa_set.all %}
-        <li>{% if arq.arquivo %}<a href="{{ arq.arquivo.url }}" target="_blank">{{ arq.descricao }}</a>{% else %}{{ arq.descricao }}{% endif %}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-    {% endfor %}
   </div>
   {% endif %}
 
   {# --- Empenhos --- #}
   {% if emenda.empenhoemendaajuste_set.exists %}
   <div class="sub-secao">
-    <h4 class="sub-titulo">Empenhos ({{ emenda.empenhoemendaajuste_set.count }})</h4>
+    <h4 class="sub-titulo-tabela">Empenhos ({{ emenda.empenhoemendaajuste_set.count }})</h4>
     {% with emenda.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
     <table>
       <thead>
@@ -156,7 +136,7 @@
   {# --- Ajustes Técnicos relacionados --- #}
   {% if emenda.registroajusteloa_set.exists %}
   <div class="sub-secao">
-    <h4 class="sub-titulo">Ajustes Técnicos ({{ emenda.registroajusteloa_set.count }})</h4>
+    <h4 class="sub-titulo-tabela">Ajustes Técnicos ({{ emenda.registroajusteloa_set.count }})</h4>
     <table>
       <thead>
         <tr>
@@ -198,7 +178,7 @@
   {% if emenda.materia %}
   {% if emenda.materia.tramitacao_set.exists %}
   <div class="sub-secao">
-    <h4 class="sub-titulo">Tramitações ({{ emenda.materia.tramitacao_set.count }})</h4>
+    <h4 class="sub-titulo-tabela">Tramitações ({{ emenda.materia.tramitacao_set.count }})</h4>
     <table>
       <thead>
         <tr>
@@ -225,7 +205,7 @@
   {# --- Documentos Acessórios --- #}
   {% if emenda.materia.documentoacessorio_set.exists %}
   <div class="sub-secao">
-    <h4 class="sub-titulo">Documentos Acessórios ({{ emenda.materia.documentoacessorio_set.count }})</h4>
+    <h4 class="sub-titulo-tabela">Documentos Acessórios ({{ emenda.materia.documentoacessorio_set.count }})</h4>
     <table>
       <thead>
         <tr>

@@ -51,7 +51,7 @@
   {# --- Prestação de Contas --- #}
   {% if ajuste.prestacaocontaregistro_set.exists %}
   <div class="sub-secao">
-    <h4 class="sub-titulo">Prestação de Contas ({{ ajuste.prestacaocontaregistro_set.count }})</h4>
+    <h4 class="sub-titulo-tabela">Prestação de Contas ({{ ajuste.prestacaocontaregistro_set.count }})</h4>
     <table>
       <thead>
         <tr>
@@ -64,7 +64,7 @@
       <tbody>
         {% for pc in ajuste.prestacaocontaregistro_set.all %}
         <tr>
-          <td>{{ pc.prestacao_conta.epigrafe }}</td>
+          <td><a href="{% url 'cmj.loa:prestacaocontaregistro_detail' pc.id %}" target="_blank">{{ pc.prestacao_conta.epigrafe }}</a></td>
           <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
           <td>{{ pc.get_situacao_display }}</td>
           <td>{{ pc.detalhamento|default:"—" }}</td>
@@ -72,35 +72,13 @@
         {% endfor %}
       </tbody>
     </table>
-    {% for pc in ajuste.prestacaocontaregistro_set.all %}
-    {% if pc.arquivoprestacaocontaregistro_set.exists %}
-    <div style="margin-top:4px;font-size:0.82rem;">
-      <strong>Arq. do Registro ({{ pc.prestacao_conta.epigrafe }}):</strong>
-      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
-        {% for arq in pc.arquivoprestacaocontaregistro_set.all %}
-        <li>{% if arq.arquivo %}<a href="{{ arq.arquivo.url }}" target="_blank">{{ arq.descricao }}</a>{% else %}{{ arq.descricao }}{% endif %}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-    {% if pc.prestacao_conta.arquivoprestacaocontaloa_set.exists %}
-    <div style="margin-top:4px;font-size:0.82rem;">
-      <strong>Arq. da {{ pc.prestacao_conta.epigrafe }}:</strong>
-      <ul style="margin:2px 0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
-        {% for arq in pc.prestacao_conta.arquivoprestacaocontaloa_set.all %}
-        <li>{% if arq.arquivo %}<a href="{{ arq.arquivo.url }}" target="_blank">{{ arq.descricao }}</a>{% else %}{{ arq.descricao }}{% endif %}</li>
-        {% endfor %}
-      </ul>
-    </div>
-    {% endif %}
-    {% endfor %}
   </div>
   {% endif %}
 
   {# --- Empenhos --- #}
   {% if ajuste.empenhoemendaajuste_set.exists %}
   <div class="sub-secao">
-    <h4 class="sub-titulo">Empenhos ({{ ajuste.empenhoemendaajuste_set.count }})</h4>
+    <h4 class="sub-titulo-tabela">Empenhos ({{ ajuste.empenhoemendaajuste_set.count }})</h4>
     {% with ajuste.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
     <table>
       <thead>

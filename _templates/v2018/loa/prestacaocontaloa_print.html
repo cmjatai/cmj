@@ -69,10 +69,13 @@
       margin-top: 1.5rem;
     }
     .item-titulo { font-size: 11pt; }
-    .sub-titulo {
+    .sub-titulo,
+    .sub-titulo-tabela {
       font-size: 10pt;
-      border-bottom: 1px solid #bbb;
       margin-top: 0.5rem;
+    }
+    .sub-titulo {
+      border-bottom: 1px solid #bbb;
     }
     dl.dados-gerais dt {
       font-weight: bold;
@@ -96,10 +99,13 @@
     font-weight: bold;
     margin-bottom: 0.4rem;
   }
-  .sub-titulo {
+  .sub-titulo,
+  .sub-titulo-tabela {
     font-size: 0.95rem;
     font-weight: bold;
-    margin: 0.6rem 0 0.2rem 0;
+    margin: 1rem 0 0.2rem 0;
+  }
+  .sub-titulo {
     border-bottom: 1px solid #ccc;
   }
   .sub-secao { margin-top: 0.6rem; }
@@ -156,6 +162,11 @@
     <h2>Poder Legislativo</h2>
   </div>
   <div class="col-2 no-print"></div>
+</div>
+<div class="infofilter">
+  {% if infofilter %}
+      {{ infofilter|safe }}
+  {% endif %}
 </div>
 
 {% include "loa/prestacaocontaloa_emenda_print.html" %}

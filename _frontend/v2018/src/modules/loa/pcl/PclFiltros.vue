@@ -199,6 +199,18 @@ export default {
   components: {
     ModelSelect
   },
+  data () {
+    const url = new URL(window.location.href)
+    url.searchParams.set('print', 'true')
+    const tiposIn = url.searchParams.getAll('emendas_tipos')
+    if (tiposIn.length) {
+      url.searchParams.delete('emendas_tipos')
+      tiposIn.forEach(v => url.searchParams.append('tipo__in', v))
+    }
+    return {
+      printUrl: url.toString()
+    }
+  },
   props: {
     value: {
       type: Object,
@@ -289,11 +301,23 @@ export default {
       }
       for (let i = start; i <= end; i++) pages.push(i)
       return pages
-    },
-    printUrl () {
-      const url = new URL(window.location.href)
-      url.searchParams.set('print', 'true')
-      return url.toString()
+    }
+  },
+  watch: {
+    value: {
+      deep: true,
+      handler () {
+        this.$nextTick(() => {
+          const url = new URL(window.location.href)
+          url.searchParams.set('print', 'true')
+          const tiposIn = url.searchParams.getAll('emendas_tipos')
+          if (tiposIn.length) {
+            url.searchParams.delete('emendas_tipos')
+            tiposIn.forEach(v => url.searchParams.append('tipo__in', v))
+          }
+          this.printUrl = url.toString()
+        })
+      }
     }
   },
   methods: {

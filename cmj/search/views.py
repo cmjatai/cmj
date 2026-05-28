@@ -105,7 +105,9 @@ class CmjSearchView(AudigLogFilterMixin, SearchView):
 
 class InfoFilterMixin:
 
-    def infofilter(self, data):
+    def infofilter(self, data, form=None):
+        if form is not None:
+            self.form = form
         cd = self.form.cleaned_data if self.form.is_valid() else {}
 
         filters = []
@@ -127,6 +129,8 @@ class InfoFilterMixin:
             elif queryset is not None:
                 if not isinstance(v, (list, tuple)):
                     v = [v]
+                if v and not isinstance(v[0], int):
+                    v = [x.id for x in v]
                 items = queryset.filter(id__in=v)
                 filtro = (
                     f'<strong>{label}:</strong> {" / ".join([str(x) for x in items])}'

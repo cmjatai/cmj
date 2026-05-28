@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.db.models import Exists, OuterRef
 from django.http import HttpResponseNotAllowed
 from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
+
 from cmj.api.forms import EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
 from cmj.loa.forms.f_prestacaoconta import (
     PrestacaoContaLoaForm,
@@ -15,6 +16,7 @@ from cmj.loa.models import (
     RegistroAjusteLoa,
     RegistroAjusteLoaParlamentar,
 )
+from cmj.search.views import InfoFilterMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 
 
@@ -287,14 +289,15 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 """,
             )
 
-    class ListView(MasterDetailCrud.ListView):
+    class ListView(InfoFilterMixin, MasterDetailCrud.ListView):
         ordering = "-data_envio"
         paginate_by = 25
 
         def get(self, request, *args, **kwargs):
             self.selected_print = request.GET.get("print", None)
             if self.selected_print == "true":
-                return self._print_gate(request)
+                # return self._print_gate(request)
+                return self.print(request)
             if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
                 self.template_name = "loa/prestacaocontaloa_list_public.html"
             return super().get(request, *args, **kwargs)
@@ -416,21 +419,34 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             filtersets = []
 
             for filterset_class, queryset in filterset_classes.items():
+                data = self.request.GET if self.request.GET else {}
+                data = data.copy()
+                if filterset_class == RegistroAjusteLoaFilterSet:
+                    parlamentares = self.request.GET.getlist("parlamentares")
+                    del data["parlamentares"]
+                    data["parlamentares_valor"] = ",".join(parlamentares)
+
                 filterset = filterset_class(
-                    data=self.request.GET or None,
+                    data=data,
                     request=self.request,
                     queryset=queryset,
                 )
                 if (
                     not filterset.is_bound
                     or filterset.is_valid()
-                    or not self.get_strict()
+                    # or not self.get_strict()
                 ):
                     filtersets.append(filterset)
 
             context = {}
             for filterset in filtersets:
                 context[f"{filterset._meta.model._meta.model_name}_list"] = filterset.qs
+
+            context["infofilter"] = self.infofilter(
+                data, form=filtersets[0].form if filtersets else None
+            )
+
+            print(str(filterset.qs.query))
 
             return self.response_class(
                 request=self.request,
