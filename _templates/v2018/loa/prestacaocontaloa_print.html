@@ -4,6 +4,9 @@
 
 {% block appvue_content %}
 {% endblock appvue_content %}
+{% block head_title %}
+  {{loa_title|cut:"<br>"}}
+{% endblock head_title %}
 
 {% block base_content %}
 <style type="text/css">
@@ -145,29 +148,41 @@
 </style>
 
 {# ===== CABEÇALHO ===== #}
-<div class="row mt-2 mb-3">
-  <div class="col-2 no-print"></div>
-  <div class="col-auto">
-    <img
-      height="80"
-      src="{% webpack_static '/brasao/brasao_256.png' %}"
-      alt="Brasão da Câmara Municipal de Jataí">
+<div class="row mt-3 mb-3">
+  <div class="col row">
+    <div class="col-auto">
+      <img
+        height="128"
+        src="{% webpack_static '/brasao/brasao_256.png' %}"
+        alt="Brasão da Câmara Municipal de Jataí">
+    </div>
+    <div class="col d-flex flex-column justify-content-center align-items-center">
+      <h1>
+        <strong>
+          {% if nome %}{{ nome }}{% else %}{% trans 'Sem Nome Cadastrado' %}{% endif %}
+        </strong>
+      </h1>
+      <h2>Poder Legislativo</h2>
+      <h4>
+        {{loa_title|safe}}
+      </h4>
+    </div>
   </div>
-  <div class="col d-flex flex-column justify-content-center align-items-center">
-    <h1>
-      <strong>
-        {% if nome %}{{ nome }}{% else %}{% trans 'Sem Nome Cadastrado' %}{% endif %}
-      </strong>
-    </h1>
-    <h2>Poder Legislativo</h2>
+  <div class="col-auto no-print">
+    <a class="btn btn-outline-secondary d-inline-block" href="#" onclick="window.print(); return false;" title="{% trans 'Imprimir em PDF ou Impressora' %}">
+      <i class="fas fa-print fa-3x"></i><br>
+      Salvar como PDF<br>ou<br>Imprimir em impressora
+    </a>
   </div>
-  <div class="col-2 no-print"></div>
 </div>
-<div class="infofilter">
-  {% if infofilter %}
-      {{ infofilter|safe }}
-  {% endif %}
+<div class="row">
+  <div class="col infofilter">
+    {% if infofilter %}
+    {{ infofilter|safe }}
+    {% endif %}
+  </div>
 </div>
+
 
 {% include "loa/prestacaocontaloa_emenda_print.html" %}
 

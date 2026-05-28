@@ -127,7 +127,7 @@ class InfoFilterMixin:
             if k == "autoria_is":
                 filtro = f"<strong>{label}:</strong> {Autor.objects.get(id=v).nome}"
             elif queryset is not None:
-                if not isinstance(v, (list, tuple)):
+                if not isinstance(v, (list, tuple, QuerySet)):
                     v = [v]
                 if v and not isinstance(v[0], int):
                     v = [x.id for x in v]

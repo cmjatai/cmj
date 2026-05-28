@@ -16,6 +16,7 @@ from cmj.loa.models import (
     RegistroAjusteLoa,
     RegistroAjusteLoaParlamentar,
 )
+from cmj.loa.models.m_loa import Loa
 from cmj.search.views import InfoFilterMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 
@@ -364,6 +365,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
 
         def print(self, request, *args, **kwargs):
             pk = self.kwargs["pk"]
+            self.loa = Loa.objects.filter(pk=pk).first()
             filterset_classes = {
                 EmendaLoaFilterSet: EmendaLoaFilterSet._meta.model.objects.filter(
                     loa=pk
@@ -445,6 +447,12 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             context = {}
             for filterset in filtersets:
                 context[f"{filterset._meta.model._meta.model_name}_list"] = filterset.qs
+
+            context["loa_title"] = (
+                f"Prestação de Contas das Emendas Impositivas <br>{self.loa}"
+                if hasattr(self, "loa") and self.loa
+                else "Prestação de Contas da LOA"
+            )
 
             context["infofilter"] = self.infofilter(
                 data,
