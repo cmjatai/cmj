@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib import messages
 from django.db.models.query import QuerySet
-from django.forms import ValidationError
+from django.forms import ChoiceField, ValidationError
 from django.http import HttpResponseRedirect
 from django.urls.base import reverse
 from django.utils.encoding import force_str
@@ -105,7 +105,7 @@ class CmjSearchView(AudigLogFilterMixin, SearchView):
 
 class InfoFilterMixin:
 
-    def infofilter(self, data, form=None):
+    def infofilter(self, data, form=None, model=None):
         if form is not None:
             self.form = form
         cd = self.form.cleaned_data if self.form.is_valid() else {}
@@ -137,6 +137,38 @@ class InfoFilterMixin:
                 )
             elif isinstance(v, bool):
                 filtro = f'<strong>{label}:</strong> {"Sim" if v else ("Não")}'
+            elif isinstance(self.form.fields[k], ChoiceField):
+                choices_dict = {
+                    str(key): value for key, value in self.form.fields[k].choices
+                }
+
+                if not isinstance(v, (list, tuple)):
+                    v = [v]
+                filtro = " / ".join([str(choices_dict.get(str(x), str(x))) for x in v])
+                filtro = f"<strong>{label}:</strong> {filtro}"
+            elif "__in" in k and isinstance(v, (list, tuple)):
+                try:
+                    field = k.split("__in")[0]
+                    # field presente no model e é um choice?
+                    fields_names = (
+                        [f.name for f in model._meta.get_fields()] if model else []
+                    )
+                    if field in fields_names:
+                        model_field = model._meta.get_field(field)
+                        if hasattr(model_field, "choices") and model_field.choices:
+                            choices_dict = {
+                                str(key): value for key, value in model_field.choices
+                            }
+                            filtro = " / ".join(
+                                [str(choices_dict.get(str(x), str(x))) for x in v]
+                            )
+                            filtro = f"<strong>{label}:</strong> {filtro}"
+                        else:
+                            filtro = f"<strong>{label}:</strong> {', '.join([str(x) for x in v])}"
+                except Exception as e:
+                    filtro = (
+                        f"<strong>{label}:</strong> {', '.join([str(x) for x in v])}"
+                    )
             else:
                 filtro = f"<strong>{label}:</strong> {v}"
 

@@ -296,8 +296,10 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
         def get(self, request, *args, **kwargs):
             self.selected_print = request.GET.get("print", None)
             if self.selected_print == "true":
-                # return self._print_gate(request)
-                return self.print(request)
+                if settings.DEBUG:
+                    return self.print(request)
+                else:
+                    return self._print_gate(request)
             if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
                 self.template_name = "loa/prestacaocontaloa_list_public.html"
             return super().get(request, *args, **kwargs)
@@ -366,6 +368,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 EmendaLoaFilterSet: EmendaLoaFilterSet._meta.model.objects.filter(
                     loa=pk
                 )
+                .order_by("materia__numero", "id")
                 .distinct()
                 .select_related(
                     "unidade",
@@ -422,9 +425,10 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 data = self.request.GET if self.request.GET else {}
                 data = data.copy()
                 if filterset_class == RegistroAjusteLoaFilterSet:
-                    parlamentares = self.request.GET.getlist("parlamentares")
-                    del data["parlamentares"]
-                    data["parlamentares_valor"] = ",".join(parlamentares)
+                    if "parlamentares" in data:
+                        parlamentares = self.request.GET.getlist("parlamentares")
+                        del data["parlamentares"]
+                        data["parlamentares_valor"] = ",".join(parlamentares)
 
                 filterset = filterset_class(
                     data=data,
@@ -443,10 +447,12 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 context[f"{filterset._meta.model._meta.model_name}_list"] = filterset.qs
 
             context["infofilter"] = self.infofilter(
-                data, form=filtersets[0].form if filtersets else None
+                data,
+                form=filtersets[0].form if filtersets else None,
+                model=filtersets[0]._meta.model if filtersets else None,
             )
 
-            print(str(filterset.qs.query))
+            # print(str(filterset.qs.query))
 
             return self.response_class(
                 request=self.request,

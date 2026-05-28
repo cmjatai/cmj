@@ -1,7 +1,7 @@
 import logging
 
 from django.db.models import Q
-from django_filters import CharFilter, ModelChoiceFilter
+from django_filters import CharFilter, ModelChoiceFilter, MultipleChoiceFilter
 
 from cmj.loa.models import (
     EmendaLoa,
