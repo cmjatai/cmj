@@ -110,6 +110,7 @@ Proposicao:
   - tipo data_envio
   - descricao
   - observacao
+  - assinantes
   {% trans 'Vínculos' %}:
   - materia_de_vinculo emendaloa
   {% trans 'Complemento' %}:

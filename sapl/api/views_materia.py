@@ -1,15 +1,22 @@
 from django.apps.registry import apps
 from django.db import transaction
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.text import slugify
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_409_CONFLICT
+from rest_framework.status import (
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST,
+    HTTP_403_FORBIDDEN,
+    HTTP_409_CONFLICT,
+)
 
 from drfautoapi.drfautoapi import (
     ApiViewSetConstrutor,
     customize,
-    wrapper_queryset_response_for_drf_action,
 )
 from sapl.api.mixins import ResponseFileMixin
 from sapl.api.permissions import SaplModelPermissions
@@ -17,6 +24,7 @@ from sapl.materia.models import (
     DocumentoAcessorio,
     MateriaLegislativa,
     Proposicao,
+    ProposicaoAssinante,
     TipoMateriaLegislativa,
     TipoProposicao,
     Tramitacao,
@@ -122,7 +130,168 @@ class _ProposicaoViewSet(ResponseFileMixin):
     def texto_original(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
 
+    @action(detail=True, methods=["get"])
+    def assinantes(self, request, *args, **kwargs):
+        proposicao = self.get_object()
+        qs = (
+            ProposicaoAssinante.objects.filter(proposicao=proposicao)
+            .select_related("autor")
+            .order_by("autor__nome")
+        )
+        data = [
+            {
+                "autor_id": pa.autor_id,
+                "autor": str(pa.autor),
+                "status": pa.status,
+                "status_display": pa.get_status_display(),
+                "data_captura": pa.data_captura,
+                "data_assinatura": pa.data_assinatura,
+            }
+            for pa in qs
+        ]
+        return Response(data)
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def capturar_assinatura(self, request, *args, **kwargs):
+        from datetime import timedelta
+
+        proposicao = self.get_object()
+
+        if proposicao.data_envio is not None:
+            return Response(
+                {
+                    "detail": "Esta proposição já foi enviada e não aceita mais assinaturas."
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        autor = request.user.autor_set.first()
+        if not autor:
+            return Response(
+                {"detail": "Usuário não possui Autor vinculado."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        with transaction.atomic():
+            assinantes = list(
+                ProposicaoAssinante.objects.select_for_update()
+                .filter(proposicao=proposicao)
+                .select_related("autor")
+            )
+
+            # Auto-liberar locks expirados (mais de 5 minutos)
+            expiracao = timezone.now() - timedelta(minutes=5)
+            for pa in assinantes:
+                if (
+                    pa.status == ProposicaoAssinante.STATUS_EM_ASSINATURA
+                    and pa.data_captura
+                    and pa.data_captura < expiracao
+                ):
+                    pa.status = ProposicaoAssinante.STATUS_PENDENTE
+                    pa.data_captura = None
+                    pa.save(update_fields=["status", "data_captura"])
+
+            meu_registro = next(
+                (pa for pa in assinantes if pa.autor_id == autor.pk), None
+            )
+            if not meu_registro:
+                return Response(
+                    {"detail": "Você não é um assinante desta proposição."},
+                    status=HTTP_403_FORBIDDEN,
+                )
+
+            if meu_registro.status == ProposicaoAssinante.STATUS_ASSINADO:
+                return Response(
+                    {"detail": "Você já assinou esta proposição."},
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
+            if meu_registro.status == ProposicaoAssinante.STATUS_EM_ASSINATURA:
+                return Response(
+                    {
+                        "detail": "Você já possui uma captura de assinatura ativa para esta proposição."
+                    },
+                    status=HTTP_400_BAD_REQUEST,
+                )
+
+            em_assinatura = next(
+                (
+                    pa
+                    for pa in assinantes
+                    if pa.status == ProposicaoAssinante.STATUS_EM_ASSINATURA
+                ),
+                None,
+            )
+            if em_assinatura:
+                return Response(
+                    {
+                        "detail": f"O Autor {em_assinatura.autor} está assinando no momento."
+                    },
+                    status=HTTP_409_CONFLICT,
+                )
+
+            meu_registro.status = ProposicaoAssinante.STATUS_EM_ASSINATURA
+            meu_registro.data_captura = timezone.now()
+            meu_registro.save(update_fields=["status", "data_captura"])
+
+        return Response(
+            {
+                "detail": "Assinatura capturada com sucesso.",
+                "hash_code": proposicao.hash_code,
+                "data_captura": meu_registro.data_captura,
+            }
+        )
+
+    @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
+    def liberar_assinatura(self, request, *args, **kwargs):
+        proposicao = self.get_object()
+        autor = request.user.autor_set.first()
+
+        if not autor:
+            return Response(
+                {"detail": "Usuário não possui Autor vinculado."},
+                status=HTTP_403_FORBIDDEN,
+            )
+
+        try:
+            pa = ProposicaoAssinante.objects.get(
+                proposicao=proposicao,
+                autor=autor,
+                status=ProposicaoAssinante.STATUS_EM_ASSINATURA,
+            )
+        except ProposicaoAssinante.DoesNotExist:
+            return Response(
+                {
+                    "detail": "Nenhuma captura de assinatura ativa encontrada para este autor."
+                },
+                status=HTTP_400_BAD_REQUEST,
+            )
+
+        pa.status = ProposicaoAssinante.STATUS_PENDENTE
+        pa.data_captura = None
+        pa.save(update_fields=["status", "data_captura"])
+
+        return Response({"detail": "Assinatura liberada com sucesso."})
+
     def perform_update(self, serializer):
+        inst = serializer.instance
+        # Validar lock ativo quando o arquivo assinado é enviado por um assinante
+        if (
+            "texto_original" in serializer.validated_data
+            and not self.request.user.is_anonymous
+        ):
+            autor = self.request.user.autor_set.first()
+            if autor:
+                is_signer = inst.assinantes.filter(autor=autor).exists()
+                if is_signer:
+                    has_lock = inst.assinantes.filter(
+                        autor=autor,
+                        status=ProposicaoAssinante.STATUS_EM_ASSINATURA,
+                    ).exists()
+                    if not has_lock:
+                        raise PermissionDenied(
+                            "Você precisa capturar a assinatura antes de enviar o arquivo assinado."
+                        )
         inst = serializer.save()
         inst.save()
 

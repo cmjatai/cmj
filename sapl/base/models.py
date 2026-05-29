@@ -360,6 +360,16 @@ class Autor(models.Model):
         default=False,
     )
 
+    certificado_cn = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        verbose_name=_("CN do certificado digital"),
+        help_text=_(
+            "Common Name (CN) do certificado X.509 utilizado para assinar documentos."
+        ),
+    )
+
     class Meta:
         verbose_name = _("Autor")
         verbose_name_plural = _("Autores")

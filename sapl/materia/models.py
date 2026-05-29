@@ -1715,6 +1715,64 @@ class Proposicao(CommonMixin):
         return hash or ""
 
 
+class ProposicaoAssinante(models.Model):
+
+    STATUS_PENDENTE = "P"
+    STATUS_EM_ASSINATURA = "A"
+    STATUS_ASSINADO = "S"
+    STATUS_CHOICES = [
+        ("P", _("Pendente")),
+        ("A", _("Em Assinatura")),
+        ("S", _("Assinado")),
+    ]
+
+    proposicao = models.ForeignKey(
+        Proposicao,
+        on_delete=models.CASCADE,
+        related_name="assinantes",
+        verbose_name=_("Proposição"),
+    )
+    autor = models.ForeignKey(
+        Autor,
+        on_delete=models.PROTECT,
+        related_name="proposicao_assinantes",
+        verbose_name=_("Autor"),
+    )
+    status = models.CharField(
+        max_length=1,
+        choices=STATUS_CHOICES,
+        default=STATUS_PENDENTE,
+        verbose_name=_("Status"),
+    )
+    data_captura = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Data de Captura"),
+        help_text=_("Momento em que o autor capturou o lock para assinar."),
+    )
+    data_assinatura = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name=_("Data de Assinatura"),
+        help_text=_("Momento confirmado pela extração de assinatura digital."),
+    )
+
+    class Meta:
+        verbose_name = _("Assinante de Proposição")
+        verbose_name_plural = _("Assinantes de Proposição")
+        unique_together = (("proposicao", "autor"),)
+        constraints = [
+            models.UniqueConstraint(
+                fields=["proposicao"],
+                condition=Q(status="A"),
+                name="unique_em_assinatura_per_proposicao",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.autor} — {self.get_status_display()}"
+
+
 class StatusTramitacao(models.Model):
     INDICADOR_CHOICES = Choices(("F", "fim", _("Fim")), ("R", "retorno", _("Retorno")))
 

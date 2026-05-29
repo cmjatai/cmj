@@ -75,6 +75,7 @@ from .models import (
     DocumentoAcessorio,
     Numeracao,
     Proposicao,
+    ProposicaoAssinante,
     Relatoria,
     TipoMateriaLegislativa,
     Tramitacao,
@@ -2535,6 +2536,16 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
         help_text=_('<i class="text-red">NAD - Necessário Assinatura Digital</i>'),
     )
 
+    assinantes = ModelMultipleChoiceField(
+        queryset=Autor.objects.none(),
+        required=False,
+        label=_("Autores Assinantes"),
+        widget=CheckboxSelectMultiple(),
+        help_text=_(
+            "Parlamentares que deverão assinar esta proposição via sistema externo."
+        ),
+    )
+
     class Meta:
         model = Proposicao
         fields = [
@@ -2682,10 +2693,21 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             )
         )
 
+        fields.append(
+            to_column(
+                (Fieldset(_("Autores Assinantes"), to_row([("assinantes", 12)])), 12)
+            )
+        )
+
         self.helper = SaplFormHelper()
         self.helper.layout = SaplFormLayout(*fields)
 
         super(ProposicaoForm, self).__init__(*args, **kwargs)
+
+        parlamentar_ct = ContentType.objects.get_for_model(Parlamentar)
+        self.fields["assinantes"].queryset = Autor.objects.filter(
+            content_type=parlamentar_ct
+        ).order_by("nome")
 
         content_types = ContentType.objects.get_for_models(
             *models_with_gr_for_model(TipoProposicao)
@@ -2728,6 +2750,10 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                     if self.instance.proposicao_vinculada.data_envio
                     else self.instance.proposicao_vinculada.ultima_edicao.year
                 )
+
+            self.fields["assinantes"].initial = self.instance.assinantes.values_list(
+                "autor_id", flat=True
+            )
 
     def clean_texto_original(self):
         texto_original = self.cleaned_data.get("texto_original", False)
@@ -2887,7 +2913,9 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                         inst.texto_original.delete()
             self.gerar_hash(inst, receber_recibo)
 
-            return super().save(commit)
+            result = super().save(commit)
+            self._sync_assinantes(inst, cd)
+            return result
 
         inst.ano = timezone.now().year
         sequencia_numeracao = AppConfig.attr("sequencia_numeracao_proposicao")
@@ -2910,7 +2938,31 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
             logger.error("Erro ao salvar Proposição: {}".format(e))
             logger.error(str(tb))
             raise ValidationError(_("Erro ao salvar Proposição: {}".format(e)))
+        self._sync_assinantes(inst, cd)
         return inst
+
+    def _sync_assinantes(self, inst, cd):
+        if "assinantes" not in cd:
+            return
+        selected = set(cd["assinantes"])
+        existing = {
+            pa.autor: pa for pa in ProposicaoAssinante.objects.filter(proposicao=inst)
+        }
+        # Adicionar novos assinantes
+        for autor in selected:
+            if autor not in existing:
+                ProposicaoAssinante.objects.create(
+                    proposicao=inst,
+                    autor=autor,
+                    status=ProposicaoAssinante.STATUS_PENDENTE,
+                )
+        # Remover desmarcados que ainda não assinaram nem estão assinando
+        for autor, pa in existing.items():
+            if (
+                autor not in selected
+                and pa.status == ProposicaoAssinante.STATUS_PENDENTE
+            ):
+                pa.delete()
 
 
 class DevolverProposicaoForm(forms.ModelForm):

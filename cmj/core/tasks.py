@@ -234,6 +234,56 @@ def signed_files_extraction(self, app_label, model_name, pk):
         )
 
 
+def _confirmar_assinatura_proposicao(proposicao):
+    """
+    Após extração de assinaturas de uma Proposição, confirma ou reverte
+    o lock de assinatura ativo (status='A') no ProposicaoAssinante.
+    O CN do certificado X.509 é comparado com Autor.certificado_cn.
+    """
+    from sapl.materia.models import ProposicaoAssinante
+
+    assinante = (
+        ProposicaoAssinante.objects.filter(
+            proposicao=proposicao,
+            status=ProposicaoAssinante.STATUS_EM_ASSINATURA,
+        )
+        .select_related("autor")
+        .first()
+    )
+
+    if not assinante:
+        return
+
+    try:
+        signs = proposicao.metadata["signs"]["texto_original"]["signs"]
+    except (TypeError, KeyError):
+        signs = []
+
+    cn_assinante = (assinante.autor.certificado_cn or "").strip().lower()
+
+    if cn_assinante:
+        matched = any(cn_assinante == sign[0].strip().lower() for sign in signs)
+    else:
+        # Sem CN configurado: qualquer assinatura no arquivo confirma
+        matched = bool(signs)
+
+    if matched:
+        assinante.status = ProposicaoAssinante.STATUS_ASSINADO
+        assinante.data_assinatura = timezone.now()
+        assinante.save(update_fields=["status", "data_assinatura"])
+        logger.info(
+            f"ProposicaoAssinante {assinante.pk}: assinatura confirmada para {assinante.autor}."
+        )
+    else:
+        assinante.status = ProposicaoAssinante.STATUS_PENDENTE
+        assinante.data_captura = None
+        assinante.save(update_fields=["status", "data_captura"])
+        logger.warning(
+            f"ProposicaoAssinante {assinante.pk}: assinatura não encontrada para "
+            f"{assinante.autor}, lock liberado."
+        )
+
+
 def task_signed_files_extraction_function(app_label, model_name, pk):
 
     def run_signed_name_and_date_via_fields(fields):
@@ -531,3 +581,9 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
             instance.save(update_fields=["metadata"])
         except:
             logger.error(f"Erro ao salvar {instance.pk} - {instance}")
+
+    # Confirmar ou reverter lock de assinatura para Proposicao
+    from sapl.materia.models import Proposicao as ProposicaoModel
+
+    if isinstance(instance, ProposicaoModel):
+        _confirmar_assinatura_proposicao(instance)

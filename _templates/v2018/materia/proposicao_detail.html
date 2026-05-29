@@ -196,6 +196,42 @@
       </div>
     </div>
   {% endif %}
+
+  {% with assinantes=object.assinantes.all %}
+    {% if assinantes %}
+      <div class="row">
+        <div class="col-sm-12">
+          <div id="div_id_assinantes" class="form-group">
+            <p class="control-label">{% trans "Assinantes" %}</p>
+            <div class="controls">
+              <div class="form-control-static">
+                <ul class="list-unstyled mb-0">
+                  {% for pa in assinantes %}
+                    <li class="mb-1">
+                      {% if pa.status == 'S' %}
+                        <span class="badge badge-success">✔ {% trans "Assinado" %}</span>
+                      {% elif pa.status == 'A' %}
+                        <span class="badge badge-warning text-dark">🔒 {% trans "Assinando" %}</span>
+                      {% else %}
+                        <span class="badge badge-secondary">{% trans "Pendente" %}</span>
+                      {% endif %}
+                      {{ pa.autor }}
+                      {% if pa.data_assinatura %}
+                        <small class="text-muted">— {% trans "em" %} {{ pa.data_assinatura }}</small>
+                      {% elif pa.status == 'A' and pa.data_captura %}
+                        <small class="text-muted">— {% trans "capturado em" %} {{ pa.data_captura }}</small>
+                      {% endif %}
+                    </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+  {% endwith %}
+
   <div class="row">
 
     {% if object.materia_de_vinculo %}
