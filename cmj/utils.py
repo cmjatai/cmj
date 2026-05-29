@@ -76,18 +76,21 @@ def clear_redis_key_contains(key, contain):
 
 
 def delete_django_cache_pattern(pattern: str):
-    client = cache._cache.get_client()
+    try:
+        client = cache._cache.get_client()
 
-    pattern = pattern.strip("*")
-    full_pattern = f"*{pattern}*"
+        pattern = pattern.strip("*")
+        full_pattern = f"*{pattern}*"
 
-    cursor = 0
-    while True:
-        cursor, keys = client.scan(cursor, match=full_pattern, count=100)
-        if keys:
-            client.unlink(*keys)
-        if cursor == 0:
-            break
+        cursor = 0
+        while True:
+            cursor, keys = client.scan(cursor, match=full_pattern, count=100)
+            if keys:
+                client.unlink(*keys)
+            if cursor == 0:
+                break
+    except Exception as e:
+        logger.error(f"Erro ao deletar cache com padrão '{pattern}': {str(e)}")
 
 
 def get_celery_worker_status():

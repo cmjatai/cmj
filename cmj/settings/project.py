@@ -146,7 +146,7 @@ CACHES = {
     }
 }
 
-if False and DEBUG:
+if DEBUG:
     CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",

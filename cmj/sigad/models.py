@@ -849,6 +849,10 @@ class Classe(ShortUrl, CMSMixin):
         _("Classe do PNTP"), choices=YES_NO_CHOICES, default=False
     )
 
+    pntp_servico = models.BooleanField(
+        _("Classe do PNTP Serviço"), choices=YES_NO_CHOICES, default=False
+    )
+
     menu_lateral = models.BooleanField(
         _("Montar Menu Lateral"), choices=YES_NO_CHOICES, default=False
     )

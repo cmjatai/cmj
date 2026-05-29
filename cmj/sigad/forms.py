@@ -113,6 +113,7 @@ class ClasseForm(ModelForm):
             "list_in_menu",
             "list_in_menu_sapl",
             "pntp",
+            "pntp_servico",
             "icon_classe",
             "menu_lateral",
             "url_redirect",
@@ -147,8 +148,9 @@ class ClasseForm(ModelForm):
             [
                 ("perfil", 3),
                 ("url_redirect", 3),
-                ("list_in_menu", 3),
-                ("list_in_menu_sapl", 3),
+                ("list_in_menu", 2),
+                ("pntp_servico", 2),
+                ("list_in_menu_sapl", 2),
             ]
         )
         row4 = to_row(

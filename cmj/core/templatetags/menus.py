@@ -131,7 +131,9 @@ def sigad_navbar(context, field=None):
     menu = get_how_menu(raizes)
     if not user.is_superuser:
         cache.set(
-            f"portalcmj_c_menu_publico_{field}", menu, 604800 if not settings.DEBUG else 10
+            f"portalcmj_c_menu_publico_{field}",
+            menu,
+            604800 if not settings.DEBUG else 10,
         )
 
     menu = encapsule_menu_em_dropdown_portal(menu)
@@ -330,8 +332,11 @@ def app_pntp_content(classe_atual, categoria):
     if not classe_atual:
         return ""
 
+    pntp_servico_atual = {}
     if not isinstance(classe_atual, Classe):
         classe_atual = Classe.objects.filter(slug=classe_atual).first()
+    else:
+        pntp_servico_atual = {"pntp_servico": classe_atual.pntp_servico}
 
     if not classe_atual:
         return ""
@@ -388,17 +393,19 @@ def app_pntp_content(classe_atual, categoria):
             nonlocal active_item
             active_item = item
 
-        for (
-            classe_referenciada
-        ) in classe.classes_referenciadas.qs_classes_publicas().order_by(
-            "referente_set__ordem"
+        for classe_referenciada in (
+            classe.classes_referenciadas.qs_classes_publicas()
+            .filter(**pntp_servico_atual)
+            .order_by("referente_set__ordem")
         ):
             item_child = recursive_classes(classe_referenciada, classe)
             if item_child:
                 item["childs"].append(classe_referenciada.id)
 
         order = "codigo"  # "titulo" if classe == classe_atual else "codigo"
-        for child in classe.childs.qs_pntp().order_by(order):
+        for child in (
+            classe.childs.qs_pntp().filter(**pntp_servico_atual).order_by(order)
+        ):
             item_child = recursive_classes(child, classe)
             if item_child:
                 item["childs"].append(child.id)
