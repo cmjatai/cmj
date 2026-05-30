@@ -201,7 +201,7 @@ export default {
   },
   data () {
     const url = new URL(window.location.href)
-    url.searchParams.set('print', 'true')
+    url.searchParams.set('print', 'True')
     const tiposIn = url.searchParams.getAll('emendas_tipos')
     if (tiposIn.length) {
       url.searchParams.delete('emendas_tipos')
@@ -267,6 +267,11 @@ export default {
   },
   computed: {
     filtersDisabled () {
+      if (this.disabled) {
+        window.loadingCMJ('Atualizando filtros...')
+      } else {
+        window.unloadingCMJ('')
+      }
       return this.disabled
     },
     multiLoaSelected () {
@@ -309,7 +314,7 @@ export default {
       handler () {
         this.$nextTick(() => {
           const url = new URL(window.location.href)
-          url.searchParams.set('print', 'true')
+          url.searchParams.set('print', 'True')
           const tiposIn = url.searchParams.getAll('emendas_tipos')
           if (tiposIn.length) {
             url.searchParams.delete('emendas_tipos')

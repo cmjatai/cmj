@@ -156,14 +156,14 @@
         src="{% webpack_static '/brasao/brasao_256.png' %}"
         alt="Brasão da Câmara Municipal de Jataí">
     </div>
-    <div class="col d-flex flex-column justify-content-center align-items-center">
+    <div class="col d-flex flex-column justify-content-center align-items-center text-center">
       <h1>
         <strong>
           {% if nome %}{{ nome }}{% else %}{% trans 'Sem Nome Cadastrado' %}{% endif %}
         </strong>
       </h1>
       <h2>Poder Legislativo</h2>
-      <h4 class"text-center">
+      <h4>
         {{loa_title|safe}}
       </h4>
     </div>

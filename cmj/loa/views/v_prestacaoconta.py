@@ -296,7 +296,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             self.selected_print = request.GET.get("print", None)
-            if self.selected_print == "true":
+            if self.selected_print == "True":
                 if settings.DEBUG:
                     return self.print(request)
                 else:
@@ -306,7 +306,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
             return super().get(request, *args, **kwargs)
 
         def post(self, request, *args, **kwargs):
-            if request.GET.get("print") == "true":
+            if request.GET.get("print") == "True":
                 return self._print_post(request, *args, **kwargs)
             return HttpResponseNotAllowed(["GET"])
 
@@ -370,7 +370,7 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 EmendaLoaFilterSet: EmendaLoaFilterSet._meta.model.objects.filter(
                     loa=pk
                 )
-                .order_by("materia__numero", "id")
+                .order_by("materia__tipo__sigla", "materia__numero", "id")
                 .distinct()
                 .select_related(
                     "unidade",
@@ -442,6 +442,17 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                     or filterset.is_valid()
                     # or not self.get_strict()
                 ):
+                    if filterset_class == EmendaLoaFilterSet:
+                        if data.get("ajustes", None) == "True" and not data.get(
+                            "tipo__in", None
+                        ):
+                            continue
+                    elif filterset_class == RegistroAjusteLoaFilterSet:
+                        if data.get("ajustes", None) == "False" and data.get(
+                            "tipo__in", None
+                        ):
+                            continue
+
                     filtersets.append(filterset)
 
             context = {}
@@ -454,10 +465,23 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 else "Prestação de Contas da LOA"
             )
 
-            context["infofilter"] = self.infofilter(
-                data,
-                form=filtersets[0].form if filtersets else None,
-                model=filtersets[0]._meta.model if filtersets else None,
+            context["infofilter"] = (
+                self.infofilter(
+                    data,
+                    form=filtersets[0].form if filtersets else None,
+                    model=filtersets[0]._meta.model if filtersets else None,
+                )
+                or ""
+            )
+
+            if data.get("ajustes", None) == "True":
+                context["infofilter"] += " - Registros de Ajuste Técnico"
+
+            context["infofilter"] = (
+                context["infofilter"]
+                .replace("EM_EXECUCAO", "Em Execução")
+                .replace("FINALIZADO", "Finalizado")
+                .replace("IMPEDIMENTO", "Impedimento")
             )
 
             # print(str(filterset.qs.query))

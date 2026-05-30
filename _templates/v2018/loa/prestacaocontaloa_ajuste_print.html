@@ -11,8 +11,11 @@
 
   {# --- Cabeçalho do bloco --- #}
   <h3 class="item-titulo">
-    {{ forloop.counter }}. {{ ajuste.oficio_ajuste_loa.epigrafe }}
-    &mdash; {{ ajuste.get_tipo_display }} &mdash; <em>{{ ajuste.get_fase_display }}</em>
+    {{ forloop.counter }}.
+    <a href="{% url 'cmj.loa:registroajusteloa_detail' ajuste.id %}" target="_blank">
+      {{ ajuste.oficio_ajuste_loa.epigrafe }}
+      &mdash; {{ ajuste.get_tipo_display }} &mdash; <em>{{ ajuste.get_fase_display }}</em>
+    </a>
   </h3>
 
   <dl class="dados-gerais">

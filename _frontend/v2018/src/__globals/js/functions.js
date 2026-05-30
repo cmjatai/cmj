@@ -6,11 +6,15 @@ window.onpageshow = event => {
 
 window.loadingCMJ = function (msg) {
   // history.replaceState({ loading: true }, '', '#')
-  const html = `<div class="loading">
+  const html = `<div class="loadingCMJ">
   <div class="loader"></div>
   <div class="message">${msg}</div>
   </div>`
   $(html).appendTo($('body'))
+}
+window.unloadingCMJ = function (msg) {
+  // history.replaceState({ loading: false }, '', '#')
+  $('.loadingCMJ').remove()
 }
 
 window.refreshSelectPicker = function () {
