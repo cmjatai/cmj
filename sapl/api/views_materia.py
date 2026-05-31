@@ -94,27 +94,106 @@ class _ProposicaoViewSet(ResponseFileMixin):
 
     permission_classes = (ProposicaoPermission,)
 
+    @property
+    def _autor_do_usuario(self):
+        """Autor vinculado ao usuário logado. Resultado cacheado por request."""
+        if not hasattr(self, "_autor_cache"):
+            self._autor_cache = (
+                None
+                if self.request.user.is_anonymous
+                else self.request.user.autor_set.first()
+            )
+        return self._autor_cache
+
+    def _q_visibilidade_proposicao(self):
+        """
+        Retorna o filtro Q de visibilidade de proposições para o usuário atual.
+
+        Regras:
+          - Anônimo: apenas proposições incorporadas (recebidas com matéria vinculada)
+          - Usuário com Autor: apenas as próprias proposições
+          - Usuário sem Autor (ex.: staff sem vínculo parlamentar): todas
+          - Operador de protocolo: acrescenta qualquer proposição já enviada/devolvida
+        """
+        user = self.request.user
+        if user.is_anonymous:
+            return Q(data_recebimento__isnull=False, object_id__isnull=False)
+
+        autor = self._autor_do_usuario
+        q = Q(autor=autor) if autor else Q()
+
+        if user.has_perm("protocoloadm.list_protocolo"):
+            q |= Q(data_envio__isnull=False) | Q(data_devolucao__isnull=False)
+
+        return q
+
+    def _proposicao_ids_como_assinante(self, incluir_assinados=False):
+        """
+        IDs de proposições em que o usuário logado é co-signatário.
+
+        Por padrão exclui STATUS_ASSINADO (usado para ações que só fazem sentido
+        enquanto a assinatura está pendente). Passe incluir_assinados=True para
+        retornar também proposições já assinadas (ex.: polling de confirmação).
+        Retorna queryset vazio se o usuário não possui Autor vinculado.
+        """
+        autor = self._autor_do_usuario
+        if not autor:
+            return ProposicaoAssinante.objects.none().values_list(
+                "proposicao_id", flat=True
+            )
+        qs = ProposicaoAssinante.objects.filter(autor=autor)
+        if not incluir_assinados:
+            qs = qs.exclude(status=ProposicaoAssinante.STATUS_ASSINADO)
+        return qs.values_list("proposicao_id", flat=True)
+
     def get_queryset(self):
         qs = super().get_queryset()
+        action = getattr(self, "action", None)
 
-        # se usuário anônimo, pode ver apenas proposições recebidas
-        q = Q(data_recebimento__isnull=False, object_id__isnull=False)
-        if not self.request.user.is_anonymous:
+        # minhas_solicitacoes: retorna proposições em que o usuário é co-signatário
+        # pendente, independente de quem é o autor principal.
+        if action == "minhas_solicitacoes":
+            autor = self._autor_do_usuario
+            if not autor:
+                return qs.none()
+            return (
+                qs.filter(pk__in=self._proposicao_ids_como_assinante())
+                .select_related("autor", "tipo")
+                .order_by("-id")
+            )
 
-            autor_do_usuario_logado = self.request.user.autor_set.first()
+        # Actions que operam sobre uma proposição específica (get_object) e precisam
+        # incluir proposições em que o usuário é co-signatário, além das visíveis
+        # pelo critério padrão. A expansão só é aplicada quando o usuário tem Autor
+        # vinculado — caso contrário Q() = tudo e o OR seria desnecessário.
+        #
+        # assinantes usa incluir_assinados=True: o cliente faz polling neste endpoint
+        # para confirmar que o status virou 'S' após o upload — a proposição precisa
+        # permanecer acessível mesmo depois da assinatura ser confirmada.
+        _actions_co_signatario = {
+            "texto_original",
+            "capturar_assinatura",
+            "liberar_assinatura",
+            "update",
+            "partial_update",
+        }
+        if self._autor_do_usuario:
+            if action == "assinantes":
+                return qs.filter(
+                    Q(
+                        pk__in=self._proposicao_ids_como_assinante(
+                            incluir_assinados=True
+                        )
+                    )
+                    | self._q_visibilidade_proposicao()
+                )
+            if action in _actions_co_signatario:
+                return qs.filter(
+                    Q(pk__in=self._proposicao_ids_como_assinante())
+                    | self._q_visibilidade_proposicao()
+                )
 
-            # se usuário logado é operador de algum autor
-            if autor_do_usuario_logado:
-                q = Q(autor=autor_do_usuario_logado)
-            else:
-                q = Q()
-
-            # se é operador de protocolo, ve qualquer coisa enviada
-            if self.request.user.has_perm("protocoloadm.list_protocolo"):
-                q |= Q(data_envio__isnull=False) | Q(data_devolucao__isnull=False)
-
-        qs = qs.filter(q)
-        return qs
+        return qs.filter(self._q_visibilidade_proposicao())
 
     def custom_filename(self, item):
         arcname = "{}-{}-{:03d}-proposicao-{}.{}".format(
@@ -129,6 +208,20 @@ class _ProposicaoViewSet(ResponseFileMixin):
     @action(detail=True)
     def texto_original(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
+
+    @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
+    def minhas_solicitacoes(self, request, *args, **kwargs):
+        """
+        Retorna as proposições em que o usuário logado é co-signatário
+        com status P ou A (pendente/em assinatura), independente de quem
+        é o autor principal. A filtragem é delegada a get_queryset().
+        """
+        if not self._autor_do_usuario:
+            return Response(
+                {"detail": "Usuário não possui Autor vinculado."},
+                status=HTTP_403_FORBIDDEN,
+            )
+        return self.list(request, *args, **kwargs)
 
     @action(detail=True, methods=["get"])
     def assinantes(self, request, *args, **kwargs):
@@ -165,7 +258,7 @@ class _ProposicaoViewSet(ResponseFileMixin):
                 status=HTTP_400_BAD_REQUEST,
             )
 
-        autor = request.user.autor_set.first()
+        autor = self._autor_do_usuario
         if not autor:
             return Response(
                 {"detail": "Usuário não possui Autor vinculado."},
@@ -245,7 +338,7 @@ class _ProposicaoViewSet(ResponseFileMixin):
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def liberar_assinatura(self, request, *args, **kwargs):
         proposicao = self.get_object()
-        autor = request.user.autor_set.first()
+        autor = self._autor_do_usuario
 
         if not autor:
             return Response(
@@ -280,7 +373,7 @@ class _ProposicaoViewSet(ResponseFileMixin):
             "texto_original" in serializer.validated_data
             and not self.request.user.is_anonymous
         ):
-            autor = self.request.user.autor_set.first()
+            autor = self._autor_do_usuario
             if autor:
                 is_signer = inst.assinantes.filter(autor=autor).exists()
                 if is_signer:
