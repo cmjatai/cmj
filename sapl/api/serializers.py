@@ -1,5 +1,4 @@
 import logging
-from hmac import new
 
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -9,7 +8,7 @@ from rest_framework import serializers
 from cmj.api.serializers import CmjSerializerMixin, ModelChoiceObjectRelatedField
 from sapl.api.views import SaplApiViewSetConstrutor
 from sapl.base.models import Autor, CasaLegislativa
-from sapl.materia.models import MateriaLegislativa, Tramitacao
+from sapl.materia.models import MateriaLegislativa, Proposicao, Tramitacao
 from sapl.parlamentares.models import Legislatura, Mandato, Parlamentar
 from sapl.sessao.models import OrdemDia, SessaoPlenaria
 
@@ -315,3 +314,15 @@ class SessaoPlenariaECidadaniaSerializer(serializers.ModelSerializer):
     def casa(self):
         casa = CasaLegislativa.objects.first()
         return casa
+
+
+class ProposicaoSerializer(CmjSerializerMixin):
+
+    assinantes = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Proposicao
+        fields = "__all__"
+
+    def get_assinantes(self, obj):
+        return list(obj.assinantes.values_list("id", flat=True))

@@ -250,6 +250,7 @@ def _confirmar_assinatura_proposicao(proposicao):
         .select_related("autor")
         .first()
     )
+    print(assinante)
 
     if not assinante:
         return

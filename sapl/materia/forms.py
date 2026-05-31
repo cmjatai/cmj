@@ -2911,9 +2911,25 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
                         and inst.texto_original
                     ):
                         inst.texto_original.delete()
+            hash_anterior = inst.hash_code
             self.gerar_hash(inst, receber_recibo)
 
             result = super().save(commit)
+
+            # Se o arquivo foi substituído (hash mudou), as assinaturas feitas
+            # sobre o arquivo anterior são inválidas — resetar antes de sincronizar.
+            if inst.hash_code and inst.hash_code != hash_anterior:
+                inst.assinantes.filter(
+                    status__in=[
+                        ProposicaoAssinante.STATUS_ASSINADO,
+                        ProposicaoAssinante.STATUS_EM_ASSINATURA,
+                    ]
+                ).update(
+                    status=ProposicaoAssinante.STATUS_PENDENTE,
+                    data_captura=None,
+                    data_assinatura=None,
+                )
+
             self._sync_assinantes(inst, cd)
             return result
 
@@ -2945,6 +2961,14 @@ class ProposicaoForm(FileFieldCheckMixin, forms.ModelForm):
         if "assinantes" not in cd:
             return
         selected = set(cd["assinantes"])
+
+        # Se há pelo menos um co-signatário selecionado, o autor principal também
+        # deve ser submetido ao controle de assinaturas: ele é incluído
+        # automaticamente na lista. Se não há co-signatários, o autor não precisa
+        # assinar — e se estava na lista como PENDENTE, será removido abaixo.
+        if selected and inst.autor:
+            selected.add(inst.autor)
+
         existing = {
             pa.autor: pa for pa in ProposicaoAssinante.objects.filter(proposicao=inst)
         }

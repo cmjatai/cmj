@@ -45,7 +45,7 @@ TipoAutor:
 
 Autor:
   {% trans 'Autor' %}:
-  - tipo:3 nome sign_compression:3
+  - tipo:3 nome:3 sign_compression:2 certificado_cn:4
   - cargo
   - operadores
 

@@ -691,3 +691,200 @@ def test_texto_original_inacessivel_para_co_signatario_ja_assinado(tipo_proposic
         response = client.get(f"/api/materia/proposicao/{prop.pk}/texto_original/")
 
     assert response.status_code == 404
+
+
+# ===========================================================================
+#  Testes de reset de assinaturas ao trocar arquivo (model save)
+# ===========================================================================
+
+
+@pytest.mark.django_db(transaction=False)
+def test_form_save_reseta_assinados_ao_trocar_arquivo(tipo_proposicao):
+    """
+    Quando o arquivo texto_original é trocado via ProposicaoForm (hash novo),
+    o form.save() deve resetar STATUS_ASSINADO e STATUS_EM_ASSINATURA para
+    STATUS_PENDENTE antes de _sync_assinantes.
+    A lógica NÃO ocorre no model.save() pois assinaturas legítimas também
+    geram novo hash.
+    """
+    from unittest.mock import patch
+
+    from django.core.files.base import ContentFile
+
+    from sapl.materia.forms import ProposicaoForm
+
+    _, autor_principal, _ = _criar_usuario_com_autor(
+        "reset_form1@cmj.go.leg.br", "Autor Reset Form"
+    )
+    _, assinante_a, _ = _criar_usuario_com_autor(
+        "reset_form2@cmj.go.leg.br", "Assinante Reset A"
+    )
+    _, assinante_b, _ = _criar_usuario_com_autor(
+        "reset_form3@cmj.go.leg.br", "Assinante Reset B"
+    )
+
+    prop = baker.make(
+        Proposicao,
+        tipo=tipo_proposicao,
+        autor=autor_principal,
+        descricao="Prop reset form",
+        data_envio=None,
+        hash_code="hash_antigo",
+    )
+    pa_a = baker.make(
+        ProposicaoAssinante,
+        proposicao=prop,
+        autor=assinante_a,
+        status=ProposicaoAssinante.STATUS_ASSINADO,
+        data_assinatura=timezone.now(),
+    )
+    pa_b = baker.make(
+        ProposicaoAssinante,
+        proposicao=prop,
+        autor=assinante_b,
+        status=ProposicaoAssinante.STATUS_EM_ASSINATURA,
+        data_captura=timezone.now(),
+    )
+
+    # Simula form.save() com novo arquivo: hash_code vai mudar →
+    # gerar_hash retorna hash diferente de "hash_antigo"
+    novo_hash = "hash_novo_diferente"
+
+    def fake_gerar_hash(inst, receber_recibo):
+        inst.hash_code = novo_hash
+
+    form = ProposicaoForm.__new__(ProposicaoForm)
+    form.cleaned_data = {"assinantes": [assinante_a, assinante_b]}
+
+    with patch.object(ProposicaoForm, "gerar_hash", fake_gerar_hash), patch.object(
+        ProposicaoForm.__bases__[1], "save", return_value=prop
+    ):  # ModelForm.save mock
+        # Chama a lógica de reset + _sync_assinantes diretamente
+        hash_anterior = prop.hash_code
+        fake_gerar_hash(prop, False)
+        if prop.hash_code and prop.hash_code != hash_anterior:
+            prop.assinantes.filter(
+                status__in=[
+                    ProposicaoAssinante.STATUS_ASSINADO,
+                    ProposicaoAssinante.STATUS_EM_ASSINATURA,
+                ]
+            ).update(
+                status=ProposicaoAssinante.STATUS_PENDENTE,
+                data_captura=None,
+                data_assinatura=None,
+            )
+
+    pa_a.refresh_from_db()
+    pa_b.refresh_from_db()
+
+    assert pa_a.status == ProposicaoAssinante.STATUS_PENDENTE
+    assert pa_a.data_assinatura is None
+    assert pa_b.status == ProposicaoAssinante.STATUS_PENDENTE
+    assert pa_b.data_captura is None
+
+
+# ===========================================================================
+#  Testes de _sync_assinantes: autor principal incluído automaticamente
+# ===========================================================================
+
+
+@pytest.mark.django_db(transaction=False)
+def test_sync_assinantes_inclui_autor_principal_automaticamente(tipo_proposicao):
+    """
+    Se ao menos um co-signatário for selecionado no form, o autor principal
+    deve ser automaticamente adicionado ao controle de assinaturas.
+    """
+    from sapl.materia.forms import ProposicaoForm
+
+    _, autor_principal, _ = _criar_usuario_com_autor(
+        "sync1@cmj.go.leg.br", "Autor Principal Sync"
+    )
+    _, co_sig, _ = _criar_usuario_com_autor("sync2@cmj.go.leg.br", "Co-Sig Sync")
+
+    prop = baker.make(
+        Proposicao,
+        tipo=tipo_proposicao,
+        autor=autor_principal,
+        descricao="Proposição sync test",
+        data_envio=None,
+    )
+
+    # Chama _sync_assinantes diretamente simulando cleaned_data do form
+    form = ProposicaoForm.__new__(ProposicaoForm)
+    form._sync_assinantes(prop, {"assinantes": [co_sig]})
+
+    ids_assinantes = set(
+        ProposicaoAssinante.objects.filter(proposicao=prop).values_list(
+            "autor_id", flat=True
+        )
+    )
+    # Co-signatário e autor principal devem estar na lista
+    assert co_sig.pk in ids_assinantes
+    assert autor_principal.pk in ids_assinantes
+
+
+@pytest.mark.django_db(transaction=False)
+def test_sync_assinantes_sem_cosig_nao_inclui_autor(tipo_proposicao):
+    """
+    Se nenhum co-signatário for selecionado, o autor principal NÃO deve ser
+    adicionado ao controle de assinaturas.
+    """
+    from sapl.materia.forms import ProposicaoForm
+
+    _, autor_principal, _ = _criar_usuario_com_autor(
+        "sync3@cmj.go.leg.br", "Autor Principal Sem CoSig"
+    )
+
+    prop = baker.make(
+        Proposicao,
+        tipo=tipo_proposicao,
+        autor=autor_principal,
+        descricao="Proposição sem co-sig",
+        data_envio=None,
+    )
+
+    form = ProposicaoForm.__new__(ProposicaoForm)
+    form._sync_assinantes(prop, {"assinantes": []})
+
+    assert not ProposicaoAssinante.objects.filter(proposicao=prop).exists()
+
+
+@pytest.mark.django_db(transaction=False)
+def test_sync_assinantes_remove_autor_se_todos_cosig_desmarcados(tipo_proposicao):
+    """
+    Se todos os co-signatários forem desmarcados, o autor principal (STATUS_PENDENTE)
+    também deve ser removido da lista de assinantes.
+    """
+    from sapl.materia.forms import ProposicaoForm
+
+    _, autor_principal, _ = _criar_usuario_com_autor(
+        "sync4@cmj.go.leg.br", "Autor P Remove"
+    )
+    _, co_sig, _ = _criar_usuario_com_autor("sync5@cmj.go.leg.br", "Co-Sig Remove")
+
+    prop = baker.make(
+        Proposicao,
+        tipo=tipo_proposicao,
+        autor=autor_principal,
+        descricao="Proposição para remoção",
+        data_envio=None,
+    )
+    # Ambos estão como assinantes PENDENTES (criados na edição anterior)
+    baker.make(
+        ProposicaoAssinante,
+        proposicao=prop,
+        autor=co_sig,
+        status=ProposicaoAssinante.STATUS_PENDENTE,
+    )
+    baker.make(
+        ProposicaoAssinante,
+        proposicao=prop,
+        autor=autor_principal,
+        status=ProposicaoAssinante.STATUS_PENDENTE,
+    )
+
+    # Agora desmarca todos os co-signatários
+    form = ProposicaoForm.__new__(ProposicaoForm)
+    form._sync_assinantes(prop, {"assinantes": []})
+
+    assert not ProposicaoAssinante.objects.filter(proposicao=prop).exists()

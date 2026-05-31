@@ -490,6 +490,7 @@ class AutorForm(ModelForm):
             "nome",
             "sign_compression",
             "cargo",
+            "certificado_cn",
             "autor_related_test52",
             "q",
         ]
@@ -520,6 +521,7 @@ class AutorForm(ModelForm):
         autor_select = Row(
             to_column(("tipo", 3)),
             to_column(("sign_compression", 3)),
+            to_column(("certificado_cn", 6)),
             Div(
                 to_column(("nome", 6)),
                 to_column(("cargo", 5)),
