@@ -551,6 +551,7 @@ class GoogleRecapthaViewMixin:
             "form_action": request.get_full_path(),
             "error": error,
             "recaptcha_gate_title": self.recaptcha_gate_title,
+            "recaptcha_gate_button": self.recaptcha_gate_button,
         }
         return self.response_class(
             request=request,

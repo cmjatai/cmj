@@ -48,6 +48,7 @@ from cmj.mixins import (
     AudigLogFilterMixin,
     BtnCertMixin,
     CheckCheckMixin,
+    GoogleRecapthaViewMixin,
     MultiFormatOutputMixin,
 )
 from cmj.utils_report import render_pdf_to_response
@@ -2657,10 +2658,20 @@ class MateriaLegislativaCrud(Crud):
 
     cache_page_materia_detail(60 * 5)
 
-    class DetailView(BtnCertMixin, Crud.DetailView):
+    class DetailView(BtnCertMixin, GoogleRecapthaViewMixin, Crud.DetailView):
 
         layout_key = "MateriaLegislativaDetail"
         template_name = "materia/materialegislativa_detail.html"
+
+        recaptcha_trigger_param = "download"
+        recaptcha_gate_title = _("Gerar ZIP com os documentos da matéria")
+        recaptcha_gate_button = _("Gerar ZIP")
+        recaptcha_success_method = "download"
+
+        @property
+        def recaptcha_gate_title(self):
+            obj = self.get_object()
+            return f"<strong>Gerar ZIP de documentos da matéria:</strong><br>{obj}"
 
         @property
         def extras_url(self):
@@ -2720,7 +2731,8 @@ class MateriaLegislativaCrud(Crud):
             btns = list(filter(None, btns))
             return btns
 
-        def download(self, download):
+        def download(self, request, *args, **kwargs):
+            download = request.GET.get("download", None)
 
             principal = self.get_object()
             test = [
@@ -2730,7 +2742,7 @@ class MateriaLegislativaCrud(Crud):
             ]
             if principal.anexo_de.exists() or all(test):
                 messages.error(
-                    self.request,
+                    request,
                     _(
                         "Matéria possui apenas seu PDF, não há anexadas ou documentos acessórios para download."
                     ),
@@ -2823,9 +2835,6 @@ class MateriaLegislativaCrud(Crud):
             #    (kwargs['pk'], ),
             #    countdown=10
             # )
-            if "download" in request.GET:
-                return self.download(request.GET.get("download"))
-
             if "ia_run" in request.GET and request.user.has_perm(
                 "core.generate_analise_genia"
             ):
@@ -2838,16 +2847,16 @@ class MateriaLegislativaCrud(Crud):
             ):
                 self.object = self.get_object()
                 if request.user.is_superuser:
-                    x = int(self.request.GET.get("x", 193))
-                    y = int(self.request.GET.get("y", 50))
-                    compression = self.request.GET.get("compression", None)
-                    original2copia = self.request.GET.get("original2copia", False)
+                    x = int(request.GET.get("x", 193))
+                    y = int(request.GET.get("y", 50))
+                    compression = request.GET.get("compression", None)
+                    original2copia = request.GET.get("original2copia", False)
                     self.object.homologar(
                         x=x, y=y, compression=compression, original2copia=original2copia
                     )
                 else:
                     self.object.homologar()
-                messages.info(self.request, _("Matéria homologada com sucesso."))
+                messages.info(request, _("Matéria homologada com sucesso."))
                 return redirect(
                     "sapl.materia:materialegislativa_detail", pk=self.object.pk
                 )

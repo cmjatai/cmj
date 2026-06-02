@@ -502,7 +502,7 @@ class UnidadeTramitacaoForm(ModelForm):
         return unidade
 
 
-class AcompanhamentoMateriaForm(GoogleRecapthaMixin, ModelForm):
+class AcompanhamentoMateriaForm(GoogleRecapthaFormMixin, ModelForm):
 
     class Meta:
         model = AcompanhamentoMateria
