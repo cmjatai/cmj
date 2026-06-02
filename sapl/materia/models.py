@@ -776,6 +776,7 @@ class MateriaLegislativa(CommonMixin):
             self.clear_cache(page=page, error=2)
 
     def zip_process(self, original=False):
+        from sapl.sessao.models import OrdemDia, SessaoPlenaria
 
         ff = "original_path" if original else "path"
 
@@ -812,6 +813,19 @@ class MateriaLegislativa(CommonMixin):
         for d in docs:
             get_docadm_anexados_from(d)
 
+        # captura as atas das reuniões com registro de votação aprovada/reprovadas
+        for ordem in OrdemDia.objects.filter(materia=principal).exclude(
+            registrovotacao_set__tipo_resultado_votacao__natureza="P"
+        ):
+            if ordem.sessao_plenaria and ordem.sessao_plenaria.upload_ata:
+                m_paths.append(
+                    (
+                        ordem.sessao_plenaria,
+                        "SessaoPlenaria",
+                        getattr(ordem.sessao_plenaria.upload_ata, ff),
+                    )
+                )
+
         m_paths = list(set(m_paths))
         m_paths.sort(key=lambda x: f"{x[1]}{x[2]}")
 
@@ -833,8 +847,10 @@ class MateriaLegislativa(CommonMixin):
         path_cache = "{}/{}/{}".format(
             opt.app_label,
             opt.model_name,
-            f"cache-{self.ano}-{self.tipo.sigla}-{self.numero}-{self.id}-{hash_files}.zip",
+            f"cache-{self.ano}-{self.tipo.sigla if self.tipo else self.tipo}-{self.numero}-{self.id}-{hash_files}.zip",
         )
+
+        path_cache = slugify(path_cache)
 
         if media_cache_storage.exists(path_cache):
             return media_cache_storage.path(path_cache)
@@ -862,11 +878,19 @@ class MateriaLegislativa(CommonMixin):
                     else:
                         arcname = "{}-{}-{}-{}-{}-{}-{}".format(
                             prefixo,
-                            "ML" if isinstance(i, MateriaLegislativa) else "DA",
+                            (
+                                "ML"
+                                if isinstance(i, MateriaLegislativa)
+                                else "SP" if isinstance(i, SessaoPlenaria) else "DA"
+                            ),
                             i.ano,
                             i.numero,
-                            i.tipo.sigla,
-                            i.tipo.descricao,
+                            i.tipo.sigla if hasattr(i.tipo, "sigla") else "",
+                            (
+                                i.tipo.descricao
+                                if hasattr(i.tipo, "descricao")
+                                else (i.tipo.nome if hasattr(i.tipo, "nome") else "")
+                            ),
                             i.id,
                         )
                         arcname = slugify(arcname)

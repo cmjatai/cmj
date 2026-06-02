@@ -592,10 +592,10 @@ class GoogleRecapthaViewMixin:
     def dispatch(self, request, *args, **kwargs):
         if self._is_recaptcha_triggered(request):
             if request.method == "GET":
-                # if settings.DEBUG and self.recaptcha_success_method:
-                #    return getattr(self, self.recaptcha_success_method)(
-                #        request, *args, **kwargs
-                #    )
+                if settings.DEBUG and self.recaptcha_success_method:
+                    return getattr(self, self.recaptcha_success_method)(
+                        request, *args, **kwargs
+                    )
                 return self._recaptcha_gate(request)
             elif request.method == "POST":
                 try:

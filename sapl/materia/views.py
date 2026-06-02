@@ -93,7 +93,7 @@ from sapl.materia.forms import (
 from sapl.norma.models import LegislacaoCitada
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import Protocolo
-from sapl.sessao.models import SessaoPlenaria
+from sapl.sessao.models import OrdemDia, SessaoPlenaria
 from sapl.settings import MAX_DOC_UPLOAD_SIZE, MEDIA_ROOT
 from sapl.utils import (
     SEPARADOR_HASH_PROPOSICAO,
@@ -2739,6 +2739,11 @@ class MateriaLegislativaCrud(Crud):
                 not principal.anexadas.exists(),
                 not principal.documentoacessorio_set.exists(),
                 not principal.documentoadministrativo_set.exists(),
+                not OrdemDia.objects.filter(materia=principal)
+                .exclude(
+                    registrovotacao_set__tipo_resultado_votacao__natureza="P",
+                )
+                .exists(),
             ]
             if principal.anexo_de.exists() or all(test):
                 messages.error(
