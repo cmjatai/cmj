@@ -19,7 +19,7 @@ from image_cropping.widgets import CropWidget, ImageCropWidget, get_attrs
 
 from cmj.core.models import AreaTrabalho, OperadorAreaTrabalho
 from cmj.globalrules import WORKSPACE_GROUPS
-from cmj.mixins import GoogleRecapthaMixin
+from cmj.mixins import GoogleRecapthaFormMixin
 from cmj.utils import YES_NO_CHOICES
 from sapl.base.models import Autor, OperadorAutor
 from sapl.crispy_layout_mixin import (
@@ -428,7 +428,7 @@ class CmjUserAdminForm(ModelForm):
                 password_validation.validate_password(new_password2, self.instance)
 
 
-class RecuperarSenhaForm(GoogleRecapthaMixin, PasswordResetForm):
+class RecuperarSenhaForm(GoogleRecapthaFormMixin, PasswordResetForm):
 
     def __init__(self, *args, **kwargs):
 

@@ -15,11 +15,11 @@
       <div class="card-body p-4">
 
         <h4 class="card-title mb-3">
-          <i class="fa-solid fa-print me-2"></i>
-          {% trans "Gerar Relatório de Prestação de Contas das Emendas Impositivas" %}
+          <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" alt="reCAPTCHA Logo" class="mr-3" style="width: 24px; height: 24px;">
+        {{ recaptcha_gate_title|default:"Confirmação de Segurança" }}
         </h4>
-        <p class="text-muted mb-4">
-          {% trans "Para acessar o relatório, confirme que você não é um robô." %}
+        <p class="text-muted mb-4 d-flex justify-content-end">
+          {% trans "Confirme que você não é um robô." %}
         </p>
 
         {% if error %}
@@ -37,10 +37,10 @@
             </div>
           </div>
 
-          <div class="d-grid">
+          <div class="d-flex justify-content-center">
             <button type="submit" class="btn btn-primary">
               <i class="fa-solid fa-file-lines me-1"></i>
-              {% trans "Gerar Relatório" %}
+              {{ recaptcha_gate_button|default:"Acessar Conteúdo" }}
             </button>
           </div>
         </form>

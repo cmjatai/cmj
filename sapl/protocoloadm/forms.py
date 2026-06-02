@@ -1,23 +1,22 @@
 import logging
 
 import django_filters
-from crispy_forms.bootstrap import Alert, FormActions, InlineRadios
-from crispy_forms.layout import HTML, Button, Column, Div, Fieldset, Layout, Submit
+from crispy_forms.bootstrap import FormActions, InlineRadios
+from crispy_forms.layout import HTML, Button, Div, Fieldset, Layout, Submit
 from django import forms
-from django.conf import settings
 from django.core.exceptions import (
     MultipleObjectsReturned,
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.db import models, transaction
+from django.db import transaction
 from django.db.models import Max, Q
 from django.forms import ModelForm
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import AreaTrabalho
-from cmj.mixins import GoogleRecapthaMixin
+from cmj.mixins import GoogleRecapthaFormMixin
 from cmj.utils import CHOICE_SIGNEDS, AlertSafe, DecimalField
 from sapl.base.models import AppConfig, Autor, TipoAutor
 from sapl.crispy_layout_mixin import (
@@ -46,7 +45,6 @@ from sapl.utils import (
     DocumentoAdministrativoOrderingFilter,
     FileFieldCheckMixin,
     FilterOverridesMetaMixin,
-    RangeWidgetOverride,
     autor_label,
     autor_modal,
     choice_anos_com_documentoadministrativo,
@@ -76,7 +74,7 @@ NATUREZA_PROCESSO = [("0", "Administrativo"), ("1", "Legislativo")]
 EM_TRAMITACAO = [(0, "Sim"), (1, "Não")]
 
 
-class AcompanhamentoDocumentoForm(GoogleRecapthaMixin, ModelForm):
+class AcompanhamentoDocumentoForm(GoogleRecapthaFormMixin, ModelForm):
 
     class Meta:
         model = AcompanhamentoDocumento

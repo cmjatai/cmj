@@ -448,7 +448,7 @@ class CmjSearchMixin(models.Model):
         )
 
 
-class GoogleRecapthaMixin:
+class GoogleRecapthaFormMixin:
 
     def __init__(self, *args, **kwargs):
 
@@ -511,6 +511,102 @@ class GoogleRecapthaMixin:
             raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
 
         return cd
+
+
+class GoogleRecapthaViewMixin:
+    """
+    Mixin que adiciona proteção reCAPTCHA baseada em parâmetro de disparo.
+
+    Atributos configuráveis na subclasse:
+      recaptcha_trigger_param   — nome do parâmetro GET que ativa o gate (ex: "print")
+      recaptcha_trigger_value   — valor esperado do parâmetro (ex: "True");
+                                  None aceita qualquer valor não-nulo
+      recaptcha_gate_title      — título exibido no gate HTML
+      recaptcha_success_method  — nome do método a chamar após validação bem-sucedida
+
+    Fluxo automático via dispatch():
+      GET  com parâmetro → exibe gate (ou chama success_method direto em DEBUG)
+      POST com parâmetro → valida reCAPTCHA → chama success_method em caso de sucesso
+    """
+
+    recaptcha_trigger_param = None
+    recaptcha_trigger_value = None
+    recaptcha_gate_title = _("Verificação de Segurança")
+    recaptcha_gate_button = _("Acessar Conteúdo")
+    recaptcha_success_method = None
+
+    def _is_recaptcha_triggered(self, request):
+        if not self.recaptcha_trigger_param:
+            return False
+        param_val = request.GET.get(self.recaptcha_trigger_param)
+        if param_val is None:
+            return False
+        if self.recaptcha_trigger_value is None:
+            return True
+        return param_val == self.recaptcha_trigger_value
+
+    def _recaptcha_gate(self, request, error=None):
+        context = {
+            "recaptcha_site_key": settings.GOOGLE_RECAPTCHA_SITE_KEY,
+            "form_action": request.get_full_path(),
+            "error": error,
+            "recaptcha_gate_title": self.recaptcha_gate_title,
+        }
+        return self.response_class(
+            request=request,
+            template=["crud/gate.html"],
+            context=context,
+            using=self.template_engine,
+        )
+
+    def _validate_recaptcha(self, request):
+
+        recaptcha = request.POST.get("g-recaptcha-response", "")
+        if not recaptcha:
+            raise ValidationError(_("Verificação do reCAPTCHA não efetuada."))
+
+        import json
+
+        import urllib3
+
+        url = (
+            "https://www.google.com/recaptcha/api/siteverify?"
+            "secret=%s"
+            "&response=%s" % (settings.GOOGLE_RECAPTCHA_SECRET_KEY, recaptcha)
+        )
+
+        http = urllib3.PoolManager()
+        try:
+            r = http.request("POST", url)
+            data = r.data.decode("utf-8")
+            jdata = json.loads(data)
+        except Exception as e:
+            raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
+
+        if jdata["success"]:
+            return True
+        else:
+            raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
+
+    def dispatch(self, request, *args, **kwargs):
+        if self._is_recaptcha_triggered(request):
+            if request.method == "GET":
+                # if settings.DEBUG and self.recaptcha_success_method:
+                #    return getattr(self, self.recaptcha_success_method)(
+                #        request, *args, **kwargs
+                #    )
+                return self._recaptcha_gate(request)
+            elif request.method == "POST":
+                try:
+                    self._validate_recaptcha(request)
+                except ValidationError as e:
+                    msg = e.messages[0] if e.messages else str(e)
+                    return self._recaptcha_gate(request, error=msg)
+                if self.recaptcha_success_method:
+                    return getattr(self, self.recaptcha_success_method)(
+                        request, *args, **kwargs
+                    )
+        return super().dispatch(request, *args, **kwargs)
 
 
 class AudigLogFilterMixin:

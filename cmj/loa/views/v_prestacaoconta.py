@@ -1,6 +1,4 @@
-from django.conf import settings
 from django.db.models import Exists, OuterRef
-from django.http import HttpResponseNotAllowed
 from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -17,6 +15,7 @@ from cmj.loa.models import (
     RegistroAjusteLoaParlamentar,
 )
 from cmj.loa.models.m_loa import Loa
+from cmj.mixins import GoogleRecapthaViewMixin
 from cmj.search.views import InfoFilterMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 
@@ -290,72 +289,21 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 """,
             )
 
-    class ListView(InfoFilterMixin, MasterDetailCrud.ListView):
+    class ListView(InfoFilterMixin, GoogleRecapthaViewMixin, MasterDetailCrud.ListView):
         ordering = "-data_envio"
         paginate_by = 25
 
+        recaptcha_trigger_param = "print"
+        recaptcha_trigger_value = "True"
+        recaptcha_gate_title = _(
+            "Gerar Relatório de Prestação de Contas das Emendas Impositivas"
+        )
+        recaptcha_success_method = "print"
+
         def get(self, request, *args, **kwargs):
-            self.selected_print = request.GET.get("print", None)
-            if self.selected_print == "True":
-                if settings.DEBUG:
-                    return self.print(request)
-                else:
-                    return self._print_gate(request)
             if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
                 self.template_name = "loa/prestacaocontaloa_list_public.html"
             return super().get(request, *args, **kwargs)
-
-        def post(self, request, *args, **kwargs):
-            if request.GET.get("print") == "True":
-                return self._print_post(request, *args, **kwargs)
-            return HttpResponseNotAllowed(["GET"])
-
-        def _print_gate(self, request, error=None):
-            context = {
-                "recaptcha_site_key": settings.GOOGLE_RECAPTCHA_SITE_KEY,
-                "form_action": request.get_full_path(),
-                "error": error,
-            }
-            return self.response_class(
-                request=request,
-                template=["loa/prestacaocontaloa_print_gate.html"],
-                context=context,
-                using=self.template_engine,
-            )
-
-        def _print_post(self, request, *args, **kwargs):
-            import json
-
-            import urllib3
-
-            recaptcha = request.POST.get("g-recaptcha-response", "")
-            if not recaptcha:
-                return self._print_gate(
-                    request, error=_("Verificação do reCAPTCHA não efetuada.")
-                )
-
-            url = (
-                "https://www.google.com/recaptcha/api/siteverify?"
-                "secret=%s&response=%s"
-                % (settings.GOOGLE_RECAPTCHA_SECRET_KEY, recaptcha)
-            )
-            http = urllib3.PoolManager()
-            try:
-                r = http.request("POST", url)
-                jdata = json.loads(r.data.decode("utf-8"))
-            except Exception:
-                return self._print_gate(
-                    request,
-                    error=_("Ocorreu um erro na validação do reCAPTCHA."),
-                )
-
-            if not jdata.get("success"):
-                return self._print_gate(
-                    request,
-                    error=_("Verificação do reCAPTCHA falhou. Tente novamente."),
-                )
-
-            return self.print(request, *args, **kwargs)
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)

@@ -23,7 +23,7 @@ from django_filters.filters import ModelMultipleChoiceFilter
 
 import sapl
 from cmj.loa.models import EmendaLoa
-from cmj.mixins import GoogleRecapthaMixin
+from cmj.mixins import GoogleRecapthaFormMixin
 from cmj.utils import CHOICE_SIGNEDS, AlertSafe
 from sapl.base.models import AppConfig, Autor, Metadata, TipoAutor
 from sapl.comissoes.models import Comissao, Composicao, Participacao
