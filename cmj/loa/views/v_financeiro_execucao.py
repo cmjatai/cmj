@@ -108,7 +108,7 @@ class EmpenhoCrud(MasterDetailCrud):
             if self.request.user.has_perm("loa.change_empenho"):
                 return qs.order_by(
                     "-empenhoemendaajuste_set__empenho__codigo", "-codigo"
-                )
+                ).distinct()
 
             return (
                 qs.filter(
@@ -129,9 +129,9 @@ class EmpenhoCrud(MasterDetailCrud):
         def hook_detail(self, empenho, *args, **kwargs):
             return f"""
                 Processo: {empenho.processo}
-                - {'Modalidade: ' if empenho.modalidade else ''}{empenho.modalidade}
-                <br>- {'Nº Licitação: ' if empenho.numero_licitacao else ''}{empenho.numero_licitacao}
-                - {'Dotação: ' if empenho.dotacao else ''}{empenho.dotacao}
+                {'- Modalidade: ' if empenho.modalidade else ''}{empenho.modalidade or ''}
+                {'- Nº Licitação: ' if empenho.numero_licitacao else ''}{empenho.numero_licitacao or ''}
+                {'- Dotação: ' if empenho.dotacao else ''}{empenho.dotacao or ''}
                 <br>{empenho.cpfcnpj} - {empenho.nome}
                 {('<hr class="divider">' + str(empenho.unidade)) if empenho.unidade and self.request.user.has_perm("loa.change_empenho") else ""}
                 {("<br>" + empenho.historico) if empenho.historico and self.request.user.has_perm("loa.change_empenho") else ""}
