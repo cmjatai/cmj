@@ -24,6 +24,7 @@ from django.utils import formats, timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
+from weasyprint import HTML
 
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial
@@ -922,6 +923,9 @@ class MateriaLegislativa(CommonMixin):
                     arcname = f"DiarioOficial-Publicacao-Norma-{d.diario.id}"
                     arcname = slugify(arcname)
                     m_paths[p] = (d.diario, "DiarioOficial", p, arcname)
+            continue
+
+            # TODO: gerar PDF do texto articulado
             if n.texto_articulado.exists():
                 ta = n.texto_articulado.first()
                 if ta and not ta.privacidade:
@@ -936,7 +940,11 @@ class MateriaLegislativa(CommonMixin):
                         with tempfile.NamedTemporaryFile(
                             delete=False, suffix=".pdf"
                         ) as tmp_ta:
-                            tmp_ta.write(response.content)
+                            html = response.content
+                            pdf = HTML(
+                                string=html, base_url=settings.SITE_URL
+                            ).write_pdf(media_type="print")
+                            tmp_ta.write(pdf)
                             tmp_ta.flush()
                             m_paths[tmp_ta.name] = (
                                 ta,
@@ -946,7 +954,7 @@ class MateriaLegislativa(CommonMixin):
                             )
                     except Exception as e:
                         logger.error(
-                            f"Erro ao baixar ata da sessão plenária para zip: {e}"
+                            f"Erro ao gerar PDF do texto articulado para zip: {e}"
                         )
 
         for a in self.autografos:
