@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from sapl.base.models import Autor
 from sapl.base.models import TipoAutor as modelTipoAutor
-from sapl.materia.models import MateriaLegislativa, Tramitacao
+from sapl.materia.models import Tramitacao
 from sapl.protocoloadm.models import TramitacaoAdministrativo
 from sapl.utils import get_base_url, models_with_gr_for_model
 
@@ -41,6 +41,18 @@ def signal_materia_materialegislativa_disable_cache(sender, **kwargs):
                         and hasattr(inst.materia, "id")
                     ):
                         inst = inst.materia.id
+                    elif (
+                        hasattr(inst, "materia_principal")
+                        and inst.materia_principal
+                        and hasattr(inst.materia_principal, "id")
+                    ):
+                        inst = inst.materia_principal.id
+                    elif (
+                        hasattr(inst, "materia_anexada")
+                        and inst.materia_anexada
+                        and hasattr(inst.materia_anexada, "id")
+                    ):
+                        inst = inst.materia_anexada.id
                     elif hasattr(inst, "id"):
                         inst = inst.id
                     else:
