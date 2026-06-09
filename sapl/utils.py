@@ -20,6 +20,7 @@ from django.contrib.contenttypes.fields import (
     GenericRel,
     GenericRelation,
 )
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.files.storage import FileSystemStorage
 from django.core.files.uploadedfile import UploadedFile
@@ -1258,19 +1259,22 @@ def mail_service_configured(request=None):
     if settings.DEBUG:
         return False
 
-    if settings.EMAIL_RUNNING is None:
-        result = True
-        try:
-            connection = get_connection()
-            connection.open()
-        except Exception as e:
-            logger.error(str(e))
-            result = False
-        finally:
-            connection.close()
-        settings.EMAIL_RUNNING = result
+    cache_email_running = cache.get("email_running")
+    if cache_email_running is not None:
+        return cache_email_running
 
-    return settings.EMAIL_RUNNING
+    result = True
+    try:
+        connection = get_connection()
+        connection.open()
+    except Exception as e:
+        logger.error(str(e))
+        result = False
+    finally:
+        connection.close()
+        cache.set("email_running", result, timeout=60 * 60)  # Cache por 1 hora
+
+    return result
 
 
 def lista_anexados(principal, isMateriaLegislativa=True):
