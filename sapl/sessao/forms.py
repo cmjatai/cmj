@@ -3,15 +3,12 @@ from datetime import datetime
 import django_filters
 from crispy_forms.layout import HTML, Button, Fieldset, Layout
 from django import forms
-from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.db import transaction
 from django.db.models import Max, Q
 from django.forms import ModelForm
 from django.forms.widgets import CheckboxSelectMultiple
 from django.utils.translation import gettext_lazy as _
 
-from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import (
     SaplFormHelper,
     SaplFormLayout,
@@ -23,7 +20,6 @@ from sapl.materia.models import (
     MateriaLegislativa,
     StatusTramitacao,
     TipoMateriaLegislativa,
-    Tramitacao,
 )
 from sapl.parlamentares.models import Mandato, Parlamentar
 from sapl.sessao.models import RegistroLeitura
@@ -36,13 +32,11 @@ from sapl.utils import (
     autor_label,
     autor_modal,
     choice_anos_com_sessaoplenaria,
-    parlamentares_ativos,
     timezone,
     verifica_afastamento_parlamentar,
 )
 
 from .models import (
-    ORDENACAO_RESUMO,
     ExpedienteMateria,
     JustificativaAusencia,
     OcorrenciaSessao,
@@ -51,7 +45,6 @@ from .models import (
     OradorOrdemDia,
     OrdemDia,
     PresencaOrdemDia,
-    ResumoOrdenacao,
     RetiradaPauta,
     SessaoPlenaria,
     SessaoPlenariaPresenca,
@@ -928,7 +921,9 @@ class PautaSessaoFilterSet(SessaoPlenariaFilterSet):
     @property
     def qs(self):
         qs = super(PautaSessaoFilterSet, self).qs
-        return qs.exclude(tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO)
+        return qs.filter(pauta_publicada=True).exclude(
+            tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO
+        )
 
     def __init__(self, *args, **kwargs):
         super(PautaSessaoFilterSet, self).__init__(*args, **kwargs)
@@ -940,7 +935,9 @@ class PautaComissaoFilterSet(SessaoPlenariaFilterSet):
     @property
     def qs(self):
         qs = super(PautaComissaoFilterSet, self).qs
-        return qs.filter(tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO)
+        return qs.filter(tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_REUNIAO).filter(
+            pauta_publicada=True
+        )
 
     def __init__(self, *args, **kwargs):
         super(PautaComissaoFilterSet, self).__init__(*args, **kwargs)

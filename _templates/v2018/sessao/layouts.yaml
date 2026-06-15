@@ -23,26 +23,26 @@ SessaoPlenariaCreate:
 
 SessaoPlenariaSessaoEdit:
   {% trans 'Dados Básicos' %}:
-  - legislatura  sessao_legislativa tipo:3  numero:1
-  - data_inicio:5  hora_inicio:5  iniciada
-  - data_fim:5  hora_fim:5  finalizada
+  - legislatura sessao_legislativa tipo numero:1 pauta_publicada:2
+  - data_inicio:5 hora_inicio:5 iniciada
+  - data_fim:5 hora_fim:5 finalizada
   - upload_pauta upload_ata upload_anexo
   - url_audio url_video
 
 SessaoPlenariaAudienciaEdit:
   {% trans 'Dados Básicos' %}:
-  - legislatura  sessao_legislativa tipo:3  numero:1
-  - data_inicio:5  hora_inicio:5  iniciada
-  - data_fim:5  hora_fim:5  finalizada
+  - legislatura sessao_legislativa tipo:3 numero:1
+  - data_inicio:5 hora_inicio:5 iniciada
+  - data_fim:5 hora_fim:5 finalizada
   - titulo
   - upload_pauta upload_ata upload_anexo
   - url_audio url_video
 
 SessaoPlenariaReuniaoEdit:
   {% trans 'Dados Básicos' %}:
-  - legislatura  sessao_legislativa tipo:3  numero:1
-  - data_inicio:5  hora_inicio:5  iniciada
-  - data_fim:5  hora_fim:5 finalizada
+  - legislatura sessao_legislativa tipo:3 numero:1 pauta_publicada:2
+  - data_inicio:5 hora_inicio:5 iniciada
+  - data_fim:5 hora_fim:5 finalizada
   - upload_pauta upload_ata upload_anexo
   - url_audio url_video
 
@@ -57,8 +57,8 @@ TipoExpediente:
 
 RegistroVotacao:
   {% trans 'Votação Simbólica' %}:
-  - numero_votos_sim  numero_votos_nao  numero_abstencoes  nao_votou_FIXME
-  - votacao_branco_FIXME  ind_votacao_presidente_FIXME
+  - numero_votos_sim numero_votos_nao numero_abstencoes nao_votou_FIXME
+  - votacao_branco_FIXME ind_votacao_presidente_FIXME
   - tipo_resultado_votacao
   - observacao
 

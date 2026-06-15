@@ -232,6 +232,14 @@ class SessaoPlenaria(models.Model):
         blank=True, max_length=500, verbose_name=_("Tema da Sessão Solene")
     )
 
+    pauta_publicada = models.BooleanField(
+        null=True,
+        blank=True,
+        choices=YES_NO_CHOICES,
+        verbose_name=_("Pauta publicada?"),
+        default=False,
+    )
+
     data_ultima_atualizacao = models.DateTimeField(
         blank=True, null=True, auto_now=True, verbose_name=_("Data")
     )
