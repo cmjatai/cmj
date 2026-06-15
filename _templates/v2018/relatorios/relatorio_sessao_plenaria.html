@@ -158,7 +158,7 @@
                 </dl>
               </td>
               <td><div>{{materia.txt_ementa}}</div>
-                {% for anexada in materia.materia.anexadas.all %}
+                {% for anexada in materia.materia.anexadas.materias_anexadas.all %}
                     {% if forloop.first %}
                       <strong>Matérias Anexadas:</strong><br>
                     {% endif %}

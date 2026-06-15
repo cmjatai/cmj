@@ -80,11 +80,12 @@ class PautaSessaoDetailView(DetailView):
                 "basica": [
                     _("Tipo de Sessão: %(tipo)s") % {"tipo": self.object.tipo},
                     _("Abertura: %(abertura)s") % {"abertura": abertura},
-                    _("Encerramento: %(encerramento)s")
-                    % {"encerramento": encerramento},
+                    # _("Encerramento: %(encerramento)s")
+                    # % {"encerramento": encerramento},
                 ]
             }
         )
+
         # =====================================================================
         # Matérias Expediente
         materias = ExpedienteMateria.objects.filter(
@@ -170,6 +171,7 @@ class PautaSessaoDetailView(DetailView):
                 situacao = ultima_tramitacao.status if ultima_tramitacao else None
             else:
                 situacao = tramitacao_item_sessao.status
+                situacao = f"<b>{tramitacao_item_sessao.status}</b><br><em>{tramitacao_item_sessao.texto}</em>"
 
             if situacao is None:
                 situacao = _("Não informada")

@@ -1,12 +1,9 @@
 import logging
 
-from django.http import HttpResponse
-from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.detail import DetailView
 
 from cmj.mixins import PdfOutputMixin
-from cmj.utils_report import make_pdf
 from sapl.base.models import AppConfig as AppsAppConfig
 from sapl.materia.models import Autoria, Tramitacao
 from sapl.parlamentares.models import Filiacao, Parlamentar
@@ -77,7 +74,11 @@ class ResumoMixin:
             "cargo_id"
         )
         integrantes = [
-            {"parlamentar": m.parlamentar, "cargo": m.cargo, "assina_ata": m.assina_ata}
+            {
+                "parlamentar": m.parlamentar,
+                "cargo": str(m.cargo),
+                "assina_ata": m.assina_ata,
+            }
             for m in mesa
         ]
         return {"mesa": integrantes}
@@ -233,13 +234,19 @@ class ResumoMixin:
     def get_assinaturas(cls, sessao_plenaria):
         mesa_dia = cls.get_mesa_diretora(sessao_plenaria)["mesa"]
 
+        # se um dos integrantes é o Presidente em "cargo", mas assina_ata está desmarcada, então altera o cargo de Vice-Presidente para Presidente em Exercício
+        if any(m["cargo"] == "Presidente" and not m["assina_ata"] for m in mesa_dia):
+            for m in mesa_dia:
+                if m["cargo"] == "Vice-Presidente":
+                    m["cargo"] = "Presidente em Exercício"
+
         presidente_dia = [
             next(
                 iter(
                     [
                         m["parlamentar"]
                         for m in mesa_dia
-                        if m["cargo"].descricao.startswith("Presidente")
+                        if m["cargo"].startswith("Presidente") and m["assina_ata"]
                     ]
                 ),
                 "",
@@ -263,9 +270,8 @@ class ResumoMixin:
         context = {}
         if any([m["assina_ata"] for m in mesa_dia]):
             # join dos cargos que assinam a ata
-            cargos_dos_assinantes = [
-                m["cargo"].descricao for m in mesa_dia if m["assina_ata"]
-            ]
+            cargos_dos_assinantes = [m["cargo"] for m in mesa_dia if m["assina_ata"]]
+
             # join com ", " e " e " para o ultimo item
             if len(cargos_dos_assinantes) > 1:
                 texto_assinatura = (

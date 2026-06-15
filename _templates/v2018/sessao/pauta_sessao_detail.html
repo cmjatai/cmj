@@ -49,7 +49,7 @@
         <tr>
           <th>Matéria</th>
           <th>Ementa</th>
-          <th>Situação</th>
+            <th>Tramitação Pautada</th>
         </tr>
         </thead>
     {% for m in materia_expediente %}
@@ -79,7 +79,7 @@
             <tr>
                 <th>Matéria</th>
                 <th>Ementa</th>
-                <th>Situação</th>
+            <th>Tramitação Pautada</th>
             </tr>
         </thead>
     {% for m in materias_ordem %}
@@ -89,8 +89,8 @@
             <br />
             <b>Autor{{ m.autor|length|pluralize:"es" }}</b>: {{ m.autor|join:', ' }}
                 </td>
-                <td style="width:70%;">{{m.ementa|safe}}<br>{{m.observacao|linebreaksbr|safe}}</td>
-                <td style="width:10%;">{{m.situacao}}</td>
+                <td style="width:50%;">{{m.ementa|safe}}<br>{{m.observacao|linebreaksbr|safe}}</td>
+                <td style="width:30%;">{{m.situacao|safe}}</td>
             </tr>
     {% endfor %}
   </table>
