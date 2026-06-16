@@ -41,7 +41,7 @@
 
   {# --- Emendas relacionadas --- #}
   {% if ajuste.emendaloa.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-ajuste-emendas-relacionadas">
     <h4 class="sub-titulo">Emendas Impositivas Relacionadas</h4>
     <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;">
       {% for em in ajuste.emendaloa.all %}
@@ -53,7 +53,7 @@
 
   {# --- Prestação de Contas --- #}
   {% if ajuste.prestacaocontaregistro_set.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-ajuste-prestacao-contas">
     <h4 class="sub-titulo-tabela">Prestação de Contas ({{ ajuste.prestacaocontaregistro_set.count }})</h4>
     <table>
       <thead>
@@ -80,7 +80,7 @@
 
   {# --- Empenhos --- #}
   {% if ajuste.empenhoemendaajuste_set.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-ajuste-empenhos">
     <h4 class="sub-titulo-tabela">Empenhos ({{ ajuste.empenhoemendaajuste_set.count }})</h4>
     {% with ajuste.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
     <table>
@@ -102,7 +102,7 @@
       </tbody>
     </table>
     {% endwith %}
-    <table style="margin-top:4px">
+    <table class="container-loa-ajuste-empenhos-detalhes" style="margin-top:4px">
       <thead>
         <tr>
           <th>Código</th>

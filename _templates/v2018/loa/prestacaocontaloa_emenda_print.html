@@ -45,7 +45,7 @@
 
   {# --- Prestação de Contas --- #}
   {% if emenda.prestacaocontaregistro_set.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-prestacaocontaloa">
     <h4 class="sub-titulo-tabela">Prestação de Contas ({{ emenda.prestacaocontaregistro_set.count }})</h4>
     <table>
       <thead>
@@ -77,7 +77,7 @@
   <div class="sub-secao">
     <h4 class="sub-titulo-tabela">Empenhos ({{ emenda.empenhoemendaajuste_set.count }})</h4>
     {% with emenda.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
-    <table>
+    <table class="container-loa-empenhos-totais">
       <thead>
         <tr>
           <th class="text-right">Total Empenhado (R$)</th>
@@ -96,7 +96,7 @@
       </tbody>
     </table>
     {% endwith %}
-    <table style="margin-top:4px">
+    <table class="container-loa-empenhos-detalhes" style="margin-top:4px">
       <thead>
         <tr>
           <th>Código</th>
@@ -135,7 +135,7 @@
 
   {# --- Ajustes Técnicos relacionados --- #}
   {% if emenda.registroajusteloa_set.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-emenda-ajustes-tecnicos">
     <h4 class="sub-titulo-tabela">Ajustes Técnicos ({{ emenda.registroajusteloa_set.count }})</h4>
     <table>
       <thead>
@@ -164,7 +164,7 @@
 
   {# --- Registros Contábeis --- #}
   {% if emenda.registrocontabil_set.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-emenda-registros-contabeis">
     <h4 class="sub-titulo">Registros Contábeis ({{ emenda.registrocontabil_set.count }})</h4>
     <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
       {% for rc in emenda.registrocontabil_set.all %}
@@ -177,7 +177,7 @@
   {# --- Tramitações --- #}
   {% if emenda.materia %}
   {% if emenda.materia.tramitacao_set.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-emenda-tramitacoes">
     <h4 class="sub-titulo-tabela">Tramitações ({{ emenda.materia.tramitacao_set.count }})</h4>
     <table>
       <thead>
@@ -204,7 +204,7 @@
 
   {# --- Documentos Acessórios --- #}
   {% if emenda.materia.documentoacessorio_set.exists %}
-  <div class="sub-secao">
+  <div class="sub-secao container-loa-emenda-documentos-acessorios">
     <h4 class="sub-titulo-tabela">Documentos Acessórios ({{ emenda.materia.documentoacessorio_set.count }})</h4>
     <table>
       <thead>
