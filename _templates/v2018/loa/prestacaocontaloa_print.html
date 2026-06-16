@@ -35,13 +35,13 @@
     }
     .emenda-item,
     .ajuste-item {
-      page-break-inside: avoid;
+      // page-break-inside: avoid;
       margin-bottom: 1.5rem;
       border-top: 2px solid #333;
       padding-top: 0.4rem;
     }
     .sub-secao {
-      page-break-inside: avoid;
+      // page-break-inside: avoid;
       margin-top: 0.4rem;
     }
     table {
@@ -176,13 +176,51 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-6 infofilter">
+  <div class="col-4 infofilter d-flex flex-column justify-content-center">
     {% if infofilter %}
     {{ infofilter|safe }}
     {% endif %}
   </div>
-  <div class="col-6">
-
+  <div class="col-8 form-loa-filter-parts">
+    <div class="card p-2">
+      <p class="mb-0 font-weight-bold" style="font-size:0.85rem;">Exibir seções:</p>
+      <form id="form-loa-filtros" class="mt-0">
+        <div class="row">
+          <div class="col-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="container-loa-prestacao-contas" id="chk-prestacao-contas" checked>
+              <label class="form-check-label small" for="chk-prestacao-contas">Prestação de Contas</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="container-loa-empenhos-totais" id="chk-empenhos-totais" checked>
+              <label class="form-check-label small" for="chk-empenhos-totais">Resumo de Empenhos</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="container-loa-empenhos-detalhes" id="chk-empenhos-detalhes" checked>
+              <label class="form-check-label small" for="chk-empenhos-detalhes">Detalhes de Empenhos</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="container-loa-emenda-ajustes-tecnicos" id="chk-emenda-ajustes" checked>
+              <label class="form-check-label small" for="chk-emenda-ajustes">Ajustes Técnicos vinculados à Emenda</label>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="container-loa-emenda-registros-contabeis" id="chk-emenda-reg-contabeis" checked>
+              <label class="form-check-label small" for="chk-emenda-reg-contabeis">Registros Contábeis (Emendas)</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="container-loa-emenda-tramitacoes" id="chk-emenda-tramitacoes" checked>
+              <label class="form-check-label small" for="chk-emenda-tramitacoes">Tramitações da Matéria (Emendas)</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="container-loa-emenda-documentos-acessorios" id="chk-emenda-docs" checked>
+              <label class="form-check-label small" for="chk-emenda-docs">Documentos Acessórios (Emendas)</label>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
@@ -193,4 +231,19 @@
 
 {% endblock base_content %}
 
+
+{% block extra_js %}
+<script>
+$(function () {
+  $('#form-loa-filtros input[type=checkbox]').on('change', function () {
+    var cls = $(this).val();
+    if ($(this).is(':checked')) {
+      $('.' + cls).removeClass('d-none d-print-none');
+    } else {
+      $('.' + cls).addClass('d-none d-print-none');
+    }
+  });
+});
+</script>
+{% endblock extra_js %}
 

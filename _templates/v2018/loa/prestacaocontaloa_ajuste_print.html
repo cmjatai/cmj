@@ -53,7 +53,7 @@
 
   {# --- Prestação de Contas --- #}
   {% if ajuste.prestacaocontaregistro_set.exists %}
-  <div class="sub-secao container-loa-ajuste-prestacao-contas">
+  <div class="sub-secao container-loa-prestacao-contas">
     <h4 class="sub-titulo-tabela">Prestação de Contas ({{ ajuste.prestacaocontaregistro_set.count }})</h4>
     <table>
       <thead>
@@ -80,10 +80,10 @@
 
   {# --- Empenhos --- #}
   {% if ajuste.empenhoemendaajuste_set.exists %}
-  <div class="sub-secao container-loa-ajuste-empenhos">
+  <div class="sub-secao ">
     <h4 class="sub-titulo-tabela">Empenhos ({{ ajuste.empenhoemendaajuste_set.count }})</h4>
     {% with ajuste.empenhoemendaajuste_set.aggregate_sum_dos_empenhos as sums %}
-    <table>
+    <table class="container-loa-empenhos-totais">
       <thead>
         <tr>
           <th class="text-right">Total Empenhado (R$)</th>
@@ -102,7 +102,7 @@
       </tbody>
     </table>
     {% endwith %}
-    <table class="container-loa-ajuste-empenhos-detalhes" style="margin-top:4px">
+    <table class="container-loa-empenhos-detalhes" style="margin-top:4px">
       <thead>
         <tr>
           <th>Código</th>
