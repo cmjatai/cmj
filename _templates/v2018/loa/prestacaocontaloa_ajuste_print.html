@@ -70,7 +70,15 @@
           <td><a href="{% url 'cmj.loa:prestacaocontaregistro_detail' pc.id %}" target="_blank">{{ pc.prestacao_conta.epigrafe }}</a></td>
           <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
           <td>{{ pc.get_situacao_display }}</td>
-          <td>{{ pc.detalhamento|default:"—" }}</td>
+          <td>{{ pc.detalhamento|default:"—" }}
+            {% if pc.arquivoprestacaocontaregistro_set.exists %}
+            <hr class="divider"><span class="text-muted">Arquivos detalhados encaminhados nesta prestação de contas:</span>
+              <ul class="m-0">
+                {% for arquivo in pc.arquivoprestacaocontaregistro_set.all %}
+                  <li><a href="{{ arquivo.arquivo.url }}" target="_blank">{{ arquivo.descricao }}</a></li>
+                {% endfor %}
+              </ul>
+            {% endif %}</td>
         </tr>
         {% endfor %}
       </tbody>
