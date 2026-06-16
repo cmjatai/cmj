@@ -47,25 +47,38 @@
   {% if emenda.prestacaocontaregistro_set.exists %}
   <div class="sub-secao container-loa-prestacao-contas">
     <h4 class="sub-titulo-tabela">Prestação de Contas ({{ emenda.prestacaocontaregistro_set.count }})</h4>
+    <small><em class="text-muted">Enviado em lote, cada data abaixo é um lote que possui um relatório geral onde, normalmente, é único para toda emenda e/ou ajuste.</em></small>
     <table>
       <thead>
         <tr>
-          <th>Epígrafe</th>
           <th>Data de Envio</th>
           <th>Situação</th>
-          <th>Detalhamento</th>
+          <th>Relatório Geral</th>
+          <th>Encaminhamento Detalhado desta Emenda</th>
           {% comment %}<th>Ajuste Técnico Ref.</th>{% endcomment %}
         </tr>
       </thead>
       <tbody>
         {% for pc in emenda.prestacaocontaregistro_set.all %}
         <tr>
-          <td><a href="{% url 'cmj.loa:prestacaocontaregistro_detail' pc.id %}" target="_blank">{{ pc.prestacao_conta.epigrafe }}</a></td>
           <td>{{ pc.prestacao_conta.data_envio|date:"d/m/Y" }}</td>
           <td>{{ pc.get_situacao_display }}</td>
-          <td>{{ pc.detalhamento|default:"—" }}
+          <td>
+            {% if pc.prestacao_conta.arquivoprestacaocontaloa_set.exists %}
+            <span class="text-muted">Arquivos encaminhados nesta data:</span>
+              <ul class="m-0">
+                {% for arquivo in pc.prestacao_conta.arquivoprestacaocontaloa_set.all %}
+                  <li><a href="{{ arquivo.arquivo.url }}" target="_blank">{{ arquivo.descricao }}</a></li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </td>
+          <td>
+            <a href="{% url 'cmj.loa:prestacaocontaregistro_detail' pc.id %}" target="_blank">
+              {{ pc.detalhamento|default:"Detalhamento não informado" }}
+            </a>
             {% if pc.arquivoprestacaocontaregistro_set.exists %}
-            <hr class="divider"><span class="text-muted">Arquivos detalhados encaminhados nesta prestação de contas:</span>
+            <hr class="divider"><span class="text-muted">Arquivos sobre esta emenda encaminhados nesta prestação de contas:</span>
               <ul class="m-0">
                 {% for arquivo in pc.arquivoprestacaocontaregistro_set.all %}
                   <li><a href="{{ arquivo.arquivo.url }}" target="_blank">{{ arquivo.descricao }}</a></li>
