@@ -112,7 +112,7 @@ class ArquivoPrestacaoContaLoa(models.Model):
 class PrestacaoContaRegistro(models.Model):
 
     class SituacaoChoices(models.TextChoices):
-        EM_EXECUCAO = "EM_EXECUCAO", _("Em Execução")
+        EM_EXECUCAO = "EM_EXECUCAO", _("Em Análise/Execução")
         FINALIZADO = "FINALIZADO", _("Finalizada")
 
     prestacao_conta = models.ForeignKey(
