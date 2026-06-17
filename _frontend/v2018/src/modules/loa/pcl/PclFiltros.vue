@@ -407,10 +407,7 @@ export default {
   cursor: pointer;
   user-select: none;
   transition: all 0.15s ease;
-  &:hover:not(.active) {
-    background: #e9ecef;
-    border-color: #adb5bd;
-  }
+
   &.active {
     background: #6c757d;
     border-color: #6c757d;
@@ -431,11 +428,22 @@ export default {
     position: absolute;
     top: 0;
     right: 0;
+    opacity: 0.3;
     &:hover {
       background: #495057;
       color: #fff;
       border-color: #495057;
       border-radius: 0.2rem;
+    }
+  }
+  &:hover:not(.active) {
+    background: #e9ecef;
+    border-color: #adb5bd;
+    .btn-change-principal {
+      opacity: 1;
+      &:hover {
+        opacity: 1;
+      }
     }
   }
 }
