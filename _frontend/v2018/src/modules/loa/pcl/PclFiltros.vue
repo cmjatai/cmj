@@ -8,14 +8,23 @@
       <div v-if="loasChoice.length" class="col-auto d-flex align-items-center">
         <label class="pcl-filtros-label pcl-filtro-exercicio mb-0 mr-2">EXERCÍCIO</label>
         <div class="pcl-loa-toggles d-flex flex-wrap">
-          <span
+          <div
             v-for="loa in loasChoice"
             :key="loa.value"
             class="pcl-loa-toggle"
             :class="{ active: isLoaSelected(loa.value), locked: loa.value === lockedLoaId }"
             :title="loa.value === lockedLoaId ? 'Exercício principal (não pode ser removido)' : ''"
             @click="toggleLoa(loa.value)"
-          >{{ loa.text }}</span>
+          >
+          {{ loa.text }}
+          <a
+            :href="`/loa/${loa.value}/prestacaocontaloa`"
+            class="btn-change-principal"
+            title="Tornar este exercício o principal"
+            @click.stop>
+            <i class="fa-solid fa-arrows-turn-to-dots"></i>
+          </a>
+        </div>
         </div>
       </div>
     </div>
@@ -385,9 +394,10 @@ export default {
   gap: 0.3rem;
 }
 .pcl-loa-toggle {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  padding: 0.15rem 0.55rem;
+  padding: 0.35rem 1.5rem;
   font-size: 0.85rem;
   font-weight: 500;
   color: #6c757d;
@@ -406,12 +416,26 @@ export default {
     border-color: #6c757d;
     color: #fff;
     font-weight: 600;
+    .btn-change-principal {
+      display: none;
+    }
   }
   &.locked {
     cursor: default;
     &.active {
       background: #495057;
       border-color: #495057;
+    }
+  }
+  .btn-change-principal {
+    position: absolute;
+    top: 0;
+    right: 0;
+    &:hover {
+      background: #495057;
+      color: #fff;
+      border-color: #495057;
+      border-radius: 0.2rem;
     }
   }
 }
