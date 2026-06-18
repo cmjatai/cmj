@@ -16,6 +16,15 @@
     <span class="legislatura">
       <strong>Legislatura:</strong> {{sessao.legislatura}} | <strong>Sessão Legislativa:</strong> {{sessao.sessao_legislativa}}
     </span>
+    <div class="d-inline">
+      {% if sessao.pauta_publicada %}
+        <span class="badge badge-success">Pauta Publicada</span>
+        {% else %}
+        <span class="badge badge-warning d-inline">Pauta em Elaboração</span>
+      {% endif %}
+
+    </div>
+
   </div>
 
   {% if forloop.last %}
