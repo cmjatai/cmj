@@ -45,7 +45,9 @@
         <div class="item-listas">
           <div class="item-raiz p-3 m-0">
             <div class="links-texto">
-              {% if sessao.upload_ata %}
+              {% if not sessao.pauta_publicada %}
+
+              {% elif sessao.upload_ata %}
                 <a class="link-texto btn btn-primary btn-sm page-preview m-0 mr-3" href="{{sessao.upload_ata.url}}" title="Ata Aprovada">
                   <strong>
                     Ata<br>Aprovada
@@ -78,7 +80,13 @@
 
             <div class="item-texto">
               <div class="item-texto-titulo">
-                <a href="{% url 'sapl.sessao:resumo' sessao.id %}">{{sessao}}</a>
+                {% if not sessao.pauta_publicada %}
+                  <span class="badge badge-warning">Pauta em Elaboração</span>
+                  <span>{{sessao}}</span>
+                {% else %}
+                  <a href="{% url 'sapl.sessao:resumo' sessao.id %}">{{sessao}}</a>
+
+                {% endif %}
               </div>
               <div class="item-texto-descricao">
 

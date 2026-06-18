@@ -243,7 +243,9 @@ class PesquisarSessaoPlenariaView(
             .distinct()
             .order_by("-legislatura__numero", "-data_inicio", "-hora_inicio")
         )
+        # if self.request.user.has_perm("sessao.change_sessaoplenaria"):
         return qs
+        # return qs.filter(pauta_publicada=True)
 
     def get_filterset_kwargs(self, filterset_class):
         kwargs = super().get_filterset_kwargs(filterset_class)

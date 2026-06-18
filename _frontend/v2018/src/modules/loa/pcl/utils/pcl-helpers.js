@@ -80,6 +80,24 @@ const SITUACAO_AJUSTE_LABELS = {
   FINALIZADO: 'Finalizado'
 }
 
+const PRESTACAO_CONTA_VARIANTS = {
+  EM_EXECUCAO: 'warning',
+  FINALIZADO: 'success'
+}
+
+const PRESTACAO_CONTA_LABELS = {
+  EM_EXECUCAO: 'Em Análise/Execução',
+  FINALIZADO: 'Finalizada'
+}
+
+export function prestacaoContaVariant (situacao) {
+  return PRESTACAO_CONTA_VARIANTS[situacao] || 'light'
+}
+
+export function prestacaoContaLabel (situacao) {
+  return PRESTACAO_CONTA_LABELS[situacao] || situacao
+}
+
 export function tipoVariant (tipo, isAjuste = false) {
   if (isAjuste) {
     return TIPO_AJUSTE_VARIANTS[tipo] || 'light'

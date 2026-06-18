@@ -10,12 +10,11 @@ from django.db.models import F, Max, Q
 from django.db.models.functions import Coalesce
 from django.http import JsonResponse
 from django.http.response import Http404, HttpResponseRedirect
-from django.shortcuts import redirect, render
+from django.shortcuts import render
 from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.datastructures import MultiValueDictKeyError
 from django.utils.decorators import method_decorator
-from django.utils.encoding import force_str
 from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
@@ -23,7 +22,6 @@ from django.views.generic import FormView, ListView, TemplateView
 from django.views.generic.base import RedirectView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import FormMixin
-from django_filters.views import FilterView
 
 from cmj.mixins import BtnCertMixin, PluginSignMixin
 from sapl.base.models import AppConfig as AppsAppConfig
@@ -40,7 +38,6 @@ from sapl.materia.forms import filtra_tramitacao_status
 from sapl.materia.models import Autoria, TipoMateriaLegislativa, Tramitacao
 from sapl.materia.views import MateriaLegislativaPesquisaView
 from sapl.parlamentares.models import (
-    Filiacao,
     Legislatura,
     Mandato,
     Parlamentar,
@@ -62,7 +59,6 @@ from sapl.sessao.forms import (
     OrdemExpedienteLeituraForm,
     PresencaForm,
     RetiradaPautaForm,
-    SessaoPlenariaFilterSet,
     SessaoPlenariaForm,
     VotacaoEditForm,
     VotacaoForm,
@@ -99,7 +95,6 @@ from sapl.sessao.models import (
 from sapl.utils import (
     get_client_ip,
     remover_acentos,
-    show_results_filter_set,
     verifica_afastamento_parlamentar,
 )
 
@@ -1605,6 +1600,12 @@ class SessaoCrud(Crud):
                 context.update({"subnav_template_name": "sessao/subnav-audiencia.yaml"})
 
             return context
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+            if self.request.user.has_perm("sessao.change_sessaoplenaria"):
+                return qs
+            return qs.filter(pauta_publicada=True)
 
         def get(self, request, *args, **kwargs):
 

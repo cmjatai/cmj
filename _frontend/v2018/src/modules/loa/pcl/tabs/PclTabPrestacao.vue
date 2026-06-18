@@ -55,8 +55,8 @@
               <small class="text-muted">Relativo ao Ajuste Técnico: {{ pc.registro_ajuste.descricao || pc.registro_ajuste.__str__ }}</small>
             </template>
           </div>
-          <b-badge :variant="situacaoVariant(pc.situacao)">
-            {{ situacaoLabel(pc.situacao) }}
+          <b-badge :variant="prestacaoContaVariant(pc.situacao)">
+            {{ prestacaoContaLabel(pc.situacao) }}
           </b-badge>
         </div>
       </div>
@@ -65,7 +65,7 @@
 </template>
 
 <script>
-import { situacaoVariant, situacaoLabel, formatDateBR } from '../utils/pcl-helpers'
+import { situacaoVariant, situacaoLabel, prestacaoContaVariant, prestacaoContaLabel, formatDateBR } from '../utils/pcl-helpers'
 
 export default {
   name: 'pcl-tab-prestacao',
@@ -82,6 +82,8 @@ export default {
   methods: {
     situacaoVariant,
     situacaoLabel,
+    prestacaoContaVariant,
+    prestacaoContaLabel,
     formatDateBR
   }
 }

@@ -18,7 +18,8 @@
   <a class="btn btn-sm btn-outline-primary" href="{%url 'sapl.sessao:pesquisar_sessao' %}?data_inicio__year={% now 'Y' %}" class="">Fazer nova Pesquisa</a>
 </div>
 <div>
-  {% if sessaoplenaria.upload_ata %}
+  {% if not sessaoplenaria.pauta_publicada %}
+  {% elif sessaoplenaria.upload_ata %}
     <a class="link-texto btn btn-primary btn-sm page-preview m-0 mr-3" href="{{sessaoplenaria.upload_ata.url}}" title="Ata Aprovada">
       <strong>
         Ata Aprovada
@@ -48,44 +49,57 @@
       {% endif %}
     {% endif %}
 </div>
-<div>
-    <a class="btn btn-primary" href="{% url 'sapl.relatorios:relatorio_sessao_plenaria_pdf' sessaoplenaria.pk %}">
-    PDF
-    </a>
-</div>
+{% if sessaoplenaria.pauta_publicada %}
+  <div>
+      <a class="btn btn-primary" href="{% url 'sapl.relatorios:relatorio_sessao_plenaria_pdf' sessaoplenaria.pk %}">
+      PDF
+      </a>
+  </div>
+  {% endif %}
 {% endblock %}
 
 {% block detail_content %}
 
     {% include 'sessao/resumos/blocos_resumo/'|add:primeiro_ordenacao %}
-    {% include 'sessao/resumos/blocos_resumo/'|add:segundo_ordenacao %}
-    {% include 'sessao/resumos/blocos_resumo/'|add:terceiro_ordenacao %}
 
-    <div class="row">
-        <div class="col-12 col-md-6">
-            {% include 'sessao/resumos/blocos_resumo/'|add:quarto_ordenacao %}
-        </div>
-        <div class="col-12 col-md-6">
-            {% include 'sessao/resumos/blocos_resumo/'|add:quinto_ordenacao %}
-        </div>
-    </div>
+{% if not sessaoplenaria.pauta_publicada and not sessaoplenaria.finalizada %}
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:sexto_ordenacao %}
+  <div class="alert alert-warning">
+    <strong class="alert-heading">Atenção!</strong>
+    <p>A Pauta desta sessão está em elaboração...</p>
+  </div>
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:setimo_ordenacao %}
+{% else %}
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:oitavo_ordenacao %}
+      {% include 'sessao/resumos/blocos_resumo/'|add:segundo_ordenacao %}
+      {% include 'sessao/resumos/blocos_resumo/'|add:terceiro_ordenacao %}
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:nono_ordenacao %}
+      <div class="row">
+          <div class="col-12 col-md-6">
+              {% include 'sessao/resumos/blocos_resumo/'|add:quarto_ordenacao %}
+          </div>
+          <div class="col-12 col-md-6">
+              {% include 'sessao/resumos/blocos_resumo/'|add:quinto_ordenacao %}
+          </div>
+      </div>
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:decimo_ordenacao %}
+      {% include 'sessao/resumos/blocos_resumo/'|add:sexto_ordenacao %}
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:decimo_primeiro_ordenacao %}
+      {% include 'sessao/resumos/blocos_resumo/'|add:setimo_ordenacao %}
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:decimo_segundo_ordenacao %}
+      {% include 'sessao/resumos/blocos_resumo/'|add:oitavo_ordenacao %}
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:decimo_terceiro_ordenacao %}
+      {% include 'sessao/resumos/blocos_resumo/'|add:nono_ordenacao %}
 
-    {% include 'sessao/resumos/blocos_resumo/'|add:decimo_quarto_ordenacao %}
+      {% include 'sessao/resumos/blocos_resumo/'|add:decimo_ordenacao %}
 
+      {% include 'sessao/resumos/blocos_resumo/'|add:decimo_primeiro_ordenacao %}
+
+      {% include 'sessao/resumos/blocos_resumo/'|add:decimo_segundo_ordenacao %}
+
+      {% include 'sessao/resumos/blocos_resumo/'|add:decimo_terceiro_ordenacao %}
+
+      {% include 'sessao/resumos/blocos_resumo/'|add:decimo_quarto_ordenacao %}
+
+{% endif %}
 {% endblock detail_content %}
