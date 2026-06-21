@@ -39,7 +39,7 @@ def signal_sessao_registrovotacao(sender, instance, **kwargs):
 def signal_sessao_sessaoplenaria(sender, **kwargs):
     keys = [
         make_template_fragment_key("portalcmj_tc_pagina_inicial_parte1"),
-        "portalcmj_c_sessoes_futuras",
+        "portalcmj_c_sessoes_quinzena",
     ]
     for key in keys:
         cache.delete(key)

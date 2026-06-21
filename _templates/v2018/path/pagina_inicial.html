@@ -12,7 +12,7 @@
   {% include "path/pagina_inicial_parte1.html" %}
   {% include "path/pagina_inicial_servicos.html" %}
 {% else %}
-  {% cache 604800 portalcmj_tc_pagina_inicial_parte1 %}
+  {% cache 604800 portalcmj_tc_pagina_inicial_parte1 %} 
     {% include "path/pagina_inicial_parte1.html" %}
   {% endcache %}
   {% cache 604800 portalcmj_tc_pagina_inicial_servicos %}

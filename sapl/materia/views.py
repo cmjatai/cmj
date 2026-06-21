@@ -2713,7 +2713,7 @@ class MateriaLegislativaCrud(Crud):
                 )
 
             if self.request.user.has_perm("materia.add_materialegislativa"):
-                if not self.object.protocolo_gr.exists():
+                if self.request.user.is_superuser or not self.object.protocolo_gr.exists():
                     btns.extend(
                         [
                             (
@@ -2844,6 +2844,7 @@ class MateriaLegislativaCrud(Crud):
                 "core.generate_analise_genia"
             ):
                 return self.ia_run()
+
             elif "cabec_autografo" in request.GET:
                 return self.cabec_autografo(request.GET.get("cabec_autografo"))
 
@@ -2865,6 +2866,8 @@ class MateriaLegislativaCrud(Crud):
                 return redirect(
                     "sapl.materia:materialegislativa_detail", pk=self.object.pk
                 )
+
+
 
             return Crud.DetailView.get(self, request, *args, **kwargs)
 
