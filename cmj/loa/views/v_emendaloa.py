@@ -1648,7 +1648,14 @@ class EmendaLoaCrud(MasterDetailCrud):
         ):
             if not self.request.user.is_superuser:
                 return "", ""
-            return verbose_name, field_display, "courier"
+
+            lines = []
+            for ehf in emendaloa.emendaloahistoricofase_set.order_by("-id"):
+                lines.append(
+                    f"{ehf.id} - {ehf.timestamp} - {ehf.get_fase_display()}<br>"
+                )
+
+            return verbose_name, "".join(lines), "courier"
 
         def hook_auditlog(self, emendaloa, verbose_name="", field_display=""):
             if not self.request.user.is_superuser:

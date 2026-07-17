@@ -3576,22 +3576,18 @@ class AdicionarVariasMateriasExpediente(
                 lista_status = filtra_tramitacao_status(
                     self.request.GET["tramitacao__status"]
                 )
+                qs = qs.filter(id__in=lista_status).distinct()
 
-                lista_materias_adicionadas = retira_materias_ja_adicionadas(
-                    self.kwargs["pk"], ExpedienteMateria
-                )
+        lista_materias_adicionadas = retira_materias_ja_adicionadas(
+            self.kwargs["pk"], ExpedienteMateria
+        )
 
-                qs = (
-                    qs.filter(id__in=lista_status)
-                    .exclude(id__in=lista_materias_adicionadas)
-                    .distinct()
-                )
-
-                kwargs.update(
-                    {
-                        "queryset": qs,
-                    }
-                )
+        qs = qs.exclude(id__in=lista_materias_adicionadas).distinct()
+        kwargs.update(
+            {
+                "queryset": qs,
+            }
+        )
 
         return kwargs
 
@@ -3693,22 +3689,19 @@ class AdicionarVariasMateriasOrdemDia(AdicionarVariasMateriasExpediente):
                 lista_status = filtra_tramitacao_status(
                     self.request.GET["tramitacao__status"]
                 )
+                qs = qs.filter(id__in=lista_status).distinct()
 
-                lista_materias_adicionadas = retira_materias_ja_adicionadas(
-                    self.kwargs["pk"], OrdemDia
-                )
+        lista_materias_adicionadas = retira_materias_ja_adicionadas(
+            self.kwargs["pk"], OrdemDia
+        )
 
-                qs = (
-                    qs.filter(id__in=lista_status)
-                    .exclude(id__in=lista_materias_adicionadas)
-                    .distinct()
-                )
+        qs = qs.exclude(id__in=lista_materias_adicionadas).distinct()
 
-                kwargs.update(
-                    {
-                        "queryset": qs,
-                    }
-                )
+        kwargs.update(
+            {
+                "queryset": qs,
+            }
+        )
         return kwargs
 
     def post(self, request, *args, **kwargs):

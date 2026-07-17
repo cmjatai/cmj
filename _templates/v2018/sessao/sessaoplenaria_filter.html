@@ -82,14 +82,14 @@
               <div class="item-texto-titulo">
                 {% if not sessao.pauta_publicada %}
                   <span class="badge badge-warning">Pauta em Elaboração</span>
+                {% endif %}
+                {% if  not sessao.pauta_publicada and not perms.sessao.change_sessaoplenaria  %}
                   <span>{{sessao}}</span>
                 {% else %}
                   <a href="{% url 'sapl.sessao:resumo' sessao.id %}">{{sessao}}</a>
-
                 {% endif %}
               </div>
               <div class="item-texto-descricao">
-
                 <strong>Legislatura:</strong> {{sessao.legislatura}} | <strong>Sessão Legislativa:</strong> {{sessao.sessao_legislativa}}</br>
                 <strong>Abertura:</strong> {{sessao.data_inicio}} às {{sessao.hora_inicio}} | <strong>Tipo:</strong> {{sessao.tipo}}</br>
               </div>
