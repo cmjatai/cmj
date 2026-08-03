@@ -317,12 +317,14 @@ class MateriaSearchForm(SearchForm):
             FieldWithButtons(
                 Field(
                     "q",
-                    placeholder=_("O que você procura? "),
+                    placeholder=_(
+                        "Busca descritiva (palavras-chave, trechos de texto, etc.)"
+                    ),
                     type="search",
                 ),
                 StrictButton(
-                    '<i class="fas fa-2x fa-search"></i>',
-                    css_class="btn-outline-primary",
+                    '<strong>FILTRAR&nbsp;&nbsp;&nbsp;<i class="fas fa-search"></i></strong>',
+                    css_class="btn-primary text-white",
                     type="submit",
                 ),
                 css_class="div-search",
@@ -334,15 +336,17 @@ class MateriaSearchForm(SearchForm):
                 FieldWithButtons(
                     Field(
                         "q",
-                        placeholder=_("O que você procura? "),
+                        placeholder=_(
+                            "Busca descritiva (palavras-chave, trechos de texto, etc.)"
+                        ),
                         type="search",
                     ),
                     StrictButton(
-                        '<i class="fas fa-2x fa-search"></i>',
-                        css_class="btn-outline-primary",
+                        '<strong>FILTRAR&nbsp;&nbsp;&nbsp;<i class="fas fa-search"></i></strong>',
+                        css_class="btn-primary text-white",
                         type="submit",
                     ),
-                    css_class="div-search",
+                    css_class="",
                 ),
             )
 
@@ -350,12 +354,13 @@ class MateriaSearchForm(SearchForm):
                 [
                     (
                         HTML("""
-                    <small class="text-blue">
-                    <strong>
-                        O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... <br>
-                        Clique na lupa após definir seus critérios de pesquisa.
-                    </strong>
-                    </small>"""),
+                                <small class="text-blue">
+                            <i class="fas fa-info-circle"></i>
+                            <i>
+                                    O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... <br>
+                                Clique em FILTRAR após definir ou alterar qualquer dos critérios de pesquisa.
+                            </i>
+                                </small>"""),
                         12,
                     ),
                     (Div(), 1),
@@ -425,8 +430,8 @@ class MateriaSearchForm(SearchForm):
                         type="search",
                     ),
                     StrictButton(
-                        '<i class="fas fa-search"></i>',
-                        css_class="btn-outline-primary",
+                        '<strong>FILTRAR&nbsp;&nbsp;&nbsp;<i class="fas fa-search"></i></strong>',
+                        css_class="btn-primary text-white",
                         type="submit",
                     ),
                     css_class="div-search",
@@ -473,9 +478,19 @@ class MateriaSearchForm(SearchForm):
                         3,
                     ),
                     ("assuntos_is", 3),
-                    ("uta_i", 3),
+                    ("uta_i", 2),
                     ("sta_i", 3),
-                    (q_field, 3),
+                    (q_field, 4),
+                    (
+                        HTML("""
+                                <small class="text-muted text-right d-block">
+                            <i class="fas fa-info-circle"></i>
+                            <i>O PREENCHIMENTO DOS CAMPOS ACIMA É OPCIONAL...
+                                Clique em FILTRAR após definir ou alterar qualquer dos critérios de pesquisa.
+                            </i>
+                                </small>"""),
+                        12,
+                    ),
                 ]
             )
 
@@ -707,38 +722,41 @@ class NormaSearchForm(SearchForm):
             FieldWithButtons(
                 Field(
                     "q",
-                    placeholder=_("O que você procura? "),
+                    placeholder=_(
+                        "Busca descritiva (palavras-chave, trechos de texto, etc.)"
+                    ),
                     type="search",
                 ),
                 StrictButton(
-                    '<i class="fas fa-2x fa-search"></i>',
-                    css_class="btn-outline-primary",
+                    '<strong>FILTRAR&nbsp;&nbsp;&nbsp;<i class="fas fa-search"></i></strong>',
+                    css_class="btn-primary text-white",
                     type="submit",
                 ),
-                css_class="div-search",
+                css_class="",
             ),
         )
 
         row1 = to_row(
             [
-                (
-                    HTML("""
-                <small class="text-blue">
-                  <strong>
-                    O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... &nbsp;&nbsp;
-                    Clique na lupa após definir seus critérios de pesquisa.
-                  </strong>
-                </small>"""),
-                    12,
-                ),
-                (Div(), 2),
-                (q_field, 8),
-                (Div(), 2),
                 ("tipo_i", 3),
                 ("numero_s", 2),
                 ("ano_i", 2),
                 ("assuntos_is", 3),
                 ("ordenacao", 2),
+                (Div(), 2),
+                (q_field, 8),
+                (Div(), 2),
+                (
+                    HTML("""
+                <small class="text-blue">
+                  <i class="fas fa-info-circle"></i>
+                  <i>
+                    O PREENCHIMENTO DOS CAMPOS ACIMA É OPCIONAL... &nbsp;&nbsp;
+                    Clique em FILTRAR após definir ou alterar qualquer dos critérios de pesquisa.
+                  </i>
+                </small>"""),
+                    12,
+                ),
             ]
         )
 
