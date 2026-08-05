@@ -26,7 +26,11 @@
     list-style: none;
   }
   .form-group {
-    padding-top: 1em;
+    padding-top: 0.1em;
+    label {
+
+      margin-bottom: 0.1em;
+    }
   }
   .collapse {
     margin: 10px 0;

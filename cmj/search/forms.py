@@ -352,26 +352,9 @@ class MateriaSearchForm(SearchForm):
 
             row1 = to_row(
                 [
-                    (
-                        HTML("""
-                                <small class="text-blue">
-                            <i class="fas fa-info-circle"></i>
-                            <i>
-                                    O PREENCHIMENTO DOS CAMPOS ABAIXO É OPCIONAL... <br>
-                                Clique em FILTRAR após definir ou alterar qualquer dos critérios de pesquisa.
-                            </i>
-                                </small>"""),
-                        12,
-                    ),
-                    (Div(), 1),
-                    (q_field, 10),
-                    (Div(), 1),
                     ("tipo_i", 7),
                     ("numero_i", 2),
-                    (
-                        "ano_i",
-                        3,
-                    ),
+                    ("ano_i", 3),
                 ]
             )
 
@@ -391,32 +374,46 @@ class MateriaSearchForm(SearchForm):
                             HTML(autor_modal),
                             to_row(
                                 [
-                                    ("autoria_is", 0),
+                                    ("autoria_is", 12),
                                     (
                                         Button(
                                             "pesquisar",
                                             "Selecionar Autor",
-                                            css_class="btn btn-secondary btn-sm mt-1 w-100",
+                                            css_class="btn btn-secondary btn-sm mt-1 py-0 w-100",
                                         ),
-                                        12,
+                                        6,
                                     ),
                                     (
                                         Button(
                                             "limpar",
                                             "Remover Autor",
-                                            css_class="btn btn-secondary btn-sm mt-1 p-0 w-100",
+                                            css_class="btn btn-secondary btn-sm mt-1 py-0  w-100",
                                         ),
-                                        12,
+                                        "col-md-6 pl-2",
                                     ),
                                 ],
-                                css_class="row flex-column",
+                                css_class="row no-gutters",
                             ),
                             css_class="form-group",
                         ),
-                        4,
+                        5,
                     ),
-                    ("assuntos_is", 5),
+                    ("assuntos_is", 4),
                     ("ordenacao", 3),
+                    (Div(), 1),
+                    (q_field, 10),
+                    (Div(), 1),
+                    (
+                        HTML("""
+                                <small class="text-blue">
+                            <i class="fas fa-info-circle"></i>
+                            <i>
+                                    O PREENCHIMENTO DOS CAMPOS ACIMA É OPCIONAL... <br>
+                                Clique em FILTRAR após definir ou alterar qualquer dos critérios de pesquisa.
+                            </i>
+                                </small>"""),
+                        12,
+                    ),
                 ]
             )
 
@@ -426,7 +423,9 @@ class MateriaSearchForm(SearchForm):
                 FieldWithButtons(
                     Field(
                         "q",
-                        placeholder=_("O que você procura? "),
+                        placeholder=_(
+                            "Busca descritiva (palavras-chave, trechos de texto, etc.)"
+                        ),
                         type="search",
                     ),
                     StrictButton(
@@ -458,7 +457,7 @@ class MateriaSearchForm(SearchForm):
                                         Button(
                                             "pesquisar",
                                             "Selecionar",
-                                            css_class="btn btn-secondary btn-sm p-0 w-100",
+                                            css_class="btn btn-secondary btn-sm mt-1 w-100",
                                         ),
                                         6,
                                     ),
@@ -466,7 +465,7 @@ class MateriaSearchForm(SearchForm):
                                         Button(
                                             "limpar",
                                             "Remover",
-                                            css_class="btn btn-secondary btn-sm p-0 w-100",
+                                            css_class="btn btn-secondary btn-sm mt-1 p-0 w-100",
                                         ),
                                         6,
                                     ),
