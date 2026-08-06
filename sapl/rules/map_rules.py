@@ -36,7 +36,6 @@ from sapl.audiencia import models as audiencia
 from sapl.base import models as base
 from sapl.comissoes import models as comissoes
 from sapl.compilacao import models as compilacao
-from sapl.lexml import models as lexml
 from sapl.materia import models as materia
 from sapl.norma import models as norma
 from sapl.painel import models as painel
@@ -159,6 +158,7 @@ rules_group_materia = {
         ),
         (materia.Numeracao, __base__, __perms_publicas__),
         (materia.Tramitacao, __base__, __perms_publicas__),
+        (materia.AnaliseSimilaridade, __base__, __perms_publicas__),
         (norma.LegislacaoCitada, __base__, __perms_publicas__),
         (norma.AutoriaNorma, __base__, __perms_publicas__),
         (

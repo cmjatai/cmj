@@ -115,13 +115,13 @@ class AdicionarVariasAutoriasFilterSet(django_filters.FilterSet):
 
 class AssuntoMateriaForm(ModelForm):
 
-    temas = MultipleChoiceField(
-        required=False, label="Temas", widget=forms.CheckboxSelectMultiple
+    junc = MultipleChoiceField(
+        required=False, label="Junção de Assuntos", widget=forms.CheckboxSelectMultiple
     )
 
     class Meta:
         model = AssuntoMateria
-        fields = ["assunto", "dispositivo", "temas"]
+        fields = ["assunto", "dispositivo", "junc"]
 
     def __init__(self, *args, **kwargs):
 
@@ -133,7 +133,7 @@ class AssuntoMateriaForm(ModelForm):
         )
         row2 = to_row(
             [
-                ("temas", 12),
+                ("junc", 12),
             ]
         )
 
@@ -148,36 +148,48 @@ class AssuntoMateriaForm(ModelForm):
         )
         super(AssuntoMateriaForm, self).__init__(*args, **kwargs)
 
-        self.fields["temas"].choices = self.extrair_temas_dos_metadados()
+        self.fields["junc"].choices = self.extrair_temas_dos_metadados()
 
     def extrair_temas_dos_metadados(self):
-        temas_global = set()
+        temas_textuais_criados_pela_ia = set()
         mds = Metadata.objects.all()
 
         for md in mds:
             temas = md.metadata.get("genia", {}).get("temas", [])
             for tema in temas:
-                if tema not in temas_global:
-                    temas_global.add(tema)
+                if tema not in temas_textuais_criados_pela_ia:
+                    temas_textuais_criados_pela_ia.add(tema)
 
-        assuntos_usados = set(AssuntoMateria.objects.values_list("assunto", flat=True))
+        assuntos_cadastrados = set(
+            AssuntoMateria.objects.values_list("assunto", flat=True)
+        )
 
-        assuntos_a_usar = temas_global - assuntos_usados
+        assuntos_a_usar = temas_textuais_criados_pela_ia.union(assuntos_cadastrados)
+        assuntos_usados = set(
+            MateriaAssunto.objects.values_list("assunto__assunto", flat=True)
+        )
 
-        temas_global = [(k, k) for k in sorted(assuntos_a_usar)]
-        return temas_global
+        temas_textuais_criados_pela_ia = [(k, k) for k in sorted(assuntos_a_usar)]
+        return temas_textuais_criados_pela_ia
 
     def save(self, commit=True):
         assunto = super(AssuntoMateriaForm, self).save(commit)
-        temas = self.cleaned_data["temas"]
-        for tema_select in temas:
-            mds = Metadata.objects.filter(metadata__genia__temas__icontains=tema_select)
+        junc = self.cleaned_data["junc"]
+        for junc_select in junc:
+            mds = Metadata.objects.filter(metadata__genia__temas__icontains=junc_select)
             for md in mds:
                 for i, tema_ia in enumerate(md.metadata["genia"]["temas"]):
-                    if tema_select == tema_ia:
+                    if junc_select.lower() == tema_ia.lower():
                         md.metadata["genia"]["temas"][i] = assunto.assunto
                 md.save()
                 print(md.content_object)
+            assuntos_usados = MateriaAssunto.objects.filter(
+                assunto__assunto__iexact=junc_select
+            )
+            for assunto_usado in assuntos_usados:
+                if assunto_usado.assunto != assunto:
+                    assunto_usado.assunto = assunto
+                    assunto_usado.save()
         return assunto
 
 
