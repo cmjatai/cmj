@@ -155,7 +155,7 @@ class PrestacaoContaRegistroForm(ModelForm):
         self.fields["emendaloa"].choices = [("", "---------")] + [
             (
                 e.pk,
-                f'{e.materia.epigrafe_short if e.materia else ""} - {str(e.unidade)} - {str(e)[:100]}',
+                f'{e.materia.epigrafe_short if e.materia else ""} - {str(e.unidade)} - {e}',
             )
             for e in self.fields["emendaloa"].queryset
         ]
@@ -163,7 +163,7 @@ class PrestacaoContaRegistroForm(ModelForm):
         self.fields["registro_ajuste"].choices = [("", "---------")] + [
             (
                 r.pk,
-                f'{r.oficio_ajuste_loa.epigrafe if r.oficio_ajuste_loa else ""} - {r.str_valor} - {str(r.descricao)[:100]}',
+                f'{r.oficio_ajuste_loa.epigrafe if r.oficio_ajuste_loa else ""} - {r.str_valor} - {r.descricao}',
             )
             for r in self.fields["registro_ajuste"].queryset
         ]
