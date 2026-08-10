@@ -25,7 +25,9 @@ import sapl
 from cmj.loa.models import EmendaLoa
 from cmj.mixins import GoogleRecapthaFormMixin
 from cmj.utils import CHOICE_SIGNEDS, AlertSafe
-from sapl.base.models import AppConfig, Autor, Metadata, TipoAutor
+from sapl.base.models import AppConfig
+from sapl.base.models import AppConfig as BaseAppConfig
+from sapl.base.models import Autor, Metadata, TipoAutor
 from sapl.comissoes.models import Comissao, Composicao, Participacao
 from sapl.compilacao.models import STATUS_TA_IMMUTABLE_PUBLIC, STATUS_TA_PRIVATE
 from sapl.crispy_layout_mixin import (
@@ -920,7 +922,9 @@ class TramitacaoForm(ModelForm):
 
             if ultima_tramitacao:
                 destino = ultima_tramitacao.unidade_tramitacao_destino
-                if destino != self.cleaned_data["unidade_tramitacao_local"]:
+                if destino != self.cleaned_data[
+                    "unidade_tramitacao_local"
+                ] and BaseAppConfig.attr("tramitacao_origem_fixa"):
                     self.logger.error(
                         "A origem da nova tramitação ({}) não é igual ao "
                         "destino da última adicionada ({})!".format(

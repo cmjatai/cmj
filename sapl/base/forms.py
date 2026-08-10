@@ -1146,6 +1146,7 @@ class ConfiguracoesAppForm(ModelForm):
             "assinatura_ata",
             "estatisticas_acesso_normas",
             "escolher_numero_materia_proposicao",
+            "tramitacao_origem_fixa",
             "tramitacao_materia",
             "tramitacao_documento",
             "cronometro_discurso",

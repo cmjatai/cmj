@@ -2006,12 +2006,13 @@ class TramitacaoCrud(MasterDetailCrud):
             # necessária?
             if ultima_tramitacao:
                 if ultima_tramitacao.unidade_tramitacao_destino:
-                    context["form"].fields["unidade_tramitacao_local"].choices = [
-                        (
-                            ultima_tramitacao.unidade_tramitacao_destino.pk,
-                            ultima_tramitacao.unidade_tramitacao_destino,
-                        )
-                    ]
+                    if BaseAppConfig.attr("tramitacao_origem_fixa"):
+                        context["form"].fields["unidade_tramitacao_local"].choices = [
+                            (
+                                ultima_tramitacao.unidade_tramitacao_destino.pk,
+                                ultima_tramitacao.unidade_tramitacao_destino,
+                            )
+                        ]
                 else:
                     self.logger.error(
                         "user=" + username + ". Unidade de tramitação destino "
@@ -2713,7 +2714,10 @@ class MateriaLegislativaCrud(Crud):
                 )
 
             if self.request.user.has_perm("materia.add_materialegislativa"):
-                if self.request.user.is_superuser or not self.object.protocolo_gr.exists():
+                if (
+                    self.request.user.is_superuser
+                    or not self.object.protocolo_gr.exists()
+                ):
                     btns.extend(
                         [
                             (
@@ -2866,8 +2870,6 @@ class MateriaLegislativaCrud(Crud):
                 return redirect(
                     "sapl.materia:materialegislativa_detail", pk=self.object.pk
                 )
-
-
 
             return Crud.DetailView.get(self, request, *args, **kwargs)
 
