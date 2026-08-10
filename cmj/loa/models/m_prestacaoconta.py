@@ -56,6 +56,14 @@ class ArquivoPrestacaoContaLoa(models.Model):
 
     FIELDFILE_NAME = ("arquivo",)
 
+    metadata = JSONField(
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
+
     prestacao_conta = models.ForeignKey(
         "loa.PrestacaoContaLoa",
         verbose_name=_("Prestação de Conta LOA"),
@@ -167,6 +175,14 @@ class PrestacaoContaRegistro(models.Model):
 class ArquivoPrestacaoContaRegistro(models.Model):
 
     FIELDFILE_NAME = ("arquivo",)
+
+    metadata = JSONField(
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     registro = models.ForeignKey(
         "loa.PrestacaoContaRegistro",
