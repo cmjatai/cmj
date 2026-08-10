@@ -93,6 +93,9 @@
       <strong>Protocolo: </strong>{{m.protocolo_gr.first.epigrafe}} |
     {% endif %}
     <strong>Data de Apresentação:</strong> <span style="white-space: nowrap">{{m.data_apresentacao}}</span>
+    {% if m.regime_tramitacao.descricao != 'Ordinária' %}
+     | <strong>Regime de Tramitação:</strong> {{m.regime_tramitacao}}
+    {% endif %}
   </small>
   <br><strong>Autoria:</strong> {{ m.autores.all|join:", "}}
 
@@ -105,7 +108,7 @@
 
 <div>
   {% if m.tramitacao_set.first.unidade_tramitacao_destino %}
-    <strong>Data da última Tramitação:</strong><br>{{m.tramitacao_set.first.data_tramitacao}}</br>
+    <strong>Data da última Tramitação:</strong> {{m.tramitacao_set.first.data_tramitacao}}</br>
     {% if m.tramitacao_set.first.data_fim_prazo %}
       <strong>Data Fim Prazo (Tramitação):</strong> {{m.tramitacao_set.first.data_fim_prazo|default_if_none:""}}</br>
     {% endif %}
