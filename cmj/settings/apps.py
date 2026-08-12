@@ -73,6 +73,7 @@ CMJ_APPS = (
     "cmj.videos",
     "cmj.sigad",
     "cmj.search",
+    "cmj.checklist",
     "cmj.painelset",
     "cmj.api",
     "cmj.dashboard",
