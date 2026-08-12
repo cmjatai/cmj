@@ -1,6 +1,5 @@
 from django.contrib.auth import get_user_model
 
-from cmj import loa
 from cmj.agenda import models as agenda_models
 from cmj.arq import models as arq_models
 from cmj.cerimonial import models as cerimonial_models
@@ -13,6 +12,7 @@ from cmj.globalrules import (
     GROUP_ARQ_OPERADOR,
     GROUP_DIARIOS_OPERADOR,
     GROUP_DRAFT_OPERADOR,
+    GROUP_ENTIDADE_OPERADOR,
     GROUP_IA_OPERADOR,
     GROUP_LOA_OPERADOR,
     GROUP_MATERIA_WORKSPACE_VIEWER,
@@ -47,7 +47,6 @@ from cmj.painelset import models as painelset_models
 from cmj.search import models as search_models
 from cmj.sigad import models as sigad_models
 from sapl.parlamentares import models as parlamentares_models
-from sapl.rules import SAPL_GROUP_GERAL
 from sapl.rules.map_rules import __base__
 
 __base__ = [RP_LIST, RP_DETAIL, RP_ADD, RP_CHANGE, RP_DELETE]
@@ -238,6 +237,17 @@ rules_diarios_group_operador = {
     ],
 }
 
+rules_entidade_group_operador = {
+    "group": GROUP_ENTIDADE_OPERADOR,
+    "rules": [
+        (
+            loa_models.Entidade,
+            [RP_LIST, RP_DETAIL],
+            __perms_publicas__,
+        ),
+    ],
+}
+
 rules_loa_group_operador = {
     "group": GROUP_LOA_OPERADOR,
     "rules": [
@@ -411,6 +421,7 @@ rules_patterns = [
     rules_diarios_group_operador,
     rules_draft_group_operador,
     rules_arq_group_operador,
+    rules_entidade_group_operador,
     rules_loa_group_operador,
     rules_sigad_view_status_restritos,
     rules_ouvidoria_visualizacao_respostas,

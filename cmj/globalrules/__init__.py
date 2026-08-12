@@ -45,6 +45,8 @@ GROUP_DIARIOS_OPERADOR = _("Operador dos Diários Oficiais")
 
 GROUP_LOA_OPERADOR = _("Operador da LOA")
 
+GROUP_ENTIDADE_OPERADOR = _("Operador de Entidades")
+
 GROUP_DRAFT_OPERADOR = _("Usuário do Draft")
 
 GROUP_ARQ_OPERADOR = _("Operador do Modulo Arq")

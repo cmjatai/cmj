@@ -23,6 +23,7 @@ urlpatterns = [
             + views.v_financeiro_orcamento.SubFuncaoCrud.get_urls()
             + views.v_prestacaoconta.PrestacaoContaLoaCrud.get_urls()
             + views.v_prestacaoconta.PrestacaoContaRegistroCrud.get_urls()
+            + views.v_entidade.EntidadeLoaCrud.get_urls()
         ),
     ),
     re_path(r"^loa/dash", LoaDashboardView.as_view(), name="loa_dashboard"),

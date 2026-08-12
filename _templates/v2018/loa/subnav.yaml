@@ -11,6 +11,10 @@
     url: oficioajusteloa_list
   - title: {% trans 'Empenhos' %}
     url: empenho_list
+  {% if perms.loa.entidadeloa_list %}
+  - title: {% trans 'Entidades' %}
+    url: entidadeloa_list
+  {% endif %}
   - title: {% trans 'Despesas Orçamentárias' %}
     url: despesa_list
   - title: ''
