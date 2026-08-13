@@ -1,0 +1,40 @@
+{% load i18n %}
+ChecklistTemplate:
+  {% trans 'Dados do Template' %}:
+  - title:8 version:2 status:2
+  - description
+
+ChecklistSection:
+  {% trans 'Dados da Seção' %}:
+  - title:9 order:3
+  - description
+
+ChecklistItem:
+  {% trans 'Dados do Item' %}:
+  - label
+  - response_type:4 is_mandatory:2 order:2
+  - description
+
+ItemOption:
+  {% trans 'Dados da Opção' %}:
+  - text:9 order:3
+
+ChecklistInstance:
+  {% trans 'Dados da Instância' %}:
+  - template:6 status:3 submitted_at:3
+  - content_type:6 object_id:3
+
+ChecklistItemResponse:
+  {% trans 'Resposta' %}:
+  - item
+  - text_value
+  - boolean_value:3 date_value:3
+  - selected_options
+  {% trans 'Validação' %}:
+  - validation_status:4 validated_at:4
+  - validation_notes
+
+ChecklistItemAttachment:
+  {% trans 'Anexo' %}:
+  - file:9 description:3
+

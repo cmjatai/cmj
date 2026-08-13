@@ -34,6 +34,7 @@ from django.views.generic.base import RedirectView, TemplateView
 import cmj.agenda.urls
 import cmj.arq.urls
 import cmj.cerimonial.urls
+import cmj.checklist.urls
 import cmj.core.urls
 import cmj.diarios.urls
 import cmj.globalrules.urls
@@ -81,6 +82,7 @@ urlpatterns_all = [
     re_path(r"", include(cmj.agenda.urls)),
     re_path(r"", include(cmj.videos.urls)),
     re_path(r"", include(cmj.painelset.urls)),
+    re_path(r"", include(cmj.checklist.urls)),
     re_path(r"", include(sapl.audiencia.urls)),
     re_path(r"", include(sapl.comissoes.urls)),
     re_path(r"", include(sapl.sessao.urls)),

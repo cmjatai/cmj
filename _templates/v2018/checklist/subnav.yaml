@@ -1,0 +1,11 @@
+{% load i18n common_tags%}
+- title: {% trans 'Resumo' %}
+  url: checklist_detail
+- title: {% trans 'Seções' %}
+  children:
+  - title: {% trans 'Seções' %}
+    url: checklistsection_list
+  {% if perms.checklist.checklistitem_list %}
+  - title: {% trans 'Itens' %}
+    url: checklistitem_list
+  {% endif %}
