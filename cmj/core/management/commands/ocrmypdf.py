@@ -1,8 +1,8 @@
+import fcntl
 import logging
 import os
 import shutil
 import stat
-import subprocess
 import sys
 import time
 from datetime import datetime, timedelta
@@ -32,43 +32,44 @@ def _get_registration_key(model):
     return "%s_%s" % (model._meta.app_label, model._meta.model_name)
 
 
-class CompressPDF:
+class _TempoLimiteAtingido(Exception):
+    """Corte de tempo por execução: para de varrer, mas ainda reindexa."""
 
-    quality = {0: "/default", 1: "/prepress", 2: "/printer", 3: "/ebook", 4: "/screen"}
 
-    def compress(self, compress_level, file=None, new_file=None):
-
-        try:
-            initial_size = os.path.getsize(file)
-
-            subprocess.call(
-                [
-                    "gs",
-                    "-sDEVICE=pdfwrite",
-                    "-dCompatibilityLevel=1.4",
-                    "-dPDFSETTINGS={}".format(self.quality[compress_level]),
-                    "-dNOPAUSE",
-                    "-dQUIET",
-                    "-dBATCH",
-                    "-sOutputFile={}".format(new_file),
-                    file,
-                ]
-            )
-
-            final_size = os.path.getsize(new_file)
-            ratio = 1 - (final_size / initial_size)
-            print("Compression by {0:.0%}.".format(ratio))
-            print("Final file size is {0:.1f}MB".format(final_size / 1000000))
-            return True
-
-        except Exception as error:
-            print("Caught this error: " + repr(error))
-        except subprocess.CalledProcessError as e:
-            print("Unexpected error:".format(e.output))
-            return False
+class _SessaoAbertaInterrompeu(Exception):
+    """Sessão plenária abriu durante o processamento: aborta sem reindexar."""
 
 
 class Command(BaseCommand):
+
+    # janela considerada execução noturna: [22h, 6h)
+    HORA_FIM_NOTURNO = 6
+    HORA_INICIO_NOTURNO = 22
+
+    JOBS_NOTURNO = 12
+    JOBS_DIURNO = 4
+
+    TIMEOUT_OCR_SECONDS = 300
+    TEMPO_MAX_EXECUCAO = timedelta(minutes=2)
+    SLEEP_ENTRE_ITENS = 2
+
+    # retenção de histórico de OcrMyPDF, aplicada só na execução noturna
+    RETENCAO_OCR_DIAS = 360
+    RETENCAO_OCR_FALHA_DIAS = 90
+
+    TMP_IDLE_SECONDS = 86400  # 1 dia sem uso para ser elegível à limpeza
+    MTIME_FOLGA_SECONDS = 86400  # folga de 1 dia ao comparar mtime x último ocr
+
+    # (usuário dono do arquivo, prefixo do nome) elegíveis à limpeza em /tmp
+    TMP_CLEAR_RULES = [
+        ("djangoapps", "pymp"),
+        ("djangoapps", "com.github.ocrmypdf"),
+        ("djangoapps", "yarn--"),
+        # ('solr', 'upload_'),
+        ("djangoapps", "br.leg.go.jatai.portalcmj."),
+    ]
+
+    LOCK_PATH = "/tmp/cmj_ocrmypdf.lock"
 
     max_paginas_noturno = 100  # avaliar tempo de execução para números maiores
     max_paginas_diurno = 50
@@ -140,64 +141,46 @@ class Command(BaseCommand):
     ]
 
     def delete_itens_tmp_folder(self):
-        list = os.scandir("/tmp/")
+        entries = os.scandir("/tmp/")
 
         now = time.time()
-        for i in list:
-            age = now - os.stat(i.path)[stat.ST_MTIME]
+        for entry in entries:
+            age = now - os.stat(entry.path)[stat.ST_MTIME]
 
-            clears = [
-                ("djangoapps", "pymp"),
-                ("djangoapps", "com.github.ocrmypdf"),
-                ("djangoapps", "yarn--"),
-                # ('solr', 'upload_'),
-                ("djangoapps", "br.leg.go.jatai.portalcmj."),
-            ]
-
-            if age > 86400:
-                for user, start_name in clears:
-                    if i.name.startswith(start_name):
-                        if getpwuid(os.stat(i.path).st_uid).pw_name == user:
-                            try:
-                                shutil.rmtree(i.path, ignore_errors=True)
-                                if os.path.exists(i.path):
-                                    os.remove(i.path)
-                                break
-                            except Exception as e:
-                                print(e)
-                                break
-
-    def is_running(self):
-        process = subprocess.Popen(
-            ["ps", "-eo", "pid,args"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        )
-        mypid = str(os.getpid())
-        stdout, notused = process.communicate()
-        for line in stdout.splitlines():
-            line = line.decode("utf-8")
-            pid, cmdline = line.strip().split(" ", 1)
-
-            if pid == mypid:
+            if age <= self.TMP_IDLE_SECONDS:
                 continue
 
-            if "manage.py ocrmypdf" in cmdline:
-                return True
+            for user, start_name in self.TMP_CLEAR_RULES:
+                if not entry.name.startswith(start_name):
+                    continue
+                if getpwuid(os.stat(entry.path).st_uid).pw_name != user:
+                    continue
 
-        return False
+                try:
+                    shutil.rmtree(entry.path, ignore_errors=True)
+                    if os.path.exists(entry.path):
+                        os.remove(entry.path)
+                except Exception:
+                    self.logger.exception("Falha ao limpar %s", entry.path)
+                break
 
-    def run_distibui_ocr_ao_longo_do_ano(self):
-        ocrs = OcrMyPDF.objects.all().order_by("id")
+    def _adquirir_lock(self):
+        # lock exclusivo via flock: liberado automaticamente pelo SO mesmo
+        # se o processo morrer, ao contrário do parsing de `ps` anterior
+        self._lock_file = open(self.LOCK_PATH, "w")
+        try:
+            fcntl.flock(self._lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            self._lock_file.close()
+            self._lock_file = None
+            return False
+        return True
 
-        c = ocrs.count()
-        d = timezone.now() - timedelta(days=(365 * 3))
-        i = (31536000 * 3) // c
-        for o in ocrs:
-            concluido_interval = o.concluido - o.created
-            o.created = d
-            o.concluido = d + concluido_interval
-            o.save()
-
-            d = d + timedelta(seconds=i)
+    def _liberar_lock(self):
+        if getattr(self, "_lock_file", None):
+            fcntl.flock(self._lock_file, fcntl.LOCK_UN)
+            self._lock_file.close()
+            self._lock_file = None
 
     def tem_sessaoplenaria_aberta(self):
         return SessaoPlenaria.objects.filter(
@@ -212,243 +195,228 @@ class Command(BaseCommand):
         self.logger = logging.getLogger(__name__)
 
         init = timezone.localtime()
-        if not settings.DEBUG and self.is_running():
+        if not settings.DEBUG and not self._adquirir_lock():
             print(init, "Command OcrMyPdf já está sendo executado por outro processo")
             return
 
-        post_save.disconnect(dispatch_uid="timerefresh_post_signal")
+        try:
+            self._executar(init)
+        finally:
+            if not settings.DEBUG:
+                self._liberar_lock()
 
-        # self.run_distibui_ocr_ao_longo_do_ano()
-        # return
+    def _executar(self, init):
+        post_save.disconnect(dispatch_uid="timerefresh_post_signal")
+        post_save.disconnect(dispatch_uid="signal_post_syncrefresh")
 
         self.delete_itens_tmp_folder()
 
-        self.execucao_noturna = init.hour < 6 or init.hour >= 22
+        self.execucao_noturna = (
+            init.hour < self.HORA_FIM_NOTURNO or init.hour >= self.HORA_INICIO_NOTURNO
+        )
 
-        # só faz limpeza em execução norturna
+        # só faz limpeza de histórico em execução noturna
         if self.execucao_noturna:
-            # Refaz tudo que foi feito a mais de tres anos
-
-            OcrMyPDF.objects.filter(created__lt=init - timedelta(days=360)).delete()
-
-            # Refaz tudo que foi feito a mais de tres mêses e nao teve sucesso
-            OcrMyPDF.objects.filter(
-                created__lt=init - timedelta(days=90), sucesso=False
-            ).delete()
-
-        # OcrMyPDF.objects.filter(
-        #    object_id=xxxx).delete()
-
-        """if settings.DEBUG:
-            OcrMyPDF.objects.all().delete()"""
+            self._run_manutencao_noturna(init)
 
         years_updated = set()
-        break_while = False
-        while self.models and not break_while:
+        try:
+            while self.models:
+                for model in self.models:
+                    model["count"] = 0
 
-            for model in self.models:
-                model["count"] = 0
+                for model in self.models:
+                    self._processar_model(model, init, years_updated)
 
-            for model in self.models:
-                ct = ContentType.objects.get_for_model(model["model"])
-                count = 0
+                self.models = list(filter(lambda x: x["count"] != 0, self.models))
+        except _TempoLimiteAtingido:
+            pass
+        except _SessaoAbertaInterrompeu:
+            return
 
-                data_field = model["order_by"][
-                    1 if model["order_by"].startswith("-") else 0 :
-                ]
+        self._reindexar_anos(years_updated)
 
-                params = {
-                    "{}__year__gte".format(data_field): init.year
-                    - model["years_priority"],
-                }
-                items = (
-                    model["model"].objects.filter(**params).order_by(model["order_by"])
-                )
+    def _run_manutencao_noturna(self, init):
+        # refaz tudo que foi feito há mais de RETENCAO_OCR_DIAS
+        OcrMyPDF.objects.filter(
+            created__lt=init - timedelta(days=self.RETENCAO_OCR_DIAS)
+        ).delete()
 
-                # se não existir nenhum registro pra processar do último ano
-                # ou ano atual, e a execução é de madrugada,
-                # então faz do passado.
-                # if self.execucao_noturna:  # and not items.exists():
-                items = model["model"].objects.order_by(model["order_by"])
+        # refaz tudo que foi feito há mais de RETENCAO_OCR_FALHA_DIAS e falhou
+        OcrMyPDF.objects.filter(
+            created__lt=init - timedelta(days=self.RETENCAO_OCR_FALHA_DIAS),
+            sucesso=False,
+        ).delete()
 
-                # items = items.filter(pk=3559)
-                for item in items:
+    def _processar_model(self, model, init, years_updated):
+        ct = ContentType.objects.get_for_model(model["model"])
+        count = 0
 
-                    if self.tem_sessaoplenaria_aberta():
-                        return
+        data_field = model["order_by"][1 if model["order_by"].startswith("-") else 0 :]
 
-                    # item.save()
+        items = model["model"].objects.order_by(model["order_by"])
+
+        for item in items:
+
+            if self.tem_sessaoplenaria_aberta():
+                raise _SessaoAbertaInterrompeu()
+
+            paginas = 0
+            if hasattr(item, "_paginas"):
+                # tenta capturar o número de páginas
+                try:
+                    paginas = item.paginas
+                except Exception:
                     paginas = 0
-                    if hasattr(item, "_paginas"):
-                        # tenta capturar o número de páginas
-                        try:
-                            paginas = item.paginas
-                        except:
-                            paginas = 0
 
-                        # se não tem conseguiu num de páginas
-                        # só passa ao teste de tamanho de arquivo se a execução
-                        # é noturna
-                        if not paginas and not self.execucao_noturna:
-                            continue
+                # se não conseguiu num de páginas, só passa ao teste de
+                # tamanho de arquivo se a execução é noturna
+                if not paginas and not self.execucao_noturna:
+                    continue
 
-                        # mesmo a execução sendo noturna não faz arquivos com
-                        # mais de max_paginas_noturno
-                        if paginas > self.max_paginas_noturno:
-                            continue
+                # mesmo a execução sendo noturna não faz arquivos com mais
+                # de max_paginas_noturno
+                if paginas > self.max_paginas_noturno:
+                    continue
 
-                        # se diurno não faz ocr em arquivos com páginas
-                        # superiores a max_paginas_diurno
-                        if (
-                            paginas > self.max_paginas_diurno
-                            and not self.execucao_noturna
-                        ):
-                            continue
+                # se diurno não faz ocr em arquivos com páginas superiores
+                # a max_paginas_diurno
+                if paginas > self.max_paginas_diurno and not self.execucao_noturna:
+                    continue
 
-                    if count >= model["count_base"] and not self.execucao_noturna:
-                        break
+            if count >= model["count_base"] and not self.execucao_noturna:
+                break
 
-                    for ff in model["file_field"]:
-
-                        # se documento foi homologado não executa ocr
-                        if hasattr(item, "metadata"):
-                            md = item.metadata
-                            if md and "signs" in md and ff in md["signs"]:
-                                if (
-                                    "hom" in md["signs"][ff] and md["signs"][ff]["hom"]
-                                ) or (
-                                    "signs" in md["signs"][ff]
-                                    and md["signs"][ff]["signs"]
-                                ):
-                                    continue
-
-                        file = getattr(item, ff)
-
-                        if file and not file.name.endswith(".pdf"):
-                            continue
-
-                        if not paginas:
-                            if file and file.name and file.size > self.max_size_noturno:
-                                continue
-
-                            if (
-                                file
-                                and file.name
-                                and file.size > self.max_size_diurno
-                                and not self.execucao_noturna
-                            ):
-                                continue
-
-                        ocr = OcrMyPDF.objects.filter(
-                            content_type=ct, object_id=item.id, field=ff
-                        ).first()
-
-                        if ocr and file and file.name:
-                            # possui meta ocr anterior,
-                            # testa se o arq é mais recente que último ocr
-                            # feito
-                            try:
-
-                                t = os.path.getmtime(file.path) - 86400
-                                date_file = datetime.fromtimestamp(t, timezone.utc)
-
-                                if date_file <= ocr.created:
-                                    continue
-                            except Exception as e:
-                                print(e)
-                                if settings.DEBUG:
-                                    continue
-
-                            # se arq é mais novo, apaga o meta ocr p fazer
-                            # novamente
-                            ocr.delete()
-                            ocr = None
-
-                        elif ocr and not file or ocr and file and not file.name:
-                            # se existe um meta ocr mas não existe mais o
-                            # arquivo
-                            ocr.delete()
-                            continue
-
-                        if not ocr and file and file.name:
-                            # se existe arquivo mas não existe meta ocr por nunca
-                            # ter feito ou por alguma regra de remoção acima
-
-                            self.logger.info(str(item.id) + " " + str(model["model"]))
-
-                            model["count"] += 1
-                            print(item.id, model["model"])
-                            count += 1
-                            o = OcrMyPDF()
-                            o.content_object = item
-                            o.field = ff
-                            o.sucesso = False
-                            o.save()
-                            try:
-                                init_item = timezone.localtime()
-                                result = self.run(item, ff)
-                                if result is None:
-                                    break
-
-                                o.sucesso = result
-                                o.save()
-
-                                if result:
-                                    if hasattr(item, data_field):
-                                        item_data = getattr(item, data_field)
-                                        if item_data and hasattr(item_data, "year"):
-                                            years_updated.add(
-                                                (item_data.year, model["model"])
-                                            )
-
-                                now = timezone.localtime()
-
-                                if hasattr(item, "_paginas"):
-                                    print(
-                                        item.id,
-                                        item._paginas,
-                                        model["model"]._meta.label,
-                                        str(now - init_item),
-                                    )
-
-                                # if result:
-                                #    post_save.send(
-                                #        model['model'],
-                                #        instance=item, using='default')
-
-                                self.logger.info(
-                                    str(now - init_item)
-                                    + " "
-                                    + str(item.id)
-                                    + " "
-                                    + str(model["model"])
-                                )
-
-                                if now - init > timedelta(minutes=2):
-                                    break_while = True
-                                    break
-
-                            except Exception as e:
-                                print(e)
-                            self.logger.info("Aguardando...")
-                            print("Aguardando...")
-                            sleep(2)
-                            print("Seguindo...")
-                            self.logger.info("Seguindo...")
-
-                        if break_while:
-                            break
-                    if break_while:
-                        break
-                if break_while:
+            for ff in model["file_field"]:
+                tentou, continuar = self._processar_campo(
+                    item, ff, model, ct, data_field, paginas, init, years_updated
+                )
+                if tentou:
+                    count += 1
+                if not continuar:
                     break
 
-            # for m in self.models:
-            #    if not self.execucao_noturna and not m['count'] and m['years_priority'] < 10:
-            #        m['years_priority'] += 1
+    def _processar_campo(
+        self, item, ff, model, ct, data_field, paginas, init, years_updated
+    ):
+        """Retorna (tentou_processar, continuar_proximos_campos)."""
 
-            self.models = list(filter(lambda x: x["count"] != 0, self.models))
+        # se documento foi homologado não executa ocr
+        if hasattr(item, "metadata"):
+            md = item.metadata
+            if md and "signs" in md and ff in md["signs"]:
+                signs_field = md["signs"][ff]
+                if ("hom" in signs_field and signs_field["hom"]) or (
+                    "signs" in signs_field and signs_field["signs"]
+                ):
+                    return False, True
 
+        file = getattr(item, ff)
+
+        if file and not file.name.endswith(".pdf"):
+            return False, True
+
+        if not paginas:
+            if file and file.name and file.size > self.max_size_noturno:
+                return False, True
+
+            if (
+                file
+                and file.name
+                and file.size > self.max_size_diurno
+                and not self.execucao_noturna
+            ):
+                return False, True
+
+        ocr = OcrMyPDF.objects.filter(
+            content_type=ct, object_id=item.id, field=ff
+        ).first()
+
+        if ocr and file and file.name:
+            # possui meta ocr anterior, testa se o arq é mais recente que
+            # o último ocr feito
+            try:
+                t = os.path.getmtime(file.path) - self.MTIME_FOLGA_SECONDS
+                date_file = datetime.fromtimestamp(t, timezone.utc)
+
+                if date_file <= ocr.created:
+                    return False, True
+            except Exception:
+                self.logger.exception("Falha ao checar mtime de %s", file.path)
+                if settings.DEBUG:
+                    return False, True
+
+            # se arq é mais novo, apaga o meta ocr p fazer novamente
+            ocr.delete()
+            ocr = None
+
+        elif ocr and not file or ocr and file and not file.name:
+            # se existe um meta ocr mas não existe mais o arquivo
+            ocr.delete()
+            return False, True
+
+        if ocr or not file or not file.name:
+            return False, True
+
+        # existe arquivo mas não existe meta ocr por nunca ter feito ou por
+        # alguma regra de remoção acima
+        self.logger.info(str(item.id) + " " + str(model["model"]))
+        model["count"] += 1
+        print(item.id, model["model"])
+
+        o = OcrMyPDF()
+        o.content_object = item
+        o.field = ff
+        o.sucesso = False
+        o.save()
+
+        try:
+            init_item = timezone.localtime()
+            result = self.run(item, ff)
+            if result is None:
+                return True, False
+
+            o.sucesso = result
+            o.save()
+
+            if result and hasattr(item, data_field):
+                item_data = getattr(item, data_field)
+                if item_data and hasattr(item_data, "year"):
+                    years_updated.add((item_data.year, model["model"]))
+
+            now = timezone.localtime()
+
+            if hasattr(item, "_paginas"):
+                print(
+                    item.id,
+                    item._paginas,
+                    model["model"]._meta.label,
+                    str(now - init_item),
+                )
+
+            self.logger.info(
+                str(now - init_item) + " " + str(item.id) + " " + str(model["model"])
+            )
+
+            if now - init > self.TEMPO_MAX_EXECUCAO:
+                raise _TempoLimiteAtingido()
+
+        except _TempoLimiteAtingido:
+            raise
+        except Exception:
+            self.logger.exception(
+                "Falha ao processar OCR do item %s (%s)", item.id, model["model"]
+            )
+
+        self.logger.info("Aguardando...")
+        print("Aguardando...")
+        sleep(self.SLEEP_ENTRE_ITENS)
+        print("Seguindo...")
+        self.logger.info("Seguindo...")
+
+        return True, True
+
+    def _reindexar_anos(self, years_updated):
         for y, m in years_updated:
             try:
                 self.logger.info(f"Ano Executado: {y} chamando update_index...")
@@ -461,9 +429,8 @@ class Command(BaseCommand):
                     "--batch-size=100",
                     "--using=default",
                 )
-
-            except Exception as e:
-                self.logger.error(e)
+            except Exception:
+                self.logger.exception("Falha ao reindexar ano %s do model %s", y, m)
 
     def run(self, item, fstr):
 
@@ -473,24 +440,21 @@ class Command(BaseCommand):
         # force-ocr só pode ser usado se outro teste verificar antes que um
         # documento não possui assinatura digital
 
-        # cmd = ["ocrmypdf",  "--deskew",  "-l por", file.path, file.path]
-
         in_path = file.path.replace("media/sapl/", "media/original__sapl/")
         in_path = in_path.replace("media/cmj/", "media/original__cmj/")
-        # print(o_path)
-        # print(file.path)
 
         out_path = file.path
         if out_path.endswith("jpeg"):
             out_path = out_path + ".pdf"
 
+        jobs = self.JOBS_NOTURNO if self.execucao_noturna else self.JOBS_DIURNO
+
         cmd = [
             "{}/ocrmypdf".format("/".join(sys.executable.split("/")[:-1])),
-            # "--deskew",
             "--redo-ocr",
             "-l por",
             "-q",
-            "-j {}".format(12 if self.execucao_noturna else 4),
+            "-j {}".format(jobs),
             "--output-type pdfa-2",
             in_path,
             out_path,
@@ -498,27 +462,13 @@ class Command(BaseCommand):
 
         try:
             p = ProcessoExterno(" ".join(cmd), self.logger)
-            r = p.run(timeout=300)
+            r = p.run(timeout=self.TIMEOUT_OCR_SECONDS)
 
             if r is None:
                 return None
             if r[0] in (0, 2, 6):
                 return True
             return None
-        except:
+        except Exception:
+            self.logger.exception("Falha ao executar ocrmypdf para o item %s", item.id)
             return False
-
-        # redo-ocr é excelente para execuções no futuro
-        # mas não funciona no servidores atuais de 32 bits
-        """cmd = ["ocrmypdf", "--redo-ocr", "-l por", file.path, file.path]
-        try:
-            p = ProcessOCR(' '.join(cmd), self.logger)
-            r = p.run(timeout=300)
-
-            if r is None:
-                return None
-            if not r or r == 6:
-                return True
-        except:
-            return False
-        return False"""

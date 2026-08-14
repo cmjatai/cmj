@@ -1,14 +1,11 @@
 import glob
-import io
 import logging
 import os
 import pathlib
 import re
+import shlex
 import subprocess
 import sys
-from collections import OrderedDict
-from pathlib import Path
-from time import sleep
 
 import cv2
 import fitz
@@ -19,20 +16,15 @@ import requests
 from bs4 import BeautifulSoup as bs
 from bs4.element import Tag
 from django.apps import apps
-from django.core.files.base import File
 from django.core.management.base import BaseCommand
-from django.db.models import Q
 from PIL import Image, ImageDraw, ImageEnhance
 from PIL.Image import Resampling
-from pymupdf import Rect
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
 from cmj.arq.models import ArqDoc
-from cmj.diarios.models import DiarioOficial
-from cmj.loa.models import Despesa
 from cmj.utils import Manutencao
-from sapl.compilacao.models import Dispositivo, UrlizeReferencia
+from sapl.compilacao.models import Dispositivo
 from sapl.materia.models import DocumentoAcessorio, MateriaLegislativa
 from sapl.norma.models import NormaJuridica
 from sapl.rules.apps import reset_id_model
@@ -973,7 +965,10 @@ class Command(BaseCommand):
             ]
 
             print(" ".join(cmd))
-            subprocess.Popen(" ".join(cmd), shell=True, stdout=subprocess.PIPE)
+            # shell=False: evita interpretar metacaracteres de shell nos caminhos
+            subprocess.Popen(
+                shlex.split(" ".join(cmd)), shell=False, stdout=subprocess.PIPE
+            )
             # try:
             #    p = ProcessoExterno(' '.join(cmd), self.logger)
             #    r = p.run(timeout=300)#
@@ -1041,7 +1036,10 @@ class Command(BaseCommand):
             ]
 
             print(" ".join(cmd))
-            p = subprocess.Popen(" ".join(cmd), shell=True, stdout=subprocess.PIPE)
+            # shell=False: evita interpretar metacaracteres de shell nos caminhos
+            p = subprocess.Popen(
+                shlex.split(" ".join(cmd)), shell=False, stdout=subprocess.PIPE
+            )
             p.wait()
             # subprocess.call(' '.join(cmd))
 

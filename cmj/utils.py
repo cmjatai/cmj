@@ -1,6 +1,7 @@
 import decimal
 import logging
 import re
+import shlex
 import ssl
 import subprocess
 import threading
@@ -643,11 +644,14 @@ class ProcessoExterno(object):
 
     def run(self, timeout):
 
+        # aceita cmd como string (tokenizada com shlex) ou lista de args já
+        # separados; nunca usa shell=True para não interpretar
+        # metacaracteres vindos de nomes de arquivo não confiáveis
+        argv = shlex.split(self.cmd) if isinstance(self.cmd, str) else list(self.cmd)
+
         def target():
             self.logger.info("Thread started")
-            self.process = subprocess.Popen(
-                self.cmd, shell=True, stdout=subprocess.PIPE
-            )
+            self.process = subprocess.Popen(argv, shell=False, stdout=subprocess.PIPE)
             self.stdout, self.stderr = self.process.communicate()
             self.returncode = self.process.returncode
             self.logger.info(self.returncode)

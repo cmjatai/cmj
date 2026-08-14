@@ -1,5 +1,6 @@
 import logging
 import os
+import shlex
 import subprocess
 import sys
 from datetime import datetime
@@ -22,8 +23,11 @@ logger = (
 
 
 def console(cmd):
+    # aceita string (tokenizada com shlex) ou lista de args; shell=False
+    # evita que metacaracteres em nomes de arquivo sejam interpretados
+    argv = shlex.split(cmd) if isinstance(cmd, str) else list(cmd)
     p = subprocess.Popen(
-        cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        argv, shell=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     out, err = p.communicate()
     return (p.returncode, out, err)

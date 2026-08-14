@@ -1,35 +1,23 @@
 import glob
-import io
 import logging
 import os
-import pathlib
-import re
-import shutil
+import shlex
 import subprocess
 import sys
-from pathlib import Path
 
 import cv2
 import fitz
 import numpy as np
-import ocrmypdf
 import pytesseract as tess
-from django.core.files.base import File
 from django.core.management.base import BaseCommand
-from django.db.models import Q
-from django.db.models.signals import post_delete, post_save
-from PIL import Image, ImageDraw, ImageEnhance, ImageFilter
-from PIL.Image import LANCZOS, Resampling
+from PIL import Image, ImageEnhance
+from PIL.Image import LANCZOS
 from pytesseract.pytesseract import Output
 from reportlab.pdfgen import canvas
 from reportlab.platypus.doctemplate import SimpleDocTemplate
 
-from cmj.arq.models import ArqDoc
 from cmj.arq.tasks import console
 from cmj.utils import Manutencao
-from sapl.materia.models import MateriaLegislativa
-from sapl.norma.models import NormaJuridica
-from sapl.rules.apps import reset_id_model
 
 
 def _get_registration_key(model):
@@ -465,7 +453,10 @@ class Command(BaseCommand):
             ]
 
             print(" ".join(cmd))
-            subprocess.Popen(" ".join(cmd), shell=True, stdout=subprocess.PIPE)
+            # shell=False: evita interpretar metacaracteres de shell nos caminhos
+            subprocess.Popen(
+                shlex.split(" ".join(cmd)), shell=False, stdout=subprocess.PIPE
+            )
             # try:
             #    p = ProcessoExterno(' '.join(cmd), self.logger)
             #    r = p.run(timeout=300)#
@@ -533,6 +524,9 @@ class Command(BaseCommand):
             ]
 
             print(" ".join(cmd))
-            p = subprocess.Popen(" ".join(cmd), shell=True, stdout=subprocess.PIPE)
+            # shell=False: evita interpretar metacaracteres de shell nos caminhos
+            p = subprocess.Popen(
+                shlex.split(" ".join(cmd)), shell=False, stdout=subprocess.PIPE
+            )
             p.wait()
             # subprocess.call(' '.join(cmd))
