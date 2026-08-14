@@ -239,7 +239,10 @@ class Command(BaseCommand):
         except _SessaoAbertaInterrompeu:
             return
 
-        self._reindexar_anos(years_updated)
+        if self.execucao_noturna:
+            self.logger.info("Reindexando anos atualizados: %s", years_updated)
+            print("Reindexando anos atualizados:", years_updated)
+            self._reindexar_anos(years_updated)
 
     def _run_manutencao_noturna(self, init):
         # refaz tudo que foi feito há mais de RETENCAO_OCR_DIAS
@@ -259,7 +262,7 @@ class Command(BaseCommand):
 
         data_field = model["order_by"][1 if model["order_by"].startswith("-") else 0 :]
 
-        items = model["model"].objects.order_by(model["order_by"])
+        items = model["model"].objects.order_by(model["order_by"], "-id")
 
         for item in items:
 
@@ -431,7 +434,7 @@ class Command(BaseCommand):
         for y, m in years_updated:
             try:
                 self.logger.info(f"Ano Executado: {y} chamando update_index...")
-                management.call_command(
+                command = [
                     "update_index",
                     f"{m._meta.app_label}.{m._meta.object_name}",
                     f"--start={y}-01-01T00:00:00'",
@@ -439,7 +442,9 @@ class Command(BaseCommand):
                     "--verbosity=3",
                     "--batch-size=100",
                     "--using=default",
-                )
+                ]
+                print(f"Chamando comando: {command}")
+                management.call_command(*command)
             except Exception:
                 self.logger.exception("Falha ao reindexar ano %s do model %s", y, m)
 
