@@ -1,3 +1,4 @@
+import datetime
 import fcntl
 import logging
 import os
@@ -5,7 +6,6 @@ import shutil
 import stat
 import sys
 import time
-from datetime import datetime, timedelta
 from pwd import getpwuid
 from time import sleep
 
@@ -50,7 +50,7 @@ class Command(BaseCommand):
     JOBS_DIURNO = 4
 
     TIMEOUT_OCR_SECONDS = 300
-    TEMPO_MAX_EXECUCAO = timedelta(minutes=2)
+    TEMPO_MAX_EXECUCAO = datetime.timedelta(minutes=2)
     SLEEP_ENTRE_ITENS = 2
 
     # retenção de histórico de OcrMyPDF, aplicada só na execução noturna
@@ -86,7 +86,7 @@ class Command(BaseCommand):
             "model": DocumentoAdministrativo,
             "file_field": ("texto_integral",),
             "count": 0,
-            "count_base": 9,
+            "count_base": 5,
             "order_by": "-data",
             "years_priority": 1,
         },
@@ -94,7 +94,7 @@ class Command(BaseCommand):
             "model": MateriaLegislativa,
             "file_field": ("texto_original",),
             "count": 0,
-            "count_base": 2,
+            "count_base": 5,
             "order_by": "-data_apresentacao",
             "years_priority": 1,
         },
@@ -102,7 +102,7 @@ class Command(BaseCommand):
             "model": NormaJuridica,
             "file_field": ("texto_integral",),
             "count": 0,
-            "count_base": 2,
+            "count_base": 5,
             "order_by": "-data",
             "years_priority": 1,
         },
@@ -134,7 +134,7 @@ class Command(BaseCommand):
             "model": DiarioOficial,
             "file_field": ("arquivo",),
             "count": 0,
-            "count_base": 1,
+            "count_base": 2,
             "order_by": "-data",
             "years_priority": 0,
         },
@@ -228,7 +228,12 @@ class Command(BaseCommand):
                 for model in self.models:
                     self._processar_model(model, init, years_updated)
 
-                self.models = list(filter(lambda x: x["count"] != 0, self.models))
+                self.models = list(
+                    filter(
+                        lambda x: x["count"] != 0 and x["count"] <= x["count_base"],
+                        self.models,
+                    )
+                )
         except _TempoLimiteAtingido:
             pass
         except _SessaoAbertaInterrompeu:
@@ -239,12 +244,12 @@ class Command(BaseCommand):
     def _run_manutencao_noturna(self, init):
         # refaz tudo que foi feito há mais de RETENCAO_OCR_DIAS
         OcrMyPDF.objects.filter(
-            created__lt=init - timedelta(days=self.RETENCAO_OCR_DIAS)
+            created__lt=init - datetime.timedelta(days=self.RETENCAO_OCR_DIAS)
         ).delete()
 
         # refaz tudo que foi feito há mais de RETENCAO_OCR_FALHA_DIAS e falhou
         OcrMyPDF.objects.filter(
-            created__lt=init - timedelta(days=self.RETENCAO_OCR_FALHA_DIAS),
+            created__lt=init - datetime.timedelta(days=self.RETENCAO_OCR_FALHA_DIAS),
             sucesso=False,
         ).delete()
 
@@ -293,6 +298,7 @@ class Command(BaseCommand):
                 )
                 if tentou:
                     count += 1
+                    return
                 if not continuar:
                     break
 
@@ -310,6 +316,11 @@ class Command(BaseCommand):
                     "signs" in signs_field and signs_field["signs"]
                 ):
                     return False, True
+
+            # selos não tem ligação com ff. selos é um dict e se estiver vazio
+            # não tem selos. se tiver, é um dict de campos, e cada campo é um dict de selos. se tiver selo hom, não faz ocr
+            if md and "selos" in md and md["selos"]:
+                return False, True
 
         file = getattr(item, ff)
 
@@ -337,7 +348,7 @@ class Command(BaseCommand):
             # o último ocr feito
             try:
                 t = os.path.getmtime(file.path) - self.MTIME_FOLGA_SECONDS
-                date_file = datetime.fromtimestamp(t, timezone.utc)
+                date_file = timezone.datetime.fromtimestamp(t, datetime.timezone.utc)
 
                 if date_file <= ocr.created:
                     return False, True
