@@ -267,8 +267,9 @@ class LoaCrud(Crud):
 
         def get(self, request, *args, **kwargs):
 
-            pk = int(kwargs["pk"])
-            if pk <= 2022:
+            self.object = self.get_object()
+
+            if self.object.ano <= 2022:
                 self.layout_key = "LoaDetailATE2022"
 
             response = super().get(request, *args, **kwargs)
@@ -678,6 +679,7 @@ class LoaCrud(Crud):
                 .values(
                     "tipo",
                     "entidade__nome_fantasia",
+                    "entidade__id",
                     "unidade__especificacao",
                     "emendaloaparlamentar_set__parlamentar__id",
                     "emendaloaparlamentar_set__parlamentar__nome_parlamentar",
@@ -696,17 +698,17 @@ class LoaCrud(Crud):
                     continue
 
                 el["entidade__nome_fantasia"] = nom_entidade.upper()
-                if el["entidade__nome_fantasia"] not in entidades:
-                    entidades[el["entidade__nome_fantasia"]] = {
+                if (el['entidade__id'],el["entidade__nome_fantasia"]) not in entidades:
+                    entidades[(el['entidade__id'],el["entidade__nome_fantasia"])] = {
                         "tipo": el["tipo"],
                         "parlamentares": [],
                         "soma_entidade": Decimal("0.00"),
                     }
 
-                entidades[el["entidade__nome_fantasia"]]["soma_entidade"] += el[
+                entidades[(el['entidade__id'],el["entidade__nome_fantasia"])]["soma_entidade"] += el[
                     "valor_parte_parlamentar"
                 ]
-                entidades[el["entidade__nome_fantasia"]]["parlamentares"].append(
+                entidades[(el['entidade__id'],el["entidade__nome_fantasia"])]["parlamentares"].append(
                     {
                         "id": el["emendaloaparlamentar_set__parlamentar__id"],
                         "nome_parlamentar": el[

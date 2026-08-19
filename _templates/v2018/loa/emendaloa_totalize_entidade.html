@@ -1,7 +1,7 @@
 {% load i18n common_cmj_tags %}
 <div class="container-table">
   <table class="table table-form table-bordered table-entidade-totalize">
-    {% for nome_entidade, values in entidades %}
+    {% for entidade, values in entidades %}
       {% if forloop.first %}
         <thead>
           <tr>
@@ -15,8 +15,8 @@
       {% endif %}
       {% if forloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
         <td class="text-left" rowspan="{{ values.parlamentares|length }}">
-          <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?finalidade={{ nome_entidade }}" class="nome-entidade">
-            {{ nome_entidade }}
+          <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?entidade={{ entidade.0 }}" class="nome-entidade">
+            {{ entidade.1 }}
           </a>
         </td>
         <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_entidade|decimal2str }}</td>

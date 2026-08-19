@@ -561,6 +561,27 @@ export default {
                 }
               })
             }
+          } else if (f === 'entidade') {
+            const eid = parseInt(query[f])
+            if (eid) {
+              this.$nextTick(() => {
+                const entidadeSelect =
+                  this.$refs.filtros && this.$refs.filtros.getEntidadeSelectRef()
+                if (entidadeSelect) {
+                  const checkOptions = () => {
+                    const opt = entidadeSelect.options.find(
+                      (o) => o.value && o.value.id === eid
+                    )
+                    if (opt) {
+                      this.filters_value.entidade = opt.value
+                    } else {
+                      setTimeout(checkOptions, 100)
+                    }
+                  }
+                  checkOptions()
+                }
+              })
+            }
           } else {
             this.filters_value[f] = query[f]
           }
