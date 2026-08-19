@@ -26,7 +26,7 @@
             {% if forloop.parentloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
           {% endif %}
             <td class="text-left ">
-              <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?parlamentares={{ parlamentar.id }}&finalidade={{ nome_entidade }}">
+              <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?parlamentares={{ parlamentar.id }}&entidade={{ entidade.0 }}">
                 <small>{{ parlamentar.nome_parlamentar }}</small>
               </a>
             </td>

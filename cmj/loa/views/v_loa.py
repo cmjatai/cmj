@@ -16,6 +16,7 @@ from cmj.loa.models import (
     Loa,
     RegistroAjusteLoaParlamentar,
 )
+from cmj.loa.models.m_financeiro_execucao import Empenho
 from cmj.loa.views.v_mixins import LoaContextDataMixin
 from cmj.utils import quantize
 from sapl.crud.base import RP_DETAIL, RP_LIST, Crud
@@ -420,6 +421,37 @@ class LoaCrud(Crud):
                     resumo_parlamentar[k]["impedimento_tecnico"] = 0
                     resumo_parlamentar[k]["ja_destinado"] = 0
 
+                    # 0 - Soma os empenhos feitos para aquele parlamentar, LOA e tipo de emenda
+                    totalize_empenhos = Empenho.objects.filter(
+                        Q(
+                            empenhoemendaajuste_set__ajuste__oficio_ajuste_loa__loa__ano=l.ano,
+                            empenhoemendaajuste_set__ajuste__registroajusteloaparlamentar_set__parlamentar__id=lp.parlamentar.id,
+                            empenhoemendaajuste_set__ajuste__tipo=k,
+                        )
+                        | Q(
+                            empenhoemendaajuste_set__emendaloa__loa__ano=l.ano,
+                            empenhoemendaajuste_set__emendaloa__emendaloaparlamentar_set__parlamentar__id=lp.parlamentar.id,
+                            empenhoemendaajuste_set__emendaloa__tipo=k,
+                        )
+                    ).aggregate(
+                        total_empenhado=Sum("valor_empenhado"),
+                        total_liquidado=Sum("valor_liquidado"),
+                        total_pago_bruto=Sum("valor_pago_bruto"),
+                        total_anulado=Sum("valor_anulado"),
+                    )
+                    resumo_parlamentar[k]["total_empenhado"] = totalize_empenhos[
+                        "total_empenhado"
+                    ] or Decimal("0.00")
+                    resumo_parlamentar[k]["total_liquidado"] = totalize_empenhos[
+                        "total_liquidado"
+                    ] or Decimal("0.00")
+                    resumo_parlamentar[k]["total_pago_bruto"] = totalize_empenhos[
+                        "total_pago_bruto"
+                    ] or Decimal("0.00")
+                    resumo_parlamentar[k]["total_anulado"] = totalize_empenhos[
+                        "total_anulado"
+                    ] or Decimal("0.00")
+
                     params = dict(
                         parlamentar=lp.parlamentar,
                         emendaloa__loa=self.object,
@@ -550,6 +582,16 @@ class LoaCrud(Crud):
 
                 resumo_emendas_impositivas.append(resumo_parlamentar)
 
+            t10 = EmendaLoa.SAUDE
+            t99 = EmendaLoa.DIVERSOS
+
+            for rei in resumo_emendas_impositivas:
+                rei['total_empenhado'] = rei[t10]['total_empenhado'] + rei[t99]['total_empenhado']
+                rei['total_liquidado'] = rei[t10]['total_liquidado'] + rei[t99]['total_liquidado']
+                rei['total_pago_bruto'] = rei[t10]['total_pago_bruto'] + rei[t99]['total_pago_bruto']
+                rei['total_anulado'] = rei[t10]['total_anulado'] + rei[t99]['total_anulado']
+                rei['total_empenhado'] -= rei['total_anulado']
+
             resumo_emendas_impositivas.sort(
                 key=lambda x: (
                     not x["loaparlamentar"].parlamentar.ativo,
@@ -558,10 +600,9 @@ class LoaCrud(Crud):
                 )
             )
 
+
             is_us = self.request.user.is_superuser
 
-            t10 = EmendaLoa.SAUDE
-            t99 = EmendaLoa.DIVERSOS
             # dsjd display_saude_ja_destinado
             dsjd = 1 if totais[t10]["ja_destinado"] or is_us else 0
             dsit = 1 if totais[t10]["impedimento_tecnico"] or is_us else 0
@@ -573,6 +614,7 @@ class LoaCrud(Crud):
             ddsd = 1 if totais[t99]["sem_destinacao"] or is_us else 0
 
             context = dict(
+                is_superuser=is_us,
                 resumo_emendas_impositivas=resumo_emendas_impositivas,
                 columns=dict(
                     saude=dict(
@@ -590,6 +632,10 @@ class LoaCrud(Crud):
                             if dssd
                             else ""
                         ),
+                        total_empenhado="Total Empenhado",
+                        total_liquidado="Total Liquidado",
+                        total_pago_bruto="Total Pago Bruto",
+                        total_anulado="Total Anulado",
                     ),
                     diversos=dict(
                         num_columns=ddjd + ddit + ddsd,
@@ -606,6 +652,10 @@ class LoaCrud(Crud):
                             if ddsd
                             else ""
                         ),
+                        total_empenhado="Total Empenhado",
+                        total_liquidado="Total Liquidado",
+                        total_pago_bruto="Total Pago Bruto",
+                        total_anulado="Total Anulado",
                     ),
                 ),
             )
@@ -626,6 +676,7 @@ class LoaCrud(Crud):
                 EmendaLoa.objects.filter(loa=l, tipo__gt=0)
                 .values(
                     "unidade__especificacao",
+                    "unidade__id",
                     "emendaloaparlamentar_set__parlamentar__id",
                     "emendaloaparlamentar_set__parlamentar__nome_parlamentar",
                 )
@@ -637,17 +688,19 @@ class LoaCrud(Crud):
                     valor_parte_parlamentar=Sum("emendaloaparlamentar_set__valor")
                 )
             ):
-                if el["unidade__especificacao"] not in unidades:
-                    unidades[el["unidade__especificacao"]] = {
+                if (el["unidade__id"], el["unidade__especificacao"]) not in unidades:
+                    unidades[(el["unidade__id"], el["unidade__especificacao"])] = {
                         "parlamentares": [],
                         "soma_unidade": Decimal("0.00"),
                     }
 
-                unidades[el["unidade__especificacao"]]["soma_unidade"] += el[
-                    "valor_parte_parlamentar"
-                ]
+                unidades[(el["unidade__id"], el["unidade__especificacao"])][
+                    "soma_unidade"
+                ] += el["valor_parte_parlamentar"]
 
-                unidades[el["unidade__especificacao"]]["parlamentares"].append(
+                unidades[(el["unidade__id"], el["unidade__especificacao"])][
+                    "parlamentares"
+                ].append(
                     {
                         "id": el["emendaloaparlamentar_set__parlamentar__id"],
                         "nome_parlamentar": el[
@@ -698,17 +751,19 @@ class LoaCrud(Crud):
                     continue
 
                 el["entidade__nome_fantasia"] = nom_entidade.upper()
-                if (el['entidade__id'],el["entidade__nome_fantasia"]) not in entidades:
-                    entidades[(el['entidade__id'],el["entidade__nome_fantasia"])] = {
+                if (el["entidade__id"], el["entidade__nome_fantasia"]) not in entidades:
+                    entidades[(el["entidade__id"], el["entidade__nome_fantasia"])] = {
                         "tipo": el["tipo"],
                         "parlamentares": [],
                         "soma_entidade": Decimal("0.00"),
                     }
 
-                entidades[(el['entidade__id'],el["entidade__nome_fantasia"])]["soma_entidade"] += el[
-                    "valor_parte_parlamentar"
-                ]
-                entidades[(el['entidade__id'],el["entidade__nome_fantasia"])]["parlamentares"].append(
+                entidades[(el["entidade__id"], el["entidade__nome_fantasia"])][
+                    "soma_entidade"
+                ] += el["valor_parte_parlamentar"]
+                entidades[(el["entidade__id"], el["entidade__nome_fantasia"])][
+                    "parlamentares"
+                ].append(
                     {
                         "id": el["emendaloaparlamentar_set__parlamentar__id"],
                         "nome_parlamentar": el[

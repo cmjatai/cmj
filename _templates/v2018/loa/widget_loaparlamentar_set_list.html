@@ -9,16 +9,28 @@
           <th colspan={{columns.saude.num_columns}}>EMENDAS DESTINADAS À SAÚDE<br>
             <i class="d-none">(por Parlamentar R$ {{lp.loaparlamentar.disp_saude|decimal2str}})</i></th>
           <th colspan={{columns.diversos.num_columns}}>EMENDAS COM DESTINAÇÃO GERAL<br>
+
             <i class="d-none">(por Parlamentar R$ {{lp.loaparlamentar.disp_diversos|decimal2str}})</i></th>
+            {% if is_superuser %}
+            <th colspan=4>TOTAIS EMPENHADOS, LIQUIDADOS e PAGOS</th>
+            {% endif %}
         </tr>
         <tr>
           {% if columns.saude.ja_destinado %}<th class="text-blue">{{columns.saude.ja_destinado|safe}}</th>{% endif %}
           {% if columns.saude.impedimento_tecnico %}<th class="text-red">{{columns.saude.impedimento_tecnico|safe}}</th>{% endif %}
           {% if columns.saude.sem_destinacao %}<th class="text-orange">{{columns.saude.sem_destinacao|safe}}</th>{% endif %}
 
+
+
           {% if columns.diversos.ja_destinado %}<th class="text-blue">{{columns.diversos.ja_destinado|safe}}</th>{% endif %}
           {% if columns.diversos.impedimento_tecnico %}<th class="text-red">{{columns.diversos.impedimento_tecnico|safe}}</th>{% endif %}
           {% if columns.diversos.sem_destinacao %}<th class="text-orange">{{columns.diversos.sem_destinacao|safe}}</th>{% endif %}
+
+          {% if is_superuser %}
+            {% if columns.diversos.total_empenhado %}<th class="text-gray">{{columns.diversos.total_empenhado|safe}}</th>{% endif %}
+            {% if columns.diversos.total_liquidado %}<th class="text-gray">{{columns.diversos.total_liquidado|safe}}</th>{% endif %}
+            {% if columns.diversos.total_pago_bruto %}<th class="text-gray">{{columns.diversos.total_pago_bruto|safe}}</th>{% endif %}
+          {% endif %}
         </tr>
       </thead>
     {% endif %}
@@ -39,6 +51,12 @@
       {% if columns.diversos.ja_destinado %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-blue{% else %}text-gray{% endif %}">{{lp.99.ja_destinado|decimal2str}}</td>{% endif %}
       {% if columns.diversos.impedimento_tecnico %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-red{% else %}text-gray{% endif %}">{{lp.99.impedimento_tecnico|decimal2str}}</td>{% endif %}
       {% if columns.diversos.sem_destinacao %}<td class="text-right {% if lp.loaparlamentar.parlamentar.ativo %}text-orange{% else %}text-gray{% endif %}">{{lp.99.sem_destinacao|decimal2str}}</td>{% endif %}
+
+      {% if is_superuser %}
+        {% if lp.total_empenhado %}<td class="text-right text-gray">{{lp.total_empenhado|decimal2str}}</td>{% endif %}
+        {% if lp.total_liquidado %}<td class="text-right text-gray">{{lp.total_liquidado|decimal2str}}</td>{% endif %}
+        {% if lp.total_pago_bruto %}<td class="text-right text-gray">{{lp.total_pago_bruto|decimal2str}}</td>{% endif %}
+      {% endif %}
     </tr>
     {% endfor %}
   </table>
