@@ -27,11 +27,11 @@ class Command(BaseCommand):
 
         def pagina_com_logotipo():
             topo = PROJECT_DIR.child(
-                "_frontend", "v1", "dist", "img", "pdf_cabec_margem.jpg"
+                "_frontend", "v2018", "dist", "v2018", "img", "pdf_cabec.jpg"
             )
-            rodape = PROJECT_DIR.child(
-                "_frontend", "v1", "dist", "img", "pdf_rodape_margem.jpg"
-            )
+            #rodape = PROJECT_DIR.child(
+            ##    "_frontend", "v1", "dist", "img", "pdf_rodape_margem.jpg"
+            #)
 
             packet = io.BytesIO()
             try:
@@ -40,12 +40,14 @@ class Command(BaseCommand):
                 # can.setFillColorRGB(255, 255, 0, 1)
                 # can.setFillColorCMYK(0, 0, 0, 0, 1)
                 # can.rect(v['xf'], v['yf'], v['wf'], v['hf'], stroke=0, fill=1)
+                margem = 20
                 largura = 595
-                can.drawImage(topo, 0, 746, largura, 400 / 2500 * largura)
+                altura = 842
+                can.drawImage(topo, margem, altura - 391 / 2317 * (largura + 4 * margem), largura - 2 * margem, 391 / 2317 * (largura - 2 * margem))
 
                 # can.setFillColorCMYK(0, 0, 0, 0, 1)
                 # can.rect(v['xh'], v['yh'], v['wh'], v['hh'], stroke=0, fill=1)
-                can.drawImage(rodape, 0, 0, largura, 150 / 1700 * largura)
+                #can.drawImage(rodape, 0, 0, largura, 150 / 1700 * largura)
 
                 # can.setFillColorCMYK(0, 0, 0, 1, 1)
                 # can.setFontSize(9)

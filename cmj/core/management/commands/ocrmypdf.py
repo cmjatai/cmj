@@ -50,7 +50,7 @@ class Command(BaseCommand):
     JOBS_DIURNO = 4
 
     TIMEOUT_OCR_SECONDS = 300
-    TEMPO_MAX_EXECUCAO = datetime.timedelta(minutes=2)
+    TEMPO_MAX_EXECUCAO = datetime.timedelta(minutes=10)
     SLEEP_ENTRE_ITENS = 2
 
     # retenção de histórico de OcrMyPDF, aplicada só na execução noturna
@@ -301,7 +301,7 @@ class Command(BaseCommand):
                 )
                 if tentou:
                     count += 1
-                    return
+                    # return
                 if not continuar:
                     break
 
