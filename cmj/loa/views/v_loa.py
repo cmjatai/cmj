@@ -130,7 +130,7 @@ class LoaCrud(Crud):
             if l.ano > ano_atual:
                 frase = (
                     "Processo Legislativo em adamento"
-                    if not l.materia.normajuridica()
+                    if not l.materia or not l.materia.normajuridica()
                     else "LOA Aprovada"
                 )
                 return (
@@ -245,19 +245,19 @@ class LoaCrud(Crud):
         def extras_list_url(self):
             btns = []
 
-            return btns
-
-            btns.extend(
-                [
-                    (
-                        reverse(
-                            "cmj.loa:emendaloa_list", kwargs={"pk": self.kwargs["pk"]}
-                        ),
-                        "btn-primary",
-                        _("Listar Emendas Impositivas"),
-                    )
-                ]
-            )
+            if not self.object.materia or not self.object.materia.normajuridica():
+                btns.extend(
+                    [
+                        (
+                            reverse(
+                                "cmj.loa:emendaloa_create",
+                                kwargs={"pk": self.kwargs["pk"]},
+                            ),
+                            "btn-primary",
+                            _("Adicionar Emendas Impositivas"),
+                        )
+                    ]
+                )
 
             btns = list(filter(None, btns))
             return btns
@@ -561,7 +561,7 @@ class LoaCrud(Crud):
                     # - Se o parlamentar estiver ativo, o valor que está em fase de impedimento técnico
                     #   é acrescido do remanescente, para mostrar o impacto total no valor disponível
                     #   para destinação.
-                    if lp.parlamentar.ativo:
+                    if lp.parlamentar.ativo and l.materia and l.materia.normajuridica():
                         resumo_parlamentar[k][
                             "impedimento_tecnico"
                         ] = resumo_parlamentar[k]["impedimento_tecnico"] + (
@@ -588,11 +588,19 @@ class LoaCrud(Crud):
             t99 = EmendaLoa.DIVERSOS
 
             for rei in resumo_emendas_impositivas:
-                rei['total_empenhado'] = rei[t10]['total_empenhado'] + rei[t99]['total_empenhado']
-                rei['total_liquidado'] = rei[t10]['total_liquidado'] + rei[t99]['total_liquidado']
-                rei['total_pago_bruto'] = rei[t10]['total_pago_bruto'] + rei[t99]['total_pago_bruto']
-                rei['total_anulado'] = rei[t10]['total_anulado'] + rei[t99]['total_anulado']
-                rei['total_empenhado'] -= rei['total_anulado']
+                rei["total_empenhado"] = (
+                    rei[t10]["total_empenhado"] + rei[t99]["total_empenhado"]
+                )
+                rei["total_liquidado"] = (
+                    rei[t10]["total_liquidado"] + rei[t99]["total_liquidado"]
+                )
+                rei["total_pago_bruto"] = (
+                    rei[t10]["total_pago_bruto"] + rei[t99]["total_pago_bruto"]
+                )
+                rei["total_anulado"] = (
+                    rei[t10]["total_anulado"] + rei[t99]["total_anulado"]
+                )
+                rei["total_empenhado"] -= rei["total_anulado"]
 
             resumo_emendas_impositivas.sort(
                 key=lambda x: (
@@ -601,7 +609,6 @@ class LoaCrud(Crud):
                     x["loaparlamentar"].parlamentar.nome_parlamentar,
                 )
             )
-
 
             is_us = self.request.user.is_superuser
 
