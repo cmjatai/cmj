@@ -178,13 +178,15 @@ class LoaCrud(Crud):
                 f"""
             <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
             <div class="btn-group" role="group">
-                <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/emendaloa" title="Listagem de Emendas à LOA"><i class="fas fa-clipboard-list"></i></a>
-                <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/oficioajusteloa" title="Ofícios de Ajustes"><i class="fas fa-file-signature"></i></a>
                 <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/prestacaocontaloa" title="Prestação de Contas"><i class="fas fa-hand-holding-usd"></i></a>
             </div>
             """,
                 "",
             )
+            """
+                <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/emendaloa" title="Listagem de Emendas à LOA"><i class="fas fa-clipboard-list"></i></a>
+                <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/oficioajusteloa" title="Ofícios de Ajustes"><i class="fas fa-file-signature"></i></a>
+            """
 
         def hook_perc_disp_total(self, *args, **kwargs):
             l = args[0]
