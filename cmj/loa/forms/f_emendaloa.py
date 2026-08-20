@@ -19,6 +19,7 @@ from django_filters import BooleanFilter, ModelChoiceFilter
 from django_filters.filters import CharFilter, ChoiceFilter, MultipleChoiceFilter
 from django_filters.filterset import FilterSet
 
+from cmj.core.models import Bairro
 from cmj.loa.forms.f_mixins import (
     LoaParlModelMultipleChoiceFilter,
     MateriaCheckFormMixin,
@@ -188,6 +189,21 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 "data-live-search": "true",
                 "data-header": "Entidades Cadastradas",
                 "data-dropup-auto": "false",
+                "data-width": "100%",
+            }
+        ),
+    )
+
+    bairro = forms.ModelChoiceField(
+        queryset=Bairro.objects.exclude(codigo=0),
+        label="Bairro",
+        required=False,
+        widget=forms.Select(
+            attrs={
+                "class": "selectpicker",
+                "data-live-search": "true",
+                "data-header": "Bairros Cadastrados",
+                "data-dropup-auto": "false",
             }
         ),
     )
@@ -211,6 +227,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             "busca_despesa",
             "ano_loa",
             "unidade",
+            "bairro",
             "entidade",  # 'registrocontabil_set'
         ]
 
@@ -247,7 +264,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         )
 
         row3 = [
-            ("entidade", 12),
+            ("entidade", 7),
+            ("bairro", 5),
             ("prefixo_indicacao", 3),
             ("unidade", 9),
             ("prefixo_finalidade", 3),

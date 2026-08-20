@@ -104,6 +104,16 @@ class EmendaLoa(CmjSearchMixin):
         on_delete=PROTECT,
     )
 
+    bairro = models.ForeignKey(
+        "core.Bairro",
+        verbose_name=_("Bairro"),
+        related_name="emendaloa_set",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
+
     unidade = models.ForeignKey(
         "loa.UnidadeOrcamentaria",
         verbose_name=_("Unidade Orçamentária"),
@@ -424,6 +434,8 @@ class EmendaLoa(CmjSearchMixin):
                     valor = getattr(self, chave_strip) or ""
                     if isinstance(valor, models.Model):
                         valor = str(valor)
+                else:
+                    valor = ""
                 valor = valor.upper() if valor and isinstance(valor, str) else valor
                 finalidade = finalidade.replace(f"{{{chave}}}", str(valor))
 

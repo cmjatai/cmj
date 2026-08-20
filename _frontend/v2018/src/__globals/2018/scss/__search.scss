@@ -87,7 +87,7 @@
   border: 0;
   padding: 0;
   .dropdown-menu {
-    max-width: 130% !important;
+    //max-width: 230% !important;
     table-layout: fixed; /* Ajuda o navegador a ignorar o tamanho do texto interno no cálculo */
   }
   .selectpicker {
@@ -118,8 +118,7 @@
       }
       span.text {
         font-size: 0.9em;
-        white-space: normal;
-        word-wrap: break-word;
+        white-space: nowrap;
       }
       &:nth-child(odd) {
         background-color: #f5f5f5;
