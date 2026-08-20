@@ -410,14 +410,30 @@ class LoaViewSet:
             "fonte": "fte",
         }
         for k, v in filters_data.items():
-            if v and k in field_to_alias:
-                if "/" in v:
-                    v = v.split("/")
-                    filter_sql.append(
-                        f" {field_to_alias[k]}.codigo = '{v[0]}' and {field_to_alias[k]}.orgao_id = {v[1]} "
-                    )
-                else:
-                    filter_sql.append(f" {field_to_alias[k]}.codigo = '{v}' ")
+
+            if not v:
+                continue
+
+            v_str = str(v).strip()
+            parts = v_str.split("/", 1)
+
+            v0 = parts[0].strip()
+
+            v1 = parts[1].strip() if len(parts) == 2 else None
+
+            try:
+                v0_int = int(v0)
+                v1_int = int(v1) if v1 is not None else None
+            except ValueError:
+                continue
+
+            if v1 is None:
+                value = f" {field_to_alias[k]}.codigo = '{v0}' "
+            else:
+                value = f" ({field_to_alias[k]}.codigo >= '{v0}' and {field_to_alias[k]}.orgao_id <= '{v1}') "
+
+            filter_sql.append(value)
+
         filter_sql = " and ".join(filter_sql)
         filter_sql = f" and {filter_sql} " if filter_sql else ""
 
