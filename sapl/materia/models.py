@@ -709,7 +709,10 @@ class MateriaLegislativa(CommonMixin):
             p.numero_paginas = self.paginas
             p.save()
             protocolo = p
+
+        if not self.numero_protocolo or self.data_apresentacao != protocolo.timestamp.date():
             self.numero_protocolo = protocolo.numero
+            self.data_apresentacao = protocolo.timestamp
             self.save()
 
         for field_file in self.FIELDFILE_NAME:
