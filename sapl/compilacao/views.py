@@ -1,11 +1,9 @@
 import io
 import logging
-import os
 import sys
 from collections import OrderedDict
 from datetime import timedelta
 
-import pymupdf
 from braces.views import FormMessagesMixin
 from django import forms
 from django.apps.registry import apps
@@ -14,11 +12,9 @@ from django.contrib import messages
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.files.base import File
 from django.core.signing import Signer
 from django.db import IntegrityError, transaction
 from django.db.models import Q
-from django.db.models.query import QuerySet
 from django.http.response import (
     Http404,
     HttpResponse,
@@ -26,17 +22,15 @@ from django.http.response import (
     JsonResponse,
 )
 from django.shortcuts import get_object_or_404, redirect
-from django.template.loader import render_to_string
 from django.urls.base import reverse, reverse_lazy
 from django.utils.dateparse import parse_date
 from django.utils.encoding import force_str
-from django.utils.text import format_lazy, slugify
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import ContextMixin, TemplateView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.views.generic.list import ListView
-from django_filters.views import FilterView
 
 from cmj.search.tasks import (
     task_sync_embeddings_textoarticulado,
@@ -87,7 +81,6 @@ from sapl.compilacao.utils import (
 from sapl.crud.base import (
     RP_DETAIL,
     RP_LIST,
-    Crud,
     CrudAux,
     CrudListView,
     ListWithSearchForm,
@@ -3960,13 +3953,17 @@ class DispositivoSearchFragmentFormView(ListView):
                 "texto_articulado_do_editor", ""
             )
             tipo_model = self.request.GET.get("tipo_model", "")
-            limit = int(self.request.GET.get("max_results", 100))
             tipo_ta = self.request.GET.get("tipo_ta", "")
             num_ta = self.request.GET.get("num_ta", "")
             ano_ta = self.request.GET.get("ano_ta", "")
             rotulo = self.request.GET.get("rotulo", "")
             str_texto = self.request.GET.get("texto", "")
             texto = str_texto.split(" ")
+
+            try:
+                limit = int(self.request.GET.get("max_results", 100))
+            except ValueError:
+                limit = 10
 
             tipo_resultado = self.request.GET.get("tipo_resultado", "")
             tipo_resultado = "" if tipo_resultado == "False" else tipo_resultado
@@ -4011,46 +4008,66 @@ class DispositivoSearchFragmentFormView(ListView):
             dts = self.request.GET.get("data_type_selection", "")
             df = self.request.GET.get("data_function", "")
 
-            AND_CONTROLS = ""
+            # params é preenchido na mesma ordem em que os %s aparecem no
+            # sql final, para casar corretamente com o binding do raw().
+            params = []
+
+            AND1_CONTROLS = ""
             if dts == "checkbox":
-                AND_CONTROLS = "AND td.dispositivo_de_alteracao = false"
+                AND1_CONTROLS = "AND td.dispositivo_de_alteracao = false"
             else:
                 if df == "alterador":
-                    AND_CONTROLS = """AND td.dispositivo_de_alteracao = true
+                    AND1_CONTROLS = """AND td.dispositivo_de_alteracao = true
                                     AND td.dispositivo_de_articulacao = true"""
 
-            texto = list(map("d.texto ~* '{}'".format, texto))
+            texto_palavras = texto
+            BUSCA_TEXTO = " AND ".join(["d.texto ~* %s"] * len(texto_palavras))
             if str_texto and rotulo:
-                AND_TEXTO_ROTULO = """AND (  ({BUSCA_TEXTO} AND d.rotulo ~* '{BUSCA_ROTULO}')  OR
-                                         ({BUSCA_TEXTO} AND d.rotulo = '' AND dp.rotulo ~* '{BUSCA_ROTULO}')
-                                      )""".format(
-                    BUSCA_TEXTO=" AND ".join(texto), BUSCA_ROTULO=rotulo
-                )
+                AND2_TEXTO_ROTULO = """AND (  ({BUSCA_TEXTO} AND d.rotulo ~* %s)  OR
+                                         ({BUSCA_TEXTO} AND d.rotulo = '' AND dp.rotulo ~* %s)
+                                      )""".format(BUSCA_TEXTO=BUSCA_TEXTO)
+                params += texto_palavras + [rotulo] + texto_palavras + [rotulo]
             elif str_texto:
-                AND_TEXTO_ROTULO = " AND %s" % " AND ".join(texto)
+                AND2_TEXTO_ROTULO = " AND " + BUSCA_TEXTO
+                params += texto_palavras
             elif rotulo:
-                AND_TEXTO_ROTULO = "AND d.rotulo ~* '{BUSCA_ROTULO}'".format(
-                    BUSCA_ROTULO=rotulo
-                )
+                AND2_TEXTO_ROTULO = "AND d.rotulo ~* %s"
+                params += [rotulo]
             else:
-                AND_TEXTO_ROTULO = ""
+                AND2_TEXTO_ROTULO = ""
 
-            jtms = ""  # JOIN_TYPE_MODEL_SELECTED
-            atms = ""  # AND_TYPE_MODEL_SELECTED
-            if tipo_model:
-                jtms = "JOIN {gfk_table} gfkt on (gfkt.id = ta.object_id)".format(
-                    gfk_table=model_class._meta.db_table
-                )
-                atms = "AND gfkt.{gfk_field_type} = {gfk_field_type_id}".format(
-                    gfk_field_type=column_field,
-                    gfk_field_type_id=tipo_model.id,
-                )
-
-            AND_EDIT_CLONE = ""
+            AND3_EDIT_CLONE = ""
             if ta:
-                AND_EDIT_CLONE = (
+                AND3_EDIT_CLONE = (
                     "AND ta.object_id != 0" if ta.object_id else "AND ta.object_id = 0"
                 )
+
+            AND4_NUMERO = ""
+            if num_ta:
+                AND4_NUMERO = "AND ta.numero ~* %s"
+                params.append(num_ta)
+
+            AND5_ANO = ""
+            if ano_ta and str(ano_ta).isdigit():
+                AND5_ANO = "AND ta.ano = %s"
+                params.append(int(ano_ta))
+
+            AND6_TIPO_TA = ""
+            if tipo_ta:
+                AND6_TIPO_TA = "AND ta.tipo_ta_id = %s"
+                params.append(tipo_ta.id)
+
+            JOIN_TYPE_MODEL_SELECTED = ""  # JOIN_TYPE_MODEL_SELECTED
+            AND7_TYPE_MODEL_SELECTED = ""  # AND_TYPE_MODEL_SELECTED
+            if tipo_model:
+                # nomes de tabela/coluna vêm de _meta do Django (não do usuário)
+                JOIN_TYPE_MODEL_SELECTED = "JOIN {gfk_table} gfkt on (gfkt.id = ta.object_id)".format(
+                    gfk_table=model_class._meta.db_table
+                )
+                AND7_TYPE_MODEL_SELECTED = "AND gfkt.{gfk_field_type} = %s".format(
+                    gfk_field_type=column_field,
+                )
+                params.append(tipo_model.id)
 
             sql = """
                 SELECT d.* FROM compilacao_dispositivo d
@@ -4062,15 +4079,14 @@ class DispositivoSearchFragmentFormView(ListView):
 
                     where d.nivel > 0
 
-                    {AND_TYPE_MODEL_SELECTED}
 
-                    {AND_TEXTO_ROTULO}
-                    {AND1_NUMERO}
-                    {AND2_ANO}
-                    {AND3_TIPO_TA}
-                    {AND_CONTROLS}
-
-                    {AND_EDIT_CLONE}
+                    {AND1_CONTROLS}
+                    {AND2_TEXTO_ROTULO}
+                    {AND3_EDIT_CLONE}
+                    {AND4_NUMERO}
+                    {AND5_ANO}
+                    {AND6_TIPO_TA}
+                    {AND7_TYPE_MODEL_SELECTED}
 
                     order by ta.data desc,
                             ta.numero desc,
@@ -4079,19 +4095,17 @@ class DispositivoSearchFragmentFormView(ListView):
                     {limit};
                 """.format(
                 limit="limit {}".format(limit) if limit else "",
-                JOIN_TYPE_MODEL_SELECTED=jtms,
-                AND_TYPE_MODEL_SELECTED=atms,
-                AND3_TIPO_TA=(
-                    "AND ta.tipo_ta_id = {}".format(tipo_ta.id) if tipo_ta else ""
-                ),
-                AND2_ANO="AND ta.ano = {}".format(ano_ta) if ano_ta else "",
-                AND1_NUMERO="AND ta.numero ~* '{}'".format(num_ta) if num_ta else "",
-                AND_TEXTO_ROTULO=AND_TEXTO_ROTULO if AND_TEXTO_ROTULO else "",
-                AND_CONTROLS=AND_CONTROLS if AND_CONTROLS else "",
-                AND_EDIT_CLONE=AND_EDIT_CLONE,
+                AND1_CONTROLS=AND1_CONTROLS if AND1_CONTROLS else "",
+                AND2_TEXTO_ROTULO=AND2_TEXTO_ROTULO,
+                AND3_EDIT_CLONE=AND3_EDIT_CLONE,
+                AND4_NUMERO=AND4_NUMERO,
+                AND5_ANO=AND5_ANO,
+                AND6_TIPO_TA=AND6_TIPO_TA,
+                AND7_TYPE_MODEL_SELECTED=AND7_TYPE_MODEL_SELECTED,
+                JOIN_TYPE_MODEL_SELECTED=JOIN_TYPE_MODEL_SELECTED,
             )
 
-            result = Dispositivo.objects.raw(sql)
+            result = Dispositivo.objects.raw(sql, params)
 
             r = []
             ids = set()
