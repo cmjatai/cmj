@@ -19,9 +19,9 @@ ipython==9.8.0
 pytz==2025.2
 num2words==0.5.14
 
-gunicorn==23.0.0
-daphne==4.1.2
-Twisted==24.7.0
+gunicorn==26.1.0
+daphne==4.2.3
+#Twisted==24.7.0
 channels==4.1.0
 channels_redis==4.2.0
 redis==5.1.1
@@ -49,7 +49,7 @@ ocrmypdf==17.3.0
 trml2pdf
 pypdf4==1.27.0
 pdfrw
-WeasyPrint==68.1
+WeasyPrint==69.0
 python-docx==1.1.2
 XlsxWriter==3.2.0
 Pillow==12.3.0
