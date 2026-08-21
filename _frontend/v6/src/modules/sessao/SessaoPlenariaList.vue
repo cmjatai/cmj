@@ -56,7 +56,7 @@ const fetchSessaoPlenariaList = async (page = 1, form_filter = {}) => {
     year: form_filter.year || '',
     month: form_filter.month || '',
     tipo: form_filter.tipo || '',
-    expand: 'tipo;legislatura;sessao_legislativa'
+    expand: 'tipo;legislatura;sessao_legislativa;comissao'
   }
 
   Resource

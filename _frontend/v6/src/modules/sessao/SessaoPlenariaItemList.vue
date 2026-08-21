@@ -4,7 +4,7 @@
     :to="{ name: 'sessao_plenaria_view_link', params: {id: sessao.id} }"
   >
     <h4 class="tit">
-      {{ titulo }}
+      {{ sessao.epigrafe }}
     </h4>
     <div class="subtitulo">
       <span>{{ subtitulo }}</span><span class="separator"> – </span>
@@ -39,6 +39,9 @@ const titulo = computed(() => {
 
   // acesso direto ao objeto tipo que foram
   // baixados via resource e não está ligado ao syncStore
+
+  if (tipo.tipogeral === 20) { return sessao.__str__ }
+
   if (tipo.tipo_numeracao === 1) { base += ` da ${data_inicio.getDate() > 15 ? 2 : 1}ª Quinzena do mês de ${month_text(data_inicio.getMonth())}` }
 
   if (tipo.tipo_numeracao === 2) { base += ` do mês de ${month_text(data_inicio.getMonth())}` }

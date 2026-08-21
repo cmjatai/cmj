@@ -83,6 +83,7 @@ class SessaoPlenariaForm(FileFieldCheckMixin, ModelForm):
         sl = self.cleaned_data["sessao_legislativa"]
         leg = self.cleaned_data["legislatura"]
         tipo = self.cleaned_data["tipo"]
+        comissao = self.cleaned_data["comissao"]
         abertura = self.cleaned_data["data_inicio"]
         encerramento = self.cleaned_data["data_fim"]
 
@@ -94,6 +95,8 @@ class SessaoPlenariaForm(FileFieldCheckMixin, ModelForm):
 
         qs = tipo.queryset_tipo_numeracao(leg, sl, abertura)
         qs &= Q(numero=num)
+        if comissao:
+            qs &= Q(comissao=comissao)
 
         if SessaoPlenaria.objects.filter(qs).exclude(pk=instance.pk).exists():
             raise error

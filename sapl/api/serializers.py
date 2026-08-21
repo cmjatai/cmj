@@ -1,5 +1,4 @@
 import logging
-from hmac import new
 
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -204,6 +203,17 @@ class ParlamentarSerializerVerbose(CmjSerializerMixin):
             "partido",
             "titular",
         ]
+
+
+class SessaoPlenariaSerializer(CmjSerializerMixin):
+    epigrafe = serializers.SerializerMethodField("get_epigrafe")
+
+    class Meta:
+        model = SessaoPlenaria
+        fields = "__all__"
+
+    def get_epigrafe(self, obj):
+        return obj.epigrafe
 
 
 class SessaoPlenariaECidadaniaSerializer(serializers.ModelSerializer):
