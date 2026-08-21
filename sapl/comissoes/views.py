@@ -239,6 +239,9 @@ class ComissaoCrud(Crud):
         def form_valid(self, form):
             return super(Crud.UpdateView, self).form_valid(form)
 
+    class ListView(Crud.ListView):
+        paginate_by = 50
+
 
 def lista_materias_comissao(comissao_pk):
     ts = (
