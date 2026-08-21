@@ -5,7 +5,7 @@ TipoSessaoPlenaria:
 
 SessaoPlenaria:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo numero:2
+  - legislatura sessao_legislativa tipo comissao numero:1
   - data_inicio:5 hora_inicio:5 iniciada
   - data_fim:5 hora_fim:5 finalizada
   - upload_pauta:4 upload_ata:4 upload_anexo:4 diariooficial:8
@@ -14,7 +14,7 @@ SessaoPlenaria:
 
 SessaoPlenariaCreate:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo numero:2
+  - legislatura sessao_legislativa tipo comissao numero:1
   - data_inicio:5 hora_inicio:5 iniciada
   - data_fim:5 hora_fim:5 finalizada
   - upload_pauta:4 upload_ata:4 upload_anexo:4
@@ -23,7 +23,7 @@ SessaoPlenariaCreate:
 
 SessaoPlenariaSessaoEdit:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo numero:1 pauta_publicada:2
+  - legislatura sessao_legislativa tipo comissao numero:1 pauta_publicada:2
   - data_inicio:5 hora_inicio:5 iniciada
   - data_fim:5 hora_fim:5 finalizada
   - upload_pauta upload_ata upload_anexo

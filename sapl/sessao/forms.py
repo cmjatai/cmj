@@ -9,6 +9,7 @@ from django.forms import ModelForm
 from django.forms.widgets import CheckboxSelectMultiple
 from django.utils.translation import gettext_lazy as _
 
+from sapl.comissoes.models import Comissao
 from sapl.crispy_layout_mixin import (
     SaplFormHelper,
     SaplFormLayout,
@@ -58,6 +59,13 @@ DIA_CHOICES = RANGE_DIAS_MES
 
 
 class SessaoPlenariaForm(FileFieldCheckMixin, ModelForm):
+
+    comissao = forms.ModelChoiceField(
+        label="Comissão",
+        required=False,
+        queryset=Comissao.objects.filter(ativa=True).order_by("nome"),
+        empty_label="------------",
+    )
 
     class Meta:
         model = SessaoPlenaria

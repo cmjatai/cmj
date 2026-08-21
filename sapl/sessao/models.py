@@ -160,6 +160,17 @@ class SessaoPlenaria(models.Model):
     legislatura = models.ForeignKey(
         Legislatura, on_delete=models.PROTECT, verbose_name=_("Legislatura")
     )
+
+    comissao = models.ForeignKey(
+        "comissoes.Comissao",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=models.PROTECT,
+        related_name="sessaoplenaria_set",
+        verbose_name=_("Comissão"),
+    )
+
     # XXX seems to be empty
     data_inicio = models.DateField(verbose_name=_("Abertura"))
     hora_inicio = models.CharField(max_length=5, verbose_name=_("Horário (hh:mm)"))

@@ -1262,6 +1262,7 @@ def recuperar_numero_sessao_view(request):
         tipo = TipoSessaoPlenaria.objects.get(pk=request.GET.get("tipo", "0"))
         sl = request.GET.get("sessao_legislativa", "0")
         l = request.GET.get("legislatura", "0")
+        comissao = request.GET.get("comissao", "")
         data = request.GET.get("data_inicio", timezone.now())
 
         if isinstance(data, str):
@@ -1270,8 +1271,12 @@ def recuperar_numero_sessao_view(request):
             else:
                 data = timezone.now().date()
 
+        q = tipo.queryset_tipo_numeracao(l, sl, data)
+        if comissao:
+            q &= Q(comissao=comissao)
+
         sessao = SessaoPlenaria.objects.filter(
-            tipo.queryset_tipo_numeracao(l, sl, data)
+            q
         ).last()
 
     except ObjectDoesNotExist:

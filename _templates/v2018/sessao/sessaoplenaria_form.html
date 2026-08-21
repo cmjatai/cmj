@@ -12,13 +12,15 @@
     var sessao = $("#id_sessao_legislativa").val();
     var legislatura = $("#id_legislatura").val();
     var data_ini = $("#id_data_inicio").val();
+    var comissao = $("#id_comissao").val();
 
     if (tipo) {
       $.get("{% url 'sapl.sessao:recuperar_numero_sessao_view' %}",
         {
           tipo: tipo,
           sessao_legislativa: sessao,
-          data_inicio: data_ini
+          data_inicio: data_ini,
+          comissao: comissao
         },
         function(data, status) {
           $("#id_numero").val(data.numero);
@@ -57,6 +59,7 @@
       $("#id_tipo").click(recuperar_numero_sessao);
       $("#id_sessao_legislativa").click(recuperar_numero_sessao);
       $("#id_legislatura").click(recuperar_numero_sessao);
+      $("#id_comissao").click(recuperar_numero_sessao);
 
     {% endif %}
 
