@@ -9,7 +9,7 @@
   {% endif %}
 
   <div class="item-sessao">
-    <a href="{% url 'sapl.sessao:resumo' sessao.id %}">{{sessao.epigrafe}}</a>
+    <a href="{% url 'sapl.sessao:resumo' sessao.id %}">{{sessao}}</a>
     <span class="data-sessao">
       <strong>Abertura:</strong> {{sessao.data_inicio}} às {{sessao.hora_inicio}} | <strong>Tipo:</strong> {{sessao.tipo}}
     </span>

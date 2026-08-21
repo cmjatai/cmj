@@ -555,10 +555,11 @@ def sessaoplenaria_semanal(limite=0):
 
     return sessoes_futuras
 
+
 @register.filter
 def sessaoplenaria_quinzena(limite=0):
 
-    sessoes_quinzena = cache.get("portalcmj_c_sessoes_quinzena")
+    sessoes_quinzena = None  # cache.get("portalcmj_c_sessoes_quinzena")
 
     if sessoes_quinzena is not None:
         if limite > 0:
@@ -575,8 +576,6 @@ def sessaoplenaria_quinzena(limite=0):
         inicio_quinzena = hoje.replace(day=16)
         fim_quinzena = inicio_quinzena + timedelta(days=16)
         fim_quinzena = fim_quinzena.replace(day=1) - timedelta(days=1)
-
-
 
     sessoes_quinzena = SessaoPlenaria.objects.filter(
         data_inicio__range=(inicio_quinzena, fim_quinzena),

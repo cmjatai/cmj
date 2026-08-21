@@ -318,6 +318,9 @@ class SessaoPlenaria(models.Model):
 
         base = "{}ª {}".format(self.numero, self.tipo.nome)
 
+        if self.tipo.tipogeral == self.tipo.TIPOGERAL_REUNIAO:
+            base = "{}ª Reunião da {}".format(self.numero, self.comissao.nome)
+
         if self.tipo.tipo_numeracao == tnc.quizenal:
             if self.data_inicio.year == 2023 and self.data_inicio.month == 2:
                 base += " da {}ª Quinzena".format(
@@ -358,6 +361,9 @@ class SessaoPlenaria(models.Model):
         tnc = self.tipo.TIPO_NUMERACAO_CHOICES
 
         base = "{}ª {}".format(self.numero, self.tipo.nome)
+
+        if self.tipo.tipogeral == self.tipo.TIPOGERAL_REUNIAO:
+            base = "{}ª Reunião da {}".format(self.numero, self.comissao.nome)
 
         if self.tipo.tipo_numeracao == tnc.quizenal:
             base += " da {}ª Quinzena".format(1 if self.data_inicio.day <= 15 else 2)
