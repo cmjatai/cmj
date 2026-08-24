@@ -666,21 +666,42 @@ class SessaoPlenariaFilterSet(django_filters.FilterSet):
     data_inicio__day = django_filters.ChoiceFilter(
         required=False, label="Dia", choices=DIA_CHOICES
     )
+
+    comissao = django_filters.ChoiceFilter(
+        required=False, label="Filtrar por Reuniões de Comissão", choices=[]
+    )
+
+    quinzena = django_filters.ChoiceFilter(
+        required=False,
+        label="Quinzena",
+        choices=[("1", "1ª Quinzena"), ("2", "2ª Quinzena")],
+        method="filter_quinzena",
+    )
+
     titulo = _("Pesquisa de Sessão Plenária")
 
     class Meta:
         model = SessaoPlenaria
         fields = ["tipo"]
 
+    def filter_quinzena(self, queryset, name, value):
+        if value == "1":
+            queryset = queryset.filter(data_inicio__day__lte=15)
+        elif value == "2":
+            queryset = queryset.filter(data_inicio__day__gt=15)
+        return queryset
+
     def __init__(self, *args, **kwargs):
         super(SessaoPlenariaFilterSet, self).__init__(*args, **kwargs)
 
         row1 = to_row(
             [
-                ("data_inicio__year", 3),
-                ("data_inicio__month", 3),
-                ("data_inicio__day", 3),
+                ("data_inicio__year", 2),
+                ("data_inicio__month", 1),
+                ("data_inicio__day", 1),
+                ("quinzena", 2),
                 ("tipo", 3),
+                ("comissao", 3),
             ]
         )
 
@@ -691,6 +712,10 @@ class SessaoPlenariaFilterSet(django_filters.FilterSet):
                 self.titulo, row1, form_actions(label="Pesquisar", name="pesquisar")
             )
         )
+
+        self.form.fields["comissao"].choices = [
+            (c.id, c.nome) for c in Comissao.objects.filter(ativa=True).order_by("nome")
+        ]
 
 
 class AdicionarVariasMateriasFilterSet(MateriaLegislativaFilterSet):
