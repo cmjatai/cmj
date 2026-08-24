@@ -74,7 +74,7 @@
 
     {% endif %}
 
-    {% if user.is_superuser %} {# DJANGO template perms.sessao.add_ordemdia #}
+    {% if perms.sessao.add_ordemdia and not sessao.iniciada or user.is_superuser %} {# DJANGO template perms.sessao.add_ordemdia #}
       $('tbody').sortable({
         start: function(event, ui) {
           ui.item.startPos = ui.item.index();
@@ -88,12 +88,18 @@
               pos_ini: pos_ini,
               pos_fim: pos_fim,
               pk_sessao: pk_sessao,
-              pk_list,
-              materia: 'ordem'},
+              pk_list: pk_list,
+              materia: 'ordem'
+            },
+            dataType: 'json',
             type: 'POST',
             url: "{% url 'sapl.sessao:mudar_ordem_materia_sessao' %}",
+          }).done(function(response) {
+            setTimeout(function() {
+              window.location.href = `{% url 'sapl.sessao:ordemdia_list' root_pk %}#id${response.materia}`;
+              // window.location.reload();
+            }, 500);
           });
-          setTimeout(function(){ window.location.reload(true) }, 500);
         }
       });
     {% endif %}

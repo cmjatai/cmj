@@ -1275,9 +1275,7 @@ def recuperar_numero_sessao_view(request):
         if comissao:
             q &= Q(comissao=comissao)
 
-        sessao = SessaoPlenaria.objects.filter(
-            q
-        ).last()
+        sessao = SessaoPlenaria.objects.filter(q).last()
 
     except ObjectDoesNotExist:
         numero = 1
@@ -3835,7 +3833,7 @@ def mudar_ordem_materia_sessao(request):
     materia_1.numero_ordem = posicao_final
     materia_1.save()
 
-    return JsonResponse({}, safe=False)
+    return JsonResponse({"status": "ok", "materia": materia_1.materia.id}, safe=False)
 
 
 class JustificativaAusenciaCrud(MasterDetailCrud):

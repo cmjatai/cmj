@@ -579,7 +579,7 @@ def sessaoplenaria_quinzena(limite=0):
 
     sessoes_quinzena = SessaoPlenaria.objects.filter(
         data_inicio__range=(inicio_quinzena, fim_quinzena),
-    ).order_by("data_inicio", "hora_inicio", "id")
+    ).order_by("-data_inicio", "-hora_inicio", "-id")
 
     cache.set("portalcmj_c_sessoes_quinzena", sessoes_quinzena, 1800)
 
