@@ -675,13 +675,17 @@ class MateriaLegislativa(CommonMixin):
             )
             assinantes = map(lambda x: x[0], assinaturas)
 
-        autores_via_assinantes = Autor.objects.filter(
-            content_type=ContentType.objects.get_for_model(Parlamentar),
-            parlamentar_set__nome_completo__in=assinantes,
-        )
+            autores_via_assinantes = []
+            if assinantes:
+                autores_via_assinantes = Autor.objects.filter(
+                    content_type=ContentType.objects.get_for_model(Parlamentar),
+                    parlamentar_set__nome_completo__in=assinantes,
+                )
 
-        for a in autores_via_assinantes:
-            Autoria.objects.get_or_create(materia=self, autor=a, primeiro_autor=True)
+            for a in autores_via_assinantes:
+                Autoria.objects.get_or_create(
+                    materia=self, autor=a, primeiro_autor=True
+                )
 
         if compression is None:
             compression = all(autores.values_list("sign_compression", flat=True))
