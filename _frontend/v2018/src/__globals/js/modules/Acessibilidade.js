@@ -2,7 +2,6 @@ window.Acessibilidade = function () {
   let VLibras = {
     storage: 'vlibras',
     currentState: null,
-    check: checkVLibras,
     getState: getVLibrasState,
     setState: setVLibrasState,
     toogle: toogleVLibras,
@@ -10,11 +9,11 @@ window.Acessibilidade = function () {
   }
 
   window.toogleVLibras = function () {
+    VLibras.currentState = VLibras.getState()
     VLibras.toogle()
   }
-
-  function checkVLibras () {
-    this.updateView()
+  function toogleVLibras () {
+    this.setState(!this.currentState)
   }
 
   function getVLibrasState () {
@@ -28,21 +27,8 @@ window.Acessibilidade = function () {
   }
 
   function updateViewVLibras () {
-    let vw = document.querySelector('[vw]')
-    if (this.currentState === null) {
-      this.currentState = this.getState()
-    }
-    if (this.currentState) {
-      vw.classList.remove('disabled')
-      vw.classList.add('enabled')
-    } else {
-      vw.classList.remove('enabled')
-      vw.classList.add('disabled')
-    }
-  }
-
-  function toogleVLibras () {
-    this.setState(!this.currentState)
+    document.cookie = `vlibras_enabled=${this.currentState}; path=/`
+    window.location.reload()
   }
 
   let Contrast = {
@@ -197,7 +183,6 @@ window.Acessibilidade = function () {
     }
   }
 
-  VLibras.check()
   Contrast.check()
   FontSizeZoom.check()
   KeysAcessibilidade.load()

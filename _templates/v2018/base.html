@@ -147,13 +147,6 @@
 
   {% endblock root_body %}
 
-  <div vw class="disabled">
-    <div vw-access-button class="active"></div>
-    <div vw-plugin-wrapper>
-      <div class="vw-plugin-top-wrapper"></div>
-    </div>
-  </div>
-
   {% block foot_js %}
 
     {% block webpack_loader_js %}
@@ -170,10 +163,12 @@
   {% block widgets_form_js %}{% endblock widgets_form_js %}
 
 
-  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
-  <script>
-    new window.VLibras.Widget('https://vlibras.gov.br/app');
-  </script>
+  {% if request.COOKIES.vlibras_enabled == 'true' %}
+    <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+    <script type="text/javascript">
+      new window.VLibras.Widget('https://vlibras.gov.br/app');
+    </script>
+  {% endif %}
 
   {% if not DEBUG and not perms.materia and not perms.norma and not perms.sessao %}
 
