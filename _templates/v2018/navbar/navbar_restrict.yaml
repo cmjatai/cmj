@@ -1,6 +1,8 @@
 {% load i18n common_cmj_tags %}
 {% yaml_render "navbar/navbar_restrict_atividadelegislativa.yaml" 0 %}
 
+{% yaml_render "navbar/navbar_restrict_saap.yaml" 0 %}
+
 {% yaml_render "navbar/navbar_restrict_arq.yaml" 0 %}
 
 - title: {% trans 'Proposições' %}

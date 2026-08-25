@@ -663,15 +663,17 @@ class MateriaLegislativa(CommonMixin):
 
         protocolo = self.protocolo_gr.first()
 
-        autor = self.autores.all().first()
-        if autor and autor.content_type.model == "parlamentar":
+        autores = self.autores.all()
+
+        autor = autores.first()
+        if autor and autor.content_type:
             self.autores.clear()
 
-        metadata = self.metadata or {}
-        assinaturas = (
-            metadata.get("signs", {}).get("texto_original", {}).get("signs", [])
-        )
-        assinantes = map(lambda x: x[0], assinaturas)
+            metadata = self.metadata or {}
+            assinaturas = (
+                metadata.get("signs", {}).get("texto_original", {}).get("signs", [])
+            )
+            assinantes = map(lambda x: x[0], assinaturas)
 
         autores_via_assinantes = Autor.objects.filter(
             content_type=ContentType.objects.get_for_model(Parlamentar),
@@ -681,7 +683,6 @@ class MateriaLegislativa(CommonMixin):
         for a in autores_via_assinantes:
             Autoria.objects.get_or_create(materia=self, autor=a, primeiro_autor=True)
 
-        autores = self.autores.all()
         if compression is None:
             compression = all(autores.values_list("sign_compression", flat=True))
 
@@ -710,7 +711,10 @@ class MateriaLegislativa(CommonMixin):
             p.save()
             protocolo = p
 
-        if not self.numero_protocolo or self.data_apresentacao != protocolo.timestamp.date():
+        if (
+            not self.numero_protocolo
+            or self.data_apresentacao != protocolo.timestamp.date()
+        ):
             self.numero_protocolo = protocolo.numero
             self.data_apresentacao = protocolo.timestamp
             self.save()
