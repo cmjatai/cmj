@@ -4179,8 +4179,8 @@ class AnaliseSimilaridadeRankingCrud(Crud):
                 "-materia_1__ano",
                 "-data_analise__year",
                 "-data_analise__month",
-                "-similaridade",
                 "-data_analise__day",
+                "-similaridade",
             )
             return qs
 
