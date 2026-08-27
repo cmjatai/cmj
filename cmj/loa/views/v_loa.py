@@ -7,6 +7,7 @@ from django.shortcuts import redirect
 from django.template import loader
 from django.urls.base import reverse, reverse_lazy
 from django.utils import formats, timezone
+from django.utils.decorators import classonlymethod
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.forms.f_loa import LoaForm
@@ -28,6 +29,21 @@ class LoaCrud(Crud):
     public = [RP_LIST, RP_DETAIL]
     ordered_list = False
     frontend = Loa._meta.app_label
+
+    @classonlymethod
+    def get_urls(cls):
+        urls = super().get_urls()
+        from django.urls import path
+
+        def redirect_to_latest_loa(request):
+            try:
+                latest_loa = Loa.objects.filter(publicado=True).latest("ano")
+                return redirect("cmj.loa:prestacaocontaloa_list", pk=latest_loa.pk)
+            except Loa.DoesNotExist:
+                raise Http404(_("Nenhuma LOA publicada encontrada."))
+
+        urls = [path("/atual", redirect_to_latest_loa, name="loa_atual")] + urls
+        return urls
 
     class BaseMixin(LoaContextDataMixin, Crud.BaseMixin):
 

@@ -76,6 +76,9 @@ $fator-xl: 1.06;
   &.icon-comissoes {
     background-image: url(~@/assets/img/icon_comissoes.png);
   }
+  &.icon-emendas-impositivas {
+    background-image: url(~@/assets/img/icon_emendas_impositivas.png);
+  }
 }
 
 #wrapper {
@@ -161,13 +164,15 @@ $fator-xl: 1.06;
       flex: 1 1 100%;
       &:not(:last-child) {
         border-bottom: 1px solid #555;
-
       }
       &.box-search:hover {
         background: #fff3 !important;
       }
       &.box-parlamentares:hover {
         background: $color_parlamentar !important;
+      }
+      &.box-emendas-impositivas:hover {
+        background: $color_primary !important;
       }
       &.box-documento-administrativo:hover {
         background: $color_documentoadministrativo !important;

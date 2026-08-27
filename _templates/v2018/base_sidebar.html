@@ -31,6 +31,15 @@
         <a href="/transparencia" class="">Transparência</a>
       </div>
     </div>
+    <div class="box box-emendas-impositivas">
+      <a onclick="return false;" class="d-none d-lg-block icon icon-emendas-impositivas" href="{% url 'cmj.loa:loa_atual' %}" >
+      </a>
+      <a class="d-lg-none icon icon-emendas-impositivas" href="{% url 'cmj.loa:loa_atual' %}" >
+      </a>
+      <div class="inner">
+        <a href="{% url 'cmj.loa:loa_atual' %}" class="">Emendas Impositivas</a>
+      </div>
+    </div>
     <div class="box box-documento-administrativo">
       <a onclick="return false;" class="d-none d-lg-block icon icon-licitacao" href="{% url 'sapl.protocoloadm:documentoadministrativo_list' %}?o" >
       </a>
