@@ -19,6 +19,13 @@
     <div class="d-inline">
       {% if sessao.pauta_publicada %}
         <span class="badge badge-success">Pauta Publicada</span>
+          {% if sessao.iniciada and not sessao.finalizada%}
+            <span class="badge badge-info d-inline">Sessão Em Andamento</span>
+          {% elif sessao.finalizada %}
+            <span class="badge badge-secondary d-inline">Sessão Encerrada</span>
+
+          {% endif %}
+
         {% else %}
         <span class="badge badge-warning d-inline">Pauta em Elaboração</span>
       {% endif %}
