@@ -19,6 +19,11 @@
   </div>
 {% else %}
   <div>
+    {% if perms.sessao.add_sessaoplenaria %}
+      <a class="btn btn-sm btn-secondary" href="{% url 'sapl.sessao:resumo_ata' sessaoplenaria.pk %}?check">
+        Expandir
+      </a>
+    {% endif %}
     <a class="btn btn-primary" href="{% url 'sapl.sessao:resumo_ata_pdf' sessaoplenaria.pk %}">
       PDF
     </a>
