@@ -15,6 +15,7 @@ from cmj.loa.models import (
     RegistroAjusteLoaParlamentar,
 )
 from cmj.loa.models.m_loa import Loa
+from cmj.loa.views.v_mixins import LoaContextDataMixin
 from cmj.mixins import GoogleRecapthaViewMixin
 from cmj.search.views import InfoFilterMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
@@ -28,8 +29,7 @@ class PrestacaoContaRegistroCrud(MasterDetailCrud):
     link_return_to_parent_field = True
     ListView = None  # Disable ListView
 
-    class BaseMixin(MasterDetailCrud.BaseMixin):
-
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         @property
         def cancel_url(self):
             if self.object:
@@ -172,6 +172,9 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
     model_set = "prestacaocontaregistro_set"
     public = [RP_LIST, RP_DETAIL]
     frontend = PrestacaoContaLoa._meta.app_label
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
 
     class CreateView(MasterDetailCrud.CreateView):
         def get_success_url(self):

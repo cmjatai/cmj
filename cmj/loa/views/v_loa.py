@@ -37,7 +37,9 @@ class LoaCrud(Crud):
 
         def redirect_to_latest_loa(request):
             try:
-                latest_loa = Loa.objects.filter(publicado=True).latest("ano")
+                latest_loa = Loa.objects.filter(
+                    publicado=True, emendaloa_set__isnull=False
+                ).latest("ano")
                 return redirect("cmj.loa:prestacaocontaloa_list", pk=latest_loa.pk)
             except Loa.DoesNotExist:
                 raise Http404(_("Nenhuma LOA publicada encontrada."))
@@ -190,19 +192,23 @@ class LoaCrud(Crud):
 
         def hook_ano(self, *args, **kwargs):
             l = args[0]
+            if l.materia and l.materia.normajuridica():
+                return (
+                    f"""
+                <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
+                <div class="btn-group" role="group">
+                    <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/prestacaocontaloa" title="Prestação de Contas"><i class="fas fa-hand-holding-usd"></i></a>
+                </div>
+                """,
+                    "",
+                )
             return (
                 f"""
-            <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
-            <div class="btn-group" role="group">
-                <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/prestacaocontaloa" title="Prestação de Contas"><i class="fas fa-hand-holding-usd"></i></a>
-            </div>
-            """,
+                <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
+                <a class="btn btn-sm btn-primary" href="/loa/{l.id}/emendaloa" title="Emendas à LOA em Elaboração"><i class="fas fa-clipboard-list"></i></a>
+                """,
                 "",
             )
-            """
-                <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/emendaloa" title="Listagem de Emendas à LOA"><i class="fas fa-clipboard-list"></i></a>
-                <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/oficioajusteloa" title="Ofícios de Ajustes"><i class="fas fa-file-signature"></i></a>
-            """
 
         def hook_perc_disp_total(self, *args, **kwargs):
             l = args[0]
@@ -260,20 +266,23 @@ class LoaCrud(Crud):
         @property
         def extras_list_url(self):
             btns = []
-
+            u = self.request.user
             if not self.object.materia or not self.object.materia.normajuridica():
-                btns.extend(
-                    [
-                        (
-                            reverse(
-                                "cmj.loa:emendaloa_create",
-                                kwargs={"pk": self.kwargs["pk"]},
-                            ),
-                            "btn-primary",
-                            _("Adicionar Emendas Impositivas"),
-                        )
-                    ]
-                )
+                if u.has_perm("cmj.loa.add_emendaloa") or (
+                    not u.is_anonymous and u.operadorautor_set.exists()
+                ):
+                    btns.extend(
+                        [
+                            (
+                                reverse(
+                                    "cmj.loa:emendaloa_create",
+                                    kwargs={"pk": self.kwargs["pk"]},
+                                ),
+                                "btn-primary",
+                                _("Adicionar Emendas Impositivas"),
+                            )
+                        ]
+                    )
 
             btns = list(filter(None, btns))
             return btns
@@ -282,6 +291,7 @@ class LoaCrud(Crud):
             context = super().get_context_data(**kwargs)
             path = context.get("path", "")
             context["path"] = f"{path} loa-detail"
+
             return context
 
         def get(self, request, *args, **kwargs):

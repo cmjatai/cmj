@@ -27,7 +27,13 @@ class UnidadeOrcamentariaCrud(MasterDetailCrud):
     model = UnidadeOrcamentaria
     parent_field = "loa"
 
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
 
 class SubFuncaoCrud(MasterDetailCrud):
     model = SubFuncao
     parent_field = "loa"
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass

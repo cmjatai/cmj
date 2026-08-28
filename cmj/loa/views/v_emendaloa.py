@@ -790,6 +790,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             path = context.get("path", "")
             context["path"] = f"{path} emendaloa-list"
             context["type_pagination"] = "pagination-static"
+            context.pop("title")
 
             return context
 
@@ -1053,6 +1054,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             path = context.get("path", "")
             context["path"] = f"{path} emendaloa-update"
             # context['fluid'] ='-fluid'
+
             return context
 
         def get_success_url(self):
@@ -1432,6 +1434,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             """
             context["title"] = title.replace("\n", "")
+
             return context
 
         def hook_str_valor_computado(self, el, verbose_name="", field_display=""):

@@ -75,6 +75,7 @@ class AgrupamentoCrud(MasterDetailCrud):
             context = super().get_context_data(**kwargs)
             path = context.get("path", "")
             context["path"] = f"{path} agrupamento-update"
+
             return context
 
         def get_initial(self):

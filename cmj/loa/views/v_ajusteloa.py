@@ -167,6 +167,9 @@ class RegistroAjusteLoaCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
     frontend = RegistroAjusteLoa._meta.app_label
 
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
     class DetailView(MasterDetailCrud.DetailView):
 
         layout_key = "RegistroAjusteLoaDetail"
