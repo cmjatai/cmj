@@ -9,7 +9,6 @@ from django.db.models.functions import Substr
 from django.db.models.functions.comparison import Coalesce
 from django.utils import formats
 from django.utils.datastructures import OrderedSet
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -447,15 +446,15 @@ class LoaViewSet:
                             SUM(CASE WHEN elrc.valor < 0 THEN elrc.valor ELSE 0 END) OVER (PARTITION BY d.id) AS soma_registroscontabeis_reducao
 
                         from loa_despesa d
-                            inner join loa_loa             loa on (loa.id = d.loa_id)
-                            inner join loa_orgao             o on (  o.id = d.orgao_id)
-                            inner join loa_unidadeorcamentaria           u on (  u.id = d.unidade_id)
-                            inner join loa_funcao            f on (  f.id = d.funcao_id)
-                            inner join loa_subfuncao        sf on ( sf.id = d.subfuncao_id)
-                            inner join loa_programa          p on (  p.id = d.programa_id)
-                            inner join loa_acao              a on (  a.id = d.acao_id)
-                            inner join loa_natureza          n on (  n.id = d.natureza_id)
-                            inner join loa_fonte           fte on (fte.id = d.fonte_id)
+                            inner join loa_loa                   loa on (loa.id = d.loa_id)
+                            inner join loa_orgao                   o on (  o.id = d.orgao_id)
+                            inner join loa_unidadeorcamentaria     u on (  u.id = d.unidade_id)
+                            inner join loa_funcao                  f on (  f.id = d.funcao_id)
+                            inner join loa_subfuncao              sf on ( sf.id = d.subfuncao_id)
+                            inner join loa_programa                p on (  p.id = d.programa_id)
+                            inner join loa_acao                    a on (  a.id = d.acao_id)
+                            inner join loa_natureza                n on (  n.id = d.natureza_id)
+                            inner join loa_fonte                 fte on (fte.id = d.fonte_id)
                             left outer join loa_emendaloaregistrocontabil elrc on (elrc.despesa_id = d.id)
                             where loa.id = {loa.pk} {filter_sql} order by codigo_base
         """
@@ -508,17 +507,27 @@ class LoaViewSet:
             "geral.soma",
             f"""
                 CASE
-                    when LENGTH(codigo_base) = 6  then (select especificacao                   from loa_orgao                       where loa_orgao.codigo             = substr(codigo_base, 5, 2) limit 1)
+                    when LENGTH(codigo_base) = 6 then (select especificacao from loa_orgao where loa_orgao.codigo = substr(codigo_base, 5, 2) and loa_orgao.loa_id = {loa.id} limit 1)
 
-                    when LENGTH(codigo_base) = 8  then (select loa_unidadeorcamentaria.especificacao from loa_unidadeorcamentaria
-                                                            inner join loa_orgao on loa_orgao.id = loa_unidadeorcamentaria.orgao_id where loa_unidadeorcamentaria.codigo = substr(codigo_base, 7, 2) and loa_orgao.codigo = substr(codigo_base, 5, 2) limit 1)
+                    when LENGTH(codigo_base) = 8 then (
+                                                        select loa_unidadeorcamentaria.especificacao
+                                                            from loa_unidadeorcamentaria
+                                                            inner join loa_orgao on loa_orgao.id = loa_unidadeorcamentaria.orgao_id
+                                                            where
+                                                                loa_orgao.loa_id = {loa.id} and
+                                                                loa_unidadeorcamentaria.loa_id = {loa.id} and
+                                                                loa_orgao.codigo = substr(codigo_base, 5, 2) and
+                                                                loa_unidadeorcamentaria.codigo = substr(codigo_base, 7, 2)
+                                                            order by loa_orgao.loa_id, loa_orgao.codigo, loa_unidadeorcamentaria.codigo
+                                                            limit 1
+                                                    )
 
-                    when LENGTH(codigo_base) = 10 then (select especificacao from loa_funcao    where loa_funcao.codigo    = substr(codigo_base, 9, 2) limit 1)
-                    when LENGTH(codigo_base) = 13 then (select especificacao from loa_subfuncao where loa_subfuncao.codigo = substr(codigo_base, 11, 3) limit 1)
-                    when LENGTH(codigo_base) = 17 then (select especificacao from loa_programa  where loa_programa.codigo  = substr(codigo_base, 14, 4) limit 1)
-                    when LENGTH(codigo_base) = 22 then (select especificacao from loa_acao      where loa_acao.codigo      = substr(codigo_base, 18, 5) limit 1)
-                    when LENGTH(codigo_base) = 34 then (select especificacao from loa_natureza  where loa_natureza.codigo  = substr(codigo_base, 23, 12) limit 1)
-                    when LENGTH(codigo_base) = 37 then (select especificacao from loa_fonte     where loa_fonte.codigo     = substr(codigo_base, 35, 3) limit 1)
+                    when LENGTH(codigo_base) = 10 then (select especificacao from loa_funcao    where loa_funcao.loa_id     = {loa.id} and loa_funcao.codigo    = substr(codigo_base, 9, 2) limit 1)
+                    when LENGTH(codigo_base) = 13 then (select especificacao from loa_subfuncao where loa_subfuncao.loa_id  = {loa.id} and loa_subfuncao.codigo = substr(codigo_base, 11, 3) limit 1)
+                    when LENGTH(codigo_base) = 17 then (select especificacao from loa_programa  where loa_programa.loa_id   = {loa.id} and loa_programa.codigo  = substr(codigo_base, 14, 4) limit 1)
+                    when LENGTH(codigo_base) = 22 then (select especificacao from loa_acao      where loa_acao.loa_id       = {loa.id} and loa_acao.codigo      = substr(codigo_base, 18, 5) limit 1)
+                    when LENGTH(codigo_base) = 34 then (select especificacao from loa_natureza  where loa_natureza.loa_id   = {loa.id} and loa_natureza.codigo  = substr(codigo_base, 23, 12) limit 1)
+                    when LENGTH(codigo_base) = 37 then (select especificacao from loa_fonte     where loa_fonte.loa_id      = {loa.id} and loa_fonte.codigo     = substr(codigo_base, 35, 3) limit 1)
                         else ''
                 END as especificacao
             """,
