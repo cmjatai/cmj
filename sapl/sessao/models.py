@@ -171,14 +171,13 @@ class SessaoPlenaria(models.Model):
         verbose_name=_("Comissão"),
     )
 
-    # XXX seems to be empty
+    numero = models.PositiveIntegerField(verbose_name=_("Número"))
     data_inicio = models.DateField(verbose_name=_("Abertura"))
     hora_inicio = models.CharField(max_length=5, verbose_name=_("Horário (hh:mm)"))
-    hora_fim = models.CharField(
-        max_length=5, blank=True, verbose_name=_("Horário (hh:mm)")
-    )
-    numero = models.PositiveIntegerField(verbose_name=_("Número"))
+
     data_fim = models.DateField(blank=True, null=True, verbose_name=_("Encerramento"))
+    hora_fim = models.CharField(max_length=5, blank=True, verbose_name=_("Horário (hh:mm)"))
+
     url_audio = models.URLField(
         max_length=150,
         blank=True,
@@ -217,7 +216,7 @@ class SessaoPlenaria(models.Model):
         blank=True,
         choices=YES_NO_CHOICES,
         verbose_name=_("Sessão iniciada?"),
-        default=True,
+        default=False,
     )
     finalizada = models.BooleanField(
         null=True,

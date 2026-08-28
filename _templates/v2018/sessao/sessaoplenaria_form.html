@@ -56,10 +56,11 @@
       // faz recuperação do próximo número apenas em caso de inclusão de sessão plenária
       // Seleciona o numero de acordo com o tipo
 
-      $("#id_tipo").click(recuperar_numero_sessao);
-      $("#id_sessao_legislativa").click(recuperar_numero_sessao);
-      $("#id_legislatura").click(recuperar_numero_sessao);
-      $("#id_comissao").click(recuperar_numero_sessao);
+      $("#id_tipo").change(recuperar_numero_sessao);
+      $("#id_sessao_legislativa").change(recuperar_numero_sessao);
+      $("#id_legislatura").change(recuperar_numero_sessao);
+      $("#id_comissao").change(recuperar_numero_sessao);
+      $("#id_data_inicio").change(recuperar_numero_sessao);
 
     {% endif %}
 

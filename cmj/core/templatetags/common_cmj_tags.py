@@ -23,7 +23,7 @@ from sapl.base.models import AppConfig
 from sapl.materia.models import TipoMateriaLegislativa
 from sapl.norma.models import NormaJuridica, TipoNormaJuridica
 from sapl.parlamentares.models import Filiacao
-from sapl.sessao.models import SessaoPlenaria
+from sapl.sessao.models import SessaoPlenaria, TipoSessaoPlenaria
 
 logger = logging.getLogger(__name__)
 
@@ -559,7 +559,79 @@ def sessaoplenaria_semanal(limite=0):
 @register.filter
 def sessaoplenaria_quinzena(limite=0):
 
-    sessoes_quinzena = cache.get("portalcmj_c_sessoes_quinzena")
+    sessoes_quinzena = None  # cache.get("portalcmj_c_sessoes_quinzena")
+
+    if sessoes_quinzena is not None:
+        if limite > 0:
+            return sessoes_quinzena[:limite]
+        return sessoes_quinzena
+
+    hoje = timezone.localdate()
+    if hoje.day <= 15:
+        inicio_quinzena = hoje.replace(day=1)
+        fim_quinzena = hoje.replace(day=15)
+    else:
+        inicio_quinzena = hoje.replace(day=16)
+        fim_quinzena = inicio_quinzena + timedelta(days=16)
+        fim_quinzena = fim_quinzena.replace(day=1) - timedelta(days=1)
+
+    if fim_quinzena.month == 12:
+        fim_quinzena = fim_quinzena.replace(day=31)
+
+    sessoes_do_tipogeral_sessao_da_quinzena = SessaoPlenaria.objects.filter(
+        tipo__tipogeral=TipoSessaoPlenaria.TIPOGERAL_SESSAO,
+        data_inicio__range=(inicio_quinzena, fim_quinzena),
+    ).order_by("-data_inicio", "-hora_inicio", "-id")
+
+    fim_adaptado_quinzena = min(
+        fim_quinzena,
+        (
+            sessoes_do_tipogeral_sessao_da_quinzena.first().data_inicio
+            if sessoes_do_tipogeral_sessao_da_quinzena.exists()
+            else fim_quinzena
+        ),
+    )
+    # se já se passou 1 dia após fim_adaptado_quinzena, avança para próxima quinzena com base na variável "hoje"
+    if hoje > fim_adaptado_quinzena:  # + timedelta(days=1):
+        if hoje.day <= 15:
+            inicio_quinzena = hoje.replace(day=16)
+            fim_quinzena = inicio_quinzena + timedelta(days=16)
+            fim_quinzena = fim_quinzena.replace(day=1) - timedelta(days=1)
+        else:
+            inicio_quinzena = hoje.replace(day=1) + timedelta(days=31)
+            inicio_quinzena = inicio_quinzena.replace(day=1)
+            fim_quinzena = inicio_quinzena.replace(day=15)
+
+    inicio_adaptado_quinzena = inicio_quinzena
+
+    sessoes_da_quinzena_anterior = SessaoPlenaria.objects.filter(
+        data_inicio__range=(fim_adaptado_quinzena, inicio_quinzena - timedelta(days=1)),
+    ).order_by("-data_inicio", "-hora_inicio", "-id")
+
+    if inicio_adaptado_quinzena > hoje:
+        fim_adaptado_quinzena = fim_quinzena
+
+        if sessoes_da_quinzena_anterior.exists():
+            for sessao in sessoes_da_quinzena_anterior:
+                if sessao.tipo.tipogeral == TipoSessaoPlenaria.TIPOGERAL_SESSAO:
+                    break
+                inicio_adaptado_quinzena = sessao.data_inicio
+
+    sessoes_quinzena = SessaoPlenaria.objects.filter(
+        data_inicio__range=(inicio_adaptado_quinzena, fim_adaptado_quinzena),
+    ).order_by("-data_inicio", "-hora_inicio", "-id")
+
+    cache.set("portalcmj_c_sessoes_quinzena", sessoes_quinzena, 1800)
+    if limite > 0:
+        sessoes_quinzena = list(sessoes_quinzena[:limite])
+
+    return sessoes_quinzena
+
+
+@register.filter
+def sessaoplenaria_quinzena_old(limite=0):
+
+    sessoes_quinzena = None  # cache.get("portalcmj_c_sessoes_quinzena")
 
     if sessoes_quinzena is not None:
         if limite > 0:

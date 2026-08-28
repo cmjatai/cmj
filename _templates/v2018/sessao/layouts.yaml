@@ -5,46 +5,44 @@ TipoSessaoPlenaria:
 
 SessaoPlenaria:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo numero:1
-  - data_inicio:5 hora_inicio:5 iniciada
-  - data_fim:5 hora_fim:5 finalizada
+  - data_inicio:3 hora_inicio:3 tipo numero:1
+  - data_fim:3 hora_fim:3 iniciada finalizada
+  - legislatura:3 sessao_legislativa:3 comissao
   - upload_pauta:4 upload_ata:4 upload_anexo:4 diariooficial:8
-  - url_video
-  - url_audio
+  - url_video url_audio
 
 SessaoPlenariaCreate:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo comissao numero:1
-  - data_inicio:5 hora_inicio:5 iniciada
-  - data_fim:5 hora_fim:5 finalizada
+  - data_inicio hora_inicio tipo comissao numero:1
+  - data_fim hora_fim iniciada finalizada
+  - legislatura sessao_legislativa
   - upload_pauta:4 upload_ata:4 upload_anexo:4
-  - url_video
-  - url_audio
+  - url_video url_audio
 
 SessaoPlenariaSessaoEdit:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo comissao numero:1 pauta_publicada:2
-  - data_inicio:5 hora_inicio:5 iniciada
-  - data_fim:5 hora_fim:5 finalizada
-  - upload_pauta upload_ata upload_anexo
-  - url_audio url_video
+  - data_inicio hora_inicio tipo comissao numero:1 pauta_publicada:2
+  - data_fim hora_fim iniciada finalizada
+  - legislatura sessao_legislativa
+  - upload_pauta:4 upload_ata:4 upload_anexo:4
+  - url_video url_audio
 
 SessaoPlenariaAudienciaEdit:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo:3 numero:1
-  - data_inicio:5 hora_inicio:5 iniciada
-  - data_fim:5 hora_fim:5 finalizada
+  - data_inicio hora_inicio tipo comissao numero:1 pauta_publicada:2
+  - data_fim hora_fim iniciada finalizada
   - titulo
-  - upload_pauta upload_ata upload_anexo
-  - url_audio url_video
+  - legislatura sessao_legislativa
+  - upload_pauta:4 upload_ata:4 upload_anexo:4
+  - url_video url_audio
 
 SessaoPlenariaReuniaoEdit:
   {% trans 'Dados Básicos' %}:
-  - legislatura sessao_legislativa tipo comissao numero:1 pauta_publicada:2
-  - data_inicio:5 hora_inicio:5 iniciada
-  - data_fim:5 hora_fim:5 finalizada
-  - upload_pauta upload_ata upload_anexo
-  - url_audio url_video
+  - data_inicio hora_inicio tipo comissao numero:1 pauta_publicada:2
+  - data_fim hora_fim iniciada finalizada
+  - legislatura sessao_legislativa
+  - upload_pauta:4 upload_ata:4 upload_anexo:4
+  - url_video url_audio
 
 TipoResultadoVotacao:
   {% trans 'Tipo de Resultado da Votação' %}:

@@ -20,22 +20,19 @@
       {% if sessao.pauta_publicada %}
         <span class="badge badge-success">Pauta Publicada</span>
         {% if sessao.iniciada and not sessao.finalizada%}
-          <span class="badge badge-info d-inline">{{ sessao.tipo.get_tipogeral_display}} Em Andamento</span>
+          <span class="badge badge-primary d-inline">{{ sessao.tipo.get_tipogeral_display}} Em Andamento</span>
         {% elif not sessao.iniciada and sessao.finalizada %}
           <span class="badge badge-secondary d-inline">{{ sessao.tipo.get_tipogeral_display }} Cancelada</span>
         {% elif sessao.iniciada and sessao.finalizada %}
-          <span class="badge badge-primary d-inline">{{ sessao.tipo.get_tipogeral_display }} Realizada</span>
+          <span class="badge badge-info d-inline">{{ sessao.tipo.get_tipogeral_display }} Realizada</span>
         {% endif %}
       {% else %}
         <span class="badge badge-warning d-inline">Pauta em Elaboração</span>
       {% endif %}
-
     </div>
-
   </div>
-
   {% if forloop.last %}
-</div>
+    </div>
     </div>
   {% endif %}
 {% endfor %}

@@ -1632,6 +1632,8 @@ class SessaoCrud(Crud):
             return response
 
         def hook_url_video(self, obj, verbose_name, field_display):
+            if not obj.url_video:
+                return "", ""
             if "youtu" in obj.url_video:
                 return _(f"Vídeo da {obj.tipo.nome}"), field_display
             return verbose_name, field_display
