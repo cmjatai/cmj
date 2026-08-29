@@ -34,6 +34,9 @@ class Orgao(ElementoBase):
         verbose_name = _("Órgão")
         verbose_name_plural = _("Órgãos")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "codigo"]),
+        ]
 
 
 class UnidadeOrcamentaria(ElementoBase):
@@ -76,6 +79,9 @@ class UnidadeOrcamentaria(ElementoBase):
         verbose_name = _("Unidade Orçamentária")
         verbose_name_plural = _("Unidades Orçamentárias")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "orgao", "codigo"]),
+        ]
 
 
 class Funcao(ElementoBase):
@@ -84,6 +90,9 @@ class Funcao(ElementoBase):
         verbose_name = _("Função")
         verbose_name_plural = _("Funções")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "codigo"]),
+        ]
 
     def __str__(self):
         return f"{self.codigo} - {self.especificacao} ({self.loa.ano})"
@@ -99,6 +108,9 @@ class SubFuncao(ElementoBase):
         verbose_name = _("SubFunção")
         verbose_name_plural = _("SubFunções")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "codigo"]),
+        ]
 
 
 class Programa(ElementoBase):
@@ -107,6 +119,9 @@ class Programa(ElementoBase):
         verbose_name = _("Programa")
         verbose_name_plural = _("Programas")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "codigo"]),
+        ]
 
 
 class Acao(ElementoBase):
@@ -115,6 +130,9 @@ class Acao(ElementoBase):
         verbose_name = _("Ação")
         verbose_name_plural = _("Ações")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "codigo"]),
+        ]
 
 
 class Fonte(ElementoBase):
@@ -123,6 +141,9 @@ class Fonte(ElementoBase):
         verbose_name = _("Fonte")
         verbose_name_plural = _("Fontes")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "codigo"]),
+        ]
 
 
 class Natureza(ElementoBase):
@@ -131,6 +152,9 @@ class Natureza(ElementoBase):
         verbose_name = _("Natureza")
         verbose_name_plural = _("Naturezas")
         ordering = ["codigo"]
+        indexes = [
+            models.Index(fields=["loa", "codigo"]),
+        ]
 
 
 class Despesa(models.Model):
@@ -221,6 +245,22 @@ class Despesa(models.Model):
                 "natureza",
             ),
         )
+
+        indexes = [
+            models.Index(
+                fields=[
+                    "loa",
+                    "orgao",
+                    "unidade",
+                    "funcao",
+                    "subfuncao",
+                    "programa",
+                    "acao",
+                    "natureza",
+                    "fonte",
+                ]
+            ),
+        ]
 
     def __str__(self):
         dc = DespesaConsulta.objects.get(pk=self.id)

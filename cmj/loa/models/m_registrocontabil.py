@@ -84,3 +84,8 @@ class EmendaLoaRegistroContabil(models.Model):
                 "despesa",
             ),
         )
+
+        indexes = [
+            models.Index(fields=["emendaloa", "despesa"]),
+            models.Index(fields=["despesa", "valor"]),
+        ]
