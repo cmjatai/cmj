@@ -1,4 +1,5 @@
 from django.db.models import Exists, OuterRef
+from django.shortcuts import redirect
 from django.urls.base import reverse_lazy
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -292,7 +293,11 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
                 """,
             )
 
-    class ListView(InfoFilterMixin, GoogleRecapthaViewMixin, MasterDetailCrud.ListView):
+    class ListView(
+        InfoFilterMixin,
+        GoogleRecapthaViewMixin,
+        MasterDetailCrud.ListView,
+    ):
         ordering = "-data_envio"
         paginate_by = 25
 
@@ -304,6 +309,9 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
         recaptcha_success_method = "print"
 
         def get(self, request, *args, **kwargs):
+            self.loa = Loa.objects.filter(pk=self.kwargs["pk"]).first()
+            if not self.loa.materia or not self.loa.materia.normajuridica():
+                return redirect("cmj.loa:loa_detail", pk=self.loa.pk)
             if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
                 self.template_name = "loa/prestacaocontaloa_list_public.html"
             return super().get(request, *args, **kwargs)
