@@ -534,6 +534,7 @@ export default {
     },
     fetch (recursive = '', hist = 0) {
       const t = this
+
       const formFilter = {
         orgao: t.despesa.orgaoselected ? t.despesa.orgaoselected.codigo : null,
         unidade: t.despesa.unidadeselected ? `${t.despesa.unidadeselected.codigo}/${t.despesa.unidadeselected.orgao}` : null,
@@ -623,8 +624,10 @@ export default {
               { alert: 'danger', message: 'Não foi possível recuperar a lista...', time: 5 }))
         })
         .then(() => {
+          window.loadingCMJ('Atualizando filtros...')
           t.utils.postModelAction('loa', 'loa', t.loa.id, 'espelho', formFilter)
             .then((response) => {
+              window.unloadingCMJ('')
               t.espelho = response.data
             })
         })
