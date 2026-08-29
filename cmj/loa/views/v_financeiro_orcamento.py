@@ -12,11 +12,11 @@ class DespesaCrud(MasterDetailCrud):
     ordered_list = False
     frontend = Loa._meta.app_label
 
-    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
-        pass
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 1
 
-    class ListView(MasterDetailCrud.ListView):
         def get_context_data(self, **kwargs):
+            self.loa = Loa.objects.get(pk=self.kwargs["pk"])
             context = super().get_context_data(**kwargs)
             path = context.get("path", "")
             context["path"] = f"{path} despesa-list"
