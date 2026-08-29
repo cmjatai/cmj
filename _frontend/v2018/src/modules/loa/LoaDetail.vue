@@ -630,6 +630,12 @@ export default {
               window.unloadingCMJ('')
               t.espelho = response.data
             })
+            .catch((response) => {
+              t.sendMessage(
+                { alert: 'danger', message: 'Não foi possível recuperar o espelho...', time: 5 }
+              )
+              window.unloadingCMJ('')
+            })
         })
         /* .then(() => {
           t.utils.patchModelAction('loa', 'loa', t.loa.id, 'despesas_executadas')
