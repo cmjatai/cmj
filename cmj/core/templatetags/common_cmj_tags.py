@@ -559,7 +559,7 @@ def sessaoplenaria_semanal(limite=0):
 @register.filter
 def sessaoplenaria_quinzena(limite=0):
 
-    sessoes_quinzena = None  # cache.get("portalcmj_c_sessoes_quinzena")
+    sessoes_quinzena = cache.get("portalcmj_c_sessoes_quinzena")
 
     if sessoes_quinzena is not None:
         if limite > 0:
