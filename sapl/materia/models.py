@@ -3,6 +3,7 @@ import hashlib
 import logging
 import os
 import tempfile
+import time
 import zipfile
 from time import sleep
 
@@ -817,6 +818,22 @@ class MateriaLegislativa(CommonMixin):
 
         ff = "original_path" if original else "path"
 
+        materias = set()
+
+        # Coleta todas as matérias relacionadas, recursivamente em anexadas e anexo_de
+        def collect_related(m):
+            if m in materias:
+                return
+            materias.add(m)
+
+            for a in m.materia_principal_set.filter(data_desanexacao__isnull=True):
+                collect_related(a.materia_anexada)
+
+            for a in m.materia_anexada_set.filter(data_desanexacao__isnull=True):
+                collect_related(a.materia_principal)
+
+        collect_related(self)
+
         m_paths = {}
 
         principal = self
@@ -847,15 +864,7 @@ class MateriaLegislativa(CommonMixin):
                 )
                 arcname = slugify(arcname)
 
-            m_paths[p] = (m, prefixo, p, arcname)
-
-            for a in m.materia_principal_set.filter(
-                data_desanexacao__isnull=True
-            ).order_by("materia_anexada__tipo", "data_anexacao"):
-                manex = a.materia_anexada
-                p2 = f"Anexada-{manex.tipo.sigla}"
-
-                get_anexadas_from(a.materia_anexada, prefixo=p2, parents=parents)
+            m_paths[p] = (m, prefixo, p, arcname, m.data_apresentacao)
 
             for d in m.documentoacessorio_set.all():
                 p = getattr(d.arquivo, ff)
@@ -863,13 +872,28 @@ class MateriaLegislativa(CommonMixin):
                     prefixo, d.ano, d.tipo.descricao, d.nome, d.id
                 )
                 arcname = slugify(arcname)
-                m_paths[p] = (d, prefixo, p, arcname)
+                m_paths[p] = (d, prefixo, p, arcname, d.data)
 
         # Adiciona a própria matéria, suas anexadas e seus docs acessórios
         try:
-            get_anexadas_from(principal)
+            for m in materias:
+                get_anexadas_from(m)
         except Exception as e:
             logger.error(f"Erro ao adicionar matéria e anexadas para zip: {e}")
+
+        for m in materias:
+            for df in m.diariosoficiais:
+                if df.diario.arquivo:
+                    p = getattr(df.diario.arquivo, ff)
+                    arcname = f"DiarioOficial-Publicacao-Materia-{df.diario.id}"
+                    arcname = slugify(arcname)
+                    m_paths[p] = (
+                        df.diario,
+                        "DiarioOficial",
+                        p,
+                        arcname,
+                        df.diario.data,
+                    )
 
         # Adiciona os documentos administrativos relacionados à matéria e seus anexados
         def get_docadm_anexados_from(d, prefixo="", parents=[]):
@@ -890,124 +914,137 @@ class MateriaLegislativa(CommonMixin):
 
             if d.texto_integral:
                 p = getattr(d.texto_integral, ff)
-                m_paths[p] = (d, "DocAdm", p, arcname)
+                m_paths[p] = (d, "DocAdm", p, arcname, d.data)
 
             for danex in d.anexados.all():
                 get_docadm_anexados_from(danex, prefixo=prefixo, parents=parents)
 
         try:
-            docs = principal.documentoadministrativo_set.all()
-            for d in docs:
-                get_docadm_anexados_from(d)
+            for m in materias:
+                docs = m.documentoadministrativo_set.all()
+                for d in docs:
+                    get_docadm_anexados_from(d)
         except Exception as e:
             logger.error(f"Erro ao adicionar documentos administrativos para zip: {e}")
 
         try:
             # Captura as atas das reuniões com registro de votação aprovada/reprovadas
-            for ordem in OrdemDia.objects.filter(materia=principal).exclude(
-                registrovotacao_set__tipo_resultado_votacao__natureza="P"
-            ):
-                arcname = f"SessaoPlenaria-{ordem.sessao_plenaria.id}"
-                arcname = slugify(arcname)
-                if ordem.sessao_plenaria.upload_ata:
-                    p = getattr(ordem.sessao_plenaria.upload_ata, ff)
-                    m_paths[p] = (ordem.sessao_plenaria, "SessaoPlenaria", p, arcname)
-                else:
-                    # utilizar lib requests e baixar a ata eletronicamente, salvando em um arquivo temporário para adicionar ao zip
-                    url = reverse(
-                        "sapl.sessao:resumo_ata_pdf", args=[ordem.sessao_plenaria.id]
-                    )
-                    url = f"{settings.SITE_URL}{url}"
-
-                    try:
-                        response = requests.get(url)
-                        response.raise_for_status()
-                        with tempfile.NamedTemporaryFile(
-                            delete=False, suffix=".pdf"
-                        ) as tmp_ata:
-                            tmp_ata.write(response.content)
-                            tmp_ata.flush()
-                            m_paths[tmp_ata.name] = (
-                                ordem.sessao_plenaria,
-                                "SessaoPlenaria",
-                                tmp_ata.name,
-                                arcname,
-                            )
-                    except Exception as e:
-                        logger.error(
-                            f"Erro ao baixar ata da sessão plenária para zip: {e}"
+            for m in materias:
+                for ordem in OrdemDia.objects.filter(materia=m).exclude(
+                    registrovotacao_set__tipo_resultado_votacao__natureza="P"
+                ):
+                    arcname = f"SessaoPlenaria-{ordem.sessao_plenaria.id}"
+                    arcname = slugify(arcname)
+                    if ordem.sessao_plenaria.upload_ata:
+                        p = getattr(ordem.sessao_plenaria.upload_ata, ff)
+                        m_paths[p] = (
+                            ordem.sessao_plenaria,
+                            "SessaoPlenaria",
+                            p,
+                            arcname,
+                            ordem.sessao_plenaria.data_inicio,
                         )
+                    else:
+                        # utilizar lib requests e baixar a ata eletronicamente, salvando em um arquivo temporário para adicionar ao zip
+                        url = reverse(
+                            "sapl.sessao:resumo_ata_pdf",
+                            args=[ordem.sessao_plenaria.id],
+                        )
+                        url = f"{settings.SITE_URL}{url}"
+
+                        try:
+                            response = requests.get(url)
+                            response.raise_for_status()
+
+                            with tempfile.NamedTemporaryFile(
+                                delete=False, suffix=".pdf"
+                            ) as tmp_ata:
+                                tmp_ata.write(response.content)
+                                tmp_ata.flush()
+                                m_paths[tmp_ata.name] = (
+                                    ordem.sessao_plenaria,
+                                    "SessaoPlenaria",
+                                    tmp_ata.name,
+                                    arcname,
+                                    ordem.sessao_plenaria.data_inicio,
+                                )
+                        except Exception as e:
+                            logger.error(
+                                f"Erro ao baixar ata da sessão plenária para zip: {e}"
+                            )
         except Exception as e:
             logger.error(f"Erro ao adicionar atas das reuniões para zip: {e}")
 
-        for n in self.normajuridicas:
-            if n.texto_integral:
-                p = getattr(n.texto_integral, ff)
-                arcname = f"{n.epigrafe}-{n.id}"
-                arcname = slugify(arcname)
-                m_paths[p] = (n, "NormaJuridica", p, arcname)
-            for d in n.diariosoficiais.all():
-                if d.diario.arquivo:
-                    p = getattr(d.diario.arquivo, ff)
-                    arcname = f"DiarioOficial-Publicacao-Norma-{d.diario.id}"
+        for m in materias:
+            for a in m.autografos:
+                if a.texto_integral:
+                    p = getattr(a.texto_integral, ff)
+                    arcname = f"{a.epigrafe}-{a.id}"
                     arcname = slugify(arcname)
-                    m_paths[p] = (d.diario, "DiarioOficial", p, arcname)
-            continue
+                    m_paths[p] = (a, "Autografo", p, arcname, a.data)
 
-            # TODO: gerar PDF do texto articulado
-            if n.texto_articulado.exists():
-                ta = n.texto_articulado.first()
-                if ta and not ta.privacidade:
-                    arcname = f"{n.epigrafe}-compilada-{ta.id}"
+        for m in materias:
+            for n in m.normajuridicas:
+                if n.texto_integral:
+                    p = getattr(n.texto_integral, ff)
+                    arcname = f"{n.epigrafe}-{n.id}"
                     arcname = slugify(arcname)
-                    url = reverse("sapl.compilacao:ta_text", args=[ta.id])
-                    url = f"{settings.SITE_URL}{url}?print"
-
-                    try:
-                        response = requests.get(url)
-                        response.raise_for_status()
-                        with tempfile.NamedTemporaryFile(
-                            delete=False, suffix=".pdf"
-                        ) as tmp_ta:
-                            html = response.content
-                            pdf = HTML(
-                                string=html, base_url=settings.SITE_URL
-                            ).write_pdf(media_type="print")
-                            tmp_ta.write(pdf)
-                            tmp_ta.flush()
-                            m_paths[tmp_ta.name] = (
-                                ta,
-                                "TextoArticulado",
-                                tmp_ta.name,
-                                arcname,
-                            )
-                    except Exception as e:
-                        logger.error(
-                            f"Erro ao gerar PDF do texto articulado para zip: {e}"
+                    m_paths[p] = (n, "NormaJuridica", p, arcname, n.data_publicacao)
+                for d in n.diariosoficiais.all():
+                    if d.diario.arquivo:
+                        p = getattr(d.diario.arquivo, ff)
+                        arcname = f"DiarioOficial-Publicacao-Norma-{d.diario.id}"
+                        arcname = slugify(arcname)
+                        m_paths[p] = (
+                            d.diario,
+                            "DiarioOficial",
+                            p,
+                            arcname,
+                            d.diario.data,
                         )
+                continue
 
-        for a in self.autografos:
-            if a.texto_integral:
-                p = getattr(a.texto_integral, ff)
-                arcname = f"{a.epigrafe}-{a.id}"
-                arcname = slugify(arcname)
-                m_paths[p] = (a, "Autografo", p, arcname)
+                # TODO: gerar PDF do texto articulado
+                if n.texto_articulado.exists():
+                    ta = n.texto_articulado.first()
+                    if ta and not ta.privacidade:
+                        arcname = f"{n.epigrafe}-compilada-{ta.id}"
+                        arcname = slugify(arcname)
+                        url = reverse("sapl.compilacao:ta_text", args=[ta.id])
+                        url = f"{settings.SITE_URL}{url}?print"
 
-        for df in self.diariosoficiais:
-            if df.diario.arquivo:
-                p = getattr(df.diario.arquivo, ff)
-                arcname = f"DiarioOficial-Publicacao-Materia-{df.diario.id}"
-                arcname = slugify(arcname)
-                m_paths[p] = (df.diario, "DiarioOficial", p, arcname)
+                        try:
+                            response = requests.get(url)
+                            response.raise_for_status()
+                            with tempfile.NamedTemporaryFile(
+                                delete=False, suffix=".pdf"
+                            ) as tmp_ta:
+                                html = response.content
+                                pdf = HTML(
+                                    string=html, base_url=settings.SITE_URL
+                                ).write_pdf(media_type="print")
+                                tmp_ta.write(pdf)
+                                tmp_ta.flush()
+                                m_paths[tmp_ta.name] = (
+                                    ta,
+                                    "TextoArticulado",
+                                    tmp_ta.name,
+                                    arcname,
+                                    ta.data,
+                                )
+                        except Exception as e:
+                            logger.error(
+                                f"Erro ao gerar PDF do texto articulado para zip: {e}"
+                            )
 
         m_paths = list(m_paths.values())
-        m_paths.sort(key=lambda x: f"{x[1]}{x[2]}")
+        m_paths.sort(key=lambda x: x[-1])
 
         def calc_hash(paths):
             hash_input = "".join(
                 [
                     f"{i.id}-{prefixo}-{os.path.getmtime(path)}"
-                    for i, prefixo, path, arqname in paths
+                    for i, prefixo, path, arqname, _ in paths
                 ]
             ).encode("utf-8")
             md5 = hashlib.md5()
@@ -1033,13 +1070,44 @@ class MateriaLegislativa(CommonMixin):
 
             with zipfile.ZipFile(tmp, "w") as file:
 
-                for i, prefixo, path, arcname in m_paths:
-                    arcname = f'{arcname}.{path.split(".")[-1] or "pdf"}'
-                    file.write(path, arcname)
+                dt = time.localtime()[:6]
+                idx = 1
+                for i, prefixo, path, arcname, _ in m_paths:
+                    arcname = f'{idx:03}_{arcname}.{path.split(".")[-1] or "pdf"}'
+                    info = zipfile.ZipInfo(arcname)
+                    info.date_time = dt
+                    info.compress_type = zipfile.ZIP_DEFLATED
+                    with open(path, "rb") as f:
+                        file.writestr(info, f.read())
+                    idx += 1
             tmp.seek(0)
 
             media_cache_storage.save(path_cache, tmp)
         return media_cache_storage.path(path_cache)
+
+    def pdf_generate_from_zip_process(self, original=False):
+        media_cache_zip_process = self.zip_process(original)
+
+        # abrir aquivo zipado e criar um pdf merge de todos os pdfs de dentro do zip utilizando pymupdf
+        from io import BytesIO
+
+        import fitz  # PyMuPDF
+
+        pdf_output = fitz.open()
+
+        with zipfile.ZipFile(media_cache_zip_process, "r") as zip_file:
+            for file_name in zip_file.namelist():
+                if file_name.lower().endswith(".pdf"):
+                    with zip_file.open(file_name) as f:
+                        pdf_input = fitz.open(stream=f.read(), filetype="pdf")
+                        pdf_input.bake()
+                        pdf_output.insert_pdf(pdf_input)
+
+        output_path = media_cache_zip_process.replace(".zip", ".pdf")
+        pdf_output.save(output_path, garbage=4, deflate=True)
+        pdf_output.close()
+
+        return output_path
 
     @staticmethod
     def get_proximo_numero(tipo, ano=None, numero_candidato=None):

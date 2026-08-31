@@ -93,7 +93,7 @@ from sapl.materia.forms import (
 from sapl.norma.models import LegislacaoCitada
 from sapl.parlamentares.models import Parlamentar
 from sapl.protocoloadm.models import Protocolo
-from sapl.sessao.models import OrdemDia, SessaoPlenaria
+from sapl.sessao.models import SessaoPlenaria
 from sapl.settings import MAX_DOC_UPLOAD_SIZE, MEDIA_ROOT
 from sapl.utils import (
     SEPARADOR_HASH_PROPOSICAO,
@@ -2658,7 +2658,6 @@ class MateriaLegislativaCrud(Crud):
             return self.search_url
 
     cache_page_materia_detail(60 * 5)
-
     class DetailView(BtnCertMixin, GoogleRecapthaViewMixin, Crud.DetailView):
 
         layout_key = "MateriaLegislativaDetail"
@@ -2738,8 +2737,8 @@ class MateriaLegislativaCrud(Crud):
         def download(self, request, *args, **kwargs):
             download = request.GET.get("download", None)
 
-            principal = self.get_object()
-            test = [
+            materia = self.get_object()
+            """test = [
                 not principal.anexadas.exists(),
                 not principal.documentoacessorio_set.exists(),
                 not principal.documentoadministrativo_set.exists(),
@@ -2761,8 +2760,17 @@ class MateriaLegislativaCrud(Crud):
                         "sapl.materia:materialegislativa_detail",
                         kwargs={"pk": self.kwargs["pk"]},
                     )
-                )
-            path_zip_cache = principal.zip_process(original=download == "original")
+                )"""
+
+            if not download:
+                path_zip_cache = materia.zip_process(original=False)
+            elif download == "original":
+                path_zip_cache = materia.zip_process(original=True)
+            elif download == "pdf":
+                path_zip_cache = materia.pdf_generate_from_zip_process(original=False)
+            elif download == 'pdforiginal':
+                path_zip_cache = materia.pdf_generate_from_zip_process(original=True)
+
             response = HttpResponse(
                 open(path_zip_cache, "rb"), content_type="application/zip"
             )
@@ -2770,11 +2778,18 @@ class MateriaLegislativaCrud(Crud):
             response["Cache-Control"] = "no-cache"
             response["Pragma"] = "no-cache"
             response["Expires"] = 0
-            response["Content-Disposition"] = "inline; filename=%s-%s-%s.zip" % (
-                slugify(principal.tipo.sigla),
-                principal.numero,
-                principal.ano,
-            )
+            if download == "pdf" or download == "pdforiginal":
+                response["Content-Disposition"] = "inline; filename=%s-%s-%s.pdf" % (
+                    slugify(materia.tipo.sigla),
+                    materia.numero,
+                    materia.ano,
+                )
+            else:
+                response["Content-Disposition"] = "inline; filename=%s-%s-%s.zip" % (
+                    slugify(materia.tipo.sigla),
+                    materia.numero,
+                    materia.ano,
+                )
 
             return response
 
