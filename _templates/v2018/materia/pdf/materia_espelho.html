@@ -1,0 +1,68 @@
+{% extends "base_pdf.html" %}
+
+{% load crispy_forms_tags %}
+{% load common_tags %}
+
+{% block head_extra_css %}
+  {% include "css/base_table.css" %}
+  td {
+    line-height: 1.5;
+  }
+  .col-1 {
+    width: 30%;
+    vertical-align: top;
+    text-align: right;
+  }
+{% endblock head_extra_css %}
+
+{% block body_content %}
+    <table>
+      <thead>
+        <tr>
+          <th>{{ object|upper }}</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+{% with object as materia %}
+  {% include "materia/materialegislativa_detail_deliberacao_plenario.html" %}
+{% endwith %}
+
+{% with object.tramitacao_set.all as tramitacao_list %}
+
+  {% for tramitacao in tramitacao_list %}
+    {% if forloop.first %}
+    <table>
+      <thead>
+        <tr>
+          <th colspan="2">TRAMITAÇÕES</th>
+        </tr>
+      </thead>
+      <tbody>
+    {% endif %}
+    <tr>
+      <td class="col-1">
+        <strong>{{ tramitacao.data_tramitacao }}</strong><br>
+        <strong>Situação{% if forloop.first %} Atual{% endif %}:</strong><br>
+        <strong>Turno:</strong><br>
+        <strong>Ação:</strong>
+      </td>
+      <td>
+        {{tramitacao.unidade_tramitacao_destino}}<br>
+        {{tramitacao.status}}<br>
+        {{tramitacao.get_turno_display}}<br>
+        {{ tramitacao.texto }}
+      </td>
+    </tr>
+    {% if forloop.last %}
+      </tbody>
+    </table>
+    {% endif %}
+  {% endfor %}
+
+
+{% endwith %}
+
+
+{% endblock body_content %}

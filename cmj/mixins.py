@@ -677,8 +677,11 @@ class PdfOutputMixin:
 
         pdf_file = make_pdf(base_url=base_url, main_template=template)
 
-        filename = self.template_name.split("/")[-1].replace(".html", "")
-        filename = f'{filename}_{self.kwargs.get("pk","")}.pdf'
+        if not hasattr(self, "filename_template_name"):
+            filename = self.template_name.split("/")[-1].replace(".html", "")
+            filename = f'{filename}_{self.kwargs.get("pk","")}.pdf'
+        else:
+            filename = self.filename_template_name
 
         response = HttpResponse(pdf_file, content_type="application/pdf")
         response["Content-Disposition"] = f'inline; filename="{filename}"'

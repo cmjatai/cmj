@@ -31,11 +31,18 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.urls.base import reverse
 from django.utils import formats, timezone
+from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_str
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import cache_page
-from django.views.generic import CreateView, ListView, TemplateView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
@@ -50,6 +57,7 @@ from cmj.mixins import (
     CheckCheckMixin,
     GoogleRecapthaViewMixin,
     MultiFormatOutputMixin,
+    PdfOutputMixin,
 )
 from cmj.utils_report import render_pdf_to_response
 from sapl.base.email_utils import do_envia_email_confirmacao
@@ -1642,7 +1650,7 @@ class ProposicaoCrud(Crud):
                 try:
                     tipo = TipoProposicao.objects.get(pk=initial["tipo"])
                     initial["especie"] = tipo.content_type
-                except TipoProposicao.DoesNotExist:
+                except TipoProposicao.DoesNotExist as e:
                     tb = "".join(traceback.format_tb(e.__traceback__))
                     self.logger.error(str(tb))
 
@@ -2553,6 +2561,38 @@ class MateriaLegislativaCrud(Crud):
     model = MateriaLegislativa
     help_topic = "materia_legislativa"
     public = [RP_LIST, RP_DETAIL]
+
+    class MateriaEspelhoView(PdfOutputMixin, DetailView):
+        model = MateriaLegislativa
+        template_name = "materia/pdf/materia_espelho.html"
+
+        @property
+        def filename_template_name(self):
+            return f'materia_espelho_{self.kwargs.get("pk","")}.pdf'
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+
+            context["title_pdf"] = (
+                f"PortalCMJ - Espelho {str(self.object.epigrafe_short)}"
+            )
+
+            return context
+
+    @classonlymethod
+    def get_urls(cls):
+        urls = super().get_urls()
+        from django.urls import path
+
+        urls += [
+            path(
+                "/<int:pk>/espelho.pdf",
+                cls.MateriaEspelhoView.as_view(),
+                name="materia_legislativa_espelho",
+            ),
+        ]
+
+        return urls
 
     class BaseMixin(Crud.BaseMixin):
         list_field_names = ["tipo", "numero", "ano", "data_apresentacao"]
