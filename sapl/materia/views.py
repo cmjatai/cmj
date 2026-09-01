@@ -2848,26 +2848,29 @@ class MateriaLegislativaCrud(Crud):
                     original=True, force=force is not None
                 )
 
-            response = HttpResponse(
-                open(path_zip_cache, "rb"), content_type="application/zip"
-            )
 
-            response["Cache-Control"] = "no-cache"
-            response["Pragma"] = "no-cache"
-            response["Expires"] = 0
+            
             if download == "pdf" or download == "pdforiginal":
+                response = HttpResponse(
+                    open(path_zip_cache, "rb"), content_type="application/pdf"
+                )
                 response["Content-Disposition"] = "inline; filename=%s-%s-%s.pdf" % (
                     slugify(materia_root.tipo.sigla),
                     materia_root.numero,
                     materia_root.ano,
                 )
-            else:
+            else:                                
+                response = HttpResponse(
+                    open(path_zip_cache, "rb"), content_type="application/zip"
+                )
                 response["Content-Disposition"] = "inline; filename=%s-%s-%s.zip" % (
                     slugify(materia_root.tipo.sigla),
                     materia_root.numero,
                     materia_root.ano,
                 )
-
+            response["Cache-Control"] = "no-cache"
+            response["Pragma"] = "no-cache"
+            response["Expires"] = 0 
             return response
 
         def cabec_autografo(self, cabec_autografo):
