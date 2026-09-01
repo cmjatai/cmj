@@ -901,32 +901,32 @@ class MateriaLegislativa(CommonMixin):
                 media_cache_storage.delete(path_cache)
 
         try:
-            # utilizar lib requests e baixar a ata eletronicamente, salvando em um arquivo temporário para adicionar ao zip
-            url = reverse(
-                "sapl.materia:materia_legislativa_espelho",
-                args=[materia_root.id],
-            )
-            url = f"{settings.SITE_URL}{url}"
-
-            response = requests.get(url)
-            response.raise_for_status()
-
-            with tempfile.NamedTemporaryFile(
-                delete=False, suffix=".pdf"
-            ) as tmp_espelho:
-                tmp_espelho.write(response.content)
-                tmp_espelho.flush()
-                m_paths[tmp_espelho.name] = (
-                    materia_root,
-                    "MateriaEspelho",
-                    tmp_espelho.name,
-                    arcname,
-                    datetime.combine(
-                        materia_root.data_apresentacao, datetime.min.time()
-                    )
-                    + timedelta(seconds=1),
+            for m in materias:
+                # utilizar lib requests e baixar a ata eletronicamente, salvando em um arquivo temporário para adicionar ao zip
+                url = reverse(
+                    "sapl.materia:materia_legislativa_espelho",
+                    args=[m.id],
                 )
-            pass
+                url = f"{settings.SITE_URL}{url}"
+
+                response = requests.get(url)
+                response.raise_for_status()
+
+                arcname = f"MateriaEspelho-{m.id}"
+                arcname = slugify(arcname)
+                with tempfile.NamedTemporaryFile(
+                    delete=False, suffix=".pdf"
+                ) as tmp_espelho:
+                    tmp_espelho.write(response.content)
+                    tmp_espelho.flush()
+                    m_paths[tmp_espelho.name] = (
+                        m,
+                        "MateriaEspelho",
+                        tmp_espelho.name,
+                        arcname,
+                        datetime.combine(m.data_apresentacao, datetime.min.time())
+                        + timedelta(seconds=1),
+                    )
         except Exception as e:
             logger.error(f"Erro ao gerar espelhos: {e}")
 
@@ -946,7 +946,8 @@ class MateriaLegislativa(CommonMixin):
                     prefixo,
                     p,
                     arcname,
-                    datetime.combine(d.data, datetime.min.time()),
+                    datetime.combine(d.data, datetime.min.time())
+                    + timedelta(seconds=2),
                 )
 
         # Adiciona a própria matéria, suas anexadas e seus docs acessórios
@@ -994,7 +995,8 @@ class MateriaLegislativa(CommonMixin):
                     "DocAdm",
                     p,
                     arcname,
-                    datetime.combine(d.data, datetime.min.time()),
+                    datetime.combine(d.data, datetime.min.time())
+                    + timedelta(seconds=2),
                 )
 
             for danex in d.anexados.all():
@@ -1025,7 +1027,8 @@ class MateriaLegislativa(CommonMixin):
                             arcname,
                             datetime.combine(
                                 ordem.sessao_plenaria.data_inicio, datetime.min.time()
-                            ),
+                            )
+                            + timedelta(seconds=2),
                         )
                     else:
                         # utilizar lib requests e baixar a ata eletronicamente, salvando em um arquivo temporário para adicionar ao zip
@@ -1052,7 +1055,8 @@ class MateriaLegislativa(CommonMixin):
                                     datetime.combine(
                                         ordem.sessao_plenaria.data_inicio,
                                         datetime.min.time(),
-                                    ),
+                                    )
+                                    + timedelta(seconds=2),
                                 )
                         except Exception as e:
                             logger.error(
@@ -1072,7 +1076,8 @@ class MateriaLegislativa(CommonMixin):
                         "Autografo",
                         p,
                         arcname,
-                        datetime.combine(a.data, datetime.min.time()),
+                        datetime.combine(a.data, datetime.min.time())
+                        + timedelta(seconds=2),
                     )
 
         for m in materias:
@@ -1086,7 +1091,8 @@ class MateriaLegislativa(CommonMixin):
                         "NormaJuridica",
                         p,
                         arcname,
-                        datetime.combine(n.data_publicacao, datetime.min.time()),
+                        datetime.combine(n.data_publicacao, datetime.min.time())
+                        + timedelta(seconds=2),
                     )
                 for d in n.diariosoficiais.all():
                     if d.diario.arquivo:
@@ -1098,7 +1104,8 @@ class MateriaLegislativa(CommonMixin):
                             "DiarioOficial",
                             p,
                             arcname,
-                            datetime.combine(d.diario.data, datetime.min.time()),
+                            datetime.combine(d.diario.data, datetime.min.time())
+                            + timedelta(seconds=2),
                         )
                 continue
 
