@@ -813,10 +813,12 @@ class MateriaLegislativa(CommonMixin):
             sleep(3)
             self.clear_cache(page=page, error=2)
 
-    def zip_process(self, original=False):
+    def zip_process(self, original=False, force=False):
         from sapl.sessao.models import OrdemDia, SessaoPlenaria
 
         ff = "original_path" if original else "path"
+
+        opt = self._meta
 
         materias = set()
 
@@ -866,6 +868,37 @@ class MateriaLegislativa(CommonMixin):
 
             m_paths[p] = (m, prefixo, p, arcname, m.data_apresentacao)
 
+        # Adiciona a própria matéria, suas anexadas e seus docs acessórios
+        try:
+            for m in materias:
+                get_anexadas_from(m)
+        except Exception as e:
+            logger.error(f"Erro ao adicionar matéria e anexadas para zip: {e}")
+
+        m_paths_temp = list(m_paths.values())
+        m_paths_temp.sort(key=lambda x: x[-1])
+        materia_root = m_paths_temp[0][0]
+
+        if materia_root.checkcheck or materia_root.normasjuridicas:
+            path_cache = "{}-{}-{}".format(
+                opt.app_label,
+                opt.model_name,
+                f"cache-{materia_root.ano}-{materia_root.tipo.sigla}-{materia_root.numero}-{materia_root.id}",
+            )
+
+            path_cache = slugify(path_cache)
+            path_cache += ".zip"
+
+            if not force and media_cache_storage.exists(path_cache):
+                return materia_root, media_cache_storage.path(path_cache)
+            elif force and media_cache_storage.exists(path_cache):
+                media_cache_storage.delete(path_cache)
+
+        def get_docs_acessorios_from(m, prefixo="", parents=[]):
+            if m.id in parents:
+                return
+            parents.append(m.id)
+
             for d in m.documentoacessorio_set.all():
                 p = getattr(d.arquivo, ff)
                 arcname = "{}-DA-{}-{}-{}-{}".format(
@@ -877,9 +910,9 @@ class MateriaLegislativa(CommonMixin):
         # Adiciona a própria matéria, suas anexadas e seus docs acessórios
         try:
             for m in materias:
-                get_anexadas_from(m)
+                get_docs_acessorios_from(m)
         except Exception as e:
-            logger.error(f"Erro ao adicionar matéria e anexadas para zip: {e}")
+            logger.error(f"Erro ao adicionar documentos acessórios para zip: {e}")
 
         for m in materias:
             for df in m.diariosoficiais:
@@ -1039,6 +1072,7 @@ class MateriaLegislativa(CommonMixin):
 
         m_paths = list(m_paths.values())
         m_paths.sort(key=lambda x: x[-1])
+        materia_root = m_paths[0][0]
 
         def calc_hash(paths):
             hash_input = "".join(
@@ -1051,20 +1085,26 @@ class MateriaLegislativa(CommonMixin):
             md5.update(hash_input)
             return md5.hexdigest()
 
-        hash_files = calc_hash(m_paths)
+        if materia_root.checkcheck or materia_root.normasjuridicas:
+            hash_files = ""
+        else:
+            hash_files = calc_hash(m_paths)
 
         opt = self._meta
 
-        path_cache = "{}/{}/{}".format(
+        path_cache = "{}-{}-{}".format(
             opt.app_label,
             opt.model_name,
-            f"cache-{self.ano}-{self.tipo.sigla}-{self.numero}-{self.id}-{hash_files}.zip",
+            f"cache-{materia_root.ano}-{materia_root.tipo.sigla}-{materia_root.numero}-{materia_root.id}{hash_files}",
         )
 
         path_cache = slugify(path_cache)
+        path_cache += ".zip"
 
-        if media_cache_storage.exists(path_cache):
-            return media_cache_storage.path(path_cache)
+        if not force and media_cache_storage.exists(path_cache):
+            return materia_root, media_cache_storage.path(path_cache)
+        elif force and media_cache_storage.exists(path_cache):
+            media_cache_storage.delete(path_cache)
 
         with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
 
@@ -1073,7 +1113,7 @@ class MateriaLegislativa(CommonMixin):
                 dt = time.localtime()[:6]
                 idx = 1
                 for i, prefixo, path, arcname, _ in m_paths:
-                    arcname = f'{idx:03}_{arcname}.{path.split(".")[-1] or "pdf"}'
+                    arcname = f'{idx:03}-{arcname}.{path.split(".")[-1] or "pdf"}'
                     info = zipfile.ZipInfo(arcname)
                     info.date_time = dt
                     info.compress_type = zipfile.ZIP_DEFLATED
@@ -1083,10 +1123,10 @@ class MateriaLegislativa(CommonMixin):
             tmp.seek(0)
 
             media_cache_storage.save(path_cache, tmp)
-        return media_cache_storage.path(path_cache)
+        return materia_root, media_cache_storage.path(path_cache)
 
-    def pdf_generate_from_zip_process(self, original=False):
-        media_cache_zip_process = self.zip_process(original)
+    def pdf_generate_from_zip_process(self, original=False, force=False):
+        materia_root, media_cache_zip_process = self.zip_process(original, force=force)
 
         # abrir aquivo zipado e criar um pdf merge de todos os pdfs de dentro do zip utilizando pymupdf
         from io import BytesIO
@@ -1107,7 +1147,7 @@ class MateriaLegislativa(CommonMixin):
         pdf_output.save(output_path, garbage=4, deflate=True)
         pdf_output.close()
 
-        return output_path
+        return materia_root, output_path
 
     @staticmethod
     def get_proximo_numero(tipo, ano=None, numero_candidato=None):

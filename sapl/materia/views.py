@@ -2658,6 +2658,7 @@ class MateriaLegislativaCrud(Crud):
             return self.search_url
 
     cache_page_materia_detail(60 * 5)
+
     class DetailView(BtnCertMixin, GoogleRecapthaViewMixin, Crud.DetailView):
 
         layout_key = "MateriaLegislativaDetail"
@@ -2669,13 +2670,48 @@ class MateriaLegislativaCrud(Crud):
         recaptcha_success_method = "download"
 
         @property
+        def zip_or_pdf(self):
+            zip_or_pdf = self.request.GET.get("download", "ZIP")
+            zip_or_pdf = zip_or_pdf.upper()
+            zip_or_pdf = zip_or_pdf if zip_or_pdf in ["ZIP", "PDF"] else "ZIP"
+            return zip_or_pdf
+
+        @property
         def recaptcha_gate_title(self):
             obj = self.get_object()
-            return f"<strong>Gerar ZIP de documentos da matéria:</strong><br>{obj}"
+            return f"<strong>Gerar {self.zip_or_pdf} com Processo Legislativo a:</strong><br>{obj}"
+
+        @property
+        def recaptcha_gate_button(self):
+            return f"Gerar {self.zip_or_pdf}"
 
         @property
         def extras_url(self):
             btns = self.btn_certidao("texto_original")
+
+            btns.append(
+                (
+                    "%s?download=zip"
+                    % reverse(
+                        "sapl.materia:materialegislativa_detail",
+                        kwargs={"pk": self.object.pk},
+                    ),
+                    "btn-secondary",
+                    _("ZIP do Processo Legislativo"),
+                )
+            )
+
+            btns.append(
+                (
+                    "%s?download=pdf"
+                    % reverse(
+                        "sapl.materia:materialegislativa_detail",
+                        kwargs={"pk": self.object.pk},
+                    ),
+                    "btn-secondary",
+                    _("PDF do Processo Legislativo"),
+                )
+            )
 
             if self.request.user.has_perm("compilacao.add_textoarticulado"):
                 if not self.object.texto_articulado.exists():
@@ -2762,14 +2798,16 @@ class MateriaLegislativaCrud(Crud):
                     )
                 )"""
 
-            if not download:
-                path_zip_cache = materia.zip_process(original=False)
-            elif download == "original":
-                path_zip_cache = materia.zip_process(original=True)
+            force = request.GET.get("force", None)
+
+            if not download or download == 'zip':
+                materia_root, path_zip_cache = materia.zip_process(original=False, force=force is not None)
+            elif download == "ziporiginal":
+                materia_root, path_zip_cache = materia.zip_process(original=True, force=force is not None)
             elif download == "pdf":
-                path_zip_cache = materia.pdf_generate_from_zip_process(original=False)
-            elif download == 'pdforiginal':
-                path_zip_cache = materia.pdf_generate_from_zip_process(original=True)
+                materia_root, path_zip_cache = materia.pdf_generate_from_zip_process(original=False, force=force is not None)
+            elif download == "pdforiginal":
+                materia_root, path_zip_cache = materia.pdf_generate_from_zip_process(original=True, force=force is not None)
 
             response = HttpResponse(
                 open(path_zip_cache, "rb"), content_type="application/zip"
@@ -2780,15 +2818,15 @@ class MateriaLegislativaCrud(Crud):
             response["Expires"] = 0
             if download == "pdf" or download == "pdforiginal":
                 response["Content-Disposition"] = "inline; filename=%s-%s-%s.pdf" % (
-                    slugify(materia.tipo.sigla),
-                    materia.numero,
-                    materia.ano,
+                    slugify(materia_root.tipo.sigla),
+                    materia_root.numero,
+                    materia_root.ano,
                 )
             else:
                 response["Content-Disposition"] = "inline; filename=%s-%s-%s.zip" % (
-                    slugify(materia.tipo.sigla),
-                    materia.numero,
-                    materia.ano,
+                    slugify(materia_root.tipo.sigla),
+                    materia_root.numero,
+                    materia_root.ano,
                 )
 
             return response

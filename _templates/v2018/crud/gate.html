@@ -38,7 +38,7 @@
           </div>
 
           <div class="d-flex justify-content-center">
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" onsubmit="return grecaptcha.getResponse() != '';">
               <i class="fa-solid fa-file-lines me-1"></i>
               {{ recaptcha_gate_button }}
             </button>
