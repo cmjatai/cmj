@@ -2669,21 +2669,12 @@ class MateriaLegislativaCrud(Crud):
         recaptcha_gate_button = _("Gerar ZIP")
         recaptcha_success_method = "download"
 
-        @property
-        def zip_or_pdf(self):
-            zip_or_pdf = self.request.GET.get("download", "ZIP")
-            zip_or_pdf = zip_or_pdf.upper()
-            zip_or_pdf = zip_or_pdf if zip_or_pdf in ["ZIP", "PDF"] else "ZIP"
-            return zip_or_pdf
+        recaptcha_gate_template = "materia/materialegislativa_gate.html"
 
         @property
         def recaptcha_gate_title(self):
             obj = self.get_object()
-            return f"<strong>Gerar {self.zip_or_pdf} com Processo Legislativo a:</strong><br>{obj}"
-
-        @property
-        def recaptcha_gate_button(self):
-            return f"Gerar {self.zip_or_pdf}"
+            return f"""<strong>Baixar Processo Legislativo completo de:<br><span class="text-primary">{obj}</span></strong>"""
 
         @property
         def recaptcha_return_url(self):
@@ -2695,25 +2686,13 @@ class MateriaLegislativaCrud(Crud):
 
             btns.append(
                 (
-                    "%s?download=zip"
+                    "%s?download"
                     % reverse(
                         "sapl.materia:materialegislativa_detail",
                         kwargs={"pk": self.object.pk},
                     ),
                     "btn-secondary",
-                    _("ZIP do Processo Legislativo"),
-                )
-            )
-
-            btns.append(
-                (
-                    "%s?download=pdf"
-                    % reverse(
-                        "sapl.materia:materialegislativa_detail",
-                        kwargs={"pk": self.object.pk},
-                    ),
-                    "btn-secondary",
-                    _("PDF do Processo Legislativo"),
+                    _("Processo Legislativo Completo"),
                 )
             )
 
@@ -2803,6 +2782,14 @@ class MateriaLegislativaCrud(Crud):
                 )"""
 
             force = request.GET.get("force", None)
+
+            pdf = request.POST.get("pdf", None)
+            zip = request.POST.get("zip", None)
+
+            if pdf and pdf is not None:
+                download = "pdf"
+            elif zip and zip is not None:
+                download = "zip"
 
             if not download or download == "zip":
                 materia_root, path_zip_cache = materia.zip_process(

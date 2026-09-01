@@ -536,6 +536,9 @@ class GoogleRecapthaViewMixin:
     recaptcha_success_method = None
     recaptcha_return_url = '/'
 
+    recaptcha_gate_template = 'crud/gate.html'
+
+
     def _is_recaptcha_triggered(self, request):
         if not self.recaptcha_trigger_param:
             return False
@@ -557,7 +560,7 @@ class GoogleRecapthaViewMixin:
         }
         return self.response_class(
             request=request,
-            template=["crud/gate.html"],
+            template=[self.recaptcha_gate_template],
             context=context,
             using=self.template_engine,
         )
