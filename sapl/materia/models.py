@@ -879,7 +879,7 @@ class MateriaLegislativa(CommonMixin):
         m_paths_temp.sort(key=lambda x: x[-1])
         materia_root = m_paths_temp[0][0]
 
-        if materia_root.checkcheck or materia_root.normasjuridicas:
+        if materia_root.checkcheck or materia_root.normajuridicas:
             path_cache = "{}-{}-{}".format(
                 opt.app_label,
                 opt.model_name,
@@ -1085,7 +1085,7 @@ class MateriaLegislativa(CommonMixin):
             md5.update(hash_input)
             return md5.hexdigest()
 
-        if materia_root.checkcheck or materia_root.normasjuridicas:
+        if materia_root.checkcheck or materia_root.normajuridicas:
             hash_files = ""
         else:
             hash_files = calc_hash(m_paths)
