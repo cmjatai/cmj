@@ -2686,6 +2686,10 @@ class MateriaLegislativaCrud(Crud):
             return f"Gerar {self.zip_or_pdf}"
 
         @property
+        def recaptcha_return_url(self):
+            return self.request.path
+
+        @property
         def extras_url(self):
             btns = self.btn_certidao("texto_original")
 
@@ -2800,14 +2804,22 @@ class MateriaLegislativaCrud(Crud):
 
             force = request.GET.get("force", None)
 
-            if not download or download == 'zip':
-                materia_root, path_zip_cache = materia.zip_process(original=False, force=force is not None)
+            if not download or download == "zip":
+                materia_root, path_zip_cache = materia.zip_process(
+                    original=False, force=force is not None
+                )
             elif download == "ziporiginal":
-                materia_root, path_zip_cache = materia.zip_process(original=True, force=force is not None)
+                materia_root, path_zip_cache = materia.zip_process(
+                    original=True, force=force is not None
+                )
             elif download == "pdf":
-                materia_root, path_zip_cache = materia.pdf_generate_from_zip_process(original=False, force=force is not None)
+                materia_root, path_zip_cache = materia.pdf_generate_from_zip_process(
+                    original=False, force=force is not None
+                )
             elif download == "pdforiginal":
-                materia_root, path_zip_cache = materia.pdf_generate_from_zip_process(original=True, force=force is not None)
+                materia_root, path_zip_cache = materia.pdf_generate_from_zip_process(
+                    original=True, force=force is not None
+                )
 
             response = HttpResponse(
                 open(path_zip_cache, "rb"), content_type="application/zip"

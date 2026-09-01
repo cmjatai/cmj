@@ -534,6 +534,7 @@ class GoogleRecapthaViewMixin:
     recaptcha_gate_title = _("Verificação de Segurança")
     recaptcha_gate_button = _("Acessar Conteúdo")
     recaptcha_success_method = None
+    recaptcha_return_url = '/'
 
     def _is_recaptcha_triggered(self, request):
         if not self.recaptcha_trigger_param:
@@ -552,6 +553,7 @@ class GoogleRecapthaViewMixin:
             "error": error,
             "recaptcha_gate_title": self.recaptcha_gate_title,
             "recaptcha_gate_button": self.recaptcha_gate_button,
+            "recaptcha_return_url": self.recaptcha_return_url,
         }
         return self.response_class(
             request=request,
