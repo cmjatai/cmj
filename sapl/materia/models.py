@@ -886,19 +886,32 @@ class MateriaLegislativa(CommonMixin):
         materia_root = m_paths_temp[0][0]
 
         if materia_root.checkcheck or materia_root.normajuridicas:
-            path_cache = "{}-{}-{}".format(
-                opt.app_label,
-                opt.model_name,
-                f"cache-{materia_root.ano}-{materia_root.tipo.sigla}-{materia_root.numero}-{materia_root.id}",
-            )
 
-            path_cache = slugify(path_cache)
-            path_cache += ".zip"
+            use_cache = True
 
-            if not force and media_cache_storage.exists(path_cache):
-                return materia_root, media_cache_storage.path(path_cache)
-            elif force and media_cache_storage.exists(path_cache):
-                media_cache_storage.delete(path_cache)
+            now = timezone.localtime()
+            if not materia_root.normajuridicas:
+                if materia_root.data_apresentacao > (now - timedelta(days=30)).date():
+                    use_cache = False
+            else:
+                norma = materia_root.normajuridicas.first()
+                if norma.data_publicacao > (now - timedelta(days=15)).date():
+                    use_cache = False
+
+            if use_cache:
+                path_cache = "{}-{}-{}".format(
+                    opt.app_label,
+                    opt.model_name,
+                    f"cache-{materia_root.ano}-{materia_root.tipo.sigla}-{materia_root.numero}-{materia_root.id}",
+                )
+
+                path_cache = slugify(path_cache)
+                path_cache += ".zip"
+
+                if not force and media_cache_storage.exists(path_cache):
+                    return materia_root, media_cache_storage.path(path_cache)
+                elif force and media_cache_storage.exists(path_cache):
+                    media_cache_storage.delete(path_cache)
 
         try:
             for m in materias:
