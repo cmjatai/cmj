@@ -5,7 +5,7 @@ import os
 import tempfile
 import time
 import zipfile
-from time import sleep
+from datetime import datetime, timedelta
 
 import requests
 from django.conf import settings
@@ -810,7 +810,7 @@ class MateriaLegislativa(CommonMixin):
             logger.error(f"Erro ao limpar cache de: {self.texto_original.path}. {e}")
 
         if error == 1:
-            sleep(3)
+            time.sleep(3)
             self.clear_cache(page=page, error=2)
 
     def zip_process(self, original=False, force=False):
@@ -866,7 +866,13 @@ class MateriaLegislativa(CommonMixin):
                 )
                 arcname = slugify(arcname)
 
-            m_paths[p] = (m, prefixo, p, arcname, m.data_apresentacao)
+            m_paths[p] = (
+                m,
+                prefixo,
+                p,
+                arcname,
+                datetime.combine(m.data_apresentacao, datetime.min.time()),
+            )
 
         # Adiciona a própria matéria, suas anexadas e seus docs acessórios
         try:
@@ -894,6 +900,36 @@ class MateriaLegislativa(CommonMixin):
             elif force and media_cache_storage.exists(path_cache):
                 media_cache_storage.delete(path_cache)
 
+        try:
+            # utilizar lib requests e baixar a ata eletronicamente, salvando em um arquivo temporário para adicionar ao zip
+            url = reverse(
+                "sapl.materia:materia_legislativa_espelho",
+                args=[materia_root.id],
+            )
+            url = f"{settings.SITE_URL}{url}"
+
+            response = requests.get(url)
+            response.raise_for_status()
+
+            with tempfile.NamedTemporaryFile(
+                delete=False, suffix=".pdf"
+            ) as tmp_espelho:
+                tmp_espelho.write(response.content)
+                tmp_espelho.flush()
+                m_paths[tmp_espelho.name] = (
+                    materia_root,
+                    "MateriaEspelho",
+                    tmp_espelho.name,
+                    arcname,
+                    datetime.combine(
+                        materia_root.data_apresentacao, datetime.min.time()
+                    )
+                    + timedelta(seconds=1),
+                )
+            pass
+        except Exception as e:
+            logger.error(f"Erro ao gerar espelhos: {e}")
+
         def get_docs_acessorios_from(m, prefixo="", parents=[]):
             if m.id in parents:
                 return
@@ -905,7 +941,13 @@ class MateriaLegislativa(CommonMixin):
                     prefixo, d.ano, d.tipo.descricao, d.nome, d.id
                 )
                 arcname = slugify(arcname)
-                m_paths[p] = (d, prefixo, p, arcname, d.data)
+                m_paths[p] = (
+                    d,
+                    prefixo,
+                    p,
+                    arcname,
+                    datetime.combine(d.data, datetime.min.time()),
+                )
 
         # Adiciona a própria matéria, suas anexadas e seus docs acessórios
         try:
@@ -925,7 +967,7 @@ class MateriaLegislativa(CommonMixin):
                         "DiarioOficial",
                         p,
                         arcname,
-                        df.diario.data,
+                        datetime.combine(df.diario.data, datetime.min.time()),
                     )
 
         # Adiciona os documentos administrativos relacionados à matéria e seus anexados
@@ -947,7 +989,13 @@ class MateriaLegislativa(CommonMixin):
 
             if d.texto_integral:
                 p = getattr(d.texto_integral, ff)
-                m_paths[p] = (d, "DocAdm", p, arcname, d.data)
+                m_paths[p] = (
+                    d,
+                    "DocAdm",
+                    p,
+                    arcname,
+                    datetime.combine(d.data, datetime.min.time()),
+                )
 
             for danex in d.anexados.all():
                 get_docadm_anexados_from(danex, prefixo=prefixo, parents=parents)
@@ -975,7 +1023,9 @@ class MateriaLegislativa(CommonMixin):
                             "SessaoPlenaria",
                             p,
                             arcname,
-                            ordem.sessao_plenaria.data_inicio,
+                            datetime.combine(
+                                ordem.sessao_plenaria.data_inicio, datetime.min.time()
+                            ),
                         )
                     else:
                         # utilizar lib requests e baixar a ata eletronicamente, salvando em um arquivo temporário para adicionar ao zip
@@ -999,7 +1049,10 @@ class MateriaLegislativa(CommonMixin):
                                     "SessaoPlenaria",
                                     tmp_ata.name,
                                     arcname,
-                                    ordem.sessao_plenaria.data_inicio,
+                                    datetime.combine(
+                                        ordem.sessao_plenaria.data_inicio,
+                                        datetime.min.time(),
+                                    ),
                                 )
                         except Exception as e:
                             logger.error(
@@ -1014,7 +1067,13 @@ class MateriaLegislativa(CommonMixin):
                     p = getattr(a.texto_integral, ff)
                     arcname = f"{a.epigrafe}-{a.id}"
                     arcname = slugify(arcname)
-                    m_paths[p] = (a, "Autografo", p, arcname, a.data)
+                    m_paths[p] = (
+                        a,
+                        "Autografo",
+                        p,
+                        arcname,
+                        datetime.combine(a.data, datetime.min.time()),
+                    )
 
         for m in materias:
             for n in m.normajuridicas:
@@ -1022,7 +1081,13 @@ class MateriaLegislativa(CommonMixin):
                     p = getattr(n.texto_integral, ff)
                     arcname = f"{n.epigrafe}-{n.id}"
                     arcname = slugify(arcname)
-                    m_paths[p] = (n, "NormaJuridica", p, arcname, n.data_publicacao)
+                    m_paths[p] = (
+                        n,
+                        "NormaJuridica",
+                        p,
+                        arcname,
+                        datetime.combine(n.data_publicacao, datetime.min.time()),
+                    )
                 for d in n.diariosoficiais.all():
                     if d.diario.arquivo:
                         p = getattr(d.diario.arquivo, ff)
@@ -1033,7 +1098,7 @@ class MateriaLegislativa(CommonMixin):
                             "DiarioOficial",
                             p,
                             arcname,
-                            d.diario.data,
+                            datetime.combine(d.diario.data, datetime.min.time()),
                         )
                 continue
 
@@ -1063,7 +1128,7 @@ class MateriaLegislativa(CommonMixin):
                                     "TextoArticulado",
                                     tmp_ta.name,
                                     arcname,
-                                    ta.data,
+                                    datetime.combine(ta.data, datetime.min.time()),
                                 )
                         except Exception as e:
                             logger.error(
