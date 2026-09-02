@@ -47,10 +47,37 @@
               <input type="submit" class="btn btn-primary" name="pdf" value="Gerar PDF">
             </div>
           </div>
-        </form>
+          <div class="alert alert-info d-message" role="alert" style="display: none;">
 
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
 {% endblock base_content %}
+
+{% block extra_js %}
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('form').on('submit', function(event) {
+      var clickedButton = $(document.activeElement);
+      if (clickedButton.attr("name") === "zip") {
+        $(".d-message").text("{% trans 'O arquivo ZIP está sendo gerado e em breve estará disponível na sua lista de downloads.' %}");
+        $(".d-message").show();
+      } else if (clickedButton.attr("name") === "pdf") {
+        $(".d-message").text("{% trans 'O arquivo PDF está sendo gerado e em breve estará disponível na sua lista de downloads.' %}");
+        $(".d-message").show();
+      }
+      setTimeout(function() {
+        grecaptcha.reset();
+      }, 1000);
+    });
+  });
+</script>
+
+{% endblock extra_js %}
+
+
+
