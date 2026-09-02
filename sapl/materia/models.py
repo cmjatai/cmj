@@ -1170,26 +1170,31 @@ class MateriaLegislativa(CommonMixin):
             md5.update(hash_input)
             return md5.hexdigest()
 
-        if materia_root.checkcheck or materia_root.normajuridicas:
+        if use_cache and (materia_root.checkcheck or materia_root.normajuridicas):
             hash_files = ""
         else:
             hash_files = calc_hash(m_paths)
 
         opt = self._meta
 
-        path_cache = "{}-{}-{}".format(
+        path_cache_prefix = "{}-{}-{}".format(
             opt.app_label,
             opt.model_name,
-            f"cache-{materia_root.ano}-{materia_root.tipo.sigla}-{materia_root.numero}-{materia_root.id}{hash_files}",
+            f"cache-{materia_root.ano}-{materia_root.tipo.sigla}-{materia_root.numero}-{materia_root.id}",
         )
 
-        path_cache = slugify(path_cache)
+        path_cache = slugify(path_cache_prefix+hash_files)
         path_cache += ".zip"
 
-        if not force and media_cache_storage.exists(path_cache):
+        if use_cache and not force and media_cache_storage.exists(path_cache):
             return materia_root, media_cache_storage.path(path_cache)
         elif force and media_cache_storage.exists(path_cache):
             media_cache_storage.delete(path_cache)
+
+        # apagar tudo que começa com path_cache_prefix
+        for filename in media_cache_storage.listdir("")[1]:
+            if filename.startswith(slugify(path_cache_prefix)):
+                media_cache_storage.delete(filename)
 
         with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
 

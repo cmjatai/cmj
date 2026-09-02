@@ -2832,6 +2832,7 @@ class MateriaLegislativaCrud(Crud):
                 download = "zip"
 
             content_type = "application/zip"
+
             if not download or download == "zip":
                 materia_root, path_zip_cache = materia.zip_process(
                     original=False, force=force is not None
@@ -2850,8 +2851,6 @@ class MateriaLegislativaCrud(Crud):
                     original=True, force=force is not None
                 )
                 content_type = "application/pdf"
-
-
 
             response = HttpResponse(
                 open(path_zip_cache, "rb"), content_type=content_type
