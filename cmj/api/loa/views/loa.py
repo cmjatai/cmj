@@ -440,10 +440,10 @@ class LoaViewSet:
         loa = self.loa
 
         # TODO: refatorar mask para montar o case com laço
-        # mask_codigo = '1234.67.90.23.567.9012.4.678.0.2.45.78.01.345'
-        # mask_codbas = '1234 56 78 90 123 4567 89012 345678901234 567'
-        parts_codigo = [4, 7, 10, 13, 17, 22, 28, 41, 45]
-        parts_codigo_base = [4, 6, 8, 10, 13, 17, 22, 34, 37]
+        # mask_codigo = '1234.67.90.23.567.9012.4.678.0.2.45.78.01.345.789'
+        # mask_codbas = '1234 56 78 90 123 4567 89012 345678901234 5678901'
+        parts_codigo = [4, 7, 10, 13, 17, 22, 28, 41, 49]
+        parts_codigo_base = [4, 6, 8, 10, 13, 17, 22, 34, 41]
 
         agrupamento_select = filters_data.pop("agrupamento", "fonte")
         agrupamentos = dict(
@@ -459,7 +459,7 @@ class LoaViewSet:
                 ("natureza_3", 35),
                 ("natureza_4", 38),
                 ("natureza_5", 41),
-                ("fonte", 45),
+                ("fonte", 49),
             ]
         )
         agrupamentos_inverse = {v: k for k, v in agrupamentos.items()}
@@ -635,7 +635,7 @@ class LoaViewSet:
                         WHEN LENGTH(codigo_base) = 17 THEN (SELECT especificacao FROM loa_programa  WHERE loa_id = {loa.id} AND codigo = SUBSTR(codigo_base, 14, 4) LIMIT 1)
                         WHEN LENGTH(codigo_base) = 22 THEN (SELECT especificacao FROM loa_acao      WHERE loa_id = {loa.id} AND codigo = SUBSTR(codigo_base, 18, 5) LIMIT 1)
                         WHEN LENGTH(codigo_base) = 34 THEN (SELECT especificacao FROM loa_natureza  WHERE loa_id = {loa.id} AND codigo = SUBSTR(codigo_base, 23, 12) LIMIT 1)
-                        WHEN LENGTH(codigo_base) = 37 THEN (SELECT especificacao FROM loa_fonte     WHERE loa_id = {loa.id} AND codigo = SUBSTR(codigo_base, 35, 3) LIMIT 1)
+                        WHEN LENGTH(codigo_base) = 41 THEN (SELECT especificacao FROM loa_fonte     WHERE loa_id = {loa.id} AND codigo = SUBSTR(codigo_base, 35, 7) LIMIT 1)
                         ELSE ''
                     END AS especificacao,
                     geral.soma_registroscontabeis_acrescimo,
@@ -656,9 +656,6 @@ class LoaViewSet:
         rs = []
         lr_old = 0
         value = Decimal(0)
-
-        # parts_codigo =      [4, 7, 10, 13, 17, 22, 28, 41, 46]
-        # parts_codigo_base = [4, 6,  8, 10, 13, 17, 22, 34, 37]
 
         if agrupamento_select in (
             "natureza_1",
@@ -693,7 +690,7 @@ class LoaViewSet:
                 agrupamento_local = (
                     parts_codigo[idx_part + 1]
                     if idx_part + 1 < len(parts_codigo)
-                    else 45
+                    else 49
                 )
 
             if lr > agrupamento_local:
