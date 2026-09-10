@@ -7,7 +7,6 @@ from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.forms.models import ModelForm
 from django.utils.translation import gettext_lazy as _
-from django_filters.filters import ModelMultipleChoiceFilter
 
 from cmj.loa.forms.f_mixins import MateriaCheckFormMixin
 from cmj.loa.models import Despesa, Loa
@@ -61,6 +60,7 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             "despesa_default_deducao_saude",
             "despesa_default_deducao_diversos",
             "despesa_default_deducao_educacao",
+            "forcar_detalhamento_de_fonte",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -81,25 +81,17 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             ).distinct()
 
             despesa_default_deducao_diversos = Despesa.objects.filter(
-                loa=instance,
-                funcao__codigo="99",
-                fonte__codigo__in=[
-                    "100",
-                ],
+                loa=instance, funcao__codigo="99", fonte__codigo__startswith="100"
             ).order_by("fonte__codigo")
             despesa_default_deducao_educacao = Despesa.objects.filter(
                 loa=instance,
                 funcao__codigo="99",
-                fonte__codigo__in=[
-                    "101",
-                ],
+                fonte__codigo__startswith="101",
             ).order_by("fonte__codigo")
             despesa_default_deducao_saude = Despesa.objects.filter(
                 loa=instance,
                 funcao__codigo="99",
-                fonte__codigo__in=[
-                    "102",
-                ],
+                fonte__codigo__startswith="102",
             ).order_by("fonte__codigo")
 
         self.fields["parlamentares"].choices = [(p.pk, p) for p in parlamentares]

@@ -134,6 +134,16 @@ class Loa(models.Model):
         on_delete=PROTECT,
     )
 
+    forcar_detalhamento_de_fonte = models.CharField(
+        max_length=3,
+        verbose_name=_("Detalhamento de Fonte"),
+        blank=True,
+        default="",
+        help_text=_(
+            "Forçar detalhamento de fonte com 3 caracteres para destinação de Emendas Impositivas"
+        ),
+    )
+
     class Meta:
         verbose_name = _("LOA")
         verbose_name_plural = _("LOAs")
