@@ -105,7 +105,14 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
     tipo = forms.ChoiceField(required=True, choices=EmendaLoa.TIPOEMENDALOA_CHOICE)
 
     finalidade = forms.CharField(
-        label="Finalidade", widget=forms.Textarea(attrs={"rows": 3}), required=True
+        label="Finalidade",
+        widget=forms.Textarea(attrs={"rows": 3}),
+        required=True,
+        help_text=(
+            "Para fazer constar na finalidade, você pode utilizar as máscaras "
+            "{{entidade}} e/ou {{bairro}} para customizar o texto conforme preferir. "
+            "Ao não utilizar as máscaras, será inserido de forma padrão."
+        ),
     )
 
     indicacao = forms.CharField(label="Indicação", required=False)
@@ -177,7 +184,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False,
     )
 
-    valor = DecimalField(label=_("Valor Global da Emenda (R$)"), required=False)
+    valor = DecimalField(label=_("Valor Global (R$)"), required=False)
 
     entidade = forms.ModelChoiceField(
         queryset=Entidade.objects.filter(ativo=True),
@@ -192,6 +199,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 "data-width": "100%",
             }
         ),
+        empty_label="Selecione uma entidade",
     )
 
     bairro = forms.ModelChoiceField(
@@ -206,6 +214,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 "data-dropup-auto": "false",
             }
         ),
+        empty_label="Selecione um bairro",
     )
 
     class Meta:
@@ -245,16 +254,28 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             and not self.user.is_superuser
         )
 
-        row1 = to_row(
+        row_topo_0 = to_row(
             [
-                ("tipo", 3),
-                ("fase", 5),
-                ("valor", 4),
                 ("ano_loa", 0),
             ]
         )
 
-        row2 = to_row(
+        row_topo_1 = to_row(
+            [
+                ("tipo", 2),
+                ("fase", 2),
+                ("valor", 2),
+                ("prefixo_indicacao", 2),
+                ("unidade", 4),
+            ]
+        )
+
+        rows_topo = [
+            row_topo_0,
+            row_topo_1,
+        ]
+
+        row1 = to_row(
             [
                 ("tipo_materia", 6),
                 ("numero_materia", 3),
@@ -263,25 +284,22 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             ]
         )
 
-        row3 = [
-            ("entidade", 7),
-            ("bairro", 5),
-            ("prefixo_indicacao", 3),
-            ("unidade", 9),
+        row2 = [
+            ("entidade", 6),
+            ("bairro", 6),
             ("prefixo_finalidade", 3),
             ("finalidade", 9),
         ]
 
         if not full_editor:
-            row3.append(("parl_assinantes", 12))
-            row3.append(("parlamentares__valor", 12))
+            row2.append(("parl_assinantes", 12))
+            row2.append(("parlamentares__valor", 12))
 
-        row3 = to_row(row3)
+        row2 = to_row(row2)
 
         rows_base = [
             row1,
             row2,
-            row3,
         ]
 
         if full_editor or self.user.is_superuser:
@@ -352,11 +370,17 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         if row4:
             rows_base.append(row4)
 
-        row_form = to_row([(rows_base, 12)])
-
-        if not self.creating:
+        if self.creating:
             row_form = to_row(
                 [
+                    (rows_topo, 12),
+                    (rows_base, 12),
+                ]
+            )
+        else:
+            row_form = to_row(
+                [
+                    (rows_topo, 12),
                     (rows_base, 8 if full_editor else 6),
                     (Div(css_class="container-preview"), 4 if full_editor else 6),
                 ]
@@ -497,7 +521,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             parlamentares=self.parls,
             user=self.user if self.instance.pk else None,
             elps=elps,
-            attrs={"class": "text-right"},
+            attrs={"class": "text-right small"},
             instance=self.instance,
         )
 

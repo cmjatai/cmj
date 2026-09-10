@@ -127,7 +127,7 @@ class EmendaLoa(CmjSearchMixin):
     finalidade = models.TextField(verbose_name=_("Finalidade"))
 
     prefixo_indicacao = models.CharField(
-        verbose_name=_("Prefixo da Indicação"),
+        verbose_name=_("Prefixo da Unidade"),
         max_length=30,
         blank=True,
         default="o(a)",
@@ -235,14 +235,14 @@ class EmendaLoa(CmjSearchMixin):
                 Altera destinação de recursos orçamentários, indicando {self.prefixo_indicacao}
                 {self.indicacao or "XXXXXXX"}, para a recepção do valor de
                 R$ { self.str_valor} ({self.valor_por_extenso}), que será { self.prefixo_finalidade}
-                { self.finalidade_format or "XXXXXXX"}.
+                { self.finalidade_format or "XXXXXXX"}
             """
         else:
             ementa = f"""
                 Altera destinação de recursos orçamentários, indicando {self.prefixo_indicacao}
                 {self.indicacao or "XXXXXXX"}, para a recepção do valor de
                 R$ { self.str_valor} ({self.valor_por_extenso}), que será { self.prefixo_finalidade}
-                { self.finalidade_format or "XXXXXXX"}.
+                { self.finalidade_format or "XXXXXXX"}
             """
 
         ementa = ementa.strip().replace("\n", " ")
@@ -277,7 +277,7 @@ class EmendaLoa(CmjSearchMixin):
             f"para a recepção do valor de "
             f"R$ {valor_str} ({extenso}), "
             f"que será {self.prefixo_finalidade} "
-            f'{self.finalidade_format or "XXXXXXX"}.'
+            f'{self.finalidade_format or "XXXXXXX"}'
         )
         artigos.append(("ementa", ementa))
 
@@ -341,7 +341,7 @@ class EmendaLoa(CmjSearchMixin):
                 f"Art {art_num}º - O valor deduzido de "
                 f"R$ {valor_str} ({extenso}), "
                 f"será inserido na {texto_insercoes}, "
-                f"{self.prefixo_finalidade} {self.finalidade_format}."
+                f"{self.prefixo_finalidade} {self.finalidade_format}"
             )
             artigos.append(("artigo", texto))
 
@@ -388,7 +388,7 @@ class EmendaLoa(CmjSearchMixin):
             texto = (
                 f"Art {art_num}º - Altera-se o Orçamento de {self.loa.ano}, "
                 f"incluindo o valor de R$ {valor_str} ({extenso}), "
-                f"{self.prefixo_finalidade} {self.finalidade_format}."
+                f"{self.prefixo_finalidade} {self.finalidade_format}"
             )
             artigos.append(("artigo", texto))
 
@@ -418,8 +418,17 @@ class EmendaLoa(CmjSearchMixin):
             finalidade = self.finalidade
             chaves = re.findall(r"\{(.*?)\}", finalidade)
 
+            chave_bairro_presente = False
+            chave_entidade_presente = False
+
             for chave in chaves:
                 chave_strip = chave.strip().lower()
+
+                if chave_strip == "bairro":
+                    chave_bairro_presente = True
+                if chave_strip == "entidade":
+                    chave_entidade_presente = True
+
                 if "__" in chave_strip:
                     partes = chave_strip.split("__")
                     obj = self
@@ -440,6 +449,22 @@ class EmendaLoa(CmjSearchMixin):
                 finalidade = finalidade.replace(f"{{{chave}}}", str(valor))
 
             finalidade = finalidade if finalidade[-1] != "." else finalidade[:-1]
+
+            finalidade = finalidade.rstrip(" ")
+            finalidade = finalidade.rstrip(".")
+
+            if self.entidade and not chave_entidade_presente:
+                finalidade += f". Entidade beneficiada: {self.entidade}."
+
+            finalidade = finalidade.rstrip(" ")
+            finalidade = finalidade.rstrip(".")
+
+            if self.bairro and not chave_bairro_presente:
+                finalidade += f". Localidade beneficiada: {self.bairro}."
+
+            if finalidade and finalidade[-1] != ".":
+                finalidade += "."
+
             return finalidade
         except:
             return self.finalidade
