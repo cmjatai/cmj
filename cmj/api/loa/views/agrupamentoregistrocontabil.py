@@ -242,9 +242,10 @@ class AgrupamentoRegistroContabilSerializer(CmjSerializerMixin):
             loa = despesa.loa
             if loa.forcar_detalhamento_de_fonte:
                 if despesa not in (
-                    loa.despesa_default_deducao_saude,
-                    loa.despesa_default_deducao_diversos,
-                    loa.despesa_default_deducao_educacao,
+                    "",
+                    # loa.despesa_default_deducao_saude,
+                    # loa.despesa_default_deducao_diversos,
+                    # loa.despesa_default_deducao_educacao,
                 ):
                     if despesa.fonte.codigo.endswith(".000"):
                         detalhamento_forcado = despesa.fonte.codigo.split(".")

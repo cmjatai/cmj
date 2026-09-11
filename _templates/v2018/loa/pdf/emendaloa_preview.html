@@ -122,8 +122,9 @@
       <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
       {% for rc in object.registrocontabil_set.all_deducoes %}
           Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
-          Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
-          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
+          Classificação Funcional: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
+          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} /
+          Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
             - Valor: R$ {{rc.valor|valor_abs_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
           o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>.
       {% endspaceless %}
