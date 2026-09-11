@@ -465,105 +465,8 @@ class LoaViewSet:
         )
         agrupamentos_inverse = {v: k for k, v in agrupamentos.items()}
 
-        def exec_sql_espelho_v1(_filter_sql):
-            # TODO: refatorar "sql" para usar o modelo de dados de view db não gerenciada pelo django
-            sql_geral = f"""SELECT distinct
-                                d.id,
-                                d.valor_materia,
-                                loa.ano || '.' || o.codigo || '.' || u.codigo || '.' || f.codigo || '.' || sf.codigo || '.' || p.codigo || '.' || a.codigo || '.' || n.codigo || '.' || fte.codigo as codigo,
-                                loa.ano || o.codigo || u.codigo || f.codigo || sf.codigo || p.codigo || a.codigo || n.codigo || fte.codigo as codigo_base,
-                                SUM(CASE WHEN elrc.valor > 0 THEN elrc.valor ELSE 0 END) OVER (PARTITION BY d.id) AS soma_registroscontabeis_acrescimo,
-                                SUM(CASE WHEN elrc.valor < 0 THEN elrc.valor ELSE 0 END) OVER (PARTITION BY d.id) AS soma_registroscontabeis_reducao
-
-                            from loa_despesa d
-                                inner join loa_loa                   loa on (loa.id = d.loa_id)
-                                inner join loa_orgao                   o on (  o.id = d.orgao_id)
-                                inner join loa_unidadeorcamentaria     u on (  u.id = d.unidade_id)
-                                inner join loa_funcao                  f on (  f.id = d.funcao_id)
-                                inner join loa_subfuncao              sf on ( sf.id = d.subfuncao_id)
-                                inner join loa_programa                p on (  p.id = d.programa_id)
-                                inner join loa_acao                    a on (  a.id = d.acao_id)
-                                inner join loa_natureza                n on (  n.id = d.natureza_id)
-                                inner join loa_fonte                 fte on (fte.id = d.fonte_id)
-                                left outer join loa_emendaloaregistrocontabil elrc on (elrc.despesa_id = d.id)
-                                where loa.id = {loa.pk} {_filter_sql} order by codigo_base
-            """
-
-            mask_union = """
-                (
-                    SELECT DISTINCT
-                        Substr(codigo_base, 1, {partcb}) AS codigo_base, Substr(codigo, 1, {partc}) AS codigo,
-                        SUM(valor_materia) AS soma,
-                        SUM(soma_registroscontabeis_acrescimo) AS soma_registroscontabeis_acrescimo,
-                        SUM(soma_registroscontabeis_reducao) AS soma_registroscontabeis_reducao
-                        FROM (
-                            {sql_geral}
-                        ) todas_as_despesas
-                            GROUP BY
-                                Substr(codigo_base, 1, {partcb}), Substr(codigo, 1, {partc})
-                                /* HAVING SUM(valor_materia) > 0*/
-                            order by codigo_base
-                )
-            """
-
-            columns = [
-                "geral.codigo",
-                "geral.codigo_base",
-                "geral.soma",
-                f"""
-                    CASE
-                        when LENGTH(codigo_base) = 6 then (select especificacao from loa_orgao where loa_orgao.codigo = substr(codigo_base, 5, 2) and loa_orgao.loa_id = {loa.id} limit 1)
-
-                        when LENGTH(codigo_base) = 8 then (
-                                                            select loa_unidadeorcamentaria.especificacao
-                                                                from loa_unidadeorcamentaria
-                                                                inner join loa_orgao on loa_orgao.id = loa_unidadeorcamentaria.orgao_id
-                                                                where
-                                                                    loa_orgao.loa_id = {loa.id} and
-                                                                    loa_unidadeorcamentaria.loa_id = {loa.id} and
-                                                                    loa_orgao.codigo = substr(codigo_base, 5, 2) and
-                                                                    loa_unidadeorcamentaria.codigo = substr(codigo_base, 7, 2)
-                                                                order by loa_orgao.loa_id, loa_orgao.codigo, loa_unidadeorcamentaria.codigo
-                                                                limit 1
-                                                        )
-
-                        when LENGTH(codigo_base) = 10 then (select especificacao from loa_funcao    where loa_funcao.loa_id     = {loa.id} and loa_funcao.codigo    = substr(codigo_base, 9, 2) limit 1)
-                        when LENGTH(codigo_base) = 13 then (select especificacao from loa_subfuncao where loa_subfuncao.loa_id  = {loa.id} and loa_subfuncao.codigo = substr(codigo_base, 11, 3) limit 1)
-                        when LENGTH(codigo_base) = 17 then (select especificacao from loa_programa  where loa_programa.loa_id   = {loa.id} and loa_programa.codigo  = substr(codigo_base, 14, 4) limit 1)
-                        when LENGTH(codigo_base) = 22 then (select especificacao from loa_acao      where loa_acao.loa_id       = {loa.id} and loa_acao.codigo      = substr(codigo_base, 18, 5) limit 1)
-                        when LENGTH(codigo_base) = 34 then (select especificacao from loa_natureza  where loa_natureza.loa_id   = {loa.id} and loa_natureza.codigo  = substr(codigo_base, 23, 12) limit 1)
-                        when LENGTH(codigo_base) = 37 then (select especificacao from loa_fonte     where loa_fonte.loa_id      = {loa.id} and loa_fonte.codigo     = substr(codigo_base, 35, 3) limit 1)
-                            else ''
-                    END as especificacao
-                """,
-                "geral.soma_registroscontabeis_acrescimo",
-                "geral.soma_registroscontabeis_reducao",
-            ]
-
-            sql_for_run = f"""
-                select
-                    {', '.join(columns)}
-                    from (
-                        {
-                'union '.join(
-                    [
-                        mask_union.format(
-                            partc=partc, partcb=partcb, sql_geral=sql_geral
-                        )
-                        for partc, partcb in zip(parts_codigo, parts_codigo_base)
-                    ]
-                )
-            }) geral order by codigo_base
-                """
-
-            with TimeExecution():  #'gerar_espelho'
-                # print('Running SQL for espelho:', sql_for_run)
-                results = run_sql(sql_for_run)
-
-            return results
-
         def exec_sql_espelho_v2(_filter_sql):
-            sql1 = f"""
+            sql_carga = f"""
                 WITH emendas_agrupadas AS (
                     -- Pré-agrega as emendas para manter cardinalidade 1:1 com despesa
                     SELECT
@@ -596,21 +499,24 @@ class LoaViewSet:
                     WHERE d.loa_id = {loa.id} {_filter_sql}
                 ),
             """
-            mask_union = """
+
+            sql_sum_registros_contabeis = """
                 SELECT SUBSTR(codigo_base, 1, {partcb}) AS codigo_base, SUBSTR(codigo, 1, {partc}) AS codigo,
                         SUM(valor_materia) AS soma, SUM(soma_acrescimo) AS soma_registroscontabeis_acrescimo, SUM(soma_reducao) AS soma_registroscontabeis_reducao
                     FROM despesas_base GROUP BY SUBSTR(codigo_base, 1,  {partcb}), SUBSTR(codigo, 1, {partc})
             """
             unions = []
             for partcb, partc in zip(parts_codigo_base, parts_codigo):
-                unions.append(mask_union.format(partcb=partcb, partc=partc))
+                unions.append(
+                    sql_sum_registros_contabeis.format(partcb=partcb, partc=partc)
+                )
 
-            union_all = " UNION ALL ".join(unions)
+            union_all_sql_sum_registros_contabeis = " UNION ALL ".join(unions)
 
-            sql2 = f"""
-                {sql1}
+            sql_geral = f"""
+                {sql_carga}
                 geral AS (
-                    {union_all}
+                    {union_all_sql_sum_registros_contabeis}
                 )
                 SELECT
                     geral.codigo,
@@ -646,9 +552,9 @@ class LoaViewSet:
                 ORDER BY codigo_base;
             """
 
-            with TimeExecution(print_date=True):  #'gerar_espelho'
+            with TimeExecution(print_date=True):  # 'gerar_espelho'
                 # print('Running SQL for espelho:', sql_for_run)
-                results = run_sql(sql2)
+                results = run_sql(sql_geral)
 
             return results
 

@@ -15,7 +15,7 @@ class LoaContextDataMixin:
 
         if not self.loa and not self.object:
             try:
-                loa = Loa.objects.get(pk=kwargs["pk"])
+                loa = Loa.objects.get(pk=self.kwargs.get("pk", 0))
                 self.loa = loa
             except Loa.DoesNotExist:
                 pass
