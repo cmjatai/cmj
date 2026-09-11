@@ -9,8 +9,8 @@ from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.fields import CharField
 
-from cmj.api.serializers import CmjSerializerMixin
 from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
+from cmj.api.serializers import CmjSerializerMixin
 from cmj.loa.models import (
     Acao,
     Despesa,
@@ -70,8 +70,10 @@ class EmendaLoaRegistroContabilSerializer(CmjSerializerMixin):
     )
 
     fonte = RegexLocalField(
-        r"^(\d{3})$",
-        error_messages={"invalid": _('O campo "Fonte" deve serguir o padrão "999".')},
+        r"^(\d{3}\.\d{3})$",
+        error_messages={
+            "invalid": _('O campo "Fonte" deve serguir o padrão "999.999".')
+        },
     )
 
     valor = CharField(
@@ -235,6 +237,32 @@ class EmendaLoaRegistroContabilSerializer(CmjSerializerMixin):
             ddict.pop("valor_materia")
             ddict.pop("valor_norma")
             despesa, created = Despesa.objects.get_or_create(**ddict)
+
+        else:
+
+            loa = despesa.loa
+            if loa.forcar_detalhamento_de_fonte:
+                if despesa.fonte.codigo.endswith(".000"):
+                    detalhamento_forcado = despesa.fonte.codigo.split(".")
+                    fonte_codigo = (
+                        f"{detalhamento_forcado[0]}.{loa.forcar_detalhamento_de_fonte}"
+                    )
+                    fonte, created = Fonte.objects.get_or_create(
+                        codigo=fonte_codigo, loa_id=loa.id
+                    )
+                    if created:
+                        fonte.especificacao = (
+                            f"{despesa.fonte.especificacao} / Emendas Impositivas"
+                        )
+                        fonte.save()
+
+                    despesa_dict = despesa.__dict__.copy()
+                    despesa_dict["fonte_id"] = fonte.id
+                    despesa_dict.pop("id")
+                    despesa_dict.pop("_state")
+                    despesa_dict.pop("valor_materia")
+                    despesa_dict.pop("valor_norma")
+                    despesa, created = Despesa.objects.get_or_create(**despesa_dict)
 
         validated_data = {
             "despesa": despesa,

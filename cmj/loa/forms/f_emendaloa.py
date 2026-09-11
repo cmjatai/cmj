@@ -110,7 +110,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=True,
         help_text=(
             "Para fazer constar na finalidade, você pode utilizar as máscaras "
-            "{{entidade}} e/ou {{bairro}} para customizar o texto conforme preferir. "
+            "{{entidade}}, {{entidade__nome_fantasia}} e/ou {{bairro}} para customizar o texto conforme preferir. "
             "Ao não utilizar as máscaras, será inserido de forma padrão."
         ),
     )

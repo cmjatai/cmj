@@ -12,7 +12,7 @@ class AgrupamentoCrud(MasterDetailCrud):
     public = [RP_LIST, RP_DETAIL]
     frontend = Agrupamento._meta.app_label
 
-    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+    class BaseMixin(MasterDetailCrud.BaseMixin):
         pass
 
         @property
@@ -48,14 +48,14 @@ class AgrupamentoCrud(MasterDetailCrud):
     class DeleteView(MasterDetailCrud.DeleteView):
         permission_required = ("loa.emendaloa_full_editor",)
 
-    class CreateView(MasterDetailCrud.CreateView):
+    class CreateView(LoaContextDataMixin, MasterDetailCrud.CreateView):
         permission_required = ("loa.emendaloa_full_editor",)
         layout_key = "AgrupamentoCreate"
 
         def get_success_url(self):
             return self.update_url
 
-    class ListView(MasterDetailCrud.ListView):
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
         def hook_despesas(self, obj, ss, url):
             str_regs = []
             for rc in obj.agrupamentoregistrocontabil_set.order_by("-percentual"):
@@ -65,7 +65,7 @@ class AgrupamentoCrud(MasterDetailCrud):
 
             return f"<ul>{src}</ul>", ""
 
-    class UpdateView(MasterDetailCrud.UpdateView):
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
         permission_required = ("loa.emendaloa_full_editor",)
         layout_key = None
         form_class = AgrupamentoForm

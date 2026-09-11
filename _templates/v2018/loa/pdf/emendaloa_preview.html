@@ -135,8 +135,9 @@
       será inserido na
       {% for rc in object.registrocontabil_set.all_insercoes %}
           Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
-          Código: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
-          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
+          Classificação Funcional: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
+          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} /
+          Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
             - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
             {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
     </p>

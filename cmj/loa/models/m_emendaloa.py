@@ -328,8 +328,9 @@ class EmendaLoa(CmjSearchMixin):
             for i, rc in enumerate(insercoes):
                 parte = (
                     f"Unidade Orçamentária {rc.despesa.unidade.especificacao} / "
-                    f"Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
-                    f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza}"
+                    f"Classificação Funcional: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
+                    f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza} / "
+                    f"Fonte: {rc.despesa.consulta.fonte.codigo}"
                 )
                 if insercoes.count() > 1:
                     parte += f" - Valor: R$ {formats.number_format(rc.valor, force_grouping=True)}"
@@ -424,9 +425,9 @@ class EmendaLoa(CmjSearchMixin):
             for chave in chaves:
                 chave_strip = chave.strip().lower()
 
-                if chave_strip == "bairro":
+                if chave_strip.startswith("bairro"):
                     chave_bairro_presente = True
-                if chave_strip == "entidade":
+                if chave_strip.startswith("entidade"):
                     chave_entidade_presente = True
 
                 if "__" in chave_strip:
@@ -537,7 +538,9 @@ class EmendaLoa(CmjSearchMixin):
                 )
 
             registros = self.registrocontabil_set.all()
-            fontes_invalidas = registros.exclude(despesa__fonte__codigo="102")
+            fontes_invalidas = registros.exclude(
+                despesa__fonte__codigo__startswith="102"
+            )
             if fontes_invalidas.exists():
                 erros.append(
                     "Emendas Impositivas da Saúde não podem ter registros com fonte diferente de 102."
@@ -553,7 +556,9 @@ class EmendaLoa(CmjSearchMixin):
         ):
             # existe registro com fonte diferente de 101?
             registros = self.registrocontabil_set.all()
-            fontes_invalidas = registros.exclude(despesa__fonte__codigo="101")
+            fontes_invalidas = registros.exclude(
+                despesa__fonte__codigo__startswith="101"
+            )
             if fontes_invalidas.exists():
                 erros.append(
                     "Emendas Impositivas da Educação não podem ter registros com fonte diferente de 101."
