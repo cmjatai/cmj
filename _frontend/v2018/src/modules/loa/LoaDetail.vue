@@ -236,7 +236,7 @@ export default {
         subfuncaoselected: null,
         programaselected: null,
         acaoselected: null,
-        agrupamentoselected: 'unidade',
+        agrupamentoselected: 'fonte',
         itensselected: 15
       },
       filters: [

@@ -254,9 +254,7 @@ class AgrupamentoRegistroContabilSerializer(CmjSerializerMixin):
                             codigo=fonte_codigo, loa_id=loa.id
                         )
                         if created:
-                            fonte.especificacao = (
-                                f"{despesa.fonte.especificacao} / Emendas Impositivas"
-                            )
+                            fonte.especificacao = f"Emendas Impositivas"
                             fonte.save()
 
                         despesa_dict = despesa.__dict__
