@@ -25,7 +25,7 @@ from cmj.loa.models import (
     SubFuncao,
     UnidadeOrcamentaria,
 )
-from cmj.utils import TimeExecution, decimal2str, run_sql
+from cmj.utils import decimal2str, run_sql
 from sapl.api.permissions import SaplModelPermissions
 
 logger = logging.getLogger(__name__)
@@ -383,16 +383,6 @@ class LoaViewSet:
     def construct_espelho(self, filters_data):
 
         filters_data = dict(filters_data)
-        try:
-            itens = filters_data.pop("itens")
-            if itens != 1000:
-                itens = min(25, int(itens))
-
-            hist = filters_data.pop("hist")
-            hist = int(hist)
-        except:
-            itens = 20
-            hist = 0
 
         filter_sql = []
         field_to_alias = {
@@ -409,6 +399,8 @@ class LoaViewSet:
             "natureza_5": "n",
             "fonte": "fte",
         }
+
+        cleaned_data = {}
         for k, v in filters_data.items():
 
             if not v:
@@ -427,15 +419,7 @@ class LoaViewSet:
             except ValueError:
                 continue
 
-            if v1 is None:
-                value = f" {field_to_alias[k]}.codigo = '{v0}' "
-            else:
-                value = f" ({field_to_alias[k]}.codigo = '{v0}' and {field_to_alias[k]}.orgao_id = {v1}) "
-
-            filter_sql.append(value)
-
-        filter_sql = " and ".join(filter_sql)
-        filter_sql = f" and {filter_sql} " if filter_sql else ""
+            cleaned_data[k] = v
 
         loa = self.loa
 
@@ -445,27 +429,24 @@ class LoaViewSet:
         parts_codigo = [4, 7, 10, 13, 17, 22, 28, 41, 45, 49]
         parts_codigo_base = [4, 6, 8, 10, 13, 17, 22, 34, 37, 41]
 
-        agrupamento_select = filters_data.pop("agrupamento", "fonte")
-        agrupamentos = dict(
-            [
-                ("orgao", 7),
-                ("unidade", 10),
-                ("funcao", 13),
-                ("subfuncao", 17),
-                ("programa", 22),
-                ("acao", 28),
-                ("natureza_1", 30),
-                ("natureza_2", 32),
-                ("natureza_3", 35),
-                ("natureza_4", 38),
-                ("natureza_5", 41),
-                ("fonte_1", 45),
-                ("fonte_2", 49),
-            ]
-        )
-        agrupamentos_inverse = {v: k for k, v in agrupamentos.items()}
+        def exec_sql_espelho_v2(_cleaned_data):
 
-        def exec_sql_espelho_v2(_filter_sql):
+            _filter_sql = []
+            for k, v in _cleaned_data.items():
+                if not v:
+                    continue
+                v_str = str(v).strip()
+                parts = v_str.split("/", 1)
+                v0 = parts[0].strip()
+                v1 = parts[1].strip() if len(parts) == 2 else None
+                if v1 is None:
+                    value = f" {field_to_alias[k]}.codigo = '{v0}' "
+                else:
+                    value = f" ({field_to_alias[k]}.codigo = '{v0}' and {field_to_alias[k]}.orgao_id = {v1}) "
+                _filter_sql.append(value)
+            _filter_sql = " and ".join(_filter_sql)
+            _filter_sql = f" and {_filter_sql} " if _filter_sql else ""
+
             sql_carga = f"""
                 WITH emendas_agrupadas AS (
                     -- Pré-agrega as emendas para manter cardinalidade 1:1 com despesa
@@ -514,7 +495,9 @@ class LoaViewSet:
             union_all_sql_sum_registros_contabeis = " UNION ALL ".join(unions)
 
             sql_geral = f"""
+
                 {sql_carga}
+
                 geral AS (
                     {union_all_sql_sum_registros_contabeis}
                 )
@@ -552,14 +535,35 @@ class LoaViewSet:
                 ORDER BY codigo_base;
             """
 
-            with TimeExecution(print_date=True):  # 'gerar_espelho'
-                # print('Running SQL for espelho:', sql_for_run)
-                results = run_sql(sql_geral)
+            # with TimeExecution(print_date=True):  # 'gerar_espelho'
+            # print('Running SQL for espelho:', sql_for_run)
+            results = run_sql(sql_geral)
 
             return results
 
         # results = exec_sql_espelho_v1(filter_sql)
-        results = exec_sql_espelho_v2(filter_sql)
+        results = exec_sql_espelho_v2(cleaned_data)
+
+        agrupamento_select = filters_data.pop("agrupamento", "fonte")
+        agrupamentos = dict(
+            [
+                ("orgao", 7),
+                ("unidade", 10),
+                ("funcao", 13),
+                ("subfuncao", 17),
+                ("programa", 22),
+                ("acao", 28),
+                ("natureza_1", 30),
+                ("natureza_2", 32),
+                ("natureza_3", 35),
+                ("natureza_4", 38),
+                ("natureza_5", 41),
+                ("fonte_1", 45),
+                ("fonte_2", 49),
+            ]
+        )
+
+        agrupamentos_inverse = {v: k for k, v in agrupamentos.items()}
 
         rs = []
         lr_old = 0
