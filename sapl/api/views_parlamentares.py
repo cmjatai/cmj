@@ -85,6 +85,7 @@ class _LegislaturaViewSet:
 
     @action(detail=True)
     def parlamentares(self, request, *args, **kwargs):
+        from sapl.api.serializers import ParlamentarSerializerVerbose
 
         def get_serializer_context():
             return {"request": self.request, "legislatura": kwargs["pk"]}
