@@ -3,6 +3,7 @@ from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import Group, PermissionsMixin
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.postgres.fields import ArrayField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -1068,7 +1069,7 @@ class IAQuota(models.Model):
         verbose_name=_("Modelo"),
     )
 
-    ativo = models.BooleanField(_("Ativo"), choices=YES_NO_CHOICES, default=True)
+    ativo = models.BooleanField(_("Ativo"), choices=YES_NO_CHOICES, default=False)
 
     batch_size = models.PositiveIntegerField(
         verbose_name=_("Tamanho do Lote"),
@@ -1084,10 +1085,36 @@ class IAQuota(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(5)],
     )
 
+    descricao = models.TextField(
+        verbose_name=_("Descrição"),
+        help_text=_("Descrição do modelo da Quota IA."),
+        blank=True,
+        default="",
+    )
+
+    class ServicosAutorizados(models.TextChoices):
+        IA_GENAI_BASE = "cmj.genia.IAGenaiBase", _("IA Genai Base")
+        IA_CLASSIFICACAO_MATERIA_SERVICE = "cmj.genia.IAClassificacaoMateriaService", _(
+            "IA Classificação Matéria Service"
+        )
+        IA_ANALISE_SIMILARIDADE_SERVICE = "cmj.genia.IAAnaliseSimilaridadeService", _(
+            "IA Análise Similaridade Service"
+        )
+
+    servicos_autorizados = ArrayField(
+        models.CharField(max_length=100, choices=ServicosAutorizados.choices),
+        verbose_name=_("Serviços Autorizados"),
+        blank=True,
+        default=list,
+    )
+
     class Meta:
         verbose_name = _("Quota IA")
         verbose_name_plural = _("Quotas IA")
-        ordering = ("-modelo",)
+        ordering = (
+            "-ativo",
+            "-modelo",
+        )
 
     def __str__(self):
         return "%s - %d (Remaining: %d; Ativo: %s)" % (
@@ -1096,6 +1123,10 @@ class IAQuota(models.Model):
             self.remaining_quota(),
             self.ativo,
         )
+
+    @property
+    def str_remaining_quota(self):
+        return "%d" % self.remaining_quota()
 
     def has_margin(self):
         """

@@ -2,15 +2,12 @@ import json
 import logging
 import re
 import time
-from math import e
-from pydoc import text
 
 import pymupdf
 import yaml
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.urls.base import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from google import genai
@@ -93,22 +90,22 @@ class IAGenaiBase:
     top_p = 0.95
     response_mime_type = "application/json"
 
-    # modelos llm permitidos
-    allowed_models = [
-        "gemini-2.5-flash-lite",
-        "gemini-2.5-flash",
-        "gemini-3-pro-preview",
-        "gemini-3-flash-preview",
-        "gemini-3.1-pro-preview",
-        "gemini-3.1-flash-lite-preview",
-        "gemini-3.1-pro-preview-customtools",
-    ]
+    _chat = None
+    _chat_quota = None
 
     def __init__(self, *args, **kwargs):
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-    _chat = None
-    _chat_quota = None
+    def update_or_create_llm_models_in_quotamodel(self):
+        models = self.client.models.list()
+        for model in models.page:
+            model_name = model.name.split("/")[-1]
+            quota, created = IAQuota.objects.update_or_create(modelo=model_name)
+            if created:
+                quota.servicos_autorizados = []
+
+            quota.descricao = repr(model)
+            quota.save()
 
     def chat_send_message(self, message, history, tools=None):
         if not self._chat:
@@ -165,7 +162,11 @@ class IAGenaiBase:
         e_message = _("Nenhum Modelo com Quota para consumo disponível.")
 
         qms = IAQuota.objects.quotas_with_margin(ascending=ascending)
-        qms = qms.filter(modelo__in=self.allowed_models)
+        qms = qms.filter(
+            servicos_autorizados__contains=[
+                f"{self.__class__.__module__}.{self.__class__.__name__}",
+            ]
+        )
         if not qms:
             raise Exception(e_message)
 
@@ -272,13 +273,6 @@ class IAClassificacaoMateriaService(IAGenaiBase):
     _model = None  # Model from app django
     _content_type = None  # ContentType from app django
     _object = None  # Object from app django
-
-    allowed_models = [
-        # "gemini-2.0-flash-lite",
-        # "gemini-2.0-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.5-flash",
-    ]
 
     @property
     def model(self):
@@ -503,13 +497,6 @@ class IAAnaliseSimilaridadeService(IAGenaiBase):
     """
     Classe para análise de similaridade
     """
-
-    allowed_models = [
-        # "gemini-2.0-flash-lite",
-        # "gemini-2.0-flash",
-        "gemini-2.5-flash-lite",
-        "gemini-2.5-flash",
-    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

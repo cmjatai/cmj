@@ -15,6 +15,7 @@ class ChatManager:
     def __init__(self):
         self.ia = IAGenaiBase()
         # self.ia.ia_model_name = 'gemini-3-flash-preview'
+        self.ia.refresh_llm_models_in_quota()
 
     def query_gemini(self, user_message, history):
         """Envia para Gemini com histórico completo"""
