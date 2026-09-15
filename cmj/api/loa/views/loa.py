@@ -384,22 +384,6 @@ class LoaViewSet:
 
         filters_data = dict(filters_data)
 
-        filter_sql = []
-        field_to_alias = {
-            "orgao": "o",
-            "unidade": "u",
-            "funcao": "f",
-            "subfuncao": "sf",
-            "programa": "p",
-            "acao": "a",
-            "natureza_1": "n",
-            "natureza_2": "n",
-            "natureza_3": "n",
-            "natureza_4": "n",
-            "natureza_5": "n",
-            "fonte": "fte",
-        }
-
         cleaned_data = {}
         for k, v in filters_data.items():
 
@@ -423,13 +407,27 @@ class LoaViewSet:
 
         loa = self.loa
 
-        # TODO: refatorar mask para montar o case com laço
         # mask_codigo = '1234.67.90.23.567.9012.4.678.0.2.45.78.01.345.789'
         # mask_codbas = '1234 56 78 90 123 4567 89012 345678901234 567 901'
         parts_codigo = [4, 7, 10, 13, 17, 22, 28, 41, 45, 49]
         parts_codigo_base = [4, 6, 8, 10, 13, 17, 22, 34, 37, 41]
 
-        def exec_sql_espelho_v2(_cleaned_data):
+        def exec_sql_espelho_v2(_cleaned_data={}):
+
+            field_to_alias = {
+                "orgao": "o",
+                "unidade": "u",
+                "funcao": "f",
+                "subfuncao": "sf",
+                "programa": "p",
+                "acao": "a",
+                "natureza_1": "n",
+                "natureza_2": "n",
+                "natureza_3": "n",
+                "natureza_4": "n",
+                "natureza_5": "n",
+                "fonte": "fte",
+            }
 
             _filter_sql = []
             for k, v in _cleaned_data.items():
