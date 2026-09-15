@@ -382,37 +382,11 @@ class LoaViewSet:
 
     def construct_espelho(self, filters_data):
 
-        filters_data = dict(filters_data)
-
-        cleaned_data = {}
-        for k, v in filters_data.items():
-
-            if not v:
-                continue
-
-            v_str = str(v).strip()
-            parts = v_str.split("/", 1)
-
-            v0 = parts[0].strip()
-
-            v1 = parts[1].strip() if len(parts) == 2 else None
-
-            try:
-                v0_int = int(v0)
-                v1_int = int(v1) if v1 is not None else None
-            except ValueError:
-                continue
-
-            cleaned_data[k] = v
-
         loa = self.loa
 
-        # mask_codigo = '1234.67.90.23.567.9012.4.678.0.2.45.78.01.345.789'
-        # mask_codbas = '1234 56 78 90 123 4567 89012 345678901234 567 901'
-        parts_codigo = [4, 7, 10, 13, 17, 22, 28, 41, 45, 49]
-        parts_codigo_base = [4, 6, 8, 10, 13, 17, 22, 34, 37, 41]
-
-        def exec_sql_espelho_v2(_cleaned_data={}):
+        def exec_sql_espelho_v2(
+            _cleaned_data={}, _parts_codigo={}, _parts_codigo_base={}
+        ):
 
             field_to_alias = {
                 "orgao": "o",
@@ -431,6 +405,8 @@ class LoaViewSet:
 
             _filter_sql = []
             for k, v in _cleaned_data.items():
+                if k not in field_to_alias:
+                    continue
                 if not v:
                     continue
                 v_str = str(v).strip()
@@ -485,7 +461,7 @@ class LoaViewSet:
                     FROM despesas_base GROUP BY SUBSTR(codigo_base, 1,  {partcb}), SUBSTR(codigo, 1, {partc})
             """
             unions = []
-            for partcb, partc in zip(parts_codigo_base, parts_codigo):
+            for partcb, partc in zip(_parts_codigo_base, _parts_codigo):
                 unions.append(
                     sql_sum_registros_contabeis.format(partcb=partcb, partc=partc)
                 )
@@ -539,8 +515,40 @@ class LoaViewSet:
 
             return results
 
+        filters_data = dict(filters_data)
+
+        cleaned_data = {}
+        for k, v in filters_data.items():
+
+            if not v:
+                continue
+
+            v_str = str(v).strip()
+            parts = v_str.split("/", 1)
+
+            v0 = parts[0].strip()
+
+            v1 = parts[1].strip() if len(parts) == 2 else None
+
+            try:
+                v0_int = int(v0)
+                v1_int = int(v1) if v1 is not None else None
+            except ValueError:
+                continue
+
+            cleaned_data[k] = v
+
+        # mask_codigo = '1234.67.90.23.567.9012.4.678.0.2.45.78.01.345.789'
+        # mask_codbas = '1234 56 78 90 123 4567 89012 345678901234 567 901'
+        parts_codigo = [4, 7, 10, 13, 17, 22, 28, 41, 45, 49]
+        parts_codigo_base = [4, 6, 8, 10, 13, 17, 22, 34, 37, 41]
+
         # results = exec_sql_espelho_v1(filter_sql)
-        results = exec_sql_espelho_v2(cleaned_data)
+        results = exec_sql_espelho_v2(
+            cleaned_data,
+            _parts_codigo=parts_codigo,
+            _parts_codigo_base=parts_codigo_base,
+        )
 
         agrupamento_select = filters_data.pop("agrupamento", "fonte")
         agrupamentos = dict(
@@ -563,8 +571,6 @@ class LoaViewSet:
 
         agrupamentos_inverse = {v: k for k, v in agrupamentos.items()}
 
-        rs = []
-        lr_old = 0
         value = Decimal(0)
 
         if agrupamento_select in (
@@ -577,11 +583,22 @@ class LoaViewSet:
             agrupamento_select = "natureza_5"
 
         agrupamento = agrupamentos.get(agrupamento_select, 49)
+
         agrupamento_local = agrupamento
+
+        rs = []
+        lr_old = 0
         for i, rr in enumerate(results):
             lr = len(rr[0])
             # remove natureza da despesa do tipo X.X.XX.XX.00 se este for igual a X.X.XX.XX
             if lr == 41 and rr[1][-2:] == "00":
+                if rr[2:6] == results[i - 1][2:6]:
+                    continue
+
+            # remove fonte de recurso do tipo XXX.000, ativando a XXX
+            if lr == 49 and rr[1][-3:] == "000":
+                rs[-1][-1] = True
+                continue
                 if rr[2:6] == results[i - 1][2:6]:
                     continue
 
