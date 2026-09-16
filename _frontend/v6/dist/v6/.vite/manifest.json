@@ -1,10 +1,6 @@
 {
-  "_ModelSelect-D3JDbIjF.css": {
-    "file": "v6/ModelSelect-D3JDbIjF.css",
-    "src": "_ModelSelect-D3JDbIjF.css"
-  },
-  "_ModelSelect-DfE6Fg8a.js": {
-    "file": "v6/ModelSelect-DfE6Fg8a.js",
+  "_ModelSelect-Bg4R_7-M.js": {
+    "file": "v6/ModelSelect-Bg4R_7-M.js",
     "name": "ModelSelect",
     "imports": [
       "_vendor-B_402C7n.js",
@@ -14,12 +10,16 @@
       "v6/ModelSelect-D3JDbIjF.css"
     ]
   },
+  "_ModelSelect-D3JDbIjF.css": {
+    "file": "v6/ModelSelect-D3JDbIjF.css",
+    "src": "_ModelSelect-D3JDbIjF.css"
+  },
   "_NormaSimpleModalView-6-cesBck.css": {
     "file": "v6/NormaSimpleModalView-6-cesBck.css",
     "src": "_NormaSimpleModalView-6-cesBck.css"
   },
-  "_NormaSimpleModalView-QBNIfMDu.js": {
-    "file": "v6/NormaSimpleModalView-QBNIfMDu.js",
+  "_NormaSimpleModalView-UiNTnZq4.js": {
+    "file": "v6/NormaSimpleModalView-UiNTnZq4.js",
     "name": "NormaSimpleModalView",
     "imports": [
       "_vendor-B_402C7n.js",
@@ -36,8 +36,8 @@
       "_vendor-B_402C7n.js"
     ]
   },
-  "_WidgetCronometroBase-Byp5qVaz.js": {
-    "file": "v6/WidgetCronometroBase-Byp5qVaz.js",
+  "_WidgetCronometroBase-DLD7c-a9.js": {
+    "file": "v6/WidgetCronometroBase-DLD7c-a9.js",
     "name": "WidgetCronometroBase",
     "imports": [
       "_vendor-B_402C7n.js",
@@ -67,7 +67,7 @@
     ]
   },
   "components/atoms/Alert.vue": {
-    "file": "v6/Alert-x564LzeD.js",
+    "file": "v6/Alert-_EkOn7H9.js",
     "name": "Alert",
     "src": "components/atoms/Alert.vue",
     "isDynamicEntry": true,
@@ -78,7 +78,7 @@
     ]
   },
   "components/atoms/RefreshPage.vue": {
-    "file": "v6/RefreshPage-BV37WbrN.js",
+    "file": "v6/RefreshPage-C5IVdh9v.js",
     "name": "RefreshPage",
     "src": "components/atoms/RefreshPage.vue",
     "isDynamicEntry": true,
@@ -92,7 +92,7 @@
     ]
   },
   "main.js": {
-    "file": "v6/main-CF18d8mk.js",
+    "file": "v6/main-CGOG9ggC.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
@@ -147,7 +147,7 @@
     ]
   },
   "modules/arq/admin/AdminLayout.vue": {
-    "file": "v6/AdminLayout-BmYRrdeT.js",
+    "file": "v6/AdminLayout-Bq_KQ3Gz.js",
     "name": "AdminLayout",
     "src": "modules/arq/admin/AdminLayout.vue",
     "isDynamicEntry": true,
@@ -162,7 +162,7 @@
     ]
   },
   "modules/arq/admin/DocListLayout.vue": {
-    "file": "v6/DocListLayout-DQAnexq_.js",
+    "file": "v6/DocListLayout-7MdRxdgF.js",
     "name": "DocListLayout",
     "src": "modules/arq/admin/DocListLayout.vue",
     "isDynamicEntry": true,
@@ -177,14 +177,14 @@
     ]
   },
   "modules/arq/draft/DraftManage.vue": {
-    "file": "v6/DraftManage-DnfCSd6N.js",
+    "file": "v6/DraftManage--GfmJ6DO.js",
     "name": "DraftManage",
     "src": "modules/arq/draft/DraftManage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
       "main.js",
-      "_ModelSelect-DfE6Fg8a.js",
+      "_ModelSelect-Bg4R_7-M.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
@@ -192,7 +192,7 @@
     ]
   },
   "modules/chat/ChatModule.vue": {
-    "file": "v6/ChatModule-2QEpSL9C.js",
+    "file": "v6/ChatModule-DFa0uElp.js",
     "name": "ChatModule",
     "src": "modules/chat/ChatModule.vue",
     "isDynamicEntry": true,
@@ -202,11 +202,11 @@
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
-      "v6/ChatModule-Byi3oYT7.css"
+      "v6/ChatModule-WHu2emdD.css"
     ]
   },
   "modules/chat/ChatSessionView.vue": {
-    "file": "v6/ChatSessionView-CyaVmHKY.js",
+    "file": "v6/ChatSessionView-Y-krncTK.js",
     "name": "ChatSessionView",
     "src": "modules/chat/ChatSessionView.vue",
     "isDynamicEntry": true,
@@ -216,11 +216,11 @@
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
-      "v6/ChatSessionView-BjKJDMgi.css"
+      "v6/ChatSessionView-BxdyT6fJ.css"
     ]
   },
   "modules/loa/LoaModule.vue": {
-    "file": "v6/LoaModule-Cc_fpZU6.js",
+    "file": "v6/LoaModule-xc0vRUOw.js",
     "name": "LoaModule",
     "src": "modules/loa/LoaModule.vue",
     "isDynamicEntry": true,
@@ -231,7 +231,7 @@
     ]
   },
   "modules/loa/dashboard/LoaDashboard.vue": {
-    "file": "v6/LoaDashboard-NI_uvDKH.js",
+    "file": "v6/LoaDashboard-CXhoFBCf.js",
     "name": "LoaDashboard",
     "src": "modules/loa/dashboard/LoaDashboard.vue",
     "isDynamicEntry": true,
@@ -245,7 +245,7 @@
     ]
   },
   "modules/loa/pcl/LoaPrestacaoContas.vue": {
-    "file": "v6/LoaPrestacaoContas-D8wTRnpP.js",
+    "file": "v6/LoaPrestacaoContas-DWjEaWc2.js",
     "name": "LoaPrestacaoContas",
     "src": "modules/loa/pcl/LoaPrestacaoContas.vue",
     "isDynamicEntry": true,
@@ -259,7 +259,7 @@
     ]
   },
   "modules/painelset/PainelSetModule.vue": {
-    "file": "v6/PainelSetModule-ZwLky2U4.js",
+    "file": "v6/PainelSetModule-giXEPjix.js",
     "name": "PainelSetModule",
     "src": "modules/painelset/PainelSetModule.vue",
     "isDynamicEntry": true,
@@ -274,7 +274,7 @@
     ]
   },
   "modules/painelset/painel/Painel.vue": {
-    "file": "v6/Painel-B4PwSSTy.js",
+    "file": "v6/Painel-CLXKfM7y.js",
     "name": "Painel",
     "src": "modules/painelset/painel/Painel.vue",
     "isDynamicEntry": true,
@@ -289,7 +289,7 @@
     ]
   },
   "modules/painelset/painelsetadmin/PainelSetAdmin.vue": {
-    "file": "v6/PainelSetAdmin-4FIePwId.js",
+    "file": "v6/PainelSetAdmin-C3tSo1sE.js",
     "name": "PainelSetAdmin",
     "src": "modules/painelset/painelsetadmin/PainelSetAdmin.vue",
     "isDynamicEntry": true,
@@ -303,7 +303,7 @@
     ]
   },
   "modules/painelset/painelsetadmin/PainelSetEventoList.vue": {
-    "file": "v6/PainelSetEventoList-ULiILLVq.js",
+    "file": "v6/PainelSetEventoList-v_q8FXM7.js",
     "name": "PainelSetEventoList",
     "src": "modules/painelset/painelsetadmin/PainelSetEventoList.vue",
     "isDynamicEntry": true,
@@ -320,7 +320,7 @@
     ]
   },
   "modules/painelset/painelsetadmin/PainelSetEventoListItem.vue": {
-    "file": "v6/PainelSetEventoListItem-D4hU8mWQ.js",
+    "file": "v6/PainelSetEventoListItem-CAbEs2-e.js",
     "name": "PainelSetEventoListItem",
     "src": "modules/painelset/painelsetadmin/PainelSetEventoListItem.vue",
     "isDynamicEntry": true,
@@ -334,7 +334,7 @@
     ]
   },
   "modules/painelset/painelsetadmin/PainelSetModuleAdmin.vue": {
-    "file": "v6/PainelSetModuleAdmin-BV8KRrB_.js",
+    "file": "v6/PainelSetModuleAdmin-B4-QrAQ_.js",
     "name": "PainelSetModuleAdmin",
     "src": "modules/painelset/painelsetadmin/PainelSetModuleAdmin.vue",
     "isDynamicEntry": true,
@@ -348,14 +348,14 @@
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue": {
-    "file": "v6/WidgetCronometroEvento-DTh5HGnN.js",
+    "file": "v6/WidgetCronometroEvento-9XJQq6xF.js",
     "name": "WidgetCronometroEvento",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroEvento.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
       "main.js",
-      "_WidgetCronometroBase-Byp5qVaz.js",
+      "_WidgetCronometroBase-DLD7c-a9.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
@@ -363,14 +363,14 @@
     ]
   },
   "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue": {
-    "file": "v6/WidgetCronometroPalavra-3nhAScm1.js",
+    "file": "v6/WidgetCronometroPalavra-DGIaGPkD.js",
     "name": "WidgetCronometroPalavra",
     "src": "modules/painelset/widgets/painelset/WidgetCronometroPalavra.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
       "main.js",
-      "_WidgetCronometroBase-Byp5qVaz.js",
+      "_WidgetCronometroBase-DLD7c-a9.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
@@ -378,14 +378,14 @@
     ]
   },
   "modules/painelset/widgets/painelset/WidgetStatusEventoSessao.vue": {
-    "file": "v6/WidgetStatusEventoSessao-Ds3kssET.js",
+    "file": "v6/WidgetStatusEventoSessao-kvHSVfzm.js",
     "name": "WidgetStatusEventoSessao",
     "src": "modules/painelset/widgets/painelset/WidgetStatusEventoSessao.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
       "main.js",
-      "_WidgetCronometroBase-Byp5qVaz.js",
+      "_WidgetCronometroBase-DLD7c-a9.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
@@ -393,7 +393,7 @@
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoItemEmPauta.vue": {
-    "file": "v6/WidgetSessaoItemEmPauta-hXYKy9Rh.js",
+    "file": "v6/WidgetSessaoItemEmPauta-BqtCNx26.js",
     "name": "WidgetSessaoItemEmPauta",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoItemEmPauta.vue",
     "isDynamicEntry": true,
@@ -407,7 +407,7 @@
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoPlenariaStatus.vue": {
-    "file": "v6/WidgetSessaoPlenariaStatus-b6flJbl1.js",
+    "file": "v6/WidgetSessaoPlenariaStatus-DiH9O4vS.js",
     "name": "WidgetSessaoPlenariaStatus",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoPlenariaStatus.vue",
     "isDynamicEntry": true,
@@ -421,7 +421,7 @@
     ]
   },
   "modules/painelset/widgets/sessao/WidgetSessaoRegistroPresenca.vue": {
-    "file": "v6/WidgetSessaoRegistroPresenca-CzAltpSI.js",
+    "file": "v6/WidgetSessaoRegistroPresenca-DRpbErqK.js",
     "name": "WidgetSessaoRegistroPresenca",
     "src": "modules/painelset/widgets/sessao/WidgetSessaoRegistroPresenca.vue",
     "isDynamicEntry": true,
@@ -435,7 +435,7 @@
     ]
   },
   "modules/painelset/widgets/utils/WidgetHtmlCode.vue": {
-    "file": "v6/WidgetHtmlCode-B7_zvrL2.js",
+    "file": "v6/WidgetHtmlCode-DRD-B1n1.js",
     "name": "WidgetHtmlCode",
     "src": "modules/painelset/widgets/utils/WidgetHtmlCode.vue",
     "isDynamicEntry": true,
@@ -449,7 +449,7 @@
     ]
   },
   "modules/painelset/widgets/utils/WidgetYoutubeEmbed.vue": {
-    "file": "v6/WidgetYoutubeEmbed-BOZ3zhOW.js",
+    "file": "v6/WidgetYoutubeEmbed-BukmBFmA.js",
     "name": "WidgetYoutubeEmbed",
     "src": "modules/painelset/widgets/utils/WidgetYoutubeEmbed.vue",
     "isDynamicEntry": true,
@@ -463,14 +463,14 @@
     ]
   },
   "modules/root/RootPage.vue": {
-    "file": "v6/RootPage-Bf4Ge8kJ.js",
+    "file": "v6/RootPage-BP6f9iF0.js",
     "name": "RootPage",
     "src": "modules/root/RootPage.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
       "main.js",
-      "_NormaSimpleModalView-QBNIfMDu.js",
+      "_NormaSimpleModalView-UiNTnZq4.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
@@ -478,14 +478,14 @@
     ]
   },
   "modules/sessao/SessaoPlenariaList.vue": {
-    "file": "v6/SessaoPlenariaList-basyadPR.js",
+    "file": "v6/SessaoPlenariaList-D7H6MFb8.js",
     "name": "SessaoPlenariaList",
     "src": "modules/sessao/SessaoPlenariaList.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
       "main.js",
-      "_ModelSelect-DfE6Fg8a.js",
+      "_ModelSelect-Bg4R_7-M.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
@@ -493,13 +493,13 @@
     ]
   },
   "modules/sessao/SessaoPlenariaModule.vue": {
-    "file": "v6/SessaoPlenariaModule-BIl7VAQP.js",
+    "file": "v6/SessaoPlenariaModule-BgxUdLxi.js",
     "name": "SessaoPlenariaModule",
     "src": "modules/sessao/SessaoPlenariaModule.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
-      "_WidgetCronometroBase-Byp5qVaz.js",
+      "_WidgetCronometroBase-DLD7c-a9.js",
       "main.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
@@ -508,14 +508,14 @@
     ]
   },
   "modules/sessao/SessaoPlenariaView.vue": {
-    "file": "v6/SessaoPlenariaView-BwAidK77.js",
+    "file": "v6/SessaoPlenariaView-C4hRajCy.js",
     "name": "SessaoPlenariaView",
     "src": "modules/sessao/SessaoPlenariaView.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-B_402C7n.js",
       "main.js",
-      "_NormaSimpleModalView-QBNIfMDu.js",
+      "_NormaSimpleModalView-UiNTnZq4.js",
       "_vendor_fortawesome-C39lT9Km.js"
     ],
     "css": [
@@ -523,7 +523,7 @@
     ]
   },
   "views/Error404.vue": {
-    "file": "v6/Error404-DIYbyPEd.js",
+    "file": "v6/Error404-CGu3CmRM.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
