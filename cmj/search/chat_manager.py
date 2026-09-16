@@ -114,7 +114,7 @@ class ChatManager:
                 and sessions_today >= self.MAX_SESSIONS_PER_USER
             ):
                 raise ValueError(
-                    f"Devido aos custos com I.A. o limite de conversas por usuário atingido ({self.MAX_SESSIONS_PER_USER})."
+                    f"Devido aos custos com I.A. o limite de conversas por usuário por dia foi atingido: ({self.MAX_SESSIONS_PER_USER})."
                 )
 
         # Cria ou obtém a sessão
@@ -128,7 +128,7 @@ class ChatManager:
             and chat_session.messages.count() >= self.MAX_MESSAGES_PER_SESSION
         ):
             raise ValueError(
-                f"Devido aos custos com I.A. o limite de mensagens por conversa foi atingido ({self.MAX_MESSAGES_PER_SESSION})."
+                f"Devido aos custos com I.A. o limite de mensagens por conversa foi atingido: ({self.MAX_MESSAGES_PER_SESSION})."
             )
 
         # Cria a mensagem
