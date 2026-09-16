@@ -37,7 +37,7 @@
             type="search"
             :value="value.search"
             @change="val => updateFilter('search', val)"
-            placeholder="Filtre por termos nos Ajustes e Emendas"
+            placeholder="Filtre por Número ou termos nos registros..."
             :disabled="filtersDisabled"
           ></b-form-input>
           <b-input-group-append>

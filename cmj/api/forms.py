@@ -1,7 +1,7 @@
 import logging
 
 from django.db.models import Q
-from django_filters import CharFilter, ModelChoiceFilter, MultipleChoiceFilter
+from django_filters import CharFilter, ModelChoiceFilter
 
 from cmj.loa.models import (
     EmendaLoa,
@@ -103,6 +103,14 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
 
     def filter_search(self, queryset, name, value):
         query = value.split(" ")
+
+        lquery = len(query)
+        if lquery == 0:
+            return queryset
+        elif lquery == 1:
+            q1 = query[0]
+            if q1.isdigit():
+                return queryset.filter(materia__numero=int(q1))
 
         q = Q()
         for termo in query:

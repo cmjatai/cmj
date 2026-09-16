@@ -24,8 +24,11 @@
 
           <!-- Título e badges -->
           <div class="flex-grow-1">
+            <small class="text-muted d-block">
+              Identificador Único da Emenda:
+            </small>
             <h3 class="mb-1 font-weight-bold text-wrap text-primary">
-              <a :href="registro.link_detail_backend" target="_blank">
+              <a :href="registro.link_detail_backend" target="_blank" title="Identificador Único da Emenda. Clique para abrir em nova aba">
                 {{ tituloRegistro }}
                 <i class="fas fa-external-link-alt fa-sm ml-1 text-muted"></i>
               </a>
