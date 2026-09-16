@@ -1,5 +1,7 @@
 import logging
 
+from channels.db import database_sync_to_async
+
 from cmj.genia import IAGenaiBase
 from cmj.search.models import ChatMessage, ChatSession, Embedding
 
@@ -15,7 +17,7 @@ class ChatManager:
     def __init__(self):
         self.ia = IAGenaiBase()
         # self.ia.ia_model_name = 'gemini-3-flash-preview'
-        self.ia.refresh_llm_models_in_quota()
+        database_sync_to_async(self.ia.update_or_create_llm_models_in_quotamodel)()
 
     def query_gemini(self, user_message, history):
         """Envia para Gemini com histórico completo"""
