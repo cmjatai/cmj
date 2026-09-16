@@ -98,7 +98,7 @@
       v-else
       class="chat-input-area permission-denied"
     >
-      <p>LegisBee está em desenvolvimento.</p>
+      <p>LegisBee está em fase de testes e aprendizado.</p>
       <p v-if="false">
         Você não tem permissão para acessar o chat.
       </p>

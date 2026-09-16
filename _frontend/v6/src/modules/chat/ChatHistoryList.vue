@@ -58,7 +58,7 @@
             As respostas da IA podem estar incorretas ou desatualizadas.
             Utilize com cautela, para fins informativos. Confira sempre as fontes originais.
           </em><br><br>
-          <em>LegisBee está em testes.</em>
+          <em>LegisBee está em fase de testes e aprendizado. Você pode abrir apenas 2 conversas por dia e, em cada conversa, realizar apenas 4 de interações.</em>
         </small>
       </div>
     </div>
