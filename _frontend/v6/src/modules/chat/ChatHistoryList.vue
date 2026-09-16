@@ -57,7 +57,8 @@
           <em>
             As respostas da IA podem estar incorretas ou desatualizadas.
             Utilize com cautela, para fins informativos. Confira sempre as fontes originais.
-          </em>
+          </em><br><br>
+          <em>LegisBee está em testes.</em>
         </small>
       </div>
     </div>

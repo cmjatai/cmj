@@ -1,6 +1,7 @@
 import logging
 
 from channels.db import database_sync_to_async
+from django.utils import timezone
 
 from cmj.genia import IAGenaiBase
 from cmj.search.models import ChatMessage, ChatSession, Embedding
@@ -100,12 +101,17 @@ class ChatManager:
                 }
             )
 
+        today = timezone.localdate()
+
         # Verifica limite de sessões antes de criar uma nova
         if not ChatSession.objects.filter(session_id=session_id).exists():
+
+            # quantas sessões o usuário tem no dia de hoje
+            sessions_today = ChatSession.objects.filter(user=user, created_at__date=today).count()
+
             if (
                 not user.is_superuser
-                and ChatSession.objects.filter(user=user).count()
-                >= self.MAX_SESSIONS_PER_USER
+                and sessions_today >= self.MAX_SESSIONS_PER_USER
             ):
                 raise ValueError(
                     f"Devido aos custos com I.A. o limite de conversas por usuário atingido ({self.MAX_SESSIONS_PER_USER})."

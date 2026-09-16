@@ -10,12 +10,12 @@
 
     <!-- Mobile Toggle Button (Visible only on small screens) -->
     <button
-      class="btn btn-primary d-md-none position-fixed m-3"
-      style="z-index: 1050; bottom: 0; right: 0;"
+      class="btn btn-primary d-md-none"
       type="button"
       data-bs-toggle="offcanvas"
       data-bs-target="#chatHistoryOffcanvas"
       aria-controls="chatHistoryOffcanvas"
+      id="chatHistoryToggle"
     >
       <FontAwesomeIcon icon="history" />
     </button>
@@ -92,5 +92,12 @@ const userCanUserChat = computed(() => authStore.hasPermission('search.can_use_c
   height: 100%;
   overflow: hidden;
   position: relative;
+}
+#chatHistoryToggle {
+  z-index: 1050;
+  bottom: 3px;
+  right: 3px;
+  position: fixed;
+  padding: 3px 7px;
 }
 </style>

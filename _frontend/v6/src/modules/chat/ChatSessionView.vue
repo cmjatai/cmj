@@ -8,11 +8,11 @@
       <h6>
         Fonte de Dados da LegisBee:
         <a
-          href="/norma/destaques"
+          href="/pesquisar/norma"
           target="_blank"
-          title="Inicialmente, apenas as normas de destaque estão disponíveis para pesquisa"
+          title="Base de Leis compiladas."
         >
-          Normas de Destaque
+          Base de Leis Compiladas
         </a>
       </h6>
       <span
@@ -583,6 +583,39 @@ textarea {
 
   &.limit-reached {
     color: #dc3545;
+  }
+}
+
+@media (max-width: 768px) {
+  .chat-input-area {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 5px;
+    font-size: 0.7rem;
+    gap: 5px;
+  }
+  .char-counter {
+    font-size: 0.6rem;
+  }
+
+  .send-btn {
+    width: 100%;
+    border-radius: 10px;
+    height: 30px;
+  }
+  .chat-header {
+    flex-direction: column;
+    align-items: stretch;
+    h6 {
+      font-size: 0.6rem;
+    }
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+    }
   }
 }
 </style>
