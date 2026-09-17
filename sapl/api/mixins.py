@@ -1,13 +1,15 @@
+import io
 import logging
 import os
 
 import fitz
 import pymupdf
 from django.conf import settings
-from django.http.response import Http404, HttpResponse
+from django.core.exceptions import PermissionDenied
+from django.http.response import HttpResponse
 from easy_thumbnails.files import get_thumbnailer
-from image_cropping.utils import get_backend
-from pymupdf import Point, Rect
+from PIL import Image, ImageDraw
+from pymupdf import Rect
 from rest_framework.exceptions import NotFound
 
 from cmj.core.models import AreaTrabalho
@@ -97,17 +99,25 @@ class ResponseFileMixin:
         try:
             fin = arquivo.path
             doc = pymupdf.open(fin)
-            pages = doc.pages() if not page else doc.pages(page - 1, page, 1)
+            pages = doc.pages()
 
-            grade = tuple(filter(lambda y: y, map(lambda x: int(x), grade.split(","))))
+            grade_int = tuple(map(lambda x: int(x), grade.split(",")))
+            grade = tuple(filter(lambda y: y, grade_int))
+
+            if grade and len(grade) != 4:
+                grade = grade_int
+
             excludes = tuple(
                 filter(lambda y: y, map(lambda x: x.strip(), anon.split(",")))
             )
 
             for p in pages:
+                if page and p.number != page - 1:
+                    continue
                 r = Rect(*grade) if grade else p.rect
-                areas_all = []
 
+                # anonimização se texto
+                areas_all = []
                 for e in excludes:
                     areas = p.search_for(e)
                     areas_all.extend(areas)
@@ -118,15 +128,67 @@ class ResponseFileMixin:
 
                 p.apply_redactions()
 
-            if settings.DEBUG:
-                doc.save("/home/leandro/TEMP/pdf_anon.pdf")
-                doc.close()
-                return
+                # anonimização se imagem
+
+                for img in p.get_images(full=True):
+                    xref = img[0]
+
+                    # Obtém a posição e o tamanho da imagem DENTRO da página do PDF
+                    # img[1] é o xref da máscara se houver, mas p.get_image_rects nos dá a área visual
+                    rects = p.get_image_rects(xref)
+                    if not rects:
+                        continue
+                    img_rect_in_page = rects[0]  # Posição da imagem na página
+
+                    # Se houver uma grade/restrição e ela não tocar nesta imagem, pula para a próxima
+                    if grade and not img_rect_in_page.intersects(r):
+                        continue
+
+                    # Extrai e abre a imagem com o Pillow
+                    base_image = doc.extract_image(xref)
+                    image_bytes = base_image["image"]
+                    image = Image.open(io.BytesIO(image_bytes))
+
+                    # Calcula a escala: quantos pixels da imagem equivalem a 1 ponto do PDF
+                    scale_x = image.width / img_rect_in_page.width
+                    scale_y = image.height / img_rect_in_page.height
+
+                    draw = ImageDraw.Draw(image)
+
+                    if grade:
+                        # Converte as coordenadas da 'grade' da página para os pixels reais da imagem
+                        # (Subtrai a origem da imagem e multiplica pela escala do pixel)
+                        pixel_x0 = (r.x0 - img_rect_in_page.x0) * scale_x
+                        pixel_y0 = (r.y0 - img_rect_in_page.y0) * scale_y
+                        pixel_x1 = (r.x1 - img_rect_in_page.x0) * scale_x
+                        pixel_y1 = (r.y1 - img_rect_in_page.y0) * scale_y
+
+                        draw.rectangle(
+                            [pixel_x0, pixel_y0, pixel_x1, pixel_y1], fill=(0, 0, 0)
+                        )
+                    else:
+                        # Se não há grade, pinta a imagem inteira de preto
+                        draw.rectangle(
+                            [0, 0, image.width, image.height], fill=(0, 0, 0)
+                        )
+
+                    # Salva em memória e atualiza imediatamente dentro do loop (indentação corrigida)
+                    output = io.BytesIO()
+                    image.save(output, format="PNG")
+
+                    # Correção do erro: Chamando o update_image na indentação correta
+                    p.replace_image(xref, stream=output.getvalue())
+
+            # if settings.DEBUG:
+            #    doc.save("/tmp/pdf_anon.pdf")
+            #    doc.close()
+            #    return
             fout = f"{fin}.new"
             doc.save(fout)
             doc.close()
             os.remove(fin)
-            os.rename(fout, fin)
+            if os.path.exists(fout) and os.path.getsize(fout) > 0:
+                os.rename(fout, fin)
 
         except Exception as e:
             print(e)
@@ -205,10 +267,16 @@ class ResponseFileMixin:
             self.thumbnail() if self.format_kwarg and mime.startswith("image") else None
         )
 
-        if settings.DEBUG:
-            file_path = (
-                arquivo.original_path if "original" in request.GET else arquivo.path
+        original = ""
+        if "original" in request.GET and not self.request.user.is_superuser:
+            raise PermissionDenied(
+                "Acesso ao arquivo original permitido apenas ao Administrador do PortalCMJ."
             )
+        else:
+            original = "original__"
+
+        if settings.DEBUG:
+            file_path = arquivo.original_path if original else arquivo.path
 
             if thumbnail:
                 file_path = thumbnail.path
@@ -224,8 +292,6 @@ class ResponseFileMixin:
         response["Cache-Control"] = "no-cache"
         response["Pragma"] = "no-cache"
         response["Expires"] = 0
-
-        original = "original__" if "original" in request.GET else ""
 
         if thumbnail:
             original = ""
