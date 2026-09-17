@@ -186,12 +186,12 @@ class ResponseFileMixin:
             fout = f"{fin}.new"
             doc.save(fout)
             doc.close()
-            os.remove(fin)
             if os.path.exists(fout) and os.path.getsize(fout) > 0:
+                os.remove(fin)
                 os.rename(fout, fin)
 
         except Exception as e:
-            print(e)
+            logger.error(f"Erro ao processar arquivo: {e}")
             pass
 
     def response_pdftotext(self, arquivo):
@@ -268,12 +268,12 @@ class ResponseFileMixin:
         )
 
         original = ""
-        if "original" in request.GET and not self.request.user.is_superuser:
+        if "original" in request.GET and self.request.user.is_superuser:
+            original = "original__"
+        elif "original" in request.GET:
             raise PermissionDenied(
                 "Acesso ao arquivo original permitido apenas ao Administrador do PortalCMJ."
             )
-        else:
-            original = "original__"
 
         if settings.DEBUG:
             file_path = arquivo.original_path if original else arquivo.path
