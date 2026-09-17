@@ -257,6 +257,11 @@ export default {
         params.search = this.filters_value.search
       }
 
+      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
+      if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
+        params.tipo__in = emendasTipos.join(',')
+      }
+
       return params
     },
     getEmendaParams (loaId, options = {}) {
@@ -270,11 +275,6 @@ export default {
         typeof this.filters_value.parlamentares === 'object'
       ) {
         params.parlamentares = this.filters_value.parlamentares.id
-      }
-
-      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
-      if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
-        params.tipo__in = emendasTipos.join(',')
       }
 
       if (options.withListOptions) {

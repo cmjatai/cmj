@@ -40,20 +40,24 @@
 
     <div class="row mx-0 mb-1" v-if="mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
       <div class="col-md-3 text-center py-1 border-right">
-        <small class="text-muted d-block">Empenhado</small>
+        <small class="text-muted d-block">Total Empenhado</small>
         <strong class="text-primary">R$ {{ formatCurrency(totalEmpenhado) }}</strong>
+        <small class="text-muted d-block text-blue">{{ percentual('empenhado').toFixed(2) }}%</small>
       </div>
       <div class="col-md-3 text-center py-1 border-right">
-        <small class="text-muted d-block">Liquidado</small>
+        <small class="text-muted d-block">Total Liquidado</small>
         <strong class="text-info">R$ {{ formatCurrency(totalLiquidado) }}</strong>
+        <small class="text-muted d-block text-blue">{{ percentual('liquidado').toFixed(2) }}%</small>
       </div>
       <div class="col-md-3 text-center py-1 border-right">
-        <small class="text-muted d-block">Pago</small>
+        <small class="text-muted d-block">Total Pago</small>
         <strong class="text-success">R$ {{ formatCurrency(totalPago) }}</strong>
+        <small class="text-muted d-block text-blue">{{ percentual('pago').toFixed(2) }}%</small>
       </div>
       <div class="col-md-3 text-center py-1">
-        <small class="text-muted d-block">Anulado</small>
+        <small class="text-muted d-block">Total Anulado</small>
         <strong class="text-danger">R$ {{ formatCurrency(totalAnulado) }}</strong>
+        <small class="text-muted d-block text-blue">{{ percentual('anulado').toFixed(2) }}%</small>
       </div>
     </div>
     <div class="row mx-0 mb-1" v-else-if="!mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
@@ -212,6 +216,11 @@ export default {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       })
+    },
+    percentual (item) {
+      const valor = this.totaisEmpenhos[`total_${item}`] || 0
+      const total = Number(this.totalGeral || 0)
+      return total ? (valor / total) * 100 : 0
     }
   }
 }
