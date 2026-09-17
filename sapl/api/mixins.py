@@ -148,7 +148,7 @@ class ResponseFileMixin:
                     # Extrai e abre a imagem com o Pillow
                     base_image = doc.extract_image(xref)
                     image_bytes = base_image["image"]
-                    fmt_original = base_image["ext"] # Ex: "jpeg" ou "png"
+                    fmt_original = base_image["ext"]  # Ex: "jpeg" ou "png"
                     image = Image.open(io.BytesIO(image_bytes))
 
                     # Converte para RGB caso seja JPEG e esteja em outro formato interno
@@ -180,11 +180,16 @@ class ResponseFileMixin:
 
                     # Salva em memória e atualiza imediatamente dentro do loop (indentação corrigida)
                     output = io.BytesIO()
-                    save_format = "JPEG" if fmt_original.lower() in ["jpg", "jpeg"] else "PNG"
+                    save_format = (
+                        "JPEG" if fmt_original.lower() in ["jpg", "jpeg"] else "PNG"
+                    )
                     image.save(output, format=save_format)
 
                     # Correção do erro: Chamando o update_image na indentação correta
                     p.replace_image(xref, stream=output.getvalue())
+
+                    p.add_redact_annot(img_rect_in_page, fill=None)
+                    p.apply_redactions(images=0)
 
             # if settings.DEBUG:
             #    doc.save("/tmp/pdf_anon.pdf")
@@ -290,6 +295,8 @@ class ResponseFileMixin:
 
             with open(file_path, "rb") as f:
                 response = HttpResponse(f, content_type=mime)
+            response["Cache-Control"] = "no-cache"
+            response["Pragma"] = "no-cache"
             response["Content-Disposition"] = 'inline; filename="%s"' % custom_filename
             return response
 
