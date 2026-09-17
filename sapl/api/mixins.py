@@ -138,6 +138,7 @@ class ResponseFileMixin:
                     rects = p.get_image_rects(xref)
                     if not rects:
                         continue
+
                     img_rect_in_page = rects[0]  # Posição da imagem na página
 
                     # Se houver uma grade/restrição e ela não tocar nesta imagem, pula para a próxima
@@ -147,7 +148,12 @@ class ResponseFileMixin:
                     # Extrai e abre a imagem com o Pillow
                     base_image = doc.extract_image(xref)
                     image_bytes = base_image["image"]
+                    fmt_original = base_image["ext"] # Ex: "jpeg" ou "png"
                     image = Image.open(io.BytesIO(image_bytes))
+
+                    # Converte para RGB caso seja JPEG e esteja em outro formato interno
+                    if fmt_original.upper() in ["JPEG", "JPG"] and image.mode != "RGB":
+                        image = image.convert("RGB")
 
                     # Calcula a escala: quantos pixels da imagem equivalem a 1 ponto do PDF
                     scale_x = image.width / img_rect_in_page.width
@@ -174,7 +180,8 @@ class ResponseFileMixin:
 
                     # Salva em memória e atualiza imediatamente dentro do loop (indentação corrigida)
                     output = io.BytesIO()
-                    image.save(output, format="PNG")
+                    save_format = "JPEG" if fmt_original.lower() in ["jpg", "jpeg"] else "PNG"
+                    image.save(output, format=save_format)
 
                     # Correção do erro: Chamando o update_image na indentação correta
                     p.replace_image(xref, stream=output.getvalue())
