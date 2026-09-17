@@ -52,7 +52,7 @@
       <div class="col-md-3 text-center py-1 border-right">
         <small class="text-muted d-block">Total Pago</small>
         <strong class="text-success">R$ {{ formatCurrency(totalPago) }}</strong>
-        <small class="text-muted d-block text-blue">{{ percentual('pago').toFixed(2) }}%</small>
+        <small class="text-muted d-block text-blue">{{ percentual('pago_bruto').toFixed(2) }}%</small>
       </div>
       <div class="col-md-3 text-center py-1">
         <small class="text-muted d-block">Total Anulado</small>

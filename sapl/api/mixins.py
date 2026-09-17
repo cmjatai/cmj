@@ -196,7 +196,12 @@ class ResponseFileMixin:
             #    doc.close()
             #    return
             fout = f"{fin}.new"
-            doc.save(fout)
+            doc.save(
+                fout,
+                garbage=4,
+                deflate=True,
+                use_bojstms=True,
+            )
             doc.close()
             if os.path.exists(fout) and os.path.getsize(fout) > 0:
                 os.remove(fin)
