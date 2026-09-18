@@ -454,17 +454,19 @@ class EmendaLoa(CmjSearchMixin):
             finalidade = finalidade.rstrip(" ")
             finalidade = finalidade.rstrip(".")
 
-            if self.entidade and not chave_entidade_presente:
-                finalidade += f". Entidade beneficiada: {self.entidade}."
+            # TODO: associação para 2027 em diante.
+            if self.loa.ano >= 2027:
+                if self.entidade and not chave_entidade_presente:
+                    finalidade += f". Entidade beneficiada: {self.entidade}."
 
-            finalidade = finalidade.rstrip(" ")
-            finalidade = finalidade.rstrip(".")
+                finalidade = finalidade.rstrip(" ")
+                finalidade = finalidade.rstrip(".")
 
-            if self.bairro and not chave_bairro_presente:
-                finalidade += f". Localidade beneficiada: {self.bairro}."
+                if self.bairro and not chave_bairro_presente:
+                    finalidade += f". Localidade beneficiada: {self.bairro}."
 
-            if finalidade and finalidade[-1] != ".":
-                finalidade += "."
+                if finalidade and finalidade[-1] != ".":
+                    finalidade += "."
 
             return finalidade
         except:
