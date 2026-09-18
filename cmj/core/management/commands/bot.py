@@ -27,47 +27,12 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        d = (
-            Documento.objects.filter(parent__isnull=True, public_date__isnull=False)
-            .exclude(slug__icontains="video")
-            .order_by("-public_date")
-            .first()
-        )
-        if not d.metadata:
-            d.metadata = {}
-        d.metadata["send"] = {}
-        d.save()
-
-        d = (
-            Documento.objects.filter(parent__isnull=True, public_date__isnull=False)
-            .order_by("-public_date")
-            .first()
-        )
-        if not d.metadata:
-            d.metadata = {}
-        d.metadata["send"] = {}
-        d.save()
-        return
-
-        m = MateriaLegislativa.objects.first()
-        m.metadata["signs"] = {}
-        m.metadata["send"] = {}
-        m.save()
-        # n = NormaJuridica.objects.first()
-        # n.save()
-        # task_send_rede_social(
-        #    self, 'telegram', serialize('json', [m])
-        # )
-
-        # send_telegram_materia_materialegislativa(m)
-        # m.save()
-        return
-
         self.start = options["start"]
 
         if self.start == "bot":
             self.start_bot()
             return
+        
         TOKEN = settings.TELEGRAM_CMJATAI_BOT_KEY
         API_ID = settings.TELEGRAM_API_ID
         API_HASH = settings.TELEGRAM_API_HASH
