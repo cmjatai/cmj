@@ -637,34 +637,54 @@ class ProcessoExterno(object):
     stdout = None
     stderr = None
 
-    def __init__(self, cmd, logger):
+    def __init__(self, cmd, logger, silent=True):
         self.cmd = cmd
         self.process = None
         self.logger = logger
+        if silent:
+            self.logger = lambda msg: None
+
+    def _logger(self, msg, level="info"):
+        # se logger é uma função
+        if callable(self.logger):
+            self.logger(msg)
+        else:
+            if level == "info":
+                self.logger.info(msg)
+            elif level == "error":
+                self.logger.error(msg)
+            elif level == "warning":
+                self.logger.warning(msg)
 
     def run(self, timeout):
 
-        # aceita cmd como string (tokenizada com shlex) ou lista de args já
-        # separados; nunca usa shell=True para não interpretar
-        # metacaracteres vindos de nomes de arquivo não confiáveis
-        argv = shlex.split(self.cmd) if isinstance(self.cmd, str) else list(self.cmd)
+        argv = self.cmd
+        if not isinstance(argv, str):
+            argv = " ".join(argv)
+        argv = shlex.split(argv)
 
         def target():
-            self.logger.info("Thread started")
-            self.process = subprocess.Popen(argv, shell=False, stdout=subprocess.PIPE)
+            self._logger("Thread started")
+            self.process = subprocess.Popen(
+                argv,
+                shell=False,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
             self.stdout, self.stderr = self.process.communicate()
             self.returncode = self.process.returncode
-            self.logger.info(self.returncode)
-            self.logger.info(self.stdout)
-            self.logger.info(self.stderr)
-            self.logger.info("Thread finished:")
+            self._logger(f"Return code: {self.returncode}")
+            self._logger(f"Stderr: {self.stderr}")
+            self._logger(f"Stdout: {self.stdout}")
+            self._logger("Thread finished: end")
 
         thread = threading.Thread(target=target)
         thread.start()
 
         thread.join(timeout)
         if thread.is_alive():
-            self.logger.info("Killed process")
+            self._logger("Killed process")
             self.process.kill()
             return None
             # thread.join()

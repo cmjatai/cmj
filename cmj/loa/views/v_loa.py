@@ -154,9 +154,9 @@ class LoaCrud(Crud):
                 return (
                     f"""
                     {rcl_previa}
-                    <small class="text-gray">
+                    <small>
                         <small>
-                            <em class="text-blue"><strong>{frase}</strong></em>
+                            <em class="text-orange"><strong>{frase}</strong></em>
                             <em>RCL referente ao ano anterior ao Projeto da LOA</em>
                         </small>
                     </small>
@@ -311,7 +311,7 @@ class LoaCrud(Crud):
                 nj = l.materia.normajuridica()
                 if not nj:
                     get_column = self.get_column("materia|fk_urlize_for_detail", "")
-                    return get_column["verbose_name"], get_column["text"]
+                    return get_column["verbose_name"], f'''{get_column["text"]}<em class="text-orange"><strong>Processo Legislativo em Andamento</strong></em>'''
 
                 return (
                     "Norma Jurídica",
