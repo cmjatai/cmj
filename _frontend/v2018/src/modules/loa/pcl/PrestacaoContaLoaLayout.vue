@@ -18,7 +18,7 @@
         :view-mode="viewMode"
         @update:page-size="onPageSizeChange"
         @update:current-page="onPageChange"
-        @update:view-mode="val => viewMode = val"
+        @update:view-mode="val => viewModeChange(val)"
         @reset="resetFilters"
         @loas-change="on_loas_change"
       />
@@ -33,7 +33,12 @@
         class="mt-3"
       />
 
-      <div class="pcldetalhe-list" v-if="viewMode === 'list' && (emendas_ajustes_list.length || fetching)">
+      <pcl-dashboard
+        v-if="filters_value.dash_activated && viewMode === 'dashboard' && emendas_ajustes_list.length"
+        :lista="emendas_ajustes_list"
+        :parlamentar-selecionado="filters_value.parlamentares"
+      />
+      <div class="pcldetalhe-list" v-else-if="viewMode === 'list' && (emendas_ajustes_list.length || fetching)">
         <template v-for="item in paginatedList">
           <pcl-detalhe-emenda
             v-if="item.__label__ === 'loa_emendaloa'"
@@ -56,11 +61,6 @@
           />
         </template>
       </div>
-      <pcl-dashboard
-        v-else-if="filters_value.dash_activated && viewMode === 'dashboard' && emendas_ajustes_list.length"
-        :lista="emendas_ajustes_list"
-        :parlamentar-selecionado="filters_value.parlamentares"
-      />
       <div v-else-if="ready && viewMode === 'list'" class="card text-muted text-center my-3 p-3 mx-5 font-weight-bold">
         Nenhum resultado encontrado para os filtros selecionados.
       </div>
@@ -93,7 +93,7 @@ export default {
       ready: false,
       viewMode: 'list',
       filters_value: {
-        dash_activated: false,
+        dash_activated: true,
         unidade: null,
         entidade: null,
         parlamentares: null,
@@ -208,6 +208,16 @@ export default {
     }
   },
   methods: {
+    viewModeChange (val) {
+      // armazena o valor do modo de visualização no localstorage
+      localStorage.setItem('portalcmj_pcl_view_mode', val)
+      this.viewMode = val
+    },
+    viewModeRestore () {
+      // restaura o valor do modo de visualização do localstorage, caso exista
+      this.viewMode = localStorage.getItem('portalcmj_pcl_view_mode') || this.viewMode
+      return this.viewMode
+    },
     emptyTotaisEmpenhos () {
       return {
         total_empenhado: 0,
@@ -688,6 +698,7 @@ export default {
   },
   mounted () {
     const t = this
+    t.viewModeRestore()
     t.removeAside()
     t.$nextTick().then(() => {
       const fetchLoa = t.utils.fetch({
