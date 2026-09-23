@@ -267,7 +267,6 @@ export default {
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 0.375rem;
-  margin: 0 -15px;
 }
 .total-geral-box {
   background: #fff;

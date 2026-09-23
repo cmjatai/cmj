@@ -69,21 +69,34 @@ export default {
     horizontal: {
       type: Boolean,
       default: false
+    },
+    valueFormatter: {
+      type: Function,
+      default: (value) => value
     }
   },
   data () {
     return {
-      chartData: null,
-      chartOptions: {
+      chartData: null
+    }
+  },
+  computed: {
+    chartOptions () {
+      const t = this
+      const base = {
         indexAxis: this.horizontal ? 'y' : 'x',
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: this.horizontal ? { right: 48 } : { top: 24 }
+        },
         plugins: {
           title: {
             display: true,
-            text: 'teste'
+            text: (this.plugins[0] && this.plugins[0].title && this.plugins[0].title.text) || ''
           },
           legend: {
+            display: !this.horizontal,
             position: 'bottom',
             onClick: this.handleClick,
             labels: {
@@ -93,37 +106,62 @@ export default {
               }
             }
           },
-          datalabels: {
-            formatter: (value, ctx) => {
-              let dataset = ctx.dataset.data
-              let sum = 0
-              dataset.map(ds => {
-                sum += ds
-              })
-              let percentage = ((value / sum) * 100).toFixed(0) + '%'
-              return percentage
-            },
-            color: '#0000',
-            rotation: -60,
-            align: 'top'
+          tooltip: {
+            callbacks: {
+              label: (ctx) => `${ctx.dataset.label ? ctx.dataset.label + ': ' : ''}${t.valueFormatter(ctx.parsed[t.horizontal ? 'x' : 'y'])}`
+            }
+          },
+          datalabels: this.horizontal
+            ? {
+              formatter: (value) => t.valueFormatter(value),
+              color: '#495057',
+              anchor: 'end',
+              align: 'end',
+              offset: 4,
+              font: { size: 12, weight: 'bold' }
+            }
+            : {
+              formatter: (value, ctx) => {
+                const dataset = ctx.dataset.data
+                const sum = dataset.reduce((acc, v) => acc + v, 0)
+                return sum ? ((value / sum) * 100).toFixed(0) + '%' : ''
+              },
+              color: '#0000',
+              rotation: -60,
+              align: 'top'
+            }
+        }
+      }
+
+      if (this.horizontal) {
+        base.scales = {
+          x: {
+            beginAtZero: true,
+            grid: { color: '#e9ecef' },
+            ticks: { callback: (value) => t.valueFormatter(value) }
+          },
+          y: {
+            grid: { display: false },
+            ticks: { font: { size: 13 } }
           }
         }
       }
+
+      return base
     }
   },
   watch: {
-    plugins: function (nv, ov) {
-      this.chartOptions.plugins.title.text = nv[0].title.text
+    chartDataUser: {
+      immediate: true,
+      handler (nv) {
+        this.chartData = nv
+      }
     }
   },
   methods: {
     handleClick (evt, item, legend) {
       // console.debug(evt, item, legend)
     }
-  },
-  mounted: function () {
-    this.chartOptions.plugins.title.text = this.plugins[0].title.text
-    this.chartData = this.chartDataUser
   }
 }
 </script>
