@@ -16,25 +16,45 @@
     </div>
 
     <div class="d-flex align-items-stretch total-geral-row mb-2">
-      <div class="total-geral-box flex-fill d-flex align-items-center justify-content-center px-3 py-2">
-        <i class="fas fa-coins text-success mr-2"></i>
-        <span class="font-weight-bold mr-2">Total Impositivas:</span>
-        <span class="font-weight-bold text-success">R$ {{ formatCurrency(totalGeral) }}</span>
+      <div class="total-geral-box flex-fill d-flex flex-column px-3 py-2">
+        <div class="d-flex">
+          <i class="fas fa-coins text-success mr-2"></i>
+          <span class="font-weight-bold mr-2">Total Impositivas:</span>
+        </div>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+          <h2 class="font-weight-bold text-success mb-0">R$ {{ formatCurrency(totalGeral) }}</h2>
+          <small class="text-muted">({{ countGeral }} {{ countGeral === 1 ? 'registro' : 'registros' }})</small>
+        </div>
       </div>
-      <div class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
-        <i class="fas fa-heartbeat text-success mr-1"></i>
-        <span class="font-weight-bold mr-1">Saúde:</span>
-        <span class="font-weight-bold text-success">R$ {{ formatCurrency(totalSaude) }}</span>
+      <div class="total-geral-box sub-total-box flex-fill d-flex flex-column px-3 py-2 ml-2">
+        <div class="d-flex">
+          <i class="fas fa-heartbeat text-success mr-1"></i>
+          <span class="font-weight-bold mr-1">Saúde:</span>
+        </div>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+          <h2 class="font-weight-bold text-success mb-0">R$ {{ formatCurrency(totalSaude) }}</h2>
+          <small class="text-muted">({{ countSaude }} {{ countSaude === 1 ? 'registro' : 'registros' }})</small>
+        </div>
       </div>
-      <div class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
-        <i class="fas fa-th-large text-info mr-1"></i>
-        <span class="font-weight-bold mr-1">Áreas Diversas:</span>
-        <span class="font-weight-bold text-info">R$ {{ formatCurrency(totalAreasDiversas) }}</span>
+      <div class="total-geral-box sub-total-box flex-fill d-flex flex-column px-3 py-2 ml-2">
+        <div class="d-flex">
+          <i class="fas fa-th-large text-info mr-1"></i>
+          <span class="font-weight-bold mr-1">Áreas Diversas:</span>
+        </div>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+          <h2 class="font-weight-bold text-info mb-0">R$ {{ formatCurrency(totalAreasDiversas) }}</h2>
+          <small class="text-muted">({{ countAreasDiversas }} {{ countAreasDiversas === 1 ? 'registro' : 'registros' }})</small>
+        </div>
       </div>
-      <div v-if="totalModificativas > 0" class="total-geral-box sub-total-box flex-fill d-flex align-items-center justify-content-center px-3 py-2 ml-2">
-        <i class="fas fa-pen-fancy text-secondary mr-1"></i>
-        <span class="font-weight-bold mr-1">Modificativas:</span>
-        <span class="font-weight-bold text-secondary">R$ {{ formatCurrency(totalModificativas) }}</span>
+      <div v-if="totalModificativas > 0" class="total-geral-box sub-total-box flex-fill d-flex flex-column px-3 py-2 ml-2">
+        <div class="d-flex">
+          <i class="fas fa-pen-fancy text-secondary mr-1"></i>
+          <span class="font-weight-bold mr-1">Modificativas:</span>
+        </div>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+          <h2 class="font-weight-bold text-secondary mb-0">R$ {{ formatCurrency(totalModificativas) }}</h2>
+          <small class="text-muted">({{ countModificativas }} {{ countModificativas === 1 ? 'registro' : 'registros' }})</small>
+        </div>
       </div>
     </div>
 
@@ -87,7 +107,7 @@
 </template>
 
 <script>
-import { isEmenda, tipoLabel, tipoVariant } from './utils/pcl-helpers'
+import { isEmenda, tipoLabel, tipoVariant } from './../utils/pcl-helpers'
 
 const TIPO_ICONS = {
   0: 'fas fa-pen-fancy',
@@ -115,6 +135,18 @@ export default {
   computed: {
     permissionEdit () {
       return this.permissions.includes('loa.change_empenho')
+    },
+    countGeral () {
+      return this.lista.length
+    },
+    countSaude () {
+      return this.lista.filter(item => item.tipo === 10).length
+    },
+    countAreasDiversas () {
+      return this.lista.filter(item => item.tipo === 99).length
+    },
+    countModificativas () {
+      return this.lista.filter(item => item.tipo === 0).length
     },
     totalGeral () {
       return this.lista
@@ -242,9 +274,6 @@ export default {
   border: 1px solid #dee2e6;
   border-radius: 0.25rem;
   font-size: 0.95rem;
-}
-.sub-total-box {
-  font-size: 0.85rem;
 }
 .grupo-box {
   background: #fff;

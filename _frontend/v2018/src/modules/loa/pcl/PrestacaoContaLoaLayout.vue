@@ -22,21 +22,13 @@
         @reset="resetFilters"
         @loas-change="on_loas_change"
       />
-
-      <pcl-totalizacao
-        v-if="emendas_ajustes_list.length"
+      <pcl-dashboard
+        v-if="filters_value.dash_activated && viewMode === 'dashboard' && emendas_ajustes_list.length"
         :lista="emendas_ajustes_list"
         :parlamentar-selecionado="filters_value.parlamentares"
         :loas-choice="loas_choice"
         :selected-loa-ids="selected_loa_ids"
         :totais-empenhos="totais_empenhos"
-        class="mt-3"
-      />
-
-      <pcl-dashboard
-        v-if="filters_value.dash_activated && viewMode === 'dashboard' && emendas_ajustes_list.length"
-        :lista="emendas_ajustes_list"
-        :parlamentar-selecionado="filters_value.parlamentares"
       />
       <div class="pcldetalhe-list" v-else-if="viewMode === 'list' && (emendas_ajustes_list.length || fetching)">
         <template v-for="item in paginatedList">
@@ -72,8 +64,7 @@
 import PclFiltros from './PclFiltros.vue'
 import PclDetalheEmenda from './PclDetalheEmenda.vue'
 import PclDetalheAjuste from './PclDetalheAjuste.vue'
-import PclTotalizacao from './PclTotalizacao.vue'
-import PclDashboard from './PclDashboard.vue'
+import PclDashboard from './dash/PclDashboard.vue'
 
 export default {
   name: 'prestacaocontaloa-layout',
@@ -81,7 +72,6 @@ export default {
     PclFiltros,
     PclDetalheEmenda,
     PclDetalheAjuste,
-    PclTotalizacao,
     PclDashboard
   },
   data () {
@@ -290,8 +280,8 @@ export default {
       if (options.withListOptions) {
         Object.assign(params, {
           o: 'materia__tipo__sigla,materia__numero',
-          exclude: 'search;metadata',
-          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id',
+          exclude: 'search;metadata;prefixo_finalidade;prefixo_indicacao;owner;finalidade;finalidade_format;proposicao',
+          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id;entidade.id,nome_fantasia,__str__',
           expand: 'parlamentares;unidade;materia;entidade',
           page_size: 25
         })

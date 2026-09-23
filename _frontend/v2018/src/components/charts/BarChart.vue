@@ -65,12 +65,17 @@ export default {
     plugins: {
       type: Array,
       default: () => []
+    },
+    horizontal: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
     return {
       chartData: null,
       chartOptions: {
+        indexAxis: this.horizontal ? 'y' : 'x',
         responsive: true,
         maintainAspectRatio: false,
         plugins: {
