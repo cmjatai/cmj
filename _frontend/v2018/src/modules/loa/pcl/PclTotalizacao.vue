@@ -39,25 +39,29 @@
     </div>
 
     <div class="row mx-0 mb-1" v-if="mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
-      <div class="col-md-3 text-center py-1 border-right">
-        <small class="text-muted d-block">Total Empenhado</small>
+      <div class="col-md-3 d-flex flex-column text-center py-1 border-right">
+        <span class="d-inline">
+          <small class="text-muted">Total Empenhado</small> <small class="text-muted text-blue">({{ percentual('empenhado').toFixed(2) }}%)</small>
+        </span>
         <strong class="text-primary">R$ {{ formatCurrency(totalEmpenhado) }}</strong>
-        <small class="text-muted d-block text-blue">{{ percentual('empenhado').toFixed(2) }}%</small>
       </div>
-      <div class="col-md-3 text-center py-1 border-right">
-        <small class="text-muted d-block">Total Liquidado</small>
+      <div class="col-md-3 d-flex flex-column text-center py-1 border-right">
+        <span class="d-inline">
+          <small class="text-muted">Total Liquidado</small> <small class="text-muted text-blue">({{ percentual('liquidado').toFixed(2) }}%)</small>
+        </span>
         <strong class="text-info">R$ {{ formatCurrency(totalLiquidado) }}</strong>
-        <small class="text-muted d-block text-blue">{{ percentual('liquidado').toFixed(2) }}%</small>
       </div>
-      <div class="col-md-3 text-center py-1 border-right">
-        <small class="text-muted d-block">Total Pago</small>
+      <div class="col-md-3 d-flex flex-column text-center py-1 border-right">
+        <span class="d-inline">
+          <small class="text-muted">Total Pago</small> <small class="text-muted text-blue">({{ percentual('pago_bruto').toFixed(2) }}%)</small>
+        </span>
         <strong class="text-success">R$ {{ formatCurrency(totalPago) }}</strong>
-        <small class="text-muted d-block text-blue">{{ percentual('pago_bruto').toFixed(2) }}%</small>
       </div>
-      <div class="col-md-3 text-center py-1">
-        <small class="text-muted d-block">Total Anulado</small>
+      <div class="col-md-3 d-flex flex-column text-center py-1">
+        <span class="d-inline">
+          <small class="text-muted">Total Anulado</small> <small class="text-muted text-blue">({{ percentual('anulado').toFixed(2) }}%)</small>
+        </span>
         <strong class="text-danger">R$ {{ formatCurrency(totalAnulado) }}</strong>
-        <small class="text-muted d-block text-blue">{{ percentual('anulado').toFixed(2) }}%</small>
       </div>
     </div>
     <div class="row mx-0 mb-1" v-else-if="!mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
