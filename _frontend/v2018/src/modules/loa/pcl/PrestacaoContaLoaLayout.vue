@@ -22,6 +22,15 @@
         @reset="resetFilters"
         @loas-change="on_loas_change"
       />
+      <pcl-totalizacao
+        v-if="emendas_ajustes_list.length && viewMode === 'list'"
+        :lista="emendas_ajustes_list"
+        :parlamentar-selecionado="filters_value.parlamentares"
+        :loas-choice="loas_choice"
+        :selected-loa-ids="selected_loa_ids"
+        :totais-empenhos="totais_empenhos"
+        class="mt-3 dash-section"
+      />
       <pcl-dashboard
         v-if="filters_value.dash_activated && viewMode === 'dashboard' && emendas_ajustes_list.length"
         :lista="emendas_ajustes_list"
@@ -65,6 +74,7 @@ import PclFiltros from './PclFiltros.vue'
 import PclDetalheEmenda from './PclDetalheEmenda.vue'
 import PclDetalheAjuste from './PclDetalheAjuste.vue'
 import PclDashboard from './dash/PclDashboard.vue'
+import PclTotalizacao from './dash/PclTotalizacao.vue'
 
 export default {
   name: 'prestacaocontaloa-layout',
@@ -72,7 +82,8 @@ export default {
     PclFiltros,
     PclDetalheEmenda,
     PclDetalheAjuste,
-    PclDashboard
+    PclDashboard,
+    PclTotalizacao
   },
   data () {
     return {

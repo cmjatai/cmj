@@ -59,6 +59,12 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     soma_valor_pago_bruto = serializers.SerializerMethodField()
     soma_valor_anulado = serializers.SerializerMethodField()
 
+    fase_prestacao_contas = serializers.SerializerMethodField()
+
+    def get_fase_prestacao_contas(self, obj):
+        pcr_last = obj.prestacaocontaregistro_set.all().last()
+        return pcr_last.situacao
+
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa
 

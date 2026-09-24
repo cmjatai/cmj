@@ -52,28 +52,40 @@
       </div>
     </div>
 
-    <!-- ===== SEÇÃO 2: Distribuição por Situação/Fase ===== -->
-    <div class="dash-section" v-if="faseDistribuicao.length">
-      <div class="dash-section-title">
-        <i class="fas fa-tasks mr-2"></i>Distribuição por Situação
-      </div>
-      <div class="dash-progress-container">
-        <div class="progress dash-progress-bar">
-          <div
-            v-for="f in faseDistribuicao"
-            :key="f.key"
-            class="progress-bar"
-            :style="{ width: f.pct + '%', backgroundColor: f.color }"
-            :title="`${f.label} (${f.tipoLabel}): ${f.count} (${f.pct.toFixed(1)}%)`"
-          ></div>
-        </div>
-        <div class="dash-legend d-flex flex-wrap mt-2">
-          <div v-for="f in faseDistribuicao" :key="'leg_' + f.key" class="dash-legend-item mr-3 mb-1">
-            <span class="dash-legend-dot" :style="{ backgroundColor: f.color }"></span>
-            <span class="dash-legend-label">{{ f.label }}</span>
-            <span class="badge badge-light ml-1" style="font-size:.7rem">{{ f.tipoLabel }}</span>
-            <strong class="ml-1">{{ f.count }}</strong>
-            <span class="text-muted ml-1">(R$ {{ formatCurrency(f.total) }})</span>
+    <!-- ===== SEÇÃO 2: Distribuição por Situação (Saúde e Áreas Diversas) ===== -->
+    <div class="dash-section" v-if="faseSecoes.some(s => s.dados.length)">
+      <div class="row">
+        <div
+          v-for="secao in faseSecoes"
+          :key="secao.titulo"
+          v-show="secao.dados.length"
+          class="col-md-6"
+        >
+          <div class="dash-section-title">
+            <i :class="['fas', secao.icon, 'mr-2']"></i>{{ secao.titulo }}
+          </div>
+          <div class="dash-bar-list">
+            <div
+              v-for="f in secao.dados"
+              :key="f.key"
+              class="dash-bar-item d-flex align-items-center"
+            >
+              <span class="dash-legend-dot mr-2" :style="{ backgroundColor: f.color }"></span>
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                  <span class="dash-bar-name text-truncate">{{ f.label }}</span>
+                  <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">
+                    {{ f.count }} <small class="text-muted font-weight-normal">(R$ {{ formatCurrency(f.total) }})</small>
+                  </span>
+                </div>
+                <div class="progress dash-bar-progress">
+                  <div
+                    class="progress-bar"
+                    :style="{ width: f.pct + '%', backgroundColor: f.color }"
+                  ></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -189,12 +201,6 @@ import { isEmenda, faseLabel, situacaoLabel } from '../utils/pcl-helpers'
 import PclTotalizacao from './PclTotalizacao.vue'
 const TOP_N = 10
 
-const TIPO_SHORT = {
-  0: 'Modificativa',
-  10: 'Saúde',
-  99: 'Áreas Diversas'
-}
-
 const DASH_SITUACAO_PALETTE = [
   '#4e79a7', // azul aço
   '#f28e2b', // laranja
@@ -249,40 +255,11 @@ export default {
       }
     },
 
-    faseDistribuicao () {
-      const map = {}
-      this.lista.forEach(item => {
-        const emenda = isEmenda(item)
-        const tipo = item.tipo
-        const tipoLbl = TIPO_SHORT[tipo] || `Tipo ${tipo}`
-        let key, label
-        if (emenda) {
-          key = `emenda_fase${item.fase}_tipo${tipo}`
-          label = faseLabel(item.fase)
-        } else {
-          const sit = item.fase_prestacao_contas || 'SEM_PRESTACAO_CONTAS'
-          key = `ajuste_sit${sit}_tipo${tipo}`
-          label = situacaoLabel(sit)
-        }
-        if (!map[key]) {
-          map[key] = {
-            key,
-            label,
-            tipoLabel: emenda ? `Emenda ${tipoLbl}` : `Ajuste ${tipoLbl}`,
-            count: 0,
-            total: 0
-          }
-        }
-        map[key].count++
-        map[key].total += Number(this.valorEfetivo(item))
-      })
-      const total = this.lista.length || 1
-      const sorted = Object.values(map).sort((a, b) => b.count - a.count)
-      return sorted.map((f, i) => ({
-        ...f,
-        pct: (f.count / total) * 100,
-        color: DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length]
-      }))
+    faseSecoes () {
+      return [
+        { titulo: 'Situação — Saúde', icon: 'fa-heartbeat', dados: this.distribuicaoPorFase(10) },
+        { titulo: 'Situação — Áreas Diversas', icon: 'fa-th-large', dados: this.distribuicaoPorFase(99) }
+      ]
     },
 
     parlamentarDistribuicao () {
@@ -363,6 +340,28 @@ export default {
     }
   },
   methods: {
+    // Agrupa emenda + ajuste do mesmo tipo por fase/situação, sem distinguir a origem do documento
+    distribuicaoPorFase (tipo) {
+      const map = {}
+      this.lista.forEach(item => {
+        if (item.tipo !== tipo) return
+        const label = isEmenda(item)
+          ? faseLabel(item.fase)
+          : situacaoLabel(item.fase_prestacao_contas || 'Ajustes Sem Prestação de Contas')
+        if (!map[label]) {
+          map[label] = { key: label, label, count: 0, total: 0 }
+        }
+        map[label].count++
+        map[label].total += Number(this.valorEfetivo(item))
+      })
+      const sorted = Object.values(map).sort((a, b) => b.count - a.count)
+      const max = sorted.length ? sorted[0].count : 1
+      return sorted.map((f, i) => ({
+        ...f,
+        pct: (f.count / max) * 100,
+        color: DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length]
+      }))
+    },
     valorEfetivo (item) {
       if (!isEmenda(item)) {
         let valor = Number(item.valor || 0)
@@ -450,28 +449,13 @@ export default {
   font-weight: 700;
 }
 
-/* Progress stacked bar */
-.dash-progress-bar {
-  height: 1.25rem;
-  border-radius: 0.375rem;
-}
-
-/* Legend */
-.dash-legend-item {
-  font-size: 0.82rem;
-  display: flex;
-  align-items: center;
-}
+/* Legend dot (usado nas linhas da Seção 2) */
 .dash-legend-dot {
   display: inline-block;
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  margin-right: 0.35rem;
   flex-shrink: 0;
-}
-.dash-legend-label {
-  color: #555;
 }
 
 /* Horizontal bar list */
@@ -531,9 +515,6 @@ export default {
   }
   .dash-kpi-card {
     min-width: auto;
-  }
-  .dash-legend {
-    flex-direction: column;
   }
 }
 </style>
