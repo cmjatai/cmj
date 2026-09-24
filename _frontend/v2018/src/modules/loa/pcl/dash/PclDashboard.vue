@@ -422,7 +422,7 @@ export default {
         if (!parlamentares || !parlamentares.length) return
         const val = Number(this.valorEfetivo(item))
         // key por __str__ permite identificar unidades de forma única ao longo dos anos de LOA
-        const unidadeKey = item.unidade ? item.unidade.__str__ : 'sem-unidade'
+        const unidadeKey = item.unidade ? item.unidade.id : 'sem-unidade'
         const unidadeLabel = item.unidade ? item.unidade.__str__ : 'Sem unidade' // label também usa __str__ para consistência
         if (!unidadeTotais[unidadeKey]) unidadeTotais[unidadeKey] = { label: unidadeLabel, total: 0 }
         unidadeTotais[unidadeKey].total += val
@@ -440,7 +440,13 @@ export default {
           }
           const valorParlamentar = this.valorEfetivoPorParlamentar(item, p.id)
           map[p.id].total += valorParlamentar
-          if (!map[p.id].unidades[unidadeKey]) map[p.id].unidades[unidadeKey] = { id: unidadeKey, label: unidadeLabel, total: 0 }
+          if (!map[p.id].unidades[unidadeKey]) {
+            map[p.id].unidades[unidadeKey] = {
+              id: unidadeKey,
+              label: `${unidadeLabel} (${item.loa || item._loa_id})`,
+              total: 0
+            }
+          }
           map[p.id].unidades[unidadeKey].total += valorParlamentar
           if (isEmenda(item)) map[p.id].emendas++
           else map[p.id].ajustes++
