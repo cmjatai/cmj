@@ -146,9 +146,9 @@
         target="_blank"
         title="Versão para impressão"
       ><i class="fas fa-print"></i></a>
-      <div v-if="totalItems > 0 && viewMode === 'list'" class="pcl-pagination w-100 d-flex align-items-center justify-content-between">
+      <div v-if="totalItems > 0" class="pcl-pagination w-100 d-flex align-items-center justify-content-between">
         <div class="d-flex align-items-center">
-          <div class="d-flex align-items-center mr-3 px-1">
+          <div class="d-flex align-items-center mr-3 px-1" v-if="viewMode === 'list'">
             <small class="text-muted text-uppercase font-weight-bold mr-2" style="font-size:.7rem;letter-spacing:.03em;">Exibir</small>
             <b-form-select
             :value="pageSize"
@@ -162,7 +162,7 @@
             <b-spinner v-if="fetching" small variant="secondary" class="ml-2" style="vertical-align:middle;"></b-spinner>
           </small>
         </div>
-        <nav class="d-flex align-items-center">
+        <nav class="d-flex align-items-center" v-if="viewMode === 'list'">
           <button
             class="pcl-page-btn"
             :disabled="currentPage <= 1"
