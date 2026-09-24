@@ -124,7 +124,11 @@
           </div>
           <div class="flex-grow-1 min-w-0">
             <div class="d-flex justify-content-between align-items-baseline mb-1">
-              <span class="dash-bar-name text-truncate">{{ p.nome }}</span>
+              <span
+                class="dash-bar-name dash-bar-name--clickable text-truncate"
+                title="Filtrar por este parlamentar"
+                @click="$emit('filter-parlamentar', { id: p.id, __str__: p.nome })"
+              >{{ p.nome }}</span>
               <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(p.total) }}</span>
             </div>
             <div
@@ -153,7 +157,11 @@
               </thead>
               <tbody>
                 <tr v-for="seg in p.segmentos" :key="seg.key">
-                  <td>{{ seg.label }}</td>
+                  <td
+                    :class="{ 'dash-bar-detalhe-link': seg.key !== 'sem-unidade' }"
+                    :title="seg.key !== 'sem-unidade' ? 'Filtrar por esta unidade' : ''"
+                    @click="seg.key !== 'sem-unidade' && $emit('filter-unidade', { id: seg.key, __str__: seg.label })"
+                  >{{ seg.label }}</td>
                   <td class="d-flex text-nowrap justify-content-between">
                     <small class="text-muted">({{ formatPercent(seg.total, p.total) }}%)</small>
                     <span>
@@ -196,7 +204,11 @@
             >
               <div class="flex-grow-1 min-w-0">
                 <div class="d-flex justify-content-between align-items-baseline mb-1">
-                  <span class="dash-bar-name text-truncate">{{ u.nome }}</span>
+                  <span
+                    class="dash-bar-name dash-bar-name--clickable text-truncate"
+                    title="Filtrar por esta unidade"
+                    @click="$emit('filter-unidade', { id: u.id, __str__: u.nome })"
+                  >{{ u.nome }}</span>
                   <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(u.total) }}</span>
                 </div>
                 <div
@@ -219,7 +231,11 @@
                   </thead>
                   <tbody>
                     <tr v-for="seg in u.parlamentares" :key="seg.key">
-                      <td>{{ seg.label }}</td>
+                      <td
+                        class="dash-bar-detalhe-link"
+                        title="Filtrar por este parlamentar"
+                        @click="$emit('filter-parlamentar', { id: seg.key, __str__: seg.label })"
+                      >{{ seg.label }}</td>
                       <td class="d-flex text-nowrap justify-content-between">
                         <small class="text-muted">({{ formatPercent(seg.total, u.total) }}%)</small>
                         <span>R$ {{ formatCurrency(seg.total) }}</span>
@@ -259,7 +275,11 @@
             >
               <div class="flex-grow-1 min-w-0">
                 <div class="d-flex justify-content-between align-items-baseline mb-1">
-                  <span class="dash-bar-name text-truncate">{{ e.nome }}</span>
+                  <span
+                    class="dash-bar-name dash-bar-name--clickable text-truncate"
+                    title="Filtrar por esta entidade"
+                    @click="$emit('filter-entidade', { id: e.id, __str__: e.nome })"
+                  >{{ e.nome }}</span>
                   <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(e.total) }}</span>
                 </div>
                 <div
@@ -282,7 +302,11 @@
                   </thead>
                   <tbody>
                     <tr v-for="seg in e.parlamentares" :key="seg.key">
-                      <td>{{ seg.label }}</td>
+                      <td
+                        class="dash-bar-detalhe-link"
+                        title="Filtrar por este parlamentar"
+                        @click="$emit('filter-parlamentar', { id: seg.key, __str__: seg.label })"
+                      >{{ seg.label }}</td>
                       <td class="d-flex text-nowrap justify-content-between">
                         <small class="text-muted">({{ formatPercent(seg.total, e.total) }}%)</small>
                         <span>R$ {{ formatCurrency(seg.total) }}</span>
@@ -400,7 +424,7 @@ export default {
           }
           const valorParlamentar = this.valorEfetivoPorParlamentar(item, p.id)
           map[p.id].total += valorParlamentar
-          if (!map[p.id].unidades[unidadeKey]) map[p.id].unidades[unidadeKey] = { label: unidadeLabel, total: 0 }
+          if (!map[p.id].unidades[unidadeKey]) map[p.id].unidades[unidadeKey] = { id: unidadeKey, label: unidadeLabel, total: 0 }
           map[p.id].unidades[unidadeKey].total += valorParlamentar
           if (isEmenda(item)) map[p.id].emendas++
           else map[p.id].ajustes++
@@ -420,7 +444,7 @@ export default {
         const segmentos = Object.entries(unidades)
           .filter(([, u]) => u.total !== 0)
           .map(([key, u]) => ({
-            key,
+            key: u.id, // preserva o tipo original do id (Object.entries sempre retorna chaves em string)
             label: u.label,
             total: u.total,
             pct: (u.total / max) * 100,
@@ -759,6 +783,20 @@ export default {
   font-size: 0.88rem;
   font-weight: 500;
   color: #333;
+}
+.dash-bar-name--clickable {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+    color: #495057;
+  }
+}
+.dash-bar-detalhe-link {
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+    color: #495057;
+  }
 }
 .dash-bar-value {
   font-size: 0.85rem;

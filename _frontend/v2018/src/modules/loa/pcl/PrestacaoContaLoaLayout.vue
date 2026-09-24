@@ -38,6 +38,9 @@
         :loas-choice="loas_choice"
         :selected-loa-ids="selected_loa_ids"
         :totais-empenhos="totais_empenhos"
+        @filter-unidade="applyUnidadeFilter"
+        @filter-entidade="applyEntidadeFilter"
+        @filter-parlamentar="applyParlamentarFilter"
       />
       <div class="pcldetalhe-list" v-else-if="viewMode === 'list' && (emendas_ajustes_list.length || fetching)">
         <template v-for="item in paginatedList">
