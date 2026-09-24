@@ -421,8 +421,9 @@ export default {
         const parlamentares = isEmenda(item) ? item.parlamentares : item.parlamentares_valor
         if (!parlamentares || !parlamentares.length) return
         const val = Number(this.valorEfetivo(item))
-        const unidadeKey = item.unidade ? item.unidade.id : 'sem-unidade'
-        const unidadeLabel = item.unidade ? item.unidade.__str__ : 'Sem unidade'
+        // key por __str__ permite identificar unidades de forma única ao longo dos anos de LOA
+        const unidadeKey = item.unidade ? item.unidade.__str__ : 'sem-unidade'
+        const unidadeLabel = item.unidade ? item.unidade.__str__ : 'Sem unidade' // label também usa __str__ para consistência
         if (!unidadeTotais[unidadeKey]) unidadeTotais[unidadeKey] = { label: unidadeLabel, total: 0 }
         unidadeTotais[unidadeKey].total += val
         parlamentares.forEach(p => {
@@ -476,7 +477,7 @@ export default {
         if (item.tipo !== 99) return
         const u = item.unidade
         if (!u) return
-        const key = u.id
+        const key = u.__str__
         if (!map[key]) {
           map[key] = { id: key, nome: u.__str__, total: 0, count: 0, itens: [] }
         }
