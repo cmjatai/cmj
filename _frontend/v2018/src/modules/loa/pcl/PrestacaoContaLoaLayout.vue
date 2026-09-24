@@ -216,10 +216,15 @@ export default {
       // armazena o valor do modo de visualização no localstorage
       localStorage.setItem('portalcmj_pcl_view_mode', val)
       this.viewMode = val
+      this.syncQueryString()
     },
     viewModeRestore () {
-      // restaura o valor do modo de visualização do localstorage, caso exista
-      this.viewMode = localStorage.getItem('portalcmj_pcl_view_mode') || this.viewMode
+      // restaura o valor do modo de visualização a partir da url ou, na ausência, do localstorage
+      const fromQuery = this.$route.query.view
+      this.viewMode = (fromQuery === 'list' || fromQuery === 'dashboard')
+        ? fromQuery
+        : (localStorage.getItem('portalcmj_pcl_view_mode') || this.viewMode)
+      this.syncQueryString()
       return this.viewMode
     },
     emptyTotaisEmpenhos () {
@@ -380,7 +385,7 @@ export default {
       })
     },
     syncQueryString () {
-      const query = {}
+      const query = { view: this.viewMode }
       this.filters.forEach((f) => {
         if (
           this.filters_value[f] !== null &&

@@ -62,7 +62,8 @@
           class="col-md-6"
         >
           <div class="dash-section-title">
-            <i :class="['fas', secao.icon, 'mr-2']"></i>{{ secao.titulo }}
+              <i :class="['fas', secao.icon, 'mr-2']"></i>{{ secao.titulo }}
+              <small class="text-muted">(Emendas Impositivas e Ajustes Técnicos)</small>
           </div>
           <div class="dash-bar-list">
             <div
@@ -96,7 +97,7 @@
       <div class="dash-section-title d-flex justify-content-between align-items-center">
         <span>
           <i class="fas fa-users mr-2"></i>Distribuição por Parlamentar em Áreas Diversas
-          <small class="text-muted ml-2">(*50% da Área da Saúde não estão incluídos.)</small>
+          <small class="text-muted ml-2">(50% da Área da Saúde não estão incluídos)</small>
         </span>
         <button
           type="button"
