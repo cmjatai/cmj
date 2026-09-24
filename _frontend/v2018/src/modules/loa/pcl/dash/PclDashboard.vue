@@ -169,14 +169,24 @@
     </div>
 
     <!-- ===== SEÇÃO 4 e 5: Distribuição por Unidade Orçamentária / Entidade-Beneficiário ===== -->
-    <div class="row" v-if="unidadeDistribuicao.length || entidadeDistribuicao.length">
+    <div class="row dash-grid-tight" v-if="unidadeDistribuicao.length || entidadeDistribuicao.length">
       <div class="col-md-6" v-if="unidadeDistribuicao.length">
         <div class="dash-section">
-          <div class="dash-section-title">
-            <i class="fas fa-building mr-2"></i>Distribuição por Unidade Orçamentária
-            <small v-if="unidadeDistribuicaoExtra > 0" class="text-muted ml-2">
-              (top {{ unidadeDistribuicao.length }} de {{ unidadeDistribuicao.length + unidadeDistribuicaoExtra }})
-            </small>
+          <div class="dash-section-title d-flex justify-content-between align-items-center">
+            <span>
+              <i class="fas fa-building mr-2"></i>Distribuição por Unidade Orçamentária
+              <small v-if="unidadeDistribuicaoExtra > 0" class="text-muted ml-2">
+                (top {{ unidadeDistribuicao.length }} de {{ unidadeDistribuicao.length + unidadeDistribuicaoExtra }})
+              </small>
+            </span>
+            <button
+              type="button"
+              class="btn btn-sm btn-link text-muted p-0 dash-toggle-all"
+              @click="toggleTodasUnidades"
+            >
+              <i :class="['fas', todasUnidadesExpandidas ? 'fa-compress-alt' : 'fa-expand-alt', 'mr-1']"></i>
+              {{ todasUnidadesExpandidas ? 'Recolher todos' : 'Expandir todos' }}
+            </button>
           </div>
           <div class="dash-bar-list">
             <div
@@ -189,13 +199,34 @@
                   <span class="dash-bar-name text-truncate">{{ u.nome }}</span>
                   <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(u.total) }}</span>
                 </div>
-                <div class="progress dash-bar-progress">
+                <div
+                  class="progress dash-bar-progress dash-bar-progress--clickable"
+                  role="button"
+                  @click="toggleUnidadeDetalhe(u.id)"
+                >
                   <div
                     class="progress-bar bg-info"
                     :style="{ width: u.pct + '%' }"
                   ></div>
                 </div>
                 <small class="text-muted">{{ u.count }} registro{{ u.count !== 1 ? 's' : '' }}</small>
+                <table v-if="isUnidadeExpandida(u.id)" class="table table-sm dash-bar-detalhe mb-0 mt-2">
+                  <thead>
+                    <tr>
+                      <th>Parlamentar</th>
+                      <th class="text-right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="seg in u.parlamentares" :key="seg.key">
+                      <td>{{ seg.label }}</td>
+                      <td class="d-flex text-nowrap justify-content-between">
+                        <small class="text-muted">({{ formatPercent(seg.total, u.total) }}%)</small>
+                        <span>R$ {{ formatCurrency(seg.total) }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -204,11 +235,21 @@
 
       <div class="col-md-6" v-if="entidadeDistribuicao.length">
         <div class="dash-section">
-          <div class="dash-section-title">
-            <i class="fas fa-hand-holding-heart mr-2"></i>Distribuição por Entidade/Beneficiário
-            <small v-if="entidadeDistribuicaoExtra > 0" class="text-muted ml-2">
-              (top {{ entidadeDistribuicao.length }} de {{ entidadeDistribuicao.length + entidadeDistribuicaoExtra }})
-            </small>
+          <div class="dash-section-title d-flex justify-content-between align-items-center">
+            <span>
+              <i class="fas fa-hand-holding-heart mr-2"></i>Distribuição por Entidade/Beneficiário
+              <small v-if="entidadeDistribuicaoExtra > 0" class="text-muted ml-2">
+                (top {{ entidadeDistribuicao.length }} de {{ entidadeDistribuicao.length + entidadeDistribuicaoExtra }})
+              </small>
+            </span>
+            <button
+              type="button"
+              class="btn btn-sm btn-link text-muted p-0 dash-toggle-all"
+              @click="toggleTodasEntidades"
+            >
+              <i :class="['fas', todasEntidadesExpandidas ? 'fa-compress-alt' : 'fa-expand-alt', 'mr-1']"></i>
+              {{ todasEntidadesExpandidas ? 'Recolher todos' : 'Expandir todos' }}
+            </button>
           </div>
           <div class="dash-bar-list">
             <div
@@ -221,13 +262,34 @@
                   <span class="dash-bar-name text-truncate">{{ e.nome }}</span>
                   <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(e.total) }}</span>
                 </div>
-                <div class="progress dash-bar-progress">
+                <div
+                  class="progress dash-bar-progress dash-bar-progress--clickable"
+                  role="button"
+                  @click="toggleEntidadeDetalhe(e.id)"
+                >
                   <div
                     class="progress-bar bg-success"
                     :style="{ width: e.pct + '%' }"
                   ></div>
                 </div>
                 <small class="text-muted">{{ e.count }} registro{{ e.count !== 1 ? 's' : '' }}</small>
+                <table v-if="isEntidadeExpandida(e.id)" class="table table-sm dash-bar-detalhe mb-0 mt-2">
+                  <thead>
+                    <tr>
+                      <th>Parlamentar</th>
+                      <th class="text-right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="seg in e.parlamentares" :key="seg.key">
+                      <td>{{ seg.label }}</td>
+                      <td class="d-flex text-nowrap justify-content-between">
+                        <small class="text-muted">({{ formatPercent(seg.total, e.total) }}%)</small>
+                        <span>R$ {{ formatCurrency(seg.total) }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -275,7 +337,9 @@ export default {
   },
   data () {
     return {
-      parlamentaresExpandidos: []
+      parlamentaresExpandidos: [],
+      unidadesExpandidas: [],
+      entidadesExpandidas: []
     }
   },
   computed: {
@@ -354,6 +418,7 @@ export default {
       const max = list.length ? list[0].total : 1
       return list.map(({ unidades, ...p }) => {
         const segmentos = Object.entries(unidades)
+          .filter(([, u]) => u.total !== 0)
           .map(([key, u]) => ({
             key,
             label: u.label,
@@ -369,24 +434,29 @@ export default {
     unidadeDistribuicaoAll () {
       const map = {}
       this.lista.forEach(item => {
+        if (item.tipo === 0) return
         const u = item.unidade
         if (!u) return
         const key = u.id
         if (!map[key]) {
-          map[key] = { id: key, nome: u.__str__, total: 0, count: 0 }
+          map[key] = { id: key, nome: u.__str__, total: 0, count: 0, itens: [] }
         }
         map[key].total += Number(this.valorEfetivo(item))
         map[key].count++
+        map[key].itens.push(item)
       })
-      return Object.values(map).sort((a, b) => b.total - a.total)
+      return Object.values(map)
+        .filter(u => u.total !== 0)
+        .sort((a, b) => b.total - a.total)
     },
     unidadeDistribuicao () {
       const all = this.unidadeDistribuicaoAll
-      const top = all.slice(0, TOP_N)
+      const top = this.parlamentarSelecionado ? all : all.slice(0, TOP_N)
       const max = top.length ? top[0].total : 1
-      return top.map(u => ({ ...u, pct: (u.total / max) * 100 }))
+      return top.map(({ itens, ...u }) => ({ ...u, pct: (u.total / max) * 100, parlamentares: this.distribuicaoPorParlamentar(itens) }))
     },
     unidadeDistribuicaoExtra () {
+      if (this.parlamentarSelecionado) return 0
       return Math.max(0, this.unidadeDistribuicaoAll.length - TOP_N)
     },
 
@@ -394,30 +464,45 @@ export default {
       const map = {}
       this.lista.forEach(item => {
         if (!isEmenda(item)) return
+        if (item.tipo === 0) return
         const e = item.entidade
         if (!e || !e.nome_fantasia) return
         const key = e.id
         if (!map[key]) {
-          map[key] = { id: key, nome: e.nome_fantasia, total: 0, count: 0 }
+          map[key] = { id: key, nome: e.nome_fantasia, total: 0, count: 0, itens: [] }
         }
         map[key].total += Number(this.valorEfetivo(item))
         map[key].count++
+        map[key].itens.push(item)
       })
-      return Object.values(map).sort((a, b) => b.total - a.total)
+      return Object.values(map)
+        .filter(e => e.total !== 0)
+        .sort((a, b) => b.total - a.total)
     },
     entidadeDistribuicao () {
       const all = this.entidadeDistribuicaoAll
-      const top = all.slice(0, TOP_N)
+      const top = this.parlamentarSelecionado ? all : all.slice(0, TOP_N)
       const max = top.length ? top[0].total : 1
-      return top.map(e => ({ ...e, pct: (e.total / max) * 100 }))
+      return top.map(({ itens, ...e }) => ({ ...e, pct: (e.total / max) * 100, parlamentares: this.distribuicaoPorParlamentar(itens) }))
     },
     entidadeDistribuicaoExtra () {
+      if (this.parlamentarSelecionado) return 0
       return Math.max(0, this.entidadeDistribuicaoAll.length - TOP_N)
     },
 
     todosParlamentaresExpandidos () {
       return this.parlamentarDistribuicao.length > 0 &&
         this.parlamentaresExpandidos.length >= this.parlamentarDistribuicao.length
+    },
+
+    todasUnidadesExpandidas () {
+      return this.unidadeDistribuicao.length > 0 &&
+        this.unidadesExpandidas.length >= this.unidadeDistribuicao.length
+    },
+
+    todasEntidadesExpandidas () {
+      return this.entidadeDistribuicao.length > 0 &&
+        this.entidadesExpandidas.length >= this.entidadeDistribuicao.length
     }
   },
   methods: {
@@ -480,6 +565,23 @@ export default {
       }
       return valorInicialParlamentar
     },
+    // Agrupa o valor de um conjunto de itens por parlamentar (usado nos detalhes das seções 4 e 5)
+    distribuicaoPorParlamentar (itens) {
+      const map = {}
+      itens.forEach(item => {
+        const parlamentares = isEmenda(item) ? item.parlamentares : item.parlamentares_valor
+        if (!parlamentares || !parlamentares.length) return
+        parlamentares.forEach(p => {
+          if (!map[p.id]) {
+            map[p.id] = { key: p.id, label: p.__str__ || p.nome_parlamentar || `Parlamentar ${p.id}`, total: 0 }
+          }
+          map[p.id].total += this.valorEfetivoPorParlamentar(item, p.id)
+        })
+      })
+      return Object.values(map)
+        .filter(s => s.total !== 0)
+        .sort((a, b) => b.total - a.total)
+    },
     formatCurrency (value) {
       return Number(value).toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
@@ -512,6 +614,32 @@ export default {
       this.parlamentaresExpandidos = this.todosParlamentaresExpandidos
         ? []
         : this.parlamentarDistribuicao.map(p => p.id)
+    },
+    toggleUnidadeDetalhe (id) {
+      const idx = this.unidadesExpandidas.indexOf(id)
+      if (idx === -1) this.unidadesExpandidas.push(id)
+      else this.unidadesExpandidas.splice(idx, 1)
+    },
+    isUnidadeExpandida (id) {
+      return this.unidadesExpandidas.includes(id)
+    },
+    toggleTodasUnidades () {
+      this.unidadesExpandidas = this.todasUnidadesExpandidas
+        ? []
+        : this.unidadeDistribuicao.map(u => u.id)
+    },
+    toggleEntidadeDetalhe (id) {
+      const idx = this.entidadesExpandidas.indexOf(id)
+      if (idx === -1) this.entidadesExpandidas.push(id)
+      else this.entidadesExpandidas.splice(idx, 1)
+    },
+    isEntidadeExpandida (id) {
+      return this.entidadesExpandidas.includes(id)
+    },
+    toggleTodasEntidades () {
+      this.entidadesExpandidas = this.todasEntidadesExpandidas
+        ? []
+        : this.entidadeDistribuicao.map(e => e.id)
     }
   }
 }
@@ -528,6 +656,15 @@ export default {
   border-radius: 0.375rem;
   padding: 1rem 1.25rem;
   margin-bottom: 1rem;
+}
+/* Reduz o gutter padrão do bootstrap (30px) para igualar ao espaço vertical entre seções (1rem) */
+.dash-grid-tight {
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  > [class*='col-'] {
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+  }
 }
 .dash-section-title {
   font-weight: 700;
