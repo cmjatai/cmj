@@ -93,8 +93,19 @@
 
     <!-- ===== SEÇÃO 3: Distribuição por Parlamentar ===== -->
     <div class="dash-section" v-if="parlamentarDistribuicao.length">
-      <div class="dash-section-title">
-        <i class="fas fa-users mr-2"></i>Distribuição por Parlamentar
+      <div class="dash-section-title d-flex justify-content-between align-items-center">
+        <span>
+          <i class="fas fa-users mr-2"></i>Distribuição por Parlamentar em Áreas Diversas
+          <small class="text-muted ml-2">(*50% são da Área da Saúde e não estão incluídos)</small>
+        </span>
+        <button
+          type="button"
+          class="btn btn-sm btn-link text-muted p-0 dash-toggle-all"
+          @click="toggleTodosParlamentares"
+        >
+          <i :class="['fas', todosParlamentaresExpandidos ? 'fa-compress-alt' : 'fa-expand-alt', 'mr-1']"></i>
+          {{ todosParlamentaresExpandidos ? 'Recolher todos' : 'Expandir todos' }}
+        </button>
       </div>
       <div class="dash-bar-list">
         <div
@@ -116,78 +127,109 @@
               <span class="dash-bar-name text-truncate">{{ p.nome }}</span>
               <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(p.total) }}</span>
             </div>
-            <div class="progress dash-bar-progress">
+            <div
+              class="progress dash-bar-progress dash-bar-progress--clickable"
+              role="button"
+              @click="toggleParlamentarDetalhe(p.id)"
+            >
               <div
-                class="progress-bar bg-primary"
-                :style="{ width: p.pct + '%' }"
+                v-for="seg in p.segmentos"
+                :key="seg.key"
+                class="progress-bar"
+                :title="`${seg.label}: R$ ${formatCurrency(seg.total)}`"
+                :style="{ width: seg.pct + '%', backgroundColor: seg.color }"
               ></div>
             </div>
             <small class="text-muted">
               {{ p.emendas }} emenda{{ p.emendas !== 1 ? 's' : '' }},
               {{ p.ajustes }} ajuste{{ p.ajustes !== 1 ? 's' : '' }}
             </small>
+            <table v-if="isParlamentarExpandido(p.id)" class="table table-sm dash-bar-detalhe mb-0 mt-2">
+              <thead>
+                <tr>
+                  <th>Unidade</th>
+                  <th class="text-right">Valor</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="seg in p.segmentos" :key="seg.key">
+                  <td>{{ seg.label }}</td>
+                  <td class="d-flex text-nowrap justify-content-between">
+                    <small class="text-muted">({{ formatPercent(seg.total, p.total) }}%)</small>
+                    <span>
+                      R$ {{ formatCurrency(seg.total) }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ===== SEÇÃO 4: Distribuição por Unidade Orçamentária ===== -->
-    <div class="dash-section" v-if="unidadeDistribuicao.length">
-      <div class="dash-section-title">
-        <i class="fas fa-building mr-2"></i>Distribuição por Unidade Orçamentária
-        <small v-if="unidadeDistribuicaoExtra > 0" class="text-muted ml-2">
-          (top {{ unidadeDistribuicao.length }} de {{ unidadeDistribuicao.length + unidadeDistribuicaoExtra }})
-        </small>
-      </div>
-      <div class="dash-bar-list">
-        <div
-          v-for="u in unidadeDistribuicao"
-          :key="u.id"
-          class="dash-bar-item d-flex align-items-center"
-        >
-          <div class="flex-grow-1 min-w-0">
-            <div class="d-flex justify-content-between align-items-baseline mb-1">
-              <span class="dash-bar-name text-truncate">{{ u.nome }}</span>
-              <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(u.total) }}</span>
+    <!-- ===== SEÇÃO 4 e 5: Distribuição por Unidade Orçamentária / Entidade-Beneficiário ===== -->
+    <div class="row" v-if="unidadeDistribuicao.length || entidadeDistribuicao.length">
+      <div class="col-md-6" v-if="unidadeDistribuicao.length">
+        <div class="dash-section">
+          <div class="dash-section-title">
+            <i class="fas fa-building mr-2"></i>Distribuição por Unidade Orçamentária
+            <small v-if="unidadeDistribuicaoExtra > 0" class="text-muted ml-2">
+              (top {{ unidadeDistribuicao.length }} de {{ unidadeDistribuicao.length + unidadeDistribuicaoExtra }})
+            </small>
+          </div>
+          <div class="dash-bar-list">
+            <div
+              v-for="u in unidadeDistribuicao"
+              :key="u.id"
+              class="dash-bar-item d-flex align-items-center"
+            >
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                  <span class="dash-bar-name text-truncate">{{ u.nome }}</span>
+                  <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(u.total) }}</span>
+                </div>
+                <div class="progress dash-bar-progress">
+                  <div
+                    class="progress-bar bg-info"
+                    :style="{ width: u.pct + '%' }"
+                  ></div>
+                </div>
+                <small class="text-muted">{{ u.count }} registro{{ u.count !== 1 ? 's' : '' }}</small>
+              </div>
             </div>
-            <div class="progress dash-bar-progress">
-              <div
-                class="progress-bar bg-info"
-                :style="{ width: u.pct + '%' }"
-              ></div>
-            </div>
-            <small class="text-muted">{{ u.count }} registro{{ u.count !== 1 ? 's' : '' }}</small>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- ===== SEÇÃO 5: Distribuição por Entidade/Beneficiário ===== -->
-    <div class="dash-section" v-if="entidadeDistribuicao.length">
-      <div class="dash-section-title">
-        <i class="fas fa-hand-holding-heart mr-2"></i>Distribuição por Entidade/Beneficiário
-        <small v-if="entidadeDistribuicaoExtra > 0" class="text-muted ml-2">
-          (top {{ entidadeDistribuicao.length }} de {{ entidadeDistribuicao.length + entidadeDistribuicaoExtra }})
-        </small>
-      </div>
-      <div class="dash-bar-list">
-        <div
-          v-for="e in entidadeDistribuicao"
-          :key="e.id"
-          class="dash-bar-item d-flex align-items-center"
-        >
-          <div class="flex-grow-1 min-w-0">
-            <div class="d-flex justify-content-between align-items-baseline mb-1">
-              <span class="dash-bar-name text-truncate">{{ e.nome }}</span>
-              <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(e.total) }}</span>
+      <div class="col-md-6" v-if="entidadeDistribuicao.length">
+        <div class="dash-section">
+          <div class="dash-section-title">
+            <i class="fas fa-hand-holding-heart mr-2"></i>Distribuição por Entidade/Beneficiário
+            <small v-if="entidadeDistribuicaoExtra > 0" class="text-muted ml-2">
+              (top {{ entidadeDistribuicao.length }} de {{ entidadeDistribuicao.length + entidadeDistribuicaoExtra }})
+            </small>
+          </div>
+          <div class="dash-bar-list">
+            <div
+              v-for="e in entidadeDistribuicao"
+              :key="e.id"
+              class="dash-bar-item d-flex align-items-center"
+            >
+              <div class="flex-grow-1 min-w-0">
+                <div class="d-flex justify-content-between align-items-baseline mb-1">
+                  <span class="dash-bar-name text-truncate">{{ e.nome }}</span>
+                  <span class="dash-bar-value font-weight-bold ml-2 text-nowrap">R$ {{ formatCurrency(e.total) }}</span>
+                </div>
+                <div class="progress dash-bar-progress">
+                  <div
+                    class="progress-bar bg-success"
+                    :style="{ width: e.pct + '%' }"
+                  ></div>
+                </div>
+                <small class="text-muted">{{ e.count }} registro{{ e.count !== 1 ? 's' : '' }}</small>
+              </div>
             </div>
-            <div class="progress dash-bar-progress">
-              <div
-                class="progress-bar bg-success"
-                :style="{ width: e.pct + '%' }"
-              ></div>
-            </div>
-            <small class="text-muted">{{ e.count }} registro{{ e.count !== 1 ? 's' : '' }}</small>
           </div>
         </div>
       </div>
@@ -231,6 +273,11 @@ export default {
     selectedLoaIds: { type: Array, default: () => [] },
     totaisEmpenhos: { type: Object, default: () => ({}) }
   },
+  data () {
+    return {
+      parlamentaresExpandidos: []
+    }
+  },
   computed: {
     kpis () {
       let totalSaude = 0; let countSaude = 0
@@ -264,11 +311,17 @@ export default {
 
     parlamentarDistribuicao () {
       const map = {}
-      this.lista.forEach(item => {
+      const unidadeTotais = {}
+      // apenas emendas/ajustes de 99 (Áreas Diversas) entram na soma
+      const itensValidos = this.lista.filter(item => item.tipo === 99)
+      itensValidos.forEach(item => {
         const parlamentares = isEmenda(item) ? item.parlamentares : item.parlamentares_valor
         if (!parlamentares || !parlamentares.length) return
         const val = Number(this.valorEfetivo(item))
-        const share = val / parlamentares.length
+        const unidadeKey = item.unidade ? item.unidade.id : 'sem-unidade'
+        const unidadeLabel = item.unidade ? item.unidade.__str__ : 'Sem unidade'
+        if (!unidadeTotais[unidadeKey]) unidadeTotais[unidadeKey] = { label: unidadeLabel, total: 0 }
+        unidadeTotais[unidadeKey].total += val
         parlamentares.forEach(p => {
           if (!map[p.id]) {
             map[p.id] = {
@@ -277,17 +330,40 @@ export default {
               fotografia: p.fotografia || null,
               total: 0,
               emendas: 0,
-              ajustes: 0
+              ajustes: 0,
+              unidades: {}
             }
           }
-          map[p.id].total += share
+          const valorParlamentar = this.valorEfetivoPorParlamentar(item, p.id)
+          map[p.id].total += valorParlamentar
+          if (!map[p.id].unidades[unidadeKey]) map[p.id].unidades[unidadeKey] = { label: unidadeLabel, total: 0 }
+          map[p.id].unidades[unidadeKey].total += valorParlamentar
           if (isEmenda(item)) map[p.id].emendas++
           else map[p.id].ajustes++
         })
       })
+
+      // cores fixas por unidade, na mesma ordem em todos os parlamentares
+      const unidadeKeys = Object.keys(unidadeTotais).sort((a, b) => unidadeTotais[b].total - unidadeTotais[a].total)
+      const corPorUnidade = {}
+      unidadeKeys.forEach((key, i) => {
+        corPorUnidade[key] = DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length]
+      })
+
       const list = Object.values(map).sort((a, b) => b.total - a.total)
       const max = list.length ? list[0].total : 1
-      return list.map(p => ({ ...p, pct: (p.total / max) * 100 }))
+      return list.map(({ unidades, ...p }) => {
+        const segmentos = Object.entries(unidades)
+          .map(([key, u]) => ({
+            key,
+            label: u.label,
+            total: u.total,
+            pct: (u.total / max) * 100,
+            color: corPorUnidade[key]
+          }))
+          .sort((a, b) => b.total - a.total)
+        return { ...p, pct: (p.total / max) * 100, segmentos }
+      })
     },
 
     unidadeDistribuicaoAll () {
@@ -337,6 +413,11 @@ export default {
     },
     entidadeDistribuicaoExtra () {
       return Math.max(0, this.entidadeDistribuicaoAll.length - TOP_N)
+    },
+
+    todosParlamentaresExpandidos () {
+      return this.parlamentarDistribuicao.length > 0 &&
+        this.parlamentaresExpandidos.length >= this.parlamentarDistribuicao.length
     }
   },
   methods: {
@@ -381,10 +462,35 @@ export default {
       }
       return valor_inicial
     },
+    // Valor de um item atribuído a um parlamentar específico (independente do parlamentarSelecionado)
+    valorEfetivoPorParlamentar (item, parlamentarId) {
+      if (!isEmenda(item)) {
+        const vp = item.valor_por_parlamentar && item.valor_por_parlamentar[parlamentarId]
+        return vp !== undefined ? Number(vp) : 0
+      }
+      const valorInicialTotal = Number(item.valor_inicial || 0)
+      const vip = item.valor_inicial_por_parlamentar && item.valor_inicial_por_parlamentar[parlamentarId]
+      const valorInicialParlamentar = vip !== undefined ? Number(vip) : 0
+
+      if (item.has_ajustes || item.fase === 40) {
+        if (!valorInicialTotal) return 0
+        const valor_computado = Number(item.valor_computado || 0)
+        // mantém a proporção original do parlamentar aplicada ao valor computado
+        return (valorInicialParlamentar / valorInicialTotal) * valor_computado
+      }
+      return valorInicialParlamentar
+    },
     formatCurrency (value) {
       return Number(value).toLocaleString('pt-BR', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
+      })
+    },
+    formatPercent (value, total) {
+      if (!total) return '0,0'
+      return (Number(value) / Number(total) * 100).toLocaleString('pt-BR', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
       })
     },
     fotoThumb (foto) {
@@ -393,6 +499,19 @@ export default {
         return foto.replace('/media/', '/media/cache/') || foto
       }
       return foto.thumbnail || foto.original || ''
+    },
+    toggleParlamentarDetalhe (id) {
+      const idx = this.parlamentaresExpandidos.indexOf(id)
+      if (idx === -1) this.parlamentaresExpandidos.push(id)
+      else this.parlamentaresExpandidos.splice(idx, 1)
+    },
+    isParlamentarExpandido (id) {
+      return this.parlamentaresExpandidos.includes(id)
+    },
+    toggleTodosParlamentares () {
+      this.parlamentaresExpandidos = this.todosParlamentaresExpandidos
+        ? []
+        : this.parlamentarDistribuicao.map(p => p.id)
     }
   }
 }
@@ -417,6 +536,15 @@ export default {
   margin-bottom: 0.75rem;
   padding-bottom: 0.4rem;
   border-bottom: 2px solid #e9ecef;
+}
+.dash-toggle-all {
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+  &:hover {
+    text-decoration: none;
+    color: #495057 !important;
+  }
 }
 
 /* KPI Cards */
@@ -503,6 +631,25 @@ export default {
   height: 0.5rem;
   border-radius: 0.25rem;
   background: #e9ecef;
+}
+.dash-bar-progress--clickable {
+  cursor: pointer;
+  transition: opacity 0.15s ease-in-out;
+  &:hover {
+    opacity: 0.8;
+  }
+}
+.dash-bar-detalhe {
+  font-size: 0.82rem;
+  th {
+    font-weight: 600;
+    color: #666;
+    border-top: none;
+    padding: 0.3rem 0.5rem;
+  }
+  td {
+    padding: 0.3rem 0.5rem;
+  }
 }
 .min-w-0 {
   min-width: 0;

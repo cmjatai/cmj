@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class Pdf2PdfA:
     """
     Class responsible for converting PDF files to PDF/A format using ocrmypdf.
-
+Pdf2PdfA
     Attributes:
         in_path (str): Path to the input PDF file.
         jobs (int): Number of parallel jobs to run.

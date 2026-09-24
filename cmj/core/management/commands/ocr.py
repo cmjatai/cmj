@@ -26,8 +26,9 @@ class Command(BaseCommand):
         logger.info("Post-save signals have been disconnected.")
         logger.info("OCR command setup is complete.")
 
-        in_path = settings.MEDIA_ROOT.child("teste", "ri.pdf")
+        #in_path = settings.MEDIA_ROOT.child("teste", "ri.pdf")
 
         in_path = settings.MEDIA_ROOT.child("teste", "2026-4979-lei-lei-ordinaria.pdf")
+        #in_path = '/home'
         logger.info("Pdf2PdfA conversion is starting for file: %s", in_path)
         Pdf2PdfA(in_path, ocr=True, level=3, jobs=8, verbose=2).execute()
