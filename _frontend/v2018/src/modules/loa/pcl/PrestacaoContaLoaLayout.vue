@@ -642,17 +642,20 @@ export default {
         .filter(item => item && item.id !== undefined && !cache[item.id])
         .map(item => item.id)
 
+      // cria sequencia Ids separados por vírgula
+      const idsSequence = missingIds.join(',')
+      const params = { ...this.detail_params[model], id__in: idsSequence, get_all: true }
+
       const fetchMissing = missingIds.length
-        ? Promise.all(missingIds.map(id =>
-          this.utils.fetch({
-            app: 'loa',
-            model,
-            id,
-            params: this.detail_params[model]
-          }).then(response => {
-            cache[id] = response.data
+        ? this.utils.fetch({
+          app: 'loa',
+          model,
+          params: params
+        }).then(response => {
+          missingIds.forEach(id => {
+            cache[id] = response.data.find(item => item.id === id)
           })
-        ))
+        })
         : Promise.resolve()
 
       return fetchMissing.then(() =>
