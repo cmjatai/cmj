@@ -96,7 +96,7 @@
       <div class="dash-section-title d-flex justify-content-between align-items-center">
         <span>
           <i class="fas fa-users mr-2"></i>Distribuição por Parlamentar em Áreas Diversas
-          <small class="text-muted ml-2">(*50% são da Área da Saúde e não estão incluídos)</small>
+          <small class="text-muted ml-2">(*50% da Área da Saúde não estão incluídos.)</small>
         </span>
         <button
           type="button"
@@ -181,12 +181,15 @@
       <div class="col-md-6" v-if="unidadeDistribuicao.length">
         <div class="dash-section">
           <div class="dash-section-title d-flex justify-content-between align-items-center">
-            <span>
-              <i class="fas fa-building mr-2"></i>Distribuição por Unidade Orçamentária
-              <small v-if="unidadeDistribuicaoExtra > 0" class="text-muted ml-2">
-                (top {{ unidadeDistribuicao.length }} de {{ unidadeDistribuicao.length + unidadeDistribuicaoExtra }})
-              </small>
-            </span>
+            <div class="d-flex flex-column">
+              <span>
+                <i class="fas fa-building mr-2"></i>Distribuição por Unidade Orçamentária
+                <small v-if="unidadeDistribuicaoExtra > 0" class="text-muted ml-2">
+                  (top {{ unidadeDistribuicao.length }} de {{ unidadeDistribuicao.length + unidadeDistribuicaoExtra }})
+                </small>
+              </span>
+              <small class="text-muted">*Apenas unidades orçamentárias das Áreas Diversas</small>
+            </div>
             <button
               type="button"
               class="btn btn-sm btn-link text-muted p-0 dash-toggle-all"
@@ -252,12 +255,15 @@
       <div class="col-md-6" v-if="entidadeDistribuicao.length">
         <div class="dash-section">
           <div class="dash-section-title d-flex justify-content-between align-items-center">
-            <span>
-              <i class="fas fa-hand-holding-heart mr-2"></i>Distribuição por Entidade/Beneficiário
-              <small v-if="entidadeDistribuicaoExtra > 0" class="text-muted ml-2">
-                (top {{ entidadeDistribuicao.length }} de {{ entidadeDistribuicao.length + entidadeDistribuicaoExtra }})
-              </small>
-            </span>
+            <div class="d-flex flex-column">
+              <span>
+                <i class="fas fa-hand-holding-heart mr-2"></i>Distribuição por Entidade/Beneficiário
+                <small v-if="entidadeDistribuicaoExtra > 0" class="text-muted ml-2">
+                  (top {{ entidadeDistribuicao.length }} de {{ entidadeDistribuicao.length + entidadeDistribuicaoExtra }})
+                </small>
+              </span>
+              <small class="text-muted">*Inclui entidades da Área da Saúde e de Áreas Diversas</small>
+            </div>
             <button
               type="button"
               class="btn btn-sm btn-link text-muted p-0 dash-toggle-all"
@@ -317,6 +323,14 @@
               </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        <div class="dash-section">
+          <h3>OBS: Os dados acima são computados com base nas Emendas Impositivas e Ajustes Técnicos.</h3>
+          <h4>Outros gráficos que comporão o dashboard estão em desenvolvimento para correlacionar com os Empenhos.</h4>
         </div>
       </div>
     </div>
@@ -458,7 +472,7 @@ export default {
     unidadeDistribuicaoAll () {
       const map = {}
       this.lista.forEach(item => {
-        if (item.tipo === 0) return
+        if (item.tipo !== 99) return
         const u = item.unidade
         if (!u) return
         const key = u.id
@@ -616,7 +630,7 @@ export default {
       if (!total) return '0,0'
       return (Number(value) / Number(total) * 100).toLocaleString('pt-BR', {
         minimumFractionDigits: 1,
-        maximumFractionDigits: 1
+        maximumFractionDigits: 2
       })
     },
     fotoThumb (foto) {
