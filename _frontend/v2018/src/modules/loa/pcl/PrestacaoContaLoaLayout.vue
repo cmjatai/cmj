@@ -96,6 +96,7 @@ export default {
       loas_data: {},
       ready: false,
       viewMode: 'list',
+      dash_activated: true,
       filters_value: {
         dash_activated: true,
         unidade: null,
@@ -118,6 +119,30 @@ export default {
       results: {
         emendas: [],
         ajustes: []
+      },
+      // cache local dos registros completos já obtidos, por modelo e id,
+      // para evitar refazer buscas com joins/expand a cada filtro aplicado
+      record_cache: {
+        emendaloa: {},
+        registroajusteloa: {}
+      },
+      // true depois da 1a busca tradicional (completa) de cada modelo
+      full_load_done: {
+        emendaloa: false,
+        registroajusteloa: false
+      },
+      // params usados apenas na busca individual (por id) do registro completo
+      detail_params: {
+        emendaloa: {
+          exclude: 'search;metadata;prefixo_finalidade;prefixo_indicacao;owner;finalidade;finalidade_format;proposicao',
+          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id;entidade.id,nome_fantasia,__str__',
+          expand: 'parlamentares;unidade;materia;entidade'
+        },
+        registroajusteloa: {
+          exclude: 'search',
+          include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
+          expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa'
+        }
       },
       totais_empenhos: {
         total_empenhado: 0,
@@ -299,10 +324,10 @@ export default {
       if (options.withListOptions) {
         Object.assign(params, {
           o: 'materia__tipo__sigla,materia__numero',
-          exclude: 'search;metadata;prefixo_finalidade;prefixo_indicacao;owner;finalidade;finalidade_format;proposicao',
-          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id;entidade.id,nome_fantasia,__str__',
-          expand: 'parlamentares;unidade;materia;entidade',
-          page_size: 25
+          // 1a busca (cache vazio): traz o registro completo direto na listagem.
+          // Buscas seguintes: só o id, resolvido via cache (record_cache)
+          ...(options.traditional ? this.detail_params.emendaloa : { include: 'id' }),
+          page_size: 40
         })
       }
 
@@ -323,14 +348,13 @@ export default {
 
       if (options.withListOptions) {
         Object.assign(params, {
-          exclude: 'search',
-          include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
-          expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa',
           o: 'parlamentares_valor__nome_parlamentar',
-          page_size: 25
+          // 1a busca (cache vazio): traz o registro completo direto na listagem.
+          // Buscas seguintes: só o id, resolvido via cache (record_cache)
+          ...(options.traditional ? this.detail_params.registroajusteloa : { include: 'id' }),
+          page_size: 40
         })
       }
-
       return params
     },
     fetchTotaisEmpenhos (fetchId, loaIds = this.selected_loa_ids) {
@@ -475,7 +499,8 @@ export default {
         situacao: [],
         emendas_tipos: [],
         ajustes: 'False',
-        search: ''
+        search: '',
+        dash_activated: this.dash_activated
       }
     },
     onPageSizeChange (size) {
@@ -608,7 +633,44 @@ export default {
       })
     },
 
-    _fetchAllPages (resultKey, model, params, fetchId, loaId) {
+    // Resolve uma pagina de ids no registro completo, usando o cache local.
+    // So dispara requisicao individual (com expand/include/exclude) para os
+    // ids que ainda nao foram carregados nesta sessao do componente.
+    resolveRecords (model, idsPage) {
+      const cache = this.record_cache[model]
+      const missingIds = idsPage
+        .filter(item => item && item.id !== undefined && !cache[item.id])
+        .map(item => item.id)
+
+      const fetchMissing = missingIds.length
+        ? Promise.all(missingIds.map(id =>
+          this.utils.fetch({
+            app: 'loa',
+            model,
+            id,
+            params: this.detail_params[model]
+          }).then(response => {
+            cache[id] = response.data
+          })
+        ))
+        : Promise.resolve()
+
+      return fetchMissing.then(() =>
+        idsPage
+          .map(item => item && cache[item.id])
+          .filter(record => record)
+      )
+    },
+    // Busca tradicional (1a busca): a pagina já vem com o registro completo,
+    // só precisamos guardá-lo no cache
+    cacheFullRecords (model, pageItems) {
+      const cache = this.record_cache[model]
+      pageItems.forEach(item => {
+        if (item && item.id !== undefined) cache[item.id] = item
+      })
+      return pageItems
+    },
+    _fetchAllPages (resultKey, model, params, fetchId, loaId, traditional) {
       const fetchPage = (page) => {
         if (this._fetchId !== fetchId) return Promise.resolve()
 
@@ -620,27 +682,35 @@ export default {
           if (this._fetchId !== fetchId) return
 
           const data = response.data
-          let items = []
+          let pageItems = []
           let nextPage = null
 
           if (data && data.pagination && Array.isArray(data.results)) {
-            items = data.results
+            pageItems = data.results
             nextPage = data.pagination.next_page
           } else if (Array.isArray(data)) {
-            items = data
+            pageItems = data
           }
 
-          if (items.length && this.selected_loa_ids.includes(loaId)) {
-            items = items.map(item => Object.assign({}, item, { _loa_id: loaId }))
-            this.results = Object.assign({}, this.results, {
-              [resultKey]: [...this.results[resultKey], ...items]
-            })
-            this.firstPageLoaded = true
-          }
+          const resolved = traditional
+            ? Promise.resolve(this.cacheFullRecords(model, pageItems))
+            : this.resolveRecords(model, pageItems)
 
-          if (nextPage) {
-            return fetchPage(nextPage)
-          }
+          return resolved.then((items) => {
+            if (this._fetchId !== fetchId) return
+
+            if (items.length && this.selected_loa_ids.includes(loaId)) {
+              items = items.map(item => Object.assign({}, item, { _loa_id: loaId }))
+              this.results = Object.assign({}, this.results, {
+                [resultKey]: [...this.results[resultKey], ...items]
+              })
+              this.firstPageLoaded = true
+            }
+
+            if (nextPage) {
+              return fetchPage(nextPage)
+            }
+          })
         })
       }
       return fetchPage(1)
@@ -679,17 +749,41 @@ export default {
         .map(l => l.id)
         .filter(id => (isIncremental ? onlyLoaIds : this.selected_loa_ids).includes(id))
 
+      // 1a busca de cada modelo (cache ainda vazio): traz os registros completos direto.
+      // Depois disso, toda busca passa a ser leve (include=id) resolvida via cache.
+      const emendaTraditional = !this.full_load_done.emendaloa
+      const ajusteTraditional = !this.full_load_done.registroajusteloa
+      const emendaTraditionalPending = []
+      const ajusteTraditionalPending = []
+
       orderedLoaIds.forEach(loaId => {
         if (fetchEmendas) {
-          const params_emendas = this.getEmendaParams(loaId, { withListOptions: true })
-          pending.push(this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId, loaId))
+          const params_emendas = this.getEmendaParams(loaId, { withListOptions: true, traditional: emendaTraditional })
+          const p = this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId, loaId, emendaTraditional)
+          pending.push(p)
+          if (emendaTraditional) emendaTraditionalPending.push(p)
         }
 
         if (fetchAjustes) {
-          const params_ajustes = this.getAjusteParams(loaId, { withListOptions: true })
-          pending.push(this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId, loaId))
+          const params_ajustes = this.getAjusteParams(loaId, { withListOptions: true, traditional: ajusteTraditional })
+          const p = this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId, loaId, ajusteTraditional)
+          pending.push(p)
+          if (ajusteTraditional) ajusteTraditionalPending.push(p)
         }
       })
+
+      // so marca a 1a busca como concluida quando TODAS as paginas de TODAS
+      // as loas dessa rodada tiverem terminado (nao no disparo da page=1)
+      if (emendaTraditionalPending.length) {
+        Promise.all(emendaTraditionalPending).then(() => {
+          if (this._fetchId === currentFetchId) this.full_load_done.emendaloa = true
+        })
+      }
+      if (ajusteTraditionalPending.length) {
+        Promise.all(ajusteTraditionalPending).then(() => {
+          if (this._fetchId === currentFetchId) this.full_load_done.registroajusteloa = true
+        })
+      }
 
       if (!pending.length) {
         this.fetching = false

@@ -63,7 +63,7 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
 
     def get_fase_prestacao_contas(self, obj):
         pcr_last = obj.prestacaocontaregistro_set.all().last()
-        return pcr_last.situacao
+        return pcr_last.situacao if pcr_last else None
 
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa

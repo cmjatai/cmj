@@ -23,7 +23,7 @@ class DisabledMiddleware:
 
         response = self.get_response(request)
 
-        if not request.user.is_authenticated and "u" in request.GET:
+        if hasattr(request, "user") and not request.user.is_authenticated and "u" in request.GET:
             return HttpResponse(status=444)
             # return HttpResponseForbidden()
 
