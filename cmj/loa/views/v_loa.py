@@ -18,6 +18,7 @@ from cmj.loa.models import (
     RegistroAjusteLoaParlamentar,
 )
 from cmj.loa.models.m_financeiro_execucao import Empenho
+from cmj.loa.models.m_prestacaoconta import PrestacaoContaRegistro
 from cmj.loa.views.v_mixins import LoaContextDataMixin
 from cmj.utils import quantize
 from sapl.crud.base import RP_DETAIL, RP_LIST, Crud
@@ -311,7 +312,10 @@ class LoaCrud(Crud):
                 nj = l.materia.normajuridica()
                 if not nj:
                     get_column = self.get_column("materia|fk_urlize_for_detail", "")
-                    return get_column["verbose_name"], f'''{get_column["text"]}<em class="text-orange"><strong>Processo Legislativo em Andamento</strong></em>'''
+                    return (
+                        get_column["verbose_name"],
+                        f"""{get_column["text"]}<em class="text-orange"><strong>Processo Legislativo em Andamento</strong></em>""",
+                    )
 
                 return (
                     "Norma Jurídica",
@@ -637,6 +641,9 @@ class LoaCrud(Crud):
             )
 
             is_us = self.request.user.is_superuser
+            existe_pcl = PrestacaoContaRegistro.objects.filter(
+                prestacao_conta__loa=l
+            ).exists()
 
             # dsjd display_saude_ja_destinado
             dsjd = 1 if totais[t10]["ja_destinado"] or is_us else 0
@@ -648,6 +655,10 @@ class LoaCrud(Crud):
             ddit = 1 if totais[t99]["impedimento_tecnico"] or is_us else 0
             ddsd = 1 if totais[t99]["sem_destinacao"] or is_us else 0
 
+            if existe_pcl:
+                ddsd = 0
+                dssd = 0
+
             context = dict(
                 is_superuser=is_us,
                 resumo_emendas_impositivas=resumo_emendas_impositivas,
@@ -656,17 +667,7 @@ class LoaCrud(Crud):
                         num_columns=dsjd + dsit + dssd,
                         ja_destinado="Valores<br>Já Destinados" if dsjd else "",
                         impedimento_tecnico="Impedimentos<br>Técnicos" if dsit else "",
-                        sem_destinacao=(
-                            (
-                                "Sem Destinação"
-                                if not l.materia
-                                or l.materia
-                                and not l.materia.normajuridica()
-                                else "Remanescente"
-                            )
-                            if dssd
-                            else ""
-                        ),
+                        sem_destinacao="Sem<br>Destinação" if dssd else "",
                         total_empenhado="Total Empenhado",
                         total_liquidado="Total Liquidado",
                         total_pago_bruto="Total Pago Bruto",
@@ -676,17 +677,7 @@ class LoaCrud(Crud):
                         num_columns=ddjd + ddit + ddsd,
                         ja_destinado="Valores<br>Já Destinados" if ddjd else "",
                         impedimento_tecnico="Impedimentos<br>Técnicos" if ddit else "",
-                        sem_destinacao=(
-                            (
-                                "Sem Destinação"
-                                if not l.materia
-                                or l.materia
-                                and not l.materia.normajuridica()
-                                else "Remanescente"
-                            )
-                            if ddsd
-                            else ""
-                        ),
+                        sem_destinacao="Sem<br>Destinação" if ddsd else "",
                         total_empenhado="Total Empenhado",
                         total_liquidado="Total Liquidado",
                         total_pago_bruto="Total Pago Bruto",
