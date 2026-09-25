@@ -210,6 +210,17 @@ class RegistroAjusteLoa(CmjSearchMixin):
         )
         return soma
 
+    @property
+    def valor_computado(self):
+        if self.fase == self.AJUSTE_IMPEDIDO:
+            return Decimal("0.00")
+        return self.soma_valor
+
+    @property
+    def str_valor_computado(self):
+        valor_str = formats.number_format(self.valor_computado, force_grouping=True)
+        return valor_str
+
     def __str__(self):
         return f"R$ {self.str_valor} - {self.oficio_ajuste_loa}"
 

@@ -224,7 +224,7 @@ export default {
   methods: {
     valorEfetivo (item) {
       if (!isEmenda(item)) {
-        let valor = Number(item.valor || 0)
+        let valor = Number(item.valor_computado || 0)
         if (this.parlamentarSelecionado && item.valor_por_parlamentar) {
           const vp = item.valor_por_parlamentar[this.parlamentarSelecionado.id]
           if (vp !== undefined) {

@@ -50,6 +50,11 @@ class EmendaLoaSearchSerializer(CmjSerializerMixin):
 class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     str_valor = serializers.CharField(read_only=True)
 
+    str_valor_computado = serializers.CharField(
+        read_only=True,
+    )
+    valor_computado = serializers.FloatField(read_only=True)
+
     # crie o campo valor como DecimalField chamanado método para calcular
     valor = serializers.SerializerMethodField()
     valor_por_parlamentar = serializers.SerializerMethodField()
@@ -82,9 +87,12 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
         for registro in obj.registroajusteloaparlamentar_set.all():
             parlamentar = registro.parlamentar
             if parlamentar:
-                valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
-                    registro.valor or Decimal("0.00")
-                )
+                if obj.valor_computado:
+                    valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
+                        registro.valor or Decimal("0.00")
+                    )
+                else:
+                    valores[parlamentar.id] = Decimal("0.00")
         return valores
 
     def get_valor(self, obj):

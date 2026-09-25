@@ -45,7 +45,7 @@ const SITUACAO_EMENDA_VARIANTS = {
 
 const SITUACAO_EMENDA_LABELS = {
   10: 'Registrado',
-  40: 'Em Impedimento',
+  40: 'Impedimento',
   60: 'Em Execução',
   99: 'Finalizada'
 }

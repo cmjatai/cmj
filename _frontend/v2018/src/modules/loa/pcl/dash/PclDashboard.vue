@@ -500,7 +500,7 @@ export default {
       const max = list.length ? list[0].total : 1
       return list.map(({ unidades, ...p }) => {
         const segmentos = Object.entries(unidades)
-          .filter(([, u]) => u.total !== 0)
+          // .filter(([, u]) => u.total !== 0)
           .map(([key, u]) => ({
             key: u.id, // preserva o tipo original do id (Object.entries sempre retorna chaves em string)
             label: u.label,
@@ -528,7 +528,7 @@ export default {
         map[key].itens.push(item)
       })
       return Object.values(map)
-        .filter(u => u.total !== 0)
+        // .filter(u => u.total !== 0)
         .sort((a, b) => b.total - a.total)
     },
     unidadeDistribuicao () {
@@ -558,7 +558,7 @@ export default {
         map[key].itens.push(item)
       })
       return Object.values(map)
-        .filter(e => e.total !== 0)
+        // .filter(e => e.total !== 0)
         .sort((a, b) => b.total - a.total)
     },
     entidadeDistribuicao () {
@@ -604,7 +604,7 @@ export default {
         map[label].itens.push(item)
       })
       const sorted = Object.values(map)
-        .filter(f => f.total !== 0)
+        // .filter(f => f.total !== 0)
         .sort((a, b) => b.count - a.count)
       const max = sorted.length ? sorted[0].count : 1
       return sorted.map(({ itens, ...f }, i) => ({
@@ -665,7 +665,7 @@ export default {
         })
       })
       return Object.values(map)
-        .filter(s => s.total !== 0)
+        // .filter(s => s.total !== 0)
         .sort((a, b) => b.total - a.total)
     },
     formatCurrency (value) {
