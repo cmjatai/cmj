@@ -245,11 +245,13 @@ export default {
     },
     viewModeRestore () {
       // restaura o valor do modo de visualização a partir da url ou, na ausência, do localstorage
+      // NÃO chamar syncQueryString() aqui: nesse ponto do mounted() os demais filtros
+      // ainda não foram lidos da querystring (applyQueryFilters roda depois), e sincronizar
+      // agora reescreveria a URL com os valores default, descartando os filtros compartilhados por link.
       const fromQuery = this.$route.query.view
       this.viewMode = (fromQuery === 'list' || fromQuery === 'dashboard')
         ? fromQuery
         : (localStorage.getItem('portalcmj_pcl_view_mode') || this.viewMode)
-      this.syncQueryString()
       return this.viewMode
     },
     emptyTotaisEmpenhos () {
@@ -862,6 +864,8 @@ export default {
         loadExtra.then(() => {
           t.applyQueryFilters()
           t.ready = true
+          // normaliza a querystring somente agora, com os filtros já lidos da url original
+          t.syncQueryString()
           t.fetch()
         })
       })
