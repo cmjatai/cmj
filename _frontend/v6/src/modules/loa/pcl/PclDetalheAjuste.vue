@@ -42,8 +42,8 @@
             </h4>
             <div class="mb-2">
               <span class="badge me-1 text-bg-warning">Registro de Ajuste</span>
-              <span :class="['badge', `text-bg-${situacaoVariant(registro.fase_prestacao_contas)}`]">
-                {{ situacaoLabel(registro.fase_prestacao_contas) }}
+              <span :class="['badge', `text-bg-${situacaoVariant(registro.fase)}`]">
+                {{ situacaoLabel(registro.fase) }}
               </span>
             </div>
           </div>

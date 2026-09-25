@@ -61,9 +61,19 @@
           v-show="secao.dados.length"
           class="col-md-6"
         >
-          <div class="dash-section-title">
+          <div class="dash-section-title d-flex justify-content-between align-items-center">
+            <span>
               <i :class="['fas', secao.icon, 'mr-2']"></i>{{ secao.titulo }}
               <small class="text-muted">(Emendas Impositivas e Ajustes Técnicos)</small>
+            </span>
+            <button
+              type="button"
+              class="btn btn-sm btn-link text-muted p-0 dash-toggle-all"
+              @click="toggleTodasSituacoes(secao)"
+            >
+              <i :class="['fas', todasSituacoesExpandidas(secao) ? 'fa-compress-alt' : 'fa-expand-alt', 'mr-1']"></i>
+              {{ todasSituacoesExpandidas(secao) ? 'Recolher todos' : 'Expandir todos' }}
+            </button>
           </div>
           <div class="dash-bar-list">
             <div
@@ -79,12 +89,37 @@
                     {{ f.count }} <small class="text-muted font-weight-normal">(R$ {{ formatCurrency(f.total) }})</small>
                   </span>
                 </div>
-                <div class="progress dash-bar-progress">
+                <div
+                  class="progress dash-bar-progress dash-bar-progress--clickable"
+                  role="button"
+                  @click="toggleSituacaoDetalhe(secao.titulo, f.key)"
+                >
                   <div
                     class="progress-bar"
                     :style="{ width: f.pct + '%', backgroundColor: f.color }"
                   ></div>
                 </div>
+                <table v-if="isSituacaoExpandida(secao.titulo, f.key)" class="table table-sm dash-bar-detalhe mb-0 mt-2">
+                  <thead>
+                    <tr>
+                      <th>Parlamentar</th>
+                      <th class="text-right">Valor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="seg in f.parlamentares" :key="seg.key">
+                      <td
+                        class="dash-bar-detalhe-link"
+                        title="Filtrar por este parlamentar"
+                        @click="$emit('filter-parlamentar', { id: seg.key, __str__: seg.label })"
+                      >{{ seg.label }}</td>
+                      <td class="d-flex text-nowrap justify-content-between">
+                        <small class="text-muted">({{ formatPercent(seg.total, f.total) }}%)</small>
+                        <span>R$ {{ formatCurrency(seg.total) }}</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -378,7 +413,8 @@ export default {
     return {
       parlamentaresExpandidos: [],
       unidadesExpandidas: [],
-      entidadesExpandidas: []
+      entidadesExpandidas: [],
+      situacoesExpandidas: []
     }
   },
   computed: {
@@ -443,7 +479,7 @@ export default {
           if (!map[p.id].unidades[unidadeKey]) {
             map[p.id].unidades[unidadeKey] = {
               id: unidadeKey,
-              label: `${unidadeLabel} (${item.loa || item._loa_id})`,
+              label: `${unidadeLabel} ${this.selectedLoaIds.length > 1 ? ('(' + (item.loa || item._loa_id) + ')') : ''}`,
               total: 0
             }
           }
@@ -559,19 +595,23 @@ export default {
         if (item.tipo !== tipo) return
         const label = isEmenda(item)
           ? faseLabel(item.fase)
-          : situacaoLabel(item.fase_prestacao_contas || 'Ajustes Sem Prestação de Contas')
+          : situacaoLabel(item.fase || 'Ajustes Sem Prestação de Contas')
         if (!map[label]) {
-          map[label] = { key: label, label, count: 0, total: 0 }
+          map[label] = { key: label, label, count: 0, total: 0, itens: [] }
         }
         map[label].count++
         map[label].total += Number(this.valorEfetivo(item))
+        map[label].itens.push(item)
       })
-      const sorted = Object.values(map).sort((a, b) => b.count - a.count)
+      const sorted = Object.values(map)
+        .filter(f => f.total !== 0)
+        .sort((a, b) => b.count - a.count)
       const max = sorted.length ? sorted[0].count : 1
-      return sorted.map((f, i) => ({
+      return sorted.map(({ itens, ...f }, i) => ({
         ...f,
         pct: (f.count / max) * 100,
-        color: DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length]
+        color: DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length],
+        parlamentares: this.distribuicaoPorParlamentar(itens)
       }))
     },
     valorEfetivo (item) {
@@ -686,6 +726,28 @@ export default {
       this.entidadesExpandidas = this.todasEntidadesExpandidas
         ? []
         : this.entidadeDistribuicao.map(e => e.id)
+    },
+    toggleSituacaoDetalhe (secaoTitulo, key) {
+      const id = `${secaoTitulo}|${key}`
+      const idx = this.situacoesExpandidas.indexOf(id)
+      if (idx === -1) this.situacoesExpandidas.push(id)
+      else this.situacoesExpandidas.splice(idx, 1)
+    },
+    isSituacaoExpandida (secaoTitulo, key) {
+      return this.situacoesExpandidas.includes(`${secaoTitulo}|${key}`)
+    },
+    todasSituacoesExpandidas (secao) {
+      return secao.dados.length > 0 &&
+        secao.dados.every(f => this.isSituacaoExpandida(secao.titulo, f.key))
+    },
+    toggleTodasSituacoes (secao) {
+      const ids = secao.dados.map(f => `${secao.titulo}|${f.key}`)
+      if (this.todasSituacoesExpandidas(secao)) {
+        this.situacoesExpandidas = this.situacoesExpandidas.filter(id => !ids.includes(id))
+      } else {
+        const novos = ids.filter(id => !this.situacoesExpandidas.includes(id))
+        this.situacoesExpandidas = [...this.situacoesExpandidas, ...novos]
+      }
     }
   }
 }

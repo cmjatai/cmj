@@ -37,13 +37,17 @@ const FASE_EMENDA_LABELS = {
 }
 
 const SITUACAO_EMENDA_VARIANTS = {
-  EM_EXECUCAO: 'warning',
-  FINALIZADO: 'success'
+  10: 'secondary',
+  40: 'danger',
+  60: 'warning',
+  99: 'success'
 }
 
 const SITUACAO_EMENDA_LABELS = {
-  EM_EXECUCAO: 'Em Execução',
-  FINALIZADO: 'Finalizada'
+  10: 'Registrado',
+  40: 'Em Impedimento',
+  60: 'Em Execução',
+  99: 'Finalizada'
 }
 
 const TIPO_AJUSTE_LABELS = {
@@ -67,17 +71,17 @@ const FASE_AJUSTE_LABELS = {
   90: 'Finalizado'
 }
 const SITUACAO_AJUSTE_VARIANTS = {
-  REGISTRADO: 'secondary',
-  IMPEDIMENTO: 'danger',
-  EM_EXECUCAO: 'warning',
-  FINALIZADO: 'success'
+  10: 'secondary',
+  40: 'danger',
+  60: 'warning',
+  99: 'success'
 }
 
 const SITUACAO_AJUSTE_LABELS = {
-  REGISTRADO: 'Registrado',
-  IMPEDIMENTO: 'Impedimento',
-  EM_EXECUCAO: 'Em Execução',
-  FINALIZADO: 'Finalizado'
+  10: 'Registrado',
+  40: 'Impedimento',
+  60: 'Em Execução',
+  99: 'Finalizado'
 }
 
 const PRESTACAO_CONTA_VARIANTS = {
