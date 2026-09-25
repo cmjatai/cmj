@@ -46,7 +46,7 @@ class EmendaLoa(CmjSearchMixin):
     EM_TRAMITACAO = 20
     APROVACAO_LEGISLATIVA = 25
     APROVACAO_LEGAL = 30
-    IMPEDIMENTO_TECNICO = 40 
+    IMPEDIMENTO_TECNICO = 40
     EMENDA_REDEFINIDA = 50
 
     EMENDA_EM_EXECUCAO = 60
@@ -330,7 +330,7 @@ class EmendaLoa(CmjSearchMixin):
                     f"Unidade Orçamentária {rc.despesa.unidade.especificacao} / "
                     f"Classificação Funcional: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
                     f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza} / "
-                    f"Fonte: {rc.despesa.consulta.fonte.codigo}"
+                    f"Fonte: {rc.despesa.consulta.cod_fonte}"
                 )
                 if insercoes.count() > 1:
                     parte += f" - Valor: R$ {formats.number_format(rc.valor, force_grouping=True)}"

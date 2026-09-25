@@ -425,14 +425,16 @@ class CmjSearchMixin(models.Model):
                 if len(fields) == 1:
                     try:
                         search += str(getattr(self, str_field)) + " "
-                    except:
+                    except Exception as e:
+                        print(f"Error accessing field '{str_field}': {e}")
                         pass
                 else:
                     _self = self
                     for field in fields:
                         try:
                             _self = getattr(_self, field)
-                        except:
+                        except Exception as e:
+                            print(f"Error accessing nested field '{field}': {e}")
                             _self = None
                             break
                     if _self:
