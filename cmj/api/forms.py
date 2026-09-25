@@ -74,17 +74,24 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
     def filter_situacao(self, queryset, name, value):
         situacao = value.split(",")
 
+        incluir_registradas = "REGISTRADO" in situacao
         incluir_impedidas = "IMPEDIMENTO" in situacao
         incluir_em_execucao = "EM_EXECUCAO" in situacao
         incluir_finalizadas = "FINALIZADO" in situacao
 
         # tudo selecionado, retorna sem filtro
-        if incluir_impedidas and incluir_em_execucao and incluir_finalizadas:
+        if (
+            incluir_registradas
+            and incluir_impedidas
+            and incluir_em_execucao
+            and incluir_finalizadas
+        ):
             return queryset
 
         # se nada selecionado, retorna tudo
         if (
-            not incluir_impedidas
+            not incluir_registradas
+            and not incluir_impedidas
             and not incluir_em_execucao
             and not incluir_finalizadas
         ):
@@ -92,6 +99,8 @@ class EmendaLoaFilterSet(CmjFilterSetMixin):
 
         q = Q()
 
+        if incluir_registradas:
+            q |= Q(fase=EmendaLoa.APROVACAO_LEGAL)
         if incluir_impedidas:
             q |= Q(fase=EmendaLoa.IMPEDIMENTO_TECNICO)
         if incluir_em_execucao:
@@ -155,17 +164,24 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
     def filter_situacao(self, queryset, name, value):
         situacao = value.split(",")
 
+        incluir_registradas = "REGISTRADO" in situacao
         incluir_em_execucao = "EM_EXECUCAO" in situacao
         incluir_finalizadas = "FINALIZADO" in situacao
         incluir_impedidas = "IMPEDIMENTO" in situacao
 
         # tudo selecionado, retorna sem filtro
-        if incluir_em_execucao and incluir_finalizadas and incluir_impedidas:
+        if (
+            incluir_registradas
+            and incluir_em_execucao
+            and incluir_finalizadas
+            and incluir_impedidas
+        ):
             return queryset
 
         # se nada selecionado, retorna tudo
         if (
-            not incluir_em_execucao
+            not incluir_registradas
+            and not incluir_em_execucao
             and not incluir_finalizadas
             and not incluir_impedidas
         ):
@@ -178,5 +194,7 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
             q |= Q(fase=RegistroAjusteLoa.AJUSTE_EM_EXECUCAO)
         if incluir_finalizadas:
             q |= Q(fase=RegistroAjusteLoa.AJUSTE_FINALIZADO)
+        if incluir_registradas:
+            q |= Q(fase=RegistroAjusteLoa.AJUSTE_REGISTRADO)
 
         return queryset.filter(q)

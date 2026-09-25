@@ -113,9 +113,10 @@
         <label class="pcl-filtros-label">Situação</label>
         <div class="pcl-filtros-check-group d-flex flex-wrap">
           <b-form-checkbox-group :checked="value.situacao" @change="val => updateFilter('situacao', val)" :disabled="filtersDisabled">
+            <b-form-checkbox class="mr-3" value="REGISTRADO">Registrado</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="EM_EXECUCAO">Em Execução</b-form-checkbox>
             <b-form-checkbox class="mr-3" value="FINALIZADO">Finalizado</b-form-checkbox>
-            <b-form-checkbox value="IMPEDIMENTO">Impedidas em definitivo</b-form-checkbox>
+            <b-form-checkbox value="IMPEDIMENTO">Impedido</b-form-checkbox>
           </b-form-checkbox-group>
         </div>
       </div>
