@@ -12,7 +12,7 @@
     />
 
     <!-- ===== SEÇÃO 1: KPIs ===== -->
-    <div class="dash-section d-none">
+    <div class="dash-section" v-if="false">
       <div class="dash-section-title">
         <i class="fas fa-coins mr-2"></i>Resumo por Tipo
       </div>
@@ -59,7 +59,7 @@
           v-for="secao in faseSecoes"
           :key="secao.titulo"
           v-show="secao.dados.length"
-          class="col-md-6"
+          :class="[`col-md-${faseSecoes.every(s => s.dados.length) ? 6 : 12}`]"
         >
           <div class="dash-section-title d-flex justify-content-between align-items-center">
             <span>
