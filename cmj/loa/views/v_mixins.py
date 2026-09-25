@@ -8,33 +8,22 @@ class LoaContextDataMixin:
         path = context.get("path", "")
         context["path"] = f"{path} container-loa"
 
-        if not hasattr(self, "loa"):
-            self.loa = None
-        if not hasattr(self, "object"):
-            self.object = None
+        if self.model == Loa:
+            if (
+                hasattr(self, "object")
+                and self.object
+                and self.object.materia
+                and not self.object.materia.normajuridica()
+            ):
+                context["subnav_template_name"] = "loa/subnav_loa_em_tramitacao.yaml"
+        elif self.crud.parent_field == "loa":
+            obj = self.loa if hasattr(self, "loa") and self.loa else self.object
 
-        if not self.loa and not self.object:
-            try:
-                loa = Loa.objects.get(pk=self.kwargs.get("pk", 0))
-                self.loa = loa
-            except Loa.DoesNotExist:
-                pass
+            # Ensure obj is a Loa instance
+            if obj and hasattr(obj, "loa"):
+                obj = obj.loa
 
-        if self.loa and self.loa.materia and not self.loa.materia.normajuridica():
-            context["subnav_template_name"] = "loa/subnav_loa_em_tramitacao.yaml"
-        elif (
-            self.object
-            and hasattr(self.object, "loa")
-            and self.object.loa.materia
-            and not self.object.loa.materia.normajuridica()
-        ):
-            context["subnav_template_name"] = "loa/subnav_loa_em_tramitacao.yaml"
-        elif (
-            self.object
-            and hasattr(self.object, "materia")
-            and self.object.materia
-            and not self.object.materia.normajuridica()
-        ):
-            context["subnav_template_name"] = "loa/subnav_loa_em_tramitacao.yaml"
+            if obj and obj.materia and not obj.materia.normajuridica():
+                context["subnav_template_name"] = "loa/subnav_loa_em_tramitacao.yaml"
 
         return context
