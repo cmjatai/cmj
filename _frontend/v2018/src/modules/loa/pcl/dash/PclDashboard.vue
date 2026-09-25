@@ -11,47 +11,6 @@
       class="mt-3 dash-section"
     />
 
-    <!-- ===== SEÇÃO 1: KPIs ===== -->
-    <div class="dash-section" v-if="false">
-      <div class="dash-section-title">
-        <i class="fas fa-coins mr-2"></i>Resumo por Tipo
-      </div>
-      <div class="d-flex flex-wrap dash-kpi-row">
-        <div class="dash-kpi-card flex-fill">
-          <div class="dash-kpi-icon text-success"><i class="fas fa-coins"></i></div>
-          <div class="dash-kpi-body">
-            <div class="dash-kpi-label">Total Impositivas</div>
-            <div class="dash-kpi-value text-success">R$ {{ formatCurrency(kpis.totalImpositivas) }}</div>
-            <small class="text-muted">{{ kpis.countImpositivas }} registro{{ kpis.countImpositivas !== 1 ? 's' : '' }}</small>
-          </div>
-        </div>
-        <div class="dash-kpi-card flex-fill">
-          <div class="dash-kpi-icon text-success"><i class="fas fa-heartbeat"></i></div>
-          <div class="dash-kpi-body">
-            <div class="dash-kpi-label">Saúde</div>
-            <div class="dash-kpi-value text-success">R$ {{ formatCurrency(kpis.totalSaude) }}</div>
-            <small class="text-muted">{{ kpis.countSaude }} registro{{ kpis.countSaude !== 1 ? 's' : '' }}</small>
-          </div>
-        </div>
-        <div class="dash-kpi-card flex-fill">
-          <div class="dash-kpi-icon text-info"><i class="fas fa-th-large"></i></div>
-          <div class="dash-kpi-body">
-            <div class="dash-kpi-label">Áreas Diversas</div>
-            <div class="dash-kpi-value text-info">R$ {{ formatCurrency(kpis.totalAreasDiversas) }}</div>
-            <small class="text-muted">{{ kpis.countAreasDiversas }} registro{{ kpis.countAreasDiversas !== 1 ? 's' : '' }}</small>
-          </div>
-        </div>
-        <div v-if="kpis.countModificativas > 0" class="dash-kpi-card flex-fill">
-          <div class="dash-kpi-icon text-secondary"><i class="fas fa-pen-fancy"></i></div>
-          <div class="dash-kpi-body">
-            <div class="dash-kpi-label">Modificativas</div>
-            <div class="dash-kpi-value text-secondary">R$ {{ formatCurrency(kpis.totalModificativas) }}</div>
-            <small class="text-muted">{{ kpis.countModificativas }} registro{{ kpis.countModificativas !== 1 ? 's' : '' }}</small>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- ===== SEÇÃO 2: Distribuição por Situação (Saúde e Áreas Diversas) ===== -->
     <div class="dash-section" v-if="faseSecoes.some(s => s.dados.length)">
       <div class="row">
@@ -418,29 +377,6 @@ export default {
     }
   },
   computed: {
-    kpis () {
-      let totalSaude = 0; let countSaude = 0
-      let totalAreasDiversas = 0; let countAreasDiversas = 0
-      let totalModificativas = 0; let countModificativas = 0
-
-      this.lista.forEach(item => {
-        const val = Number(this.valorEfetivo(item))
-        const tipo = item.tipo
-        if (tipo === 10) { totalSaude += val; countSaude++ } else if (tipo === 99) { totalAreasDiversas += val; countAreasDiversas++ } else if (tipo === 0) { totalModificativas += val; countModificativas++ }
-      })
-
-      return {
-        totalImpositivas: totalSaude + totalAreasDiversas,
-        countImpositivas: countSaude + countAreasDiversas,
-        totalSaude,
-        countSaude,
-        totalAreasDiversas,
-        countAreasDiversas,
-        totalModificativas,
-        countModificativas
-      }
-    },
-
     faseSecoes () {
       return [
         { titulo: 'Situação — Saúde', icon: 'fa-heartbeat', dados: this.distribuicaoPorFase(10) },
@@ -519,7 +455,7 @@ export default {
         if (item.tipo !== 99) return
         const u = item.unidade
         if (!u) return
-        const key = u.__str__
+        const key = u.id
         if (!map[key]) {
           map[key] = { id: key, nome: u.__str__, total: 0, count: 0, itens: [] }
         }

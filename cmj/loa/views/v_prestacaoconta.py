@@ -310,6 +310,8 @@ class PrestacaoContaLoaCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.filter(pk=self.kwargs["pk"]).first()
+            if not self.loa:
+                return redirect("cmj.loa:loa_list")
             if not self.loa.materia or not self.loa.materia.normajuridica():
                 return redirect("cmj.loa:loa_detail", pk=self.loa.pk)
             if not request.user.has_perm("cmj.loa.add_prestacaocontaloa"):
