@@ -1,87 +1,77 @@
 FROM python:3.12.13-bookworm
 
-ENV LANG=C.UTF-8
-ENV LC_ALL=C.UTF-8
-ENV DEBIAN_FRONTEND=noninteractive
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-RUN apt-get update && \
-    apt-get upgrade -y
-
-ENV RUN0_PACKAGES="apt-utils apt-file libpq-dev build-essential pkg-config \
-    libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
-    libcairo2-dev software-properties-common graphviz graphviz-dev \
-    procps nmap git vim bash curl jq pngquant"
-RUN apt-get install -y --no-install-recommends $RUN0_PACKAGES
-
-ENV RUN1_PACKAGES="python3-dev python3-lxml python3-magic postgresql-client\
-    python3-psycopg python3-setuptools python3-pip \
-    poppler-utils python3-venv tzdata nodejs nginx"
-RUN apt-get install -y --no-install-recommends $RUN1_PACKAGES
-
-ENV LIBRE_PACKAGES="libreoffice \
-    libreoffice-writer \
-    libreoffice-java-common \
-    libreoffice-core \
-    libreoffice-common \
-    ure \
-    hyphen-pt-br \
-    fonts-opensymbol \
-    fonts-dejavu \
-    fonts-dejavu-core \
-    fonts-dejavu-extra \
-    fonts-droid-fallback \
-    fonts-dustin \
-    fonts-f500 \
-    fonts-fanwood \
-    fonts-freefont-ttf \
-    fonts-lmodern \
-    fonts-lyx \
-    fonts-sil-gentium \
-    fonts-texgyre \
-    fonts-tlwg-purisa \
-    fonts-liberation \
-    fontconfig"
-RUN apt-get install -y -q $LIBRE_PACKAGES
-
-ENV RUN2_PACKAGES="openjdk-17-jdk-headless tesseract-ocr tesseract-ocr-por ghostscript"
-RUN apt-get install -y --no-install-recommends $RUN2_PACKAGES
-
-RUN mkdir /ghostscript
-WORKDIR /ghostscript
-RUN wget https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10040/ghostscript-10.04.0.tar.gz
-RUN tar vzxfp ghostscript-10.04.0.tar.gz
-WORKDIR /ghostscript/ghostscript-10.04.0
-RUN ./configure && make && make install
-
-RUN apt-get update && apt-get install -y curl ca-certificates gnupg
-RUN install -d /usr/share/postgresql-common/pgdg
-RUN curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc
-RUN echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-RUN apt-get update && apt-get install -y postgresql-client-18
-
-ENV HOME=/root
+# Agrupando variáveis de ambiente
+ENV LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8 \
+    DEBIAN_FRONTEND=noninteractive \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    HOME=/root
 
 WORKDIR ${HOME}
 
+# 1. Instalação de dependências do sistema
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        # RUN0_PACKAGES
+        apt-utils apt-file libpq-dev build-essential pkg-config \
+        autoconf automake libtool libleptonica-dev \
+        libxml2-dev libjpeg-dev libssl-dev libffi-dev libxslt1-dev \
+        libcairo2-dev software-properties-common graphviz graphviz-dev \
+        procps nmap git vim curl jq pngquant \
+        poppler-utils tzdata nodejs nginx \
+        ca-certificates gnupg wget \
+        # LIBRE_PACKAGES
+        libreoffice libreoffice-writer libreoffice-java-common libreoffice-core libreoffice-common ure \
+        hyphen-pt-br fonts-opensymbol fonts-dejavu fonts-dejavu-core fonts-dejavu-extra fonts-droid-fallback \
+        fonts-dustin fonts-f500 fonts-fanwood fonts-freefont-ttf fonts-lmodern fonts-lyx fonts-sil-gentium \
+        fonts-texgyre fonts-tlwg-purisa fonts-liberation fontconfig \
+        # java e tesseract
+        openjdk-17-jdk-headless tesseract-ocr tesseract-ocr-por && \
+    # Limpeza do cache do APT para reduzir tamanho da imagem
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 2. Instalação do PostgreSQL 18 Client
+RUN install -d /usr/share/postgresql-common/pgdg && \
+    curl -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc --fail https://www.postgresql.org/media/keys/ACCC4CF8.asc && \
+    echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends postgresql-client-18 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# 3. Compilação do Ghostscript (tudo na mesma camada para permitir a exclusão do código-fonte)
+RUN mkdir -p /tmp/ghostscript && \
+    cd /tmp/ghostscript && \
+    wget https://github.com/ArtifexSoftware/ghostpdl-downloads/releases/download/gs10080/ghostscript-10.08.0.tar.gz && \
+    tar vzxfp ghostscript-10.08.0.tar.gz && \
+    cd ghostscript-10.08.0 && \
+    ./configure && make && make install && \
+    # Limpeza pesada: deletar a pasta onde compilamos para não gastar espaço na imagem final
+    cd / && rm -rf /tmp/ghostscript
+
+# 4. Compilação e instalação do jbig2enc (Tag 0.32)
+RUN cd /tmp && \
+    # Clona especificamente a tag 0.32 e sem o histórico do git (--depth 1)
+    git clone -b 0.32 --depth 1 https://github.com/agl/jbig2enc.git && \
+    cd jbig2enc && \
+    ./autogen.sh && \
+    ./configure && \
+    make && \
+    make install && \
+    ldconfig && \
+    cd / && rm -rf /tmp/jbig2enc
+
+# 5. Configurações gerais e atualização do PIP
 RUN fc-cache -fv && \
-    pip3 install --no-cache-dir --upgrade pip setuptools
-
-RUN rm -f /etc/nginx/conf.d/* && \
+    pip install --no-cache-dir --upgrade pip setuptools && \
+    rm -f /etc/nginx/conf.d/* && \
     rm -f /etc/nginx/sites-enabled/*
-#&& \
-#SUDO_FORCE_REMOVE=yes apt-get purge -y --auto-remove $BUILD_PACKAGES && \
-#apt-get -y autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-#RUN adduser --home=/opt/libreoffice --disabled-password --comment "" --shell=/bin/bash libreoffice
-#ADD libreoffice_entrypoint.sh /opt/libreoffice/libreoffice_entrypoint.sh
-#RUN chmod +x /opt/libreoffice/libreoffice_entrypoint.sh
-
-COPY requirements/requirements.txt $HOME
-RUN pip install -r requirements.txt
-
-COPY requirements/ia-requirements.txt $HOME
-RUN pip install -r ia-requirements.txt
+# 5. Cópia dos requirements e instalação (Atenção ao --no-cache-dir)
+COPY requirements/requirements.txt requirements/ia-requirements.txt ${HOME}/
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r ia-requirements.txt
 
 CMD ["python3"]

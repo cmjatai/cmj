@@ -1,4 +1,4 @@
-FROM leandrojatai/portalcmj:base.0007
+FROM leandrojatai/portalcmj:base.0008
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -13,7 +13,6 @@ RUN pip install -r requirements.txt
 
 COPY requirements/ia-requirements.txt $HOME
 RUN pip install -r ia-requirements.txt
-
 
 ENV HOME=/var/cmjatai/cmj
 RUN mkdir -p /var/cmjatai/cmj
