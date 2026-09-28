@@ -43,16 +43,6 @@
       "publicPath": "/static/v2018/brasao/escola_1024.png",
       "sourceFilename": "src/assets/brasao/escola_1024.png"
     },
-    "css/645.1d893d4e.css": {
-      "name": "css/645.1d893d4e.css",
-      "path": "css/645.1d893d4e.css",
-      "publicPath": "/static/v2018/css/645.1d893d4e.css"
-    },
-    "css/645.1d893d4e.css.gz": {
-      "name": "css/645.1d893d4e.css.gz",
-      "path": "css/645.1d893d4e.css.gz",
-      "publicPath": "/static/v2018/css/645.1d893d4e.css.gz"
-    },
     "css/792.73e5247e.css": {
       "name": "css/792.73e5247e.css",
       "path": "css/792.73e5247e.css",
@@ -72,6 +62,16 @@
       "name": "css/793.4d0db486.css.gz",
       "path": "css/793.4d0db486.css.gz",
       "publicPath": "/static/v2018/css/793.4d0db486.css.gz"
+    },
+    "css/98.4316ac70.css": {
+      "name": "css/98.4316ac70.css",
+      "path": "css/98.4316ac70.css",
+      "publicPath": "/static/v2018/css/98.4316ac70.css"
+    },
+    "css/98.4316ac70.css.gz": {
+      "name": "css/98.4316ac70.css.gz",
+      "path": "css/98.4316ac70.css.gz",
+      "publicPath": "/static/v2018/css/98.4316ac70.css.gz"
     },
     "css/app.152962c8.css": {
       "name": "css/app.152962c8.css",
@@ -991,16 +991,6 @@
       "path": "js/256.434a68c8.js.gz",
       "publicPath": "/static/v2018/js/256.434a68c8.js.gz"
     },
-    "js/645.cdced6ad.js": {
-      "name": "js/645.cdced6ad.js",
-      "path": "js/645.cdced6ad.js",
-      "publicPath": "/static/v2018/js/645.cdced6ad.js"
-    },
-    "js/645.cdced6ad.js.gz": {
-      "name": "js/645.cdced6ad.js.gz",
-      "path": "js/645.cdced6ad.js.gz",
-      "publicPath": "/static/v2018/js/645.cdced6ad.js.gz"
-    },
     "js/774.f837e48c.js": {
       "name": "js/774.f837e48c.js",
       "path": "js/774.f837e48c.js",
@@ -1036,6 +1026,16 @@
       "path": "js/840.f74fb7fb.js.gz",
       "publicPath": "/static/v2018/js/840.f74fb7fb.js.gz"
     },
+    "js/98.5ca2dddc.js": {
+      "name": "js/98.5ca2dddc.js",
+      "path": "js/98.5ca2dddc.js",
+      "publicPath": "/static/v2018/js/98.5ca2dddc.js"
+    },
+    "js/98.5ca2dddc.js.gz": {
+      "name": "js/98.5ca2dddc.js.gz",
+      "path": "js/98.5ca2dddc.js.gz",
+      "publicPath": "/static/v2018/js/98.5ca2dddc.js.gz"
+    },
     "js/983.634d4321.js": {
       "name": "js/983.634d4321.js",
       "path": "js/983.634d4321.js",
@@ -1046,15 +1046,15 @@
       "path": "js/983.634d4321.js.gz",
       "publicPath": "/static/v2018/js/983.634d4321.js.gz"
     },
-    "js/app.99455728.js": {
-      "name": "js/app.99455728.js",
-      "path": "js/app.99455728.js",
-      "publicPath": "/static/v2018/js/app.99455728.js"
+    "js/app.566328cb.js": {
+      "name": "js/app.566328cb.js",
+      "path": "js/app.566328cb.js",
+      "publicPath": "/static/v2018/js/app.566328cb.js"
     },
-    "js/app.99455728.js.gz": {
-      "name": "js/app.99455728.js.gz",
-      "path": "js/app.99455728.js.gz",
-      "publicPath": "/static/v2018/js/app.99455728.js.gz"
+    "js/app.566328cb.js.gz": {
+      "name": "js/app.566328cb.js.gz",
+      "path": "js/app.566328cb.js.gz",
+      "publicPath": "/static/v2018/js/app.566328cb.js.gz"
     },
     "js/compilacao.f018f6dd.js": {
       "name": "js/compilacao.f018f6dd.js",
@@ -1437,15 +1437,15 @@
       "path": "js/npm.vuex.eb039395.js.gz",
       "publicPath": "/static/v2018/js/npm.vuex.eb039395.js.gz"
     },
-    "js/runtime.bc49c376.js": {
-      "name": "js/runtime.bc49c376.js",
-      "path": "js/runtime.bc49c376.js",
-      "publicPath": "/static/v2018/js/runtime.bc49c376.js"
+    "js/runtime.2c09e2c9.js": {
+      "name": "js/runtime.2c09e2c9.js",
+      "path": "js/runtime.2c09e2c9.js",
+      "publicPath": "/static/v2018/js/runtime.2c09e2c9.js"
     },
-    "js/runtime.bc49c376.js.gz": {
-      "name": "js/runtime.bc49c376.js.gz",
-      "path": "js/runtime.bc49c376.js.gz",
-      "publicPath": "/static/v2018/js/runtime.bc49c376.js.gz"
+    "js/runtime.2c09e2c9.js.gz": {
+      "name": "js/runtime.2c09e2c9.js.gz",
+      "path": "js/runtime.2c09e2c9.js.gz",
+      "publicPath": "/static/v2018/js/runtime.2c09e2c9.js.gz"
     },
     "js/skins/content/dark/content.css": {
       "name": "js/skins/content/dark/content.css",
@@ -2197,7 +2197,7 @@
   },
   "chunks": {
     "app": [
-      "js/runtime.bc49c376.js",
+      "js/runtime.2c09e2c9.js",
       "js/npm.core-js.b8a2323d.js",
       "js/npm.jquery.47506297.js",
       "js/npm.lodash.8bc48406.js",
@@ -2226,10 +2226,10 @@
       "js/npm.bootstrap-select.2a92f18e.js",
       "js/774.f837e48c.js",
       "css/app.152962c8.css",
-      "js/app.99455728.js"
+      "js/app.566328cb.js"
     ],
     "compilacao": [
-      "js/runtime.bc49c376.js",
+      "js/runtime.2c09e2c9.js",
       "js/npm.core-js.b8a2323d.js",
       "js/npm.jquery.47506297.js",
       "js/npm.lodash.8bc48406.js",
@@ -2242,7 +2242,7 @@
       "js/compilacao.f018f6dd.js"
     ],
     "construct": [
-      "js/runtime.bc49c376.js",
+      "js/runtime.2c09e2c9.js",
       "js/npm.core-js.b8a2323d.js",
       "js/npm.jquery.47506297.js",
       "js/npm.lodash.8bc48406.js",
@@ -2265,13 +2265,13 @@
       "js/construct.65e734c6.js"
     ],
     "libsuserauth": [
-      "js/runtime.bc49c376.js",
+      "js/runtime.2c09e2c9.js",
       "js/npm.jquery.47506297.js",
       "js/npm.tinymce.76dcc830.js",
       "js/libsuserauth.239f61c6.js"
     ],
     "loa": [
-      "js/runtime.bc49c376.js",
+      "js/runtime.2c09e2c9.js",
       "js/npm.core-js.b8a2323d.js",
       "js/npm.jquery.47506297.js",
       "js/npm.lodash.8bc48406.js",

@@ -22,7 +22,7 @@
         >
           <div class="dash-section-title d-flex justify-content-between align-items-center">
             <span>
-              <i :class="['fas', secao.icon, 'mr-2']"></i>{{ secao.titulo }}
+              <i :class="['fas', secao.icon, 'mr-2']"></i>{{ secao.titulo }}<br>
               <small class="text-muted">(Emendas Impositivas e Ajustes Técnicos)</small>
             </span>
             <button
@@ -172,7 +172,7 @@
     </div>
 
     <!-- ===== SEÇÃO 4 e 5: Distribuição por Unidade Orçamentária / Entidade-Beneficiário ===== -->
-    <div class="row dash-grid-tight" v-if="unidadeDistribuicao.length || entidadeDistribuicao.length">
+    <div class="dash-grid-tight" v-if="unidadeDistribuicao.length || entidadeDistribuicao.length">
       <div class="col-md-6" v-if="unidadeDistribuicao.length">
         <div class="dash-section">
           <div class="dash-section-title d-flex justify-content-between align-items-center">
@@ -321,13 +321,9 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <div class="dash-section">
-          <h3>OBS: Os dados acima são computados com base nas Emendas Impositivas e Ajustes Técnicos.</h3>
-          <h4>Outros gráficos que comporão o dashboard estão em desenvolvimento para correlacionar com os Empenhos.</h4>
-        </div>
-      </div>
+    <div class="dash-section">
+      <h3>OBS: Os dados acima são computados com base nas Emendas Impositivas e Ajustes Técnicos.</h3>
+      <h4>Outros gráficos que comporão o dashboard estão em desenvolvimento para correlacionar com os Empenhos.</h4>
     </div>
 
   </div>
@@ -703,11 +699,13 @@ export default {
 }
 /* Reduz o gutter padrão do bootstrap (30px) para igualar ao espaço vertical entre seções (1rem) */
 .dash-grid-tight {
-  margin-left: -0.5rem;
-  margin-right: -0.5rem;
-  > [class*='col-'] {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  > [class*='col-md'] {
+    padding: 0;
+    // flex: 1 1 calc(50% - 2rem);
+    max-width: calc(50% - 0.5rem);
   }
 }
 .dash-section-title {
@@ -775,7 +773,7 @@ export default {
 }
 .dash-bar-item {
   padding: 0.5rem 0;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #e5e5ef;
   &:last-child {
     border-bottom: none;
   }
@@ -857,6 +855,24 @@ export default {
   }
   .dash-kpi-card {
     min-width: auto;
+  }
+  .dash-grid-tight {
+    display: flex;
+    gap: 0rem;
+    > [class*='col-md'] {
+      flex: 1 1 100%;
+      max-width: 100%;
+    }
+  }
+  .dash-section {
+    margin: 0.25rem 0.5rem;
+    .col-md-6 {
+      padding-top: 1rem;
+    }
+    table {
+      display: table;
+      width: 100%;
+    }
   }
 }
 </style>

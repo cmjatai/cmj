@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app-vue">
     <router-view></router-view>
     <slot />
     <message></message>
