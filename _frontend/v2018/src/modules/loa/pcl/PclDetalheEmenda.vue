@@ -54,15 +54,15 @@
                 R$ {{ registro.str_valor || registro.str_valor_computado }}
               </span>
               <br>
-              <small class="text-muted">Valor Original da Emenda</small>
+              <small class="text-muted">Valor Original</small>
             </div>
             <div class="valor-computado" v-if="hasAjustes || !registro.valor_computado">
               <span class="emenda-valor font-weight-bold text-success">
                 R$ {{ registro.str_valor_computado }}
               </span>
               <br>
-              <small class="text-muted" v-if="registro.valor_computado">Valor Final após Ajustes</small>
-              <small class="text-muted" v-else>Emenda Redefinida nos Ajustes</small>
+              <small class="text-muted" v-if="registro.valor_computado">Valor Final</small>
+              <small class="text-muted" v-else>Valor Final</small>
             </div>
           </div>
         </div>

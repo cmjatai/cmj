@@ -52,14 +52,14 @@
             <small class="text-muted">Valor do Ajuste</small>
           </div>
           <div
-            v-if="registro.str_valor_computado"
+            v-if="registro.str_valor_computado && registro.str_valor_computado !== registro.str_valor"
             class="text-center ml-auto p-2 mr-3 rounded hover"
           >
             <span class="emenda-valor font-weight-bold text-success">
               R$ {{ registro.str_valor_computado }}
             </span>
             <br>
-            <small class="text-muted">Valor Computado</small>
+            <small class="text-muted">Valor Final</small>
           </div>
         </div>
       </div>
