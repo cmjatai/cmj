@@ -92,12 +92,12 @@ python-osc==1.10.2
 # 9. FRONTEND, TEMPLATES E UI
 # (Renderização de telas, HTML e empacotamento JS)
 # ====================================================================
-django-vite==3.1.0
-django-webpack-loader
-django-crispy-forms==2.3
-crispy-bootstrap4==2025.6
-crispy-bootstrap5==2025.6
-markdown==3.10.2
+django-vite==3.2.0
+django-webpack-loader==3.2.4
+django-crispy-forms==2.7
+crispy-bootstrap4==2026.2
+crispy-bootstrap5==2026.9
+markdown==3.11
 
 # ====================================================================
 # 10. DEVTOOLS E MONITORAMENTO
