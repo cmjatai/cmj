@@ -17,6 +17,7 @@ from cmj.loa.models import (
     Loa,
     RegistroAjusteLoaParlamentar,
 )
+from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa
 from cmj.loa.models.m_financeiro_execucao import Empenho
 from cmj.loa.models.m_prestacaoconta import PrestacaoContaRegistro
 from cmj.loa.views.v_mixins import LoaContextDataMixin
@@ -427,6 +428,10 @@ class LoaCrud(Crud):
                 "-parlamentar__ativo", "parlamentar__nome_parlamentar"
             )
 
+            existe_pcl = PrestacaoContaRegistro.objects.filter(
+                prestacao_conta__loa=l
+            ).exists()
+
             resumo_emendas_impositivas = []
 
             totais = {}
@@ -612,6 +617,25 @@ class LoaCrud(Crud):
                         "sem_destinacao"
                     ]
 
+                    if existe_pcl:
+                        # contabiliza totais de registros de ajuste com fase "Impedido"
+                        total_ajustado_impedito = (
+                            RegistroAjusteLoaParlamentar.objects.filter(
+                                parlamentar=lp.parlamentar,
+                                registro__oficio_ajuste_loa__loa=l,
+                                registro__tipo=k,
+                                registro__fase=RegistroAjusteLoa.AJUSTE_IMPEDIDO,
+                            )
+                            .distinct()
+                            .aggregate(Sum("valor"))
+                            )
+                        resumo_parlamentar[k]["ja_destinado"] -= (
+                            total_ajustado_impedito["valor__sum"] or 0
+                        )
+                        resumo_parlamentar[k]["impedimento_tecnico"] += (
+                            total_ajustado_impedito["valor__sum"] or 0
+                        )
+
                 resumo_emendas_impositivas.append(resumo_parlamentar)
 
             t10 = EmendaLoa.SAUDE
@@ -641,9 +665,6 @@ class LoaCrud(Crud):
             )
 
             is_us = self.request.user.is_superuser
-            existe_pcl = PrestacaoContaRegistro.objects.filter(
-                prestacao_conta__loa=l
-            ).exists()
 
             # dsjd display_saude_ja_destinado
             dsjd = 1 if totais[t10]["ja_destinado"] or is_us else 0
@@ -656,6 +677,7 @@ class LoaCrud(Crud):
             ddsd = 1 if totais[t99]["sem_destinacao"] or is_us else 0
 
             if existe_pcl:
+                # Se existir prestação de contas, não exibe colunas de sem destinação.
                 ddsd = 0
                 dssd = 0
 
