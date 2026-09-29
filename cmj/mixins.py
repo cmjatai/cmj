@@ -2,6 +2,7 @@ import csv
 import io
 import logging
 
+import pymupdf
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Fieldset
 from django.apps import apps
@@ -18,7 +19,6 @@ from django.utils.translation import gettext_lazy as _
 from haystack.models import SearchResult
 from model_utils.choices import Choices
 from pdfminer.high_level import extract_text
-from pdfrw.pdfreader import PdfReader
 from xlsxwriter.workbook import Workbook as XlsxWorkbook
 
 from cmj.utils import ProcessoExterno, get_settings_auth_user_model, normalize, run_sql
@@ -281,8 +281,8 @@ class CommonMixin(models.Model):
                 path = getattr(self, field).file.name
 
                 if path.endswith(".pdf"):
-                    pdf = PdfReader(path)
-                    count_pages += len(pdf.pages)
+                    pdf = pymupdf.open(path)
+                    count_pages += pdf.page_count
                     getattr(self, field).file.close()
                 elif ".doc" in path:
                     return 0
