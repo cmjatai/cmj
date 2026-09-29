@@ -71,9 +71,9 @@ XlsxWriter==3.2.9
 Pillow==12.3.0
 opencv-python-headless==5.0.0.93
 django-image-cropping==1.7.0
-easy-thumbnails==2.10
+easy-thumbnails==2.10.1
 python-magic==0.4.27
-qrcode
+qrcode==8.2.0
 
 # ====================================================================
 # 8. UTILITÁRIOS GERAIS, DADOS E INTEGRAÇÕES DE TERCEIROS
