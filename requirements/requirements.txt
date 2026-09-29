@@ -53,17 +53,17 @@ django-haystack==3.4.0
 pysolr==3.11.0
 
 # ====================================================================
-# 6. PROCESSAMENTO DE DOCUMENTOS E OCR (O CORAÇÃO DO SISTEMA)
+# 6. PROCESSAMENTO DE DOCUMENTOS E OCR
 # (Geração, leitura e manipulação de PDF, DOCX, XLSX)
 # ====================================================================
 ocrmypdf==17.13.0
 pymupdf==1.28.2
 WeasyPrint==70.0
-reportlab==4.2.5
+reportlab==5.0.1
 rl-renderPM==4.0.3
 trml2pdf
-python-docx==1.1.2
-XlsxWriter==3.2.0
+python-docx==1.2.0
+XlsxWriter==3.2.9
 
 # ====================================================================
 # 7. MANIPULAÇÃO DE IMAGENS E ARQUIVOS VISUAIS
