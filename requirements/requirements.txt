@@ -2,8 +2,7 @@ django==5.2.16
 
 django-ratelimit==4.1.0
 
-django-image-cropping==1.7.0   # Suporte ao django 4.2
-django-haystack==3.4.0         # Suporte ao django 5.0
+django-haystack==3.4.0    
 django-extensions==4.1
 
 djangorestframework==3.18.0
@@ -11,9 +10,6 @@ django-filter==25.1
 
 social-auth-app-django==5.6.0
 python-telegram-bot==21.6
-
-django-crispy-forms==2.3
-crispy-bootstrap4==2025.6
 
 ipython==9.8.0
 pytz==2025.2
@@ -60,15 +56,12 @@ rl-renderPM==4.0.3
 django-braces==1.14.0
 django-model-utils==4.0.0
 drf-spectacular==0.24.2
-django-webpack-loader
 
 dj-database-url==0.5.0
-easy-thumbnails==2.10
 
 asn1crypto
 boto3==1.26.95
 
-beautifulsoup4==4.12.3
 #billiard==3.6.3.0
 
 #billiard<4.0,>=3.6.4.0
@@ -92,10 +85,16 @@ charset-normalizer==2.1.1
 
 opencv-python-headless==5.0.0.93
 
-python-osc==1.9.3
+python-osc==1.10.2
 
 django-vite==3.1.0
 crispy-bootstrap5==2025.6
+django-webpack-loader
+easy-thumbnails==2.10
+beautifulsoup4==4.12.3
+django-crispy-forms==2.3
+crispy-bootstrap4==2025.6
+django-image-cropping==1.7.0
 
 psycopg[binary,pool]==3.3.3
 pgvector==0.5.0
