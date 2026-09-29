@@ -628,11 +628,17 @@ class LoaCrud(Crud):
                             )
                             .distinct()
                             .aggregate(Sum("valor"))
-                            )
+                        )
                         resumo_parlamentar[k]["ja_destinado"] -= (
                             total_ajustado_impedito["valor__sum"] or 0
                         )
                         resumo_parlamentar[k]["impedimento_tecnico"] += (
+                            total_ajustado_impedito["valor__sum"] or 0
+                        )
+                        totais[k]["ja_destinado"] -= (
+                            total_ajustado_impedito["valor__sum"] or 0
+                        )
+                        totais[k]["impedimento_tecnico"] += (
                             total_ajustado_impedito["valor__sum"] or 0
                         )
 
@@ -694,6 +700,7 @@ class LoaCrud(Crud):
                         total_liquidado="Total Liquidado",
                         total_pago_bruto="Total Pago Bruto",
                         total_anulado="Total Anulado",
+                        totais=totais[t10],
                     ),
                     diversos=dict(
                         num_columns=ddjd + ddit + ddsd,
@@ -704,6 +711,7 @@ class LoaCrud(Crud):
                         total_liquidado="Total Liquidado",
                         total_pago_bruto="Total Pago Bruto",
                         total_anulado="Total Anulado",
+                        totais=totais[t99],
                     ),
                 ),
             )
