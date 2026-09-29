@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 
 import requests
 from asn1crypto import cms
@@ -11,7 +12,6 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.db.models.signals import post_save, pre_save
 from django.utils import timezone
 from django.utils.text import slugify
-from PyPDF4.pdf import PdfFileReader
 
 from cmj.celery import app
 from cmj.sigad.models import Documento
@@ -235,23 +235,94 @@ def signed_files_extraction(self, app_label, model_name, pk):
 
 
 def task_signed_files_extraction_function(app_label, model_name, pk):
+    def get_pdf_dictionary_bounds(pdfdata, position):
+        """
+        Encontra os limites << e >> do dicionário PDF que contém a posição informada.
+        Lida com dicionários aninhados usando um contador de profundidade.
+        """
+        # 1. Busca para trás o início do dicionário (<<)
+        start_pos = position
+        depth = 1
+        while start_pos > 0:
+            start_pos = pdfdata.rfind(b"<<", 0, start_pos)
+            if start_pos == -1:
+                break
+            # Como estamos indo de trás para frente, se acharmos >> primeiro,
+            # significa que entramos em um sub-dicionário, ignoramos
+            close_tags = pdfdata.count(b">>", start_pos, position)
+            open_tags = pdfdata.count(b"<<", start_pos, position)
+            if open_tags > close_tags:
+                break
 
-    def run_signed_name_and_date_via_fields(fields):
+        # 2. Busca para frente o fim do dicionário (>>)
+        end_pos = position
+        depth = 1
+        while end_pos < len(pdfdata):
+            end_pos = pdfdata.find(b">>", end_pos + 1)
+            if end_pos == -1:
+                end_pos = len(pdfdata)
+                break
+
+            close_tags = pdfdata.count(b">>", position, end_pos + 2)
+            open_tags = pdfdata.count(b"<<", position, end_pos + 2)
+            if close_tags > open_tags:
+                end_pos += 2  # Inclui os caracteres >>
+                break
+
+        return max(0, start_pos), min(len(pdfdata), end_pos)
+
+    def run_signed_name_and_date_extract(file_obj):
         signs = {}
 
-        for key, field in fields.items():
+        if hasattr(file_obj, "read"):
+            file_obj.seek(0)
+            pdfdata = file_obj.read()
+        else:
+            with open(file_obj, "rb") as f:
+                pdfdata = f.read()
 
-            if "/FT" not in field and field["/FT"] != "/Sig":
-                continue
-            if "/V" not in field:
+        n = -1
+        while True:
+            n = pdfdata.find(b"/ByteRange", n + 1)
+            if n == -1:
+                break
+
+            start = pdfdata.find(b"[", n)
+            stop = pdfdata.find(b"]", start)
+            if start == -1 or stop == -1:
                 continue
 
             try:
-                content_sign = field["/V"]["/Contents"]
-                nome = "Nome do assinante não localizado."
-                oname = ""
-                info = cms.ContentInfo.load(content_sign)
+                br = [int(i, 10) for i in pdfdata[start + 1 : stop].split()]
+                if len(br) != 4:
+                    continue
+            except ValueError:
+                continue
+
+            hex_start = br[0] + br[1]
+            hex_end = br[2]
+
+            contents_area = pdfdata[hex_start:hex_end]
+            c_start = contents_area.find(b"<")
+            c_end = contents_area.rfind(b">")
+
+            if c_start == -1 or c_end == -1:
+                continue
+
+            hex_str = contents_area[c_start + 1 : c_end]
+            try:
+                bcontents = bytes.fromhex(hex_str.decode("ascii", errors="ignore"))
+            except ValueError:
+                continue
+
+            nome = "Nome do assinante não localizado."
+            oname = ""
+            fd = None
+
+            try:
+                info = cms.ContentInfo.load(bcontents)
                 signed_data = info["content"]
+
                 oun_old = []
                 for cert in signed_data["certificates"]:
                     subject = cert.native["tbs_certificate"]["subject"]
@@ -262,145 +333,57 @@ def task_signed_files_extraction_function(app_label, model_name, pk):
                         nome = subject["common_name"].split(":")[0]
                         continue
 
-                    oun = subject["organizational_unit_name"]
+                    oun = subject.get("organizational_unit_name")
 
                     if isinstance(oun, str):
                         continue
 
-                    if len(oun) > len(oun_old):
+                    if oun and len(oun) > len(oun_old):
                         oun_old = oun
-                        nome = subject["common_name"].split(":")[0]
+                        nome = subject.get("common_name", "").split(":")[0]
 
                     if oun and isinstance(oun, list) and len(oun) == 4:
                         oname += " - " + oun[3]
                         break
-
-            except:
-                if "/Name" in field["/V"]:
-                    nome = field["/V"]["/Name"]
-
-            fd = None
-            try:
-                data = str(field["/V"]["/M"])
-
-                if "D:" not in data:
-                    data = None
-                else:
-                    if not data.endswith("Z"):
-                        data = data.replace("Z", "+")
-                    data = data.replace("'", "")
-
-                    fd = datetime.datetime.strptime(data[2:], "%Y%m%d%H%M%S%z")
-            except:
+            except Exception:
                 pass
+
+            # =================================================================
+            # NOVO: ISOLAMENTO PERFEITO DO DICIONÁRIO DA ASSINATURA
+            # =================================================================
+            dict_start, dict_end = get_pdf_dictionary_bounds(pdfdata, n)
+            signature_dict = pdfdata[dict_start:dict_end]
+
+            # Fallback do Nome restrito apenas a este dicionário exato
+            if nome == "Nome do assinante não localizado.":
+                name_match = re.search(rb"/Name\s*\((.*?)\)", signature_dict)
+                if name_match:
+                    try:
+                        raw_name = name_match.group(1)
+                        if raw_name.startswith(b"\xfe\xff"):
+                            nome = raw_name.decode("utf-16-be", errors="ignore")
+                        else:
+                            nome = raw_name.decode("utf-8", errors="ignore")
+                    except Exception:
+                        pass
+
+            # Resgate da Data restrito apenas a este dicionário exato
+            date_match = re.search(rb"/M\s*\((D:[0-9+Z\'-]+)\)", signature_dict)
+            if date_match:
+                try:
+                    data_str = date_match.group(1).decode("ascii", errors="ignore")
+                    if "D:" in data_str:
+                        if not data_str.endswith("Z"):
+                            data_str = data_str.replace("Z", "+")
+                        data_str = data_str.replace("'", "")
+                        fd = datetime.datetime.strptime(data_str[2:], "%Y%m%d%H%M%S%z")
+                except Exception:
+                    pass
 
             if nome and nome not in signs:
                 signs[nome] = [fd, oname]
 
         return list(signs.items())
-
-    def run_signed_name_and_date_extract(file):
-        signs = []
-        fields = {}
-        pdfdata = file.read()
-
-        # se não tem byterange então não é assinado
-        byterange = []
-        n = -1
-        while True:
-            n = pdfdata.find(b"/ByteRange", n + 1)
-            if n == -1:
-                break
-            byterange.append(n)
-
-        if not byterange:
-            return signs
-
-        # tenta extrair via /Fields
-        fields_br = []
-        try:
-            pdf = PdfFileReader(file)
-            fields = pdf.getFields()
-            fields_br = list(
-                map(lambda x: x.get("/V", {}).get("/ByteRange", []), fields.values())
-            )
-        except Exception as e:
-            try:
-                pdf = PdfFileReader(file, strict=False)
-                fields = pdf.getFields()
-                fields_br = list(
-                    map(
-                        lambda x: x.get("/V", {}).get("/ByteRange", []), fields.values()
-                    )
-                )
-            except Exception as ee:
-                fields = ee
-
-        try:
-            # se a extração via /Fields ocorrer sem erros e forem capturadas
-            # tantas assinaturas quanto byteranges
-            if isinstance(fields, dict):
-                signs = run_signed_name_and_date_via_fields(fields)
-                if len(signs) == len(byterange):
-                    return signs
-
-            for n in byterange:
-
-                start = pdfdata.find(b"[", n)
-                stop = pdfdata.find(b"]", start)
-                assert n != -1 and start != -1 and stop != -1
-                n += 1
-
-                br = [int(i, 10) for i in pdfdata[start + 1 : stop].split()]
-
-                if br in fields_br:
-                    continue
-
-                contents = pdfdata[br[0] + br[1] + 1 : br[2] - 1]
-                bcontents = bytes.fromhex(contents.decode("utf8"))
-                data1 = pdfdata[br[0] : br[0] + br[1]]
-                data2 = pdfdata[br[2] : br[2] + br[3]]
-                # signedData = data1 + data2
-
-                not_nome = nome = "Nome do assinante não localizado."
-                oname = ""
-                try:
-                    info = cms.ContentInfo.load(bcontents)
-                    signed_data = info["content"]
-
-                    oun_old = []
-                    for cert in signed_data["certificates"]:
-                        subject = cert.native["tbs_certificate"]["subject"]
-                        issuer = cert.native["tbs_certificate"]["issuer"]
-                        oname = issuer.get("organization_name", "")
-
-                        if oname in ("Gov-Br", "1Doc"):
-                            nome = subject["common_name"].split(":")[0]
-                            continue
-
-                        oun = subject["organizational_unit_name"]
-
-                        if isinstance(oun, str):
-                            continue
-
-                        if len(oun) > len(oun_old):
-                            oun_old = oun
-                            nome = subject["common_name"].split(":")[0]
-
-                        if oun and isinstance(oun, list) and len(oun) == 4:
-                            oname += " - " + oun[3]
-                            break
-
-                except Exception as e:
-                    pass
-
-                fd = None
-                if nome != not_nome:
-                    signs.append((nome, [fd, oname]))
-        except Exception as e:
-            pass
-
-        return signs
 
     def signed_name_and_date_extract(file, isola_hom=True):
 
