@@ -43,7 +43,7 @@ pymupdf==1.28.2
 
 Werkzeug==3.1.6
 
-ocrmypdf==17.3.0
+ocrmypdf==17.13.0
 #pikepdf>=5.0.0,<6.0.0
 trml2pdf
 pypdf4==1.27.0
@@ -98,4 +98,4 @@ django-vite==3.1.0
 crispy-bootstrap5==2025.6
 
 psycopg[binary,pool]==3.3.3
-pgvector==0.4.2
+pgvector==0.5.0

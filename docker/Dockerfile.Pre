@@ -22,8 +22,12 @@ RUN apt-get update && \
         poppler-utils tzdata nodejs nginx \
         ca-certificates gnupg wget \
         # LIBRE_PACKAGES
-        libreoffice libreoffice-writer libreoffice-java-common libreoffice-core libreoffice-common ure \
-        hyphen-pt-br fonts-opensymbol fonts-dejavu fonts-dejavu-core fonts-dejavu-extra fonts-droid-fallback \
+        libreoffice \
+        libreoffice-writer \
+        libreoffice-java-common \
+        libreoffice-core \
+        libreoffice-common \
+        ure hyphen-pt-br fonts-opensymbol fonts-dejavu fonts-dejavu-core fonts-dejavu-extra fonts-droid-fallback \
         fonts-dustin fonts-f500 fonts-fanwood fonts-freefont-ttf fonts-lmodern fonts-lyx fonts-sil-gentium \
         fonts-texgyre fonts-tlwg-purisa fonts-liberation fontconfig \
         # java e tesseract

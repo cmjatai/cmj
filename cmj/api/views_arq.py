@@ -1,3 +1,4 @@
+import json
 import logging
 import re
 import subprocess
@@ -6,7 +7,7 @@ import zipfile
 from copy import deepcopy
 from subprocess import CalledProcessError, TimeoutExpired
 
-import fitz
+import pymupdf
 from django.apps.registry import apps
 from django.conf import settings
 from django.db.models import F
@@ -128,13 +129,13 @@ class _Draft:
 
             if tipo in ("jpg", "png"):
                 fname = f.name + ".pdf"
-                doc = fitz.open()
+                doc = pymupdf.open()
 
-                img = fitz.open(dm.arquivo.path)  # open pic as document
+                img = pymupdf.open(dm.arquivo.path)  # open pic as document
                 rect = img[0].rect  # pic dimension
                 pdfbytes = img.convert_to_pdf()  # make a PDF stream
                 img.close()  # no longer needed
-                imgPDF = fitz.open("pdf", pdfbytes)  # open stream as PDF
+                imgPDF = pymupdf.open("pdf", pdfbytes)  # open stream as PDF
                 page = doc.new_page(
                     width=rect.width, height=rect.height  # new page with ...
                 )  # pic dimension
@@ -182,17 +183,43 @@ class _Draft:
                 fname = dm.arquivo.path.split("/")[-1]
                 fname = re.sub(f"{tipo}$", "pdf", fname)
 
+                filter_data = {
+                    "SelectPdfVersion": {"type": "long", "value": "2"},  # PDF/A-2b
+                    "UseTaggedPDF": {
+                        "type": "boolean",
+                        "value": "true",
+                    },  # PDF Estruturado (Bom para IA)
+                    "ReduceImageResolution": {
+                        "type": "boolean",
+                        "value": "true",
+                    },  # Ativa compressão
+                    "MaxImageResolution": {
+                        "type": "long",
+                        "value": "150",
+                    },  # Limita a 150 DPI
+                    "Quality": {"type": "long", "value": "80"},  # Qualidade JPEG 80%
+                    "ExportBookmarks": {
+                        "type": "boolean",
+                        "value": "true",
+                    },  # Exporta Sumário lateral
+                }
+                json_str = json.dumps(filter_data, separators=(",", ":"))
+                pdf_filter = f"pdf:writer_pdf_Export:{json_str}"
+
                 cmd = [
-                    "lowriter",
+                    "soffice",
                     "--headless",
+                    "--nologo",  # Opcional: evita que o LibreOffice tente renderizar a tela de carregamento (splash) na memória
+                    "--nofirststartwizard",  # Opcional: garante que pop-ups de primeira execução não travem o processo
                     "--convert-to",
-                    'pdf:draw_pdf_Export:{"SelectPdfVersion":{"type":"long","value":"2"}}',
+                    pdf_filter,
                     "--outdir",
                     fpdf,
                     str(dm.arquivo.path),
                 ]
                 try:
-                    subprocess.run(cmd, check=True, timeout=60)
+                    # logger.info("Executando comando: %s", " ".join(cmd))
+                    subprocess.run(cmd, check=True, timeout=120)
                 except TimeoutExpired:
                     logger.error("Timeout na converserção de arquivo")
                     raise ValidationError("Timeout na converserção de arquivo")
@@ -212,7 +239,7 @@ class _Draft:
                     dm.metadata["uploadedfile"]["paginas"] = 1
                     dm.save()
 
-            doc = fitz.open(dm.arquivo.file)
+            doc = pymupdf.open(dm.arquivo.file)
             dm.metadata["uploadedfile"]["paginas"] = len(doc)
             dm.save()
             doc.close()
@@ -264,9 +291,9 @@ class _Draft:
         fname = f"{dm_primary.id:09}.pdf"
         fp = f'{"/".join(fp)}/{fname}'
 
-        d_new = fitz.open()
+        d_new = pymupdf.open()
         for dm in dm_draft:
-            doc = fitz.open(dm.arquivo.file)
+            doc = pymupdf.open(dm.arquivo.file)
             d_new.insert_pdf(doc, from_page=0, to_page=len(doc))
             doc.close()
 
@@ -378,7 +405,7 @@ class _DraftMidia(ResponseFileMixin):
         dm_atual = self.get_queryset().filter(pk=kwargs["pk"]).first()
         dm_new = deepcopy(dm_atual)
 
-        doc = fitz.open(dm_atual.arquivo.file)
+        doc = pymupdf.open(dm_atual.arquivo.file)
         ldoc = len(doc)
         # doc = Pdf.open(dm_atual.arquivo.file)
         # ldoc = len(doc.pages)
@@ -398,7 +425,7 @@ class _DraftMidia(ResponseFileMixin):
             fn = fn[0 : fn.rindex(".pdf")]
             fn = f"{fn}-p{p+1:0>3}.pdf"
 
-            d = fitz.open()
+            d = pymupdf.open()
             d.insert_pdf(doc, from_page=p, to_page=p)
             d.metadata["title"] = f"{dm_atual.draft.descricao} - página: {p+1}"
             # d.metadata['creator'] = str(request.user)
@@ -475,8 +502,8 @@ class _DraftMidia(ResponseFileMixin):
 
         dm.clear_cache(page=p + 1)
 
-        doc = fitz.open(dm.arquivo.path)
-        nd = fitz.open()
+        doc = pymupdf.open(dm.arquivo.path)
+        nd = pymupdf.open()
         lp = len(doc)
         if p:
             nd.insert_pdf(doc, from_page=0, to_page=p - 1)
@@ -501,8 +528,8 @@ class _DraftMidia(ResponseFileMixin):
 
         dm.clear_cache(page=p + 1)
 
-        doc = fitz.open(dm.arquivo.path)
-        nd = fitz.open()
+        doc = pymupdf.open(dm.arquivo.path)
+        nd = pymupdf.open()
         lp = len(doc)
 
         if p:

@@ -1221,15 +1221,15 @@ class MateriaLegislativa(CommonMixin):
         # abrir aquivo zipado e criar um pdf merge de todos os pdfs de dentro do zip utilizando pymupdf
         from io import BytesIO
 
-        import fitz  # PyMuPDF
+        import pymupdf  # PyMuPDF
 
-        pdf_output = fitz.open()
+        pdf_output = pymupdf.open()
 
         with zipfile.ZipFile(media_cache_zip_process, "r") as zip_file:
             for file_name in zip_file.namelist():
                 if file_name.lower().endswith(".pdf"):
                     with zip_file.open(file_name) as f:
-                        pdf_input = fitz.open(stream=f.read(), filetype="pdf")
+                        pdf_input = pymupdf.open(stream=f.read(), filetype="pdf")
                         pdf_input.bake()
                         pdf_output.insert_pdf(pdf_input)
 

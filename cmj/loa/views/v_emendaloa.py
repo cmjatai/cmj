@@ -5,7 +5,7 @@ import zipfile
 from decimal import Decimal
 from urllib.parse import urlencode
 
-import fitz
+import pymupdf
 import requests
 from _collections import OrderedDict
 from django.conf import settings
@@ -1373,7 +1373,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 )
 
                 arq_bytes = io.BytesIO(response.content)
-                pdf = fitz.open(stream=arq_bytes, filetype="pdf")
+                pdf = pymupdf.open(stream=arq_bytes, filetype="pdf")
 
                 if pdf.page_count == 0:
                     break

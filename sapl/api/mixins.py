@@ -2,7 +2,6 @@ import io
 import logging
 import os
 
-import fitz
 import pymupdf
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
@@ -69,7 +68,7 @@ class ResponseFileMixin:
             elif os.path.exists(fcache_path):
                 os.remove(fcache_path)
 
-        doc = fitz.open(arquivo.file)
+        doc = pymupdf.open(arquivo.file)
         for index, page in enumerate(doc, 1):
             if index == _page:
                 if _grade >= 10:

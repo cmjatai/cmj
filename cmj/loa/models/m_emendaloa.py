@@ -710,7 +710,7 @@ class EmendaLoa(CmjSearchMixin):
         base_url = settings.SITE_URL.rstrip("/")
         import io
 
-        import fitz  # PyMuPDF
+        import pymupdf  # PyMuPDF
         import requests
 
         pra_frente = True
@@ -727,7 +727,7 @@ class EmendaLoa(CmjSearchMixin):
             )
 
             arq_bytes = io.BytesIO(response.content)
-            pdf = fitz.open(stream=arq_bytes, filetype="pdf")
+            pdf = pymupdf.open(stream=arq_bytes, filetype="pdf")
 
             if pdf.page_count == 0:
                 break

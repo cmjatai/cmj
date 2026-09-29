@@ -6,7 +6,7 @@ import sys
 from datetime import datetime
 
 import cv2
-import fitz
+import pymupdf
 from celery.utils.log import get_task_logger
 from django.apps import apps
 from django.conf import settings
@@ -38,7 +38,7 @@ class PDFAltaCompactacao:
         self.file_path = file_path
         self.jobs = jobs
         self.file_path_temp = f"{file_path}.tmp"
-        self.doc = fitz.open(file_path)
+        self.doc = pymupdf.open(file_path)
 
         self.folder = os.path.dirname(file_path)
         self.filename = os.path.basename(file_path)
@@ -82,7 +82,7 @@ class PDFAltaCompactacao:
             page = self.doc[i]
             img_name = f"{i:0>6}.png"
             self.images_names.append(img_name)
-            pix = page.get_pixmap(dpi=300, colorspace=fitz.csGRAY)
+            pix = page.get_pixmap(dpi=300, colorspace=pymupdf.csGRAY)
             pix.save(f"{self.images}/{img_name}")
 
     def converter_imagens_para_pb(self):
@@ -103,13 +103,13 @@ class PDFAltaCompactacao:
 
     def montar_pdf_grande(self):
         # monta um pdf grande com todas as páginas
-        self.doc = fitz.open()
+        self.doc = pymupdf.open()
         for img_name in self.images_names:
-            img = fitz.open(f"{self.images}/{img_name}")
+            img = pymupdf.open(f"{self.images}/{img_name}")
             rect = img[0].rect
             pdfbytes = img.convert_to_pdf()
             img.close()
-            img = fitz.open("pdf", pdfbytes)
+            img = pymupdf.open("pdf", pdfbytes)
 
             self.doc.insert_pdf(img, from_page=0, to_page=len(img))
 
@@ -143,7 +143,7 @@ class PDFAltaCompactacao:
 
     def substituir_imagens(self):
         # substitui as imagens do pdf grande pelas imagens compactadas
-        doc = fitz.open(self.file_path_temp)
+        doc = pymupdf.open(self.file_path_temp)
         for i, img_name in enumerate(self.images_names):
             page = doc[i]
             xref = page.get_image_info(xrefs=True)[0]["xref"]
@@ -184,8 +184,8 @@ def task_ocrmypdf_function(app_label, model_name, field_name, id_list, jobs, tas
 
         if task_name not in ("pdf2pdfa_rapida", "pdf2pdfa_compacta"):
             try:
-                d_new = fitz.open()
-                doc = fitz.open(f)
+                d_new = pymupdf.open()
+                doc = pymupdf.open(f)
 
                 if task_name == "pdf2pdfa_forcada":
                     for i in range(len(doc)):
