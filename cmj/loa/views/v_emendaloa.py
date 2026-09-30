@@ -332,9 +332,9 @@ class EmendaLoaCrud(MasterDetailCrud):
             ):
                 try:
                     context = self.get_context_data_makepdf()
-                except:
+                except Exception as e:
                     raise ValidationError(
-                        "Ocorreu um erro ao processar seus filtros e agrupamentos."
+                        f"Ocorreu um erro ao processar seus filtros e agrupamentos."
                     )
 
             # context['groups'][0]['rows'] = context['groups'][0]['rows'][:10]
@@ -559,7 +559,7 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                         key = tuple()
                         for ag in agrupamento:
-                            key += (rc[ag],)
+                            key += (rc[ag] or "",)
                         if key not in groups:
                             groups[key] = {
                                 "emendas": OrderedDict(),
