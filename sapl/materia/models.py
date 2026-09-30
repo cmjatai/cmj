@@ -895,7 +895,9 @@ class MateriaLegislativa(CommonMixin):
                     use_cache = False
             else:
                 norma = materia_root.normajuridicas.first()
-                if norma.data_publicacao > (now - timedelta(days=15)).date():
+                if (norma.data_publicacao or norma.data) > (
+                    now - timedelta(days=15)
+                ).date():
                     use_cache = False
 
             if use_cache:
@@ -1017,8 +1019,12 @@ class MateriaLegislativa(CommonMixin):
 
         try:
             for m in materias:
-                docs = m.documentoadministrativo_set.all()
-                for d in docs:
+                docs_associacao_direta = list(m.documentoadministrativo_set.all())
+                docs_vinculados = list(
+                    map(lambda v: v.documento, m.vinculodocadminmateria_set.all())
+                )
+
+                for d in docs_associacao_direta + docs_vinculados:
                     get_docadm_anexados_from(d)
         except Exception as e:
             logger.error(f"Erro ao adicionar documentos administrativos para zip: {e}")
@@ -1104,7 +1110,9 @@ class MateriaLegislativa(CommonMixin):
                         "NormaJuridica",
                         p,
                         arcname,
-                        datetime.combine(n.data_publicacao, datetime.min.time())
+                        datetime.combine(
+                            (n.data_publicacao or n.data), datetime.min.time()
+                        )
                         + timedelta(seconds=2),
                     )
                 for d in n.diariosoficiais.all():
@@ -1157,7 +1165,12 @@ class MateriaLegislativa(CommonMixin):
 
         m_paths = list(m_paths.values())
         m_paths.sort(key=lambda x: x[-1])
-        materia_root = m_paths[0][0]
+        materia_root = None
+
+        for i, prefixo, path, arcname, _ in m_paths:
+            if isinstance(i, self.__class__):
+                materia_root = i
+                break
 
         def calc_hash(paths):
             hash_input = "".join(
@@ -1183,7 +1196,7 @@ class MateriaLegislativa(CommonMixin):
             f"cache-{materia_root.ano}-{materia_root.tipo.sigla}-{materia_root.numero}-{materia_root.id}",
         )
 
-        path_cache = slugify(path_cache_prefix+hash_files)
+        path_cache = slugify(path_cache_prefix + hash_files)
         path_cache += ".zip"
 
         if use_cache and not force and media_cache_storage.exists(path_cache):
@@ -1196,9 +1209,23 @@ class MateriaLegislativa(CommonMixin):
             if filename.startswith(slugify(path_cache_prefix)):
                 media_cache_storage.delete(filename)
 
+        # create manifest file for the zip archive
+        idx = 1
+        manifest_content = ""
+        for i, prefixo, path, arcname, _ in m_paths:
+            arcname = f'{idx:03}-{arcname}.{path.split(".")[-1] or "pdf"}'
+            manifest_content += f"{arcname}\n      {i}\n"
+            idx += 1
+
         with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
 
             with zipfile.ZipFile(tmp, "w") as file:
+
+                # add manifest file to the zip archive
+                info = zipfile.ZipInfo("000-manifest.txt")
+                info.date_time = time.localtime()[:6]
+                info.compress_type = zipfile.ZIP_DEFLATED
+                file.writestr(info, manifest_content)
 
                 dt = time.localtime()[:6]
                 idx = 1
