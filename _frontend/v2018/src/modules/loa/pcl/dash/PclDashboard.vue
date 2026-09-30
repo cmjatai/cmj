@@ -135,8 +135,11 @@
                 v-for="seg in p.segmentos"
                 :key="seg.key"
                 class="progress-bar"
+                :class="{ 'dash-bar-segmento--hover': isSegmentoHover(p.id, seg.key) }"
                 :title="`${seg.label}: R$ ${formatCurrency(seg.total)}`"
                 :style="{ width: seg.pct + '%', backgroundColor: seg.color }"
+                @mouseenter="setSegmentoHover(p.id, seg.key)"
+                @mouseleave="clearSegmentoHover"
               ></div>
             </div>
             <small class="text-muted">
@@ -151,7 +154,13 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="seg in p.segmentos" :key="seg.key">
+                <tr
+                  v-for="seg in p.segmentos"
+                  :key="seg.key"
+                  :class="{ 'dash-bar-detalhe-hover': isSegmentoHover(p.id, seg.key) }"
+                  @mouseenter="setSegmentoHover(p.id, seg.key)"
+                  @mouseleave="clearSegmentoHover"
+                >
                   <td
                     :class="{ 'dash-bar-detalhe-link': seg.key !== 'sem-unidade' }"
                     :title="seg.key !== 'sem-unidade' ? 'Filtrar por esta unidade' : ''"
@@ -369,7 +378,8 @@ export default {
       parlamentaresExpandidos: [],
       unidadesExpandidas: [],
       entidadesExpandidas: [],
-      situacoesExpandidas: []
+      situacoesExpandidas: [],
+      segmentoHover: null
     }
   },
   computed: {
@@ -633,6 +643,15 @@ export default {
         ? []
         : this.parlamentarDistribuicao.map(p => p.id)
     },
+    setSegmentoHover (parlamentarId, segKey) {
+      this.segmentoHover = parlamentarId + '|' + segKey
+    },
+    clearSegmentoHover () {
+      this.segmentoHover = null
+    },
+    isSegmentoHover (parlamentarId, segKey) {
+      return this.segmentoHover === (parlamentarId + '|' + segKey)
+    },
     toggleUnidadeDetalhe (id) {
       const idx = this.unidadesExpandidas.indexOf(id)
       if (idx === -1) this.unidadesExpandidas.push(id)
@@ -824,12 +843,16 @@ export default {
   height: 0.5rem;
   border-radius: 0.25rem;
   background: #e9ecef;
+  overflow: visible; // permite o zoom do segmento em hover sem ser cortado
 }
 .dash-bar-progress--clickable {
   cursor: pointer;
   transition: opacity 0.15s ease-in-out;
   &:hover {
     opacity: 0.8;
+  }
+  .progress-bar {
+    transition: transform 0.15s ease-in-out, filter 0.15s ease-in-out;
   }
 }
 .dash-bar-detalhe {
@@ -843,6 +866,16 @@ export default {
   td {
     padding: 0.3rem 0.5rem;
   }
+}
+.dash-bar-detalhe-hover {
+  background-color: #eef3f8;
+}
+.dash-bar-segmento--hover {
+  filter: brightness(0.85);
+  transform: scaleY(1.6);
+  transform-origin: center;
+  position: relative;
+  z-index: 1;
 }
 .min-w-0 {
   min-width: 0;
