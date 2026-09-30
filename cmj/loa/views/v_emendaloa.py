@@ -413,7 +413,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     materia = f"""
                             <span class="materia">
                                 <a href="{reverse('cmj.loa:emendaloa_detail',kwargs={'pk': item.id})}">
-                                Emenda Parlamentar em construção
+                                Emenda em Elaboração
                                 </a>
                             </span>
                     """
@@ -425,21 +425,10 @@ class EmendaLoaCrud(MasterDetailCrud):
                 """
 
                 col_emenda = f"""
-
                     <div class="loa-mat">
-                        <div class="row">
-                            <div class="col">
-                                {materia}
-                                { '&nbsp;-&nbsp;' if item.parlamentares.count() <= 3 else '' }
-                                { autores if item.parlamentares.count() <= 3 else ''}
-                            </div>
-                            <div class="col">
-                                <span>Tipo:</span>&nbsp;
-                                <strong class="tipo">{item.get_tipo_display()}</strong>
-                            </div>
-                        </div>
-                        { autores if item.parlamentares.count() > 3 else ''}
-                        { '<br>' if item.parlamentares.count() > 3 else ''}
+                        {materia}
+                        - <small class="tipo">{item.get_tipo_display()}</small>
+                        - {autores}
                         <span class="indicacao">{item.indicacao}</span>
                         <div>
                             {item.finalidade_format}
