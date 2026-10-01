@@ -593,6 +593,9 @@ StatusTramitacaoCrud = CrudAux.build(StatusTramitacao, "status_tramitacao")
 class AssuntoMateriaCrud(CrudAux):
     model = AssuntoMateria
 
+    class BaseMixin(CrudAux.BaseMixin):
+        list_field_names = ["assunto", "qtd_materias_associadas", "dispositivo"]
+
     class CreateView(CrudAux.CreateView):
         layout_key = None
         form_class = AssuntoMateriaForm
@@ -600,6 +603,49 @@ class AssuntoMateriaCrud(CrudAux):
     class UpdateView(CrudAux.UpdateView):
         layout_key = None
         form_class = AssuntoMateriaForm
+
+    class ListView(CrudAux.ListView):
+
+        def get(self, request, *args, **kwargs):
+            if "unifique" in request.GET:
+                self.unifique(request, *args, **kwargs)
+                return redirect(request.path)
+            return super(AssuntoMateriaCrud.ListView, self).get(
+                request, *args, **kwargs
+            )
+
+        def hook_header_qtd_materias_associadas(self, *args, **kwargs):
+            return "Qtd. Matérias Associadas"
+
+        def hook_qtd_materias_associadas(self, assunto, *args, **kwargs):
+            return MateriaAssunto.objects.filter(assunto=assunto).count(), ""
+
+        def unifique(self, request, *args, **kwargs):
+            object_list = self.get_queryset().order_by("id")
+            assuntos_dict = {}
+            for obj in object_list:
+                obj_lower = obj.assunto.lower()
+                if obj_lower in assuntos_dict:
+                    assuntos_dict[obj_lower].append(obj)
+                else:
+                    assuntos_dict[obj_lower] = [obj]
+
+            for key, objs in assuntos_dict.items():
+                if len(objs) <= 1:
+                    continue
+
+                associacoes = MateriaAssunto.objects.filter(assunto__in=objs)
+                # Example: reassign associacoes to the first object and delete the rest
+                if associacoes.exists():
+                    principal = objs[0]
+                    associacoes.update(assunto=principal)
+                    for obj in objs[1:]:
+                        obj.delete()
+
+            messages.success(
+                request,
+                "Assuntos unificados com sucesso. Execute update_index para atualizar o índice de busca de matérias.",
+            )
 
 
 class OrgaoCrud(CrudAux):

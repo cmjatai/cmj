@@ -117,13 +117,27 @@ class AdicionarVariasAutoriasFilterSet(django_filters.FilterSet):
 
 class AssuntoMateriaForm(ModelForm):
 
-    junc = MultipleChoiceField(
-        required=False, label="Junção de Assuntos", widget=forms.CheckboxSelectMultiple
+    assuntos_nos_metadados = MultipleChoiceField(
+        required=False,
+        label="Assuntos nos Metadados a unificar",
+        widget=forms.CheckboxSelectMultiple,
+    )
+
+    assuntos_de_materia = ModelMultipleChoiceField(
+        queryset=AssuntoMateria.objects.all(),
+        required=False,
+        label="Assuntos de Matéria a unificar",
+        widget=forms.CheckboxSelectMultiple,
     )
 
     class Meta:
         model = AssuntoMateria
-        fields = ["assunto", "dispositivo", "junc"]
+        fields = [
+            "assunto",
+            "dispositivo",
+            "assuntos_nos_metadados",
+            "assuntos_de_materia",
+        ]
 
     def __init__(self, *args, **kwargs):
 
@@ -135,7 +149,8 @@ class AssuntoMateriaForm(ModelForm):
         )
         row2 = to_row(
             [
-                ("junc", 12),
+                ("assuntos_nos_metadados", 6),
+                ("assuntos_de_materia", 6),
             ]
         )
 
@@ -150,11 +165,21 @@ class AssuntoMateriaForm(ModelForm):
         )
         super(AssuntoMateriaForm, self).__init__(*args, **kwargs)
 
-        self.fields["junc"].choices = self.extrair_temas_dos_metadados()
+        self.fields["assuntos_nos_metadados"].choices = (
+            self.extrair_temas_dos_metadados()
+        )
+
+        assuntos_de_materia = AssuntoMateria.objects.all()
+        if self.instance.pk:
+            assuntos_de_materia = AssuntoMateria.objects.exclude(pk=self.instance.pk)
+
+        
+
+        self.fields["assuntos_de_materia"].queryset = assuntos_de_materia
 
     def extrair_temas_dos_metadados(self):
         temas_textuais_criados_pela_ia = set()
-        mds = Metadata.objects.all()
+        mds = Metadata.objects.filter(metadata__genia__temas__isnull=False)
 
         for md in mds:
             temas = md.metadata.get("genia", {}).get("temas", [])
@@ -162,36 +187,49 @@ class AssuntoMateriaForm(ModelForm):
                 if tema not in temas_textuais_criados_pela_ia:
                     temas_textuais_criados_pela_ia.add(tema)
 
-        assuntos_cadastrados = set(
-            AssuntoMateria.objects.values_list("assunto", flat=True)
-        )
-
-        assuntos_a_usar = temas_textuais_criados_pela_ia.union(assuntos_cadastrados)
-        assuntos_usados = set(
-            MateriaAssunto.objects.values_list("assunto__assunto", flat=True)
-        )
-
-        temas_textuais_criados_pela_ia = [(k, k) for k in sorted(assuntos_a_usar)]
+        temas_textuais_criados_pela_ia = [
+            (k, k) for k in sorted(temas_textuais_criados_pela_ia)
+        ]
         return temas_textuais_criados_pela_ia
 
     def save(self, commit=True):
         assunto = super(AssuntoMateriaForm, self).save(commit)
-        junc = self.cleaned_data["junc"]
-        for junc_select in junc:
-            mds = Metadata.objects.filter(metadata__genia__temas__icontains=junc_select)
+        assuntos_nos_metadados = self.cleaned_data["assuntos_nos_metadados"]
+        assuntos_de_materia = self.cleaned_data["assuntos_de_materia"]
+
+        for ass_meta_substituir in assuntos_nos_metadados:
+            if ass_meta_substituir == assunto.assunto:
+                continue
+            mds = Metadata.objects.filter(
+                metadata__genia__temas__icontains=ass_meta_substituir
+            )
             for md in mds:
                 for i, tema_ia in enumerate(md.metadata["genia"]["temas"]):
-                    if junc_select.lower() == tema_ia.lower():
+                    if ass_meta_substituir.lower() == tema_ia.lower():
                         md.metadata["genia"]["temas"][i] = assunto.assunto
                 md.save()
                 print(md.content_object)
-            assuntos_usados = MateriaAssunto.objects.filter(
-                assunto__assunto__iexact=junc_select
+
+
+        materias_a_executar_save = set()
+        for ass_associados_a_substituir in assuntos_de_materia:
+
+            associacoes = MateriaAssunto.objects.filter(
+                assunto=ass_associados_a_substituir
             )
-            for assunto_usado in assuntos_usados:
-                if assunto_usado.assunto != assunto:
-                    assunto_usado.assunto = assunto
-                    assunto_usado.save()
+            for a in associacoes:
+                materias_a_executar_save.add(a.materia)
+
+            associacoes.update(assunto=assunto)
+
+            if not MateriaAssunto.objects.filter(
+                assunto=ass_associados_a_substituir
+            ).exists():
+                ass_associados_a_substituir.delete()
+
+        for materia in materias_a_executar_save:
+            materia.save()
+
         return assunto
 
 
