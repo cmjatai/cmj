@@ -73,7 +73,8 @@ class Command(BaseCommand):
                         "--batch-size=100",
                         f"--using={model['using']}",
                     ]
+                    print(*params)
                     management.call_command(*params)
-                    sleep(60)
+                    sleep(5)
                 except Exception as e:
                     self.logger.error(e)
