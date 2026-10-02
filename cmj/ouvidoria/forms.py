@@ -1,4 +1,3 @@
-from crispy_forms.bootstrap import Alert
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div
 from django import forms
@@ -8,7 +7,6 @@ from django.forms.models import ModelForm
 from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 
-from cmj.context_processors import areatrabalho
 from cmj.core.models import AreaTrabalho, Notificacao
 from cmj.ouvidoria.models import MensagemSolicitacao, Solicitacao
 from cmj.utils import AlertSafe

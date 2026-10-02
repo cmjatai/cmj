@@ -173,8 +173,6 @@ class AssuntoMateriaForm(ModelForm):
         if self.instance.pk:
             assuntos_de_materia = AssuntoMateria.objects.exclude(pk=self.instance.pk)
 
-        
-
         self.fields["assuntos_de_materia"].queryset = assuntos_de_materia
 
     def extrair_temas_dos_metadados(self):
@@ -209,7 +207,6 @@ class AssuntoMateriaForm(ModelForm):
                         md.metadata["genia"]["temas"][i] = assunto.assunto
                 md.save()
                 print(md.content_object)
-
 
         materias_a_executar_save = set()
         for ass_associados_a_substituir in assuntos_de_materia:

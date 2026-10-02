@@ -11,29 +11,29 @@ logger = logging.getLogger(__name__)
 
 class Pdf2PdfA:
     """
-    Class responsible for converting PDF files to PDF/A format using ocrmypdf.
-Pdf2PdfA
-    Attributes:
-        in_path (str): Path to the input PDF file.
-        jobs (int): Number of parallel jobs to run.
-        ocr (bool): Whether to perform OCR on the PDF.
-        level (int): Processing level for the output PDF/A.
-        verbose (int): Verbosity level for logging.
-        doc (pymupdf.Document): Opened PDF document.
-        folder (str): Folder containing the input PDF.
-        filename (str): Filename of the input PDF.
-        filename_noext (str): Filename of the input PDF without extension.
+        Class responsible for converting PDF files to PDF/A format using ocrmypdf.
+    Pdf2PdfA
+        Attributes:
+            in_path (str): Path to the input PDF file.
+            jobs (int): Number of parallel jobs to run.
+            ocr (bool): Whether to perform OCR on the PDF.
+            level (int): Processing level for the output PDF/A.
+            verbose (int): Verbosity level for logging.
+            doc (pymupdf.Document): Opened PDF document.
+            folder (str): Folder containing the input PDF.
+            filename (str): Filename of the input PDF.
+            filename_noext (str): Filename of the input PDF without extension.
 
-        level_0 (int): Level 0 for the output PDF/A.
-            Transforma o arquivo em PDF/A com skip-text.
-        level_1 (int): Level 1 for the output PDF/A.
-            Transforma o arquivo em PDF/A com redo-ocr.
-        level_2 (int): Level 2 for the output PDF/A.
-            Transforma o arquivo em PDF/A com redo-ocr e compressão adicional.
-        level_3 (int): Level 3 for the output PDF/A.
-            Transforma o arquivo em PDF/A com force-ocr.
-        level_4 (int): Level 4 for the output PDF/A.
-            Transforma o arquivo em PDF/A com force-ocr e compressão máxima via multiprocessing.
+            level_0 (int): Level 0 for the output PDF/A.
+                Transforma o arquivo em PDF/A com skip-text.
+            level_1 (int): Level 1 for the output PDF/A.
+                Transforma o arquivo em PDF/A com redo-ocr.
+            level_2 (int): Level 2 for the output PDF/A.
+                Transforma o arquivo em PDF/A com redo-ocr e compressão adicional.
+            level_3 (int): Level 3 for the output PDF/A.
+                Transforma o arquivo em PDF/A com force-ocr.
+            level_4 (int): Level 4 for the output PDF/A.
+                Transforma o arquivo em PDF/A com force-ocr e compressão máxima via multiprocessing.
 
     """
 

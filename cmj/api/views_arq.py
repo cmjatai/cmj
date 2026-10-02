@@ -31,7 +31,7 @@ from cmj.arq import tasks
 from cmj.arq.models import ArqClasse, ArqDoc, Draft, DraftMidia
 from cmj.globalrules import GROUP_ARQ_OPERADOR
 from cmj.settings.project import DEBUG
-from cmj.utils_files import TIPOS_MIDIAS_PERMITIDOS
+from cmj.utils.utils_files import TIPOS_MIDIAS_PERMITIDOS
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
 

@@ -18,7 +18,7 @@ from django_filters.views import FilterView
 
 import sapl
 from cmj.mixins import AudigLogFilterMixin, BtnCertMixin, MultiFormatOutputMixin
-from cmj.utils_report import render_pdf_to_response
+from cmj.utils.utils_report import render_pdf_to_response
 from sapl import settings
 from sapl.base.models import AppConfig
 from sapl.compilacao.views import IntegracaoTaView

@@ -4061,8 +4061,10 @@ class DispositivoSearchFragmentFormView(ListView):
             AND7_TYPE_MODEL_SELECTED = ""  # AND_TYPE_MODEL_SELECTED
             if tipo_model:
                 # nomes de tabela/coluna vêm de _meta do Django (não do usuário)
-                JOIN_TYPE_MODEL_SELECTED = "JOIN {gfk_table} gfkt on (gfkt.id = ta.object_id)".format(
-                    gfk_table=model_class._meta.db_table
+                JOIN_TYPE_MODEL_SELECTED = (
+                    "JOIN {gfk_table} gfkt on (gfkt.id = ta.object_id)".format(
+                        gfk_table=model_class._meta.db_table
+                    )
                 )
                 AND7_TYPE_MODEL_SELECTED = "AND gfkt.{gfk_field_type} = %s".format(
                     gfk_field_type=column_field,

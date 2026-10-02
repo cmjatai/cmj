@@ -6,7 +6,7 @@ import django.utils.timezone
 from django.conf import settings
 from django.db import migrations, models
 
-import cmj.utils_files
+import cmj.utils.utils_files
 import sapl.materia.models
 import sapl.utils
 
@@ -923,7 +923,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.materia.models.materia_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Texto Original",
                     ),
                 ),
@@ -1372,7 +1374,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.materia.models.anexo_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Texto Integral",
                     ),
                 ),
@@ -1900,7 +1904,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.materia.models.materia_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Texto Original",
                     ),
                 ),

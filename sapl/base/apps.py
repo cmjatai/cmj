@@ -1,13 +1,9 @@
 import inspect
 import logging
-import random
 
 from django import apps
 from django.conf import settings
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-
-from cmj.utils import start_task
 
 logger = logging.getLogger(__name__)
 

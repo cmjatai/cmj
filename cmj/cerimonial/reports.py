@@ -33,7 +33,7 @@ from cmj.cerimonial.forms import (
 )
 from cmj.cerimonial.models import Contato, Processo
 from cmj.core.models import AreaTrabalho
-from cmj.utils_report import render_pdf_to_response
+from cmj.utils.utils_report import render_pdf_to_response
 from sapl.crud.base import make_pagination
 
 

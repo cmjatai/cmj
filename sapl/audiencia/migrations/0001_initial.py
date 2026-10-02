@@ -3,7 +3,7 @@
 import django.core.serializers.json
 from django.db import migrations, models
 
-import cmj.utils_files
+import cmj.utils.utils_files
 import sapl.audiencia.models
 import sapl.utils
 
@@ -142,7 +142,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.audiencia.models.pauta_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Pauta da Audiência Pública",
                     ),
                 ),
@@ -153,7 +155,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.audiencia.models.ata_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Ata da Audiência Pública",
                     ),
                 ),

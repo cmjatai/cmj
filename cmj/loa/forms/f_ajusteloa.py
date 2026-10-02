@@ -95,7 +95,7 @@ class RegistroAjusteLoaForm(ModelForm):
             "unidade",
             "entidade",
             "descricao",
-            'fase'
+            "fase",
         ]
 
     def __init__(self, *args, **kwargs):

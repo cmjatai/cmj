@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from cmj.api.forms import EmendaLoaFilterSet
 from cmj.api.loa.serializers import EmendaLoaSearchSerializer
 from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, Empenho, Loa
-from cmj.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf
 from sapl.api.permissions import SaplModelPermissions
 from sapl.parlamentares.models import Parlamentar
 

@@ -10,7 +10,7 @@ from model_utils import Choices
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin
-from cmj.utils_files import (
+from cmj.utils.utils_files import (
     restringe_tipos_de_arquivo_midias,
     restringe_tipos_de_arquivo_txt,
 )

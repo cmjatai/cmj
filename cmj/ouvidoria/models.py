@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 from cmj.core.models import AreaTrabalho, Notificacao
 from cmj.mixins import CmjChoices
 from cmj.utils import get_settings_auth_user_model, media_protected_storage
-from cmj.utils_files import TIPOS_MIDIAS_PERMITIDOS, restringe_tipos_de_arquivo_midias
+from cmj.utils.utils_files import TIPOS_MIDIAS_PERMITIDOS, restringe_tipos_de_arquivo_midias
 
 
 class Solicitacao(models.Model):

@@ -1,15 +1,11 @@
-import json
-from datetime import timedelta
-
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.db.models import F, Q
 from django.utils import timezone
-from IPython.display import Markdown, display
 
 from cmj.celery import app as cmj_celery_app
-from cmj.genia import IAAnaliseSimilaridadeService, IAClassificacaoMateriaService
 from cmj.utils import start_task
+from cmj.utils.genia import IAAnaliseSimilaridadeService, IAClassificacaoMateriaService
 from sapl.base.email_utils import do_envia_email_tramitacao
 from sapl.base.models import Metadata
 from sapl.materia.models import (

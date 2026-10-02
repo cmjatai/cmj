@@ -37,7 +37,7 @@ from cmj.loa.models import (
 )
 from cmj.loa.views.v_mixins import LoaContextDataMixin
 from cmj.utils import TimeExecution
-from cmj.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Parlamentar

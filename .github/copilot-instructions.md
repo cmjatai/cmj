@@ -36,7 +36,7 @@ Django system for the Câmara Municipal de Jataí (CMJ). Two backend packages (`
 - **CRUD base classes**: `sapl/crud/` — used across sapl apps
 - **Search**: Haystack + Solr (`cmj/haystack.py`); check `search_indexes.py` per app
 - **API**: DRF in `cmj/api/` and `sapl/api/`
-- **PDF reports**: `cmj/utils_report.py`
+- **PDF reports**: `cmj/utils/utils_report.py`
 - **Form layouts**: `sapl/crispy_layout_mixin.py`
 - **Frontend stores** (v6): `SyncStore` (data cache + WebSocket), `AuthStore`, `MessageStore` — see [`/memories/repo/v6_frontend_patterns.md`](/memories/repo/v6_frontend_patterns.md)
 - **Test infrastructure details**: see [`/memories/repo/test_infrastructure.md`](/memories/repo/test_infrastructure.md)

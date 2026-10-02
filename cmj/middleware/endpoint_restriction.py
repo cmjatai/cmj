@@ -41,7 +41,9 @@ class EndpointRestrictionMiddleware:
 
             try:
                 for allowed_ip in ALLOWED_IPS:
-                    if ipaddress.ip_address(client_ip) in ipaddress.ip_network(allowed_ip):
+                    if ipaddress.ip_address(client_ip) in ipaddress.ip_network(
+                        allowed_ip
+                    ):
                         break
                 else:
                     logger.warning(

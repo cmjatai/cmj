@@ -49,7 +49,6 @@ from django_filters.views import FilterView
 
 import sapl
 from cmj.core.models import AreaTrabalho
-from cmj.genia import IAClassificacaoMateriaService
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
 from cmj.mixins import (
     AudigLogFilterMixin,
@@ -59,7 +58,8 @@ from cmj.mixins import (
     MultiFormatOutputMixin,
     PdfOutputMixin,
 )
-from cmj.utils_report import render_pdf_to_response
+from cmj.utils.genia import IAClassificacaoMateriaService
+from cmj.utils.utils_report import render_pdf_to_response
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import AppConfig as BaseAppConfig
 from sapl.base.models import Autor, CasaLegislativa

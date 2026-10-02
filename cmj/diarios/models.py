@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.mixins import CmjCleanMixin, CommonMixin
 from cmj.utils import texto_upload_path
-from cmj.utils_files import restringe_tipos_de_arquivo_txt
+from cmj.utils.utils_files import restringe_tipos_de_arquivo_txt
 from sapl.utils import OverwriteStorage, PortalFileField
 
 

@@ -14,7 +14,7 @@ from model_utils import Choices
 from cmj.core.models import CertidaoPublicacao
 from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CmjChoices
-from cmj.utils_files import restringe_tipos_de_arquivo_txt
+from cmj.utils.utils_files import restringe_tipos_de_arquivo_txt
 from cmj.videos.models import VideoParte
 from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.parlamentares.models import (
