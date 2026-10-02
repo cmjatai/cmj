@@ -47,6 +47,7 @@ from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
+from cmj.utils.genia.classificacao import IAClassificacaoMateriaService
 import sapl
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
