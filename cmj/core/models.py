@@ -1093,12 +1093,14 @@ class IAQuota(models.Model):
     )
 
     class ServicosAutorizados(models.TextChoices):
-        IA_GENAI_BASE = "cmj.genia.IAGenaiBase", _("IA Genai Base")
-        IA_CLASSIFICACAO_MATERIA_SERVICE = "cmj.genia.IAClassificacaoMateriaService", _(
-            "IA Classificação Matéria Service"
+        IA_GENAI_BASE = "IAGenaiBase", _("IA Genai Base")
+        IA_CLASSIFICACAO_MATERIA_SERVICE = (
+            "IAClassificacaoMateriaService",
+            _("IA Classificação Matéria Service"),
         )
-        IA_ANALISE_SIMILARIDADE_SERVICE = "cmj.genia.IAAnaliseSimilaridadeService", _(
-            "IA Análise Similaridade Service"
+        IA_ANALISE_SIMILARIDADE_SERVICE = (
+            "IAAnaliseSimilaridadeService",
+            _("IA Análise Similaridade Service"),
         )
 
     servicos_autorizados = ArrayField(

@@ -25,13 +25,13 @@ class Migration(migrations.Migration):
             field=django.contrib.postgres.fields.ArrayField(
                 base_field=models.CharField(
                     choices=[
-                        ("cmj.genia.IAGenaiBase", "IA Genai Base"),
+                        ("IAGenaiBase", "IA Genai Base"),
                         (
-                            "cmj.genia.IAClassificacaoMateriaService",
+                            "IAClassificacaoMateriaService",
                             "IA Classificação Matéria Service",
                         ),
                         (
-                            "cmj.genia.IAAnaliseSimilaridadeService",
+                            "IAAnaliseSimilaridadeService",
                             "IA Análise Similaridade Service",
                         ),
                     ],

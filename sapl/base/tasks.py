@@ -5,7 +5,8 @@ from django.utils import timezone
 
 from cmj.celery import app as cmj_celery_app
 from cmj.utils import start_task
-from cmj.utils.genia import IAAnaliseSimilaridadeService, IAClassificacaoMateriaService
+from cmj.utils.genia.classificacao import IAClassificacaoMateriaService
+from cmj.utils.genia.similaridade import IAAnaliseSimilaridadeService
 from sapl.base.email_utils import do_envia_email_tramitacao
 from sapl.base.models import Metadata
 from sapl.materia.models import (
