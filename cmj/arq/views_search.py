@@ -1,22 +1,16 @@
-import re
-
 from braces.views._access import PermissionRequiredMixin
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout
 from django import forms
-from django.db.models import Q
-from django.http.request import QueryDict
-from django.urls.base import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from haystack.forms import ModelSearchForm, SearchForm, model_choices
+from haystack.forms import ModelSearchForm, model_choices
 from haystack.models import SearchResult
 from haystack.query import SearchQuerySet
 from haystack.utils.app_loading import haystack_get_model
 from haystack.views import SearchView
 
-from cmj.arq.models import ARQCLASSE_LOGICA, ArqClasse
-from cmj.core.models import AreaTrabalho
+from cmj.arq.models import ArqClasse
 from cmj.haystack import CMJARQ_ALIAS
 from cmj.mixins import AudigLogFilterMixin
 from cmj.utils import make_pagination

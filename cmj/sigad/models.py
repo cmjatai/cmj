@@ -34,7 +34,7 @@ from cmj.utils import (
     get_settings_auth_user_model,
     media_protected_storage,
 )
-from cmj.utils_files import TIPOS_IMG_PERMITIDOS, restringe_tipos_de_arquivo_midias
+from cmj.utils.utils_files import TIPOS_IMG_PERMITIDOS, restringe_tipos_de_arquivo_midias
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 

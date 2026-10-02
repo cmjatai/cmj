@@ -14,8 +14,8 @@ from google import genai
 from google.genai import types
 
 from cmj.core.models import IAQuota
-from cmj.genia_system_instruction_v3 import rag_system_instruction
 from cmj.utils import clean_text
+from cmj.utils.genia.genia_system_instruction_v3 import rag_system_instruction
 from sapl.base.models import Metadata
 
 logger = logging.getLogger(__name__)

@@ -6,7 +6,7 @@ import image_cropping.fields
 from django.conf import settings
 from django.db import migrations, models
 
-import cmj.utils_files
+import cmj.utils.utils_files
 import sapl.parlamentares.models
 import sapl.utils
 
@@ -239,7 +239,9 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         upload_to=sapl.parlamentares.models.logo_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_img],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_img
+                        ],
                         verbose_name="Logo Partido",
                     ),
                 ),
@@ -831,7 +833,9 @@ class Migration(migrations.Migration):
                         blank=True,
                         null=True,
                         upload_to=sapl.parlamentares.models.logo_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_img],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_img
+                        ],
                         verbose_name="Logo Partido",
                     ),
                 ),

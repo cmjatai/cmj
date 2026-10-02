@@ -1,9 +1,7 @@
 import logging
-from asyncio.tasks import sleep
 from datetime import timedelta
 
 import dateutil.parser
-from _hashlib import new
 from django.utils import timezone
 
 from cmj.celery import app

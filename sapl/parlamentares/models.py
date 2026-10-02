@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from image_cropping.fields import ImageCropField, ImageRatioField
 from model_utils import Choices
 
-from cmj.utils_files import restringe_tipos_de_arquivo_img
+from cmj.utils.utils_files import restringe_tipos_de_arquivo_img
 from sapl.base.models import Autor
 from sapl.decorators import vigencia_atual
 from sapl.utils import (

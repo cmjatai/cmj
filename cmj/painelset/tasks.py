@@ -2,7 +2,6 @@
 import logging
 from datetime import timedelta
 
-from celery import shared_task
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.utils import timezone
@@ -10,10 +9,8 @@ from pythonosc import udp_client
 
 from cmj.celery import app as cmj_celery_app
 from cmj.painelset.tasks_function import task_refresh_states_from_visaodepainel_function
-from cmj.utils import TimeExecution
 
 from .cronometro_manager import CronometroManager
-from .models import Cronometro, CronometroState
 
 logger = logging.getLogger(__name__)
 

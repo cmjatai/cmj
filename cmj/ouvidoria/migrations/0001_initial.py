@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import migrations, models
 
 import cmj.ouvidoria.models
-import cmj.utils_files
+import cmj.utils.utils_files
 
 
 class Migration(migrations.Migration):
@@ -155,7 +155,9 @@ class Migration(migrations.Migration):
                             location="/mnt/volumes/cmj_media/media_protected",
                         ),
                         upload_to=cmj.ouvidoria.models.anexo_ouvidoria_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_midias],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_midias
+                        ],
                         verbose_name="Anexo",
                     ),
                 ),

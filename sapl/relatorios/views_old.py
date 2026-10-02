@@ -12,7 +12,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from cmj.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf
 from sapl.base.models import CasaLegislativa
 from sapl.materia.models import (
     Autoria,

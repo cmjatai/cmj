@@ -14,9 +14,9 @@ from pgvector.django import CosineDistance, HnswIndex
 from pgvector.django.halfvec import HalfVectorField
 from pgvector.django.vector import VectorField
 
-from cmj.genia import IAGenaiBase
 from cmj.mixins import CmjModelMixin
 from cmj.utils import get_settings_auth_user_model
+from cmj.utils.genia import IAGenaiBase
 
 
 class Embedding(CmjModelMixin):

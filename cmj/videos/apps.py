@@ -5,8 +5,6 @@ from django import apps
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import get_celery_worker_status
-
 
 class AppConfig(apps.AppConfig):
     name = "cmj.videos"

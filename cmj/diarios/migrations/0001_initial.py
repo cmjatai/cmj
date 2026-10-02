@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 import cmj.diarios.models
 import cmj.mixins
-import cmj.utils_files
+import cmj.utils.utils_files
 import sapl.utils
 
 
@@ -58,7 +58,7 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=cmj.diarios.models.diario_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[cmj.utils.utils_files.restringe_tipos_de_arquivo_txt],
                         verbose_name="Arquivo Digital do Diário",
                     ),
                 ),

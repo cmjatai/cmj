@@ -22,7 +22,7 @@ from pdfminer.high_level import extract_text
 from xlsxwriter.workbook import Workbook as XlsxWorkbook
 
 from cmj.utils import ProcessoExterno, get_settings_auth_user_model, normalize, run_sql
-from cmj.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 
 logger = logging.getLogger(__name__)

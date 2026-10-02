@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
-from cmj.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf
 
 
 class RelatorioMixin:

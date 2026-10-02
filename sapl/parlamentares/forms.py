@@ -5,7 +5,7 @@ import django_filters
 from crispy_forms.layout import Fieldset, Layout
 from django import forms
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group, User
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -15,7 +15,6 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from image_cropping.widgets import get_attrs
 
-from cmj.utils import get_settings_auth_user_model
 from sapl.base.models import Autor, TipoAutor
 from sapl.crispy_layout_mixin import SaplFormHelper, form_actions, to_row
 from sapl.rules import SAPL_GROUP_VOTANTE

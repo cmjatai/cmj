@@ -1,5 +1,4 @@
 import datetime
-import decimal
 import logging
 import operator
 from datetime import date, timedelta
@@ -10,26 +9,18 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import (
     HTML,
     BaseInput,
-    Button,
     Div,
     Field,
     Fieldset,
     Layout,
-    Row,
-    Submit,
 )
-from crispy_forms.templatetags.crispy_forms_field import css_class
-from crispy_forms.utils import get_template_pack
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
-from django.db.models.expressions import Func
-from django.forms import widgets
 from django.forms.models import ModelForm, ModelMultipleChoiceField
-from django.http.request import QueryDict
 from django.utils.translation import gettext_lazy as _
 from django_filters.filters import (
     CharFilter,
@@ -71,13 +62,10 @@ from cmj.core.models import (
     Trecho,
 )
 from cmj.settings.medias import MAX_DOC_UPLOAD_SIZE
-from cmj.utils import NONE_YES_NO_CHOICES, YES_NO_CHOICES, normalize
+from cmj.utils import YES_NO_CHOICES, normalize
 from sapl.crispy_layout_mixin import (
     SaplFormHelper,
     SaplFormLayout,
-    form_actions,
-    to_column,
-    to_fieldsets,
     to_row,
 )
 from sapl.crud.base import ListWithSearchForm

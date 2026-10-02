@@ -4,7 +4,7 @@ import django.core.serializers.json
 import django.db.models.deletion
 from django.db import migrations, models
 
-import cmj.utils_files
+import cmj.utils.utils_files
 import sapl.comissoes.models
 import sapl.utils
 
@@ -204,7 +204,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.comissoes.models.anexo_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Texto Integral",
                     ),
                 ),
@@ -319,7 +321,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.comissoes.models.pauta_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Pauta da Reunião",
                     ),
                 ),
@@ -330,7 +334,9 @@ class Migration(migrations.Migration):
                         null=True,
                         storage=sapl.utils.OverwriteStorage(),
                         upload_to=sapl.comissoes.models.ata_upload_path,
-                        validators=[cmj.utils_files.restringe_tipos_de_arquivo_txt],
+                        validators=[
+                            cmj.utils.utils_files.restringe_tipos_de_arquivo_txt
+                        ],
                         verbose_name="Ata da Reunião",
                     ),
                 ),

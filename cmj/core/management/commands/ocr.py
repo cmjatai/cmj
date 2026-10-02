@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.utils.translation import gettext_lazy as _
 
 from cmj.utils import Manutencao
-from cmj.utils_pdf import Pdf2PdfA
+from cmj.utils.utils_pdf import Pdf2PdfA
 
 logger = logging.getLogger(__name__)
 
@@ -26,9 +26,9 @@ class Command(BaseCommand):
         logger.info("Post-save signals have been disconnected.")
         logger.info("OCR command setup is complete.")
 
-        #in_path = settings.MEDIA_ROOT.child("teste", "ri.pdf")
+        # in_path = settings.MEDIA_ROOT.child("teste", "ri.pdf")
 
         in_path = settings.MEDIA_ROOT.child("teste", "2026-4979-lei-lei-ordinaria.pdf")
-        #in_path = '/home'
+        # in_path = '/home'
         logger.info("Pdf2PdfA conversion is starting for file: %s", in_path)
         Pdf2PdfA(in_path, ocr=True, level=3, jobs=8, verbose=2).execute()

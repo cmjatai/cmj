@@ -1,23 +1,11 @@
-import six
-from crispy_forms.bootstrap import FieldWithButtons, StrictButton
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Field, Layout
-from django import forms
 from django.contrib.auth import logout
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import PermissionDenied
-from django.db.models import Q
-from django.db.models.base import Model
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.urls.base import reverse
 from django.urls.conf import re_path
-from django.utils.datastructures import OrderedSet
 from django.utils.decorators import classonlymethod
-from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import ContextMixin
-from django.views.generic.list import MultipleObjectMixin
 
 from cmj.cerimonial.forms import PerfilForm
 from cmj.cerimonial.models import Perfil
@@ -29,16 +17,12 @@ from cmj.globalrules import (
     RP_DETAIL,
     RP_LIST,
 )
-from cmj.utils import normalize
 from sapl.crispy_layout_mixin import get_field_display
 from sapl.crud import base
 from sapl.crud.base import (
     Crud,
     CrudCreateView,
-    CrudDeleteView,
-    CrudDetailView,
     CrudListView,
-    CrudUpdateView,
     MasterDetailCrud,
 )
 from sapl.rules import map_rules

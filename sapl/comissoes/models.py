@@ -4,7 +4,7 @@ from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
 from model_utils import Choices
 
-from cmj.utils_files import restringe_tipos_de_arquivo_txt
+from cmj.utils.utils_files import restringe_tipos_de_arquivo_txt
 from sapl.base.models import Autor
 from sapl.parlamentares.models import Parlamentar
 from sapl.utils import (
