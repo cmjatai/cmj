@@ -58,7 +58,6 @@ from cmj.mixins import (
     MultiFormatOutputMixin,
     PdfOutputMixin,
 )
-from cmj.utils.genia import IAClassificacaoMateriaService
 from cmj.utils.utils_report import render_pdf_to_response
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import AppConfig as BaseAppConfig
