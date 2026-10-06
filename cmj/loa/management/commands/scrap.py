@@ -179,7 +179,7 @@ class Command(BaseCommand):
                 "orgaos": models.Orgao.objects.filter(
                     loa__ano__range=(self.ano_inicial, self.ano_final)
                 )
-                .exclude(Q(codigo="01"))
+                #.exclude(Q(codigo="01"))
                 .order_by(*order_by),
             },
             {
