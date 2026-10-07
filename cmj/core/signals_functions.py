@@ -13,7 +13,8 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.core import tasks
 from cmj.core.models import AuditLog, Bi, OcrMyPDF
-from cmj.loa.models import DespesaPaga, ScrapRecord
+from cmj.loa.models import DespesaPaga
+from cmj.loa.models.m_scrap_sigep import ScrapRecordSigep
 from cmj.painelset.models import Cronometro
 from cmj.settings.email import EMAIL_SEND_USER
 from cmj.sigad.models import ShortRedirect
@@ -42,7 +43,7 @@ def auditlog_signal_function(sender, **kwargs):
         OcrMyPDF,  # já é o log de execução de ocr
         Bi,  # Bi é um processo automático estatístico
         PullExec,  # Conexão com youtube
-        ScrapRecord,  # Extração Automática das Despesas e Receitas
+        ScrapRecordSigep,  # Extração Automática das Despesas e Receitas
         DespesaPaga,
         AnaliseSimilaridade,  # Análise de Similaridade
         Cronometro,  # Cronometro é um processo automático que possui seu próprio log

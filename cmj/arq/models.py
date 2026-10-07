@@ -4,10 +4,10 @@ import os
 import re
 
 from django.conf import settings
+from django.db.models.fields.json import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import CASCADE, PROTECT
-from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
 from unipath import Path
 

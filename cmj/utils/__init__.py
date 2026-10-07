@@ -206,6 +206,26 @@ def decimal2str(
         return str(value)
 
 
+def str2decimal(value: str) -> decimal.Decimal:
+
+    value = value or "0,00"
+
+    try:
+        if value and "." in value and "," in value:
+            if value.rindex(",") > value.rindex("."):
+                value = value.replace(".", "").replace(",", ".")
+            else:
+                value = value.replace(",", "")
+        elif value and "," in value:
+            value = value.replace(",", ".")
+
+        value = decimal.Decimal(value)
+    except:
+        value = decimal.Decimal("0.00")
+
+    return value
+
+
 def normalize(txt):
     return unicodedata_normalize("NFKD", txt).encode("ASCII", "ignore").decode("ASCII")
 
@@ -670,7 +690,7 @@ class ProcessoExterno(object):
                 shell=False,
                 text=True,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                stderr=subprocess.PIPE,
             )
             self.stdout, self.stderr = self.process.communicate()
             self.returncode = self.process.returncode

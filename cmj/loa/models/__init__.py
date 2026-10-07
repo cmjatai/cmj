@@ -42,7 +42,7 @@ from cmj.loa.models.m_prestacaoconta import (
     PrestacaoContaRegistro,
 )
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
-from cmj.loa.models.m_scrap import ScrapRecord
+from cmj.loa.models.m_scrap_sigep import ScrapRecordSigep
 
 __all__ = [
     "Agrupamento",
@@ -78,5 +78,5 @@ __all__ = [
     "PrestacaoContaRegistro",
     "ArquivoPrestacaoContaRegistro",
     "EmendaLoaRegistroContabil",
-    "ScrapRecord",
+    "ScrapRecordSigep",
 ]
