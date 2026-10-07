@@ -1,5 +1,6 @@
 import calendar
 import datetime
+import hashlib
 import io
 import json
 import logging
@@ -143,7 +144,6 @@ class Command(BaseCommand):
         )
         print(f"Constructed endpoint: {endpoint}")
 
-        raw_data = []
         for ano in range(self.ano_final, self.ano_inicial - 1, -1):
 
             loa = LoaModels.Loa.objects.filter(ano=ano).first()
@@ -154,8 +154,12 @@ class Command(BaseCommand):
 
             print(f"Fetching empenhos for year={ano}")
             print(f"Using endpoint: {endpoint}")
-            try:
-                for mes in range(12, 0, -1):
+            updated_count = 0
+            for mes in range(12, 0, -1):
+
+                try:
+                    raw_data = []
+
                     print(f"Fetching empenhos for month={mes}")
 
                     if loa.ano == ano and mes > self.mes_atual:
@@ -193,13 +197,27 @@ class Command(BaseCommand):
                         dados = self.fetch_empenhos(endpoint, payload)
                         if dados:
                             raw_data.extend(dados)
-                    # if mes == 9:
+
+                    updated_count = 0
+                    for item_centi in raw_data:
+                        empenho, updated_or_created = self.update_or_create_empenho(
+                            item_centi
+                        )
+                        # se None, então o md5 de item_centi não mudou
+                        if updated_or_created is not None:
+                            updated_count += 1
+
+                    if not self.force and not updated_count:
+                        # nenhuma modificação nos empenhos, interrompe o loop de mês
+                        break
+
+                except Exception as e:
+                    print(f"Erro ao processar empenhos para ano={ano} mes={mes}: {e}")
+
+                if not self.force and not updated_count:
+                    # nenhuma modificação nos empenhos, interrompe o loop de mês
                     break
-            except Exception as e:
-                print(f"Erro ao processar empenhos para ano={ano}: {e}")
-            break
-        for item_centi in raw_data:
-            self.update_or_create_empenho(item_centi)
+
             # print(item)
 
     def update_or_create_empenho(self, item_centi):
@@ -325,14 +343,33 @@ class Command(BaseCommand):
         empenho = LoaModels.Empenho.objects.filter(
             codigo=Sequencial or Numero or Id
         ).first()
+        created = False
         if not empenho:
             empenho = LoaModels.Empenho()
             empenho.id = Sequencial or Numero or Id
             empenho.codigo = Sequencial or Numero or Id
+            new_md5 = ""
+            created = True
+        else:
+            # preparar o dict para garantir sequencia de chaves e valor antes de calcular o hash
+            str_item_centi = str(sorted(item_centi.items()))
+            new_md5 = hashlib.md5()
+            new_md5.update(str_item_centi.encode("utf-8"))
+            new_md5 = new_md5.hexdigest()
 
         md = empenho.metadata or {}
         md["scrap"] = md.get("scrap", {})
+        md5_old = md["scrap"].get("md5", "")
+
+        if md5_old == new_md5:
+            return (
+                empenho,
+                None,
+            )  # retorna terceiro estado indicando que não houve alterações, testado via hash
+
         empenho.metadata = md
+
+        md["scrap"]["md5"] = new_md5
         md["scrap"]["values"] = {
             "Número": Numero,
             "CpfCnpjCredor": CpfCnpjCredor,
@@ -381,6 +418,7 @@ class Command(BaseCommand):
         empenho.fonte = destinacaoRecurso
 
         empenho.save()
+        return (empenho, created)
 
     def fetch_empenhos(self, endpoint, payload):
         response_text = None
