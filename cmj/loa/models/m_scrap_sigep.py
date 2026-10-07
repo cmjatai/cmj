@@ -28,7 +28,7 @@ from cmj.loa.models.m_loa import Loa
 from cmj.utils import quantize
 
 
-class ScrapRecord(models.Model):
+class ScrapRecordSigep(models.Model):
 
     metadata = JSONField(
         verbose_name=_("Metadados"),
@@ -44,7 +44,7 @@ class ScrapRecord(models.Model):
 
     codigo = models.TextField(verbose_name=_("Código"), default="")
 
-    url = models.TextField(verbose_name=_("Órgão"), unique=True)
+    url = models.TextField(verbose_name=_("URL"), unique=True)
 
     content = models.BinaryField(editable=True, default=b"")
 
@@ -55,7 +55,7 @@ class ScrapRecord(models.Model):
     erro = models.BooleanField(default=False)
 
     parent = models.ForeignKey(
-        "loa.ScrapRecord",
+        "loa.ScrapRecordSigep",
         blank=True,
         null=True,
         default=None,
@@ -64,8 +64,8 @@ class ScrapRecord(models.Model):
     )
 
     class Meta:
-        verbose_name = "ScrapRecord"
-        verbose_name_plural = "ScrapRecord"
+        verbose_name = "ScrapRecordSigep"
+        verbose_name_plural = "ScrapRecordSigep"
         ordering = ["id"]
 
     def clean_text(self, text):

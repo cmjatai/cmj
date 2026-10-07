@@ -1,7 +1,10 @@
 from decimal import Decimal
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
+from django.db.models.fields.json import JSONField
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 
@@ -17,15 +20,28 @@ class ElementoBase(models.Model):
         max_length=256, verbose_name=_("Especificação"), default="", blank=True
     )
 
-    # metadata = JSONField(
-    #    verbose_name=_('Metadados'),
-    #    blank=True, null=True, default=None, encoder=DjangoJSONEncoder)
+    metadata = JSONField(
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
+    )
 
     class Meta:
         abstract = True
 
     def __str__(self):
         return f"{self.codigo} - {self.especificacao}"
+
+    def save(self, *args, **kwargs):
+        if not self.metadata:
+            self.metadata = {}
+        scrap = self.metadata.get("scrap", {})
+        self.metadata["scrap"] = scrap
+        scrap["key_especificacao"] = slugify(self.especificacao)
+
+        super().save(*args, **kwargs)
 
 
 class Orgao(ElementoBase):

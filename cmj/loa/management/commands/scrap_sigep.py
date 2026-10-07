@@ -189,11 +189,11 @@ class Command(BaseCommand):
             },
         ]
 
-        # ScrapRecord.objects.all().delete()
+        # ScrapRecordSigepobjects.all().delete()
         # urls.reverse()
 
         # 558404
-        # for scrap in ScrapRecord.objects.filter(codigo='477275').order_by('-codigo'):
+        # for scrap in ScrapRecordSigepobjects.filter(codigo='477275').order_by('-codigo'):
         #    scrap.update_data_models()
         # return
 
