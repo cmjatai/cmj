@@ -133,7 +133,7 @@ class Command(BaseCommand):
                 self.centi_getempenhos(url_config)
 
     def centi_getempenhos(self, url_config):
-        uf = "GO"
+        uf = "go"
         tenant = "jatai"
         page_size = 100
 
@@ -191,22 +191,27 @@ class Command(BaseCommand):
                     TotalPaginas = TotalRegistros // page_size + (
                         1 if TotalRegistros % page_size > 0 else 0
                     )
-
+                    print(f"Total registros: {TotalRegistros}, Total páginas: {TotalPaginas}")
                     for page_number in range(2, TotalPaginas + 1):
                         payload["page"]["number"] = page_number
                         dados = self.fetch_empenhos(endpoint, payload)
                         if dados:
                             raw_data.extend(dados)
-
+                    print(f"Fetched {len(raw_data)} empenhos for month={mes}")
                     updated_count = 0
                     for item_centi in raw_data:
                         empenho, updated_or_created = self.update_or_create_empenho(
                             item_centi
                         )
+
+                        if not empenho:
+                            continue
+
                         # se None, então o md5 de item_centi não mudou
                         if updated_or_created is not None:
                             updated_count += 1
 
+                    print(f"Updated {updated_count} empenhos for month={mes}")
                     if not self.force and not updated_count:
                         # nenhuma modificação nos empenhos, interrompe o loop de mês
                         break
@@ -221,15 +226,43 @@ class Command(BaseCommand):
             # print(item)
 
     def update_or_create_empenho(self, item_centi):
-        data = item_centi.get("Data", None)
-        if not data:
-            return
+        dataItem = item_centi.get("Data", None)
+        if not dataItem:
+            return None, None
 
-        data = datetime.datetime.strptime(data, "%d/%m/%Y").date()
+        data = datetime.datetime.strptime(dataItem, "%d/%m/%Y").date()
 
         Id = item_centi.get("Id", None)
         Numero = item_centi.get("Numero", None)
         Sequencial = item_centi.get("Sequencial", None)
+
+        empenho = LoaModels.Empenho.objects.filter(
+            codigo=Sequencial or Numero or Id
+        ).first()
+        created = False
+        if not empenho:
+            empenho = LoaModels.Empenho()
+            empenho.id = Sequencial or Numero or Id
+            empenho.codigo = Sequencial or Numero or Id
+            created = True
+
+        str_item_centi = str(sorted(item_centi.items()))
+        new_md5 = hashlib.md5()
+        new_md5.update(str_item_centi.encode("utf-8"))
+        new_md5 = new_md5.hexdigest()
+
+        md = empenho.metadata or {}
+        md["scrap"] = md.get("scrap", {})
+        md5_old = md["scrap"].get("md5", "")
+
+        if md5_old == new_md5:
+            return (
+                empenho,
+                None,
+            )  # retorna terceiro estado indicando que não houve alterações, testado via hash
+
+        md["scrap"]["md5"] = new_md5
+
         Fornecedor = item_centi.get("Fornecedor", None)
         ValorEmpenhado = item_centi.get("ValorEmpenhado", 0)
         ValorAnulacao = item_centi.get("ValorAnulacao", 0)
@@ -340,37 +373,8 @@ class Command(BaseCommand):
             destinacaoRecurso.codigo = destinacaoRecursoCodigo
             destinacaoRecurso.save()
 
-        empenho = LoaModels.Empenho.objects.filter(
-            codigo=Sequencial or Numero or Id
-        ).first()
-        created = False
-        if not empenho:
-            empenho = LoaModels.Empenho()
-            empenho.id = Sequencial or Numero or Id
-            empenho.codigo = Sequencial or Numero or Id
-            new_md5 = ""
-            created = True
-        else:
-            # preparar o dict para garantir sequencia de chaves e valor antes de calcular o hash
-            str_item_centi = str(sorted(item_centi.items()))
-            new_md5 = hashlib.md5()
-            new_md5.update(str_item_centi.encode("utf-8"))
-            new_md5 = new_md5.hexdigest()
-
-        md = empenho.metadata or {}
-        md["scrap"] = md.get("scrap", {})
-        md5_old = md["scrap"].get("md5", "")
-
-        if md5_old == new_md5:
-            return (
-                empenho,
-                None,
-            )  # retorna terceiro estado indicando que não houve alterações, testado via hash
-
-        empenho.metadata = md
-
-        md["scrap"]["md5"] = new_md5
         md["scrap"]["values"] = {
+            "Data": dataItem,
             "Número": Numero,
             "CpfCnpjCredor": CpfCnpjCredor,
             "Fornecedor": Fornecedor,
@@ -389,13 +393,13 @@ class Command(BaseCommand):
             "Destinação Recurso": str(destinacaoRecurso),
         }
 
+        empenho.nome = Fornecedor
         empenho.cpfcnpj = CpfCnpjCredor
         if len(CpfCnpjCredor) == 14:
             empenho.cpfcnpj = f"{CpfCnpjCredor[:3]}.***.***-{CpfCnpjCredor[12:]}"
             md["scrap"]["values"]["CpfCnpjCredor"] = empenho.cpfcnpj
 
         empenho.data = data
-        empenho.nome = Fornecedor
         empenho.processo = ""
 
         empenho.valor_empenhado = ValorEmpenhado
