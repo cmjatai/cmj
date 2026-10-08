@@ -531,6 +531,9 @@ class LoaViewSet:
             v1 = parts[1].strip() if len(parts) == 2 else None
 
             try:
+                v0 = v0.replace(".", "")
+                if v1 is not None:
+                    v1 = v1.replace(".", "")
                 v0_int = int(v0)
                 v1_int = int(v1) if v1 is not None else None
             except ValueError:
