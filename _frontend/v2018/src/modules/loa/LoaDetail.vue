@@ -200,6 +200,7 @@ export default {
     return {
       check_filter: false,
       check_espec: false,
+      routeSyncReady: false,
       loa: {
         id: this.$route.params.pkloa
       },
@@ -361,6 +362,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         if ((ov || nv) && ov !== nv) {
           t.$nextTick()
             .then(function () {
@@ -377,6 +381,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         if ((ov || nv) && ov !== nv) {
           t.$nextTick()
             .then(function () {
@@ -393,6 +400,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         if ((ov || nv) && ov !== nv) {
           t.$nextTick()
             .then(function () {
@@ -409,6 +419,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         if ((ov || nv) && ov !== nv) {
           t.$nextTick()
             .then(function () {
@@ -425,6 +438,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         if ((ov || nv) && ov !== nv) {
           t.$nextTick()
             .then(function () {
@@ -441,6 +457,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         if ((ov || nv) && ov !== nv) {
           t.$nextTick()
             .then(function () {
@@ -457,6 +476,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         if ((ov || nv) && ov !== nv) {
           t.$nextTick()
             .then(function () {
@@ -470,6 +492,9 @@ export default {
       immediate: true,
       handler (nv, ov) {
         const t = this
+        if (!t.routeSyncReady) {
+          return
+        }
         t.$nextTick()
           .then(function () {
             if ((ov || nv) && ov !== nv) {
@@ -477,9 +502,101 @@ export default {
             }
           })
       }
+    },
+    despesa: {
+      deep: true,
+      handler () {
+        if (!this.routeSyncReady) {
+          return
+        }
+        this.syncQueryString()
+      }
+    },
+    check_filter () {
+      if (!this.routeSyncReady) {
+        return
+      }
+      this.syncQueryString()
+    },
+    check_espec () {
+      if (!this.routeSyncReady) {
+        return
+      }
+      this.syncQueryString()
     }
   },
   methods: {
+    syncQueryString () {
+      const t = this
+      const query = {}
+      const fieldToQueryKey = {
+        orgaoselected: 'orgao',
+        unidadeselected: 'unidade',
+        funcaoselected: 'funcao',
+        subfuncaoselected: 'subfuncao',
+        programaselected: 'programa',
+        acaoselected: 'acao'
+      }
+      _.forOwn(fieldToQueryKey, function (queryKey, field) {
+        const value = t.despesa[field]
+        if (value && value.id) {
+          query[queryKey] = value.id
+        }
+      })
+      if (t.despesa.agrupamentoselected) {
+        query.agrupamento = t.despesa.agrupamentoselected
+      }
+      if (t.despesa.itensselected) {
+        query.itens = t.despesa.itensselected
+      }
+      if (t.check_filter) {
+        query.check_filter = '1'
+      }
+      if (t.check_espec) {
+        query.check_espec = '1'
+      }
+      t.$router.replace({ query }).catch((err) => {
+        if (err.name !== 'NavigationDuplicated') throw err
+      })
+    },
+    restoreFromQuery () {
+      const t = this
+      const query = t.$route.query
+
+      if (query.agrupamento) {
+        t.despesa.agrupamentoselected = query.agrupamento
+      }
+      if (query.itens) {
+        t.despesa.itensselected = Number(query.itens)
+      }
+      t.check_filter = query.check_filter === '1'
+      t.check_espec = query.check_espec === '1'
+
+      // busca pelo id direto no endpoint de detalhe: fetchSync com `id` não pagina,
+      // ao contrário da listagem, cuja paginação é disparada sem aguardar as próximas páginas
+      const restoreSelect = (app, model, field, id) => {
+        if (!id) {
+          return Promise.resolve()
+        }
+        return t.fetchSync({ app, model, id })
+          .then(() => {
+            const cacheKey = `${app}_${model}`
+            const item = t.data_cache[cacheKey] && t.data_cache[cacheKey][id]
+            if (item) {
+              t.$set(t.despesa, field, item)
+            }
+          })
+      }
+
+      return Promise.all([
+        restoreSelect('loa', 'orgao', 'orgaoselected', query.orgao ? Number(query.orgao) : null),
+        restoreSelect('loa', 'unidadeorcamentaria', 'unidadeselected', query.unidade ? Number(query.unidade) : null),
+        restoreSelect('loa', 'funcao', 'funcaoselected', query.funcao ? Number(query.funcao) : null),
+        restoreSelect('loa', 'subfuncao', 'subfuncaoselected', query.subfuncao ? Number(query.subfuncao) : null),
+        restoreSelect('loa', 'programa', 'programaselected', query.programa ? Number(query.programa) : null),
+        restoreSelect('loa', 'acao', 'acaoselected', query.acao ? Number(query.acao) : null)
+      ])
+    },
     space2nbsp (value) {
       return value.replace(/ /g, '&nbsp;')
     },
@@ -761,7 +878,12 @@ export default {
             const yaml_obs = YAML.load(response.data.yaml_obs)
             response.data.yaml_obs = yaml_obs
             t.loa = response.data
-            // t.fetch()
+          })
+          .then(() => t.restoreFromQuery())
+          .then(() => {
+            t.routeSyncReady = true
+            t.syncQueryString()
+            t.fetch()
           })
       })
   }
