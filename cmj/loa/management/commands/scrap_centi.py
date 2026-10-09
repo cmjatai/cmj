@@ -73,13 +73,9 @@ def consertar_json_rigoroso(texto):
 class Command(BaseCommand):
 
     def add_arguments(self, parser):
-        parser.add_argument("--deep", action="store_true", default=False)
-        parser.add_argument("--onlychilds", action="store_true", default=False)
-        parser.add_argument("--onlyoverlist", action="store_true", default=False)
         parser.add_argument("--outfile", action="store_true", default=False)
         parser.add_argument("--force", action="store_true", default=False)
-        parser.add_argument("--parcial_force", action="store_true", default=False)
-        parser.add_argument("--timeexec", type=int, default=30000)
+        parser.add_argument("--stopinpage", action="store_true", default=False)
         parser.add_argument(
             "--ano_inicial", type=int, default=timezone.localtime().year
         )
@@ -92,21 +88,10 @@ class Command(BaseCommand):
         m.desativa_signals()
 
         self.force = force = options["force"]
-        self.parcial_force = parcial_force = options["parcial_force"]
-        self.deep = deep = options["deep"]
-        self.onlychilds = onlychilds = options["onlychilds"]
-        self.onlyoverlist = onlyoverlist = options["onlyoverlist"]
-        outfile = options["outfile"]
-        timeexec = options["timeexec"]
+        self.stopinpage = stopinpage = options["stopinpage"]
         self.ano_inicial = options["ano_inicial"]
         self.ano_final = options["ano_final"]
-        # deep=True buscas as listas e a partir das listas, busca os registros
-        # deep=False buscas apenas as listas
-        # onlychilds=True ignora deep e, a partir das listas já baixadas, busca
-        # os registros individuais
-
-        if onlychilds:
-            self.deep = deep = True
+        outfile = options["outfile"]
 
         if outfile:
             file_path = settings.PROJECT_DIR.child("logs").child("scrap_running.txt")
@@ -123,7 +108,9 @@ class Command(BaseCommand):
         if self.ano_inicial > self.ano_final:
             raise ValueError("Ano inicial não pode ser maior que ano final.")
 
-        print(f"START scrap: {self.time_start}")
+        print('')
+        print('----------------------------------------')
+        print(f"START scrap centi: {self.time_start}")
 
         for url_config in urls:
             if not url_config["active"]:
@@ -144,6 +131,7 @@ class Command(BaseCommand):
         )
         print(f"Constructed endpoint: {endpoint}")
 
+        raw_data_global = []
         for ano in range(self.ano_final, self.ano_inicial - 1, -1):
 
             loa = LoaModels.Loa.objects.filter(ano=ano).first()
@@ -192,28 +180,41 @@ class Command(BaseCommand):
                         1 if TotalRegistros % page_size > 0 else 0
                     )
                     print(f"Total registros: {TotalRegistros}, Total páginas: {TotalPaginas}")
+                    def processa_dados(_dados):
+                        updated_count = 0
+                        for item_centi in _dados:
+                            empenho, updated_or_created = self.update_or_create_empenho(
+                                item_centi
+                            )
+
+                            if not empenho:
+                                continue
+
+                            # se None, então o md5 de item_centi não mudou
+                            if updated_or_created is not None:
+                                updated_count += 1
+
+                        return updated_count
+
                     for page_number in range(2, TotalPaginas + 1):
                         payload["page"]["number"] = page_number
                         dados = self.fetch_empenhos(endpoint, payload)
                         if dados:
                             raw_data.extend(dados)
-                    print(f"Fetched {len(raw_data)} empenhos for month={mes}")
+
+                        if not self.force and self.stopinpage:
+                            updated_count = processa_dados(dados)
+                            if not updated_count:
+                                break
+
+                    raw_data_global.extend(raw_data)
+
                     updated_count = 0
-                    for item_centi in raw_data:
-                        empenho, updated_or_created = self.update_or_create_empenho(
-                            item_centi
-                        )
+                    if not self.force and not self.stopinpage:
+                        updated_count = processa_dados(raw_data)
 
-                        if not empenho:
-                            continue
-
-                        # se None, então o md5 de item_centi não mudou
-                        if updated_or_created is not None:
-                            updated_count += 1
-
-                    print(f"Updated {updated_count} empenhos for month={mes}")
                     if not self.force and not updated_count:
-                        # nenhuma modificação nos empenhos, interrompe o loop de mês
+                        # se nenhuma modificação nos empenhos então interrompe o loop de mês
                         break
 
                 except Exception as e:
