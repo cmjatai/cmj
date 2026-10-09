@@ -99,6 +99,10 @@ class Command(BaseCommand):
             if file_path.exists():
                 sys.stdout.seek(0, io.SEEK_END)
 
+        if self.force:
+            print("[scrap_centi] Force mode enabled.")
+            self.stopinpage = False
+
         self.time_start = timezone.localtime()
 
         self.ano_atual = self.time_start.year
@@ -247,7 +251,8 @@ class Command(BaseCommand):
                     # mês seguinte por crer que não houve alterações)
                     mes_updated_count = 0
 
-                    if not self.force and self.stopinpage:
+                    # self.stopinpage já é forçado para False quando force=True (ver handle())
+                    if self.stopinpage:
                         mes_updated_count += processa_dados(dados)
                         print(
                             f"[scrap_centi] [{ano}-{mes:02d}] página 1/{TotalPaginas}: "
@@ -264,7 +269,7 @@ class Command(BaseCommand):
                         if dados_pagina:
                             raw_data.extend(dados_pagina)
 
-                        if not self.force and self.stopinpage:
+                        if self.stopinpage:
                             pagina_updated_count = processa_dados(dados_pagina)
                             mes_updated_count += pagina_updated_count
                             print(
@@ -284,7 +289,7 @@ class Command(BaseCommand):
 
                     raw_data_global.extend(raw_data)
 
-                    if not self.force and not self.stopinpage:
+                    if not self.stopinpage:
                         mes_updated_count = processa_dados(raw_data)
 
                     updated_count = mes_updated_count
