@@ -17,7 +17,7 @@ from django.utils.text import slugify
 from cmj.loa import models as LoaModels
 from cmj.utils import Manutencao, str2decimal
 
-headers = {"User-Agent": "CamaraMunicipalJatai-Bot/1.0 (dde@jatai.go.leg.br)"}
+DEFAULT_HEADERS = {"User-Agent": "CamaraMunicipalJatai-Bot/1.0 (dde@jatai.go.leg.br)"}
 
 urls = [
     {
@@ -34,7 +34,7 @@ urls = [
 ]
 
 
-def consertar_json_rigoroso(texto):
+def sanitize_json_content(texto):
     """
     Usa Expressão Regular (Regex) avançada para isolar EXATAMENTE o miolo
     das strings baseando-se nas chaves do JSON.
@@ -52,7 +52,7 @@ def consertar_json_rigoroso(texto):
         re.DOTALL,
     )
 
-    def limpar_miolo(match):
+    def sanitize_content(match):
         inicio = match.group(1)
         conteudo = match.group(2)
         fim = match.group(3)
@@ -67,7 +67,7 @@ def consertar_json_rigoroso(texto):
         return inicio + conteudo + fim
 
     # Aplica a substituição varrendo do primeiro "{" até o último "}"
-    return padrao.sub(limpar_miolo, texto)
+    return padrao.sub(sanitize_content, texto)
 
 
 class Command(BaseCommand):
@@ -108,9 +108,14 @@ class Command(BaseCommand):
         if self.ano_inicial > self.ano_final:
             raise ValueError("Ano inicial não pode ser maior que ano final.")
 
-        print('')
-        print('----------------------------------------')
-        print(f"START scrap centi: {self.time_start}")
+        print("")
+        print("=" * 70)
+        print(f"[scrap_centi] INÍCIO em {self.time_start:%d/%m/%Y %H:%M:%S}")
+        print(
+            f"[scrap_centi] Período solicitado: {self.ano_inicial} a {self.ano_final} "
+            f"| force={self.force} | stopinpage={self.stopinpage}"
+        )
+        print("=" * 70)
 
         for url_config in urls:
             if not url_config["active"]:
@@ -119,17 +124,25 @@ class Command(BaseCommand):
             if url_config["name"] == "centi_getempenhos":
                 self.centi_getempenhos(url_config)
 
+        time_end = timezone.localtime()
+        print("=" * 70)
+        print(
+            f"[scrap_centi] FIM em {time_end:%d/%m/%Y %H:%M:%S} "
+            f"(duração: {time_end - self.time_start})"
+        )
+        print("=" * 70)
+
     def centi_getempenhos(self, url_config):
         uf = "go"
         tenant = "jatai"
         page_size = 100
 
-        print(f"Fetching empenhos for UF={uf}, Tenant={tenant}")
+        print(f"[scrap_centi] Fetching empenhos for UF={uf}, Tenant={tenant}")
 
         endpoint = url_config["endpoint"].format(
             base_url=url_config["base_url"], uf=uf, tenant=tenant
         )
-        print(f"Constructed endpoint: {endpoint}")
+        print(f"[scrap_centi] Endpoint: {endpoint}")
 
         raw_data_global = []
         for ano in range(self.ano_final, self.ano_inicial - 1, -1):
@@ -137,94 +150,181 @@ class Command(BaseCommand):
             loa = LoaModels.Loa.objects.filter(ano=ano).first()
 
             if not loa:
-                print(f"No Loa found for year={ano}")
+                print(
+                    f"[scrap_centi] [{ano}] LOA não cadastrada para o ano — ano ignorado."
+                )
                 continue
 
-            print(f"Fetching empenhos for year={ano}")
-            print(f"Using endpoint: {endpoint}")
-            updated_count = 0
+            print(f"\n[scrap_centi] === Ano {ano}: iniciando varredura mensal ===")
+
             for mes in range(12, 0, -1):
-
+                # resetado a cada mês para não herdar valor de iteração anterior
+                # em caso de exceção (evita interrupção indevida do loop de meses)
+                updated_count = 0
                 try:
-                    raw_data = []
-
-                    print(f"Fetching empenhos for month={mes}")
-
                     if loa.ano == ano and mes > self.mes_atual:
-                        print(f"Skipping month={mes} as it is in the future")
+                        print(f"[scrap_centi] [{ano}-{mes:02d}] mês futuro — ignorado.")
                         continue
-
-                    print(f"Processing empenhos for year={ano}, month={mes}")
 
                     primeiro_dia = date(ano, mes, 1)
                     ultimo_dia = date(ano, mes, calendar.monthrange(ano, mes)[1])
-                    print(f"Processing period from {primeiro_dia} to {ultimo_dia}")
 
                     # converter datas para 'dd/MM/yyyy'
-                    primeiro_dia = primeiro_dia.strftime("%d/%m/%Y")
-                    ultimo_dia = ultimo_dia.strftime("%d/%m/%Y")
+                    primeiro_dia_str = primeiro_dia.strftime("%d/%m/%Y")
+                    ultimo_dia_str = ultimo_dia.strftime("%d/%m/%Y")
 
+                    print(
+                        f"[scrap_centi] [{ano}-{mes:02d}] buscando empenhos de "
+                        f"{primeiro_dia_str} a {ultimo_dia_str}..."
+                    )
+
+                    raw_data = []
                     payload = {
                         "ano": ano,
                         "covid": False,
-                        "dataInicio": primeiro_dia,
-                        "dataFim": ultimo_dia,
+                        "dataInicio": primeiro_dia_str,
+                        "dataFim": ultimo_dia_str,
                         "page": {"number": 1, "size": page_size},
                     }
-                    dados = self.fetch_empenhos(endpoint, payload)
-                    if dados:
-                        raw_data.extend(dados)
 
-                    TotalRegistros = dados[0].get("TotalRegistros")
+                    dados = self.fetch_empenhos(endpoint, payload)
+                    if not dados:
+                        print(
+                            f"[scrap_centi] [{ano}-{mes:02d}] nenhum registro retornado "
+                            f"pela API — mês ignorado."
+                        )
+                        continue
+
+                    raw_data.extend(dados)
+
+                    # TotalRegistros pode vir ausente/None da API — default evita TypeError
+                    TotalRegistros = dados[0].get("TotalRegistros") or 0
                     TotalPaginas = TotalRegistros // page_size + (
                         1 if TotalRegistros % page_size > 0 else 0
                     )
-                    print(f"Total registros: {TotalRegistros}, Total páginas: {TotalPaginas}")
+                    print(
+                        f"[scrap_centi] [{ano}-{mes:02d}] {TotalRegistros} registro(s) "
+                        f"em {TotalPaginas} página(s)."
+                    )
+
                     def processa_dados(_dados):
-                        updated_count = 0
+                        """Processa os itens isoladamente: falha em 1 empenho não aborta os demais."""
+                        sucesso = 0
                         for item_centi in _dados:
-                            empenho, updated_or_created = self.update_or_create_empenho(
-                                item_centi
+                            codigo_item = (
+                                item_centi.get("Sequencial")
+                                or item_centi.get("Numero")
+                                or item_centi.get("Id")
                             )
+                            try:
+                                empenho, updated_or_created = (
+                                    self.update_or_create_empenho(item_centi)
+                                )
+                            except Exception as e:
+                                print(
+                                    f"[scrap_centi] [{ano}-{mes:02d}] ERRO ao gravar "
+                                    f"empenho código={codigo_item}: {e}"
+                                )
+                                self.logger.error(
+                                    f"Erro ao processar empenho ano={ano} mes={mes} "
+                                    f"codigo={codigo_item}: {e}",
+                                    exc_info=True,
+                                )
+                                continue
 
                             if not empenho:
                                 continue
 
                             # se None, então o md5 de item_centi não mudou
                             if updated_or_created is not None:
-                                updated_count += 1
+                                sucesso += 1
 
-                        return updated_count
+                        return sucesso
+
+                    # acumula alterações de todas as páginas; antes era reatribuído
+                    # para 0 após o loop de páginas, mascarando o resultado real
+                    # quando --stopinpage estava ativo (bug: sempre interrompia o
+                    # mês seguinte por crer que não houve alterações)
+                    mes_updated_count = 0
+
+                    if not self.force and self.stopinpage:
+                        mes_updated_count += processa_dados(dados)
+                        print(
+                            f"[scrap_centi] [{ano}-{mes:02d}] página 1/{TotalPaginas}: "
+                            f"{mes_updated_count} alteração(ões)."
+                        )
 
                     for page_number in range(2, TotalPaginas + 1):
                         payload["page"]["number"] = page_number
-                        dados = self.fetch_empenhos(endpoint, payload)
-                        if dados:
-                            raw_data.extend(dados)
+                        print(
+                            f"[scrap_centi] [{ano}-{mes:02d}] buscando página "
+                            f"{page_number}/{TotalPaginas}..."
+                        )
+                        dados_pagina = self.fetch_empenhos(endpoint, payload)
+                        if dados_pagina:
+                            raw_data.extend(dados_pagina)
 
                         if not self.force and self.stopinpage:
-                            updated_count = processa_dados(dados)
-                            if not updated_count:
+                            pagina_updated_count = processa_dados(dados_pagina)
+                            mes_updated_count += pagina_updated_count
+                            print(
+                                f"[scrap_centi] [{ano}-{mes:02d}] página "
+                                f"{page_number}/{TotalPaginas}: "
+                                f"{pagina_updated_count} alteração(ões)."
+                            )
+                            if not pagina_updated_count:
+                                print(
+                                    f"[scrap_centi] [{ano}-{mes:02d}] sem alterações "
+                                    f"na página {page_number} — paginação do mês "
+                                    f"interrompida."
+                                )
                                 break
+
+                        self.stdout.flush()
 
                     raw_data_global.extend(raw_data)
 
-                    updated_count = 0
                     if not self.force and not self.stopinpage:
-                        updated_count = processa_dados(raw_data)
+                        mes_updated_count = processa_dados(raw_data)
+
+                    updated_count = mes_updated_count
+
+                    print(
+                        f"[scrap_centi] [{ano}-{mes:02d}] mês concluído: "
+                        f"{updated_count} empenho(s) novo(s)/atualizado(s) de "
+                        f"{len(raw_data)} recebido(s)."
+                    )
 
                     if not self.force and not updated_count:
                         # se nenhuma modificação nos empenhos então interrompe o loop de mês
+                        print(
+                            f"[scrap_centi] [{ano}-{mes:02d}] sem novidades neste "
+                            f"mês — varredura do ano {ano} interrompida."
+                        )
                         break
 
                 except Exception as e:
-                    print(f"Erro ao processar empenhos para ano={ano} mes={mes}: {e}")
+                    print(
+                        f"[scrap_centi] [{ano}-{mes:02d}] ERRO inesperado ao "
+                        f"processar o mês: {e}"
+                    )
+                    self.logger.error(
+                        f"Erro ao processar empenhos para ano={ano} mes={mes}: {e}",
+                        exc_info=True,
+                    )
+                    continue
 
-                if not self.force and not updated_count:
-                    # nenhuma modificação nos empenhos, interrompe o loop de mês
-                    break
+            print(f"[scrap_centi] === Ano {ano}: varredura finalizada ===")
 
-            # print(item)
+    @staticmethod
+    def _split_codigo_especificacao(valor, sep=" - "):
+        """Separa 'codigo - especificação' sem quebrar quando o padrão não é seguido."""
+        if not valor:
+            return "", ""
+        partes = valor.split(sep, 1)
+        codigo = partes[0].strip()
+        especificacao = partes[1].strip() if len(partes) > 1 else ""
+        return codigo, especificacao
 
     def update_or_create_empenho(self, item_centi):
         dataItem = item_centi.get("Data", None)
@@ -278,7 +378,7 @@ class Command(BaseCommand):
         SubFuncao = item_centi.get("SubFuncao", None)
         Programa = item_centi.get("Programa", None)
         Acao = item_centi.get("Acao", None)
-        CpfCnpjCredor = item_centi.get("CpfCnpjCredor", None)
+        CpfCnpjCredor = item_centi.get("CpfCnpjCredor", None) or ""
         LicitacaoModalidade = item_centi.get("LicitacaoModalidade", None)
         IdLicitacaoDispensaAdesao = item_centi.get("IdLicitacaoDispensaAdesao", None)
         Historico = item_centi.get("Historico", None)
@@ -333,22 +433,24 @@ class Command(BaseCommand):
 
             map_values[key] = [value, slug, model, obj]
 
-        elemento = Elemento.split(" - ")
+        elemento_codigo, elemento_especificacao = self._split_codigo_especificacao(
+            Elemento
+        )
         natureza = LoaModels.Natureza.objects.filter(
             loa__ano=data.year,
-            codigo__iexact=elemento[0],
-            # especificacao__iexact=elemento[1],
+            codigo__iexact=elemento_codigo,
         ).first()
         if not natureza:
             natureza = LoaModels.Natureza()
             natureza.loa_id = loa.id
-            natureza.especificacao = elemento[1]
-            natureza.codigo = elemento[0]
+            natureza.especificacao = elemento_especificacao
+            natureza.codigo = elemento_codigo
             natureza.save()
 
-        fonteRecurso = FonteRecurso.split(" - ", 1)
-        fonteRecursoCodigo = "".join(filter(str.isdigit, fonteRecurso[0]))
-        especFonteRecurso = fonteRecurso[1].strip()
+        fonteRecurso_codigo_raw, especFonteRecurso = self._split_codigo_especificacao(
+            FonteRecurso
+        )
+        fonteRecursoCodigo = "".join(filter(str.isdigit, fonteRecurso_codigo_raw))
         fonteRecurso = LoaModels.Fonte.objects.filter(
             loa__ano=data.year, codigo__iexact=fonteRecursoCodigo
         ).first()
@@ -359,10 +461,12 @@ class Command(BaseCommand):
             fonteRecurso.codigo = fonteRecursoCodigo
             fonteRecurso.save()
 
-        destinacaoRecurso = DestinacaoRecurso.split(" - ", 1)
-        destinacaoRecursoCodigo = "".join(filter(str.isdigit, destinacaoRecurso[0]))
-        especDestinacaoRecurso = destinacaoRecurso[1].strip()
-
+        destinacaoRecurso_codigo_raw, especDestinacaoRecurso = (
+            self._split_codigo_especificacao(DestinacaoRecurso)
+        )
+        destinacaoRecursoCodigo = "".join(
+            filter(str.isdigit, destinacaoRecurso_codigo_raw)
+        )
         destinacaoRecursoCodigo = f"{fonteRecursoCodigo}.{destinacaoRecursoCodigo}"
         destinacaoRecurso = LoaModels.Fonte.objects.filter(
             loa__ano=data.year, codigo__iexact=destinacaoRecursoCodigo
@@ -427,38 +531,66 @@ class Command(BaseCommand):
 
     def fetch_empenhos(self, endpoint, payload):
         response_text = None
+        response = None
+        pagina = payload.get("page", {}).get("number")
+        periodo = f"{payload.get('dataInicio')} a {payload.get('dataFim')}"
         try:
-            print(f"Buscando dados em: {endpoint}...")
-
-            # Adicionamos o argumento headers=headers aqui
-            headers = {"Content-Type": "application/json"}
-            response = requests.post(endpoint, json=payload, headers=headers)
+            # headers locais mesclados com o User-Agent padrão do módulo,
+            # que antes era sobrescrito (shadowing) e nunca chegava a ser enviado
+            request_headers = {**DEFAULT_HEADERS, "Content-Type": "application/json"}
+            response = requests.post(endpoint, json=payload, headers=request_headers)
 
             # Dispara uma exceção se o status code for um erro
             response.raise_for_status()
             response_text = response.text
 
         except requests.exceptions.HTTPError as errh:
-            print(f"Erro da API (HTTP Error): {errh}")
-            print(f"Detalhes do erro: {response.text}")
+            print(
+                f"[scrap_centi] ERRO HTTP ao buscar página {pagina} ({periodo}): {errh}"
+            )
+            self.logger.error(
+                f"Erro HTTP ao buscar empenhos página={pagina} periodo={periodo}: "
+                f"{errh} | resposta={response.text if response is not None else ''}"
+            )
         except requests.exceptions.RequestException as err:
-            print(f"Erro de conexão ou requisição: {err}")
+            print(
+                f"[scrap_centi] ERRO de conexão ao buscar página {pagina} "
+                f"({periodo}): {err}"
+            )
+            self.logger.error(
+                f"Erro de conexão ao buscar empenhos página={pagina} "
+                f"periodo={periodo}: {err}"
+            )
         except Exception as err:
-            print(f"Erro inesperado: {err}")
+            print(f"[scrap_centi] ERRO inesperado ao buscar página {pagina}: {err}")
+            self.logger.error(
+                f"Erro inesperado ao buscar empenhos página={pagina} "
+                f"periodo={periodo}: {err}",
+                exc_info=True,
+            )
 
         if not response_text:
             return []
 
         try:
             dados = json.loads(response_text)
-            print("Sucesso!")
-        except json.JSONDecodeError as e:
+        except json.JSONDecodeError:
             try:
-                texto_limpo = consertar_json_rigoroso(response_text)
+                texto_limpo = sanitize_json_content(response_text)
                 dados = json.loads(texto_limpo)
-                print("Sucesso após conserto!")
+                print(
+                    f"[scrap_centi] JSON da página {pagina} precisou de correção "
+                    f"automática."
+                )
             except json.JSONDecodeError as e2:
-                print(f"Falha ao tentar consertar o JSON: {e2}")
+                print(
+                    f"[scrap_centi] ERRO: falha ao corrigir JSON da página "
+                    f"{pagina}: {e2}"
+                )
+                self.logger.error(
+                    f"Falha ao corrigir JSON de empenhos página={pagina} "
+                    f"periodo={periodo}: {e2}"
+                )
                 dados = []
 
         return dados
