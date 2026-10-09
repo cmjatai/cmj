@@ -21,7 +21,11 @@ LoaDetailATE2022:
 
 Despesa:
   {% trans 'Dados Gerais' %}:
-  - orgao unidade funcao subfuncao programa acao natureza fonte
+  - orgao unidade
+  - funcao subfuncao
+  - programa acao
+  - natureza fonte
+  - valor_materia
 
 Orgao:
   {% trans 'Dados Gerais' %}:

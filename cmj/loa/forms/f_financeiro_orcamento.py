@@ -1,17 +1,127 @@
 import logging
 
-from crispy_forms.layout import Fieldset
+from crispy_forms.bootstrap import FieldWithButtons, StrictButton
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Field, Fieldset
 from django import forms
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
+from django_filters import CharFilter, FilterSet
 
-from cmj.loa.models import UnidadeOrcamentaria
+from cmj.loa.models import (
+    Acao,
+    Despesa,
+    Fonte,
+    Funcao,
+    Natureza,
+    Orgao,
+    Programa,
+    SubFuncao,
+    UnidadeOrcamentaria,
+)
 from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa
 from cmj.loa.models.m_emendaloa import EmendaLoa
 from cmj.loa.models.m_financeiro_execucao import DespesaPaga, Empenho
-from cmj.loa.models.m_financeiro_orcamento import Despesa, Orgao, ReceitaOrcamentaria
+from cmj.loa.models.m_financeiro_orcamento import ReceitaOrcamentaria
 from sapl.crispy_layout_mixin import SaplFormHelper, SaplFormLayout, to_row
 
 logger = logging.getLogger(__name__)
+
+
+class DespesaFilterSet(FilterSet):
+
+    search = CharFilter(
+        label=_("Busca por termos"),
+        help_text="Informe termos separados por espaço para filtrar as despesas. A busca é feita em todos os campos das Despesas.",
+        method="filter_search",
+    )
+
+    class Meta:
+        model = Despesa
+        fields = ["search"]
+
+        class Form(forms.Form):
+            crispy_field_template = ("search",)
+
+        form = Form
+
+    def filter_search(self, queryset, name, value):
+        if not value:
+            return queryset
+
+        terms = value.split()
+        if terms:
+            fq = Q()
+            for term in terms:
+                if term.startswith("-") and len(term) > 1:
+                    fq &= ~Q(search__unaccent__icontains=term[1:])
+                else:
+                    fq &= Q(search__unaccent__icontains=term)
+
+            queryset = queryset.filter(fq)
+        return queryset
+
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        search_field = FieldWithButtons(
+            Field(
+                "search", label=_("Busca"), placeholder=_("Informe termos a filtrar...")
+            ),
+            StrictButton(_("Filtrar"), css_class="btn-secondary", type="submit"),
+        )
+
+        row = to_row(
+            [
+                (search_field, 12),
+            ]
+        )
+        fields = [row]
+        self.form.helper = FormHelper()
+        self.form.helper.form_method = "get"
+        self.form.helper.form_class = "container"
+        self.form.helper.layout = SaplFormLayout(*fields, actions=False)
+
+
+class DespesaForm(forms.ModelForm):
+
+    class Meta:
+        model = Despesa
+        fields = (
+            "orgao",
+            "unidade",
+            "funcao",
+            "subfuncao",
+            "programa",
+            "acao",
+            "natureza",
+            "fonte",
+            "valor_materia",
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["orgao"].queryset = Orgao.objects.filter(loa=self.instance.loa)
+        self.fields["unidade"].queryset = UnidadeOrcamentaria.objects.filter(
+            loa=self.instance.loa
+        )
+        self.fields["funcao"].queryset = Funcao.objects.filter(loa=self.instance.loa)
+        self.fields["subfuncao"].queryset = SubFuncao.objects.filter(
+            loa=self.instance.loa
+        )
+        self.fields["programa"].queryset = Programa.objects.filter(
+            loa=self.instance.loa
+        )
+        self.fields["acao"].queryset = Acao.objects.filter(loa=self.instance.loa)
+        self.fields["natureza"].queryset = Natureza.objects.filter(
+            loa=self.instance.loa
+        )
+        self.fields["fonte"].queryset = Fonte.objects.filter(loa=self.instance.loa)
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        return instance
 
 
 class OrgaoForm(forms.ModelForm):

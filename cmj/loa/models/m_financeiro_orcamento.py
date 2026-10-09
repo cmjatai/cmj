@@ -1,11 +1,14 @@
 from decimal import Decimal
 
+from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models.deletion import PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+
+from cmj.mixins import CmjSearchMixin
 
 
 class ElementoBase(models.Model):
@@ -173,7 +176,7 @@ class Natureza(ElementoBase):
         ]
 
 
-class Despesa(models.Model):
+class Despesa(CmjSearchMixin):
 
     loa = models.ForeignKey(
         "loa.Loa", verbose_name=_("Loa"), related_name="despesa_set", on_delete=PROTECT
@@ -276,7 +279,38 @@ class Despesa(models.Model):
                     "fonte",
                 ]
             ),
+            GinIndex(
+                OpClass("search", name="gin_trgm_ops"),
+                name="despesa_search_gin_trgm",
+            ),
         ]
+
+    @property
+    def fields_search(self):
+        return ["hook_search"]
+
+    def hook_search(self):
+        fields = [
+            "loa",
+            "orgao",
+            "unidade",
+            "funcao",
+            "subfuncao",
+            "programa",
+            "acao",
+            "natureza",
+            "fonte",
+            "valor_materia",
+        ]
+        values = []
+        for field in fields:
+            value = getattr(self, field)
+            if value is not None:
+                values.extend(str(value).split())
+
+        values = sorted(list(set(values)))
+
+        return " ".join(values)
 
     def __str__(self):
         dc = DespesaConsulta.objects.get(pk=self.id)
@@ -292,8 +326,7 @@ class Despesa(models.Model):
 
         self.clean()
 
-        return models.Model.save(
-            self,
+        return super(Despesa, self).save(
             force_insert=force_insert,
             force_update=force_update,
             using=using,

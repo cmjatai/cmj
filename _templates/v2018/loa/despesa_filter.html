@@ -1,0 +1,6 @@
+{% extends "crud/list.html" %}
+{% load crispy_forms_tags %}
+
+{% block extra_content %}
+{% crispy filter.form %}
+{% endblock %}

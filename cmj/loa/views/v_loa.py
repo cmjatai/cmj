@@ -2,6 +2,7 @@ from decimal import ROUND_DOWN, Decimal
 
 from django.db.models import Q
 from django.db.models.aggregates import Sum
+from django.http import HttpResponse
 from django.http.response import Http404
 from django.shortcuts import redirect
 from django.template import loader
@@ -46,7 +47,25 @@ class LoaCrud(Crud):
             except Loa.DoesNotExist:
                 raise Http404(_("Nenhuma LOA publicada encontrada."))
 
-        urls = [path("/atual", redirect_to_latest_loa, name="loa_atual")] + urls
+        def despesas_espelho(request, pk):
+            try:
+                loa = Loa.objects.get(pk=pk, publicado=True)
+            except Loa.DoesNotExist:
+                raise Http404(_("LOA não encontrada."))
+            template = loader.get_template("loa/despesas_espelho.html")
+            context = {
+                "object": loa,
+                "root_pk": pk,
+                "title": f"Espelho das Despesas <small>({loa})</small>",
+                "path": " container-loa despesas-espelho",
+                "subnav_template_name": "loa/subnav_loa_em_tramitacao.yaml",
+            }
+            return HttpResponse(template.render(context, request))
+
+        urls = [
+            path("/atual", redirect_to_latest_loa, name="loa_atual"),
+            path("/<int:pk>/despesas", despesas_espelho, name="loa_despesas_espelho"),
+        ] + urls
         return urls
 
     class BaseMixin(LoaContextDataMixin, Crud.BaseMixin):
