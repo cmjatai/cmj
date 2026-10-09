@@ -251,6 +251,10 @@ class Command(BaseCommand):
                     # mês seguinte por crer que não houve alterações)
                     mes_updated_count = 0
 
+                    # sinaliza que o --stopinpage já encontrou dados sincronizados:
+                    # a varredura deve parar totalmente, não só a paginação do mês
+                    dados_sincronizados = False
+
                     # self.stopinpage já é forçado para False quando force=True (ver handle())
                     if self.stopinpage:
                         mes_updated_count += processa_dados(dados)
@@ -258,8 +262,17 @@ class Command(BaseCommand):
                             f"[scrap_centi] [{ano}-{mes:02d}] página 1/{TotalPaginas}: "
                             f"{mes_updated_count} alteração(ões)."
                         )
+                        if not mes_updated_count:
+                            print(
+                                f"[scrap_centi] [{ano}-{mes:02d}] sem alterações "
+                                f"na página 1 — dados já sincronizados."
+                            )
+                            dados_sincronizados = True
 
                     for page_number in range(2, TotalPaginas + 1):
+                        if dados_sincronizados:
+                            break
+
                         payload["page"]["number"] = page_number
                         print(
                             f"[scrap_centi] [{ano}-{mes:02d}] buscando página "
@@ -280,9 +293,9 @@ class Command(BaseCommand):
                             if not pagina_updated_count:
                                 print(
                                     f"[scrap_centi] [{ano}-{mes:02d}] sem alterações "
-                                    f"na página {page_number} — paginação do mês "
-                                    f"interrompida."
+                                    f"na página {page_number} — dados já sincronizados."
                                 )
+                                dados_sincronizados = True
                                 break
 
                         self.stdout.flush()
@@ -299,6 +312,15 @@ class Command(BaseCommand):
                         f"{updated_count} empenho(s) novo(s)/atualizado(s) de "
                         f"{len(raw_data)} recebido(s)."
                     )
+
+                    if dados_sincronizados:
+                        # página já sincronizada: interrompe a varredura por completo,
+                        # não apenas a paginação do mês atual
+                        print(
+                            f"[scrap_centi] [{ano}-{mes:02d}] dados já sincronizados "
+                            f"— varredura do ano {ano} interrompida totalmente."
+                        )
+                        break
 
                     if not self.force and not updated_count:
                         # se nenhuma modificação nos empenhos então interrompe o loop de mês
