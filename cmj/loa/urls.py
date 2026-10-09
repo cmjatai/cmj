@@ -19,6 +19,7 @@ urlpatterns = [
             + views.v_emendaloa.EmendaLoaCrud.get_urls()
             + views.v_financeiro_execucao.EmpenhoCrud.get_urls()
             + views.v_financeiro_orcamento.DespesaCrud.get_urls()
+            + views.v_financeiro_orcamento.OrgaoCrud.get_urls()
             + views.v_financeiro_orcamento.UnidadeOrcamentariaCrud.get_urls()
             + views.v_financeiro_orcamento.SubFuncaoCrud.get_urls()
             + views.v_prestacaoconta.PrestacaoContaLoaCrud.get_urls()

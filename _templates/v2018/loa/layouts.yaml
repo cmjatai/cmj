@@ -23,6 +23,10 @@ Despesa:
   {% trans 'Dados Gerais' %}:
   - orgao unidade funcao subfuncao programa acao natureza fonte
 
+Orgao:
+  {% trans 'Dados Gerais' %}:
+  - codigo:3 especificacao
+
 UnidadeOrcamentaria:
   {% trans 'Dados Gerais' %}:
   - codigo:3 especificacao:6 area:3

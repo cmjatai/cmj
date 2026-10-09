@@ -1,6 +1,7 @@
 from django.utils.translation import gettext_lazy as _
 
-from cmj.loa.models import Despesa, Loa, SubFuncao, UnidadeOrcamentaria
+from cmj.loa.forms.f_financeiro_orcamento import OrgaoForm, UnidadeOrcamentariaForm
+from cmj.loa.models import Despesa, Loa, Orgao, SubFuncao, UnidadeOrcamentaria
 from cmj.loa.views.v_mixins import LoaContextDataMixin
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
 
@@ -23,12 +24,44 @@ class DespesaCrud(MasterDetailCrud):
             return context
 
 
+class OrgaoCrud(MasterDetailCrud):
+    model = Orgao
+    parent_field = "loa"
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = OrgaoForm
+
+
 class UnidadeOrcamentariaCrud(MasterDetailCrud):
     model = UnidadeOrcamentaria
     parent_field = "loa"
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+        ordering = [
+            "orgao__especificacao",
+            "especificacao",
+        ]
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = UnidadeOrcamentariaForm
 
 
 class SubFuncaoCrud(MasterDetailCrud):

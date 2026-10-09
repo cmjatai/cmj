@@ -19,12 +19,16 @@
   - title: {% trans 'Agrupamentos' %}
     url: agrupamento_list
   {% endif %}
+  {% if perms.loa.orgao_list %}
+  - title: {% trans 'Orgãos' %}
+    url: orgao_list
+  {% endif %}
   {% if perms.loa.unidadeorcamentaria_list %}
-  - title: {% trans 'U.O.' %}
+  - title: {% trans 'Unidades Orçamentárias' %}
     url: unidadeorcamentaria_list
   {% endif %}
   {% if perms.loa.subfuncao_list %}
-  - title: {% trans 'SF' %}
+  - title: {% trans 'Sub-Funções' %}
     url: subfuncao_list
   {% endif %}
   {% if False %}
