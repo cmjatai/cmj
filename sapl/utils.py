@@ -1351,3 +1351,37 @@ def from_date_to_datetime_utc(data):
 def parseString(data, fout=None):
     data = data.replace("<br>", "<br/>")
     return trml2pdfParseString(data, fout)
+
+
+def validar_cpf(cpf: str) -> bool:
+    # Converte para string caso seja int e remove caracteres não numéricos
+    cpf = re.sub(r"[^0-9]", "", str(cpf))
+
+    # Verifica se o CPF tem exatamente 11 dígitos
+    if len(cpf) != 11:
+        return False
+
+    # CPFs com todos os números iguais são inválidos (ex: 000.000.000-00)
+    if cpf == cpf[0] * 11:
+        return False
+
+    # Função auxiliar para calcular os dígitos verificadores
+    def calcular_digito(cpf_parcial, peso_inicial):
+        soma = sum(
+            int(digito) * (peso_inicial - i) for i, digito in enumerate(cpf_parcial)
+        )
+        resto = soma % 11
+        return 0 if resto < 2 else 11 - resto
+
+    # Calcula o primeiro dígito verificador
+    primeiro_digito = calcular_digito(cpf[:9], 10)
+    if primeiro_digito != int(cpf[9]):
+        return False
+
+    # Calcula o segundo dígito verificador
+    segundo_digito = calcular_digito(cpf[:10], 11)
+    if segundo_digito != int(cpf[10]):
+        return False
+
+    # Se passou por todas as verificações, o CPF é válido
+    return True
