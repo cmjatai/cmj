@@ -23,6 +23,7 @@ urlpatterns = [
             + views.v_financeiro_orcamento.UnidadeOrcamentariaCrud.get_urls()
             + views.v_financeiro_orcamento.FuncaoCrud.get_urls()
             + views.v_financeiro_orcamento.SubFuncaoCrud.get_urls()
+            + views.v_financeiro_orcamento.ProgramaCrud.get_urls()
             + views.v_financeiro_orcamento.AcaoCrud.get_urls()
             + views.v_financeiro_orcamento.NaturezaCrud.get_urls()
             + views.v_financeiro_orcamento.FonteCrud.get_urls()
