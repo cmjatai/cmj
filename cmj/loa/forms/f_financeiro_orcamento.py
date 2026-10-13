@@ -331,7 +331,7 @@ class FuncaoForm(forms.ModelForm):
 
 
 class SubFuncaoForm(forms.ModelForm):
-    outros_funcoes = forms.ModelMultipleChoiceField(
+    outros_subfuncoes = forms.ModelMultipleChoiceField(
         queryset=SubFuncao.objects.all(),
         required=False,
         widget=forms.CheckboxSelectMultiple,
@@ -360,13 +360,13 @@ class SubFuncaoForm(forms.ModelForm):
                         ("codigo", 3),
                         ("especificacao", 9),
                         ("funcao", 9),
-                        ("outros_funcoes", 12),
+                        ("outros_subfuncoes", 12),
                     ]
                 ),
             ),
         )
 
-        self.fields["outros_funcoes"].choices = [
+        self.fields["outros_subfuncoes"].choices = [
             (f.pk, f"{f}")
             for f in SubFuncao.objects.filter(
                 loa=self.instance.loa,
@@ -377,12 +377,11 @@ class SubFuncaoForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=commit)
-        funcoes_a_substituir = self.cleaned_data["outros_funcoes"]
+        funcoes_a_substituir = self.cleaned_data["outros_subfuncoes"]
 
         models_a_substituir = (
-            (SubFuncao, "funcao"),
-            (Empenho, "funcao"),
-            (Despesa, "funcao"),
+            (Empenho, "subfuncao"),
+            (Despesa, "subfuncao"),
         )
         for model, field in models_a_substituir:
             for item in model.objects.filter(**{f"{field}__in": funcoes_a_substituir}):
