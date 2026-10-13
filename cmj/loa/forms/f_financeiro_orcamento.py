@@ -264,3 +264,386 @@ class UnidadeOrcamentariaForm(forms.ModelForm):
         except Exception as e:
             logger.error(f"Erro ao excluir unidades orçamentárias substituídas: {e}")
         return instance
+
+
+class FuncaoForm(forms.ModelForm):
+    outros_funcoes = forms.ModelMultipleChoiceField(
+        queryset=Funcao.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label=_("Outros Funções"),
+    )
+
+    class Meta:
+        model = Funcao
+        fields = (
+            "codigo",
+            "especificacao",
+        )
+        widgets = {
+            "codigo": forms.TextInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(
+                _("Função"),
+                to_row(
+                    [
+                        ("codigo", 3),
+                        ("especificacao", 9),
+                        ("outros_funcoes", 12),
+                    ]
+                ),
+            ),
+        )
+
+        self.fields["outros_funcoes"].choices = [
+            (f.pk, f"{f}")
+            for f in Funcao.objects.filter(
+                loa=self.instance.loa,
+            )
+            .exclude(pk=self.instance.pk)
+            .order_by("codigo")
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        funcoes_a_substituir = self.cleaned_data["outros_funcoes"]
+
+        models_a_substituir = (
+            (SubFuncao, "funcao"),
+            (Empenho, "funcao"),
+            (Despesa, "funcao"),
+        )
+        for model, field in models_a_substituir:
+            for item in model.objects.filter(**{f"{field}__in": funcoes_a_substituir}):
+                setattr(item, field, self.instance)
+                item.save()
+        try:
+            for f in funcoes_a_substituir:
+                f.delete()
+        except Exception as e:
+            logger.error(f"Erro ao excluir funções substituídas: {e}")
+        return instance
+
+
+class SubFuncaoForm(forms.ModelForm):
+    outros_funcoes = forms.ModelMultipleChoiceField(
+        queryset=SubFuncao.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label=_("Outros Subfunções"),
+    )
+
+    class Meta:
+        model = SubFuncao
+        fields = (
+            "codigo",
+            "especificacao",
+            "funcao",
+        )
+        widgets = {
+            "codigo": forms.TextInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(
+                _("Subfunção"),
+                to_row(
+                    [
+                        ("codigo", 3),
+                        ("especificacao", 9),
+                        ("funcao", 9),
+                        ("outros_funcoes", 12),
+                    ]
+                ),
+            ),
+        )
+
+        self.fields["outros_funcoes"].choices = [
+            (f.pk, f"{f}")
+            for f in SubFuncao.objects.filter(
+                loa=self.instance.loa,
+            )
+            .exclude(pk=self.instance.pk)
+            .order_by("codigo")
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        funcoes_a_substituir = self.cleaned_data["outros_funcoes"]
+
+        models_a_substituir = (
+            (SubFuncao, "funcao"),
+            (Empenho, "funcao"),
+            (Despesa, "funcao"),
+        )
+        for model, field in models_a_substituir:
+            for item in model.objects.filter(**{f"{field}__in": funcoes_a_substituir}):
+                setattr(item, field, self.instance)
+                if hasattr(item, "funcao"):
+                    item.funcao = self.instance.funcao
+                item.save()
+        try:
+            for f in funcoes_a_substituir:
+                f.delete()
+        except Exception as e:
+            logger.error(f"Erro ao excluir subfunções substituídas: {e}")
+        return instance
+
+
+class ProgramaForm(forms.ModelForm):
+
+    outros_programas = forms.ModelMultipleChoiceField(
+        queryset=Programa.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label=_("Outros Programas"),
+    )
+
+    class Meta:
+        model = Programa
+        fields = (
+            "codigo",
+            "especificacao",
+        )
+        widgets = {
+            "codigo": forms.TextInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(
+                _("Programa"),
+                to_row(
+                    [
+                        ("codigo", 3),
+                        ("especificacao", 9),
+                        ("outros_programas", 12),
+                    ]
+                ),
+            ),
+        )
+        self.fields["outros_programas"].choices = [
+            (f.pk, f"{f}")
+            for f in Programa.objects.filter(
+                loa=self.instance.loa,
+            )
+            .exclude(pk=self.instance.pk)
+            .order_by("codigo")
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        programas_a_substituir = self.cleaned_data["outros_programas"]
+
+        models_a_substituir = (
+            (Empenho, "programa"),
+            (Despesa, "programa"),
+        )
+        for model, field in models_a_substituir:
+            for item in model.objects.filter(
+                **{f"{field}__in": programas_a_substituir}
+            ):
+                setattr(item, field, self.instance)
+                item.save()
+        try:
+            for f in programas_a_substituir:
+                f.delete()
+        except Exception as e:
+            logger.error(f"Erro ao excluir programas substituídos: {e}")
+        return instance
+
+
+class AcaoForm(forms.ModelForm):
+    outros_acoes = forms.ModelMultipleChoiceField(
+        queryset=Acao.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label=_("Outros Ações"),
+    )
+
+    class Meta:
+        model = Acao
+        fields = (
+            "codigo",
+            "especificacao",
+        )
+        widgets = {
+            "codigo": forms.TextInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(
+                _("Ação"),
+                to_row(
+                    [
+                        ("codigo", 3),
+                        ("especificacao", 9),
+                        ("outros_acoes", 12),
+                    ]
+                ),
+            ),
+        )
+        self.fields["outros_acoes"].choices = [
+            (f.pk, f"{f}")
+            for f in Acao.objects.filter(
+                loa=self.instance.loa,
+            )
+            .exclude(pk=self.instance.pk)
+            .order_by("codigo")
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        acoes_a_substituir = self.cleaned_data["outros_acoes"]
+
+        models_a_substituir = (
+            (Empenho, "acao"),
+            (Despesa, "acao"),
+        )
+        for model, field in models_a_substituir:
+            for item in model.objects.filter(**{f"{field}__in": acoes_a_substituir}):
+                setattr(item, field, self.instance)
+                item.save()
+        try:
+            for f in acoes_a_substituir:
+                f.delete()
+        except Exception as e:
+            logger.error(f"Erro ao excluir ações substituídas: {e}")
+        return instance
+
+
+class NaturezaForm(forms.ModelForm):
+    outros_naturezas = forms.ModelMultipleChoiceField(
+        queryset=Natureza.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label=_("Outros Naturezas"),
+    )
+
+    class Meta:
+        model = Natureza
+        fields = (
+            "codigo",
+            "especificacao",
+        )
+        widgets = {
+            "codigo": forms.TextInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(
+                _("Natureza"),
+                to_row(
+                    [
+                        ("codigo", 3),
+                        ("especificacao", 9),
+                        ("outros_naturezas", 12),
+                    ]
+                ),
+            ),
+        )
+        self.fields["outros_naturezas"].choices = [
+            (f.pk, f"{f}")
+            for f in Natureza.objects.filter(
+                loa=self.instance.loa,
+            )
+            .exclude(pk=self.instance.pk)
+            .order_by("codigo")
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        naturezas_a_substituir = self.cleaned_data["outros_naturezas"]
+
+        models_a_substituir = (
+            (Empenho, "natureza"),
+            (Despesa, "natureza"),
+        )
+        for model, field in models_a_substituir:
+            for item in model.objects.filter(**{f"{field}__in": naturezas_a_substituir}):
+                setattr(item, field, self.instance)
+                item.save()
+        try:
+            for f in naturezas_a_substituir:
+                f.delete()
+        except Exception as e:
+            logger.error(f"Erro ao excluir naturezas substituídas: {e}")
+        return instance
+
+
+class FonteForm(forms.ModelForm):
+    outros_fontes = forms.ModelMultipleChoiceField(
+        queryset=Fonte.objects.all(),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        label=_("Outros Fontes"),
+    )
+
+    class Meta:
+        model = Fonte
+        fields = (
+            "codigo",
+            "especificacao",
+        )
+        widgets = {
+            "codigo": forms.TextInput,
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = SaplFormHelper()
+        self.helper.layout = SaplFormLayout(
+            Fieldset(
+                _("Fonte"),
+                to_row(
+                    [
+                        ("codigo", 3),
+                        ("especificacao", 9),
+                        ("outros_fontes", 12),
+                    ]
+                ),
+            ),
+        )
+        self.fields["outros_fontes"].choices = [
+            (f.pk, f"{f}")
+            for f in Fonte.objects.filter(
+                loa=self.instance.loa,
+            )
+            .exclude(pk=self.instance.pk)
+            .order_by("codigo")
+        ]
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        fontes_a_substituir = self.cleaned_data["outros_fontes"]
+
+        models_a_substituir = (
+            (Empenho, "fonte"),
+            (Despesa, "fonte"),
+        )
+        for model, field in models_a_substituir:
+            for item in model.objects.filter(**{f"{field}__in": fontes_a_substituir}):
+                setattr(item, field, self.instance)
+                item.save()
+        try:
+            for f in fontes_a_substituir:
+                f.delete()
+        except Exception as e:
+            logger.error(f"Erro ao excluir fontes substituídas: {e}")
+        return instance

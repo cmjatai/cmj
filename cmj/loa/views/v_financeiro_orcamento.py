@@ -2,12 +2,29 @@ from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
 
 from cmj.loa.forms.f_financeiro_orcamento import (
+    AcaoForm,
     DespesaFilterSet,
     DespesaForm,
+    FuncaoForm,
+    NaturezaForm,
+    FonteForm,
     OrgaoForm,
+    ProgramaForm,
+    SubFuncaoForm,
     UnidadeOrcamentariaForm,
 )
-from cmj.loa.models import Despesa, Loa, Orgao, SubFuncao, UnidadeOrcamentaria
+from cmj.loa.models import (
+    Acao,
+    Despesa,
+    Funcao,
+    Loa,
+    Natureza,
+    Fonte,
+    Orgao,
+    Programa,
+    SubFuncao,
+    UnidadeOrcamentaria,
+)
 from cmj.loa.views.v_mixins import LoaContextDataMixin
 from cmj.utils import decimal2str
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
@@ -120,9 +137,109 @@ class UnidadeOrcamentariaCrud(MasterDetailCrud):
         form_class = UnidadeOrcamentariaForm
 
 
+class FuncaoCrud(MasterDetailCrud):
+    model = Funcao
+    parent_field = "loa"
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = FuncaoForm
+
+
 class SubFuncaoCrud(MasterDetailCrud):
     model = SubFuncao
     parent_field = "loa"
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = SubFuncaoForm
+
+
+class ProgramaCrud(MasterDetailCrud):
+    model = Programa
+    parent_field = "loa"
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = ProgramaForm
+
+
+class AcaoCrud(MasterDetailCrud):
+    model = Acao
+    parent_field = "loa"
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = AcaoForm
+
+
+class NaturezaCrud(MasterDetailCrud):
+    model = Natureza
+    parent_field = "loa"
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = NaturezaForm
+
+
+class FonteCrud(MasterDetailCrud):
+    model = Fonte
+    parent_field = "loa"
+
+    class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
+        pass
+
+    class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+        paginate_by = 100
+
+        def hook_codigo(self, obj, *args, **kwargs):
+            return obj.codigo or "sem código", args[1]
+
+    class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
+        layout_key = None
+        form_class = FonteForm

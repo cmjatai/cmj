@@ -9,7 +9,7 @@
 - title: {% trans 'Agrupamentos' %}
   url: agrupamento_list
 {% endif %}
-{% if perms.loa.unidadeorcamentaria_list or perms.loa.subfuncao_list %}
+{% if perms.loa.unidadeorcamentaria_list %}
 - title: {% trans 'Registros' %}
   children:
   {% if perms.loa.despesa_list %}
@@ -24,8 +24,28 @@
   - title: {% trans 'Unidades Orçamentárias' %}
     url: unidadeorcamentaria_list
   {% endif %}
+  {% if perms.loa.funcao_list %}
+  - title: {% trans 'Funções' %}
+    url: funcao_list
+  {% endif %}
   {% if perms.loa.subfuncao_list %}
   - title: {% trans 'Sub-Funções' %}
     url: subfuncao_list
+  {% endif %}
+  {% if perms.loa.programa_list %}
+  - title: {% trans 'Programas' %}
+    url: programa_list
+  {% endif %}
+  {% if perms.loa.acao_list %}
+  - title: {% trans 'Ações' %}
+    url: acao_list
+  {% endif %}
+  {% if perms.loa.natureza_list %}
+  - title: {% trans 'Naturezas' %}
+    url: natureza_list
+  {% endif %}
+  {% if perms.loa.fonte_list %}
+  - title: {% trans 'Fontes' %}
+    url: fonte_list
   {% endif %}
 {% endif %}

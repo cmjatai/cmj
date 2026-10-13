@@ -30,11 +30,27 @@ Despesa:
 Orgao:
   {% trans 'Dados Gerais' %}:
   - codigo:3 especificacao
+  {% trans 'Despesas' %}:
+  - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set|
 
 UnidadeOrcamentaria:
   {% trans 'Dados Gerais' %}:
   - codigo:3 especificacao:6 area:3
   - orgao:7 recebe_emenda_impositiva
+  {% trans 'Despesas' %}:
+  - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set
+
+Funcao:
+  {% trans 'Dados Gerais' %}:
+  - codigo:3 especificacao
+  {% trans 'Despesas' %}:
+  - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set
 
 SubFuncao:
   {% trans 'Dados Gerais' %}:
@@ -42,6 +58,42 @@ SubFuncao:
   - funcao:7
   {% trans 'Despesas' %}:
   - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set
+
+Programa:
+  {% trans 'Dados Gerais' %}:
+  - codigo:4 especificacao:8
+  {% trans 'Despesas' %}:
+  - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set
+
+Acao:
+  {% trans 'Dados Gerais' %}:
+  - codigo:4 especificacao:8
+  {% trans 'Despesas' %}:
+  - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set
+
+Natureza:
+  {% trans 'Dados Gerais' %}:
+  - codigo:4 especificacao:8
+  {% trans 'Despesas' %}:
+  - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set
+
+Fonte:
+  {% trans 'Dados Gerais' %}:
+  - codigo:4 especificacao:8
+  {% trans 'Despesas' %}:
+  - despesa_set
+  {% trans 'Empenhos' %}:
+  - empenho_set
+
+
 
 EmendaLoa:
   {% trans 'Dados Gerais' %}:

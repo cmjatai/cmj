@@ -21,7 +21,11 @@ urlpatterns = [
             + views.v_financeiro_orcamento.DespesaCrud.get_urls()
             + views.v_financeiro_orcamento.OrgaoCrud.get_urls()
             + views.v_financeiro_orcamento.UnidadeOrcamentariaCrud.get_urls()
+            + views.v_financeiro_orcamento.FuncaoCrud.get_urls()
             + views.v_financeiro_orcamento.SubFuncaoCrud.get_urls()
+            + views.v_financeiro_orcamento.AcaoCrud.get_urls()
+            + views.v_financeiro_orcamento.NaturezaCrud.get_urls()
+            + views.v_financeiro_orcamento.FonteCrud.get_urls()
             + views.v_prestacaoconta.PrestacaoContaLoaCrud.get_urls()
             + views.v_prestacaoconta.PrestacaoContaRegistroCrud.get_urls()
         ),
