@@ -1,14 +1,17 @@
 import logging
 
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
-from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field, Fieldset
 from django import forms
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django_filters import CharFilter, FilterSet
 
-from cmj.loa.models import (
+from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa
+from cmj.loa.models.m_emendaloa import EmendaLoa
+from cmj.loa.models.m_financeiro_execucao import DespesaPaga, Empenho
+from cmj.loa.models.m_financeiro_orcamento import (
     Acao,
     Despesa,
     Fonte,
@@ -16,13 +19,10 @@ from cmj.loa.models import (
     Natureza,
     Orgao,
     Programa,
+    ReceitaOrcamentaria,
     SubFuncao,
     UnidadeOrcamentaria,
 )
-from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa
-from cmj.loa.models.m_emendaloa import EmendaLoa
-from cmj.loa.models.m_financeiro_execucao import DespesaPaga, Empenho
-from cmj.loa.models.m_financeiro_orcamento import ReceitaOrcamentaria
 from sapl.crispy_layout_mixin import SaplFormHelper, SaplFormLayout, to_row
 
 logger = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ class DespesaFilterSet(FilterSet):
             ]
         )
         fields = [row]
-        self.form.helper = FormHelper()
+        self.form.helper = SaplFormHelper()
         self.form.helper.form_method = "get"
         self.form.helper.form_class = "container"
         self.form.helper.layout = SaplFormLayout(*fields, actions=False)
@@ -172,9 +172,9 @@ class OrgaoForm(forms.ModelForm):
         models_a_substituir = (
             (UnidadeOrcamentaria, "orgao"),
             (ReceitaOrcamentaria, "orgao"),
+            (Despesa, "orgao"),
             (DespesaPaga, "orgao"),
             (Empenho, "orgao"),
-            (Despesa, "orgao"),
         )
         for model, field in models_a_substituir:
             for item in model.objects.filter(
@@ -242,28 +242,39 @@ class UnidadeOrcamentariaForm(forms.ModelForm):
         ]
 
     def save(self, commit=True):
-        instance = super().save(commit=commit)
-        unidades_a_substituir = self.cleaned_data["outras_unidades"]
-
-        models_a_substituir = (
-            (RegistroAjusteLoa, "unidade"),
-            (EmendaLoa, "unidade"),
-            (DespesaPaga, "unidade"),
-            (Empenho, "unidade"),
-            (Despesa, "unidade"),
-        )
-        for model, field in models_a_substituir:
-            for item in model.objects.filter(**{f"{field}__in": unidades_a_substituir}):
-                setattr(item, field, self.instance)
-                if hasattr(item, "orgao"):
-                    item.orgao = self.instance.orgao
-                item.save()
         try:
-            for uo in unidades_a_substituir:
-                uo.delete()
+            with transaction.atomic():
+                instance = super().save(commit=commit)
+                unidades_a_substituir = self.cleaned_data["outras_unidades"]
+
+                models_a_substituir = (
+                    (Despesa, "unidade"),
+                    (DespesaPaga, "unidade"),
+                    (RegistroAjusteLoa, "unidade"),
+                    (EmendaLoa, "unidade"),
+                    (Empenho, "unidade"),
+                )
+
+                for model, field in models_a_substituir:
+                    for item in model.objects.filter(
+                        **{f"{field}__in": unidades_a_substituir}
+                    ):
+                        setattr(item, field, self.instance)
+                        if hasattr(item, "orgao"):
+                            item.orgao = self.instance.orgao
+                        item.save()
+                try:
+                    for uo in unidades_a_substituir:
+                        uo.delete()
+                except Exception as e:
+                    logger.error(
+                        f"Erro ao excluir unidades orçamentárias substituídas: {e}"
+                    )
+            return instance
         except Exception as e:
-            logger.error(f"Erro ao excluir unidades orçamentárias substituídas: {e}")
-        return instance
+            raise ValueError(
+                f"Erro ao salvar unidade orçamentária: {e}",
+            )
 
 
 class FuncaoForm(forms.ModelForm):
@@ -315,8 +326,8 @@ class FuncaoForm(forms.ModelForm):
 
         models_a_substituir = (
             (SubFuncao, "funcao"),
-            (Empenho, "funcao"),
             (Despesa, "funcao"),
+            (Empenho, "funcao"),
         )
         for model, field in models_a_substituir:
             for item in model.objects.filter(**{f"{field}__in": funcoes_a_substituir}):
@@ -380,8 +391,8 @@ class SubFuncaoForm(forms.ModelForm):
         funcoes_a_substituir = self.cleaned_data["outros_subfuncoes"]
 
         models_a_substituir = (
-            (Empenho, "subfuncao"),
             (Despesa, "subfuncao"),
+            (Empenho, "subfuncao"),
         )
         for model, field in models_a_substituir:
             for item in model.objects.filter(**{f"{field}__in": funcoes_a_substituir}):
@@ -445,8 +456,8 @@ class ProgramaForm(forms.ModelForm):
         programas_a_substituir = self.cleaned_data["outros_programas"]
 
         models_a_substituir = (
-            (Empenho, "programa"),
             (Despesa, "programa"),
+            (Empenho, "programa"),
         )
         for model, field in models_a_substituir:
             for item in model.objects.filter(
@@ -509,8 +520,8 @@ class AcaoForm(forms.ModelForm):
         acoes_a_substituir = self.cleaned_data["outros_acoes"]
 
         models_a_substituir = (
-            (Empenho, "acao"),
             (Despesa, "acao"),
+            (Empenho, "acao"),
         )
         for model, field in models_a_substituir:
             for item in model.objects.filter(**{f"{field}__in": acoes_a_substituir}):
@@ -571,11 +582,13 @@ class NaturezaForm(forms.ModelForm):
         naturezas_a_substituir = self.cleaned_data["outros_naturezas"]
 
         models_a_substituir = (
-            (Empenho, "natureza"),
             (Despesa, "natureza"),
+            (Empenho, "natureza"),
         )
         for model, field in models_a_substituir:
-            for item in model.objects.filter(**{f"{field}__in": naturezas_a_substituir}):
+            for item in model.objects.filter(
+                **{f"{field}__in": naturezas_a_substituir}
+            ):
                 setattr(item, field, self.instance)
                 item.save()
         try:
@@ -633,8 +646,8 @@ class FonteForm(forms.ModelForm):
         fontes_a_substituir = self.cleaned_data["outros_fontes"]
 
         models_a_substituir = (
-            (Empenho, "fonte"),
             (Despesa, "fonte"),
+            (Empenho, "fonte"),
         )
         for model, field in models_a_substituir:
             for item in model.objects.filter(**{f"{field}__in": fontes_a_substituir}):

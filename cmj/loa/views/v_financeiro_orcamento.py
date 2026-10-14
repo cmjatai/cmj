@@ -5,9 +5,9 @@ from cmj.loa.forms.f_financeiro_orcamento import (
     AcaoForm,
     DespesaFilterSet,
     DespesaForm,
+    FonteForm,
     FuncaoForm,
     NaturezaForm,
-    FonteForm,
     OrgaoForm,
     ProgramaForm,
     SubFuncaoForm,
@@ -16,10 +16,10 @@ from cmj.loa.forms.f_financeiro_orcamento import (
 from cmj.loa.models import (
     Acao,
     Despesa,
+    Fonte,
     Funcao,
     Loa,
     Natureza,
-    Fonte,
     Orgao,
     Programa,
     SubFuncao,
@@ -135,6 +135,13 @@ class UnidadeOrcamentariaCrud(MasterDetailCrud):
     class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
         layout_key = None
         form_class = UnidadeOrcamentariaForm
+
+        def form_valid(self, form):
+            try:
+                return super().form_valid(form)
+            except ValueError as e:
+                form.add_error(None, str(e))
+                return super().form_invalid(form)
 
 
 class FuncaoCrud(MasterDetailCrud):

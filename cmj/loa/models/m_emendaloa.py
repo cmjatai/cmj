@@ -658,18 +658,23 @@ class EmendaLoa(CmjSearchMixin):
         return self
 
     def save(
-        self, force_insert=False, force_update=False, using=None, update_fields=None
+        self,
+        force_insert=False,
+        force_update=False,
+        using=None,
+        update_fields=None,
     ):
         if self.unidade:
             self.indicacao = self.unidade.especificacao
 
         creating = not self.pk
 
-        if not self._syncing and not creating:
-            self._syncing = True
-            r = self.sync()
-            self._syncing = False
-            return r
+        if self.loa.materia and not self.loa.materia.normajuridica():
+            if not self._syncing and not creating:
+                self._syncing = True
+                r = self.sync()
+                self._syncing = False
+                return r
 
         r = super().save(
             force_insert=force_insert,
