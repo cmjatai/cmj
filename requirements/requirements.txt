@@ -87,6 +87,7 @@ charset-normalizer==3.5.1
 num2words==0.5.14
 python-telegram-bot==22.8
 python-osc==1.10.2
+nh3==0.3.7
 
 # ====================================================================
 # 9. FRONTEND, TEMPLATES E UI
