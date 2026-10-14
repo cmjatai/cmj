@@ -11,7 +11,10 @@ from django.db import models
 from django.urls.base import reverse
 from django.utils import formats
 from django.utils.encoding import force_str
+from django.utils.html import escape
 from django.utils.translation import gettext as _
+
+from sapl.sanitize import sanitize_html, sanitize_scope
 
 re_start_tag = re.compile("<[^>]*>")
 
@@ -209,6 +212,14 @@ def get_field_display(obj, fieldname):
         has_html = re_start_tag.search(display)
         if not has_html:
             display = display.replace("\n", "<br/>")
+        scope = sanitize_scope(obj._meta.model, fieldname)
+        if scope == "rich":
+            display = sanitize_html(value, rich=True)
+        elif scope == "plain":
+            display = escape(sanitize_html(value))
+        else:
+            display = escape(value)
+        display = display.replace("\n", "<br/>")
         display = '<div class="dont-break-out">{}</div>'.format(display)
     elif "DecimalField" in str_type_from_field:
         display = formats.number_format(value, force_grouping=True)

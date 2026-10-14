@@ -11,9 +11,21 @@ from markdown.extensions.toc import slugify_unicode
 from sapl.base.models import AppConfig
 from sapl.materia.models import Proposicao
 from sapl.parlamentares.models import Filiacao
+from sapl.sanitize import sanitize_html
 from sapl.utils import SEPARADOR_HASH_PROPOSICAO, filiacao_data
 
 register = template.Library()
+
+
+@register.filter(is_safe=True)
+@stringfilter
+def sanitize(value):
+    """Renderiza HTML de campo rico (TinyMCE) sem script nem URL perigosa.
+
+    Substitui o |safe nos campos que legitimamente guardam HTML. Protege
+    também as linhas gravadas antes da sanitização no pre_save.
+    """
+    return mark_safe(sanitize_html(value, rich=True))
 
 
 def get_class(class_string):

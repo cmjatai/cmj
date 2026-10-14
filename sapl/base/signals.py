@@ -1,10 +1,12 @@
 import inspect
 import logging
 
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
-from django.db.models.signals import post_delete, post_migrate, post_save
+from django.db.models.fields import TextField
+from django.db.models.signals import post_delete, post_migrate, post_save, pre_save
 from django.db.utils import DEFAULT_DB_ALIAS
 from django.dispatch import receiver
 from django.utils.translation import gettext_lazy as _
@@ -13,11 +15,48 @@ from sapl.base.models import Autor
 from sapl.base.models import TipoAutor as modelTipoAutor
 from sapl.materia.models import Tramitacao
 from sapl.protocoloadm.models import TramitacaoAdministrativo
+from sapl.sanitize import sanitize_field
 from sapl.utils import get_base_url, models_with_gr_for_model
 
 from .tasks import task_envia_email_tramitacao
 
 logger = logging.getLogger(__name__)
+
+_text_fields_cache = {}
+PORTALCMJ_APP_LABELS = frozenset(
+    app.rsplit(".", 1)[-1] for app in settings.BUSINESS_APPS
+)
+
+
+def get_text_fields(model):
+    try:
+        return _text_fields_cache[model]
+    except KeyError:
+        fields = [f.name for f in model._meta.fields if isinstance(f, TextField)]
+        _text_fields_cache[model] = fields
+        return fields
+
+
+@receiver(pre_save, dispatch_uid="signal_sanitize_textfields_pre_save_signal")
+def signal_sanitize_textfields_pre_save_signal(sender, instance, **kwargs):
+    """Remove HTML/JavaScript perigoso de todo TextField dos modelos do SAPL e do Portal CMJ.
+
+    Cobre forms, a API do drfautoapi, o admin e o shell num único ponto.
+    Ver sapl.sanitize para as políticas por campo.
+    """
+    # loaddata (inclusive dentro de migrations) grava o objeto literalmente
+    if kwargs.get("raw"):
+        return
+    if sender._meta.app_label not in PORTALCMJ_APP_LABELS:
+        return
+
+    for fieldname in get_text_fields(sender):
+        value = getattr(instance, fieldname, None)
+        if not value:
+            continue
+        sanitized = sanitize_field(sender, fieldname, value)
+        if sanitized != value:
+            setattr(instance, fieldname, sanitized)
 
 
 @receiver([post_save, post_delete])
