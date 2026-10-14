@@ -51,9 +51,9 @@ from sapl.compilacao.forms import (
     PublicacaoForm,
     TaForm,
     TextNotificacoesForm,
+    TipoDispositivoForm,
     TipoTaForm,
     VideForm,
-    TipoDispositivoForm,
 )
 from sapl.compilacao.models import (
     STATUS_TA_EDITION,
