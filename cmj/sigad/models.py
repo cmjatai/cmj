@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import zipfile
 
@@ -18,7 +19,7 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from django_extensions.db.fields.json import JSONField as django_extensions_JSONField
+from django_extensions.db.fields.json import JSONField as ExtensionsJSONField
 from PIL import Image, ImageFont
 from PIL.Image import LANCZOS
 from PIL.ImageDraw import Draw
@@ -34,7 +35,10 @@ from cmj.utils import (
     get_settings_auth_user_model,
     media_protected_storage,
 )
-from cmj.utils.utils_files import TIPOS_IMG_PERMITIDOS, restringe_tipos_de_arquivo_midias
+from cmj.utils.utils_files import (
+    TIPOS_IMG_PERMITIDOS,
+    restringe_tipos_de_arquivo_midias,
+)
 from sapl.materia.models import MateriaLegislativa
 from sapl.parlamentares.models import Parlamentar
 
@@ -105,6 +109,14 @@ CLASSE_TEMPLATES_CHOICE = CmjChoices(
     (998, "qs_pntp", _("Classe do pntp ")),
     (999, "mapa_site", _("Mapa do Site")),
 )
+
+
+class SafeExtensionsJSONField(ExtensionsJSONField):
+    def get_prep_value(self, value):
+        # Garante que antes do TextField fazer str(value), nós convertemos para JSON válido
+        if isinstance(value, (dict, list)):
+            return json.dumps(value, cls=DjangoJSONEncoder)
+        return super().get_prep_value(value)
 
 
 class Parent(models.Model):
@@ -1246,7 +1258,7 @@ class Documento(ShortUrl, CMSMixin):
         verbose_name=_("Json no Portal Modelo 1.0"), blank=True, null=True, default=None
     )
 
-    extra_data = django_extensions_JSONField(
+    extra_data = SafeExtensionsJSONField(
         verbose_name=_("Dados Extras"), blank=True, null=True, default=None
     )
 

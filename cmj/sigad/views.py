@@ -89,6 +89,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         docs = Documento.objects.qs_video_news()[:100].values(
             "id", "extra_data", "titulo"
         )
+        # docs = Documento.objects.qs_video_news()[:100]
 
         r = []
 
@@ -98,7 +99,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             "nada se perde": True,
             "sessão ordinária": True,
         }
-        return r
+
         for d in docs:
             ed = d["extra_data"]
             if (
