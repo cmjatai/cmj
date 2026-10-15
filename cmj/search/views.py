@@ -362,6 +362,22 @@ class MateriaSearchView(
 
                 if k == "autoria_is":
                     filtro = f"<strong>{label}:</strong> {Autor.objects.get(id=v).nome}"
+                elif k == "assuntos_is":
+                    items = (
+                        self.form.fields[k]
+                        .queryset.filter(id__in=v)
+                        .values_list("assunto", flat=True)
+                    )
+                    filtro = f'<strong>{label}:</strong> {", ".join([str(x) for x in items])}'
+                elif k == "uta_i":
+                    items = self.form.fields[k].queryset.filter(id__in=v).values(
+                        'comissao__nome', 'parlamentar__nome_parlamentar', 'orgao__nome'
+                    )
+                    join = ", ".join([
+                        x['comissao__nome'] or x['parlamentar__nome_parlamentar'] or x['orgao__nome']
+                        for x in items
+                    ])
+                    filtro = f'<strong>{label}:</strong> {join}'
                 elif isinstance(v, (list, tuple)):
                     filtro = (
                         f'<strong>{label}:</strong> {", ".join([str(x) for x in v])}'

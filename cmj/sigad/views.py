@@ -98,7 +98,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             "nada se perde": True,
             "sessão ordinária": True,
         }
-
+        return r
         for d in docs:
             ed = d["extra_data"]
             if (
