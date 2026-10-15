@@ -1,22 +1,14 @@
-import json
 import logging
 import re
-import time
 
 import pymupdf
-import yaml
 from django.conf import settings
-from django.contrib import messages
-from django.contrib.contenttypes.models import ContentType
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from google import genai
 from google.genai import types
 
 from cmj.core.models import IAQuota
-from cmj.utils import clean_text
 from cmj.utils.genia.genia_system_instruction_v3 import rag_system_instruction
-from sapl.base.models import Metadata
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +25,7 @@ class IAGenaiBase:
 
     def __init__(self, *args, **kwargs):
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        self.update_or_create_llm_models_in_quotamodel()
 
     def update_or_create_llm_models_in_quotamodel(self):
         models = self.client.models.list()
