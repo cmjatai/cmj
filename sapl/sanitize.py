@@ -99,6 +99,9 @@ SANITIZE_CLEAN_CONTENT_TAGS = {"script", "style"}
 RICH_TEXT_FIELDS = {
     "base.CasaLegislativa": {"informacao_geral"},
     "norma.NormaRelacionada": {"resumo"},
+    "materia.MateriaLegislativa": {"ementa"},
+    "materia.DocumentoAcessorio": {"ementa"},
+    "protocoloadm.DocumentoAdministrativo": {"ementa"},
     "parlamentares.Legislatura": {"observacao"},
     "parlamentares.Parlamentar": {"biografia"},
     "sessao.ExpedienteSessao": {"conteudo"},
@@ -112,6 +115,15 @@ RICH_TEXT_FIELDS = {
         "texto_sufixo_html",
         "nota_automatica_prefixo_html",
         "nota_automatica_sufixo_html",
+    },
+    "sigad.Classe": {
+        "subtitle",
+        "descricao",
+    },
+    "sigad.Documento": {
+        "subtitle",
+        "descricao",
+        "texto"
     },
 }
 
