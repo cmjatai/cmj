@@ -60,7 +60,7 @@ ocrmypdf==17.13.0
 pymupdf==1.28.2
 WeasyPrint==70.0
 reportlab[pycairo]==5.0.1
-freetype-py==2.5.1
+freetype-py==2.3.0
 rl-renderPM==4.0.3
 trml2pdf
 python-docx==1.2.0
