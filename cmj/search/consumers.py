@@ -3,9 +3,7 @@ import logging
 
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
-from django.conf import settings
 from django.utils.html import escape
-from google import genai
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +44,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
         max_length = self.context_manager.MAX_LENGTH_USER_MESSAGE
         if self.user.is_superuser:
             max_length = 10000
+            await sync_to_async(
+                self.context_manager.update_or_create_llm_models_in_quotamodel
+            )()
 
         await self.send(
             json.dumps(

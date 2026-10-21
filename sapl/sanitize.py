@@ -101,7 +101,7 @@ RICH_TEXT_FIELDS = {
     "norma.NormaRelacionada": {"resumo"},
     "materia.MateriaLegislativa": {"ementa"},
     "materia.DocumentoAcessorio": {"ementa"},
-    "protocoloadm.DocumentoAdministrativo": {"ementa"},
+    "protocoloadm.DocumentoAdministrativo": {"assunto"},
     "parlamentares.Legislatura": {"observacao"},
     "parlamentares.Parlamentar": {"biografia"},
     "sessao.ExpedienteSessao": {"conteudo"},
@@ -120,11 +120,7 @@ RICH_TEXT_FIELDS = {
         "subtitle",
         "descricao",
     },
-    "sigad.Documento": {
-        "subtitle",
-        "descricao",
-        "texto"
-    },
+    "sigad.Documento": {"subtitle", "descricao", "texto"},
 }
 
 # Campos que não devem ser tocados em hipótese alguma.

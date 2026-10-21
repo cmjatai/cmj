@@ -1,6 +1,5 @@
 import logging
 
-from channels.db import database_sync_to_async
 from django.utils import timezone
 
 from cmj.search.models import ChatMessage, ChatSession, Embedding
@@ -18,7 +17,9 @@ class ChatManager:
     def __init__(self):
         self.ia = IAGenaiBase()
         # self.ia.ia_model_name = 'gemini-3-flash-preview'
-        database_sync_to_async(self.ia.update_or_create_llm_models_in_quotamodel)()
+
+    def update_or_create_llm_models_in_quotamodel(self):
+        self.ia.update_or_create_llm_models_in_quotamodel()
 
     def query_gemini(self, user_message, history):
         """Envia para Gemini com histórico completo"""
