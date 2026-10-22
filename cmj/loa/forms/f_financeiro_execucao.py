@@ -1,12 +1,14 @@
 import logging
+from datetime import timedelta
 
 from crispy_forms.bootstrap import FieldWithButtons, StrictButton
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Field
 from django import forms
 from django.db.models import Q
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from django_filters import CharFilter, FilterSet
+from django_filters import CharFilter, ChoiceFilter, FilterSet
 
 from cmj.loa.models.m_financeiro_execucao import Empenho
 from cmj.utils import DecimalField
@@ -122,13 +124,26 @@ class EmpenhoFilterSet(FilterSet):
 
     search = CharFilter(
         label=_("Busca por termos"),
-        help_text="Informe termos separados por espaço para filtrar os empenhos. A busca é feita em todos os campos dos Empenhos e a dados ligados às emendas e ajustes técnicos.",
         method="filter_search",
+    )
+
+    # criar um choice com periodos: * Ultimos 7 dias, * Ultimo 30 dias, * Ultimo 90 dias, * Ultimo ano, * Tudo
+    # default period is "7"
+    period = ChoiceFilter(
+        label=_("Período"),
+        initial="7",
+        choices=[
+            ("7", _("Últimos 7 dias")),
+            ("30", _("Últimos 30 dias")),
+            ("90", _("Últimos 90 dias")),
+            ("365", _("Último ano")),
+        ],
+        method="filter_period",
     )
 
     class Meta:
         model = Empenho
-        fields = ["search"]
+        fields = ["search", "period"]
 
         class Form(forms.Form):
             crispy_field_template = ("search",)
@@ -168,7 +183,8 @@ class EmpenhoFilterSet(FilterSet):
 
         row = to_row(
             [
-                (search_field, 12),
+                ("period", 4),
+                (search_field, 8),
             ]
         )
         fields = [row]
@@ -176,3 +192,16 @@ class EmpenhoFilterSet(FilterSet):
         self.form.helper.form_method = "get"
         self.form.helper.form_class = "container"
         self.form.helper.layout = SaplFormLayout(*fields, actions=False)
+
+    def filter_period(self, queryset, name, value):
+        if value == "7":
+            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=7))
+        elif value == "30":
+            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=30))
+        elif value == "90":
+            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=90))
+        elif value == "365":
+            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=365))
+        elif value == "all":
+            return queryset
+        return queryset
