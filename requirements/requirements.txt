@@ -69,7 +69,7 @@ XlsxWriter==3.2.9
 # ====================================================================
 # 7. MANIPULAÇÃO DE IMAGENS E ARQUIVOS VISUAIS
 # ====================================================================
-Pillow==12.3.0
+Pillow==13.0.0
 opencv-python-headless==5.0.0.93
 django-image-cropping==1.7.0
 easy-thumbnails==2.10.1
