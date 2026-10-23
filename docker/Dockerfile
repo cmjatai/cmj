@@ -1,9 +1,4 @@
-FROM leandrojatai/portalcmj:base.0008
-
-# TODO:
-#    A imagem gerada a partir deste dockerfile
-#    não pode ser compartilhada por conter o .env, portanto,
-#    uma refatoração seria necessária.
+FROM leandrojatai/portalcmj:base.0009
 
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
@@ -20,7 +15,7 @@ RUN mkdir -p /var/cmjatai/BD_POSTGRESQL
 ENV HOME=/var/cmjatai/cmj
 WORKDIR ${HOME}
 
-RUN pip install --no-cache-dir setuptools
+#RUN pip install --no-cache-dir setuptools
 
 # instalados na imagem base
 COPY requirements/requirements.txt $HOME
@@ -39,8 +34,7 @@ ADD _templates  /var/cmjatai/cmj/_templates
 ADD cmj         /var/cmjatai/cmj/cmj
 ADD sapl        /var/cmjatai/cmj/sapl
 
-COPY cmj/.env $HOME/cmj/
-COPY key_cert.pfx $HOME
+#COPY cmj/.env $HOME/cmj/
 COPY manage.py $HOME
 RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake --no-default-ignore
 RUN rm -rf /var/cmjatai/cmj/db.sqlite3
@@ -70,6 +64,6 @@ ENV DEBIAN_FRONTEND teletype
 
 EXPOSE 80/tcp 443/tcp
 
-VOLUME ["/var/cmjatai/cmj/data", "/var/cmjatai/cmj_media", "/var/cmjatai/cmj/logs"]
+VOLUME ["/var/cmjatai/cmj_data", "/var/cmjatai/cmj_media", "/var/cmjatai/cmj/logs"]
 
 CMD ["/var/cmjatai/cmj/start.sh"]
