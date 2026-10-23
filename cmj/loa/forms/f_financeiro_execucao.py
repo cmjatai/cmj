@@ -195,13 +195,13 @@ class EmpenhoFilterSet(FilterSet):
 
     def filter_period(self, queryset, name, value):
         if value == "7":
-            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=7))
+            return queryset.filter(data__gte=timezone.now() - timedelta(days=7))
         elif value == "30":
-            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=30))
+            return queryset.filter(data__gte=timezone.now() - timedelta(days=30))
         elif value == "90":
-            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=90))
+            return queryset.filter(data__gte=timezone.now() - timedelta(days=90))
         elif value == "365":
-            return queryset.filter(created_at__gte=timezone.now() - timedelta(days=365))
+            return queryset.filter(data__gte=timezone.now() - timedelta(days=365))
         elif value == "all":
             return queryset
         return queryset
