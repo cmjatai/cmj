@@ -19,7 +19,6 @@ norecursedirs = [
     "__notebooks_private",
     "docker",
     "solr",
-    "solr_old",
     "fonts",
     "logs",
     "__pycache__",
