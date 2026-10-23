@@ -1,9 +1,4 @@
-import os
-
-import certifi
-from decouple import AutoConfig
-
-config = AutoConfig()
+from .zenv import config
 
 EMAIL_BACKEND = "cmj.utils.CmjEmailBackend"
 

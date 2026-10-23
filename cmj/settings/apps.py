@@ -1,10 +1,5 @@
 import sys
 
-from decouple import AutoConfig
-
-config = AutoConfig()
-DEBUG = config("DEBUG", default=False, cast=bool)
-
 PYTHON_VERSION = sys.version_info[0:3]
 PYTHON_VERSION_MIN_FOR_JWT = 3, 7, 0
 

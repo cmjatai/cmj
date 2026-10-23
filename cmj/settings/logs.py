@@ -3,9 +3,9 @@ import logging
 import sys
 
 import yaml
-from decouple import AutoConfig
 
-config = AutoConfig()
+from .zenv import config
+
 LOGGING_ROOT_LEVEL = config("LOGGING_ROOT_LEVEL", default="INFO", cast=str)
 
 logging.captureWarnings(True)
@@ -102,9 +102,9 @@ LOGGING = {
             "level": LOGGING_ROOT_LEVEL,
             "propagate": False,
         },
-        "fontTools": {
+        "weasyprint": {
             "handlers": ["cmj_logger_file", "console"],
-            "level": "WARNING",
+            "level": "ERROR",
             "propagate": False,
         },
     },

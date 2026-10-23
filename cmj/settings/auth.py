@@ -1,7 +1,4 @@
-from decouple import AutoConfig
-
-config = AutoConfig()
-DEBUG = config("DEBUG", default=False, cast=bool)
+from .zenv import DEBUG, config
 
 AUTH_USER_MODEL = "core.User"
 SOCIAL_AUTH_JSONFIELD_ENABLED = True
