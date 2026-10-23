@@ -1,10 +1,5 @@
 FROM leandrojatai/portalcmj:base.0008
 
-# TODO:
-#    A imagem gerada a partir deste dockerfile
-#    não pode ser compartilhada por conter o .env, portanto,
-#    uma refatoração seria necessária.
-
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
@@ -40,7 +35,6 @@ ADD cmj         /var/cmjatai/cmj/cmj
 ADD sapl        /var/cmjatai/cmj/sapl
 
 COPY cmj/.env $HOME/cmj/
-COPY key_cert.pfx $HOME
 COPY manage.py $HOME
 RUN python3 manage.py collectstatic --noinput --clear --settings=cmj.settings.fake --no-default-ignore
 RUN rm -rf /var/cmjatai/cmj/db.sqlite3

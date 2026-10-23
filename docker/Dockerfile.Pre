@@ -1,4 +1,4 @@
-FROM python:3.12.13-bookworm
+FROM python:3.12.15-bookworm
 
 # Agrupando variáveis de ambiente
 ENV LANG=C.UTF-8 \

@@ -1,14 +1,9 @@
-from decouple import AutoConfig
 from easy_thumbnails.conf import Settings as thumbnail_settings
 from unipath import Path
 
-config = AutoConfig()
+from .zenv import DEBUG, PROJECT_DIR, config
 
 MEDIA_DEV_LOCAL = config("MEDIA_DEV_LOCAL", default=False, cast=bool)
-DEBUG = config("DEBUG", default=False, cast=bool)
-
-BASE_DIR = Path(__file__).ancestor(2)
-PROJECT_DIR = Path(__file__).ancestor(3)
 
 MEDIA_URL = "/media/"
 

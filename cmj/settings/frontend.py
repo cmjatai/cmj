@@ -1,17 +1,10 @@
-from decouple import AutoConfig
-from unipath import Path
-
-config = AutoConfig()
-DEBUG = config("DEBUG", default=False, cast=bool)
+from .zenv import DEBUG, PROJECT_DIR, config
 
 if DEBUG:
     DEV_HOST_NAME = config("DEV_HOST_NAME", default="localhost", cast=str)
     DEV_BACKENDPORT = config("DEV_BACKENDPORT", default=8000, cast=int)
     DEV_V2018PORT = config("DEV_V2018PORT", default=8080, cast=int)
     DEV_V6PORT = config("DEV_V6PORT", default=5173, cast=int)
-
-BASE_DIR = Path(__file__).ancestor(2)
-PROJECT_DIR = Path(__file__).ancestor(3)
 
 Fv2018 = "v2018"
 Fv6 = "v6"

@@ -1,6 +1,5 @@
 import socket
 
-from decouple import AutoConfig
 from dj_database_url import parse as db_url
 from unipath import Path
 
@@ -13,17 +12,15 @@ from .languages import *
 from .logs import *
 from .medias import *
 from .middleware import *
+from .zenv import DEBUG, config
 
 host = socket.gethostbyname_ex(socket.gethostname())[0]
-
-config = AutoConfig()
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
 FONTS_DIR = Path(__file__).ancestor(3).child("fonts")
 
 SECRET_KEY = config("SECRET_KEY")
-DEBUG = config("DEBUG", default=False, cast=bool)
 
 FOLDER_DEBUG_CONTAINER = Path(
     config("FOLDER_DEBUG_CONTAINER", default=__file__, cast=str)

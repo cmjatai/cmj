@@ -3,9 +3,9 @@ import logging
 import sys
 
 import yaml
-from decouple import AutoConfig
 
-config = AutoConfig()
+from .zenv import config
+
 LOGGING_ROOT_LEVEL = config("LOGGING_ROOT_LEVEL", default="INFO", cast=str)
 
 logging.captureWarnings(True)
