@@ -7,7 +7,6 @@ from functools import wraps
 from random import choice
 from string import ascii_letters, digits
 
-import werkzeug
 from crispy_forms.layout import HTML
 from django import template
 from django.conf import settings
@@ -33,7 +32,7 @@ from django.urls.base import reverse
 from django.utils import formats, timezone
 from django.utils.decorators import classonlymethod
 from django.utils.encoding import force_str
-from django.utils.text import slugify
+from django.utils.text import get_valid_filename, slugify
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.cache import cache_page
 from django.views.generic import (
@@ -3636,7 +3635,9 @@ class DocumentoAcessorioEmLoteView(PermissionRequiredMixin, FilterView):
             return self.get(request, self.kwargs)
 
         tmp_name = os.path.join(MEDIA_ROOT, request.FILES["arquivo"].name)
-        tmp_name = werkzeug.utils.secure_filename(tmp_name)
+        filename = os.path.basename(request.FILES["arquivo"].name.replace("\\", "/"))
+        filename = get_valid_filename(filename.strip(".") or "arquivo")
+        tmp_name = os.path.join(MEDIA_ROOT, filename)
         with open(tmp_name, "wb") as destination:
             for chunk in request.FILES["arquivo"].chunks():
                 destination.write(chunk)
