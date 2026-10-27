@@ -44,7 +44,7 @@ def task_send_rede_social(self, rede, app_label, model_name, pk):
     # print(kwargs)
     # return
 
-    if "www" not in settings.SITE_URL:
+    if "www" not in settings.BASE_URL:
         return
 
     send_func = f"send_{rede}_{app_label}_{model_name}"
@@ -105,7 +105,7 @@ def send_telegram_sigad_documento(pk):
         if vp.video.json["snippet"]["liveBroadcastContent"] == "live":
             live = f"#AoVivo"
     else:
-        link = f'{chr(10)}{chr(10)}<a href="{settings.SITE_URL}/{instance.slug}">Leia mais!</a>'
+        link = f'{chr(10)}{chr(10)}<a href="{settings.BASE_URL}/{instance.slug}">Leia mais!</a>'
 
     text = f"""#{instance.classe.titulo} {live}
 <b>{instance.titulo}</b>{descricao}{texto}{link}"""
@@ -167,7 +167,7 @@ Autoria:
 {autores}
 
 {autores_hash_tag}
-<a href="{settings.SITE_URL}/materia/{instance.id}">Acompanhe o Processo Legislativo desta Matéria clicando aqui.</a>
+<a href="{settings.BASE_URL}/materia/{instance.id}">Acompanhe o Processo Legislativo desta Matéria clicando aqui.</a>
     """
 
     # <tg-spoiler>spoiler</tg-spoiler>

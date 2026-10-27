@@ -28,9 +28,9 @@ FOLDER_DEBUG_CONTAINER = Path(
 
 ALLOWED_HOSTS = ["localhost:5173", "*"]
 
-# SITE_URL = 'http://localhost'
-SITE_URL = config("SITE_URL", default="https://www.jatai.go.leg.br", cast=str)
-CSRF_TRUSTED_ORIGINS = [SITE_URL, "https://cmjatai.1doc.com.br"]
+# BASE_URL = 'http://localhost'
+BASE_URL = config("BASE_URL", default="https://www.jatai.go.leg.br", cast=str)
+CSRF_TRUSTED_ORIGINS = [BASE_URL, "https://cmjatai.1doc.com.br"]
 
 SESSION_COOKIE_SECURE = not DEBUG
 

@@ -234,7 +234,7 @@ class PesquisarSessaoPlenariaView(
 
     def hook_url(self, obj):
         url_reverse = reverse(self.detail_view, kwargs={"pk": obj.pk})
-        return f"{settings.SITE_URL}{url_reverse}", ""
+        return f"{settings.BASE_URL}{url_reverse}", ""
 
     def get_queryset(self):
         qs = FilterView.get_queryset(self)

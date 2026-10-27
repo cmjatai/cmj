@@ -922,7 +922,7 @@ class MateriaLegislativa(CommonMixin):
                     "sapl.materia:materia_legislativa_espelho",
                     args=[m.id],
                 )
-                url = f"{settings.SITE_URL}{url}"
+                url = f"{settings.BASE_URL}{url}"
 
                 response = requests.get(url)
                 response.raise_for_status()
@@ -1055,7 +1055,7 @@ class MateriaLegislativa(CommonMixin):
                             "sapl.sessao:resumo_ata_pdf",
                             args=[ordem.sessao_plenaria.id],
                         )
-                        url = f"{settings.SITE_URL}{url}"
+                        url = f"{settings.BASE_URL}{url}"
 
                         try:
                             response = requests.get(url)
@@ -1137,7 +1137,7 @@ class MateriaLegislativa(CommonMixin):
                         arcname = f"{n.epigrafe}-compilada-{ta.id}"
                         arcname = slugify(arcname)
                         url = reverse("sapl.compilacao:ta_text", args=[ta.id])
-                        url = f"{settings.SITE_URL}{url}?print"
+                        url = f"{settings.BASE_URL}{url}?print"
 
                         try:
                             response = requests.get(url)
@@ -1147,7 +1147,7 @@ class MateriaLegislativa(CommonMixin):
                             ) as tmp_ta:
                                 html = response.content
                                 pdf = HTML(
-                                    string=html, base_url=settings.SITE_URL
+                                    string=html, base_url=settings.BASE_URL
                                 ).write_pdf(media_type="print")
                                 tmp_ta.write(pdf)
                                 tmp_ta.flush()

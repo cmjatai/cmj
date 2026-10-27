@@ -538,9 +538,9 @@ class DocumentoAdministrativoCrud(Crud):
 
         def hook_texto_integral(self, obj):
             if isinstance(obj, dict):
-                return f'{settings.SITE_URL}/doc/{obj["id"]}'
+                return f'{settings.BASE_URL}/doc/{obj["id"]}'
 
-            return f"{settings.SITE_URL}{obj.texto_integral.url}"
+            return f"{settings.BASE_URL}{obj.texto_integral.url}"
 
         @classmethod
         def get_url_regex(cls):

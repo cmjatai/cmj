@@ -712,7 +712,7 @@ class EmendaLoa(CmjSearchMixin):
 
     def retrieve_file_bytes(self):
 
-        base_url = settings.SITE_URL.rstrip("/")
+        base_url = settings.BASE_URL.rstrip("/")
         import io
 
         import pymupdf  # PyMuPDF

@@ -18,7 +18,7 @@ class View(RelatorioMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         self.ano = self.kwargs.get("ano", None)
-        self.site_url = settings.SITE_URL
+        self.base_url = settings.BASE_URL
         try:
             self.ano = int(self.ano)
         except ValueError:
@@ -147,7 +147,7 @@ class View(RelatorioMixin, TemplateView):
                 comissoes.append(comissao)
                 comissao_atual = participacao.composicao.comissao
                 comissao.append(
-                    f"#### [{comissao_atual.sigla} - {comissao_atual.nome}]({self.site_url}/comissao/{comissao_atual.pk})"
+                    f"#### [{comissao_atual.sigla} - {comissao_atual.nome}]({self.base_url}/comissao/{comissao_atual.pk})"
                 )
 
             comissao.append(

@@ -130,7 +130,7 @@ class NormaDestaquesView(MultiFormatOutputMixin, ListView):
 
     def hook_texto_integral(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
-        return f"{settings.SITE_URL}/norma/{id}"
+        return f"{settings.BASE_URL}/norma/{id}"
 
     def get_queryset(self):
         return NormaJuridica.objects.filter(norma_de_destaque=True).order_by(
@@ -167,7 +167,7 @@ class NormaPesquisaView(AudigLogFilterMixin, MultiFormatOutputMixin, FilterView)
 
     def hook_texto_integral(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
-        return f"{settings.SITE_URL}/norma/{id}"
+        return f"{settings.BASE_URL}/norma/{id}"
 
     def get_queryset(self):
         qs = super().get_queryset()

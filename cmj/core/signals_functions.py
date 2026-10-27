@@ -119,7 +119,7 @@ def notificacao_signal_function(sender, instance, **kwargs):
                 instance.content_object._meta.app_label,
                 instance.content_object._meta.model_name,
             ),
-            {"notificacao": instance, "site_url": settings.SITE_URL},
+            {"notificacao": instance, "base_url": settings.BASE_URL},
             EMAIL_SEND_USER,
             instance.user.email,
         )

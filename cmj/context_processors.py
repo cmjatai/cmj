@@ -14,8 +14,8 @@ def debug(request):
     return {"DEBUG": settings.DEBUG}
 
 
-def site_url(request):
-    return {"site_url": settings.SITE_URL}
+def base_url(request):
+    return {"base_url": settings.BASE_URL}
 
 
 def debug_and_remote_database(request):

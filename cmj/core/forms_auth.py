@@ -464,7 +464,7 @@ class RecuperarSenhaForm(GoogleRecapthaFormMixin, PasswordResetForm):
 
     def save(self, **kwargs):
         kwargs["extra_email_context"] = {
-            "site_url": settings.SITE_URL,
+            "base_url": settings.BASE_URL,
         }
         super(RecuperarSenhaForm, self).save(**kwargs)
 

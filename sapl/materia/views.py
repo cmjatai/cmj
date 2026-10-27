@@ -46,7 +46,6 @@ from django.views.generic.base import RedirectView
 from django.views.generic.edit import FormView
 from django_filters.views import FilterView
 
-from cmj.utils.genia.classificacao import IAClassificacaoMateriaService
 import sapl
 from cmj.core.models import AreaTrabalho
 from cmj.globalrules import GROUP_MATERIA_WORKSPACE_VIEWER
@@ -58,6 +57,7 @@ from cmj.mixins import (
     MultiFormatOutputMixin,
     PdfOutputMixin,
 )
+from cmj.utils.genia.classificacao import IAClassificacaoMateriaService
 from cmj.utils.utils_report import render_pdf_to_response
 from sapl.base.email_utils import do_envia_email_confirmacao
 from sapl.base.models import AppConfig as BaseAppConfig
@@ -3330,7 +3330,7 @@ class MateriaLegislativaPesquisaView(
 
     def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
-        return f"{settings.SITE_URL}/materia/{id}"
+        return f"{settings.BASE_URL}/materia/{id}"
 
     def render_to_response(self, context, **response_kwargs):
 

@@ -2,7 +2,6 @@ import json
 import logging
 import re
 from datetime import timedelta
-from random import random
 
 import dateutil.parser
 import requests as rq
@@ -28,7 +27,7 @@ def pull_youtube_metadata_video(v, force=False):
 
     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     headers = {}
-    headers["Referer"] = settings.SITE_URL
+    headers["Referer"] = settings.BASE_URL
     headers["Content-Type"] = "application/json"
 
     url_search = (
@@ -156,7 +155,7 @@ def pull_youtube(force=False):
 
     # 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'}
     headers = {}
-    headers["Referer"] = settings.SITE_URL
+    headers["Referer"] = settings.BASE_URL
     headers["Content-Type"] = "application/json"
 
     url_search = (

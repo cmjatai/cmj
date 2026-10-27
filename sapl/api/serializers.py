@@ -89,7 +89,7 @@ class ParlamentarSerializerVerbose(CmjSerializerMixin):
     logger = logging.getLogger(__name__)
 
     def get_fotografia(self, obj):
-        return settings.SITE_URL + "/" + self.crop_fotografia(obj)
+        return settings.BASE_URL + "/" + self.crop_fotografia(obj)
 
     def crop_fotografia(self, obj):
         try:

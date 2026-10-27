@@ -340,7 +340,7 @@ class MateriaSearchView(
 
     def hook_texto_original(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
-        return f"{settings.SITE_URL}/materia/{id}"
+        return f"{settings.BASE_URL}/materia/{id}"
 
     def render_to_pdf(self, context):
 
@@ -370,14 +370,24 @@ class MateriaSearchView(
                     )
                     filtro = f'<strong>{label}:</strong> {", ".join([str(x) for x in items])}'
                 elif k == "uta_i":
-                    items = self.form.fields[k].queryset.filter(id__in=v).values(
-                        'comissao__nome', 'parlamentar__nome_parlamentar', 'orgao__nome'
+                    items = (
+                        self.form.fields[k]
+                        .queryset.filter(id__in=v)
+                        .values(
+                            "comissao__nome",
+                            "parlamentar__nome_parlamentar",
+                            "orgao__nome",
+                        )
                     )
-                    join = ", ".join([
-                        x['comissao__nome'] or x['parlamentar__nome_parlamentar'] or x['orgao__nome']
-                        for x in items
-                    ])
-                    filtro = f'<strong>{label}:</strong> {join}'
+                    join = ", ".join(
+                        [
+                            x["comissao__nome"]
+                            or x["parlamentar__nome_parlamentar"]
+                            or x["orgao__nome"]
+                            for x in items
+                        ]
+                    )
+                    filtro = f"<strong>{label}:</strong> {join}"
                 elif isinstance(v, (list, tuple)):
                     filtro = (
                         f'<strong>{label}:</strong> {", ".join([str(x) for x in v])}'
@@ -465,7 +475,7 @@ class NormaSearchView(
 
     def hook_texto_integral(self, obj):
         id = obj["id"] if isinstance(obj, dict) else obj.id
-        return f"{settings.SITE_URL}/norma/{id}"
+        return f"{settings.BASE_URL}/norma/{id}"
 
     def hook_header_epigrafe_ementa(self):
         return force_str(_("Epígrafe / Ementa"))

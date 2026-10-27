@@ -50,7 +50,7 @@ TEMPLATES = [
                 "cmj.context_processors.debug_and_remote_database",
                 "cmj.context_processors.areatrabalho",
                 "cmj.context_processors.debug",
-                "cmj.context_processors.site_url",
+                "cmj.context_processors.base_url",
                 "sapl.context_processors.parliament_info",
                 "sapl.context_processors.mail_service_configured",
                 "cmj.dashboard.context_processors.dashboard",
