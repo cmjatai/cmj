@@ -35,9 +35,9 @@ django-ratelimit==4.1.0
 # 4. TASKS ASSÍNCRONAS E BACKGROUND (CELERY)
 # (Motor de fila e agendamento)
 # ====================================================================
-celery==5.4.0
-django-celery-results==2.5.1
-django-celery-beat==2.8.1
+celery==5.6.3
+django-celery-results==2.6.0
+django-celery-beat==2.9.0
 git+https://github.com/LeandroJatai/celery-haystack.git
 
 # ====================================================================

@@ -1,5 +1,4 @@
 import logging
-import time
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
@@ -8,7 +7,6 @@ from django.db.models import Q
 from cmj.celery import app as cmj_celery_app
 from cmj.search.models import Embedding
 from sapl.compilacao.models import Dispositivo, TextoArticulado
-from sapl.norma.models import NormaJuridica
 
 logger = (
     get_task_logger(__name__) if not settings.DEBUG else logging.getLogger(__name__)
@@ -77,16 +75,13 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
             )
             # time.sleep(0.1)
 
-        for emb in Embedding.objects.filter(
+        qs_to_batch_process = Embedding.objects.filter(
             total_tokens__gt=0,
             vetor1536__isnull=True,
             dispositivo_set__in=dispositivo_set__in,
-        ):
-            emb.generate_embedding()
-            emb.vetor = None
-            emb.save()
-            logger.info(f"T.A.: {ta.id} Embedding: {emb.id} Generated embedding.")
-            # time.sleep(0.1)
+        )
+
+        Embedding.generate_embeddings_for_queryset(qs_to_batch_process)
 
         continue
 

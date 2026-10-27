@@ -26,8 +26,8 @@ class IAGenaiBase:
     def __init__(self, *args, **kwargs):
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-        #TODO: não pode estar aqui devido a criação async
-        #self.update_or_create_llm_models_in_quotamodel()
+        # TODO: não pode estar aqui devido a criação async
+        # self.update_or_create_llm_models_in_quotamodel()
 
     def update_or_create_llm_models_in_quotamodel(self):
         models = self.client.models.list()
@@ -181,21 +181,72 @@ class IAGenaiBase:
             return response.total_tokens
         except Exception as e:
             logger.error(f"Erro ao contar tokens: {e}")
-            return 0
 
-    def embed_content(self, text):
+    def prepare_document(self, text: str, title: str | None = None) -> str:
+        """Formata o texto de acordo com o padrão exigido pelo modelo."""
+        doc_title = title.strip() if title else "none"
+        return f"title: {doc_title} | text: {text}"
+
+    def prepare_query(self, query: str) -> str:
+        """Prepara uma query de recuperação de acordo com o padrão exigido pelo modelo."""
+        return f"task: question answering | query: {query}"
+
+    def get_query_embedding(
+        self,
+        query_text: str,
+        model: str = "gemini-embedding-2",
+        is_qa_mode: bool = True,
+    ):
+        # Escolhe a instrução de acordo com o padrão de uso
+        task_prefix = "question answering" if is_qa_mode else "search result"
+        formatted_query = f"task: {task_prefix} | query: {query_text}"
+
+        response = self.client.models.embed_content(
+            model=model,
+            contents=[formatted_query],
+            config=types.EmbedContentConfig(
+                output_dimensionality=1536,
+            ),
+        )
+        return response.embeddings[0].values
+
+    def embed_documents(
+        self,
+        documents: list[dict],  # [{'text': '...', 'title': '...'}, ...]
+        model: str = "gemini-embedding-2",
+        batch_size: int = 64,
+    ):
+        all_embeddings = []
+
         try:
-            response = self.client.models.embed_content(
-                model="gemini-embedding-001",
-                contents=[text],
-                config=types.EmbedContentConfig(
-                    task_type="RETRIEVAL_QUERY",
-                    output_dimensionality=1536,
-                ),
-            )
-            [embedding_object] = response.embeddings
-            # print(len(embedding_object.values))
-            return embedding_object.values
+            for i in range(0, len(documents), batch_size):
+                batch = documents[i : i + batch_size]
+
+                # 1. Aplica a formatação oficial do modelo novo em cada documento
+                formatted_batch = [
+                    self.prepare_document(doc["text"], doc.get("title"))
+                    for doc in batch
+                ]
+
+                # 2. Chama a API enviando o lote inteiro
+                response = self.client.models.embed_content(
+                    model=model,
+                    contents=formatted_batch,
+                    config=types.EmbedContentConfig(
+                        output_dimensionality=1536,
+                        # task_type NÃO é incluído aqui
+                    ),
+                )
+
+                # 3. Coleta os vetores retornados
+                for emb in response.embeddings:
+                    all_embeddings.append(emb.values)
+
+                # print(
+                #    f"Processados {min(i + batch_size, len(documents))}/{len(documents)}..."
+                # )
+
         except Exception as e:
-            logger.error(f"Erro ao gerar embedding: {e}")
-            return []
+            logger.error(f"Erro ao gerar embeddings em lotes: {e}")
+
+        return all_embeddings

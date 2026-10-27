@@ -149,9 +149,27 @@ class Embedding(CmjModelMixin):
         buscas por similaridade semântica.
         """
         IAGenaiBase_instance = IAGenaiBase()
-        embedding_vector = IAGenaiBase_instance.embed_content(self.chunk)
-        self.vetor1536 = embedding_vector
+        embedding_vector = IAGenaiBase_instance.embed_documents(
+            [{"text": self.chunk, "title": None}]
+        )
+        self.vetor1536 = embedding_vector[0] if embedding_vector else None
         self.save()
+
+    @classmethod
+    def generate_embeddings_for_queryset(cls, queryset):
+
+        chunks = [{'text': emb.chunk, 'title': None} for emb in queryset]
+        if not chunks:
+            return None
+
+        IAGenaiBase_instance = IAGenaiBase()
+
+        all_embeddings =  IAGenaiBase_instance.embed_documents(chunks)
+        for emb, embedding_vector in zip(queryset, all_embeddings):
+            emb.vetor1536 = embedding_vector if embedding_vector else None
+            emb.vetor = None
+            emb.save()
+        return all_embeddings if all_embeddings else None
 
     def update_search_vector(self):
         """

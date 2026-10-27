@@ -31,7 +31,7 @@ class ChatManager:
             logger.info(f"[Sistema] LLM solicitou busca por: {query}")
 
             ia_embedding = IAGenaiBase()
-            query_embedding = ia_embedding.embed_content(query)
+            query_embedding = ia_embedding.get_query_embedding(query)
             context = Embedding.make_context(query, query_embedding)
 
             rag_query.append({"query": query, "results": context})
