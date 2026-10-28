@@ -136,7 +136,7 @@ class Embedding(CmjModelMixin):
         e validação de limites de contexto.
         """
         IAGenaiBase_instance = IAGenaiBase()
-        self.total_tokens = IAGenaiBase_instance.count_tokens_in_text(self.chunk)
+        self.total_tokens = IAGenaiBase_instance.count_tokens_in_text(self.chunk) or 0
         self.save()
 
     def generate_embedding(self):

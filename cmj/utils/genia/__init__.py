@@ -181,6 +181,7 @@ class IAGenaiBase:
             return response.total_tokens
         except Exception as e:
             logger.error(f"Erro ao contar tokens: {e}")
+            return 0
 
     def prepare_document(self, text: str, title: str | None = None) -> str:
         """Formata o texto de acordo com o padrão exigido pelo modelo."""
