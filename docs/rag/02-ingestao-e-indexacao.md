@@ -34,7 +34,7 @@ flowchart TD
     F -- sim --> G[DELETE embeddings do TA] --> E
     F -- não --> H["generate_chunks()<br/>(cria/atualiza Embedding + search_vector)"]
     H --> I["Para embeddings com total_tokens=0:<br/>update_total_tokens() → Gemini count_tokens"]
-    I --> J["Embeddings com total_tokens>0 e vetor1536 NULL:<br/>generate_embeddings_for_queryset() (lotes de 64)"]
+    I --> J["Embeddings com vetor1536 NULL:<br/>generate_embeddings_for_queryset() (lotes de 64)"]
     J --> E
 ```
 
@@ -45,7 +45,7 @@ Pontos importantes:
 * Só entram no índice dispositivos **vigentes** (`dispositivo_subsequente IS NULL`). Quando um dispositivo
   é substituído por uma redação nova, seus embeddings antigos são apagados.
 * Normas **revogadas integralmente** não ficam no índice (o chat não responde com lei revogada).
-* O trecho após `continue` na função (prints de depuração) é **código morto**.
+* A contagem de tokens é informativa: uma falha em `count_tokens` (retorna 0) **não** impede a vetorização.
 
 ## 2.3 Segmentação – `TextoArticulado.generate_chunks()`
 
@@ -85,7 +85,7 @@ Exemplo (Art. 5º com 2 incisos, seguido do Art. 6º):
 O objetivo é que a resposta nunca fique "cortada": o LLM vê o *caput*, os incisos/alíneas e o começo do
 próximo artigo.
 
-> Existe um bloco `if False:` (retorno linear) mantido como alternativa descartada.
+Chunks vazios (sem conteúdo) nunca são gerados.
 
 ### Divisão por tamanho (`chunk_size = 1536` **palavras**)
 

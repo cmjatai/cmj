@@ -4,7 +4,6 @@ import logging
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils.html import escape
-
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +25,11 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         has_perm = await sync_to_async(self.user.has_perm)("search.can_use_chat_module")
         if self.user == AnonymousUser() or not has_perm:
+            await self.close()
+            return
+
+        # Sessão existente só pode ser acessada pelo dono (antes de derrubar conexões)
+        if not await self.session_belongs_to_user():
             await self.close()
             return
 
@@ -71,9 +75,18 @@ class ChatConsumer(AsyncWebsocketConsumer):
         )  # 4001: Código personalizado para "Substituído por nova conexão"
 
     @sync_to_async
+    def session_belongs_to_user(self):
+        from .models import ChatSession
+
+        session = ChatSession.objects.filter(session_id=self.session_id).first()
+        return session is None or session.user_id == self.user.pk
+
+    @sync_to_async
     def get_formatted_history(self):
         """Recupera histórico do cache e formata para o frontend"""
-        history = self.context_manager.get_context_for_gemini(self.session_id)
+        history = self.context_manager.get_context_for_gemini(
+            self.session_id, user=self.user
+        )
         return [
             {
                 "role": msg["role"],
@@ -88,6 +101,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
         ]
 
     async def receive(self, text_data):
+        from cmj.utils.genia import IAQuotaUnavailableError
+
         has_perm = await sync_to_async(self.user.has_perm)("search.can_use_chat_module")
         if not self.user.is_authenticated or not has_perm:
             await self.send_error("Authentication required")
@@ -133,8 +148,14 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 },
             )
 
-        except Exception as e:
+        except (ValueError, IAQuotaUnavailableError) as e:
+            # Limites de uso e cota: mensagens pensadas para o usuário
             await self.send_error(str(e))
+        except Exception:
+            logger.exception("Erro ao processar mensagem do chat.")
+            await self.send_error(
+                "Não foi possível processar sua mensagem. Tente novamente mais tarde."
+            )
 
     async def chat_message(self, event):
         await self.send(

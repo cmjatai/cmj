@@ -779,27 +779,6 @@ class TextoArticulado(TimestampedMixin):
                 )
                 textos_previous.insert(0, disp_renderizado)
 
-            if False:  # retorno linear
-                disp_previous = dispositivos[:i]
-                disp_previous.reverse()
-                textos_previous = []
-                for k, dprev in enumerate(disp_previous):
-                    dprev, contextprev = dprev
-
-                    texto_prev = contextprev["rendered"]
-                    disp_renderizado = (
-                        (contextprev["rotulo"] + " " + texto_prev)
-                        if contextprev["rotulo"]
-                        else texto_prev
-                    )
-                    textos_previous.insert(0, disp_renderizado)
-
-                    if d.tipo_dispositivo_id > 120 and dprev.tipo_dispositivo_id <= 119:
-                        break
-
-                    if d.tipo_dispositivo_id == dprev.tipo_dispositivo_id:
-                        break
-
             chunks = []
             textos = textos_previous + textos_next
             textos = list(filter(lambda x: x.strip(), textos))
@@ -807,7 +786,8 @@ class TextoArticulado(TimestampedMixin):
             current_chunk = ""
             for t in textos:
                 if len(current_chunk.split()) + len(t.split()) > chunk_size:
-                    chunks.append(current_chunk)
+                    if current_chunk.strip():
+                        chunks.append(current_chunk)
                     current_chunk = t
                 else:
                     current_chunk += " \n " + t
@@ -832,7 +812,7 @@ class TextoArticulado(TimestampedMixin):
             if not context["chunks"]:
                 continue
 
-            chunks_db = [c.chunk for c in d.embeddings.all()]
+            chunks_db = [c.chunk for c in d.embeddings.order_by("id")]
             if len(chunks_db) == len(context["chunks"]):
                 equal = True
                 for i, c in enumerate(context["chunks"]):

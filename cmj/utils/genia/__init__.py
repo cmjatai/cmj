@@ -13,15 +13,16 @@ from cmj.utils.genia.genia_system_instruction_v3 import rag_system_instruction
 logger = logging.getLogger(__name__)
 
 
+class IAQuotaUnavailableError(Exception):
+    """Nenhuma IAQuota ativa, autorizada e com margem para o serviço."""
+
+
 class IAGenaiBase:
     ia_model_name = "gemini-3-flash-preview"
     temperature = 0.1
     top_k = 40
     top_p = 0.95
     response_mime_type = "application/json"
-
-    _chat = None
-    _chat_quota = None
 
     def __init__(self, *args, **kwargs):
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
@@ -41,22 +42,19 @@ class IAGenaiBase:
             quota.save()
 
     def chat_send_message(self, message, history, tools=None):
-        if not self._chat:
-            self.response_mime_type = "text/plain"
-            self._chat_quota = self.retrieve_quota_if_available()
-            config = self.update_generation_config(tools=tools)
-            self._chat = self.client.chats.create(
-                model=self.ia_model_name,
-                config=config,
-                history=history,
-            )
+        # O banco é a fonte do histórico: um Chat novo por mensagem mantém as
+        # tools (e o que elas coletam) sempre associadas à mensagem corrente.
+        self.response_mime_type = "text/plain"
+        quota = self.retrieve_quota_if_available()
+        config = self.update_generation_config(tools=tools)
+        chat = self.client.chats.create(
+            model=self.ia_model_name,
+            config=config,
+            history=history,
+        )
 
-        message = str(message)
-        response = self._chat.send_message(message)
-        print(self._chat.get_history())
-
-        if self._chat_quota:
-            self._chat_quota.create_log()
+        response = chat.send_message(str(message))
+        quota.create_log()
 
         return response
 
@@ -101,13 +99,13 @@ class IAGenaiBase:
             ]
         )
         if not qms:
-            raise Exception(e_message)
+            raise IAQuotaUnavailableError(e_message)
 
         qms_custom = qms
         if ia_model_name:
             qms_custom = qms.filter(modelo=ia_model_name)
             if not qms_custom:
-                raise Exception(e_message)
+                raise IAQuotaUnavailableError(e_message)
 
         self.ia_model_name = qms_custom.first().modelo
         return qms_custom.first()

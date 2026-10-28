@@ -33,10 +33,10 @@ Superusuários: sem limites de sessões/mensagens e com 10.000 caracteres por pe
 | Conexão WebSocket fecha imediatamente | Usuário anônimo ou sem `search.can_use_chat_module` | Permissões do usuário; log do Channels |
 | Fecha com código **4001** | Mesma conversa aberta em outra aba | Esperado |
 | Erro "Nenhum Modelo com Quota…" | Nenhuma `IAQuota` ativa, esgotada, ou sem `IAGenaiBase` autorizado | Admin Quotas IA; superusuário ao conectar sincroniza a lista de modelos |
-| Resposta "informação não consta na base" para algo que existe | Norma não indexada (`vetor1536` NULL / `total_tokens` 0), norma revogada, chunk sem `search_vector`, *query* com termos demais (FTS AND) | Ver consultas abaixo; `metadata.rag_results.rag_query` da mensagem |
+| Resposta "informação não consta na base" para algo que existe | Norma não indexada (`vetor1536` NULL), norma revogada, chunk sem `search_vector`, *query* com termos demais (FTS AND) | Ver consultas abaixo; `metadata.rag_results.rag_query` da mensagem |
 | Resposta com links quebrados/externos | *System instruction* alterada ou formato de `Fonte` modificado | Comparar com [§4.6](./04-chat-websocket-e-llm.md#46-system-instruction-v3) |
 | Texto publicado não aparece no chat | Task Celery não executou (worker/fila `cq_base`), erro na API Gemini (apenas logado) | Logs do worker: "Starting task_sync_embeddings_textoarticulado_function…" |
-| Embeddings com `total_tokens=0` que nunca recebem vetor | `count_tokens` falhou (retorna 0) e a task só vetoriza `total_tokens>0` | Reexecutar a task para o T.A. |
+| Embeddings sem vetor (`vetor1536` NULL) | Falha na API de embeddings (erro apenas logado; o lote parcial é gravado) | Reexecutar a task para o T.A. |
 
 ### Consultas úteis (shell Django)
 
@@ -69,52 +69,50 @@ task_sync_embeddings_textoarticulado_function([793])
   deduplicação), o que domina o custo de *prompt tokens* – acompanhe `rag_infos.prompt_token_count`.
 * O log de cota é gravado **por mensagem do usuário** (peso 1), não por token.
 
-## 6.5 Pontos de atenção observados no código atual
+## 6.5 Pontos de atenção
 
-Itens verificados na leitura do código; não alteram o funcionamento descrito, mas merecem avaliação.
+Os itens abaixo foram identificados na leitura inicial do código. Os marcados com ✅ já foram corrigidos
+(testes em [cmj/search/test_chat_manager.py](../../cmj/search/test_chat_manager.py)).
 
 ### Segurança / privacidade
 
-1. **Propriedade da sessão não é verificada.** `ChatManager.add_message_to_context` faz
-   `ChatSession.get_or_create(session_id=…, defaults={"user": user})`, e o `ChatConsumer` entra no grupo e
-   carrega o histórico apenas pelo `session_id` (único global). Quem conhecer/adivinhar o `session_id` de
-   outro usuário e tiver a permissão do chat poderia **ler o histórico e escrever na conversa**. Mitigação
-   atual: o frontend gera o ID com `'session_' + Math.random().toString(36).substr(2, 9)`
-   (`ChatHistoryList.vue`), que **não é criptograficamente seguro** e é curto. Recomenda-se validar
-   `chat_session.user == user` no consumer e no `ChatManager`.
-2. **Mensagens de erro brutas** (`str(e)`) são enviadas ao cliente – útil para limites, mas pode expor
-   detalhes internos de exceções inesperadas.
-3. A entrada do usuário é **escapada com `html.escape`** *antes* de ser salva e enviada ao LLM (entidades como
-   `&amp;` entram no prompt e no histórico). O limite de 200 caracteres é validado antes do escape.
+1. ✅ **Propriedade da sessão.** `ChatManager.add_message_to_context` agora recusa (`PermissionError`) uma
+   sessão existente de outro usuário; `get_context_for_gemini(session_id, user=…)` filtra pelo dono; e o
+   `ChatConsumer.connect` fecha a conexão **antes** de derrubar conexões antigas (o `ChatSession.session_id`
+   continua sendo único globalmente). O ID gerado pelo frontend (`Math.random()`, em `ChatHistoryList.vue`)
+   segue curto e não criptográfico – a verificação de dono é o que protege, não o sigilo do ID.
+2. ✅ **Mensagens de erro.** Só `ValueError` (limites de uso) e `IAQuotaUnavailableError` (sem cota) são
+   enviados ao cliente; qualquer outra exceção é registrada com `logger.exception` e o usuário recebe uma
+   mensagem genérica.
+3. A entrada do usuário continua **escapada com `html.escape`** *antes* de ser salva e enviada ao LLM
+   (entidades como `&amp;` entram no prompt e no histórico) – mantido por proteger a renderização no
+   frontend. O limite de 200 caracteres é validado antes do escape.
 
 ### Correção funcional
 
-4. **Estado do `genai` Chat por conexão.** `IAGenaiBase._chat` é criado na **primeira** mensagem de cada
-   conexão WebSocket e reutilizado nas seguintes (o `history` do banco só é usado na criação). Efeitos:
-   * a *closure* `buscar_na_base_dados` e a lista `rag_query` ficam presas à **primeira** mensagem; nas
-     seguintes, `metadata.rag_results.rag_query` tende a ficar **vazio**, embora a busca ocorra;
-   * o modelo/cota é escolhido uma vez por conexão (`create_log` usa a mesma cota).
-5. **Falha após salvar a pergunta.** Se a I.A. falhar, a mensagem do usuário permanece salva sem resposta e
-   conta no limite de 8 mensagens; uma nova tentativa no mesmo estado gera dois `user` consecutivos no
-   histórico reconstruído.
-6. **Ordem de comparação em `generate_chunks`.** `d.embeddings.all()` usa `ordering = ("-id",)`; para
-   dispositivos com **mais de um chunk**, a comparação posicional com os chunks novos pode considerar
-   "diferente" e recriar os embeddings (custo extra, sem erro de dados).
-7. **Chunk vazio.** Se o primeiro texto de um dispositivo exceder 1536 palavras, o laço de divisão adiciona
-   um `current_chunk` vazio antes, que seria persistido apenas com o prefixo do T.A.
-8. **`total_tokens=0` por falha de API** impede a vetorização (a task filtra `total_tokens__gt=0`).
+4. ✅ **Chat do `genai` sem estado por conexão.** `IAGenaiBase.chat_send_message` agora cria um `Chat` por
+   mensagem, a partir do histórico do banco. Assim a *closure* de `buscar_na_base_dados` e a lista
+   `rag_query` pertencem sempre à mensagem corrente (`metadata.rag_results.rag_query` correto em todas as
+   respostas), e modelo/cota são escolhidos e registrados a cada mensagem. Contrapartida: as chamadas de
+   função de turnos anteriores não fazem parte do histórico reenviado (apenas texto).
+5. ✅ **Falha após salvar a pergunta.** Se a I.A. falhar, `process_user_message` remove a pergunta recém-salva
+   e relança a exceção: não sobra mensagem órfã, não conta no limite de 8 e não há `user` consecutivos.
+6. ✅ **Ordem de comparação em `generate_chunks`.** A comparação com os chunks salvos usa
+   `d.embeddings.order_by("id")` (a ordenação padrão `-id` invertia a ordem em dispositivos com vários chunks).
+7. ✅ **Chunk vazio.** O laço de divisão só fecha um chunk se ele tiver conteúdo.
+8. ✅ **`total_tokens=0` por falha de API** não impede mais a vetorização: a task seleciona todo embedding
+   com `vetor1536` nulo. (A contagem de tokens é apenas informativa.)
 9. **FTS com AND** (`plainto_tsquery`): consultas longas reduzem a recuperação textual; a mitigação está
-   no prompt (palavras-chave curtas e múltiplas tentativas).
+   no prompt (palavras-chave curtas e múltiplas tentativas). Mantido como decisão de projeto.
 
 ### Manutenção
 
-10. `print(self._chat.get_history())` em `chat_send_message` é depuração e deve usar `logger.debug`.
-11. Código morto em `task_sync_embeddings_textoarticulado_function` (após `continue`) e em
-    `generate_chunks` (`if False:`).
-12. `make_context__old` e `make_context__20260225` não são mais usados.
-13. `Embedding.vetor` (3072) é legado; `prepare_query` não é utilizado.
-14. Docstrings de `Embedding` mencionam `text-embedding-3-large` (OpenAI); o modelo efetivo é
-    `gemini-embedding-2` com 1536 dimensões.
+10. ✅ `print` de depuração removido de `chat_send_message`.
+11. ✅ Código morto removido da task (após `continue`) e de `generate_chunks` (`if False:`).
+12. ✅ `make_context__old` e `make_context__20260225` removidos (sem chamadores).
+13. `Embedding.vetor` (3072) permanece como campo legado (remoção exige migration) e `prepare_query` não é
+    utilizado.
+14. ✅ Docstrings de `Embedding` corrigidas: o modelo efetivo é `gemini-embedding-2`, 1536 dimensões.
 
 ## 6.6 Como evoluir com segurança
 

@@ -36,7 +36,7 @@ O frontend conecta em `ws(s)://<host>/ws/chat/<session_id>/`. O `session_id` ide
 
 | Código | Significado |
 |--------|-------------|
-| padrão (sem `accept`) | Usuário anônimo ou sem a permissão `search.can_use_chat_module` |
+| padrão (sem `accept`) | Usuário anônimo, sem a permissão `search.can_use_chat_module`, ou `session_id` pertencente a outro usuário |
 | **4001** | Substituído por uma nova conexão na mesma sessão (o frontend exibe "Você abriu esta conversa em outra guia/janela!") |
 
 ## 4.2 `ChatConsumer`
@@ -49,7 +49,9 @@ Cada instância cria seu próprio `ChatManager` (e, portanto, seu próprio `IAGe
 flowchart TD
     A[connect] --> B{"anônimo ou sem<br/>search.can_use_chat_module?"}
     B -- sim --> X[close]
-    B -- não --> C["group_send chat_&lt;session_id&gt;: disconnect_old_connection<br/>(ANTES de entrar no grupo)"]
+    B -- não --> B2{"sessão existente é<br/>de outro usuário?"}
+    B2 -- sim --> X
+    B2 -- não --> C["group_send chat_&lt;session_id&gt;: disconnect_old_connection<br/>(ANTES de entrar no grupo)"]
     C --> D[group_add + accept]
     D --> E["get_formatted_history()"]
     E --> F{superusuário?}
@@ -76,8 +78,9 @@ flowchart TD
    bloqueante e roda em *thread*.
 6. `group_send` para `chat_<session_id>` com a resposta (`type: chat_message`) → o handler `chat_message`
    serializa para o cliente.
-7. Qualquer `Exception` é enviada ao cliente como `{"type":"error","message": str(e)}`
-   (inclui os `ValueError` de limites de uso, que são mensagens pensadas para o usuário).
+7. Erros: `ValueError` (limites de uso) e `IAQuotaUnavailableError` (sem cota) são enviados ao cliente como
+   `{"type":"error","message": str(e)}`; qualquer outra exceção é registrada em log (`logger.exception`) e o
+   cliente recebe uma mensagem genérica.
 
 > A mensagem do **usuário não é "ecoada"** pelo servidor: o frontend a adiciona localmente ao enviar.
 
@@ -98,6 +101,7 @@ flowchart TD
     A["add_message_to_context(role='user')"] --> B["get_context_for_gemini(session_id)"]
     B --> C["remove 'ia_model_name' de cada item"]
     C --> D["query_gemini(user_message, history)"]
+    D -- falha --> D2["remove a pergunta salva e relança"]
     D --> E["add_message_to_context(role='model',<br/>metadata={'rag_results': {...}})"]
     E --> F[retorna ChatMessage]
 ```
@@ -106,15 +110,18 @@ flowchart TD
 
 1. Se `metadata` foi informado, injeta `ia_model_name = self.ia.ia_model_name`
    (portanto **só as mensagens do modelo** guardam o nome do LLM).
-2. Se a sessão ainda **não existe**: conta sessões do usuário criadas hoje; se `>= 2` e não for superusuário →
+2. Se a sessão já existe e pertence a **outro usuário** → `PermissionError` (não é exibido ao usuário).
+3. Se a sessão ainda **não existe**: conta sessões do usuário criadas hoje; se `>= 2` e não for superusuário →
    `ValueError("...limite de conversas por usuário por dia...")`.
-3. `ChatSession.get_or_create(session_id, defaults={"user": user})`.
-4. Se não for superusuário e a sessão já tem `>= 8` mensagens → `ValueError("...limite de mensagens por conversa...")`.
-5. Cria `ChatMessage` e atualiza `updated_at` da sessão.
-6. **Título automático:** se o título ainda é `"Nova Conversa"` e a mensagem é do usuário, usa os
+4. `ChatSession.get_or_create(session_id, defaults={"user": user})`.
+5. Se não for superusuário e a sessão já tem `>= 8` mensagens → `ValueError("...limite de mensagens por conversa...")`.
+6. Cria `ChatMessage` e atualiza `updated_at` da sessão.
+7. **Título automático:** se o título ainda é `"Nova Conversa"` e a mensagem é do usuário, usa os
    primeiros 100 caracteres (`...` se truncado).
 
-### `get_context_for_gemini(session_id)`
+### `get_context_for_gemini(session_id, user=None)`
+
+Com `user`, só devolve o histórico de sessões que pertencem a ele (usado pelo `ChatConsumer`).
 
 Monta o histórico no formato do SDK:
 
@@ -161,15 +168,14 @@ Cliente fino sobre `google-genai`.
 
 ### `chat_send_message(message, history, tools=None)`
 
-* Na **primeira** chamada de uma instância:
+* A cada chamada cria um **novo** `Chat` (`client.chats.create`) com o histórico vindo do banco – o banco é
+  a fonte da verdade e as *tools* ficam sempre ligadas à mensagem corrente:
   1. `response_mime_type = "text/plain"`;
-  2. `_chat_quota = retrieve_quota_if_available()` (escolhe a cota/modelo – ver 4.5);
+  2. `quota = retrieve_quota_if_available()` (escolhe a cota/modelo – ver 4.5);
   3. `update_generation_config(tools)`;
-  4. `client.chats.create(model, config, history)`.
-* Em seguida `self._chat.send_message(str(message))`.
-* Se há cota, registra consumo com `create_log()` (peso 1 por mensagem do usuário, independentemente
+  4. `client.chats.create(model, config, history)` e `chat.send_message(str(message))`.
+* Registra consumo com `quota.create_log()` (peso 1 por mensagem do usuário, independentemente
   de quantas chamadas de função ocorram internamente).
-* Há um `print(self._chat.get_history())` de depuração.
 
 ### `update_generation_config(tools)`
 

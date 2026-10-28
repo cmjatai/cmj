@@ -67,16 +67,21 @@ class ChatManager:
         """
 
         # Salva mensagem do usuário no contexto
-        self.add_message_to_context(session_id, "user", user_message, user)
+        user_msg = self.add_message_to_context(session_id, "user", user_message, user)
 
-        # Obtém histórico completo do DB
-        history = self.get_context_for_gemini(session_id)
-        for h in history:
-            if "ia_model_name" in h:
-                del h["ia_model_name"]
+        try:
+            # Obtém histórico completo do DB
+            history = self.get_context_for_gemini(session_id)
+            for h in history:
+                if "ia_model_name" in h:
+                    del h["ia_model_name"]
 
-        # Envia para Gemini com histórico
-        text_response, rag_results = self.query_gemini(user_message, history)
+            # Envia para Gemini com histórico
+            text_response, rag_results = self.query_gemini(user_message, history)
+        except Exception:
+            # Sem resposta, a pergunta não fica órfã no histórico nem consome o limite
+            user_msg.delete()
+            raise
 
         # Salva resposta do modelo no contexto
         msg = self.add_message_to_context(
@@ -104,8 +109,12 @@ class ChatManager:
 
         today = timezone.localdate()
 
+        existing_session = ChatSession.objects.filter(session_id=session_id).first()
+        if existing_session and existing_session.user_id != user.pk:
+            raise PermissionError("Conversa não pertence ao usuário.")
+
         # Verifica limite de sessões antes de criar uma nova
-        if not ChatSession.objects.filter(session_id=session_id).exists():
+        if not existing_session:
 
             # quantas sessões o usuário tem no dia de hoje
             sessions_today = ChatSession.objects.filter(
@@ -150,12 +159,16 @@ class ChatManager:
 
         return msg
 
-    def get_context_for_gemini(self, session_id):
+    def get_context_for_gemini(self, session_id, user=None):
         """
-        Retorna o histórico completo do banco no formato que Gemini espera
+        Retorna o histórico completo do banco no formato que Gemini espera.
+        Se `user` for informado, só retorna o histórico de sessões que lhe pertencem.
         """
         try:
-            chat_session = ChatSession.objects.get(session_id=session_id)
+            filters = {"session_id": session_id}
+            if user is not None:
+                filters["user"] = user
+            chat_session = ChatSession.objects.get(**filters)
             messages = chat_session.messages.all().order_by("timestamp")
 
             history = []

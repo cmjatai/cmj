@@ -113,14 +113,12 @@ como resposta da função.
 | Config FTS | `portuguese` | `make_context` e `update_search_vector` (devem ser a mesma) |
 | Métrica | cosseno | `CosineDistance` + `halfvec_cosine_ops` |
 
-## 3.4 Versões anteriores (mantidas no arquivo)
+## 3.4 Versões anteriores (removidas)
 
-| Método | Estado | Observação |
-|--------|--------|------------|
-| `make_context__20260225(query_embedding, top_k=50)` | Legado | Apenas busca semântica; mesma montagem por T.A./`ordem` e fusão de prefixos |
-| `make_context__old(query_embedding, top_k=50)` | Legado, **com falha documentada** | Usava o texto da primeira linha como chave; dispositivos com mesmo texto e pais diferentes colidiam e se perdiam, além de perder a ordem de similaridade |
-
-Nenhum dos dois é chamado pelo `ChatManager`.
+Duas implementações anteriores foram removidas do código por não terem chamadores: uma só com busca semântica
+(`make_context__20260225`) e outra que usava o texto da primeira linha como chave
+(`make_context__old`), que perdia dispositivos com mesmo texto e pais diferentes e a ordem de similaridade.
+O histórico está no Git.
 
 ## 3.5 Exemplo ilustrativo de retorno
 

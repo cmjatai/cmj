@@ -76,24 +76,11 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
             # time.sleep(0.1)
 
         qs_to_batch_process = Embedding.objects.filter(
-            total_tokens__gt=0,
             vetor1536__isnull=True,
             dispositivo_set__in=dispositivo_set__in,
         )
 
         Embedding.generate_embeddings_for_queryset(qs_to_batch_process)
-
-        continue
-
-        for i, (d, context) in enumerate(dispositivos):
-            print(
-                f"[{i+1}/{len(dispositivos)}] Dispositivo ID {d.id} - Nivel {d.nivel} - Tipo {d.tipo_dispositivo} - Ordem {d.ordem}"
-            )
-            print(f'Rendered Text: {context["rendered"][:250]}...')
-            print(f'Chunks: {len(context["chunks"])}')
-            for j, chunk in enumerate(context["chunks"]):
-                print(f"  Chunk {j+1} ({len(chunk.split())} words): {chunk[:250]}...")
-            print("-" * 150)
 
 
 @cmj_celery_app.task(queue="cq_base", bind=True)
