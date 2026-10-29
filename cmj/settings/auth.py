@@ -39,6 +39,8 @@ GOOGLE_RECAPTCHA_SECRET_KEY = config(
 )
 
 GEMINI_API_KEY = config("GEMINI_API_KEY", cast=str, default="")
+# Estratégia de chunking do chat RAG: "v1" (janela por dispositivo) ou "v2" (por artigo)
+RAG_CHUNK_STRATEGY = config("RAG_CHUNK_STRATEGY", cast=str, default="v1")
 HUGGINGFACEHUB_API_TOKEN = config("HUGGINGFACEHUB_API_TOKEN", cast=str, default="")
 
 SOCIAL_AUTH_JSONFIELD_ENABLED = True

@@ -5,6 +5,21 @@ from django.contrib.postgres.search import SearchQuery
 FTS_CONFIG = "portuguese"
 MAX_TERMS = 12
 
+# Variações da função de ranking do PostgreSQL (SearchRank):
+# - normalization: 1 divide pelo log do tamanho; 2, pelo tamanho do documento
+# - cover_density: ts_rank_cd, que considera a proximidade entre os termos
+RANKERS = {
+    "base": {},
+    "n1": {"normalization": 1},
+    "n2": {"normalization": 2},
+    "cd": {"cover_density": True},
+    "cd1": {"cover_density": True, "normalization": 1},
+    "cd2": {"cover_density": True, "normalization": 2},
+}
+# Escolhido por avaliação (docs/rag/07): o "base" (ts_rank sem normalização) favorece
+# chunks longos que repetem os termos; n1 divide pelo log do tamanho do documento.
+RANKER_PADRAO = "n1"
+
 _EDGE_PUNCTUATION = ".,;:!?()[]{}\"'“”‘’«»"
 _NUMERO_COM_MILHAR = re.compile(r"^\d{1,3}(\.\d{3})+$")
 _NUMERO_PURO = re.compile(r"^[1-9]\d{3,}$")

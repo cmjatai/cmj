@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib.postgres.search import SearchVector
 from django.core.management.base import BaseCommand
 
@@ -38,9 +39,22 @@ class Command(BaseCommand):
             help="Reindexa os T.A. publicados que não têm nenhum embedding.",
         )
         parser.add_argument(
+            "--todos-publicados",
+            action="store_true",
+            help="Reindexa todos os T.A. publicados (ex.: para gerar a estratégia v2).",
+        )
+        parser.add_argument(
             "--sem-pendentes",
             action="store_true",
-            help="Não vetoriza os embeddings pendentes ao final.",
+            help="Não vetoriza nem conta tokens (não consome a API do Gemini): "
+            "apenas reindexa os chunks.",
+        )
+        parser.add_argument(
+            "--estrategia",
+            choices=["v1", "v2"],
+            default=None,
+            help="Estratégia de chunking a processar (padrão: settings.RAG_CHUNK_STRATEGY). "
+            "Os pendentes vetorizados são apenas os dessa estratégia.",
         )
         parser.add_argument(
             "--dry-run",
@@ -64,6 +78,9 @@ class Command(BaseCommand):
                 .distinct()
             )
 
+        if options["todos_publicados"]:
+            ta_ids.update(published.values_list("id", flat=True))
+
         if options["sem_embedding"]:
             with_embedding = Embedding.objects.order_by().values(
                 "dispositivo_set__ta_id"
@@ -76,15 +93,22 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
+        estrategia = options["estrategia"] or getattr(
+            settings, "RAG_CHUNK_STRATEGY", "v1"
+        )
+        da_estrategia = Embedding.strategy_filter(estrategia)
         ta_ids = self.get_ta_ids(options)
 
+        self.stdout.write(f"Estratégia: {estrategia}")
         self.stdout.write(
-            f"Tipos individualizáveis: {', '.join(CHUNK_TIPOS_INDIVIDUALIZAVEIS)}"
+            f"Tipos individualizáveis (v1): {', '.join(CHUNK_TIPOS_INDIVIDUALIZAVEIS)}"
         )
         self.stdout.write(f"T.A. a reindexar: {len(ta_ids)}")
 
-        pendentes = Embedding.objects.filter(vetor1536__isnull=True)
-        sem_tsvector = Embedding.objects.filter(search_vector__isnull=True)
+        pendentes = Embedding.objects.filter(da_estrategia, vetor1536__isnull=True)
+        sem_tsvector = Embedding.objects.filter(
+            da_estrategia, search_vector__isnull=True
+        )
 
         if dry_run:
             self.stdout.write(
@@ -95,7 +119,11 @@ class Command(BaseCommand):
 
         for i, ta_id in enumerate(ta_ids, start=1):
             try:
-                task_sync_embeddings_textoarticulado_function([ta_id])
+                task_sync_embeddings_textoarticulado_function(
+                    [ta_id],
+                    strategy=estrategia,
+                    vectorize=not options["sem_pendentes"],
+                )
             except Exception as e:
                 self.stderr.write(f"T.A. {ta_id}: erro ao reindexar: {e}")
             if i % 50 == 0:

@@ -13,10 +13,16 @@ logger = (
 )
 
 
-def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
-
+def task_sync_embeddings_textoarticulado_function(
+    ta_ids=[], strategy=None, vectorize=True
+):
+    """
+    Reindexa os T.A. (chunks) e, se `vectorize`, conta tokens e vetoriza os
+    embeddings pendentes (chamadas à API do Gemini).
+    """
+    strategy = strategy or getattr(settings, "RAG_CHUNK_STRATEGY", "v1")
     logger.info(
-        f"Starting task_sync_embeddings_textoarticulado_function for TextoArticulado IDs: {ta_ids}"
+        f"Starting task_sync_embeddings_textoarticulado_function ({strategy}) for TextoArticulado IDs: {ta_ids}"
     )
 
     ta_ids = (
@@ -55,19 +61,28 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
             )
             continue
 
-        dispositivos = ta.generate_chunks()
-        dispositivo_set__in = list(
-            map(
-                lambda d: d[0].id if d and d[0] and hasattr(d[0], "id") else None,
-                dispositivos,
+        if strategy == "v2":
+            chunks = ta.generate_chunks_v2()
+            dispositivo_set__in = sorted({c.raiz_pk for c in chunks})
+        else:
+            dispositivos = ta.generate_chunks()
+            dispositivo_set__in = list(
+                map(
+                    lambda d: d[0].id if d and d[0] and hasattr(d[0], "id") else None,
+                    dispositivos,
+                )
             )
-        )
 
         # count_embedding = Embedding.objects.filter(total_tokens=0).count()
         # logger.info(f'Total de dispositivos para chunking: {len(dispositivos)}')
 
+        if not vectorize:
+            continue
+
+        da_estrategia = Embedding.strategy_filter(strategy)
+
         for emb in Embedding.objects.filter(
-            total_tokens=0, dispositivo_set__in=dispositivo_set__in
+            da_estrategia, total_tokens=0, dispositivo_set__in=dispositivo_set__in
         ):
             emb.update_total_tokens()
             logger.info(
@@ -76,6 +91,7 @@ def task_sync_embeddings_textoarticulado_function(ta_ids=[]):
             # time.sleep(0.1)
 
         qs_to_batch_process = Embedding.objects.filter(
+            da_estrategia,
             vetor1536__isnull=True,
             dispositivo_set__in=dispositivo_set__in,
         )

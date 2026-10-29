@@ -1,5 +1,6 @@
 import logging
 
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.indexes import GinIndex
@@ -15,7 +16,7 @@ from pgvector.django.halfvec import HalfVectorField
 from pgvector.django.vector import VectorField
 
 from cmj.mixins import CmjModelMixin
-from cmj.search.fts import build_fts_queries
+from cmj.search.fts import RANKER_PADRAO, RANKERS, build_fts_queries
 from cmj.utils import get_settings_auth_user_model
 from cmj.utils.genia import IAGenaiBase
 
@@ -222,7 +223,19 @@ class Embedding(CmjModelMixin):
         cls.objects.update(search_vector=SearchVector("chunk", config="portuguese"))
 
     @classmethod
-    def _fts_ids(cls, search_query, top_k):
+    def strategy_filter(cls, strategy=None):
+        """
+        Q que seleciona os embeddings de uma estratégia de chunking. A v1 não
+        tem a chave `chunk_strategy` em `metadata`. Sem argumento, usa
+        settings.RAG_CHUNK_STRATEGY (padrão "v1").
+        """
+        strategy = strategy or getattr(settings, "RAG_CHUNK_STRATEGY", "v1")
+        if strategy == "v1":
+            return ~models.Q(metadata__has_key="chunk_strategy")
+        return models.Q(metadata__chunk_strategy=strategy)
+
+    @classmethod
+    def _fts_ids(cls, search_query, top_k, strategy=None, ranker=None):
         """
         IDs dos embeddings por Full-Text Search, em duas camadas: primeiro os
         que contêm TODOS os termos (AND); se houver menos que top_k, completa
@@ -234,12 +247,17 @@ class Embedding(CmjModelMixin):
         if query_and is None:
             return []
 
+        base = cls.objects.filter(cls.strategy_filter(strategy))
+        rank_options = RANKERS[ranker or RANKER_PADRAO]
+
         def ranked_ids(fts_query, limit, exclude=()):
             return list(
-                cls.objects.filter(search_vector=fts_query)
+                base.filter(search_vector=fts_query)
                 .exclude(id__in=exclude)
-                .annotate(fts_rank=SearchRank("search_vector", fts_query))
-                .order_by("-fts_rank")[:limit]
+                .annotate(
+                    fts_rank=SearchRank("search_vector", fts_query, **rank_options)
+                )
+                .order_by("-fts_rank", "id")[:limit]
                 .values_list("id", flat=True)
             )
 
@@ -249,19 +267,29 @@ class Embedding(CmjModelMixin):
         return ids
 
     @classmethod
-    def make_context(cls, search_query, query_embedding, top_k=60):
+    def search_ids(
+        cls, search_query, query_embedding, top_k=60, strategy=None, ranker=None
+    ):
+        """
+        Etapa de recuperação: busca semântica (se houver `query_embedding`) +
+        Full-Text Search, fundidas por Reciprocal Rank Fusion. Retorna os ids
+        ordenados por relevância.
+        """
         RRF_K = 60  # Constante de suavização para Reciprocal Rank Fusion
 
         # 1. Busca semântica via pgvector (distância do cosseno)
-        semantic_ids = list(
-            Embedding.objects.filter(vetor1536__isnull=False)
-            .annotate(distance=CosineDistance("vetor1536", query_embedding))
-            .order_by("distance")[:top_k]
-            .values_list("id", flat=True)
-        )
+        semantic_ids = []
+        if query_embedding is not None:
+            semantic_ids = list(
+                cls.objects.filter(cls.strategy_filter(strategy))
+                .filter(vetor1536__isnull=False)
+                .annotate(distance=CosineDistance("vetor1536", query_embedding))
+                .order_by("distance")[:top_k]
+                .values_list("id", flat=True)
+            )
 
         # 2. Busca por palavra-chave via Full-Text Search (PostgreSQL)
-        text_ids = cls._fts_ids(search_query, top_k)
+        text_ids = cls._fts_ids(search_query, top_k, strategy, ranker)
 
         # 3. Reciprocal Rank Fusion (RRF)
         # score = 1/(k + rank_semantico) + 1/(k + rank_texto)
@@ -273,7 +301,15 @@ class Embedding(CmjModelMixin):
             rrf_scores[eid] = rrf_scores.get(eid, 0) + 1.0 / (RRF_K + rank)
 
         # 4. Ordena por score RRF decrescente e seleciona top_k
-        sorted_ids = sorted(rrf_scores, key=rrf_scores.get, reverse=True)[:top_k]
+        return sorted(rrf_scores, key=rrf_scores.get, reverse=True)[:top_k]
+
+    @classmethod
+    def make_context(
+        cls, search_query, query_embedding, top_k=60, strategy=None, ranker=None
+    ):
+        sorted_ids = cls.search_ids(
+            search_query, query_embedding, top_k, strategy, ranker
+        )
 
         # 5. Busca os embeddings completos preservando a ordem RRF
         embeddings_map = Embedding.objects.in_bulk(sorted_ids)
@@ -296,7 +332,9 @@ class Embedding(CmjModelMixin):
 
         context = []
         for ta_id in tas:
-            ta_dict[ta_id].sort(key=lambda e: e.content_object.ordem)
+            ta_dict[ta_id].sort(
+                key=lambda e: (e.content_object.ordem, e.metadata.get("parte", 0))
+            )
             for embed in ta_dict[ta_id]:
                 context.append(
                     (

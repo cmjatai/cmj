@@ -20,6 +20,8 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.mixins import CmjSearchMixin
 from cmj.utils import media_cache_storage
+from sapl.compilacao.chunking import ESTRATEGIA as ESTRATEGIA_V2
+from sapl.compilacao.chunking import No, construir_chunks
 from sapl.compilacao.utils import (
     get_integrations_view_names,
     int_to_letter,
@@ -28,7 +30,6 @@ from sapl.compilacao.utils import (
 from sapl.utils import YES_NO_CHOICES, get_settings_auth_user_model
 
 logger = logging.getLogger(__name__)
-
 # Tipos de dispositivo que geram chunks próprios para busca (RAG).
 # O caput de um Artigo é filho do tipo "Caput" e entra no chunk do Artigo.
 CHUNK_TIPOS_INDIVIDUALIZAVEIS = [
@@ -51,7 +52,10 @@ CHUNK_ANEXO_MIN_PALAVRAS = 8
 
 
 def texto_plano_html(html):
-    return re.sub(r"\s+", " ", bs(html or "", "html.parser").get_text(" ")).strip()
+    html = html or ""
+    if "<" not in html and "&" not in html:
+        return re.sub(r"\s+", " ", html).strip()
+    return re.sub(r"\s+", " ", bs(html, "html.parser").get_text(" ")).strip()
 
 
 class TimestampedMixin(models.Model):
@@ -854,7 +858,10 @@ class TextoArticulado(TimestampedMixin):
             if not context["chunks"]:
                 continue
 
-            chunks_db = [c.chunk for c in d.embeddings.order_by("id")]
+            # só os embeddings da estratégia v1 (sem a chave chunk_strategy)
+            embeddings_v1 = d.embeddings.exclude(metadata__has_key="chunk_strategy")
+
+            chunks_db = [c.chunk for c in embeddings_v1.order_by("id")]
             if len(chunks_db) == len(context["chunks"]):
                 equal = True
                 for i, c in enumerate(context["chunks"]):
@@ -868,13 +875,13 @@ class TextoArticulado(TimestampedMixin):
                 equal = False
 
             if not equal:
-                d.embeddings.all().delete()
+                embeddings_v1.delete()
 
             for c in context["chunks"]:
 
                 c = f"{self} \n {c}"
 
-                emb = d.embeddings.filter(chunk=c).first()
+                emb = embeddings_v1.filter(chunk=c).first()
                 if not emb:
                     emb = d.embeddings.create(chunk=c)
                     emb.update_search_vector()
@@ -883,6 +890,79 @@ class TextoArticulado(TimestampedMixin):
                 )
 
         return dispositivos
+
+    def generate_chunks_v2(self, **opcoes):
+        """
+        Indexa o T.A. com o chunking v2 (ver sapl/compilacao/chunking.py).
+
+        Sincroniza por hash de conteúdo: chunks inalterados são mantidos (e
+        com eles seus vetores); só o que mudou é apagado/criado. Não toca nos
+        embeddings de outras estratégias.
+
+        Returns:
+            list[ChunkV2]: os chunks desejados para o T.A.
+        """
+        from django.contrib.contenttypes.models import ContentType
+        from django.contrib.postgres.search import SearchVector
+
+        from cmj.search.models import Embedding
+
+        nos = [
+            No(
+                d.pk,
+                d.dispositivo_pai_id,
+                d.tipo_dispositivo.nome,
+                d.nivel,
+                d.ordem,
+                (d.rotulo or "").strip(),
+                texto_plano_html(d.texto),
+            )
+            for d in self.dispositivos_set.filter(
+                dispositivo_subsequente__isnull=True
+            ).select_related("tipo_dispositivo")
+        ]
+        ementa = next((n.texto for n in nos if n.tipo == "Ementa" and n.texto), "")
+        chunks = construir_chunks(nos, str(self), ementa, **opcoes)
+
+        content_type = ContentType.objects.get_for_model(Dispositivo)
+        existentes = {
+            (e.object_id, e.metadata.get("parte", 0), e.metadata.get("hash")): e.pk
+            for e in Embedding.objects.filter(
+                content_type=content_type,
+                dispositivo_set__ta=self,
+                metadata__chunk_strategy=ESTRATEGIA_V2,
+            )
+            .order_by()
+            .only("id", "object_id", "metadata")
+        }
+        desejados = {(c.raiz_pk, c.parte, c.metadata["hash"]): c for c in chunks}
+
+        obsoletos = [pk for chave, pk in existentes.items() if chave not in desejados]
+        if obsoletos:
+            Embedding.objects.filter(pk__in=obsoletos).delete()
+
+        novos = Embedding.objects.bulk_create(
+            [
+                Embedding(
+                    content_type=content_type,
+                    object_id=c.raiz_pk,
+                    chunk=c.texto,
+                    total_tokens=c.metadata["tokens_estimados"],
+                    metadata=c.metadata,
+                )
+                for chave, c in desejados.items()
+                if chave not in existentes
+            ]
+        )
+        if novos:
+            Embedding.objects.filter(pk__in=[e.pk for e in novos]).update(
+                search_vector=SearchVector("chunk", config="portuguese")
+            )
+        logger.info(
+            f"T.A. {self.pk} v2: {len(novos)} chunks criados, "
+            f"{len(obsoletos)} removidos, {len(existentes) - len(obsoletos)} mantidos."
+        )
+        return chunks
 
 
 class TipoNota(models.Model):

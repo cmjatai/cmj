@@ -47,7 +47,10 @@ Pontos importantes:
 * Normas **revogadas integralmente** não ficam no índice (o chat não responde com lei revogada).
 * A contagem de tokens é informativa: uma falha em `count_tokens` (retorna 0) **não** impede a vetorização.
 
-## 2.3 Segmentação – `TextoArticulado.generate_chunks()`
+## 2.3 Segmentação v1 – `TextoArticulado.generate_chunks()`
+
+> Esta é a estratégia **v1** (janela por dispositivo), ainda a padrão. A estratégia **v2** (por artigo), mais
+> eficiente na avaliação, está descrita em [§2.6](#26-chunking-v2-por-artigo).
 
 ### Quais dispositivos geram chunks
 
@@ -210,3 +213,72 @@ Outros cenários (alterar modelo de embedding, formato do prefixo ou algoritmo d
 3. Para forçar novos vetores: `Embedding.objects.update(vetor1536=None)` e executar `sync_embeddings`
    (os registros voltam a ser "pendentes").
 4. Para recalcular o FTS em massa: `Embedding.update_all_search_vectors()`.
+
+## 2.6 Chunking v2 (por artigo)
+
+Código: [sapl/compilacao/chunking.py](../../sapl/compilacao/chunking.py) (lógica **pura**, sem banco, testada em
+[test_chunking.py](../../sapl/compilacao/test_chunking.py)) e `TextoArticulado.generate_chunks_v2()` (persistência).
+Ativação: `RAG_CHUNK_STRATEGY=v2` (padrão `v1`); roteiro de adoção em [07 §7.4](./07-diagnostico-e-evolucao.md#74-como-adotar-o-v2).
+
+### Unidade de busca
+
+Cada chunk nasce de uma **unidade**: o que um jurista cita, e não uma janela de vizinhos.
+
+| Unidade | Conteúdo do chunk |
+|---------|-------------------|
+| **Artigo** | O artigo completo: caput (mesclado ao rótulo na mesma linha: `Art. 1º. Será concedida…`), parágrafos, incisos, alíneas e itens, **sem** os artigos vizinhos |
+| **Ementa** | A ementa da norma |
+| **Anexo** | Rótulo + título + descendentes (≥ 8 palavras de conteúdo) |
+| **Texto Não Estruturado** | Só os soltos (filhos da articulação) com ≥ 40 palavras; os filhos de `Caput`/`Anexo` ficam no pai |
+| Parágrafo/Inciso/Alínea/Item **órfãos** | Sem artigo ancestral, viram unidade própria |
+
+- **Artigo aninhado** (dentro de um `Bloco Alteração`, texto citado de outra lei) é uma unidade própria e **não** entra no
+  chunk do artigo que o contém; o cabeçalho dele inclui o artigo-pai (`Art. 2º. O art. 48 da Lei X passa a vigorar:`),
+  que diz qual lei está sendo alterada.
+- **Ignorados:** unidades sem conteúdo, `(Revogado)` e `Vetado`. Linhas `[...]` de `Omissis` não são emitidas.
+- Todo texto é convertido em **texto puro** (sem `<a href>` de referências cruzadas, tags ou entidades).
+
+### Cabeçalho de contexto (em todo chunk)
+
+```text
+Lei Ordinária nº 1 de 2020                      ← norma (a 1ª linha vira a "Fonte" em make_context)
+Dispõe sobre diárias de viagem.                 ← ementa da norma (truncada em 300 caracteres)
+Capítulo I DAS DIÁRIAS                          ← títulos/artigos ancestrais (Livro, Título, Capítulo, Seção…)
+Art. 1º. Será concedida diária ao servidor…     ← conteúdo da unidade
+§ 1º A diária cobre alimentação.
+```
+
+A **ementa** é a parte mais valiosa do cabeçalho: muitas vezes o assunto só aparece nela (ex.: "devolução da
+carteira de identidade funcional"). Sem ela, o MRR de "contexto-da-norma" cai de 0,55 para 0,25 (ver [08](./08-avaliacao-da-recuperacao.md)).
+O layout (1ª linha = norma) é compatível com a montagem e a deduplicação de prefixos de `make_context`.
+
+### Divisão de artigos grandes
+
+O orçamento é `MAX_TOKENS = 350` tokens estimados por chunk (`len/3,2`, medido no índice de produção). Artigo dentro do
+orçamento = 1 chunk. Acima, as **linhas** (dispositivos) são empacotadas em partes, e **cada parte** repete:
+
+1. o cabeçalho da norma;
+2. a linha do artigo (caput, truncado em 400 caracteres nas continuações);
+3. as **migalhas**: os dispositivos que governam a primeira linha da parte (ex.: o inciso `XL coordenar:` das alíneas
+   que seguem).
+
+Uma única linha maior que o orçamento (ex.: tabela de um Anexo) vira janelas por caracteres, em fronteira de palavra, com
+10% de sobreposição. Nenhum chunk ultrapassa o orçamento (verificado nas 5,9 mil normas).
+
+### Persistência e metadados
+
+`generate_chunks_v2()` guarda cada chunk como `Embedding` vinculado ao dispositivo-raiz (`content_object`, que `make_context`
+exige com `ta_id` e `ordem`), com `total_tokens` estimado (sem chamar a API) e `metadata`:
+
+```json
+{"chunk_strategy": "v2", "tipo": "Artigo", "rotulo": "Art. 1º.", "ordem": 4000, "ordem_fim": 7000,
+ "parte": 0, "partes": 1, "caminho": ["Dispõe sobre…", "Capítulo I DAS DIÁRIAS"],
+ "hash": "9f2c…", "tokens_estimados": 148}
+```
+
+A sincronização é **por hash de conteúdo** (`objeto + parte + hash`): chunk inalterado mantém o registro e o vetor;
+só o que mudou é apagado/criado. Editar o Art. 6º não recria o Art. 5º (na v1 recriava, pela janela de fronteira).
+A v2 **não toca** nos embeddings da v1 e vice-versa (a v1 ignora registros com `chunk_strategy`).
+
+Efeito no índice de produção (estimado em memória sobre as 5.928 normas publicadas): **48 mil chunks e ~8,5 M tokens**,
+contra 71,7 mil e 12,7 M da v1 (−33% e −34%).

@@ -14,7 +14,8 @@ conteúdo dos Textos Articulados (leis, decretos, resoluções etc.) publicados 
 | 4 | [04-chat-websocket-e-llm.md](./04-chat-websocket-e-llm.md) | `ChatConsumer`, `ChatManager`, `IAGenaiBase`, function calling, system instruction e cotas |
 | 5 | [05-modelos-de-dados.md](./05-modelos-de-dados.md) | `Embedding`, `ChatSession`, `ChatMessage`, `IAQuota`, índices e metadados salvos |
 | 6 | [06-operacao-limites-e-pontos-de-atencao.md](./06-operacao-limites-e-pontos-de-atencao.md) | Configuração, permissões, limites, troubleshooting e pontos de atenção do código atual |
-| 7 | [07-diagnostico-e-evolucao.md](./07-diagnostico-e-evolucao.md) | Medições do índice de produção, correções de cobertura/full-text e pendências do chunking |
+| 7 | [07-diagnostico-e-evolucao.md](./07-diagnostico-e-evolucao.md) | Medições do índice de produção, correções de cobertura/full-text, problemas do chunking v1 e roteiro de adoção do v2 |
+| 8 | [08-avaliacao-da-recuperacao.md](./08-avaliacao-da-recuperacao.md) | Conjunto de 57 perguntas de referência, comando `avaliar_rag`, métricas, resultados v1 × v2 e limitações |
 
 ## Resumo em 30 segundos
 

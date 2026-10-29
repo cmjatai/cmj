@@ -52,6 +52,16 @@ não interpreta operadores digitados pelo LLM ou usuário). Os termos são combi
 
 Ambas usam o índice GIN `embedding_search_vector_gin`, ordenam por `SearchRank` e respeitam o limite.
 
+**Função de ranking.** O `SearchRank` padrão do PostgreSQL (`ts_rank`, sem normalização) favorece chunks longos que
+repetem os termos. O sistema usa o ranker **`n1`** (`normalization=1`: divide pelo log do tamanho do documento),
+escolhido por avaliação ([08](./08-avaliacao-da-recuperacao.md)); as alternativas ficam em `cmj.search.fts.RANKERS`
+(`base`, `n1`, `n2`, `cd`, `cd1`, `cd2`) e o padrão em `RANKER_PADRAO`. **Desempate** por `id` (determinístico): sem isso,
+a ordem entre chunks de mesmo rank dependia do plano do PostgreSQL e variava entre execuções.
+
+**Estratégia.** Todas as buscas filtram por estratégia de chunking (`Embedding.strategy_filter`): `settings.RAG_CHUNK_STRATEGY`
+(padrão `v1`) ou o argumento `strategy`. `Embedding.search_ids` expõe só a etapa de recuperação (ids ordenados), usada por
+`make_context` e pela avaliação.
+
 **Variantes de número.** O `tsvector` trata `4353` e `4.353` como lexemas diferentes, então cada número com
 4+ dígitos (sem zero à esquerda) ou com separador de milhar vira `(4353 | 4.353)` dentro da própria camada.
 
@@ -126,6 +136,8 @@ como resposta da função.
 | Dimensão da consulta | 1536 | `IAGenaiBase.get_query_embedding` |
 | Config FTS | `portuguese` | `cmj/search/fts.py` (`FTS_CONFIG`) e `update_search_vector` (devem ser a mesma) |
 | Máx. de termos da busca textual | 12 | `cmj/search/fts.py` (`MAX_TERMS`) |
+| Ranker do FTS | `n1` | `cmj/search/fts.py` (`RANKER_PADRAO`, `RANKERS`) |
+| Estratégia de chunking consultada | `v1` | `RAG_CHUNK_STRATEGY` (variável de ambiente) |
 | Métrica | cosseno | `CosineDistance` + `halfvec_cosine_ops` |
 
 ## 3.4 Versões anteriores (removidas)
