@@ -2,17 +2,20 @@ import json
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+from django.db.models import Count
 
 from cmj.search.fts import RANKER_PADRAO, RANKERS
 from cmj.search.models import Embedding
 from cmj.search.rag_eval.avaliacao import (
     KS,
     PERGUNTAS_PADRAO,
+    PORTES,
     ArtigoKey,
     agregar,
     artigos_distintos,
     carregar_perguntas,
     melhor_posicao,
+    porte_da_norma,
 )
 from sapl.compilacao.models import Dispositivo, TextoArticulado
 
@@ -81,6 +84,7 @@ class Command(BaseCommand):
         perguntas = carregar_perguntas(options["perguntas"])
         if options["categoria"]:
             perguntas = [p for p in perguntas if p["categoria"] == options["categoria"]]
+        perguntas = self.validar(perguntas)
         if not perguntas:
             raise CommandError("Nenhuma pergunta selecionada.")
 
@@ -129,6 +133,43 @@ class Command(BaseCommand):
                     ensure_ascii=False,
                     indent=2,
                 )
+
+    def validar(self, perguntas):
+        """
+        Descarta perguntas cuja norma esperada não está publicada ou foi
+        revogada (nenhuma estratégia a indexa: seriam "não encontradas" por
+        construção) e anota o porte da norma esperada (nº de artigos vigentes).
+        """
+        ta_ids = {e["ta_id"] for p in perguntas for e in p["esperado"]}
+        validas = {
+            ta.pk
+            for ta in TextoArticulado.objects.filter(pk__in=ta_ids, editing_locked=True)
+            if not ta.is_revogado()
+        }
+        n_artigos = dict(
+            Dispositivo.objects.filter(
+                ta_id__in=validas,
+                tipo_dispositivo__nome="Artigo",
+                dispositivo_subsequente__isnull=True,
+            )
+            .values_list("ta_id")
+            .annotate(n=Count("id"))
+            .values_list("ta_id", "n")
+        )
+
+        aceitas = []
+        for p in perguntas:
+            if not all(e["ta_id"] in validas for e in p["esperado"]):
+                self.stderr.write(
+                    f"{p['id']}: descartada (norma esperada revogada ou não publicada)."
+                )
+                continue
+            p = {
+                **p,
+                "porte": porte_da_norma(n_artigos.get(p["esperado"][0]["ta_id"], 0)),
+            }
+            aceitas.append(p)
+        return aceitas
 
     def simular_v2(self, opcoes):
         tas = TextoArticulado.objects.filter(editing_locked=True).order_by("pk")
@@ -197,6 +238,7 @@ class Command(BaseCommand):
                 {
                     "id": p["id"],
                     "categoria": p["categoria"],
+                    "porte": p["porte"],
                     "posicao": melhor_posicao(artigos, p["esperado"]),
                     "artigos": len(artigos),
                     "chunks": len(ordenados),
@@ -229,6 +271,24 @@ class Command(BaseCommand):
             linha(chave, chave, lambda m: m["geral"])
         for extra in ("artigos_medio", "chunks_medio"):
             linha(extra, extra, lambda m: m["geral"])
+
+        portes = [p for p in PORTES if any(p in m["portes"] for m in metricas.values())]
+        self.stdout.write(
+            "\n== POR PORTE DA NORMA (nº de artigos: <10, 10-49, 50-199, >=200) =="
+        )
+        for porte in portes:
+            n = next(
+                m["portes"][porte]["n"]
+                for m in metricas.values()
+                if porte in m["portes"]
+            )
+            self.stdout.write(f"[{porte}] n={n}")
+            for chave in ("hit@5", "hit@20", "mrr"):
+                linha(
+                    f"  {chave}",
+                    chave,
+                    lambda m, c=porte: m["portes"].get(c, {}),
+                )
 
         categorias = sorted({c for m in metricas.values() for c in m["categorias"]})
         self.stdout.write("\n== POR CATEGORIA (hit@5 / hit@20 / mrr) ==")

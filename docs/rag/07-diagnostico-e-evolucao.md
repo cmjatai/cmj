@@ -93,7 +93,26 @@ produção enquanto `RAG_CHUNK_STRATEGY` for `v1` (padrão).
 
 ### Próximos passos
 
-1. Rodar a avaliação em modo `hibrido` depois de vetorizar a v2 (a avaliação feita aqui foi só textual).
+1. Rodar a avaliação em modo `hibrido` depois de vetorizar a v2 (a avaliação feita aqui foi só textual), com atenção
+   às normas muito grandes, onde a distância de vocabulário mais pesa.
 2. Ampliar o conjunto de perguntas com perguntas reais dos usuários do chat (ver `ChatMessage`).
-3. Perguntas por número ("artigo 75 da lei 2281") não melhoraram: reconhecer o padrão "art. N / lei N" na
+3. Perguntas por número ("artigo 56 da Lei Orgânica") não melhoraram: reconhecer o padrão "art. N / lei N" na
    consulta e filtrar por norma/rótulo.
+4. Tratar os problemas de dados da seção 7.5 na origem (cadastro de revogações), pois afetam o que o chat cita.
+
+## 7.5 Achados de dados nas normas grandes
+
+Descobertos ao revisar a avaliação por porte da norma (a maior parte do corpus são normas pequenas, mas as normas
+grandes concentram o uso e os problemas):
+
+| Achado | Medida | Efeito |
+|--------|--------|--------|
+| **Disposições vigentes sob estruturas "(Revogado)"** (ex.: um Capítulo ou Seção marcado revogado que mantém seus artigos no banco) | 181 de 30.627 artigos (0,6%) no corpus, mas **130 de 458 (28%) no Código Tributário** e 43 de 43 na norma 1122 | O chat podia citar dispositivos revogados como vigentes. A v2 os ignora; a v1 continua indexando |
+| **Artigos com o mesmo rótulo na mesma norma** (um deles sob estrutura revogada) | Código Tributário: Art. 153, 161, 175, 207, 214 duplicados | Um rótulo não identifica o artigo; a avaliação usa `ordem` para desambiguar |
+| **Versões sucessivas do Código de Posturas ainda não marcadas como revogadas** (leis 1778/95, 2064/99 e 3066/10 coexistem; a ementa da 2064 diz "Revoga a Lei nº 1778/95") | 3 normas quase idênticas no índice (722 a 769 embeddings cada na v1) | O chat pode responder com texto de uma lei já substituída. É um problema de cadastro de revogação, não de chunking |
+| Normas marcadas revogadas | 179 de 5.928; 0 embeddings v1 nelas | Corpora do v1 e da v2 equivalentes na comparação |
+
+Armadilha de método (registrada porque custou uma correção): uma regra nova da v2 que tratava estrutura com **texto vazio**
+como revogada descartou todos os artigos sob "Livro I/II" do Código Tributário (331 chunks para 458 artigos, quando o certo
+são ~830). Só a avaliação **estratificada por porte** revelou o defeito; o resultado geral mal mudaria. Há teste de
+regressão.

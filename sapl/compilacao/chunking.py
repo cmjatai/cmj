@@ -39,6 +39,15 @@ TIPO_CAPUT = "Caput"
 TIPO_EMENTA = "Ementa"
 TIPO_ANEXO = "Anexo"
 TIPO_TNU = "Texto Não Estruturado"
+TIPOS_ESTRUTURAIS = {
+    "Livro",
+    "Título",
+    "Capítulo",
+    "Seção",
+    "SubSeção",
+    "Disposições Preliminares",
+    "Disposições Finais",
+}
 TIPOS_ORFAOS = {
     "Parágrafo",
     "Inciso",
@@ -96,6 +105,11 @@ def _truncar(texto, limite):
     return texto[: limite - 1].rstrip() + "…"
 
 
+def _revogado(texto):
+    """O texto declara revogação/veto (texto vazio não é revogação)."""
+    return bool(_SEM_CONTEUDO.match(_normalizar(texto)))
+
+
 def _sem_conteudo(texto):
     texto = _normalizar(texto)
     return not texto or bool(_SEM_CONTEUDO.match(texto))
@@ -144,6 +158,9 @@ def _unidades(arvore):
     unidades = []
 
     def visitar(no, dentro):
+        # estrutura (capítulo, seção...) revogada: nada abaixo dela é indexado
+        if no.tipo in TIPOS_ESTRUTURAIS and _revogado(no.texto):
+            return
         pai = arvore.pai(no)
         nova = False
         if no.tipo == TIPO_EMENTA:

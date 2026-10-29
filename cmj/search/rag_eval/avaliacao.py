@@ -14,6 +14,18 @@ from pathlib import Path
 
 PERGUNTAS_PADRAO = Path(__file__).with_name("perguntas_referencia.json")
 KS = (1, 3, 5, 10, 20)
+PORTES = ("pequena", "média", "grande", "muito grande")
+
+
+def porte_da_norma(n_artigos):
+    """Faixa pelo número de artigos vigentes da norma."""
+    if n_artigos < 10:
+        return "pequena"
+    if n_artigos < 50:
+        return "média"
+    if n_artigos < 200:
+        return "grande"
+    return "muito grande"
 
 
 @dataclass(frozen=True)
@@ -85,9 +97,13 @@ def agregar(resultados):
         }
 
     por_categoria = defaultdict(list)
+    por_porte = defaultdict(list)
     for r in resultados:
         por_categoria[r["categoria"]].append(r)
+        if r.get("porte"):
+            por_porte[r["porte"]].append(r)
     return {
         "geral": resumo(resultados),
         "categorias": {c: resumo(itens) for c, itens in sorted(por_categoria.items())},
+        "portes": {p: resumo(por_porte[p]) for p in PORTES if p in por_porte},
     }

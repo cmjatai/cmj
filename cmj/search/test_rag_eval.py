@@ -8,6 +8,7 @@ from cmj.search.rag_eval.avaliacao import (
     casa,
     melhor_posicao,
     normalizar_artigo,
+    porte_da_norma,
 )
 
 pytestmark = pytest.mark.django_db
@@ -63,10 +64,53 @@ def test_agregar_metricas_gerais_e_por_categoria():
     assert metricas["categorias"]["y"]["hit@20"] == 0.0
 
 
+def test_porte_da_norma():
+    assert [porte_da_norma(n) for n in (0, 9, 10, 49, 50, 199, 200, 458)] == [
+        "pequena",
+        "pequena",
+        "média",
+        "média",
+        "grande",
+        "grande",
+        "muito grande",
+        "muito grande",
+    ]
+
+
+def test_agregar_por_porte():
+    resultados = [
+        {"categoria": "x", "porte": "pequena", "posicao": 1, "artigos": 1, "chunks": 1},
+        {
+            "categoria": "x",
+            "porte": "muito grande",
+            "posicao": None,
+            "artigos": 1,
+            "chunks": 1,
+        },
+        {
+            "categoria": "x",
+            "porte": "muito grande",
+            "posicao": 2,
+            "artigos": 1,
+            "chunks": 1,
+        },
+    ]
+
+    portes = agregar(resultados)["portes"]
+
+    assert list(portes) == ["pequena", "muito grande"]  # ordem de PORTES
+    assert portes["pequena"]["hit@1"] == 1.0
+    assert portes["muito grande"]["n"] == 2
+    assert (
+        portes["muito grande"]["hit@1"] == 0.0
+        and portes["muito grande"]["hit@5"] == 0.5
+    )
+
+
 def test_conjunto_de_perguntas_de_referencia_e_consistente():
     perguntas = carregar_perguntas()
 
-    assert len(perguntas) >= 50
+    assert len(perguntas) >= 90
     assert len({p["id"] for p in perguntas}) == len(perguntas)
     categorias = {p["categoria"] for p in perguntas}
     assert categorias >= {"parafrase", "contexto-da-norma", "dispositivo-interno"}
@@ -75,3 +119,6 @@ def test_conjunto_de_perguntas_de_referencia_e_consistente():
         assert p["esperado"] and all(
             e["ta_id"] and e["artigo"].startswith("Art.") for e in p["esperado"]
         )
+    # normas grandes (Código Tributário, Estatutos, Lei Orgânica) estão bem representadas
+    grandes = {1117, 1, 1210, 281}
+    assert sum(1 for p in perguntas if p["esperado"][0]["ta_id"] in grandes) >= 30

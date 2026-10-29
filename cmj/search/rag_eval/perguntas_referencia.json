@@ -13,14 +13,12 @@
   "perguntas": [
     {"id": "q01", "categoria": "contexto-da-norma", "pergunta": "Quando o Fisco pode rever o valor declarado de um imóvel no programa de regularização de compra e venda com alíquota reduzida?", "esperado": [{"ta_id": 10061, "artigo": "Art. 5º", "norma": "Lei Complementar nº 36"}]},
     {"id": "q02", "categoria": "termos-especificos", "pergunta": "Como a Câmara efetua o pagamento das despesas a fornecedores e servidores?", "esperado": [{"ta_id": 9825, "artigo": "Art. 55", "norma": "Resolução nº 93 de 2024"}]},
-    {"id": "q03", "categoria": "parafrase", "pergunta": "Qual o prazo para contestar uma decisão do conselho fiscal do fundo de previdência dos servidores?", "esperado": [{"ta_id": 935, "artigo": "Art. 75", "norma": "Lei Ordinária nº 2281"}]},
     {"id": "q04", "categoria": "parafrase", "pergunta": "Qual é a data comemorativa municipal voltada às micro e pequenas empresas?", "esperado": [{"ta_id": 2858, "artigo": "Art. 36", "norma": "Lei Complementar nº 10"}]},
     {"id": "q05", "categoria": "contexto-da-norma", "pergunta": "O servidor que se desliga definitivamente precisa devolver a carteira de identidade funcional?", "esperado": [{"ta_id": 6497, "artigo": "Art. 5º", "norma": "Resolução nº 28 de 2017"}]},
     {"id": "q06", "categoria": "contexto-da-norma", "pergunta": "Em quanto tempo prescrevem as parcelas não reclamadas do benefício do plano de assistência à saúde dos servidores?", "esperado": [{"ta_id": 835, "artigo": "Art. 33", "norma": "Lei Ordinária nº 2409"}]},
     {"id": "q07", "categoria": "termos-especificos", "pergunta": "Como são calculadas as taxas de vistoria de localização e de funcionamento?", "esperado": [{"ta_id": 1117, "artigo": "Art. 153", "ordem": 3145000, "norma": "Lei Complementar nº 1445"}]},
     {"id": "q08", "categoria": "termos-especificos", "pergunta": "Qual o nome do posto de saúde da Vila Brasília?", "esperado": [{"ta_id": 2432, "artigo": "Art. 1º", "norma": "Lei Ordinária nº 3053"}]},
     {"id": "q09", "categoria": "parafrase", "pergunta": "Para conseguir o habite-se numa reforma residencial é preciso plantar árvore na calçada?", "esperado": [{"ta_id": 4611, "artigo": "Art. 1º", "norma": "Lei Ordinária nº 3656"}]},
-    {"id": "q10", "categoria": "parafrase", "pergunta": "O teletrabalho dos servidores da Câmara é um direito deles?", "esperado": [{"ta_id": 8332, "artigo": "Art. 4º", "norma": "Resolução nº 58 de 2020"}]},
     {"id": "q11", "categoria": "parafrase", "pergunta": "Qual o prazo de defesa para o permissionário de mototáxi depois de ser autuado?", "esperado": [{"ta_id": 2775, "artigo": "Art. 99", "norma": "Lei Ordinária nº 3100"}]},
     {"id": "q12", "categoria": "parafrase", "pergunta": "A licença de funcionamento de equipamentos pode ser renovada automaticamente, sem vistoria?", "esperado": [{"ta_id": 2572, "artigo": "Art. 148", "norma": "Lei Ordinária nº 3066"}]},
     {"id": "q13", "categoria": "parafrase", "pergunta": "Os vereadores recebem décimo terceiro salário?", "esperado": [{"ta_id": 1169, "artigo": "Art. 2º", "norma": "Emenda à Lei Orgânica nº 3"}]},
@@ -49,7 +47,6 @@
     {"id": "q36", "categoria": "alteracao", "pergunta": "Qual lei complementar acrescentou o inciso VII e o parágrafo único ao artigo 154 do Código Tributário Municipal?", "esperado": [{"ta_id": 5259, "artigo": "Art. 6º", "norma": "Lei Complementar nº 21"}]},
     {"id": "q37", "categoria": "contexto-da-norma", "pergunta": "Até que montante o Executivo pode usar os artigos 7º e 43 da Lei 4.320 no orçamento de 2018?", "esperado": [{"ta_id": 7761, "artigo": "Art. 8º", "norma": "Lei Ordinária nº 4052"}]},
     {"id": "q38", "categoria": "numero-da-norma", "pergunta": "O que institui a Lei Ordinária 5000 de 2026?", "esperado": [{"ta_id": 10359, "artigo": "Art. 1º", "norma": "Lei Ordinária nº 5000"}]},
-    {"id": "q39", "categoria": "numero-da-norma", "pergunta": "O que diz o artigo 75 da lei 2281?", "esperado": [{"ta_id": 935, "artigo": "Art. 75", "norma": "Lei Ordinária nº 2281"}]},
     {"id": "q40", "categoria": "dispositivo-interno", "pergunta": "Qual o mínimo de instalações sanitárias exigido numa casa unifamiliar?", "esperado": [{"ta_id": 2573, "artigo": "Art. 46", "norma": "Lei Ordinária nº 3067"}]},
     {"id": "q41", "categoria": "dispositivo-interno", "pergunta": "Quanto tempo de licença tem o professor que sofre acidente no exercício das suas atribuições?", "esperado": [{"ta_id": 1849, "artigo": "Art. 64", "norma": "Lei Ordinária nº 1401"}]},
     {"id": "q42", "categoria": "dispositivo-interno", "pergunta": "A quem compete zelar pela execução dos recursos transferidos pela União e pelos estados para a assistência social?", "esperado": [{"ta_id": 7758, "artigo": "Art. 17", "norma": "Lei Ordinária nº 4062"}]},
@@ -61,12 +58,60 @@
     {"id": "q48", "categoria": "dispositivo-interno", "pergunta": "Os benefícios fiscais precisam entrar na estimativa da receita e num estudo de impacto orçamentário?", "esperado": [{"ta_id": 8570, "artigo": "Art. 37", "norma": "Lei Ordinária nº 4277"}]},
     {"id": "q49", "categoria": "dispositivo-interno", "pergunta": "O que é a Arena de Jogos e Convivência do Programa Eureka?", "esperado": [{"ta_id": 10395, "artigo": "Art. 4º", "norma": "Lei Ordinária nº 5012"}]},
     {"id": "q50", "categoria": "dispositivo-interno", "pergunta": "Qual a multa por não ligar o imóvel à rede pública de água?", "esperado": [{"ta_id": 2373, "artigo": "Art. 13", "norma": "Lei Ordinária nº 3047"}]},
-    {"id": "q51", "categoria": "artigo-longo", "pergunta": "A Secretaria de Meio Ambiente é responsável por pesquisas sobre fauna e flora?", "esperado": [{"ta_id": 6989, "artigo": "Art. 38", "norma": "Lei Ordinária nº 3947"}]},
     {"id": "q52", "categoria": "artigo-longo", "pergunta": "A Câmara tem comissão permanente de defesa do consumidor?", "esperado": [{"ta_id": 2222, "artigo": "Art. 28", "norma": "Regimento Interno nº 2"}]},
     {"id": "q53", "categoria": "artigo-longo", "pergunta": "A Secretaria de Desenvolvimento Social tem uma gerência do centro de referência especializado de assistência social?", "esperado": [{"ta_id": 9665, "artigo": "Art. 31", "norma": "Lei Ordinária nº 4702"}]},
     {"id": "q54", "categoria": "artigo-longo", "pergunta": "A educação ambiental é instrumento da política de resíduos sólidos?", "esperado": [{"ta_id": 4544, "artigo": "Art. 7º", "norma": "Lei Ordinária nº 3622"}]},
-    {"id": "q55", "categoria": "artigo-longo", "pergunta": "Agente comunitário de saúde pode receber gratificação por serviço extraordinário que não prestou?", "esperado": [{"ta_id": 4479, "artigo": "Art. 46", "norma": "Lei Ordinária nº 3564"}]},
     {"id": "q56", "categoria": "artigo-longo", "pergunta": "Onde fica a Escola Municipal Rio Paraíso I?", "esperado": [{"ta_id": 1869, "artigo": "Art. 1º", "norma": "Lei Ordinária nº 1380"}]},
-    {"id": "q57", "categoria": "artigo-longo", "pergunta": "O Fórum Municipal de Educação coordena discussões sobre temas educacionais em suas reuniões?", "esperado": [{"ta_id": 6976, "artigo": "Art. 2º", "norma": "Lei Ordinária nº 3958"}]}
+    {"id": "q57", "categoria": "artigo-longo", "pergunta": "O Fórum Municipal de Educação coordena discussões sobre temas educacionais em suas reuniões?", "esperado": [{"ta_id": 6976, "artigo": "Art. 2º", "norma": "Lei Ordinária nº 3958"}]},
+
+    {"id": "q58", "categoria": "parafrase", "pergunta": "Em quantos anos o contribuinte perde o direito de pedir de volta um tributo pago indevidamente?", "esperado": [{"ta_id": 1117, "artigo": "Art. 22", "norma": "Código Tributário (LC 1445)"}]},
+    {"id": "q59", "categoria": "parafrase", "pergunta": "Em que situação as multas por descumprir obrigação principal e acessória se somam?", "esperado": [{"ta_id": 1117, "artigo": "Art. 207", "ordem": 3843000, "norma": "Código Tributário (LC 1445)"}]},
+    {"id": "q60", "categoria": "parafrase", "pergunta": "Os livros fiscais podem ser emitidos por sistema informatizado?", "esperado": [{"ta_id": 1117, "artigo": "Art. 147-B", "norma": "Código Tributário (LC 1445)"}]},
+    {"id": "q61", "categoria": "parafrase", "pergunta": "Os servidores encarregados da arrecadação respondem se cobrarem tributo a menor?", "esperado": [{"ta_id": 1117, "artigo": "Art. 13", "norma": "Código Tributário (LC 1445)"}]},
+    {"id": "q62", "categoria": "parafrase", "pergunta": "Quem paga o preço público pela ocupação do espaço aéreo ou subterrâneo de via pública?", "esperado": [{"ta_id": 1117, "artigo": "Art. 175", "ordem": 3247000, "norma": "Código Tributário (LC 1445)"}]},
+    {"id": "q63", "categoria": "parafrase", "pergunta": "Se o local do anúncio publicitário não é do requerente, o que ele precisa juntar ao pedido?", "esperado": [{"ta_id": 1117, "artigo": "Art. 161", "ordem": 3194000, "norma": "Código Tributário (LC 1445)"}]},
+    {"id": "q64", "categoria": "parafrase", "pergunta": "O que se considera reincidência na infração tributária?", "esperado": [{"ta_id": 1117, "artigo": "Art. 214", "ordem": 3875000, "norma": "Código Tributário (LC 1445)"}]},
+    {"id": "q65", "categoria": "parafrase", "pergunta": "Quem pode decidir por equidade e dispensar penalidades pecuniárias?", "esperado": [{"ta_id": 1117, "artigo": "Art. 262", "norma": "Código Tributário (LC 1445)"}]},
+
+    {"id": "q66", "categoria": "parafrase", "pergunta": "A partir de quando vale a aposentadoria compulsória do servidor?", "esperado": [{"ta_id": 1, "artigo": "Art. 234", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+    {"id": "q67", "categoria": "parafrase", "pergunta": "O que é a posse no cargo público municipal?", "esperado": [{"ta_id": 1, "artigo": "Art. 21", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+    {"id": "q68", "categoria": "parafrase", "pergunta": "Os prazos do estatuto dos servidores contam em dias corridos ou úteis?", "esperado": [{"ta_id": 1, "artigo": "Art. 329", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+    {"id": "q69", "categoria": "parafrase", "pergunta": "Quantas vezes o pedido de reconsideração interrompe a prescrição?", "esperado": [{"ta_id": 1, "artigo": "Art. 262", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+    {"id": "q70", "categoria": "parafrase", "pergunta": "Por quanto tempo o servidor efetivo pode ficar afastado por interesse particular?", "esperado": [{"ta_id": 1, "artigo": "Art. 215", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+    {"id": "q71", "categoria": "parafrase", "pergunta": "Em que mês, em regra, é realizado o acesso do servidor à classe seguinte?", "esperado": [{"ta_id": 1, "artigo": "Art. 87", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+    {"id": "q72", "categoria": "parafrase", "pergunta": "Quem pode exercer o direito de petição em nome do servidor?", "esperado": [{"ta_id": 1, "artigo": "Art. 265", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+    {"id": "q73", "categoria": "parafrase", "pergunta": "O servidor nomeado para cargo em comissão pode optar pelo vencimento do seu cargo efetivo?", "esperado": [{"ta_id": 1, "artigo": "Art. 129", "norma": "Estatuto dos Servidores (Lei 1400)"}]},
+
+    {"id": "q74", "categoria": "parafrase", "pergunta": "A profissional da educação tem intervalo para amamentar? De quanto tempo?", "esperado": [{"ta_id": 1210, "artigo": "Art. 132", "norma": "Estatuto do Magistério (Lei 2822)"}]},
+    {"id": "q75", "categoria": "termos-especificos", "pergunta": "Em que data se comemora o dia do professor na festa escolar do município?", "esperado": [{"ta_id": 1210, "artigo": "Art. 202", "norma": "Estatuto do Magistério (Lei 2822)"}]},
+    {"id": "q76", "categoria": "parafrase", "pergunta": "O que recebe a família do profissional da educação que falece?", "esperado": [{"ta_id": 1210, "artigo": "Art. 119", "norma": "Estatuto do Magistério (Lei 2822)"}]},
+    {"id": "q77", "categoria": "termos-especificos", "pergunta": "Que medalha homenageia o educador emérito?", "esperado": [{"ta_id": 1210, "artigo": "Art. 199", "norma": "Estatuto do Magistério (Lei 2822)"}]},
+    {"id": "q78", "categoria": "parafrase", "pergunta": "Quem exerce a função de secretário geral da escola e quem o escolhe?", "esperado": [{"ta_id": 1210, "artigo": "Art. 78", "norma": "Estatuto do Magistério (Lei 2822)"}]},
+    {"id": "q79", "categoria": "parafrase", "pergunta": "O profissional da educação pode ter licença para cuidar de familiar doente?", "esperado": [{"ta_id": 1210, "artigo": "Art. 129", "norma": "Estatuto do Magistério (Lei 2822)"}]},
+
+    {"id": "q80", "categoria": "parafrase", "pergunta": "Quanto dura o mandato do prefeito e ele pode ser reeleito?", "esperado": [{"ta_id": 281, "artigo": "Art. 56", "norma": "Lei Orgânica do Município"}]},
+    {"id": "q81", "categoria": "termos-especificos", "pergunta": "Que percentual dos impostos o município destina à Secretaria da Cultura?", "esperado": [{"ta_id": 281, "artigo": "Art. 146", "norma": "Lei Orgânica do Município"}]},
+    {"id": "q82", "categoria": "parafrase", "pergunta": "Quem assume a administração quando o prefeito e o vice estão impedidos?", "esperado": [{"ta_id": 281, "artigo": "Art. 54", "norma": "Lei Orgânica do Município"}]},
+    {"id": "q83", "categoria": "parafrase", "pergunta": "O município cobra contribuição dos servidores para o sistema previdenciário?", "esperado": [{"ta_id": 281, "artigo": "Art. 105", "norma": "Lei Orgânica do Município"}]},
+    {"id": "q84", "categoria": "parafrase", "pergunta": "O serviço funerário para pessoas carentes é gratuito?", "esperado": [{"ta_id": 281, "artigo": "Art. 137", "norma": "Lei Orgânica do Município"}]},
+    {"id": "q85", "categoria": "parafrase", "pergunta": "Quando a Câmara se reúne para a posse dos vereadores e a eleição da mesa?", "esperado": [{"ta_id": 281, "artigo": "Art. 18", "norma": "Lei Orgânica do Município"}]},
+    {"id": "q86", "categoria": "parafrase", "pergunta": "O município pode conceder subvenção a instituições privadas com fins lucrativos?", "esperado": [{"ta_id": 281, "artigo": "Art. 178", "norma": "Lei Orgânica do Município"}]},
+
+    {"id": "q87", "categoria": "parafrase", "pergunta": "Por quanto tempo vale a sepultura gratuita concedida a indigentes?", "esperado": [{"ta_id": 2572, "artigo": "Art. 90", "norma": "Código de Posturas (Lei 3066)"}], "nota": "O texto é praticamente idêntico nas versões anteriores do Código de Posturas (leis 2064/99 e 1778/95), que o índice ainda não trata como revogadas; só a vigente é aceita."},
+    {"id": "q88", "categoria": "parafrase", "pergunta": "É permitido deixar água parada nos quintais das casas da área urbana?", "esperado": [{"ta_id": 2572, "artigo": "Art. 8º", "norma": "Código de Posturas (Lei 3066)"}], "nota": "Idem q87."},
+
+    {"id": "q89", "categoria": "parafrase", "pergunta": "A partir de quantos usuários a edificação precisa ter banheiros separados por sexo?", "esperado": [{"ta_id": 2573, "artigo": "Art. 47", "norma": "Código de Edificações (Lei 3067)"}]},
+    {"id": "q90", "categoria": "parafrase", "pergunta": "Prédios que atendem o público precisam ser adaptados para pessoas com deficiência?", "esperado": [{"ta_id": 2573, "artigo": "Art. 28", "norma": "Código de Edificações (Lei 3067)"}]},
+
+    {"id": "q91", "categoria": "parafrase", "pergunta": "É permitido transportar cargas perigosas dentro do município?", "esperado": [{"ta_id": 246, "artigo": "Art. 127", "norma": "Código do Meio Ambiente (Lei 2047)"}]},
+    {"id": "q92", "categoria": "parafrase", "pergunta": "De onde vêm as receitas do Fundo Municipal do Meio Ambiente?", "esperado": [{"ta_id": 246, "artigo": "Art. 75", "norma": "Código do Meio Ambiente (Lei 2047)"}]},
+    {"id": "q93", "categoria": "parafrase", "pergunta": "O poder público pode reconhecer unidades de conservação em propriedade privada?", "esperado": [{"ta_id": 246, "artigo": "Art. 36", "norma": "Código do Meio Ambiente (Lei 2047)"}]},
+
+    {"id": "q94", "categoria": "parafrase", "pergunta": "O que é uma questão de ordem no plenário?", "esperado": [{"ta_id": 2222, "artigo": "Art. 123", "norma": "Regimento Interno nº 2"}]},
+    {"id": "q95", "categoria": "parafrase", "pergunta": "O que faz o presidente quando um vereador comete excesso no plenário?", "esperado": [{"ta_id": 2222, "artigo": "Art. 56", "norma": "Regimento Interno nº 2"}]},
+    {"id": "q96", "categoria": "parafrase", "pergunta": "Quais são os títulos de cidadão honorário concedidos pelo município?", "esperado": [{"ta_id": 2222, "artigo": "Art. 125-A", "norma": "Regimento Interno nº 2"}]},
+
+    {"id": "q97", "categoria": "numero-da-norma", "pergunta": "O que diz o artigo 56 da Lei Orgânica do Município?", "esperado": [{"ta_id": 281, "artigo": "Art. 56", "norma": "Lei Orgânica do Município"}]},
+    {"id": "q98", "categoria": "numero-da-norma", "pergunta": "O que prevê o artigo 21 da Lei 1400 sobre a posse?", "esperado": [{"ta_id": 1, "artigo": "Art. 21", "norma": "Estatuto dos Servidores (Lei 1400)"}]}
   ]
 }

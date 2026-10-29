@@ -235,7 +235,9 @@ Cada chunk nasce de uma **unidade**: o que um jurista cita, e não uma janela de
 - **Artigo aninhado** (dentro de um `Bloco Alteração`, texto citado de outra lei) é uma unidade própria e **não** entra no
   chunk do artigo que o contém; o cabeçalho dele inclui o artigo-pai (`Art. 2º. O art. 48 da Lei X passa a vigorar:`),
   que diz qual lei está sendo alterada.
-- **Ignorados:** unidades sem conteúdo, `(Revogado)` e `Vetado`. Linhas `[...]` de `Omissis` não são emitidas.
+- **Ignorados:** unidades sem conteúdo, `(Revogado)` e `Vetado`; **tudo o que está sob uma estrutura revogada** (Livro,
+  Título, Capítulo, Seção, SubSeção cujo texto é "(Revogado)"; texto vazio **não** é revogação, pois "Livro I" costuma
+  ter só rótulo). Linhas `[...]` de `Omissis` não são emitidas.
 - Todo texto é convertido em **texto puro** (sem `<a href>` de referências cruzadas, tags ou entidades).
 
 ### Cabeçalho de contexto (em todo chunk)

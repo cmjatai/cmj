@@ -243,5 +243,40 @@ def test_dispositivo_orfao_individualizavel_gera_unidade():
     assert [c.raiz_pk for c in construir_chunks(nos, TITULO, "")] == [2]
 
 
+def test_artigo_sob_estrutura_revogada_nao_e_indexado():
+    nos = norma_simples() + [
+        no(30, 3, "Capítulo", 20000, "Capítulo II", "(Revogado)"),
+        no(31, 30, "Artigo", 21000, "Art. 9º."),
+        no(
+            32,
+            31,
+            "Caput",
+            22000,
+            texto="Texto que ainda existe no banco mas está sob capítulo revogado.",
+        ),
+        no(33, 3, "Seção", 23000, "Seção I", "DAS REGRAS"),
+        no(34, 33, "Artigo", 24000, "Art. 10."),
+        no(35, 34, "Caput", 25000, texto="Texto vigente sob seção vigente."),
+    ]
+
+    raizes = {c.raiz_pk for c in construir_chunks(nos, TITULO, EMENTA)}
+
+    assert 31 not in raizes
+    assert 34 in raizes
+
+
+def test_estrutura_com_texto_vazio_nao_e_revogada():
+    # "Livro I" costuma ter só rótulo; isso não significa revogação
+    nos = [
+        no(1, None, "Articulação", 1000),
+        no(2, 1, "Livro", 2000, "Livro I", ""),
+        no(3, 2, "Título", 3000, "Título I", "DAS NORMAS"),
+        no(4, 3, "Artigo", 4000, "Art. 1º."),
+        no(5, 4, "Caput", 5000, texto="Texto do artigo sob livro sem título."),
+    ]
+
+    assert [c.raiz_pk for c in construir_chunks(nos, TITULO, "")] == [4]
+
+
 def test_constantes_coerentes():
     assert chunking.MAX_TOKENS > 0 and chunking.TNU_MIN_PALAVRAS > 0
