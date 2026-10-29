@@ -232,17 +232,23 @@ def nav_run(context, path=None, pk=None):
     return {"menu": menu}
 
 
-def resolve_urls_inplace(menu, pk, rm, context):
+def resolve_urls_inplace(menu, pk, rm, context, activate_defined=False):
+
     if isinstance(menu, list):
         list_active = ""
         for item in menu:
             # print(item)
-            menuactive = resolve_urls_inplace(item, pk, rm, context)
+            menuactive, activate_defined = resolve_urls_inplace(
+                item, pk, rm, context, activate_defined=activate_defined
+            )
             list_active = menuactive if menuactive else list_active
             if not isinstance(item, list):
-                item["active"] = menuactive
+                if not activate_defined:
+                    item["active"] = menuactive
+                    if menuactive:
+                        activate_defined = True
 
-        return list_active
+        return list_active, activate_defined
     else:
         if "url" in menu:
 
@@ -274,9 +280,14 @@ def resolve_urls_inplace(menu, pk, rm, context):
                             pass
 
                 menu["active"] = (
-                    "active" if context["request"].path == menu["url"] else ""
+                    "active"
+                    if not activate_defined and context["request"].path == menu["url"]
+                    else ""
                 )
-                if not menu["active"]:
+
+                if menu["active"]:
+                    activate_defined = True
+                else:
                     """
                     Se não encontrada diretamente,
                     procura a url acionada dentro do crud, caso seja um.
@@ -295,7 +306,9 @@ def resolve_urls_inplace(menu, pk, rm, context):
                                         or "urls_extras" in menu
                                         and u.name in menu["urls_extras"]
                                     ):
-                                        menu["active"] = "active"
+                                        if not activate_defined:
+                                            menu["active"] = "active"
+                                            activate_defined = True
                                         break
                     except:
                         url_active = menu.get("url", "")
@@ -309,8 +322,10 @@ def resolve_urls_inplace(menu, pk, rm, context):
             del menu["children"]
 
         if "children" in menu:
-            menu["active"] = resolve_urls_inplace(menu["children"], pk, rm, context)
-        return menu["active"]
+            menu["active"], activate_defined = resolve_urls_inplace(
+                menu["children"], pk, rm, context, activate_defined=activate_defined
+            )
+        return menu["active"], activate_defined
 
 
 @register.filter
