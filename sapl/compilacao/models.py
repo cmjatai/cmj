@@ -29,6 +29,30 @@ from sapl.utils import YES_NO_CHOICES, get_settings_auth_user_model
 
 logger = logging.getLogger(__name__)
 
+# Tipos de dispositivo que geram chunks próprios para busca (RAG).
+# O caput de um Artigo é filho do tipo "Caput" e entra no chunk do Artigo.
+CHUNK_TIPOS_INDIVIDUALIZAVEIS = [
+    "Ementa",
+    "Artigo",
+    "Parágrafo",
+    "Inciso",
+    "Alinea",
+    "Item",
+    "Inciso de Item",
+    "Alinea de Item",
+    "Anexo",
+    "Texto Não Estruturado",
+]
+TIPO_TEXTO_NAO_ESTRUTURADO = "Texto Não Estruturado"
+# Texto não estruturado abaixo disso é, em geral, fecho/assinatura sem conteúdo normativo
+CHUNK_TNU_MIN_PALAVRAS = 40
+# Anexo sem conteúdo além do rótulo (ex.: só imagem) não deve virar chunk
+CHUNK_ANEXO_MIN_PALAVRAS = 8
+
+
+def texto_plano_html(html):
+    return re.sub(r"\s+", " ", bs(html or "", "html.parser").get_text(" ")).strip()
+
 
 class TimestampedMixin(models.Model):
     created = models.DateTimeField(
@@ -709,22 +733,26 @@ class TextoArticulado(TimestampedMixin):
     def generate_chunks(self, tipos_indivisualizaveis=[]):
 
         if not tipos_indivisualizaveis:
-            tipos_indivisualizaveis = TipoDispositivo.objects.filter(
-                nome__in=["Ementa", "Artigo", "Parágrafo", "Inciso", "Alinea", "Item"]
-            ).values_list("nome", flat=True)
+            tipos_indivisualizaveis = CHUNK_TIPOS_INDIVIDUALIZAVEIS
 
         qs_dispositivos = self.dispositivos_set.filter(
             dispositivo_subsequente__isnull=True
-        )
+        ).select_related("tipo_dispositivo")
         dispositivos = []
         dispositivos_dict = OrderedDict()
         for d in qs_dispositivos:
+
+            # Texto não estruturado é HTML cru (div/style); embute só o texto
+            if d.tipo_dispositivo.nome == TIPO_TEXTO_NAO_ESTRUTURADO:
+                rendered = texto_plano_html(d.texto)
+            else:
+                rendered = d.render_texto()
 
             d_tuple = (
                 d,
                 {
                     "embeddings": d.embeddings.all(),
-                    "rendered": d.render_texto(),
+                    "rendered": rendered,
                     "texto": d.texto.strip(),
                     "rotulo": d.rotulo.strip(),
                     "chunks": [],
@@ -747,6 +775,14 @@ class TextoArticulado(TimestampedMixin):
             if not texto and not rotulo:
                 continue
 
+            if d.tipo_dispositivo.nome == TIPO_TEXTO_NAO_ESTRUTURADO:
+                # Filho de Caput/Anexo já está no chunk do pai; só os soltos
+                # (filhos da articulação) e substantivos são individualizados
+                if (
+                    d.dispositivo_pai.tipo_dispositivo.nome != "Articulação"
+                    or len(renderizado.split()) < CHUNK_TNU_MIN_PALAVRAS
+                ):
+                    continue
             disp_renderizado = (rotulo + " " + renderizado) if rotulo else renderizado
 
             textos_next = [disp_renderizado]
@@ -782,6 +818,12 @@ class TextoArticulado(TimestampedMixin):
             chunks = []
             textos = textos_previous + textos_next
             textos = list(filter(lambda x: x.strip(), textos))
+
+            if (
+                d.tipo_dispositivo.nome == "Anexo"
+                and sum(len(t.split()) for t in textos_next) < CHUNK_ANEXO_MIN_PALAVRAS
+            ):
+                continue
             chunk_size = 1536
             current_chunk = ""
             for t in textos:

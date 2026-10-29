@@ -51,15 +51,27 @@ Pontos importantes:
 
 ### Quais dispositivos geram chunks
 
-Somente os tipos **individualizáveis**:
+Somente os tipos **individualizáveis** (constante `CHUNK_TIPOS_INDIVIDUALIZAVEIS` em
+[sapl/compilacao/models.py](../../sapl/compilacao/models.py)):
 
 ```python
-["Ementa", "Artigo", "Parágrafo", "Inciso", "Alinea", "Item"]
+["Ementa", "Artigo", "Parágrafo", "Inciso", "Alinea", "Item",
+ "Inciso de Item", "Alinea de Item", "Anexo", "Texto Não Estruturado"]
 ```
 
 Dispositivos de outros tipos (Capítulo, Seção, Título, Livro etc.) **não geram chunk próprio**, mas
 aparecem como *ancestrais* no cabeçalho dos chunks de seus filhos. Dispositivos sem texto **e** sem
 rótulo são ignorados.
+
+> No modelo de dados o **Artigo tem `texto` vazio**: o caput é um filho do tipo `Caput`, que não é
+> individualizável e entra no chunk do Artigo (como descendente) e nos de seus incisos (como ancestral).
+
+Regras específicas dos tipos de conteúdo "solto":
+
+| Tipo | Regra |
+|------|-------|
+| **Anexo** | Gera chunk com o rótulo + título + descendentes (inclui os "Texto Não Estruturado" filhos). Anexo com menos de `CHUNK_ANEXO_MIN_PALAVRAS` (8) palavras além do rótulo (ex.: só imagem) é ignorado |
+| **Texto Não Estruturado** | O HTML é convertido em texto puro (`texto_plano_html`) antes de ser embutido. Só é individualizado se for **filho da Articulação** (os filhos de `Caput`/`Anexo` já estão no chunk do pai) e tiver ao menos `CHUNK_TNU_MIN_PALAVRAS` (40) palavras – abaixo disso são, em geral, fechos e assinaturas ("Prefeito Municipal…") sem conteúdo normativo |
 
 ### Composição do texto de cada chunk
 
@@ -138,7 +150,7 @@ que a task usa para filtrar os embeddings do T.A. corrente.
 | `update_all_search_vectors()` (classmethod) | Mesmo `UPDATE` em lote para toda a tabela (útil em reindexação total) |
 | `update_total_tokens()` | `IAGenaiBase.count_tokens_in_text(chunk)` (Gemini `count_tokens`, 0 em caso de erro) e `save()` |
 | `generate_embedding()` | Vetoriza **um** chunk, salva em `vetor1536` |
-| `generate_embeddings_for_queryset(qs)` | Vetoriza o queryset **em lote**; para cada item grava `vetor1536` e zera o campo legado `vetor` (3072) |
+| `generate_embeddings_for_queryset(qs, slice_size=256)` | Vetoriza o queryset **em fatias**, gravando o progresso a cada fatia (`vetor1536`; zera o campo legado `vetor`). Embeddings que falharem continuam sem vetor (pendentes). Retorna a quantidade vetorizada |
 
 ### `IAGenaiBase.embed_documents`
 
@@ -147,8 +159,14 @@ que a task usa para filtrar os embeddings do T.A. corrente.
 * Formatação de documento exigida pelo modelo: `"title: {titulo|none} | text: {texto}"`
   (`prepare_document`). Aqui o título é sempre `None` → `title: none | text: ...`.
 * `task_type` **não** é enviado (a instrução vai no próprio texto).
-* Em exceção, registra o erro e **devolve o que já foi gerado** (lotes anteriores). Como o laço para no
-  primeiro erro, o resultado parcial continua alinhado com o início do queryset.
+* **Resiliência** (antes, o primeiro erro abortava tudo e descartava o restante):
+  1. cada lote é tentado até `EMBED_MAX_ATTEMPTS` (3) vezes, com espera exponencial
+     (`EMBED_RETRY_BASE_DELAY` = 2 s → 2, 4 s);
+  2. se o lote continua falhando, seus documentos são reenviados **um a um**, para que um chunk
+     problemático (ex.: texto acima do limite do modelo) não derrube os outros 63;
+  3. o retorno é uma lista **alinhada** a `documents`, com `None` nos que falharam;
+  4. se `EMBED_MAX_CONSECUTIVE_FAILED_BATCHES` (2) lotes seguidos falharem por completo (API fora do ar,
+     cota), a execução é interrompida e a lista parcial é devolvida.
 
 ### Assimetria documento × consulta
 
@@ -160,13 +178,35 @@ que a task usa para filtrar os embeddings do T.A. corrente.
 Essa assimetria é intencional e recomendada para o `gemini-embedding-2`. Se o formato de documento
 mudar, **todos os vetores precisam ser regenerados** para manter a comparabilidade.
 
-## 2.5 Reindexação manual
+## 2.5 Reindexação e completude do índice (`sync_embeddings`)
 
-Útil quando se altera o modelo de embedding, o formato do prefixo ou o algoritmo de chunking:
+O comando [sync_embeddings](../../cmj/search/management/commands/sync_embeddings.py) completa o índice
+sem depender de uma nova publicação. Ele reindexa (chunks) os T.A. selecionados e, ao final, vetoriza
+**todos** os embeddings pendentes (`vetor1536` nulo) e preenche `search_vector` ausentes.
+
+```bash
+# Quanto falta (nada é gravado)
+python manage.py sync_embeddings --tipos Anexo "Texto Não Estruturado" --sem-embedding --dry-run
+
+# Indexar os tipos novos nos T.A. publicados e as normas sem nenhum embedding, e vetorizar os pendentes
+python manage.py sync_embeddings --tipos Anexo "Texto Não Estruturado" --sem-embedding
+
+# Somente vetorizar os pendentes
+python manage.py sync_embeddings
+
+# Reindexar T.A. específicos, sem vetorizar pendentes
+python manage.py sync_embeddings --ta-ids 793 1021 --sem-pendentes
+```
+
+Só T.A. **publicados** (`editing_locked=True`) são selecionados por `--tipos` e `--sem-embedding`, para
+não indexar rascunhos. O comando é **retomável**: o que falhar continua pendente e uma nova execução
+continua de onde parou. A vetorização consome a API do Gemini (cota/custo).
+
+Outros cenários (alterar modelo de embedding, formato do prefixo ou algoritmo de chunking):
 
 1. Ajustar o código (ex.: `chunk_size`, tipos individualizáveis).
-2. Executar `task_sync_embeddings_textoarticulado_function([ids...])` (shell Django/notebook – ver
-   `__notebooks_private/2026/compilacao__dispositivo__chunking.py` para experimentos).
-3. Para forçar novos vetores: `Embedding.objects.update(vetor1536=None)` e reexecutar a task
+2. Executar `sync_embeddings --ta-ids ...` ou `task_sync_embeddings_textoarticulado_function([ids...])`
+   (ver `__notebooks_private/2026/compilacao__dispositivo__chunking.py` para experimentos).
+3. Para forçar novos vetores: `Embedding.objects.update(vetor1536=None)` e executar `sync_embeddings`
    (os registros voltam a ser "pendentes").
 4. Para recalcular o FTS em massa: `Embedding.update_all_search_vectors()`.

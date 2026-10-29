@@ -1,3 +1,5 @@
+import logging
+
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.postgres.indexes import GinIndex
@@ -13,8 +15,11 @@ from pgvector.django.halfvec import HalfVectorField
 from pgvector.django.vector import VectorField
 
 from cmj.mixins import CmjModelMixin
+from cmj.search.fts import build_fts_queries
 from cmj.utils import get_settings_auth_user_model
 from cmj.utils.genia import IAGenaiBase
+
+logger = logging.getLogger(__name__)
 
 
 class Embedding(CmjModelMixin):
@@ -154,20 +159,41 @@ class Embedding(CmjModelMixin):
         self.save()
 
     @classmethod
-    def generate_embeddings_for_queryset(cls, queryset):
+    def generate_embeddings_for_queryset(cls, queryset, slice_size=256):
+        """
+        Vetoriza os embeddings do queryset em fatias, gravando o progresso a
+        cada fatia. Embeddings cuja vetorização falhar continuam sem vetor
+        (pendentes) e serão retomados numa próxima execução.
 
-        chunks = [{'text': emb.chunk, 'title': None} for emb in queryset]
-        if not chunks:
-            return None
+        Returns:
+            int: quantidade de embeddings vetorizados.
+        """
+        ids = sorted(set(queryset.order_by().values_list("id", flat=True)))
+        if not ids:
+            return 0
 
-        IAGenaiBase_instance = IAGenaiBase()
+        ia = IAGenaiBase()
+        done = 0
+        for start in range(0, len(ids), slice_size):
+            slice_ids = ids[start : start + slice_size]
+            embs = list(
+                cls.objects.filter(id__in=slice_ids).only("id", "chunk").order_by("id")
+            )
+            vectors = ia.embed_documents(
+                [{"text": e.chunk, "title": None} for e in embs]
+            )
 
-        all_embeddings =  IAGenaiBase_instance.embed_documents(chunks)
-        for emb, embedding_vector in zip(queryset, all_embeddings):
-            emb.vetor1536 = embedding_vector if embedding_vector else None
-            emb.vetor = None
-            emb.save()
-        return all_embeddings if all_embeddings else None
+            for emb, vector in zip(embs, vectors):
+                if vector:
+                    cls.objects.filter(pk=emb.pk).update(vetor1536=vector, vetor=None)
+                    done += 1
+
+            if len(vectors) < len(embs):
+                logger.warning(
+                    "Vetorização interrompida: API indisponível. Pendentes serão retomados."
+                )
+                break
+        return done
 
     def update_search_vector(self):
         """
@@ -196,28 +222,46 @@ class Embedding(CmjModelMixin):
         cls.objects.update(search_vector=SearchVector("chunk", config="portuguese"))
 
     @classmethod
-    def make_context(cls, search_query, query_embedding, top_k=60):
-        from django.contrib.postgres.search import SearchQuery, SearchRank
+    def _fts_ids(cls, search_query, top_k):
+        """
+        IDs dos embeddings por Full-Text Search, em duas camadas: primeiro os
+        que contêm TODOS os termos (AND); se houver menos que top_k, completa
+        com os que contêm QUALQUER termo (OR), sempre abaixo dos primeiros.
+        """
+        from django.contrib.postgres.search import SearchRank
 
+        query_and, query_or = build_fts_queries(search_query)
+        if query_and is None:
+            return []
+
+        def ranked_ids(fts_query, limit, exclude=()):
+            return list(
+                cls.objects.filter(search_vector=fts_query)
+                .exclude(id__in=exclude)
+                .annotate(fts_rank=SearchRank("search_vector", fts_query))
+                .order_by("-fts_rank")[:limit]
+                .values_list("id", flat=True)
+            )
+
+        ids = ranked_ids(query_and, top_k)
+        if len(ids) < top_k and query_or is not None:
+            ids += ranked_ids(query_or, top_k - len(ids), exclude=ids)
+        return ids
+
+    @classmethod
+    def make_context(cls, search_query, query_embedding, top_k=60):
         RRF_K = 60  # Constante de suavização para Reciprocal Rank Fusion
 
         # 1. Busca semântica via pgvector (distância do cosseno)
         semantic_ids = list(
-            Embedding.objects.annotate(
-                distance=CosineDistance("vetor1536", query_embedding)
-            )
+            Embedding.objects.filter(vetor1536__isnull=False)
+            .annotate(distance=CosineDistance("vetor1536", query_embedding))
             .order_by("distance")[:top_k]
             .values_list("id", flat=True)
         )
 
         # 2. Busca por palavra-chave via Full-Text Search (PostgreSQL)
-        fts_query = SearchQuery(search_query, config="portuguese")
-        text_ids = list(
-            Embedding.objects.filter(search_vector=fts_query)
-            .annotate(fts_rank=SearchRank("search_vector", fts_query))
-            .order_by("-fts_rank")[:top_k]
-            .values_list("id", flat=True)
-        )
+        text_ids = cls._fts_ids(search_query, top_k)
 
         # 3. Reciprocal Rank Fusion (RRF)
         # score = 1/(k + rank_semantico) + 1/(k + rank_texto)

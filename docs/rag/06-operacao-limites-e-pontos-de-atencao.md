@@ -36,7 +36,7 @@ Superusuários: sem limites de sessões/mensagens e com 10.000 caracteres por pe
 | Resposta "informação não consta na base" para algo que existe | Norma não indexada (`vetor1536` NULL), norma revogada, chunk sem `search_vector`, *query* com termos demais (FTS AND) | Ver consultas abaixo; `metadata.rag_results.rag_query` da mensagem |
 | Resposta com links quebrados/externos | *System instruction* alterada ou formato de `Fonte` modificado | Comparar com [§4.6](./04-chat-websocket-e-llm.md#46-system-instruction-v3) |
 | Texto publicado não aparece no chat | Task Celery não executou (worker/fila `cq_base`), erro na API Gemini (apenas logado) | Logs do worker: "Starting task_sync_embeddings_textoarticulado_function…" |
-| Embeddings sem vetor (`vetor1536` NULL) | Falha na API de embeddings (erro apenas logado; o lote parcial é gravado) | Reexecutar a task para o T.A. |
+| Embeddings sem vetor (`vetor1536` NULL) | Falha na API de embeddings (agora com retentativa e isolamento por documento; um documento rejeitado pelo modelo ou uma indisponibilidade prolongada deixam o registro pendente) | `python manage.py sync_embeddings` (retomável) |
 
 ### Consultas úteis (shell Django)
 
@@ -102,17 +102,22 @@ Os itens abaixo foram identificados na leitura inicial do código. Os marcados c
 7. ✅ **Chunk vazio.** O laço de divisão só fecha um chunk se ele tiver conteúdo.
 8. ✅ **`total_tokens=0` por falha de API** não impede mais a vetorização: a task seleciona todo embedding
    com `vetor1536` nulo. (A contagem de tokens é apenas informativa.)
-9. **FTS com AND** (`plainto_tsquery`): consultas longas reduzem a recuperação textual; a mitigação está
-   no prompt (palavras-chave curtas e múltiplas tentativas). Mantido como decisão de projeto.
+9. ✅ **FTS com AND.** Passou a ter uma segunda camada OR de reserva (ver
+   [03](./03-recuperacao-hibrida.md#2-busca-por-palavra-chave-fts--em-duas-camadas)). Contrapartida: com
+   termos muito comuns a camada OR pode levar ~1–2 s; a *system instruction* continua pedindo poucas
+   palavras-chave.
+10. ✅ **Cobertura do índice.** Vetorização resiliente e comando `sync_embeddings`; `Anexo` e
+    `Texto Não Estruturado` substantivo passam a ser indexados (ver
+    [07-diagnostico-e-evolucao.md](./07-diagnostico-e-evolucao.md)).
 
 ### Manutenção
 
-10. ✅ `print` de depuração removido de `chat_send_message`.
-11. ✅ Código morto removido da task (após `continue`) e de `generate_chunks` (`if False:`).
-12. ✅ `make_context__old` e `make_context__20260225` removidos (sem chamadores).
-13. `Embedding.vetor` (3072) permanece como campo legado (remoção exige migration) e `prepare_query` não é
+11. ✅ `print` de depuração removido de `chat_send_message`.
+12. ✅ Código morto removido da task (após `continue`) e de `generate_chunks` (`if False:`).
+13. ✅ `make_context__old` e `make_context__20260225` removidos (sem chamadores).
+14. `Embedding.vetor` (3072) permanece como campo legado (remoção exige migration) e `prepare_query` não é
     utilizado.
-14. ✅ Docstrings de `Embedding` corrigidas: o modelo efetivo é `gemini-embedding-2`, 1536 dimensões.
+15. ✅ Docstrings de `Embedding` corrigidas: o modelo efetivo é `gemini-embedding-2`, 1536 dimensões.
 
 ## 6.6 Como evoluir com segurança
 

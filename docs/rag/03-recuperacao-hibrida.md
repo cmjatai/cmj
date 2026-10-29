@@ -36,18 +36,32 @@ flowchart TD
 
 ### 1) Busca semântica
 `CosineDistance("vetor1536", query_embedding)` (pgvector, operador `<=>`), ordenada de forma crescente
-(0 = idêntico, 2 = oposto). Usa o índice **HNSW** `embedding_vetor1536_hnsw`
-(`halfvec_cosine_ops`, `m=16`, `ef_construction=64`). Retorna só os **IDs** dos `top_k` (60) mais próximos.
+(0 = idêntico, 2 = oposto), considerando só embeddings com `vetor1536` preenchido. Usa o índice **HNSW**
+`embedding_vetor1536_hnsw` (`halfvec_cosine_ops`, `m=16`, `ef_construction=64`). Retorna só os **IDs** dos
+`top_k` (60) mais próximos.
 
-### 2) Busca por palavra-chave (FTS)
-`SearchQuery(search_query, config="portuguese")` – o `search_type` padrão do Django é **`plain`**
-(`plainto_tsquery`): todos os termos são combinados com **AND** e passam por *stemming* em português.
-Usa o índice GIN `embedding_search_vector_gin`. Ordena por `SearchRank` decrescente e limita a `top_k`.
+### 2) Busca por palavra-chave (FTS) – em duas camadas
+Implementada em `Embedding._fts_ids` com os construtores de [cmj/search/fts.py](../../cmj/search/fts.py).
+Cada termo da consulta vira um `SearchQuery` **plain** (`plainto_tsquery`, config `portuguese`, com *stemming*;
+não interpreta operadores digitados pelo LLM ou usuário). Os termos são combinados em duas consultas:
 
-> **Consequência prática:** quanto mais termos a *query* tiver, mais restritivo fica o FTS (todos precisam
-> existir no chunk). Por isso a *system instruction* manda o LLM extrair **só as palavras-chave centrais**
-> e tentar sinônimos/números isolados (ver [04](./04-chat-websocket-e-llm.md#46-system-instruction-v3)).
-> Quando o FTS não retorna nada, a busca semântica ainda alimenta o resultado.
+| Camada | Condição | Papel |
+|--------|----------|-------|
+| 1. **AND** | O chunk contém **todos** os termos | Alta precisão; ocupa as primeiras posições |
+| 2. **OR** | O chunk contém **qualquer** termo | Só entra para completar até `top_k` quando o AND traz menos que isso; sempre **abaixo** dos resultados do AND e sem repetir ids |
+
+Ambas usam o índice GIN `embedding_search_vector_gin`, ordenam por `SearchRank` e respeitam o limite.
+
+**Variantes de número.** O `tsvector` trata `4353` e `4.353` como lexemas diferentes, então cada número com
+4+ dígitos (sem zero à esquerda) ou com separador de milhar vira `(4353 | 4.353)` dentro da própria camada.
+
+**Normalização dos termos:** pontuação nas bordas é removida, duplicatas e letras soltas descartadas e o
+máximo é de 12 termos. Consulta vazia ou só de *stopwords* retorna lista vazia (a busca semântica segue).
+
+> **Por que duas camadas:** só com AND, uma consulta de 3 termos que não coexistem no mesmo chunk retornava
+> **zero** (ex.: "incentivo empresa terraplenagem"). Só com OR, termos comuns ("lei", "município") casam dezenas
+> de milhares de chunks, o `ts_rank` não pondera frequência (sem IDF) e a consulta chega a ~1,7 s.
+> No banco de produção, com 71 mil chunks, a camada 1 responde em milissegundos e a camada 2 em 0,2–1,8 s.
 
 ### 3) Reciprocal Rank Fusion (RRF)
 ```python
@@ -110,7 +124,8 @@ como resposta da função.
 | `top_k` | 60 (semântica, FTS e corte final) | assinatura de `make_context` |
 | `RRF_K` | 60 | constante local |
 | Dimensão da consulta | 1536 | `IAGenaiBase.get_query_embedding` |
-| Config FTS | `portuguese` | `make_context` e `update_search_vector` (devem ser a mesma) |
+| Config FTS | `portuguese` | `cmj/search/fts.py` (`FTS_CONFIG`) e `update_search_vector` (devem ser a mesma) |
+| Máx. de termos da busca textual | 12 | `cmj/search/fts.py` (`MAX_TERMS`) |
 | Métrica | cosseno | `CosineDistance` + `halfvec_cosine_ops` |
 
 ## 3.4 Versões anteriores (removidas)

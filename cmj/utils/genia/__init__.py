@@ -1,5 +1,6 @@
 import logging
 import re
+import time
 
 import pymupdf
 from django.conf import settings
@@ -209,43 +210,87 @@ class IAGenaiBase:
         )
         return response.embeddings[0].values
 
+    EMBED_MAX_ATTEMPTS = 3
+    EMBED_RETRY_BASE_DELAY = 2  # segundos; dobra a cada tentativa
+    EMBED_MAX_CONSECUTIVE_FAILED_BATCHES = 2
+
+    def _embed_texts(self, texts, model, attempts):
+        last_error = None
+        for attempt in range(attempts):
+            try:
+                response = self.client.models.embed_content(
+                    model=model,
+                    contents=texts,
+                    config=types.EmbedContentConfig(
+                        output_dimensionality=1536,
+                        # task_type NÃO é incluído aqui
+                    ),
+                )
+                vectors = [emb.values for emb in response.embeddings]
+                if len(vectors) != len(texts):
+                    raise ValueError(
+                        f"API retornou {len(vectors)} vetores para {len(texts)} textos."
+                    )
+                return vectors
+            except Exception as e:
+                last_error = e
+                logger.warning(
+                    f"Falha ao gerar embeddings (tentativa {attempt + 1}): {e}"
+                )
+                if attempt < attempts - 1:
+                    time.sleep(self.EMBED_RETRY_BASE_DELAY * 2**attempt)
+        raise last_error
+
     def embed_documents(
         self,
         documents: list[dict],  # [{'text': '...', 'title': '...'}, ...]
         model: str = "gemini-embedding-2",
         batch_size: int = 64,
     ):
+        """
+        Retorna uma lista alinhada a `documents`; documentos que falharam
+        ficam como None. Se vários lotes seguidos falharem por completo
+        (API fora do ar/cota), interrompe e devolve a lista parcial.
+        """
         all_embeddings = []
+        failed_batches = 0
 
-        try:
-            for i in range(0, len(documents), batch_size):
-                batch = documents[i : i + batch_size]
+        for i in range(0, len(documents), batch_size):
+            batch = documents[i : i + batch_size]
 
-                # 1. Aplica a formatação oficial do modelo novo em cada documento
-                formatted_batch = [
-                    self.prepare_document(doc["text"], doc.get("title"))
-                    for doc in batch
-                ]
+            # Aplica a formatação oficial do modelo novo em cada documento
+            formatted_batch = [
+                self.prepare_document(doc["text"], doc.get("title")) for doc in batch
+            ]
 
-                # 2. Chama a API enviando o lote inteiro
-                response = self.client.models.embed_content(
-                    model=model,
-                    contents=formatted_batch,
-                    config=types.EmbedContentConfig(
-                        output_dimensionality=1536,
-                        # task_type NÃO é incluído aqui
-                    ),
+            try:
+                vectors = self._embed_texts(
+                    formatted_batch, model, self.EMBED_MAX_ATTEMPTS
                 )
+            except Exception as e:
+                # Isola o documento problemático (ex.: texto acima do limite do
+                # modelo) para que não derrube os demais do lote.
+                logger.error(
+                    f"Erro no lote de embeddings, reprocessando individualmente: {e}"
+                )
+                vectors = []
+                for text in formatted_batch:
+                    try:
+                        vectors.extend(self._embed_texts([text], model, attempts=1))
+                    except Exception as single_error:
+                        logger.error(f"Documento sem embedding: {single_error}")
+                        vectors.append(None)
 
-                # 3. Coleta os vetores retornados
-                for emb in response.embeddings:
-                    all_embeddings.append(emb.values)
+            all_embeddings.extend(vectors)
 
-                # print(
-                #    f"Processados {min(i + batch_size, len(documents))}/{len(documents)}..."
-                # )
-
-        except Exception as e:
-            logger.error(f"Erro ao gerar embeddings em lotes: {e}")
+            if any(vectors):
+                failed_batches = 0
+            else:
+                failed_batches += 1
+                if failed_batches >= self.EMBED_MAX_CONSECUTIVE_FAILED_BATCHES:
+                    logger.error(
+                        "Geração de embeddings interrompida: lotes seguidos falharam."
+                    )
+                    break
 
         return all_embeddings
