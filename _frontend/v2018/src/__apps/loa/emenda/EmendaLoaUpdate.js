@@ -50,7 +50,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
     containerPreview.html(`
       <div class="inner-preview">
         <a class="w-100" target="_blank" href="${this.urlBase}/view/">
-          <img src="${this.urlBase}/view/?page=1&u=${Date.now()}"/>
+          <img src="${this.urlBase}/view/?page=1&nocache="/>
         </a>
       </div>
       <div class="btn-toolbar justify-content-between">
@@ -91,7 +91,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
 
     this.previewImg.style.opacity = 0.35
 
-    let queryString = `?page=1&u=${Date.now()}`
+    let queryString = `?page=1&nocache=`
     for (const [key, value] of Object.entries(params)) {
       queryString += `&${key}=${value}`
     }
