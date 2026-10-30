@@ -915,7 +915,7 @@ class TextoArticulado(TimestampedMixin):
                 d.nivel,
                 d.ordem,
                 (d.rotulo or "").strip(),
-                texto_plano_html(d.texto),
+                texto_plano_html(d.render_texto()),
             )
             for d in self.dispositivos_set.filter(
                 dispositivo_subsequente__isnull=True
