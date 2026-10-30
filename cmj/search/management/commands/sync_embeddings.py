@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.contrib.postgres.search import SearchVector
+from django.core.management import CommandError
 from django.core.management.base import BaseCommand
 
 from cmj.search.models import Embedding
@@ -34,20 +35,19 @@ class Command(BaseCommand):
             'desses tipos (ex.: "Anexo" "Texto Não Estruturado").',
         )
         parser.add_argument(
-            "--sem-embedding",
+            "--apenas-pendentes",
+            action="store_true",
+            help="Reindexa os T.A. publicados que têm embeddings pendentes (sem vetor1536).",
+        )
+        parser.add_argument(
+            "--ta-sem-embedding",
             action="store_true",
             help="Reindexa os T.A. publicados que não têm nenhum embedding.",
         )
         parser.add_argument(
-            "--todos-publicados",
+            "--reindexar-todos",
             action="store_true",
             help="Reindexa todos os T.A. publicados (ex.: para gerar a estratégia v2).",
-        )
-        parser.add_argument(
-            "--sem-pendentes",
-            action="store_true",
-            help="Não vetoriza nem conta tokens (não consome a API do Gemini): "
-            "apenas reindexa os chunks.",
         )
         parser.add_argument(
             "--estrategia",
@@ -64,7 +64,26 @@ class Command(BaseCommand):
 
     def get_ta_ids(self, options):
         ta_ids = set(options["ta_ids"])
+        if ta_ids:
+            return sorted(ta_ids)
+
+        if not any(
+            [
+                options["reindexar_todos"],
+                options["tipos"],
+                options["apenas_pendentes"],
+                options["ta_sem_embedding"],
+            ]
+        ):
+            raise CommandError(
+                "É necessário especificar pelo menos uma das opções: "
+                "--ta-ids, --tipos, --embeddings-pendentes, --ta-sem-embedding ou --reindexar-todos."
+            )
+
         published = TextoArticulado.objects.filter(editing_locked=True)
+
+        if options["reindexar_todos"]:
+            ta_ids.update(published.values_list("id", flat=True))
 
         if options["tipos"]:
             ta_ids.update(
@@ -78,43 +97,78 @@ class Command(BaseCommand):
                 .distinct()
             )
 
-        if options["todos_publicados"]:
-            ta_ids.update(published.values_list("id", flat=True))
-
-        if options["sem_embedding"]:
-            with_embedding = Embedding.objects.order_by().values(
-                "dispositivo_set__ta_id"
+        if options["ta_sem_embedding"]:
+            with_embedding = (
+                self.qse.order_by()
+                .values_list("dispositivo_set__ta_id", flat=True)
+                .distinct()
             )
             ta_ids.update(
                 published.exclude(id__in=with_embedding).values_list("id", flat=True)
+            )
+
+        if options["apenas_pendentes"]:
+            ta_com_embedding_pendente = (
+                self.qse.filter(vetor1536__isnull=True)
+                .order_by()
+                .values_list("dispositivo_set__ta_id", flat=True)
+                .distinct()
+            )
+            ta_ids.update(
+                published.filter(id__in=ta_com_embedding_pendente).values_list(
+                    "id", flat=True
+                )
             )
 
         return sorted(ta_ids)
 
     def handle(self, *args, **options):
         dry_run = options["dry_run"]
+
         estrategia = options["estrategia"] or getattr(
             settings, "RAG_CHUNK_STRATEGY", "v1"
         )
-        da_estrategia = Embedding.strategy_filter(estrategia)
+
+        da_estrategia = self.da_estrategia = Embedding.strategy_filter(estrategia)
+        self.qse = Embedding.objects.filter(da_estrategia)
+
         ta_ids = self.get_ta_ids(options)
 
-        self.stdout.write(f"Estratégia: {estrategia}")
-        self.stdout.write(
-            f"Tipos individualizáveis (v1): {', '.join(CHUNK_TIPOS_INDIVIDUALIZAVEIS)}"
-        )
-        self.stdout.write(f"T.A. a reindexar: {len(ta_ids)}")
-
-        pendentes = Embedding.objects.filter(da_estrategia, vetor1536__isnull=True)
-        sem_tsvector = Embedding.objects.filter(
-            da_estrategia, search_vector__isnull=True
-        )
-
-        if dry_run:
+        if estrategia == "v1":
             self.stdout.write(
-                f"Embeddings sem vetor: {pendentes.count()} | "
-                f"sem search_vector: {sem_tsvector.count()}"
+                f"Estratégia: {estrategia} | "
+                f"Tipos individualizáveis (v1): {', '.join(CHUNK_TIPOS_INDIVIDUALIZAVEIS)}"
             )
+        else:
+            self.stdout.write(f"Estratégia: {estrategia}")
+
+        # Obter embeddings apenas pendentes para os T.A. selecionados
+        pendentes = self.qse.filter(
+            dispositivo_set__ta_id__in=ta_ids, vetor1536__isnull=True
+        )
+
+        # Obter embeddings sem search_vector para os T.A. selecionados
+        sem_tsvector = self.qse.filter(
+            dispositivo_set__ta_id__in=ta_ids, search_vector__isnull=True
+        )
+
+        # Obter T.A. sem embedding para os T.A. selecionados
+        ta_com_pendencia = (
+            self.qse.filter(dispositivo_set__ta_id__in=ta_ids, vetor1536__isnull=True)
+            .values_list("dispositivo_set__ta_id", flat=True)
+            .distinct()
+        )
+
+        self.stdout.write(f"T.A. selecionados.: {len(ta_ids)}")
+
+        self.stdout.write(
+            f"T.A. com pendência: {ta_com_pendencia.count()} | "
+            f"Total embeddings: {self.qse.filter(
+                dispositivo_set__ta_id__in=ta_ids).count()} | "
+            f"Embeddings pendentes: {pendentes.count()} | "
+            f"Embeddings sem search_vector: {sem_tsvector.count()}"
+        )
+        if dry_run:
             return
 
         for i, ta_id in enumerate(ta_ids, start=1):
@@ -122,7 +176,7 @@ class Command(BaseCommand):
                 task_sync_embeddings_textoarticulado_function(
                     [ta_id],
                     strategy=estrategia,
-                    vectorize=not options["sem_pendentes"],
+                    vectorize=not options["apenas_pendentes"],
                 )
             except Exception as e:
                 self.stderr.write(f"T.A. {ta_id}: erro ao reindexar: {e}")
@@ -131,7 +185,7 @@ class Command(BaseCommand):
 
         sem_tsvector.update(search_vector=SearchVector("chunk", config="portuguese"))
 
-        if not options["sem_pendentes"]:
+        if options["apenas_pendentes"]:
             total = pendentes.count()
             self.stdout.write(f"Vetorizando {total} embeddings pendentes...")
             done = Embedding.generate_embeddings_for_queryset(pendentes)
