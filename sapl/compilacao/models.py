@@ -750,7 +750,7 @@ class TextoArticulado(TimestampedMixin):
             if d.tipo_dispositivo.nome == TIPO_TEXTO_NAO_ESTRUTURADO:
                 rendered = texto_plano_html(d.texto)
             else:
-                rendered = d.render_texto()
+                rendered = re.sub(r"\s+", " ", d.render_texto()).strip()
 
             d_tuple = (
                 d,
@@ -813,7 +813,7 @@ class TextoArticulado(TimestampedMixin):
             textos_previous = []
             parents = d.get_parents()
             for dprev in parents:
-                texto_prev = dprev.render_texto()
+                texto_prev = re.sub(r"\s+", " ", dprev.render_texto()).strip()
                 disp_renderizado = (
                     (dprev.rotulo + " " + texto_prev) if dprev.rotulo else texto_prev
                 )
@@ -845,7 +845,7 @@ class TextoArticulado(TimestampedMixin):
                     bs(c, "html.parser")
                 )  # converte letras acentuadas em formato html para letra com acento
 
-                chunks[idx] = re.sub(r"[ \t]{2,}", " ", chunks[idx])
+                chunks[idx] = re.sub(r"([ \t]{2,}|\r\n|\r)", " ", chunks[idx])
                 chunks[idx] = re.sub(r" \n \n ", " \n ", chunks[idx])
 
                 while len(chunks[idx]) > 0 and chunks[idx][0] in [" ", "\n"]:

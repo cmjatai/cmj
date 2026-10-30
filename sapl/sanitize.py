@@ -120,6 +120,7 @@ RICH_TEXT_FIELDS = {
         "subtitle",
         "descricao",
     },
+    "search.Embedding": {"chunk"},
     "sigad.Documento": {"subtitle", "descricao", "texto"},
 }
 
