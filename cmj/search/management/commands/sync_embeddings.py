@@ -77,7 +77,7 @@ class Command(BaseCommand):
         ):
             raise CommandError(
                 "É necessário especificar pelo menos uma das opções: "
-                "--ta-ids, --tipos, --embeddings-pendentes, --ta-sem-embedding ou --reindexar-todos."
+                "--ta-ids, --tipos, --apenas-pendente, --ta-sem-embedding ou --reindexar-todos."
             )
 
         published = TextoArticulado.objects.filter(editing_locked=True)
@@ -177,6 +177,7 @@ class Command(BaseCommand):
                     [ta_id],
                     strategy=estrategia,
                     vectorize=not options["apenas_pendentes"],
+                    logger=self.stdout
                 )
             except Exception as e:
                 self.stderr.write(f"T.A. {ta_id}: erro ao reindexar: {e}")

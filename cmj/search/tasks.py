@@ -8,21 +8,30 @@ from cmj.celery import app as cmj_celery_app
 from cmj.search.models import Embedding
 from sapl.compilacao.models import Dispositivo, TextoArticulado
 
-logger = (
-    get_task_logger(__name__) if not settings.DEBUG else logging.getLogger(__name__)
-)
+logger_task = get_task_logger(__name__)
+logger_exec = logging.getLogger(__name__)
+
+
+def logger_info(msg, logger=logger_task):
+    if hasattr(logger, "info"):
+        logger.info(msg)
+    elif hasattr(logger, "write"):
+        logger.write(msg)
+    else:
+        print(msg)
 
 
 def task_sync_embeddings_textoarticulado_function(
-    ta_ids=[], strategy=None, vectorize=True
+    ta_ids=[], strategy=None, vectorize=True, logger=logger_task
 ):
     """
     Reindexa os T.A. (chunks) e, se `vectorize`, conta tokens e vetoriza os
     embeddings pendentes (chamadas à API do Gemini).
     """
     strategy = strategy or getattr(settings, "RAG_CHUNK_STRATEGY", "v1")
-    logger.info(
-        f"Starting task_sync_embeddings_textoarticulado_function ({strategy}) for TextoArticulado IDs: {ta_ids}"
+    logger_info(
+        f"Starting task_sync_embeddings_textoarticulado_function ({strategy}) for TextoArticulado IDs: {ta_ids}",
+        logger=logger,
     )
 
     ta_ids = (
@@ -52,12 +61,16 @@ def task_sync_embeddings_textoarticulado_function(
     Embedding.objects.filter(dispositivo_set__ta__id__in=textos_revogados).delete()
 
     for ta in TextoArticulado.objects.filter(id__in=ta_ids):
-        logger.info(f"T.A.: {ta.id} Iniciando processamento de chunking e embeddings.")
+        logger_info(
+            f"T.A.: {ta.id} Iniciando processamento de chunking e embeddings.",
+            logger=logger,
+        )
 
         if ta.is_revogado():
             Embedding.objects.filter(dispositivo_set__ta=ta).delete()
-            logger.info(
-                f"T.A.: {ta.id} Está revogado. Embeddings relacionados foram deletados."
+            logger_info(
+                f"T.A.: {ta.id} Está revogado. Embeddings relacionados foram deletados.",
+                logger=logger,
             )
             continue
 
@@ -85,8 +98,9 @@ def task_sync_embeddings_textoarticulado_function(
             da_estrategia, total_tokens=0, dispositivo_set__in=dispositivo_set__in
         ):
             emb.update_total_tokens()
-            logger.info(
-                f"T.A.: {ta.id} Embedding: {emb.id} Updated total tokens: {emb.total_tokens},"
+            logger_info(
+                f"T.A.: {ta.id} Embedding: {emb.id} Updated total tokens: {emb.total_tokens},",
+                logger=logger,
             )
             # time.sleep(0.1)
 
@@ -108,4 +122,4 @@ def task_sync_embeddings_textoarticulado(self, textoarticulado_ids):
     try:
         task_sync_embeddings_textoarticulado_function(ta_ids=textoarticulado_ids)
     except Exception as e:
-        logger.error(f"Erro ao executar task_sync_embeddings_textoarticulado: {e}")
+        logger_task.error(f"Erro ao executar task_sync_embeddings_textoarticulado: {e}")
