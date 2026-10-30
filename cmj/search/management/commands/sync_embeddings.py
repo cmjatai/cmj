@@ -171,14 +171,23 @@ class Command(BaseCommand):
         if dry_run:
             return
 
+        processeds_global = set()
         for i, ta_id in enumerate(ta_ids, start=1):
             try:
-                task_sync_embeddings_textoarticulado_function(
-                    [ta_id],
+                if ta_id in processeds_global:
+                    continue
+
+                processeds = task_sync_embeddings_textoarticulado_function(
+                    ta_ids=[ta_id],
                     strategy=estrategia,
                     vectorize=not options["apenas_pendentes"],
-                    logger=self.stdout
+                    logger=self.stdout,
+                    ignore_ta_ids=processeds_global,
                 )
+
+                if processeds:
+                    processeds_global.update(processeds)
+
             except Exception as e:
                 self.stderr.write(f"T.A. {ta_id}: erro ao reindexar: {e}")
             if i % 50 == 0:

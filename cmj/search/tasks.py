@@ -22,8 +22,11 @@ def logger_info(msg, logger=logger_task):
 
 
 def task_sync_embeddings_textoarticulado_function(
-    ta_ids=[], strategy=None, vectorize=True, logger=logger_task
+    ta_ids=[], strategy=None, vectorize=True, logger=logger_task, ignore_ta_ids=set()
 ):
+    if not ta_ids:
+        return set()
+    ta_ids = set(ta_ids) - set(ignore_ta_ids)
     """
     Reindexa os T.A. (chunks) e, se `vectorize`, conta tokens e vetoriza os
     embeddings pendentes (chamadas à API do Gemini).
@@ -36,7 +39,7 @@ def task_sync_embeddings_textoarticulado_function(
 
     ta_ids = (
         Dispositivo.objects.filter(
-            Q(ta__id__in=ta_ids) | Q(ta_publicado__id__in=ta_ids)
+            (Q(ta__id__in=ta_ids) | Q(ta_publicado__id__in=ta_ids)) & ~Q(ta__id__in=ignore_ta_ids)
         )
         .values_list("ta__id", flat=True)
         .order_by("ta__id")
@@ -111,6 +114,8 @@ def task_sync_embeddings_textoarticulado_function(
         )
 
         Embedding.generate_embeddings_for_queryset(qs_to_batch_process)
+
+    return ta_ids
 
 
 @cmj_celery_app.task(queue="cq_base", bind=True)
