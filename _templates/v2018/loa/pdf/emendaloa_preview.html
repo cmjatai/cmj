@@ -121,11 +121,13 @@
       {% spaceless %}
       <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
       {% for rc in object.registrocontabil_set.all_deducoes %}
-          Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
-          Classificação Funcional: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
-          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} /
-          Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
-            - Valor: R$ {{rc.valor|valor_abs_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
+          Unidade Orçamentária {{rc.despesa.unidade.especificacao}}
+          / Classificação Funcional:
+          <a class="link-black" target="_blank" href="{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
+          >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a>
+          / Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}
+          / Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
+            - Valor: R$ {{rc.valor|valor_abs_str }}{% endif %}{% if not forloop.last %}// {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
           o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>.
       {% endspaceless %}
     </p>
@@ -136,7 +138,9 @@
       será inserido na
       {% for rc in object.registrocontabil_set.all_insercoes %}
           Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
-          Classificação Funcional: {{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}} /
+          Classificação Funcional:
+          <a class="link-black" target="_blank" href="{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
+          >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a> /
           Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} /
           Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
             - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},

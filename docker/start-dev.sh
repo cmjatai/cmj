@@ -3,7 +3,7 @@
 echo -e "\033[38;2;255;255;0;2m\033[1m====> StartDEV...\033[0m"
 echo "${UID}:${GID}"
 #/bin/bash docker/wait-for-pg.sh "postgresql://cmj:cmj@cmjdb18:5432/cmj"
-yes yes | python3 manage.py migrate
+#yes yes | python3 manage.py migrate
 
 ## SOLR
 USE_SOLR="${USE_SOLR:=False}"
