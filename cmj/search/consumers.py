@@ -4,6 +4,8 @@ import logging
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils.html import escape
+
+from sapl.sanitize import sanitize_html
 logger = logging.getLogger(__name__)
 
 
@@ -123,7 +125,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 )
                 return
 
-            user_message = escape(user_message)
+            user_message = sanitize_html(user_message)
             user_message = user_message.split()
             user_message = " ".join(user_message)
 
