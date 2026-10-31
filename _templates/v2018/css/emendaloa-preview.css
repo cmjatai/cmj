@@ -94,3 +94,19 @@ h3, h4, h5 {
 .assinatura small {
   font-style: italic;
 }
+
+.courier {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.dotacao-list {
+  list-style-type: decimal;
+  font-size: 8pt;
+  margin: 0;
+  padding: 0 0 0 0.5cm;
+
+  li {
+    margin: 0;
+    margin-bottom: 0.2cm;
+  }
+}

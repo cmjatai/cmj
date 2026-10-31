@@ -118,41 +118,51 @@
   </p>
 
   {% if object.tipo %}
-    <p class="art">
-      {% spaceless %}
-      <span class="rotulo">Art {{ view.art }}º - </span>Deduz-se da
-      {% for rc in object.registrocontabil_set.all_deducoes %}
-          Unidade Orçamentária {{rc.despesa.unidade.especificacao}}
-          / Classificação Funcional:
-          <a class="link-black" target="_blank" href="{{ base_url }}{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
-          >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a>
-          / Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}
-          / Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
-            - Valor: R$ {{rc.valor|valor_abs_str }}{% endif %}{% if not forloop.last %}// {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
-          o valor de <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>.
-      {% endspaceless %}
-    </p>
 
-    <p class="art">
-      <span class="rotulo">Art {{ view.art }}º - </span>O valor deduzido de
-      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-      será inserido na
+    <p class="art" style="margin-bottom: 0cm; padding-bottom: 0;">
+      <span class="rotulo">Art {{ view.art }}º - </span>O valor de
+      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong> será
+      {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
+    </p>
+    <p style="margin: 0.2cm 0 0 0; padding: 0; text-align: justify;">
+      <small><strong>§ 1º.</strong> Acrescenta-se ao orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
       {% for rc in object.registrocontabil_set.all_insercoes %}
-          Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
-          Classificação Funcional:
+        {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
+          <li>
+          <strong> R$ {{rc.valor|valor_str }} ({{rc.valor|valor_por_extenso}})</strong>
+          <br>&nbsp;<strong>Unid. Orçamentária:</strong> {{rc.despesa.unidade.especificacao}}
+          <br>&nbsp;<strong>Classif. Funcional:</strong>
           <a class="link-black" target="_blank" href="{{ base_url }}{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
-          >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a> /
-          Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} /
-          Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
-            - Valor: R$ {{rc.valor|valor_str }}{% endif %}{% if not forloop.last %} // {% endif %}{% empty %}XXXXXXXXXX{% endfor %},
-            {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
+            >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a>
+            <br>&nbsp;<strong>Nat. da Despesa...:</strong> {{rc.despesa.consulta.cod_natureza}} - {{rc.despesa.natureza.especificacao}}
+            <br>&nbsp;<strong>Fonte de Recurso..:</strong> {{rc.despesa.consulta.cod_fonte}}
+
+          </li>
+          {% if forloop.last %} </ol> {% endif %}{% empty %}XXXXXXXXXX{% endfor %}
     </p>
 
-    {% if object.parlamentares.count > 1 and object.tipo %}
-      <p class="art">
-        <span class="rotulo">Art {{ view.art }}º - </span>O valor de
+    <p style="margin: 0.1cm 0 0 0; padding: 0; text-align: justify;">
+      <small><strong>§ 2º.</strong> Deduz-se do orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
+      {% for rc in object.registrocontabil_set.all_deducoes %}
+          {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
+            <li>
+              <strong> R$ {{rc.valor|valor_abs_str }} ({{rc.valor.copy_abs|valor_por_extenso}})</strong>
+              <br>&nbsp;<strong>Unid. Orçamentária:</strong> {{rc.despesa.unidade.especificacao}}
+              <br>&nbsp;<strong>Classif. Funcional:</strong>
+              <a class="link-black" target="_blank" href="{{ base_url }}{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
+                >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a>
+              <br>&nbsp;<strong>Nat. da Despesa...:</strong> {{rc.despesa.consulta.cod_natureza}} - {{rc.despesa.natureza.especificacao}}
+              <br>&nbsp;<strong>Fonte de Recurso..:</strong> {{rc.despesa.consulta.cod_fonte}}
+            </li>
+          {% if forloop.last %}</ol>{% endif %}
+      {% empty %}XXXXXXXXXX{% endfor %}
+    </p>
+
+      {% if object.parlamentares.count > 1 and object.tipo %}
+        <p class="art">
+          <span class="rotulo">Art {{ view.art }}º - </span>O valor de
         <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-        será divido entre
+        será dividido entre
         {% if object.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
         vereador{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
         subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
@@ -174,6 +184,9 @@
           {% endfor %}
       </p>
     {% endif %}
+
+
+
   {% else %}
     <p class="art">
       <span class="rotulo">Art {{ view.art }}º - </span>Altera-se o Orçamento de {{object.loa.ano}},

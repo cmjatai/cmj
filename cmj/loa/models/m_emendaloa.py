@@ -468,8 +468,8 @@ class EmendaLoa(CmjSearchMixin):
                 if self.bairro and not chave_bairro_presente:
                     finalidade += f". Localidade beneficiada: {self.bairro}."
 
-                if finalidade and finalidade[-1] != ".":
-                    finalidade += "."
+            if finalidade and finalidade[-1] != ".":
+                finalidade += "."
 
             return finalidade
         except:
