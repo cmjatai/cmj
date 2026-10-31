@@ -898,4 +898,4 @@ class EmendaLoaParlamentar(models.Model):
     class Meta:
         verbose_name = _("Participação Parlamentar na Emenda Impositiva")
         verbose_name_plural = _("Participações Parlamentares na Emenda Impositiva")
-        ordering = ["id"]
+        ordering = ["emendaloa", "parlamentar__nome_parlamentar"]

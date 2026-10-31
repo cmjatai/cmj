@@ -36,7 +36,7 @@ p.referencia {
   line-height: 1;
 }
 p.art {
-  margin: 0.2cm 0;
+  margin: 0.4cm 0;
   text-indent: 2cm;
 }
 
@@ -77,6 +77,7 @@ h3, h4, h5 {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  line-height: 1;
 }
 
 .assinatura {
@@ -87,7 +88,7 @@ h3, h4, h5 {
   padding-top: 2cm;
   text-align: center;
   font-weight: bold;
-  line-height: 1.15;
+  line-height: 50%;
 }
 
 .assinatura small {

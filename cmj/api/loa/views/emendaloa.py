@@ -2,6 +2,7 @@ import logging
 from decimal import Decimal
 
 import pymupdf
+from django.conf import settings
 from django.db.models import Q, Sum
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
@@ -250,6 +251,7 @@ class EmendaLoaViewSet:
             "view": self,
             "object": el,
             "lineHeight": str(el.metadata["style"]["lineHeight"] / 100.0),
+            "base_url": settings.BASE_URL if not settings.DEBUG else "",
             "espacoAssinatura": str(
                 el.metadata["style"].get("espacoAssinatura", "") or ""
             ),

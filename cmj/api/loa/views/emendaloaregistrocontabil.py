@@ -236,6 +236,7 @@ class EmendaLoaRegistroContabilSerializer(CmjSerializerMixin):
             ddict.pop("_state")
             ddict.pop("valor_materia")
             ddict.pop("valor_norma")
+            ddict.pop('search', None)
             despesa, created = Despesa.objects.get_or_create(**ddict)
 
         else:
@@ -262,6 +263,7 @@ class EmendaLoaRegistroContabilSerializer(CmjSerializerMixin):
                     despesa_dict.pop("_state")
                     despesa_dict.pop("valor_materia")
                     despesa_dict.pop("valor_norma")
+                    despesa_dict.pop('search')
                     despesa, created = Despesa.objects.get_or_create(**despesa_dict)
 
         validated_data = {

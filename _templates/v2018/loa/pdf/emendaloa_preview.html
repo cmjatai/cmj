@@ -11,7 +11,7 @@
     {% include "css/emendaloa-preview.css" %}
     @page {}
 
-    html {
+    main {
       line-height: {{lineHeight}};
     }
 
@@ -21,7 +21,7 @@
       break-inside: avoid;
       padding-left: 0.7cm;
       padding-top: 0.3cm;
-      line-height: 1;
+      line-height: 1.15;
     }
     .errors {
       color: red;
@@ -58,6 +58,7 @@
     {% endif %}
   {% endif %}
 
+<main>
 
   <h3>EMENDA {% if object.tipo %}IMPOSITIVA{% else %}MODIFICATIVA{% endif %}, de
   {% if object.materia %}
@@ -123,7 +124,7 @@
       {% for rc in object.registrocontabil_set.all_deducoes %}
           Unidade Orçamentária {{rc.despesa.unidade.especificacao}}
           / Classificação Funcional:
-          <a class="link-black" target="_blank" href="{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
+          <a class="link-black" target="_blank" href="{{ base_url }}{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
           >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a>
           / Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}}
           / Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_deducoes.count > 1 %}
@@ -139,7 +140,7 @@
       {% for rc in object.registrocontabil_set.all_insercoes %}
           Unidade Orçamentária {{rc.despesa.unidade.especificacao}} /
           Classificação Funcional:
-          <a class="link-black" target="_blank" href="{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
+          <a class="link-black" target="_blank" href="{{ base_url }}{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
           >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a> /
           Natureza da Despesa: {{rc.despesa.consulta.cod_natureza}} /
           Fonte de Recurso: {{rc.despesa.consulta.cod_fonte}}{% if object.registrocontabil_set.all_insercoes.count > 1 %}
@@ -157,11 +158,19 @@
         subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
         sendo utilizado:
           {% for elp in object.emendaloaparlamentar_set.all %}
-            <strong> R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),</strong>
+            {% if forloop.first %}
+            <ol>
+            {% endif %}
+            <li>
+              R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),
 
-            d{% if elp.parlamentar.sexo == 'F' %}a{% else %}o{% endif %}
-            Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
-            {{elp.parlamentar.nome_parlamentar}}{% if not forloop.last %};{% else %}.{% endif %}
+              d{% if elp.parlamentar.sexo == 'F' %}a{% else %}o{% endif %}
+              <strong>Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
+              {{elp.parlamentar.nome_parlamentar}}</strong>{% if not forloop.last %};{% else %}.{% endif %}
+            </li>
+            {% if forloop.last %}
+            </ol>
+            {% endif %}
           {% endfor %}
       </p>
     {% endif %}
@@ -191,6 +200,8 @@
     {% now "d \d\e F \d\e Y" %}.
   {% endif %}
 </p>
+
+</main>
 
 {% if not espacoAssinatura %}
   <small style="line-height: 1.2; display:block;">
