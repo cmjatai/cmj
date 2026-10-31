@@ -264,6 +264,9 @@ class EmendaLoa(CmjSearchMixin):
     @property
     def artigos(self):
         artigos = []
+        if not self.id:
+            return artigos
+
         art_num = 0
         feminino = self.parlamentares.isonly_sexo_feminino()
         plural = self.parlamentares.count() > 1
