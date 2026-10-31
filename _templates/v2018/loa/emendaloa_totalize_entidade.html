@@ -15,9 +15,15 @@
       {% endif %}
       {% if forloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
         <td class="text-left" rowspan="{{ values.parlamentares|length }}">
-          <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?entidade={{ entidade.0 }}" class="nome-entidade">
-            {{ entidade.1 }}
-          </a>
+          {% if loa.materia.normajuridica %}
+            <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?entidade={{ entidade.0 }}" class="nome-entidade">
+              {{ entidade.1 }}
+            </a>
+          {% else %}
+            <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?entidade={{ entidade.0 }}" class="nome-entidade">
+              {{ entidade.1 }}
+            </a>
+          {% endif %}
         </td>
         <td class="text-center" rowspan="{{ values.parlamentares|length }}">{{ values.soma_entidade|decimal2str }}</td>
 
@@ -26,9 +32,15 @@
             {% if forloop.parentloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
           {% endif %}
             <td class="text-left ">
-              <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?parlamentares={{ parlamentar.id }}&entidade={{ entidade.0 }}">
-                <small>{{ parlamentar.nome_parlamentar }}</small>
-              </a>
+              {% if loa.materia.normajuridica %}
+                <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?parlamentares={{ parlamentar.id }}&entidade={{ entidade.0 }}">
+                  <small>{{ parlamentar.nome_parlamentar }}</small>
+                </a>
+              {% else %}
+                <a href="{% url 'cmj.loa:emendaloa_list' loa.id %}?parlamentares={{ parlamentar.id }}&entidade={{ entidade.0 }}">
+                  <small>{{ parlamentar.nome_parlamentar }}</small>
+                </a>
+              {% endif %}
             </td>
             <td class="text-right">
               <small>{{ parlamentar.soma_valor|decimal2str }}</small>
