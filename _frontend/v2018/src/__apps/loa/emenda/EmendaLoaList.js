@@ -38,6 +38,10 @@ export default class EmendaLoaList {
     delete formProps.agrupamento
     delete formProps.tipo_agrupamento
     delete formProps.pdf
+    // 'ambas' é o valor padrão do radio, não conta como filtro selecionado
+    if (formProps.autoria === 'ambas') {
+      delete formProps.autoria
+    }
 
     // Função auxiliar para capturar os dados relevantes de filtro
     const getFilterData = () => {
@@ -46,12 +50,14 @@ export default class EmendaLoaList {
       const fase = formData.getAll('fase')
       const finalidade = formData.get('finalidade')
       const tipo = formData.getAll('tipo')
+      const autoria = formData.get('autoria')
 
       return {
         parlamentares: parlamentares.length > 0 ? parlamentares : [],
         fase: fase.length > 0 ? fase : [],
         finalidade: finalidade !== '' ? [finalidade] : [],
-        tipo: tipo.length > 0 ? tipo : []
+        tipo: tipo.length > 0 ? tipo : [],
+        autoria: autoria && autoria !== 'ambas' ? [autoria] : []
       }
     }
 
