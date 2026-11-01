@@ -59,7 +59,6 @@
   {% endif %}
 
 <main>
-
   <h3>EMENDA {% if object.tipo %}IMPOSITIVA{% else %}MODIFICATIVA{% endif %}, de
   {% if object.materia %}
     {{ object.materia.data_apresentacao|date:"d \d\e F \d\e Y" }}.
@@ -124,13 +123,13 @@
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong> será
       {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
     </p>
-    <p style="margin: 0.2cm 0 0 0; padding: 0; text-align: justify;">
+    <p style="margin: 0.2cm 0; padding: 0; text-align: justify;">
       <small><strong>§ 1º.</strong> Acrescenta-se ao orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
       {% for rc in object.registrocontabil_set.all_insercoes %}
         {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
           <li>
           <strong> R$ {{rc.valor|valor_str }} ({{rc.valor|valor_por_extenso}})</strong>
-          <br>&nbsp;<strong>Unid. Orçamentária:</strong> {{rc.despesa.unidade.especificacao}}
+          <br>&nbsp;<strong>Unid. Orçamentária:</strong> {{rc.despesa.unidade.codigo}}-{{rc.despesa.unidade.especificacao}}
           <br>&nbsp;<strong>Classif. Funcional:</strong>
           <a class="link-black" target="_blank" href="{{ base_url }}{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
             >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a>
@@ -141,13 +140,13 @@
           {% if forloop.last %} </ol> {% endif %}{% empty %}XXXXXXXXXX{% endfor %}
     </p>
 
-    <p style="margin: 0.1cm 0 0 0; padding: 0; text-align: justify;">
+    <p style="margin: 0.1cm 0; padding: 0; text-align: justify;">
       <small><strong>§ 2º.</strong> Deduz-se do orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
       {% for rc in object.registrocontabil_set.all_deducoes %}
           {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
             <li>
               <strong> R$ {{rc.valor|valor_abs_str }} ({{rc.valor.copy_abs|valor_por_extenso}})</strong>
-              <br>&nbsp;<strong>Unid. Orçamentária:</strong> {{rc.despesa.unidade.especificacao}}
+              <br>&nbsp;<strong>Unid. Orçamentária:</strong> {{rc.despesa.unidade.codigo}}-{{rc.despesa.unidade.especificacao}}
               <br>&nbsp;<strong>Classif. Funcional:</strong>
               <a class="link-black" target="_blank" href="{{ base_url }}{% url 'cmj.loa:loa_despesas_espelho' object.loa.id %}?acao={{rc.despesa.acao.id}}&unidade={{rc.despesa.unidade.id}}"
                 >{{rc.despesa.consulta.codigo}} - {{rc.despesa.consulta.especificacao}}</a>
@@ -184,9 +183,6 @@
           {% endfor %}
       </p>
     {% endif %}
-
-
-
   {% else %}
     <p class="art">
       <span class="rotulo">Art {{ view.art }}º - </span>Altera-se o Orçamento de {{object.loa.ano}},

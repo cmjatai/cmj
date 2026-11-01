@@ -262,7 +262,7 @@ class EmendaLoa(CmjSearchMixin):
         return _artigos_search
 
     @property
-    def artigos(self):
+    def artigos(self):  # refatorar método para gerar artigos conforme template
         artigos = []
         if not self.id:
             return artigos
@@ -302,50 +302,52 @@ class EmendaLoa(CmjSearchMixin):
         artigos.append(("preambulo", preambulo))
 
         if self.tipo:
-            # Art - Dedução
-            art_num += 1
-            deducoes = self.registrocontabil_set.all_deducoes()
-            partes_deducao = []
-            for i, rc in enumerate(deducoes):
-                parte = (
-                    f"Unidade Orçamentária {rc.despesa.unidade.especificacao} / "
-                    f"Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
-                    f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza}"
-                )
-                if deducoes.count() > 1:
-                    parte += f" - Valor: R$ {formats.number_format(rc.valor.copy_abs(), force_grouping=True)}"
-                partes_deducao.append(parte)
-            texto_deducoes = (
-                " // ".join(partes_deducao) if partes_deducao else "XXXXXXXXXX"
-            )
-            texto = (
-                f"Art {art_num}º - Deduz-se da {texto_deducoes}, "
-                f"o valor de R$ {valor_str} ({extenso})."
-            )
-            artigos.append(("artigo", texto))
-
             # Art - Inserção
             art_num += 1
             insercoes = self.registrocontabil_set.all_insercoes()
             partes_insercao = []
             for i, rc in enumerate(insercoes):
                 parte = (
-                    f"Unidade Orçamentária {rc.despesa.unidade.especificacao} / "
+                    f"Unidade Orçamentária {rc.despesa.unidade.codigo}-{rc.despesa.unidade.especificacao} / "
                     f"Classificação Funcional: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
                     f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza} / "
                     f"Fonte: {rc.despesa.consulta.cod_fonte}"
                 )
-                if insercoes.count() > 1:
-                    parte += f" - Valor: R$ {formats.number_format(rc.valor, force_grouping=True)}"
+                parte = (
+                    f"{i+1}. R$ {formats.number_format(rc.valor, force_grouping=True)} ({valor_por_extenso(rc.valor)}) / "
+                    + parte
+                )
                 partes_insercao.append(parte)
             texto_insercoes = (
                 " // ".join(partes_insercao) if partes_insercao else "XXXXXXXXXX"
             )
+
+            deducoes = self.registrocontabil_set.all_deducoes()
+            partes_deducao = []
+            for i, rc in enumerate(deducoes):
+                parte = (
+                    f"Unidade Orçamentária {rc.despesa.unidade.codigo}-{rc.despesa.unidade.especificacao} / "
+                    f"Código: {rc.despesa.consulta.codigo} - {rc.despesa.consulta.especificacao} / "
+                    f"Natureza da Despesa: {rc.despesa.consulta.cod_natureza} / "
+                    f"Fonte: {rc.despesa.consulta.cod_fonte}"
+                )
+                parte = (
+                    f"{i+1}. R$ {formats.number_format(rc.valor.copy_abs(), force_grouping=True)} ({valor_por_extenso(rc.valor.copy_abs())}) / "
+                    + parte
+                )
+                partes_deducao.append(parte)
+            texto_deducoes = (
+                " // ".join(partes_deducao) if partes_deducao else "XXXXXXXXXX"
+            )
+
             texto = (
-                f"Art {art_num}º - O valor deduzido de "
-                f"R$ {valor_str} ({extenso}), "
-                f"será inserido na {texto_insercoes}, "
-                f"{self.prefixo_finalidade} {self.finalidade_format}"
+                f"Art {art_num}º - O valor de "
+                f"R$ {valor_str} ({extenso}) será "
+                f"{self.prefixo_finalidade} {self.finalidade_format} "
+                f"§ 1º. Acrescenta-se ao orçamento o montante indicado no caput conforme se segue:"
+                f" {texto_insercoes} || "
+                f"§ 2º. Deduz-se do orçamento o montante indicado no caput conforme se segue:"
+                f" {texto_deducoes}"
             )
             artigos.append(("artigo", texto))
 
@@ -357,7 +359,7 @@ class EmendaLoa(CmjSearchMixin):
                 subscritor_gen = "subscritoras" if feminino else "subscritores"
 
                 partes_parlamentares = []
-                for elp in self.emendaloaparlamentar_set.all():
+                for i, elp in enumerate(self.emendaloaparlamentar_set.all()):
                     elp_valor_str = formats.number_format(
                         elp.valor, force_grouping=True
                     )
@@ -367,7 +369,7 @@ class EmendaLoa(CmjSearchMixin):
                         "Vereadora" if elp.parlamentar.sexo == "F" else "Vereador"
                     )
                     partes_parlamentares.append(
-                        f"R$ {elp_valor_str} ({elp_extenso}), "
+                        f"{i+1}. R$ {elp_valor_str} ({elp_extenso}), "
                         f"d{gen_parl} {vereador_parl} {elp.parlamentar.nome_parlamentar}"
                     )
                 lista_parlamentares = "; ".join(partes_parlamentares[:-1])
@@ -381,7 +383,7 @@ class EmendaLoa(CmjSearchMixin):
                 texto = (
                     f"Art {art_num}º - O valor de "
                     f"R$ {valor_str} ({extenso}), "
-                    f"será divido entre {art_gen} {vereador_gen} {subscritor_gen}, "
+                    f"será dividido entre {art_gen} {vereador_gen} {subscritor_gen}, "
                     f"sendo utilizado: {lista_parlamentares}"
                 )
                 artigos.append(("artigo", texto))
@@ -718,7 +720,7 @@ class EmendaLoa(CmjSearchMixin):
         base_url = settings.BASE_URL.rstrip("/")
         import io
 
-        import pymupdf  # PyMuPDF
+        import pymupdf
         import requests
 
         pra_frente = True
@@ -775,8 +777,8 @@ class EmendaLoa(CmjSearchMixin):
             if pra_frente:
                 continue
 
-            page2 = pdf.load_page(1)
-            text = page2.get_text("text")
+            last_page = pdf.load_page(pdf.page_count - 1)
+            text = last_page.get_text("text")
             text = text
             if "A presente emenda fará parte" in text:
                 break

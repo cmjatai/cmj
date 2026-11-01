@@ -165,7 +165,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     reverse_lazy(
                         "cmj.loa:emendaloa_list", kwargs={"pk": self.kwargs["pk"]}
                     )
-                    + "?register",
+                    + "?registrar",
                     "btn-warning btn-register-emendas-liberadas",
                     """<span title="Registrar todas as emendas Liberadas no módulo de proposições. Emendas já registradas serão atualizadas se ainda não enviadas ao protocolo.">
                         <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas</span>
@@ -195,74 +195,72 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             self.loa = Loa.objects.get(pk=kwargs["pk"])
-            if "register" in self.request.GET:
+            if "registrar" in self.request.GET:
+                self.registrar_emendas_liberadas(request)
+                return redirect(reverse_lazy("sapl.materia:proposicao_list"))
+            return FilterView.get(self, request, *args, **kwargs)
 
-                from sapl.base.models import OperadorAutor
+        def registrar_emendas_liberadas(self, request, *args, **kwargs):
 
-                # verifica se existe emenda desse usuario que está com metadata setado para register
+            from sapl.base.models import OperadorAutor
 
-                if request.user.is_anonymous:
-                    messages.warning(
-                        self.request, "Ação não permitida para usuários anônimos."
-                    )
-                    return redirect(
-                        reverse_lazy(
-                            "cmj.loa:emendaloa_list", kwargs={"pk": self.loa.id}
-                        )
-                    )
+            # verifica se existe emenda desse usuario que está com metadata setado para register
 
-                user_id = request.user.id
-
-                autor_operado = OperadorAutor.objects.filter(user_id=user_id).first()
-                if not autor_operado:
-                    messages.warning(
-                        self.request,
-                        "Ação não permitida. Usuário não é operador de nenhum autor parlamentar.",
-                    )
-
-                    return redirect(
-                        reverse_lazy(
-                            "cmj.loa:emendaloa_list", kwargs={"pk": self.loa.id}
-                        )
-                    )
-
-                autor_operado = autor_operado.autor
-                operadores = OperadorAutor.objects.filter(
-                    autor=autor_operado
-                ).values_list("user_id", flat=True)
-
-                emendas_sendo_registradas = EmendaLoa.objects.filter(
-                    loa=self.loa,
-                    owner__id__in=operadores,
-                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL,
-                    metadata__register_emendaloa_proposicao_task__isnull=False,
+            if request.user.is_anonymous:
+                messages.warning(
+                    self.request, "Ação não permitida para usuários anônimos."
+                )
+                return redirect(
+                    reverse_lazy("cmj.loa:emendaloa_list", kwargs={"pk": self.loa.id})
                 )
 
-                if emendas_sendo_registradas.exists():
-                    messages.warning(
-                        self.request,
-                        "Ação não permitida. Existem emendas liberadas que estão sendo registradas no módulo de proposições. Aguarde o término do processo antes de iniciar um novo.",
-                    )
+            user_id = request.user.id
 
-                    return redirect(reverse_lazy("sapl.materia:proposicao_list"))
-
-                messages.info(
+            autor_operado = OperadorAutor.objects.filter(user_id=user_id).first()
+            if not autor_operado:
+                messages.warning(
                     self.request,
-                    "Iniciando o registro aqui no módulo de proposições das emendas liberadas... atualize esta página para acompanhar o progresso.",
+                    "Ação não permitida. Usuário não é operador de nenhum autor parlamentar.",
                 )
-                params_task = (self.loa.id, self.request.user.id)
-                if not settings.DEBUG or (
-                    settings.DEBUG
-                    and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR
-                ):
-                    tasks.task_register_emendaloa_proposicao.apply_async(
-                        params_task, countdown=0
-                    )
-                else:
-                    tasks.task_register_emendaloa_proposicao_function(*params_task)
+
+                return redirect(
+                    reverse_lazy("cmj.loa:emendaloa_list", kwargs={"pk": self.loa.id})
+                )
+
+            autor_operado = autor_operado.autor
+            operadores = OperadorAutor.objects.filter(autor=autor_operado).values_list(
+                "user_id", flat=True
+            )
+
+            emendas_sendo_registradas = EmendaLoa.objects.filter(
+                loa=self.loa,
+                owner__id__in=operadores,
+                fase__gte=EmendaLoa.LIBERACAO_CONTABIL,
+                metadata__register_emendaloa_proposicao_task__isnull=False,
+            )
+
+            if emendas_sendo_registradas.exists():
+                messages.warning(
+                    self.request,
+                    "Ação não permitida. Existem emendas liberadas que estão sendo registradas no módulo de proposições. Aguarde o término do processo antes de iniciar um novo.",
+                )
+
                 return redirect(reverse_lazy("sapl.materia:proposicao_list"))
 
-            return FilterView.get(self, request, *args, **kwargs)
+            messages.info(
+                self.request,
+                "Iniciando o registro aqui no módulo de proposições das emendas liberadas... atualize esta página para acompanhar o progresso.",
+            )
+            params_task = (self.loa.id, self.request.user.id)
+            if not settings.DEBUG or (
+                settings.DEBUG
+                and settings.FOLDER_DEBUG_CONTAINER == settings.PROJECT_DIR
+            ):
+                tasks.task_register_emendaloa_proposicao.apply_async(
+                    params_task, countdown=0
+                )
+            else:
+                tasks.task_register_emendaloa_proposicao_function(*params_task)
 
         def render_to_response(self, context, **response_kwargs):
             if "pdf" in self.request.GET:
@@ -836,7 +834,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     else f"Atualizar a {el.proposicao} vinculada a esta Emenda Impositiva/Modificativa"
                 )
                 link_generate_proposicao = f"""
-                    <a title="{title}" href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': el.id})}?register" target="_blank" >
+                    <a title="{title}" href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': el.id})}?registrar" target="_blank" >
                         <i class="fas fa-2x fa-file-contract"></i>
                     </a>
                 """
@@ -1204,7 +1202,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         def get(self, request, *args, **kwargs):
             self.object = self.get_object()
 
-            if "register" in request.GET:
+            if "registrar" in request.GET:
                 user = request.user
                 if user.is_anonymous:
                     raise PermissionDenied()
