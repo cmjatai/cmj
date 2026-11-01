@@ -8,7 +8,8 @@ from crispy_forms.layout import HTML, Div, Field, Fieldset, Submit
 from django import forms
 from django.contrib.postgres.forms.array import SplitArrayField, SplitArrayWidget
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Exists, IntegerField, OuterRef, Q, Subquery
+from django.db.models.aggregates import Count
 from django.forms.models import ModelForm
 from django.forms.widgets import HiddenInput, TextInput
 from django.template.base import Template
@@ -642,6 +643,20 @@ class EmendaLoaFilterSet(FilterSet):
         widget=forms.CheckboxSelectMultiple(attrs={"class": "small"}),
     )
 
+    autoria = ChoiceFilter(
+        required=False,
+        label=_("Autoria"),
+        choices=[
+            ("ambas", _("Ambas")),
+            ("individual", _("Individual")),
+            ("coletiva", _("Coletiva")),
+        ],
+        method="filter_autoria",
+        widget=forms.RadioSelect,
+        empty_label=None,
+        initial="ambas",
+    )
+
     agrupamento = MultipleChoiceFilter(
         required=False,
         label=_("Totalizar listagem por:"),
@@ -681,6 +696,7 @@ class EmendaLoaFilterSet(FilterSet):
         queryset=Parlamentar.objects.all(),
         widget=forms.CheckboxSelectMultiple,
         help_text="Clique nos parlamentares para selecionar. Nenhuma seleção irá considerar emendas de todos os parlamentares.",
+        method="filter_parlamentares",
     )
 
     finalidade = CharFilter(
@@ -734,6 +750,7 @@ class EmendaLoaFilterSet(FilterSet):
                 "quebrar_pagina",
                 "entidade",
                 "unidade",
+                "autoria",
             )
 
         model = EmendaLoa
@@ -748,6 +765,7 @@ class EmendaLoaFilterSet(FilterSet):
             "quebrar_pagina",
             "entidade",
             "unidade",
+            "autoria",
         ]
         form = Form
 
@@ -806,6 +824,18 @@ class EmendaLoaFilterSet(FilterSet):
                 html = html[: x2 - 8 - lp] + trendered + html[x2 - 8 :]
             return mark_safe(html)
 
+    def filter_parlamentares(self, queryset, field_name, value):
+        if value:
+            # Exists evita que o JOIN afete o Count de filter_autoria e duplicatas
+            queryset = queryset.filter(
+                Exists(
+                    EmendaLoaParlamentar.objects.filter(
+                        emendaloa=OuterRef("pk"), parlamentar__in=value
+                    )
+                )
+            )
+        return queryset
+
     def filter_agrupamento(self, queryset, field_name, value):
         return queryset
 
@@ -826,29 +856,24 @@ class EmendaLoaFilterSet(FilterSet):
             queryset = queryset.filter(q)
         return queryset
 
-    def filter_finalidade_old(self, queryset, field_name, value):
-
-        query = value
-
-        query = query.split(" ")
-        if query:
-            q = Q()
-            for item in query:
-
-                if not item:
-                    continue
-                q &= (
-                    Q(unidade__especificacao__icontains=item)
-                    | Q(entidade__razao_social__icontains=item)
-                    | Q(entidade__nome_fantasia__icontains=item)
-                    | Q(entidade__cnes__icontains=item)
-                    | Q(entidade__cpfcnpj__icontains=item)
-                    | Q(finalidade__icontains=item)
-                    | Q(materia__numero=item)
-                )
-
-            if q:
-                queryset = queryset.filter(q)
+    def filter_autoria(self, queryset, field_name, value):
+        # Subquery conta todos os parlamentares da emenda, independente do
+        # filtro de parlamentares aplicado
+        if value in ("individual", "coletiva"):
+            num = (
+                EmendaLoaParlamentar.objects.filter(emendaloa=OuterRef("pk"))
+                .order_by()
+                .values("emendaloa")
+                .annotate(c=Count("pk"))
+                .values("c")
+            )
+            queryset = queryset.annotate(
+                num_parlamentares=Subquery(num, output_field=IntegerField())
+            )
+            if value == "individual":
+                queryset = queryset.filter(num_parlamentares=1)
+            else:
+                queryset = queryset.filter(num_parlamentares__gt=1)
         return queryset
 
     def __init__(self, *args, **kwargs):
@@ -869,15 +894,16 @@ class EmendaLoaFilterSet(FilterSet):
                             ("parlamentares", 12),
                             ("entidade", 6),
                             ("unidade", 6),
-                            ("fase", 4),
+                            ("fase", 5),
                             (
                                 to_row(
                                     [
-                                        ("tipo", 12),
+                                        ("tipo", 7),
+                                        ("autoria", 5),
                                         (finalidade_field, 12),
                                     ]
                                 ),
-                                "col-md-8 p-0",
+                                "col-md-7 p-0",
                             ),
                         ]
                     ),

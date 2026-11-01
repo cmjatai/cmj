@@ -303,12 +303,18 @@ class EmendaLoaCrud(MasterDetailCrud):
                             f"{base_url}/api/loa/emendaloa/{emenda.id}/view/"
                         )
 
+                        prefixo = (
+                            "coletiva"
+                            if emenda.emendaloaparlamentar_set.count() > 1
+                            else "individual"
+                        )
+
                         if response.status_code == 200:
-                            nome_emenda = f"emendaloa_{emenda.id}_sem_vinculo_com_proposicao_{emenda.loa.ano}"
+                            nome_emenda = f"{prefixo}_{emenda.id}_sem_vinculo_com_proposicao_{emenda.loa.ano}"
                             if emenda.materia:
-                                nome_emenda = f"emendaloa_{emenda.id}_ja_procolocada_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}"
+                                nome_emenda = f"{prefixo}_{emenda.id}_ja_procolocada_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}"
                             elif emenda.proposicao:
-                                nome_emenda = f"emendaloa_{emenda.id}_com_proposicao_gerada_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}"
+                                nome_emenda = f"{prefixo}_{emenda.id}_com_proposicao_gerada_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}"
                             nome_emenda = slugify(nome_emenda)
 
                             file.writestr(f"{nome_emenda}.pdf", response.content)

@@ -280,9 +280,12 @@ class EmendaLoaViewSet:
         else:
             bresponse = doc.tobytes()
 
-        nome_autor = (el.owner.operadorautor_set.first() or "") if el.owner else ""
-        if nome_autor:
-            nome_autor = nome_autor.autor.nome
+        if el.emendaloaparlamentar_set.count() > 1:
+            nome_autor = 'coletiva'
+        else:
+            nome_autor = (el.owner.operadorautor_set.first() or "") if el.owner else ""
+            if nome_autor:
+                nome_autor = nome_autor.autor.nome
 
         arcname = "{}-{}-{:04d}-{}{}.{}".format(
             el.loa.ano,

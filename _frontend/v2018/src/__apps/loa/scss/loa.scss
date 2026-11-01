@@ -121,7 +121,7 @@
         padding-left: $mp;
         height: 100%;
       }
-      #div_id_fase, #div_id_tipo, #div_id_finalidade {
+      #div_id_fase, #div_id_tipo, #div_id_finalidade, #div_id_autoria {
         margin-top: 0.7rem;
         border-top: 1px solid #ddd;
         & > div {
@@ -136,12 +136,14 @@
       }
       #div_id_tipo {
         & > div {
-          gap: 1.5rem;
+          // gap: 1.5rem;
           line-height: 1rem;
           display: flex;
           width: 100%;
           justify-content: center;
           flex-wrap: wrap;
+          flex-direction: column;
+
         }
       }
       .text-muted {
