@@ -23,8 +23,9 @@ class CmjSearchView(AudigLogFilterMixin, SearchView):
     results_per_page = 20
 
     def __call__(self, request):
+        call = SearchView.__call__(self, request)
         self.log(request)
-        return SearchView.__call__(self, request)
+        return call
 
     def __init__(
         self,
@@ -224,8 +225,9 @@ class MateriaSearchView(
     }
 
     def __call__(self, request):
+        call = SearchView.__call__(self, request)
         self.log(request)
-        return SearchView.__call__(self, request)
+        return call
 
     def __init__(
         self,
@@ -487,8 +489,9 @@ class NormaSearchView(
         return html
 
     def __call__(self, request):
+        call = SearchView.__call__(self, request)
         self.log(request)
-        return SearchView.__call__(self, request)
+        return call
 
     def __init__(
         self,

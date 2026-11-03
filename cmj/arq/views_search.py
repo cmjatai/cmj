@@ -136,14 +136,15 @@ class ArqSearchView(PermissionRequiredMixin, AudigLogFilterMixin, SearchView):
     permission_required = ("arq.view_arqclasse",)
 
     def __call__(self, request):
-        self.log(request)
 
         has_permission = self.check_permissions(request)
 
         if not has_permission:
             return self.handle_no_permission(request)
 
-        return SearchView.__call__(self, request)
+        call = SearchView.__call__(self, request)
+        self.log(request)
+        return call
 
     def __init__(
         self,

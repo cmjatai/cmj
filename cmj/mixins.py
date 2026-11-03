@@ -620,23 +620,35 @@ class GoogleRecapthaViewMixin:
 class AudigLogFilterMixin:
 
     def dispatch(self, request, *args, **kwargs):
+        dispach = super().dispatch(request, *args, **kwargs)
         self.log(request, *args, **kwargs)
-        return super().dispatch(request, *args, **kwargs)
+        return dispach
 
     def log(self, request, *args, **kwargs):
 
         try:
-            data = request.GET or request.POST
-            data = data.lists()
             md = {}
-            for k, v in data:
-                v = list(filter(lambda i: i, v))
-                if not v or "csrf" in k or "salvar" in k:
-                    continue
+            if not self.form:
+                data = request.GET or request.POST
+                data = data.lists()
+                for k, v in data:
+                    if k not in ["q"]:
+                        continue
 
-                v = sanitize.sanitize_html(v)
+                    v = list(filter(lambda i: i, v))
+                    v = sanitize.sanitize_html(v)
 
-                md[k] = v[0] if len(v) == 1 else v
+                    md[k] = v[0] if len(v) == 1 else v
+            else:
+                md = {}
+                for k, v in self.form.cleaned_data.items():
+
+                    v = list(filter(lambda i: i, v))
+                    if not v:
+                        continue
+                    if k in ("ordenacao", "tipo_listagem"):
+                        continue
+                    md[k] = v
 
             if md:
                 AuditLog = apps.get_model("core", "auditlog")
