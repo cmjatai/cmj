@@ -166,7 +166,7 @@ class Command(BaseCommand):
                 # em caso de exceção (evita interrupção indevida do loop de meses)
                 updated_count = 0
                 try:
-                    if loa.ano == ano and mes > self.mes_atual:
+                    if loa.ano == ano and ano == self.ano_atual and mes > self.mes_atual:
                         print(f"[scrap_centi] [{ano}-{mes:02d}] mês futuro — ignorado.")
                         continue
 
@@ -186,8 +186,8 @@ class Command(BaseCommand):
                     payload = {
                         "ano": ano,
                         "covid": False,
-                        "dataInicio": "27/10/2026",  # primeiro_dia_str,
-                        "dataFim": "27/10/2026",  # ultimo_dia_str,
+                        "dataInicio": primeiro_dia_str,
+                        "dataFim": ultimo_dia_str,
                         "page": {"number": 1, "size": page_size},
                     }
 
