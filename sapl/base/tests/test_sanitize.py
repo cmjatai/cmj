@@ -252,6 +252,7 @@ def test_html_fragment_is_balanced(valor, esperado):
     assert html_fragment_is_balanced(valor) is esperado
 
 
+@pytest.mark.django_db
 def test_tipo_dispositivo_form_rejeita_fragmento_desbalanceado():
     td = baker.make(TipoDispositivo)
     dados = {f: getattr(td, f) or "" for f in TipoDispositivoForm.Meta.fields}

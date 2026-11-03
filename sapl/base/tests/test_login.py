@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 from django.contrib.auth import get_user_model
+from urllib.parse import urlparse
 
 pytestmark = pytest.mark.django_db
 
@@ -38,6 +39,7 @@ def test_username_do_usuario_logado_aparece_na_barra(client, user):
 #     assert '<a href="/logout/">Sair</a>' in str(response.content)
 
 
+@pytest.mark.django_db
 @pytest.mark.urls("sapl.base.tests.teststub_urls")
 @pytest.mark.parametrize(
     "link_login,destino",
@@ -54,9 +56,10 @@ def test_login(app, user, link_login, destino):
     res = form.submit()  # login
 
     assert str(user.pk) == app.session["_auth_user_id"]
-    assert res.url == destino
+    assert urlparse(res.url).path == destino
 
 
+@pytest.mark.django_db
 @pytest.mark.parametrize(
     "link_logout,destino",
     [

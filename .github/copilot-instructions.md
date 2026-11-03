@@ -1,42 +1,41 @@
-# GitHub Copilot Instructions for CMJ Portal
+# Instruções do GitHub Copilot para o Portal CMJ
 
-Django system for the Câmara Municipal de Jataí (CMJ). Two backend packages (`cmj/`, `sapl/`) + dual Vue frontend.
+Sistema Django para a Câmara Municipal de Jataí (CMJ). Dois pacotes de backend (`cmj/`, `sapl/`) + frontend em Vue dual.
 
-## Commands
+## Comandos
 
-| Task | Command |
-|------|---------|
-| Start dev env | `./ddev.sh` |
-| Run tests | `pytest` (config in `pyproject.toml`) |
-| Frontend v6 dev | `cd _frontend/v6 && yarn dev` (Vite, port 5173) |
-| Frontend v2018 dev | `cd _frontend/v2018 && yarn serve` (Webpack, port 8080) |
+| Tarefa | Comando | Descrição |
+|--------|---------|-----------|
+| Iniciar ambiente de desenvolvimento | `./uupdev.sh` | Inicializa o ambiente de desenvolvimento a partir do docker-compose-dev.yaml onde estão definidos os serviços necessários para o backend e os dois frontend |
+| Executar testes | `pytest` (configuração em `pyproject.toml`) | Executa a suíte de testes |
+| Desenvolvimento do frontend v6 | `cd _frontend/v6 && npm run dev` (Vite, porta 5173) | Inicia o servidor de desenvolvimento do frontend v6 (Atenção ao compose dev: Se foi utilizado o docker-compose-dev.yaml, o servidor Vite já está em execução e não é necessário iniciá-lo manualmente) |
+| Desenvolvimento do frontend v2018 | `cd _frontend/v2018 && npm run serve` (Webpack, porta 8080) | Inicia o servidor de desenvolvimento do frontend v2018 (Atenção ao compose dev: Se foi utilizado o docker-compose-dev.yaml, o servidor Webpack já está em execução e não é necessário iniciá-lo manualmente) |
 
-- Tests use `--no-migrations --reuse-db`; settings: `cmj/settings/fake.py`
-- Notebooks: use `django_setup.py` to initialize Django (`__notebooks/`, `__notebooks_private/`)
+- Os testes usam `--no-migrations --reuse-db`;
 
-## Architecture
+## Arquitetura
 
 ### Backend
-- **`cmj/`** — Portal apps: `agenda`, `arq`, `cerimonial`, `core`, `dashboard`, `diarios`, `loa`, `ouvidoria`, `painelset`, `search`, `sigad`, `videos`
-- **`sapl/`** — Legislative core (legacy-heavy): `materia`, `sessao`, `norma`, `parlamentares`, `compilacao`, `comissoes`, `audiencia`, `base`, `painel`, `protocoloadm`
-- URLs: `cmj/urls.py` aggregates all routes; `sapl` prefixed at `/sapl/`
+- **`cmj/`** — aplicativos do portal: `agenda`, `arq`, `cerimonial`, `core`, `dashboard`, `diarios`, `loa`, `ouvidoria`, `painelset`, `search`, `sigad`, `videos`
+- **`sapl/`** — núcleo legislativo (legado pesado): `materia`, `sessao`, `norma`, `parlamentares`, `compilacao`, `comissoes`, `audiencia`, `base`, `painel`, `protocoloadm`
+- URLs: `cmj/urls.py` agrega todas as rotas;
 
 ### Frontend (`_frontend/`)
-- **`v6/`** ← **Prefer for new features**: Vue 3, Vite, Pinia, Bootstrap 5
-- **`v2018/`** — Maintenance only: Vue 2, Webpack, Bootstrap 4
-- Built assets served from `collected_static/`; Django templates act as shell for Vue apps
+- **`v6/`** ← **Preferência para novas funcionalidades**: Vue 3, Vite, Pinia, Bootstrap 5
+- **`v2018/`** — Manutenção apenas: Vue 2, Webpack, Bootstrap 4
+- Os assets compilados são servidos em `collected_static/`; os templates do Django atuam como shell para os apps Vue
 
-## Configuration
+## Configuração
 
-- Settings split across `cmj/settings/`: `project.py` (entry point), `apps.py`, `drf.py`, `auth.py`, `middleware.py`, `email.py`, `medias.py`, `fake.py` (tests)
-- Env vars via `python-decouple` → `security.json`
+- As configurações estão divididas em `cmj/settings/`: `project.py` (ponto de entrada), `__init__.py`, `apps.py`, `auth.py`, `drf.py`, `email.py`, `fake.py`, `frontend.py`, `languages.py`, `logs.py`, `medias.py`, `middleware.py`, `zenv.py`
+- Variáveis de ambiente devem ser definidas em um dos arquivos de configuração em `cmj/settings/` e carregadas com config que deve é importado em todos os arquivos de `cmj/settings/`, garantindo que todas as partes do projeto tenham acesso às mesmas configurações de ambiente.
+- Arquivo `cmj/settings/fake.py` contém configurações específicas para execução de collectstatic feito em `docker/Dockerfile`, garantindo que os assets estáticos sejam corretamente coletados durante o build da imagem Docker, sem impactar as configurações de ambiente de produção.
 
-## Key Patterns
+## Padrões principais
 
-- **CRUD base classes**: `sapl/crud/` — used across sapl apps
-- **Search**: Haystack + Solr (`cmj/haystack.py`); check `search_indexes.py` per app
-- **API**: DRF in `cmj/api/` and `sapl/api/`
-- **PDF reports**: `cmj/utils/utils_report.py`
-- **Form layouts**: `sapl/crispy_layout_mixin.py`
-- **Frontend stores** (v6): `SyncStore` (data cache + WebSocket), `AuthStore`, `MessageStore` — see [`/memories/repo/v6_frontend_patterns.md`](/memories/repo/v6_frontend_patterns.md)
-- **Test infrastructure details**: see [`/memories/repo/test_infrastructure.md`](/memories/repo/test_infrastructure.md)
+- **Classes base de CRUD**: `sapl/crud/` — usadas em vários apps do sapl
+- **Busca**: Haystack + Solr (`cmj/haystack.py`); verificar `search_indexes.py` em cada app.
+- **API**: DRF em `cmj/api/` e `sapl/api/`
+- **Relatórios em PDF**: `cmj/utils/utils_report.py`
+- **Layouts de formulário**: `sapl/crispy_layout_mixin.py`
+- **Stores do frontend** (v6): `SyncStore` (cache de dados + WebSocket), `AuthStore`, `MessageStore` — consulte [`/.github/instructions/frontend-v6.instructions.md`](/.github/instructions/frontend-v6.instructions.md)

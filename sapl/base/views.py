@@ -1184,24 +1184,26 @@ class ListarLegislaturaInfindavelView(PermissionRequiredMixin, ListView):
 
 
 def bancada_comissao_autor_externo():
-    tipo_autor_externo = TipoAutor.objects.filter(descricao="Externo")
+    tipo_autor_externo = TipoAutor.objects.filter(descricao="Externo").first()
 
     lista_bancada_autor_externo = []
     for bancada in Bancada.objects.all().order_by("nome"):
-        autor_externo = bancada.autor.filter(tipo=tipo_autor_externo)
+        if tipo_autor_externo:
+            autor_externo = bancada.autor.filter(tipo=tipo_autor_externo)
 
-        if autor_externo:
-            q_autor_externo = bancada.autor.get(tipo=tipo_autor_externo)
+        if tipo_autor_externo and autor_externo:
+            q_autor_externo = bancada.autor.filter(tipo=tipo_autor_externo).first()
             lista_bancada_autor_externo.append(
                 (q_autor_externo, bancada, "Bancada", "sistema/bancada")
             )
 
     lista_comissao_autor_externo = []
     for comissao in Comissao.objects.all().order_by("nome"):
-        autor_externo = comissao.autor.filter(tipo=tipo_autor_externo)
+        if tipo_autor_externo:
+            autor_externo = comissao.autor.filter(tipo=tipo_autor_externo)
 
-        if autor_externo:
-            q_autor_externo = comissao.autor.get(tipo=tipo_autor_externo)
+        if tipo_autor_externo and autor_externo:
+            q_autor_externo = comissao.autor.filter(tipo=tipo_autor_externo).first()
             lista_comissao_autor_externo.append(
                 (q_autor_externo, comissao, "Comissão", "comissao")
             )
