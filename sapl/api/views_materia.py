@@ -243,6 +243,13 @@ class _TipoMateriaLegislativaViewSet:
         if "pos_ini" in d and "pos_fim" in d:
             if d["pos_ini"] != d["pos_fim"]:
                 pk = kwargs["pk"]
+                # valide d["pos_fim"]
+                try:
+                    d["pos_fim"] = int(d["pos_fim"])
+                except (ValueError, TypeError):
+                    return Response({"status": 400, "message": "Invalid pos_fim"}, status=400)
+                if d["pos_fim"] < 0:
+                    return Response({"status": 400, "message": "Invalid pos_fim"}, status=400)
                 TipoMateriaLegislativa.objects.reposicione(pk, d["pos_fim"])
 
         return Response(result)

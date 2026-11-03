@@ -23,6 +23,7 @@ from xlsxwriter.workbook import Workbook as XlsxWorkbook
 
 from cmj.utils import ProcessoExterno, get_settings_auth_user_model, normalize, run_sql
 from cmj.utils.utils_report import make_pdf
+from sapl import sanitize
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 
 logger = logging.getLogger(__name__)
@@ -632,6 +633,8 @@ class AudigLogFilterMixin:
                 v = list(filter(lambda i: i, v))
                 if not v or "csrf" in k or "salvar" in k:
                     continue
+
+                v = sanitize.sanitize_html(v)
 
                 md[k] = v[0] if len(v) == 1 else v
 

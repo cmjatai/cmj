@@ -1,5 +1,4 @@
 import logging
-import time
 from datetime import timedelta
 from time import sleep
 
@@ -33,7 +32,6 @@ from cmj.painelset.models import (
 from cmj.painelset.tasks import SEND_MESSAGE_MICROPHONE
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 from sapl.api.mixins import ResponseFileMixin
-from sapl.base.templatetags.common_tags import youtube_id
 
 logger = logging.getLogger(__name__)
 
@@ -267,6 +265,10 @@ class _IndividuoViewSet(ResponseFileMixin):
         if "pos_ini" in d and "pos_fim" in d:
             if d["pos_ini"] != d["pos_fim"]:
                 pk = kwargs["pk"]
+                try:
+                    d["pos_fim"] = int(d["pos_fim"])
+                except ValueError:
+                    return Response({"status": 400, "message": "pos_fim inválido"})
                 Individuo.objects.reposicione(pk, d["pos_fim"])
 
         return Response(result)

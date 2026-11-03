@@ -209,6 +209,10 @@ class DocumentoViewSet(viewsets.ModelViewSet):
         if not len(self.request.FILES):
 
             rotate = self.request.data.get("rotate", 0)
+            try:    
+                rotate = int(rotate)
+            except ValueError:
+                rotate = 0
             if rotate:
                 instance.midia.last.rotate(rotate)
 

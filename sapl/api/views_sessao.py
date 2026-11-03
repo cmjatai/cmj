@@ -1,5 +1,3 @@
-from functools import partial
-
 from django.apps.registry import apps
 from django.db.models import Q
 from rest_framework.decorators import action
@@ -182,18 +180,33 @@ class ChangeExpMatOrdemDiaMixin:
     @action(detail=True, methods=["patch"])
     def action_registrovotacao(self, request, *args, **kwargs):
         item = self.get_object()
+
+        form = request.data
+
         unanime = request.data.get("unanime", False)
+        if not isinstance(unanime, bool):
+            try:
+                unanime = bool(unanime)
+            except (ValueError, TypeError):
+                return Response(
+                    {"detail": "Field 'unanime' must be a boolean."}, status=400
+                )
 
         if unanime:
             return self.action_registrovotacao_unanime(request, *args, **kwargs)
-
-        form = request.data
 
         tipo_resultado_votacao_id = form.get("tipo_resultado_votacao", None)
         if not tipo_resultado_votacao_id:
             return Response(
                 {"detail": "Tipo de resultado de votação é obrigatório."}, status=400
             )
+        else:
+            try:
+                tipo_resultado_votacao_id = int(tipo_resultado_votacao_id)
+            except (ValueError, TypeError):
+                return Response(
+                    {"detail": "Tipo de resultado de votação inválido."}, status=400
+                )
 
         votos = VotoParlamentar.objects.filter(
             expediente=item if item._meta.model == ExpedienteMateria else None,
@@ -236,6 +249,12 @@ class ChangeExpMatOrdemDiaMixin:
             return Response({"detail": "Resultado inválido."}, status=400)
 
         com_presidente = request.data.get("com_presidente", False)
+        try:
+            com_presidente = bool(com_presidente)
+        except (ValueError, TypeError):
+            return Response(
+                {"detail": "Field 'com_presidente' must be a boolean."}, status=400
+            )
 
         item = self.get_object()
 
