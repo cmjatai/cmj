@@ -414,7 +414,7 @@ def video_documento_na_galeria(force=False):
             '<iframe width="560" height="315"'
             'src="https://www.youtube.com/embed/%s" '
             'frameborder="0" '
-            'allow="autoplay; encrypted-media" allowfullscreen>'
+            'allow="autoplay; encrypted-media" allowfullscreen referrerpolicy="strict-origin-when-cross-origin">'
             "</iframe>" % v.vid
         )
 
