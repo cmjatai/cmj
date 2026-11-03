@@ -186,8 +186,8 @@ class Command(BaseCommand):
                     payload = {
                         "ano": ano,
                         "covid": False,
-                        "dataInicio": primeiro_dia_str,
-                        "dataFim": ultimo_dia_str,
+                        "dataInicio": "27/10/2026",  # primeiro_dia_str,
+                        "dataFim": "27/10/2026",  # ultimo_dia_str,
                         "page": {"number": 1, "size": page_size},
                     }
 
@@ -216,10 +216,15 @@ class Command(BaseCommand):
                         sucesso = 0
                         for item_centi in _dados:
                             codigo_item = (
-                                item_centi.get("Sequencial")
-                                or item_centi.get("Numero")
+                                item_centi.get("Numero")
                                 or item_centi.get("Id")
+                                or item_centi.get("Sequencial")
                             )
+                            if not codigo_item:
+                                print(
+                                    f"[scrap_centi] [{ano}-{mes:02d}] item sem código identificado: {item_centi}"
+                                )
+                                continue
                             try:
                                 empenho, updated_or_created = (
                                     self.update_or_create_empenho(item_centi)
@@ -364,14 +369,22 @@ class Command(BaseCommand):
         Numero = item_centi.get("Numero", None)
         Sequencial = item_centi.get("Sequencial", None)
 
-        empenho = LoaModels.Empenho.objects.filter(
-            codigo=Sequencial or Numero or Id
-        ).first()
+        empenhos = LoaModels.Empenho.objects.filter(codigo=Numero or Id or Sequencial)
+        if empenhos.count() > 1:
+            print(
+                f"[scrap_centi] [{data}] mais de um empenho encontrado para código {Numero or Id or Sequencial} — usando o primeiro encontrado.",
+            )
+            self.logger.warning(
+                f"Mais de um empenho encontrado para código {Numero or Id or Sequencial} — usando o primeiro encontrado."
+            )
+
+        empenho = empenhos.first()
+
         created = False
         if not empenho:
             empenho = LoaModels.Empenho()
-            empenho.id = Sequencial or Numero or Id
-            empenho.codigo = Sequencial or Numero or Id
+            empenho.id = Numero or Id or Sequencial
+            empenho.codigo = Numero or Id or Sequencial
             created = True
 
         str_item_centi = str(sorted(item_centi.items()))
