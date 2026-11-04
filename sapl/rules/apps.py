@@ -1,5 +1,6 @@
 import logging
 from builtins import LookupError
+import re
 
 import django.apps
 from django.conf import settings
@@ -262,6 +263,8 @@ def reset_id_model(model):
                 coalesce(max("id"), 1), max("id") IS NOT null)
                 FROM "%(table_name)s";
             """ % {"table_name": model._meta.db_table}
+
+    #query = re.sub(r"\s+", " ", query)
 
     try:
         with connection.cursor() as cursor:

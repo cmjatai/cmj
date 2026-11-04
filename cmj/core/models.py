@@ -334,6 +334,17 @@ class AuditLog(models.Model):
         verbose_name = _("AuditLog")
         verbose_name_plural = _("AuditLogs")
         ordering = ("-id",)
+        indexes = [
+            models.Index(fields=["app_name", "model_name"]),
+            models.Index(fields=["model_name", "app_name"]),
+            models.Index(fields=["content_type", "object_id"]),
+            models.Index(fields=["obj_id"]),
+            models.Index(fields=["timestamp"]),
+            models.Index(fields=["user"]),
+            models.Index(fields=["operation"]),
+            models.Index(fields=["visibilidade"]),
+            models.Index(fields=["email"]),
+        ]
 
     def __str__(self):
         return "[%s] %s %s.%s %s" % (

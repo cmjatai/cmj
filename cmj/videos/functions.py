@@ -333,6 +333,7 @@ def vincular_sistema_aos_videos(force=False):
                         vp.content_object = i
                         vp.fieldname = f
 
+
                         r = re.findall(r"http.+youtu.+\?.*t=(\d+)", vf)
 
                         if r:
