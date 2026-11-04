@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.core.cache import cache
 from django.utils import timezone
 from pythonosc import udp_client
 
@@ -188,11 +189,21 @@ def task_check_finished_cronometros_function():
 def task_painelset_refresh_states(self):
     # logger.info("Iniciando tarefa de atualização de estados das visões de painel")
 
-    zero_time_cronometros, running_cronometros = (
-        task_check_finished_cronometros_function()
-    )
+    lock_cq_painelset = cache.add("lock_cq_painelset", "rodando", timeout=5)
+
+    if not lock_cq_painelset:
+        logger_celery.debug(
+            "Tarefa de atualização de estados das visões de painel já está em execução."
+        )
+        return
 
     try:
+        zero_time_cronometros, running_cronometros = (
+            task_check_finished_cronometros_function()
+        )
+
         task_refresh_states_from_visaodepainel_function()
     except Exception as e:
         logger_celery.error(f"Erro ao atualizar estados das visões de painel: {e}")
+    finally:
+        cache.delete("lock_cq_painelset")
