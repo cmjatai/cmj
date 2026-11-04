@@ -73,6 +73,7 @@ services:
       PGDATA : /var/lib/postgresql/data/
     volumes:
       - cmjdb18_data:/var/lib/postgresql/data/
+    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
     #ports:
     #  - "5433:5432"
     networks:

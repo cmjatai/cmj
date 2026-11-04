@@ -294,9 +294,7 @@ class CommonMixin(models.Model):
         finally:
             self._paginas = count_pages
             run_sql(
-                """update {}
-                        set _paginas = {}
-                        where id = {};""".format(
+                'update {} set _paginas = {} where id = {};'.format(
                     "%s_%s" % (self._meta.app_label, self._meta.model_name),
                     count_pages,
                     self.id,
