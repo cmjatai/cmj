@@ -113,7 +113,7 @@ def get_celery_worker_status():
     return result
 
 
-def start_task(task_name, task, eta, expires=86400):
+def start_task(task_name, task, eta, expires=86400, _logger=logger):
 
     s_tasks = get_celery_worker_status().get("scheduled_tasks", {})
 
@@ -125,11 +125,11 @@ def start_task(task_name, task, eta, expires=86400):
     ]
 
     if task_name not in s_tasks:
-        logger.info(f"START TRUE {task_name} {eta}")
+        _logger.info(f"START TRUE {task_name} {eta}")
         expires = eta + timedelta(seconds=expires)
         task.apply_async(eta=eta, expires=expires)
         return True
-    logger.info(f"START FALSE {task_name} {eta}")
+    _logger.info(f"START FALSE {task_name} {eta}")
     return False
 
 
