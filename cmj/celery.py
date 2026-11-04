@@ -1,7 +1,6 @@
 import os
 
 from celery import Celery
-from celery.app import shared_task
 
 from cmj import settings
 

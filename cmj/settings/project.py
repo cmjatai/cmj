@@ -58,6 +58,14 @@ DATABASES = {
         cast=db_url,
     )
 }
+DATABASES["default"]["CONN_MAX_AGE"] = 0  # 60 if not DEBUG else 0
+DATABASES["default"]["OPTIONS"]["pool"] = {
+    "min_size": 1,  # Mínimo de conexões mantidas vivas por worker
+    "max_size": 5,  # Máximo de conexões que esse worker pode abrir
+    "max_idle": 300,  # Fecha conexões ociosas (acima do min_size) após 5 min
+    "max_lifetime": 600,  # Tempo máximo de vida total de uma conexão (substitui o CONN_MAX_AGE)
+    "timeout": 30,  # Tempo de espera se o pool esgotar antes de dar erro
+}
 
 DATABASE_URL_PRD = config("DATABASE_URL_PRD", cast=str, default="")
 DATABASE_URL_DEV = config("DATABASE_URL_DEV", cast=str, default="")
