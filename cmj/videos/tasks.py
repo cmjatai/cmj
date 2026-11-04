@@ -2,6 +2,7 @@ import logging
 from datetime import timedelta
 
 import dateutil.parser
+from celery.utils.log import get_task_logger
 from django.utils import timezone
 
 from cmj.celery import app
@@ -15,6 +16,7 @@ from cmj.videos.functions import (
 from cmj.videos.models import PullExec, Video
 
 logger = logging.getLogger(__name__)
+logger_celery = get_task_logger(__name__)
 
 
 @app.task(queue="cq_videos", bind=True)
@@ -34,7 +36,7 @@ def task_pull_youtube_geral(*args, **kwargs):
             v, executado = pull_youtube_metadata_video(v)
             if not executado:
                 return
-            logger.info(f"TASK GERAL {v.id} {v.vid} {v.created} {v.modified}")
+            logger_celery.info(f"TASK GERAL {v.id} {v.vid} {v.created} {v.modified}")
         except:
             pass
 
@@ -57,7 +59,7 @@ def task_pull_youtube_live(*args, **kwargs):
                 v, executado = pull_youtube_metadata_video(v)
                 if not executado:
                     continue
-                logger.info(f"TASK LIVE {v.id} {v.vid} {v.created} {v.modified}")
+                logger_celery.info(f"TASK LIVE {v.id} {v.vid} {v.created} {v.modified}")
             except:
                 pass
 
@@ -83,11 +85,15 @@ def task_pull_youtube_upcoming(*args, **kwargs):
                 v, executado = pull_youtube_metadata_video(v)
                 if not executado:
                     continue
-                logger.info(f"TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}")
+                logger_celery.info(
+                    f"TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}"
+                )
                 liveBroadcastContent = v.json["snippet"]["liveBroadcastContent"]
             except Exception as e:
                 print(f"TASK UPCOMING ERROR {v.id} {v.vid} {v.created} {v.modified}")
-                logger.error(f"TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}")
+                logger_celery.error(
+                    f"TASK UPCOMING {v.id} {v.vid} {v.created} {v.modified}"
+                )
                 continue
 
             if liveBroadcastContent == "live":
@@ -127,14 +133,14 @@ def task_pull_youtube(self, *args, **kwargs):
     td = PullExec.objects.timedelta_quota_pull()
 
     print(f"RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}")
-    logger.info(f"RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}")
+    logger_celery.info(f"RUNNING Task_pull_youtube - proximo em: {td.total_seconds()}")
     new_started = start_task(
         "cmj.videos.tasks.task_pull_youtube", task_pull_youtube, now + td
     )
 
     if not new_started:
         print(f"NEW_STARTED FALSE Task_pull_youtube - proximo em: {td.total_seconds()}")
-        logger.info(
+        logger_celery.info(
             f"NEW_STARTED FALSE Task_pull_youtube - proximo em: {td.total_seconds()}"
         )
         return
@@ -145,7 +151,7 @@ def task_pull_youtube(self, *args, **kwargs):
         video_documento_na_galeria()
     except Exception as e:
         print("ERROR in Task_pull_youtube")
-        logger.error("ERROR in Task_pull_youtube")
+        logger_celery.error("ERROR in Task_pull_youtube")
 
     now = timezone.now()
 
