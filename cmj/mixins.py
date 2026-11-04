@@ -628,10 +628,11 @@ class AudigLogFilterMixin:
 
         try:
             md = {}
-            if not self.form:
+            if not hasattr(self, "form") or not self.form:
                 data = request.GET or request.POST
                 data = data.lists()
                 for k, v in data:
+
                     if k not in ["q"]:
                         continue
 
@@ -641,14 +642,17 @@ class AudigLogFilterMixin:
                     md[k] = v[0] if len(v) == 1 else v
             else:
                 md = {}
-                for k, v in self.form.cleaned_data.items():
+                for k, v in getattr(self.form, "cleaned_data", {}).items():
 
-                    v = list(filter(lambda i: i, v))
                     if not v:
                         continue
                     if k in ("ordenacao", "tipo_listagem"):
                         continue
-                    md[k] = v
+
+                    v = list(v)
+                    v = list(filter(lambda i: i, v))
+
+                    md[k] = v[0] if len(v) == 1 else v
 
             if md:
                 AuditLog = apps.get_model("core", "auditlog")
