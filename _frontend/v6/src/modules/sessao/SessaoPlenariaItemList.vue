@@ -1,16 +1,27 @@
 <template>
-  <router-link
+  <component
+    :is="sessao.pauta_publicada ? 'router-link' : 'div'"
     :class="'sessao-plenaria-item-list'"
     :to="{ name: 'sessao_plenaria_view_link', params: {id: sessao.id} }"
+    :des
   >
-    <h4 class="tit">
-      {{ sessao.epigrafe }}
-    </h4>
+    <div class="tit-block">
+      <h4 class="tit">
+        {{ sessao.epigrafe }}
+      </h4>
+    </div>
+
     <div class="subtitulo">
+      <div
+        class="badge bg-warning text-white"
+        v-if="!sessao.pauta_publicada"
+      >
+        Pauta em Elaboração
+      </div><br />
       <span>{{ subtitulo }}</span><span class="separator"> – </span>
       <span>{{ date_text }}</span>
     </div>
-  </router-link>
+  </component>
 </template>
 <script setup>
 import { computed } from 'vue'
@@ -103,6 +114,9 @@ const date_text = computed(() => {
     color: var(--bs-highlight-color);
     margin-bottom: 0px;
   }
+}
+div.sessao-plenaria-item-list {
+  cursor: not-allowed;
 }
 
 [data-bs-theme="dark"] {

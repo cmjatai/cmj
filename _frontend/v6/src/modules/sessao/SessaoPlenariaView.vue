@@ -13,7 +13,7 @@
     </a>
     <div
       class="sessao-plenaria-content"
-      v-if="sessao"
+      v-if="sessao && sessao.pauta_publicada"
     >
       <div
         v-if="textoAbertura.length > 0"
@@ -44,6 +44,9 @@
       >
         <div v-html="ritoOpened ? textoFechamento[0].conteudo : 'Visualizar o Roteiro...'" />
       </div>
+    </div>
+    <div v-else>
+      <h4 class="bg-warning text-white text-center rounded">Pauta em Elaboração</h4>
     </div>
   </div>
 </template>
@@ -104,6 +107,7 @@ const toggleRitoOpened = () => {
 }
 
 const handleResync = (force_fetch_materias = true) => {
+  if (!sessao.value.pauta_publicada) return
   syncStore.invalidateDataCache([
     'sessao'
   ], [
