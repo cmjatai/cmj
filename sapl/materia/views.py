@@ -1894,7 +1894,7 @@ class ReciboProposicaoView(TemplateView):
             # FIXME hash para textos articulados
             _hash = "P" + ta.hash() + "/" + str(proposicao.id)
 
-        base64_data = create_barcode(_hash, 100, 500)
+        base64_data = create_barcode(str(proposicao.pk).zfill(6))
         barcode = "data:image/png;base64,{0}".format(base64_data)
 
         context.update({"proposicao": proposicao, "hash": _hash, "barcode": barcode})

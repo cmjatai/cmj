@@ -63,5 +63,5 @@ celery multi start 6 -A cmj -l INFO \
     --logfile=./logs/celery/%n%I.log
 
 celery -A cmj beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler &
-
+sleep 5
 yes yes | python3 manage.py runserver 0.0.0.0:9000

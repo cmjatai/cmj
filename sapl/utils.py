@@ -566,7 +566,7 @@ def get_base_url(request):
     return "{0}://{1}".format(protocol, current_domain)
 
 
-def create_barcode(value, width=170, height=50):
+def create_barcode(value, width=170, height=50): 
     """
     creates a base64 encoded barcode PNG image
     """
