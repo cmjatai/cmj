@@ -85,7 +85,7 @@
           target="_blank"
         >
           <img
-            :src="`${elemento.arquivo}?page=${page}&dpi=48&nocache=${nocache}&u=${data}`"
+            :src="`${elemento.arquivo}?page=${page}&dpi=48&nocache=${nocache}`"
             ref="imgViewRef"
           >
         </a>
@@ -233,7 +233,7 @@ function clickDraftmidiaAction (action) {
       nocache.value = Date.now()
       nextTick(() => {
         if (imgViewRef.value) {
-          imgViewRef.value.src = `${props.elemento.arquivo}?page=${page.value}&dpi=48&nocache=${nocache.value}&u=${data.value}`
+          imgViewRef.value.src = `${props.elemento.arquivo}?page=${page.value}&dpi=48&nocache=${nocache.value}`
         }
         emit('redrawDraftMidia')
       })
