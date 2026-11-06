@@ -2,7 +2,6 @@ import logging
 import tempfile
 import zipfile
 from datetime import datetime
-from distutils.util import strtobool
 from random import choice
 from string import ascii_letters, digits
 
@@ -609,7 +608,7 @@ class DocumentoAdministrativoCrud(Crud):
             context["bg_title"] = "bg-aqua text-white"
 
             mostrar_anexos = self.request.GET.get("mostrar_anexos", "0")
-            mostrar_anexos = strtobool(mostrar_anexos)
+            mostrar_anexos = bool(int(mostrar_anexos))
 
             context["mostrar_anexos"] = mostrar_anexos
 
@@ -1903,19 +1902,26 @@ class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
     permanent = False
     permission_required = ("protocoloadm.list_protocolo",)
 
-    def get_redirect_url(self, *args, **kwargs):
+    def has_permission(self):
         try:
-            p = Protocolo.objects.get(pk=kwargs["pk"])
-        except:
+            self.object = Protocolo.objects.get(pk=self.kwargs["pk"])
+            if self.object.conteudo_protocolado._meta.model == MateriaLegislativa:
+                return True
+        except Exception:
+            self.object = None
             raise Http404
+
+        return super().has_permission()
+
+    def get_redirect_url(self, *args, **kwargs):
 
         return reverse(
             "%s:%s_detail"
             % (
-                p.conteudo_protocolado._meta.app_config.name,
-                p.conteudo_protocolado._meta.model_name,
+                self.object.conteudo_protocolado._meta.app_config.name,
+                self.object.conteudo_protocolado._meta.model_name,
             ),
-            args=(p.conteudo_protocolado.id,),
+            args=(self.object.conteudo_protocolado.id,),
         )
 
 
