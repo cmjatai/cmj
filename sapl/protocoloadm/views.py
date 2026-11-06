@@ -1905,7 +1905,10 @@ class ProtocoloRedirectConteudoView(PermissionRequiredMixin, RedirectView):
     def has_permission(self):
         try:
             self.object = Protocolo.objects.get(pk=self.kwargs["pk"])
-            if self.object.conteudo_protocolado._meta.model == MateriaLegislativa:
+            if self.object.conteudo_protocolado._meta.model in (
+                MateriaLegislativa,
+                DocumentoAcessorio,
+            ):
                 return True
         except Exception:
             self.object = None
