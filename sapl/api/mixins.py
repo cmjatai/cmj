@@ -329,10 +329,11 @@ class ResponseFileMixin:
         # Dentro da sua ViewSet do DRF, ao liberar o arquivo:
         user = request.user.id if request.user.is_authenticated else "anonymous"
         logger_xaccel.info(
-            f"ACESSO_PERMITIDO: Usuário {user} acessou o documento {response['X-Accel-Redirect']}. "
-            f"IP de Origem: {request.META.get('HTTP_X_REAL_IP')}"
-            f" User-Agent: {request.META.get('HTTP_USER_AGENT')}"
-            f" Referer: {request.META.get('HTTP_REFERER')}"
+            f"[{request.META.get('HTTP_X_REAL_IP')}] "
+            f"User: {user} "
+            f"Media: {response['X-Accel-Redirect']} "
+            f"User-Agent: {request.META.get('HTTP_USER_AGENT')} "
+            f"Referer: {request.META.get('HTTP_REFERER')}"
         )
 
         return response
