@@ -17,8 +17,15 @@ from sapl.utils import get_mime_type_from_file_extension
 
 logger = logging.getLogger(__name__)
 
+logger_xaccel = logging.getLogger("XAccelRedirect")
+
 
 class ResponseFileMixin:
+    # controle de permissão de responsabilidade da view que utiliza este mixin
+    # este mixin apenas fornece métodos auxiliares para manipulação e resposta de arquivos,
+    # como conversão de páginas de PDF para imagens e anonimização de conteúdo.
+    # Ele não realiza validações de permissão ou autenticação, que devem ser tratadas na view que o utiliza.
+    # Portanto, é responsabilidade da view garantir que o usuário tenha acesso adequado aos arquivos manipulados por este mixin.
 
     def response_pagepdftoimage(self, arquivo, _page, _dpi, _grade="0"):
 
@@ -207,7 +214,7 @@ class ResponseFileMixin:
                 os.rename(fout, fin)
 
         except Exception as e:
-            logger.error(f"Erro ao processar arquivo: {e}")
+            logger_xaccel.error(f"Erro ao processar arquivo: {e}")
             pass
 
     def response_pdftotext(self, arquivo):
@@ -243,16 +250,16 @@ class ResponseFileMixin:
             dpi = 72
 
         if not item:
-            logger.info(f"response_file not item")
+            logger_xaccel.info(f"response_file not item")
             raise NotFound
 
         if not hasattr(item, self.action):
-            logger.info(f"response_file not attr action")
+            logger_xaccel.info(f"response_file not attr action")
             raise NotFound
 
         arquivo = getattr(item, self.action)
         if not arquivo:
-            logger.info(f"response_file not file")
+            logger_xaccel.info(f"response_file not file")
             raise NotFound
 
         mime = get_mime_type_from_file_extension(arquivo.name)
@@ -319,7 +326,15 @@ class ResponseFileMixin:
             original, arquivo.name
         )
 
-        logger.debug(f"response_file end method")
+        # Dentro da sua ViewSet do DRF, ao liberar o arquivo:
+        user = request.user.id if request.user.is_authenticated else "anonymous"
+        logger_xaccel.info(
+            f"ACESSO_PERMITIDO: Usuário {user} acessou o documento {response['X-Accel-Redirect']}. "
+            f"IP de Origem: {request.META.get('HTTP_X_REAL_IP')}"
+            f" User-Agent: {request.META.get('HTTP_USER_AGENT')}"
+            f" Referer: {request.META.get('HTTP_REFERER')}"
+        )
+
         return response
 
     def thumbnail(self):

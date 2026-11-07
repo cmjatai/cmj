@@ -76,6 +76,15 @@ LOGGING = {
             "formatter": "verbose",
             #'filters': ['require_debug_false'],
         },
+        "x_accel_redirect_logger_file": {
+            "level": "DEBUG",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/x_accel_redirect.log",
+            "maxBytes": 1024 * 1024 * 15,  # 15MB
+            "backupCount": 10,
+            "formatter": "verbose",
+            #'filters': ['require_debug_false'],
+        },
     },
     "root": {
         "handlers": ["cmj_logger_file", "console"],
@@ -105,6 +114,11 @@ LOGGING = {
         "weasyprint": {
             "handlers": ["cmj_logger_file", "console"],
             "level": "ERROR",
+            "propagate": False,
+        },
+        "XAccelRedirect": {
+            "handlers": ["x_accel_redirect_logger_file", "console"],
+            "level": "DEBUG",
             "propagate": False,
         },
     },

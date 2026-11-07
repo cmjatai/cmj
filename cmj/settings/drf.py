@@ -25,6 +25,12 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
     ),
 }
+
+# TODO:
+# rate limiting for API requests
+# https://www.django-rest-framework.org/api-guide/throttling/
+
+
 # "rest_framework.permissions.IsAuthenticated",
 
 DRFAUTOAPI = {
