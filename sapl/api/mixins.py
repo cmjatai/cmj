@@ -71,6 +71,9 @@ class ResponseFileMixin:
             if not nocache and os.path.exists(fcache_path):
                 with open(fcache_path, "rb") as f:
                     response = HttpResponse(f, content_type="image/png")
+                self.log(
+                    self.request, response, _type=f"pdftopng-page-{_page}-dpi-{_dpi}"
+                )
                 return response
             elif os.path.exists(fcache_path):
                 os.remove(fcache_path)
@@ -91,6 +94,10 @@ class ResponseFileMixin:
 
                 doc.close()
                 response = HttpResponse(bpng, content_type="image/png")
+
+                self.log(
+                    self.request, response, _type=f"pdftopng-page-{_page}-dpi-{_dpi}"
+                )
                 return response
 
         raise NotFound
@@ -225,9 +232,12 @@ class ResponseFileMixin:
         text = clean_text(text)
 
         response = HttpResponse(text, content_type="text/plain; charset=utf-8")
+
+        self.log(self.request, response, _type="pdftotext")
         return response
 
     def response_file(self, request, *args, **kwargs):
+        self.request = request
         self.item = item = self.get_queryset().filter(pk=kwargs["pk"]).first()
         text = request.GET.get("text", "")
         page = request.GET.get("page", 0)
@@ -326,17 +336,19 @@ class ResponseFileMixin:
             original, arquivo.name
         )
 
-        # Dentro da sua ViewSet do DRF, ao liberar o arquivo:
+        self.log(request, response)
+
+        return response
+
+    def log(self, request, response, _type="download"):
         user = request.user.id if request.user.is_authenticated else "anonymous"
         logger_xaccel.info(
             f"[{request.META.get('HTTP_X_REAL_IP')}] "
             f"User: {user} "
-            f"Media: {response['X-Accel-Redirect']} "
+            f"Media: {response.get('X-Accel-Redirect', _type)} "
             f"User-Agent: {request.META.get('HTTP_USER_AGENT')} "
-            f"Referer: {request.META.get('HTTP_REFERER')}"
+            f"Referer: {request.META.get('HTTP_REFERER')} "
         )
-
-        return response
 
     def thumbnail(self):
 
