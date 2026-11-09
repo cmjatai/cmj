@@ -7,6 +7,8 @@ from cmj.sigad.models import Documento
 from cmj.utils import Manutencao
 from cmj.videos.functions import (
     pull_youtube_metadata_video,
+    video_documento_na_galeria,
+    vincular_sistema_aos_videos,
 )
 from cmj.videos.models import Video
 
@@ -26,16 +28,17 @@ class Command(BaseCommand):
 
         # PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
+        vincular_sistema_aos_videos()
+        video_documento_na_galeria()
+        return
+
         videos = Video.objects.filter(json__snippet__liveBroadcastContent="upcoming")
         for v in videos[:50]:
             print(v.execucao, v.created, v)
             pull_youtube_metadata_video(v)
         # pull_youtube()
-        # vincular_sistema_aos_videos()
         # video_documento_na_galeria()
-        return
         # vincular_sistema_aos_videos()
-        # video_documento_na_galeria()
         # pull_youtube_metadata_video(Video.objects.first())
 
         for v in Video.objects.order_by("-id")[:40]:

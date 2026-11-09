@@ -1258,8 +1258,12 @@ class Documento(ShortUrl, CMSMixin):
         verbose_name=_("Json no Portal Modelo 1.0"), blank=True, null=True, default=None
     )
 
-    extra_data = SafeExtensionsJSONField(
-        verbose_name=_("Dados Extras"), blank=True, null=True, default=None
+    extra_data = JSONField(
+        verbose_name=_("Object"),
+        blank=True,
+        null=True,
+        default=None,
+        encoder=DjangoJSONEncoder,
     )
 
     parlamentares = models.ManyToManyField(

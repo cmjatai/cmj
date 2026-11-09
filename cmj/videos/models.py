@@ -14,7 +14,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.mixins import CmjAuditoriaModelMixin
-from sapl.utils import SaplGenericForeignKey, from_date_to_datetime_utc
+from sapl.utils import SaplGenericForeignKey
 
 
 class Video(CmjAuditoriaModelMixin):
@@ -82,8 +82,7 @@ class PullYoutubeManager(manager.Manager):
             data_base = now
         elif not self.data_min < data_base < now:
             raise Exception(
-                f"A data_base: {data_base} deve "
-                f"estar entre {self.data_min}  e {now}"
+                f"A data_base: {data_base} deve  estar entre {self.data_min}  e {now}"
             )
 
         pull = None

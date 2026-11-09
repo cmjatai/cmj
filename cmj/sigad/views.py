@@ -100,7 +100,7 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             "sessão ordinária": True,
         }
 
-        return r
+        # return r
         for d in docs:
             ed = d["extra_data"]
             if (

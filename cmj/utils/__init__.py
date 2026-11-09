@@ -506,10 +506,10 @@ def time_of_period(period):
     return r, seconds
 
 
-def run_sql(sql):
+def run_sql(sql, params=None):
     result = []
     with connection.cursor() as cursor:
-        result = cursor.execute(sql)
+        result = cursor.execute(sql, params or [])
         try:
             result = cursor.fetchall()
         except Exception as e:
