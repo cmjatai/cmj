@@ -268,14 +268,15 @@ def pull_youtube(force=False):
     update_auto_now(Video, disabled=False)
 
 
-def vincular_sistema_aos_videos(force=False):
+def vincular_sistema_aos_videos(force=False, only=None):
 
     if not force and DEBUG_TASKS:
         return
 
     videos = Video.objects.order_by("-created")
+    if only:
+        videos = videos.filter(id__in=only)
 
-    ct_doc = ContentType.objects.get_for_model(Documento)
     for v in videos:
 
         for app in apps.get_app_configs():
@@ -332,7 +333,6 @@ def vincular_sistema_aos_videos(force=False):
                         vp.video = v
                         vp.content_object = i
                         vp.fieldname = f
-
 
                         r = re.findall(r"http.+youtu.+\?.*t=(\d+)", vf)
 
@@ -422,5 +422,5 @@ def video_documento_na_galeria(force=False):
         video.save()
         created = True
 
-    if created:
-        vincular_sistema_aos_videos()
+        if created:
+            vincular_sistema_aos_videos(force=True, only=(v.id,))

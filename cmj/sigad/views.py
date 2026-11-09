@@ -104,7 +104,8 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
         for d in docs:
             ed = d["extra_data"]
             if (
-                "snippet" in ed
+                ed
+                and "snippet" in ed
                 and "liveBroadcastContent" in ed["snippet"]
                 and ed["snippet"]["liveBroadcastContent"] == "upcoming"
             ):
@@ -117,7 +118,8 @@ class PaginaInicialView(TabIndexMixin, TemplateView):
             for d in docs:
                 ed = d["extra_data"]
                 if (
-                    "snippet" in ed
+                    ed
+                    and "snippet" in ed
                     and "liveBroadcastContent" in ed["snippet"]
                     and ed["snippet"]["liveBroadcastContent"] in ("live", "upcoming")
                 ):
