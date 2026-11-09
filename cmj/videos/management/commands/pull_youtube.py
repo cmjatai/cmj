@@ -28,8 +28,8 @@ class Command(BaseCommand):
 
         # PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
-        vincular_sistema_aos_videos()
-        video_documento_na_galeria()
+        video_documento_na_galeria(force=True)
+        vincular_sistema_aos_videos(force=True)
         return
 
         videos = Video.objects.filter(json__snippet__liveBroadcastContent="upcoming")

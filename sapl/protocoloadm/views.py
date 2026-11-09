@@ -608,9 +608,9 @@ class DocumentoAdministrativoCrud(Crud):
             context["bg_title"] = "bg-aqua text-white"
 
             mostrar_anexos = self.request.GET.get("mostrar_anexos", "0")
-            mostrar_anexos = bool(int(mostrar_anexos))
 
-            context["mostrar_anexos"] = mostrar_anexos
+            if mostrar_anexos == "True":
+                context["mostrar_anexos"] = bool(mostrar_anexos)
 
             qr = self.request.GET.copy()
 

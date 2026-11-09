@@ -25,18 +25,11 @@ def populate_extra_data_json(apps, schema_editor):
             try:
                 extra_data_json = eval(extra_data)
 
-                if extra_data_json is None:
-                    continue
-
-                Documento.objects.filter(id=doc_id).update(
-                    extra_data_json=extra_data_json
-                )
-
             except Exception:
-                pass
+                extra_data_json = None
 
-        # Documento.objects.filter(id=doc_id).update(extra_data=None)
-
+        Documento.objects.filter(id=doc_id).update(extra_data_json=extra_data_json)
+        
     run_sql("""
         delete from sigad_documento
         where id >= 118982 and classe_id=233
