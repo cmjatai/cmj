@@ -1,6 +1,6 @@
-from django.urls.conf import path, re_path
+from django.urls.conf import path
 
-from cmj.globalrules.views import manifest, offline, service_worker_proxy
+from cmj.globalrules.views import manifest, service_worker_proxy
 
 urlpatterns = [
     path(

@@ -30,6 +30,21 @@ urls = [
         "params": ("ano", "covid", "dataInicio", "dataFim"),
         "page": ("size", "number"),
         "active": True,
+        "tenant": "camarajatai",
+        "uf": "GO",
+    },
+    {
+        "name": "centi_getempenhos",
+        "base_url": "https://api.centi.com.br",
+        "endpoint": "{base_url}/portal/getempenhos/{uf}/{tenant}",
+        "method": "POST",
+        "type": "list",
+        "format": "json",
+        "params": ("ano", "covid", "dataInicio", "dataFim"),
+        "page": ("size", "number"),
+        "active": True,
+        "tenant": "jatai",
+        "uf": "GO",
     },
 ]
 
@@ -137,8 +152,8 @@ class Command(BaseCommand):
         print("=" * 70)
 
     def centi_getempenhos(self, url_config):
-        uf = "go"
-        tenant = "jatai"
+        uf = url_config["uf"]
+        tenant = url_config["tenant"]
         page_size = 100
 
         print(f"[scrap_centi] Fetching empenhos for UF={uf}, Tenant={tenant}")
@@ -166,7 +181,11 @@ class Command(BaseCommand):
                 # em caso de exceção (evita interrupção indevida do loop de meses)
                 updated_count = 0
                 try:
-                    if loa.ano == ano and ano == self.ano_atual and mes > self.mes_atual:
+                    if (
+                        loa.ano == ano
+                        and ano == self.ano_atual
+                        and mes > self.mes_atual
+                    ):
                         print(f"[scrap_centi] [{ano}-{mes:02d}] mês futuro — ignorado.")
                         continue
 

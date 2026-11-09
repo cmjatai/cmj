@@ -32,9 +32,9 @@ RUN apt-get update && \
         fonts-texgyre fonts-tlwg-purisa fonts-liberation fontconfig \
         # java e tesseract
         openjdk-17-jdk-headless tesseract-ocr tesseract-ocr-por && \
-    # Limpeza do cache do APT para reduzir tamanho da imagem
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+        # Limpeza do cache do APT para reduzir tamanho da imagem
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*
 
 # 2. Instalação do PostgreSQL 18 Client
 RUN install -d /usr/share/postgresql-common/pgdg && \
@@ -73,7 +73,7 @@ RUN fc-cache -fv && \
     rm -f /etc/nginx/conf.d/* && \
     rm -f /etc/nginx/sites-enabled/*
 
-# 5. Cópia dos requirements e instalação (Atenção ao --no-cache-dir)
+# 6. Cópia dos requirements e instalação (Atenção ao --no-cache-dir)
 COPY requirements/requirements.txt requirements/ia-requirements.txt ${HOME}/
 RUN pip install --no-cache-dir -r requirements.txt && \
     pip install --no-cache-dir -r ia-requirements.txt
