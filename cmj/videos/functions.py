@@ -279,6 +279,8 @@ def vincular_sistema_aos_videos(force=False, only=None):
 
     for v in videos:
 
+        print(v.vid)
+
         for app in apps.get_app_configs():
             if not app.name.startswith("cmj") and not app.name.startswith("sapl"):
                 continue
@@ -356,6 +358,7 @@ def video_documento_na_galeria(force=False):
     ct_doc = ContentType.objects.get_for_model(Documento)
     created = False
     for v in videos:
+        print(v.vid)
 
         vps = v.videoparte_set.filter(content_type=ct_doc)
 
@@ -422,5 +425,8 @@ def video_documento_na_galeria(force=False):
         video.save()
         created = True
 
-        if created:
-            vincular_sistema_aos_videos(force=True, only=(v.id,))
+        vp = VideoParte()
+        vp.video = v
+        vp.content_object = documento
+        vp.fieldname = "texto"
+        vp.save()

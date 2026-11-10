@@ -8,6 +8,7 @@ from cmj.utils import Manutencao
 from cmj.videos.functions import (
     pull_youtube_metadata_video,
     video_documento_na_galeria,
+    vincular_sistema_aos_videos,
 )
 from cmj.videos.models import Video
 
@@ -27,8 +28,8 @@ class Command(BaseCommand):
 
         # PullExec.objects.timedelta_quota_pull()
         # self.corrigir_erro_causado_em_full_metadata()
-        video_documento_na_galeria(force=True)
-        # vincular_sistema_aos_videos(force=True)
+        vincular_sistema_aos_videos(force=True)
+        video_documento_na_galeria(force=False)
         return
 
         videos = Video.objects.filter(json__snippet__liveBroadcastContent="upcoming")

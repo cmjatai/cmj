@@ -27,6 +27,7 @@ TELEGRAM_API_ID = config("TELEGRAM_API_ID", cast=str, default="")
 TELEGRAM_API_HASH = config("TELEGRAM_API_HASH", cast=str, default="")
 TELEGRAM_CHAT_ID = config("TELEGRAM_CHAT_ID", cast=str, default="")
 TELEGRAM_CHAT_DEV_ID = config("TELEGRAM_CHAT_DEV_ID", cast=str, default="")
+TELEGRAM_SESSION_STRING = config("TELEGRAM_SESSION_STRING", cast=str, default="")
 
 GOOGLE_URL_SHORTENER_KEY = config("GOOGLE_URL_SHORTENER_KEY", cast=str, default="")
 GOOGLE_URL_API_KEY = config("GOOGLE_URL_API_KEY", cast=str, default="")
