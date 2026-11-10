@@ -94,7 +94,10 @@ class EmendaLoaCrud(MasterDetailCrud):
                 and EmendaLoa.PROPOSTA < self.object.fase < EmendaLoa.EM_TRAMITACAO
             ):
                 return url_perm
-            elif (
+
+            return url_perm if self.request.user == self.object.owner else ""
+
+            if (
                 self.request.user.operadorautor_set.exists()
                 and EmendaLoa.PROPOSTA <= self.object.fase < EmendaLoa.EM_TRAMITACAO
                 and self.object.parlamentares.filter(
@@ -1116,7 +1119,9 @@ class EmendaLoaCrud(MasterDetailCrud):
             self.object = (
                 self.get_object() if not hasattr(self, "object") else self.object
             )
+            return has_perm or u == self.object.owner
 
+            # permite usuários de emenda coletiva editarem a emenda caso atendam aos critérios definidos abaixo
             if not has_perm:
                 # 1) possui permissão: emendaloa_full_editor
                 # 2) é um usuário operador de autor
@@ -1429,6 +1434,11 @@ class EmendaLoaCrud(MasterDetailCrud):
             context["title"] = title.replace("\n", "")
 
             return context
+
+        def hook_owner(self, el, verbose_name="", field_display=""):
+            if self.request.user.is_anonymous:
+                return "", ""
+            return verbose_name, field_display
 
         def hook_str_valor_computado(self, el, verbose_name="", field_display=""):
             if not el.materia:
