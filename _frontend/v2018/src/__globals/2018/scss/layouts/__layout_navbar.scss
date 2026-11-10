@@ -448,11 +448,11 @@
 
     .icon_selo_atricon {
       $size_selo: 5.5em;
-      display: none; // estrutura mantida; exibir alterando para flex
+      display: flex; // estrutura mantida; exibir alterando para flex
       position: relative;
       width: $size_selo - 0.5em;
       height: 100%;
-      opacity: 0.5;
+      opacity: 0.95;
       transition: all 1s ease-in-out;
 
       &::after {
@@ -466,7 +466,7 @@
         background-repeat: no-repeat;
         background-size: $size_selo $size_selo;
         background-position: 0 0;
-        background-image: url(~@/assets/img/icon_transparencia_prata.png);
+        background-image: url(~@/assets/img/icon_transparencia_diamante_2026.png);
         transition: all 1s ease-in-out;
       }
 
@@ -475,7 +475,7 @@
         transition: all 1s ease-in-out;
 
         &::after {
-          $size_selo: 15em;
+          $size_selo: 30em;
           top: -1.8em;
           width: $size_selo;
           height: $size_selo;

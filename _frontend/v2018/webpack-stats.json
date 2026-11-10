@@ -73,15 +73,15 @@
       "path": "css/900.fe979fb8.css.gz",
       "publicPath": "/static/v2018/css/900.fe979fb8.css.gz"
     },
-    "css/app.152962c8.css": {
-      "name": "css/app.152962c8.css",
-      "path": "css/app.152962c8.css",
-      "publicPath": "/static/v2018/css/app.152962c8.css"
+    "css/app.06e8b1fe.css": {
+      "name": "css/app.06e8b1fe.css",
+      "path": "css/app.06e8b1fe.css",
+      "publicPath": "/static/v2018/css/app.06e8b1fe.css"
     },
-    "css/app.152962c8.css.gz": {
-      "name": "css/app.152962c8.css.gz",
-      "path": "css/app.152962c8.css.gz",
-      "publicPath": "/static/v2018/css/app.152962c8.css.gz"
+    "css/app.06e8b1fe.css.gz": {
+      "name": "css/app.06e8b1fe.css.gz",
+      "path": "css/app.06e8b1fe.css.gz",
+      "publicPath": "/static/v2018/css/app.06e8b1fe.css.gz"
     },
     "css/compilacao.efafaacc.css": {
       "name": "css/compilacao.efafaacc.css",
@@ -590,11 +590,17 @@
       "publicPath": "/static/v2018/img/icon_transparencia.png",
       "sourceFilename": "src/assets/img/icon_transparencia.png"
     },
-    "img/icon_transparencia_prata.9702395f.png": {
-      "name": "img/icon_transparencia_prata.9702395f.png",
-      "path": "img/icon_transparencia_prata.9702395f.png",
-      "publicPath": "/static/v2018/img/icon_transparencia_prata.9702395f.png",
-      "sourceFilename": "src/assets/img/icon_transparencia_prata.png"
+    "img/icon_transparencia_diamante_2026.361d24cb.png": {
+      "name": "img/icon_transparencia_diamante_2026.361d24cb.png",
+      "path": "img/icon_transparencia_diamante_2026.361d24cb.png",
+      "publicPath": "/static/v2018/img/icon_transparencia_diamante_2026.361d24cb.png",
+      "sourceFilename": "src/assets/img/icon_transparencia_diamante_2026.png"
+    },
+    "img/icon_transparencia_diamante_2026.png": {
+      "name": "img/icon_transparencia_diamante_2026.png",
+      "path": "img/icon_transparencia_diamante_2026.png",
+      "publicPath": "/static/v2018/img/icon_transparencia_diamante_2026.png",
+      "sourceFilename": "src/assets/img/icon_transparencia_diamante_2026.png"
     },
     "img/icon_transparencia_prata.png": {
       "name": "img/icon_transparencia_prata.png",
@@ -2225,7 +2231,7 @@
       "js/npm.jquery-mask-plugin.b6aef632.js",
       "js/npm.bootstrap-select.2a92f18e.js",
       "js/774.f837e48c.js",
-      "css/app.152962c8.css",
+      "css/app.06e8b1fe.css",
       "js/app.596055c8.js"
     ],
     "compilacao": [
