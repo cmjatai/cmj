@@ -1,7 +1,7 @@
 import re
+from _decimal import ROUND_HALF_DOWN
 from decimal import Decimal
 
-from _decimal import ROUND_HALF_DOWN
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex, OpClass
 from django.core.files import File
@@ -21,7 +21,12 @@ from cmj.loa.models.m_loa import Loa
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
 from cmj.loa.services.s_emendaloa import EmendaLoaService
 from cmj.mixins import CmjSearchMixin
-from cmj.utils import get_settings_auth_user_model, quantize, valor_por_extenso
+from cmj.utils import (
+    YES_NO_CHOICES,
+    get_settings_auth_user_model,
+    quantize,
+    valor_por_extenso,
+)
 from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Parlamentar
 
@@ -80,6 +85,12 @@ class EmendaLoa(CmjSearchMixin):
         null=True,
         default=dict,
         encoder=DjangoJSONEncoder,
+    )
+
+    permite_coletiva = models.BooleanField(
+        verbose_name=_("Permite junção coletiva?"),
+        default=False,
+        choices=YES_NO_CHOICES,
     )
 
     tipo = models.PositiveSmallIntegerField(

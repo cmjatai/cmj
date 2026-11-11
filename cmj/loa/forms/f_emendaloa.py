@@ -31,7 +31,7 @@ from cmj.loa.models import (
     Entidade,
     UnidadeOrcamentaria,
 )
-from cmj.utils import DecimalField
+from cmj.utils import YES_NO_CHOICES, DecimalField
 from sapl.crispy_layout_mixin import (
     SaplFormHelper,
     SaplFormLayout,
@@ -101,6 +101,13 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         required=False,
         widget=forms.HiddenInput(),
         queryset=MateriaLegislativa.objects.all(),
+    )
+
+    permite_coletiva = forms.ChoiceField(
+        label="Permite Junção em Coletiva?",
+        required=True,
+        choices=YES_NO_CHOICES,
+        initial=False,
     )
 
     tipo = forms.ChoiceField(required=True, choices=EmendaLoa.TIPOEMENDALOA_CHOICE)
@@ -228,6 +235,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             "tipo_materia",
             "numero_materia",
             "ano_materia",
+            "permite_coletiva",
             "prefixo_indicacao",
             "indicacao",
             "prefixo_finalidade",
@@ -263,11 +271,10 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         row_topo_1 = to_row(
             [
-                ("tipo", 2),
-                ("fase", 2),
-                ("valor", 2),
-                ("prefixo_indicacao", 2),
-                ("unidade", 4),
+                ("permite_coletiva", 3),
+                ("tipo", 3),
+                ("fase", 3),
+                ("valor", 3),
             ]
         )
 
@@ -286,6 +293,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         )
 
         row2 = [
+            ("prefixo_indicacao", 4),
+            ("unidade", 8),
             ("entidade", 6),
             ("bairro", 6),
             ("prefixo_finalidade", 3),

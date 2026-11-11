@@ -304,6 +304,22 @@
     }
   }
   &.emendaloa-update, &.emendaloa-create {
+    label {
+      margin-bottom: 0rem;
+      color: #444;
+      &[for="id_permite_coletiva"],
+      &[for="id_tipo"],
+      &[for="id_fase"],
+      &[for="id_valor"],
+      &[for="id_unidade"] ,
+      &[for="id_entidade"],
+      &[for="id_bairro"],
+      &[for="id_parlamentares__valor_0"],
+      &[for="id_finalidade"] {
+        font-weight: bold;
+        color: #023368;
+      }
+    }
     #div_id_entidade {
       li a {
         margin: 0;
