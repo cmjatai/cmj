@@ -25,7 +25,7 @@
               rel="noopener"
             >
               <small class="font-weight-bold">
-                {{ ajuste.oficio_ajuste_loa ? (ajuste.oficio_ajuste_loa.epigrafe || ajuste.oficio_ajuste_loa.__str__ || 'Ofício') : '' }}
+                {{ ajuste.__str__ }}
               </small>
             </a>
             <span v-else>
