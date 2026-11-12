@@ -188,6 +188,7 @@ class RegistroAjusteLoa(CmjSearchMixin):
     @property
     def fields_search(self):
         return [
+            "epigrafe_short",
             "hook_emendaloa__search",
             "descricao",
             "oficio_ajuste_loa",

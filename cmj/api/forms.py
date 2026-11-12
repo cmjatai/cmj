@@ -155,6 +155,14 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
 
         query = value.split(" ")
 
+        lquery = len(query)
+        if lquery == 0:
+            return queryset
+        elif lquery == 1:
+            q1 = query[0]
+            if q1.isdigit():
+                return queryset.filter(numero=int(q1))
+
         q = Q()
         for termo in query:
             q &= Q(search__unaccent__icontains=termo)

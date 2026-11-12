@@ -9,13 +9,11 @@ def popule_ano_numero(apps, schema_editor):
     for registro in RegistroAjusteLoa.objects.order_by(
         "oficio_ajuste_loa__loa__ano", "oficio_ajuste_loa__id", "id"
     ):
-        if old_loa != registro.oficio_ajuste_loa_id:
-            old_loa = registro.oficio_ajuste_loa_id
+        if old_loa != registro.oficio_ajuste_loa.loa.id:
+            old_loa = registro.oficio_ajuste_loa.loa.id
             numero = 1
-        if registro.numero is None:
-            registro.numero = numero
-        if registro.ano is None:
-            registro.ano = registro.oficio_ajuste_loa.loa.ano
+        registro.numero = numero
+        registro.ano = registro.oficio_ajuste_loa.loa.ano
         registro.save()
         numero += 1
 
