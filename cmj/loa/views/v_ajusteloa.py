@@ -105,20 +105,19 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
                 a_str = f"""
                     <tr>
-                        <td align="right">
-                            <a href="{url}">
-                                <strong style="white-space: nowrap">
-                                    {a_str}
-                                </strong>
-                            </a>
-                        </td>
                         <td>
+                          <a href="{url}"><strong>{ ajuste.epigrafe_short }</strong></a><br>
                           {unidade_orcamentaria}
                             {entidade}
                           {emenda_epigrafe}
                           <small>
                             <em>{ajuste.descricao}</em>
                           </small>
+                        </td>
+                        <td align="right">
+                                <strong style="white-space: nowrap">
+                                    {a_str}
+                                </strong>
                         </td>
                     </tr>
                 """
@@ -133,13 +132,22 @@ class OficioAjusteLoaCrud(MasterDetailCrud):
 
         @property
         def list_field_names_set(self):
-            return "descricao", "str_valor", "tipo"  # , 'emendaloa'
+            return "epigrafe_short", "descricao", "str_valor", "tipo"  # , 'emendaloa'
 
         def hook_header_str_valor(self):
             return "Valor (R$)"
 
         def hook_str_valor(self, obj, verbose_name="", field_display=""):
             return verbose_name, f'{field_display if field_display != "0" else "0,00"}'
+
+        def hook_epigrafe_short(self, obj, verbose_name="", field_display=""):
+            return (
+                verbose_name,
+                f"""<strong style="white-space: nowrap">
+                                    {field_display}
+                                </strong>
+                                """,
+            )
 
         def hook_descricao(self, obj, verbose_name="", field_display=""):
 

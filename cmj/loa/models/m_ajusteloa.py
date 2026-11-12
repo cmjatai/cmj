@@ -144,6 +144,19 @@ class RegistroAjusteLoa(CmjSearchMixin):
         through_fields=("registro", "parlamentar"),
     )
 
+    numero = models.PositiveIntegerField(
+        verbose_name=_("Número"),
+        blank=True,
+        null=True,
+        default=None,
+    )
+    ano = models.PositiveIntegerField(
+        verbose_name=_("Ano"),
+        blank=True,
+        null=True,
+        default=None,
+    )
+
     AJUSTE_REGISTRADO = 10
     AJUSTE_IMPEDIDO = 40
     AJUSTE_EM_EXECUCAO = 60
@@ -222,7 +235,15 @@ class RegistroAjusteLoa(CmjSearchMixin):
         return valor_str
 
     def __str__(self):
-        return f"R$ {self.str_valor} - {self.oficio_ajuste_loa}"
+        return f"RAT {self.numero:03d}/{self.ano} - Registro de Ajuste Técnico"
+
+    @property
+    def epigrafe(self):
+        return f"RAT {self.numero:03d}/{self.ano} - Registro de Ajuste Técnico"
+
+    @property
+    def epigrafe_short(self):
+        return f"RAT {self.numero:03d}/{self.ano}"
 
 
 class RegistroAjusteLoaParlamentar(models.Model):

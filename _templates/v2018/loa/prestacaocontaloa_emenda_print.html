@@ -162,6 +162,7 @@
     <table>
       <thead>
         <tr>
+          <th>Identificação</th>
           <th>Ofício</th>
           <th>Fase</th>
           <th>Unidade</th>
@@ -172,6 +173,7 @@
       <tbody>
         {% for ajuste in emenda.registroajusteloa_set.all %}
         <tr>
+          <td>{{ ajuste.epigrafe_short }}</td>
           <td>{{ ajuste.oficio_ajuste_loa.epigrafe }}</td>
           <td>{{ ajuste.get_fase_display }}</td>
           <td>{{ ajuste.unidade|default:"—" }}</td>

@@ -32,7 +32,7 @@
                 :href="registro.link_detail_backend"
                 target="_blank"
               >
-                {{ oficioLabel }}
+                {{ registro.__str__ }}
                 <FontAwesomeIcon
                   icon="external-link-alt"
                   size="sm"

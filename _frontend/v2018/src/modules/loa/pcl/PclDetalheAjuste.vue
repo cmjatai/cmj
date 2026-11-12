@@ -26,7 +26,7 @@
           <div class="flex-grow-1">
             <h4 class="mb-1 font-weight-bold">
               <a :href="registro.link_detail_backend" target="_blank">
-                {{ registro.oficio_ajuste_loa.__str__ || 'Registro de Ajuste' }}
+                {{ registro.__str__ || 'Registro de Ajuste' }}
                 <i class="fas fa-external-link-alt fa-sm ml-1 text-muted"></i>
               </a>
             </h4>
