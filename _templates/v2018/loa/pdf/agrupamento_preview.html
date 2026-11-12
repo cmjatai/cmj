@@ -1,0 +1,292 @@
+{% load static common_cmj_tags common_tags %}
+{% load render_bundle from webpack_loader %}
+{% load webpack_static from webpack_loader %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<meta charset="utf-8"></meta>
+<head>
+  <title>LOA {{ agrupamento.object.loa.ano }} - Emenda Impositiva</title>
+  <style>
+    {% include "css/base.css" %}
+    {% include "css/emendaloa-preview.css" %}
+    @page {}
+
+    main {
+      line-height: 1.3;
+    }
+
+    .columns2 {
+      columns: 2;
+      column-gap: 0cm;
+      break-inside: avoid;
+      padding-left: 0.7cm;
+      padding-top: 0;
+      line-height: 1.15;
+    }
+    .errors {
+      color: red;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <img src="{% webpack_static '/img/pdf_cabec.jpg' %}">
+  </header>
+    <section class="red">
+      PROTOTIPAÇÃO EM ANDAMENTO
+    </section>
+  {% define object.totais_contabeis as otc %}
+
+  {% if object.tipo %}
+    {% if object.fase < object.LIBERACAO_CONTABIL %}
+      {% if otc.divergencia_registros == 0 and otc.divergencia_emenda == 0  %}
+        <section class="blue">
+          EM EDIÇÃO
+        </section>
+      {% else %}
+        <section class="red">
+          EM EDIÇÃO
+        </section>
+      {% endif %}
+    {% else %}
+      {% if otc.divergencia_registros == 0 and otc.divergencia_emenda == 0  %}
+      {% else %}
+        <section class="red">
+          DIVERGÊNCIA DE VALORES
+        </section>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+<main>
+  <h3>
+    EMENDA IMPOSITIVA, de {% now "d \d\e F \d\e Y" %}.
+  </h3>
+  {% with agrupamento.object.loa.materia as mat_loa %}
+    <p class="referencia">
+      Ao {{mat_loa.tipo|default:"PROJETO"}} nº {{mat_loa.numero}}, de {{ mat_loa.data_apresentacao|date:"d \d\e F \d\e Y" }},
+      que {{mat_loa.ementa}}
+    </p>
+  {% endwith %}
+  <br>
+  <h5>
+    Autoria:
+    {% for parl in agrupamento.parlamentares.all %}
+      {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  </h5>
+  <p class="ementa recuo4">
+    Destina recursos orçamentários, via <strong>{{agrupamento.unidades|join:", "}}</strong>, no valor de
+    <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}})</strong>,
+    indicando como beneficiário(a) <strong>{{agrupamento.entidades|join:", "}}</strong>
+    {% if agrupamento.bairros %} (Localização: {{agrupamento.bairros|join:", "}}){% endif %}
+    {% if agrupamento.object.finalidade %}
+      <strong>{{ agrupamento.object.finalidade_format }}</strong>.
+    {% endif %}
+  </p>
+  <p class="preambulo">
+    {% if agrupamento.parlamentares.isonly_sexo_feminino %}A{% else %}O{% endif %}{% if agrupamento.parlamentares.count > 1 %}s{% endif %}
+    subscritor{% if agrupamento.parlamentares.isonly_sexo_feminino %}a{% else %}{% if agrupamento.parlamentares.count > 1 %}e{% endif %}{% endif %}{% if agrupamento.parlamentares.count > 1 %}s{% endif %}
+    da presente Emenda Impositiva, propõem a seguinte modificação no Projeto de Lei Orçamentária Anual supracitado:
+  </p>
+
+  <p class="art">
+      <span class="rotulo">Art {{ view.art }}º - </span>A destinação dos recursos
+      para {{agrupamento.entidades|join:", "}}{% if agrupamento.bairros %} (Localização: {{agrupamento.bairros|join:", "}}){% endif %},
+
+      {% if agrupamento.object.finalidade %}
+        <strong>{{ agrupamento.object.finalidade_format }}</strong>,
+      {% endif %}
+
+      no valor de
+    <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}}),</strong>
+
+
+
+    será dividido entre
+    {% if agrupamento.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
+    vereador{% if agrupamento.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
+    subscritor{% if agrupamento.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
+    da seguinte forma:
+      {% for parl, dados in agrupamento.parlamentares_list_values.items %}
+        {% if forloop.first %}
+          <ol class="courier destinacao-list">
+        {% endif %}
+        <li>
+          R$ {{ dados.valor|valor_str }} ({{dados.valor|valor_por_extenso}}):
+          <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
+          {{parl.nome_parlamentar}}</strong>{% if not agrupamento.object.finalidade %},
+          {{dados.prefixo_finalidade}} {{dados.finalidade|join:", "}}.{% else %}.{% endif %}
+        </li>
+        {% if forloop.last %}
+        </ol>
+        {% endif %}
+      {% endfor %}
+  </p>
+
+  <p style="margin: 0.2cm 0; padding: 0; text-align: justify;">
+      <small><strong>§ 1º.</strong> Acrescenta-se ao orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
+      {% for despesa, valor in agrupamento.insercoes.items %}
+        {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
+          <li>
+          <strong> R$ {{valor|valor_str }} ({{valor|valor_por_extenso}})</strong>
+          <table style="margin: 0; border-collapse: collapse;">
+            <tr>
+              <td>&nbsp;<strong>Unid. Orçamentária:</strong></td>
+              <td>{{despesa.unidade.codigo}}-{{despesa.unidade.especificacao}}</td>
+            </tr>
+            <tr>
+              <td>&nbsp;<strong>Classif. Funcional:</strong></td>
+              <td>{{despesa.consulta.codigo}} - {{despesa.consulta.especificacao}}</td>
+            </tr>
+            <tr>
+              <td>&nbsp;<strong>Nat. da Despesa...:</strong></td>
+              <td>{{despesa.consulta.cod_natureza}} - {{despesa.natureza.especificacao}}</td>
+            </tr>
+            <tr>
+              <td>&nbsp;<strong>Fonte de Recurso..:</strong></td>
+              <td>{{despesa.consulta.cod_fonte}}</td>
+            </tr>
+          </table>
+          </li>
+          {% if forloop.last %} </ol> {% endif %}{% empty %}XXXXXXXXXX{% endfor %}
+    </p>
+
+    <p style="margin: 0.1cm 0; padding: 0; text-align: justify;">
+      <small><strong>§ 2º.</strong> Deduz-se do orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
+      {% for despesa, valor in agrupamento.deducoes.items %}
+          {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
+            <li style="text-align: justify; display: block;">
+              <strong> R$ {{valor|valor_abs_str }} ({{valor|valor_por_extenso}})</strong>
+              <table style="margin: 0; border-collapse: collapse;">
+                <tr>
+                  <td>&nbsp;<strong>Unid. Orçamentária:</strong></td>
+                  <td>{{despesa.unidade.codigo}}-{{despesa.unidade.especificacao}}</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;<strong>Classif. Funcional:</strong></td>
+                  <td>{{despesa.consulta.codigo}} - {{despesa.consulta.especificacao}}</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;<strong>Nat. da Despesa...:</strong></td>
+                  <td>{{despesa.consulta.cod_natureza}} - {{despesa.natureza.especificacao}}</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;<strong>Fonte de Recurso..:</strong></td>
+                  <td>{{despesa.consulta.cod_fonte}}</td>
+                </tr>
+              </table>
+            </li>
+          {% if forloop.last %}</ol>{% endif %}
+      {% empty %}XXXXXXXXXX{% endfor %}
+    </p>
+  <p class="art">
+    <span class="rotulo">Art {{ view.art }}º - </span>Os demais artigos e dispositivos da matéria acima
+    permanecem inalterados.
+  </p>
+
+  <p class="art">
+    <span class="rotulo">Art {{ view.art }}º - </span>A presente emenda fará parte integrante do Projeto
+    de Lei em referência.
+  </p>
+
+<p class="data">
+  Câmara Municipal de Jataí, em
+  {% if object.materia %}
+    {{ object.materia.data_apresentacao|date:"d \d\e F \d\e Y" }}.
+  {% else %}
+    {% now "d \d\e F \d\e Y" %}.
+  {% endif %}
+</p>
+<small style="line-height: 1.2; display:block;">
+  Assina{% if agrupamento.parlamentares.count > 1 %}m{%endif%} Eletrônicamente:
+    {% for parl in agrupamento.parlamentares.all %}
+      {% if forloop.first %}
+      <ul class="columns2">
+      {% endif %}
+
+      <li>
+        <strong>{{parl.nome_parlamentar}}</strong><br>
+        <small>&nbsp;&nbsp;Vereador{% if parl.sexo == 'F' %}a{% endif %}</small>
+      </li>
+
+      {% if forloop.last %}
+      </ul>
+      {% endif %}
+
+    {% endfor %}
+  </small>
+</main>
+{% comment %}
+
+  <br>
+  {% for erro in agrupamento.errors %}
+    {% if forloop.first %}
+      <ul class="errors">
+    {% endif %}
+      <li>{{ erro }}</li>
+    {% if forloop.last %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+
+
+
+  {% if object.tipo %}
+
+    <p class="art" style="margin-bottom: 0cm; padding-bottom: 0;">
+      <span class="rotulo">Art {{ view.art }}º - </span>O valor de
+      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong> será
+      {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
+    </p>
+
+
+      {% if object.parlamentares.count > 1 and object.tipo %}
+
+    {% endif %}
+  {% else %}
+    <p class="art">
+      <span class="rotulo">Art {{ view.art }}º - </span>Altera-se o Orçamento de {{object.loa.ano}},
+      incluindo o valor de <strong>R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
+      {{object.prefixo_finalidade}} {{object.finalidade_format}}
+    </p>
+  {% endif %}
+
+
+</main>
+
+{% if not espacoAssinatura %}
+
+{% else %}
+  {% for parl in object.parlamentares.all %}
+  {% if forloop.first %}
+  <div class="assinaturas">
+    {% endif %}
+
+
+    {% if forloop.counter0|divisibleby:3 %}
+  </div>
+  <div class="assinaturas">
+    {% endif %}
+
+    <div class="assinatura">
+      {{parl.nome_parlamentar}}
+      <small>
+        Vereador{% if parl.sexo == 'F' %}a{% endif %}
+      </small>
+    </div>
+
+    {% if forloop.last %}
+  </div>
+  {% endif %}
+  {% endfor %}
+{% endif %}
+
+<footer>
+  <img src="{% webpack_static '/img/pdf_rodape.jpg' %}">
+</footer>
+{% endcomment %}
+</body>
+</html>

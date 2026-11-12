@@ -98,15 +98,39 @@ h3, h4, h5 {
 .courier {
   font-family: 'Courier New', Courier, monospace;
 }
+.destinacao-list {
+  list-style-type: decimal;
+  font-size: 10pt;
+  margin: 0;
+  padding: 0 0 0 0.7cm;
+  text-align: justify;
+  display: block;
+  line-height: 1;
+
+
+  li::marker {
+    font-weight: bold;
+  }
+  li {
+    margin: 0;
+    margin-bottom: 0.2cm;
+    text-align: justify;
+  }
+}
 
 .dotacao-list {
   list-style-type: decimal;
   font-size: 8pt;
   margin: 0;
   padding: 0 0 0 0.7cm;
-
+  text-align: justify;
+  display: block;
+  li::marker {
+    font-weight: bold;
+  }
   li {
     margin: 0;
     margin-bottom: 0.2cm;
+    text-align: justify;
   }
 }

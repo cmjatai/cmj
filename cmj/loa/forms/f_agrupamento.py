@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.models import Agrupamento, EmendaLoa
 from cmj.utils import DecimalField
-from sapl.crispy_layout_mixin import SaplFormLayout, to_row
+from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,11 @@ class AgrupamentoForm(ModelForm):
         model = Agrupamento
         fields = [
             "nome",
+            "finalidade",
         ]
+        widgets = {
+            "finalidade": forms.Textarea(attrs={"rows": 3}),
+        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs["initial"].pop("user", None)
@@ -79,7 +83,8 @@ class AgrupamentoForm(ModelForm):
 
         row1 = to_row(
             [
-                ("nome", 12),
+                ("nome", 4),
+                ("finalidade", 8),
                 ("ano_loa", 0),
             ]
         )
@@ -159,16 +164,25 @@ class AgrupamentoForm(ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        btns = {}
+        actions = None
         if self.instance.pk:
-            btns = {
-                "cancel_label": "Encerrar Edição",
-                "save_label": "Encerrar Edição e Concluir Registro Contábil",
-            }
+            actions = form_actions(
+                label="Encerrar Edição e Concluir Registro Contábil",
+                more=[
+                    HTML(
+                        '<a href="{{ view.cancel_url }}"'
+                        ' class="btn btn-inverse">Encerrar Edição</a>'
+                    ),
+                    HTML(
+                        '<a href="{{ view.preview_url }}"'
+                        ' class="btn btn-success ml-1">Preview Emenda Coletiva</a>'
+                    ),
+                ],
+            )
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            Fieldset(_("Dados Gerais"), row1), row4, row5, **btns
+            Fieldset(_("Dados Gerais"), row1), row4, row5, actions=actions
         )
 
         self.initial["ano_loa"] = self.loa.ano
