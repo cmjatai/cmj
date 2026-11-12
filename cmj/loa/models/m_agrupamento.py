@@ -1,3 +1,4 @@
+import re
 from decimal import Decimal
 
 from django.db import models
@@ -8,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
 from cmj.utils import PERCENTAGE_VALIDATOR, quantize
+from sapl.parlamentares.models import Parlamentar
 
 
 class Agrupamento(models.Model):
@@ -20,6 +22,8 @@ class Agrupamento(models.Model):
     )
 
     nome = models.CharField(verbose_name=_("Nome do Agrupamento"), max_length=256)
+
+    finalidade = models.TextField(verbose_name=_("Finalidade"), blank=True, default="")
 
     emendas = models.ManyToManyField(
         "loa.EmendaLoa",
@@ -44,6 +48,18 @@ class Agrupamento(models.Model):
 
     def __str__(self):
         return self.nome
+
+    @property
+    def finalidade_format(self):
+        try:
+            finalidade = self.finalidade or ""
+
+            while len(finalidade) > 0 and (re.match(r"[^\w\)\$]", finalidade[-1])):
+                finalidade = finalidade[:-1]
+
+            return finalidade
+        except Exception:
+            return ""
 
     def sync(self):
         registros = self.agrupamentoregistrocontabil_set.all()
@@ -81,6 +97,69 @@ class Agrupamento(models.Model):
                     resto = emenda.valor - sum_insercoes
                     insercoes[-1].valor = insercoes[-1].valor + resto
                     insercoes[-1].save()
+
+    def preparar_dados_para_coletiva(self):
+
+        insercoes = {}
+        deducoes = {}
+
+        parlamentares = {}
+        total_via_parlamentares = Decimal("0.00")
+
+        unidades = set()
+        entidades = set()
+        bairros = set()
+
+        for emenda in self.emendas.all():
+
+            if emenda.unidade:
+                unidades.add(emenda.unidade)
+            if emenda.entidade:
+                entidades.add(emenda.entidade)
+            if emenda.bairro:
+                bairros.add(emenda.bairro)
+
+            for r in emenda.registrocontabil_set.all_insercoes():
+                insercoes[r.despesa] = (
+                    insercoes.get(r.despesa, Decimal("0.00")) + r.valor
+                )
+            for r in emenda.registrocontabil_set.all_deducoes():
+                deducoes[r.despesa] = deducoes.get(r.despesa, Decimal("0.00")) + r.valor
+
+            for elp in emenda.emendaloaparlamentar_set.all():
+                if elp.parlamentar not in parlamentares:
+                    parlamentares[elp.parlamentar] = {
+                        "valor": Decimal("0.00"),
+                        "prefixo_finalidade": emenda.prefixo_finalidade,
+                        "finalidade": [],
+                    }
+                parlamentares[elp.parlamentar]["valor"] += elp.valor
+                parlamentares[elp.parlamentar]["finalidade"].append(emenda.finalidade)
+                total_via_parlamentares += elp.valor
+
+        # ordenar parlamentares por nome_parlamentar
+        parlamentares = dict(
+            sorted(parlamentares.items(), key=lambda item: item[0].nome_parlamentar)
+        )
+
+        # for parl, dados in parlamentares.items():
+        #    dados["finalidade"] = [
+        #        re.sub(r"\{.*?\}", "", f) for f in dados["finalidade"]
+        #    ]
+
+        return {
+            "object": self,
+            "unidades": [u.especificacao for u in unidades],
+            "entidades": list(entidades),
+            "bairros": list(bairros),
+            "total_via_parlamentares": total_via_parlamentares,
+            "parlamentares": Parlamentar.objects.filter(
+                id__in=[p.id for p in parlamentares.keys()]
+            ),
+            "parlamentares_list_values": parlamentares,
+            "insercoes": insercoes,
+            "deducoes": deducoes,
+        }
 
 
 class AgrupamentoEmendaLoa(models.Model):

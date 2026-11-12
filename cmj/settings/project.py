@@ -52,12 +52,18 @@ ASGI_APPLICATION = "cmj.asgi.application"
 
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
+
+DATABASE_URL_PRD = config("DATABASE_URL_PRD", cast=str, default="")
+DATABASE_URL_DEV = config("DATABASE_URL_DEV", cast=str, default="")
+DATABASE_URL_BLOCK = config("DATABASE_URL_BLOCK", cast=str, default=DATABASE_URL_PRD)
+
 DATABASES = {
     "default": config(
         "DATABASE_URL_DEV" if DEBUG else "DATABASE_URL_PRD",
         cast=db_url,
     )
 }
+
 if not DEBUG:
     DATABASES["default"]["OPTIONS"] = {
         "pool": {
@@ -68,10 +74,6 @@ if not DEBUG:
             "timeout": 30,  # Tempo de espera se o pool esgotar antes de dar erro
         }
     }
-
-DATABASE_URL_PRD = config("DATABASE_URL_PRD", cast=str, default="")
-DATABASE_URL_DEV = config("DATABASE_URL_DEV", cast=str, default="")
-DATABASE_URL_BLOCK = config("DATABASE_URL_BLOCK", cast=str, default=DATABASE_URL_PRD)
 
 if DEBUG and FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
     host = DATABASES["default"]["HOST"]

@@ -1,3 +1,4 @@
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.forms.f_agrupamento import AgrupamentoForm
@@ -44,6 +45,12 @@ class AgrupamentoCrud(MasterDetailCrud):
         def cancel_url(self):
             url = self.resolve_url("detail", args=(self.kwargs["pk"],))
             return url
+
+        @property
+        def preview_url(self):
+            return reverse(
+                "sapl.api:loa_agrupamento-view", kwargs={"pk": self.kwargs["pk"]}
+            )
 
     class DeleteView(MasterDetailCrud.DeleteView):
         permission_required = ("loa.emendaloa_full_editor",)
