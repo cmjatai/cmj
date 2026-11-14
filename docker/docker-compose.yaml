@@ -61,7 +61,7 @@ services:
     networks:
       - cmj-net
   cmjdb18:
-    image: pgvector/pgvector:0.8.2-pg18-bookworm
+    image: pgvector/pgvector:0.8.7-pg18-bookworm
     restart: always
     container_name: cmjpostgres18
     labels:
@@ -78,14 +78,14 @@ services:
     #  - "5433:5432"
     networks:
       - cmj-net
-  cmj:
+  cmj-blue:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
-    container_name: cmj
+    container_name: cmj-blue
     user: "root:root"
     labels:
-       NAME: "cmj"
+       NAME: "cmj-blue"
     restart: always
     environment:
       DEBUG: 'False'
@@ -106,12 +106,39 @@ services:
       - "8001:80"
     networks:
       - cmj-net
+  cmj-green:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfile
+    container_name: cmj-green
+    user: "root:root"
+    labels:
+       NAME: "cmj-green"
+    restart: always
+    environment:
+      DEBUG: 'False'
+      USE_SOLR: 'True'
+      SOLR_COLLECTIONS: portalcmj_cmj,portalcmj_arq
+      SOLR_URL: http://solr:solr@cmjsolr:8983
+      IS_ZK_EMBEDDED: 'True'
+      TZ: America/Sao_Paulo
+    volumes:
+      - cmj_data:/var/cmjatai/cmj_data
+      - cmj_media:/var/cmjatai/cmj_media
+      - cmj_logs:/var/cmjatai/cmj/logs
+    depends_on:
+      - cmjdb18
+      - cmjredis
+      - cmjsolr
+    ports:
+      - "8002:80"
+    networks:
+      - cmj-net
 networks:
   cmj-net:
     name: cmj-net
     driver: bridge
 volumes:
-  cmjdb15_data:
   cmjdb18_data:
   cmj_data:
   cmj_media:
