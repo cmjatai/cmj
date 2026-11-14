@@ -29,11 +29,10 @@
             {% endif %}
             <i class="fas fa-external-link-alt fa-sm ml-1 text-muted"></i>
           </a>
-          {% if emenda.fase == emenda|getattr:"PROPOSTA" and %}
-          <!-- link para sapl.api:loa_emendaloa-view com icone pdf -->
-          <a href="{% url 'sapl.api:loa_emendaloa-view' emenda.id %}" class="ml-2" target="_blank" title="Visualizar PDF">
-            <i class="fas fa-file-pdf fa-sm text-muted"></i>
-          </a>
+          {% if emenda.fase == emenda|getattr:"LIBERACAO_CONTABIL" and not emenda.permite_juncao_coletiva %}
+            <a href="{% url 'sapl.api:loa_emendaloa-view' emenda.id %}" class="ml-2" target="_blank" title="Visualizar PDF">
+              <i class="fas fa-file-pdf fa-sm text-muted"></i>
+            </a>
           {% endif %}
         </h4>
         <div class="mb-2">
@@ -43,6 +42,15 @@
           <span class="badge badge-{% if emenda.fase > 60 %}success{% elif emenda.fase > 40 %}warning{% elif emenda.fase == 40 %}danger{% else %}info{% endif %}">
             {{emenda.get_fase_display}}
           </span>
+          {% if emenda.tipo %}
+            {% if emenda.emendaloaparlamentar_set.count < 1 and emenda.fase < 20 and user.is_authenticated and emenda.permite_juncao_coletiva %}
+              <span class="badge badge-success ml-1">Emenda Coletiva</span>
+            {% elif emenda.fase < 20 and user.is_authenticated and emenda.permite_juncao_coletiva %}
+              <span class="badge badge-success ml-1">Permite Junção em Coletiva</span>
+            {% elif emenda.fase < 20 and user.is_authenticated and not emenda.permite_juncao_coletiva  %}
+              <span class="badge badge-danger ml-1">Emenda Individual</span>
+            {% endif %}
+          {% endif %}
         </div>
       </div>
 

@@ -87,7 +87,7 @@ class EmendaLoa(CmjSearchMixin):
         encoder=DjangoJSONEncoder,
     )
 
-    permite_coletiva = models.BooleanField(
+    permite_juncao_coletiva = models.BooleanField(
         verbose_name=_("Permite junção coletiva?"),
         default=False,
         choices=YES_NO_CHOICES,

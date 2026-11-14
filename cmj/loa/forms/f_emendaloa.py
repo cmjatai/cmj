@@ -103,7 +103,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         queryset=MateriaLegislativa.objects.all(),
     )
 
-    permite_coletiva = forms.ChoiceField(
+    permite_juncao_coletiva = forms.ChoiceField(
         label="Permite Junção em Coletiva?",
         required=True,
         choices=YES_NO_CHOICES,
@@ -235,7 +235,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             "tipo_materia",
             "numero_materia",
             "ano_materia",
-            "permite_coletiva",
+            "permite_juncao_coletiva",
             "prefixo_indicacao",
             "indicacao",
             "prefixo_finalidade",
@@ -271,7 +271,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         row_topo_1 = to_row(
             [
-                ("permite_coletiva", 3),
+                ("permite_juncao_coletiva", 3),
                 ("tipo", 3),
                 ("fase", 3),
                 ("valor", 3),
