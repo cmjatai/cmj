@@ -72,6 +72,15 @@ def render_chunk_vendors(extension=None):
         return ''"""
 
 
+@register.filter(name="getattr")
+def get_attribute(obj, attr_name):
+    if hasattr(obj, str(attr_name)):
+        return getattr(obj, str(attr_name))
+    if isinstance(obj, dict):
+        return obj.get(attr_name)
+    return None
+
+
 @register.filter("decimal2str")
 def decimal2str(value):
     return formats.number_format(value, force_grouping=True)

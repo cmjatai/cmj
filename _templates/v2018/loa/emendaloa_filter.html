@@ -49,13 +49,12 @@
           <button class="btn btn-link btn-expand">
             <i class="fas fa-expand"></i>
           </button>
-          {% if DEBUG %}
+          {% if user.is_authenticated or DEBUG %}
             {% include "loa/emendaloa_filter_cache.html" %}
           {% else %}
             {% cache 604800 l.el.l emenda.id %}
             {% include "loa/emendaloa_filter_cache.html" %}
             {% endcache %}
-
           {% endif %}
         </div>
         {% comment %}

@@ -72,7 +72,6 @@ def signal_loa_emendaloa_disable_cache(sender, **kwargs):
     if sender and hasattr(sender, "_meta"):
         if sender._meta.app_label in ("loa", "sessao", "norma", "materia"):
             try:
-                # keys com cache semanal
                 inst = kwargs.get("instance", {})
                 insts = None
                 if inst:
@@ -105,6 +104,5 @@ def signal_loa_emendaloa_disable_cache(sender, **kwargs):
                             cache.delete(key)
 
             except Exception as e:
-                # logger.error(
-                #    "Erro ao tentar invalidar cache de matéria: {}".format(e))
-                pass
+                logger.error(
+                    "Erro ao tentar invalidar cache: {}".format(e))

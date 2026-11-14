@@ -29,6 +29,12 @@
             {% endif %}
             <i class="fas fa-external-link-alt fa-sm ml-1 text-muted"></i>
           </a>
+          {% if emenda.fase == emenda|getattr:"PROPOSTA" and %}
+          <!-- link para sapl.api:loa_emendaloa-view com icone pdf -->
+          <a href="{% url 'sapl.api:loa_emendaloa-view' emenda.id %}" class="ml-2" target="_blank" title="Visualizar PDF">
+            <i class="fas fa-file-pdf fa-sm text-muted"></i>
+          </a>
+          {% endif %}
         </h4>
         <div class="mb-2">
           <span class="badge badge-{% if emenda.tipo == 10 %}info{% elif emenda.tipo == 99 %}primary{% else %}secondary{% endif %} mr-1">
@@ -68,7 +74,7 @@
   {# ===== DADOS PRINCIPAIS ===== #}
   <div class="card-body pt-2 pb-2">
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-{% if emenda.materia %}7{% else %}12{% endif %}">
         {% if emenda.unidade %}
           <small class="d-block text-muted"><strong>Unidade Orçamentária:</strong> {{emenda.unidade}}</small>
         {% endif %}
@@ -81,7 +87,7 @@
           {% endif %}
         {% endif %}
       </div>
-      <div class="col-md-6">
+      <div class="col-md-{% if emenda.materia %}5{% else %}0{% endif %}">
         {% if emenda.materia %}
           {% if emenda.loa and emenda.loa.materia and emenda.loa.materia.normajuridica %}
             <small class="d-block text-muted"><strong>LOA:</strong>
@@ -90,7 +96,7 @@
               </a>
             </small>
           {% endif %}
-          <small class="d-block text-muted"><strong>Matéria Legislativa:</strong>
+          <small class="d-block text-muted"><strong>Matéria Legislativa:</strong><br>
             <a href="{% url 'sapl.materia:materialegislativa_detail' emenda.materia.id %}">
                {{emenda.materia.epigrafe}}
             </a>
@@ -100,7 +106,7 @@
     </div>
     {% if emenda.finalidade %}
       <div class="mt-2 p-2 bg-light rounded border">
-        <small class="text-muted"><strong>Finalidade:</strong> {{emenda.ementa_format}}</small>
+        <small class="text-muted"><strong>OBJETO:</strong> {{emenda.ementa_format}}</small>
         {% if emenda.registroajusteloa_set.exists %}
           <br><small class="badge badge-warning text-wrap"><strong>Atenção:</strong> Esta emenda possui ajustes técnicos cadastrados. Verifique a aba "Ajustes Técnicos" para mais detalhes.</small>
         {% endif %}
