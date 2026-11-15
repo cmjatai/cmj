@@ -281,7 +281,7 @@ class EmendaLoaViewSet:
             bresponse = doc.tobytes()
 
         if el.emendaloaparlamentar_set.count() > 1:
-            nome_autor = 'coletiva'
+            nome_autor = "coletiva"
         else:
             nome_autor = (el.owner.operadorautor_set.first() or "") if el.owner else ""
             if nome_autor:
@@ -333,7 +333,9 @@ class EmendaLoaViewSet:
             if query:
                 qs = qs.filter(q)
 
-            return qs.order_by("-fase")
+            return qs.order_by(
+                "-agrupamentoemendaloa", "unidade__especificacao", "entidade", "-fase"
+            )
 
         self.serializer_class = EmendaLoaSearchSerializer
         self.filter_queryset = filter_queryset

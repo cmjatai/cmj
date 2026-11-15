@@ -114,6 +114,10 @@ class IAGenaiBase:
         quota = self.retrieve_quota_if_available(
             ia_model_name=ia_model_name, ascending=ascending
         )
+        # TODO: refatorar para desacoplar:
+        # - a lógica de geração de conteúdo da verificação de quota
+        # - o system_instruction da configuração fixo de chat
+        # 
         self.update_generation_config()
         config = self.generation_config
         if tools:

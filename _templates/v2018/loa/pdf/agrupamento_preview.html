@@ -78,48 +78,66 @@
     {% endfor %}
   </h5>
   <p class="ementa recuo4">
-    Destina recursos orçamentários, via <strong>{{agrupamento.unidades|join:", "}}</strong>, no valor de
-    <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}})</strong>,
-    indicando como beneficiário(a) <strong>{{agrupamento.entidades|join:", "}}</strong>
-    {% if agrupamento.bairros %} (Localização: {{agrupamento.bairros|join:", "}}){% endif %}
-    {% if agrupamento.object.finalidade %}
-      <strong>{{ agrupamento.object.finalidade_format }}</strong>.
-    {% endif %}
+    Altera destinação de recursos orçamentários indicando {{ agrupamento.emendas.0.prefixo_indicacao}} {{ agrupamento.unidade.especificacao }}, para a recepção de recursos no valor de
+    <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}})</strong>{% if agrupamento.entidade %},
+      em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.object.finalidade %},
+      que será <strong>{{ agrupamento.object.finalidade }}</strong>{% elif agrupamento.finalidade_agregada %},
+      que será <strong>{{ agrupamento.finalidade_agregada }}</strong>{% endif %}{% if 'localidade' not in agrupamento.object.finalidade.lower and agrupamento.bairro %},
+      (Localidade beneficiada: {{agrupamento.bairro}}){% endif %}.
   </p>
+
+
   <p class="preambulo">
     {% if agrupamento.parlamentares.isonly_sexo_feminino %}A{% else %}O{% endif %}{% if agrupamento.parlamentares.count > 1 %}s{% endif %}
     subscritor{% if agrupamento.parlamentares.isonly_sexo_feminino %}a{% else %}{% if agrupamento.parlamentares.count > 1 %}e{% endif %}{% endif %}{% if agrupamento.parlamentares.count > 1 %}s{% endif %}
     da presente Emenda Impositiva, propõem a seguinte modificação no Projeto de Lei Orçamentária Anual supracitado:
   </p>
 
+
   <p class="art">
-      <span class="rotulo">Art {{ view.art }}º - </span>A destinação dos recursos
-      para {{agrupamento.entidades|join:", "}}{% if agrupamento.bairros %} (Localização: {{agrupamento.bairros|join:", "}}){% endif %},
-
-      {% if agrupamento.object.finalidade %}
-        <strong>{{ agrupamento.object.finalidade_format }}</strong>,
-      {% endif %}
-
-      no valor de
-    <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}}),</strong>
-
-
-
-    será dividido entre
-    {% if agrupamento.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
+      <span class="rotulo">Art {{ view.art }}º - </span>
+      O valor de <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}})</strong>
+      será inserido na Unidade Orçamentária <strong>{{ agrupamento.unidade.especificacao }}</strong>{% if agrupamento.entidade %},
+      em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.object.finalidade %},
+      que será <strong>{{ agrupamento.object.finalidade }}</strong>{% elif agrupamento.finalidade_agregada %},
+      que será <strong>{{ agrupamento.finalidade_agregada }}</strong>{% endif %}{% if 'localidade' not in agrupamento.object.finalidade.lower and agrupamento.bairro %}.
+      (Localidade beneficiada: {{agrupamento.bairro}}){% endif %},
+    com indicação detalhada
+    {% if agrupamento.parlamentares.isonly_sexo_feminino %}das{% else %}dos{% endif %}
     vereador{% if agrupamento.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
     subscritor{% if agrupamento.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
-    da seguinte forma:
+    conforme incisos abaixo:
       {% for parl, dados in agrupamento.parlamentares_list_values.items %}
         {% if forloop.first %}
           <ol class="courier destinacao-list">
         {% endif %}
         <li>
-          R$ {{ dados.valor|valor_str }} ({{dados.valor|valor_por_extenso}}):
           <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
-          {{parl.nome_parlamentar}}</strong>{% if not agrupamento.object.finalidade %},
-          {{dados.prefixo_finalidade}} {{dados.finalidade|join:", "}}.{% else %}.{% endif %}
+          {{parl.nome_parlamentar}}</strong>:
+          <ol class="courier">
+            {% for finalidade in dados.finalidade %}
+              <li>{{finalidade|safe}}</li>
+            {% endfor %}
+          </ol>
         </li>
+
+
+        {% comment %}
+        <li>
+          <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
+          {{parl.nome_parlamentar}}</strong>{% if agrupamento.object.finalidade or agrupamento.finalidade_agregada %}
+            - R$ {{ dados.valor|valor_str }} ({{dados.valor|valor_por_extenso}})
+          {% else %}:
+          <ol>
+            {% for finalidade in dados.finalidade %}
+              <li>{{finalidade}}</li>
+            {% endfor %}
+          </ol>
+          {% endif %}
+        </li>
+        {% endcomment %}
+
+
         {% if forloop.last %}
         </ol>
         {% endif %}

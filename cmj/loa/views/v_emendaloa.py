@@ -2,12 +2,12 @@ import io
 import re
 import tempfile
 import zipfile
+from _collections import OrderedDict
 from decimal import Decimal
 from urllib.parse import urlencode
 
 import pymupdf
 import requests
-from _collections import OrderedDict
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
@@ -95,6 +95,18 @@ class EmendaLoaCrud(MasterDetailCrud):
             ):
                 return url_perm
 
+            operador_autor_da_emenda = self.object.owner.operadorautor_set.first()
+            autor_da_emenda = (
+                operador_autor_da_emenda.autor if operador_autor_da_emenda else None
+            )
+
+            operador_autor_user = self.request.user.operadorautor_set.first()
+            autor_do_usuario = (
+                operador_autor_user.autor if operador_autor_user else None
+            )
+
+            if autor_da_emenda == autor_do_usuario:
+                return url_perm
             return url_perm if self.request.user == self.object.owner else ""
 
             if (
@@ -1119,7 +1131,21 @@ class EmendaLoaCrud(MasterDetailCrud):
             self.object = (
                 self.get_object() if not hasattr(self, "object") else self.object
             )
-            return has_perm or u == self.object.owner
+
+            if has_perm:
+                return True
+
+            operador_autor_da_emenda = self.object.owner.operadorautor_set.first()
+            autor_da_emenda = (
+                operador_autor_da_emenda.autor if operador_autor_da_emenda else None
+            )
+
+            operador_autor_user = self.request.user.operadorautor_set.first()
+            autor_do_usuario = (
+                operador_autor_user.autor if operador_autor_user else None
+            )
+
+            return autor_da_emenda == autor_do_usuario
 
             # permite usuários de emenda coletiva editarem a emenda caso atendam aos critérios definidos abaixo
             if not has_perm:

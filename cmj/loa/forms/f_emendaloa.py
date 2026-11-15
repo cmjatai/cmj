@@ -74,7 +74,17 @@ class EmendaLoaValorWidget(SplitArrayWidget):
                 #    w['attrs']['readonly'] = 'readonly'
                 #    continue
 
-                if self.user == self.instance.owner:
+                operador_autor_da_emenda = self.instance.owner.operadorautor_set.first()
+                autor_da_emenda = (
+                    operador_autor_da_emenda.autor if operador_autor_da_emenda else None
+                )
+
+                operador_autor_user = self.user.operadorautor_set.first()
+                autor_do_usuario = (
+                    operador_autor_user.autor if operador_autor_user else None
+                )
+
+                if autor_da_emenda == autor_do_usuario:
                     continue
 
                 op = self.user.operadorautor_set.first()

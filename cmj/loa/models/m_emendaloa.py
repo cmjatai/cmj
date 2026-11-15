@@ -262,7 +262,17 @@ class EmendaLoa(CmjSearchMixin):
 
     @property
     def fields_search(self):
-        return ["artigos_search"]
+        return [
+            "artigos_search",
+            "parlamentares_search",
+        ]
+
+    @property
+    def parlamentares_search(self):
+        _parlamentares_search = "\n".join(
+            [p.nome_parlamentar for p in self.parlamentares.all()]
+        )
+        return _parlamentares_search
 
     @property
     def artigos_search(self):

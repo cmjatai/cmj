@@ -20,6 +20,7 @@ class AgrupamentoForm(ModelForm):
     busca_emendaloa = forms.CharField(
         label="Procurar por emendas cadastradas",
         required=False,
+        widget=TextInput(attrs={"autocomplete": "off", "type": "search"}),
     )
 
     busca_despesa = forms.CharField(
@@ -63,15 +64,19 @@ class AgrupamentoForm(ModelForm):
 
     ano_loa = forms.CharField(label="", widget=forms.HiddenInput(), required=False)
 
+    finalidade = forms.CharField(
+        label="Finalidade",
+        required=False,
+        help_text="Dê Ctrl+Clique para atualização por I.A. com base nas emendas já adicionadas",
+        widget=forms.Textarea(attrs={"rows": 3}),
+    )
+
     class Meta:
         model = Agrupamento
         fields = [
             "nome",
             "finalidade",
         ]
-        widgets = {
-            "finalidade": forms.Textarea(attrs={"rows": 3}),
-        }
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs["initial"].pop("user", None)

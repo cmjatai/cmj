@@ -4,6 +4,7 @@ from rest_framework.response import Response
 
 from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
 from cmj.loa.models import AgrupamentoEmendaLoa, EmendaLoa
+from cmj.loa.models.m_agrupamento import Agrupamento
 
 
 class AgrupamentoEmendaLoaViewSet:
@@ -30,6 +31,11 @@ class AgrupamentoEmendaLoaViewSet:
             emendaloa=int(request.data["emendaloa"]),
         ).delete()
 
+        # sync agrupamento
+        agrupamento_id = int(request.data["agrupamento"])
+        agrupamento = Agrupamento.objects.get(pk=agrupamento_id)
+        agrupamento.sync()
+
         return Response({"detail": "Registro removido com Sucesso."})
 
     def create(self, request, *args, **kwargs):
@@ -41,7 +47,10 @@ class AgrupamentoEmendaLoaViewSet:
                 el = EmendaLoa.objects.get(pk=r.data["emendaloa"])
                 el.fase = emendaloa__fase
                 el.save()
-
+            r.data["agrupamento_finalidade"] = AgrupamentoEmendaLoa.objects.get(
+                agrupamento=int(request.data["agrupamento"]),
+                emendaloa=int(request.data["emendaloa"]),
+            ).agrupamento.finalidade
             return r
         except Exception as e:
             if "code='unique'" in str(e):

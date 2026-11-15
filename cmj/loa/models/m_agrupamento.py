@@ -1,15 +1,21 @@
+import logging
 import re
 from decimal import Decimal
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.db.models import manager
 from django.db.models.deletion import CASCADE, PROTECT
+from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
 from cmj.utils import PERCENTAGE_VALIDATOR, quantize
+from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetiva
 from sapl.parlamentares.models import Parlamentar
+
+logger = logging.getLogger(__name__)
 
 
 class Agrupamento(models.Model):
@@ -39,6 +45,14 @@ class Agrupamento(models.Model):
         related_name="agrupamento_set",
         verbose_name=_("Registro Contabeis Agrupamento"),
         through_fields=("agrupamento", "despesa"),
+    )
+
+    metadata = JSONField(
+        verbose_name=_("Metadados"),
+        blank=True,
+        null=True,
+        default=dict,
+        encoder=DjangoJSONEncoder,
     )
 
     class Meta:
@@ -98,26 +112,69 @@ class Agrupamento(models.Model):
                     insercoes[-1].valor = insercoes[-1].valor + resto
                     insercoes[-1].save()
 
+        try:
+            self.update_finalidade_com_ia()
+        except Exception as e:
+            logger.error("Erro ao atualizar finalidade com IA: %s", e)
+
+    def update_finalidade_com_ia(self):
+
+        # verifica se todas as emendas são tem a mesma unidade e entidade
+        emendas = list(self.emendas.values("unidade", "entidade"))
+        if not emendas:
+            raise ValueError("Não há emendas para este agrupamento")
+        first_unidade = emendas[0]["unidade"]
+        first_entidade = emendas[0]["entidade"]
+        error = False
+        for e in emendas:
+            if e["unidade"] != first_unidade or e["entidade"] != first_entidade:
+                error = True
+                break
+
+        if error:
+            self.finalidade = ""
+            self.save(update_fields=["finalidade"])
+            raise ValueError(
+                "É necessário que todas as emendas possuam a mesma unidade e entidade."
+            )
+        try:
+            ia = IAEmentaEmendaColetiva(
+                [str(e.finalidade_format) for e in self.emendas.all()]
+            )
+            self.finalidade = ia.gerar_finalidade_global()
+            if not self.finalidade:
+                self.finalidade = ""
+            self.save(update_fields=["finalidade"])
+        except Exception as e:
+            logger.error("Erro ao atualizar finalidade com IA: %s", e)
+            self.finalidade = ""
+            self.save(update_fields=["finalidade"])
+
     def preparar_dados_para_coletiva(self):
 
-        insercoes = {}
-        deducoes = {}
+        # a chave de agrupamento de emendas é a unidade + entidade, onde unidade nunca é nula mas a entidade pode ser nula
 
-        parlamentares = {}
-        total_via_parlamentares = Decimal("0.00")
-
-        unidades = set()
-        entidades = set()
-        bairros = set()
+        emendas_coletivas = {}
 
         for emenda in self.emendas.all():
+            if not emenda.permite_juncao_coletiva:
+                continue
 
-            if emenda.unidade:
-                unidades.add(emenda.unidade)
-            if emenda.entidade:
-                entidades.add(emenda.entidade)
-            if emenda.bairro:
-                bairros.add(emenda.bairro)
+            key = (emenda.unidade, emenda.entidade)
+            if key not in emendas_coletivas:
+                emendas_coletivas[key] = {
+                    "emendas": [],
+                    "insercoes": {},
+                    "deducoes": {},
+                    "parlamentares": {},
+                    "total_via_parlamentares": Decimal("0.00"),
+                }
+            emendas_coletivas[key]["emendas"].append(emenda)
+
+            insercoes = emendas_coletivas[key]["insercoes"]
+            deducoes = emendas_coletivas[key]["deducoes"]
+            parlamentares = emendas_coletivas[key]["parlamentares"]
+            total_via_parlamentares = emendas_coletivas[key]["total_via_parlamentares"]
 
             for r in emenda.registrocontabil_set.all_insercoes():
                 insercoes[r.despesa] = (
@@ -134,32 +191,46 @@ class Agrupamento(models.Model):
                         "finalidade": [],
                     }
                 parlamentares[elp.parlamentar]["valor"] += elp.valor
-                parlamentares[elp.parlamentar]["finalidade"].append(emenda.finalidade)
+                parlamentares[elp.parlamentar]["finalidade"].append(
+                    f"<strong>R$ {emenda.str_valor}</strong> - {emenda.prefixo_finalidade} {emenda.finalidade_format}"
+                )
                 total_via_parlamentares += elp.valor
 
+            emendas_coletivas[key]["total_via_parlamentares"] = total_via_parlamentares
+
         # ordenar parlamentares por nome_parlamentar
-        parlamentares = dict(
-            sorted(parlamentares.items(), key=lambda item: item[0].nome_parlamentar)
-        )
+        for key in emendas_coletivas:
+            parlamentares = emendas_coletivas[key]["parlamentares"]
+            emendas_coletivas[key]["parlamentares"] = dict(
+                sorted(parlamentares.items(), key=lambda item: item[0].nome_parlamentar)
+            )
 
-        # for parl, dados in parlamentares.items():
-        #    dados["finalidade"] = [
-        #        re.sub(r"\{.*?\}", "", f) for f in dados["finalidade"]
-        #    ]
+        # criar finalidade agregada para cada agrupamento via I.A.
+        # ia = IAEmentaEmendaColetiva()
+        # for key in emendas_coletivas:
+        #    emendas = emendas_coletivas[key]["emendas"]
+        #    finalidades = [emenda.finalidade for emenda in emendas]
+        #    finalidade_agregada = ia.gerar_finalidade_global(finalidades)
+        #    emendas_coletivas[key]["finalidade_agregada"] = finalidade_agregada
 
-        return {
-            "object": self,
-            "unidades": [u.especificacao for u in unidades],
-            "entidades": list(entidades),
-            "bairros": list(bairros),
-            "total_via_parlamentares": total_via_parlamentares,
-            "parlamentares": Parlamentar.objects.filter(
-                id__in=[p.id for p in parlamentares.keys()]
-            ),
-            "parlamentares_list_values": parlamentares,
-            "insercoes": insercoes,
-            "deducoes": deducoes,
-        }
+        return [
+            {
+                "object": self,
+                "emendas": value["emendas"],
+                "unidade": unidade,
+                "entidade": entidade,
+                "finalidade_agregada": value.get("finalidade_agregada", None),
+                "bairro": value["emendas"][0].bairro if value["emendas"] else None,
+                "total_via_parlamentares": value["total_via_parlamentares"],
+                "parlamentares": Parlamentar.objects.filter(
+                    id__in=[p.id for p in value["parlamentares"].keys()]
+                ),
+                "parlamentares_list_values": value["parlamentares"],
+                "insercoes": value["insercoes"],
+                "deducoes": value["deducoes"],
+            }
+            for (unidade, entidade), value in emendas_coletivas.items()
+        ]
 
 
 class AgrupamentoEmendaLoa(models.Model):

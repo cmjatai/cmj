@@ -1100,7 +1100,7 @@ class IAQuota(models.Model):
         verbose_name=_("Descrição"),
         help_text=_("Descrição do modelo da Quota IA."),
         blank=True,
-        default="",
+        default="", 
     )
 
     class ServicosAutorizados(models.TextChoices):

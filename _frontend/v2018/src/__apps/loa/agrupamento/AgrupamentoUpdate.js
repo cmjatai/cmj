@@ -151,7 +151,7 @@ export default class AgrupamentoUpdate {
       return
     }
 
-    axios.get(`/api/loa/despesaconsulta/search/?page_size=5&ano=${this.ano_loa}&q=${event.target.value}`)
+    axios.get(`/api/loa/despesaconsulta/search/?page_size=10&ano=${this.ano_loa}&q=${event.target.value}`)
       .then((response) => {
         busca_render.html('')
         const inner = $('<div class="inner"></div>')
@@ -214,6 +214,12 @@ export default class AgrupamentoUpdate {
   loadEmendasAgrupamento () {
     const emendaloa_selecteds = this.form.find('.emendaloa-selecteds')
     const busca_render_emendaloa = this.form.find('.busca-render-emendaloa')
+
+    this.form.find('#id_finalidade').val('Atualizando...')
+    axios.get(`/api/loa/agrupamento/${this.pk}/`)
+      .then((response) => {
+        this.form.find('#id_finalidade').val(response.data.finalidade || '')
+      })
 
     axios.get(`/api/loa/agrupamento/${this.pk}/emendas/?&get_all=true`)
       .then((response) => {
@@ -278,11 +284,11 @@ export default class AgrupamentoUpdate {
 
           let text_html = this.renderEmendaItem(value, inner_item, true) // true = return html string
 
-          _.each(parts, (p) => {
+          /* _.each(parts, (p) => {
             const re = new RegExp(`(${p})`, 'ig')
             text_html = text_html.replace(re, '<strong class="highlight">$1</strong>')
           })
-
+          */
           // Replace content with highlighted version
           inner_item.html(text_html)
 
@@ -300,12 +306,16 @@ export default class AgrupamentoUpdate {
               emendaloa: pk_emendaloa,
               emendaloa__fase: 15
             }
+            this.form.find('#id_finalidade').val('Atualizando...')
+
             axios.post(`/api/loa/agrupamentoemendaloa/`, formData)
               .then((response) => {
+                this.form.find('#id_finalidade').val(response.data.agrupamento_finalidade)
                 busca_render_emendaloa.find(`.item-emendaloa[pk="${response.data.emendaloa}"]`).parent().remove()
                 this.loadEmendasAgrupamento()
               })
               .catch((error) => {
+                this.form.find('#id_finalidade').val('')
                 busca_render_emendaloa.find('.alert').remove()
                 inner.prepend($(`<div class="pt-2"><div class="alert alert-danger">${error.response.data[0]}</div></div>`))
               })
@@ -326,11 +336,17 @@ export default class AgrupamentoUpdate {
     }
     str_parlamentares = str_parlamentares.join('<br>')
 
+    let nao_permite_juncao_coletiva = ''
+    if (!value.permite_juncao_coletiva) {
+      nao_permite_juncao_coletiva = '<strong class="badge badge-warning" title="Pode ser classificada, mas não permite junção coletiva"><i class="fas fa-ban"></i>Não permite junção coletiva</strong><br>'
+    }
+
     let text_html = `<div class="item-emendaloa" pk="${value.id}">
-        Valor da Emenda ${value.tipo !== 0 ? 'Impositiva' : 'Modificativa'}: <strong>R$ ${value.str_valor}</strong><br>
-        <strong>${value.indicacao}</strong><br>
-        <a href="${value.link_detail_backend}/edit" target="_blank">${value.finalidade}</a><br>
-        <small>${str_parlamentares}</small><br>
+            Valor da Emenda ${value.tipo !== 0 ? 'Impositiva' : 'Modificativa'}: <strong>R$ ${value.str_valor}</strong><br>
+            <strong>${value.indicacao}</strong><br>
+
+        <a href="${value.link_detail_backend}/edit" target="_blank">${value.prefixo_finalidade} ${value.finalidade}</a><br>
+        <small>${str_parlamentares}</small> ${nao_permite_juncao_coletiva}
         <span class="fase ${value.fase === 10 ? 'bg-danger' : value.fase === 12 ? 'bg-warning' : 'bg-green'}">${value.str_fase}</span>
       </div>`
 
@@ -357,13 +373,22 @@ export default class AgrupamentoUpdate {
       }
     })
 
-    this.form.find('select[name="fase"]').change((event) => {
-      const select = event.target
-      if (select.value === '10') {
-        select.classList.add('is-invalid')
-      } else {
-        select.classList.remove('is-invalid')
-      }
+    this.form.find('textarea[name="finalidade"]').on('click', (event) => {
+      if (!event.ctrlKey) return
+      const textarea = event.target
+      this.form.find('textarea[name="finalidade"]').prop('readonly', true)
+      this.form.find('textarea[name="finalidade"]').val('Atualizando com I.A...')
+      axios.patch(`${this.urlBase}/generate_finalidade_global/`)
+        .then((response) => {
+          const finalidadeGlobal = response.data.finalidade_global
+          if (finalidadeGlobal) {
+            textarea.value = finalidadeGlobal
+          }
+          this.form.find('textarea[name="finalidade"]').prop('readonly', false)
+        })
+        .catch((error) => {
+          this.form.find('textarea[name="finalidade"]').val(error.response?.data?.error || error.message)
+        })
     })
 
     this.form.change((event) => this.handleAutoSave(event))

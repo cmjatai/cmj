@@ -99,13 +99,13 @@ h3, h4, h5 {
   font-family: 'Courier New', Courier, monospace;
 }
 .destinacao-list {
-  list-style-type: decimal;
+  list-style-type: upper-roman;
   font-size: 10pt;
   margin: 0;
   padding: 0 0 0 0.7cm;
   text-align: justify;
   display: block;
-  line-height: 1;
+  line-height: 1.15;
 
 
   li::marker {

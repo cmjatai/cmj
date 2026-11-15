@@ -1,5 +1,5 @@
 import pymupdf
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from rest_framework.decorators import action
 
@@ -37,6 +37,24 @@ class AgrupamentoViewSet:
 
     @action(
         methods=[
+            "patch",
+        ],
+        detail=True,
+    )
+    def generate_finalidade_global(self, request, *args, **kwargs):
+        agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
+        finalidade_global = ""
+        try:
+          if agrupamento:
+              agrupamento.update_finalidade_com_ia()
+              finalidade_global = agrupamento.finalidade
+          return JsonResponse({"finalidade_global": finalidade_global})
+        except ValueError as e:
+            #responder com erro para que o promise no frontend saiba que houve falha
+            return JsonResponse({"error": str(e)}, status=400)
+
+    @action(
+        methods=[
             "get",
         ],
         detail=True,
@@ -44,15 +62,35 @@ class AgrupamentoViewSet:
     def view(self, request, *args, **kwargs):
         base_url = request.build_absolute_uri()
 
-        context = self.get_context_preview({})
-
-        template = render_to_string("loa/pdf/agrupamento_preview.html", context)
-        pdf_file = make_pdf(base_url=base_url, main_template=template)
-        ext = "pdf"
-
-        doc = pymupdf.Document(stream=pdf_file)
+        agrupamento = self.get_object()
+        emendas_coletivas_structured = agrupamento.preparar_dados_para_coletiva()
 
         p = int(request.GET.get("p", "0"))
+        doc = pymupdf.Document()
+        for idx, emenda_coletiva in enumerate(emendas_coletivas_structured):
+            self._art = 0
+            context = {}
+            context["lineHeight"] = 1.2
+            context["view"] = self
+            context["agrupamento"] = emenda_coletiva
+
+            template = render_to_string("loa/pdf/agrupamento_preview.html", context)
+            pdf_file = make_pdf(base_url=base_url, main_template=template)
+
+            doc_individual = pymupdf.Document(stream=pdf_file)
+            emenda_coletiva["doc"] = doc_individual
+            doc.insert_pdf(doc_individual)
+
+        # doc to byte
+        bresponse = doc.write()
+
+        for emenda_coletiva in emendas_coletivas_structured:
+            emenda_coletiva["doc"].close()
+
+        # reopen the merged document for reading
+        doc = pymupdf.Document(stream=bresponse)
+        ext = "pdf"
+
         if p:
             d2b = doc
             ext = "png"
@@ -82,14 +120,6 @@ class AgrupamentoViewSet:
         response["Pragma"] = "no-cache"
         response["Expires"] = 0
         return response
-
-    def get_context_preview(self, context):
-        agrupamento = self.get_object()
-        context["agrupamento"] = agrupamento.preparar_dados_para_coletiva()
-        context["lineHeight"] = 1.2
-        context["view"] = self
-
-        return context
 
     @property
     def art(self):

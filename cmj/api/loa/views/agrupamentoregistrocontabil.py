@@ -230,11 +230,12 @@ class AgrupamentoRegistroContabilSerializer(CmjSerializerMixin):
             d.natureza = natureza
             d.fonte = fonte
 
-            despesa_dict = d.__dict__
+            despesa_dict = d.__dict__.copy()
             despesa_dict.pop("id")
             despesa_dict.pop("_state")
             despesa_dict.pop("valor_materia", None)
             despesa_dict.pop("valor_norma", None)
+            despesa_dict.pop("search")
             despesa, created = Despesa.objects.get_or_create(**despesa_dict)
 
         else:
@@ -254,15 +255,18 @@ class AgrupamentoRegistroContabilSerializer(CmjSerializerMixin):
                             codigo=fonte_codigo, loa_id=loa.id
                         )
                         if created:
-                            fonte.especificacao = f"Emendas Impositivas"
+                            fonte.especificacao = (
+                                f"{despesa.fonte.especificacao} / Emendas Impositivas"
+                            )
                             fonte.save()
 
-                        despesa_dict = despesa.__dict__
+                        despesa_dict = despesa.__dict__.copy()
                         despesa_dict["fonte_id"] = fonte.id
                         despesa_dict.pop("id")
                         despesa_dict.pop("_state")
                         despesa_dict.pop("valor_materia")
                         despesa_dict.pop("valor_norma")
+                        despesa_dict.pop("search")
                         despesa, created = Despesa.objects.get_or_create(**despesa_dict)
 
         validated_data = {
