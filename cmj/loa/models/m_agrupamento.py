@@ -19,6 +19,13 @@ logger = logging.getLogger(__name__)
 
 
 class Agrupamento(models.Model):
+    SAUDE = 10
+    DIVERSOS = 99
+    TIPOEMENDALOA_CHOICE = (
+        (-1, _("Não selecionado")),
+        (SAUDE, _("Em.Imp. Saúde")),
+        (DIVERSOS, _("Em.Imp. Áreas Diversas")),
+    )
 
     loa = models.ForeignKey(
         "loa.Loa",
@@ -28,6 +35,10 @@ class Agrupamento(models.Model):
     )
 
     nome = models.CharField(verbose_name=_("Nome do Agrupamento"), max_length=256)
+
+    tipo = models.SmallIntegerField(
+        choices=TIPOEMENDALOA_CHOICE, default=-1, verbose_name=_("Área de aplicação")
+    )
 
     finalidade = models.TextField(verbose_name=_("Finalidade"), blank=True, default="")
 
@@ -74,6 +85,28 @@ class Agrupamento(models.Model):
             return finalidade
         except Exception:
             return ""
+
+    def create_copia(self):
+        # verifica antes o número de cópias colocando o número dentro do nome
+        nome = self.nome.split(" (Cópia")[0]
+        num_copias = Agrupamento.objects.filter(
+            loa=self.loa, nome__startswith=nome
+        ).count()
+        nome_copia = f"{nome} (Cópia {num_copias + 1})"
+        copia = Agrupamento.objects.create(
+            loa=self.loa,
+            nome=nome_copia,
+            finalidade="",
+            metadata={},
+        )
+
+        for registro in self.agrupamentoregistrocontabil_set.all():
+            copia.agrupamentoregistrocontabil_set.create(
+                despesa=registro.despesa,
+                percentual=registro.percentual,
+                operacao=registro.operacao if hasattr(registro, "operacao") else None,
+            )
+        return copia
 
     def sync(self):
         registros = self.agrupamentoregistrocontabil_set.all()
@@ -206,12 +239,12 @@ class Agrupamento(models.Model):
             )
 
         # criar finalidade agregada para cada agrupamento via I.A.
-        # ia = IAEmentaEmendaColetiva()
-        # for key in emendas_coletivas:
-        #    emendas = emendas_coletivas[key]["emendas"]
-        #    finalidades = [emenda.finalidade for emenda in emendas]
-        #    finalidade_agregada = ia.gerar_finalidade_global(finalidades)
-        #    emendas_coletivas[key]["finalidade_agregada"] = finalidade_agregada
+        ia = IAEmentaEmendaColetiva()
+        for key in emendas_coletivas:
+            emendas = emendas_coletivas[key]["emendas"]
+            finalidades = [emenda.finalidade for emenda in emendas]
+            finalidade_agregada = ia.gerar_finalidade_global(finalidades)
+            emendas_coletivas[key]["finalidade_agregada"] = finalidade_agregada
 
         return [
             {

@@ -201,7 +201,7 @@ PrestacaoContaRegistroDetail:
 
 AgrupamentoCreate:
   {% trans 'Agrupamento' %}:
-  - nome
+  - nome tipo
 
 Agrupamento:
   {% trans 'Agrupamento' %}:

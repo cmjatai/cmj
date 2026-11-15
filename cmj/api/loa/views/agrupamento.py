@@ -37,6 +37,20 @@ class AgrupamentoViewSet:
 
     @action(
         methods=[
+            "post",
+        ],
+        detail=True,
+    )
+    def create_copia(self, request, *args, **kwargs):
+        agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
+        if not agrupamento:
+            return JsonResponse({"error": "Agrupamento not found"}, status=404)
+
+        copia = agrupamento.create_copia()
+        return JsonResponse({"pk": copia.id})
+
+    @action(
+        methods=[
             "patch",
         ],
         detail=True,
@@ -45,12 +59,12 @@ class AgrupamentoViewSet:
         agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
         finalidade_global = ""
         try:
-          if agrupamento:
-              agrupamento.update_finalidade_com_ia()
-              finalidade_global = agrupamento.finalidade
-          return JsonResponse({"finalidade_global": finalidade_global})
+            if agrupamento:
+                agrupamento.update_finalidade_com_ia()
+                finalidade_global = agrupamento.finalidade
+            return JsonResponse({"finalidade_global": finalidade_global})
         except ValueError as e:
-            #responder com erro para que o promise no frontend saiba que houve falha
+            # responder com erro para que o promise no frontend saiba que houve falha
             return JsonResponse({"error": str(e)}, status=400)
 
     @action(

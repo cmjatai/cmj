@@ -322,6 +322,7 @@ class EmendaLoaViewSet:
         # TODO: refatorar para usar filterset e o serializer de listagem, ao invés de criar um serializer específico para a busca e uma função de filtro específica
         def filter_queryset(qs):
             ano = request.GET.get("ano", None)
+            tipo = request.GET.get("tipo", None)
             query = request.GET.get("q", "")
             query = query.split(" ")
 
@@ -330,11 +331,17 @@ class EmendaLoaViewSet:
                 q &= Q(search__unaccent__icontains=termo)
 
             qs = qs.filter(fase__lt=EmendaLoa.LIBERACAO_CONTABIL, loa__ano=ano)
+            if tipo is not None:
+                qs = qs.filter(tipo=tipo)
             if query:
                 qs = qs.filter(q)
 
             return qs.order_by(
-                "-agrupamentoemendaloa", "unidade__especificacao", "entidade", "-fase"
+                "-tipo",
+                "-agrupamentoemendaloa",
+                "unidade__especificacao",
+                "entidade",
+                "-fase",
             )
 
         self.serializer_class = EmendaLoaSearchSerializer

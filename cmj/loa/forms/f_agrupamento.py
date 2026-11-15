@@ -73,10 +73,8 @@ class AgrupamentoForm(ModelForm):
 
     class Meta:
         model = Agrupamento
-        fields = [
-            "nome",
-            "finalidade",
-        ]
+        fields = ["nome", "finalidade", "tipo"]
+        widgets = {"tipo": forms.RadioSelect()}
 
     def __init__(self, *args, **kwargs):
         self.user = kwargs["initial"].pop("user", None)
@@ -88,8 +86,25 @@ class AgrupamentoForm(ModelForm):
 
         row1 = to_row(
             [
+                (
+                    Div(
+                        HTML("""
+                                <button type="button" id="create_copia_agrupamento" class="btn btn-secondary" title="Criar Cópia deste Agrupamento">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            """),
+                        css_class="btn-group btn-group",
+                    ),
+                    "col-auto d-flex align-items-start justify-content-start",
+                ),
                 ("nome", 4),
-                ("finalidade", 8),
+                (
+                    Div(
+                        "tipo",
+                    ),
+                    "col-auto",
+                ),
+                ("finalidade", 12),
                 ("ano_loa", 0),
             ]
         )

@@ -19,9 +19,20 @@ export default class AgrupamentoUpdate {
     this.setupBuscaDespesa()
     this.setupEmendasAgrupamento()
     this.setupFormEvents()
+    this.setupCreateCopiaAgrupamento()
 
     // Trigger initial change to set state
     this.form.trigger('change')
+  }
+
+  setupCreateCopiaAgrupamento () {
+    const create_copia_agrupamento = this.form.find('#create_copia_agrupamento')
+    create_copia_agrupamento.click(() => {
+      axios.post(`/api/loa/agrupamento/${this.pk}/create_copia/`)
+        .then((response) => {
+          window.location.href = `/loa/agrupamento/${response.data.pk}/edit`
+        })
+    })
   }
 
   setupRegistroRender () {
@@ -270,7 +281,13 @@ export default class AgrupamentoUpdate {
 
     let parts = event.target.value.trim().split(' ').filter((p) => p.length >= 3)
 
-    axios.get(`/api/loa/emendaloa/search/?&get_all=true&ano=${this.ano_loa}&q=${parts.join(' ')}`)
+    let tipo = Number(this.form.find('input[name="tipo"]:checked').val())
+
+    if (tipo >= 0) {
+      tipo = `tipo=${tipo}`
+    }
+
+    axios.get(`/api/loa/emendaloa/search/?&get_all=true&ano=${this.ano_loa}&q=${parts.join(' ')}&${tipo}`)
       .then((response) => {
         busca_render_emendaloa.html('')
         const inner = $('<div class="inner"></div>')
@@ -341,9 +358,9 @@ export default class AgrupamentoUpdate {
       nao_permite_juncao_coletiva = '<strong class="badge badge-warning" title="Pode ser classificada, mas não permite junção coletiva"><i class="fas fa-ban"></i>Não permite junção coletiva</strong><br>'
     }
 
+    let tipo = value.tipo !== 0 ? 'Impositiva' : 'Modificativa'
     let text_html = `<div class="item-emendaloa" pk="${value.id}">
-            Valor da Emenda ${value.tipo !== 0 ? 'Impositiva' : 'Modificativa'}: <strong>R$ ${value.str_valor}</strong><br>
-            <strong>${value.indicacao}</strong><br>
+      <span class="badge badge-info">Tipo: ${tipo}</span> <strong>R$ ${value.str_valor}</strong> - <strong>${value.indicacao}</strong><br>
 
         <a href="${value.link_detail_backend}/edit" target="_blank">${value.prefixo_finalidade} ${value.finalidade}</a><br>
         <small>${str_parlamentares}</small> ${nao_permite_juncao_coletiva}

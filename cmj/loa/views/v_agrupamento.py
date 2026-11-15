@@ -12,6 +12,7 @@ class AgrupamentoCrud(MasterDetailCrud):
     parent_field = "loa"
     public = [RP_LIST, RP_DETAIL]
     frontend = Agrupamento._meta.app_label
+    ordered_list = False
 
     class BaseMixin(MasterDetailCrud.BaseMixin):
         pass
@@ -63,10 +64,33 @@ class AgrupamentoCrud(MasterDetailCrud):
             return self.update_url
 
     class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
+
+        ordering = [
+            "-agrupamentoemendaloa_set__emendaloa__unidade__especificacao",
+        ]
+
+        def get_queryset(self):
+            qs = super().get_queryset()
+            return qs.distinct()
+
         def hook_despesas(self, obj, ss, url):
             str_regs = []
             for rc in obj.agrupamentoregistrocontabil_set.order_by("-percentual"):
                 src = f"{rc.str_percentual}% - {rc.despesa}"
+                str_regs.append(src)
+            src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
+
+            return f"<ul>{src}</ul>", ""
+
+        def hook_emendas(self, obj, ss, url):
+            str_regs = []
+            for e in obj.emendas.all():
+                entidade = str(e.entidade) + "<br>" if e.entidade else ""
+                src = f"""
+                  {e.unidade}<br>
+                  {entidade}
+                   {e}
+                """
                 str_regs.append(src)
             src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
 
