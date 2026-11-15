@@ -33,6 +33,8 @@ class AgrupamentoViewSet:
     def get_emendas(self, **kwargs):
         self.serializer_class = EmendaLoaSearchSerializer
         qs = self.get_queryset()
+        # remove filtro padrão de fase do EmendaLoaManager, que filtra apenas fases maiores que 0
+        qs = qs.model._base_manager.all()
         return qs.filter(agrupamentoemendaloa__agrupamento_id=kwargs["pk"])
 
     @action(

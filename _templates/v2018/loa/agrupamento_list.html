@@ -1,0 +1,34 @@
+{% extends "crud/list.html" %}
+{% block extra_js %}
+  <script language="Javascript">
+    document.addEventListener("DOMContentLoaded", function() {
+
+      const tds = document.querySelectorAll("td");
+      tds.forEach(function(td) {
+          td.style.verticalAlign = "top";
+      });
+
+      const emendasLists = document.querySelectorAll(".emendas-list");
+      emendasLists.forEach(function(list) {
+        list.style.overflow = "hidden";
+
+        list.style.height = "10vh";
+        list.classList.remove("expanded");
+
+        const toggleButton = document.createElement("button");
+        toggleButton.classList.add("btn", "btn-link");
+        toggleButton.textContent = "Mostrar/Esconder Emendas";
+        toggleButton.addEventListener("click", function() {
+          list.classList.toggle("expanded");
+          list.style.height = list.classList.contains("expanded") ? "auto" : "10vh";
+        });
+
+        list.parentNode.insertBefore(toggleButton, list);
+        list.addEventListener("click", function() {
+          this.classList.toggle("expanded");
+          this.style.height = this.classList.contains("expanded") ? "auto" : "10vh";
+        });
+      });
+    });
+  </script>
+{% endblock %}

@@ -1,3 +1,5 @@
+from django.db.models import Case, Value, When
+from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.forms.f_agrupamento import AgrupamentoForm
@@ -53,18 +55,48 @@ class AgrupamentoCrud(MasterDetailCrud):
         permission_required = ("loa.emendaloa_full_editor",)
         layout_key = "AgrupamentoCreate"
 
-        def get_success_url(self):
-            return self.update_url
+        def get(self, request, *args, **kwargs):
+            self.loa = Loa.objects.get(pk=kwargs["pk"])
+            # captura o padrão do nome e incrementa número
+            nome_base = "Novo Agrupamento"
+            ultimo_agrupamento = (
+                Agrupamento.objects.filter(loa=self.loa, nome__startswith=nome_base)
+                .order_by("-id")
+                .first()
+            )
+            if ultimo_agrupamento:
+                numero = 1
+                import re
+
+                match = re.search(r"(\d+)$", ultimo_agrupamento.nome)
+                if match:
+                    numero = int(match.group(1)) + 1
+                nome = f"{nome_base} {numero}"
+            else:
+                nome = nome_base
+
+            self.object = Agrupamento.objects.create(loa=self.loa, nome=nome)
+            return redirect(self.update_url)
 
     class ListView(LoaContextDataMixin, MasterDetailCrud.ListView):
-
-        ordering = [
-            "-agrupamentoemendaloa_set__emendaloa__unidade__especificacao",
-        ]
+        paginate_by = 100
+        ordered_list = False
 
         def get_queryset(self):
-            qs = super().get_queryset()
-            return qs.distinct()
+            qs = (
+                super()
+                .get_queryset()
+                .annotate(
+                    has_no_emendas=Case(
+                        When(agrupamentoemendaloa_set__isnull=True, then=Value(0)),
+                        default=Value(1),
+                    )
+                )
+            )
+            return qs.order_by(
+                "has_no_emendas",
+                "agrupamentoemendaloa_set__emendaloa__unidade__especificacao",
+            ).distinct()
 
         def hook_despesas(self, obj, ss, url):
             str_regs = []
@@ -77,7 +109,7 @@ class AgrupamentoCrud(MasterDetailCrud):
 
         def hook_emendas(self, obj, ss, url):
             str_regs = []
-            for e in obj.emendas.all():
+            for e in obj.emendas(manager="all_objects").all():
                 entidade = str(e.entidade) + "<br>" if e.entidade else ""
                 src = f"""
                   {e.unidade}<br>
@@ -87,7 +119,7 @@ class AgrupamentoCrud(MasterDetailCrud):
                 str_regs.append(src)
             src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
 
-            return f"<ul>{src}</ul>", ""
+            return f"""<div class="emendas-list"><ul>{src}</ul></div>""", ""
 
     class UpdateView(LoaContextDataMixin, MasterDetailCrud.UpdateView):
         permission_required = ("loa.emendaloa_full_editor",)
@@ -114,6 +146,20 @@ class AgrupamentoCrud(MasterDetailCrud):
             str_regs = []
             for rc in obj.agrupamentoregistrocontabil_set.order_by("-percentual"):
                 src = f"{rc.str_percentual}% - {rc.despesa}"
+                str_regs.append(src)
+            src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
+
+            return verbose_name, f"<ul>{src}</ul>"
+
+        def hook_emendas(self, obj, verbose_name, field_display):
+            str_regs = []
+            for e in obj.emendas(manager="all_objects").all():
+                entidade = str(e.entidade) + "<br>" if e.entidade else ""
+                src = f"""
+                  {e.unidade}<br>
+                  {entidade}
+                   {e}
+                """
                 str_regs.append(src)
             src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
 

@@ -31,9 +31,32 @@ from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Parlamentar
 
 
+class EmendaLoaManager(models.Manager):
+    use_for_related_fields = True
+
+    def get_queryset(self):
+        return super().get_queryset().filter(fase__gt=0)
+
+    def all_objects(self):
+        return super().get_queryset()
+
+
+class EmendaLoaAllManager(models.Manager):
+    use_for_related_fields = True
+
+    def all_objects(self):
+        return super().get_queryset()
+
+
 class EmendaLoa(CmjSearchMixin):
 
     service = EmendaLoaService()
+    objects = (
+        EmendaLoaManager()
+    )  # emenda transformada em coletiva não deve aparecer por padrão, mantendo apenas visibilidade nos agrupamentos
+    all_objects = (
+        EmendaLoaAllManager()
+    )  # usado para acessar todas as emendas, incluindo as transformadas em coletivas, basicamente apenas no módulo de agrupamento
 
     SAUDE = 10
     DIVERSOS = 99
@@ -44,6 +67,7 @@ class EmendaLoa(CmjSearchMixin):
         (MODIFICATIVA, _("Emenda Modificativa")),
     )
 
+    TRANSFORMADA_EM_COLETIVA = -10
     PROPOSTA = 10
     PROPOSTA_LIBERADA = 12
     EDICAO_CONTABIL = 15
@@ -97,7 +121,7 @@ class EmendaLoa(CmjSearchMixin):
         choices=TIPOEMENDALOA_CHOICE, default=99, verbose_name=_("Área de aplicação")
     )
 
-    fase = models.PositiveSmallIntegerField(
+    fase = models.SmallIntegerField(
         choices=FASE_CHOICE, default=10, verbose_name=_("Fase")
     )
 

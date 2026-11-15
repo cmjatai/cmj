@@ -109,7 +109,7 @@
     conforme incisos abaixo:
       {% for parl, dados in agrupamento.parlamentares_list_values.items %}
         {% if forloop.first %}
-          <ol class="courier destinacao-list">
+          <ol class="destinacao-list">
         {% endif %}
         {% if model == '4' %}
           <li>
@@ -120,7 +120,7 @@
           <li>
             <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
             {{parl.nome_parlamentar}}</strong>:
-            <ol class="courier">
+            <ol class=""">
               {% for finalidade in dados.finalidade %}
                 <li>{{finalidade|safe}}</li>
               {% endfor %}
@@ -172,7 +172,7 @@
       <small><strong>§ 2º.</strong> Deduz-se do orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
       {% for despesa, valor in agrupamento.deducoes.items %}
           {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
-            <li style="text-align: justify; display: block;">
+            <li style="text-align: justify;">
               <strong> R$ {{valor|valor_abs_str }} ({{valor|valor_por_extenso}})</strong>
               <table style="margin: 0; border-collapse: collapse;">
                 <tr>
