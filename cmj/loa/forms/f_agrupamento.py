@@ -6,6 +6,7 @@ from crispy_forms.layout import HTML, Div, Fieldset
 from django import forms
 from django.forms.models import ModelForm
 from django.forms.widgets import TextInput
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.models import Agrupamento, EmendaLoa
@@ -67,7 +68,7 @@ class AgrupamentoForm(ModelForm):
     finalidade = forms.CharField(
         label="Finalidade",
         required=False,
-        help_text="Dê Ctrl+Clique para atualização por I.A. com base nas emendas já adicionadas",
+        help_text="Dê Ctrl+Clique para atualização por I.A. com base nas emendas já adicionadas. Você pode editar manualmente se necessário após registros abaixo. Sem Texto a I.A. criará Finalidade Automática.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 
@@ -84,25 +85,46 @@ class AgrupamentoForm(ModelForm):
             and not self.user.is_superuser
         )
 
+        super().__init__(*args, **kwargs)
+
+        agrupamento = self.instance
+
         row1 = to_row(
             [
-                (
-                    Div(
-                        HTML("""
-                                <button type="button" id="create_copia_agrupamento" class="btn btn-secondary" title="Criar Cópia deste Agrupamento">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                            """),
-                        css_class="btn-group btn-group",
-                    ),
-                    "col-auto d-flex align-items-start justify-content-start",
-                ),
                 ("nome", 4),
                 (
-                    Div(
-                        "tipo",
-                    ),
+                    "tipo",
                     "col-auto",
+                ),
+                (
+                    Div(
+                        Div(
+                            HTML("""
+                                    <button type="button" id="create_copia_agrupamento" class="btn btn-secondary" title="Criar Cópia deste Agrupamento">
+                                        <i class="fas fa-copy"></i>&nbsp;
+                                    </button>
+                                """),
+                            css_class="btn-group btn-group",
+                        ),
+                        Div(
+                            HTML(f"""
+                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=1" target="_blank" id="preview_m1" class="btn btn-secondary" title="Previsualização Modelo 1">
+                                        M1
+                                    </a>
+                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=2" target="_blank" id="preview_m2" class="btn btn-secondary" title="Previsualização Modelo 2">
+                                        M2
+                                    </a>
+                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=3" target="_blank" id="preview_m3" class="btn btn-secondary" title="Previsualização Modelo 3">
+                                        M3
+                                    </a>
+                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=4" target="_blank" id="preview_m4" class="btn btn-secondary" title="Previsualização Modelo 4">
+                                        M4
+                                    </a>
+                                """),
+                            css_class="btn-group btn-group",
+                        ),
+                    ),
+                    "col-auto d-flex align-items-start justify-content-start",
                 ),
                 ("finalidade", 12),
                 ("ano_loa", 0),
@@ -182,8 +204,6 @@ class AgrupamentoForm(ModelForm):
             ]
         )
 
-        super().__init__(*args, **kwargs)
-
         actions = None
         if self.instance.pk:
             actions = form_actions(
@@ -192,10 +212,6 @@ class AgrupamentoForm(ModelForm):
                     HTML(
                         '<a href="{{ view.cancel_url }}"'
                         ' class="btn btn-inverse">Encerrar Edição</a>'
-                    ),
-                    HTML(
-                        '<a href="{{ view.preview_url }}"'
-                        ' class="btn btn-success ml-1">Preview Emenda Coletiva</a>'
                     ),
                 ],
             )

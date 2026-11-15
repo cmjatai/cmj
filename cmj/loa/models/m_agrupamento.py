@@ -243,8 +243,8 @@ class Agrupamento(models.Model):
         for key in emendas_coletivas:
             emendas = emendas_coletivas[key]["emendas"]
             finalidades = [emenda.finalidade for emenda in emendas]
-            finalidade_agregada = ia.gerar_finalidade_global(finalidades)
-            emendas_coletivas[key]["finalidade_agregada"] = finalidade_agregada
+            finalidade_automatica = ia.gerar_finalidade_global(finalidades)
+            emendas_coletivas[key]["finalidade_automatica"] = finalidade_automatica
 
         return [
             {
@@ -252,7 +252,8 @@ class Agrupamento(models.Model):
                 "emendas": value["emendas"],
                 "unidade": unidade,
                 "entidade": entidade,
-                "finalidade_agregada": value.get("finalidade_agregada", None),
+                "finalidade_customizada": self.finalidade,
+                "finalidade_automatica": value.get("finalidade_automatica", None),
                 "bairro": value["emendas"][0].bairro if value["emendas"] else None,
                 "total_via_parlamentares": value["total_via_parlamentares"],
                 "parlamentares": Parlamentar.objects.filter(

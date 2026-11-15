@@ -80,9 +80,9 @@
   <p class="ementa recuo4">
     Altera destinação de recursos orçamentários indicando {{ agrupamento.emendas.0.prefixo_indicacao}} {{ agrupamento.unidade.especificacao }}, para a recepção de recursos no valor de
     <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}})</strong>{% if agrupamento.entidade %},
-      em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.object.finalidade %},
-      que será <strong>{{ agrupamento.object.finalidade }}</strong>{% elif agrupamento.finalidade_agregada %},
-      que será <strong>{{ agrupamento.finalidade_agregada }}</strong>{% endif %}{% if 'localidade' not in agrupamento.object.finalidade.lower and agrupamento.bairro %},
+      em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.finalidade_customizada%},
+      que será <strong>{{ agrupamento.finalidade_customizada}}</strong>{% elif agrupamento.finalidade_automatica %},
+      que será <strong>{{ agrupamento.finalidade_automatica }}</strong>{% endif %}{% if 'localidade' not in agrupamento.finalidade_customizadalower and 'localidade' not in agrupamento.finalidade_automatica.lower and agrupamento.bairro %},
       (Localidade beneficiada: {{agrupamento.bairro}}){% endif %}.
   </p>
 
@@ -98,9 +98,9 @@
       <span class="rotulo">Art {{ view.art }}º - </span>
       O valor de <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}})</strong>
       será inserido na Unidade Orçamentária <strong>{{ agrupamento.unidade.especificacao }}</strong>{% if agrupamento.entidade %},
-      em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.object.finalidade %},
-      que será <strong>{{ agrupamento.object.finalidade }}</strong>{% elif agrupamento.finalidade_agregada %},
-      que será <strong>{{ agrupamento.finalidade_agregada }}</strong>{% endif %}{% if 'localidade' not in agrupamento.object.finalidade.lower and agrupamento.bairro %}.
+      em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.finalidade_customizada and not model == '3' %},
+      que será <strong>{{ agrupamento.finalidade_customizada}}</strong>{% elif agrupamento.finalidade_automatica and not model == '3' %},
+      que será <strong>{{ agrupamento.finalidade_automatica }}</strong>{% endif %}{% if not model == '3' and 'localidade' not in agrupamento.finalidade_customizadalower and 'localidade' not in agrupamento.finalidade_automatica.lower and agrupamento.bairro %}.
       (Localidade beneficiada: {{agrupamento.bairro}}){% endif %},
     com indicação detalhada
     {% if agrupamento.parlamentares.isonly_sexo_feminino %}das{% else %}dos{% endif %}
@@ -111,30 +111,26 @@
         {% if forloop.first %}
           <ol class="courier destinacao-list">
         {% endif %}
-        <li>
-          <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
-          {{parl.nome_parlamentar}}</strong>:
-          <ol class="courier">
-            {% for finalidade in dados.finalidade %}
-              <li>{{finalidade|safe}}</li>
-            {% endfor %}
-          </ol>
-        </li>
+        {% if model == '4' %}
+          <li>
+            <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
+            {{parl.nome_parlamentar}}</strong> - R$ {{ dados.valor|valor_str }} ({{dados.valor|valor_por_extenso}}){% if not forloop.last %};{% else %}.{% endif %}
+          </li>
+        {% else %}
+          <li>
+            <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
+            {{parl.nome_parlamentar}}</strong>:
+            <ol class="courier">
+              {% for finalidade in dados.finalidade %}
+                <li>{{finalidade|safe}}</li>
+              {% endfor %}
+            </ol>
+          </li>
+        {% endif %}
 
 
         {% comment %}
-        <li>
-          <strong>Vereador{% if parl.sexo == 'F' %}a{% endif %}
-          {{parl.nome_parlamentar}}</strong>{% if agrupamento.object.finalidade or agrupamento.finalidade_agregada %}
-            - R$ {{ dados.valor|valor_str }} ({{dados.valor|valor_por_extenso}})
-          {% else %}:
-          <ol>
-            {% for finalidade in dados.finalidade %}
-              <li>{{finalidade}}</li>
-            {% endfor %}
-          </ol>
-          {% endif %}
-        </li>
+
         {% endcomment %}
 
 

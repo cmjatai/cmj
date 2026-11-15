@@ -72,6 +72,7 @@ class AgrupamentoViewSet:
             "get",
         ],
         detail=True,
+        permission_classes=(AgrupamentoPermission,),
     )
     def view(self, request, *args, **kwargs):
         base_url = request.build_absolute_uri()
@@ -88,6 +89,27 @@ class AgrupamentoViewSet:
             context["view"] = self
             context["agrupamento"] = emenda_coletiva
 
+            context["model"] = request.GET.get("model", "1")
+            if not context["model"].isdigit():
+                context["model"] = "1"
+
+            """
+            - model = 1 - padrão
+                - campo finalidade_customizada tem precedência sobre finalidade_automatica e
+                  é colocado tanto na ementa quanto no art 1º
+                - o detalhamento dos objetos das emendas individuais são colocados junto ao parlamentar
+
+            - model = 2 - finalidade_automatica e finalidade_customizada não aparecem na ementa e no Art 1º
+
+            - model = 3 - remove finalidade_customizada e finalidade_automatica do Art 1.
+
+            - model = 4 - remove detalhamento dos objetos das emendas individuais do Art 1.
+            """
+
+            if context["model"] == "2":
+                emenda_coletiva["finalidade_automatica"] = ""
+                emenda_coletiva["finalidade_customizada"] = ""
+
             template = render_to_string("loa/pdf/agrupamento_preview.html", context)
             pdf_file = make_pdf(base_url=base_url, main_template=template)
 
@@ -95,6 +117,22 @@ class AgrupamentoViewSet:
             emenda_coletiva["doc"] = doc_individual
             doc.insert_pdf(doc_individual)
 
+        if not doc.page_count:
+            # cria uma página e escreve "Nenhuma página gerada. "
+            page = doc.new_page()
+
+            total_emendas_agrupamento = agrupamento.emendas.count()
+            texto = f"""
+                Nenhuma Emenda gerada.
+                Total de emendas no agrupamento: {total_emendas_agrupamento}
+                Com permissão de junção em Emenda Coletiva: {len(emendas_coletivas_structured)}
+            """
+
+            page.insert_text((72, 72), texto, fontsize=12)
+            # bresponse = doc.write()
+            # return HttpResponse(
+            #     bresponse, content_type="application/pdf", status=400
+            # )
         # doc to byte
         bresponse = doc.write()
 
@@ -119,8 +157,8 @@ class AgrupamentoViewSet:
         tipo = "emenda-impositiva-coletiva"
 
         arcname = "{}-{:04d}-{}{}.{}".format(
-            context["agrupamento"]["object"].loa.ano,
-            context["agrupamento"]["object"].id,
+            agrupamento.loa.ano,
+            agrupamento.id,
             tipo,
             f"-p{p}" if p else "",
             ext,

@@ -353,17 +353,19 @@ export default class AgrupamentoUpdate {
     }
     str_parlamentares = str_parlamentares.join('<br>')
 
-    let nao_permite_juncao_coletiva = ''
-    if (!value.permite_juncao_coletiva) {
-      nao_permite_juncao_coletiva = '<strong class="badge badge-warning" title="Pode ser classificada, mas não permite junção coletiva"><i class="fas fa-ban"></i>Não permite junção coletiva</strong><br>'
-    }
+    let permite_juncao_coletiva = (value.permite_juncao_coletiva
+      ? '<strong class="badge badge-primary" title="Pode ser classificada e permite junção em Emenda Coletiva"><i class="fas fa-check"></i>Permite junção em Emenda Coletiva</strong>'
+      : '<strong class="badge badge-warning" title="Pode ser classificada, mas não permite junção coletiva"><i class="fas fa-ban"></i>Não permite junção em Emenda Coletiva</strong>')
 
-    let tipo = value.tipo !== 0 ? 'Impositiva' : 'Modificativa'
+    let tipo = value.tipo === 0 ? 'Modificativa' : value.tipo === 10 ? 'Saúde' : 'Geral'
     let text_html = `<div class="item-emendaloa" pk="${value.id}">
-      <span class="badge badge-info">Tipo: ${tipo}</span> <strong>R$ ${value.str_valor}</strong> - <strong>${value.indicacao}</strong><br>
+      <span class="badge badge-info">Tipo: ${tipo}</span> ${permite_juncao_coletiva}<br>
+
+      <strong>R$ ${value.str_valor}</strong>
+        <strong>${value.indicacao}</strong><br>
 
         <a href="${value.link_detail_backend}/edit" target="_blank">${value.prefixo_finalidade} ${value.finalidade}</a><br>
-        <small>${str_parlamentares}</small> ${nao_permite_juncao_coletiva}
+        <small>${str_parlamentares}</small>
         <span class="fase ${value.fase === 10 ? 'bg-danger' : value.fase === 12 ? 'bg-warning' : 'bg-green'}">${value.str_fase}</span>
       </div>`
 
