@@ -68,7 +68,8 @@ class AgrupamentoForm(ModelForm):
     finalidade = forms.CharField(
         label="Finalidade",
         required=False,
-        help_text="Dê Ctrl+Clique para atualização por I.A. com base nas emendas já adicionadas. Você pode editar manualmente se necessário após registros abaixo. Sem Texto a I.A. criará Finalidade Automática.",
+        help_text='Inserções ou remoções de Emenda geram "finalidade" automaticamente quando não há multiplicidade de Unidades e Entidades.'
+        " Dê Ctrl+Clique para atualização por I.A. Sem Texto a I.A. criará Finalidade Automática quando for possível. Edição manual só é mantida ao final das inserções ou remoções de Emenda.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 

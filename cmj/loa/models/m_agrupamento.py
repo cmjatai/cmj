@@ -239,12 +239,13 @@ class Agrupamento(models.Model):
             )
 
         # criar finalidade agregada para cada agrupamento via I.A.
-        ia = IAEmentaEmendaColetiva()
-        for key in emendas_coletivas:
-            emendas = emendas_coletivas[key]["emendas"]
-            finalidades = [emenda.finalidade for emenda in emendas]
-            finalidade_automatica = ia.gerar_finalidade_global(finalidades)
-            emendas_coletivas[key]["finalidade_automatica"] = finalidade_automatica
+        if not self.finalidade:
+            ia = IAEmentaEmendaColetiva()
+            for key in emendas_coletivas:
+                emendas = emendas_coletivas[key]["emendas"]
+                finalidades = [emenda.finalidade for emenda in emendas]
+                finalidade_automatica = ia.gerar_finalidade_global(finalidades)
+                emendas_coletivas[key]["finalidade_automatica"] = finalidade_automatica
 
         return [
             {

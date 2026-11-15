@@ -464,6 +464,15 @@ class EmendaLoa(CmjSearchMixin):
         return artigos
 
     @property
+    def has_mask(self):
+        try:
+            finalidade = self.finalidade
+            chaves = re.findall(r"\{(.*?)\}", finalidade)
+            return bool(chaves)
+        except:
+            return False
+
+    @property
     def finalidade_format(self):
         try:
             finalidade = self.finalidade
@@ -504,8 +513,8 @@ class EmendaLoa(CmjSearchMixin):
             finalidade = finalidade.rstrip(" ")
             finalidade = finalidade.rstrip(".")
 
-            # TODO: associação para 2026 em diante.
-            if self.loa.ano >= 2026:
+            # TODO: associação para 2027 em diante.
+            if self.loa.ano >= 2027:
                 if self.entidade and not chave_entidade_presente:
                     finalidade += f". Entidade beneficiada: {self.entidade}."
 

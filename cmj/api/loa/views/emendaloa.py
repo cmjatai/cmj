@@ -210,6 +210,14 @@ class EmendaLoaViewSet:
         self._art += 1
         return self._art
 
+    @property
+    def paragrafo(self):
+        if not hasattr(self, "_paragrafo"):
+            self._paragrafo = 0
+
+        self._paragrafo += 1
+        return self._paragrafo
+
     @action(detail=True)
     def view(self, request, *args, **kwargs):
         # base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()

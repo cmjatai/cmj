@@ -88,25 +88,22 @@
   <h5>
     Autoria:
     {% for parl in object.parlamentares.all %}
-      {% if forloop.first %}
-          Vereador{% if object.parlamentares.isonly_sexo_feminino %}a{% if object.parlamentares.count > 1 %}s{% endif %}{% else %}{% if object.parlamentares.count > 1 %}es{% endif %}{% endif %}
-      {% endif %}
       {{parl.nome_parlamentar}}{% if not forloop.last %},{% endif %}
     {% endfor %}
   </h5>
   {% if object.tipo %}
     <p class="ementa recuo5">
       Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
-      para a recepção do valor de
+      para a recepção de recursos no valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-      que será {{ object.prefixo_finalidade}} <strong>{{ object.finalidade_format|default:"XXXXXXX" }}</strong>
+      sendo {{ object.prefixo_finalidade}} <strong>{{ object.finalidade_format|default:"XXXXXXX" }}</strong>
     </p>
   {% else %}
     <p class="ementa recuo4">
       Altera destinação de recursos orçamentários, indicando {{object.prefixo_indicacao}} {{object.indicacao|default:"XXXXXXX"}},
-      para a recepção do valor de
+      para a recepção de recursos no valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-      que será {{ object.prefixo_finalidade}} <strong>{{ object.finalidade_format|default:"XXXXXXX" }}</strong>
+      sendo {{ object.prefixo_finalidade}} <strong>{{ object.finalidade_format|default:"XXXXXXX" }}</strong>
     </p>
   {% endif %}
 
@@ -120,11 +117,38 @@
 
     <p class="art" style="margin-bottom: 0cm; padding-bottom: 0;">
       <span class="rotulo">Art {{ view.art }}º - </span>O valor de
-      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong> será
-      {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
+      <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>
+      será inserido na Unidade Orçamentária<strong> {{ object.unidade.especificacao }}</strong>{% if not object.has_mask and object.entidade %},
+      em beneficio de <strong>{{ object.entidade }}</strong>{% endif %},
+      sendo {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
     </p>
+
+
+    {% if object.parlamentares.count > 1 %}
+      <p style="margin: 0.2cm 0; padding: 0; text-align: justify;">
+        <small><strong>§ {{ view.paragrafo }}º.</strong> O montante indicado no <em>caput</em> é composto com indicação detalhada
+          {% if object.parlamentares.isonly_sexo_feminino %}das{% else %}dos{% endif %}
+          vereador{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
+          subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
+          conforme incisos a seguir:</small>
+          {% for elp in object.emendaloaparlamentar_set.all %}
+            {% if forloop.first %}
+            <ol class="destinacao-list">
+            {% endif %}
+            <li>
+              <strong>Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
+                {{elp.parlamentar.nome_parlamentar}}</strong>:
+                R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}){% if not forloop.last %};{% else %}.{% endif %}
+            </li>
+            {% if forloop.last %}
+            </ol>
+            {% endif %}
+          {% endfor %}
+      </p>
+    {% endif %}
+
     <p style="margin: 0.2cm 0; padding: 0; text-align: justify;">
-      <small><strong>§ 1º.</strong> Acrescenta-se ao orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
+        <small><strong>§ {{ view.paragrafo }}º.</strong> Acrescenta-se ao orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
       {% for rc in object.registrocontabil_set.all_insercoes %}
         {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
           <li>
@@ -141,7 +165,7 @@
     </p>
 
     <p style="margin: 0.1cm 0; padding: 0; text-align: justify;">
-      <small><strong>§ 2º.</strong> Deduz-se do orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
+        <small><strong>§ {{ view.paragrafo }}º.</strong> Deduz-se do orçamento o montante indicado no <em>caput</em> conforme se segue:</small>
       {% for rc in object.registrocontabil_set.all_deducoes %}
           {% if forloop.first %}<ol class="courier dotacao-list">{% endif %}
             <li>
@@ -157,32 +181,6 @@
       {% empty %}XXXXXXXXXX{% endfor %}
     </p>
 
-      {% if object.parlamentares.count > 1 and object.tipo %}
-        <p class="art">
-          <span class="rotulo">Art {{ view.art }}º - </span>O valor de
-        <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}}),</strong>
-        será dividido entre
-        {% if object.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
-        vereador{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
-        subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
-        sendo utilizado:
-          {% for elp in object.emendaloaparlamentar_set.all %}
-            {% if forloop.first %}
-            <ol>
-            {% endif %}
-            <li>
-              R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}),
-
-              d{% if elp.parlamentar.sexo == 'F' %}a{% else %}o{% endif %}
-              <strong>Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
-              {{elp.parlamentar.nome_parlamentar}}</strong>{% if not forloop.last %};{% else %}.{% endif %}
-            </li>
-            {% if forloop.last %}
-            </ol>
-            {% endif %}
-          {% endfor %}
-      </p>
-    {% endif %}
   {% else %}
     <p class="art">
       <span class="rotulo">Art {{ view.art }}º - </span>Altera-se o Orçamento de {{object.loa.ano}},

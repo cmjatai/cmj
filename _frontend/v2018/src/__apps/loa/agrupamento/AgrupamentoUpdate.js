@@ -407,6 +407,9 @@ export default class AgrupamentoUpdate {
         })
         .catch((error) => {
           this.form.find('textarea[name="finalidade"]').val(error.response?.data?.error || error.message)
+          setTimeout(() => {
+            this.form.find('textarea[name="finalidade"]').prop('readonly', false)
+          }, 5000)
         })
     })
 

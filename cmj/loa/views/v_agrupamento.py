@@ -112,9 +112,11 @@ class AgrupamentoCrud(MasterDetailCrud):
             for e in obj.emendas(manager="all_objects").all():
                 entidade = str(e.entidade) + "<br>" if e.entidade else ""
                 src = f"""
-                  {e.unidade}<br>
-                  {entidade}
-                   {e}
+                    - <strong>{e.unidade}</strong><br>
+                    - {f"{entidade}" if entidade else ""}
+                    - <strong>{", ".join(str(p) for p in e.parlamentares.all())}</strong>
+                    - {e}<br>
+                    <hr class="divider">
                 """
                 str_regs.append(src)
             src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
