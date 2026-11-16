@@ -126,8 +126,8 @@
 
     {% if object.parlamentares.count > 1 %}
       <p style="margin: 0.2cm 0; padding: 0; text-align: justify;">
-        <small><strong>§ {{ view.paragrafo }}º.</strong> O montante indicado no <em>caput</em> é composto com indicação detalhada
-          {% if object.parlamentares.isonly_sexo_feminino %}das{% else %}dos{% endif %}
+        <small><strong>§ {{ view.paragrafo }}º.</strong> O montante indicado no <em>caput</em> é composto por indicação compartilhada entre
+          {% if object.parlamentares.isonly_sexo_feminino %}as{% else %}os{% endif %}
           vereador{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %}
           subscritor{% if object.parlamentares.isonly_sexo_feminino %}as{% else %}es{% endif %},
           conforme incisos a seguir:</small>

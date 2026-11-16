@@ -661,7 +661,10 @@ class EmendaLoa(CmjSearchMixin):
 
             if hasattr(self, "agrupamentoemendaloa"):
                 registros.delete()
-                # self.agrupamentoemendaloa.save()
+                # o sync do agrupamento não gera novos registros contábeis
+                # se a emenda sendo sincronizada (self) possui faze TRANSFORMADA_EM_COLETIVA,
+                # significa que ela já foi incorporada a uma emenda coletiva,
+                # portanto, o agrupamento não deve criar novos registros contábeis para ela.
                 self.agrupamentoemendaloa.agrupamento.sync()
             else:
                 if old_self:

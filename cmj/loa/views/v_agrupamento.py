@@ -1,5 +1,6 @@
 from django.db.models import Case, Value, When
 from django.shortcuts import redirect
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.forms.f_agrupamento import AgrupamentoForm
@@ -110,12 +111,16 @@ class AgrupamentoCrud(MasterDetailCrud):
         def hook_emendas(self, obj, ss, url):
             str_regs = []
             for e in obj.emendas(manager="all_objects").all():
+                transf = ""
+                if e.fase == e.TRANSFORMADA_EM_COLETIVA:
+                    transf += "<em>Transformada em coletiva</em>"
                 entidade = str(e.entidade) + "<br>" if e.entidade else ""
                 src = f"""
-                    - <strong>{e.unidade}</strong><br>
+                    <strong>{e.unidade}</strong><br>
                     - {f"{entidade}" if entidade else ""}
                     - <strong>{", ".join(str(p) for p in e.parlamentares.all())}</strong>
                     - {e}<br>
+                    {transf}
                     <hr class="divider">
                 """
                 str_regs.append(src)
@@ -142,6 +147,12 @@ class AgrupamentoCrud(MasterDetailCrud):
             initial["user"] = self.request.user
             return initial
 
+        def get_success_url(self):
+            return reverse(
+                "cmj.loa:agrupamento_detail",
+                kwargs={"pk": self.object.pk},
+            )
+
     class DetailView(MasterDetailCrud.DetailView):
 
         def hook_despesas(self, obj, verbose_name, field_display):
@@ -158,9 +169,10 @@ class AgrupamentoCrud(MasterDetailCrud):
             for e in obj.emendas(manager="all_objects").all():
                 entidade = str(e.entidade) + "<br>" if e.entidade else ""
                 src = f"""
-                  {e.unidade}<br>
-                  {entidade}
-                   {e}
+                    <strong>{e.unidade}</strong><br>
+                    - {f"{entidade}" if entidade else ""}
+                    - {e}<br>
+                    <hr class="divider">
                 """
                 str_regs.append(src)
             src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))

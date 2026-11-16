@@ -257,7 +257,7 @@ export default class AgrupamentoUpdate {
               })
               .catch((error) => {
                 busca_render_emendaloa.find('.alert').remove()
-                inner.prepend($(`<div class="alert alert-danger">${error.message}</div>`))
+                inner.prepend($(`<div class="alert alert-danger">${error.response?.data?.detail || (error.response?.data && error.response?.data[0]) || error.message}</div>`))
               })
           })
         })

@@ -80,7 +80,9 @@ class AgrupamentoViewSet:
         base_url = request.build_absolute_uri()
 
         agrupamento = self.get_object()
-        emendas_coletivas_structured = agrupamento.preparar_dados_para_coletiva()
+        emendas_coletivas_structured = agrupamento.preparar_dados_para_coletiva(
+            for_preview=True
+        )
 
         p = int(request.GET.get("p", "0"))
         doc = pymupdf.Document()

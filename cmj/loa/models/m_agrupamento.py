@@ -179,13 +179,15 @@ class Agrupamento(models.Model):
             self.finalidade = ""
             self.save(update_fields=["finalidade"])
 
-    def preparar_dados_para_coletiva(self):
+    def preparar_dados_para_coletiva(self, for_preview=False):
 
         # a chave de agrupamento de emendas é a unidade + entidade, onde unidade nunca é nula mas a entidade pode ser nula
 
         emendas_coletivas = {}
 
-        for emenda in self.emendas.all():
+        for emenda in self.emendas(
+            manager=("all_objects" if for_preview else "objects")
+        ).all():
             if not emenda.permite_juncao_coletiva or emenda.materia:
                 continue
 
@@ -271,6 +273,8 @@ class Agrupamento(models.Model):
             with transaction.atomic():
 
                 for emenda in emendas_preparadas:
+                    if not emenda["emendas"] or len(emenda["emendas"]) == 1:
+                        continue
 
                     ec = EmendaLoa()  # ec -> emenda_coletiva
                     ec.permite_juncao_coletiva = False

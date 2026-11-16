@@ -30,10 +30,18 @@ class AgrupamentoEmendaLoaViewSet:
     )
     def delete(self, request, *args, **kwargs):
 
-        AgrupamentoEmendaLoa.objects.filter(
+        agrupamento_emenda = AgrupamentoEmendaLoa.objects.filter(
             agrupamento=int(request.data["agrupamento"]),
             emendaloa=int(request.data["emendaloa"]),
-        ).delete()
+        ).first()
+
+        if not agrupamento_emenda:
+            raise DRFValidationError("Registro não encontrado.")
+
+        if agrupamento_emenda.emendaloa.fase == EmendaLoa.TRANSFORMADA_EM_COLETIVA:
+            raise DRFValidationError(
+                "Não é possível remover Emenda de um agrupamento transformado em coletiva."
+            )
 
         try:
             # sync agrupamento
@@ -41,8 +49,15 @@ class AgrupamentoEmendaLoaViewSet:
             agrupamento = Agrupamento.objects.get(pk=agrupamento_id)
             agrupamento.sync()
             agrupamento.update_finalidade_com_ia()
+
+            # sync emenda
+            emendaloa_id = int(request.data["emendaloa"])
+            emendaloa = EmendaLoa.objects.get(pk=emendaloa_id)
+            emendaloa.sync()
         except Exception as e:
             logger.error("Erro ao atualizar finalidade com IA: %s", e)
+
+        agrupamento_emenda.delete()
 
         return Response({"detail": "Registro removido com Sucesso."})
 
