@@ -3,13 +3,14 @@ import re
 from decimal import Decimal
 
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db import models
+from django.db import models, transaction
 from django.db.models import manager
 from django.db.models.deletion import CASCADE, PROTECT
 from django.db.models.fields.json import JSONField
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
+from cmj.loa.models.m_emendaloa import EmendaLoa, EmendaLoaParlamentar
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
 from cmj.utils import PERCENTAGE_VALIDATOR, quantize
 from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetiva
@@ -145,11 +146,6 @@ class Agrupamento(models.Model):
                     insercoes[-1].valor = insercoes[-1].valor + resto
                     insercoes[-1].save()
 
-        try:
-            self.update_finalidade_com_ia()
-        except Exception as e:
-            logger.error("Erro ao atualizar finalidade com IA: %s", e)
-
     def update_finalidade_com_ia(self):
 
         # verifica se todas as emendas são tem a mesma unidade e entidade
@@ -190,7 +186,7 @@ class Agrupamento(models.Model):
         emendas_coletivas = {}
 
         for emenda in self.emendas.all():
-            if not emenda.permite_juncao_coletiva:
+            if not emenda.permite_juncao_coletiva or emenda.materia:
                 continue
 
             key = (emenda.unidade, emenda.entidade)
@@ -266,6 +262,65 @@ class Agrupamento(models.Model):
             }
             for (unidade, entidade), value in emendas_coletivas.items()
         ]
+
+    def gerar_emendas_coletivas(self):
+        emendas_preparadas = self.preparar_dados_para_coletiva()
+
+        try:
+
+            with transaction.atomic():
+
+                for emenda in emendas_preparadas:
+
+                    ec = EmendaLoa()  # ec -> emenda_coletiva
+                    ec.permite_juncao_coletiva = False
+                    ec.agrupamento_de_origem = self
+                    ec.owner_id = (
+                        1  # TODO: definir estratégia de owner da emenda coletiva
+                    )
+                    ec.valor = emenda["total_via_parlamentares"]
+                    ec.loa = self.loa
+                    ec.prefixo_finalidade = ""
+                    ec.prefixo_indicacao = ""
+                    ec.finalidade = self.finalidade or emenda["finalidade_automatica"]
+                    ec.unidade = emenda["unidade"]
+                    ec.entidade = emenda["entidade"]
+                    ec.bairro = emenda["bairro"]
+                    ec.indicacao = emenda["unidade"].especificacao
+                    ec.fase = EmendaLoa.LIBERACAO_CONTABIL
+                    ec.tipo = emenda["emendas"][0].tipo
+                    ec.save()
+
+                    for ems in emenda["emendas"]:
+                        ems.emenda_coletiva = ec
+                        ems.fase = EmendaLoa.TRANSFORMADA_EM_COLETIVA
+                        ems.save()
+
+                    for p, v in emenda["parlamentares_list_values"].items():
+                        elp = EmendaLoaParlamentar()
+                        elp.emendaloa = ec
+                        elp.parlamentar = p
+                        elp.valor = v["valor"]
+                        elp.save()
+
+                    # inserções
+                    for despesa, valor in emenda["insercoes"].items():
+                        erc = EmendaLoaRegistroContabil()
+                        erc.emendaloa = ec
+                        erc.despesa = despesa
+                        erc.valor = valor
+                        erc.save()
+
+                    # deduções
+                    for despesa, valor in emenda["deducoes"].items():
+                        erc = EmendaLoaRegistroContabil()
+                        erc.emendaloa = ec
+                        erc.despesa = despesa
+                        erc.valor = valor
+                        erc.save()
+
+        except Exception as e:
+            raise e
 
 
 class AgrupamentoEmendaLoa(models.Model):

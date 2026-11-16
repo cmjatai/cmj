@@ -42,12 +42,12 @@
           <span class="badge badge-{% if emenda.fase > 60 %}success{% elif emenda.fase > 40 %}warning{% elif emenda.fase == 40 %}danger{% else %}info{% endif %}">
             {{emenda.get_fase_display}}
           </span>
-            {% if emenda.emendaloaparlamentar_set.count < 1 and emenda.fase < 20 and user.is_authenticated and emenda.permite_juncao_coletiva %}
+            {% if emenda.emendaloaparlamentar_set.count > 1 and emenda.fase < 20 and user.is_authenticated and not emenda.permite_juncao_coletiva %}
               <span class="badge badge-success ml-1">Emenda Coletiva</span>
             {% elif emenda.fase < 20 and user.is_authenticated and emenda.permite_juncao_coletiva %}
-              <span class="badge badge-success ml-1">Disponível para Junção em Emenda Coletiva</span>
-            {% elif emenda.fase < 20 and user.is_authenticated and not emenda.permite_juncao_coletiva  %}
-              <span class="badge badge-warning ml-1">Emenda Individual</span>
+              <span class="badge badge-warning ml-1">Disponível para Junção em Emenda Coletiva</span>
+            {% elif emenda.fase < 20 and user.is_authenticated and not emenda.permite_juncao_coletiva and emenda.parlamentares.count == 1 %}
+              <span class="badge badge-info ml-1">Emenda Individual</span>
             {% endif %}
         </div>
       </div>

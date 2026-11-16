@@ -110,16 +110,16 @@ class AgrupamentoForm(ModelForm):
                         Div(
                             HTML(f"""
                                     <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=1" target="_blank" id="preview_m1" class="btn btn-secondary" title="Previsualização Modelo 1">
-                                        M1
+                                        Preview M1
                                     </a>
                                     <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=2" target="_blank" id="preview_m2" class="btn btn-secondary" title="Previsualização Modelo 2">
-                                        M2
+                                        Preview M2
                                     </a>
                                     <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=3" target="_blank" id="preview_m3" class="btn btn-secondary" title="Previsualização Modelo 3">
-                                        M3
+                                        Preview M3
                                     </a>
                                     <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=4" target="_blank" id="preview_m4" class="btn btn-secondary" title="Previsualização Modelo 4">
-                                        M4
+                                        Preview M4
                                     </a>
                                 """),
                             css_class="btn-group btn-group",
@@ -229,9 +229,19 @@ class AgrupamentoForm(ModelForm):
         if not self.instance.pk:
             return ModelForm.save(self, commit=commit)
 
-        for e in self.instance.emendas.all():
-            if e.fase < EmendaLoa.LIBERACAO_CONTABIL:
-                e.fase = 17
-            e.save()
+        try:
+            self.instance.gerar_emendas_coletivas()
+
+            self.instance.refresh_from_db()
+            # emendas.all() puxará apenas as emendas que não passaram para a fase TRANSFORMADA_EM_COLETIVA
+            # ou seja, emendas com permitir_juncao_coletiva=False não foram transformadas em coletivas
+            # e são simplesmente aqui liberadas para a fase de LIBERACAO_CONTABIL
+            for e in self.instance.emendas.all():
+                if 0 < e.fase < EmendaLoa.LIBERACAO_CONTABIL:
+                    e.fase = EmendaLoa.LIBERACAO_CONTABIL
+                e.save()
+
+        except Exception as e:
+            raise e
 
         return self.instance

@@ -479,9 +479,9 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
             if not full_editor:
                 if self.creating:
-                    self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[:1]
+                    self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[1:2]
                 else:
-                    self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[:2]
+                    self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[1:3]
 
                 if self.instance.fase > EmendaLoa.PROPOSTA_LIBERADA:
                     # self.fields['prefixo_indicacao'].widget.attrs['readonly'] = 'readonly'
@@ -510,7 +510,7 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
             else:
                 self.fields["fase"].widget.attrs["class"] = "is-invalid"
-                self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[2:4]
+                self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[3:5]
 
         if full_editor:
             self.fields.pop("parlamentares__valor")
@@ -657,7 +657,7 @@ class EmendaLoaFilterSet(FilterSet):
 
     fase = MultipleChoiceFilter(
         required=False,
-        choices=EmendaLoa.FASE_CHOICE,
+        choices=EmendaLoa.FASE_CHOICE[1:],
         label=_("Fases"),
         widget=forms.CheckboxSelectMultiple(attrs={"class": "small"}),
     )
@@ -978,9 +978,9 @@ class EmendaLoaFilterSet(FilterSet):
         # self.form.fields['tipo_agrupamento'].initial = 'insercao'
 
         if not self.loa.materia or not self.loa.materia.em_tramitacao:
-            self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[5:]
+            self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[6:]
         else:
-            self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[:5]
+            self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[1:6]
         self.form.fields["tipo"].choices = EmendaLoa.TIPOEMENDALOA_CHOICE
 
         self.form.fields["entidade"].queryset = (

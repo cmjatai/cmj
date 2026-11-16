@@ -1,3 +1,5 @@
+import logging
+
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.response import Response
@@ -5,6 +7,8 @@ from rest_framework.response import Response
 from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
 from cmj.loa.models import AgrupamentoEmendaLoa, EmendaLoa
 from cmj.loa.models.m_agrupamento import Agrupamento
+
+logger = logging.getLogger(__name__)
 
 
 class AgrupamentoEmendaLoaViewSet:
@@ -31,10 +35,14 @@ class AgrupamentoEmendaLoaViewSet:
             emendaloa=int(request.data["emendaloa"]),
         ).delete()
 
-        # sync agrupamento
-        agrupamento_id = int(request.data["agrupamento"])
-        agrupamento = Agrupamento.objects.get(pk=agrupamento_id)
-        agrupamento.sync()
+        try:
+            # sync agrupamento
+            agrupamento_id = int(request.data["agrupamento"])
+            agrupamento = Agrupamento.objects.get(pk=agrupamento_id)
+            agrupamento.sync()
+            agrupamento.update_finalidade_com_ia()
+        except Exception as e:
+            logger.error("Erro ao atualizar finalidade com IA: %s", e)
 
         return Response({"detail": "Registro removido com Sucesso."})
 
@@ -47,10 +55,20 @@ class AgrupamentoEmendaLoaViewSet:
                 el = EmendaLoa.objects.get(pk=r.data["emendaloa"])
                 el.fase = emendaloa__fase
                 el.save()
+
             r.data["agrupamento_finalidade"] = AgrupamentoEmendaLoa.objects.get(
                 agrupamento=int(request.data["agrupamento"]),
                 emendaloa=int(request.data["emendaloa"]),
             ).agrupamento.finalidade
+
+            try:
+                agrupamento = Agrupamento.objects.get(
+                    pk=int(request.data["agrupamento"])
+                )
+                agrupamento.update_finalidade_com_ia()
+            except Exception as e:
+                logger.error("Erro ao atualizar finalidade com IA: %s", e)
+
             return r
         except Exception as e:
             if "code='unique'" in str(e):

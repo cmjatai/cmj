@@ -82,6 +82,7 @@ class EmendaLoa(CmjSearchMixin):
     EMENDA_FINALIZADA = 99
 
     FASE_CHOICE = (
+        (TRANSFORMADA_EM_COLETIVA, _("Transformada em Emenda Coletiva")),
         (PROPOSTA, _("Proposta Legislativa")),
         (PROPOSTA_LIBERADA, _("Proposta Liberada para Edição Contábil")),
         (EDICAO_CONTABIL, _("Em edição pela Contabilidade")),
@@ -224,6 +225,26 @@ class EmendaLoa(CmjSearchMixin):
         on_delete=PROTECT,
     )
 
+    emenda_coletiva = models.ForeignKey(
+        "self",
+        verbose_name=_("Emenda Coletiva"),
+        related_name="emendas_substituidas",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
+
+    agrupamento_de_origem = models.ForeignKey(
+        "loa.Agrupamento",
+        verbose_name=_("Agrupamento de Origem"),
+        related_name="emendas_coletivas_geradas",
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=PROTECT,
+    )
+
     _syncing = False
 
     class Meta:
@@ -293,6 +314,9 @@ class EmendaLoa(CmjSearchMixin):
 
     @property
     def parlamentares_search(self):
+        if not self.pk:
+            return ""
+
         _parlamentares_search = "\n".join(
             [p.nome_parlamentar for p in self.parlamentares.all()]
         )
@@ -909,7 +933,7 @@ class EmendaLoaHistoricoFase(models.Model):
         on_delete=CASCADE,
     )
 
-    fase = models.PositiveSmallIntegerField(
+    fase = models.SmallIntegerField(
         choices=EmendaLoa.FASE_CHOICE, default=10, verbose_name=_("Fase")
     )
 
