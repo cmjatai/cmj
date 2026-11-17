@@ -1100,24 +1100,53 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def get(self, request, *args, **kwargs):
             u = request.user
-            if not u.is_superuser and not u.is_anonymous:
-                if u.operadorautor_set.exists():
-                    if (
-                        self.object.fase > EmendaLoa.PROPOSTA_LIBERADA
-                        and self.object.fase != EmendaLoa.LIBERACAO_CONTABIL
-                    ):
+
+            if (
+                u.has_perm("loa.emendaloa_full_editor")
+                and self.object.fase == EmendaLoa.PROPOSTA_LIBERADA
+            ):
+                self.object.fase = EmendaLoa.EDICAO_CONTABIL
+                self.object.save()
+
+            else:
+                if (
+                    not u.is_superuser
+                    and self.object.fase > EmendaLoa.LIBERACAO_CONTABIL
+                ):
+                    messages.warning(
+                        request,
+                        f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.',
+                    )
+                    return redirect(self.detail_url)
+
+                if not u.is_superuser:
+                    autor_do_usuario = (
+                        u.operadorautor_set.first().autor
+                        if u.operadorautor_set.exists()
+                        else None
+                    )
+                    autor_da_emenda = (
+                        self.object.owner.operadorautor_set.first().autor
+                        if self.object.owner.operadorautor_set.exists()
+                        else None
+                    )
+
+                    if autor_do_usuario != autor_da_emenda:
                         messages.warning(
                             request,
-                            f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.',
+                            f"Apenas o usuário ligado ao cadastro pode editar esta emenda.",
                         )
                         return redirect(self.detail_url)
 
                 if (
-                    u.has_perm("loa.emendaloa_full_editor")
-                    and self.object.fase == EmendaLoa.PROPOSTA_LIBERADA
+                    self.object.fase > EmendaLoa.PROPOSTA_LIBERADA
+                    and self.object.fase < EmendaLoa.LIBERACAO_CONTABIL
                 ):
-                    self.object.fase = EmendaLoa.EDICAO_CONTABIL
-                    self.object.save()
+                    messages.warning(
+                        request,
+                        f'A Emenda está na fase de "{self.object.get_fase_display()}". Não pode ser editada por usuário de autoria.',
+                    )
+                    return redirect(self.detail_url)
 
             return MasterDetailCrud.UpdateView.get(self, request, *args, **kwargs)
 

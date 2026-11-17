@@ -82,10 +82,9 @@
     <strong> R$ {{ agrupamento.total_via_parlamentares|valor_str }} ({{agrupamento.total_via_parlamentares|valor_por_extenso}})</strong>{% if agrupamento.entidade %},
       em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.finalidade_customizada%},
       que será <strong>{{ agrupamento.finalidade_customizada}}</strong>{% elif agrupamento.finalidade_automatica %},
-      que será <strong>{{ agrupamento.finalidade_automatica }}</strong>{% endif %}{% if 'localidade' not in agrupamento.finalidade_customizadalower and 'localidade' not in agrupamento.finalidade_automatica.lower and agrupamento.bairro %},
+      que será <strong>{{ agrupamento.finalidade_automatica }}</strong>{% endif %}{% if 'localidade' not in agrupamento.finalidade_customizada.lower and 'localidade' not in agrupamento.finalidade_automatica.lower and agrupamento.bairro %},
       (Localidade beneficiada: {{agrupamento.bairro}}){% endif %}.
   </p>
-
 
   <p class="preambulo">
     {% if agrupamento.parlamentares.isonly_sexo_feminino %}A{% else %}O{% endif %}{% if agrupamento.parlamentares.count > 1 %}s{% endif %}
@@ -99,7 +98,7 @@
     será inserido na Unidade Orçamentária <strong>{{ agrupamento.unidade.especificacao }}</strong>{% if agrupamento.entidade %},
     em benefício de <strong>{{agrupamento.entidade}}</strong>{% endif %}{% if agrupamento.finalidade_customizada and not model == '3' %},
     sendo <strong>{{ agrupamento.finalidade_customizada}}</strong>{% elif agrupamento.finalidade_automatica and not model == '3' %},
-    sendo <strong>{{ agrupamento.finalidade_automatica }}</strong>{% endif %}{% if not model == '3' and 'localidade' not in agrupamento.finalidade_customizadalower and 'localidade' not in agrupamento.finalidade_automatica.lower and agrupamento.bairro %}.
+    sendo <strong>{{ agrupamento.finalidade_automatica }}</strong>{% endif %}{% if not model == '3' and 'localidade' not in agrupamento.finalidade_customizada.lower and 'localidade' not in agrupamento.finalidade_automatica.lower and agrupamento.bairro %}.
     (Localidade beneficiada: {{agrupamento.bairro}}){% endif %}.
   </p>
 

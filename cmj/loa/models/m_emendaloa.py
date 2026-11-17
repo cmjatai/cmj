@@ -263,6 +263,11 @@ class EmendaLoa(CmjSearchMixin):
             ("emendaloa_full_editor", _("Edição completa de Emendas Impositivas.")),
         )
 
+
+    @property
+    def qs_emendas_substituidas_all_objects(self):
+        return self.emendas_substituidas(manager='all_objects').all()
+
     @property
     def has_ajustes(self):
         # Usa anotação pré-computada no queryset quando disponível (evita query extra)

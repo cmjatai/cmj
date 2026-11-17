@@ -114,15 +114,19 @@
   </p>
 
   {% if object.tipo %}
-
     <p class="art" style="margin-bottom: 0cm; padding-bottom: 0;">
       <span class="rotulo">Art {{ view.art }}º - </span>O valor de
       <strong> R$ {{ object.valor|valor_str }} ({{object.valor|valor_por_extenso}})</strong>
       será inserido na Unidade Orçamentária<strong> {{ object.unidade.especificacao }}</strong>{% if not object.has_mask and object.entidade %},
       em beneficio de <strong>{{ object.entidade }}</strong>{% endif %},
-      sendo {{object.prefixo_finalidade}} <strong>{{object.finalidade_format}}</strong>
+      sendo {{object.prefixo_finalidade}} <strong>
+        {% if object.has_mask %}
+          {{ object.finalidade_format }}
+        {% else %}
+          {{ object.finalidade }}{% if object.bairro %}. Localidade: {{ object.bairro }}{% endif %}
+        {% endif %}
+        </strong>
     </p>
-
 
     {% if object.parlamentares.count > 1 %}
       <p style="margin: 0.2cm 0; padding: 0; text-align: justify;">
