@@ -127,3 +127,4 @@ package-lock.json
 security.json
 /.pytest_cache/
 .eslintcache
+.claude/settings.local.json
