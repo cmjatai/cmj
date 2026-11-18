@@ -1,4 +1,4 @@
-{% load static common_cmj_tags common_tags %}
+{% load static common_cmj_tags common_tags loa_filters %}
 {% load render_bundle from webpack_loader %}
 {% load webpack_static from webpack_loader %}
 <!DOCTYPE html>
@@ -140,9 +140,21 @@
             <ol class="destinacao-list">
             {% endif %}
             <li>
-              <strong>Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
+              {% if not object.qs_emendas_substituidas_all_objects.exists %}
+                <strong>Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
                 {{elp.parlamentar.nome_parlamentar}}</strong>:
                 R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}){% if not forloop.last %};{% else %}.{% endif %}
+              {% else %}
+                <strong>Vereador{% if elp.parlamentar.sexo == 'F' %}a{% endif %}
+                {{elp.parlamentar.nome_parlamentar}}</strong> -
+                R$ {{ elp.valor|valor_str }} ({{elp.valor|valor_por_extenso}}):
+
+                <ol>
+                  {% for emenda in object.get_parlamentares_com_emendas_substituidas|lookup:elp.parlamentar.id %}
+                    <li>{{ emenda }}</li>
+                  {% endfor %}
+                </ol>
+              {% endif %}
             </li>
             {% if forloop.last %}
             </ol>

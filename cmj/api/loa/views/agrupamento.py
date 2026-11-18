@@ -71,6 +71,53 @@ class AgrupamentoViewSet:
 
     @action(
         methods=[
+            "post",
+        ],
+        detail=True,
+        permission_classes=(AgrupamentoPermission,),
+    )
+    def gerar_emenda_coletiva(self, request, *args, **kwargs):
+        agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
+        if not agrupamento:
+            return JsonResponse({"error": "Agrupamento not found"}, status=404)
+
+        try:
+            emendas_criadas = agrupamento.gerar_emendas_coletivas()
+            # após gerar emendas coletivas, atualizar a instância para refletir as mudanças
+            return JsonResponse(
+                {
+                    "status": "success",
+                    "emendas_criadas": [e.id for e in emendas_criadas],
+                }
+            )
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    @action(
+        methods=[
+            "post",
+        ],
+        detail=True,
+        permission_classes=(AgrupamentoPermission,),
+    )
+    def cancelar_emendas_coletivas(self, request, *args, **kwargs):
+        agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
+        if not agrupamento:
+            return JsonResponse({"error": "Agrupamento not found"}, status=404)
+
+        try:
+            agrupamento.cancelar_emendas_coletivas()
+
+            for emenda in agrupamento.emendas.all():
+                emenda.fase = EmendaLoa.EDICAO_CONTABIL
+                emenda.save()
+
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+
+    @action(
+        methods=[
             "get",
         ],
         detail=True,

@@ -19,18 +19,64 @@ export default class AgrupamentoUpdate {
     this.setupBuscaDespesa()
     this.setupEmendasAgrupamento()
     this.setupFormEvents()
-    this.setupCreateCopiaAgrupamento()
+    this.setupActionsExtras()
 
     // Trigger initial change to set state
     this.form.trigger('change')
   }
 
-  setupCreateCopiaAgrupamento () {
+  setupActionsExtras () {
     const create_copia_agrupamento = this.form.find('#create_copia_agrupamento')
     create_copia_agrupamento.click(() => {
       axios.post(`/api/loa/agrupamento/${this.pk}/create_copia/`)
         .then((response) => {
           window.location.href = `/loa/agrupamento/${response.data.pk}/edit`
+        })
+    })
+    const gerar_emenda_coletiva = this.form.find('#gerar_emenda_coletiva')
+    gerar_emenda_coletiva.click(() => {
+      window.loadingCMJ('Gerando Emendas Coletivas...')
+      axios.post(`/api/loa/agrupamento/${this.pk}/gerar_emenda_coletiva/`)
+        .then((response) => {
+          window.unloadingCMJ()
+          if (response.data.status === 'success') {
+            if (response.data.emendas_criadas && response.data.emendas_criadas.length === 0) {
+              alert('Nenhuma emenda coletiva foi criada.')
+              return
+            }
+            const n = response.data.emendas_criadas.length
+            alert(`${n} emenda(s) coletiva(s) criada(s) com sucesso.`)
+
+            window.location.href = `/loa/agrupamento/${this.pk}`
+          } else if (response.data.error) {
+            alert(response.data.error)
+          }
+        })
+        .catch(() => {
+          window.unloadingCMJ()
+          alert('Ocorreu um erro ao gerar a emenda coletiva.')
+        })
+    })
+    const cancelar_emendas_coletivas = this.form.find('#cancelar_emendas_coletivas')
+    cancelar_emendas_coletivas.click(() => {
+      if (!confirm('Tem certeza que deseja cancelar todas as emendas coletivas?')) {
+        return
+      }
+      window.loadingCMJ('Cancelando emendas coletivas...')
+      axios.post(`/api/loa/agrupamento/${this.pk}/cancelar_emendas_coletivas/`)
+        .then((response) => {
+          if (response.data.status === 'success') {
+            window.unloadingCMJ()
+            alert('Emendas coletivas canceladas com sucesso.')
+            window.location.reload()
+          } else if (response.data.error) {
+            window.unloadingCMJ()
+            alert(response.data.error)
+          }
+        })
+        .catch(() => {
+          window.unloadingCMJ()
+          alert('Ocorreu um erro ao cancelar as emendas coletivas.')
         })
     })
   }

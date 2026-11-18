@@ -1102,11 +1102,12 @@ class EmendaLoaCrud(MasterDetailCrud):
             u = request.user
 
             if (
-                u.has_perm("loa.emendaloa_full_editor")
-                and self.object.fase == EmendaLoa.PROPOSTA_LIBERADA
+                u.has_perm("loa.emendaloa_full_editor") and
+                EmendaLoa.PROPOSTA_LIBERADA <= self.object.fase <= EmendaLoa.LIBERACAO_CONTABIL
             ):
-                self.object.fase = EmendaLoa.EDICAO_CONTABIL
-                self.object.save()
+                if self.object.fase == EmendaLoa.PROPOSTA_LIBERADA:
+                    self.object.fase = EmendaLoa.EDICAO_CONTABIL
+                    self.object.save()
 
             else:
                 if (

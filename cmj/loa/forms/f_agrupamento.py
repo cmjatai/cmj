@@ -4,6 +4,7 @@ from decimal import Decimal
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Fieldset
 from django import forms
+from django.core.exceptions import ValidationError
 from django.forms.models import ModelForm
 from django.forms.widgets import TextInput
 from django.urls import reverse
@@ -102,25 +103,38 @@ class AgrupamentoForm(ModelForm):
                         Div(
                             HTML("""
                                     <button type="button" id="create_copia_agrupamento" class="btn btn-secondary" title="Criar Cópia deste Agrupamento">
-                                        <i class="fas fa-copy"></i>&nbsp;
+                                        <i class="fas fa-copy"></i>
                                     </button>
                                 """),
-                            css_class="btn-group btn-group",
+                            css_class="btn-group btn-group mr-4",
                         ),
                         Div(
                             HTML(f"""
-                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=1" target="_blank" id="preview_m1" class="btn btn-secondary" title="Previsualização Modelo 1">
-                                        Preview M1
+                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=1" target="_blank" id="preview_m1" class="btn btn-secondary" title="Pre-visualização Modelo 1">
+                                        <i class="fas fa-eye"></i>
                                     </a>
-                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=2" target="_blank" id="preview_m2" class="btn btn-secondary" title="Previsualização Modelo 2">
-                                        Preview M2
+                                """),
+                            css_class="btn-group btn-group mr-4",
+                        ),
+                        Div(
+                            HTML(f"""
+                                    <a href="#" id="cancelar_emendas_coletivas" class="btn btn-danger" title="Cancelar Emendas Coletivas e/ou reverter para edição">
+                                        <i class="fas fa-arrow-rotate-left"></i>
                                     </a>
-                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=3" target="_blank" id="preview_m3" class="btn btn-secondary" title="Previsualização Modelo 3">
-                                        Preview M3
+                                    <a href="#" id="gerar_emenda_coletiva" class="btn btn-success" title="Gerar Emendas Coletivas">
+                                        <i class="fas fa-file-circle-plus"></i>
                                     </a>
-                                    <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=4" target="_blank" id="preview_m4" class="btn btn-secondary" title="Previsualização Modelo 4">
-                                        Preview M4
+                                """),
+                            css_class="btn-group btn-group mr-4",
+                        ),
+                        Div(
+                            HTML(f"""
+                                    <a href="{reverse('cmj.loa:agrupamento_detail', args=[agrupamento.id])}" id="cancelar" class="btn btn-secondary" title="Fechar Edição">
+                                        <i class="fas fa-times"></i>
                                     </a>
+                                    <button type="submit" class="btn btn-primary" title="Liberar para Protocolo">
+                                        <i class="fas fa-check"></i>
+                                    </button>
                                 """),
                             css_class="btn-group btn-group",
                         ),
@@ -131,6 +145,21 @@ class AgrupamentoForm(ModelForm):
                 ("ano_loa", 0),
             ]
         )
+
+        """
+            <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=1" target="_blank" id="preview_m1" class="btn btn-secondary" title="Previsualização Modelo 1">
+                M1
+            </a>
+            <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=2" target="_blank" id="preview_m2" class="btn btn-secondary" title="Previsualização Modelo 2">
+                M2
+            </a>
+            <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=3" target="_blank" id="preview_m3" class="btn btn-secondary" title="Previsualização Modelo 3">
+                M3
+            </a>
+            <a href="{reverse('sapl.api:loa_agrupamento-view', args=[agrupamento.id])}?model=4" target="_blank" id="preview_m4" class="btn btn-secondary" title="Previsualização Modelo 4">
+                M4
+            </a>
+        """
 
         row4_1 = to_row(
             [
@@ -155,6 +184,7 @@ class AgrupamentoForm(ModelForm):
                 <button type="button" id="add_registro" class="btn btn-primary" title="Adicionar Registro Contábil">
                     <i class="fas fa-plus-circle"></i>
                 </button>
+
             """),
                         css_class="btn-group btn-group",
                     ),
@@ -219,24 +249,50 @@ class AgrupamentoForm(ModelForm):
 
         self.helper = FormHelper()
         self.helper.layout = SaplFormLayout(
-            Fieldset(_("Dados Gerais"), row1), row4, row5, actions=actions
+            Fieldset(_("Dados Gerais"), row1), row4, row5, actions=[]
         )
 
         self.initial["ano_loa"] = self.loa.ano
         self.initial["perc_despesa"] = Decimal("100.00")
+
+    def clean(self):
+        cleaned_data = super().clean()
+        # acessar os registros contabeis de agrupamentos e verificar se percentual soma zero
+        agrupamentos_contabeis = (
+            self.instance.agrupamentoregistrocontabil_set.values_list(
+                "percentual", flat=True
+            )
+        )
+        soma_zero = sum(agrupamentos_contabeis)
+        if soma_zero != 0:
+            raise ValidationError(
+                _(
+                    "O percentual dos registros contábeis do agrupamento deve somar zero."
+                )
+            )
+        if not agrupamentos_contabeis:
+            raise ValidationError(
+                _("Nenhum agrupamento contábil foi encontrado para validação.")
+            )
+        return cleaned_data
 
     def save(self, commit=False):
         if not self.instance.pk:
             return ModelForm.save(self, commit=commit)
 
         try:
-            self.instance.gerar_emendas_coletivas()
+            # self.instance.gerar_emendas_coletivas()
 
-            self.instance.refresh_from_db()
+            # self.instance.refresh_from_db()
             # emendas.all() puxará apenas as emendas que não passaram para a fase TRANSFORMADA_EM_COLETIVA
             # ou seja, emendas com permitir_juncao_coletiva=False não foram transformadas em coletivas
             # e são simplesmente aqui liberadas para a fase de LIBERACAO_CONTABIL
             for e in self.instance.emendas.all():
+                if 0 < e.fase < EmendaLoa.LIBERACAO_CONTABIL:
+                    e.fase = EmendaLoa.LIBERACAO_CONTABIL
+                e.save()
+
+            for e in self.instance.emendas_coletivas_geradas.all():
                 if 0 < e.fase < EmendaLoa.LIBERACAO_CONTABIL:
                     e.fase = EmendaLoa.LIBERACAO_CONTABIL
                 e.save()

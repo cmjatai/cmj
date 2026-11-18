@@ -153,7 +153,8 @@ class AgrupamentoCrud(MasterDetailCrud):
                 kwargs={"pk": self.object.pk},
             )
 
-    class DetailView(MasterDetailCrud.DetailView):
+    class DetailView(LoaContextDataMixin, MasterDetailCrud.DetailView):
+        layout_key = "AgrupamentoDetail"
 
         def hook_despesas(self, obj, verbose_name, field_display):
             str_regs = []
@@ -166,15 +167,50 @@ class AgrupamentoCrud(MasterDetailCrud):
 
         def hook_emendas(self, obj, verbose_name, field_display):
             str_regs = []
-            for e in obj.emendas(manager="all_objects").all():
+
+            total_emendas = obj.emendas(manager="all_objects").count()
+            for i, e in enumerate(obj.emendas(manager="all_objects").all()):
                 entidade = str(e.entidade) + "<br>" if e.entidade else ""
+                # se for o ultimo não colocar a linha divisória
                 src = f"""
-                    <strong>{e.unidade}</strong><br>
+                    <strong>{e.unidade}</strong> <a href="{reverse('cmj.loa:emendaloa_detail', kwargs={'pk': e.pk})}" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-external-link"></i></a><br>
                     - {f"{entidade}" if entidade else ""}
                     - {e}<br>
-                    <hr class="divider">
+                    <small class="text-muted">{e.get_fase_display()}</small><br>
+                    {'' if i == total_emendas - 1 else '<hr class="divider">'}
                 """
                 str_regs.append(src)
-            src = "".join(map(lambda x: f"<li>{x}</li>", str_regs))
+            src = "".join(
+                map(lambda x: f"<li style='padding: 1rem 0;'>{x}</li>", str_regs)
+            )
 
-            return verbose_name, f"<ul>{src}</ul>"
+            return (
+                "Emendas Substituídas/Classificadas",
+                f'<ul style="line-height: 1.4;">{src}</ul>',
+            )
+
+        def hook_emendas_coletivas(self, obj, verbose_name, field_display):
+            str_regs = []
+
+            # retire o link do e e coloque em um icone afrente do da unidade para abrir em blank
+            # substituao por fa-link para indicar que é um link externo
+
+            total_emendas_coletivas = obj.emendas_coletivas_geradas.count()
+            for i, e in enumerate(obj.emendas_coletivas_geradas.all()):
+                entidade = str(e.entidade) + "<br>" if e.entidade else ""
+                src = f"""
+                    <strong>{e.unidade}</strong> <a href="{reverse('cmj.loa:emendaloa_detail', kwargs={'pk': e.pk})}" target="_blank" class="btn btn-sm btn-primary"><i class="fa fa-external-link"></i></a><br>
+                    - {f"{entidade}" if entidade else ""}
+                    - {e}<br>
+                    <small class="text-muted">{e.get_fase_display()}</small><br>
+                    {'' if i == total_emendas_coletivas - 1 else '<hr class="divider">'}
+                """
+                str_regs.append(src)
+            src = "".join(
+                map(lambda x: f"<li style='padding: 1rem 0;'>{x}</li>", str_regs)
+            )
+
+            return (
+                "Emendas Coletivas Geradas",
+                f'<ul style="line-height: 1.2;">{src}</ul>',
+            )

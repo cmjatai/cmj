@@ -203,6 +203,13 @@ AgrupamentoCreate:
   {% trans 'Agrupamento' %}:
   - nome tipo
 
+AgrupamentoDetail:
+  {% trans 'Agrupamento' %}:
+  - nome
+  - despesas
+  - emendas_coletivas
+  - emendas
+
 Agrupamento:
   {% trans 'Agrupamento' %}:
   - nome

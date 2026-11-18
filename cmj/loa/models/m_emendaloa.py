@@ -263,10 +263,20 @@ class EmendaLoa(CmjSearchMixin):
             ("emendaloa_full_editor", _("Edição completa de Emendas Impositivas.")),
         )
 
-
     @property
     def qs_emendas_substituidas_all_objects(self):
-        return self.emendas_substituidas(manager='all_objects').all()
+        return self.emendas_substituidas(manager="all_objects").all()
+
+    def get_parlamentares_com_emendas_substituidas(self):
+        result = {}
+        for p in self.emendaloaparlamentar_set.all():
+            emendas_substituidas = self.emendas_substituidas(
+                manager="all_objects"
+            ).filter(emendaloaparlamentar_set__parlamentar__id=p.parlamentar.id)
+            result[p.parlamentar.id] = list(
+                map(lambda e: e.finalidade_format, emendas_substituidas)
+            )
+        return result
 
     @property
     def has_ajustes(self):

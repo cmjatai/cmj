@@ -26,11 +26,14 @@ class LoaContextDataMixin:
                 # Ensure obj is a Loa instance
                 if obj and hasattr(obj, "loa"):
                     obj = obj.loa
+                if not obj:
+                    obj = Loa.objects.get(pk=self.kwargs.get("pk"))
 
                 if obj and obj.materia and not obj.materia.normajuridica():
                     context["subnav_template_name"] = (
                         "loa/subnav_loa_em_tramitacao.yaml"
                     )
+                    #context['title'] = f"LOA {obj.ano}"
         except Exception as e:
             # Optionally log the exception or handle it as needed
             pass

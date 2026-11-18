@@ -60,9 +60,10 @@ REGRAS OBRIGATÓRIAS:
 4. Utilize conectivos adequados para garantir a coesão e a fluidez do texto consolidado.
 5. Evite iniciar frases com números ou símbolos isolados, reestruturando quando necessário.
 6. Certifique-se de que todas as localidades beneficiadas estejam claramente indicadas, sem omissões.
-7. Mantenha a consistência na formatação de valores monetários, utilizando sempre o mesmo padrão de moeda e separadores decimais.
-8. Garanta que todas as informações relevantes das ementas estejam preservadas, sem omitir detalhes importantes, mesmo que haja pequenas variações de redação entre elas.
-9. Ao consolidar as ementas, assegure que a redação final seja clara, coesa e de fácil compreensão, evitando ambiguidades e mantendo a precisão técnica.
+7. Evite duplicidades semânticas, garantindo que informações equivalentes não sejam repetidas de forma redundante. Principalmente as mascasras {{entidade}} e {{bairro}}, assegurando que cada bairro/localidade seja mencionada apenas uma vez, mesmo que apareça em diferentes ementas.
+8. Mantenha a consistência na formatação de valores monetários, utilizando sempre o mesmo padrão de moeda e separadores decimais.
+9. Garanta que todas as informações relevantes das ementas estejam preservadas, sem omitir detalhes importantes, mesmo que haja pequenas variações de redação entre elas.
+10. Ao consolidar as ementas, assegure que a redação final seja clara, coesa e de fácil compreensão, evitando ambiguidades e mantendo a precisão técnica.
 
 
 EMENTAS:

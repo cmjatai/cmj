@@ -168,7 +168,7 @@ class Agrupamento(models.Model):
             )
         try:
             ia = IAEmentaEmendaColetiva(
-                [str(e.finalidade_format) for e in self.emendas.all()]
+                [str(e.finalidade) for e in self.emendas.all()]
             )
             self.finalidade = ia.gerar_finalidade_global()
             if not self.finalidade:
@@ -265,9 +265,26 @@ class Agrupamento(models.Model):
             for (unidade, entidade), value in emendas_coletivas.items()
         ]
 
+    def cancelar_emendas_coletivas(self):
+        try:
+            with transaction.atomic():
+                for e in self.emendas(manager="all_objects").filter(
+                    emenda_coletiva__isnull=False
+                ):
+                    e.emenda_coletiva = None
+                    e.fase = EmendaLoa.EDICAO_CONTABIL
+                    e.save()
+
+                # deletando emendas coletivas associadas ao agrupamento
+                for ec in self.emendas_coletivas_geradas.all():
+                    ec.delete()
+        except Exception as e:
+            raise e
+
     def gerar_emendas_coletivas(self):
         emendas_preparadas = self.preparar_dados_para_coletiva()
 
+        emendas_criadas = []  # Lista para armazenar as emendas coletivas criadas
         try:
 
             with transaction.atomic():
@@ -291,7 +308,7 @@ class Agrupamento(models.Model):
                     ec.entidade = emenda["entidade"]
                     ec.bairro = emenda["bairro"]
                     ec.indicacao = emenda["unidade"].especificacao
-                    ec.fase = EmendaLoa.LIBERACAO_CONTABIL
+                    ec.fase = EmendaLoa.EDICAO_CONTABIL
                     ec.tipo = emenda["emendas"][0].tipo
                     ec.save()
 
@@ -323,6 +340,11 @@ class Agrupamento(models.Model):
                         erc.valor = valor
                         erc.save()
 
+                    ec.refresh_from_db()
+                    ec.save()
+
+                    emendas_criadas.append(ec)
+            return emendas_criadas
         except Exception as e:
             raise e
 
