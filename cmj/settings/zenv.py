@@ -7,7 +7,7 @@ config = AutoConfig(
     search_path=(Path(__file__).ancestor(4).child("cmj_data") if production else None)
 )
 
-DEBUG = config("DEBUG", default=False, cast=bool)
+DEBUG = config("DEBUG", default=True, cast=bool)
 
 BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)

@@ -17,9 +17,3 @@ def debug(request):
 def base_url(request):
     return {"base_url": settings.BASE_URL}
 
-
-def debug_and_remote_database(request):
-    return {
-        "DEBUG_AND_REMOTE_DATABASE": settings.DEBUG
-        and not settings.DEV_HOST_NAME in settings.DATABASES["default"]["HOST"],
-    }

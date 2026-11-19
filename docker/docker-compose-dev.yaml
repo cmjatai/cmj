@@ -88,6 +88,24 @@ services:
       - cmj-net
     ports:
       - "5173:5173"
+  cmjdb18:
+    image: pgvector/pgvector:0.8.7-pg18-bookworm
+    restart: always
+    container_name: cmjpostgres18
+    labels:
+        NAME: "cmjpostgres18"
+    environment:
+      POSTGRES_PASSWORD: cmj
+      POSTGRES_USER: cmj
+      POSTGRES_DB: cmj
+      PGDATA : /var/lib/postgresql/data/
+    volumes:
+      - cmjdb18_data:/var/lib/postgresql/data/
+    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
+    ports:
+      - "5433:5432"
+    networks:
+      - cmj-net
   cmj:
     build:
       context: ../
@@ -111,6 +129,7 @@ services:
       - cmjfront2018
       - cmjfront2026
       - cmjsolr
+      - cmjdb18
     ports:
       - "9099:9000"
     networks:
@@ -123,5 +142,6 @@ volumes:
   csolr_data:
   csolr_configsets:
   credis_data:
+  cmjdb18_data:
   prometheus_data:
   grafana_data:

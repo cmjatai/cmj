@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).ancestor(2)
 PROJECT_DIR = Path(__file__).ancestor(3)
 FONTS_DIR = Path(__file__).ancestor(3).child("fonts")
 
-SECRET_KEY = config("SECRET_KEY")
+SECRET_KEY = config("SECRET_KEY", default="insecure-secret-key")
 
 FOLDER_DEBUG_CONTAINER = Path(
     config("FOLDER_DEBUG_CONTAINER", default=__file__, cast=str)
@@ -77,7 +77,9 @@ if not DEBUG:
 
 if DEBUG and FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
     host = DATABASES["default"]["HOST"]
+    port = DATABASES["default"]["PORT"]
     DATABASES["default"]["HOST"] = "localhost" if host == "cmjdb18" else host
+    DATABASES["default"]["PORT"] = 5433 if host == "cmjdb18" else port
 
 PORTALCMJ_VERSION = "master"
 
@@ -179,20 +181,21 @@ if DEBUG:
         "__notebooks",
     ]
 
+
 DEBUG_TOOLBAR_ACTIVE = config("DEBUG_TOOLBAR_ACTIVE", default=False, cast=bool)
-DEBUG_TOOLBAR_INTERNAL_IPS = config(
-    "DEBUG_TOOLBAR_INTERNAL_IPS", default="127.0.0.1,localhost", cast=str
-).split(",")
-INTERNAL_IPS = DEBUG_TOOLBAR_INTERNAL_IPS
-
-SILKY_PYTHON_PROFILER = True
-SILKY_PYTHON_PROFILER_BINARY = True
-SILKY_AUTHENTICATION = True  # User must login
-SILKY_AUTHORISATION = True  # User must have permissions
-SILKY_PERMISSIONS = lambda user: user.is_superuser
-SILKY_META = True
-
 if DEBUG_TOOLBAR_ACTIVE:
+    DEBUG_TOOLBAR_INTERNAL_IPS = config(
+        "DEBUG_TOOLBAR_INTERNAL_IPS", default="127.0.0.1,localhost", cast=str
+    ).split(",")
+    INTERNAL_IPS = DEBUG_TOOLBAR_INTERNAL_IPS
+
+    SILKY_PYTHON_PROFILER = True
+    SILKY_PYTHON_PROFILER_BINARY = True
+    SILKY_AUTHENTICATION = True  # User must login
+    SILKY_AUTHORISATION = True  # User must have permissions
+    SILKY_PERMISSIONS = lambda user: user.is_superuser
+    SILKY_META = True
+
     INSTALLED_APPS += (
         "debug_toolbar",
         "silk",

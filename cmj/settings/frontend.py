@@ -47,7 +47,6 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
-                "cmj.context_processors.debug_and_remote_database",
                 "cmj.context_processors.areatrabalho",
                 "cmj.context_processors.debug",
                 "cmj.context_processors.base_url",
