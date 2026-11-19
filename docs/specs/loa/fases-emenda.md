@@ -1,7 +1,7 @@
 # LOA: fases da emenda
 
 Status: acordado, implementação pendente
-Última verificação: 2026-11-19 (commit `7273814e0` com alterações locais)
+Última verificação: 2026-11-19 (commit `9b96527d8`)
 Código principal: `cmj/loa/models/m_emendaloa.py`, `cmj/loa/views/v_emendaloa.py`,
 `cmj/loa/forms/f_emendaloa.py`, `cmj/loa/models/m_agrupamento.py`, `cmj/api/loa/views/`
 Testes: nenhum encontrado para `EmendaLoa`
@@ -10,6 +10,20 @@ As regras `[observado]` descrevem o comportamento atual, obtido por leitura do c
 os fluxos. As regras de negócio confirmadas em 2026-11-19 estão em "Regras acordadas": `[acordado]`
 indica que o código já atende e `[desejado]` indica que ele ainda precisa mudar. Quando uma regra
 `[observado]` conflitar com uma delas, vale a regra acordada.
+
+## Ordem de implementação
+
+**Os testes vêm antes de qualquer correção.** Não altere código de produção para atender às regras
+`[desejado]` antes de concluir a etapa 1.
+
+1. **Testes:** escreva testes para as regras `[acordado]` e `[desejado]`, ligados aos IDs com
+   `@pytest.mark.spec("LOA-FASE-NNN")`. O marker precisa ser registrado no `pyproject.toml`, porque o
+   projeto usa `--strict-markers`. Testes de `[acordado]` devem passar. Testes de `[desejado]` devem
+   falhar, mostrando a divergência atual. Comece por inclusão em agrupamento (LOA-FASE-058 a 060),
+   cancelamento de coletiva (056 e 057) e dono da coletiva (064), e siga para as transições e permissões.
+2. **Revisão:** apresente o resultado dos testes antes de iniciar as correções.
+3. **Implementação:** corrija uma regra ou um grupo pequeno de regras por vez, até o teste passar, e
+   marque cada uma como `[implementado]`.
 
 ## Escopo
 
@@ -175,7 +189,13 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
 
 ## Dúvidas
 
-Nenhuma dúvida aberta. As decisões estão em "Regras acordadas".
+Devem ser decididas antes de implementar as regras afetadas. Não bloqueiam os demais testes.
+
+- D13. **Botões em fases avançadas.** Com o acesso do Operador da LOA em qualquer fase (LOA-FASE-065),
+  "Concluir edição" e "Devolver para correção" podem levar uma emenda de fase avançada para 17 ou 10
+  (`cmj/loa/views/v_emendaloa.py:1098-1108`). Os botões devem ficar restritos às fases 15 e 17?
+- D14. **Registros contábeis fora da fase 15.** O Operador da LOA edita a emenda em qualquer fase, mas
+  a API só aceita alterar esses registros na fase 15 (LOA-FASE-040). Isso deve continuar assim?
 
 ## Fora do escopo
 
