@@ -70,9 +70,11 @@ EMENTAS:
 {chr(10).join(f"- {e}" for e in self.ementas)}
             """
 
+            model = "gemini-3.1-flash-lite"
+
             # TODO: refatorar junto com o necessário para IAGenaiBase
             response = self.client.models.generate_content(
-                model="gemini-3.1-flash-lite",
+                model=model,
                 contents=[prompt_1],
                 config=types.GenerateContentConfig(
                     # Baixa temperatura para manter a resposta factual e determinística

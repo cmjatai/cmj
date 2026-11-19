@@ -26,7 +26,10 @@ class IAGenaiBase:
     response_mime_type = "application/json"
 
     def __init__(self, *args, **kwargs):
-        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        if settings.GEMINI_API_KEY:
+            self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
+        else:
+            raise ValueError("GEMINI_API_KEY não configurada.")
 
     def update_or_create_llm_models_in_quotamodel(self):
         models = self.client.models.list()
@@ -117,7 +120,7 @@ class IAGenaiBase:
         # TODO: refatorar para desacoplar:
         # - a lógica de geração de conteúdo da verificação de quota
         # - o system_instruction da configuração fixo de chat
-        # 
+        #
         self.update_generation_config()
         config = self.generation_config
         if tools:

@@ -167,9 +167,7 @@ class Agrupamento(models.Model):
                 "É necessário que todas as emendas possuam a mesma unidade e entidade."
             )
         try:
-            ia = IAEmentaEmendaColetiva(
-                [str(e.finalidade) for e in self.emendas.all()]
-            )
+            ia = IAEmentaEmendaColetiva([str(e.finalidade) for e in self.emendas.all()])
             self.finalidade = ia.gerar_finalidade_global()
             if not self.finalidade:
                 self.finalidade = ""
@@ -238,12 +236,17 @@ class Agrupamento(models.Model):
 
         # criar finalidade agregada para cada agrupamento via I.A.
         if not self.finalidade:
-            ia = IAEmentaEmendaColetiva()
-            for key in emendas_coletivas:
-                emendas = emendas_coletivas[key]["emendas"]
-                finalidades = [emenda.finalidade for emenda in emendas]
-                finalidade_automatica = ia.gerar_finalidade_global(finalidades)
-                emendas_coletivas[key]["finalidade_automatica"] = finalidade_automatica
+            try:
+                ia = IAEmentaEmendaColetiva()
+                for key in emendas_coletivas:
+                    emendas = emendas_coletivas[key]["emendas"]
+                    finalidades = [emenda.finalidade for emenda in emendas]
+                    finalidade_automatica = ia.gerar_finalidade_global(finalidades)
+                    emendas_coletivas[key][
+                        "finalidade_automatica"
+                    ] = finalidade_automatica
+            except Exception as e:
+                logger.error(f"Erro ao gerar finalidade automática: {e}")
 
         return [
             {
@@ -302,7 +305,9 @@ class Agrupamento(models.Model):
                     ec.loa = self.loa
                     ec.prefixo_finalidade = ""
                     ec.prefixo_indicacao = ""
-                    ec.finalidade = self.finalidade or emenda["finalidade_automatica"]
+                    ec.finalidade = (
+                        self.finalidade or emenda["finalidade_automatica"] or ""
+                    )
                     ec.unidade = emenda["unidade"]
                     ec.entidade = emenda["entidade"]
                     ec.bairro = emenda["bairro"]
