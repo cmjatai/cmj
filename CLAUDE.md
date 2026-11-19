@@ -175,6 +175,7 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
 - `docs/backend/convencoes.md`: exemplos de CRUD, mixins, API, permissões, testes e novo app.
 - `docs/frontend/v6.md`: stores, `Resources.Utils`, rotas e padrões do v6.
 - `docs/frontend/v2018.md`: Vuex, `Resources.Utils` e padrões do v2018.
+- `docs/specs/loa/fases-emenda.md`: comportamento atual das fases da emenda. Leia antes de alterá-las.
 
 ## A confirmar
 

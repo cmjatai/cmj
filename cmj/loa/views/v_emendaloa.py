@@ -1068,9 +1068,20 @@ class EmendaLoaCrud(MasterDetailCrud):
         def get_success_url(self):
             return MasterDetailCrud.UpdateView.get_success_url(self)
 
+        @property
+        def edita_em_qualquer_fase(self):
+            # superusuário e quem tem as permissões do grupo Operador da LOA
+            return self.request.user.has_perms(
+                (
+                    "loa.add_emendaloa",
+                    "loa.change_emendaloa",
+                    "loa.emendaloa_full_editor",
+                )
+            )
+
         def post(self, request, *args, **kwargs):
             u = request.user
-            if not u.is_superuser and not u.is_anonymous:
+            if not u.is_anonymous and not self.edita_em_qualquer_fase:
                 if u.operadorautor_set.exists():
                     if (
                         self.object.fase > EmendaLoa.PROPOSTA_LIBERADA
@@ -1109,7 +1120,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     self.object.fase = EmendaLoa.EDICAO_CONTABIL
                     self.object.save()
 
-            else:
+            elif not self.edita_em_qualquer_fase:
                 if (
                     not u.is_superuser
                     and self.object.fase > EmendaLoa.LIBERACAO_CONTABIL
