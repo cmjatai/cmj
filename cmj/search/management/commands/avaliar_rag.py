@@ -90,9 +90,9 @@ class Command(BaseCommand):
 
         embeddings = {}
         if options["modo"] == "hibrido":
-            from cmj.utils.genia import IAGenaiBase
+            from cmj.utils.genia import IAEmbeddingService
 
-            ia = IAGenaiBase()
+            ia = IAEmbeddingService()
             for p in perguntas:
                 embeddings[p["id"]] = ia.get_query_embedding(p["pergunta"])
 

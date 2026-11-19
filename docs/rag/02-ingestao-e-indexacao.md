@@ -8,7 +8,7 @@ Arquivos envolvidos:
 * Orquestração: [cmj/search/tasks.py](../../cmj/search/tasks.py)
 * Segmentação: `TextoArticulado.generate_chunks` em [sapl/compilacao/models.py](../../sapl/compilacao/models.py)
 * Persistência/vetorização: `Embedding` em [cmj/search/models.py](../../cmj/search/models.py)
-* API de embeddings: `IAGenaiBase.embed_documents` em [cmj/utils/genia/\_\_init\_\_.py](../../cmj/utils/genia/__init__.py)
+* API de embeddings: `IAEmbeddingService.embed_documents` em [cmj/utils/genia/embeddings.py](../../cmj/utils/genia/embeddings.py)
 
 ## 2.1 Gatilho
 
@@ -151,11 +151,11 @@ que a task usa para filtrar os embeddings do T.A. corrente.
 |--------|-----------|
 | `update_search_vector()` | `UPDATE ... SET search_vector = to_tsvector('portuguese', chunk)` para a linha |
 | `update_all_search_vectors()` (classmethod) | Mesmo `UPDATE` em lote para toda a tabela (útil em reindexação total) |
-| `update_total_tokens()` | `IAGenaiBase.count_tokens_in_text(chunk)` (Gemini `count_tokens`, 0 em caso de erro) e `save()` |
+| `update_total_tokens()` | `IAEmbeddingService().count_tokens_in_text(chunk)` (Gemini `count_tokens`, 0 em caso de erro) e `save()` |
 | `generate_embedding()` | Vetoriza **um** chunk, salva em `vetor1536` |
 | `generate_embeddings_for_queryset(qs, slice_size=256)` | Vetoriza o queryset **em fatias**, gravando o progresso a cada fatia (`vetor1536`; zera o campo legado `vetor`). Embeddings que falharem continuam sem vetor (pendentes). Retorna a quantidade vetorizada |
 
-### `IAGenaiBase.embed_documents`
+### `IAEmbeddingService.embed_documents`
 
 * Modelo: **`gemini-embedding-2`**, `output_dimensionality=1536`.
 * Lotes de **64** documentos por chamada.

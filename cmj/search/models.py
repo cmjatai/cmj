@@ -18,7 +18,7 @@ from pgvector.django.vector import VectorField
 from cmj.mixins import CmjModelMixin
 from cmj.search.fts import RANKER_PADRAO, RANKERS, build_fts_queries
 from cmj.utils import get_settings_auth_user_model
-from cmj.utils.genia import IAGenaiBase
+from cmj.utils.genia import IAEmbeddingService
 
 logger = logging.getLogger(__name__)
 
@@ -135,25 +135,23 @@ class Embedding(CmjModelMixin):
         """
         Atualiza a contagem de tokens do chunk de texto.
 
-        Utiliza o tokenizador da classe IAGenaiBase para calcular
+        Utiliza o tokenizador da classe IAEmbeddingService para calcular
         o número de tokens. Útil para controle de custos de API
         e validação de limites de contexto.
         """
-        IAGenaiBase_instance = IAGenaiBase()
-        self.total_tokens = IAGenaiBase_instance.count_tokens_in_text(self.chunk) or 0
+        self.total_tokens = IAEmbeddingService().count_tokens_in_text(self.chunk) or 0
         self.save()
 
     def generate_embedding(self):
         """
         Gera o vetor de embedding a partir do chunk de texto.
 
-        Utiliza a API de embedding configurada em IAGenaiBase
+        Utiliza a API de embedding configurada em IAEmbeddingService
         para converter o texto em representação vetorial de 1536 dimensões.
         O vetor resultante é salvo no campo `vetor1536` para uso em
         buscas por similaridade semântica.
         """
-        IAGenaiBase_instance = IAGenaiBase()
-        embedding_vector = IAGenaiBase_instance.embed_documents(
+        embedding_vector = IAEmbeddingService().embed_documents(
             [{"text": self.chunk, "title": None}]
         )
         self.vetor1536 = embedding_vector[0] if embedding_vector else None
@@ -173,7 +171,7 @@ class Embedding(CmjModelMixin):
         if not ids:
             return 0
 
-        ia = IAGenaiBase()
+        ia = IAEmbeddingService()
         done = 0
         for start in range(0, len(ids), slice_size):
             slice_ids = ids[start : start + slice_size]

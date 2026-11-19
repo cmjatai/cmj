@@ -3,20 +3,20 @@ import logging
 from django.utils import timezone
 
 from cmj.search.models import ChatMessage, ChatSession, Embedding
-from cmj.utils.genia import IAGenaiBase
+from cmj.utils.genia import IAChatService, IAEmbeddingService
 
 logger = logging.getLogger(__name__)
 
 
 class ChatManager:
 
-    MAX_SESSIONS_PER_USER = 2
-    MAX_MESSAGES_PER_SESSION = 8
-    MAX_LENGTH_USER_MESSAGE = 200
+    # Os limites de uso do chat são definidos em IAChatService.
+    MAX_SESSIONS_PER_USER = IAChatService.MAX_SESSIONS_PER_USER
+    MAX_MESSAGES_PER_SESSION = IAChatService.MAX_MESSAGES_PER_SESSION
+    MAX_LENGTH_USER_MESSAGE = IAChatService.MAX_LENGTH_USER_MESSAGE
 
     def __init__(self):
-        self.ia = IAGenaiBase()
-        # self.ia.ia_model_name = 'gemini-3-flash-preview'
+        self.ia = IAChatService()
 
     def update_or_create_llm_models_in_quotamodel(self):
         self.ia.update_or_create_llm_models_in_quotamodel()
@@ -30,8 +30,7 @@ class ChatManager:
             """Busca informações específicas na base de dados interna ."""
             logger.info(f"[Sistema] LLM solicitou busca por: {query}")
 
-            ia_embedding = IAGenaiBase()
-            query_embedding = ia_embedding.get_query_embedding(query)
+            query_embedding = IAEmbeddingService().get_query_embedding(query)
             context = Embedding.make_context(query, query_embedding)
 
             rag_query.append({"query": query, "results": context})

@@ -4,7 +4,7 @@ from unittest import mock
 import pytest
 
 from cmj.search.models import Embedding
-from cmj.utils.genia import IAGenaiBase
+from cmj.utils.genia import IAEmbeddingService
 
 VECTOR = [0.1] * 1536
 
@@ -13,10 +13,10 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def ia():
-    with mock.patch("cmj.utils.genia.genai.Client") as client_cls, mock.patch(
-        "cmj.utils.genia.time.sleep"
+    with mock.patch("cmj.utils.genia.base.genai.Client") as client_cls, mock.patch(
+        "cmj.utils.genia.embeddings.time.sleep"
     ):
-        instance = IAGenaiBase()
+        instance = IAEmbeddingService()
         instance.client = client_cls.return_value
         yield instance
 
@@ -61,7 +61,7 @@ def test_generate_embeddings_for_queryset_grava_progresso_e_deixa_pendentes(db):
     ok = Embedding.objects.create(chunk="a")
     falho = Embedding.objects.create(chunk="b")
 
-    with mock.patch("cmj.search.models.IAGenaiBase") as ia_cls:
+    with mock.patch("cmj.search.models.IAEmbeddingService") as ia_cls:
         ia_cls.return_value.embed_documents.return_value = [VECTOR, None]
         done = Embedding.generate_embeddings_for_queryset(
             Embedding.objects.filter(id__in=[ok.id, falho.id])

@@ -6,12 +6,12 @@ import pytest
 from cmj.core.models import User
 from cmj.search.chat_manager import ChatManager
 from cmj.search.models import ChatMessage, ChatSession
-from cmj.utils.genia import IAGenaiBase
+from cmj.utils.genia import IAChatService
 
 
 @pytest.fixture
 def manager():
-    with mock.patch("cmj.search.chat_manager.IAGenaiBase") as ia_cls:
+    with mock.patch("cmj.search.chat_manager.IAChatService") as ia_cls:
         ia_cls.return_value.ia_model_name = "modelo-teste"
         yield ChatManager()
 
@@ -72,11 +72,11 @@ def test_resposta_do_modelo_e_salva_com_metadata(manager, users):
 @pytest.mark.django_db
 def test_chat_e_criado_a_cada_mensagem_e_cota_registrada(db):
     quota = mock.Mock()
-    with mock.patch("cmj.utils.genia.genai.Client") as client_cls:
+    with mock.patch("cmj.utils.genia.base.genai.Client") as client_cls:
         client = client_cls.return_value
-        ia = IAGenaiBase()
+        ia = IAChatService()
         with mock.patch.object(
-            IAGenaiBase, "retrieve_quota_if_available", return_value=quota
+            IAChatService, "retrieve_quota_if_available", return_value=quota
         ):
             ia.chat_send_message("a", [], tools=[lambda query: query])
             ia.chat_send_message("b", [], tools=[lambda query: query])

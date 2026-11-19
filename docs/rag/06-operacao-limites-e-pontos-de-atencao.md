@@ -90,7 +90,7 @@ Os itens abaixo foram identificados na leitura inicial do código. Os marcados c
 
 ### Correção funcional
 
-4. ✅ **Chat do `genai` sem estado por conexão.** `IAGenaiBase.chat_send_message` agora cria um `Chat` por
+4. ✅ **Chat do `genai` sem estado por conexão.** `IAChatService.chat_send_message` agora cria um `Chat` por
    mensagem, a partir do histórico do banco. Assim a *closure* de `buscar_na_base_dados` e a lista
    `rag_query` pertencem sempre à mensagem corrente (`metadata.rag_results.rag_query` correto em todas as
    respostas), e modelo/cota são escolhidos e registrados a cada mensagem. Contrapartida: as chamadas de

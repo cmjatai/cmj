@@ -133,7 +133,7 @@ como resposta da função.
 |-----------|-------|--------------|
 | `top_k` | 60 (semântica, FTS e corte final) | assinatura de `make_context` |
 | `RRF_K` | 60 | constante local |
-| Dimensão da consulta | 1536 | `IAGenaiBase.get_query_embedding` |
+| Dimensão da consulta | 1536 | `IAEmbeddingService.get_query_embedding` |
 | Config FTS | `portuguese` | `cmj/search/fts.py` (`FTS_CONFIG`) e `update_search_vector` (devem ser a mesma) |
 | Máx. de termos da busca textual | 12 | `cmj/search/fts.py` (`MAX_TERMS`) |
 | Ranker do FTS | `n1` | `cmj/search/fts.py` (`RANKER_PADRAO`, `RANKERS`) |

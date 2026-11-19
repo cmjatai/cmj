@@ -5,7 +5,9 @@ Arquivos:
 * [cmj/search/routing.py](../../cmj/search/routing.py) – rota
 * [cmj/search/consumers.py](../../cmj/search/consumers.py) – `ChatConsumer`
 * [cmj/search/chat_manager.py](../../cmj/search/chat_manager.py) – `ChatManager`
-* [cmj/utils/genia/\_\_init\_\_.py](../../cmj/utils/genia/__init__.py) – `IAGenaiBase`
+* [cmj/utils/genia/base.py](../../cmj/utils/genia/base.py) – `IAGenaiBase`
+* [cmj/utils/genia/chat.py](../../cmj/utils/genia/chat.py) – `IAChatService`
+* [cmj/utils/genia/embeddings.py](../../cmj/utils/genia/embeddings.py) – `IAEmbeddingService`
 * [cmj/utils/genia/genia_system_instruction_v3.py](../../cmj/utils/genia/genia_system_instruction_v3.py)
 * Frontend: [ChatSessionView.vue](../../_frontend/v6/src/modules/chat/ChatSessionView.vue), `ChatModule.vue`, `ChatHistoryList.vue`
 
@@ -41,7 +43,7 @@ O frontend conecta em `ws(s)://<host>/ws/chat/<session_id>/`. O `session_id` ide
 
 ## 4.2 `ChatConsumer`
 
-Cada instância cria seu próprio `ChatManager` (e, portanto, seu próprio `IAGenaiBase`).
+Cada instância cria seu próprio `ChatManager` (e, portanto, seu próprio `IAChatService`).
 
 ### `connect()`
 
@@ -139,7 +141,7 @@ rag_query = []
 
 def buscar_na_base_dados(query: str) -> str:
     """Busca informações específicas na base de dados interna ."""
-    query_embedding = IAGenaiBase().get_query_embedding(query)
+    query_embedding = IAEmbeddingService().get_query_embedding(query)
     context = Embedding.make_context(query, query_embedding)
     rag_query.append({"query": query, "results": context})
     return context
@@ -147,7 +149,7 @@ def buscar_na_base_dados(query: str) -> str:
 
 * A **docstring e a assinatura** da função são o que o SDK transforma em *function declaration*
   (nome `buscar_na_base_dados`, parâmetro `query: str`). **Não renomeie** sem atualizar a *system instruction*.
-* Cada chamada cria um novo `IAGenaiBase` apenas para obter o embedding da consulta.
+* Cada chamada cria um novo `IAEmbeddingService` apenas para obter o embedding da consulta.
 * Após a resposta, extrai de `response.usage_metadata`: `total_token_count`, `prompt_token_count`,
   `candidate_token_count`, `thoughts_token_count` (quando existirem).
 * Retorna `(response.text, {"rag_query": [...], "rag_infos": {...}})`.
@@ -155,31 +157,36 @@ def buscar_na_base_dados(query: str) -> str:
 O dicionário é gravado em `ChatMessage.metadata["rag_results"]` da resposta, permitindo **auditar** quais
 buscas o LLM fez, o contexto recuperado e o consumo de tokens.
 
-## 4.4 `IAGenaiBase`
+## 4.4 `IAChatService` e `IAGenaiBase`
 
-Cliente fino sobre `google-genai`.
+As regras do pacote estão em [docs/specs/genia/](../specs/genia/README.md). `IAGenaiBase` é o cliente
+fino sobre `google-genai`, com o controle de cota. `IAChatService` herda dela e reúne o que é só do chat.
 
-| Atributo | Valor padrão |
-|----------|--------------|
-| `ia_model_name` | `gemini-3-flash-preview` (sobrescrito pela cota escolhida) |
-| `temperature` | `0.1` (respostas determinísticas, jurídicas) |
-| `top_k` / `top_p` | `40` / `0.95` |
-| `response_mime_type` | `application/json` (no chat é trocado para `text/plain`) |
+| Atributo | `IAGenaiBase` | `IAChatService` |
+|----------|---------------|-----------------|
+| `ia_model_name` | `gemini-3-flash-preview` | sobrescrito pela cota escolhida |
+| `temperature` | `0.1` (respostas determinísticas, jurídicas) | herdado |
+| `top_k` / `top_p` | `40` / `0.95` | herdado |
+| `response_mime_type` | `application/json` | `text/plain` |
+| `system_instruction` | nenhuma | `rag_system_instruction` |
+| `quota_service_name` | nenhuma | `IAGenaiBase` (chave histórica) |
 
-### `chat_send_message(message, history, tools=None)`
+`IAChatService` também define `MAX_SESSIONS_PER_USER`, `MAX_MESSAGES_PER_SESSION` e
+`MAX_LENGTH_USER_MESSAGE`, aplicados pelo `ChatManager` e pelo `ChatConsumer`.
+
+### `IAChatService.chat_send_message(message, history, tools=None)`
 
 * A cada chamada cria um **novo** `Chat` (`client.chats.create`) com o histórico vindo do banco – o banco é
   a fonte da verdade e as *tools* ficam sempre ligadas à mensagem corrente:
-  1. `response_mime_type = "text/plain"`;
-  2. `quota = retrieve_quota_if_available()` (escolhe a cota/modelo – ver 4.5);
-  3. `update_generation_config(tools)`;
-  4. `client.chats.create(model, config, history)` e `chat.send_message(str(message))`.
+  1. `quota = retrieve_quota_if_available()` (escolhe a cota/modelo – ver 4.5);
+  2. `build_generation_config(tools)`;
+  3. `client.chats.create(model, config, history)` e `chat.send_message(str(message))`.
 * Registra consumo com `quota.create_log()` (peso 1 por mensagem do usuário, independentemente
   de quantas chamadas de função ocorram internamente).
 
-### `update_generation_config(tools)`
+### `build_generation_config(tools)`
 
-Com `tools`:
+No chat, com `tools`:
 
 ```python
 GenerateContentConfig(
@@ -194,19 +201,18 @@ GenerateContentConfig(
 **Function calling automático:** o SDK executa a função Python localmente, devolve o resultado ao modelo e
 repete, até **10** chamadas remotas por mensagem, antes de produzir o texto final.
 
-Sem `tools` não há *system instruction* (usado por outros serviços de I.A. que herdam a classe).
+A *system instruction* é do `IAChatService`: os outros serviços de I.A. não a recebem.
 
 ### Outros métodos usados pelo RAG
 
 | Método | Uso |
 |--------|-----|
-| `get_query_embedding(query, model="gemini-embedding-2", is_qa_mode=True)` | Embedding da consulta (1536 dim) |
-| `embed_documents(documents, model, batch_size=64)` | Embeddings de chunks (ver [02](./02-ingestao-e-indexacao.md)) |
-| `count_tokens_in_text(text)` | Contagem via API (`0` se falhar) |
-| `update_or_create_llm_models_in_quotamodel()` | Lista modelos do Gemini e faz *upsert* em `IAQuota` (`descricao = repr(model)`) |
-| `generate_content(...)` | Chamada *one-shot* com cota (não usada pelo chat) |
-| `prepare_document` / `prepare_query` | Formatação textual exigida pelo modelo de embedding (`prepare_query` não é usado atualmente; `get_query_embedding` monta o prefixo inline) |
-| `_extract_pdf_text(doc)` | Extração de texto de PDF com OCR para páginas com fonte corrompida (fora do chat) |
+| `IAEmbeddingService.get_query_embedding(query, model="gemini-embedding-2", is_qa_mode=True)` | Embedding da consulta (1536 dim) |
+| `IAEmbeddingService.embed_documents(documents, model, batch_size=64)` | Embeddings de chunks (ver [02](./02-ingestao-e-indexacao.md)) |
+| `IAEmbeddingService.prepare_document` / `prepare_query` | Formatação textual exigida pelo modelo de embedding |
+| `IAGenaiBase.count_tokens_in_text(text)` | Contagem via API (`0` se falhar) |
+| `IAGenaiBase.update_or_create_llm_models_in_quotamodel()` | Lista modelos do Gemini e faz *upsert* em `IAQuota` (`descricao = repr(model)`) |
+| `IAGenaiBase.generate_content(...)` | Chamada *one-shot* com cota (não usada pelo chat) |
 
 ## 4.5 Cotas (`IAQuota`)
 
@@ -214,8 +220,8 @@ Sem `tools` não há *system instruction* (usado por outros serviços de I.A. qu
 
 1. `IAQuota.objects.quotas_with_margin(ascending=True)` → cotas **ativas** cujo consumo de hoje
    (`SUM(IAQuotasLog.peso)`) é **menor** que `quota_diaria`, ordenadas por `quota_diaria` e consumo (ordem crescente).
-2. Filtra as que têm o nome da classe (`IAGenaiBase`) em `servicos_autorizados`.
-3. Sem resultado → `Exception("Nenhum Modelo com Quota para consumo disponível.")` (chega ao usuário
+2. Filtra as que têm a chave do serviço (`quota_service_name`; no chat, `IAGenaiBase`) em `servicos_autorizados`.
+3. Sem resultado → `IAQuotaUnavailableError("Nenhum Modelo com Quota para consumo disponível.")` (chega ao usuário
    como mensagem de erro).
 4. Define `self.ia_model_name = cota.modelo`.
 

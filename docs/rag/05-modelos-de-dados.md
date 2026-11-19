@@ -146,5 +146,5 @@ Mensagens do usuário têm `metadata = {}`.
 | `IAQuotasLog` | `quota`, `data`, `peso`, `timestamp` | Uma linha por uso (`create_log(peso=1)`) |
 
 `IAQuota.objects.quotas_with_margin()`, `has_margin()` e `remaining_quota()` calculam o saldo do dia
-(`quota_diaria − Σ peso` na data local). Serviços autorizados disponíveis: `IAGenaiBase`,
+(`quota_diaria − Σ peso` na data local). Serviços autorizados disponíveis: `IAGenaiBase` (chave usada pelo chat, via `IAChatService`),
 `IAClassificacaoMateriaService`, `IAAnaliseSimilaridadeService`.

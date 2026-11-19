@@ -32,7 +32,7 @@ flowchart LR
 
     subgraph Dominio["Regras de negócio"]
         CMG[ChatManager]
-        IA[IAGenaiBase]
+        IA[IAChatService]
         SI[system instruction v3]
     end
 
@@ -89,7 +89,7 @@ sequenceDiagram
     participant CC as ChatConsumer
     participant CM as ChatManager
     participant DB as PostgreSQL
-    participant IA as IAGenaiBase
+    participant IA as IAChatService
     participant G as Gemini
     participant R as Embedding.make_context
 
@@ -121,7 +121,7 @@ sequenceDiagram
 |--------|-----------------|------------------|
 | Transporte | `ChatConsumer` | Autenticação/permissão, conexão única por sessão, validação e normalização da entrada, envio de respostas e erros |
 | Aplicação | `ChatManager` | Limites (sessões/dia, mensagens/sessão), persistência de mensagens, título da sessão, histórico no formato Gemini, definição da *tool* de busca |
-| Integração I.A. | `IAGenaiBase` | Cliente Gemini, configuração de geração, seleção de cota/modelo, `chats.create`, embeddings, contagem de tokens |
+| Integração I.A. | `IAGenaiBase`, `IAChatService`, `IAEmbeddingService` | A base faz a conexão com o Gemini, a configuração de geração, a seleção de cota/modelo e a contagem de tokens; `IAChatService` faz `chats.create` com a *system instruction*; `IAEmbeddingService` gera os embeddings |
 | Recuperação | `Embedding.make_context` | Busca híbrida (vetorial + FTS), fusão RRF, agrupamento por Texto Articulado, deduplicação e links de fonte |
 | Indexação | `TextoArticulado.generate_chunks` + task Celery | Segmentação hierárquica dos dispositivos, persistência de chunks, embeddings |
 | Persistência | `Embedding`, `ChatSession`, `ChatMessage`, `IAQuota` | Dados vetoriais, conversas e controle de consumo |
@@ -145,5 +145,5 @@ sequenceDiagram
 * **PostgreSQL** com extensão `vector` (pgvector) e dicionário de FTS `portuguese`.
 * **Redis**: broker do Celery e *channel layer* do Channels (`CHANNEL_LAYERS`).
 * **Google Gemini API** (`google-genai`): geração, embeddings, `count_tokens`, listagem de modelos.
-* **PyMuPDF** (`pymupdf`): usado em `_extract_pdf_text` (OCR de PDFs – fora do fluxo do chat, mas parte de `IAGenaiBase`).
+* **PyMuPDF** (`pymupdf`): usado em `cmj/utils/genia/extracao.py` (OCR de PDFs – fora do fluxo do chat).
 * **BeautifulSoup** (`bs`): normalização de entidades HTML nos chunks.

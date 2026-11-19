@@ -1,7 +1,6 @@
 import json
 import logging
 
-import pymupdf
 import yaml
 from django.conf import settings
 from django.contrib import messages
@@ -9,14 +8,26 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import clean_text
-from cmj.utils.genia import IAGenaiBase
+from cmj.core.models import IAQuota
+from cmj.utils.genia.base import IAGenaiBase
+from cmj.utils.genia.extracao import extract_clean_text_from_path
 from sapl.base.models import Metadata
 
 logger = logging.getLogger(__name__)
 
 
 class IAClassificacaoMateriaService(IAGenaiBase):
+    """
+    Classificação de um registro (hoje, MateriaLegislativa) a partir dos seus
+    PDFs e do prompt YAML do tipo. O resultado fica em Metadata, chave "genia".
+
+    Spec: docs/specs/genia/classificacao-materia.md
+    """
+
+    quota_service_name = IAQuota.ServicosAutorizados.IA_CLASSIFICACAO_MATERIA_SERVICE
+
+    METADATA_KEY = "genia"
+    METADATA_TEMPLATE = "table1"
 
     _model = None  # Model from app django
     _content_type = None  # ContentType from app django
@@ -104,41 +115,20 @@ class IAClassificacaoMateriaService(IAGenaiBase):
         """
         Verifica se o objeto já possui análise gerada
         """
-        obj = self.object
-        if not obj:
-            return False
-
-        metadata = Metadata.objects.filter(
-            object_id=obj.id, content_type=self.content_type
-        ).first()
-
-        if not metadata:
-            return False
-
-        if "genia" not in metadata.metadata:
-            return False
-
-        return True
+        return self.get_analise() is not None
 
     def get_analise(self):
         """
-        Retorna a análise gerada
+        Retorna a análise gerada, ou None se não houver
         """
-        obj = self.object
-        if not obj:
-            return None
-
         metadata = Metadata.objects.filter(
-            object_id=obj.id, content_type=self.content_type
+            object_id=self.object.id, content_type=self.content_type
         ).first()
 
-        if not metadata:
+        if not metadata or self.METADATA_KEY not in metadata.metadata:
             return None
 
-        if "genia" not in metadata.metadata:
-            return None
-
-        return metadata.metadata["genia"]
+        return metadata.metadata[self.METADATA_KEY]
 
     def make_prompt(self, context):
         obj = self.object
@@ -188,11 +178,7 @@ class IAClassificacaoMateriaService(IAGenaiBase):
             if not getattr(obj, fn):
                 continue
 
-            doc = pymupdf.open(getattr(obj, fn).path)
-            doc_text = self._extract_pdf_text(doc)
-            doc_text = clean_text(doc_text)
-
-            text += doc_text
+            text += extract_clean_text_from_path(getattr(obj, fn).path)
         return text
 
     def generate(self):
@@ -209,13 +195,15 @@ class IAClassificacaoMateriaService(IAGenaiBase):
 
             md = Metadata()
             md.content_object = obj
-            metadata = {"genia": json.loads(answer.text)}
-            metadata["genia"]["model_name"] = self.ia_model_name
-            metadata["genia"]["template"] = "table1"
-            metadata["genia"]["temperature"] = self.temperature
-            metadata["genia"]["top_k"] = self.top_k
-            metadata["genia"]["top_p"] = self.top_p
-            md.metadata = metadata
+            analise = json.loads(answer.text)
+            analise.update(
+                model_name=self.ia_model_name,
+                template=self.METADATA_TEMPLATE,
+                temperature=self.temperature,
+                top_k=self.top_k,
+                top_p=self.top_p,
+            )
+            md.metadata = {self.METADATA_KEY: analise}
 
             if settings.DEBUG:
                 md.created = timezone.localtime()

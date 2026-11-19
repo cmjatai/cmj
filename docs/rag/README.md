@@ -11,7 +11,7 @@ conteúdo dos Textos Articulados (leis, decretos, resoluções etc.) publicados 
 | 1 | [01-arquitetura.md](./01-arquitetura.md) | Visão geral, componentes, diagramas e mapa de arquivos |
 | 2 | [02-ingestao-e-indexacao.md](./02-ingestao-e-indexacao.md) | Como os textos viram chunks, embeddings e `tsvector` (pipeline offline) |
 | 3 | [03-recuperacao-hibrida.md](./03-recuperacao-hibrida.md) | `Embedding.make_context`: busca vetorial + FTS + RRF e montagem do contexto |
-| 4 | [04-chat-websocket-e-llm.md](./04-chat-websocket-e-llm.md) | `ChatConsumer`, `ChatManager`, `IAGenaiBase`, function calling, system instruction e cotas |
+| 4 | [04-chat-websocket-e-llm.md](./04-chat-websocket-e-llm.md) | `ChatConsumer`, `ChatManager`, `IAChatService`, function calling, system instruction e cotas |
 | 5 | [05-modelos-de-dados.md](./05-modelos-de-dados.md) | `Embedding`, `ChatSession`, `ChatMessage`, `IAQuota`, índices e metadados salvos |
 | 6 | [06-operacao-limites-e-pontos-de-atencao.md](./06-operacao-limites-e-pontos-de-atencao.md) | Configuração, permissões, limites, troubleshooting e pontos de atenção do código atual |
 | 7 | [07-diagnostico-e-evolucao.md](./07-diagnostico-e-evolucao.md) | Medições do índice de produção, correções de cobertura/full-text, problemas do chunking v1 e roteiro de adoção do v2 |
@@ -52,7 +52,10 @@ gemini-embedding-2 (1536 dim) ─▶ vetor1536 ───────────
 | [cmj/search/models.py](../../cmj/search/models.py) | `Embedding` (+ `make_context`), `ChatSession`, `ChatMessage` |
 | [cmj/search/consumers.py](../../cmj/search/consumers.py) | `ChatConsumer` (WebSocket) |
 | [cmj/search/chat_manager.py](../../cmj/search/chat_manager.py) | `ChatManager` (regras de negócio do chat e ponte com a I.A.) |
-| [cmj/utils/genia/\_\_init\_\_.py](../../cmj/utils/genia/__init__.py) | `IAGenaiBase` (cliente Gemini, chat, embeddings, cotas) |
+| [cmj/utils/genia/base.py](../../cmj/utils/genia/base.py) | `IAGenaiBase` (cliente Gemini e cotas) |
+| [cmj/utils/genia/chat.py](../../cmj/utils/genia/chat.py) | `IAChatService` (chat, *system instruction*, limites de uso) |
+| [cmj/utils/genia/embeddings.py](../../cmj/utils/genia/embeddings.py) | `IAEmbeddingService` (embeddings) |
+| [docs/specs/genia/](../specs/genia/README.md) | Specs do pacote `genia` |
 | [cmj/utils/genia/genia_system_instruction_v3.py](../../cmj/utils/genia/genia_system_instruction_v3.py) | *System instruction* do RAG |
 | [cmj/search/routing.py](../../cmj/search/routing.py) | Rota WebSocket |
 | [cmj/search/tasks.py](../../cmj/search/tasks.py) | Task de sincronização de embeddings |
