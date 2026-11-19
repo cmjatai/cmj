@@ -82,13 +82,15 @@ client_secrets.json
 .pydevproject
 .settings
 .vagrant
-.vscode
 *.sublime-project
 *.sublime-workspace
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
+
+.vscode/*
+!.vscode/launch.json
 
 # specific to this project
 collected_static

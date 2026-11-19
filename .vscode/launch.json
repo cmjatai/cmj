@@ -1,0 +1,221 @@
+{
+  // Use o IntelliSense para saber mais sobre os atributos possíveis.
+  // Focalizar para exibir as descrições dos atributos existentes.
+  // Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Depurador do Python: Arquivo atual com argumentos",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "args": "${command:pickArgs}"
+    },
+
+    {
+      "name": "Python: Arquivo Atual",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Runserver",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": [
+        "runserver",
+        /*"--noreload",
+        "--nothreading",*/
+        "0.0.0.0:9098"
+      ],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: Collectstatic Fake settings",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["collectstatic", "--noinput", "--settings=cmj.settings.fake"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: OCRmyPDF",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["ocrmypdf", "--settings=cmj.settings"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: OCR",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["ocr", "--settings=cmj.settings"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: Makemigrations",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["makemigrations"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: Migrate",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["migrate"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: Pull YouTube",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["pull_youtube"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: Scrap CENTI",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["scrap_centi", "--force"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: sync_embeddings",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["sync_embeddings",  "--estrategia", "v2", "--ta-ids", "2222"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: avaliar_rag",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["avaliar_rag", "--modo", "hibrido", "--estrategias", "v2"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+      "name": "Django: Selenium Test",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/manage.py",
+      "args": ["selenium_test"],
+      "django": true,
+      "justMyCode": false,
+      "console": "integratedTerminal",
+      "autoReload": {
+        "enable": true
+      }
+    },
+    {
+        "name": "Pytest: Debug conftest + testes",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": [
+            "${file}",
+            "-vv",
+            "--tb=short",
+            "--capture=no"
+        ],
+        "console": "integratedTerminal",
+        "justMyCode": false,
+        "django": true,
+        "cwd": "${workspaceFolder}"
+    },
+    {
+        "name": "Pytest: Debug specific test file",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": [
+            "${command:pickArgs}",
+            "-vv",
+            "--tb=short",
+            "--capture=no"
+        ],
+        "console": "integratedTerminal",
+        "justMyCode": false,
+        "django": true,
+        "cwd": "${workspaceFolder}"
+    },
+    {
+        "name": "Pytest: Debug conftest setup/teardown",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": [
+            "--setup-show",
+            "-vv",
+            "--tb=short",
+            "--capture=no",
+            "${file}"
+        ],
+        "console": "integratedTerminal",
+        "justMyCode": false,
+        "django": true,
+        "cwd": "${workspaceFolder}"
+    }
+  ]
+}
