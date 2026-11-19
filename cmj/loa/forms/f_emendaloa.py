@@ -549,6 +549,22 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
         super().clean()
         cleaned_data = self.cleaned_data
 
+        if "fase" in cleaned_data:
+            destino = int(cleaned_data["fase"])
+            if self.instance.pk:
+                # self.instance ainda tem a fase gravada: o ModelForm só copia
+                # cleaned_data para a instância depois do clean()
+                permitido = EmendaLoa.transicao_permitida(
+                    self.user, self.instance.fase, destino
+                )
+            else:
+                permitido = EmendaLoa.criacao_permitida(self.user, destino)
+            if not permitido:
+                raise ValidationError(
+                    "Você não tem permissão para levar a Emenda para a fase "
+                    f'"{dict(EmendaLoa.FASE_CHOICE).get(destino, destino)}".'
+                )
+
         if cleaned_data["tipo"] != "0":
             if "parlamentares__valor" in cleaned_data:
                 if not self.user.is_superuser and self.user.operadorautor_set.exists():

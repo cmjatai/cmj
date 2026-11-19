@@ -104,6 +104,19 @@ class EmendaLoa(CmjSearchMixin):
         (EMENDA_REDEFINIDA, _("Emenda Redefinida/Sanada")),
     )
 
+    # Transições manuais de fase (docs/specs/loa/fases-emenda.md)
+    TRANSICOES_AUTOR = {  # LOA-FASE-052
+        (PROPOSTA, PROPOSTA_LIBERADA),
+        (PROPOSTA_LIBERADA, PROPOSTA),
+    }
+    TRANSICOES_EDITOR_CONTABIL = {  # LOA-FASE-053
+        (PROPOSTA_LIBERADA, EDICAO_CONTABIL),
+        (PROPOSTA_LIBERADA, LIBERACAO_CONTABIL),
+        (EDICAO_CONTABIL, LIBERACAO_CONTABIL),
+        (LIBERACAO_CONTABIL, EDICAO_CONTABIL),
+    }
+    FASES_DOS_BOTOES_CONTABEIS = (EDICAO_CONTABIL, LIBERACAO_CONTABIL)  # LOA-FASE-069
+
     metadata = JSONField(
         verbose_name=_("Metadados"),
         blank=True,
@@ -262,6 +275,40 @@ class EmendaLoa(CmjSearchMixin):
         permissions = (
             ("emendaloa_full_editor", _("Edição completa de Emendas Impositivas.")),
         )
+
+    @staticmethod
+    def edita_em_qualquer_fase(user):
+        """Superusuário e Operador da LOA (LOA-FASE-062, LOA-FASE-065)."""
+        return user.has_perms(
+            (
+                "loa.add_emendaloa",
+                "loa.change_emendaloa",
+                "loa.emendaloa_full_editor",
+            )
+        )
+
+    @classmethod
+    def criacao_permitida(cls, user, fase):
+        """LOA-FASE-051: fora o Operador da LOA e o superusuário, só se cria na fase 10."""
+        return fase == cls.PROPOSTA or cls.edita_em_qualquer_fase(user)
+
+    @classmethod
+    def transicao_permitida(cls, user, origem, destino):
+        """Transição manual de fase (LOA-FASE-052 a 055).
+
+        Os botões "Concluir edição contábil" e "Devolver para correção" seguem
+        FASES_DOS_BOTOES_CONTABEIS e não passam por aqui.
+        """
+        if origem == destino or cls.edita_em_qualquer_fase(user):
+            return True
+
+        transicoes = set()
+        if user.has_perm("loa.emendaloa_full_editor"):
+            transicoes |= cls.TRANSICOES_EDITOR_CONTABIL
+        if user.operadorautor_set.exists():
+            transicoes |= cls.TRANSICOES_AUTOR
+
+        return (origem, destino) in transicoes
 
     @property
     def qs_emendas_substituidas_all_objects(self):

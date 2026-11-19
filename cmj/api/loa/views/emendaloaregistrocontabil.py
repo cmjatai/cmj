@@ -14,7 +14,6 @@ from cmj.api.serializers import CmjSerializerMixin
 from cmj.loa.models import (
     Acao,
     Despesa,
-    EmendaLoa,
     EmendaLoaRegistroContabil,
     Fonte,
     Funcao,
@@ -289,16 +288,10 @@ class EmendaLoaRegistroContabilViewSet:
 
     class EmendaLoaRegistroContabilPermission(EmendaLoaViewSet.EmendaLoaPermission):
         def has_permission_post(self, request, view):
+            # LOA-FASE-068: quem pode alterar registros contábeis o faz em qualquer fase
             pk_emenda = request.data.get("emendaloa", None)
             pk_registro = view.kwargs.get("pk", None)
-            if pk_registro:
-                el = EmendaLoaRegistroContabil.objects.get(pk=pk_registro).emendaloa
-            elif pk_emenda:
-                el = EmendaLoa.objects.get(pk=pk_emenda)
-            else:
-                return False
-
-            if el.fase != EmendaLoa.EDICAO_CONTABIL:
+            if not pk_registro and not pk_emenda:
                 return False
             return request.user.has_perm("loa.emendaloa_full_editor")
 
@@ -311,8 +304,7 @@ class EmendaLoaRegistroContabilViewSet:
         if request.user.is_authenticated:
             raise DRFValidationError(
                 "Você não tem permissão para realizar esta ação. "
-                "Verifique se a Emenda Impositiva está na fase correta "
-                "ou se você tem permissão de editor(a) contábil."
+                "Verifique se você tem permissão de editor(a) contábil."
             )
         return super().permission_denied(request, message, **kwargs)
 

@@ -1071,13 +1071,7 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def edita_em_qualquer_fase(self):
             # superusuário e quem tem as permissões do grupo Operador da LOA
-            return self.request.user.has_perms(
-                (
-                    "loa.add_emendaloa",
-                    "loa.change_emendaloa",
-                    "loa.emendaloa_full_editor",
-                )
-            )
+            return EmendaLoa.edita_em_qualquer_fase(self.request.user)
 
         def post(self, request, *args, **kwargs):
             u = request.user
@@ -1101,6 +1095,18 @@ class EmendaLoaCrud(MasterDetailCrud):
                 submit_concluir = "submit_concluir" in self.request.POST
                 submit_devolver = "submit_devolver" in self.request.POST
                 if submit_concluir or submit_devolver:
+                    # LOA-FASE-063 e 069: os botões só agem nas fases 15 e 17.
+                    # form.initial guarda a fase gravada; form.instance já recebeu a do POST.
+                    fase_origem = form.initial.get("fase")
+                    if fase_origem not in EmendaLoa.FASES_DOS_BOTOES_CONTABEIS:
+                        fases = dict(EmendaLoa.FASE_CHOICE)
+                        form.add_error(
+                            None,
+                            "Concluir ou devolver só é possível nas fases "
+                            f'"{fases[EmendaLoa.EDICAO_CONTABIL]}" e '
+                            f'"{fases[EmendaLoa.LIBERACAO_CONTABIL]}".',
+                        )
+                        return self.form_invalid(form)
                     form.instance.fase = (
                         EmendaLoa.LIBERACAO_CONTABIL
                         if submit_concluir
@@ -1113,8 +1119,11 @@ class EmendaLoaCrud(MasterDetailCrud):
             u = request.user
 
             if (
-                u.has_perm("loa.emendaloa_full_editor") and
-                EmendaLoa.PROPOSTA_LIBERADA <= self.object.fase <= EmendaLoa.LIBERACAO_CONTABIL
+                u.has_perm("loa.emendaloa_full_editor")
+                and not u.is_superuser  # LOA-FASE-066: captura só para o editor contábil
+                and EmendaLoa.PROPOSTA_LIBERADA
+                <= self.object.fase
+                <= EmendaLoa.LIBERACAO_CONTABIL
             ):
                 if self.object.fase == EmendaLoa.PROPOSTA_LIBERADA:
                     self.object.fase = EmendaLoa.EDICAO_CONTABIL

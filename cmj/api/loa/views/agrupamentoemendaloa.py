@@ -61,14 +61,43 @@ class AgrupamentoEmendaLoaViewSet:
 
         return Response({"detail": "Registro removido com Sucesso."})
 
+    FASES_PERMITIDAS_NA_INCLUSAO = (
+        EmendaLoa.PROPOSTA_LIBERADA,
+        EmendaLoa.EDICAO_CONTABIL,
+    )
+
+    def validar_inclusao(self, request):
+        try:
+            agrupamento = Agrupamento.objects.get(pk=int(request.data["agrupamento"]))
+            el = EmendaLoa.objects.get(pk=int(request.data["emendaloa"]))
+        except (KeyError, TypeError, ValueError, Agrupamento.DoesNotExist):
+            raise DRFValidationError("Agrupamento ou Emenda inválidos.")
+        except EmendaLoa.DoesNotExist:
+            raise DRFValidationError("Emenda Impositiva não encontrada.")
+
+        if el.fase not in self.FASES_PERMITIDAS_NA_INCLUSAO:
+            raise DRFValidationError(
+                "Só é possível adicionar ao agrupamento Emendas nas fases "
+                f'"{dict(EmendaLoa.FASE_CHOICE)[EmendaLoa.PROPOSTA_LIBERADA]}" ou '
+                f'"{dict(EmendaLoa.FASE_CHOICE)[EmendaLoa.EDICAO_CONTABIL]}".'
+            )
+
+        if el.loa.ano != agrupamento.loa.ano:
+            raise DRFValidationError(
+                "A Emenda Impositiva deve ser do mesmo ano da LOA do agrupamento."
+            )
+
+        return el
+
     def create(self, request, *args, **kwargs):
+        # a fase resultante é definida aqui; emendaloa__fase enviado pelo cliente é ignorado
+        el = self.validar_inclusao(request)
         try:
             r = super().create(request, *args, **kwargs)
 
-            emendaloa__fase = request.data.get("emendaloa__fase", None)
-            if emendaloa__fase:
-                el = EmendaLoa.objects.get(pk=r.data["emendaloa"])
-                el.fase = emendaloa__fase
+            el.refresh_from_db()
+            if el.fase != EmendaLoa.EDICAO_CONTABIL:
+                el.fase = EmendaLoa.EDICAO_CONTABIL
                 el.save()
 
             r.data["agrupamento_finalidade"] = AgrupamentoEmendaLoa.objects.get(

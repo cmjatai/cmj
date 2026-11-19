@@ -106,11 +106,9 @@ class AgrupamentoViewSet:
             return JsonResponse({"error": "Agrupamento not found"}, status=404)
 
         try:
+            # só as emendas que estavam em -10 voltam para 15 (feito no model);
+            # as demais emendas do agrupamento mantêm a fase
             agrupamento.cancelar_emendas_coletivas()
-
-            for emenda in agrupamento.emendas.all():
-                emenda.fase = EmendaLoa.EDICAO_CONTABIL
-                emenda.save()
 
             return JsonResponse({"status": "success"})
         except Exception as e:

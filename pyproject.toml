@@ -33,6 +33,7 @@ addopts = [
 markers = [
     "django_db: mark test as requiring database access",
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "spec(id): liga o teste a uma regra de docs/specs (ex.: LOA-FASE-058)",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning:model_mommy.*",

@@ -296,9 +296,8 @@ class Agrupamento(models.Model):
                     ec = EmendaLoa()  # ec -> emenda_coletiva
                     ec.permite_juncao_coletiva = False
                     ec.agrupamento_de_origem = self
-                    ec.owner_id = (
-                        1  # TODO: definir estratégia de owner da emenda coletiva
-                    )
+                    # dono da coletiva: owner da primeira emenda do conjunto (ordem por id)
+                    ec.owner_id = emenda["emendas"][0].owner_id
                     ec.valor = emenda["total_via_parlamentares"]
                     ec.loa = self.loa
                     ec.prefixo_finalidade = ""

@@ -85,6 +85,37 @@ class EmendaLoaViewSet:
     permission_classes = (EmendaLoaPermission,)
     filterset_class = EmendaLoaFilterSet
 
+    @staticmethod
+    def fase_do_request(request, default=None):
+        fase = request.data.get("fase", default)
+        if fase is None:
+            return None
+        try:
+            return int(fase)
+        except (TypeError, ValueError):
+            raise DRFValidationError("Fase inválida.")
+
+    def create(self, request, *args, **kwargs):
+        fase = self.fase_do_request(request, default=EmendaLoa.PROPOSTA)
+        if not EmendaLoa.criacao_permitida(request.user, fase):
+            raise DRFValidationError(
+                "A Emenda Impositiva só pode ser criada na fase "
+                f'"{dict(EmendaLoa.FASE_CHOICE)[EmendaLoa.PROPOSTA]}".'
+            )
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        destino = self.fase_do_request(request)
+        if destino is not None:
+            el = self.get_object()
+            if not EmendaLoa.transicao_permitida(request.user, el.fase, destino):
+                fases = dict(EmendaLoa.FASE_CHOICE)
+                raise DRFValidationError(
+                    "Você não tem permissão para mudar a fase de "
+                    f'"{fases.get(el.fase, el.fase)}" para "{fases.get(destino, destino)}".'
+                )
+        return super().update(request, *args, **kwargs)
+
     @action(
         methods=[
             "patch",
