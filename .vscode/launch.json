@@ -216,6 +216,23 @@
         "justMyCode": false,
         "django": true,
         "cwd": "${workspaceFolder}"
+    },
+    {
+        "name": "Pytest: Debug conftest.py (roda todos testes)",
+        "type": "debugpy",
+        "request": "launch",
+        "module": "pytest",
+        "args": [
+            "cmj",
+            "-vv",
+            "--tb=short",
+            "--capture=no",
+            "-x"
+        ],
+        "console": "integratedTerminal",
+        "justMyCode": false,
+        "django": true,
+        "cwd": "${workspaceFolder}"
     }
   ]
 }

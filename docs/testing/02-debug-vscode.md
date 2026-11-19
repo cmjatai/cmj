@@ -5,17 +5,17 @@ Permitir debug interativo do `conftest.py` para diagnosticar problemas de setup/
 
 ## ⚙️ Launches Configurados em `.vscode/launch.json`
 
-### 1️⃣ "Pytest: Debug conftest + testes"
-**Melhor para**: Debugar fixtures específicas do conftest
+### ⭐ 0️⃣ "Pytest: Debug conftest.py (roda todos testes)" [NOVO - RECOMENDADO]
+**Melhor para**: Debugar conftest.py sem precisar abrir arquivo de teste
 
 **Passos**:
 ```
-1. Abra conftest.py no VSCode
-2. Coloque breakpoint (clique na linha, à esquerda do número)
-   Exemplo: linha 20 em create_base_appconfig
+1. Abra conftest.py (ou qualquer arquivo)
+2. Coloque breakpoint em conftest.py (clique na linha, à esquerda do número)
+   Exemplo: linha 23 em create_base_appconfig
 3. Pressione F5
-4. Selecione "Pytest: Debug conftest + testes"
-5. Execução para no breakpoint
+4. Selecione "Pytest: Debug conftest.py (roda todos testes)"
+5. Execução para no breakpoint quando fixture rodar
 6. Use painel Debug para:
    - Ver variáveis locais (request, django_db_blocker, etc.)
    - Step over (F10) ou step into (F11)
@@ -27,6 +27,23 @@ Permitir debug interativo do `conftest.py` para diagnosticar problemas de setup/
 - `django_db_setup`: Parâmetros de banco (host, port, user)
 - `settings`: Django settings (DATABASES, CACHES)
 - `psycopg`: Conexão com PostgreSQL
+
+---
+
+### 1️⃣ "Pytest: Debug conftest + testes"
+**Melhor para**: Debugar fixtures ao rodar um teste específico
+
+**Passos**:
+```
+1. Abra um arquivo de teste: cmj/loa/tests/test_something.py
+   ⚠️ IMPORTANTE: Deve ser um arquivo com testes (test_*.py)
+2. Coloque breakpoint em conftest.py
+3. Pressione F5
+4. Selecione "Pytest: Debug conftest + testes"
+5. Execução para no breakpoint quando a fixture é usada naquele teste
+```
+
+**⚠️ Aviso**: Se abrir conftest.py e rodar este launch, não funciona porque pytest não encontra testes para rodar. Use o Launch 0️⃣ em vez disso.
 
 ---
 
