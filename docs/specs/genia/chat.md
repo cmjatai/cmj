@@ -17,27 +17,27 @@ recuperação) está em `docs/rag/04-chat-websocket-e-llm.md`.
 ### Configuração
 
 - GENIA-CHAT-001 [implementado] Só o chat usa `rag_system_instruction`, e responde em `text/plain`.
-  Evidência: `cmj/utils/genia/chat.py:23-24`.
+  Evidência: `cmj/utils/genia/chat.py:21-22`.
 - GENIA-CHAT-004 [observado] Com `DEBUG=True`, a system instruction inclui a regra da palavra-chave
   `RAGRAG`, que libera conversa técnica sobre o RAG. Evidência:
   `cmj/utils/genia/genia_system_instruction_v3.py:3-6`.
 
 ### Cota do modelo
 
-- GENIA-CHAT-002 [implementado] Cada mensagem consome a cota autorizada para a chave `IAGenaiBase`,
+- GENIA-CHAT-002 [implementado] Cada mensagem consome a cota autorizada para a chave `IAChatService`,
   escolhendo a de menor `quota_diaria` com margem. O modelo da cota é o usado na conversa e fica em
   `ia_model_name`, que o `ChatManager` grava no metadata da resposta. Evidência:
-  `cmj/utils/genia/chat.py:21`, `cmj/utils/genia/chat.py:32-45`, `cmj/search/chat_manager.py:96-107`.
+  `cmj/utils/genia/chat.py:19`, `cmj/utils/genia/chat.py:30-43`, `cmj/search/chat_manager.py:96-107`.
 - GENIA-CHAT-003 [implementado] Sem cota disponível, nenhuma conversa é aberta na API e
   `IAQuotaUnavailableError` sobe até o `ChatConsumer`, que devolve a mensagem de erro ao usuário.
-  Evidência: `cmj/utils/genia/chat.py:35`, `cmj/search/consumers.py:153`.
+  Evidência: `cmj/utils/genia/chat.py:33`, `cmj/search/consumers.py:153`.
 - GENIA-CHAT-005 [implementado] Cada mensagem abre um `Chat` novo na API com o histórico recebido e
-  registra um consumo de peso 1 depois da resposta. Evidência: `cmj/utils/genia/chat.py:36-43`.
+  registra um consumo de peso 1 depois da resposta. Evidência: `cmj/utils/genia/chat.py:34-41`.
   Teste: `cmj/search/test_chat_manager.py` (`test_chat_e_criado_a_cada_mensagem_e_cota_registrada`).
 
 ### Limites de uso por usuário
 
-Os valores ficam em `IAChatService` (`cmj/utils/genia/chat.py:28-30`). Quem aplica é o
+Os valores ficam em `IAChatService` (`cmj/utils/genia/chat.py:26-28`). Quem aplica é o
 `ChatManager`, que os reexpõe com os mesmos nomes (`cmj/search/chat_manager.py:14-16`), porque a
 verificação depende de `ChatSession` e `ChatMessage`.
 
@@ -53,6 +53,11 @@ verificação depende de `ChatSession` e `ChatMessage`.
 - GENIA-CHAT-010 [observado] Quando um superusuário conecta, a lista de modelos da API é sincronizada
   com `IAQuota` (GENIA-BASE-012). Evidência: `cmj/search/consumers.py:51-55`.
 
+## Chave de cota
+
+A chave do chat passou de `IAGenaiBase` para `IAChatService` (`cmj.core` 0008 e 0009). A 0009 copia a
+autorização: toda `IAQuota` com `IAGenaiBase` ganha também `IAChatService`, sem remover a antiga.
+
 ## Mudança de comportamento na refatoração
 
 Antes, a system instruction só era enviada quando havia `tools`. Agora vai em toda mensagem do chat.
@@ -60,11 +65,9 @@ O `ChatManager` sempre envia a tool `buscar_na_base_dados`, então o fluxo atual
 
 ## Dúvidas
 
-- D1. O chat consome a chave de cota `IAGenaiBase`, que no admin aparece como "IA Genai Base". O nome
-  vem de quando o chat usava a classe-base direto. Trocar para uma chave própria (por exemplo
-  `IAChatService`) exige migration de `cmj.core` alterando os `choices` e copiando a autorização nas
-  `IAQuota` existentes. Em produção, com blue/green, a migration precisa manter a chave antiga até a
-  versão anterior sair do ar. Fazer a troca?
+- D1. A chave legada `IAGenaiBase` continua em `IAQuota.ServicosAutorizados` ("IA Genai Base (legado)")
+  e nas cotas existentes, para a versão anterior (blue/green) achar cota. Retirá-la do model e das
+  `servicos_autorizados` exige outra migration, depois que a versão anterior sair do ar.
 - D2. O limite de 2 conversas por dia compara `created_at__date` com a data local, e o de 8
   mensagens conta as respostas do modelo, o que dá 4 perguntas por conversa. É esse o limite
   pretendido?

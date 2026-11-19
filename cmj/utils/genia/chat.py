@@ -16,9 +16,7 @@ class IAChatService(IAGenaiBase):
     Spec: docs/specs/genia/chat.md
     """
 
-    # Chave histórica: o chat sempre consumiu as cotas autorizadas para
-    # "IAGenaiBase". Trocar a chave exige migration de dados em IAQuota.
-    quota_service_name = IAQuota.ServicosAutorizados.IA_GENAI_BASE
+    quota_service_name = IAQuota.ServicosAutorizados.IA_CHAT_SERVICE
 
     response_mime_type = "text/plain"
     system_instruction = rag_system_instruction

@@ -191,7 +191,7 @@ def test_count_tokens_devolve_zero_em_erro(client):
 @pytest.mark.spec("GENIA-BASE-014")
 def test_chave_de_cota_de_cada_servico():
     servicos = IAQuota.ServicosAutorizados
-    assert IAChatService.quota_service_name == servicos.IA_GENAI_BASE
+    assert IAChatService.quota_service_name == servicos.IA_CHAT_SERVICE
     assert (
         IAClassificacaoMateriaService.quota_service_name
         == servicos.IA_CLASSIFICACAO_MATERIA_SERVICE
@@ -215,7 +215,7 @@ def test_chat_usa_system_instruction_do_rag_e_texto_puro():
 @pytest.mark.spec("GENIA-CHAT-002")
 def test_chat_consome_cota_do_servico_e_registra_modelo(client):
     _quota("so-classificacao")
-    quota = _quota("modelo-chat", servicos=[IAQuota.ServicosAutorizados.IA_GENAI_BASE])
+    quota = _quota("modelo-chat", servicos=[IAQuota.ServicosAutorizados.IA_CHAT_SERVICE])
     ia = IAChatService()
 
     ia.chat_send_message("oi", [], tools=[lambda query: query])

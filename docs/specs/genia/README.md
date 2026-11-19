@@ -20,7 +20,7 @@ Cada teste de `cmj/utils/genia/test_genia.py` aponta a regra com `@pytest.mark.s
 
 ```
 IAGenaiBase                      conexão, cota e geração; sem regra de funcionalidade
-├── IAChatService                chat RAG: system instruction, limites de uso, cota "IAGenaiBase"
+├── IAChatService                chat RAG: system instruction, limites de uso, cota "IAChatService"
 ├── IAEmbeddingService           vetorização; isento de cota
 ├── IAClassificacaoMateriaService  cota "IAClassificacaoMateriaService"
 ├── IAAnaliseSimilaridadeService   cota "IAAnaliseSimilaridadeService"
@@ -56,4 +56,4 @@ As dúvidas de cada capacidade estão na spec correspondente. As de maior risco:
    D1: dois serviços chamam a API sem nenhum limite de cota.
 3. [similaridade.md](./similaridade.md) D1 e D2: o batch pode gravar a análise no par errado e
    ultrapassar a cota diária.
-4. [chat.md](./chat.md) D1: o chat usa a chave de cota `IAGenaiBase`, nome que não o identifica.
+4. [chat.md](./chat.md) D1: a chave legada `IAGenaiBase` ainda existe em `IAQuota` e deve sair depois do blue/green.

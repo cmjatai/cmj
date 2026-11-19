@@ -1104,7 +1104,10 @@ class IAQuota(models.Model):
     )
 
     class ServicosAutorizados(models.TextChoices):
-        IA_GENAI_BASE = "IAGenaiBase", _("IA Genai Base")
+        # Chave legada do chat. Mantida enquanto a versão anterior ao
+        # IA_CHAT_SERVICE puder estar no ar (blue/green); depois pode sair.
+        IA_GENAI_BASE = "IAGenaiBase", _("IA Genai Base (legado)")
+        IA_CHAT_SERVICE = "IAChatService", _("IA Chat Service")
         IA_CLASSIFICACAO_MATERIA_SERVICE = (
             "IAClassificacaoMateriaService",
             _("IA Classificação Matéria Service"),

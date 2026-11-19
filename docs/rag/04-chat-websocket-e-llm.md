@@ -169,7 +169,7 @@ fino sobre `google-genai`, com o controle de cota. `IAChatService` herda dela e 
 | `top_k` / `top_p` | `40` / `0.95` | herdado |
 | `response_mime_type` | `application/json` | `text/plain` |
 | `system_instruction` | nenhuma | `rag_system_instruction` |
-| `quota_service_name` | nenhuma | `IAGenaiBase` (chave histórica) |
+| `quota_service_name` | nenhuma | `IAChatService` |
 
 `IAChatService` também define `MAX_SESSIONS_PER_USER`, `MAX_MESSAGES_PER_SESSION` e
 `MAX_LENGTH_USER_MESSAGE`, aplicados pelo `ChatManager` e pelo `ChatConsumer`.
@@ -220,7 +220,7 @@ A *system instruction* é do `IAChatService`: os outros serviços de I.A. não a
 
 1. `IAQuota.objects.quotas_with_margin(ascending=True)` → cotas **ativas** cujo consumo de hoje
    (`SUM(IAQuotasLog.peso)`) é **menor** que `quota_diaria`, ordenadas por `quota_diaria` e consumo (ordem crescente).
-2. Filtra as que têm a chave do serviço (`quota_service_name`; no chat, `IAGenaiBase`) em `servicos_autorizados`.
+2. Filtra as que têm a chave do serviço (`quota_service_name`; no chat, `IAChatService`) em `servicos_autorizados`.
 3. Sem resultado → `IAQuotaUnavailableError("Nenhum Modelo com Quota para consumo disponível.")` (chega ao usuário
    como mensagem de erro).
 4. Define `self.ia_model_name = cota.modelo`.

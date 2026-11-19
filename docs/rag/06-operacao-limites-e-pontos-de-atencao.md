@@ -9,7 +9,7 @@
 | Redis | `CHANNEL_LAYERS` (`channels_redis`) e `CELERY_BROKER_URL` | Necessário para WebSocket e para a task de indexação |
 | Worker Celery | fila `cq_base` | Executa `task_sync_embeddings_textoarticulado` |
 | ASGI | Channels | `search.routing.websocket_urlpatterns` precisa estar no roteador ASGI do projeto |
-| Cota ativa | Admin → **Quotas IA** | Pelo menos uma `IAQuota` com `ativo=True`, `quota_diaria>0` e `IAGenaiBase` em *Serviços Autorizados* |
+| Cota ativa | Admin → **Quotas IA** | Pelo menos uma `IAQuota` com `ativo=True`, `quota_diaria>0` e `IAChatService` em *Serviços Autorizados* |
 | Permissão | Admin → grupos/usuários | `search.can_use_chat_module` para quem pode usar o chat |
 
 Bibliotecas Python: `google-genai`, `pgvector`, `channels`, `channels_redis`, `celery`, `beautifulsoup4`, `pymupdf`.
@@ -32,7 +32,7 @@ Superusuários: sem limites de sessões/mensagens e com 10.000 caracteres por pe
 |---------|------------------|-------------|
 | Conexão WebSocket fecha imediatamente | Usuário anônimo ou sem `search.can_use_chat_module` | Permissões do usuário; log do Channels |
 | Fecha com código **4001** | Mesma conversa aberta em outra aba | Esperado |
-| Erro "Nenhum Modelo com Quota…" | Nenhuma `IAQuota` ativa, esgotada, ou sem `IAGenaiBase` autorizado | Admin Quotas IA; superusuário ao conectar sincroniza a lista de modelos |
+| Erro "Nenhum Modelo com Quota…" | Nenhuma `IAQuota` ativa, esgotada, ou sem `IAChatService` autorizado | Admin Quotas IA; superusuário ao conectar sincroniza a lista de modelos |
 | Resposta "informação não consta na base" para algo que existe | Norma não indexada (`vetor1536` NULL), norma revogada, chunk sem `search_vector`, *query* com termos demais (FTS AND) | Ver consultas abaixo; `metadata.rag_results.rag_query` da mensagem |
 | Resposta com links quebrados/externos | *System instruction* alterada ou formato de `Fonte` modificado | Comparar com [§4.6](./04-chat-websocket-e-llm.md#46-system-instruction-v3) |
 | Texto publicado não aparece no chat | Task Celery não executou (worker/fila `cq_base`), erro na API Gemini (apenas logado) | Logs do worker: "Starting task_sync_embeddings_textoarticulado_function…" |
