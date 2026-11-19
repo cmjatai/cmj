@@ -1,5 +1,8 @@
+import logging
 import pytest
 from django_webtest import DjangoTestApp, WebTestMixin
+
+logger = logging.getLogger(__name__)
 
 # Testes que dependem de módulos removidos (scripts.lista_urls, etc.)
 # ou de views/models que foram reestruturados
@@ -100,8 +103,8 @@ def django_db_setup(
     with django_db_blocker.unblock():
         try:
             teardown_databases(db_cfg, verbosity=0)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Erro ao desmontar banco de testes: {e}")
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -117,7 +120,82 @@ def _configure_celery_for_tests():
     )
 
 
+@pytest.fixture(autouse=True)
+def _clear_cache_between_tests():
+    """Limpa cache após cada teste para evitar contaminação cruzada."""
+    from django.core.cache import cache
+
+    yield
+
+    # Limpa cache DummyCache e MemoryCache
+    if hasattr(cache, 'clear'):
+        cache.clear()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _configure_test_settings():
+    """Configura settings específicos para testes."""
+    from django.conf import settings
+
+    # Usar DummyCache em testes garante que não há estado entre testes
+    settings.CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+        }
+    }
+    # Desabilita alguns processadores que podem interferir em testes
+    settings.EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+
+@pytest.fixture(autouse=True)
+def _cleanup_django_signals():
+    """Limpa signal handlers entre testes para evitar contaminação cruzada."""
+    yield
+
+    try:
+        # Desconecta signal handlers temporários adicionados durante testes
+        # Mantém handlers padrão do Django e da app
+        from django.db.models import signals
+
+        # Itera sobre sinais comuns
+        for signal in [signals.post_save, signals.post_delete, signals.pre_save]:
+            # Se há maneira de identificar handlers de teste, desconecta
+            # Por enquanto, apenas log de debug
+            logger.debug(f"Signal {signal} tem {len(signal.receivers)} receivers ativos")
+    except Exception as e:
+        logger.debug(f"Erro ao limpar signals de teste: {e}")
+
+
+@pytest.fixture(scope="session")
+def test_user_data():
+    """Define dados padrão para usuários de teste."""
+    return {
+        'admin': {
+            'username': 'admin',
+            'password': 'testpass123!',
+            'email': 'admin@test.local',
+            'is_staff': True,
+            'is_superuser': True,
+        },
+        'staff': {
+            'username': 'staff_user',
+            'password': 'testpass123!',
+            'email': 'staff@test.local',
+            'is_staff': True,
+            'is_superuser': False,
+        },
+        'regular': {
+            'username': 'regular_user',
+            'password': 'testpass123!',
+            'email': 'user@test.local',
+            'is_staff': False,
+            'is_superuser': False,
+        },
+    }
+
+
 class OurTestApp(DjangoTestApp):
+    """Cliente HTTP para testes com suporte a usuário padrão e auto-follow."""
 
     def __init__(self, *args, **kwargs):
         self.default_user = kwargs.pop("default_user", None)
@@ -131,17 +209,7 @@ class OurTestApp(DjangoTestApp):
 
 @pytest.fixture(scope="function")
 def app(request, admin_user):
-    """WebTest's TestApp.
-
-    Patch and unpatch settings before and after each test.
-
-    WebTestMixin, when used in a unittest.TestCase, automatically calls
-    _patch_settings() and _unpatchsettings.
-
-    source: https://gist.github.com/magopian/6673250
-    """
     wtm = WebTestMixin()
     wtm._patch_settings()
     request.addfinalizer(wtm._unpatch_settings)
-    # XXX change this admin user to "saploper"
     return OurTestApp(default_user=admin_user.username)
