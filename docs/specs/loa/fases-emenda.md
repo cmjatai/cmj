@@ -160,7 +160,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
 
 | ID | De | Para | Gatilho | Quem | Evidência |
 | --- | --- | --- | --- | --- | --- |
-| LOA-FASE-010 [observado] | 10, 12 | 10, 12 | Campo `fase` no formulário, com autosave por PATCH | Quem não tem `add_emendaloa` nem é editor contábil | `cmj/loa/forms/f_emendaloa.py:472-484`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:386-393` |
+| LOA-FASE-010 [observado] | 10, 12 | 10, 12 | Campo `fase` no formulário, com autosave por PATCH | Quem não tem `add_emendaloa` nem é editor contábil | `cmj/loa/forms/f_emendaloa.py:472-484`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:358-365` |
 | LOA-FASE-011 [acordado] | 12 | 15 | Abrir a tela de edição (GET) | Editor contábil (ver LOA-FASE-066) | `cmj/loa/views/v_emendaloa.py:1115-1121` |
 | LOA-FASE-012 [observado] | Qualquer | 15, 17 | Campo `fase` no formulário | Editor contábil sem `add_emendaloa` e não superusuário | `cmj/loa/forms/f_emendaloa.py:271-274`, `cmj/loa/forms/f_emendaloa.py:472`, `cmj/loa/forms/f_emendaloa.py:511-513` |
 | LOA-FASE-013 [observado] | Qualquer | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1098-1108` |

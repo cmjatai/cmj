@@ -1,6 +1,15 @@
 import $ from 'jquery'
 import axios from 'axios'
 import _ from 'lodash'
+import { mensagemDoErro } from '../mensagens'
+
+// Campos do model Agrupamento que o autosave envia, com o rótulo usado nas mensagens
+// (LOA-AGR-063 e LOA-AGR-064)
+const CAMPOS_DO_MODEL = {
+  nome: 'Nome',
+  tipo: 'Área de aplicação',
+  finalidade: 'Finalidade'
+}
 
 // Mensagem guardada para ser mostrada depois do recarregamento da página (LOA-AGR-090)
 const CHAVE_MENSAGEM_GUARDADA = 'agrupamento-mensagem-guardada'
@@ -558,21 +567,41 @@ export default class AgrupamentoUpdate {
   }
 
   handleAutoSave (event) {
-    let formData = {}
-    let field = event.target.name
-    let value = event.target.value
+    const field = event.target.name
+    const value = event.target.value
 
-    if (!field) return
+    // LOA-AGR-063: buscas, campos despesa_* e perc_despesa não são do model
+    if (!_.has(CAMPOS_DO_MODEL, field)) return
 
-    let action = '/'
-    formData[field] = value
-
-    axios.patch(`${this.urlBase}${action}`, formData)
+    axios.patch(`${this.urlBase}/`, { [field]: value })
       .then(() => {
         this.loadRegistrosContabeis()
       })
-      .catch(() => {
-        // console.debug(event)
+      .catch((error) => {
+        // LOA-AGR-064: mostra o erro e devolve só este campo ao valor gravado
+        this.mostrarMensagem(
+          mensagemDoErro(error),
+          'danger',
+          `Alteração não gravada (${CAMPOS_DO_MODEL[field]}).`
+        )
+        this.restaurarCampo(field)
       })
+  }
+
+  restaurarCampo (field) {
+    return axios.get(`${this.urlBase}/`)
+      .then((response) => {
+        const gravado = response.data[field]
+        if (field === 'tipo') {
+          this.form.find(`input[name="tipo"][value="${gravado}"]`).prop('checked', true)
+        } else {
+          this.form.find(`[name="${field}"]`).val(gravado || '')
+        }
+      })
+      .catch((error) => this.mostrarMensagem(
+        mensagemDoErro(error),
+        'danger',
+        'Erro ao recarregar o valor gravado.'
+      ))
   }
 }

@@ -50,8 +50,8 @@ finalidade de um agrupamento. As regras do agrupamento estão em `docs/specs/loa
     entidades diferentes só geram aviso quando apagam uma finalidade digitada (LOA-AGR-053). Na remoção, a finalidade é gerada depois de a emenda sair
     do agrupamento. Evidência: `cmj/api/loa/views/agrupamentoemendaloa.py:59-86`,
     `cmj/api/loa/views/agrupamentoemendaloa.py:129`,
-    `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:304`,
-    `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:381`. Testes:
+    `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:388`,
+    `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:465`. Testes:
     `test_inclusao_conclui_e_avisa`, `test_inclusao_sem_erro_devolve_finalidade_gerada`,
     `test_remocao_conclui_e_avisa`, `test_remocao_gera_finalidade_sem_a_emenda_removida`.
   - prévia em PDF: faixa vermelha com o aviso. Evidência:

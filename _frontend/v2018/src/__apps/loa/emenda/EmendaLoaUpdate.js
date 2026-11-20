@@ -2,6 +2,7 @@ import EmendaLoaForm from './EmendaLoaForm'
 import axios from 'axios'
 import _ from 'lodash'
 import $ from 'jquery'
+import { mensagemDoErro } from '../mensagens'
 
 // Campos do model EmendaLoa que o formulário de edição exibe e que o autosave
 // envia pelo PATCH genérico (LOA-EMD-053 e LOA-EMD-083)
@@ -21,35 +22,6 @@ const CAMPOS_DO_MODEL = [
 
 // Erro do autosave guardado para ser mostrado depois do recarregamento (LOA-EMD-084)
 const CHAVE_ERRO_AUTOSAVE = 'emendaloa-erro-autosave'
-
-// Mensagem do servidor a partir de um erro do axios (LOA-EMD-084)
-function mensagemDoErro (error) {
-  const response = error && error.response
-  if (!response) {
-    return 'Não foi possível comunicar com o servidor. Verifique a conexão e tente novamente.'
-  }
-
-  const data = response.data
-  const generica = `O servidor respondeu com erro ${response.status}.`
-
-  const textos = (valor) => {
-    if (_.isString(valor)) return [valor]
-    if (_.isArray(valor)) return _.flatMap(valor, textos)
-    if (_.isPlainObject(valor)) {
-      return _.flatMap(Object.entries(valor), ([chave, v]) => {
-        if (chave === 'detail' || chave === 'non_field_errors') return textos(v)
-        return textos(v).map((t) => `${chave}: ${t}`)
-      })
-    }
-    return []
-  }
-
-  // Página HTML de erro (500, 502...) não é mensagem para o usuário
-  if (_.isString(data) && /^\s*</.test(data)) return generica
-
-  const lista = textos(data).filter((t) => t.trim() !== '')
-  return lista.length > 0 ? lista.join('\n') : generica
-}
 
 export default class EmendaLoaUpdate extends EmendaLoaForm {
   constructor (container) {

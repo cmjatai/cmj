@@ -457,3 +457,20 @@ def test_excluir_registro_da_emenda_nao_a_tira_do_agrupamento(agrupada):
     registro.delete()
 
     assert AgrupamentoEmendaLoa.objects.filter(emendaloa=agrupada).exists()
+
+
+# ------------------------------------------------------- erro do autosave (D4)
+
+
+@pytest.mark.spec("LOA-AGR-064")
+def test_autosave_com_nome_vazio_responde_400_e_nao_grava(
+    api, editor_contabil, agrupamento
+):
+    r = api(editor_contabil).patch(
+        f"/api/loa/agrupamento/{agrupamento.pk}/", {"nome": ""}, format="json"
+    )
+
+    assert r.status_code == 400
+    assert "nome" in r.data
+    agrupamento.refresh_from_db()
+    assert agrupamento.nome == "Agrupamento"
