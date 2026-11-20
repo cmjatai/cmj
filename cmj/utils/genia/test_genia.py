@@ -1,7 +1,11 @@
+import importlib
 from types import SimpleNamespace
 from unittest import mock
 
 import pytest
+from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
+from model_bakery import baker
 
 from cmj.core.models import IAQuota, IAQuotasLog
 from cmj.utils.genia import (
@@ -14,6 +18,8 @@ from cmj.utils.genia.classificacao import IAClassificacaoMateriaService
 from cmj.utils.genia.genia_system_instruction_v3 import rag_system_instruction
 from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetiva
 from cmj.utils.genia.similaridade import IAAnaliseSimilaridadeService
+from sapl.base.models import Metadata
+from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
 
 pytestmark = pytest.mark.django_db
 
@@ -215,7 +221,9 @@ def test_chat_usa_system_instruction_do_rag_e_texto_puro():
 @pytest.mark.spec("GENIA-CHAT-002")
 def test_chat_consome_cota_do_servico_e_registra_modelo(client):
     _quota("so-classificacao")
-    quota = _quota("modelo-chat", servicos=[IAQuota.ServicosAutorizados.IA_CHAT_SERVICE])
+    quota = _quota(
+        "modelo-chat", servicos=[IAQuota.ServicosAutorizados.IA_CHAT_SERVICE]
+    )
     ia = IAChatService()
 
     ia.chat_send_message("oi", [], tools=[lambda query: query])
@@ -332,3 +340,203 @@ def test_similaridade_sincrona_usa_maior_cota_e_salva(client):
     assert (analise.similaridade, analise.ia_name) == (70, "maior")
     analise.save.assert_called_once()
     assert IAQuotasLog.objects.filter(quota=maior).count() == 1
+
+
+# ----------------------------------------------------------------------
+# Classificação de matéria
+# ----------------------------------------------------------------------
+
+PROMPT_YAML = """PROMPTs:
+  - status: False
+    mask: "inativo {context}"
+  - status: True
+    ia_model_name: modelo-do-yaml
+    temperature: 0.3
+    top_k: 20
+    top_p: 0.8
+    mask: "Analise:  {context}"
+"""
+
+
+@pytest.fixture
+def materia():
+    tipo = baker.make(TipoMateriaLegislativa, prompt=PROMPT_YAML)
+    return baker.make(MateriaLegislativa, tipo=tipo)
+
+
+def _cota_classificacao():
+    _quota("menor", 5)
+    return _quota("maior", 50)
+
+
+def _metadata(materia, **dados):
+    md = Metadata(metadata=dados)
+    md.content_object = materia
+    md.save()
+    return md
+
+
+def _metadatas(materia):
+    return list(
+        Metadata.objects.filter(
+            object_id=materia.id,
+            content_type=ContentType.objects.get_for_model(MateriaLegislativa),
+        )
+    )
+
+
+def _classificar(materia, request=None, **kwargs):
+    ia = IAClassificacaoMateriaService()
+    ia.model = MateriaLegislativa
+    ia.object = materia.id
+    with mock.patch.object(
+        ia, "extract_text", return_value="texto"
+    ) as extract, mock.patch(
+        "cmj.utils.genia.classificacao.messages.add_message"
+    ) as add_message:
+        md = ia.run(request=request, **kwargs)
+    levels = [c.args[1] for c in add_message.call_args_list]
+    return SimpleNamespace(ia=ia, md=md, extract=extract, levels=levels)
+
+
+@pytest.mark.spec("GENIA-CLA-001")
+@pytest.mark.spec("GENIA-CLA-002")
+@pytest.mark.spec("GENIA-CLA-009")
+def test_classificacao_usa_maior_cota_e_ignora_modelo_do_yaml(client, materia):
+    maior = _cota_classificacao()
+    client.models.generate_content.return_value = SimpleNamespace(
+        text='{"temas": ["saúde"]}'
+    )
+
+    r = _classificar(materia)
+
+    kwargs = client.models.generate_content.call_args.kwargs
+    assert kwargs["model"] == "maior"
+    assert kwargs["contents"] == "Analise: texto"
+    assert r.md.metadata["genia"] == {
+        "temas": ["saúde"],
+        "model_name": "maior",
+        "template": "table1",
+        "temperature": 0.3,
+        "top_k": 20,
+        "top_p": 0.8,
+    }
+    assert IAQuotasLog.objects.filter(quota=maior).count() == 1
+
+
+@pytest.mark.spec("GENIA-CLA-008")
+def test_classificacao_substitui_so_a_chave_genia(client, materia):
+    _cota_classificacao()
+    _metadata(materia, genia={"temas": ["antigo"]}, outra="mantida")
+    client.models.generate_content.return_value = SimpleNamespace(
+        text='{"temas": ["novo"]}'
+    )
+
+    _classificar(materia)
+
+    (md,) = _metadatas(materia)
+    assert md.metadata["outra"] == "mantida"
+    assert md.metadata["genia"]["temas"] == ["novo"]
+
+
+@pytest.mark.spec("GENIA-CLA-008")
+@pytest.mark.spec("GENIA-CLA-010")
+def test_classificacao_com_erro_mantem_analise_anterior(client, materia, rf):
+    _cota_classificacao()
+    _metadata(materia, genia={"temas": ["antigo"]})
+    client.models.generate_content.return_value = SimpleNamespace(text="não é json")
+
+    r = _classificar(materia, request=rf.get("/", {"ia_run": "generate"}))
+
+    assert r.md is None
+    assert r.levels == [messages.ERROR]
+    (md,) = _metadatas(materia)
+    assert md.metadata["genia"]["temas"] == ["antigo"]
+
+
+@pytest.mark.spec("GENIA-CLA-010")
+def test_classificacao_sem_cota_avisa_e_nao_extrai_texto(client, materia, rf):
+    _metadata(materia, genia={"temas": ["antigo"]})
+
+    r = _classificar(materia, request=rf.get("/", {"ia_run": "generate"}))
+
+    assert r.md is None
+    assert r.levels == [messages.WARNING]
+    r.extract.assert_not_called()
+    client.models.generate_content.assert_not_called()
+    assert _metadatas(materia)[0].metadata["genia"]["temas"] == ["antigo"]
+
+
+@pytest.mark.spec("GENIA-CLA-011")
+def test_delete_remove_so_a_chave_genia(materia, rf):
+    _metadata(materia, genia={"temas": ["a"]}, outra="mantida")
+
+    r = _classificar(materia, request=rf.get("/", {"ia_run": "delete"}))
+
+    assert r.levels == [messages.SUCCESS]
+    (md,) = _metadatas(materia)
+    assert md.metadata == {"outra": "mantida"}
+
+    md.metadata = {"genia": {"temas": ["b"]}}
+    md.save()
+    _classificar(materia, action="delete")
+
+    assert _metadatas(materia) == []
+
+
+@pytest.mark.spec("GENIA-CLA-006")
+def test_generate_custom_converte_parametros_da_query_string(client, materia, rf):
+    _cota_classificacao()
+    client.models.generate_content.return_value = SimpleNamespace(text="{}")
+    request = rf.get(
+        "/",
+        {"ia_run": "generate_custom", "temperature": "0.7", "top_k": "5", "top_p": "1"},
+    )
+
+    r = _classificar(materia, request=request)
+
+    analise = r.md.metadata["genia"]
+    assert (analise["temperature"], analise["top_k"], analise["top_p"]) == (0.7, 5, 1.0)
+    assert isinstance(analise["top_k"], int)
+
+
+@pytest.mark.spec("GENIA-CLA-006")
+def test_generate_custom_com_parametro_invalido_nao_gera(client, materia, rf):
+    _cota_classificacao()
+    request = rf.get("/", {"ia_run": "generate_custom", "temperature": "abc"})
+
+    r = _classificar(materia, request=request)
+
+    assert r.md is None
+    assert r.levels == [messages.ERROR]
+    client.models.generate_content.assert_not_called()
+
+
+@pytest.mark.spec("GENIA-CLA-005")
+def test_prompt_yaml_lido_com_safe_load(client, materia):
+    _cota_classificacao()
+    materia.tipo.prompt = (
+        "PROMPTs:\n  - status: !!python/name:os.system\n    mask: '{context}'\n"
+    )
+    materia.tipo.save()
+
+    r = _classificar(materia)
+
+    assert r.md is None
+    client.models.generate_content.assert_not_called()
+
+
+@pytest.mark.spec("GENIA-CLA-014")
+def test_migration_remove_ia_model_name_sem_reescrever_o_yaml():
+    migration = importlib.import_module(
+        "sapl.materia.migrations.0003_remove_ia_model_name_do_prompt"
+    )
+    remove = migration.remove_ia_model_name
+
+    assert remove(PROMPT_YAML) == PROMPT_YAML.replace(
+        "    ia_model_name: modelo-do-yaml\n", ""
+    )
+    # Chave na linha do item da lista, ou texto da mask: não altera.
+    assert remove("PROMPTs:\n  - ia_model_name: x\n    status: True\n") is None
+    assert remove("PROMPTs:\n  - mask: |\n      ia_model_name: x\n") is None
+    assert remove("PROMPTs: []\n") is None

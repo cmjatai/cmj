@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import IAQuota
-from cmj.utils.genia.base import IAGenaiBase
+from cmj.utils.genia.base import IAGenaiBase, IAQuotaUnavailableError
 from cmj.utils.genia.extracao import extract_clean_text_from_path
 from sapl.base.models import Metadata
 
@@ -77,39 +77,51 @@ class IAClassificacaoMateriaService(IAGenaiBase):
 
     def run(self, *args, **kwargs):
         """
-        Executa a ação de IA, que pode ser gerar ou deletar
+        Executa a ação de IA: "generate", "generate_custom" ou "delete".
+        Com `request`, a ação vem de `?ia_run=` e os parâmetros de
+        "generate_custom", da query string. Sem `request`, vêm dos kwargs.
         """
-        self.request = kwargs.get("request", {})
-        self.GET = self.request.GET if hasattr(self.request, "GET") else {}
-        if not self.GET:
-            self.GET = {
-                "action": kwargs.get("action", "generate"),
-                "temperature": kwargs.get("temperature", self.temperature),
-                "top_k": kwargs.get("top_k", self.top_k),
-                "top_p": kwargs.get("top_p", self.top_p),
-            }
-            self.action = self.GET.get("action", "generate")
+        request = kwargs.get("request")
+        self.request = request if hasattr(request, "GET") else None
+
+        if self.request:
+            self.GET = self.request.GET
+            self.action = self.GET.get("ia_run") or "generate"
         else:
-            self.action = self.GET.get("ia_run", "generate")
+            self.GET = {
+                k: kwargs[k] for k in ("temperature", "top_k", "top_p") if k in kwargs
+            }
+            self.action = kwargs.get("action") or "generate"
 
         if self.action.startswith("generate"):
-            self.delete()
-            self.temperature = self.GET.get("temperature", self.temperature)
-            self.top_k = self.GET.get("top_k", self.top_k)
-            self.top_p = self.GET.get("top_p", self.top_p)
             return self.generate()
         elif self.action == "delete":
             self.delete()
-            if self.request:
-                messages.add_message(
-                    self.request, messages.SUCCESS, _("Análise removida com sucesso!")
-                )
+            self.add_message(messages.SUCCESS, _("Análise removida com sucesso!"))
+
+    def add_message(self, level, message):
+        if self.request:
+            messages.add_message(self.request, level, message)
+
+    def get_metadata(self):
+        """Metadata do objeto (único por content_type e object_id), ou None."""
+        return Metadata.objects.filter(
+            object_id=self.object.id, content_type=self.content_type
+        ).first()
 
     def delete(self):
-        obj = self.object
-        Metadata.objects.filter(
-            object_id=obj.id, content_type=self.content_type
-        ).delete()
+        """
+        Remove só a chave "genia". O Metadata é apagado se ficar vazio.
+        """
+        md = self.get_metadata()
+        if not md or self.METADATA_KEY not in (md.metadata or {}):
+            return
+
+        md.metadata.pop(self.METADATA_KEY)
+        if md.metadata:
+            md.save()
+        else:
+            md.delete()
 
     def has_analise(self):
         """
@@ -121,50 +133,58 @@ class IAClassificacaoMateriaService(IAGenaiBase):
         """
         Retorna a análise gerada, ou None se não houver
         """
-        metadata = Metadata.objects.filter(
-            object_id=self.object.id, content_type=self.content_type
-        ).first()
+        md = self.get_metadata()
+        return (md.metadata or {}).get(self.METADATA_KEY) if md else None
 
-        if not metadata or self.METADATA_KEY not in metadata.metadata:
+    def save_analise(self, analise):
+        """
+        Grava a análise na chave "genia", preservando as outras chaves do
+        Metadata do objeto.
+        """
+        md = self.get_metadata()
+        if not md:
+            md = Metadata()
+            md.content_object = self.object
+
+        md.metadata = {**(md.metadata or {}), self.METADATA_KEY: analise}
+
+        if settings.DEBUG:
+            if not md.pk:
+                md.created = timezone.localtime()
+            md.modified = timezone.localtime()
+
+        md.save()
+        return md
+
+    def get_prompt_object(self):
+        """
+        Primeiro item ativo da lista `PROMPTs` do YAML do tipo, ou None.
+        """
+        prompt_yaml = self.object.tipo.prompt
+        if not prompt_yaml:
             return None
 
-        return metadata.metadata[self.METADATA_KEY]
+        yaml_data = yaml.safe_load(prompt_yaml) or {}
 
-    def make_prompt(self, context):
-        obj = self.object
+        for prompt_object in yaml_data.get("PROMPTs") or []:
+            if prompt_object.get("status"):
+                return prompt_object
+        return None
 
-        prompt_mask = obj.tipo.prompt
-        if not prompt_mask:
-            return ""
+    def set_generation_params(self, prompt_object):
+        """
+        "generate" usa o YAML e os padrões da classe; "generate_custom", a
+        query string (ou os kwargs de `run`). Levanta ValueError ou TypeError
+        para valor inválido.
+        """
+        source = self.GET if self.action == "generate_custom" else prompt_object
 
-        yaml_data = yaml.load(prompt_mask, Loader=yaml.FullLoader)
+        self.temperature = float(source.get("temperature", self.temperature))
+        self.top_k = int(source.get("top_k", self.top_k))
+        self.top_p = float(source.get("top_p", self.top_p))
 
-        status = False
-        for prompt_object in yaml_data["PROMPTs"]:
-            status = prompt_object["status"]
-            if status:
-                break
-
-        if not status:
-            return ""
-
-        if self.action == "generate":
-            self.ia_model_name = prompt_object.get("ia_model_name", self.ia_model_name)
-            self.temperature = prompt_object.get("temperature", self.temperature)
-            self.top_k = prompt_object.get("top_k", self.top_k)
-            self.top_p = prompt_object.get("top_p", self.top_p)
-        elif self.action == "generate_custom":
-            self.ia_model_name = prompt_object.get("ia_model_name", self.ia_model_name)
-            self.temperature = float(self.GET.get("temperature", self.temperature))
-            self.top_p = float(self.GET.get("top_p", self.top_p))
-            self.top_k = int(self.GET.get("top_k", self.top_k))
-
-        prompt_mask = prompt_object.get("mask", "")
-
-        if not prompt_mask:
-            return ""
-
-        prompt = prompt_mask.format(context=context)
+    def make_prompt(self, prompt_object, context):
+        prompt = prompt_object["mask"].format(context=context)
         while "  " in prompt:
             prompt = prompt.replace("  ", " ")
 
@@ -182,19 +202,29 @@ class IAClassificacaoMateriaService(IAGenaiBase):
         return text
 
     def generate(self):
+        """
+        Gera a análise e só então substitui a anterior. Sem prompt ativo, sem
+        cota, com parâmetro inválido ou com erro, a análise anterior fica.
+        """
         try:
-            context = self.extract_text()
-            prompt = self.make_prompt(context=context)
-
-            if not prompt:
+            prompt_object = self.get_prompt_object()
+            if not prompt_object or not prompt_object.get("mask"):
                 return
 
-            answer = self.generate_content(prompt, ascending=False)
+            try:
+                self.set_generation_params(prompt_object)
+            except (TypeError, ValueError):
+                self.add_message(
+                    messages.ERROR,
+                    _("Parâmetros de geração inválidos (temperature, top_k, top_p)."),
+                )
+                return
 
-            obj = self.object
+            quota = self.retrieve_quota_if_available(ascending=False)
 
-            md = Metadata()
-            md.content_object = obj
+            prompt = self.make_prompt(prompt_object, context=self.extract_text())
+            answer = self.generate_content(prompt, quota=quota)
+
             analise = json.loads(answer.text)
             analise.update(
                 model_name=self.ia_model_name,
@@ -203,27 +233,21 @@ class IAClassificacaoMateriaService(IAGenaiBase):
                 top_k=self.top_k,
                 top_p=self.top_p,
             )
-            md.metadata = {self.METADATA_KEY: analise}
+            md = self.save_analise(analise)
 
-            if settings.DEBUG:
-                md.created = timezone.localtime()
-                md.modified = timezone.localtime()
-
-            md.save()
-
-            if self.request:
-                messages.add_message(
-                    self.request, messages.SUCCESS, _("Análise gerada com sucesso!")
-                )
-
+            self.add_message(messages.SUCCESS, _("Análise gerada com sucesso!"))
             return md
+
+        except IAQuotaUnavailableError as e:
+            logger.warning(e)
+            self.add_message(
+                messages.WARNING,
+                _(
+                    "Nenhuma cota de I.A. disponível no momento. "
+                    "A análise anterior foi mantida. Tente novamente mais tarde."
+                ),
+            )
 
         except Exception as e:
             logger.error(e)
-
-            if self.request:
-                messages.add_message(
-                    self.request,
-                    messages.ERROR,
-                    _("Ocorreu erro na geração da análise!"),
-                )
+            self.add_message(messages.ERROR, _("Ocorreu erro na geração da análise!"))
