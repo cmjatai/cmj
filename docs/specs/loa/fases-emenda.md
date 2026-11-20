@@ -134,7 +134,9 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
 
 - LOA-FASE-068 [implementado] Quem tem permissão para alterar registros contábeis da emenda
   (`emendaloa_full_editor`) pode criar, alterar e excluir esses registros em qualquer fase. Evidência:
-  `cmj/api/loa/views/emendaloaregistrocontabil.py:287-299`. Substitui LOA-FASE-040. Decidido em D14.
+  `cmj/api/loa/views/emendaloaregistrocontabil.py:288-300`. Substitui LOA-FASE-040. Decidido em D14.
+  Exceção: emenda que está num agrupamento só muda registros pelo agrupamento (LOA-AGR-045 de
+  `docs/specs/loa/edicao-agrupamento.md`).
 
 ### Valor
 

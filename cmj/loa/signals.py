@@ -69,13 +69,8 @@ def signal_pre_agrupamentoregistrocontabil(sender, instance, **kwargs):
     ).delete()
 
 
-@receiver(
-    pre_delete,
-    sender=AgrupamentoEmendaLoa,
-    dispatch_uid="signal_pre_agrupamentoemendaloa",
-)
-def signal_pre_agrupamentoemendaloa(sender, instance, **kwargs):
-    instance.emendaloa.registrocontabil_set.all().delete()
+# LOA-AGR-046: ao sair do agrupamento, a emenda mantém os registros contábeis que
+# tinha por ele; não há mais signal que os apague na remoção do vínculo
 
 
 @receiver([post_save, post_delete])
@@ -115,5 +110,4 @@ def signal_loa_emendaloa_disable_cache(sender, **kwargs):
                             cache.delete(key)
 
             except Exception as e:
-                logger.error(
-                    "Erro ao tentar invalidar cache: {}".format(e))
+                logger.error("Erro ao tentar invalidar cache: {}".format(e))

@@ -13,6 +13,7 @@ from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
 from cmj.api.serializers import CmjSerializerMixin
 from cmj.loa.models import (
     Acao,
+    AgrupamentoEmendaLoa,
     Despesa,
     EmendaLoaRegistroContabil,
     Fonte,
@@ -235,7 +236,7 @@ class EmendaLoaRegistroContabilSerializer(CmjSerializerMixin):
             ddict.pop("_state")
             ddict.pop("valor_materia")
             ddict.pop("valor_norma")
-            ddict.pop('search', None)
+            ddict.pop("search", None)
             despesa, created = Despesa.objects.get_or_create(**ddict)
 
         else:
@@ -262,7 +263,7 @@ class EmendaLoaRegistroContabilSerializer(CmjSerializerMixin):
                     despesa_dict.pop("_state")
                     despesa_dict.pop("valor_materia")
                     despesa_dict.pop("valor_norma")
-                    despesa_dict.pop('search')
+                    despesa_dict.pop("search")
                     despesa, created = Despesa.objects.get_or_create(**despesa_dict)
 
         validated_data = {
@@ -300,6 +301,44 @@ class EmendaLoaRegistroContabilViewSet:
 
     permission_classes = (EmendaLoaRegistroContabilPermission,)
 
+    @staticmethod
+    def recusar_se_agrupada(emendaloa):
+        """LOA-AGR-045: os registros da emenda agrupada vêm do agrupamento.
+
+        Alterá-los pela emenda seria desfeito no próximo sync() (LOA-AGR-033), e a
+        exclusão ainda tiraria a emenda do agrupamento (EmendaLoaRegistroContabil.delete).
+        """
+        vinculo = (
+            AgrupamentoEmendaLoa.objects.filter(emendaloa=emendaloa)
+            .select_related("agrupamento")
+            .first()
+        )
+        if vinculo:
+            raise DRFValidationError(
+                "Os registros contábeis desta emenda vêm do agrupamento "
+                f'"{vinculo.agrupamento.nome}". Altere-os no agrupamento.'
+            )
+
+    def recusar_se_agrupada_pelo_request(self, request):
+        # antes da validação dos campos, para que o motivo apareça na tela
+        try:
+            pk_emenda = int(request.data.get("emendaloa"))
+        except (TypeError, ValueError):
+            return
+        self.recusar_se_agrupada(pk_emenda)
+
+    def create(self, request, *args, **kwargs):
+        self.recusar_se_agrupada_pelo_request(request)
+        return super().create(request, *args, **kwargs)
+
+    def update(self, request, *args, **kwargs):
+        self.recusar_se_agrupada(self.get_object().emendaloa_id)
+        return super().update(request, *args, **kwargs)
+
+    def perform_destroy(self, instance):
+        self.recusar_se_agrupada(instance.emendaloa)
+        super().perform_destroy(instance)
+
     def permission_denied(self, request, message=None, **kwargs):
         if request.user.is_authenticated:
             raise DRFValidationError(
@@ -316,6 +355,7 @@ class EmendaLoaRegistroContabilViewSet:
     )
     def create_for_emendaloa_update(self, request, *args, **kwargs):
         self.serializer_class = EmendaLoaRegistroContabilSerializer
+        self.recusar_se_agrupada_pelo_request(request)
         try:
             return super().create(request, *args, **kwargs)
 

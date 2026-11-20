@@ -395,8 +395,9 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `cmj/loa/forms/f_emendaloa.py:436-438`.
 - LOA-EMD-062 [observado] Excluir um registro envia `DELETE /api/loa/emendaloaregistrocontabil/<pk>/`
   e atualiza a lista, os totais e a pré-visualização. A permissão para criar e excluir registros segue
-  LOA-FASE-068. Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:174-195`,
-  `cmj/api/loa/views/emendaloaregistrocontabil.py:287-299`.
+  LOA-FASE-068. Emenda que está num agrupamento não inclui, altera nem exclui registros pela própria
+  tela (LOA-AGR-045 de `docs/specs/loa/edicao-agrupamento.md`). Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:174-195`,
+  `cmj/api/loa/views/emendaloaregistrocontabil.py:288-300`.
 - LOA-EMD-063 [observado] O rodapé dos registros mostra quatro totais. Os dois últimos ficam em azul
   quando são zero e em vermelho quando não são:
   - soma das inserções;

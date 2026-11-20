@@ -13,6 +13,7 @@ from cmj.loa.models import (
     AgrupamentoRegistroContabil,
     Despesa,
     EmendaLoa,
+    EmendaLoaRegistroContabil,
     UnidadeOrcamentaria,
 )
 from cmj.loa.models.m_agrupamento import FinalidadeManualRemovida
@@ -355,3 +356,95 @@ def test_previa_liberada_para_editor_contabil(client, editor_contabil, sem_final
 @pytest.mark.spec("LOA-AGR-002")
 def test_detalhe_do_agrupamento_na_api_continua_publico(client, agrupamento):
     assert client.get(f"/api/loa/agrupamento/{agrupamento.pk}/").status_code == 200
+
+
+# ------------------------------------- registros contábeis da emenda agrupada (D6)
+
+
+@pytest.fixture
+def agrupada(agrupamento_liberavel, make_emenda, parlamentar):
+    """Emenda de R$ 1.000,00 num agrupamento com dedução e inserção de 100%.
+
+    O parlamentar sustenta o valor: o sync() da emenda o recalcula pela soma deles.
+    """
+    el = make_emenda(fase=EC, parlamentar=parlamentar)
+    AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento_liberavel, emendaloa=el)
+    return el
+
+
+def registros(emenda):
+    return sorted(
+        (r.despesa_id, r.valor)
+        for r in EmendaLoaRegistroContabil.objects.filter(emendaloa=emenda)
+    )
+
+
+@pytest.mark.spec("LOA-AGR-046")
+def test_remocao_mantem_registros_do_agrupamento_na_emenda(
+    api, editor_contabil, agrupada, agrupamento_liberavel
+):
+    antes = registros(agrupada)
+    assert [v for _, v in antes] == [Decimal("-1000.00"), Decimal("1000.00")]
+
+    r = api(editor_contabil).post(
+        "/api/loa/agrupamentoemendaloa/delete/",
+        {"agrupamento": agrupamento_liberavel.pk, "emendaloa": agrupada.pk},
+        format="json",
+    )
+
+    assert r.status_code == 200
+    assert not AgrupamentoEmendaLoa.objects.filter(emendaloa=agrupada).exists()
+    assert registros(agrupada) == antes
+
+
+@pytest.mark.spec("LOA-AGR-045")
+def test_emenda_agrupada_nao_exclui_registro_pela_emenda(
+    api, editor_contabil, agrupada, agrupamento_liberavel
+):
+    registro = EmendaLoaRegistroContabil.objects.filter(emendaloa=agrupada).first()
+    antes = registros(agrupada)
+
+    r = api(editor_contabil).delete(
+        f"/api/loa/emendaloaregistrocontabil/{registro.pk}/"
+    )
+
+    assert r.status_code == 400
+    assert 'agrupamento "Agrupamento"' in str(r.data)
+    assert registros(agrupada) == antes
+    assert AgrupamentoEmendaLoa.objects.filter(emendaloa=agrupada).exists()
+
+
+@pytest.mark.spec("LOA-AGR-045")
+def test_emenda_agrupada_nao_inclui_registro_pela_emenda(
+    api, editor_contabil, agrupada, loa
+):
+    despesa = mommy.make(Despesa, loa=loa)
+    antes = registros(agrupada)
+
+    r = api(editor_contabil).post(
+        "/api/loa/emendaloaregistrocontabil/create_for_emendaloa_update/",
+        {"emendaloa": agrupada.pk, "despesa": despesa.pk, "valor": "10,00"},
+        format="json",
+    )
+
+    assert r.status_code == 400
+    assert 'agrupamento "Agrupamento"' in str(r.data), r.data
+    assert registros(agrupada) == antes
+
+
+@pytest.mark.spec("LOA-AGR-045")
+def test_emenda_agrupada_nao_altera_registro_pela_emenda(
+    api, editor_contabil, agrupada
+):
+    registro = EmendaLoaRegistroContabil.objects.filter(emendaloa=agrupada).first()
+    antes = registros(agrupada)
+
+    r = api(editor_contabil).patch(
+        f"/api/loa/emendaloaregistrocontabil/{registro.pk}/",
+        {"valor": "1,00"},
+        format="json",
+    )
+
+    assert r.status_code == 400
+    assert 'agrupamento "Agrupamento"' in str(r.data), r.data
+    assert registros(agrupada) == antes
