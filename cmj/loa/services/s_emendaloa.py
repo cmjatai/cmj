@@ -18,6 +18,9 @@ class EmendaLoaService:
     )
     CAMPOS_ESTRUTURAIS = frozenset({"tipo", "fase", "unidade", "entidade"})
     CAMPOS_OPERADOR = frozenset({"valor", "materia"})
+    # LOA-EMD-080: depois da fase 12, o autor só altera a finalidade, além dos
+    # valores por parlamentar e assinantes (validar_parlamentares)
+    CAMPOS_AUTOR_APOS_LIBERACAO = frozenset({"finalidade"})
 
     def __new__(cls, *args, **kwargs):
         if cls._instance is None:
@@ -42,11 +45,12 @@ class EmendaLoaService:
             campos |= self.CAMPOS_BASE | self.CAMPOS_ESTRUTURAIS
 
         if self.e_autor_da_emenda(user, emenda):  # autor (LOA-EMD-076)
-            campos |= self.CAMPOS_BASE
             if emenda.fase <= EmendaLoa.PROPOSTA_LIBERADA:
-                campos |= self.CAMPOS_ESTRUTURAIS
+                campos |= self.CAMPOS_BASE | self.CAMPOS_ESTRUTURAIS
+            else:
+                campos |= self.CAMPOS_AUTOR_APOS_LIBERACAO
             if tipo == EmendaLoa.MODIFICATIVA:
-                # o formulário exige o Valor Global da modificativa (LOA-EMD-022)
+                # o fqormulário exige o Valor Global da modificativa (LOA-EMD-022)
                 campos.add("valor")
 
         return campos

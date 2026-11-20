@@ -498,9 +498,30 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[1:3]
 
                 if self.instance.fase > EmendaLoa.PROPOSTA_LIBERADA:
-                    # self.fields['prefixo_indicacao'].widget.attrs['readonly'] = 'readonly'
-                    # self.fields['prefixo_finalidade'].widget.attrs['readonly'] = 'readonly'
-                    # self.fields['finalidade'].widget.attrs['readonly'] = 'readonly'
+                    # LOA-EMD-080: depois da fase 12, o autor só altera finalidade,
+                    # valores por parlamentar e assinantes
+                    self.fields["prefixo_indicacao"].widget.attrs[
+                        "readonly"
+                    ] = "readonly"
+                    self.fields["prefixo_finalidade"].widget.attrs[
+                        "readonly"
+                    ] = "readonly"
+                    self.fields["permite_juncao_coletiva"].choices = [
+                        (
+                            self.instance.permite_juncao_coletiva,
+                            (
+                                _("Sim")
+                                if self.instance.permite_juncao_coletiva
+                                else _("Não")
+                            ),
+                        )
+                    ]
+                    if self.instance.bairro:
+                        self.fields["bairro"].choices = [
+                            (self.instance.bairro.id, str(self.instance.bairro))
+                        ]
+                    else:
+                        self.fields["bairro"].choices = [("", "-------")]
 
                     self.fields["indicacao"].widget.attrs[
                         "readonly"
@@ -664,6 +685,11 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     elp.parlamentar = p
                     elp.valor = v
                     elp.save()
+
+                # LOA-EMD-081: com os novos valores gravados, o save() faz o sync(),
+                # que recalcula o valor e reajusta os registros contábeis. O primeiro
+                # save() ainda via os valores antigos dos parlamentares.
+                i.save()
             elif "parl_assinantes" in self.cleaned_data:
                 i.parlamentares.clear()
                 for p in self.cleaned_data["parl_assinantes"]:

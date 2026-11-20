@@ -1,6 +1,6 @@
 # LOA: edição da emenda
 
-Status: observado; D3, D4 e D7 implementadas (LOA-EMD-070 a 079)
+Status: observado; D3, D4, D7 e D8 implementadas (LOA-EMD-070 a 081)
 Última verificação: 2026-11-20 (commit `7c7c5f1c2`)
 Código principal: `cmj/loa/views/v_emendaloa.py`, `cmj/loa/forms/f_emendaloa.py`,
 `cmj/loa/services/s_emendaloa.py`, `cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
@@ -49,7 +49,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
     `prefixo_finalidade`, `finalidade` e `bairro`.
   - **Autor** (operador de autor) com a emenda até a fase 12: base mais `tipo`, `fase`, `unidade` e
     `entidade`.
-  - **Autor** com a emenda acima da fase 12: só a base.
+  - **Autor** com a emenda acima da fase 12: só `finalidade` (LOA-EMD-080).
   - **Autor**, em qualquer fase, quando a emenda resultante é modificativa (tipo 0): também `valor`,
     porque o formulário exige o Valor Global da modificativa (LOA-EMD-022).
   - **Editor contábil** (`emendaloa_full_editor`): base mais `tipo`, `fase`, `unidade` e `entidade`.
@@ -58,7 +58,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 
   Quem tem mais de um perfil soma as listas. A fase continua sujeita às transições de LOA-FASE-052,
   LOA-FASE-053 e LOA-FASE-065. Evidência: `EmendaLoaService.campos_alteraveis`
-  (`cmj/loa/services/s_emendaloa.py:10-53`).
+  (`cmj/loa/services/s_emendaloa.py:10-56`).
 - LOA-EMD-071 [implementado] Nenhum perfil, nem o superusuário, altera pela API ou pelo formulário campos
   do model fora de LOA-EMD-070, como `owner`, `loa`, `metadata`, `indicacao`, `proposicao`,
   `emenda_coletiva` e `agrupamento_de_origem`. Esses campos continuam sendo mantidos pelos fluxos
@@ -105,6 +105,25 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `EmendaLoaService.parlamentar_protegido` (`cmj/loa/services/s_emendaloa.py:129-141`),
   `cmj/api/loa/views/emendaloa.py:142-151`, `cmj/api/loa/views/emendaloa.py:225-234`,
   `cmj/loa/forms/f_emendaloa.py:582-607`.
+
+### Autor na fase 17 e registros contábeis (D8, decidida em 2026-11-20)
+
+- LOA-EMD-080 [implementado] Depois da fase 12, o que na prática é a fase 17 (LOA-FASE-030 e
+  LOA-FASE-033), o autor só altera a finalidade, os valores por parlamentar e os assinantes. Na
+  modificativa, altera também o Valor Global, que é o valor da emenda. Prefixos, bairro e junção em
+  coletiva ficam presos no formulário e são recusados pelo servidor. Evidência:
+  `cmj/loa/services/s_emendaloa.py:20-23`, `cmj/loa/services/s_emendaloa.py:47-51`,
+  `cmj/loa/forms/f_emendaloa.py:501-524`.
+- LOA-EMD-081 [implementado] Quando muda o valor de um parlamentar, inclusive com a inclusão ou a
+  retirada de um coautor, o Valor Global passa a ser a soma dos parlamentares. Os registros contábeis
+  da emenda são reajustados na mesma proporção do total. Na emenda em agrupamento, eles são refeitos
+  pelos percentuais do agrupamento, o que dá o mesmo resultado (LOA-AGR-033). O arredondamento fecha
+  inserções e deduções no valor da emenda. Vale tanto para o autosave quanto para o POST do
+  formulário. Antes, o POST gravava os novos valores dos parlamentares depois do `sync()` e deixava o
+  valor e os registros desatualizados. O reajuste depende do `sync()` (LOA-EMD-031), que roda com a
+  LOA em tramitação. Esse é sempre o caso na fase 17: quando a LOA sai de tramitação, todas as
+  emendas já passaram da fase 20. Evidência: `cmj/loa/models/m_emendaloa.py:716-806`,
+  `cmj/loa/forms/f_emendaloa.py:689-692`.
 
 ## Regras observadas
 
@@ -331,12 +350,9 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 
 ## Dúvidas
 
-Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, e D3 e D7 viraram LOA-EMD-076 a 079.
+Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, D3 e D7 viraram LOA-EMD-076 a 079, e
+D8 virou LOA-EMD-080 e 081.
 
-- D8. **O autor edita a emenda na fase 17.** A tela e a API deixam o autor alterar valores,
-  finalidade e parlamentares depois que a contabilidade liberou a emenda. Mudar valores na 17 desfaz o
-  fechamento contábil, ou o reescala pelo `sync()` (LOA-EMD-031). A edição do autor na fase 17 é
-  intencional? Se for, quais campos ele pode mudar?
 - D1. **A criação pela tela e pela API exigem condições opostas.** Para o operador de autor, a tela de
   criação exige LOA publicada (LOA-EMD-001) e o POST da API exige LOA não publicada (LOA-EMD-002).
   Qual condição vale?

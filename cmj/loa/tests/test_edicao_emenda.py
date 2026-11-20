@@ -6,15 +6,27 @@ divergência atual e devem falhar até a correção.
 
 from decimal import Decimal
 
+import datetime
+from unittest import mock
+
 import pytest
 from django.urls import reverse
 from model_mommy import mommy
 
 from cmj.core.models import Bairro
-from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, UnidadeOrcamentaria
+from cmj.loa.models import (
+    Agrupamento,
+    AgrupamentoEmendaLoa,
+    AgrupamentoRegistroContabil,
+    Despesa,
+    EmendaLoa,
+    EmendaLoaParlamentar,
+    EmendaLoaRegistroContabil,
+    UnidadeOrcamentaria,
+)
 from cmj.loa.tests.conftest import _make_user, recarregar
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
-from sapl.parlamentares.models import Parlamentar
+from sapl.parlamentares.models import Legislatura, Parlamentar
 
 pytestmark = pytest.mark.django_db
 
@@ -91,10 +103,10 @@ def post_edicao(client, user, emenda, **extra):
 # ------------------------------------------------- service: campos alteráveis
 
 
-@pytest.mark.spec("LOA-EMD-070")
+@pytest.mark.spec("LOA-EMD-070", "LOA-EMD-080")
 @pytest.mark.parametrize(
     "fase,esperado",
-    [(P, BASE | ESTRUTURAIS), (PL, BASE | ESTRUTURAIS), (LC, BASE)],
+    [(P, BASE | ESTRUTURAIS), (PL, BASE | ESTRUTURAIS), (LC, {"finalidade"})],
 )
 def test_service_campos_do_autor_por_fase(
     autor, parlamentar, make_emenda, fase, esperado
@@ -616,3 +628,158 @@ def test_formulario_recusa_assinante_fora_da_loa(
     )
 
     assert not el.parlamentares.filter(pk=parlamentar_fora_da_loa.pk).exists()
+
+
+# ------------------------------------------ autor na fase 17 e registros contábeis
+
+
+@pytest.fixture
+def loa_em_tramitacao(loa):
+    """LOA com matéria e sem norma: o save() da emenda chama sync() (LOA-EMD-031).
+
+    O texto de busca da emenda (``artigos``) usa uma view SQL que não existe nos testes.
+    """
+    Legislatura.objects.create(
+        numero=99,
+        data_inicio=datetime.date(2025, 1, 1),
+        data_fim=datetime.date(2028, 12, 31),
+        data_eleicao=datetime.date(2024, 10, 6),
+    )
+    tipo = mommy.make(TipoMateriaLegislativa, sigla="PLOA", descricao="PLOA")
+    loa.materia = mommy.make(
+        MateriaLegislativa,
+        tipo=tipo,
+        numero=9,
+        ano=2026,
+        data_apresentacao=datetime.date(2026, 9, 1),
+    )
+    loa.save()
+    with mock.patch.object(
+        EmendaLoa, "artigos", new_callable=mock.PropertyMock, return_value=[]
+    ):
+        yield loa
+
+
+@pytest.fixture
+def emenda_liberada(make_emenda, autor, parlamentar, loa):
+    """Emenda na fase 17 com dedução de 1000 e inserções de 600 e 400.
+
+    Montada antes de a LOA entrar em tramitação, para o sync() não alterar a montagem.
+    """
+    el = make_emenda(fase=LC, owner=autor, parlamentar=parlamentar)
+    for valor in ("-1000.00", "600.00", "400.00"):
+        EmendaLoaRegistroContabil.objects.create(
+            emendaloa=el,
+            despesa=mommy.make(Despesa, loa=loa, _fill_optional=False),
+            valor=Decimal(valor),
+        )
+    return recarregar(el)
+
+
+def registros(emenda):
+    return sorted(
+        recarregar(emenda).registrocontabil_set.values_list("valor", flat=True)
+    )
+
+
+@pytest.mark.spec("LOA-EMD-080")
+@pytest.mark.parametrize(
+    "campo,valor",
+    [
+        ("prefixo_finalidade", "Novo prefixo"),
+        ("prefixo_indicacao", "Novo prefixo"),
+        ("permite_juncao_coletiva", True),
+    ],
+)
+def test_autor_na_fase_17_so_altera_finalidade_e_parlamentares(
+    api, autor, parlamentar, make_emenda, campo, valor
+):
+    el = make_emenda(fase=LC, owner=autor, parlamentar=parlamentar)
+
+    r = patch(api(autor), el, {campo: valor})
+
+    assert r.status_code == 400
+
+
+@pytest.mark.spec("LOA-EMD-080")
+def test_autor_na_fase_17_nao_altera_bairro(api, autor, parlamentar, make_emenda):
+    el = make_emenda(fase=LC, owner=autor, parlamentar=parlamentar)
+    bairro = mommy.make(Bairro, nome="Centro", codigo=1)
+
+    r = patch(api(autor), el, {"bairro": bairro.pk})
+
+    assert r.status_code == 400
+    assert recarregar(el).bairro_id is None
+
+
+@pytest.mark.spec("LOA-EMD-080", "LOA-EMD-081")
+def test_autosave_do_valor_na_fase_17_reajusta_registros(
+    api, autor, parlamentar, emenda_liberada, loa_em_tramitacao
+):
+    el = emenda_liberada
+
+    r = valor_parlamentar(api(autor), el, parlamentar, "1500,00")
+
+    assert r.status_code == 200
+    assert recarregar(el).valor == Decimal("1500.00")
+    assert registros(el) == [Decimal("-1500.00"), Decimal("600.00"), Decimal("900.00")]
+
+
+@pytest.mark.spec("LOA-EMD-080", "LOA-EMD-081")
+def test_coautor_incluido_na_fase_17_reajusta_registros(
+    api, autor, parlamentar_b, emenda_liberada, loa_em_tramitacao
+):
+    el = emenda_liberada
+
+    r = valor_parlamentar(api(autor), el, parlamentar_b, "500,00")
+
+    assert r.status_code == 200
+    assert recarregar(el).valor == Decimal("1500.00")
+    assert registros(el) == [Decimal("-1500.00"), Decimal("600.00"), Decimal("900.00")]
+
+
+@pytest.mark.spec("LOA-EMD-081")
+def test_formulario_na_fase_17_reajusta_registros(
+    client, autor, parlamentar, emenda_liberada, loa_em_tramitacao
+):
+    el = emenda_liberada
+
+    post_edicao(client, autor, el, parlamentares__valor_0="1500.00")
+
+    assert recarregar(el).valor == Decimal("1500.00")
+    assert registros(el) == [Decimal("-1500.00"), Decimal("600.00"), Decimal("900.00")]
+
+
+@pytest.mark.spec("LOA-EMD-081")
+def test_reajuste_com_proporcao_inexata_mantem_registros_fechados(
+    api, autor, parlamentar, emenda_liberada, loa_em_tramitacao
+):
+    el = emenda_liberada
+
+    valor_parlamentar(api(autor), el, parlamentar, "1333,33")
+
+    valores = registros(el)
+    insercoes = sum(v for v in valores if v > 0)
+    deducoes = sum(v for v in valores if v < 0)
+    assert recarregar(el).valor == Decimal("1333.33")
+    assert insercoes == Decimal("1333.33")
+    assert deducoes == Decimal("-1333.33")
+
+
+@pytest.mark.spec("LOA-EMD-081")
+def test_valor_na_fase_17_em_agrupamento_segue_percentuais(
+    api, autor, parlamentar, make_emenda, loa, loa_em_tramitacao
+):
+    el = make_emenda(fase=LC, owner=autor, parlamentar=parlamentar)
+    ag = mommy.make(Agrupamento, loa=loa, nome="Agrupamento")
+    for percentual in ("-100.00", "100.00"):
+        AgrupamentoRegistroContabil.objects.create(
+            agrupamento=ag,
+            despesa=mommy.make(Despesa, loa=loa, _fill_optional=False),
+            percentual=Decimal(percentual),
+        )
+    AgrupamentoEmendaLoa.objects.create(agrupamento=ag, emendaloa=el)
+
+    valor_parlamentar(api(autor), el, parlamentar, "1500,00")
+
+    assert registros(el) == [Decimal("-1500.00"), Decimal("1500.00")]
