@@ -164,7 +164,7 @@ fino sobre `google-genai`, com o controle de cota. `IAChatService` herda dela e 
 
 | Atributo | `IAGenaiBase` | `IAChatService` |
 |----------|---------------|-----------------|
-| `ia_model_name` | `gemini-3-flash-preview` | sobrescrito pela cota escolhida |
+| `ia_model_name` | `gemini-3.5-flash-lite` | sobrescrito pela cota escolhida |
 | `temperature` | `0.1` (respostas determinísticas, jurídicas) | herdado |
 | `top_k` / `top_p` | `40` / `0.95` | herdado |
 | `response_mime_type` | `application/json` | `text/plain` |

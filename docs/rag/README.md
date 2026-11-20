@@ -39,7 +39,7 @@ gemini-embedding-2 (1536 dim) ─▶ vetor1536 ───────────
                                                           texto com "Fonte: [link]" ◀┘ → LLM → resposta Markdown
 ```
 
-* **Modelo de geração:** `gemini-3-flash-preview` (padrão) – ou o modelo escolhido via `IAQuota`.
+* **Modelo de geração:** `gemini-3.5-flash-lite` (padrão) – ou o modelo escolhido via `IAQuota`.
 * **Modelo de embedding:** `gemini-embedding-2`, saída reduzida para **1536 dimensões** (`halfvec`).
 * **Banco:** PostgreSQL + `pgvector` (índice HNSW, cosseno) + Full-Text Search (`portuguese`, índice GIN).
 * **Transporte:** Django Channels (WebSocket `/ws/chat/<session_id>/`) com Redis como channel layer.

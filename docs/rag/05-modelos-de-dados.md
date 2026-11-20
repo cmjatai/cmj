@@ -121,7 +121,7 @@ Ver [02 §2.4](./02-ingestao-e-indexacao.md#24-vetorização-e-tokens-embedding)
 
 ```json
 {
-  "ia_model_name": "gemini-3-flash-preview",
+  "ia_model_name": "gemini-3.5-flash-lite",
   "rag_results": {
     "rag_query": [
       { "query": "asfaltar pátios terraplenagem incentivo", "results": "\nFonte: <a href=\"/ta/793/text\">…</a>\n…" }

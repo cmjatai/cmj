@@ -30,7 +30,7 @@ recuperação estão em `docs/rag/02-ingestao-e-indexacao.md` e `docs/rag/03-rec
 - GENIA-EMB-006 [implementado] O serviço é isento de cota por decisão: não consulta nem registra `IAQuota`.
   Evidência: `cmj/utils/genia/embeddings.py:18`.
 - GENIA-EMB-007 [observado] A contagem de tokens de um chunk usa o modelo padrão da classe-base
-  (`gemini-3-flash-preview`), não o modelo de embedding. Evidência: `cmj/search/models.py:142`,
+  (`gemini-3.5-flash-lite`), não o modelo de embedding. Evidência: `cmj/search/models.py:142`,
   `cmj/utils/genia/base.py:36`.
 
 ## Decisões
