@@ -21,6 +21,11 @@ class AgrupamentoViewSet:
 
     permission_classes = (AgrupamentoPermission,)
 
+    class AgrupamentoEditorPermission(AgrupamentoPermission):
+        # LOA-AGR-003: a prévia também exige a permissão de edição no GET
+        def has_permission_get(self, request, view):
+            return self.has_permission_post(request, view)
+
     def perform_update(self, serializer):
         # LOA-AGR-053: finalidade enviada pelo autosave é digitada; vazia volta ao
         # modo automático
@@ -131,7 +136,7 @@ class AgrupamentoViewSet:
             "get",
         ],
         detail=True,
-        permission_classes=(AgrupamentoPermission,),
+        permission_classes=(AgrupamentoEditorPermission,),
     )
     def view(self, request, *args, **kwargs):
         base_url = request.build_absolute_uri()

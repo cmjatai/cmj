@@ -42,7 +42,7 @@ finalidade de um agrupamento. As regras do agrupamento estão em `docs/specs/loa
   `test_geracao_da_coletiva_interrompe_com_mensagem`.
 - GENIA-LOA-006 [implementado] O usuário é informado da falha da I.A. em cada fluxo:
   - geração manual da finalidade (Ctrl+clique no campo): resposta 400 com a mensagem, exibida como
-    mensagem suspensa da tela (LOA-AGR-090). O campo volta ao texto gravado. Evidência: `cmj/api/loa/views/agrupamento.py:80-82`. Teste:
+    mensagem suspensa da tela (LOA-AGR-090). O campo volta ao texto gravado. Evidência: `cmj/api/loa/views/agrupamento.py:85-87`. Teste:
     `test_geracao_manual_responde_400_com_mensagem`.
   - inclusão e remoção de emenda: a operação é concluída e a resposta traz `aviso_finalidade` e a
     finalidade atualizada (`agrupamento_finalidade`), e a tela exibe o aviso como mensagem suspensa
@@ -58,12 +58,14 @@ finalidade de um agrupamento. As regras do agrupamento estão em `docs/specs/loa
     `_templates/v2018/loa/pdf/agrupamento_preview.html:40-44`.
   - geração das emendas coletivas: resposta 400 com a mensagem, exibida como mensagem suspensa
     (LOA-AGR-090). Evidência:
-    `cmj/api/loa/views/agrupamento.py:89-106`. Teste:
+    `cmj/api/loa/views/agrupamento.py:94-111`. Teste:
     `test_geracao_da_coletiva_interrompe_com_mensagem`.
 
 ## Decisões
 
-- D1. O serviço continua isento de cota, com modelo fixo no código (GENIA-LOA-001).
+- D1. O serviço continua isento de cota, com modelo fixo no código (GENIA-LOA-001). Desde
+  LOA-AGR-003, todo fluxo que chama a I.A. exige `emendaloa_full_editor`, inclusive a prévia do
+  agrupamento.
 - D2. Erro da I.A. é informado ao usuário em vez de virar finalidade vazia sem aviso
   (GENIA-LOA-002). A geração manual da finalidade e a geração das emendas coletivas respondem com
   erro e a mensagem. Na inclusão e na remoção de emenda, a operação é concluída e a resposta traz um

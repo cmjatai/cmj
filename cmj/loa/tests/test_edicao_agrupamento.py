@@ -296,3 +296,62 @@ def test_falha_da_ia_no_ctrl_clique_mantem_digitada(
     assert r.status_code == 400
     com_emenda.refresh_from_db()
     assert (com_emenda.finalidade, com_emenda.finalidade_manual) == ("Digitada", True)
+
+
+# ------------------------------------------------- prévia exige permissão (D5)
+
+
+def pdf_vazio(*args, **kwargs):
+    import pymupdf
+
+    doc = pymupdf.Document()
+    doc.new_page()
+    return doc.tobytes()
+
+
+def get_previa(client, agrupamento):
+    with mock.patch("cmj.api.loa.views.agrupamento.make_pdf", pdf_vazio):
+        return client.get(f"/api/loa/agrupamento/{agrupamento.pk}/view/?model=1")
+
+
+@pytest.fixture
+def sem_finalidade(agrupamento, make_emenda):
+    """Sem finalidade, a prévia pediria a finalidade automática à I.A."""
+    agrupamento.finalidade = ""
+    agrupamento.save()
+    for _ in range(2):
+        el = make_emenda(fase=EC, permite_juncao_coletiva=True)
+        AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento, emendaloa=el)
+    return agrupamento
+
+
+@pytest.mark.spec("LOA-AGR-003")
+@pytest.mark.parametrize("perfil", ["anonimo", "autor"])
+def test_previa_recusa_quem_nao_edita_e_nao_chama_ia(
+    request, client, perfil, sem_finalidade
+):
+    if perfil != "anonimo":
+        client.force_login(request.getfixturevalue(perfil))
+
+    with mock.patch(GERAR) as gerar:
+        r = get_previa(client, sem_finalidade)
+
+    assert r.status_code in (401, 403)
+    assert not gerar.called
+
+
+@pytest.mark.spec("LOA-AGR-003")
+def test_previa_liberada_para_editor_contabil(client, editor_contabil, sem_finalidade):
+    client.force_login(editor_contabil)
+
+    with mock.patch(GERAR, return_value="gerada") as gerar:
+        r = get_previa(client, sem_finalidade)
+
+    assert r.status_code == 200
+    assert r["Content-Type"] == "application/pdf"
+    assert gerar.called
+
+
+@pytest.mark.spec("LOA-AGR-002")
+def test_detalhe_do_agrupamento_na_api_continua_publico(client, agrupamento):
+    assert client.get(f"/api/loa/agrupamento/{agrupamento.pk}/").status_code == 200

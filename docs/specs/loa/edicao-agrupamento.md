@@ -1,6 +1,6 @@
 # LOA: edição do agrupamento
 
-Status: observado; D1 a D3 implementadas (LOA-AGR-053, 082, 083 e 090)
+Status: observado; D1 a D3 e D5 implementadas (LOA-AGR-003, 053, 082, 083 e 090)
 Última verificação: 2026-11-20 (commit `2156e76ea`)
 Código principal: `cmj/loa/views/v_agrupamento.py`, `cmj/loa/forms/f_agrupamento.py`,
 `cmj/loa/models/m_agrupamento.py`, `cmj/loa/signals.py`, `cmj/api/loa/views/agrupamento.py`,
@@ -32,6 +32,15 @@ O agrupamento reúne emendas que recebem os mesmos registros contábeis, definid
 de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e entidade.
 
 ## Regras acordadas
+
+### Pré-visualização exige permissão de edição (D5, decidida em 2026-11-20)
+
+- LOA-AGR-003 [implementado] O GET de `/api/loa/agrupamento/<pk>/view/` exige `emendaloa_full_editor`,
+  a mesma permissão da tela de edição, a única que tem link para a prévia. Anônimo e usuário sem a
+  permissão são recusados antes de montar o PDF, então a I.A. não é chamada (LOA-AGR-070). Listagem e
+  detalhe da API continuam públicos (LOA-AGR-002). As coletivas já geradas são emendas e seguem o
+  `/view/` da emenda (LOA-EMD-085). Evidência: `cmj/api/loa/views/agrupamento.py:24-27`,
+  `cmj/api/loa/views/agrupamento.py:134-141`.
 
 ### Emenda devolvida bloqueia a liberação (D1, decidida em 2026-11-20)
 
@@ -82,8 +91,8 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
 
   Substitui, para a finalidade digitada, o "em todos os casos" de LOA-AGR-050. Evidência:
   `cmj/loa/models/m_agrupamento.py:22-34`, `cmj/loa/models/m_agrupamento.py:60-65`,
-  `cmj/loa/models/m_agrupamento.py:188-232`, `cmj/api/loa/views/agrupamento.py:24-31`,
-  `cmj/api/loa/views/agrupamento.py:77`, `cmj/api/loa/views/agrupamentoemendaloa.py:72-86`,
+  `cmj/loa/models/m_agrupamento.py:188-232`, `cmj/api/loa/views/agrupamento.py:29-36`,
+  `cmj/api/loa/views/agrupamento.py:82`, `cmj/api/loa/views/agrupamentoemendaloa.py:72-86`,
   `cmj/loa/forms/f_agrupamento.py:69-76`, `cmj/loa/migrations/0027_agrupamento_finalidade_manual.py`.
 
 ### Mensagens da tela (D1, decidida em 2026-11-20)
@@ -120,7 +129,8 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   `cmj/loa/views/v_agrupamento.py:132-133`, `cmj/globalrules/map_rules.py:270-284`.
 - LOA-AGR-002 [observado] Na API de `agrupamento`, `agrupamentoemendaloa` e
   `agrupamentoregistrocontabil`, todo POST, PATCH e DELETE exige `emendaloa_full_editor`, inclusive
-  as actions. Os GET exigem só as permissões públicas de listagem e detalhe. Evidência:
+  as actions. Os GET exigem só as permissões públicas de listagem e detalhe, salvo a prévia
+  (LOA-AGR-003). Evidência:
   `cmj/api/loa/views/agrupamento.py:13-22`, `cmj/api/loa/views/agrupamentoemendaloa.py:15-24`,
   `cmj/api/loa/views/agrupamentoregistrocontabil.py:291-300`, `sapl/api/permissions.py:12-24`,
   `sapl/api/permissions.py:50-56`.
@@ -135,7 +145,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   agrupamento com o nome "<nome> (Cópia N)" e a mesma LOA. A cópia leva os registros contábeis
   (despesa, percentual e operação), mas não leva as emendas nem a finalidade. Depois, a tela abre a
   edição da cópia. Evidência: `cmj/loa/models/m_agrupamento.py:111-131`,
-  `cmj/api/loa/views/agrupamento.py:50-63`,
+  `cmj/api/loa/views/agrupamento.py:55-68`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:103-109`.
 
 ### Layout da tela
@@ -198,7 +208,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   - parlamentares;
   - fase: vermelha na 10, amarela na 12 e verde nas demais.
 
-  Evidência: `cmj/api/loa/views/agrupamento.py:33-48`,
+  Evidência: `cmj/api/loa/views/agrupamento.py:38-53`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:349-388`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:483-514`.
 - LOA-AGR-041 [observado] A busca de emendas exige ao menos 3 letras e consulta
@@ -244,7 +254,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   (`PATCH /api/loa/agrupamento/<pk>/generate_finalidade_global/`). Enquanto espera, o campo fica
   somente leitura com "Atualizando com I.A...". Se a geração falha, o erro aparece como mensagem
   (LOA-AGR-090) e o campo volta ao texto gravado no servidor, editável. Substitui a digitada
-  (LOA-AGR-053). Evidência: `cmj/api/loa/views/agrupamento.py:65-82`,
+  (LOA-AGR-053). Evidência: `cmj/api/loa/views/agrupamento.py:70-87`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:534-557`.
 - LOA-AGR-052 [observado] Ao abrir a tela e depois de cada inclusão ou remoção, o campo de finalidade
   mostra "Atualizando..." até receber o valor do servidor. Evidência:
@@ -276,8 +286,9 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   - Sem coletiva possível, o PDF tem uma página "Nenhuma Emenda gerada", com o total de emendas e de
     conjuntos.
   - Se o agrupamento não tem finalidade, a prévia pede a finalidade automática à I.A. (GENIA-LOA-005).
+  - Só quem edita o agrupamento abre a prévia (LOA-AGR-003).
 
-  Evidência: `cmj/api/loa/views/agrupamento.py:129-235`, `cmj/loa/models/m_agrupamento.py:234-326`,
+  Evidência: `cmj/api/loa/views/agrupamento.py:134-240`, `cmj/loa/models/m_agrupamento.py:234-326`,
   `cmj/loa/forms/f_agrupamento.py:113-117`.
 - LOA-AGR-071 [observado] "Gerar Emendas Coletivas"
   (`POST /api/loa/agrupamento/<pk>/gerar_emenda_coletiva/`) cria uma coletiva por conjunto com mais
@@ -317,12 +328,9 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
 
 Ordenadas por risco.
 
-Em 2026-11-20, D1 virou LOA-AGR-082 e LOA-AGR-090, D2 virou LOA-AGR-083 e D3 virou LOA-AGR-053.
+Em 2026-11-20, D1 virou LOA-AGR-082 e LOA-AGR-090, D2 virou LOA-AGR-083, D3 virou LOA-AGR-053 e
+D5 virou LOA-AGR-003.
 
-- D5. **A pré-visualização pública chama a I.A.** O GET de `/view/` é público (LOA-AGR-002). Sem
-  finalidade no agrupamento, cada acesso chama o modelo de I.A. (LOA-AGR-070), o que gera custo sem
-  autenticação e sem cota (D1 de `ementa-emenda-coletiva.md`). A prévia deve exigir permissão de
-  edição?
 - D6. **A inclusão substitui os registros contábeis da emenda.** Os registros que o editor fez na tela
   da emenda são trocados pelos percentuais do agrupamento (LOA-AGR-042). Na remoção, a emenda fica
   sem nenhum registro (LOA-AGR-043). É o comportamento desejado, ou a emenda deveria guardar os
