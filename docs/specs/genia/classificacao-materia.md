@@ -65,20 +65,20 @@ em `Metadata` na chave `genia`.
 - GENIA-CLA-013 [observado] A task `task_classifica_materialegislativa` classifica uma matéria por
   execução, de 2024 ou anterior, e está desativada. Evidência: `sapl/base/tasks.py:56-125`.
 
-## Dúvidas
+## Decisões
 
-- D1. A geração apaga todos os `Metadata` do objeto antes de chamar a I.A. (GENIA-CLA-008). Uma falha
-  de cota ou de API deixa a matéria sem análise. A remoção deve acontecer só depois de a nova análise
-  estar pronta, e só da chave `genia`?
-- D2. O `ia_model_name` do YAML é ignorado (GENIA-CLA-002). Ele deveria restringir a cota a esse
-  modelo, ou o campo pode sair do YAML?
-- D3. Sem cota, o erro é engolido (GENIA-CLA-010) e o usuário vê a mensagem genérica. Deve informar
-  que a cota acabou?
-- D4. Na ação `generate` com `request`, `temperature`, `top_k` e `top_p` lidos da query string ficam
-  como texto (`cmj/utils/genia/classificacao.py:97-99`) até o YAML sobrescrevê-los. Se o YAML não
-  trouxer o parâmetro, o texto segue para a API. A conversão deve ser feita na leitura?
-- D5. `yaml.load` usa `FullLoader` em texto editável no cadastro de tipos de matéria
-  (`cmj/utils/genia/classificacao.py:140`). Trocar por `safe_load`?
+- D1. A análise anterior só é substituída depois que a nova estiver pronta, e só a chave `genia` do
+  `Metadata` é alterada ou removida. As outras chaves do registro são preservadas (GENIA-CLA-008).
+- D2. `ia_model_name` sai do YAML do prompt: o modelo é sempre o da cota (GENIA-CLA-002). Uma
+  migration de dados remove o campo dos prompts gravados em `TipoMateriaLegislativa`, sem reescrever
+  o restante do texto.
+- D3. Sem cota, o usuário recebe um aviso (`messages.warning`) de que não há cota disponível e de
+  que a análise anterior foi mantida. A cota é obtida antes da extração de texto, para não fazer OCR
+  à toa (GENIA-CLA-010).
+- D4. `temperature`, `top_k` e `top_p` são convertidos na leitura. `generate` usa só o YAML e os
+  padrões da classe; `generate_custom` usa a query string, e valor inválido não gera análise.
+- D5. O YAML do prompt é lido com `yaml.safe_load`, que só constrói tipos básicos. O resultado é o
+  mesmo para os prompts existentes, sem aceitar tags `!!python/*`.
 
 ## Fora do escopo
 
