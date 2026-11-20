@@ -178,6 +178,8 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
 - `docs/specs/loa/fases-emenda.md`: comportamento atual das fases da emenda. Leia antes de alterá-las.
 - `docs/specs/loa/edicao-emenda.md`: telas de criação e edição da emenda, API usada por elas e
   autosave. Leia antes de alterar essas telas.
+- `docs/specs/loa/edicao-agrupamento.md`: tela de edição do agrupamento, registros contábeis,
+  emendas coletivas e autosave. Leia antes de alterar essa tela.
 
 ## A confirmar
 
