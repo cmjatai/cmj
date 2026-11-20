@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
 from cmj.loa.models import AgrupamentoEmendaLoa, EmendaLoa
-from cmj.loa.models.m_agrupamento import Agrupamento
+from cmj.loa.models.m_agrupamento import Agrupamento, FinalidadeManualRemovida
 from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetivaError
 
 logger = logging.getLogger(__name__)
@@ -71,10 +71,14 @@ class AgrupamentoEmendaLoaViewSet:
 
     @staticmethod
     def atualizar_finalidade(agrupamento):
-        """Gera a finalidade com I.A. e devolve o aviso de falha da I.A., ou ""."""
+        """Gera a finalidade com I.A. e devolve o aviso para a tela, ou "".
+
+        Há aviso quando a I.A. falha e quando a finalidade digitada é apagada
+        (LOA-AGR-053).
+        """
         try:
             agrupamento.update_finalidade_com_ia()
-        except IAEmentaEmendaColetivaError as e:
+        except (IAEmentaEmendaColetivaError, FinalidadeManualRemovida) as e:
             return str(e)
         except Exception as e:
             # sem emendas ou com unidades e entidades diferentes não há aviso

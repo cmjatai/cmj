@@ -21,6 +21,15 @@ class AgrupamentoViewSet:
 
     permission_classes = (AgrupamentoPermission,)
 
+    def perform_update(self, serializer):
+        # LOA-AGR-053: finalidade enviada pelo autosave é digitada; vazia volta ao
+        # modo automático
+        if "finalidade" in serializer.validated_data:
+            finalidade = serializer.validated_data["finalidade"] or ""
+            serializer.save(finalidade_manual=bool(finalidade.strip()))
+            return
+        serializer.save()
+
     @action(
         methods=[
             "get",
@@ -65,7 +74,7 @@ class AgrupamentoViewSet:
         finalidade_global = ""
         try:
             if agrupamento:
-                agrupamento.update_finalidade_com_ia()
+                agrupamento.update_finalidade_com_ia(forcar=True)
                 finalidade_global = agrupamento.finalidade
             return JsonResponse({"finalidade_global": finalidade_global})
         except (ValueError, IAEmentaEmendaColetivaError) as e:

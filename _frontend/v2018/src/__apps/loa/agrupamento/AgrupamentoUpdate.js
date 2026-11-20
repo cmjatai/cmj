@@ -351,10 +351,7 @@ export default class AgrupamentoUpdate {
     const busca_render_emendaloa = this.form.find('.busca-render-emendaloa')
 
     this.form.find('#id_finalidade').val('Atualizando...')
-    axios.get(`/api/loa/agrupamento/${this.pk}/`)
-      .then((response) => {
-        this.form.find('#id_finalidade').val(response.data.finalidade || '')
-      })
+    this.carregarFinalidade()
 
     axios.get(`/api/loa/agrupamento/${this.pk}/emendas/?&get_all=true`)
       .then((response) => {
@@ -468,10 +465,18 @@ export default class AgrupamentoUpdate {
       })
   }
 
+  // Mostra a finalidade gravada no servidor
+  carregarFinalidade () {
+    return axios.get(`/api/loa/agrupamento/${this.pk}/`)
+      .then((response) => {
+        this.form.find('#id_finalidade').val(response.data.finalidade || '')
+      })
+  }
+
   alertAvisoFinalidade (aviso) {
-    // falha da I.A. ao gerar a finalidade: a inclusão/remoção foi feita
+    // falha da I.A. ou finalidade digitada apagada (LOA-AGR-053): a inclusão/remoção foi feita
     if (aviso) {
-      this.mostrarMensagem(aviso, 'warning', 'Finalidade não gerada.')
+      this.mostrarMensagem(aviso, 'warning', 'Finalidade do agrupamento.')
     }
   }
 
@@ -528,22 +533,24 @@ export default class AgrupamentoUpdate {
 
     this.form.find('textarea[name="finalidade"]').on('click', (event) => {
       if (!event.ctrlKey) return
-      const textarea = event.target
-      this.form.find('textarea[name="finalidade"]').prop('readonly', true)
-      this.form.find('textarea[name="finalidade"]').val('Atualizando com I.A...')
+      const textarea = this.form.find('textarea[name="finalidade"]')
+      textarea.prop('readonly', true)
+      textarea.val('Atualizando com I.A...')
       axios.patch(`${this.urlBase}/generate_finalidade_global/`)
         .then((response) => {
-          const finalidadeGlobal = response.data.finalidade_global
-          if (finalidadeGlobal) {
-            textarea.value = finalidadeGlobal
-          }
-          this.form.find('textarea[name="finalidade"]').prop('readonly', false)
+          textarea.val(response.data.finalidade_global || '')
+          textarea.prop('readonly', false)
         })
         .catch((error) => {
-          this.form.find('textarea[name="finalidade"]').val(error.response?.data?.error || error.message)
-          setTimeout(() => {
-            this.form.find('textarea[name="finalidade"]').prop('readonly', false)
-          }, 5000)
+          // o erro vai para a mensagem e o campo volta ao texto gravado, para que o erro
+          // não seja gravado como finalidade digitada (LOA-AGR-051 e 053)
+          this.mostrarMensagem(
+            error.response?.data?.error || error.message,
+            'danger',
+            'Erro ao gerar a finalidade com I.A.'
+          )
+          this.carregarFinalidade()
+            .finally(() => textarea.prop('readonly', false))
         })
     })
 

@@ -69,8 +69,9 @@ class AgrupamentoForm(ModelForm):
     finalidade = forms.CharField(
         label="Finalidade",
         required=False,
-        help_text='Inserções ou remoções de Emenda geram "finalidade" automaticamente quando não há multiplicidade de Unidades e Entidades.'
-        " Dê Ctrl+Clique para atualização por I.A. Sem Texto a I.A. criará Finalidade Automática quando for possível. Edição manual só é mantida ao final das inserções ou remoções de Emenda.",
+        help_text='Inserções ou remoções de Emenda geram "finalidade" automaticamente quando todas as Emendas têm a mesma Unidade e Entidade.'
+        " A finalidade digitada é mantida nas inserções e remoções, mas é apagada se as Unidades ou Entidades passarem a ser diferentes."
+        " Apague o texto para voltar à finalidade automática. Dê Ctrl+Clique para gerar de novo por I.A., substituindo o texto.",
         widget=forms.Textarea(attrs={"rows": 3}),
     )
 

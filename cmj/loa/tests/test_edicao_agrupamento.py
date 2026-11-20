@@ -8,12 +8,16 @@ from django.contrib.messages import get_messages
 from model_mommy import mommy
 
 from cmj.loa.models import (
+    Agrupamento,
     AgrupamentoEmendaLoa,
     AgrupamentoRegistroContabil,
     Despesa,
     EmendaLoa,
+    UnidadeOrcamentaria,
 )
+from cmj.loa.models.m_agrupamento import FinalidadeManualRemovida
 from cmj.loa.tests.conftest import recarregar
+from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetivaError
 
 pytestmark = pytest.mark.django_db
 
@@ -145,3 +149,150 @@ def test_liberacao_nao_informa_quando_nao_ha_conjunto_para_juntar(
     assert r.status_code == 302
     assert recarregar(sozinha).fase == LC
     assert not [m for m in mensagens(r) if m[0] == "info"]
+
+
+# ------------------------------------------------- finalidade digitada (D3)
+
+# lido no import, antes do mock autouse do conftest
+UPDATE_FINALIDADE_ORIGINAL = Agrupamento.update_finalidade_com_ia
+GERAR = "cmj.loa.models.m_agrupamento.IAEmentaEmendaColetiva.gerar_finalidade_global"
+
+
+@pytest.fixture
+def ia_real():
+    """Desfaz o mock de update_finalidade_com_ia do conftest."""
+    with mock.patch.object(
+        Agrupamento, "update_finalidade_com_ia", UPDATE_FINALIDADE_ORIGINAL
+    ):
+        yield
+
+
+@pytest.fixture
+def com_emenda(agrupamento, make_emenda):
+    el = make_emenda(fase=EC)
+    AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento, emendaloa=el)
+    return agrupamento
+
+
+def digitar(client, agrupamento, texto):
+    return client.patch(
+        f"/api/loa/agrupamento/{agrupamento.pk}/", {"finalidade": texto}, format="json"
+    )
+
+
+def incluir(client, agrupamento, emenda):
+    return client.post(
+        "/api/loa/agrupamentoemendaloa/",
+        {"agrupamento": agrupamento.pk, "emendaloa": emenda.pk},
+        format="json",
+    )
+
+
+@pytest.mark.spec("LOA-AGR-053")
+def test_autosave_marca_finalidade_digitada_e_vazia_volta_ao_automatico(
+    api, editor_contabil, agrupamento
+):
+    client = api(editor_contabil)
+
+    digitar(client, agrupamento, "Digitada")
+    agrupamento.refresh_from_db()
+    assert (agrupamento.finalidade, agrupamento.finalidade_manual) == ("Digitada", True)
+
+    digitar(client, agrupamento, "  ")
+    agrupamento.refresh_from_db()
+    assert agrupamento.finalidade_manual is False
+
+
+@pytest.mark.spec("LOA-AGR-053")
+def test_autosave_de_outro_campo_nao_marca_finalidade(
+    api, editor_contabil, agrupamento
+):
+    api(editor_contabil).patch(
+        f"/api/loa/agrupamento/{agrupamento.pk}/", {"nome": "Outro"}, format="json"
+    )
+
+    agrupamento.refresh_from_db()
+    assert agrupamento.finalidade_manual is False
+
+
+@pytest.mark.spec("LOA-AGR-053")
+def test_inclusao_mantem_finalidade_digitada_sem_chamar_ia(
+    ia_real, api, editor_contabil, com_emenda, make_emenda
+):
+    client = api(editor_contabil)
+    digitar(client, com_emenda, "Digitada")
+
+    with mock.patch(GERAR) as gerar:
+        r = incluir(client, com_emenda, make_emenda(fase=EC))
+
+    assert r.status_code == 201
+    assert not gerar.called
+    assert (r.data["agrupamento_finalidade"], r.data["aviso_finalidade"]) == (
+        "Digitada",
+        "",
+    )
+
+
+@pytest.mark.spec("LOA-AGR-053")
+def test_inclusao_com_unidade_diferente_apaga_digitada_e_avisa(
+    ia_real, api, editor_contabil, com_emenda, make_emenda, loa
+):
+    client = api(editor_contabil)
+    digitar(client, com_emenda, "Digitada")
+    outra_unidade = mommy.make(UnidadeOrcamentaria, loa=loa, codigo="02")
+
+    r = incluir(client, com_emenda, make_emenda(fase=EC, unidade=outra_unidade))
+
+    assert r.status_code == 201
+    assert r.data["agrupamento_finalidade"] == ""
+    assert r.data["aviso_finalidade"] == FinalidadeManualRemovida.MENSAGEM
+    com_emenda.refresh_from_db()
+    assert com_emenda.finalidade_manual is False
+
+
+@pytest.mark.spec("LOA-AGR-053")
+def test_inclusao_com_unidade_diferente_sem_digitada_nao_avisa(
+    ia_real, api, editor_contabil, com_emenda, make_emenda, loa
+):
+    outra_unidade = mommy.make(UnidadeOrcamentaria, loa=loa, codigo="02")
+
+    r = incluir(
+        api(editor_contabil),
+        com_emenda,
+        make_emenda(fase=EC, unidade=outra_unidade),
+    )
+
+    assert r.data["agrupamento_finalidade"] == ""
+    assert r.data["aviso_finalidade"] == ""
+
+
+@pytest.mark.spec("LOA-AGR-053")
+def test_ctrl_clique_substitui_digitada(ia_real, api, editor_contabil, com_emenda):
+    client = api(editor_contabil)
+    digitar(client, com_emenda, "Digitada")
+
+    with mock.patch(GERAR, return_value="gerada"):
+        r = client.patch(
+            f"/api/loa/agrupamento/{com_emenda.pk}/generate_finalidade_global/"
+        )
+
+    assert r.json() == {"finalidade_global": "gerada"}
+    com_emenda.refresh_from_db()
+    assert (com_emenda.finalidade, com_emenda.finalidade_manual) == ("gerada", False)
+
+
+@pytest.mark.spec("LOA-AGR-053")
+def test_falha_da_ia_no_ctrl_clique_mantem_digitada(
+    ia_real, api, editor_contabil, com_emenda
+):
+    client = api(editor_contabil)
+    digitar(client, com_emenda, "Digitada")
+
+    with mock.patch(GERAR, side_effect=IAEmentaEmendaColetivaError()):
+        r = client.patch(
+            f"/api/loa/agrupamento/{com_emenda.pk}/generate_finalidade_global/"
+        )
+
+    assert r.status_code == 400
+    com_emenda.refresh_from_db()
+    assert (com_emenda.finalidade, com_emenda.finalidade_manual) == ("Digitada", True)

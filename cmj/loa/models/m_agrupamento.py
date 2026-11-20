@@ -19,6 +19,20 @@ from cmj.utils.genia.loa_agrupamento import (
 from sapl.parlamentares.models import Parlamentar
 
 
+class FinalidadeManualRemovida(ValueError):
+    """A finalidade digitada foi apagada porque as emendas deixaram de ter a mesma
+    unidade e entidade (LOA-AGR-053)."""
+
+    MENSAGEM = (
+        "A finalidade digitada foi apagada porque as emendas do agrupamento não têm "
+        "mais a mesma unidade e entidade. Cada emenda coletiva receberá a finalidade "
+        "automática do seu conjunto."
+    )
+
+    def __init__(self, mensagem=MENSAGEM):
+        super().__init__(mensagem)
+
+
 class Agrupamento(models.Model):
     SAUDE = 10
     DIVERSOS = 99
@@ -42,6 +56,13 @@ class Agrupamento(models.Model):
     )
 
     finalidade = models.TextField(verbose_name=_("Finalidade"), blank=True, default="")
+
+    # LOA-AGR-053: finalidade digitada pelo editor, mantida nas inclusões e remoções
+    finalidade_manual = models.BooleanField(
+        verbose_name=_("Finalidade digitada manualmente"),
+        default=False,
+        db_default=False,
+    )
 
     emendas = models.ManyToManyField(
         "loa.EmendaLoa",
@@ -164,7 +185,12 @@ class Agrupamento(models.Model):
             e for emendas in conjuntos.values() if len(emendas) > 1 for e in emendas
         ]
 
-    def update_finalidade_com_ia(self):
+    def update_finalidade_com_ia(self, forcar=False):
+        """Gera a finalidade por I.A. (LOA-AGR-050 e 053).
+
+        Sem forcar (inclusão e remoção de emenda), a finalidade digitada é mantida e a
+        I.A. não é chamada. forcar=True (Ctrl+clique) substitui também a digitada.
+        """
 
         # verifica se todas as emendas são tem a mesma unidade e entidade
         emendas = list(self.emendas.values("unidade", "entidade"))
@@ -179,20 +205,31 @@ class Agrupamento(models.Model):
                 break
 
         if error:
+            era_manual = self.finalidade_manual and bool(self.finalidade.strip())
             self.finalidade = ""
-            self.save(update_fields=["finalidade"])
+            self.finalidade_manual = False
+            self.save(update_fields=["finalidade", "finalidade_manual"])
+            if era_manual:
+                raise FinalidadeManualRemovida()
             raise ValueError(
                 "É necessário que todas as emendas possuam a mesma unidade e entidade."
             )
+
+        if self.finalidade_manual and not forcar:
+            return
+
         try:
             ia = IAEmentaEmendaColetiva([str(e.finalidade) for e in self.emendas.all()])
             self.finalidade = ia.gerar_finalidade_global()
         except IAEmentaEmendaColetivaError:
-            # finalidade limpa e erro repassado para ser exibido ao usuário
-            self.finalidade = ""
-            self.save(update_fields=["finalidade"])
+            # erro repassado para ser exibido ao usuário; a finalidade gerada antes é
+            # limpa, mas a digitada é mantida (LOA-AGR-053)
+            if not self.finalidade_manual:
+                self.finalidade = ""
+                self.save(update_fields=["finalidade"])
             raise
-        self.save(update_fields=["finalidade"])
+        self.finalidade_manual = False
+        self.save(update_fields=["finalidade", "finalidade_manual"])
 
     def preparar_dados_para_coletiva(self, for_preview=False):
 
