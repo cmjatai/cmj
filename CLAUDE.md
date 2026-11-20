@@ -103,8 +103,9 @@ Fora de uso: `cmj/legacy_cep`, `cmj/checklist` e `sapl/lexml` não estão em `IN
 - **Solr**: índices só em `cmj/search/search_indexes.py` e `cmj/arq/search_indexes.py`. Model novo
   entra também em `MODELS_SOLR_*` de `cmj/haystack.py`.
 - **WebSocket**: `consumers.py` e `routing.py` em `core`, `painelset` e `search`, somados em `cmj/asgi.py`.
-- **Camadas**: a lógica fica em views, models, forms e signals. Só `cmj/loa` tem `services/`.
-  Não introduza camadas novas em outros apps sem pedido.
+- **Camadas**: no legado, a lógica fica em views, models, forms e signals; não a mova sem pedido.
+  Funcionalidade nova concentra a regra de negócio em `<app>/services/s_*.py`, no app mais
+  adequado, e views, API, forms e frontend fazem só o essencial. Detalhes na skill `spec-nova`.
 - **Ambiente**: leia variáveis com `config` de `cmj/settings/zenv.py`.
 - **Estilo Python**: black (padrão, sem config no repo) e isort com `--profile black`.
 
@@ -169,6 +170,9 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
 
 ## Documentação
 
+- `docs/specs/README.md`: convenções das specs (marcadores, IDs, varredura de segurança,
+  publicação). Leia antes de criar ou alterar uma spec. Skills: `spec-legado` para comportamento
+  existente, `spec-nova` para funcionalidade nova.
 - `docs/rag/README.md`: índice do chat RAG, com arquitetura, ingestão, recuperação, WebSocket/LLM,
   modelos, operação, diagnóstico e avaliação (`docs/rag/01` a `08`). Leia antes de mexer em `cmj/search`.
 - `docs/commands/ocrmypdf_command.md`: command `ocrmypdf`.
