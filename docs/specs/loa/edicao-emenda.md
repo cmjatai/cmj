@@ -327,8 +327,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:109-172`.
 - LOA-EMD-051 [observado] A pré-visualização mostra a primeira página do documento como imagem, gerada
   por `GET /api/loa/emendaloa/<pk>/view/?page=1`. A imagem é um link para o PDF completo. Os controles
-  "Entrelinha (%)" (100 a 350, passo 5) e "Incluir espaço para Assinaturas" refazem a imagem enviando
-  `lineHeight` e `espacoAssinatura` na URL. Evidência:
+  "Entrelinha (%)" (100 a 300, passo 5, o mesmo limite do servidor) e "Incluir espaço para
+  Assinaturas" refazem a imagem enviando `lineHeight` e `espacoAssinatura` na URL. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:40-100`.
 - LOA-EMD-052 [observado] O GET de `/view/` grava em `metadata.style` a entrelinha recebida, limitada a
   100–300 no servidor, e o espaço para assinaturas. Assim, uma requisição GET altera a emenda.

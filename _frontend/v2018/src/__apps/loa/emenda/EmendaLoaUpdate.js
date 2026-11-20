@@ -162,7 +162,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
               name="lineHeight" value="${lineHeight}"
               step="5"
               min="100"
-              max="350"
+              max="300"
               class="numberinput form-control text-center"
               id="id_lineHeight">
           </label>
