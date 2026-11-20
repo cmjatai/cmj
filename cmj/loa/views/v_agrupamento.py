@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.db.models import Case, Value, When
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -146,6 +147,21 @@ class AgrupamentoCrud(MasterDetailCrud):
             initial["loa"] = self.object.loa
             initial["user"] = self.request.user
             return initial
+
+        def form_valid(self, form):
+            response = super().form_valid(form)
+            # LOA-AGR-083: avisa, sem bloquear, que emendas que permitem junção
+            # foram liberadas sem virar coletiva
+            n = getattr(form, "liberadas_sem_juncao", 0)
+            if n:
+                messages.info(
+                    self.request,
+                    _(
+                        "{} emenda(s) que permitem junção em emenda coletiva "
+                        "foram liberadas individualmente, sem junção."
+                    ).format(n),
+                )
+            return response
 
         def get_success_url(self):
             return reverse(

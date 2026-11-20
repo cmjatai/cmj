@@ -298,6 +298,14 @@ class AgrupamentoForm(ModelForm):
         if not self.instance.pk:
             return ModelForm.save(self, commit=commit)
 
+        # LOA-AGR-083: gerar as coletivas é opcional; as que poderiam ser juntadas e são
+        # liberadas agora ficam registradas para a mensagem informativa da view
+        self.liberadas_sem_juncao = sum(
+            1
+            for e in self.instance.emendas_sem_juncao()
+            if 0 < e.fase < EmendaLoa.LIBERACAO_CONTABIL
+        )
+
         try:
             # self.instance.gerar_emendas_coletivas()
 

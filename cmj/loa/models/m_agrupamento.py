@@ -146,6 +146,24 @@ class Agrupamento(models.Model):
                     insercoes[-1].valor = insercoes[-1].valor + resto
                     insercoes[-1].save()
 
+    def emendas_sem_juncao(self):
+        """Emendas que formariam coletiva se "Gerar Emendas Coletivas" fosse chamado agora.
+
+        Mesmo critério de preparar_dados_para_coletiva e gerar_emendas_coletivas, sem a I.A.:
+        permitem junção, não têm matéria, não estão na fase -10 e estão num conjunto de unidade
+        e entidade com mais de uma emenda (LOA-AGR-083).
+        """
+        conjuntos = {}
+        for emenda in self.emendas.all():
+            if not emenda.permite_juncao_coletiva or emenda.materia_id:
+                continue
+            key = (emenda.unidade_id, emenda.entidade_id)
+            conjuntos.setdefault(key, []).append(emenda)
+
+        return [
+            e for emendas in conjuntos.values() if len(emendas) > 1 for e in emendas
+        ]
+
     def update_finalidade_com_ia(self):
 
         # verifica se todas as emendas são tem a mesma unidade e entidade

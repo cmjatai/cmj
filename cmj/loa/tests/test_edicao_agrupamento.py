@@ -4,6 +4,7 @@ from decimal import Decimal
 from unittest import mock
 
 import pytest
+from django.contrib.messages import get_messages
 from model_mommy import mommy
 
 from cmj.loa.models import (
@@ -98,3 +99,49 @@ def test_liberacao_sem_devolvidas_leva_para_17(
 
     assert r.status_code == 302
     assert recarregar(el).fase == LC
+
+
+def mensagens(response):
+    return [(m.level_tag, str(m)) for m in get_messages(response.wsgi_request)]
+
+
+@pytest.mark.spec("LOA-AGR-083")
+def test_liberacao_sem_gerar_coletivas_libera_e_informa(
+    client, editor_contabil, make_emenda, agrupamento_liberavel
+):
+    juntaveis = [make_emenda(fase=EC, permite_juncao_coletiva=True) for _ in range(2)]
+    for el in juntaveis:
+        AgrupamentoEmendaLoa.objects.create(
+            agrupamento=agrupamento_liberavel, emendaloa=el
+        )
+
+    client.force_login(editor_contabil)
+    r = liberar(client, agrupamento_liberavel)
+
+    assert r.status_code == 302
+    assert all(recarregar(el).fase == LC for el in juntaveis)
+    assert not agrupamento_liberavel.emendas_coletivas_geradas.exists()
+    assert (
+        "info",
+        "2 emenda(s) que permitem junção em emenda coletiva foram liberadas "
+        "individualmente, sem junção.",
+    ) in mensagens(r)
+
+
+@pytest.mark.spec("LOA-AGR-083")
+def test_liberacao_nao_informa_quando_nao_ha_conjunto_para_juntar(
+    client, editor_contabil, make_emenda, agrupamento_liberavel
+):
+    sozinha = make_emenda(fase=EC, permite_juncao_coletiva=True)
+    sem_juncao = make_emenda(fase=EC, permite_juncao_coletiva=False)
+    for el in (sozinha, sem_juncao):
+        AgrupamentoEmendaLoa.objects.create(
+            agrupamento=agrupamento_liberavel, emendaloa=el
+        )
+
+    client.force_login(editor_contabil)
+    r = liberar(client, agrupamento_liberavel)
+
+    assert r.status_code == 302
+    assert recarregar(sozinha).fase == LC
+    assert not [m for m in mensagens(r) if m[0] == "info"]
