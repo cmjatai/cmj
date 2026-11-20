@@ -79,7 +79,9 @@ class IAAnaliseSimilaridadeService(IAGenaiBase):
         _save = kwargs.get("save", True)
 
         prompt = self.make_prompt_from_similaridade(similaridade)
-        answer = self.generate_content(prompt, ascending=False)
+        answer = self.generate_content(
+            prompt, ascending=False, quota=kwargs.get("quota")
+        )
 
         self.apply_answer(similaridade, answer.text, logger=_logger)
         if _save:
@@ -96,6 +98,9 @@ class IAAnaliseSimilaridadeService(IAGenaiBase):
 
         get_threads = quota.get_threads
         batch_size = quota.batch_size
+
+        # mesmos parâmetros de geração da execução síncrona
+        generation_config = self.build_generation_config().model_dump(exclude_none=True)
 
         stamp = int(time.time())
         execs = [
@@ -116,7 +121,7 @@ class IAAnaliseSimilaridadeService(IAGenaiBase):
         for exec_ in execs:
             inline_requests = [
                 {
-                    "config": dict(response_mime_type=self.response_mime_type),
+                    "config": generation_config,
                     "contents": [
                         {
                             "parts": [
@@ -144,12 +149,9 @@ class IAAnaliseSimilaridadeService(IAGenaiBase):
                 )
                 return
 
-            responses = [
-                resp.response.text
-                for resp in batch_job.dest.inlined_responses
-                if resp.response
-            ]
-            for i, text in enumerate(responses):
+            # o índice da resposta é o da requisição: não descartar antes de casar
+            for i, resp in enumerate(batch_job.dest.inlined_responses):
+                text = resp.response.text if resp.response else None
                 if not text:
                     continue
 

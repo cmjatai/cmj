@@ -33,7 +33,7 @@ class IAGenaiBase:
 
     # Modelo padrão. Em serviço com cota, é substituído pelo modelo da
     # IAQuota selecionada a cada chamada.
-    ia_model_name = "gemini-3-flash-preview"
+    ia_model_name = "gemini-3.5-flash-lite"
 
     # Parâmetros de geração. None deixa o padrão da API.
     temperature = 0.1
@@ -107,14 +107,17 @@ class IAGenaiBase:
         )
 
     def generate_content(
-        self, contents, ia_model_name=None, tools=None, ascending=True
+        self, contents, ia_model_name=None, tools=None, ascending=True, quota=None
     ):
         """
         Gera conteúdo com o modelo da cota disponível e registra o consumo
         depois da resposta. Serviço `quota_exempt` usa `ia_model_name` direto.
+        Com `quota`, consome essa cota sem consultar a disponibilidade de novo.
         """
-        quota = None
-        if self.quota_exempt:
+        if quota:
+            model = quota.modelo
+            self.ia_model_name = model
+        elif self.quota_exempt:
             model = ia_model_name or self.ia_model_name
         else:
             quota = self.retrieve_quota_if_available(

@@ -254,8 +254,13 @@ def task_analise_similaridade_entre_materias_function(only_materia_id=None):
 
     gen = IAAnaliseSimilaridadeService()
     if only_materia_id:
+        # a cota só limita o início: depois de obtida, não interrompe o laço
+        quota = gen.retrieve_quota_if_available(ascending=False)
         for analise in analises[:100]:
-            gen.run(analise)
+            try:
+                gen.run(analise, quota=quota)
+            except Exception as e:
+                logger.error(f"Erro ao analisar similaridade {analise.pk}: {e}")
     else:
         gen.batch_run(analises, logger=logger)
 
