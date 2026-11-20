@@ -1,0 +1,26 @@
+
+@keyframes keyframe_rotate {
+  3% {
+    transform: rotate(135deg);
+  }
+  10% {
+    transform: rotate(855deg);
+  }
+  12% {
+    transform: scale(3) rotate(855deg);
+  }
+  14% {
+    transform: scale(1) rotate(855deg);
+  }
+  18% {
+    transform: rotate(135deg);
+  }
+  100% {
+    transform: rotate(135deg);
+  }
+}
+
+.animation-rotate {
+  transform: rotate(135deg);
+  animation: keyframe_rotate 30s ease-in-out infinite;
+}

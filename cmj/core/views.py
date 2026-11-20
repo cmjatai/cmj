@@ -99,6 +99,10 @@ def app_vue_view_v6(request, slug=None):
     return render(request, "base_v6.html")
 
 
+def app_vue_view_v8(request, slug=None):
+    return render(request, "base_v8.html")
+
+
 def app_vue_view_v2018(request, slug=None):
     return render(request, "app_vue_v2018.html")
 

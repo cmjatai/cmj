@@ -33,27 +33,47 @@ def service_worker_proxy_dev_old(request):
     return response
 
 
+# Frontends Vite: prefixo da URL -> (diretório do frontend, container dev, porta dev)
+VITE_FRONTENDS = {
+    "v6": ("PROJECT_DIR_FRONTEND_2026", "cmjfront2026", 5173),
+    "v8": ("PROJECT_DIR_FRONTEND_V8", "cmjfrontv8", 5174),
+}
+
+
+def _vite_frontend(request):
+    for version in VITE_FRONTENDS:
+        if request.path.startswith(f"/{version}/"):
+            return version
+    return None
+
+
 def service_worker_proxy(request):
 
     content = ""
 
-    is_v6 = "v6" in request.path
+    version = _vite_frontend(request)
 
     sw_2018_file = settings.PROJECT_DIR_FRONTEND_2018.child(
         "dist", "v2018", "service-worker.js"
     )
-    sw_2026_file = settings.PROJECT_DIR_FRONTEND_2026.child(
-        "dist", "v6", "service-worker.js"
-    )
+
+    if version:
+        dir_setting, dev_container, dev_port = VITE_FRONTENDS[version]
+        sw_vite_file = getattr(settings, dir_setting).child(
+            "dist", version, "service-worker.js"
+        )
+        sw_allowed = f"/{version}/"
+    else:
+        sw_allowed = "/"
 
     if settings.DEBUG:
 
         host, port = request.get_host().split(":")
 
-        if is_v6:
-            host = "cmjfront2026" if port == "9099" else host
-            url = f"http://{host}:5173/static/service-worker.js"
-            sw_file = sw_2026_file
+        if version:
+            host = dev_container if port == "9099" else host
+            url = f"http://{host}:{dev_port}/static/service-worker.js"
+            sw_file = sw_vite_file
         else:
             host = "cmjfront2018" if port == "9099" else host
             url = f"http://{host}:8080/service-worker.js"
@@ -65,17 +85,18 @@ def service_worker_proxy(request):
                 if response.status_code == 200:
                     content = response.content
             except Exception:
-                content = open(sw_file).read()
+                if sw_file.exists():
+                    content = open(sw_file).read()
         except ImportError:
             content = "/* Requests library not found */"
 
         response = HttpResponse(content)
-        response.headers["Service-Worker-Allowed"] = "/v6/" if is_v6 else "/"
+        response.headers["Service-Worker-Allowed"] = sw_allowed
 
     else:
-        sw_file = sw_2026_file if is_v6 else sw_2018_file
+        sw_file = sw_vite_file if version else sw_2018_file
         response = HttpResponse(open(sw_file).read())
-        response.headers["Service-Worker-Allowed"] = "/v6/" if is_v6 else "/"
+        response.headers["Service-Worker-Allowed"] = sw_allowed
 
     response.headers["Content-Type"] = "application/javascript"
     return response
@@ -87,8 +108,10 @@ def offline(request):
 
 def manifest(request):
     try:
+        version = _vite_frontend(request) or "v6"
+        dir_setting = VITE_FRONTENDS[version][0]
         f = open(
-            settings.PROJECT_DIR_FRONTEND_2026.child("dist", "v6", "manifest.json")
+            getattr(settings, dir_setting).child("dist", version, "manifest.json")
         ).read()
         response = HttpResponse(f, content_type="application/json")
         return response

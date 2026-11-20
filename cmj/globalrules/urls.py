@@ -8,7 +8,13 @@ urlpatterns = [
         service_worker_proxy,
         name="serviceworker_proxy_v6",
     ),
+    path(
+        "v8/service-worker.js",
+        service_worker_proxy,
+        name="serviceworker_proxy_v8",
+    ),
     path("service-worker.js", service_worker_proxy, name="serviceworker_proxy_v2018"),
     path("v6/manifest.json", manifest, name="manifest"),
+    path("v8/manifest.json", manifest, name="manifest_v8"),
     #    re_path('^offline/$', offline, name='offline')
 ]
