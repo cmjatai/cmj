@@ -1,6 +1,6 @@
 # LOA: edição do agrupamento
 
-Status: observado; D1 a D3, D5 e D6 implementadas (LOA-AGR-003, 045, 046, 053, 082, 083 e 090)
+Status: observado; D1 a D3, D5 e D6 implementadas (LOA-AGR-003, 045 a 047, 053, 082, 083 e 090)
 Última verificação: 2026-11-20 (commit `2156e76ea`)
 Código principal: `cmj/loa/views/v_agrupamento.py`, `cmj/loa/forms/f_agrupamento.py`,
 `cmj/loa/models/m_agrupamento.py`, `cmj/loa/signals.py`, `cmj/api/loa/views/agrupamento.py`,
@@ -81,13 +81,19 @@ inclusão continua substituindo os registros que ela tinha.
   registro de emenda que está num agrupamento, com 400 e a mensagem "Os registros contábeis desta
   emenda vêm do agrupamento "<nome>". Altere-os no agrupamento.". A recusa vem antes da validação
   dos campos, e a tela da emenda mostra a mensagem (LOA-EMD-061 e LOA-EMD-084). Antes, a inclusão
-  e a alteração eram desfeitas no próximo `sync()`, e a exclusão tirava a emenda do agrupamento (P1).
+  e a alteração eram desfeitas no próximo `sync()`, e a exclusão tirava a emenda do agrupamento
+  (LOA-AGR-047).
   Evidência: `cmj/api/loa/views/emendaloaregistrocontabil.py:304-340`,
   `cmj/api/loa/views/emendaloaregistrocontabil.py:358`.
 - LOA-AGR-046 [implementado] Ao sair do agrupamento, a emenda mantém os registros que tinha por ele,
   já sincronizados com o valor dela no momento da remoção, e o editor os ajusta na tela da emenda.
   Não há mais signal que os apague. Substitui o trecho de LOA-AGR-043 que apagava todos os
   registros. Evidência: `cmj/api/loa/views/agrupamentoemendaloa.py:47-59`, `cmj/loa/signals.py:72-73`.
+- LOA-AGR-047 [implementado] Excluir um registro contábil da emenda não mexe no agrupamento. Antes,
+  `EmendaLoaRegistroContabil.delete()` apagava por SQL direto o vínculo da emenda com o agrupamento,
+  sem signals, para que excluir um registro pela tela da emenda a tirasse do agrupamento. Esse papel
+  passou para o botão de remover do agrupamento (LOA-AGR-043), e o `delete()` voltou ao padrão do
+  Django. Evidência: `cmj/loa/models/m_registrocontabil.py`, sem `delete()` próprio.
 
 ### Finalidade digitada é preservada (D3, decidida em 2026-11-20)
 
@@ -354,17 +360,6 @@ D5 virou LOA-AGR-003 e D6 virou LOA-AGR-045 e LOA-AGR-046.
 - D7. **GET que cria registro.** Cada acesso à URL de criação cria um agrupamento (LOA-AGR-010).
   Recarregar a página ou abrir o link duas vezes deixa agrupamentos vazios. A criação deve passar a
   ser por POST?
-
-## Pendências encontradas
-
-Problemas vistos ao implementar as regras acordadas, fora delas.
-
-- P1. **Excluir um registro contábil da emenda a tira do agrupamento.**
-  `EmendaLoaRegistroContabil.delete()` apaga, por SQL direto, o vínculo da emenda com o agrupamento,
-  sem signals: a emenda fica na mesma fase, sem aviso e sem nova finalidade. A API deixou de chegar
-  a esse caminho para emendas agrupadas (LOA-AGR-045), mas o `delete()` continua assim para outros
-  chamadores. `QuerySet.delete()`, usado pelo `sync()`, não passa por ele. Evidência:
-  `cmj/loa/models/m_registrocontabil.py:67-74`.
 
 ## Fora do escopo
 

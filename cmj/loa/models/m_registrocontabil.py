@@ -6,8 +6,6 @@ from django.db.models.deletion import CASCADE, PROTECT
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 
-from cmj.utils import run_sql
-
 
 class EmendaLoaRegistroContabilManager(manager.Manager):
 
@@ -63,15 +61,6 @@ class EmendaLoaRegistroContabil(models.Model):
             + str_valor
         )
         return str_valor
-
-    def delete(self, *args, **kwargs):
-        # remove emenda de agrupamento que possa pertercer sem causar recursividade do agrupamentoemendaloa_pre_delete
-        run_sql(
-            f"DELETE FROM loa_agrupamentoemendaloa WHERE emendaloa_id = {self.emendaloa.id}"
-        )
-        # run_sql acima substitui: AgrupamentoEmendaLoa.objects.filter(emendaloa=self.emendaloa).delete()
-
-        return super().delete(*args, **kwargs)
 
     class Meta:
         verbose_name = _("Registro Contábil de Dedução e Inserção em Emendas")

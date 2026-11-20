@@ -448,3 +448,12 @@ def test_emenda_agrupada_nao_altera_registro_pela_emenda(
     assert r.status_code == 400
     assert 'agrupamento "Agrupamento"' in str(r.data), r.data
     assert registros(agrupada) == antes
+
+
+@pytest.mark.spec("LOA-AGR-047")
+def test_excluir_registro_da_emenda_nao_a_tira_do_agrupamento(agrupada):
+    registro = EmendaLoaRegistroContabil.objects.filter(emendaloa=agrupada).first()
+
+    registro.delete()
+
+    assert AgrupamentoEmendaLoa.objects.filter(emendaloa=agrupada).exists()
