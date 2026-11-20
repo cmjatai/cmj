@@ -274,6 +274,24 @@ class AgrupamentoForm(ModelForm):
             raise ValidationError(
                 _("Nenhum agrupamento contábil foi encontrado para validação.")
             )
+
+        # LOA-AGR-082: emenda devolvida ao autor (fase 10) bloqueia a liberação
+        devolvidas = [
+            e
+            for qs in (
+                self.instance.emendas.all(),
+                self.instance.emendas_coletivas_geradas.all(),
+            )
+            for e in qs.filter(fase=EmendaLoa.PROPOSTA).order_by("id")
+        ]
+        if devolvidas:
+            raise ValidationError(
+                _(
+                    "Não é possível liberar para protocolo com emendas devolvidas "
+                    "para correção (fase 10). Remova-as do agrupamento ou aguarde "
+                    "a correção pelo autor:\n{}"
+                ).format("\n".join(f"- {str(e).strip()}" for e in devolvidas))
+            )
         return cleaned_data
 
     def save(self, commit=False):

@@ -2,6 +2,12 @@ import $ from 'jquery'
 import axios from 'axios'
 import _ from 'lodash'
 
+// Mensagem guardada para ser mostrada depois do recarregamento da página (LOA-AGR-090)
+const CHAVE_MENSAGEM_GUARDADA = 'agrupamento-mensagem-guardada'
+
+// Tempo até sumirem as mensagens de sucesso e informação (LOA-AGR-090)
+const TEMPO_MENSAGEM_MS = 8000
+
 export default class AgrupamentoUpdate {
   constructor (container) {
     this.container = container
@@ -10,10 +16,78 @@ export default class AgrupamentoUpdate {
     this.urlBase = `/api/loa/agrupamento/${this.pk}`
     this.ano_loa = this.form.find('input[name="ano_loa"')[0].value
 
+    this.mensagens = $('<div class="agrupamento-mensagens"></div>').appendTo(this.container)
+
     this.init()
   }
 
+  // Mensagem suspensa no canto superior direito, no lugar de alert() (LOA-AGR-090).
+  // Erros e avisos ficam até serem fechados; sucesso e informação somem sozinhos.
+  mostrarMensagem (texto, tipo = 'danger', titulo = '') {
+    const chave = `${tipo}\n${titulo}\n${texto}`
+    const repetido = this.mensagens.children().toArray()
+      .some((el) => el.getAttribute('data-chave') === chave)
+    if (repetido) return
+
+    const alerta = $(`
+      <div class="alert alert-${tipo} alert-dismissible" role="alert">
+        <button type="button" class="close" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <strong class="d-block"></strong>
+        <span class="texto"></span>
+      </div>
+    `)
+    alerta.attr('data-chave', chave)
+    if (titulo) {
+      alerta.find('strong').text(titulo)
+    } else {
+      alerta.find('strong').remove()
+    }
+    alerta.find('.texto').text(texto).css('white-space', 'pre-line')
+    alerta.find('.close').click(() => alerta.remove())
+    alerta.appendTo(this.mensagens)
+
+    if (tipo === 'success' || tipo === 'info') {
+      setTimeout(() => alerta.remove(), TEMPO_MENSAGEM_MS)
+    }
+  }
+
+  // Guarda a mensagem e recarrega a página, que a mostra ao abrir
+  recarregarComMensagem (texto, tipo = 'success') {
+    window.sessionStorage.setItem(
+      CHAVE_MENSAGEM_GUARDADA,
+      JSON.stringify({ pk: this.pk, texto, tipo })
+    )
+    window.location.reload()
+  }
+
+  mostrarMensagemGuardada () {
+    const guardada = window.sessionStorage.getItem(CHAVE_MENSAGEM_GUARDADA)
+    if (!guardada) return
+    window.sessionStorage.removeItem(CHAVE_MENSAGEM_GUARDADA)
+    try {
+      const { pk, texto, tipo } = JSON.parse(guardada)
+      if (pk === this.pk) this.mostrarMensagem(texto, tipo)
+    } catch (e) {}
+  }
+
+  // Erros do clean() do formulário, como o bloqueio da liberação (LOA-AGR-082),
+  // saem do topo do formulário e vão para a mensagem suspensa
+  mostrarErrosDoFormulario () {
+    this.form.find('.alert.alert-block.alert-danger').each((i, el) => {
+      const itens = $(el).find('li').toArray().map((li) => $(li).text().trim())
+      const texto = itens.length > 0 ? itens.join('\n') : $(el).text().trim()
+      if (texto) {
+        this.mostrarMensagem(texto, 'danger', 'Não foi possível liberar para protocolo.')
+      }
+      $(el).remove()
+    })
+  }
+
   init () {
+    this.mostrarMensagemGuardada()
+    this.mostrarErrosDoFormulario()
     this.setupRegistroRender()
     this.loadRegistrosContabeis()
     this.setupBuscaDespesa()
@@ -41,20 +115,25 @@ export default class AgrupamentoUpdate {
           window.unloadingCMJ()
           if (response.data.status === 'success') {
             if (response.data.emendas_criadas && response.data.emendas_criadas.length === 0) {
-              alert('Nenhuma emenda coletiva foi criada.')
+              this.mostrarMensagem('Nenhuma emenda coletiva foi criada.', 'warning')
               return
             }
             const n = response.data.emendas_criadas.length
-            alert(`${n} emenda(s) coletiva(s) criada(s) com sucesso.`)
-
-            window.location.href = `/loa/agrupamento/${this.pk}`
+            // a mensagem fica visível alguns segundos antes de ir para o detalhe
+            this.mostrarMensagem(
+              `${n} emenda(s) coletiva(s) criada(s) com sucesso. Abrindo o detalhe do agrupamento...`,
+              'success'
+            )
+            setTimeout(() => {
+              window.location.href = `/loa/agrupamento/${this.pk}`
+            }, 3000)
           } else if (response.data.error) {
-            alert(response.data.error)
+            this.mostrarMensagem(response.data.error)
           }
         })
         .catch((error) => {
           window.unloadingCMJ()
-          alert(error.response?.data?.error || 'Ocorreu um erro ao gerar a emenda coletiva.')
+          this.mostrarMensagem(error.response?.data?.error || 'Ocorreu um erro ao gerar a emenda coletiva.')
         })
     })
     const cancelar_emendas_coletivas = this.form.find('#cancelar_emendas_coletivas')
@@ -67,16 +146,15 @@ export default class AgrupamentoUpdate {
         .then((response) => {
           if (response.data.status === 'success') {
             window.unloadingCMJ()
-            alert('Emendas coletivas canceladas com sucesso.')
-            window.location.reload()
+            this.recarregarComMensagem('Emendas coletivas canceladas com sucesso.')
           } else if (response.data.error) {
             window.unloadingCMJ()
-            alert(response.data.error)
+            this.mostrarMensagem(response.data.error)
           }
         })
         .catch(() => {
           window.unloadingCMJ()
-          alert('Ocorreu um erro ao cancelar as emendas coletivas.')
+          this.mostrarMensagem('Ocorreu um erro ao cancelar as emendas coletivas.')
         })
     })
   }
@@ -393,7 +471,7 @@ export default class AgrupamentoUpdate {
   alertAvisoFinalidade (aviso) {
     // falha da I.A. ao gerar a finalidade: a inclusão/remoção foi feita
     if (aviso) {
-      alert(aviso)
+      this.mostrarMensagem(aviso, 'warning', 'Finalidade não gerada.')
     }
   }
 

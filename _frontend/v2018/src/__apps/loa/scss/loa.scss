@@ -606,7 +606,9 @@
   }
 }
 // LOA-EMD-084: erros do servidor na edição da emenda
-.container-loa .emendaloa-mensagens {
+// LOA-AGR-090: mensagens da edição do agrupamento
+.container-loa .emendaloa-mensagens,
+.container-loa .agrupamento-mensagens {
   position: fixed;
   top: 1rem;
   right: 1rem;

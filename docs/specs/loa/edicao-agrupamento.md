@@ -1,14 +1,18 @@
 # LOA: edição do agrupamento
 
-Status: observado
-Última verificação: 2026-11-19 (commit `439b517f8`)
+Status: observado; D1 implementada (LOA-AGR-082 e 090)
+Última verificação: 2026-11-20 (commit `2156e76ea`)
 Código principal: `cmj/loa/views/v_agrupamento.py`, `cmj/loa/forms/f_agrupamento.py`,
 `cmj/loa/models/m_agrupamento.py`, `cmj/loa/signals.py`, `cmj/api/loa/views/agrupamento.py`,
 `cmj/api/loa/views/agrupamentoemendaloa.py`, `cmj/api/loa/views/agrupamentoregistrocontabil.py`,
 `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js`
-Testes: nenhum específico. As regras de fase citadas têm testes em `cmj/loa/tests/test_fases_emenda.py`.
+Testes: `cmj/loa/tests/test_edicao_agrupamento.py` (regras acordadas e LOA-AGR-081). As regras de
+fase citadas têm testes em `cmj/loa/tests/test_fases_emenda.py`.
 
-Todas as regras foram obtidas por leitura do código, sem executar os fluxos.
+As regras `[observado]` foram obtidas por leitura do código, sem executar os fluxos. As decisões
+tomadas sobre as dúvidas estão em "Regras acordadas": `[desejado]` indica que o código ainda precisa
+mudar e `[implementado]` indica uma regra `[desejado]` já corrigida e coberta por teste. Quando uma
+regra `[observado]` conflitar com uma delas, vale a regra acordada.
 
 ## Escopo
 
@@ -27,7 +31,46 @@ Outras specs são donas de parte do fluxo, e esta só cita os IDs:
 O agrupamento reúne emendas que recebem os mesmos registros contábeis, definidos em percentual do valor
 de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e entidade.
 
-## Regras
+## Regras acordadas
+
+### Emenda devolvida bloqueia a liberação (D1, decidida em 2026-11-20)
+
+- LOA-AGR-082 [implementado] "Liberar para Protocolo" é recusado quando alguma emenda do agrupamento
+  ou alguma coletiva gerada por ele está na fase 10, devolvida ao autor para correção (LOA-FASE-063).
+  - A recusa vem do `clean()` do formulário, depois das validações de LOA-AGR-080, e nenhuma emenda
+    muda de fase.
+  - A mensagem diz que não é possível liberar com emendas devolvidas para correção e lista as
+    emendas, uma por linha.
+  - Para liberar, o editor remove as devolvidas do agrupamento (LOA-AGR-043) ou espera o autor
+    devolvê-las à fase 12.
+  - As emendas na fase -10, já transformadas em coletiva, não contam.
+
+  Evidência: `cmj/loa/forms/f_agrupamento.py:278-295`.
+
+### Mensagens da tela (D1, decidida em 2026-11-20)
+
+- LOA-AGR-090 [implementado] A tela de edição não usa `alert()`. As mensagens aparecem suspensas no
+  canto superior direito, fecham pelo "×" e não se repetem quando iguais.
+  - Erros (vermelho) e avisos (amarelo) ficam até serem fechados. Sucesso (verde) some sozinho
+    depois de 8 segundos.
+  - Os erros do `clean()` do formulário (LOA-AGR-080 e LOA-AGR-082) saem do topo do formulário e
+    aparecem como mensagem com o título "Não foi possível liberar para protocolo.".
+  - Gerar coletivas (LOA-AGR-071): "Nenhuma emenda coletiva foi criada." é um aviso. Com coletivas
+    criadas, a mensagem de sucesso fica 3 segundos na tela antes de ir para o detalhe.
+  - Cancelar coletivas (LOA-AGR-072): a mensagem de sucesso aparece depois do recarregamento.
+  - A falha da I.A. ao gerar a finalidade (LOA-AGR-050) é um aviso com o título "Finalidade não
+    gerada.".
+  - Os erros de gerar e cancelar coletivas são mensagens de erro.
+  - Os erros de inclusão e remoção de emenda continuam na própria lista (LOA-AGR-044), e a
+    confirmação do cancelamento de coletivas continua em `confirm()`.
+
+  Substitui os `alert()` de LOA-AGR-050, 071 e 072. Evidência:
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:5-99`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:102-159`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:471-476`,
+  `_frontend/v2018/src/__apps/loa/scss/loa.scss:608-621`.
+
+## Regras observadas
 
 ### Acesso
 
@@ -152,7 +195,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   finalidade por I.A.:
   - **Unidade e entidade iguais em todas as emendas:** grava a finalidade gerada.
   - **Unidades ou entidades diferentes:** apaga a finalidade, sem aviso na tela.
-  - **Falha da I.A.:** apaga a finalidade e devolve o aviso, que a tela mostra em `alert`.
+  - **Falha da I.A.:** apaga a finalidade e devolve o aviso, que a tela mostra (LOA-AGR-090).
 
   Em todos os casos, a finalidade digitada antes é substituída (ver D3). Evidência:
   `cmj/loa/models/m_agrupamento.py:149-177`, `cmj/api/loa/views/agrupamentoemendaloa.py:72-82`,
@@ -202,13 +245,14 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   - as inserções e deduções somadas por despesa;
   - a finalidade do agrupamento ou, sem ela, a automática.
 
-  Fases e dono seguem LOA-FASE-017, LOA-FASE-018 e LOA-FASE-064. A tela mostra em `alert` quantas
-  coletivas foram criadas, ou que nenhuma foi, e em seguida vai para o detalhe do agrupamento.
+  Fases e dono seguem LOA-FASE-017, LOA-FASE-018 e LOA-FASE-064. A tela mostra quantas coletivas
+  foram criadas e vai para o detalhe do agrupamento, ou avisa que nenhuma foi (LOA-AGR-090).
   Evidência: `cmj/loa/models/m_agrupamento.py:290-358`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:36-59`.
 - LOA-AGR-072 [observado] "Cancelar Emendas Coletivas" pede confirmação e chama
   `POST /api/loa/agrupamento/<pk>/cancelar_emendas_coletivas/`. O servidor faz o efeito de
-  LOA-FASE-019, LOA-FASE-056 e LOA-FASE-057 e exclui as coletivas geradas. Depois, a tela recarrega.
+  LOA-FASE-019, LOA-FASE-056 e LOA-FASE-057 e exclui as coletivas geradas. Depois, a tela recarrega
+  e mostra o resultado (LOA-AGR-090).
   Evidência: `cmj/loa/models/m_agrupamento.py:273-288`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:60-81`.
 
@@ -221,7 +265,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
 
   Evidência: `cmj/loa/forms/f_agrupamento.py:135-137`, `cmj/loa/forms/f_agrupamento.py:258-277`.
 - LOA-AGR-081 [observado] Com o formulário válido, as emendas do agrupamento e as coletivas geradas
-  passam para a fase 17, conforme LOA-FASE-016. Todas são salvas, mesmo as que já estavam na 17 ou
+  passam para a fase 17, conforme LOA-FASE-016, salvo o bloqueio de LOA-AGR-082. Todas são salvas, mesmo as que já estavam na 17 ou
   acima. O `save()` do formulário não grava os campos do próprio agrupamento, que dependem só do
   autosave. Depois, a tela vai para o detalhe. Evidência: `cmj/loa/forms/f_agrupamento.py:279-305`,
   `cmj/loa/views/v_agrupamento.py:150-154`.
@@ -230,10 +274,8 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
 
 Ordenadas por risco.
 
-- D1. **"Liberar para Protocolo" pula a correção do autor.** O formulário leva para 17 toda emenda do
-  agrupamento entre as fases 1 e 16 (LOA-AGR-081), inclusive a que o editor devolveu para a fase 10
-  pela tela da emenda depois de incluí-la. A emenda devolvida ao autor deve bloquear a liberação, ou
-  ficar de fora dela?
+D1 foi decidida em 2026-11-20 e virou LOA-AGR-082 e LOA-AGR-090.
+
 - D2. **Liberar sem gerar as coletivas.** A liberação não confere se as emendas que permitem junção já
   viraram coletiva. Elas vão para a 17 individualmente (LOA-AGR-081). Gerar as coletivas antes de
   liberar deve ser obrigatório?
