@@ -561,3 +561,142 @@ def test_emenda_com_ajuste_tem_valor_computado_zero(make_emenda):
     ajuste.emendaloa.add(el)
 
     assert recarregar(el).valor_computado == Decimal("0.00")
+
+
+# ---------------------------------------------------- histórico com usuário
+
+SEM_CAMPO = "EmendaLoaHistoricoFase sem o campo usuario"
+
+
+def usuario_do_historico(emenda, fase=None):
+    """Usuário do registro de histórico mais recente (da fase, se informada)."""
+    qs = recarregar(emenda).emendaloahistoricofase_set.order_by("-id")
+    if fase is not None:
+        qs = qs.filter(fase=fase)
+    h = qs.first()
+    assert h is not None, "a mudança de fase não gerou histórico"
+    return getattr(h, "usuario_id", SEM_CAMPO)
+
+
+@pytest.mark.spec("LOA-FASE-067")
+def test_historico_registra_autor_no_patch_da_api(api, autor, parlamentar, make_emenda):
+    el = make_emenda(fase=P, owner=autor, parlamentar=parlamentar)
+
+    r = patch_fase(api(autor), el, PL)
+
+    assert r.status_code == 200
+    assert usuario_do_historico(el, PL) == autor.pk
+
+
+@pytest.mark.spec("LOA-FASE-067")
+def test_historico_registra_autor_na_criacao_pela_api(api, autor, loa, unidade):
+    loa.publicado = False
+    loa.save()
+
+    r = api(autor).post(
+        "/api/loa/emendaloa/",
+        {
+            "loa": loa.pk,
+            "unidade": unidade.pk,
+            "tipo": EmendaLoa.DIVERSOS,
+            "fase": P,
+            "finalidade": "Criada pela API",
+        },
+        format="json",
+    )
+
+    assert r.status_code == 201, r.content
+    el = EmendaLoa.all_objects.get(finalidade="Criada pela API")
+    assert usuario_do_historico(el, P) == autor.pk
+
+
+@pytest.mark.spec("LOA-FASE-067")
+def test_historico_registra_editor_na_captura_ao_abrir_edicao(
+    client, editor_contabil, make_emenda
+):
+    el = make_emenda(fase=PL)
+
+    get_edicao(client, editor_contabil, el)
+
+    assert usuario_do_historico(el, EC) == editor_contabil.pk
+
+
+@pytest.mark.spec("LOA-FASE-067")
+def test_historico_registra_editor_no_botao_concluir(
+    client, editor_contabil, make_emenda
+):
+    el = make_emenda(fase=EC)
+
+    post_edicao(client, editor_contabil, el, submit_concluir="1")
+
+    assert usuario_do_historico(el, LC) == editor_contabil.pk
+
+
+@pytest.mark.spec("LOA-FASE-067")
+def test_historico_registra_editor_na_inclusao_em_agrupamento(
+    api, editor_contabil, make_emenda, agrupamento
+):
+    el = make_emenda(fase=PL)
+
+    incluir_no_agrupamento(api(editor_contabil), agrupamento, el)
+
+    assert usuario_do_historico(el, EC) == editor_contabil.pk
+
+
+@pytest.mark.spec("LOA-FASE-067")
+def test_historico_registra_usuario_ao_gerar_e_cancelar_coletiva(
+    api,
+    editor_contabil,
+    make_emenda,
+    agrupamento,
+    autor,
+    autor_b,
+    parlamentar,
+    parlamentar_b,
+):
+    a = make_emenda(
+        fase=EC, owner=autor, parlamentar=parlamentar, permite_juncao_coletiva=True
+    )
+    b = make_emenda(
+        fase=EC, owner=autor_b, parlamentar=parlamentar_b, permite_juncao_coletiva=True
+    )
+    for el in (a, b):
+        AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento, emendaloa=el)
+    client = api(editor_contabil)
+
+    r = client.post(f"/api/loa/agrupamento/{agrupamento.pk}/gerar_emenda_coletiva/")
+    assert r.status_code == 200, r.content
+    coletiva = EmendaLoa.all_objects.get(pk=r.json()["emendas_criadas"][0])
+
+    assert usuario_do_historico(coletiva, EC) == editor_contabil.pk
+    for el in (a, b):
+        assert (
+            usuario_do_historico(el, EmendaLoa.TRANSFORMADA_EM_COLETIVA)
+            == editor_contabil.pk
+        )
+
+    r = client.post(
+        f"/api/loa/agrupamento/{agrupamento.pk}/cancelar_emendas_coletivas/"
+    )
+    assert r.status_code == 200, r.content
+
+    for el in (a, b):
+        assert usuario_do_historico(el) == editor_contabil.pk
+        assert recarregar(el).fase == EC
+
+
+@pytest.mark.spec("LOA-FASE-067")
+def test_historico_sem_usuario_quando_save_nao_informa(make_emenda, editor_contabil):
+    el = make_emenda(fase=P)
+
+    assert usuario_do_historico(el, P) is None
+
+    # o usuário informado num save() não vaza para o save() seguinte
+    el._usuario_fase = editor_contabil
+    el.fase = PL
+    el.save()
+    el.fase = EC
+    el.save()
+
+    assert usuario_do_historico(el, PL) == editor_contabil.pk
+    assert usuario_do_historico(el, EC) is None

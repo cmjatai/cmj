@@ -290,11 +290,13 @@ class AgrupamentoForm(ModelForm):
             for e in self.instance.emendas.all():
                 if 0 < e.fase < EmendaLoa.LIBERACAO_CONTABIL:
                     e.fase = EmendaLoa.LIBERACAO_CONTABIL
+                e._usuario_fase = self.user  # LOA-FASE-067
                 e.save()
 
             for e in self.instance.emendas_coletivas_geradas.all():
                 if 0 < e.fase < EmendaLoa.LIBERACAO_CONTABIL:
                     e.fase = EmendaLoa.LIBERACAO_CONTABIL
+                e._usuario_fase = self.user  # LOA-FASE-067
                 e.save()
 
         except Exception as e:

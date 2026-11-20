@@ -21,6 +21,7 @@ from django.template import loader
 from django.template.loader import render_to_string
 from django.urls.base import reverse, reverse_lazy
 from django.utils import formats, timezone
+from django.utils.html import escape
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django_filters.views import FilterView
@@ -1127,6 +1128,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             ):
                 if self.object.fase == EmendaLoa.PROPOSTA_LIBERADA:
                     self.object.fase = EmendaLoa.EDICAO_CONTABIL
+                    self.object._usuario_fase = u  # LOA-FASE-067
                     self.object.save()
 
             elif not self.edita_em_qualquer_fase:
@@ -1732,9 +1734,13 @@ class EmendaLoaCrud(MasterDetailCrud):
                 return "", ""
 
             lines = []
-            for ehf in emendaloa.emendaloahistoricofase_set.order_by("-id"):
+            historico = emendaloa.emendaloahistoricofase_set.select_related("usuario")
+            for ehf in historico.order_by("-id"):
+                # LOA-FASE-067: registros antigos e mudanças automáticas não têm usuário
+                usuario = escape(str(ehf.usuario)) if ehf.usuario else "—"
                 lines.append(
-                    f"{ehf.id} - {ehf.timestamp} - {ehf.get_fase_display()}<br>"
+                    f"{ehf.id} - {ehf.timestamp} - {ehf.get_fase_display()}"
+                    f" - {usuario}<br>"
                 )
 
             return verbose_name, "".join(lines), "courier"

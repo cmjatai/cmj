@@ -118,6 +118,7 @@ class AgrupamentoEmendaLoaViewSet:
             el.refresh_from_db()
             if el.fase != EmendaLoa.EDICAO_CONTABIL:
                 el.fase = EmendaLoa.EDICAO_CONTABIL
+                el._usuario_fase = request.user  # LOA-FASE-067
                 el.save()
 
             agrupamento = Agrupamento.objects.get(pk=int(request.data["agrupamento"]))

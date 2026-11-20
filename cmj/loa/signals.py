@@ -22,12 +22,20 @@ logger = logging.getLogger(__name__)
 )
 def signal_postsave_emendaloa(sender, instance, **kwargs):
 
+    # LOA-FASE-067: quem muda a fase informa o usuário em instance._usuario_fase antes
+    # do save(). O atributo é consumido aqui para não valer num save() seguinte.
+    usuario = instance.__dict__.pop("_usuario_fase", None)
+
     if not instance.pk:
         return
 
     historico_fase = instance.emendaloahistoricofase_set.first()
     if not historico_fase or historico_fase.fase != instance.fase:
-        historico_fase = instance.emendaloahistoricofase_set.create(fase=instance.fase)
+        if usuario is not None and not getattr(usuario, "is_authenticated", False):
+            usuario = None
+        historico_fase = instance.emendaloahistoricofase_set.create(
+            fase=instance.fase, usuario=usuario
+        )
 
 
 @receiver(

@@ -960,6 +960,8 @@ class ConfirmarProposicao(PermissionRequiredForAppCrudMixin, UpdateView):
         obj = self.get_object()
         initial["numero_de_paginas"] = obj.paginas
         initial["emendaloa"] = getattr(obj, "emendaloa", None)
+        # LOA-FASE-067: usuário registrado no histórico de fase da emenda
+        initial["usuario_fase"] = self.request.user
 
         return initial
 

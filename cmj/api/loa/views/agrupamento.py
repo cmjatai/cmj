@@ -85,7 +85,7 @@ class AgrupamentoViewSet:
             return JsonResponse({"error": "Agrupamento not found"}, status=404)
 
         try:
-            emendas_criadas = agrupamento.gerar_emendas_coletivas()
+            emendas_criadas = agrupamento.gerar_emendas_coletivas(user=request.user)
             # após gerar emendas coletivas, atualizar a instância para refletir as mudanças
             return JsonResponse(
                 {
@@ -111,7 +111,7 @@ class AgrupamentoViewSet:
         try:
             # só as emendas que estavam em -10 voltam para 15 (feito no model);
             # as demais emendas do agrupamento mantêm a fase
-            agrupamento.cancelar_emendas_coletivas()
+            agrupamento.cancelar_emendas_coletivas(user=request.user)
 
             return JsonResponse({"status": "success"})
         except Exception as e:

@@ -270,7 +270,7 @@ class Agrupamento(models.Model):
             for (unidade, entidade), value in emendas_coletivas.items()
         ]
 
-    def cancelar_emendas_coletivas(self):
+    def cancelar_emendas_coletivas(self, user=None):
         try:
             with transaction.atomic():
                 for e in self.emendas(manager="all_objects").filter(
@@ -278,6 +278,7 @@ class Agrupamento(models.Model):
                 ):
                     e.emenda_coletiva = None
                     e.fase = EmendaLoa.EDICAO_CONTABIL
+                    e._usuario_fase = user  # LOA-FASE-067
                     e.save()
 
                 # deletando emendas coletivas associadas ao agrupamento
@@ -286,7 +287,7 @@ class Agrupamento(models.Model):
         except Exception as e:
             raise e
 
-    def gerar_emendas_coletivas(self):
+    def gerar_emendas_coletivas(self, user=None):
         emendas_preparadas = self.preparar_dados_para_coletiva()
 
         emendas_criadas = []  # Lista para armazenar as emendas coletivas criadas
@@ -316,11 +317,13 @@ class Agrupamento(models.Model):
                     ec.indicacao = emenda["unidade"].especificacao
                     ec.fase = EmendaLoa.EDICAO_CONTABIL
                     ec.tipo = emenda["emendas"][0].tipo
+                    ec._usuario_fase = user  # LOA-FASE-067
                     ec.save()
 
                     for ems in emenda["emendas"]:
                         ems.emenda_coletiva = ec
                         ems.fase = EmendaLoa.TRANSFORMADA_EM_COLETIVA
+                        ems._usuario_fase = user  # LOA-FASE-067
                         ems.save()
 
                     for p, v in emenda["parlamentares_list_values"].items():

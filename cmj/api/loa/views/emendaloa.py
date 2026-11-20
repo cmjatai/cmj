@@ -116,6 +116,18 @@ class EmendaLoaViewSet:
                 )
         return super().update(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        el = serializer.save()
+        # LOA-FASE-067: o serializer cria a instância, então o signal grava o histórico
+        # inicial sem usuário; logo após a criação ele é o único registro.
+        el.emendaloahistoricofase_set.filter(usuario__isnull=True).update(
+            usuario=self.request.user
+        )
+
+    def perform_update(self, serializer):
+        serializer.instance._usuario_fase = self.request.user  # LOA-FASE-067
+        serializer.save()
+
     @action(
         methods=[
             "patch",

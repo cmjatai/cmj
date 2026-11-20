@@ -3419,6 +3419,7 @@ class ConfirmarProposicaoForm(ProposicaoForm):
                 el = cd["emendaloa"]
                 el.materia = materia
                 el.fase = EmendaLoa.EM_TRAMITACAO
+                el._usuario_fase = self.initial.get("usuario_fase")  # LOA-FASE-067
                 el.save()
 
             if proposicao.texto_articulado.exists():

@@ -1004,6 +1004,17 @@ class EmendaLoaHistoricoFase(models.Model):
 
     timestamp = models.DateTimeField(auto_now_add=True, verbose_name=_("Data e Hora"))
 
+    # LOA-FASE-067: vazio nos registros antigos e nas mudanças sem usuário (tasks, shell).
+    # Preenchido pelo signal a partir de EmendaLoa._usuario_fase.
+    usuario = models.ForeignKey(
+        get_settings_auth_user_model(),
+        verbose_name=_("Usuário"),
+        related_name="+",
+        on_delete=SET_NULL,
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         verbose_name = _("Histórico de Fase da Emenda Impositiva")
         verbose_name_plural = _("Históricos de Fase das Emendas Impositivas")

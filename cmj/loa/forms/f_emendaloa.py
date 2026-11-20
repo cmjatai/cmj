@@ -612,6 +612,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         created = not i_init.pk
 
+        i_init._usuario_fase = self.user  # LOA-FASE-067
+
         if created:
             i_init.owner = self.user
             i_init.metadata = {"style": {"lineHeight": 150, "espacoAssinatura": 1}}
