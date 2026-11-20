@@ -1,6 +1,6 @@
 # LOA: edição da emenda
 
-Status: observado; D1, D3, D4, D5, D7 e D8 implementadas (LOA-EMD-070 a 083)
+Status: observado; D1, D3, D4, D5, D6, D7 e D8 implementadas (LOA-EMD-070 a 084)
 Última verificação: 2026-11-20 (commit `7c7c5f1c2`)
 Código principal: `cmj/loa/views/v_emendaloa.py`, `cmj/loa/forms/f_emendaloa.py`,
 `cmj/loa/services/s_emendaloa.py`, `cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
@@ -145,6 +145,28 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:6-20`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:402-408`,
   `cmj/api/loa/views/emendaloa.py:110-114`.
+
+### Erros do servidor na tela de edição (D6, decidida em 2026-11-20)
+
+- LOA-EMD-084 [implementado] A tela de edição mostra a mensagem do servidor quando qualquer chamada
+  feita por ela falha: carga da emenda, totais, registros contábeis, busca de despesa, exclusão de
+  registro, pré-visualização e autosave.
+  - O aviso aparece fixo no canto superior direito, com um título que diz qual operação falhou, e
+    some ao ser fechado. Avisos iguais não se repetem.
+  - O texto é a mensagem devolvida pela API: `detail`, a lista de erros ou os erros por campo, estes
+    precedidos do nome do campo. Página HTML de erro vira "O servidor respondeu com erro <status>.", e
+    falha de rede vira um aviso de comunicação.
+  - No autosave, a página continua sendo recarregada para voltar ao que está gravado, e o aviso
+    aparece depois do recarregamento, com o rótulo do campo alterado.
+  - A pré-visualização é uma imagem e não expõe a resposta: a tela só avisa que ela falhou e indica
+    o link do PDF.
+  - Na inclusão de registro contábil, os erros continuam abaixo da busca, com os campos marcados
+    (LOA-EMD-061).
+
+  Substitui a parte de falha de LOA-EMD-057. Evidência:
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:22-115`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:502-513`,
+  `_frontend/v2018/src/__apps/loa/scss/loa.scss:608-619`.
 
 ## Regras observadas
 
@@ -329,7 +351,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - recarrega a página inteira se o campo alterado foi `tipo`.
 
   Quando falha, a tela recarrega a página sem mostrar a mensagem de erro do servidor, e a alteração
-  rejeitada desaparece (ver D6). Evidência:
+  rejeitada desaparece. Substituída, quanto à falha, por LOA-EMD-084. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:393-407`.
 - LOA-EMD-058 [observado] Enter não envia o formulário. No campo de busca de despesa, Enter seleciona o
   resultado quando há só um. Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:333-345`.
@@ -372,10 +394,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 ## Dúvidas
 
 Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, D3 e D7 viraram LOA-EMD-076 a 079,
-D8 virou LOA-EMD-080 e 081, D1 virou LOA-EMD-082 e D5 virou LOA-EMD-083.
+D8 virou LOA-EMD-080 e 081, D1 virou LOA-EMD-082, D5 virou LOA-EMD-083 e D6 virou LOA-EMD-084.
 
-- D6. **O erro do autosave some.** A falha recarrega a página sem mensagem (LOA-EMD-057). Uma transição
-  de fase negada, por exemplo, só "volta" sem explicação. A tela deve mostrar o erro do servidor?
 - D2. **O GET de `/view/` altera a emenda e é público.** O endpoint grava `metadata.style`
   (LOA-EMD-052), e o GET da API é público para `EmendaLoa` (LOA-EMD-006). Qualquer pessoa, mesmo
   anônima, pode mudar a entrelinha do documento de qualquer emenda visível, o que afeta o PDF da

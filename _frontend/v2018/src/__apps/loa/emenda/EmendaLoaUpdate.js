@@ -19,6 +19,38 @@ const CAMPOS_DO_MODEL = [
   'entidade'
 ]
 
+// Erro do autosave guardado para ser mostrado depois do recarregamento (LOA-EMD-084)
+const CHAVE_ERRO_AUTOSAVE = 'emendaloa-erro-autosave'
+
+// Mensagem do servidor a partir de um erro do axios (LOA-EMD-084)
+function mensagemDoErro (error) {
+  const response = error && error.response
+  if (!response) {
+    return 'Não foi possível comunicar com o servidor. Verifique a conexão e tente novamente.'
+  }
+
+  const data = response.data
+  const generica = `O servidor respondeu com erro ${response.status}.`
+
+  const textos = (valor) => {
+    if (_.isString(valor)) return [valor]
+    if (_.isArray(valor)) return _.flatMap(valor, textos)
+    if (_.isPlainObject(valor)) {
+      return _.flatMap(Object.entries(valor), ([chave, v]) => {
+        if (chave === 'detail' || chave === 'non_field_errors') return textos(v)
+        return textos(v).map((t) => `${chave}: ${t}`)
+      })
+    }
+    return []
+  }
+
+  // Página HTML de erro (500, 502...) não é mensagem para o usuário
+  if (_.isString(data) && /^\s*</.test(data)) return generica
+
+  const lista = textos(data).filter((t) => t.trim() !== '')
+  return lista.length > 0 ? lista.join('\n') : generica
+}
+
 export default class EmendaLoaUpdate extends EmendaLoaForm {
   constructor (container) {
     super(container)
@@ -27,10 +59,63 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
     this.ano_loa = this.form.find('input[name="ano_loa"')[0].value
     this.pkObject = null
 
+    this.mensagens = $('<div class="emendaloa-mensagens"></div>').appendTo(this.container)
+
     this.init()
   }
 
+  // Mostra o erro do servidor num aviso fixo, sem repetir avisos iguais (LOA-EMD-084)
+  mostrarErro (contexto, error) {
+    const texto = _.isString(error) ? error : mensagemDoErro(error)
+    const chave = `${contexto}\n${texto}`
+
+    const repetido = this.mensagens.children().toArray()
+      .some((el) => el.getAttribute('data-chave') === chave)
+    if (repetido) return
+
+    const alerta = $(`
+      <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" aria-label="Fechar">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <strong class="d-block"></strong>
+        <span class="texto"></span>
+      </div>
+    `)
+    alerta.attr('data-chave', chave)
+    alerta.find('strong').text(contexto)
+    alerta.find('.texto').text(texto).css('white-space', 'pre-line')
+    alerta.find('.close').click(() => alerta.remove())
+    alerta.appendTo(this.mensagens)
+  }
+
+  mostrarErroGuardado () {
+    const guardado = window.sessionStorage.getItem(CHAVE_ERRO_AUTOSAVE)
+    if (!guardado) return
+    window.sessionStorage.removeItem(CHAVE_ERRO_AUTOSAVE)
+    try {
+      const { pk, contexto, texto } = JSON.parse(guardado)
+      if (pk === this.pk) this.mostrarErro(contexto, texto)
+    } catch (e) {}
+  }
+
+  // Erros do registro contábil: campos marcados e mensagens na lista indicada (LOA-EMD-061)
+  mostrarErrosRegistro (error, inner) {
+    const data = error.response && error.response.data
+    if (!_.isPlainObject(data)) {
+      $('<div class="alert alert-danger"></div>').text(mensagemDoErro(error)).appendTo(inner)
+      return
+    }
+    _.forOwn(data, (value, key) => {
+      this.form.find(`input[name=despesa_${key}], input[name=${key}_despesa]`).addClass('is-invalid')
+      $('<div class="alert alert-danger"></div>')
+        .text(mensagemDoErro({ response: { status: error.response.status, data: value } }))
+        .appendTo(inner)
+    })
+  }
+
   async init () {
+    this.mostrarErroGuardado()
     await this.loadPkObject()
     this.toggleTipo()
     this.setupPreview()
@@ -49,7 +134,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
       const response = await axios.get(`${this.urlBase}/`)
       this.pkObject = response.data
     } catch (error) {
-      console.error('Erro ao carregar dados da emenda:', error)
+      this.mostrarErro('Erro ao carregar os dados da emenda.', error)
     }
   }
 
@@ -99,6 +184,14 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
     this.previewImg.onload = () => {
       this.previewImg.style.opacity = 1
       this.loadPkObject()
+    }
+    // A imagem não expõe a resposta do servidor: só é possível avisar a falha
+    this.previewImg.onerror = () => {
+      this.previewImg.style.opacity = 1
+      this.mostrarErro(
+        'Erro ao gerar a pré-visualização.',
+        'Não foi possível gerar a imagem do documento. Abra o PDF pelo link para ver o erro.'
+      )
     }
   }
 
@@ -152,6 +245,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
           </div>
         `).appendTo(footer)
       })
+      .catch((error) => this.mostrarErro('Erro ao carregar os totais.', error))
 
     // Carrega Registros
     axios.get(`/api/loa/emendaloaregistrocontabil/?emendaloa=${this.pk}&get_all=true`)
@@ -185,11 +279,11 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
             .click((event) => this.handleDeleteRegistro(event))
         })
       })
+      .catch((error) => this.mostrarErro('Erro ao carregar os registros contábeis.', error))
   }
 
   handleDeleteRegistro (event) {
     const pk = event.target.closest('.item-rc').getAttribute('pk')
-    const inner = this.form.find('.registro-render .inner')
 
     axios.delete(`/api/loa/emendaloaregistrocontabil/${pk}/`)
       .then(() => {
@@ -198,16 +292,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
         this.loadRegistrosContabeis()
         this.updatePreview()
       })
-      .catch((error) => {
-        if (_.isString(error.response) || _.isString(error.response.data)) {
-          $(`<div class="alert alert-danger">${error.message}</div>`).appendTo(inner)
-          return
-        }
-        _.forOwn(error.response.data, (value, key) => {
-          this.form.find(`input[name=despesa_${key}], input[name=${key}_despesa]`).addClass('is-invalid')
-          $(`<div class="alert alert-danger">${_.isString(value) ? value : value[0]}</div>`).appendTo(inner)
-        })
-      })
+      .catch((error) => this.mostrarErro('Erro ao excluir o registro contábil.', error))
   }
 
   setupBuscaDespesa () {
@@ -256,22 +341,13 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
           .attr('readonly', false)
           .removeClass('is-invalid')
 
-        $('<div class="alert alert-info>Registro de Despesa Adicionado com sucesso.</div>').appendTo(inner)
+        $('<div class="alert alert-info">Registro de Despesa Adicionado com sucesso.</div>').appendTo(inner)
 
         this.loadRegistrosContabeis()
         this.updatePreview()
         this.form.trigger('change')
       })
-      .catch((error) => {
-        if (_.isString(error.response) || _.isString(error.response.data)) {
-          $(`<div class="alert alert-danger">${error.message}</div>`).appendTo(inner)
-          return
-        }
-        _.forOwn(error.response.data, (value, key) => {
-          this.form.find(`input[name=despesa_${key}], input[name=${key}_despesa]`).addClass('is-invalid')
-          $(`<div class="alert alert-danger">${_.isString(value) ? value : value[0]}</div>`).appendTo(inner)
-        })
-      })
+      .catch((error) => this.mostrarErrosRegistro(error, inner))
       .finally(() => {
         inner.appendTo(busca_render)
       })
@@ -340,6 +416,7 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
           })
         })
       })
+      .catch((error) => this.mostrarErro('Erro na busca de despesa.', error))
   }
 
   setupFormEvents () {
@@ -422,7 +499,15 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
         this.loadRegistrosContabeis(true)
         this.updatePreview()
       })
-      .catch(() => {
+      .catch((error) => {
+        // A página é recarregada para voltar ao que está gravado; o erro é
+        // guardado e mostrado depois do recarregamento (LOA-EMD-084)
+        const rotulo = this.form.find(`label[for="${event.target.id}"]`).first().text().trim()
+        window.sessionStorage.setItem(CHAVE_ERRO_AUTOSAVE, JSON.stringify({
+          pk: this.pk,
+          contexto: `Alteração não gravada${rotulo ? ` (${rotulo})` : ''}.`,
+          texto: mensagemDoErro(error)
+        }))
         window.location.reload()
       })
   }
