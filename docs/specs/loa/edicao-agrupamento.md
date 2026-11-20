@@ -1,7 +1,8 @@
 # LOA: edição do agrupamento
 
-Status: observado; D1 a D3, D5 e D4 a D6 implementadas (LOA-AGR-003, 045 a 047, 053, 063, 064, 082, 083 e 090)
-Última verificação: 2026-11-20 (commit `2156e76ea`)
+Status: observado; D1 a D7 implementadas (LOA-AGR-003, 012, 045 a 047, 053, 063, 064, 082, 083 e
+090)
+Última verificação: 2026-11-20 (commit `69911f2dd`)
 Código principal: `cmj/loa/views/v_agrupamento.py`, `cmj/loa/forms/f_agrupamento.py`,
 `cmj/loa/models/m_agrupamento.py`, `cmj/loa/signals.py`, `cmj/api/loa/views/agrupamento.py`,
 `cmj/api/loa/views/agrupamentoemendaloa.py`, `cmj/api/loa/views/agrupamentoregistrocontabil.py`,
@@ -32,6 +33,19 @@ O agrupamento reúne emendas que recebem os mesmos registros contábeis, definid
 de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e entidade.
 
 ## Regras acordadas
+
+### Criação reaproveita o agrupamento vazio (D7, decidida em 2026-11-20)
+
+- LOA-AGR-012 [implementado] A criação continua pelo GET, sem formulário (LOA-AGR-010), mas não deixa
+  agrupamentos vazios para trás. Antes de criar, o GET olha o último agrupamento da LOA (por `id`) com
+  o prefixo "Novo Agrupamento". Se ele ainda tem o nome padrão ("Novo Agrupamento" ou "Novo
+  Agrupamento N") e está vazio, a tela abre a edição dele em vez de criar outro. Vazio é não ter
+  emendas, registros contábeis, coletivas geradas nem finalidade (`Agrupamento.esta_vazio()`). Nome
+  alterado ou qualquer conteúdo fazem a criação seguir como antes.
+
+  Consequência aceita: o GET continua tendo efeito colateral, e dois editores que abrem a criação
+  ao mesmo tempo recebem o mesmo agrupamento vazio. Evidência:
+  `cmj/loa/models/m_agrupamento.py:170-177`, `cmj/loa/views/v_agrupamento.py:62-91`.
 
 ### Pré-visualização exige permissão de edição (D5, decidida em 2026-11-20)
 
@@ -68,8 +82,8 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
     matéria, não está na fase -10 e está num conjunto de unidade e entidade com mais de uma emenda.
   - Sem emendas nessa situação, não há mensagem.
 
-  Evidência: `cmj/loa/models/m_agrupamento.py:170-186`, `cmj/loa/forms/f_agrupamento.py:302-308`,
-  `cmj/loa/views/v_agrupamento.py:151-164`.
+  Evidência: `cmj/loa/models/m_agrupamento.py:179-195`, `cmj/loa/forms/f_agrupamento.py:302-308`,
+  `cmj/loa/views/v_agrupamento.py:161-174`.
 
 ### Autosave: só campos do model e erro na tela (D4, decidida em 2026-11-20)
 
@@ -134,7 +148,7 @@ inclusão continua substituindo os registros que ela tinha.
 
   Substitui, para a finalidade digitada, o "em todos os casos" de LOA-AGR-050. Evidência:
   `cmj/loa/models/m_agrupamento.py:22-34`, `cmj/loa/models/m_agrupamento.py:60-65`,
-  `cmj/loa/models/m_agrupamento.py:188-232`, `cmj/api/loa/views/agrupamento.py:29-36`,
+  `cmj/loa/models/m_agrupamento.py:197-241`, `cmj/api/loa/views/agrupamento.py:29-36`,
   `cmj/api/loa/views/agrupamento.py:82`, `cmj/api/loa/views/agrupamentoemendaloa.py:72-86`,
   `cmj/loa/forms/f_agrupamento.py:69-76`, `cmj/loa/migrations/0027_agrupamento_finalidade_manual.py`.
 
@@ -168,8 +182,8 @@ inclusão continua substituindo os registros que ela tinha.
 
 - LOA-AGR-001 [observado] Criar, editar e excluir agrupamento pela interface exige
   `emendaloa_full_editor`, que o editor contábil, o Operador da LOA e o superusuário têm. Listagem e
-  detalhe são públicos. Evidência: `cmj/loa/views/v_agrupamento.py:13-57`,
-  `cmj/loa/views/v_agrupamento.py:132-133`, `cmj/globalrules/map_rules.py:270-284`.
+  detalhe são públicos. Evidência: `cmj/loa/views/v_agrupamento.py:15-59`,
+  `cmj/loa/views/v_agrupamento.py:142-143`, `cmj/globalrules/map_rules.py:270-284`.
 - LOA-AGR-002 [observado] Na API de `agrupamento`, `agrupamentoemendaloa` e
   `agrupamentoregistrocontabil`, todo POST, PATCH e DELETE exige `emendaloa_full_editor`, inclusive
   as actions. Os GET exigem só as permissões públicas de listagem e detalhe, salvo a prévia
@@ -181,9 +195,10 @@ inclusão continua substituindo os registros que ela tinha.
 ### Criação e cópia
 
 - LOA-AGR-010 [observado] Abrir a tela de criação (GET) já cria o agrupamento, sem formulário, e
-  redireciona para a edição. O nome é "Novo Agrupamento". Se já existe um agrupamento da LOA com esse
-  prefixo, o nome recebe o número final do último deles (por `id`) mais 1. Evidência:
-  `cmj/loa/views/v_agrupamento.py:56-81`.
+  redireciona para a edição, salvo o reaproveitamento de LOA-AGR-012. O nome é "Novo Agrupamento". Se
+  já existe um agrupamento da LOA com esse prefixo, o nome recebe o número final do último deles (por
+  `id`) mais 1. Evidência:
+  `cmj/loa/views/v_agrupamento.py:58-91`.
 - LOA-AGR-011 [observado] O botão de cópia (`POST /api/loa/agrupamento/<pk>/create_copia/`) cria um
   agrupamento com o nome "<nome> (Cópia N)" e a mesma LOA. A cópia leva os registros contábeis
   (despesa, percentual e operação), mas não leva as emendas nem a finalidade. Depois, a tela abre a
@@ -222,7 +237,7 @@ inclusão continua substituindo os registros que ela tinha.
 
   Evidência: `cmj/api/loa/views/agrupamentoregistrocontabil.py:108-288`,
   `cmj/api/loa/views/agrupamentoregistrocontabil.py:302-334`,
-  `cmj/loa/models/m_agrupamento.py:502-507`.
+  `cmj/loa/models/m_agrupamento.py:511-516`.
 - LOA-AGR-031 [observado] Gravar um registro contábil do agrupamento dispara `Agrupamento.sync()`
   (LOA-AGR-033). Excluir um registro apaga, nas emendas do agrupamento, os registros com a mesma
   despesa. Evidência: `cmj/loa/signals.py:41-70`.
@@ -271,7 +286,7 @@ inclusão continua substituindo os registros que ela tinha.
   - Por fim, a finalidade é gerada por I.A. (LOA-AGR-050).
 
   Evidência: `cmj/api/loa/views/agrupamentoemendaloa.py:88-138`, `cmj/loa/signals.py:50-56`,
-  `cmj/loa/models/m_agrupamento.py:424-429`.
+  `cmj/loa/models/m_agrupamento.py:433-438`.
 - LOA-AGR-043 [observado] Remover uma emenda envia `POST /api/loa/agrupamentoemendaloa/delete/`. A
   emenda da fase -10 não pode ser removida (LOA-FASE-042). Antes de desfazer o vínculo, o servidor
   sincroniza o agrupamento e a emenda, e ignora erros nesses passos (só os registra no log). A emenda
@@ -291,7 +306,7 @@ inclusão continua substituindo os registros que ela tinha.
   - **Falha da I.A.:** apaga a finalidade e devolve o aviso, que a tela mostra (LOA-AGR-090).
 
   A finalidade digitada é mantida, salvo com unidades ou entidades diferentes (LOA-AGR-053). Evidência:
-  `cmj/loa/models/m_agrupamento.py:188-232`, `cmj/api/loa/views/agrupamentoemendaloa.py:72-86`,
+  `cmj/loa/models/m_agrupamento.py:197-241`, `cmj/api/loa/views/agrupamentoemendaloa.py:72-86`,
   GENIA-LOA-004, GENIA-LOA-006.
 - LOA-AGR-051 [observado] Ctrl+clique na finalidade pede a geração por I.A.
   (`PATCH /api/loa/agrupamento/<pk>/generate_finalidade_global/`). Enquanto espera, o campo fica
@@ -329,7 +344,7 @@ inclusão continua substituindo os registros que ela tinha.
   - Se o agrupamento não tem finalidade, a prévia pede a finalidade automática à I.A. (GENIA-LOA-005).
   - Só quem edita o agrupamento abre a prévia (LOA-AGR-003).
 
-  Evidência: `cmj/api/loa/views/agrupamento.py:134-240`, `cmj/loa/models/m_agrupamento.py:234-326`,
+  Evidência: `cmj/api/loa/views/agrupamento.py:134-240`, `cmj/loa/models/m_agrupamento.py:243-335`,
   `cmj/loa/forms/f_agrupamento.py:113-117`.
 - LOA-AGR-071 [observado] "Gerar Emendas Coletivas"
   (`POST /api/loa/agrupamento/<pk>/gerar_emenda_coletiva/`) cria uma coletiva por conjunto com mais
@@ -341,13 +356,13 @@ inclusão continua substituindo os registros que ela tinha.
 
   Fases e dono seguem LOA-FASE-017, LOA-FASE-018 e LOA-FASE-064. A tela mostra quantas coletivas
   foram criadas e vai para o detalhe do agrupamento, ou avisa que nenhuma foi (LOA-AGR-090).
-  Evidência: `cmj/loa/models/m_agrupamento.py:345-413`,
+  Evidência: `cmj/loa/models/m_agrupamento.py:354-422`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:119-147`.
 - LOA-AGR-072 [observado] "Cancelar Emendas Coletivas" pede confirmação e chama
   `POST /api/loa/agrupamento/<pk>/cancelar_emendas_coletivas/`. O servidor faz o efeito de
   LOA-FASE-019, LOA-FASE-056 e LOA-FASE-057 e exclui as coletivas geradas. Depois, a tela recarrega
   e mostra o resultado (LOA-AGR-090).
-  Evidência: `cmj/loa/models/m_agrupamento.py:328-343`,
+  Evidência: `cmj/loa/models/m_agrupamento.py:337-352`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:148-168`.
 
 ### Liberar para protocolo
@@ -363,18 +378,13 @@ inclusão continua substituindo os registros que ela tinha.
   LOA-AGR-083. Todas são salvas, mesmo as que já estavam na 17 ou acima. O `save()` do formulário não
   grava os campos do próprio agrupamento, que dependem só do autosave. Depois, a tela vai para o
   detalhe. Evidência: `cmj/loa/forms/f_agrupamento.py:298-332`,
-  `cmj/loa/views/v_agrupamento.py:166-170`.
+  `cmj/loa/views/v_agrupamento.py:176-180`.
 
 ## Dúvidas
 
-Ordenadas por risco.
-
-Em 2026-11-20, D1 virou LOA-AGR-082 e LOA-AGR-090, D2 virou LOA-AGR-083, D3 virou LOA-AGR-053,
-D4 virou LOA-AGR-063 e LOA-AGR-064, D5 virou LOA-AGR-003 e D6 virou LOA-AGR-045 a LOA-AGR-047.
-
-- D7. **GET que cria registro.** Cada acesso à URL de criação cria um agrupamento (LOA-AGR-010).
-  Recarregar a página ou abrir o link duas vezes deixa agrupamentos vazios. A criação deve passar a
-  ser por POST?
+Nenhuma em aberto. Em 2026-11-20, D1 virou LOA-AGR-082 e LOA-AGR-090, D2 virou LOA-AGR-083, D3 virou
+LOA-AGR-053, D4 virou LOA-AGR-063 e LOA-AGR-064, D5 virou LOA-AGR-003, D6 virou LOA-AGR-045 a
+LOA-AGR-047 e D7 virou LOA-AGR-012.
 
 ## Fora do escopo
 

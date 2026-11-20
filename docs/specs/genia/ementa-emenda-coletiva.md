@@ -33,12 +33,12 @@ finalidade de um agrupamento. As regras do agrupamento estão em `docs/specs/loa
   digitada pelo editor é tratada à parte (LOA-AGR-053 de `docs/specs/loa/edicao-agrupamento.md`): na
   inclusão e na remoção de emenda a I.A. não é chamada, e a falha da I.A. no Ctrl+clique a mantém.
   Evidência:
-  `cmj/loa/models/m_agrupamento.py:188-232`. Teste: `test_update_finalidade_limpa_e_repassa_erro`.
+  `cmj/loa/models/m_agrupamento.py:197-241`. Teste: `test_update_finalidade_limpa_e_repassa_erro`.
 - GENIA-LOA-005 [implementado] Na preparação da emenda coletiva, a finalidade automática só é gerada
   quando o agrupamento não tem finalidade própria, uma vez por grupo de unidade e entidade. Na
   prévia, a falha da I.A. deixa a finalidade automática vazia e grava o aviso em `aviso_finalidade`.
   Na geração das emendas coletivas, a falha interrompe a operação antes de criar qualquer emenda.
-  Evidência: `cmj/loa/models/m_agrupamento.py:293-305`. Testes: `test_previa_marca_aviso`,
+  Evidência: `cmj/loa/models/m_agrupamento.py:302-314`. Testes: `test_previa_marca_aviso`,
   `test_geracao_da_coletiva_interrompe_com_mensagem`.
 - GENIA-LOA-006 [implementado] O usuário é informado da falha da I.A. em cada fluxo:
   - geração manual da finalidade (Ctrl+clique no campo): resposta 400 com a mensagem, exibida como

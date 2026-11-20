@@ -474,3 +474,57 @@ def test_autosave_com_nome_vazio_responde_400_e_nao_grava(
     assert "nome" in r.data
     agrupamento.refresh_from_db()
     assert agrupamento.nome == "Agrupamento"
+
+
+# --------------------------------------------- criação reaproveita o vazio (D7)
+
+
+def abrir_criacao(client, loa):
+    return client.get(f"/loa/{loa.pk}/agrupamento/create")
+
+
+def agrupamento_aberto(response):
+    return Agrupamento.objects.get(pk=int(response.url.split("/")[-2]))
+
+
+@pytest.mark.spec("LOA-AGR-012")
+def test_reabrir_criacao_reaproveita_agrupamento_vazio(client, editor_contabil, loa):
+    client.force_login(editor_contabil)
+
+    primeiro = agrupamento_aberto(abrir_criacao(client, loa))
+    segundo = agrupamento_aberto(abrir_criacao(client, loa))
+
+    assert primeiro == segundo
+    assert primeiro.nome == "Novo Agrupamento"
+    assert Agrupamento.objects.filter(loa=loa).count() == 1
+
+
+@pytest.mark.spec("LOA-AGR-012")
+@pytest.mark.parametrize("ocupacao", ["finalidade", "emenda", "registro", "nome"])
+def test_criacao_cria_outro_quando_o_ultimo_nao_esta_vazio(
+    client, editor_contabil, loa, make_emenda, ocupacao
+):
+    client.force_login(editor_contabil)
+    primeiro = agrupamento_aberto(abrir_criacao(client, loa))
+
+    if ocupacao == "finalidade":
+        primeiro.finalidade = "Digitada"
+        primeiro.save()
+    elif ocupacao == "emenda":
+        AgrupamentoEmendaLoa.objects.create(
+            agrupamento=primeiro, emendaloa=make_emenda(fase=EC)
+        )
+    elif ocupacao == "registro":
+        AgrupamentoRegistroContabil.objects.create(
+            agrupamento=primeiro,
+            despesa=mommy.make(Despesa, loa=loa),
+            percentual=Decimal("100.00"),
+        )
+    else:
+        primeiro.nome = "Novo Agrupamento Saúde"
+        primeiro.save()
+
+    segundo = agrupamento_aberto(abrir_criacao(client, loa))
+
+    assert segundo != primeiro
+    assert segundo.nome == "Novo Agrupamento 1"

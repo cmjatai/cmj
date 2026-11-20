@@ -167,6 +167,15 @@ class Agrupamento(models.Model):
                     insercoes[-1].valor = insercoes[-1].valor + resto
                     insercoes[-1].save()
 
+    def esta_vazio(self):
+        """Sem emendas, registros contábeis, coletivas geradas nem finalidade (LOA-AGR-012)."""
+        return not (
+            self.finalidade.strip()
+            or self.agrupamentoemendaloa_set.exists()
+            or self.agrupamentoregistrocontabil_set.exists()
+            or self.emendas_coletivas_geradas.exists()
+        )
+
     def emendas_sem_juncao(self):
         """Emendas que formariam coletiva se "Gerar Emendas Coletivas" fosse chamado agora.
 

@@ -1,3 +1,5 @@
+import re
+
 from django.contrib import messages
 from django.db.models import Case, Value, When
 from django.shortcuts import redirect
@@ -66,10 +68,18 @@ class AgrupamentoCrud(MasterDetailCrud):
                 .order_by("-id")
                 .first()
             )
+            # LOA-AGR-012: reabrir a criação (recarregar, abrir duas vezes) reaproveita
+            # o último agrupamento com o nome padrão que continua vazio
+            if (
+                ultimo_agrupamento
+                and re.fullmatch(rf"{nome_base}( \d+)?", ultimo_agrupamento.nome)
+                and ultimo_agrupamento.esta_vazio()
+            ):
+                self.object = ultimo_agrupamento
+                return redirect(self.update_url)
+
             if ultimo_agrupamento:
                 numero = 1
-                import re
-
                 match = re.search(r"(\d+)$", ultimo_agrupamento.nome)
                 if match:
                     numero = int(match.group(1)) + 1
