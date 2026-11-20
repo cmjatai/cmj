@@ -130,6 +130,29 @@ class EmendaLoaService:
         autor = self.autor_da_emenda(emenda)
         return autor is not None and autor == self.autor_do_usuario(user)
 
+    def pode_editar(self, user, emenda):
+        """Permissão de edição da emenda pela API (LOA-EMD-005, LOA-EMD-076, LOA-EMD-085).
+
+        Com ``change_emendaloa``, edita sempre. Sem ela, exige emenda sem matéria e,
+        além disso, ``emendaloa_full_editor`` ou ser o autor do dono com a emenda até
+        a fase 12 ou na fase 17.
+        """
+        from cmj.loa.models import EmendaLoa
+
+        if not user or user.is_anonymous:
+            return False
+        if user.has_perm("loa.change_emendaloa"):
+            return True
+        if emenda.materia_id:
+            return False
+        if user.has_perm("loa.emendaloa_full_editor"):
+            return True
+        fase = (
+            emenda.fase <= EmendaLoa.PROPOSTA_LIBERADA
+            or emenda.fase == EmendaLoa.LIBERACAO_CONTABIL
+        )
+        return fase and self.e_autor_da_emenda(user, emenda)
+
     def parlamentar_protegido(self, emenda, user=None):
         """Parlamentar cujo valor não pode ser zerado nem desmarcado (LOA-EMD-079).
 

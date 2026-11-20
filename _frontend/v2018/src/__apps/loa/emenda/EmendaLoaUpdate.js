@@ -181,9 +181,10 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
     `)
 
     this.previewImg = containerPreview.find('img')[0]
-    this.previewImg.onload = () => {
+    this.previewImg.onload = async () => {
       this.previewImg.style.opacity = 1
-      this.loadPkObject()
+      await this.loadPkObject()
+      this.conferirEstiloGravado()
     }
     // A imagem não expõe a resposta do servidor: só é possível avisar a falha
     this.previewImg.onerror = () => {
@@ -205,7 +206,35 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
       queryString += `&${key}=${value}`
     }
 
+    this.estiloPedido = _.pick(params, ['lineHeight', 'espacoAssinatura'])
     this.previewImg.src = `${this.urlBase}/view/${queryString}`
+  }
+
+  // O /view/ só grava o estilo para quem pode editar a emenda (LOA-EMD-085). Os
+  // controles voltam ao estilo gravado, e a tela avisa quando o pedido não foi gravado.
+  conferirEstiloGravado () {
+    const pedido = this.estiloPedido
+    this.estiloPedido = null
+    const style = _.get(this.pkObject, 'metadata.style')
+    if (_.isEmpty(pedido) || !style) return
+
+    this.form.find('input[name="lineHeight"]').val(style.lineHeight)
+    this.form.find('input[name="espacoAssinatura"]').prop('checked', !!style.espacoAssinatura)
+
+    let gravado = true
+    if ('lineHeight' in pedido) {
+      const limitado = Math.max(100, Math.min(300, parseInt(pedido.lineHeight)))
+      gravado = gravado && limitado === parseInt(style.lineHeight)
+    }
+    if ('espacoAssinatura' in pedido) {
+      gravado = gravado && !!pedido.espacoAssinatura === !!style.espacoAssinatura
+    }
+    if (!gravado) {
+      this.mostrarErro(
+        'Estilo do documento não gravado.',
+        'Você não tem permissão para editar esta Emenda.'
+      )
+    }
   }
 
   setupRegistroRender () {

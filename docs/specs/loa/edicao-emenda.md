@@ -1,6 +1,6 @@
 # LOA: edição da emenda
 
-Status: observado; D1, D3, D4, D5, D6, D7 e D8 implementadas (LOA-EMD-070 a 084)
+Status: observado; D1 a D8 implementadas (LOA-EMD-070 a 085)
 Última verificação: 2026-11-20 (commit `7c7c5f1c2`)
 Código principal: `cmj/loa/views/v_emendaloa.py`, `cmj/loa/forms/f_emendaloa.py`,
 `cmj/loa/services/s_emendaloa.py`, `cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
@@ -168,6 +168,19 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:502-513`,
   `_frontend/v2018/src/__apps/loa/scss/loa.scss:608-619`.
 
+### Estilo do documento gravado pelo /view/ (D2, decidida em 2026-11-20)
+
+- LOA-EMD-085 [implementado] O GET de `/view/` só grava `metadata.style` (entrelinha e espaço para
+  assinaturas, inclusive o estilo padrão da emenda que ainda não tem um) para quem tem permissão de
+  edição da emenda pela API, a mesma do PATCH (LOA-EMD-005 com LOA-EMD-076). Os demais, inclusive o
+  anônimo, recebem o documento com o estilo gravado, e os parâmetros `lineHeight` e
+  `espacoAssinatura` são ignorados. O endpoint continua sendo um GET público. Na tela de edição,
+  depois de cada pré-visualização, os controles voltam ao estilo gravado, e um aviso (LOA-EMD-084)
+  informa quando o estilo pedido não foi gravado. Substitui LOA-EMD-052 quanto à permissão.
+  Evidência: `EmendaLoaService.pode_editar` (`cmj/loa/services/s_emendaloa.py:133-154`),
+  `cmj/api/loa/views/emendaloa.py:258-296`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:184-238`.
+
 ## Regras observadas
 
 ### Acesso às telas
@@ -192,7 +205,9 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - sem ela, exige emenda sem matéria e, além disso, `emendaloa_full_editor`, ou operador de autor
     participante com fase até 12 ou igual a 17.
 
-  Evidência: `cmj/api/loa/views/emendaloa.py:29-83`.
+  O "operador de autor participante" foi substituído pelo autor do dono (LOA-EMD-076). Evidência:
+  `EmendaLoaService.pode_editar` (`cmj/loa/services/s_emendaloa.py:133-154`),
+  `cmj/api/loa/views/emendaloa.py:29-57`.
 - LOA-EMD-006 [observado] Os GET da API usados pela tela (`/view/` e `/totais/`) só exigem as
   permissões de listagem e detalhe, que são públicas para `EmendaLoa`. Evidência:
   `sapl/api/permissions.py:12-24`, `sapl/api/permissions.py:50-56`, `cmj/globalrules/map_rules.py:246-250`.
@@ -316,7 +331,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `lineHeight` e `espacoAssinatura` na URL. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:40-100`.
 - LOA-EMD-052 [observado] O GET de `/view/` grava em `metadata.style` a entrelinha recebida, limitada a
-  100–300 no servidor, e o espaço para assinaturas. Assim, uma requisição GET altera a emenda (ver D2).
+  100–300 no servidor, e o espaço para assinaturas. Assim, uma requisição GET altera a emenda.
+  Substituída, quanto à permissão, por LOA-EMD-085.
   Evidência: `cmj/api/loa/views/emendaloa.py:264-299`.
 - LOA-EMD-053 [observado] O autosave reage ao evento `change` de qualquer campo com `name` do
   formulário e envia **um campo por requisição**:
@@ -393,13 +409,9 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 
 ## Dúvidas
 
-Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, D3 e D7 viraram LOA-EMD-076 a 079,
-D8 virou LOA-EMD-080 e 081, D1 virou LOA-EMD-082, D5 virou LOA-EMD-083 e D6 virou LOA-EMD-084.
-
-- D2. **O GET de `/view/` altera a emenda e é público.** O endpoint grava `metadata.style`
-  (LOA-EMD-052), e o GET da API é público para `EmendaLoa` (LOA-EMD-006). Qualquer pessoa, mesmo
-  anônima, pode mudar a entrelinha do documento de qualquer emenda visível, o que afeta o PDF da
-  proposição. A gravação deve exigir permissão de edição, ou sair do GET?
+Nenhuma em aberto. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, D3 e D7 viraram LOA-EMD-076 a 079, D8
+virou LOA-EMD-080 e 081, D1 virou LOA-EMD-082, D5 virou LOA-EMD-083, D6 virou LOA-EMD-084 e D2 virou
+LOA-EMD-085.
 
 ## Pendências encontradas
 

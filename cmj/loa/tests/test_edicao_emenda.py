@@ -867,3 +867,95 @@ def test_usuario_sem_autor_nem_permissao_nao_cria(api, client, loa, unidade):
     assert tela.status_code == 403
     assert r.status_code == 403
     assert not EmendaLoa.all_objects.filter(finalidade="Criada pela API").exists()
+
+
+# ------------------------------------------------- estilo gravado pelo /view/
+
+
+def pdf_vazio(*args, **kwargs):
+    import pymupdf
+
+    doc = pymupdf.Document()
+    doc.new_page()
+    return doc.tobytes()
+
+
+@pytest.fixture
+def get_view():
+    def _get(client, emenda, **params):
+        with mock.patch("cmj.api.loa.views.emendaloa.make_pdf", pdf_vazio):
+            return client.get(f"/api/loa/emendaloa/{emenda.pk}/view/", params)
+
+    return _get
+
+
+ESTILO = {"style": {"lineHeight": 150, "espacoAssinatura": 0}}
+
+
+@pytest.mark.spec("LOA-EMD-085")
+def test_view_anonimo_nao_grava_estilo(
+    client, get_view, autor, parlamentar, make_emenda
+):
+    el = make_emenda(fase=P, owner=autor, parlamentar=parlamentar, metadata=ESTILO)
+
+    r = get_view(client, el, lineHeight=300, espacoAssinatura="true")
+
+    assert r.status_code == 200
+    assert recarregar(el).metadata == ESTILO
+
+
+@pytest.mark.spec("LOA-EMD-085")
+def test_view_sem_permissao_de_edicao_nao_grava_estilo(
+    api, get_view, autor, autor_b, parlamentar, make_emenda
+):
+    el = make_emenda(fase=P, owner=autor, parlamentar=parlamentar, metadata=ESTILO)
+
+    r = get_view(api(autor_b), el, lineHeight=300)
+
+    assert r.status_code == 200
+    assert recarregar(el).metadata == ESTILO
+
+
+@pytest.mark.spec("LOA-EMD-085")
+def test_view_sem_estilo_nao_grava_padrao_para_quem_nao_edita(
+    client, get_view, autor, parlamentar, make_emenda
+):
+    el = make_emenda(fase=P, owner=autor, parlamentar=parlamentar, metadata={})
+
+    assert get_view(client, el).status_code == 200
+    assert recarregar(el).metadata == {}
+
+
+@pytest.mark.spec("LOA-EMD-085")
+def test_view_do_autor_grava_estilo(api, get_view, autor, parlamentar, make_emenda):
+    el = make_emenda(fase=P, owner=autor, parlamentar=parlamentar, metadata=ESTILO)
+
+    r = get_view(api(autor), el, lineHeight=200, espacoAssinatura="true")
+
+    assert r.status_code == 200
+    assert recarregar(el).metadata["style"] == {
+        "lineHeight": 200,
+        "espacoAssinatura": 1,
+    }
+
+
+@pytest.mark.spec("LOA-EMD-085")
+def test_view_do_autor_nao_grava_estilo_na_fase_15(
+    api, get_view, autor, parlamentar, make_emenda
+):
+    el = make_emenda(fase=EC, owner=autor, parlamentar=parlamentar, metadata=ESTILO)
+
+    get_view(api(autor), el, lineHeight=200)
+
+    assert recarregar(el).metadata == ESTILO
+
+
+@pytest.mark.spec("LOA-EMD-085")
+def test_view_do_operador_da_loa_grava_estilo_com_materia(
+    api, get_view, operador_loa, make_emenda, materia
+):
+    el = make_emenda(fase=LC, materia=materia, metadata=ESTILO)
+
+    get_view(api(operador_loa), el, lineHeight=200)
+
+    assert recarregar(el).metadata["style"]["lineHeight"] == 200

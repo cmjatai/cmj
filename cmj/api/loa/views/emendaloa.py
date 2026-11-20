@@ -52,16 +52,9 @@ class EmendaLoaViewSet:
 
                 el = EmendaLoa.objects.get(pk=view.kwargs["pk"])
 
-                # LOA-EMD-076: só o autor do dono edita; coautores só consultam
-                e_autor = EmendaLoa.service.e_autor_da_emenda(u, el)
-                fase = (
-                    el.fase <= EmendaLoa.PROPOSTA_LIBERADA
-                    or el.fase == EmendaLoa.LIBERACAO_CONTABIL
-                )
-
-                return (u.has_perm("loa.emendaloa_full_editor") and not el.materia) or (
-                    e_autor and not el.materia and fase
-                )
+                # LOA-EMD-005 e LOA-EMD-076: só o autor do dono edita; coautores
+                # só consultam
+                return EmendaLoa.service.pode_editar(u, el)
 
             return False
 
@@ -272,7 +265,11 @@ class EmendaLoaViewSet:
             el.metadata["style"] = {"lineHeight": 150, "espacoAssinatura": 0}
             el_changed = True
 
-        if "lineHeight" in request.GET:
+        # LOA-EMD-085: só quem pode editar a emenda grava o estilo; os demais
+        # recebem o documento com o estilo gravado
+        pode_gravar = EmendaLoa.service.pode_editar(request.user, el)
+
+        if pode_gravar and "lineHeight" in request.GET:
             lineHeight = float(el.metadata["style"]["lineHeight"])
             lineHeight = min(300, int(request.GET.get("lineHeight", lineHeight)))
             lineHeight = max(100, lineHeight)
@@ -281,7 +278,7 @@ class EmendaLoaViewSet:
                 el.metadata["style"]["lineHeight"] = lineHeight
                 el_changed = True
 
-        if "espacoAssinatura" in request.GET:
+        if pode_gravar and "espacoAssinatura" in request.GET:
             if "espacoAssinatura" not in el.metadata["style"]:
                 el.metadata["style"]["espacoAssinatura"] = 0
                 el_changed = True
@@ -295,7 +292,7 @@ class EmendaLoaViewSet:
                 el.metadata["style"]["espacoAssinatura"] = espacoAssinatura
                 el_changed = True
 
-        if el_changed:
+        if el_changed and pode_gravar:
             el.save()
 
         context = {
