@@ -7,6 +7,18 @@ from cmj.utils.genia.base import IAGenaiBase
 logger = logging.getLogger(__name__)
 
 
+class IAEmentaEmendaColetivaError(Exception):
+    """Falha da I.A. ao gerar a ementa; a mensagem é exibida ao usuário."""
+
+    MENSAGEM = (
+        "Não foi possível gerar a finalidade com I.A. Tente novamente "
+        "ou informe a finalidade manualmente."
+    )
+
+    def __init__(self, message=MENSAGEM):
+        super().__init__(message)
+
+
 class IAEmentaEmendaColetiva(IAGenaiBase):
     """
     Consolida as finalidades de várias emendas na ementa de uma emenda coletiva.
@@ -38,7 +50,11 @@ class IAEmentaEmendaColetiva(IAGenaiBase):
         )
 
     def gerar_finalidade_global(self, ementas=None):
-        """Retorna a ementa consolidada, ou "" sem ementas ou em caso de erro."""
+        """
+        Retorna a ementa consolidada, ou "" sem ementas.
+
+        Levanta IAEmentaEmendaColetivaError se a API falhar.
+        """
         if ementas:
             self.ementas = [clean_text(e) for e in ementas]
 
@@ -48,7 +64,7 @@ class IAEmentaEmendaColetiva(IAGenaiBase):
 
         try:
             response = self.generate_content([self.make_prompt()])
-            return response.text
+            return response.text or ""
         except Exception as e:
             logger.error("Erro ao agrupar ementas: %s", e)
-            return ""
+            raise IAEmentaEmendaColetivaError() from e

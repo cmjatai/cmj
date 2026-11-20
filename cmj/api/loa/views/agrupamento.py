@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 
 from cmj.api.loa.views.emendaloa import EmendaLoaSearchSerializer, EmendaLoaViewSet
 from cmj.loa.models import EmendaLoa
+from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetivaError
 from cmj.utils.utils_report import make_pdf
 from drfautoapi.drfautoapi import wrapper_queryset_response_for_drf_action
 
@@ -65,7 +66,7 @@ class AgrupamentoViewSet:
                 agrupamento.update_finalidade_com_ia()
                 finalidade_global = agrupamento.finalidade
             return JsonResponse({"finalidade_global": finalidade_global})
-        except ValueError as e:
+        except (ValueError, IAEmentaEmendaColetivaError) as e:
             # responder com erro para que o promise no frontend saiba que houve falha
             return JsonResponse({"error": str(e)}, status=400)
 

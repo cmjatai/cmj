@@ -1,4 +1,3 @@
-import logging
 import re
 from decimal import Decimal
 
@@ -13,10 +12,11 @@ from django.utils.translation import gettext_lazy as _
 from cmj.loa.models.m_emendaloa import EmendaLoa, EmendaLoaParlamentar
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
 from cmj.utils import PERCENTAGE_VALIDATOR, quantize
-from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetiva
+from cmj.utils.genia.loa_agrupamento import (
+    IAEmentaEmendaColetiva,
+    IAEmentaEmendaColetivaError,
+)
 from sapl.parlamentares.models import Parlamentar
-
-logger = logging.getLogger(__name__)
 
 
 class Agrupamento(models.Model):
@@ -169,13 +169,12 @@ class Agrupamento(models.Model):
         try:
             ia = IAEmentaEmendaColetiva([str(e.finalidade) for e in self.emendas.all()])
             self.finalidade = ia.gerar_finalidade_global()
-            if not self.finalidade:
-                self.finalidade = ""
-            self.save(update_fields=["finalidade"])
-        except Exception as e:
-            logger.error("Erro ao atualizar finalidade com IA: %s", e)
+        except IAEmentaEmendaColetivaError:
+            # finalidade limpa e erro repassado para ser exibido ao usuário
             self.finalidade = ""
             self.save(update_fields=["finalidade"])
+            raise
+        self.save(update_fields=["finalidade"])
 
     def preparar_dados_para_coletiva(self, for_preview=False):
 
@@ -235,18 +234,20 @@ class Agrupamento(models.Model):
             )
 
         # criar finalidade agregada para cada agrupamento via I.A.
+        # Na prévia, a falha vira aviso no PDF; na geração, interrompe com erro.
         if not self.finalidade:
-            try:
-                ia = IAEmentaEmendaColetiva()
-                for key in emendas_coletivas:
-                    emendas = emendas_coletivas[key]["emendas"]
-                    finalidades = [emenda.finalidade for emenda in emendas]
+            ia = IAEmentaEmendaColetiva()
+            for key in emendas_coletivas:
+                emendas = emendas_coletivas[key]["emendas"]
+                finalidades = [emenda.finalidade for emenda in emendas]
+                try:
                     finalidade_automatica = ia.gerar_finalidade_global(finalidades)
-                    emendas_coletivas[key][
-                        "finalidade_automatica"
-                    ] = finalidade_automatica
-            except Exception as e:
-                logger.error(f"Erro ao gerar finalidade automática: {e}")
+                except IAEmentaEmendaColetivaError as e:
+                    if not for_preview:
+                        raise
+                    emendas_coletivas[key]["aviso_finalidade"] = str(e)
+                    finalidade_automatica = ""
+                emendas_coletivas[key]["finalidade_automatica"] = finalidade_automatica
 
         return [
             {
@@ -256,6 +257,7 @@ class Agrupamento(models.Model):
                 "entidade": entidade,
                 "finalidade_customizada": self.finalidade,
                 "finalidade_automatica": value.get("finalidade_automatica", None),
+                "aviso_finalidade": value.get("aviso_finalidade", ""),
                 "bairro": value["emendas"][0].bairro if value["emendas"] else None,
                 "total_via_parlamentares": value["total_via_parlamentares"],
                 "parlamentares": Parlamentar.objects.filter(

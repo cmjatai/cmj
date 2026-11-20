@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from cmj.api.loa.views.emendaloa import EmendaLoaViewSet
 from cmj.loa.models import AgrupamentoEmendaLoa, EmendaLoa
 from cmj.loa.models.m_agrupamento import Agrupamento
+from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetivaError
 
 logger = logging.getLogger(__name__)
 
@@ -43,23 +44,42 @@ class AgrupamentoEmendaLoaViewSet:
                 "Não é possível remover Emenda de um agrupamento transformado em coletiva."
             )
 
+        agrupamento = agrupamento_emenda.agrupamento
         try:
             # sync agrupamento
-            agrupamento_id = int(request.data["agrupamento"])
-            agrupamento = Agrupamento.objects.get(pk=agrupamento_id)
             agrupamento.sync()
-            agrupamento.update_finalidade_com_ia()
 
             # sync emenda
             emendaloa_id = int(request.data["emendaloa"])
             emendaloa = EmendaLoa.objects.get(pk=emendaloa_id)
             emendaloa.sync()
         except Exception as e:
-            logger.error("Erro ao atualizar finalidade com IA: %s", e)
+            logger.error("Erro ao sincronizar agrupamento e emenda: %s", e)
 
         agrupamento_emenda.delete()
 
-        return Response({"detail": "Registro removido com Sucesso."})
+        # a finalidade é gerada depois da remoção, já sem a emenda removida
+        aviso_finalidade = self.atualizar_finalidade(agrupamento)
+
+        return Response(
+            {
+                "detail": "Registro removido com Sucesso.",
+                "agrupamento_finalidade": agrupamento.finalidade,
+                "aviso_finalidade": aviso_finalidade,
+            }
+        )
+
+    @staticmethod
+    def atualizar_finalidade(agrupamento):
+        """Gera a finalidade com I.A. e devolve o aviso de falha da I.A., ou ""."""
+        try:
+            agrupamento.update_finalidade_com_ia()
+        except IAEmentaEmendaColetivaError as e:
+            return str(e)
+        except Exception as e:
+            # sem emendas ou com unidades e entidades diferentes não há aviso
+            logger.error("Erro ao atualizar finalidade com IA: %s", e)
+        return ""
 
     FASES_PERMITIDAS_NA_INCLUSAO = (
         EmendaLoa.PROPOSTA_LIBERADA,
@@ -100,18 +120,9 @@ class AgrupamentoEmendaLoaViewSet:
                 el.fase = EmendaLoa.EDICAO_CONTABIL
                 el.save()
 
-            r.data["agrupamento_finalidade"] = AgrupamentoEmendaLoa.objects.get(
-                agrupamento=int(request.data["agrupamento"]),
-                emendaloa=int(request.data["emendaloa"]),
-            ).agrupamento.finalidade
-
-            try:
-                agrupamento = Agrupamento.objects.get(
-                    pk=int(request.data["agrupamento"])
-                )
-                agrupamento.update_finalidade_com_ia()
-            except Exception as e:
-                logger.error("Erro ao atualizar finalidade com IA: %s", e)
+            agrupamento = Agrupamento.objects.get(pk=int(request.data["agrupamento"]))
+            r.data["aviso_finalidade"] = self.atualizar_finalidade(agrupamento)
+            r.data["agrupamento_finalidade"] = agrupamento.finalidade
 
             return r
         except Exception as e:

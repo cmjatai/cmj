@@ -52,9 +52,9 @@ export default class AgrupamentoUpdate {
             alert(response.data.error)
           }
         })
-        .catch(() => {
+        .catch((error) => {
           window.unloadingCMJ()
-          alert('Ocorreu um erro ao gerar a emenda coletiva.')
+          alert(error.response?.data?.error || 'Ocorreu um erro ao gerar a emenda coletiva.')
         })
     })
     const cancelar_emendas_coletivas = this.form.find('#cancelar_emendas_coletivas')
@@ -298,8 +298,10 @@ export default class AgrupamentoUpdate {
               emendaloa: pk_emendaloa
             }
             axios.post(`/api/loa/agrupamentoemendaloa/delete/`, formData)
-              .then(() => {
+              .then((response) => {
+                this.form.find('#id_finalidade').val(response.data.agrupamento_finalidade)
                 this.loadEmendasAgrupamento()
+                this.alertAvisoFinalidade(response.data.aviso_finalidade)
               })
               .catch((error) => {
                 busca_render_emendaloa.find('.alert').remove()
@@ -376,6 +378,7 @@ export default class AgrupamentoUpdate {
                 this.form.find('#id_finalidade').val(response.data.agrupamento_finalidade)
                 busca_render_emendaloa.find(`.item-emendaloa[pk="${response.data.emendaloa}"]`).parent().remove()
                 this.loadEmendasAgrupamento()
+                this.alertAvisoFinalidade(response.data.aviso_finalidade)
               })
               .catch((error) => {
                 this.form.find('#id_finalidade').val('')
@@ -385,6 +388,13 @@ export default class AgrupamentoUpdate {
           })
         })
       })
+  }
+
+  alertAvisoFinalidade (aviso) {
+    // falha da I.A. ao gerar a finalidade: a inclusão/remoção foi feita
+    if (aviso) {
+      alert(aviso)
+    }
   }
 
   renderEmendaItem (value, container, returnHtml = false) {

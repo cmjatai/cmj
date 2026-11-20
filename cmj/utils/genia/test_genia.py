@@ -16,7 +16,10 @@ from cmj.utils.genia import (
 )
 from cmj.utils.genia.classificacao import IAClassificacaoMateriaService
 from cmj.utils.genia.genia_system_instruction_v3 import rag_system_instruction
-from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetiva
+from cmj.utils.genia.loa_agrupamento import (
+    IAEmentaEmendaColetiva,
+    IAEmentaEmendaColetivaError,
+)
 from cmj.utils.genia.similaridade import IAAnaliseSimilaridadeService
 from sapl.base.models import Metadata
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
@@ -281,12 +284,14 @@ def test_ementa_coletiva_usa_modelo_fixo_sem_cota(client):
 
 
 @pytest.mark.spec("GENIA-LOA-002")
-def test_ementa_coletiva_devolve_vazio_sem_ementas_ou_com_erro(client):
+def test_ementa_coletiva_sem_ementas_devolve_vazio_e_erro_levanta(client):
     assert IAEmentaEmendaColetiva().gerar_finalidade_global() == ""
     client.models.generate_content.assert_not_called()
 
     client.models.generate_content.side_effect = RuntimeError("falha")
-    assert IAEmentaEmendaColetiva().gerar_finalidade_global(["a"]) == ""
+    with pytest.raises(IAEmentaEmendaColetivaError) as exc:
+        IAEmentaEmendaColetiva().gerar_finalidade_global(["a"])
+    assert str(exc.value) == IAEmentaEmendaColetivaError.MENSAGEM
 
 
 @pytest.mark.spec("GENIA-SIM-001")

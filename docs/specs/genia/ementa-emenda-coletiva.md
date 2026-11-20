@@ -1,10 +1,12 @@
 # Genia: ementa de emenda coletiva (LOA)
 
 Status: implementado
-Última verificação: 2026-11-19 (branch `refactor/genia`, sobre o commit `d6741e498`)
+Última verificação: 2026-11-19 (branch `master`, sobre o commit `beb608754`)
 Código principal: `cmj/utils/genia/loa_agrupamento.py`, `cmj/utils/genia/prompts_loa_agrupamento.py`,
-`cmj/loa/models/m_agrupamento.py`
-Testes: `cmj/utils/genia/test_genia.py`
+`cmj/loa/models/m_agrupamento.py`, `cmj/api/loa/views/agrupamento.py`,
+`cmj/api/loa/views/agrupamentoemendaloa.py`, `_templates/v2018/loa/pdf/agrupamento_preview.html`,
+`_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js`
+Testes: `cmj/utils/genia/test_genia.py`, `cmj/loa/tests/test_agrupamento_ia.py`
 
 ## Escopo
 
@@ -15,19 +17,44 @@ finalidade de um agrupamento. As regras do agrupamento estão em `docs/specs/loa
 
 - GENIA-LOA-001 [implementado] O serviço chama o modelo fixo `gemini-3.1-flash-lite` com temperatura
   0 e os demais parâmetros no padrão da API, sem system instruction. É isento de cota: não consulta
-  nem registra `IAQuota`. Evidência: `cmj/utils/genia/loa_agrupamento.py:17-26`.
+  nem registra `IAQuota`. Evidência: `cmj/utils/genia/loa_agrupamento.py:29-38`. Teste:
+  `test_ementa_coletiva_usa_modelo_fixo_sem_cota`.
 - GENIA-LOA-003 [implementado] O prompt em uso é `PROMPT_V1`, com as finalidades limpas por
   `clean_text`, uma por linha, prefixadas com `- `. `PROMPT_V0` é histórico. Evidência:
-  `cmj/utils/genia/loa_agrupamento.py:28-38`, `cmj/utils/genia/prompts_loa_agrupamento.py:31`.
-- GENIA-LOA-002 [implementado] Sem finalidades, devolve texto vazio sem chamar a API. Qualquer erro
-  da API é registrado em log e também devolve texto vazio. Evidência:
-  `cmj/utils/genia/loa_agrupamento.py:40-54`.
-- GENIA-LOA-004 [observado] `Agrupamento.update_finalidade_com_ia` grava o resultado em `finalidade`.
-  Se as emendas não tiverem a mesma unidade e entidade, limpa a finalidade e levanta `ValueError` sem
-  chamar a I.A. Evidência: `cmj/loa/models/m_agrupamento.py:149-178`.
-- GENIA-LOA-005 [observado] Na preparação da emenda coletiva, a finalidade automática só é gerada
-  quando o agrupamento não tem finalidade própria, uma vez por grupo de unidade e entidade.
-  Evidência: `cmj/loa/models/m_agrupamento.py:237-248`.
+  `cmj/utils/genia/loa_agrupamento.py:40-50`, `cmj/utils/genia/prompts_loa_agrupamento.py:31`.
+- GENIA-LOA-002 [implementado] Sem finalidades, devolve texto vazio sem chamar a API. Um erro da API
+  é registrado em log e levanta `IAEmentaEmendaColetivaError`, cuja mensagem é exibida ao usuário
+  (GENIA-LOA-006). Evidência: `cmj/utils/genia/loa_agrupamento.py:10-20`,
+  `cmj/utils/genia/loa_agrupamento.py:52-70`. Teste:
+  `test_ementa_coletiva_sem_ementas_devolve_vazio_e_erro_levanta`.
+- GENIA-LOA-004 [implementado] `Agrupamento.update_finalidade_com_ia` grava o resultado em
+  `finalidade`. Se as emendas não tiverem a mesma unidade e entidade, limpa a finalidade e levanta
+  `ValueError` sem chamar a I.A. Se a I.A. falhar, limpa a finalidade e repassa o erro. Evidência:
+  `cmj/loa/models/m_agrupamento.py:149-177`. Teste: `test_update_finalidade_limpa_e_repassa_erro`.
+- GENIA-LOA-005 [implementado] Na preparação da emenda coletiva, a finalidade automática só é gerada
+  quando o agrupamento não tem finalidade própria, uma vez por grupo de unidade e entidade. Na
+  prévia, a falha da I.A. deixa a finalidade automática vazia e grava o aviso em `aviso_finalidade`.
+  Na geração das emendas coletivas, a falha interrompe a operação antes de criar qualquer emenda.
+  Evidência: `cmj/loa/models/m_agrupamento.py:236-260`. Testes: `test_previa_marca_aviso`,
+  `test_geracao_da_coletiva_interrompe_com_mensagem`.
+- GENIA-LOA-006 [implementado] O usuário é informado da falha da I.A. em cada fluxo:
+  - geração manual da finalidade (Ctrl+clique no campo): resposta 400 com a mensagem, exibida no
+    campo. Evidência: `cmj/api/loa/views/agrupamento.py:69-71`. Teste:
+    `test_geracao_manual_responde_400_com_mensagem`.
+  - inclusão e remoção de emenda: a operação é concluída e a resposta traz `aviso_finalidade` e a
+    finalidade atualizada (`agrupamento_finalidade`), e a tela exibe o aviso em `alert`. Unidades ou
+    entidades diferentes não geram aviso. Na remoção, a finalidade é gerada depois de a emenda sair
+    do agrupamento. Evidência: `cmj/api/loa/views/agrupamentoemendaloa.py:59-82`,
+    `cmj/api/loa/views/agrupamentoemendaloa.py:124`,
+    `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:304`,
+    `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:381`. Testes:
+    `test_inclusao_conclui_e_avisa`, `test_inclusao_sem_erro_devolve_finalidade_gerada`,
+    `test_remocao_conclui_e_avisa`, `test_remocao_gera_finalidade_sem_a_emenda_removida`.
+  - prévia em PDF: faixa vermelha com o aviso. Evidência:
+    `_templates/v2018/loa/pdf/agrupamento_preview.html:40-44`.
+  - geração das emendas coletivas: resposta 400 com a mensagem, exibida em `alert`. Evidência:
+    `cmj/api/loa/views/agrupamento.py:80-95`. Teste:
+    `test_geracao_da_coletiva_interrompe_com_mensagem`.
 
 ## Decisões
 

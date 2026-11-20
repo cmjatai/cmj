@@ -37,6 +37,11 @@
     <section class="red">
       PROTOTIPAÇÃO EM ANDAMENTO
     </section>
+  {% if agrupamento.aviso_finalidade %}
+    <section class="red">
+      {{ agrupamento.aviso_finalidade }}
+    </section>
+  {% endif %}
   {% define object.totais_contabeis as otc %}
 
   {% if object.tipo %}
