@@ -43,6 +43,7 @@ class AgrupamentoViewSet:
             "post",
         ],
         detail=True,
+        permission_classes=(AgrupamentoPermission,),
     )
     def create_copia(self, request, *args, **kwargs):
         agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
@@ -57,6 +58,7 @@ class AgrupamentoViewSet:
             "patch",
         ],
         detail=True,
+        permission_classes=(AgrupamentoPermission,),
     )
     def generate_finalidade_global(self, request, *args, **kwargs):
         agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
