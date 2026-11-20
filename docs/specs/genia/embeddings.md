@@ -27,20 +27,21 @@ recuperação estão em `docs/rag/02-ingestao-e-indexacao.md` e `docs/rag/03-rec
 - GENIA-EMB-005 [observado] Dois lotes seguidos sem nenhum vetor interrompem o processamento, e a
   lista devolvida fica menor que a de entrada. Evidência: `cmj/utils/genia/embeddings.py:120-128`.
   Teste: `test_embed_documents_interrompe_quando_api_fora_do_ar`.
-- GENIA-EMB-006 [implementado] O serviço é isento de cota: não consulta nem registra `IAQuota`.
+- GENIA-EMB-006 [implementado] O serviço é isento de cota por decisão: não consulta nem registra `IAQuota`.
   Evidência: `cmj/utils/genia/embeddings.py:18`.
 - GENIA-EMB-007 [observado] A contagem de tokens de um chunk usa o modelo padrão da classe-base
   (`gemini-3-flash-preview`), não o modelo de embedding. Evidência: `cmj/search/models.py:142`,
   `cmj/utils/genia/base.py:36`.
 
-## Dúvidas
+## Decisões
 
-- D1. A vetorização não tem limite de cota nem registro de consumo. Uma reindexação completa chama a
-  API sem controle. Deve passar a ter cota própria?
-- D2. A dimensão 1536 está fixa aqui e no campo `Embedding.vetor1536`. Mudar o modelo ou a dimensão
-  exige reindexar toda a base. Registrar isso como restrição?
-- D3. A contagem de tokens usa um modelo diferente do que gera o embedding (GENIA-EMB-007). O número
-  serve só como estimativa?
+- O serviço não tem cota nem registro de consumo, e isso é intencional (GENIA-EMB-006). A execução
+  do modelo de embedding é livre, dentro do que a ingestão já implementa: lotes, repetição e
+  interrupção por API fora do ar.
+- Restrição: a dimensão 1536 está fixa no serviço e em `Embedding.vetor1536`. Trocar a dimensão exige
+  reindexar toda a base. O modelo `gemini-embedding-2` não deve ser substituído enquanto a biblioteca
+  `google.genai` o fornecer.
+- A contagem de tokens de um chunk (GENIA-EMB-007) usa outro modelo e serve só como estimativa.
 
 ## Fora do escopo
 
