@@ -210,7 +210,7 @@ def test_cancelar_coletiva_devolve_origem_para_15(
 
 
 @pytest.mark.spec("LOA-FASE-057")
-def test_cancelar_coletiva_preserva_fase_de_quem_nao_estava_em_menos_10(
+def test_cancelar_coletiva_devolve_para_15_quem_estava_em_17(
     api, editor_contabil, agrupamento_com_coletiva
 ):
     agrupamento, _, _, fora, _ = agrupamento_com_coletiva
@@ -218,7 +218,7 @@ def test_cancelar_coletiva_preserva_fase_de_quem_nao_estava_em_menos_10(
 
     cancelar_coletivas(api(editor_contabil), agrupamento)
 
-    assert recarregar(fora).fase == LC
+    assert recarregar(fora).fase == EC
 
 
 @pytest.mark.spec("LOA-FASE-064")

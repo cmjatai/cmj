@@ -123,11 +123,18 @@ class AgrupamentoViewSet:
             return JsonResponse({"error": "Agrupamento not found"}, status=404)
 
         try:
-            # só as emendas que estavam em -10 voltam para 15 (feito no model);
-            # as demais emendas do agrupamento mantêm a fase
-            agrupamento.cancelar_emendas_coletivas(user=request.user)
+            # LOA-AGR-072: exclui as coletivas e devolve -10 e 17 para 15 (no model)
+            excluidas, devolvidas = agrupamento.cancelar_emendas_coletivas(
+                user=request.user
+            )
 
-            return JsonResponse({"status": "success"})
+            return JsonResponse(
+                {
+                    "status": "success",
+                    "coletivas_excluidas": excluidas,
+                    "emendas_devolvidas": devolvidas,
+                }
+            )
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=400)
 

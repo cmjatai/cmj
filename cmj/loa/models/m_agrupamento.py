@@ -335,21 +335,41 @@ class Agrupamento(models.Model):
         ]
 
     def cancelar_emendas_coletivas(self, user=None):
-        try:
-            with transaction.atomic():
-                for e in self.emendas(manager="all_objects").filter(
-                    emenda_coletiva__isnull=False
-                ):
-                    e.emenda_coletiva = None
-                    e.fase = EmendaLoa.EDICAO_CONTABIL
-                    e._usuario_fase = user  # LOA-FASE-067
-                    e.save()
+        """Devolve o agrupamento à edição contábil (LOA-AGR-072).
 
-                # deletando emendas coletivas associadas ao agrupamento
-                for ec in self.emendas_coletivas_geradas.all():
-                    ec.delete()
-        except Exception as e:
-            raise e
+        Exclui as coletivas geradas e devolve para 15 as emendas nas fases -10 e 17.
+        Recusa, sem mudar nada, se alguma coletiva já está em tramitação.
+        Devolve (coletivas excluídas, emendas devolvidas).
+        """
+        # manager="all_objects" já não filtra a fase; .all_objects() no related manager
+        # perderia o filtro do relacionamento e traria emendas de toda a base
+        coletivas = self.emendas_coletivas_geradas(manager="all_objects").all()
+        if coletivas.filter(fase__gte=EmendaLoa.EM_TRAMITACAO).exists():
+            raise ValueError(
+                "Há emenda coletiva deste agrupamento em tramitação. "
+                "Não é possível cancelar as coletivas."
+            )
+
+        with transaction.atomic():
+            devolvidas = 0
+            for e in self.emendas(manager="all_objects").filter(
+                fase__in=(
+                    EmendaLoa.TRANSFORMADA_EM_COLETIVA,
+                    EmendaLoa.LIBERACAO_CONTABIL,
+                )
+            ):
+                e.emenda_coletiva = None
+                e.fase = EmendaLoa.EDICAO_CONTABIL
+                e._usuario_fase = user  # LOA-FASE-067
+                e.save()
+                devolvidas += 1
+
+            excluidas = 0
+            for ec in coletivas:
+                ec.delete()
+                excluidas += 1
+
+        return excluidas, devolvidas
 
     def gerar_emendas_coletivas(self, user=None):
         emendas_preparadas = self.preparar_dados_para_coletiva()

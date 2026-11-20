@@ -528,3 +528,115 @@ def test_criacao_cria_outro_quando_o_ultimo_nao_esta_vazio(
 
     assert segundo != primeiro
     assert segundo.nome == "Novo Agrupamento 1"
+
+
+# ------------------------------------- cancelar coletivas devolve à edição (072)
+
+
+@pytest.fixture
+def cancelavel(agrupamento, make_emenda, parlamentar, parlamentar_b):
+    """Duas emendas que viram coletiva, uma na 17, uma na 12 e uma na 10."""
+    juntas = [
+        make_emenda(fase=EC, parlamentar=p, permite_juncao_coletiva=True)
+        for p in (parlamentar, parlamentar_b)
+    ]
+    na_17 = make_emenda(fase=LC, parlamentar=parlamentar)
+    na_12 = make_emenda(fase=EmendaLoa.PROPOSTA_LIBERADA, parlamentar=parlamentar)
+    na_10 = make_emenda(fase=P, parlamentar=parlamentar)
+    # pelo ORM a inclusão não muda a fase (quem leva para 15 é a API, LOA-FASE-060)
+    for el in (*juntas, na_17, na_12, na_10):
+        AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento, emendaloa=el)
+    coletivas = agrupamento.gerar_emendas_coletivas()
+    return agrupamento, juntas, na_17, na_12, na_10, coletivas
+
+
+def cancelar(client, agrupamento):
+    return client.post(
+        f"/api/loa/agrupamento/{agrupamento.pk}/cancelar_emendas_coletivas/"
+    )
+
+
+@pytest.mark.spec("LOA-AGR-072")
+def test_cancelar_exclui_coletivas_e_devolve_menos_10_e_17_para_15(
+    api, editor_contabil, cancelavel
+):
+    agrupamento, juntas, na_17, na_12, na_10, coletivas = cancelavel
+    assert len(coletivas) == 1
+    assert all(
+        recarregar(el).fase == EmendaLoa.TRANSFORMADA_EM_COLETIVA for el in juntas
+    )
+
+    r = cancelar(api(editor_contabil), agrupamento)
+
+    assert r.status_code == 200
+    assert r.json() == {
+        "status": "success",
+        "coletivas_excluidas": 1,
+        "emendas_devolvidas": 3,
+    }
+    assert not EmendaLoa.all_objects.filter(pk=coletivas[0].pk).exists()
+    for el in (*juntas, na_17):
+        el = recarregar(el)
+        assert (el.fase, el.emenda_coletiva_id) == (EC, None)
+    assert recarregar(na_12).fase == EmendaLoa.PROPOSTA_LIBERADA
+    assert recarregar(na_10).fase == P
+
+
+@pytest.mark.spec("LOA-AGR-072")
+def test_cancelar_sem_coletivas_devolve_a_17_para_15(
+    api, editor_contabil, agrupamento, make_emenda, parlamentar
+):
+    el = make_emenda(fase=LC, parlamentar=parlamentar)
+    AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento, emendaloa=el)
+
+    r = cancelar(api(editor_contabil), agrupamento)
+
+    assert r.json()["coletivas_excluidas"] == 0
+    assert r.json()["emendas_devolvidas"] == 1
+    assert recarregar(el).fase == EC
+    historico = recarregar(el).emendaloahistoricofase_set.order_by("-id").first()
+    assert (historico.fase, historico.usuario_id) == (EC, editor_contabil.pk)
+
+
+@pytest.mark.spec("LOA-AGR-072")
+def test_cancelar_recusa_com_coletiva_em_tramitacao_e_nada_muda(
+    api, editor_contabil, cancelavel
+):
+    agrupamento, juntas, na_17, _, _, coletivas = cancelavel
+    EmendaLoa.objects.filter(pk=coletivas[0].pk).update(fase=EmendaLoa.EM_TRAMITACAO)
+
+    r = cancelar(api(editor_contabil), agrupamento)
+
+    assert r.status_code == 400
+    assert "tramitação" in r.json()["error"]
+    assert EmendaLoa.all_objects.filter(pk=coletivas[0].pk).exists()
+    assert recarregar(na_17).fase == LC
+    assert all(
+        recarregar(el).fase == EmendaLoa.TRANSFORMADA_EM_COLETIVA for el in juntas
+    )
+
+
+@pytest.mark.spec("LOA-AGR-072")
+def test_cancelar_nao_mexe_em_outro_agrupamento(
+    api, editor_contabil, cancelavel, loa, make_emenda, parlamentar, parlamentar_b
+):
+    agrupamento = cancelavel[0]
+    outro = mommy.make(Agrupamento, loa=loa, nome="Outro", finalidade="Outra")
+    juntas = [
+        make_emenda(fase=EC, parlamentar=p, permite_juncao_coletiva=True)
+        for p in (parlamentar, parlamentar_b)
+    ]
+    na_17 = make_emenda(fase=LC, parlamentar=parlamentar)
+    for el in (*juntas, na_17):
+        AgrupamentoEmendaLoa.objects.create(agrupamento=outro, emendaloa=el)
+    coletiva_do_outro = outro.gerar_emendas_coletivas()[0]
+    solta_na_17 = make_emenda(fase=LC, parlamentar=parlamentar)
+
+    cancelar(api(editor_contabil), agrupamento)
+
+    assert EmendaLoa.all_objects.filter(pk=coletiva_do_outro.pk).exists()
+    assert recarregar(na_17).fase == LC
+    assert recarregar(solta_na_17).fase == LC
+    assert all(
+        recarregar(el).fase == EmendaLoa.TRANSFORMADA_EM_COLETIVA for el in juntas
+    )

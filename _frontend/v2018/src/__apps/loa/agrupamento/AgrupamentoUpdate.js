@@ -147,23 +147,34 @@ export default class AgrupamentoUpdate {
     })
     const cancelar_emendas_coletivas = this.form.find('#cancelar_emendas_coletivas')
     cancelar_emendas_coletivas.click(() => {
-      if (!confirm('Tem certeza que deseja cancelar todas as emendas coletivas?')) {
+      // LOA-AGR-072: exclui as coletivas e devolve à edição contábil as emendas em -10 e 17
+      if (!confirm(
+        'As emendas coletivas geradas serão excluídas, e as emendas do agrupamento que estão ' +
+        'transformadas em coletiva ou liberadas (fase 17) voltarão para a edição contábil. Continuar?'
+      )) {
         return
       }
       window.loadingCMJ('Cancelando emendas coletivas...')
       axios.post(`/api/loa/agrupamento/${this.pk}/cancelar_emendas_coletivas/`)
         .then((response) => {
+          window.unloadingCMJ()
           if (response.data.status === 'success') {
-            window.unloadingCMJ()
-            this.recarregarComMensagem('Emendas coletivas canceladas com sucesso.')
+            const { coletivas_excluidas: excluidas, emendas_devolvidas: devolvidas } = response.data
+            this.recarregarComMensagem(
+              `${excluidas} emenda(s) coletiva(s) excluída(s) e ` +
+              `${devolvidas} emenda(s) devolvida(s) para a edição contábil.`
+            )
           } else if (response.data.error) {
-            window.unloadingCMJ()
             this.mostrarMensagem(response.data.error)
           }
         })
-        .catch(() => {
+        .catch((error) => {
           window.unloadingCMJ()
-          this.mostrarMensagem('Ocorreu um erro ao cancelar as emendas coletivas.')
+          this.mostrarMensagem(
+            error.response?.data?.error || mensagemDoErro(error),
+            'danger',
+            'Não foi possível cancelar as emendas coletivas.'
+          )
         })
     })
   }

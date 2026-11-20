@@ -1,7 +1,7 @@
 # LOA: edição do agrupamento
 
 Status: observado; D1 a D7 implementadas (LOA-AGR-003, 012, 045 a 047, 053, 063, 064, 082, 083 e
-090)
+090); LOA-AGR-072 refeita e implementada
 Última verificação: 2026-11-20 (commit `69911f2dd`)
 Código principal: `cmj/loa/views/v_agrupamento.py`, `cmj/loa/forms/f_agrupamento.py`,
 `cmj/loa/models/m_agrupamento.py`, `cmj/loa/signals.py`, `cmj/api/loa/views/agrupamento.py`,
@@ -54,7 +54,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
   permissão são recusados antes de montar o PDF, então a I.A. não é chamada (LOA-AGR-070). Listagem e
   detalhe da API continuam públicos (LOA-AGR-002). As coletivas já geradas são emendas e seguem o
   `/view/` da emenda (LOA-EMD-085). Evidência: `cmj/api/loa/views/agrupamento.py:24-27`,
-  `cmj/api/loa/views/agrupamento.py:134-141`.
+  `cmj/api/loa/views/agrupamento.py:141-148`.
 
 ### Emenda devolvida bloqueia a liberação (D1, decidida em 2026-11-20)
 
@@ -90,7 +90,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
 - LOA-AGR-063 [implementado] O autosave só envia nome, tipo e finalidade. As buscas, os campos
   `despesa_*` e `perc_despesa` não geram requisição. Substitui LOA-AGR-061. Evidência:
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:6-12`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:569-576`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:580-587`.
 - LOA-AGR-064 [implementado] Quando o PATCH do autosave falha, a tela:
   - mostra a mensagem do servidor como erro suspenso (LOA-AGR-090), com o título "Alteração não
     gravada (<rótulo do campo>).". O texto segue LOA-EMD-084: `detail`, lista de erros ou erros por
@@ -102,7 +102,7 @@ de cada emenda. Dele podem sair emendas coletivas, uma por conjunto de unidade e
 
   A função que monta o texto do erro passou a ser comum à emenda e ao agrupamento. Evidência:
   `_frontend/v2018/src/__apps/loa/mensagens.js`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:578-606`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:589-617`.
 
 ### Registros contábeis da emenda agrupada (D6, decidida em 2026-11-20)
 
@@ -173,7 +173,7 @@ inclusão continua substituindo os registros que ela tinha.
   Substitui os `alert()` de LOA-AGR-050, 071 e 072. Evidência:
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:5-109`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:111-169`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:485-490`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:496-501`,
   `_frontend/v2018/src/__apps/loa/scss/loa.scss:608-621`.
 
 ## Regras observadas
@@ -220,7 +220,7 @@ inclusão continua substituindo os registros que ela tinha.
   `cmj/loa/forms/f_agrupamento.py:95-254`.
 - LOA-AGR-021 [observado] O percentual da despesa começa em 100,00. Depois de incluir um registro, a
   tela volta o campo para 100,00. Evidência: `cmj/loa/forms/f_agrupamento.py:257`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:266`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:277`.
 
 ### Registros contábeis do agrupamento
 
@@ -237,7 +237,7 @@ inclusão continua substituindo os registros que ela tinha.
 
   Evidência: `cmj/api/loa/views/agrupamentoregistrocontabil.py:108-288`,
   `cmj/api/loa/views/agrupamentoregistrocontabil.py:302-334`,
-  `cmj/loa/models/m_agrupamento.py:511-516`.
+  `cmj/loa/models/m_agrupamento.py:531-536`.
 - LOA-AGR-031 [observado] Gravar um registro contábil do agrupamento dispara `Agrupamento.sync()`
   (LOA-AGR-033). Excluir um registro apaga, nas emendas do agrupamento, os registros com a mesma
   despesa. Evidência: `cmj/loa/signals.py:41-70`.
@@ -247,7 +247,7 @@ inclusão continua substituindo os registros que ela tinha.
   - não avisa quando há mais de 10 resultados.
 
   O rodapé de totais não é preenchido. Evidência:
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:171-348`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:182-359`.
 - LOA-AGR-033 [observado] `Agrupamento.sync()` refaz os registros contábeis de cada emenda do
   agrupamento, exceto as da fase -10, que o manager padrão oculta:
   - apaga os registros da emenda;
@@ -267,8 +267,8 @@ inclusão continua substituindo os registros que ela tinha.
   - fase: vermelha na 10, amarela na 12 e verde nas demais.
 
   Evidência: `cmj/api/loa/views/agrupamento.py:38-53`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:358-397`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:492-523`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:369-408`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:503-534`.
 - LOA-AGR-041 [observado] A busca de emendas exige ao menos 3 letras e consulta
   `/api/loa/emendaloa/search/`.
   - O resultado traz emendas do ano da LOA com fase menor que 17, filtradas pelo tipo do agrupamento
@@ -276,7 +276,7 @@ inclusão continua substituindo os registros que ela tinha.
   - Ficam de fora as que já estão na lista de selecionadas. As que estão em outro agrupamento aparecem.
   - Emendas na fase 10 aparecem sem o botão de incluir.
 
-  Evidência: `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:399-475`,
+  Evidência: `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:410-486`,
   `cmj/api/loa/views/emendaloa.py:371-401`.
 - LOA-AGR-042 [observado] Incluir uma emenda envia `POST /api/loa/agrupamentoemendaloa/`. Fases aceitas,
   ano e fase resultante seguem LOA-FASE-058 a LOA-FASE-060.
@@ -286,7 +286,7 @@ inclusão continua substituindo os registros que ela tinha.
   - Por fim, a finalidade é gerada por I.A. (LOA-AGR-050).
 
   Evidência: `cmj/api/loa/views/agrupamentoemendaloa.py:88-138`, `cmj/loa/signals.py:50-56`,
-  `cmj/loa/models/m_agrupamento.py:433-438`.
+  `cmj/loa/models/m_agrupamento.py:453-458`.
 - LOA-AGR-043 [observado] Remover uma emenda envia `POST /api/loa/agrupamentoemendaloa/delete/`. A
   emenda da fase -10 não pode ser removida (LOA-FASE-042). Antes de desfazer o vínculo, o servidor
   sincroniza o agrupamento e a emenda, e ignora erros nesses passos (só os registra no log). A emenda
@@ -294,8 +294,8 @@ inclusão continua substituindo os registros que ela tinha.
   finalidade é gerada de novo (LOA-AGR-050 e 053). Evidência:
   `cmj/api/loa/views/agrupamentoemendaloa.py:26-70`.
 - LOA-AGR-044 [observado] Os erros de inclusão e de remoção aparecem em um alerta na própria lista.
-  Evidência: `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:390-393`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:467-471`.
+  Evidência: `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:401-404`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:478-482`.
 
 ### Finalidade
 
@@ -313,12 +313,12 @@ inclusão continua substituindo os registros que ela tinha.
   somente leitura com "Atualizando com I.A...". Se a geração falha, o erro aparece como mensagem
   (LOA-AGR-090) e o campo volta ao texto gravado no servidor, editável. Substitui a digitada
   (LOA-AGR-053). Evidência: `cmj/api/loa/views/agrupamento.py:70-87`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:543-566`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:554-577`.
 - LOA-AGR-052 [observado] Ao abrir a tela e depois de cada inclusão ou remoção, o campo de finalidade
   mostra "Atualizando..." até receber o valor do servidor. Evidência:
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:362`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:478-483`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:458`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:373`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:489-494`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:469`.
 
 ### Autosave
 
@@ -326,12 +326,12 @@ inclusão continua substituindo os registros que ela tinha.
   envia `PATCH /api/loa/agrupamento/<pk>/` com `{campo: valor}`. É assim que nome, tipo e finalidade
   são gravados. Se dá certo, a tela recarrega os registros contábeis. Só os campos do model geram
   PATCH (LOA-AGR-063), e a falha aparece na tela (LOA-AGR-064). Evidência:
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:566-589`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:577-600`.
 - LOA-AGR-061 [observado] Campos que não são do model também geravam PATCH: as buscas, os campos
   `despesa_*` e `perc_despesa`. O serializer os ignorava. Substituída por LOA-AGR-063.
 - LOA-AGR-062 [observado] Enter não envia o formulário. No campo de busca de despesa, Enter seleciona o
   resultado quando há só um. Evidência:
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:529-541`.
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:540-552`.
 
 ### Emendas coletivas
 
@@ -344,7 +344,7 @@ inclusão continua substituindo os registros que ela tinha.
   - Se o agrupamento não tem finalidade, a prévia pede a finalidade automática à I.A. (GENIA-LOA-005).
   - Só quem edita o agrupamento abre a prévia (LOA-AGR-003).
 
-  Evidência: `cmj/api/loa/views/agrupamento.py:134-240`, `cmj/loa/models/m_agrupamento.py:243-335`,
+  Evidência: `cmj/api/loa/views/agrupamento.py:141-247`, `cmj/loa/models/m_agrupamento.py:243-335`,
   `cmj/loa/forms/f_agrupamento.py:113-117`.
 - LOA-AGR-071 [observado] "Gerar Emendas Coletivas"
   (`POST /api/loa/agrupamento/<pk>/gerar_emenda_coletiva/`) cria uma coletiva por conjunto com mais
@@ -356,14 +356,22 @@ inclusão continua substituindo os registros que ela tinha.
 
   Fases e dono seguem LOA-FASE-017, LOA-FASE-018 e LOA-FASE-064. A tela mostra quantas coletivas
   foram criadas e vai para o detalhe do agrupamento, ou avisa que nenhuma foi (LOA-AGR-090).
-  Evidência: `cmj/loa/models/m_agrupamento.py:354-422`,
+  Evidência: `cmj/loa/models/m_agrupamento.py:374-442`,
   `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:119-147`.
-- LOA-AGR-072 [observado] "Cancelar Emendas Coletivas" pede confirmação e chama
-  `POST /api/loa/agrupamento/<pk>/cancelar_emendas_coletivas/`. O servidor faz o efeito de
-  LOA-FASE-019, LOA-FASE-056 e LOA-FASE-057 e exclui as coletivas geradas. Depois, a tela recarrega
-  e mostra o resultado (LOA-AGR-090).
-  Evidência: `cmj/loa/models/m_agrupamento.py:337-352`,
-  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:148-168`.
+- LOA-AGR-072 [implementado] "Cancelar Emendas Coletivas" devolve o agrupamento à edição contábil. A
+  tela pede confirmação e chama `POST /api/loa/agrupamento/<pk>/cancelar_emendas_coletivas/`, e o
+  servidor, numa transação:
+  - exclui as coletivas geradas pelo agrupamento, se houver;
+  - devolve para a fase 15 as emendas do agrupamento nas fases -10 (LOA-FASE-056) e 17
+    (LOA-FASE-057), desfazendo o vínculo com a coletiva. As demais fases não mudam;
+  - registra o usuário no histórico de fase (LOA-FASE-067).
+
+  Sem coletivas, o botão só devolve as emendas da fase 17. Se alguma coletiva gerada já está na fase
+  20 ou acima, em tramitação, o cancelamento é recusado com mensagem e nada muda. A resposta informa
+  quantas coletivas foram excluídas e quantas emendas voltaram à 15, e a tela recarrega e mostra esse
+  resultado (LOA-AGR-090). Decidido em 2026-11-20. Evidência:
+  `cmj/loa/models/m_agrupamento.py:337-372`, `cmj/api/loa/views/agrupamento.py:113-139`,
+  `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:148-179`.
 
 ### Liberar para protocolo
 

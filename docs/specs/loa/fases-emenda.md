@@ -102,12 +102,14 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
 ### Emenda coletiva
 
 - LOA-FASE-056 [acordado] Ao gerar a coletiva, a emenda de origem passa para -10. Ao cancelar, volta
-  para 15. Evidência: `cmj/loa/models/m_agrupamento.py:337-346`, `cmj/loa/models/m_agrupamento.py:387-389`.
-- LOA-FASE-057 [implementado] O cancelamento não altera a fase das emendas do agrupamento que não
-  estavam em -10. Evidência: a API só chama o model (`cmj/api/loa/views/agrupamento.py:120-132`).
+  para 15. Evidência: `cmj/loa/models/m_agrupamento.py:353-365`, `cmj/loa/models/m_agrupamento.py:407-409`.
+- LOA-FASE-057 [implementado] O cancelamento das coletivas também devolve para 15 as emendas do
+  agrupamento na fase 17. As demais fases, exceto -10 (LOA-FASE-056), não mudam. Substitui a versão
+  anterior, que preservava a fase 17. Decidido em 2026-11-20 (LOA-AGR-072 de
+  `docs/specs/loa/edicao-agrupamento.md`). Evidência: `cmj/loa/models/m_agrupamento.py:353-365`.
 - LOA-FASE-064 [implementado] A emenda coletiva recebe como dono o `owner` da primeira emenda do
   conjunto, `emenda["emendas"][0].owner_id`; a lista segue a ordem por `id`. Evidência:
-  `cmj/loa/models/m_agrupamento.py:369-370`.
+  `cmj/loa/models/m_agrupamento.py:389-390`.
 
 ### Inclusão em agrupamento
 
@@ -128,7 +130,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
   após o `save()`. O detalhe da emenda mostra o usuário ao superusuário. Evidência:
   `cmj/loa/models/m_emendaloa.py:1007-1016`, `cmj/loa/signals.py:23-38`,
   `cmj/api/loa/views/emendaloa.py:95-118`, `cmj/loa/forms/f_emendaloa.py:649`,
-  `cmj/loa/views/v_emendaloa.py:1107`, `cmj/loa/models/m_agrupamento.py:345-390`,
+  `cmj/loa/views/v_emendaloa.py:1107`, `cmj/loa/models/m_agrupamento.py:345-410`,
   `cmj/api/loa/views/agrupamentoemendaloa.py:125`, `cmj/loa/forms/f_agrupamento.py:320-326`,
   `sapl/materia/forms.py:3422`.
 
@@ -167,16 +169,16 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
 | LOA-FASE-012 [observado] | Qualquer | 15, 17 | Campo `fase` no formulário | Editor contábil sem `add_emendaloa` e não superusuário | `cmj/loa/forms/f_emendaloa.py:285-288`, `cmj/loa/forms/f_emendaloa.py:486`, `cmj/loa/forms/f_emendaloa.py:546-548` |
 | LOA-FASE-013 [observado] | 15, 17 (LOA-FASE-069) | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1069-1090` |
 | LOA-FASE-014 [observado] | 15, 17 (LOA-FASE-069) | 10 | Botão "Devolver para correção" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1069-1090` |
-| LOA-FASE-015 [observado] | Busca: menor que 17; o servidor aceita 12 e 15 (LOA-FASE-059) | 15 | Adicionar ao agrupamento; o servidor define a fase e ignora o `emendaloa__fase` que a tela ainda envia (LOA-FASE-060) | `emendaloa_full_editor` | `cmj/api/loa/views/emendaloa.py:381`, `cmj/api/loa/views/agrupamentoemendaloa.py:18-19`, `cmj/api/loa/views/agrupamentoemendaloa.py:116-126`, `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:447-456` |
+| LOA-FASE-015 [observado] | Busca: menor que 17; o servidor aceita 12 e 15 (LOA-FASE-059) | 15 | Adicionar ao agrupamento; o servidor define a fase e ignora o `emendaloa__fase` que a tela ainda envia (LOA-FASE-060) | `emendaloa_full_editor` | `cmj/api/loa/views/emendaloa.py:381`, `cmj/api/loa/views/agrupamentoemendaloa.py:18-19`, `cmj/api/loa/views/agrupamentoemendaloa.py:116-126`, `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:458-467` |
 | LOA-FASE-016 [observado] | Entre 1 e 16, recusado se alguma estiver na 10 (LOA-AGR-082) | 17 | "Liberar para Protocolo" (salvar o formulário do agrupamento), incluindo as coletivas geradas | Formulário de agrupamento | `cmj/loa/forms/f_agrupamento.py:317-327` |
-| LOA-FASE-017 [observado] | Emenda de origem | -10 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:387-391`, `cmj/api/loa/views/agrupamento.py:15-17`, `cmj/api/loa/views/agrupamento.py:96-102` |
-| LOA-FASE-018 [observado] | Nova coletiva | 15 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:366-385` |
-| LOA-FASE-019 [observado] | -10 (as demais mantêm a fase: LOA-FASE-057) | 15 | Cancelar coletivas; as coletivas geradas são excluídas | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:337-350`, `cmj/api/loa/views/agrupamento.py:120-132` |
+| LOA-FASE-017 [observado] | Emenda de origem | -10 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:407-411`, `cmj/api/loa/views/agrupamento.py:15-17`, `cmj/api/loa/views/agrupamento.py:96-102` |
+| LOA-FASE-018 [observado] | Nova coletiva | 15 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:386-405` |
+| LOA-FASE-019 [observado] | -10 e 17 (LOA-FASE-057) | 15 | Cancelar coletivas; as coletivas geradas são excluídas | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:337-372`, `cmj/api/loa/views/agrupamento.py:120-139` |
 | LOA-FASE-020 [observado] | 17 | 20 | Incorporar proposição como matéria, vinculando a emenda | Fluxo de `ConfirmarProposicaoForm` | `sapl/materia/forms.py:3278-3296`, `sapl/materia/forms.py:3418-3423` |
 
 - LOA-FASE-021 [observado] Só entram na coletiva as emendas com `permite_juncao_coletiva` e sem
   matéria, e só é gerada coletiva para conjuntos de mesma unidade e entidade com mais de uma emenda.
-  Evidência: `cmj/loa/models/m_agrupamento.py:249-255`, `cmj/loa/models/m_agrupamento.py:362-364`.
+  Evidência: `cmj/loa/models/m_agrupamento.py:249-255`, `cmj/loa/models/m_agrupamento.py:382-384`.
 - LOA-FASE-022 [observado] Quem tem `add_emendaloa`, incluindo superusuário e o grupo Operador da LOA,
   vê todas as fases no select, porque as limitações do campo só valem sem essa permissão. Evidência:
   `cmj/loa/forms/f_emendaloa.py:486-548`, `cmj/globalrules/map_rules.py:241-250`.
