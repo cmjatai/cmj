@@ -259,6 +259,20 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
             "entidade",  # 'registrocontabil_set'
         ]
 
+    CAMPOS_VERIFICADOS_NA_EDICAO = (
+        "tipo",
+        "fase",
+        "valor",
+        "materia",
+        "permite_juncao_coletiva",
+        "prefixo_indicacao",
+        "prefixo_finalidade",
+        "finalidade",
+        "unidade",
+        "bairro",
+        "entidade",
+    )
+
     def __init__(self, *args, **kwargs):
 
         self.creating = kwargs["initial"].pop("creating", None)
@@ -603,6 +617,17 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                         raise ValidationError(
                             f"É obrigatório selecionar ao menos o seu parlamentar: {p}."
                         )
+
+        if self.instance.pk:
+            # LOA-EMD-075: só os campos que o perfil pode alterar. `indicacao` fica
+            # de fora porque não é exibida e o save() a deriva da unidade.
+            # self.instance ainda tem os valores gravados (ver clean da fase).
+            dados = {
+                nome: cleaned_data[nome]
+                for nome in self.CAMPOS_VERIFICADOS_NA_EDICAO
+                if nome in cleaned_data
+            }
+            EmendaLoa.service.validar_alteracao(self.user, self.instance, dados)
 
         return cleaned_data
 

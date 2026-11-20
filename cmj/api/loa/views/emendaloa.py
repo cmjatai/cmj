@@ -3,6 +3,7 @@ from decimal import Decimal
 
 import pymupdf
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db.models import Q, Sum
 from django.http.response import HttpResponse
 from django.template.loader import render_to_string
@@ -125,6 +126,14 @@ class EmendaLoaViewSet:
         )
 
     def perform_update(self, serializer):
+        # LOA-EMD-070 a 073: só os campos que o perfil pode alterar
+        try:
+            EmendaLoa.service.validar_alteracao(
+                self.request.user, serializer.instance, serializer.validated_data
+            )
+        except ValidationError as e:
+            raise DRFValidationError(e.messages)
+
         serializer.instance._usuario_fase = self.request.user  # LOA-FASE-067
         serializer.save()
 
@@ -188,6 +197,13 @@ class EmendaLoaViewSet:
             obj = Decimal("0.01")
 
         el = EmendaLoa.objects.get(pk=kwargs["pk"])
+
+        # LOA-EMD-074: Valor Global só para quem pode alterar o campo valor
+        try:
+            EmendaLoa.service.validar_alteracao(request.user, el, {"valor": obj})
+        except ValidationError as e:
+            raise DRFValidationError(e.messages)
+
         el.valor = obj
         el.save()
 

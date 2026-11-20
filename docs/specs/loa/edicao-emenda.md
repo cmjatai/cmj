@@ -1,13 +1,17 @@
 # LOA: edição da emenda
 
-Status: observado
-Última verificação: 2026-11-19 (commit `86aa12b8f`)
+Status: observado; D4 implementada (LOA-EMD-070 a 075)
+Última verificação: 2026-11-20 (commit `7c7c5f1c2`)
 Código principal: `cmj/loa/views/v_emendaloa.py`, `cmj/loa/forms/f_emendaloa.py`,
-`cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
+`cmj/loa/services/s_emendaloa.py`, `cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
 `_frontend/v2018/src/__apps/loa/emenda/`
-Testes: nenhum específico. As regras de fase citadas têm testes em `cmj/loa/tests/test_fases_emenda.py`.
+Testes: `cmj/loa/tests/test_edicao_emenda.py` (regras acordadas). As regras de fase citadas têm
+testes em `cmj/loa/tests/test_fases_emenda.py`.
 
-Todas as regras foram obtidas por leitura do código, sem executar os fluxos.
+As regras `[observado]` foram obtidas por leitura do código, sem executar os fluxos. As decisões
+tomadas sobre as dúvidas estão em "Regras acordadas": `[desejado]` indica que o código ainda precisa
+mudar e `[implementado]` indica uma regra `[desejado]` já corrigida e coberta por teste. Quando uma
+regra `[observado]` conflitar com uma delas, vale a regra acordada.
 
 ## Escopo
 
@@ -32,7 +36,49 @@ Os mesmos de `fases-emenda.md`:
 No formulário, `full_editor` vale para quem tem `emendaloa_full_editor` e não é superusuário, ou seja,
 para o editor contábil **e** para o Operador da LOA (`cmj/loa/forms/f_emendaloa.py:271-274`).
 
-## Regras
+## Regras acordadas
+
+### Campos que cada perfil altera (D4, decidida em 2026-11-20)
+
+A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
+(`cmj/loa/services/s_emendaloa.py`). A API e o formulário consultam o service.
+
+- LOA-EMD-070 [implementado] O servidor só aceita alteração dos campos do model que o perfil do usuário
+  pode alterar naquela emenda:
+  - **Base, para todos os perfis abaixo:** `permite_juncao_coletiva`, `prefixo_indicacao`,
+    `prefixo_finalidade`, `finalidade` e `bairro`.
+  - **Autor** (operador de autor) com a emenda até a fase 12: base mais `tipo`, `fase`, `unidade` e
+    `entidade`.
+  - **Autor** com a emenda acima da fase 12: só a base.
+  - **Autor**, em qualquer fase, quando a emenda resultante é modificativa (tipo 0): também `valor`,
+    porque o formulário exige o Valor Global da modificativa (LOA-EMD-022).
+  - **Editor contábil** (`emendaloa_full_editor`): base mais `tipo`, `fase`, `unidade` e `entidade`.
+  - **Operador da LOA e superusuário** (`add_emendaloa`): base mais `tipo`, `fase`, `unidade`,
+    `entidade`, `valor` e `materia`.
+
+  Quem tem mais de um perfil soma as listas. A fase continua sujeita às transições de LOA-FASE-052,
+  LOA-FASE-053 e LOA-FASE-065. Evidência: `EmendaLoaService.campos_alteraveis`
+  (`cmj/loa/services/s_emendaloa.py:10-52`).
+- LOA-EMD-071 [implementado] Nenhum perfil, nem o superusuário, altera pela API ou pelo formulário campos
+  do model fora de LOA-EMD-070, como `owner`, `loa`, `metadata`, `indicacao`, `proposicao`,
+  `emenda_coletiva` e `agrupamento_de_origem`. Esses campos continuam sendo mantidos pelos fluxos
+  próprios: criação, coletiva, proposição, pré-visualização e `save()`. Evidência:
+  `cmj/loa/services/s_emendaloa.py:82-104`.
+- LOA-EMD-072 [implementado] Só conta como alteração o campo cujo valor enviado difere do valor gravado.
+  Enviar um campo com o mesmo valor não é recusado. Evidência: `EmendaLoaService.campos_alterados`
+  (`cmj/loa/services/s_emendaloa.py:54-80`).
+- LOA-EMD-073 [implementado] O PATCH com um campo que o usuário não pode alterar é recusado com 400, sem
+  gravar nada, e a mensagem cita o campo. Chaves que não são campos do model, como `busca_despesa`,
+  continuam sendo ignoradas. Evidência: `cmj/api/loa/views/emendaloa.py:128-138`.
+- LOA-EMD-074 [implementado] A action `updatevaloremenda` segue LOA-EMD-070 para o campo `valor`. Evidência:
+  `cmj/api/loa/views/emendaloa.py:201-205`. Substitui LOA-EMD-028 quanto à permissão.
+- LOA-EMD-075 [implementado] O POST do formulário de edição segue LOA-EMD-070. Campo alterado fora da lista,
+  inclusive pelos campos ocultos de matéria, invalida o formulário. A criação não passa por essa
+  regra: ela segue LOA-FASE-051. `indicacao` fica fora da verificação do formulário porque não é
+  exibida e o `save()` a deriva da unidade (LOA-EMD-030). Evidência:
+  `cmj/loa/forms/f_emendaloa.py:262-274`, `cmj/loa/forms/f_emendaloa.py:621-630`.
+
+## Regras observadas
 
 ### Acesso às telas
 
@@ -205,7 +251,8 @@ para o editor contábil **e** para o Operador da LOA (`cmj/loa/forms/f_emendaloa
   vermelho. Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:347-354`,
   `cmj/api/loa/views/emendaloa.py:107-117`.
 - LOA-EMD-056 [observado] O PATCH genérico usa o serializer com todos os campos do model e não aplica
-  as restrições do formulário (LOA-EMD-010, LOA-EMD-016). Só a fase é conferida no servidor (ver D4).
+  as restrições do formulário (LOA-EMD-010, LOA-EMD-016). Só a fase é conferida no servidor.
+  Substituída por LOA-EMD-070 a 073.
   Evidência: `cmj/api/serializers.py:32-33`, `cmj/api/loa/serializers/__init__.py:105-136`,
   `cmj/api/loa/views/emendaloa.py:107-117`.
 - LOA-EMD-057 [observado] Quando o autosave dá certo:
@@ -256,13 +303,8 @@ para o editor contábil **e** para o Operador da LOA (`cmj/loa/forms/f_emendaloa
 
 ## Dúvidas
 
-Ordenadas por risco.
+Ordenadas por risco. D4 foi decidida em 2026-11-20 e virou LOA-EMD-070 a 075.
 
-- D4. **O PATCH genérico ignora as restrições do formulário.** O serializer aceita todos os campos do
-  model, e o servidor só confere a fase (LOA-EMD-056). Um autor participante, na fase 17 ou até a 12,
-  pode alterar por requisição direta campos que a tela trava: `unidade`, `tipo`, `entidade`, `valor`,
-  `owner`, `materia`, `metadata` e outros. O servidor deve restringir os campos aceitos no PATCH por
-  perfil e fase, nos moldes do formulário?
 - D3. **`updatevalorparlamentar` não valida o parlamentar.** O endpoint aceita qualquer
   `parlamentar_id`, inclusive de fora da LOA, e o autor participante pode alterar o valor de outros
   parlamentares. O campo somente leitura do widget protege só a tela (LOA-EMD-020, LOA-EMD-027). Que
@@ -288,6 +330,15 @@ Ordenadas por risco.
   coletiva fica depois de um `return` e nunca executa (LOA-EMD-003). Hoje entra qualquer operador do
   mesmo autor do `owner`, participante ou não. Esse trecho deve ser removido, ou a regra de
   participação deve valer?
+
+## Pendências encontradas
+
+Problemas vistos ao implementar as regras acordadas, fora delas.
+
+- P1. **O PATCH genérico de `valor` sempre falha.** O `DecimalField` do serializer recusa "5000,00",
+  e com "5000.00" o `validate_valor` recebe um `Decimal` e o trata como texto, o que também gera 400
+  (`cmj/api/loa/serializers/__init__.py:172-200`). A tela não é afetada porque grava o Valor Global
+  pela action `updatevaloremenda`. Por isso, a regra de `valor` é testada pelo service e pela action.
 
 ## Fora do escopo
 
