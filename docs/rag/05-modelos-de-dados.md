@@ -145,6 +145,6 @@ Mensagens do usuário têm `metadata = {}`.
 | `IAQuota` | `modelo` (único), `quota_diaria`, `ativo`, `servicos_autorizados` (array), `batch_size`, `get_threads`, `descricao` | Define quais modelos podem ser usados, por quais serviços e o teto diário |
 | `IAQuotasLog` | `quota`, `data`, `peso`, `timestamp` | Uma linha por uso (`create_log(peso=1)`) |
 
-`IAQuota.objects.quotas_with_margin()`, `has_margin()` e `remaining_quota()` calculam o saldo do dia
+`IAQuota.objects.quotas_with_margin()` e `remaining_quota()` calculam o saldo do dia
 (`quota_diaria − Σ peso` na data local). Serviços autorizados disponíveis: `IAChatService` (chat), `IAGenaiBase` (chave legada do chat, mantida por compatibilidade),
 `IAClassificacaoMateriaService`, `IAAnaliseSimilaridadeService`.

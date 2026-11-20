@@ -159,8 +159,8 @@ def test_tools_ativam_function_calling_limitado():
 @pytest.mark.spec("GENIA-BASE-012")
 def test_sincroniza_modelos_sem_alterar_configuracao_existente(client):
     existente = _quota("modelo-a", quota_diaria=7)
-    client.models.list.return_value = SimpleNamespace(
-        page=[
+    client.models.list.return_value = iter(
+        [
             SimpleNamespace(name="models/modelo-a"),
             SimpleNamespace(name="models/modelo-b"),
         ]

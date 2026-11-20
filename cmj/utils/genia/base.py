@@ -78,8 +78,8 @@ class IAGenaiBase:
 
     def update_or_create_llm_models_in_quotamodel(self):
         """Sincroniza os modelos listados pela API com os registros de IAQuota."""
-        models = self.client.models.list()
-        for model in models.page:
+        # Iterar o Pager percorre todas as páginas da listagem.
+        for model in self.client.models.list():
             IAQuota.objects.update_or_create(
                 modelo=model.name.split("/")[-1],
                 defaults={"descricao": repr(model)},

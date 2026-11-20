@@ -1144,23 +1144,6 @@ class IAQuota(models.Model):
     def str_remaining_quota(self):
         return "%d" % self.remaining_quota()
 
-    def has_margin(self):
-        """
-        Verifica se a quota tem margem para ser utilizada.
-        """
-        if not self.ativo:
-            return False
-
-        hoje = timezone.localtime().date()
-        sum_log = (
-            self.iaquotaslog_set.filter(data=hoje).aggregate(total=models.Sum("peso"))[
-                "total"
-            ]
-            or 0
-        )
-
-        return sum_log < self.quota_diaria
-
     def remaining_quota(self):
         """
         Retorna a quota restante para hoje.

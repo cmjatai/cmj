@@ -68,11 +68,6 @@ O `ChatManager` sempre envia a tool `buscar_na_base_dados`, então o fluxo atual
 - D1. A chave legada `IAGenaiBase` continua em `IAQuota.ServicosAutorizados` ("IA Genai Base (legado)")
   e nas cotas existentes, para a versão anterior (blue/green) achar cota. Retirá-la do model e das
   `servicos_autorizados` exige outra migration, depois que a versão anterior sair do ar.
-- D2. O limite de 2 conversas por dia compara `created_at__date` com a data local, e o de 8
-  mensagens conta as respostas do modelo, o que dá 4 perguntas por conversa. É esse o limite
-  pretendido?
-- D3. Uma mensagem pode gerar até 10 chamadas ao modelo por function calling e conta 1 na cota (ver
-  D2 de [conexao-e-cotas.md](./conexao-e-cotas.md)).
 
 ## Fora do escopo
 

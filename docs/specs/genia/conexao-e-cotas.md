@@ -20,10 +20,10 @@ configuração de geração e contagem de tokens. É a classe-base de todos os s
 - GENIA-BASE-002 [implementado] A classe-base não conhece nenhuma funcionalidade: a configuração
   padrão não tem system instruction nem tools, e responde em `application/json` com temperatura 0.1,
   `top_k` 40 e `top_p` 0.95. Evidência: `cmj/utils/genia/base.py:38-44`,
-  `cmj/utils/genia/base.py:92-107`.
+  `cmj/utils/genia/base.py:93-108`.
 - GENIA-BASE-014 [implementado] Cada serviço declara a própria cota: `quota_service_name` com uma
   chave de `IAQuota.ServicosAutorizados`, ou `quota_exempt = True`. O nome da classe não participa da
-  autorização. Evidência: `cmj/utils/genia/chat.py:21`, `cmj/utils/genia/classificacao.py:27`,
+  autorização. Evidência: `cmj/utils/genia/chat.py:19`, `cmj/utils/genia/classificacao.py:27`,
   `cmj/utils/genia/similaridade.py:28`, `cmj/utils/genia/embeddings.py:18`,
   `cmj/utils/genia/loa_agrupamento.py:18`.
 
@@ -53,37 +53,32 @@ configuração de geração e contagem de tokens. É a classe-base de todos os s
 
 - GENIA-BASE-007 [implementado] `generate_content` chama a API com o modelo da cota selecionada e,
   depois da resposta, registra um `IAQuotasLog` de peso 1. Evidência:
-  `cmj/utils/genia/base.py:109-133`.
+  `cmj/utils/genia/base.py:110-134`.
 - GENIA-BASE-008 [implementado] Se a chamada à API falhar, a exceção sobe e nenhum consumo é
-  registrado. Evidência: `cmj/utils/genia/base.py:125-132`.
+  registrado. Evidência: `cmj/utils/genia/base.py:126-133`.
 - GENIA-BASE-009 [implementado] Sem cota disponível, a API não é chamada. Evidência:
-  `cmj/utils/genia/base.py:120-123`.
+  `cmj/utils/genia/base.py:121-124`.
 - GENIA-BASE-010 [implementado] Serviço `quota_exempt` chama o modelo de `ia_model_name` sem
-  consultar nem registrar `IAQuota`. Evidência: `cmj/utils/genia/base.py:117-119`.
+  consultar nem registrar `IAQuota`. Evidência: `cmj/utils/genia/base.py:118-120`.
 - GENIA-BASE-011 [implementado] Com `tools`, a configuração ativa o function calling automático,
   limitado a `max_remote_calls` (10) chamadas. Parâmetro de geração com valor `None` não é enviado.
-  Evidência: `cmj/utils/genia/base.py:100-107`.
+  Evidência: `cmj/utils/genia/base.py:101-108`.
 
 ### Utilidades
 
 - GENIA-BASE-012 [implementado] `update_or_create_llm_models_in_quotamodel` cria uma `IAQuota` para
   cada modelo listado pela API (inativa, `quota_diaria` 0, sem serviços) e atualiza só a `descricao`
-  das existentes. Lê apenas a primeira página da listagem. Evidência:
-  `cmj/utils/genia/base.py:79-86`.
+  das existentes. Percorre todas as páginas da listagem. Evidência:
+  `cmj/utils/genia/base.py:79-87`.
 - GENIA-BASE-013 [implementado] `count_tokens_in_text` devolve 0 quando a API falha, e registra o
-  erro em log. Não consome cota. Evidência: `cmj/utils/genia/base.py:135-143`.
+  erro em log. Não consome cota. Evidência: `cmj/utils/genia/base.py:136-144`.
 
-## Dúvidas
+## Decisões
 
-- D1. A margem é verificada antes da chamada e o consumo é gravado depois, sem transação nem lock.
-  Chamadas simultâneas podem passar todas pela verificação e ultrapassar `quota_diaria`. Isso é
-  aceitável, ou a cota deve ser reservada antes da chamada?
-- D2. Todo consumo tem peso 1, seja qual for o tamanho do prompt ou o uso de tools (no chat, uma
-  mensagem pode gerar até 10 chamadas ao modelo). A cota deve passar a contar tokens ou chamadas?
-- D3. `IAQuota.has_margin` (`cmj/core/models.py:1144`) repete a regra de `quotas_with_margin` e não é
-  usado pelo pacote. Pode ser removido?
-- D4. A listagem de modelos lê só `models.page`. Se a API paginar, modelos ficam de fora da
-  sincronização. Deve percorrer todas as páginas?
+- Margem verificada antes e consumo gravado depois, sem lock: chamadas simultâneas podem ultrapassar
+  `quota_diaria`. Aceito.
+- O consumo é por chamada, com peso 1, e não por tokens. Aceito.
+- `IAQuota.has_margin` foi removido: repetia `quotas_with_margin` e nada o usava.
 
 ## Fora do escopo
 
