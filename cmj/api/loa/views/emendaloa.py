@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 from cmj.api.forms import EmendaLoaFilterSet
 from cmj.api.loa.serializers import EmendaLoaSearchSerializer
-from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, Empenho, Loa
+from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, Empenho
 from cmj.utils.utils_report import make_pdf
 from sapl.api.permissions import SaplModelPermissions
 
@@ -45,14 +45,8 @@ class EmendaLoaViewSet:
                 return has_permission_custom(request, view)
 
             if request.method == "POST":
-
-                data = request.data
-
-                if "loa" in data:
-                    loa = Loa.objects.get(pk=data["loa"])
-
-                if not has_perm:
-                    return u.operadorautor_set.exists() and not loa.publicado
+                # LOA-EMD-082: operador de autor cria, publicada ou não a LOA
+                return EmendaLoa.service.pode_criar(u)
 
             elif request.method == "PATCH":
 

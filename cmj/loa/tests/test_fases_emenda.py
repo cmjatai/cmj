@@ -239,11 +239,6 @@ def test_select_de_criacao_do_autor_so_oferece_fase_10(autor, loa):
 @pytest.mark.spec("LOA-FASE-051")
 @pytest.mark.parametrize("fase", [PL, EC, LC, TR])
 def test_post_da_api_do_autor_nao_cria_fora_da_fase_10(api, autor, loa, unidade, fase):
-    # O POST da API só aceita operador de autor com a LOA não publicada
-    # (cmj/api/loa/views/emendaloa.py:54-55).
-    loa.publicado = False
-    loa.save()
-
     api(autor).post(
         "/api/loa/emendaloa/",
         {

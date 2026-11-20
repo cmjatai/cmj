@@ -783,3 +783,58 @@ def test_valor_na_fase_17_em_agrupamento_segue_percentuais(
     valor_parlamentar(api(autor), el, parlamentar, "1500,00")
 
     assert registros(el) == [Decimal("-1500.00"), Decimal("1500.00")]
+
+
+# ------------------------------------------------------------------- criação
+
+
+def criar_pela_api(client, loa, unidade):
+    return client.post(
+        "/api/loa/emendaloa/",
+        {
+            "loa": loa.pk,
+            "unidade": unidade.pk,
+            "tipo": EmendaLoa.DIVERSOS,
+            "fase": P,
+            "finalidade": "Criada pela API",
+        },
+        format="json",
+    )
+
+
+@pytest.mark.spec("LOA-EMD-082")
+@pytest.mark.parametrize("publicado", [True, False], ids=["publicada", "nao_publicada"])
+def test_autor_abre_criacao_com_loa_publicada_ou_nao(client, autor, loa, publicado):
+    loa.publicado = publicado
+    loa.save()
+    client.force_login(autor)
+
+    r = client.get(reverse("cmj.loa:emendaloa_create", kwargs={"pk": loa.pk}))
+
+    assert r.status_code == 200
+
+
+@pytest.mark.spec("LOA-EMD-082")
+@pytest.mark.parametrize("publicado", [True, False], ids=["publicada", "nao_publicada"])
+def test_autor_cria_pela_api_com_loa_publicada_ou_nao(
+    api, autor, loa, unidade, publicado
+):
+    loa.publicado = publicado
+    loa.save()
+
+    r = criar_pela_api(api(autor), loa, unidade)
+
+    assert r.status_code == 201, r.content
+
+
+@pytest.mark.spec("LOA-EMD-082")
+def test_usuario_sem_autor_nem_permissao_nao_cria(api, client, loa, unidade):
+    comum = _make_user("usuario_comum")
+    client.force_login(comum)
+
+    tela = client.get(reverse("cmj.loa:emendaloa_create", kwargs={"pk": loa.pk}))
+    r = criar_pela_api(api(comum), loa, unidade)
+
+    assert tela.status_code == 403
+    assert r.status_code == 403
+    assert not EmendaLoa.all_objects.filter(finalidade="Criada pela API").exists()

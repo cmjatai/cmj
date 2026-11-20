@@ -1008,10 +1008,8 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             self.loa = Loa.objects.get(pk=self.kwargs["pk"])
 
-            if not has_perm:
-                return u.operadorautor_set.exists() and self.loa.publicado
-
-            return has_perm
+            # LOA-EMD-082: operador de autor cria, publicada ou não a LOA
+            return has_perm or EmendaLoa.service.pode_criar(u)
 
         def get_initial(self):
             initial = super().get_initial()

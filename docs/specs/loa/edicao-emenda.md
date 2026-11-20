@@ -1,6 +1,6 @@
 # LOA: edição da emenda
 
-Status: observado; D3, D4, D7 e D8 implementadas (LOA-EMD-070 a 081)
+Status: observado; D1, D3, D4, D7 e D8 implementadas (LOA-EMD-070 a 082)
 Última verificação: 2026-11-20 (commit `7c7c5f1c2`)
 Código principal: `cmj/loa/views/v_emendaloa.py`, `cmj/loa/forms/f_emendaloa.py`,
 `cmj/loa/services/s_emendaloa.py`, `cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
@@ -124,6 +124,15 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   LOA em tramitação. Esse é sempre o caso na fase 17: quando a LOA sai de tramitação, todas as
   emendas já passaram da fase 20. Evidência: `cmj/loa/models/m_emendaloa.py:716-806`,
   `cmj/loa/forms/f_emendaloa.py:689-692`.
+
+### Criação (D1, decidida em 2026-11-20)
+
+- LOA-EMD-082 [implementado] Cria emenda, pela tela ou pela API, quem tem `add_emendaloa` ou é
+  operador de autor. A publicação da LOA não importa. Antes, para o operador de autor, a tela exigia
+  LOA publicada e a API exigia LOA não publicada. A fase inicial continua seguindo LOA-FASE-051.
+  Substitui LOA-EMD-001 e LOA-EMD-002 quanto à publicação. Evidência:
+  `EmendaLoaService.pode_criar` (`cmj/loa/services/s_emendaloa.py:186-194`),
+  `cmj/api/loa/views/emendaloa.py:48-49`, `cmj/loa/views/v_emendaloa.py:1011-1012`.
 
 ## Regras observadas
 
@@ -350,12 +359,9 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 
 ## Dúvidas
 
-Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, D3 e D7 viraram LOA-EMD-076 a 079, e
-D8 virou LOA-EMD-080 e 081.
+Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, D3 e D7 viraram LOA-EMD-076 a 079,
+D8 virou LOA-EMD-080 e 081, e D1 virou LOA-EMD-082.
 
-- D1. **A criação pela tela e pela API exigem condições opostas.** Para o operador de autor, a tela de
-  criação exige LOA publicada (LOA-EMD-001) e o POST da API exige LOA não publicada (LOA-EMD-002).
-  Qual condição vale?
 - D5. **O autosave grava a emenda sem mudança real.** Campos que não são do model geram PATCH e salvam a
   emenda (LOA-EMD-054). Com a LOA em tramitação, cada tecla na busca de despesa que gera `change`
   dispara o `sync()`, que pode apagar ou reescalar registros contábeis. O autosave deve ignorar esses

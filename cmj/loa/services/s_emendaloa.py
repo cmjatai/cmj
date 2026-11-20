@@ -180,3 +180,15 @@ class EmendaLoaService:
                     f"O Parlamentar {protegido} é o autor desta Emenda e não pode "
                     "ser retirado nem ter o valor zerado."
                 )
+
+    # ------------------------------------------------------------------ criação
+
+    @staticmethod
+    def pode_criar(user):
+        """Cria emenda quem tem ``add_emendaloa`` ou é operador de autor (LOA-EMD-082).
+
+        A publicação da LOA não importa. A fase inicial segue LOA-FASE-051.
+        """
+        if not user or user.is_anonymous:
+            return False
+        return user.has_perm("loa.add_emendaloa") or user.operadorautor_set.exists()
