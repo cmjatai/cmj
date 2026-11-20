@@ -165,13 +165,13 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
 | LOA-FASE-010 [observado] | 10, 12 | 10, 12 | Campo `fase` no formulário, com autosave por PATCH | Quem não tem `add_emendaloa` nem é editor contábil | `cmj/loa/forms/f_emendaloa.py:486-498`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:480-491` |
 | LOA-FASE-011 [acordado] | 12 | 15 | Abrir a tela de edição (GET) | Editor contábil (ver LOA-FASE-066) | `cmj/loa/views/v_emendaloa.py:1098-1108` |
 | LOA-FASE-012 [observado] | Qualquer | 15, 17 | Campo `fase` no formulário | Editor contábil sem `add_emendaloa` e não superusuário | `cmj/loa/forms/f_emendaloa.py:285-288`, `cmj/loa/forms/f_emendaloa.py:486`, `cmj/loa/forms/f_emendaloa.py:546-548` |
-| LOA-FASE-013 [observado] | Qualquer | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1069-1090` |
-| LOA-FASE-014 [observado] | Qualquer | 10 | Botão "Devolver para correção" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1069-1090` |
-| LOA-FASE-015 [observado] | Busca: menor que 17 | 15 pela interface | Adicionar ao agrupamento, enviando `emendaloa__fase` | `emendaloa_full_editor` | `cmj/api/loa/views/emendaloa.py:381`, `cmj/api/loa/views/agrupamentoemendaloa.py:18-19`, `cmj/api/loa/views/agrupamentoemendaloa.py:116-126`, `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:447-456` |
-| LOA-FASE-016 [observado] | Entre 1 e 16 | 17 | Salvar o agrupamento, incluindo as coletivas geradas | Formulário de agrupamento | `cmj/loa/forms/f_agrupamento.py:317-327` |
+| LOA-FASE-013 [observado] | 15, 17 (LOA-FASE-069) | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1069-1090` |
+| LOA-FASE-014 [observado] | 15, 17 (LOA-FASE-069) | 10 | Botão "Devolver para correção" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1069-1090` |
+| LOA-FASE-015 [observado] | Busca: menor que 17; o servidor aceita 12 e 15 (LOA-FASE-059) | 15 | Adicionar ao agrupamento; o servidor define a fase e ignora o `emendaloa__fase` que a tela ainda envia (LOA-FASE-060) | `emendaloa_full_editor` | `cmj/api/loa/views/emendaloa.py:381`, `cmj/api/loa/views/agrupamentoemendaloa.py:18-19`, `cmj/api/loa/views/agrupamentoemendaloa.py:116-126`, `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:447-456` |
+| LOA-FASE-016 [observado] | Entre 1 e 16, recusado se alguma estiver na 10 (LOA-AGR-082) | 17 | "Liberar para Protocolo" (salvar o formulário do agrupamento), incluindo as coletivas geradas | Formulário de agrupamento | `cmj/loa/forms/f_agrupamento.py:317-327` |
 | LOA-FASE-017 [observado] | Emenda de origem | -10 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:387-391`, `cmj/api/loa/views/agrupamento.py:15-17`, `cmj/api/loa/views/agrupamento.py:96-102` |
 | LOA-FASE-018 [observado] | Nova coletiva | 15 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:366-385` |
-| LOA-FASE-019 [observado] | -10 e emendas visíveis do agrupamento | 15 | Cancelar coletivas; as coletivas geradas são excluídas | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:337-350`, `cmj/api/loa/views/agrupamento.py:120-132` |
+| LOA-FASE-019 [observado] | -10 (as demais mantêm a fase: LOA-FASE-057) | 15 | Cancelar coletivas; as coletivas geradas são excluídas | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:337-350`, `cmj/api/loa/views/agrupamento.py:120-132` |
 | LOA-FASE-020 [observado] | 17 | 20 | Incorporar proposição como matéria, vinculando a emenda | Fluxo de `ConfirmarProposicaoForm` | `sapl/materia/forms.py:3278-3296`, `sapl/materia/forms.py:3418-3423` |
 
 - LOA-FASE-021 [observado] Só entram na coletiva as emendas com `permite_juncao_coletiva` e sem
@@ -188,14 +188,17 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
 - LOA-FASE-031 [observado] Fora do caso do editor contábil nas fases 12 a 17 e de quem tem as
   permissões de LOA-FASE-065, o GET da edição bloqueia não superusuários em fase maior que 17, usuários de outro autor e a fase 15. Evidência:
   `cmj/loa/views/v_emendaloa.py:1095-1140`.
-- LOA-FASE-032 [observado] Para quem não tem `add_emendaloa` nem é editor contábil, fase maior que 12 limita `tipo`, `fase`,
-  `unidade` e `entidade` ao valor atual no formulário. Evidência:
+- LOA-FASE-032 [observado] Para quem não tem `add_emendaloa` nem é editor contábil, fase maior que 12
+  limita ao valor atual no formulário `tipo`, `fase`, `unidade`, `entidade`, `permite_juncao_coletiva`
+  e `bairro`, e deixa somente leitura `prefixo_indicacao` e `prefixo_finalidade` (LOA-EMD-080).
+  Evidência:
   `cmj/loa/forms/f_emendaloa.py:486`, `cmj/loa/forms/f_emendaloa.py:500-544`.
-- LOA-FASE-033 [observado] Sem `change_emendaloa`, o PATCH da API exige emenda sem matéria e, ou
-  `emendaloa_full_editor`, ou operador de autor participante com fase até 12 ou igual a 17. Com
-  `change_emendaloa`, a permissão é concedida antes dessas verificações. Evidência:
-  `cmj/api/loa/views/emendaloa.py:29-38`, `cmj/api/loa/views/emendaloa.py:51-57`.
-  O "participante" foi substituído pelo autor do dono em LOA-EMD-076 (`docs/specs/loa/edicao-emenda.md`).
+- LOA-FASE-033 [observado] A permissão do PATCH da API vem de `EmendaLoaService.pode_editar`. Com
+  `change_emendaloa`, é concedida antes das demais verificações. Sem ela, exige emenda sem matéria e,
+  ou `emendaloa_full_editor`, ou ser operador do autor do dono com fase até 12 ou igual a 17
+  (LOA-EMD-076 de `docs/specs/loa/edicao-emenda.md`). Evidência:
+  `cmj/api/loa/views/emendaloa.py:29-38`, `cmj/api/loa/views/emendaloa.py:51-57`,
+  `cmj/loa/services/s_emendaloa.py:133-154`.
 
 ### Efeitos em outros fluxos
 
