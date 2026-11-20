@@ -176,6 +176,8 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
 - `docs/frontend/v6.md`: stores, `Resources.Utils`, rotas e padrões do v6.
 - `docs/frontend/v2018.md`: Vuex, `Resources.Utils` e padrões do v2018.
 - `docs/specs/loa/fases-emenda.md`: comportamento atual das fases da emenda. Leia antes de alterá-las.
+- `docs/specs/loa/edicao-emenda.md`: telas de criação e edição da emenda, API usada por elas e
+  autosave. Leia antes de alterar essas telas.
 
 ## A confirmar
 
