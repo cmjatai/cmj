@@ -191,6 +191,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:70-100`.
   `emendaloa_full_editor`, ou operador de autor participante com fase até 12 ou igual a 17. Com
   `change_emendaloa`, a permissão é concedida antes dessas verificações. Evidência:
   `cmj/api/loa/views/emendaloa.py:29-38`, `cmj/api/loa/views/emendaloa.py:57-81`.
+  O "participante" foi substituído pelo autor do dono em LOA-EMD-076 (`docs/specs/loa/edicao-emenda.md`).
 
 ### Efeitos em outros fluxos
 

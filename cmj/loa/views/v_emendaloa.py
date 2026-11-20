@@ -96,32 +96,10 @@ class EmendaLoaCrud(MasterDetailCrud):
             ):
                 return url_perm
 
-            operador_autor_da_emenda = self.object.owner.operadorautor_set.first()
-            autor_da_emenda = (
-                operador_autor_da_emenda.autor if operador_autor_da_emenda else None
-            )
-
-            operador_autor_user = self.request.user.operadorautor_set.first()
-            autor_do_usuario = (
-                operador_autor_user.autor if operador_autor_user else None
-            )
-
-            if autor_da_emenda == autor_do_usuario:
+            # LOA-EMD-076: só o autor do dono; coautores só consultam
+            if EmendaLoa.service.e_autor_da_emenda(self.request.user, self.object):
                 return url_perm
             return url_perm if self.request.user == self.object.owner else ""
-
-            if (
-                self.request.user.operadorautor_set.exists()
-                and EmendaLoa.PROPOSTA <= self.object.fase < EmendaLoa.EM_TRAMITACAO
-                and self.object.parlamentares.filter(
-                    id__in=self.request.user.operadorautor_set.values_list(
-                        "autor__object_id", flat=True
-                    )
-                ).exists()
-            ):
-                return url_perm
-
-            return ""
 
         @property
         def detail_url(self):
@@ -1143,18 +1121,8 @@ class EmendaLoaCrud(MasterDetailCrud):
                     return redirect(self.detail_url)
 
                 if not u.is_superuser:
-                    autor_do_usuario = (
-                        u.operadorautor_set.first().autor
-                        if u.operadorautor_set.exists()
-                        else None
-                    )
-                    autor_da_emenda = (
-                        self.object.owner.operadorautor_set.first().autor
-                        if self.object.owner.operadorautor_set.exists()
-                        else None
-                    )
-
-                    if autor_do_usuario != autor_da_emenda:
+                    # LOA-EMD-076
+                    if not EmendaLoa.service.e_autor_da_emenda(u, self.object):
                         messages.warning(
                             request,
                             f"Apenas o usuário ligado ao cadastro pode editar esta emenda.",
@@ -1187,48 +1155,8 @@ class EmendaLoaCrud(MasterDetailCrud):
             if has_perm:
                 return True
 
-            operador_autor_da_emenda = self.object.owner.operadorautor_set.first()
-            autor_da_emenda = (
-                operador_autor_da_emenda.autor if operador_autor_da_emenda else None
-            )
-
-            operador_autor_user = self.request.user.operadorautor_set.first()
-            autor_do_usuario = (
-                operador_autor_user.autor if operador_autor_user else None
-            )
-
-            return autor_da_emenda == autor_do_usuario
-
-            # permite usuários de emenda coletiva editarem a emenda caso atendam aos critérios definidos abaixo
-            if not has_perm:
-                # 1) possui permissão: emendaloa_full_editor
-                # 2) é um usuário operador de autor
-                # 3) a emenda em edição está na fase de Proposta Legislativa
-                # 4) participa da emenda
-                # (1 or 2) e 3 e 4
-
-                participa = False
-                if u.operadorautor_set.exists():
-                    parlamentar = u.operadorautor_set.first().autor.autor_related
-                    if isinstance(parlamentar, Parlamentar):
-                        participa = (
-                            self.object.emendaloaparlamentar_set.filter(
-                                parlamentar=parlamentar, emendaloa__tipo__gt=0
-                            ).exists()
-                            or self.object.emendaloaparlamentar_set.filter(
-                                emendaloa__owner=u, emendaloa__tipo=0
-                            ).exists()
-                        )
-
-                return (
-                    u.has_perm("loa.emendaloa_full_editor") and not self.object.materia
-                ) or (
-                    u.operadorautor_set.exists()
-                    and not self.object.materia
-                    and participa
-                )
-
-            return has_perm
+            # LOA-EMD-076: só o autor do dono; coautores só consultam (resolve D7)
+            return EmendaLoa.service.e_autor_da_emenda(u, self.object)
 
         def get_initial(self):
             initial = super().get_initial()

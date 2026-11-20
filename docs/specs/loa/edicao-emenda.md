@@ -1,6 +1,6 @@
 # LOA: edição da emenda
 
-Status: observado; D4 implementada (LOA-EMD-070 a 075)
+Status: observado; D3, D4 e D7 implementadas (LOA-EMD-070 a 079)
 Última verificação: 2026-11-20 (commit `7c7c5f1c2`)
 Código principal: `cmj/loa/views/v_emendaloa.py`, `cmj/loa/forms/f_emendaloa.py`,
 `cmj/loa/services/s_emendaloa.py`, `cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
@@ -58,7 +58,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 
   Quem tem mais de um perfil soma as listas. A fase continua sujeita às transições de LOA-FASE-052,
   LOA-FASE-053 e LOA-FASE-065. Evidência: `EmendaLoaService.campos_alteraveis`
-  (`cmj/loa/services/s_emendaloa.py:10-52`).
+  (`cmj/loa/services/s_emendaloa.py:10-53`).
 - LOA-EMD-071 [implementado] Nenhum perfil, nem o superusuário, altera pela API ou pelo formulário campos
   do model fora de LOA-EMD-070, como `owner`, `loa`, `metadata`, `indicacao`, `proposicao`,
   `emenda_coletiva` e `agrupamento_de_origem`. Esses campos continuam sendo mantidos pelos fluxos
@@ -69,14 +69,42 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   (`cmj/loa/services/s_emendaloa.py:54-80`).
 - LOA-EMD-073 [implementado] O PATCH com um campo que o usuário não pode alterar é recusado com 400, sem
   gravar nada, e a mensagem cita o campo. Chaves que não são campos do model, como `busca_despesa`,
-  continuam sendo ignoradas. Evidência: `cmj/api/loa/views/emendaloa.py:128-138`.
+  continuam sendo ignoradas. Evidência: `cmj/api/loa/views/emendaloa.py:116-126`.
 - LOA-EMD-074 [implementado] A action `updatevaloremenda` segue LOA-EMD-070 para o campo `valor`. Evidência:
-  `cmj/api/loa/views/emendaloa.py:201-205`. Substitui LOA-EMD-028 quanto à permissão.
+  `cmj/api/loa/views/emendaloa.py:188-192`. Substitui LOA-EMD-028 quanto à permissão.
 - LOA-EMD-075 [implementado] O POST do formulário de edição segue LOA-EMD-070. Campo alterado fora da lista,
   inclusive pelos campos ocultos de matéria, invalida o formulário. A criação não passa por essa
   regra: ela segue LOA-FASE-051. `indicacao` fica fora da verificação do formulário porque não é
   exibida e o `save()` a deriva da unidade (LOA-EMD-030). Evidência:
-  `cmj/loa/forms/f_emendaloa.py:262-274`, `cmj/loa/forms/f_emendaloa.py:621-630`.
+  `cmj/loa/forms/f_emendaloa.py:262-274`, `cmj/loa/forms/f_emendaloa.py:609-618`.
+
+### Autoria, coautores e parlamentares (D3 e D7, decididas em 2026-11-20)
+
+- LOA-EMD-076 [implementado] Edita a emenda, como autor, só o operador do mesmo autor do dono
+  (`owner`). Operadores dos demais parlamentares participantes (coautores) não editam nada: a tela de
+  edição, o PATCH e as actions da API os recusam, e eles só veem a emenda na listagem e no detalhe.
+  Dono sem autor não tem operador de autor que o represente. Editor contábil, Operador da LOA e
+  superusuário seguem LOA-EMD-003 e as regras de fase. Substitui o "operador de autor participante"
+  de LOA-FASE-033 e resolve D7: o trecho morto foi removido. Corrige também a comparação anterior em
+  que o dono sem autor (`None`) era igual a qualquer usuário sem autor, o que abria a edição para
+  qualquer usuário logado. Evidência: `EmendaLoaService.e_autor_da_emenda`
+  (`cmj/loa/services/s_emendaloa.py:108-127`), `cmj/api/loa/views/emendaloa.py:57-70`,
+  `cmj/loa/views/v_emendaloa.py:99-101`, `cmj/loa/views/v_emendaloa.py:1123-1130`,
+  `cmj/loa/views/v_emendaloa.py:1155-1159`.
+- LOA-EMD-077 [implementado] Alteram valores por parlamentar e assinantes só o autor do dono, o
+  Operador da LOA e o superusuário. O editor contábil não altera, como já acontecia no formulário. O
+  autor do dono pode definir o valor dos coautores. Evidência:
+  `EmendaLoaService.pode_alterar_parlamentares` (`cmj/loa/services/s_emendaloa.py:143-147`).
+- LOA-EMD-078 [implementado] O parlamentar informado em `updatevalorparlamentar`,
+  `update_parlassinantes` e no formulário precisa ser da LOA. Antes, a primeira action aceitava
+  qualquer parlamentar, e a segunda dava erro 500. Evidência: `cmj/loa/services/s_emendaloa.py:149-178`.
+- LOA-EMD-079 [implementado] O parlamentar do autor do dono não pode ter o valor zerado nem ser
+  desmarcado como assinante, por nenhum perfil. Na criação, vale o parlamentar do autor de quem cria.
+  Substitui a regra anterior, que só impedia o próprio operador de zerar o seu parlamentar
+  (LOA-EMD-021, LOA-EMD-022, LOA-EMD-026 e LOA-EMD-027). Evidência:
+  `EmendaLoaService.parlamentar_protegido` (`cmj/loa/services/s_emendaloa.py:129-141`),
+  `cmj/api/loa/views/emendaloa.py:142-151`, `cmj/api/loa/views/emendaloa.py:225-234`,
+  `cmj/loa/forms/f_emendaloa.py:582-607`.
 
 ## Regras observadas
 
@@ -303,12 +331,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 
 ## Dúvidas
 
-Ordenadas por risco. D4 foi decidida em 2026-11-20 e virou LOA-EMD-070 a 075.
+Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, e D3 e D7 viraram LOA-EMD-076 a 079.
 
-- D3. **`updatevalorparlamentar` não valida o parlamentar.** O endpoint aceita qualquer
-  `parlamentar_id`, inclusive de fora da LOA, e o autor participante pode alterar o valor de outros
-  parlamentares. O campo somente leitura do widget protege só a tela (LOA-EMD-020, LOA-EMD-027). Que
-  parlamentares cada perfil pode alterar?
 - D8. **O autor edita a emenda na fase 17.** A tela e a API deixam o autor alterar valores,
   finalidade e parlamentares depois que a contabilidade liberou a emenda. Mudar valores na 17 desfaz o
   fechamento contábil, ou o reescala pelo `sync()` (LOA-EMD-031). A edição do autor na fase 17 é
@@ -326,10 +350,6 @@ Ordenadas por risco. D4 foi decidida em 2026-11-20 e virou LOA-EMD-070 a 075.
   (LOA-EMD-052), e o GET da API é público para `EmendaLoa` (LOA-EMD-006). Qualquer pessoa, mesmo
   anônima, pode mudar a entrelinha do documento de qualquer emenda visível, o que afeta o PDF da
   proposição. A gravação deve exigir permissão de edição, ou sair do GET?
-- D7. **Há código morto em `has_permission` da edição.** O trecho que liberaria participantes de
-  coletiva fica depois de um `return` e nunca executa (LOA-EMD-003). Hoje entra qualquer operador do
-  mesmo autor do `owner`, participante ou não. Esse trecho deve ser removido, ou a regra de
-  participação deve valer?
 
 ## Pendências encontradas
 

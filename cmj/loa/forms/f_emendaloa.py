@@ -579,21 +579,14 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     f'"{dict(EmendaLoa.FASE_CHOICE).get(destino, destino)}".'
                 )
 
+        # LOA-EMD-077 a 079: perfil, parlamentares da LOA e parlamentar do dono.
+        # O editor contábil não tem esses campos e não passa por aqui.
         if cleaned_data["tipo"] != "0":
             if "parlamentares__valor" in cleaned_data:
-                if not self.user.is_superuser and self.user.operadorautor_set.exists():
-                    pv = {
-                        k: v
-                        for k, v in zip(
-                            self.parls, self.cleaned_data["parlamentares__valor"]
-                        )
-                    }
-
-                    p = self.user.operadorautor_set.first().autor.autor_related
-                    if not pv[p]:
-                        raise ValidationError(
-                            f"É obrigatório o preenchimento do valor ligado a seu Parlamentar: {p}."
-                        )
+                valores = dict(zip(self.parls, cleaned_data["parlamentares__valor"]))
+                EmendaLoa.service.validar_parlamentares(
+                    self.user, self.instance, valores
+                )
         else:
             if (
                 not "valor" in cleaned_data
@@ -603,20 +596,15 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 raise ValidationError(
                     f"Em Emendas Modificativas você deve informar o Valor Global da Emenda."
                 )
-            if not "parl_assinantes" in cleaned_data:
-                if not self.user.is_superuser and self.user.operadorautor_set.exists():
-                    raise ValidationError(
-                        f"Você deve selecionar ao menos o seu parlamentar"
-                    )
-            else:
-                if not self.user.is_superuser and self.user.operadorautor_set.exists():
-                    pv = self.cleaned_data["parl_assinantes"]
-
-                    p = self.user.operadorautor_set.first().autor.autor_related
-                    if not p in pv:
-                        raise ValidationError(
-                            f"É obrigatório selecionar ao menos o seu parlamentar: {p}."
-                        )
+            if "parl_assinantes" in self.fields:
+                assinantes = list(cleaned_data.get("parl_assinantes") or [])
+                valores = {
+                    p: Decimal("1.00") if p in assinantes else None for p in self.parls
+                }
+                valores.update({p: Decimal("1.00") for p in assinantes})
+                EmendaLoa.service.validar_parlamentares(
+                    self.user, self.instance, valores
+                )
 
         if self.instance.pk:
             # LOA-EMD-075: só os campos que o perfil pode alterar. `indicacao` fica

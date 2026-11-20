@@ -41,7 +41,7 @@ class EmendaLoaService:
         if user.has_perm("loa.emendaloa_full_editor"):  # editor contábil
             campos |= self.CAMPOS_BASE | self.CAMPOS_ESTRUTURAIS
 
-        if user.operadorautor_set.exists():  # autor
+        if self.e_autor_da_emenda(user, emenda):  # autor (LOA-EMD-076)
             campos |= self.CAMPOS_BASE
             if emenda.fase <= EmendaLoa.PROPOSTA_LIBERADA:
                 campos |= self.CAMPOS_ESTRUTURAIS
@@ -102,3 +102,77 @@ class EmendaLoaService:
         raise ValidationError(
             f'Você não tem permissão para alterar nesta Emenda: {", ".join(nomes)}.'
         )
+
+    # ------------------------------------------------- autoria e parlamentares
+
+    @staticmethod
+    def autor_do_usuario(user):
+        """Autor de que ``user`` é operador, ou None."""
+        if not user or user.is_anonymous:
+            return None
+        operador = user.operadorautor_set.first()
+        return operador.autor if operador else None
+
+    def autor_da_emenda(self, emenda):
+        """Autor do operador dono (``owner``) da emenda, ou None."""
+        return self.autor_do_usuario(emenda.owner) if emenda.owner_id else None
+
+    def e_autor_da_emenda(self, user, emenda):
+        """``user`` opera o mesmo autor do dono da emenda (LOA-EMD-076).
+
+        Operadores de outros parlamentares participantes (coautores) não contam. Dono
+        sem autor não tem operador de autor que o represente.
+        """
+        autor = self.autor_da_emenda(emenda)
+        return autor is not None and autor == self.autor_do_usuario(user)
+
+    def parlamentar_protegido(self, emenda, user=None):
+        """Parlamentar cujo valor não pode ser zerado nem desmarcado (LOA-EMD-079).
+
+        É o parlamentar do autor do dono. Na criação, sem dono gravado, vale o de
+        ``user``.
+        """
+        from sapl.parlamentares.models import Parlamentar
+
+        autor = (
+            self.autor_da_emenda(emenda) if emenda.pk else self.autor_do_usuario(user)
+        )
+        related = autor.autor_related if autor else None
+        return related if isinstance(related, Parlamentar) else None
+
+    def pode_alterar_parlamentares(self, user, emenda):
+        """Autor do dono, Operador da LOA e superusuário (LOA-EMD-077)."""
+        return user.has_perm("loa.add_emendaloa") or self.e_autor_da_emenda(
+            user, emenda
+        )
+
+    def validar_parlamentares(self, user, emenda, valores):
+        """Valida a alteração de valores por parlamentar ou de assinantes.
+
+        ``valores`` mapeia parlamentar (instância ou id) para o valor resultante;
+        valor vazio ou não positivo significa retirar o parlamentar da emenda.
+        Levanta ``ValidationError`` (LOA-EMD-077 a 079).
+        """
+        if emenda.pk and not self.pode_alterar_parlamentares(user, emenda):
+            raise ValidationError(
+                "Você não tem permissão para alterar os parlamentares desta Emenda."
+            )
+
+        ids_da_loa = set(emenda.loa.parlamentares.values_list("id", flat=True))
+        ids = {getattr(p, "pk", p) for p in valores}
+        try:
+            ids = {int(i) for i in ids}
+        except (TypeError, ValueError):
+            raise ValidationError("Parlamentar inválido.")
+        if ids - ids_da_loa:
+            raise ValidationError("O Parlamentar informado não pertence a esta LOA.")
+
+        protegido = self.parlamentar_protegido(emenda, user)
+        if protegido is None:
+            return
+        for p, valor in valores.items():
+            if int(getattr(p, "pk", p)) == protegido.pk and not (valor and valor > 0):
+                raise ValidationError(
+                    f"O Parlamentar {protegido} é o autor desta Emenda e não pode "
+                    "ser retirado nem ter o valor zerado."
+                )

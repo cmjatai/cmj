@@ -19,7 +19,6 @@ from cmj.api.loa.serializers import EmendaLoaSearchSerializer
 from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, Empenho, Loa
 from cmj.utils.utils_report import make_pdf
 from sapl.api.permissions import SaplModelPermissions
-from sapl.parlamentares.models import Parlamentar
 
 logger = logging.getLogger(__name__)
 
@@ -59,26 +58,15 @@ class EmendaLoaViewSet:
 
                 el = EmendaLoa.objects.get(pk=view.kwargs["pk"])
 
-                participa = False
-                fase = True
-                if u.operadorautor_set.exists():
-                    parlamentar = u.operadorautor_set.first().autor.autor_related
-                    if isinstance(parlamentar, Parlamentar):
-                        participa = el.emendaloaparlamentar_set.filter(
-                            parlamentar=parlamentar
-                        ).exists()
-
-                        if (
-                            el.fase > EmendaLoa.PROPOSTA_LIBERADA
-                            and el.fase != EmendaLoa.LIBERACAO_CONTABIL
-                        ):
-                            fase = False
+                # LOA-EMD-076: só o autor do dono edita; coautores só consultam
+                e_autor = EmendaLoa.service.e_autor_da_emenda(u, el)
+                fase = (
+                    el.fase <= EmendaLoa.PROPOSTA_LIBERADA
+                    or el.fase == EmendaLoa.LIBERACAO_CONTABIL
+                )
 
                 return (u.has_perm("loa.emendaloa_full_editor") and not el.materia) or (
-                    u.operadorautor_set.exists()
-                    and not el.materia
-                    and participa
-                    and fase
+                    e_autor and not el.materia and fase
                 )
 
             return False
@@ -151,19 +139,18 @@ class EmendaLoaViewSet:
 
         el = EmendaLoa.objects.get(pk=kwargs["pk"])
 
+        # LOA-EMD-077 a 079: perfil, parlamentar da LOA e parlamentar do dono
+        try:
+            EmendaLoa.service.validar_parlamentares(
+                request.user,
+                el,
+                {data["parlamentar_id"]: Decimal("1.00") if dchecked else None},
+            )
+        except ValidationError as e:
+            raise DRFValidationError(e.messages)
+
         pselected = el.loa.parlamentares.filter(id=data["parlamentar_id"]).first()
         if not dchecked:
-            u = request.user
-            if not u.is_superuser and u.operadorautor_set.exists():
-                puser = u.operadorautor_set.first().autor.autor_related
-
-                if puser == pselected:
-                    raise DRFValidationError(
-                        "Você não pode remover o Parlamentar "
-                        "ao qual seu usuário está ligado. "
-                        "Caso queira, você pode excluir esse registro "
-                        "clicando em excluir na tela de consulta."
-                    )
             el.parlamentares.remove(pselected)
         else:
             el.parlamentares.add(pselected)
@@ -235,17 +222,15 @@ class EmendaLoaViewSet:
         except:
             obj = Decimal("0.00")
 
-        u = request.user
-        if not u.is_superuser and u.operadorautor_set.exists():
-            p = u.operadorautor_set.first().autor.autor_related
-
-            if p.id == int(data["parlamentar_id"]) and obj <= Decimal("0.00"):
-                raise DRFValidationError(
-                    "Você não pode zerar o Valor do Parlamentar "
-                    "ao qual seu usuário está ligado. "
-                    "Caso queira, você pode excluir esse registro "
-                    "clicando em excluir na tela de consulta."
-                )
+        # LOA-EMD-077 a 079: perfil, parlamentar da LOA e parlamentar do dono
+        try:
+            EmendaLoa.service.validar_parlamentares(
+                request.user,
+                EmendaLoa.objects.get(pk=kwargs["pk"]),
+                {data["parlamentar_id"]: obj},
+            )
+        except ValidationError as e:
+            raise DRFValidationError(e.messages)
 
         elp, created = EmendaLoaParlamentar.objects.get_or_create(**data)
         elp.valor = obj

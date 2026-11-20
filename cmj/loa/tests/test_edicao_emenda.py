@@ -11,9 +11,10 @@ from django.urls import reverse
 from model_mommy import mommy
 
 from cmj.core.models import Bairro
-from cmj.loa.models import EmendaLoa, UnidadeOrcamentaria
-from cmj.loa.tests.conftest import recarregar
+from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, UnidadeOrcamentaria
+from cmj.loa.tests.conftest import _make_user, recarregar
 from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
+from sapl.parlamentares.models import Parlamentar
 
 pytestmark = pytest.mark.django_db
 
@@ -381,3 +382,237 @@ def test_formulario_do_operador_vincula_materia(
     )
 
     assert recarregar(el).materia_id == materia.pk
+
+
+# ------------------------------------------------- coautores e parlamentares
+
+
+@pytest.fixture
+def emenda_com_coautor(make_emenda, autor, parlamentar, parlamentar_b):
+    """Emenda do autor A com o parlamentar B (do autor_b) como coautor."""
+
+    def _make(fase=P, **kwargs):
+        el = make_emenda(fase=fase, owner=autor, parlamentar=parlamentar, **kwargs)
+        EmendaLoaParlamentar.objects.create(
+            emendaloa=el, parlamentar=parlamentar_b, valor=Decimal("500.00")
+        )
+        return recarregar(el)
+
+    return _make
+
+
+@pytest.fixture
+def parlamentar_fora_da_loa(db):
+    return mommy.make(Parlamentar, nome_parlamentar="Fora", nome_completo="Fora")
+
+
+def valor_parlamentar(client, emenda, parlamentar, valor):
+    return patch(
+        client,
+        emenda,
+        {"parlamentar_id": parlamentar.pk, "valor": valor},
+        action="updatevalorparlamentar",
+    )
+
+
+def marcar_assinante(client, emenda, parlamentar, checked):
+    return patch(
+        client,
+        emenda,
+        {"parlamentar_id": parlamentar.pk, "checked": checked},
+        action="update_parlassinantes",
+    )
+
+
+@pytest.mark.spec("LOA-EMD-079")
+def test_service_parlamentar_protegido_e_o_do_dono(
+    autor, editor_contabil, parlamentar, emenda_com_coautor, make_emenda
+):
+    el = emenda_com_coautor()
+    sem_autor = make_emenda(owner=editor_contabil)
+
+    assert EmendaLoa.service.parlamentar_protegido(el) == parlamentar
+    assert EmendaLoa.service.parlamentar_protegido(sem_autor) is None
+
+
+@pytest.mark.spec("LOA-EMD-076")
+def test_coautor_nao_edita_pelo_patch(api, autor_b, emenda_com_coautor):
+    el = emenda_com_coautor()
+
+    r = patch(api(autor_b), el, {"finalidade": "Alterada pelo coautor"})
+
+    assert r.status_code == 403
+    assert recarregar(el).finalidade == "Finalidade de teste"
+
+
+@pytest.mark.spec("LOA-EMD-076")
+def test_coautor_nao_altera_valores_pelas_actions(
+    api, autor_b, parlamentar_b, emenda_com_coautor
+):
+    el = emenda_com_coautor()
+    client = api(autor_b)
+
+    assert valor_parlamentar(client, el, parlamentar_b, "900,00").status_code == 403
+    assert marcar_assinante(client, el, parlamentar_b, False).status_code == 403
+    assert el.emendaloaparlamentar_set.get(parlamentar=parlamentar_b).valor == Decimal(
+        "500.00"
+    )
+
+
+@pytest.mark.spec("LOA-EMD-076")
+def test_coautor_ve_detalhe_mas_nao_abre_edicao(client, autor_b, emenda_com_coautor):
+    el = emenda_com_coautor()
+    client.force_login(autor_b)
+
+    detalhe = client.get(reverse("cmj.loa:emendaloa_detail", kwargs={"pk": el.pk}))
+    edicao = client.get(reverse("cmj.loa:emendaloa_update", kwargs={"pk": el.pk}))
+
+    assert detalhe.status_code == 200
+    assert edicao.status_code == 403
+
+
+@pytest.mark.spec("LOA-EMD-076")
+def test_usuario_sem_autor_nao_edita_emenda_de_dono_sem_autor(
+    client, editor_contabil, make_emenda
+):
+    # dono sem operador de autor: antes, None == None liberava qualquer usuário logado
+    el = make_emenda(fase=P, owner=editor_contabil)
+    comum = _make_user("usuario_comum")
+    client.force_login(comum)
+
+    r = client.get(reverse("cmj.loa:emendaloa_update", kwargs={"pk": el.pk}))
+
+    assert r.status_code == 403
+
+
+@pytest.mark.spec("LOA-EMD-077")
+def test_autor_do_dono_define_valor_do_coautor(
+    api, autor, parlamentar_b, emenda_com_coautor
+):
+    el = emenda_com_coautor()
+
+    r = valor_parlamentar(api(autor), el, parlamentar_b, "700,00")
+
+    assert r.status_code == 200
+    assert el.emendaloaparlamentar_set.get(parlamentar=parlamentar_b).valor == Decimal(
+        "700.00"
+    )
+
+
+@pytest.mark.spec("LOA-EMD-077")
+def test_operador_da_loa_altera_valor_de_parlamentar(
+    api, operador_loa, parlamentar_b, emenda_com_coautor
+):
+    el = emenda_com_coautor()
+
+    r = valor_parlamentar(api(operador_loa), el, parlamentar_b, "700,00")
+
+    assert r.status_code == 200
+
+
+@pytest.mark.spec("LOA-EMD-077")
+def test_editor_contabil_nao_altera_parlamentares(
+    api, editor_contabil, parlamentar_b, emenda_com_coautor
+):
+    el = emenda_com_coautor(fase=EC)
+    client = api(editor_contabil)
+
+    assert valor_parlamentar(client, el, parlamentar_b, "700,00").status_code == 400
+    assert marcar_assinante(client, el, parlamentar_b, False).status_code == 400
+    assert el.emendaloaparlamentar_set.get(parlamentar=parlamentar_b).valor == Decimal(
+        "500.00"
+    )
+
+
+@pytest.mark.spec("LOA-EMD-078")
+def test_valor_de_parlamentar_fora_da_loa_e_recusado(
+    api, autor, parlamentar_fora_da_loa, emenda_com_coautor
+):
+    el = emenda_com_coautor()
+
+    r = valor_parlamentar(api(autor), el, parlamentar_fora_da_loa, "100,00")
+
+    assert r.status_code == 400
+    assert not el.emendaloaparlamentar_set.filter(
+        parlamentar=parlamentar_fora_da_loa
+    ).exists()
+
+
+@pytest.mark.spec("LOA-EMD-078")
+def test_assinante_fora_da_loa_e_recusado(
+    api, autor, parlamentar, parlamentar_fora_da_loa, make_emenda
+):
+    el = make_emenda(
+        fase=P, owner=autor, parlamentar=parlamentar, tipo=EmendaLoa.MODIFICATIVA
+    )
+
+    r = marcar_assinante(api(autor), el, parlamentar_fora_da_loa, True)
+
+    assert r.status_code == 400
+    assert not el.parlamentares.filter(pk=parlamentar_fora_da_loa.pk).exists()
+
+
+@pytest.mark.spec("LOA-EMD-079")
+@pytest.mark.parametrize("perfil", ["autor", "operador_loa", "superuser"])
+def test_ninguem_zera_o_parlamentar_do_dono(
+    request, api, parlamentar, emenda_com_coautor, perfil
+):
+    el = emenda_com_coautor()
+    user = request.getfixturevalue(perfil)
+
+    r = valor_parlamentar(api(user), el, parlamentar, "0,00")
+
+    assert r.status_code == 400
+    assert el.emendaloaparlamentar_set.filter(parlamentar=parlamentar).exists()
+
+
+@pytest.mark.spec("LOA-EMD-079")
+@pytest.mark.parametrize("perfil", ["autor", "superuser"])
+def test_ninguem_desmarca_o_parlamentar_do_dono(
+    request, api, autor, parlamentar, make_emenda, perfil
+):
+    el = make_emenda(
+        fase=P, owner=autor, parlamentar=parlamentar, tipo=EmendaLoa.MODIFICATIVA
+    )
+    user = request.getfixturevalue(perfil)
+
+    r = marcar_assinante(api(user), el, parlamentar, False)
+
+    assert r.status_code == 400
+    assert el.parlamentares.filter(pk=parlamentar.pk).exists()
+
+
+@pytest.mark.spec("LOA-EMD-079")
+def test_formulario_do_superusuario_nao_zera_parlamentar_do_dono(
+    client, superuser, parlamentar, parlamentar_b, emenda_com_coautor
+):
+    el = emenda_com_coautor()
+    # parlamentares da LOA em ordem de nome: A (dono) e B (coautor)
+
+    post_edicao(
+        client,
+        superuser,
+        el,
+        parlamentares__valor_0="",
+        parlamentares__valor_1="500.00",
+    )
+
+    assert el.emendaloaparlamentar_set.filter(parlamentar=parlamentar).exists()
+
+
+@pytest.mark.spec("LOA-EMD-078")
+def test_formulario_recusa_assinante_fora_da_loa(
+    client, autor, parlamentar, parlamentar_fora_da_loa, make_emenda
+):
+    el = make_emenda(
+        fase=P, owner=autor, parlamentar=parlamentar, tipo=EmendaLoa.MODIFICATIVA
+    )
+
+    post_edicao(
+        client,
+        autor,
+        el,
+        parl_assinantes=[parlamentar.pk, parlamentar_fora_da_loa.pk],
+    )
+
+    assert not el.parlamentares.filter(pk=parlamentar_fora_da_loa.pk).exists()
