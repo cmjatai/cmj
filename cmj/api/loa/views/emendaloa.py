@@ -108,6 +108,11 @@ class EmendaLoaViewSet:
         )
 
     def perform_update(self, serializer):
+        # LOA-EMD-083: sem campo do model no PATCH, a emenda não é gravada, o que
+        # evita signals e o sync() (LOA-EMD-031) sem mudança real
+        if not serializer.validated_data:
+            return
+
         # LOA-EMD-070 a 073: só os campos que o perfil pode alterar
         try:
             EmendaLoa.service.validar_alteracao(

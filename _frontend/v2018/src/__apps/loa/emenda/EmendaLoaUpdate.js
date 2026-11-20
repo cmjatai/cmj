@@ -3,6 +3,22 @@ import axios from 'axios'
 import _ from 'lodash'
 import $ from 'jquery'
 
+// Campos do model EmendaLoa que o formulário de edição exibe e que o autosave
+// envia pelo PATCH genérico (LOA-EMD-053 e LOA-EMD-083)
+const CAMPOS_DO_MODEL = [
+  'tipo',
+  'fase',
+  'materia',
+  'permite_juncao_coletiva',
+  'prefixo_indicacao',
+  'indicacao',
+  'prefixo_finalidade',
+  'finalidade',
+  'unidade',
+  'bairro',
+  'entidade'
+]
+
 export default class EmendaLoaUpdate extends EmendaLoaForm {
   constructor (container) {
     super(container)
@@ -383,8 +399,12 @@ export default class EmendaLoaUpdate extends EmendaLoaForm {
     } else if (field === 'valor') {
       action = '/updatevaloremenda/'
       formData['valor'] = value
-    } else {
+    } else if (CAMPOS_DO_MODEL.includes(field)) {
       formData[field] = value
+    } else {
+      // LOA-EMD-083: busca de despesa, campos despesa_*, valor_despesa e matéria
+      // não são campos do model e não geram PATCH
+      return
     }
 
     // Opacity effect on preview during save

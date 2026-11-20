@@ -1,6 +1,6 @@
 # LOA: edição da emenda
 
-Status: observado; D1, D3, D4, D7 e D8 implementadas (LOA-EMD-070 a 082)
+Status: observado; D1, D3, D4, D5, D7 e D8 implementadas (LOA-EMD-070 a 083)
 Última verificação: 2026-11-20 (commit `7c7c5f1c2`)
 Código principal: `cmj/loa/views/v_emendaloa.py`, `cmj/loa/forms/f_emendaloa.py`,
 `cmj/loa/services/s_emendaloa.py`, `cmj/api/loa/views/emendaloa.py`, `cmj/loa/models/m_emendaloa.py`,
@@ -133,6 +133,18 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   Substitui LOA-EMD-001 e LOA-EMD-002 quanto à publicação. Evidência:
   `EmendaLoaService.pode_criar` (`cmj/loa/services/s_emendaloa.py:186-194`),
   `cmj/api/loa/views/emendaloa.py:48-49`, `cmj/loa/views/v_emendaloa.py:1011-1012`.
+
+### Autosave só de campos do model (D5, decidida em 2026-11-20)
+
+- LOA-EMD-083 [implementado] O autosave ignora os campos que não são do model: a busca de despesa, os
+  campos `despesa_*`, `valor_despesa` e os de matéria (tipo, número e ano) não geram requisição. O
+  PATCH genérico só é enviado para os campos do model exibidos no formulário. No servidor, o PATCH
+  sem nenhum campo do model responde 200 com a emenda sem gravá-la, o que não dispara signals nem o
+  `sync()` (LOA-EMD-031). O PATCH com campo do model continua gravando, mesmo quando também traz
+  chaves alheias. Substitui LOA-EMD-054. Evidência:
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:6-20`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:402-408`,
+  `cmj/api/loa/views/emendaloa.py:110-114`.
 
 ## Regras observadas
 
@@ -299,7 +311,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 - LOA-EMD-054 [observado] Pela última linha da tabela de LOA-EMD-053, campos que não são do model
   também geram PATCH: a busca de despesa, os campos `despesa_*`, `valor_despesa` e os de matéria. O
   serializer ignora esses campos, mas a emenda é salva mesmo assim, o que dispara os signals e, com a
-  LOA em tramitação, o `sync()` de LOA-EMD-031 (ver D5). Evidência:
+  LOA em tramitação, o `sync()` de LOA-EMD-031. Substituída por LOA-EMD-083. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:386-388`,
   `cmj/api/loa/views/emendaloa.py:127-129`.
 - LOA-EMD-055 [observado] Mudar a fase pelo autosave envia `PATCH` com `fase`, sujeito às transições de
@@ -360,12 +372,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 ## Dúvidas
 
 Ordenadas por risco. Em 2026-11-20, D4 virou LOA-EMD-070 a 075, D3 e D7 viraram LOA-EMD-076 a 079,
-D8 virou LOA-EMD-080 e 081, e D1 virou LOA-EMD-082.
+D8 virou LOA-EMD-080 e 081, D1 virou LOA-EMD-082 e D5 virou LOA-EMD-083.
 
-- D5. **O autosave grava a emenda sem mudança real.** Campos que não são do model geram PATCH e salvam a
-  emenda (LOA-EMD-054). Com a LOA em tramitação, cada tecla na busca de despesa que gera `change`
-  dispara o `sync()`, que pode apagar ou reescalar registros contábeis. O autosave deve ignorar esses
-  campos?
 - D6. **O erro do autosave some.** A falha recarrega a página sem mensagem (LOA-EMD-057). Uma transição
   de fase negada, por exemplo, só "volta" sem explicação. A tela deve mostrar o erro do servidor?
 - D2. **O GET de `/view/` altera a emenda e é público.** O endpoint grava `metadata.style`

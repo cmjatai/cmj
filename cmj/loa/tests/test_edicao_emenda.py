@@ -4,9 +4,8 @@ Cada teste está ligado a uma regra pelo marker ``spec``. Testes de regras ``[de
 divergência atual e devem falhar até a correção.
 """
 
-from decimal import Decimal
-
 import datetime
+from decimal import Decimal
 from unittest import mock
 
 import pytest
@@ -257,6 +256,36 @@ def test_chave_que_nao_e_campo_do_model_e_ignorada(
     r = patch(api(autor), el, {"busca_despesa": "saude"})
 
     assert r.status_code == 200
+
+
+@pytest.mark.spec("LOA-EMD-083")
+def test_patch_sem_campo_do_model_nao_grava_a_emenda(
+    api, autor, parlamentar, make_emenda
+):
+    el = make_emenda(fase=P, owner=autor, parlamentar=parlamentar)
+
+    with mock.patch.object(EmendaLoa, "save") as save:
+        r = patch(
+            api(autor),
+            el,
+            {"busca_despesa": "saude", "despesa_codigo": "1", "numero_materia": "3"},
+        )
+
+    assert r.status_code == 200
+    assert r.data["id"] == el.pk
+    save.assert_not_called()
+
+
+@pytest.mark.spec("LOA-EMD-083")
+def test_patch_com_campo_do_model_continua_gravando(
+    api, autor, parlamentar, make_emenda
+):
+    el = make_emenda(fase=P, owner=autor, parlamentar=parlamentar)
+
+    r = patch(api(autor), el, {"finalidade": "Nova", "busca_despesa": "saude"})
+
+    assert r.status_code == 200
+    assert recarregar(el).finalidade == "Nova"
 
 
 @pytest.mark.spec("LOA-EMD-073")
