@@ -3,31 +3,14 @@ import 'vite/modulepreload-polyfill'
 
 // Import our custom CSS
 import '~@/scss/styles.scss'
-// import '@fortawesome/fontawesome-free/js/all.js'
-
-// Import all of Bootstrap's JS
-
-import * as bootstrap from 'bootstrap'
-import {createBootstrap} from 'bootstrap-vue-next'
-
-// import 'bootstrap-icons/font/bootstrap-icons.scss'
 
 import axios from 'axios'
 
 import './utils'
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-
-/* import all the icons in Free Solid, Free Regular, and Brands styles */
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-import { fab } from '@fortawesome/free-brands-svg-icons'
-
-library.add(fas, far, fab)
-
 import { createApp } from 'vue'
-
 import { createPinia } from 'pinia'
+
 import router from './routers'
 
 import EventBus from './utils/EventBus'
@@ -64,7 +47,6 @@ app.config.globalProperties.$EventBus = EventBus
 app
   .use(router)
   .use(createPinia())
-  .use(createBootstrap())
   .mount('#cmj-app-root')
 
 // Registro manual do Service Worker para controle total da URL
