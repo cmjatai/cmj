@@ -18,8 +18,6 @@ export default defineConfig([
         EventBus: 'readonly',
         bootstrap: 'readonly',
         // createBootstrap: 'readonly',
-        $: 'readonly',
-        jQuery: 'readonly',
         _: 'readonly',
        }
     },

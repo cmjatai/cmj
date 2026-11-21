@@ -17,7 +17,8 @@ varredura de segurança, severidade e publicação valem aqui.
 - Não implemente antes de as dúvidas que afetam a implementação estarem resolvidas.
 - Não reformate arquivos fora do escopo.
 - Siga o `CLAUDE.md`: migrations só por `makemigrations`, task Celery com `queue=`, frontend novo no
-  v6, model em CRUD com entrada em `layouts.yaml`, grupos em `map_rules.py`.
+  v6 (o v8 só quando o pedido citar o v8), model em CRUD com entrada em `layouts.yaml`, grupos em
+  `map_rules.py`.
 
 ## Onde fica cada regra
 
@@ -55,8 +56,8 @@ Consequências:
 ### 1. Recorte e leitura
 
 1. Delimite a capacidade. Se o pedido for amplo, proponha o recorte antes de seguir.
-2. Leia a documentação da área: `docs/backend/convencoes.md`, `docs/frontend/v6.md` e as specs do
-   domínio em `docs/specs/`.
+2. Leia a documentação da área: `docs/backend/convencoes.md`, `docs/frontend/v6.md` (ou
+   `docs/frontend/v8.md`, se o pedido for no v8) e as specs do domínio em `docs/specs/`.
 3. Localize o que será reaproveitado: `Crud`, `MasterDetailCrud`, mixins de `cmj/mixins.py`,
    `@customize` da API, stores do v6, serviços existentes.
 4. Liste o legado que a funcionalidade toca. Comportamento legado sem spec que será alterado: rode a

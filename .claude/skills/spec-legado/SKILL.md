@@ -26,7 +26,7 @@ severidade e regras de publicação valem aqui sem exceção.
 1. Localize a definição central da capacidade: models, constantes e choices.
 2. Procure **todos os pontos de escrita**, não só os óbvios: views, forms, API, signals, tasks,
    commands, outros apps e frontend. Neste projeto, confira também `sapl/`, `cmj/api/`,
-   `_templates/v2018/` e os dois frontends.
+   `_templates/v2018/` e os três frontends (`_frontend/v6`, `v8` e `v2018`).
 3. Procure quem lê o estado e toma decisões com ele: permissões, filtros, relatórios e cálculos.
 4. Aplique a varredura de segurança de `docs/specs/README.md` aos pontos encontrados nos passos 2
    e 3.

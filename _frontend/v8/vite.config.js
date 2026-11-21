@@ -77,8 +77,6 @@ export default defineConfig(({command, mode}) => {
         },
       }),
       inject({   // => that should be first under plugins array
-        $: 'jquery',
-        jQuery: 'jquery',
         '_': 'lodash',
         include: ['src/**/*.js', 'src/**/*.vue'],
         exclude: 'src/routers/**'

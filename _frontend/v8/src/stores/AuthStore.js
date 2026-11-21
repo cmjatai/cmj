@@ -10,7 +10,8 @@ export const useAuthStore = defineStore('authStore', {
       return state.data_connect.is_authenticated || false
     },
     isVotante: (state) => {
-      return state.data_connect?.user?.hasOwnProperty('votante') || false
+      const user = state.data_connect?.user
+      return user ? Object.hasOwn(user, 'votante') : false
     },
     permissions: (state) => {
       return state.data_connect?.permissions || []
@@ -40,7 +41,7 @@ export const useAuthStore = defineStore('authStore', {
       const login = utils.login
       const getVersion = utils.getVersion
       return login(username, password)
-        .then(response => {
+        .then(() => {
           return getVersion()
             .then(resp_version => {
               this.data_connect = resp_version.data
@@ -53,7 +54,7 @@ export const useAuthStore = defineStore('authStore', {
       const logout = utils.logout
       const getVersion = utils.getVersion
       return logout()
-        .then(response => {
+        .then(() => {
           return getVersion()
             .then(resp_version => {
               this.data_connect = resp_version.data

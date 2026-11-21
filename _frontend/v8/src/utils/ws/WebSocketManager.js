@@ -49,7 +49,7 @@ class WebSocketManager {
       this.emit('message', data)
     }
 
-    this.ws.onclose = (e) => {
+    this.ws.onclose = () => {
       console.debug('WebSocket desconectado')
       this.stopHeartbeat()
       this.emit('disconnected')

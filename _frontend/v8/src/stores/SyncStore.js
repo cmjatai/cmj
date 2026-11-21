@@ -50,7 +50,6 @@ export const useSyncStore = defineStore('syncStore', {
       this.data_cache[key][value.id] = value
     },
 
-
     UPDATE_DATA_CACHE ({ key, value }) {
       if (value.timestamp_frontend) {
         const oldValue = this.data_cache[key] ? this.data_cache[key][value.id] : null

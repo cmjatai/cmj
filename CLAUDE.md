@@ -2,7 +2,7 @@
 
 Portal legislativo da Câmara Municipal de Jataí-GO. Monolito Django 5.2 (Python 3.12) com
 PostgreSQL 18 + pgvector, SAPL modificado (`sapl/`), apps próprios e CMS SIGAD (`cmj/`), API REST
-gerada automaticamente (`drfautoapi/`) e dois frontends Vue (`_frontend/`).
+gerada automaticamente (`drfautoapi/`) e três frontends Vue (`_frontend/`).
 Serviços: Redis (cache, broker, Channels), Solr 9.5 (Haystack), Celery + beat, Daphne (WebSocket).
 
 Não há CI: `.github/` só contém instruções do Copilot, sem workflows. A validação é local.
@@ -14,7 +14,7 @@ Rode Python no host, com o virtualenv do projeto ativo. Ele alcança os serviço
 portas publicadas. Docker exige `sudo`.
 
 ```bash
-# Ambiente completo: serviços, backend e os dois frontends em modo dev
+# Ambiente completo: serviços, backend e os três frontends em modo dev
 sudo docker compose -f docker/docker-compose-dev.yaml up --build -d
 
 # Django
@@ -36,16 +36,17 @@ python -m isort --profile black <arquivos>
 
 # Frontend (sem testes automatizados; o compose já mantém os dev servers no ar)
 cd _frontend/v6    && npm run dev | build | lint | format
+cd _frontend/v8    && npm run dev | build | lint | format
 cd _frontend/v2018 && npm run serve | build | lint
 ```
 
-`npm run lint` altera arquivos nos dois frontends (autofix).
+`npm run lint` altera arquivos nos três frontends (autofix).
 `uupdev.sh`, `rdev.sh` e `ddev.sh` são locais e ignorados pelo git: não dependa deles.
 
 | Serviço | Porta no host |
 | --- | --- |
 | Backend no container `cmj` | 9099 → 9000 |
-| Vite (v6) / Webpack (v2018) | 5173 / 8080 |
+| Vite (v6) / Vite (v8) / Webpack (v2018) | 5173 / 5174 / 8080 |
 | PostgreSQL / Redis / Solr | 5433 / 6379 / 8983 |
 
 ## Mapa do projeto
@@ -55,7 +56,7 @@ cd _frontend/v2018 && npm run serve | build | lint
 | `cmj/settings/` | Settings por tema; `project.py` agrega, `apps.py` tem `SAPL_APPS` e `CMJ_APPS` |
 | `cmj/urls.py` | Único `ROOT_URLCONF` (`sapl/urls.py` não é usado) |
 | `cmj/mixins.py`, `cmj/utils/` | Mixins de models e views, relatórios (`utils_report.py`), PDF, IA (`genia`) |
-| `cmj/core` | `User`, auditoria, áreas de trabalho, OCR, rotas `/v6/` e `/app/` |
+| `cmj/core` | `User`, auditoria, áreas de trabalho, OCR, rotas `/v6/`, `/v8/` e `/app/` |
 | `cmj/sigad` | CMS; `PathView` captura as URLs não tratadas |
 | `cmj/arq`, `cmj/diarios` | Arquivo documental, diários oficiais |
 | `cmj/loa` | LOA e emendas; `models/m_*`, `views/v_*`, `services/s_*` |
@@ -69,8 +70,10 @@ cd _frontend/v2018 && npm run serve | build | lint
 | `sapl/api/urls.py` | Rotas `/api/` de SAPL **e** CMJ, schema e autenticação |
 | `drfautoapi/` | Geração de ViewSets, serializers e filtros por model |
 | `_templates/v2018/<app_label>/` | Templates Django e `layouts.yaml` (a maioria do HTML) |
-| `_templates/v6/`, `_templates/vs/` | Shell do v6; `vs` só entra com `TEMPLATE_MODE=vs` |
+| `_templates/v6/`, `_templates/v8/` | Shell do v6 (`base_v6.html`) e do v8 (`base_v8.html`) |
+| `_templates/vs/` | Só entra com `TEMPLATE_MODE=vs` |
 | `_frontend/v6/` | Vue 3, Vite, Pinia, Bootstrap 5, bootstrap-vue-next |
+| `_frontend/v8/` | Vue 3, Vite 8, Pinia; esqueleto derivado do v6, sem UI nem telas |
 | `_frontend/v2018/` | Vue 2, Vue CLI/Webpack, Vuex, BootstrapVue |
 | `docker/` | Compose, Dockerfiles, `start*.sh`, nginx |
 | `solr/` | Configsets `cmj_configset` e `arq_configset` |
@@ -112,6 +115,7 @@ Fora de uso: `cmj/legacy_cep`, `cmj/checklist` e `sapl/lexml` não estão em `IN
 ## Convenções do frontend
 
 O código novo vai para o **v6**. O v2018 é só manutenção: não migre para Vue 3 nem Pinia.
+O **v8** é um esqueleto derivado do v6, ainda sem telas: só mexa nele quando a tarefa pedir.
 
 | | v6 | v2018 |
 | --- | --- | --- |
@@ -123,10 +127,14 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
 | EventBus | `inject('EventBus')` | `import { EventBus } from '@/event-bus'` |
 | HTTP | `Resources.Utils.fetch({ app, model, id })` | `Resources.Utils.getModel(app, model, id)` |
 
-- Componente **novo** no v6 segue a ordem de seções em `<script setup>`: `// 1. Imports`,
+- **v8**: `/v8/<slug>` → `base_v8.html`, `django_vite` com `app='v8'`. Usa o mesmo alias,
+  `<script setup>`, `useSyncStore`, `useAuthStore`, EventBus e `Resources.Utils` do v6. Não tem
+  Bootstrap, bootstrap-vue-next, jQuery, `useMessageStore` nem rotas além do 404.
+- Componente **novo** no v6 e no v8 segue a ordem de seções em `<script setup>`: `// 1. Imports`,
   `// 2. Composables`, `// 3. Props & Emits`, `// 4. State & Refs`, `// 5. Computed Properties`,
   `// 6. Watchers`, `// 7. Events & Lifecycle Hooks`, `// 8. Functions`. Não reordene os existentes.
-- Nos dois, `_` (lodash) e `$` são globais injetados. No v6 a injeção não cobre `src/routers/`.
+- No v6 e no v2018, `_` (lodash) e `$` são globais injetados. No v8 só `_`: não há jQuery nem
+  Bootstrap. No v6 e no v8 a injeção não cobre `src/routers/`.
 - Cache sincronizado: `data_cache?.<app>_<model>?.[id]`, preenchido por `fetchSync`.
 - No v2018 só `store__sync` tem namespace. `store__auth`, `store__message` e `store__online` são
   globais: use `mapGetters` e `mapActions(['sendMessage'])`.
@@ -149,7 +157,9 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
   síncrona em vez de enfileirar (`FOLDER_DEBUG_CONTAINER`).
 - **`dev-webpack-stats.json` velho** faz o Django apontar para o Webpack em :8080 mesmo com ele
   desligado. Com o dev server parado, remova esse arquivo.
-- **`dist/` é versionado** nos dois frontends e vai para a imagem de produção. Commits de
+- **`DJANGO_VITE_DEV_MODE` vale para v6 e v8 juntos**: ligada, o Django aponta para os dev
+  servers em 5173 e 5174; desligada, lê os `dist/`, e mudança em `src/` só aparece após build.
+- **`dist/` é versionado** nos três frontends e vai para a imagem de produção. Commits de
   funcionalidade não incluem rebuild; ele sai em commits "rebuild frontends".
 - **Produção roda `migrate` ao subir** (`docker/start.sh`), com containers blue e green.
   Prefira migrations compatíveis com a versão ainda em execução.
@@ -178,6 +188,8 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
 - `docs/commands/ocrmypdf_command.md`: command `ocrmypdf`.
 - `docs/backend/convencoes.md`: exemplos de CRUD, mixins, API, permissões, testes e novo app.
 - `docs/frontend/v6.md`: stores, `Resources.Utils`, rotas e padrões do v6.
+- `docs/frontend/v8.md`: estrutura do v8, diferenças para o v6, integração com o Django, PWA e
+  restos da cópia do v6. Leia antes de mexer em `_frontend/v8`.
 - `docs/frontend/v2018.md`: Vuex, `Resources.Utils` e padrões do v2018.
 - `docs/specs/loa/fases-emenda.md`: comportamento atual das fases da emenda. Leia antes de alterá-las.
 - `docs/specs/loa/edicao-emenda.md`: telas de criação e edição da emenda, API usada por elas e
