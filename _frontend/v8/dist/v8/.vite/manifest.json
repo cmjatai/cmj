@@ -1,41 +1,282 @@
 {
-  "_rolldown-runtime-CRqgUL4m.js": {
-    "file": "v8/rolldown-runtime-CRqgUL4m.js",
+  "_CampoForm-B-tJ_qfl.js": {
+    "file": "v8/CampoForm-B-tJ_qfl.js",
+    "name": "CampoForm",
+    "imports": [
+      "_vendor-DGQAoUFJ.js"
+    ]
+  },
+  "_ErrosGerais-DDIYx3g6.js": {
+    "file": "v8/ErrosGerais-DDIYx3g6.js",
+    "name": "ErrosGerais",
+    "imports": [
+      "_vendor-DGQAoUFJ.js"
+    ]
+  },
+  "_EstadoCarga-CNHe45wB.js": {
+    "file": "v8/EstadoCarga-CNHe45wB.js",
+    "name": "EstadoCarga",
+    "imports": [
+      "_rolldown-runtime-la_ZsWYt.js",
+      "_vendor-DGQAoUFJ.js",
+      "main.js"
+    ]
+  },
+  "_EtiquetaSituacao-Cq6ktela.js": {
+    "file": "v8/EtiquetaSituacao-Cq6ktela.js",
+    "name": "EtiquetaSituacao",
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_formatos-R8STBQoq.js"
+    ]
+  },
+  "_PedidosTabela-C_OMyFC5.js": {
+    "file": "v8/PedidosTabela-C_OMyFC5.js",
+    "name": "PedidosTabela",
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_formatos-R8STBQoq.js",
+      "_EtiquetaSituacao-Cq6ktela.js"
+    ]
+  },
+  "_formatos-R8STBQoq.js": {
+    "file": "v8/formatos-R8STBQoq.js",
+    "name": "formatos"
+  },
+  "_preload-helper-Da3k9pLa.js": {
+    "file": "v8/preload-helper-Da3k9pLa.js",
+    "name": "preload-helper"
+  },
+  "_rolldown-runtime-la_ZsWYt.js": {
+    "file": "v8/rolldown-runtime-la_ZsWYt.js",
     "name": "rolldown-runtime"
   },
-  "_vendor-DaRk1ffk.js": {
-    "file": "v8/vendor-DaRk1ffk.js",
+  "_useCliente-CypFVfSd.js": {
+    "file": "v8/useCliente-CypFVfSd.js",
+    "name": "useCliente",
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_EstadoCarga-CNHe45wB.js"
+    ]
+  },
+  "_useModal-Dct-GORt.js": {
+    "file": "v8/useModal-Dct-GORt.js",
+    "name": "useModal",
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_preload-helper-Da3k9pLa.js",
+      "main.js"
+    ],
+    "dynamicImports": [
+      "overlays/ModalWizard.vue"
+    ]
+  },
+  "_vendor-DGQAoUFJ.js": {
+    "file": "v8/vendor-DGQAoUFJ.js",
     "name": "vendor",
     "imports": [
-      "_rolldown-runtime-CRqgUL4m.js"
+      "_rolldown-runtime-la_ZsWYt.js"
+    ]
+  },
+  "http/ModalSessao.vue": {
+    "file": "v8/ModalSessao-CQKNbRaP.js",
+    "name": "ModalSessao",
+    "src": "http/ModalSessao.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "main.js"
     ]
   },
   "main.js": {
-    "file": "v8/main-BjwVMGqm.js",
+    "file": "v8/main-ySjRXSnb.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
     "imports": [
-      "_rolldown-runtime-CRqgUL4m.js",
-      "_vendor-DaRk1ffk.js"
+      "_vendor-DGQAoUFJ.js",
+      "_preload-helper-Da3k9pLa.js"
     ],
     "dynamicImports": [
-      "views/Error404.vue"
+      "modules/demo/ilhas/ClientesTabela.vue",
+      "modules/demo/zona.js",
+      "modules/demo/paineis/PainelCliente.vue",
+      "views/Error404.vue",
+      "http/ModalSessao.vue",
+      "modules/demo/modais/ClienteResumo.vue"
     ],
     "css": [
-      "v8/main-x1XGuNl0.css"
+      "v8/main-BB6Fs1oL.css"
+    ]
+  },
+  "modules/demo/ilhas/ClientesTabela.vue": {
+    "file": "v8/ClientesTabela-BJSe7xmz.js",
+    "name": "ClientesTabela",
+    "src": "modules/demo/ilhas/ClientesTabela.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_EtiquetaSituacao-Cq6ktela.js"
+    ]
+  },
+  "modules/demo/modais/ClienteForm.vue": {
+    "file": "v8/ClienteForm-CICvbul3.js",
+    "name": "ClienteForm",
+    "src": "modules/demo/modais/ClienteForm.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_CampoForm-B-tJ_qfl.js",
+      "_ErrosGerais-DDIYx3g6.js",
+      "main.js",
+      "_EstadoCarga-CNHe45wB.js",
+      "_formatos-R8STBQoq.js"
+    ]
+  },
+  "modules/demo/modais/ClienteResumo.vue": {
+    "file": "v8/ClienteResumo-DXkziXeq.js",
+    "name": "ClienteResumo",
+    "src": "modules/demo/modais/ClienteResumo.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_rolldown-runtime-la_ZsWYt.js",
+      "_vendor-DGQAoUFJ.js",
+      "main.js",
+      "_PedidosTabela-C_OMyFC5.js",
+      "_EstadoCarga-CNHe45wB.js",
+      "_formatos-R8STBQoq.js",
+      "_useCliente-CypFVfSd.js"
+    ]
+  },
+  "modules/demo/paineis/PainelCliente.vue": {
+    "file": "v8/PainelCliente-DgW6COlW.js",
+    "name": "PainelCliente",
+    "src": "modules/demo/paineis/PainelCliente.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "main.js",
+      "_PedidosTabela-C_OMyFC5.js",
+      "_EstadoCarga-CNHe45wB.js",
+      "_useCliente-CypFVfSd.js"
+    ]
+  },
+  "modules/demo/spa/ClienteDetalhe.vue": {
+    "file": "v8/ClienteDetalhe-DgfB48rh.js",
+    "name": "ClienteDetalhe",
+    "src": "modules/demo/spa/ClienteDetalhe.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_useModal-Dct-GORt.js",
+      "main.js",
+      "_PedidosTabela-C_OMyFC5.js",
+      "_EstadoCarga-CNHe45wB.js",
+      "_useCliente-CypFVfSd.js",
+      "_preload-helper-Da3k9pLa.js"
+    ],
+    "dynamicImports": [
+      "modules/demo/modais/ClienteForm.vue",
+      "modules/demo/modais/ClienteResumo.vue"
+    ]
+  },
+  "modules/demo/spa/ClientesLista.vue": {
+    "file": "v8/ClientesLista-BWiKQ8BS.js",
+    "name": "ClientesLista",
+    "src": "modules/demo/spa/ClientesLista.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_rolldown-runtime-la_ZsWYt.js",
+      "_vendor-DGQAoUFJ.js",
+      "main.js",
+      "_useModal-Dct-GORt.js",
+      "_EstadoCarga-CNHe45wB.js",
+      "_EtiquetaSituacao-Cq6ktela.js",
+      "_preload-helper-Da3k9pLa.js"
+    ],
+    "dynamicImports": [
+      "modules/demo/wizard/PassoIdentificacao.vue",
+      "modules/demo/wizard/PassoLocal.vue",
+      "modules/demo/wizard/PassoRevisao.vue"
+    ]
+  },
+  "modules/demo/spa/PedidoDetalhe.vue": {
+    "file": "v8/PedidoDetalhe-CleZzvHx.js",
+    "name": "PedidoDetalhe",
+    "src": "modules/demo/spa/PedidoDetalhe.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "main.js",
+      "_EstadoCarga-CNHe45wB.js",
+      "_formatos-R8STBQoq.js",
+      "_useCliente-CypFVfSd.js"
+    ]
+  },
+  "modules/demo/wizard/PassoIdentificacao.vue": {
+    "file": "v8/PassoIdentificacao-CxOEAZ_I.js",
+    "name": "PassoIdentificacao",
+    "src": "modules/demo/wizard/PassoIdentificacao.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_CampoForm-B-tJ_qfl.js"
+    ]
+  },
+  "modules/demo/wizard/PassoLocal.vue": {
+    "file": "v8/PassoLocal-BoJ8YqHF.js",
+    "name": "PassoLocal",
+    "src": "modules/demo/wizard/PassoLocal.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_CampoForm-B-tJ_qfl.js",
+      "_formatos-R8STBQoq.js"
+    ]
+  },
+  "modules/demo/wizard/PassoRevisao.vue": {
+    "file": "v8/PassoRevisao-ClLCJjee.js",
+    "name": "PassoRevisao",
+    "src": "modules/demo/wizard/PassoRevisao.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_EtiquetaSituacao-Cq6ktela.js"
+    ]
+  },
+  "modules/demo/zona.js": {
+    "file": "v8/zona-Bu-LTX28.js",
+    "name": "zona",
+    "src": "modules/demo/zona.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "_preload-helper-Da3k9pLa.js"
+    ],
+    "dynamicImports": [
+      "modules/demo/spa/ClientesLista.vue",
+      "modules/demo/spa/ClienteDetalhe.vue",
+      "modules/demo/spa/PedidoDetalhe.vue"
+    ]
+  },
+  "overlays/ModalWizard.vue": {
+    "file": "v8/ModalWizard-4U8piqLn.js",
+    "name": "ModalWizard",
+    "src": "overlays/ModalWizard.vue",
+    "isDynamicEntry": true,
+    "imports": [
+      "_vendor-DGQAoUFJ.js",
+      "main.js",
+      "_ErrosGerais-DDIYx3g6.js"
     ]
   },
   "views/Error404.vue": {
-    "file": "v8/Error404-CUuurX50.js",
+    "file": "v8/Error404-CkU2IenB.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-DaRk1ffk.js"
-    ],
-    "css": [
-      "v8/Error404-DR4iMbzq.css"
+      "_vendor-DGQAoUFJ.js"
     ]
   }
 }
