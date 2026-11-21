@@ -3,21 +3,21 @@
     "file": "v8/rolldown-runtime-CRqgUL4m.js",
     "name": "rolldown-runtime"
   },
-  "_vendor-ORRCM3tw.js": {
-    "file": "v8/vendor-ORRCM3tw.js",
+  "_vendor-DaRk1ffk.js": {
+    "file": "v8/vendor-DaRk1ffk.js",
     "name": "vendor",
     "imports": [
       "_rolldown-runtime-CRqgUL4m.js"
     ]
   },
   "main.js": {
-    "file": "v8/main-BTwL6BWY.js",
+    "file": "v8/main-BjwVMGqm.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
     "imports": [
       "_rolldown-runtime-CRqgUL4m.js",
-      "_vendor-ORRCM3tw.js"
+      "_vendor-DaRk1ffk.js"
     ],
     "dynamicImports": [
       "views/Error404.vue"
@@ -27,12 +27,12 @@
     ]
   },
   "views/Error404.vue": {
-    "file": "v8/Error404-CzXYOIFm.js",
+    "file": "v8/Error404-CUuurX50.js",
     "name": "Error404",
     "src": "views/Error404.vue",
     "isDynamicEntry": true,
     "imports": [
-      "_vendor-ORRCM3tw.js"
+      "_vendor-DaRk1ffk.js"
     ],
     "css": [
       "v8/Error404-DR4iMbzq.css"
