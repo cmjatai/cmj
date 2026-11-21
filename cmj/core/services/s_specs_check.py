@@ -656,3 +656,20 @@ def filtrar_por_spec(raiz, achados, spec_rel):
         if a.arquivo == spec.arquivo
         or (a.id and (a.id in ids or prefixo_base(a.id) in prefixos))
     ]
+
+
+if __name__ == "__main__":
+    # Execução direta, sem Django: `python cmj/core/services/s_specs_check.py [raiz]`.
+    # É assim que o CI (.github/workflows/ci.yml) roda a checagem.
+    import sys
+
+    raiz = (
+        Path(sys.argv[1]) if len(sys.argv) > 1 else Path(__file__).resolve().parents[3]
+    )
+    achados = checar(raiz)
+    for a in achados:
+        print(a)
+    if achados:
+        print(f"{len(achados)} achado(s).", file=sys.stderr)
+        sys.exit(1)
+    print("Specs consistentes: nenhum achado.")

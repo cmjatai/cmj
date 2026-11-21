@@ -4,7 +4,10 @@ Cada teste monta uma mini-árvore do repositório em tmp_path. O banco não é u
 mas a fixture autouse do conftest.py exige django_db.
 """
 
+import subprocess
+import sys
 import textwrap
+from pathlib import Path
 
 import pytest
 
@@ -329,3 +332,26 @@ def test_filtro_por_spec(repo):
     assert len(achados) == 2
     filtrados = filtrar_por_spec(repo, achados, "docs/specs/tst/outra.md")
     assert [a.id for a in filtrados] == ["TST-OUT-001"]
+
+
+SCRIPT = Path(__file__).parent / "services" / "s_specs_check.py"
+
+
+def rodar_script(raiz):
+    return subprocess.run(
+        [sys.executable, str(SCRIPT), str(raiz)], capture_output=True, text=True
+    )
+
+
+def test_script_direto_sai_com_0_sem_achados(repo):
+    spec(repo, "- TST-CAP-001 [observado] A. `app/codigo.py:1`\n")
+    r = rodar_script(repo)
+    assert r.returncode == 0
+    assert "nenhum achado" in r.stdout
+
+
+def test_script_direto_sai_com_1_com_achados(repo):
+    spec(repo, "- TST-CAP-001 [implementado] A. `app/codigo.py:1`\n")
+    r = rodar_script(repo)
+    assert r.returncode == 1
+    assert "TEST-FALTA" in r.stdout

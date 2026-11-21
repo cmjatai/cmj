@@ -5,8 +5,8 @@ PostgreSQL 18 + pgvector, SAPL modificado (`sapl/`), apps próprios e CMS SIGAD 
 gerada automaticamente (`drfautoapi/`) e três frontends Vue (`_frontend/`).
 Serviços: Redis (cache, broker, Channels), Solr 9.5 (Haystack), Celery + beat, Daphne (WebSocket).
 
-Não há CI: `.github/` só contém instruções do Copilot, sem workflows. A validação é local.
-Essas instruções têm erros conhecidos. Em caso de conflito, vale este arquivo e o código.
+CI: `.github/workflows/ci.yml` roda só o `specs_check` no GitHub Actions (runner padrão, grátis em
+repositório público), em push e PR para o `master`. O resto da validação é local.
 
 ## Comandos
 
@@ -183,7 +183,7 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 - Não use `DATABASE_URL_PRD` nem suba `docker/docker-compose.yaml` sem pedido explícito.
 - Não execute sem pedido: `restore_cmj_dev.sh` (apaga o banco), `docker/restore-db.sh`, `s3_restore`.
 - Não rode `npm run build` nem commite `dist/` sem pedido.
-- Não edite `.github/`, `collected_static/`, `__notebooks_private/`, `cmj/legacy_cep/`.
+- Não edite `collected_static/`, `__notebooks_private/`, `cmj/legacy_cep/`.
 - Não reformate arquivos inteiros fora do escopo da tarefa.
 
 ## Documentação

@@ -58,7 +58,9 @@ Cada teste aponta a regra que cobre com `@pytest.mark.spec("<ID>")` (marcador re
 
 `python manage.py specs_check` cruza as specs com os testes e com as referências a IDs no
 repositório. Use `--spec docs/specs/<dominio>/<capacidade>.md` para ver só os achados de uma spec. O
-comando termina com código 1 se houver achado, e uma spec só está pronta sem achados.
+comando termina com código 1 se houver achado, e uma spec só está pronta sem achados. O CI
+(`.github/workflows/ci.yml`) roda a mesma checagem em cada push e PR para o `master`, com
+`python cmj/core/services/s_specs_check.py`, sem Django nem dependências.
 
 | Código | Achado |
 | --- | --- |

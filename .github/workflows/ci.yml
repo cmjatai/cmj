@@ -1,0 +1,21 @@
+# CI do PortalCMJ: roda no GitHub Actions, numa máquina Linux temporária do GitHub
+# (runner padrão, gratuito em repositório público). Não acessa banco nem produção.
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  specs:
+    # Consistência das specs com testes e código (docs/specs/README.md, seção Checagem).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Só biblioteca padrão do Python: não instala dependências do projeto.
+      - run: python cmj/core/services/s_specs_check.py
