@@ -5,7 +5,8 @@ Status: implementado
 Código principal: `cmj/v8/services/s_menu.py`, `cmj/v8/templatetags/v8_tags.py`,
 `_templates/v8/v8/shell/`, `_frontend/v8/src/core/shell.js`
 Testes: `cmj/v8/tests/test_shell.py`, `_frontend/v8/tests/core/shell.spec.js`,
-`_frontend/v8/tests/core/router.spec.js`
+`_frontend/v8/tests/core/router.spec.js`, `_frontend/v8/tests/core/fonte.spec.js`,
+`cmj/v8/tests/test_arquitetura.py`
 
 O shell é a moldura dos layouts `admin` e `spa`: topbar, sidebar e breadcrumbs. Quem o renderiza é
 o Django. O JavaScript só acrescenta o recolher da sidebar, a troca de tema e a gaveta em tela

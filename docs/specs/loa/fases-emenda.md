@@ -80,7 +80,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 - LOA-FASE-055 [implementado] Emenda já na fase 20 ou superior só é movimentada por superusuário ou
   Operador da LOA. A tela bloqueia os demais ao abrir a edição acima de 17
   (`cmj/loa/views/v_emendaloa.py:1085-1093`), e o PATCH e o formulário recusam a transição.
-- LOA-FASE-062 [acordado] O superusuário usa a mesma tela de edição do autor, sem limitação das fases
+- LOA-FASE-062 [implementado] O superusuário usa a mesma tela de edição do autor, sem limitação das fases
   no select. Evidência: `cmj/loa/forms/f_emendaloa.py:486-548`, `cmj/loa/views/v_emendaloa.py:1025-1039`.
 - LOA-FASE-063 [implementado] O editor contábil pode devolver para a fase 10, pelo botão "Devolver para
   correção", emendas nas fases 15 ou 17. Evidência: `cmj/loa/views/v_emendaloa.py:1043-1067`.
@@ -89,7 +89,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   o superusuário. Em outra fase, o servidor recusa a ação com erro no formulário e mantém a fase.
   Evidência: `FASES_DOS_BOTOES_CONTABEIS` (`cmj/loa/models/m_emendaloa.py:123`),
   `cmj/loa/views/v_emendaloa.py:1043-1067`. Decidido em D13.
-- LOA-FASE-065 [acordado] O Operador da LOA acessa e edita a emenda em qualquer fase, vê todas as
+- LOA-FASE-065 [implementado] O Operador da LOA acessa e edita a emenda em qualquer fase, vê todas as
   fases no select e pode fazer as transições disponíveis nele. O acesso é identificado pelas permissões
   `add_emendaloa`, `change_emendaloa` e `emendaloa_full_editor` (`EmendaLoa.edita_em_qualquer_fase`).
   A fase -10 continua oculta pelo manager padrão (LOA-FASE-002). Evidência:
@@ -101,7 +101,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 
 ### Emenda coletiva
 
-- LOA-FASE-056 [acordado] Ao gerar a coletiva, a emenda de origem passa para -10. Ao cancelar, volta
+- LOA-FASE-056 [implementado] Ao gerar a coletiva, a emenda de origem passa para -10. Ao cancelar, volta
   para 15. Evidência: `cmj/loa/models/m_agrupamento.py:353-365`, `cmj/loa/models/m_agrupamento.py:407-409`.
 - LOA-FASE-057 [implementado] O cancelamento das coletivas também devolve para 15 as emendas do
   agrupamento na fase 17. As demais fases, exceto -10 (LOA-FASE-056), não mudam. Substitui a versão
@@ -144,7 +144,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 
 ### Valor
 
-- LOA-FASE-061 [acordado] Emenda com ajuste tem valor computado zero, porque o ajuste assume o papel
+- LOA-FASE-061 [implementado] Emenda com ajuste tem valor computado zero, porque o ajuste assume o papel
   da emenda. Evidência: `cmj/loa/models/m_emendaloa.py:637-644`.
 
 ## Regras observadas
@@ -165,7 +165,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 | ID | De | Para | Gatilho | Quem | Evidência |
 | --- | --- | --- | --- | --- | --- |
 | LOA-FASE-010 [observado] | 10, 12 | 10, 12 | Campo `fase` no formulário, com autosave por PATCH | Quem não tem `add_emendaloa` nem é editor contábil | `cmj/loa/forms/f_emendaloa.py:486-498`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:480-491` |
-| LOA-FASE-011 [acordado] | 12 | 15 | Abrir a tela de edição (GET) | Editor contábil (ver LOA-FASE-066) | `cmj/loa/views/v_emendaloa.py:1072-1082` |
+| LOA-FASE-011 [implementado] | 12 | 15 | Abrir a tela de edição (GET) | Editor contábil (ver LOA-FASE-066) | `cmj/loa/views/v_emendaloa.py:1072-1082` |
 | LOA-FASE-012 [observado] | Qualquer | 15, 17 | Campo `fase` no formulário | Editor contábil sem `add_emendaloa` e não superusuário | `cmj/loa/forms/f_emendaloa.py:285-288`, `cmj/loa/forms/f_emendaloa.py:486`, `cmj/loa/forms/f_emendaloa.py:546-548` |
 | LOA-FASE-013 [observado] | 15, 17 (LOA-FASE-069) | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1043-1064` |
 | LOA-FASE-014 [observado] | 15, 17 (LOA-FASE-069) | 10 | Botão "Devolver para correção" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1043-1064` |
@@ -204,7 +204,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 
 ### Efeitos em outros fluxos
 
-- LOA-FASE-040 [observado] Registro contábil da emenda só pode ser alterado na fase 15, por
+- LOA-FASE-040 [retirada] Registro contábil da emenda só pode ser alterado na fase 15, por
   `emendaloa_full_editor`. Evidência: `cmj/api/loa/views/emendaloaregistrocontabil.py:290-300`.
   Substituída por LOA-FASE-068.
 - LOA-FASE-041 [observado] A proposição só é gerada pelo registro em lote da listagem, que processa

@@ -70,6 +70,7 @@ def test_resposta_do_modelo_e_salva_com_metadata(manager, users):
 
 
 @pytest.mark.django_db
+@pytest.mark.spec("GENIA-CHAT-005")
 def test_chat_e_criado_a_cada_mensagem_e_cota_registrada(db):
     quota = mock.Mock()
     with mock.patch("cmj.utils.genia.base.genai.Client") as client_cls:

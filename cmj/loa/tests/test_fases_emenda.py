@@ -236,7 +236,7 @@ def test_select_de_criacao_do_autor_so_oferece_fase_10(autor, loa):
     assert fases_do_select(autor, loa=loa, creating=True) == [P]
 
 
-@pytest.mark.spec("LOA-FASE-051")
+@pytest.mark.spec("LOA-FASE-051", "LOA-FASE-050")
 @pytest.mark.parametrize("fase", [PL, EC, LC, TR])
 def test_post_da_api_do_autor_nao_cria_fora_da_fase_10(api, autor, loa, unidade, fase):
     api(autor).post(
@@ -274,7 +274,7 @@ def test_autor_alterna_entre_10_e_12(
     assert recarregar(el).fase == destino
 
 
-@pytest.mark.spec("LOA-FASE-052")
+@pytest.mark.spec("LOA-FASE-052", "LOA-FASE-050")
 @pytest.mark.parametrize(
     "origem,destino", [(P, EC), (P, LC), (PL, EC), (PL, LC), (LC, P), (LC, PL)]
 )
@@ -304,7 +304,7 @@ def test_editor_contabil_faz_transicoes_permitidas(
     assert recarregar(el).fase == destino
 
 
-@pytest.mark.spec("LOA-FASE-053")
+@pytest.mark.spec("LOA-FASE-053", "LOA-FASE-050")
 @pytest.mark.parametrize("origem,destino", [(P, EC), (P, LC), (EC, PL), (LC, P)])
 def test_editor_contabil_nao_faz_outras_transicoes_pela_api(
     api, editor_contabil, make_emenda, origem, destino
@@ -316,7 +316,7 @@ def test_editor_contabil_nao_faz_outras_transicoes_pela_api(
     assert recarregar(el).fase == origem
 
 
-@pytest.mark.spec("LOA-FASE-053")
+@pytest.mark.spec("LOA-FASE-053", "LOA-FASE-050")
 def test_editor_contabil_nao_leva_emenda_da_fase_10_para_17_pelo_formulario(
     client, editor_contabil, make_emenda
 ):
@@ -366,7 +366,7 @@ def test_select_de_fase_20_so_para_superusuario_e_operador(
     assert TR not in fases_do_select(autor, el)
 
 
-@pytest.mark.spec("LOA-FASE-054")
+@pytest.mark.spec("LOA-FASE-054", "LOA-FASE-050")
 def test_editor_contabil_nao_escolhe_fase_20_pela_api(
     api, editor_contabil, make_emenda
 ):
@@ -377,7 +377,7 @@ def test_editor_contabil_nao_escolhe_fase_20_pela_api(
     assert recarregar(el).fase == LC
 
 
-@pytest.mark.spec("LOA-FASE-054")
+@pytest.mark.spec("LOA-FASE-054", "LOA-FASE-050")
 def test_autor_nao_escolhe_fase_20_pela_api(api, autor, parlamentar, make_emenda):
     el = make_emenda(fase=LC, owner=autor, parlamentar=parlamentar)
 

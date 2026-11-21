@@ -3,8 +3,9 @@
 from unittest import mock
 
 import pytest
+from model_mommy import mommy
 
-from cmj.loa.models import AgrupamentoEmendaLoa, EmendaLoa
+from cmj.loa.models import AgrupamentoEmendaLoa, EmendaLoa, UnidadeOrcamentaria
 from cmj.loa.models.m_agrupamento import Agrupamento
 from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetivaError
 
@@ -47,6 +48,7 @@ def agrupado(agrupamento, make_emenda, parlamentar):
     return el
 
 
+@pytest.mark.spec("GENIA-LOA-004")
 def test_update_finalidade_limpa_e_repassa_erro(
     ia_real, ia_falha, agrupamento, agrupado
 ):
@@ -57,6 +59,27 @@ def test_update_finalidade_limpa_e_repassa_erro(
     assert agrupamento.finalidade == ""
 
 
+@pytest.mark.spec("GENIA-LOA-004")
+def test_unidades_diferentes_limpam_finalidade_sem_chamar_ia(
+    ia_real, agrupamento, agrupado, make_emenda, loa
+):
+    outra_unidade = mommy.make(
+        UnidadeOrcamentaria, loa=loa, codigo="02", recebe_emenda_impositiva=True
+    )
+    outra = make_emenda(fase=EmendaLoa.EDICAO_CONTABIL, unidade=outra_unidade)
+    AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento, emendaloa=outra)
+
+    with mock.patch(
+        "cmj.loa.models.m_agrupamento.IAEmentaEmendaColetiva"
+    ) as ia_cls, pytest.raises(ValueError):
+        agrupamento.update_finalidade_com_ia()
+
+    ia_cls.assert_not_called()
+    agrupamento.refresh_from_db()
+    assert agrupamento.finalidade == ""
+
+
+@pytest.mark.spec("GENIA-LOA-006")
 def test_geracao_manual_responde_400_com_mensagem(
     ia_real, ia_falha, api, editor_contabil, agrupamento, agrupado
 ):
@@ -68,6 +91,7 @@ def test_geracao_manual_responde_400_com_mensagem(
     assert r.json() == {"error": MENSAGEM}
 
 
+@pytest.mark.spec("GENIA-LOA-006")
 def test_inclusao_conclui_e_avisa(
     ia_real, ia_falha, api, editor_contabil, agrupamento, make_emenda
 ):
@@ -85,6 +109,7 @@ def test_inclusao_conclui_e_avisa(
     assert AgrupamentoEmendaLoa.objects.filter(emendaloa=el).exists()
 
 
+@pytest.mark.spec("GENIA-LOA-006")
 def test_inclusao_sem_erro_devolve_finalidade_gerada(
     ia_real, api, editor_contabil, agrupamento, make_emenda
 ):
@@ -104,6 +129,7 @@ def test_inclusao_sem_erro_devolve_finalidade_gerada(
     assert r.data["agrupamento_finalidade"] == "gerada"
 
 
+@pytest.mark.spec("GENIA-LOA-006")
 def test_remocao_conclui_e_avisa(
     ia_real, ia_falha, api, editor_contabil, agrupamento, agrupado, make_emenda
 ):
@@ -121,6 +147,7 @@ def test_remocao_conclui_e_avisa(
     assert not AgrupamentoEmendaLoa.objects.filter(emendaloa=agrupado).exists()
 
 
+@pytest.mark.spec("GENIA-LOA-006")
 def test_remocao_gera_finalidade_sem_a_emenda_removida(
     ia_real, api, editor_contabil, agrupamento, agrupado, make_emenda
 ):
@@ -138,6 +165,7 @@ def test_remocao_gera_finalidade_sem_a_emenda_removida(
     assert ia_cls.call_args.args == (["fica"],)
 
 
+@pytest.mark.spec("GENIA-LOA-005")
 def test_previa_marca_aviso(ia_falha, agrupamento, agrupado):
     agrupamento.finalidade = ""
     agrupamento.save()
@@ -148,6 +176,7 @@ def test_previa_marca_aviso(ia_falha, agrupamento, agrupado):
     assert dados[0]["finalidade_automatica"] == ""
 
 
+@pytest.mark.spec("GENIA-LOA-005", "GENIA-LOA-006")
 def test_geracao_da_coletiva_interrompe_com_mensagem(
     ia_falha, api, editor_contabil, agrupamento, agrupado
 ):

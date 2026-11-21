@@ -55,6 +55,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - **Editor contábil** (`emendaloa_full_editor`): base mais `tipo`, `fase`, `unidade` e `entidade`.
   - **Operador da LOA e superusuário** (`add_emendaloa`): base mais `tipo`, `fase`, `unidade`,
     `entidade`, `valor` e `materia`.
+  - Evidência: `cmj/loa/services/s_emendaloa.py:9-56`.
 
   Quem tem mais de um perfil soma as listas. A fase continua sujeita às transições de LOA-FASE-052,
   LOA-FASE-053 e LOA-FASE-065. Evidência: `EmendaLoaService.campos_alteraveis`
@@ -148,7 +149,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 
 ### Erros do servidor na tela de edição (D6, decidida em 2026-11-20)
 
-- LOA-EMD-084 [implementado] A tela de edição mostra a mensagem do servidor quando qualquer chamada
+- LOA-EMD-084 [acordado] A tela de edição mostra a mensagem do servidor quando qualquer chamada
   feita por ela falha: carga da emenda, totais, registros contábeis, busca de despesa, exclusão de
   registro, pré-visualização e autosave.
   - O aviso aparece fixo no canto superior direito, com um título que diz qual operação falhou, e
@@ -162,6 +163,10 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
     o link do PDF.
   - Na inclusão de registro contábil, os erros continuam abaixo da busca, com os campos marcados
     (LOA-EMD-061).
+  - Sem teste automatizado: o v2018 não tem testes.
+  - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:39-72`,
+    `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:503-513`, `_frontend/v2018/src/__apps/loa/mensagens.js:4-30`,
+    `_frontend/v2018/src/__apps/loa/scss/loa.scss:608-621`.
 
   Substitui a parte de falha de LOA-EMD-057. Evidência:
   `_frontend/v2018/src/__apps/loa/mensagens.js`,
@@ -219,6 +224,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - com `change_emendaloa`, passa direto;
   - sem ela, exige emenda sem matéria e, além disso, `emendaloa_full_editor`, ou operador de autor
     participante com fase até 12 ou igual a 17.
+  - Evidência: `cmj/api/loa/views/emendaloa.py:48-54`,
+    `cmj/loa/services/s_emendaloa.py:133-154`.
 
   O "operador de autor participante" foi substituído pelo autor do dono (LOA-EMD-076). Evidência:
   `EmendaLoaService.pode_editar` (`cmj/loa/services/s_emendaloa.py:133-154`),
@@ -275,6 +282,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 - LOA-EMD-023 [observado] Ao salvar o formulário de emenda impositiva sem `full_editor`:
   - o Valor Global passa a ser a soma dos valores por parlamentar;
   - os vínculos `EmendaLoaParlamentar` são apagados e recriados só para os valores não nulos.
+  - Evidência: `cmj/loa/forms/f_emendaloa.py:655-662`, `cmj/loa/forms/f_emendaloa.py:672-701`.
 
   Na modificativa, cada assinante é recriado com valor 1,00. Evidência:
   `cmj/loa/forms/f_emendaloa.py:621-662`.
@@ -313,6 +321,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
       - sem registros, é criada uma dedução na despesa padrão da LOA, conforme a área da unidade.
   - **Emenda modificativa:** os registros são apagados e o Valor Global é dividido igualmente entre
     os parlamentares.
+  - Evidência: `cmj/loa/models/m_emendaloa.py:723-813`, `cmj/loa/models/m_emendaloa.py:827-832`.
 
   Evidência: `cmj/loa/models/m_emendaloa.py:723-813`, `cmj/loa/models/m_emendaloa.py:823-830`.
 
@@ -322,6 +331,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - **Modificativa (tipo 0):** mostra os assinantes, oculta e desabilita os valores por parlamentar e
     libera o Valor Global.
   - **Demais tipos:** mostra os valores por parlamentar e deixa o Valor Global somente leitura.
+  - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaForm.js:7-48`,
+    `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaCreate.js:9-11`, `cmj/loa/views/v_emendaloa.py:965-966`.
 
   Não há autosave: tudo é gravado no envio. Depois de criar, a tela redireciona para a edição.
   Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaForm.js:7-48`,
@@ -330,6 +341,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 - LOA-EMD-041 [observado] Nas duas telas, preencher tipo, número e ano da matéria busca a ementa e a
   mostra abaixo dos campos. Evidência: `_templates/v2018/loa/recuperar_materia_script.html`,
   `_templates/v2018/loa/loa_form.html`.
+  Evidência: `_templates/v2018/loa/recuperar_materia_script.html:4-35`,
+  `_templates/v2018/loa/loa_form.html:4-6`, `_templates/v2018/loa/emendaloa_form.html:1`.
 
 ### Frontend: edição e autosave
 
@@ -339,6 +352,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   3. monta a pré-visualização;
   4. carrega os totais (`/totais/`) e os registros contábeis
      (`/api/loa/emendaloaregistrocontabil/?emendaloa=<pk>&get_all=true`).
+  - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:89-111`,
+    `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:219-252`.
 
   Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:18-25`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:81-144`.
@@ -360,10 +375,12 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   | Assinante (`parl_assinantes`) | `PATCH /update_parlassinantes/` com `parlamentar_id` e `checked` |
   | Valor Global (`valor`) | `PATCH /updatevaloremenda/` com `valor` |
   | Entrelinha ou espaço para assinaturas | Nenhuma: só refaz a pré-visualização (LOA-EMD-052) |
-  | Qualquer outro campo | `PATCH /api/loa/emendaloa/<pk>/` com `{campo: valor}` |
+  | Campo do model (`CAMPOS_DO_MODEL`) | `PATCH /api/loa/emendaloa/<pk>/` com `{campo: valor}` |
+  | Outros campos | Nenhuma (LOA-EMD-083) |
 
-  Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:328-380`.
-- LOA-EMD-054 [observado] Pela última linha da tabela de LOA-EMD-053, campos que não são do model
+  Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:9-21`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:453-486`.
+- LOA-EMD-054 [retirada] Pela última linha da tabela de LOA-EMD-053, campos que não são do model
   também geram PATCH: a busca de despesa, os campos `despesa_*`, `valor_despesa` e os de matéria. O
   serializer ignora esses campos, mas a emenda é salva mesmo assim, o que dispara os signals e, com a
   LOA em tramitação, o `sync()` de LOA-EMD-031. Substituída por LOA-EMD-083. Evidência:
@@ -373,7 +390,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   LOA-FASE-052, LOA-FASE-053 e LOA-FASE-065. Enquanto a fase escolhida é 10, o select fica marcado em
   vermelho. Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:319-326`,
   `cmj/api/loa/views/emendaloa.py:112-122`.
-- LOA-EMD-056 [observado] O PATCH genérico usa o serializer com todos os campos do model e não aplica
+- LOA-EMD-056 [retirada] O PATCH genérico usa o serializer com todos os campos do model e não aplica
   as restrições do formulário (LOA-EMD-010, LOA-EMD-016). Só a fase é conferida no servidor.
   Substituída por LOA-EMD-070 a 073.
   Evidência: `cmj/api/serializers.py:32-33`, `cmj/api/loa/serializers/__init__.py:121-152`,
@@ -382,6 +399,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - a tela atualiza a entrelinha e o Valor Global com os valores retornados;
   - recarrega os registros contábeis e a pré-visualização;
   - recarrega a página inteira se o campo alterado foi `tipo`.
+  - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:491-502`.
 
   Quando falha, a tela recarrega a página sem mostrar a mensagem de erro do servidor, e a alteração
   rejeitada desaparece. Substituída, quanto à falha, por LOA-EMD-084. Evidência:
@@ -401,6 +419,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - Avisa quando há mais de 10 resultados ou nenhum.
   - Ao escolher um resultado, preenche os campos `despesa_*` e os deixa somente leitura.
   - Sem resultados, os campos ficam livres para preenchimento manual.
+  - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:315`,
+    `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:357-421`.
 
   Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:169-186`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:236-299`.
@@ -422,6 +442,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - soma das deduções;
   - inserções + deduções;
   - Valor Global − inserções.
+  - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:223-249`,
+    `cmj/loa/models/m_emendaloa.py:844-866`.
 
   Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:85-110`,
   `cmj/loa/models/m_emendaloa.py:845-866`.

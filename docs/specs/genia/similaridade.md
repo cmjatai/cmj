@@ -45,7 +45,7 @@ percentual em `AnaliseSimilaridade`, de forma síncrona ou em batch.
   Evidência: `cmj/utils/genia/similaridade.py:102-104`, `cmj/utils/genia/similaridade.py:124`.
 - GENIA-SIM-007 [observado] O método bloqueia, consultando os jobs a cada 60 segundos, até todos
   chegarem a um estado final. Job que não termina com sucesso só gera log de erro. Evidência:
-  `cmj/utils/genia/similaridade.py:142-183`.
+  `cmj/utils/genia/similaridade.py:144-182`.
 - GENIA-SIM-008 [acordado] Cada resposta com texto registra um consumo de peso 1 e salva a
   análise, casada com a requisição pela posição original (resposta vazia não desloca as seguintes).
   A margem da cota só é verificada uma vez, antes de criar os jobs. Evidência:

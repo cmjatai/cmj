@@ -8,8 +8,8 @@ Código principal: `cmj/loa/views/v_emendaloa.py` (`EmendaLoaCrud.ListView`),
 `_templates/v2018/loa/emendaloa_filter_cache.html`, `_templates/v2018/loa/pdf/emendaloa_list.html`,
 `_templates/v2018/css/emendaloa-list.css`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js`,
 `_frontend/v2018/src/__apps/loa/scss/loa.scss`
-Testes: `cmj/loa/tests/test_listagem_emendas.py`, para as regras `[implementado]`. As demais regras
-não têm teste.
+Testes: `cmj/loa/tests/test_listagem_emendas.py` e `cmj/utils/tests/test_utils_report.py`, para as
+regras `[implementado]`. As demais regras não têm teste.
 
 As regras `[observado]` descrevem o que o código faz hoje e nenhuma foi confirmada como
 regra de negócio. Foram obtidas por leitura do código. As marcadas com "(executado)" também foram
@@ -96,6 +96,7 @@ mesma view, entram só no que afeta esta tela.
   página (executado).
 - LOA-LST-079 [observado] Página além da última responde 404 ("Página inválida"). Evidência:
   `?page=9999` na LOA 2026 (executado).
+  Evidência: `cmj/loa/views/v_emendaloa.py:162`, `sapl/crud/base.py:441`.
 - LOA-LST-009 [observado] Acima da lista aparece "Foi encontrada uma Emenda Parlamentar" ou "Foram
   encontradas N Emendas Parlamentares", com o total filtrado. Sem resultado aparece "Nenhuma Emenda
   Parlamentar encontrada com os critérios de busca acima!". Evidência:
@@ -158,7 +159,7 @@ mesma view, entram só no que afeta esta tela.
   gera o PDF de cada emenda no processo, por `EmendaLoa.service.documento_pdf`, sem requisição HTTP, e
   funciona também em LOA não publicada (`cmj/loa/models/m_emendaloa.py:868-890`, teste
   `test_registro_pela_listagem_gera_pdf_sem_http_em_loa_nao_publicada`).
-- LOA-LST-084 Substituída por LOA-EMD-086 de `docs/specs/loa/edicao-emenda.md`: o registro de
+- LOA-LST-084 [retirada] Substituída por LOA-EMD-086 de `docs/specs/loa/edicao-emenda.md`: o registro de
   proposição pelo detalhe da emenda foi removido em 2026-11-20.
 - LOA-LST-018 [observado] Com `?zip`, usuário anônimo ou que não seja superusuário nem operador de
   autor recebe `PermissionDenied`. Sem emenda disponível, a tela é exibida com a mensagem "Nenhuma
@@ -314,6 +315,7 @@ mesma view, entram só no que afeta esta tela.
   emenda 435 apagou as duas versões do cartão (executado, sem gravar no banco).
 - LOA-LST-042 [observado] Em desenvolvimento o cache é `DummyCache` e nada disso é exercitado.
   Evidência: `CACHES["default"]["BACKEND"]` e `DEBUG == True` (executado no ambiente local).
+  Evidência: `cmj/settings/project.py:160-167`.
 
 ### PDF da listagem
 
@@ -555,6 +557,8 @@ mesma view, entram só no que afeta esta tela.
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:8-13`. Sem teste automatizado: o v2018
   não tem testes, e o script não foi executado (sem navegador); a mudança só chega à produção com o
   rebuild do `dist/` (LOA-LST-078).
+- LOA-LST-068 [retirada] Substituída por LOA-LST-067.
+- LOA-LST-069 [retirada] Substituída por LOA-LST-067.
 - LOA-LST-070 [observado] As opções do PDF são ajustadas no navegador; o servidor só recusa as
   combinações inválidas, sem ajustá-las (LOA-LST-088). Sem nenhuma
   totalização marcada, a via passa a `sem_registro`. Na via `sem_registro` só unidade e entidade
@@ -604,6 +608,8 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-078 [observado] Mudanças no JavaScript ou no SCSS da listagem só chegam à produção depois do
   rebuild do `dist/` do v2018, que é versionado e feito à parte. Evidência: `CLAUDE.md` (seção
   "Armadilhas do legado").
+  Evidência: `CLAUDE.md:170-171`, `_frontend/v2018/vue.config.js:22-23`,
+  `cmj/settings/frontend.py:111-117`.
 
 ## Riscos de segurança
 

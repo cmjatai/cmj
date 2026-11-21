@@ -8,11 +8,13 @@ from django.contrib.contenttypes.models import ContentType
 from model_bakery import baker
 
 from cmj.core.models import IAQuota, IAQuotasLog
+from cmj.utils import clean_text
 from cmj.utils.genia import (
     IAChatService,
     IAEmbeddingService,
     IAGenaiBase,
     IAQuotaUnavailableError,
+    prompts_loa_agrupamento,
 )
 from cmj.utils.genia.classificacao import IAClassificacaoMateriaService
 from cmj.utils.genia.genia_system_instruction_v3 import rag_system_instruction
@@ -264,6 +266,28 @@ def test_documento_formatado_com_titulo():
     ia = IAEmbeddingService()
     assert ia.prepare_document("corpo", " Lei 1 ") == "title: Lei 1 | text: corpo"
     assert ia.prepare_document("corpo") == "title: none | text: corpo"
+
+
+@pytest.mark.spec("GENIA-EMB-006")
+def test_embedding_nao_consulta_nem_registra_cota(client):
+    with mock.patch.object(
+        IAEmbeddingService, "retrieve_quota_if_available"
+    ) as retrieve:
+        IAEmbeddingService().get_query_embedding("iptu")
+
+    retrieve.assert_not_called()
+    client.models.embed_content.assert_called_once()
+    assert IAQuotasLog.objects.count() == 0
+
+
+@pytest.mark.spec("GENIA-LOA-003")
+def test_ementa_coletiva_monta_prompt_v1_com_finalidades_limpas():
+    finalidades = ["  reforma   da escola ", "compra de livros"]
+    ia = IAEmentaEmendaColetiva(finalidades)
+
+    assert ia.prompt_template is prompts_loa_agrupamento.PROMPT_V1
+    linhas = "\n".join(f"- {clean_text(f)}" for f in finalidades)
+    assert ia.make_prompt() == prompts_loa_agrupamento.PROMPT_V1.format(ementas=linhas)
 
 
 @pytest.mark.spec("GENIA-LOA-001")

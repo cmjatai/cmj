@@ -3,7 +3,8 @@
 Status: implementado
 Última verificação: 2026-11-21 (branch `v8-arquitetura-hibrida`, sobre o commit `32325c9a2`)
 Código principal: `_frontend/v8/src/http/`, `cmj/v8/views.py`, `cmj/v8/services/s_respostas.py`
-Testes: `_frontend/v8/tests/http/`, `cmj/v8/tests/test_http.py`
+Testes: `_frontend/v8/tests/http/`, `cmj/v8/tests/test_http.py`, `_frontend/v8/tests/stores/auth.spec.js`,
+`_frontend/v8/tests/overlays/formularios.spec.js`
 
 Toda requisição do v8 passa por um cliente único, que cuida do CSRF, da sessão expirada e de
 entregar os erros sempre no mesmo formato.

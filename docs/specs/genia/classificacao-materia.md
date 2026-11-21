@@ -32,6 +32,7 @@ em `Metadata` na chave `genia`.
   original sem a chave. Caso contrário, mantém o prompt e registra aviso no log. Evidência:
   `sapl/materia/migrations/0003_remove_ia_model_name_do_prompt.py`. Teste:
   `test_migration_remove_ia_model_name_sem_reescrever_o_yaml`.
+  Evidência: `sapl/materia/migrations/0003_remove_ia_model_name_do_prompt.py:27-60`.
 
 ### Entrada
 

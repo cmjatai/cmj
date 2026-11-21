@@ -5,7 +5,7 @@ Status: implementado
 Código principal: `_frontend/v8/src/overlays/`, `_frontend/v8/src/core/triggers.js`,
 `cmj/v8/views.py` (fragmentos), `_templates/v8/v8/partials/`
 Testes: `_frontend/v8/tests/overlays/`, `_frontend/v8/tests/core/router.spec.js`,
-`cmj/v8/tests/test_fragmentos.py`
+`cmj/v8/tests/test_fragmentos.py`, `_frontend/v8/tests/core/fonte.spec.js`
 
 Drawers, modals e toasts têm uma implementação só, usada igualmente por páginas Django com ilhas e
 por zonas SPA. Os primitivos de foco e acessibilidade vêm do Reka UI. A pilha, as Promises e a

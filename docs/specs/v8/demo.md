@@ -4,7 +4,7 @@ Status: implementado
 Última verificação: 2026-11-21 (branch `v8-arquitetura-hibrida`, sobre o commit `32325c9a2`)
 Código principal: `cmj/v8/services/s_demo.py`, `cmj/v8/views.py`, `_templates/v8/v8/demo/`,
 `_frontend/v8/src/modules/demo/`
-Testes: `cmj/v8/tests/test_demo.py`, `_frontend/v8/tests/demo/`
+Testes: `cmj/v8/tests/test_demo.py`, `_frontend/v8/tests/demo/`, `_frontend/v8/tests/overlays/url.spec.js`
 
 Duas telas que exercitam tudo o que as outras specs do v8 definem, com dados fictícios: uma página
 Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de verificação manual.
