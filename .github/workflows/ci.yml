@@ -13,8 +13,8 @@ jobs:
     # Consistência das specs com testes e código (docs/specs/README.md, seção Checagem).
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       # Só biblioteca padrão do Python: não instala dependências do projeto.
@@ -27,13 +27,12 @@ jobs:
       run:
         working-directory: _frontend/v8
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: "24"
-          # Guarda o cache do npm entre execuções, para o npm ci ficar mais rápido.
-          cache: npm
-          cache-dependency-path: _frontend/v8/package-lock.json
-      # Instala exatamente as versões do package-lock.json.
-      - run: npm ci
+          # Sem cache: ele exige o package-lock.json, que não é versionado.
+          package-manager-cache: false
+      # Sem lock, como no build local: instala as versões mais recentes que o package.json aceita.
+      - run: npm install
       - run: npm test
