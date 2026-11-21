@@ -112,7 +112,9 @@ fora do serviço.
    `Código principal` e `Testes`.
 2. Confira se todo `arquivo:linha` citado continua correto.
 3. Domínio novo em `docs/specs/`: acrescente a spec à seção Documentação do `CLAUDE.md`.
-4. Não rode `npm run build` nem faça push.
+4. Rode `python manage.py specs_check` e resolva todos os achados. A funcionalidade só está pronta
+   sem achados.
+5. Não rode `npm run build` nem faça push.
 
 ## Formato
 

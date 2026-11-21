@@ -24,6 +24,11 @@ Regras:
 - `[acordado]`: confirmado explicitamente pelo responsável. Só mude para `[acordado]` com essa
   confirmação.
 - `[implementado]`: foi acordado e tem teste.
+- `[retirada]`: não vale mais. A entrada fica na spec, com uma frase: `Substituída por <ID>.` ou
+  `Removida: <motivo>.` Não exige evidência, e nenhum teste ou código aponta para ela.
+
+Uma regra `[observado]` pode ter teste de caracterização. Uma regra `[acordado]` com teste passa a
+`[implementado]`.
 
 Riscos de segurança (`-SEG-`):
 
@@ -34,8 +39,10 @@ Riscos de segurança (`-SEG-`):
 ## IDs
 
 - Prefixo do domínio e da capacidade, como `LOA-FASE-001`. Riscos usam o mesmo prefixo com `-SEG-`,
-  como `LOA-FASE-SEG-001`.
-- IDs são estáveis: nunca reutilize nem renumere. IDs `-SEG-` apagados não são reutilizados no
+  como `PREFIXO-SEG-001`. Cada spec usa um prefixo só, e cada prefixo pertence a uma spec.
+- `PREFIXO` é reservado para exemplos neste arquivo e nas skills.
+- IDs são estáveis: nunca reutilize nem renumere. Regra que deixa de valer recebe `[retirada]`;
+  não a apague. IDs `-SEG-` apagados não são reutilizados no
   mesmo branch.
 - Cada regra e cada risco descrevem um comportamento verificável e têm ao menos uma evidência
   `arquivo:linha`.
@@ -46,6 +53,41 @@ Riscos de segurança (`-SEG-`):
 
 Cada teste aponta a regra que cobre com `@pytest.mark.spec("<ID>")` (marcador registrado em
 `pyproject.toml`). Para um arquivo inteiro: `pytestmark = [pytest.mark.spec("<ID>")]`.
+
+## Checagem
+
+`python manage.py specs_check` cruza as specs com os testes e com as referências a IDs no
+repositório. Use `--spec docs/specs/<dominio>/<capacidade>.md` para ver só os achados de uma spec. O
+comando termina com código 1 se houver achado, e uma spec só está pronta sem achados.
+
+| Código | Achado |
+| --- | --- |
+| SPEC-DUP | ID definido mais de uma vez |
+| SPEC-FMT | ID fora do formato `PREFIXO-NNN`, ou marcador ausente ou inválido |
+| SPEC-PREFIXO | Spec com mais de um prefixo, ou prefixo usado em duas specs |
+| SPEC-CAB | Falta uma linha do cabeçalho, ou um caminho de `Código principal:` ou `Testes:` não existe |
+| SPEC-EVID | Regra sem `` `arquivo:linha` `` (exceto `[retirada]` e `[desejado]` com "a criar"), ou evidência em arquivo inexistente ou além do fim dele |
+| SPEC-SEG | Risco `-SEG-` no `master`, ou risco Crítico ou Alto sem dúvida `D<n>` existente |
+| TEST-ORFAO | Teste ligado a ID que não existe |
+| TEST-ARG | `pytest.mark.spec` com argumento que não é string literal |
+| TEST-FALTA | Regra `[implementado]` sem teste ligado |
+| TEST-STATUS | Teste ligado a regra `[acordado]`, `[desejado]`, `[retirada]` ou a risco `-SEG-` |
+| TEST-CAB | Arquivo de teste que liga IDs da spec, mas não está em `Testes:` (arquivo ou diretório) |
+| REF-ORFA | Referência a ID inexistente em código, comentário, docstring ou documento |
+| REF-RETIRADO | Referência a regra `[retirada]` fora de `docs/specs` |
+
+Como a checagem lê:
+
+- Uma regra é a linha `- ID [marcador]` ou `| ID [marcador] |`, mais as linhas indentadas que a
+  seguem. Linhas dentro de blocos de código não contam.
+- Nos testes Python vale `pytest.mark.spec("ID", ...)`, lido pela árvore sintática. Nos testes do
+  v8 (`_frontend/v8/**/*.spec.js`) vale o título que começa por `'ID: '` ou `'ID, ID: '`.
+- Nas referências, as abreviações `LOA-FASE-056, 057 e 064` e `LOA-EMD-070 a 073` contam com o
+  prefixo do ID completo. Num intervalo, só as pontas são checadas. IDs de domínios que não têm spec
+  são ignorados.
+
+A checagem não diz se a linha citada como evidência ainda mostra o que a regra afirma, nem se o
+teste cobre de fato a regra. Isso continua sendo revisão humana.
 
 ## Varredura de segurança
 

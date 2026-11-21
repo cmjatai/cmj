@@ -36,6 +36,9 @@ severidade e regras de publicação valem aqui sem exceção.
    um queryset ou os campos de um serializer.
 7. Procure testes existentes e registre se a regra está coberta.
 8. Escreva a spec e confira se todo `arquivo:linha` citado continua correto.
+9. Rode `python manage.py specs_check --spec <arquivo da spec>` e resolva todos os achados. A spec
+   só está pronta sem achados. No branch de uma spec com risco `-SEG-`, o achado `SPEC-SEG` de
+   "risco no master" não aparece. Se aparecer, você está no `master`, e a spec não pode ficar lá.
 
 Spec com risco Crítico ou Alto em aberto segue a seção `Publicação` de `docs/specs/README.md`
 (branch local, sem push, aviso imediato de Crítico). Isso vale também para quem escrever o teste da

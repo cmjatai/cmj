@@ -23,6 +23,7 @@ python manage.py makemigrations --check --dry-run   # sempre antes de criar migr
 python manage.py makemigrations <app_label>
 python manage.py migrate                            # em dev não roda ao subir o container
 python manage.py runserver 0.0.0.0:9098             # backend no host (porta do launch.json)
+python manage.py specs_check                        # consistência das specs com testes e código
 
 # Testes (config em pyproject.toml: --no-migrations --reuse-db)
 python -m pytest caminho/do/teste.py
@@ -187,8 +188,8 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 
 ## Documentação
 
-- `docs/specs/README.md`: convenções das specs (marcadores, IDs, varredura de segurança,
-  publicação). Leia antes de criar ou alterar uma spec. Skills: `spec-legado` para comportamento
+- `docs/specs/README.md`: convenções das specs (marcadores, IDs, checagem com `specs_check`,
+  varredura de segurança, publicação). Leia antes de criar ou alterar uma spec. Skills: `spec-legado` para comportamento
   existente, `spec-nova` para funcionalidade nova.
 - `docs/rag/README.md`: índice do chat RAG, com arquitetura, ingestão, recuperação, WebSocket/LLM,
   modelos, operação, diagnóstico e avaliação (`docs/rag/01` a `08`). Leia antes de mexer em `cmj/search`.
