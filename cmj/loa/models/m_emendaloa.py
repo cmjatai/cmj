@@ -1,3 +1,4 @@
+import logging
 import re
 from _decimal import ROUND_HALF_DOWN
 from decimal import Decimal
@@ -66,6 +67,10 @@ class EmendaLoa(CmjSearchMixin):
         (DIVERSOS, _("Em.Imp. Áreas Diversas")),
         (MODIFICATIVA, _("Emenda Modificativa")),
     )
+
+    # Marcadores aceitos na finalidade (ver help_text em f_emendaloa.py).
+    # Qualquer outro é trocado por vazio para não expor atributos da emenda.
+    MARCADORES_FINALIDADE = ("bairro", "entidade", "entidade__nome_fantasia")
 
     TRANSFORMADA_EM_COLETIVA = -10
     PROPOSTA = 10
@@ -575,7 +580,9 @@ class EmendaLoa(CmjSearchMixin):
                 if chave_strip.startswith("entidade"):
                     chave_entidade_presente = True
 
-                if "__" in chave_strip:
+                if chave_strip not in self.MARCADORES_FINALIDADE:
+                    valor = ""
+                elif "__" in chave_strip:
                     partes = chave_strip.split("__")
                     obj = self
                     for parte in partes:
@@ -864,22 +871,22 @@ class EmendaLoa(CmjSearchMixin):
         import io
 
         import pymupdf
-        import requests
 
         pra_frente = True
         arq_bytes, arq_name = None, ""
         while True:
-            response = requests.get(f"{base_url}/api/loa/emendaloa/{self.id}/view/")
-            if response.status_code != 200:
+            # LOA-LST-017: o PDF é gerado no processo, sem requisição HTTP
+            try:
+                conteudo = self.service.documento_pdf(self, base_url)
+            except Exception:
+                logging.getLogger(__name__).exception(
+                    f"Erro ao gerar o PDF da emenda {self.id}."
+                )
                 break
 
-            arq_name = (
-                response.headers.get("Content-Disposition", f"emenda_loa_{self.id}.pdf")
-                .split("filename=")[-1]
-                .strip('"')
-            )
+            arq_name = self.service.nome_documento(self)
 
-            arq_bytes = io.BytesIO(response.content)
+            arq_bytes = io.BytesIO(conteudo)
             pdf = pymupdf.open(stream=arq_bytes, filetype="pdf")
 
             if pdf.page_count == 0:

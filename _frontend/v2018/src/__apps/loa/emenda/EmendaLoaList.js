@@ -5,110 +5,14 @@ export default class EmendaLoaList {
     this.init()
   }
 
-  isObjectEmpty (obj) {
-    let isEmpty = true
-    _.forOwn(obj, (value, key) => {
-      if ((Array.isArray(value) && value.length > 0)) {
-        isEmpty = false
-      } else if (!Array.isArray(value) && !['', null, undefined].includes(value)) {
-        isEmpty = false
-      }
-    })
-    return isEmpty
-  }
-
   init () {
     const form = this.form
-    const formData = new FormData(form[0])
-    const formProps = {}
 
-    for (const [key, value] of formData.entries()) {
-      if (key in formProps) {
-        if (!Array.isArray(formProps[key])) {
-          formProps[key] = [formProps[key]]
-        }
-        formProps[key].push(value)
-      } else {
-        if (value !== '') {
-          formProps[key] = value
-        }
-      }
-    }
+    // LOA-LST-067: o filtro não é lembrado entre visitas; fica só na URL.
+    // Remove o filtro gravado por versões anteriores desta tela.
+    localStorage.removeItem('portalcmj_emendaloa_filter')
 
-    delete formProps.agrupamento
-    delete formProps.tipo_agrupamento
-    delete formProps.pdf
-    // 'ambas' é o valor padrão do radio, não conta como filtro selecionado
-    if (formProps.autoria === 'ambas') {
-      delete formProps.autoria
-    }
-
-    // Função auxiliar para capturar os dados relevantes de filtro
-    const getFilterData = () => {
-      const formData = new FormData(form[0])
-      const parlamentares = formData.getAll('parlamentares')
-      const fase = formData.getAll('fase')
-      const finalidade = formData.get('finalidade')
-      const tipo = formData.getAll('tipo')
-      const autoria = formData.get('autoria')
-
-      return {
-        parlamentares: parlamentares.length > 0 ? parlamentares : [],
-        fase: fase.length > 0 ? fase : [],
-        finalidade: finalidade !== '' ? [finalidade] : [],
-        tipo: tipo.length > 0 ? tipo : [],
-        autoria: autoria && autoria !== 'ambas' ? [autoria] : []
-      }
-    }
-
-    // Verifica se há filtros selecionados no formulário atual
-    if (this.isObjectEmpty(formProps)) {
-      try {
-        const lsJson = localStorage.getItem('portalcmj_emendaloa_filter')
-
-        // Verifica se existe dados salvos e se são válidos
-        if (lsJson) {
-          const lsData = JSON.parse(lsJson)
-
-          if (!this.isObjectEmpty(lsData)) {
-            _.forOwn(lsData, (value, key) => {
-              _.forEach(form.find(`input[name="${key}"]`), (item) => {
-                if ((Array.isArray(value) && value.includes(item.value)) || value === item.value) {
-                  item.checked = true
-                  $(`label[for="${item.id}"] span`).addClass('active')
-                } else if (!Array.isArray(value)) {
-                  item.value = value
-                } else if (Array.isArray(value) && value.length > 0 && item.type === 'text') {
-                  // Tratamento específico para campos de texto que foram salvos como array
-                  item.value = value[0]
-                }
-              })
-            })
-
-            // Verifica se realmente tem filtros aplicados antes de submeter o form
-            const filterData = getFilterData()
-            if (!this.isObjectEmpty(filterData)) {
-              window.loadingCMJ('Atualizando listagem...')
-              form.submit()
-            }
-          }
-        }
-      } catch (e) {
-        console.error('Erro ao recuperar filtros do localStorage:', e)
-        // Limpa localStorage se houver erro no JSON
-        localStorage.removeItem('portalcmj_emendaloa_filter')
-      }
-    } else {
-      // Salva filtros atuais no localStorage
-      const filterData = getFilterData()
-      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(filterData))
-    }
-
-    // Simplifica a função de mudança para usar getFilterData
-    let changeAction = (event) => {
-      const filterData = getFilterData()
-      localStorage.setItem('portalcmj_emendaloa_filter', JSON.stringify(filterData))
-
+    const changeAction = (event) => {
       window.loadingCMJ('Atualizando listagem...')
       form.submit()
     }
@@ -156,19 +60,20 @@ export default class EmendaLoaList {
           labelSpan.removeClass('active')
         }
       })
+    // LOA-LST-066: só o botão "Filtrar" aplica o filtro; os botões criados
+    // pelo bootstrap-select nos seletores não interferem
     form
-      .find('button[type="button"]')
+      .find('button.btn-filtrar')
       .click((event) => {
         changeAction()
       })
-    form
-      .find('input[type="submit"]')
-      .click((event) => {
-        window.loadingCMJ('Gerando Listagem em PDF...')
-      })
+    // Enter não envia o formulário; na busca por termos, aplica o filtro
     form.keypress((event) => {
       if (event.keyCode === 13) {
         event.preventDefault()
+        if (event.target.name === 'finalidade') {
+          changeAction()
+        }
         return false
       }
     })

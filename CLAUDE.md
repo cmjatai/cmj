@@ -184,6 +184,8 @@ O código novo vai para o **v6**. O v2018 é só manutenção: não migre para V
   autosave. Leia antes de alterar essas telas.
 - `docs/specs/loa/edicao-agrupamento.md`: tela de edição do agrupamento, registros contábeis,
   emendas coletivas e autosave. Leia antes de alterar essa tela.
+- `docs/specs/loa/listagem-emendas.md`: listagem das emendas da LOA, filtros, cache do cartão, PDF da
+  listagem e dependências do v2018. Leia antes de alterar essa tela.
 
 ## A confirmar
 

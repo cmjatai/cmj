@@ -153,6 +153,21 @@ class EmendaLoaService:
         )
         return fase and self.e_autor_da_emenda(user, emenda)
 
+    def ve_campos_internos(self, user, emenda):
+        """Vê ``owner``, ``metadata`` e ``search`` da emenda na API (LOA-LST-091).
+
+        Quem pode editar a emenda em alguma fase: ``change_emendaloa``,
+        ``emendaloa_full_editor`` ou o autor do dono. Não depende da fase atual,
+        para que a tela de edição continue lendo ``metadata.style``.
+        """
+        if not user or user.is_anonymous:
+            return False
+        if user.has_perm("loa.change_emendaloa") or user.has_perm(
+            "loa.emendaloa_full_editor"
+        ):
+            return True
+        return self.e_autor_da_emenda(user, emenda)
+
     def parlamentar_protegido(self, emenda, user=None):
         """Parlamentar cujo valor não pode ser zerado nem desmarcado (LOA-EMD-079).
 
@@ -215,3 +230,105 @@ class EmendaLoaService:
         if not user or user.is_anonymous:
             return False
         return user.has_perm("loa.add_emendaloa") or user.operadorautor_set.exists()
+
+    # ---------------------------------------------------------------- consulta
+
+    @staticmethod
+    def loas_visiveis(user, queryset=None):
+        """LOAs que o usuário pode consultar (LOA-LST-003 e LOA-LST-006).
+
+        É a regra da lista de LOAs: anônimo e conta comum só veem LOA
+        publicada; operador de autor vê também a não publicada cuja matéria ainda
+        não virou norma; quem tem ``loa.emendaloa_full_editor`` vê todas.
+        """
+        from django.db.models import Q
+
+        from cmj.loa.models import Loa
+
+        if queryset is None:
+            queryset = Loa.objects.all()
+        if user and not user.is_anonymous:
+            if user.has_perm("loa.emendaloa_full_editor"):
+                return queryset
+            if user.operadorautor_set.exists():
+                return queryset.filter(
+                    Q(publicado=True) | Q(materia__normajuridica__isnull=True)
+                ).distinct()
+        return queryset.filter(publicado=True)
+
+    @staticmethod
+    def visiveis(user, queryset):
+        """Emendas que o usuário pode consultar (LOA-LST-005 e LOA-LST-006): as
+        das LOAs de ``loas_visiveis``."""
+        if (
+            user
+            and not user.is_anonymous
+            and user.has_perm("loa.emendaloa_full_editor")
+        ):
+            return queryset
+        loas = EmendaLoaService.loas_visiveis(user)
+        return queryset.filter(loa__in=loas.values("id"))
+
+    # ---------------------------------------------------------------- documento
+
+    @staticmethod
+    def nome_documento(emenda, sufixo="", ext="pdf"):
+        """Nome do arquivo do documento da emenda."""
+        from django.utils.text import slugify
+
+        if emenda.emendaloaparlamentar_set.count() > 1:
+            nome_autor = "coletiva"
+        else:
+            operador = emenda.owner.operadorautor_set.first() if emenda.owner else None
+            nome_autor = operador.autor.nome if operador else ""
+
+        return "{}-{}-{:04d}-{}{}.{}".format(
+            emenda.loa.ano,
+            slugify(nome_autor),
+            emenda.id,
+            slugify(emenda.get_tipo_display()),
+            sufixo,
+            ext,
+        )
+
+    def documento_pdf(self, emenda, base_url):
+        """PDF da emenda, o mesmo da action ``view`` da API (LOA-LST-019).
+
+        Usa o estilo já presente em ``emenda.metadata`` e não grava nada.
+        ``base_url`` resolve os endereços relativos do HTML: quem chama decide
+        a origem, sem depender do ``Host`` da requisição.
+        """
+        from django.conf import settings
+        from django.template.loader import render_to_string
+
+        from cmj.utils.utils_report import make_pdf
+
+        estilo = emenda.metadata.get("style") or {}
+        context = {
+            # O template numera artigos e parágrafos com view.art e view.paragrafo
+            "view": _NumeracaoDispositivos(),
+            "object": emenda,
+            "lineHeight": str(estilo.get("lineHeight", 150) / 100.0),
+            "base_url": settings.BASE_URL if not settings.DEBUG else "",
+            "espacoAssinatura": str(estilo.get("espacoAssinatura", "") or ""),
+        }
+        template = render_to_string("loa/pdf/emendaloa_preview.html", context)
+        return make_pdf(base_url=base_url, main_template=template)
+
+
+class _NumeracaoDispositivos:
+    """Contadores de artigo e parágrafo, novos a cada documento."""
+
+    def __init__(self):
+        self._art = 0
+        self._paragrafo = 0
+
+    @property
+    def art(self):
+        self._art += 1
+        return self._art
+
+    @property
+    def paragrafo(self):
+        self._paragrafo += 1
+        return self._paragrafo

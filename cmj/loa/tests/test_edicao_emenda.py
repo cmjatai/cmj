@@ -24,7 +24,11 @@ from cmj.loa.models import (
     UnidadeOrcamentaria,
 )
 from cmj.loa.tests.conftest import _make_user, recarregar
-from sapl.materia.models import MateriaLegislativa, TipoMateriaLegislativa
+from sapl.materia.models import (
+    MateriaLegislativa,
+    Proposicao,
+    TipoMateriaLegislativa,
+)
 from sapl.parlamentares.models import Legislatura, Parlamentar
 
 pytestmark = pytest.mark.django_db
@@ -883,7 +887,7 @@ def pdf_vazio(*args, **kwargs):
 @pytest.fixture
 def get_view():
     def _get(client, emenda, **params):
-        with mock.patch("cmj.api.loa.views.emendaloa.make_pdf", pdf_vazio):
+        with mock.patch("cmj.utils.utils_report.make_pdf", pdf_vazio):
             return client.get(f"/api/loa/emendaloa/{emenda.pk}/view/", params)
 
     return _get
@@ -959,3 +963,21 @@ def test_view_do_operador_da_loa_grava_estilo_com_materia(
     get_view(api(operador_loa), el, lineHeight=200)
 
     assert recarregar(el).metadata["style"]["lineHeight"] == 200
+
+
+# ------------------------------------- registro pelo detalhe removido (LOA-EMD-086)
+
+
+@pytest.mark.spec("LOA-EMD-086")
+def test_detalhe_com_registrar_nao_registra_proposicao(client, autor, make_emenda):
+    el = make_emenda(fase=EmendaLoa.LIBERACAO_CONTABIL, owner=autor)
+    client.force_login(autor)
+    url = reverse("cmj.loa:emendaloa_detail", kwargs={"pk": el.pk})
+
+    with mock.patch("cmj.utils.utils_report.make_pdf") as gerar:
+        response = client.get(f"{url}?registrar")
+
+    assert response.status_code == 200
+    gerar.assert_not_called()
+    assert Proposicao.objects.count() == 0
+    assert recarregar(el).proposicao is None

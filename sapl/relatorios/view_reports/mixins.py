@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 
-from cmj.utils.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf, pdf_base_url
 
 
 class RelatorioMixin:
@@ -19,7 +19,7 @@ class RelatorioMixin:
         return self.export_pdf(request, response.context_data, *args, **kwargs)
 
     def export_pdf(self, request, context, *args, **kwargs):
-        base_url = request.build_absolute_uri()
+        base_url = pdf_base_url(request)
 
         template_pdf = self.get_template_pdf()
 

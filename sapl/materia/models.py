@@ -32,6 +32,7 @@ from cmj.diarios.models import VinculoDocDiarioOficial
 from cmj.mixins import CommonMixin, PluginSignMixin
 from cmj.utils import media_cache_storage
 from cmj.utils.utils_files import restringe_tipos_de_arquivo_txt
+from cmj.utils.utils_report import pdf_url_fetcher
 from sapl.base.models import SEQUENCIA_NUMERACAO_PROTOCOLO
 from sapl.base.models import AppConfig as BaseAppConfig
 from sapl.base.models import Autor, Metadata, TipoAutor
@@ -1146,8 +1147,12 @@ class MateriaLegislativa(CommonMixin):
                                 delete=False, suffix=".pdf"
                             ) as tmp_ta:
                                 html = response.content
+                                # LOA-LST-082: todo PDF só busca recursos por
+                                # http, https e data:
                                 pdf = HTML(
-                                    string=html, base_url=settings.BASE_URL
+                                    string=html,
+                                    base_url=settings.BASE_URL,
+                                    url_fetcher=pdf_url_fetcher(),
                                 ).write_pdf(media_type="print")
                                 tmp_ta.write(pdf)
                                 tmp_ta.flush()

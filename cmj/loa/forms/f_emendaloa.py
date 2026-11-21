@@ -829,6 +829,45 @@ class EmendaLoaFilterSet(FilterSet):
                 "autoria",
             )
 
+            # LOA-LST-088: as combinações de totalização que o JavaScript da tela
+            # impede (LOA-LST-070) também são recusadas no servidor
+            DIMENSOES_SEM_REGISTRO = {"despesa__unidade", "entidade"}
+
+            def clean(self):
+                cleaned_data = super().clean()
+                if "agrupamento" not in cleaned_data:
+                    return cleaned_data
+                if "tipo_agrupamento" not in cleaned_data:
+                    return cleaned_data
+
+                dimensoes = set(cleaned_data["agrupamento"] or [])
+                via = cleaned_data["tipo_agrupamento"]
+                if not dimensoes:
+                    return cleaned_data
+
+                if not via:
+                    self.add_error(
+                        "tipo_agrupamento", _("Escolha a via de totalização.")
+                    )
+                elif via == "sem_registro":
+                    if dimensoes - self.DIMENSOES_SEM_REGISTRO:
+                        self.add_error(
+                            "agrupamento",
+                            _(
+                                "Na via do valor da emenda só é possível totalizar "
+                                "por unidades orçamentárias e por entidades."
+                            ),
+                        )
+                elif "entidade" in dimensoes:
+                    self.add_error(
+                        "agrupamento",
+                        _(
+                            "Entidades só podem ser totalizadas na via do valor "
+                            "da emenda."
+                        ),
+                    )
+                return cleaned_data
+
         model = EmendaLoa
         fields = [
             "fase",
@@ -959,7 +998,10 @@ class EmendaLoaFilterSet(FilterSet):
 
         finalidade_field = FieldWithButtons(
             Field("finalidade", placeholder=_("Informe termos a filtrar...")),
-            StrictButton(_("Filtrar"), css_class="btn-secondary", type="button"),
+            # LOA-LST-066: o script da listagem liga o clique só a este botão
+            StrictButton(
+                _("Filtrar"), css_class="btn-secondary btn-filtrar", type="button"
+            ),
         )
         row = to_row(
             [
@@ -1007,8 +1049,12 @@ class EmendaLoaFilterSet(FilterSet):
                                     8,
                                 ),
                                 (
+                                    # LOA-LST-071: o PDF abre em nova aba
                                     Submit(
-                                        "pdf", "Gerar PDF", css_class="btn btn-primary"
+                                        "pdf",
+                                        "Gerar PDF",
+                                        css_class="btn btn-primary",
+                                        formtarget="_blank",
                                     ),
                                     4,
                                 ),
@@ -1034,7 +1080,10 @@ class EmendaLoaFilterSet(FilterSet):
         # self.form.initial['tipo_agrupamento'] = 'insercao'
         # self.form.fields['tipo_agrupamento'].initial = 'insercao'
 
-        if not self.loa.materia or not self.loa.materia.em_tramitacao:
+        # LOA-LST-024: matéria da LOA já com norma jurídica oferece as fases da
+        # execução (25 em diante); sem norma, as do processo legislativo (10 a 20)
+        materia = self.loa.materia
+        if materia and materia.normajuridica_set.exists():
             self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[6:]
         else:
             self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[1:6]

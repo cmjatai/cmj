@@ -1,4 +1,4 @@
-import io
+import logging
 import re
 import tempfile
 import zipfile
@@ -6,21 +6,20 @@ from _collections import OrderedDict
 from decimal import Decimal
 from urllib.parse import urlencode
 
-import pymupdf
-import requests
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied, ValidationError
-from django.core.files import File
-from django.db.models import Max, Q
+from django.core.exceptions import PermissionDenied
+from django.db.models import Exists, OuterRef, Q
 from django.db.models.aggregates import Sum
-from django.http.response import HttpResponse
-from django.shortcuts import redirect
+from django.http import Http404
+from django.http.response import HttpResponse, HttpResponseNotAllowed
+from django.shortcuts import get_object_or_404, redirect
 from django.template import loader
 from django.template.loader import render_to_string
 from django.urls.base import reverse, reverse_lazy
-from django.utils import formats, timezone
+from django.utils import formats
+from django.utils.functional import cached_property
 from django.utils.html import escape
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -35,14 +34,55 @@ from cmj.loa.models import (
     EmendaLoaParlamentar,
     EmendaLoaRegistroContabil,
     Loa,
+    RegistroAjusteLoa,
 )
 from cmj.loa.views.v_mixins import LoaContextDataMixin
+from cmj.mixins import GoogleRecapthaViewMixin
 from cmj.utils import TimeExecution
-from cmj.utils.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf, pdf_base_url
 from sapl.crud.base import RP_DETAIL, RP_LIST, MasterDetailCrud
-from sapl.materia.models import Proposicao, TipoProposicao
 from sapl.parlamentares.models import Parlamentar
-from sapl.utils import get_client_ip
+
+logger = logging.getLogger(__name__)
+
+
+def alinhar_valor(texto, largura):
+    """Alinha "R$ <valor>" à largura, com espaços depois do primeiro espaço
+    (LOA-LST-060); sem espaço, alinha o texto inteiro à direita."""
+    if " " not in texto:
+        return texto.rjust(largura)
+    cabeca, resto = texto.split(" ", 1)
+    return f"{cabeca} {resto.rjust(largura - len(cabeca) - 1)}"
+
+
+ARQUIVO_NAO_INCLUIDAS = "LEIA-ME_emendas_nao_incluidas.txt"
+
+
+def texto_emendas_nao_incluidas(emendas):
+    linhas = [
+        "Não foi possível gerar o PDF das emendas abaixo, que ficaram fora deste "
+        "arquivo. Tente baixar novamente; se o problema continuar, procure o "
+        "suporte informando os números abaixo.",
+        "",
+    ]
+    for emenda in emendas:
+        materia = emenda.materia.epigrafe_short if emenda.materia else "sem matéria"
+        linhas.append(f"- Emenda {emenda.id} ({materia})")
+    return "\n".join(linhas) + "\n"
+
+
+# Rótulo da dimensão vazia no título do grupo do PDF ("Sem ...", LOA-LST-057)
+ROTULO_SEM_DIMENSAO = {
+    "despesa__orgao": "órgão",
+    "despesa__unidade": "unidade orçamentária",
+    "despesa__funcao": "função",
+    "despesa__subfuncao": "subfunção",
+    "despesa__programa": "programa",
+    "despesa__acao": "ação",
+    "despesa__natureza": "natureza da despesa",
+    "despesa__fonte": "fonte de recursos",
+    "entidade": "entidade",
+}
 
 
 class EmendaLoaCrud(MasterDetailCrud):
@@ -53,12 +93,6 @@ class EmendaLoaCrud(MasterDetailCrud):
 
     class BaseMixin(LoaContextDataMixin, MasterDetailCrud.BaseMixin):
         list_field_names = [("id",)]
-        """list_field_names = [
-            ("finalidade"),
-            "str_valor_computado",
-            ("tipo", "fase"),
-            "parlamentares",
-        ]"""
 
         @property
         def ordered_list(self):
@@ -125,25 +159,52 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             return l
 
-    class ListView(FilterView, MasterDetailCrud.ListView):
+    class ListView(GoogleRecapthaViewMixin, FilterView, MasterDetailCrud.ListView):
         filterset_class = EmendaLoaFilterSet
+        # LOA-LST-025: filtro inválido é ignorado e o campo mostra o erro
+        strict = False
+
+        # LOA-LST-085: anônimo passa pelo reCAPTCHA antes de gerar o PDF
+        recaptcha_trigger_param = "pdf"
+        recaptcha_gate_title = _("Gerar Listagem das Emendas em PDF")
+        recaptcha_gate_button = _("Gerar PDF")
+        recaptcha_success_method = "pdf_apos_recaptcha"
+
+        def _is_recaptcha_triggered(self, request):
+            return request.user.is_anonymous and super()._is_recaptcha_triggered(
+                request
+            )
 
         @property
-        def extras_url(self):
+        def recaptcha_return_url(self):
+            return self.request.path
+
+        def pdf_apos_recaptcha(self, request, *args, **kwargs):
+            # Os filtros seguem na query string do POST do gate
+            return self.get(request, *args, **kwargs)
+
+        @cached_property
+        def tem_emendas_liberadas(self):
+            """LOA-LST-015: operador com emenda liberada do seu autor na LOA."""
             if (
                 self.request.user.is_anonymous
                 or not self.request.user.operadorautor_set.exists()
             ):
-                return []
+                return False
 
-            if (
-                not self.get_emendas_criadas_por_operador_mesmo_autor()
+            return (
+                self.get_emendas_criadas_por_operador_mesmo_autor()
                 .filter(fase__gte=EmendaLoa.LIBERACAO_CONTABIL)
                 .exists()
-            ):
+            )
+
+        @property
+        def extras_url(self):
+            # LOA-LST-015: o registro é um formulário POST no template
+            # (LOA-LST-016), não um link
+            if not self.tem_emendas_liberadas:
                 return []
 
-            btns = []
             return [
                 (
                     reverse_lazy(
@@ -155,30 +216,22 @@ class EmendaLoaCrud(MasterDetailCrud):
                         <i class="far fa-file-archive"></i> Baixar Emendas Liberadas</span>
                     """,
                 ),
-                (
-                    reverse_lazy(
-                        "cmj.loa:emendaloa_list", kwargs={"pk": self.kwargs["pk"]}
-                    )
-                    + "?registrar",
-                    "btn-warning btn-register-emendas-liberadas",
-                    """<span title="Registrar todas as emendas Liberadas no módulo de proposições. Emendas já registradas serão atualizadas se ainda não enviadas ao protocolo.">
-                        <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas</span>
-                    """,
-                ),
             ]
 
         def get_emendas_criadas_por_operador_mesmo_autor(self):
             if self.request.user.is_anonymous:
                 return self.get_queryset().none()
-            autor_operado = self.request.user.operadorautor_set.values_list(
-                "autor", flat=True
-            )
-            OperadorAutor = autor_operado.model
+            # LOA-LST-015: o operador opera um único autor; botões, ZIP e
+            # registro consideram as emendas dos operadores desse autor
+            operador = self.request.user.operadorautor_set.first()
+            if not operador:
+                return self.get_queryset().none()
+            OperadorAutor = type(operador)
 
             return self.get_queryset().filter(
                 loa=self.loa,
                 owner__id__in=OperadorAutor.objects.filter(
-                    autor__in=autor_operado
+                    autor=operador.autor_id
                 ).values_list("user", flat=True),
             )
 
@@ -187,12 +240,35 @@ class EmendaLoaCrud(MasterDetailCrud):
             return f"""Emendas Impositivas/Modificativas à LOA {self.loa.ano} <small>({self.loa.materia.epigrafe_short if self.loa.materia else ''})</small>
                 """
 
+        def dispatch(self, request, *args, **kwargs):
+            # LOA-LST-003: LOA inexistente ou que o usuário não pode ver responde
+            # 404, antes até da verificação reCAPTCHA do PDF
+            self.loa = get_object_or_404(
+                EmendaLoa.service.loas_visiveis(request.user), pk=kwargs["pk"]
+            )
+            # LOA-LST-087: sem matéria não há emenda a listar
+            if not self.loa.materia_id:
+                raise Http404("A LOA ainda não tem matéria legislativa vinculada.")
+            return super().dispatch(request, *args, **kwargs)
+
         def get(self, request, *args, **kwargs):
-            self.loa = Loa.objects.get(pk=kwargs["pk"])
+            # LOA-LST-016: o registro altera dados e só é aceito por POST
             if "registrar" in self.request.GET:
-                self.registrar_emendas_liberadas(request)
-                return redirect(reverse_lazy("sapl.materia:proposicao_list"))
+                return HttpResponseNotAllowed(["POST"])
             return FilterView.get(self, request, *args, **kwargs)
+
+        def post(self, request, *args, **kwargs):
+            # LOA-LST-016: único uso do POST nesta tela (o do reCAPTCHA do PDF é
+            # tratado antes, no dispatch do mixin); o CSRF é exigido pelo
+            # middleware
+            if "registrar" not in request.POST:
+                return HttpResponseNotAllowed(["GET"])
+            # LOA-LST-017: a recusa volta para a listagem com o aviso; o
+            # registro iniciado vai para a lista de proposições
+            recusa = self.registrar_emendas_liberadas(request)
+            if recusa:
+                return recusa
+            return redirect(reverse_lazy("sapl.materia:proposicao_list"))
 
         def registrar_emendas_liberadas(self, request, *args, **kwargs):
 
@@ -258,6 +334,15 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def render_to_response(self, context, **response_kwargs):
             if "pdf" in self.request.GET:
+                # LOA-LST-025: com filtro inválido o PDF não é gerado; a tela
+                # mostra os filtros com o aviso no campo
+                if self.filterset.is_bound and not self.filterset.is_valid():
+                    messages.warning(
+                        self.request,
+                        "Há filtros inválidos, indicados no formulário. "
+                        "Corrija-os para gerar o PDF.",
+                    )
+                    return super().render_to_response(context, **response_kwargs)
                 return self.makepdf(context, **response_kwargs)
             elif "zip" in self.request.GET:
                 return self.makezip(context, **response_kwargs)
@@ -271,8 +356,9 @@ class EmendaLoaCrud(MasterDetailCrud):
             if not user.is_superuser and not user.operadorautor_set.exists():
                 raise PermissionDenied()
 
-            req = self.request
-            base_url = f"{req.scheme}://{req.get_host()}"
+            # LOA-LST-019: o PDF é gerado no processo; a base dos endereços
+            # relativos vem da configuração, não do Host da requisição
+            base_url = settings.BASE_URL
 
             emendas = self.get_emendas_criadas_por_operador_mesmo_autor().filter(
                 fase__gte=EmendaLoa.LIBERACAO_CONTABIL
@@ -292,10 +378,16 @@ class EmendaLoaCrud(MasterDetailCrud):
             with tempfile.SpooledTemporaryFile(max_size=512000000) as tmp:
                 with zipfile.ZipFile(tmp, "w") as file:
 
+                    nao_incluidas = []
                     for emenda in emendas:
-                        response = requests.get(
-                            f"{base_url}/api/loa/emendaloa/{emenda.id}/view/"
-                        )
+                        try:
+                            pdf = EmendaLoa.service.documento_pdf(emenda, base_url)
+                        except Exception:
+                            logger.exception(
+                                f"Erro ao gerar o PDF da emenda {emenda.id} para o ZIP."
+                            )
+                            pdf = None
+                            nao_incluidas.append(emenda)
 
                         prefixo = (
                             "coletiva"
@@ -303,7 +395,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                             else "individual"
                         )
 
-                        if response.status_code == 200:
+                        if pdf:
                             nome_emenda = f"{prefixo}_{emenda.id}_sem_vinculo_com_proposicao_{emenda.loa.ano}"
                             if emenda.materia:
                                 nome_emenda = f"{prefixo}_{emenda.id}_ja_procolocada_{emenda.materia.tipo.sigla}_{emenda.materia.numero}_{emenda.materia.ano}"
@@ -311,7 +403,15 @@ class EmendaLoaCrud(MasterDetailCrud):
                                 nome_emenda = f"{prefixo}_{emenda.id}_com_proposicao_gerada_{emenda.proposicao.tipo.descricao}_{emenda.proposicao.numero_proposicao}_{emenda.proposicao.ano}"
                             nome_emenda = slugify(nome_emenda)
 
-                            file.writestr(f"{nome_emenda}.pdf", response.content)
+                            file.writestr(f"{nome_emenda}.pdf", pdf)
+
+                    # LOA-LST-019: a emenda omitida por falha no PDF é listada
+                    # num arquivo do próprio ZIP
+                    if nao_incluidas:
+                        file.writestr(
+                            ARQUIVO_NAO_INCLUIDAS,
+                            texto_emendas_nao_incluidas(nao_incluidas),
+                        )
                 tmp.seek(0)
                 response = HttpResponse(tmp.read(), content_type="application/zip")
                 response["Content-Disposition"] = (
@@ -324,28 +424,36 @@ class EmendaLoaCrud(MasterDetailCrud):
 
         def makepdf(self, context, **response_kwargs):
             self.paginate_by = 0
-            base_url = self.request.build_absolute_uri()
-            with TimeExecution(
-                print_date=settings.DEBUG, label="Make Context PDF EmendaLoa List"
-            ):
-                try:
-                    context = self.get_context_data_makepdf()
-                except Exception as e:
-                    raise ValidationError(
-                        f"Ocorreu um erro ao processar seus filtros e agrupamentos."
+            base_url = pdf_base_url(self.request)  # LOA-LST-086
+            # LOA-LST-046: erro na geração vai para o log com a causa, e o
+            # usuário volta para a tela com os filtros e um aviso
+            try:
+                with TimeExecution(
+                    print_date=settings.DEBUG, label="Make Context PDF EmendaLoa List"
+                ):
+                    context_pdf = self.get_context_data_makepdf()
+
+                with TimeExecution(
+                    print_date=settings.DEBUG, label="Render Html EmendaLoa List"
+                ):
+                    template = render_to_string(
+                        "loa/pdf/emendaloa_list.html", context_pdf
                     )
 
-            # context['groups'][0]['rows'] = context['groups'][0]['rows'][:10]
-
-            with TimeExecution(
-                print_date=settings.DEBUG, label="Render Html EmendaLoa List"
-            ):
-                template = render_to_string("loa/pdf/emendaloa_list.html", context)
-
-            with TimeExecution(
-                print_date=settings.DEBUG, label="Generate PDF EmendaLoa List"
-            ):
-                pdf_file = make_pdf(base_url=base_url, main_template=template)
+                with TimeExecution(
+                    print_date=settings.DEBUG, label="Generate PDF EmendaLoa List"
+                ):
+                    pdf_file = make_pdf(base_url=base_url, main_template=template)
+            except Exception:
+                logger.exception(
+                    f"Erro ao gerar o PDF da listagem de emendas da LOA {self.loa.id} "
+                    f"com os parâmetros: {self.request.GET.urlencode()}"
+                )
+                messages.error(
+                    self.request,
+                    "Não foi possível gerar o PDF com esses filtros e totalizações.",
+                )
+                return super().render_to_response(context, **response_kwargs)
 
             response = HttpResponse(pdf_file, content_type="application/pdf")
             response["Content-Disposition"] = (
@@ -364,23 +472,45 @@ class EmendaLoaCrud(MasterDetailCrud):
 
             filters = []
             if cd.get("parlamentares", ""):
-                filtro = f'<strong>Parlamentares:</strong> {" / ".join(map(lambda x: str(x), cd["parlamentares"]))}'
+                filtro = f'<strong>Parlamentares:</strong> {" / ".join(map(lambda x: escape(str(x)), cd["parlamentares"]))}'
                 filters.append(filtro)
 
             if cd.get("finalidade", ""):
-                filtro = f'<strong>Finalidade:</strong> {cd["finalidade"]}'
+                filtro = f'<strong>Finalidade:</strong> {escape(cd["finalidade"])}'
                 filters.append(filtro)
 
             if cd.get("tipo", ""):
                 dt = dict(
                     map(lambda x: (str(x[0]), x[1]), EmendaLoa.TIPOEMENDALOA_CHOICE)
                 )
-                filtro = f'<strong>Tipos de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["tipo"]))}'
+                filtro = f'<strong>Tipos de Emenda:</strong> {" / ".join(map(lambda x: escape(str(dt[x])), cd["tipo"]))}'
                 filters.append(filtro)
 
             if cd.get("fase", ""):
                 dt = dict(map(lambda x: (str(x[0]), x[1]), EmendaLoa.FASE_CHOICE))
-                filtro = f'<strong>Fases de Emenda:</strong> {" / ".join(map(lambda x: str(dt[x]), cd["fase"]))}'
+                filtro = f'<strong>Fases de Emenda:</strong> {" / ".join(map(lambda x: escape(str(dt[x])), cd["fase"]))}'
+                filters.append(filtro)
+
+            # LOA-LST-047: todo filtro que muda o conteúdo aparece no PDF
+            if cd.get("entidade"):
+                filtro = (
+                    f"<strong>Entidade:</strong> {escape(cd['entidade'].nome_fantasia)}"
+                )
+                filters.append(filtro)
+
+            if cd.get("unidade"):
+                filtro = (
+                    f"<strong>Unidade Orçamentária:</strong> {escape(cd['unidade'])}"
+                )
+                filters.append(filtro)
+
+            if cd.get("autoria") in ("individual", "coletiva"):
+                autoria = dict(self.filterset.filters["autoria"].extra["choices"])
+                filtro = f"<strong>Autoria:</strong> {escape(autoria[cd['autoria']])}"
+                filters.append(filtro)
+
+            if cd.get("indicacao"):
+                filtro = f"<strong>Indicação:</strong> {escape(cd['indicacao'])}"
                 filters.append(filtro)
 
             if filters:
@@ -403,7 +533,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                     materia = f"""
                             <span class="materia">
                                 <a href="{reverse('cmj.loa:emendaloa_detail',kwargs={'pk': item.id})}">
-                                {item.materia.epigrafe_short}
+                                {escape(item.materia.epigrafe_short)}
                                 </a>
                             </span>
                     """
@@ -418,18 +548,29 @@ class EmendaLoaCrud(MasterDetailCrud):
 
                 autores = f"""
                     <small>
-                        <strong>Autoria:</strong> {' - '.join(map(lambda x: str(x), item.parlamentares.all()))}
+                        <strong>Autoria:</strong> {' - '.join(map(lambda x: escape(str(x)), item.parlamentares.all()))}
                     </small>
                 """
+
+                # LOA-LST-089: a emenda cujo valor final é zero (LOA-FASE-061 e
+                # LOA-FASE-044) é sinalizada; o PDF mostra o valor original
+                aviso = ""
+                if item.pdf_tem_ajuste:
+                    aviso = "Possui ajuste técnico, não contemplado neste relatório."
+                elif item.fase == EmendaLoa.IMPEDIMENTO_TECNICO:
+                    aviso = "Em impedimento técnico."
+                if aviso:
+                    aviso = f'<small class="aviso-ajuste">{aviso}</small>'
 
                 col_emenda = f"""
                     <div class="loa-mat">
                         {materia}
-                        - <small class="tipo">{item.get_tipo_display()}</small>
+                        - <small class="tipo">{escape(item.get_tipo_display())}</small>
                         - {autores}
-                        <span class="indicacao">{item.indicacao}</span>
+                        {aviso}
+                        <span class="indicacao">{escape(item.indicacao)}</span>
                         <div>
-                            {item.finalidade_format}
+                            {escape(item.finalidade_format)}
                         </div>
                         <ul></ul>
                     </div>
@@ -437,13 +578,18 @@ class EmendaLoaCrud(MasterDetailCrud):
                 return col_emenda
 
             total = Decimal("0.00")
-            self.object_list = self.object_list.order_by("materia__numero")
+            self.object_list = self.object_list.order_by("materia__numero").annotate(
+                pdf_tem_ajuste=Exists(
+                    RegistroAjusteLoa.objects.filter(emendaloa=OuterRef("pk"))
+                )
+            )
             if not cd.get("agrupamento", []):
+                # LOA-LST-080: o marcador do título é limpo antes do retorno do
+                # resultado vazio
+                context["title"] = context["title"].replace("{}", "")
 
                 if not self.object_list.exists():
                     return context
-
-                context["title"] = context["title"].replace("{}", "")
 
                 sub_total = self.object_list.aggregate(Sum("valor"))
 
@@ -527,6 +673,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                 groups = OrderedDict()
 
                 if cd["tipo_agrupamento"] != "sem_registro":
+                    dimensoes = list(cd["agrupamento"])
                     lookup_totalizador = (
                         "gt" if cd["tipo_agrupamento"] == "insercao" else "lt"
                     )
@@ -558,16 +705,31 @@ class EmendaLoaCrud(MasterDetailCrud):
                         if not emenda:
                             continue
 
+                        # LOA-LST-055: a emenda entra uma vez na soma das emendas
+                        # do grupo, mesmo com mais de um registro nele
                         if rc["emendaloa"] not in groups[key]["emendas"]:
                             groups[key]["emendas"][rc["emendaloa"]] = emenda
+                            groups[key]["soma_valor"] += emenda.valor
                         groups[key]["soma_agrupado"] += rc["valor"]
-                        groups[key]["soma_valor"] += emenda.valor
 
                 else:
+                    # LOA-LST-057: emenda sem unidade ou sem entidade fica num
+                    # grupo com a dimensão vazia, mostrada como "Sem ..."
+                    dimensoes = [
+                        d
+                        for d in ("despesa__unidade", "entidade")
+                        if d in cd["agrupamento"]
+                    ]
                     for emenda in self.object_list:
                         key = []
                         if "despesa__unidade" in cd["agrupamento"]:
-                            key = [emenda.unidade.codigo, emenda.unidade.especificacao]
+                            if emenda.unidade:
+                                key = [
+                                    emenda.unidade.codigo,
+                                    emenda.unidade.especificacao,
+                                ]
+                            else:
+                                key = ["", ""]
                         if "entidade" in cd["agrupamento"]:
                             if emenda.entidade:
                                 cpfcnpj = re.sub(
@@ -580,8 +742,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                                     emenda.entidade.nome_fantasia,
                                 ]
                             else:
-                                if "despesa__unidade" in cd["agrupamento"]:
-                                    key += ["", ""]
+                                key += ["", ""]
 
                         key = tuple(key)
                         if not key:
@@ -595,34 +756,38 @@ class EmendaLoaCrud(MasterDetailCrud):
                         groups[key]["emendas"][emenda.id] = emenda
                         groups[key]["soma_valor"] += emenda.valor
 
-                keys = list(groups.keys())
-                keys.sort(key=lambda x: x[::-1])
-                groups_completo = {key: groups[key] for key in keys if key[-1]}
-                groups_completo.update(
-                    {key: groups[key] for key in keys if not key[-1]}
-                )
+                def dimensao_vazia(key):
+                    return any(
+                        not key[i] and not key[i + 1] for i in range(0, len(key), 2)
+                    )
 
+                # LOA-LST-058: grupos com alguma dimensão vazia vão para o fim
+                keys = sorted(groups.keys(), key=lambda x: (dimensao_vazia(x), x[::-1]))
+                groups_completo = {key: groups[key] for key in keys}
+
+                emendas_no_total = set()
                 for key, cd_group in groups_completo.items():
                     title_parts = []
-                    for i in range(0, len(agrupamento), 2):
-                        part = key[i]
-                        if part:
-                            title_parts.append((part, key[i + 1]))
+                    for i in range(0, len(key), 2):
+                        if key[i] or key[i + 1]:
+                            title_parts.append((key[i], key[i + 1]))
+                        else:
+                            rotulo = ROTULO_SEM_DIMENSAO.get(dimensoes[i // 2], "")
+                            title_parts.append(("", f"Sem {rotulo}".strip()))
 
-                    try:
-                        codigo, titulo = zip(*title_parts)
-                    except Exception as e:
-                        print(e)
-                        continue
+                    codigo, titulo = zip(*title_parts)
                     max_lenght_codigo = max(map(len, codigo))
                     codigo = list(
-                        map(lambda x: x.rjust(max_lenght_codigo, " "), codigo)
+                        map(
+                            lambda x: escape(x.rjust(max_lenght_codigo, " ")),
+                            codigo,
+                        )
                     )
                     codigo = list(map(lambda x: x.replace(" ", "&nbsp;"), codigo))
                     title_parts = []
                     for i in range(len(codigo)):
                         title_parts.append(
-                            f"<strong>{codigo[i]}</strong> - {titulo[i]}"
+                            f"<strong>{codigo[i]}</strong> - {escape(titulo[i])}"
                         )
 
                     title = "<br>".join(title_parts)
@@ -637,11 +802,6 @@ class EmendaLoaCrud(MasterDetailCrud):
                         Decimal("0.01")
                     )
 
-                    if cd["tipo_agrupamento"] != "sem_registro":
-                        total += sub_total_agrupado
-                    else:
-                        total += sub_total_emendas
-
                     movimentacao_valores = Decimal("0.00")
                     rows = []
                     cd_group["emendas"] = dict(
@@ -655,6 +815,12 @@ class EmendaLoaCrud(MasterDetailCrud):
                         )
                     )
                     for item in cd_group["emendas"].values():
+                        # LOA-LST-062: o Total soma cada emenda listada uma única
+                        # vez, mesmo que ela apareça em mais de um grupo
+                        if item.id not in emendas_no_total:
+                            emendas_no_total.add(item.id)
+                            total += item.valor
+
                         cols = []
                         rows.append(cols)
 
@@ -674,7 +840,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                         registros = []
                         max_lenght_valor = 0
                         for rc in qs_rc:
-                            rc = str(rc).split(" - ")
+                            rc = escape(str(rc)).split(" - ")
                             rc[0] = list(filter(lambda x: x, rc[0].split(" ")))
                             if "-" not in rc[0][-1]:
                                 rc[0][-1] = f"+{rc[0][-1]}"
@@ -684,8 +850,7 @@ class EmendaLoaCrud(MasterDetailCrud):
                             registros.append(rc)
 
                         for index, rc in enumerate(registros):
-                            while len(rc[0]) < max_lenght_valor:
-                                rc[0] = rc[0].replace(" ", "  ", 1)
+                            rc[0] = alinhar_valor(rc[0], max_lenght_valor)
                             rc[0] = rc[0].replace(" ", "&nbsp;")
                             registros[index] = f'<li>{" - ".join(rc)}</li>'
 
@@ -695,42 +860,49 @@ class EmendaLoaCrud(MasterDetailCrud):
                                 f'<small class="courier"><small>DOTAÇÕES ORÇAMENTÁRIAS DE ORIGEM(-) E DESTINO(+):</small></small><ul>{"".join(registros)}</ul>',
                             )
 
-                    agrupamento_soma = list(
-                        filter(
-                            lambda x: x,
-                            map(lambda x: "__".join(x.split("__")[1:]), agrupamento),
+                    # LOA-LST-061: orçamento, movimentação e saldo só são
+                    # exibidos (e calculados) nas vias de inserção e de dedução
+                    soma_valor_orcamento = Decimal("0.00")
+                    if cd["tipo_agrupamento"] != "sem_registro":
+                        agrupamento_soma = list(
+                            filter(
+                                lambda x: x,
+                                map(
+                                    lambda x: "__".join(x.split("__")[1:]),
+                                    agrupamento,
+                                ),
+                            )
                         )
-                    )
 
-                    soma_valor_orcamento = (
-                        Despesa.objects.filter(
-                            loa=self.loa, **dict(zip(agrupamento_soma, key))
+                        soma_valor_orcamento = (
+                            Despesa.objects.filter(
+                                loa=self.loa, **dict(zip(agrupamento_soma, key))
+                            )
+                            .order_by(*agrupamento_soma)
+                            .distinct()
+                            .aggregate(Sum("valor_materia"))
                         )
-                        .order_by(*agrupamento_soma)
-                        .distinct()
-                        .aggregate(Sum("valor_materia"))
-                    )
-                    soma_valor_orcamento = soma_valor_orcamento.get(
-                        "valor_materia__sum"
-                    ) or Decimal("0.00")
+                        soma_valor_orcamento = soma_valor_orcamento.get(
+                            "valor_materia__sum"
+                        ) or Decimal("0.00")
 
-                    params = dict(zip(agrupamento, key))
-                    params.pop("entidade", None)
-                    agrupset = list(
-                        set(agrupamento)
-                        - set(
-                            [
-                                "entidade",
-                            ]
+                        params = dict(zip(agrupamento, key))
+                        params.pop("entidade", None)
+                        agrupset = list(
+                            set(agrupamento)
+                            - set(
+                                [
+                                    "entidade",
+                                ]
+                            )
                         )
-                    )
-                    movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
-                        emendaloa__loa=self.loa, **params
-                    ).order_by(*agrupset).aggregate(Sum("valor")).get(
-                        "valor__sum"
-                    ) or Decimal(
-                        "0.00"
-                    )
+                        movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
+                            emendaloa__loa=self.loa, **params
+                        ).order_by(*agrupset).aggregate(Sum("valor")).get(
+                            "valor__sum"
+                        ) or Decimal(
+                            "0.00"
+                        )
 
                     group = {
                         "title": title,
@@ -767,9 +939,7 @@ class EmendaLoaCrud(MasterDetailCrud):
             return kw
 
         def get_queryset(self):
-            qs = super().get_queryset()
-            if self.request.user.is_anonymous:
-                qs = qs.filter(loa__publicado=True)
+            qs = EmendaLoa.service.visiveis(self.request.user, super().get_queryset())
             return qs.order_by("-tipo", "fase", "materia__numero", "-id")
 
         def get_context_data(self, **kwargs):
@@ -780,202 +950,6 @@ class EmendaLoaCrud(MasterDetailCrud):
             context.pop("title")
 
             return context
-
-        def hook_header_str_valor_computado(self, *args, **kwargs):
-            return "Valor Final da Emenda" if self.loa.publicado else "Valor da Emenda"
-
-        def hook_str_valor_computado(self, *args, **kwargs):
-            return f'<div class="text-nowrap text-center">R$ {args[1]}</div>', args[2]
-
-        def hook_tipo(self, *args, **kwargs):
-            el = args[0]
-            tipo = args[1] if args[1] else "EMENDA MODIFICATIVA"
-            link_pdf = ""
-            link_create_proposicao_pre_preenchida = ""
-            link_generate_proposicao = ""
-
-            emendas_mesmo_autor = (
-                self.get_emendas_criadas_por_operador_mesmo_autor().filter(
-                    fase__gte=EmendaLoa.LIBERACAO_CONTABIL
-                )
-            )
-            if not emendas_mesmo_autor.filter(id=el.id).exists():
-                return (
-                    f"""
-                    {link_pdf}
-                    <br>{tipo}
-                """,
-                    args[2],
-                )
-
-            if el.fase == EmendaLoa.LIBERACAO_CONTABIL and not el.materia:
-
-                url = reverse_lazy("sapl.api:loa_emendaloa-view", kwargs={"pk": el.id})
-                link_pdf = f'<a href="{url}" target="_blank"><i class="fa-solid fa-file-pdf fa-2x "></i></a>'
-
-                """params = dict(
-                    descricao=el.ementa_format,
-                    tipo_materia=el.loa.materia.tipo.id if el.loa.materia else '',
-                    numero_materia=el.loa.materia.numero if el.loa.materia else '',
-                    ano_materia=el.loa.materia.ano if el.loa.materia else '',
-                    tipo=33 if el.tipo != EmendaLoa.MODIFICATIVA else 5,
-                )
-                query_params = urlencode(params)
-                link_create_proposicao_pre_preenchida = f'''
-                    <a target="_blank" href="{reverse_lazy('sapl.materia:proposicao_create')}?{query_params}">
-
-                    </a>
-                '''
-                # {link_create_proposicao_pre_preenchida} <i class="fas fa-2x fa-magic"></i>"""
-
-                title = (
-                    "Gerar Proposição Legislativa para esta Emenda Impositiva/Modificativa"
-                    if not el.proposicao
-                    else f"Atualizar a {el.proposicao} vinculada a esta Emenda Impositiva/Modificativa"
-                )
-                link_generate_proposicao = f"""
-                    <a title="{title}" href="{reverse_lazy('cmj.loa:emendaloa_detail', kwargs={'pk': el.id})}?registrar" target="_blank" >
-                        <i class="fas fa-2x fa-file-contract"></i>
-                    </a>
-                """
-
-            return (
-                f"""
-                {link_pdf} &nbsp; &nbsp; &nbsp;
-
-                {link_generate_proposicao}
-                <br>{tipo}
-            """,
-                args[2],
-            )
-
-        def hook_fase(self, *args, **kwargs):
-            fase_display = f"<br><small>({args[0].get_fase_display()})</small>"
-            el = args[0]
-            link_pdf = ""
-            if el.fase == EmendaLoa.IMPEDIMENTO_TECNICO:
-                doc_acessorio = el.materia.documentoacessorio_set.order_by(
-                    "data"
-                ).first()
-                if doc_acessorio:
-                    link_pdf = f'<a title="Acesse Impedimento Técnico" href="{doc_acessorio.arquivo.url}"><i class="fa-solid fa-file-pdf fa-2x "></i></a>'
-                return f"{fase_display}<br>{link_pdf}", args[2]
-
-            return fase_display, args[2]
-
-        def hook_header_finalidade(self, *args, **kwargs):
-            return "Descrição da Emenda"
-
-        def hook_finalidade(self, *args, **kwargs):
-            emenda, display_base, url = args
-
-            render = []
-            materia = emenda.materia
-            if materia:
-                render.append(
-                    f"<small><strong>Matéria Legislativa:</strong> {materia}</small><br>"
-                )
-
-            unidade_orcamentaria = emenda.unidade or emenda.indicacao
-            if unidade_orcamentaria:
-                render.append(
-                    f'<small class="text-gray"><strong>Órgão Executor:</strong> {unidade_orcamentaria}</small><br>'
-                )
-
-            if emenda.has_ajustes:
-                ajustes = []
-                for ajuste in emenda.registroajusteloa_set.order_by("-id"):
-                    descr = ""
-                    # if ajuste.valor <= Decimal('0.00'):
-                    descr = ajuste.descricao
-
-                    ajustes.append(
-                        f'<li>{ajuste}<small class="text-gray"><br>{descr}</small></li>'
-                    )
-                ajustes = "".join(ajustes)
-                render.append(f"""
-                    <hr class="my-1">
-                    <small class="px-2 d-block">
-                        <strong>Registros de Ajuste Técnico</strong>
-                        <ul class="pl-3  m-0">{ajustes}</ul>
-                    </small>
-                    """)
-                return "".join(render), url
-
-            registrocontabil_insercao_set = emenda.registrocontabil_set.filter(
-                valor__gt=Decimal("0.00")
-            )
-            if registrocontabil_insercao_set.exists():
-                render.append(
-                    '<small class="text-gray"><strong>Ação Orçamentária:</strong> '
-                )
-                acoes = set()
-                for rc in registrocontabil_insercao_set:
-                    acoes.add(str(rc.despesa.acao))
-                render.append("<br>".join(list(acoes)))
-
-                render.append("<br></small>")
-
-            finalidade = emenda.finalidade_format
-            finalidade = f"{finalidade[0].upper()}{finalidade[1:]}"
-            finalidade = f'<small class="text-gray"><strong>Entidade/Finalidade:</strong> {finalidade}</small><br>'
-            render.append(finalidade)
-
-            return "".join(render), url
-
-        def hook_acoes(self, *args, **kwargs):
-            emenda = args[0]
-            acoes = set()
-            for rc in emenda.registrocontabil_set.filter(valor__gt=Decimal("0.00")):
-                acoes.add(str(rc.despesa.acao))
-            return "<br>".join(acoes), args[2]
-
-        def hook_parlamentares(self, *args, **kwargs):
-            pls = []
-
-            for elp in args[0].emendaloaparlamentar_set.all():
-                if elp.emendaloa.tipo:
-                    pls.append(
-                        '<tr><td>{}</td><td align="right">R$ {}</td></tr>'.format(
-                            elp.parlamentar.nome_parlamentar,
-                            formats.number_format(elp.valor, force_grouping=True),
-                        )
-                    )
-                else:
-                    pls.append(f"<tr><td>{elp.parlamentar.nome_parlamentar}</td>")
-
-            ajustes = []
-            for ajuste in args[0].registroajusteloa_set.all():
-                url = reverse_lazy(
-                    "cmj.loa:registroajusteloa_detail",
-                    kwargs={"pk": ajuste.id},
-                )
-
-                descr = ""
-                # if ajuste.valor <= Decimal('0.00'):
-                descr = ajuste.descricao
-
-                ajustes.append(
-                    f'<li><a href="{url}">{ajuste}</a><small class="text-gray"><br>{descr}</small></li>'
-                )
-
-            ajustes = "".join(ajustes)
-            if ajustes:
-                ajustes = f"""
-                    <hr class="my-1">
-                    <small class="px-2 d-block">
-                        <strong>Registros de Ajuste Técnico</strong>
-                        <ul class="pl-3  m-0">{ajustes}</ul>
-                    </small>
-                """
-
-            return (
-                f"""
-                    <table class="w-100 text-nowrap">{"".join(pls)}</table>
-                    {ajustes}
-                    """,
-                "",
-            )
 
     class CreateView(MasterDetailCrud.CreateView):
         layout_key = None
@@ -1177,251 +1151,6 @@ class EmendaLoaCrud(MasterDetailCrud):
         @property
         def layout_key(self):
             return "EmendaLoaDetail"
-
-        @property
-        def extras_url(self):
-            return []
-            if (
-                self.request.user.is_anonymous
-                or not self.request.user.operadorautor_set.exists()
-            ):
-                return []
-
-            if self.object.fase < EmendaLoa.LIBERACAO_CONTABIL:
-                return []
-
-            params = dict(
-                descricao=self.object.ementa_format.strip(),
-                tipo_materia=(
-                    self.object.loa.materia.tipo.id if self.object.loa.materia else ""
-                ),
-                numero_materia=(
-                    self.object.loa.materia.numero if self.object.loa.materia else ""
-                ),
-                ano_materia=(
-                    self.object.loa.materia.ano if self.object.loa.materia else ""
-                ),
-                tipo=33 if self.object.tipo != EmendaLoa.MODIFICATIVA else 5,
-            )
-
-            query_params = urlencode(params)
-
-            return [
-                (
-                    reverse_lazy("sapl.materia:proposicao_create") + f"?{query_params}",
-                    "btn-outline-primary",
-                    _("Cadastrar Proposição pré-preenchida"),
-                )
-            ]
-
-        def get(self, request, *args, **kwargs):
-            self.object = self.get_object()
-
-            if "registrar" in request.GET:
-                user = request.user
-                if user.is_anonymous:
-                    raise PermissionDenied()
-
-                autor_operado = self.request.user.operadorautor_set.values_list(
-                    "autor", flat=True
-                )
-                OperadorAutor = autor_operado.model
-                if not OperadorAutor.objects.filter(
-                    user=self.object.owner, autor__in=autor_operado
-                ).exists():
-                    messages.error(
-                        request,
-                        "Você não tem permissão para registrar a Proposição Legislativa desta Emenda Impositiva/Modificativa.",
-                    )
-                    return redirect(self.detail_url)
-
-                if self.object.materia:
-                    messages.error(
-                        request,
-                        "A Proposição Legislativa não pode ser gerada novamente pois já foi protocolada e está vinculada a uma Matéria Legislativa.",
-                    )
-                    return redirect(
-                        reverse_lazy(
-                            "cmj.loa:emendaloa_detail", kwargs={"pk": self.object.id}
-                        )
-                    )
-
-                if self.object.fase != EmendaLoa.LIBERACAO_CONTABIL:
-                    messages.error(
-                        request,
-                        'A Proposição Legislativa só pode ser gerada quando a Emenda Impositiva/Modificativa estiver na fase de "Liberado pela Contabilidade e/ou Aguardando Protocolo".',
-                    )
-                    return redirect(self.detail_url)
-
-                if (
-                    self.object.proposicao
-                    and self.object.proposicao.data_envio
-                    and self.object.proposicao.data_recebimento
-                ):
-                    messages.warning(
-                        request,
-                        "A Proposição Legislativa já foi registrada e recebida pelo protocolo, não pode ser atualizada via módulo de Orçamento Impositivo.",
-                    )
-                    return redirect(
-                        reverse_lazy(
-                            "sapl.materia:proposicao_detail",
-                            kwargs={"pk": self.object.proposicao.id},
-                        )
-                    )
-
-                if (
-                    self.object.proposicao
-                    and self.object.proposicao.data_envio
-                    and not self.object.proposicao.data_recebimento
-                ):
-                    messages.warning(
-                        request,
-                        "A Proposição Legislativa já foi registrada e enviada ao protocolo, para ser atualizada é necessário retomar a proposição antes do protocolo autuar.",
-                    )
-                    return redirect(
-                        reverse_lazy(
-                            "sapl.materia:proposicao_detail",
-                            kwargs={"pk": self.object.proposicao.id},
-                        )
-                    )
-
-                try:
-
-                    arq_bytes, arq_name = self.retrieve_file_bytes(request)
-
-                    autor = user.operadorautor_set.first().autor
-
-                    proposicao = self.object.proposicao
-                    created = False
-                    if not proposicao:
-                        np_max = Proposicao.objects.filter(
-                            autor=autor,
-                            ano=(
-                                self.object.loa.materia.ano
-                                if self.object.loa.materia
-                                else timezone.now().year
-                            ),
-                        ).aggregate(np=Max("numero_proposicao"))
-
-                        proposicao = Proposicao()
-                        proposicao.numero_proposicao = np_max.get("np", 0) + 1
-                        created = True
-                    else:
-                        metadata = proposicao.metadata or {}
-                        if (
-                            metadata.get("signs", {})
-                            .get("texto_original", {})
-                            .get("signs", [])
-                        ):
-                            raise Exception(
-                                "Não é possível atualizar a Proposição Legislativa "
-                                "de uma Emenda LOA que já foi assinada digitalmente. "
-                                "É necessário realizar a substituição manual do arquivo no módulo de Proposições Legislativas."
-                            )
-
-                    proposicao.autor = autor
-
-                    proposicao.tipo = TipoProposicao.objects.get(
-                        id=33 if self.object.tipo != EmendaLoa.MODIFICATIVA else 5,
-                    )
-                    proposicao.descricao = self.object.ementa_format
-                    proposicao.ano = timezone.now().year
-                    proposicao.materia_de_vinculo = self.object.loa.materia
-                    proposicao.user = user
-                    proposicao.ip = get_client_ip(request)
-                    proposicao.texto_original = File(arq_bytes, name=arq_name)
-                    proposicao.save()
-
-                    self.object.proposicao = proposicao
-                    self.object.save()
-
-                    messages.success(
-                        request,
-                        f'Proposição Legislativa {"criada" if created else "atualizada"} com sucesso.',
-                    )
-                    return redirect(
-                        reverse_lazy(
-                            "sapl.materia:proposicao_detail",
-                            kwargs={"pk": proposicao.id},
-                        )
-                    )
-                except Exception as e:
-                    messages.error(
-                        request,
-                        f"Ocorreu um erro ao registrar a Proposição Legislativa: {e}",
-                    )
-
-                return redirect(self.detail_url)
-
-            return MasterDetailCrud.DetailView.get(self, request, *args, **kwargs)
-
-        def retrieve_file_bytes(self, request):
-            base_url = f"{request.scheme}://{request.get_host()}"
-
-            pra_frente = True
-            while True:
-                response = requests.get(
-                    f"{base_url}/api/loa/emendaloa/{self.object.id}/view/"
-                )
-                if response.status_code != 200:
-                    raise Exception("Não foi possível gerar o PDF da Emenda.")
-
-                arq_name = (
-                    response.headers.get(
-                        "Content-Disposition", f"emenda_loa_{self.object.id}.pdf"
-                    )
-                    .split("filename=")[-1]
-                    .strip('"')
-                )
-
-                arq_bytes = io.BytesIO(response.content)
-                pdf = pymupdf.open(stream=arq_bytes, filetype="pdf")
-
-                if pdf.page_count == 0:
-                    break
-
-                if pdf.page_count > 1:
-                    pra_frente = False
-
-                md = self.object.metadata
-                md["style"] = md.get(
-                    "style",
-                    {
-                        "lineHeight": 150,
-                        "espacoAssinatura": 0,
-                    },
-                )
-                md["style"]["espacoAssinatura"] = md["style"].get("espacoAssinatura", 0)
-                lineHeight = md["style"]["lineHeight"]
-
-                if lineHeight < 110:
-                    break
-
-                if pdf.page_count == 1 and not pra_frente:
-                    break
-
-                if pra_frente and lineHeight > 200 and pdf.page_count == 1:
-                    break
-
-                if pra_frente:
-                    lineHeight += 5
-                else:
-                    lineHeight -= 1
-
-                md["style"]["lineHeight"] = lineHeight
-                self.object.metadata = md
-                self.object.save()
-
-                if pra_frente:
-                    continue
-
-                page2 = pdf.load_page(1)
-                text = page2.get_text("text")
-                text = text
-                if "A presente emenda fará parte integrante do Projeto" in text:
-                    break
-
-            return arq_bytes, arq_name
 
         def get_context_data(self, **kwargs):
             context = super().get_context_data(**kwargs)

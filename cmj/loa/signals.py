@@ -73,41 +73,89 @@ def signal_pre_agrupamentoregistrocontabil(sender, instance, **kwargs):
 # tinha por ele; não há mais signal que os apague na remoção do vínculo
 
 
+def chaves_do_cartao(ids):
+    """Chaves do cartão das emendas: uma para anônimo e outra para usuário
+    logado (LOA-LST-040)."""
+    return [
+        make_template_fragment_key("l.el.l", [i, logado])
+        for i in set(ids)
+        if i
+        for logado in (True, False)
+    ]
+
+
+def emendas_do_cartao(instance):
+    """Ids das emendas cujo cartão na listagem mostra dados da instância.
+
+    LOA-LST-041: só apaga o cartão de quem é afetado; model fora do mapa não
+    apaga nada.
+    """
+    from django.core.exceptions import FieldDoesNotExist
+
+    from cmj.loa.models import (
+        Empenho,
+        EmpenhoEmendaAjuste,
+        Entidade,
+        Loa,
+        UnidadeOrcamentaria,
+    )
+    from sapl.materia.models import (
+        DocumentoAcessorio,
+        MateriaLegislativa,
+        Tramitacao,
+    )
+    from sapl.parlamentares.models import Parlamentar
+
+    emendas = EmendaLoa.all_objects.all_objects()
+
+    if isinstance(instance, EmendaLoa):
+        return [instance.id]
+    if isinstance(instance, MateriaLegislativa):
+        return list(emendas.filter(materia=instance).values_list("id", flat=True))
+    if isinstance(instance, (Tramitacao, DocumentoAcessorio)):
+        return list(
+            emendas.filter(materia_id=instance.materia_id).values_list("id", flat=True)
+        )
+    if isinstance(instance, Empenho):
+        return list(
+            EmpenhoEmendaAjuste.objects.filter(empenho=instance).values_list(
+                "emendaloa_id", flat=True
+            )
+        )
+    for model, campo in (
+        (Entidade, "entidade"),
+        (UnidadeOrcamentaria, "unidade"),
+        (Parlamentar, "parlamentares"),
+        (Loa, "loa"),
+    ):
+        if isinstance(instance, model):
+            return list(
+                emendas.filter(**{campo: instance}).values_list("id", flat=True)
+            )
+
+    # Models que apontam para a emenda (FK ou M2M declarados neles)
+    try:
+        campo = instance._meta.get_field("emendaloa")
+    except FieldDoesNotExist:
+        return []
+    if campo.auto_created:
+        return []
+    if campo.many_to_many:
+        if not instance.pk:
+            return []
+        return list(instance.emendaloa.values_list("id", flat=True))
+    return [instance.emendaloa_id] if instance.emendaloa_id else []
+
+
 @receiver([post_save, post_delete])
 def signal_loa_emendaloa_disable_cache(sender, **kwargs):
-    if sender and hasattr(sender, "_meta"):
-        if sender._meta.app_label in ("loa", "sessao", "norma", "materia"):
-            try:
-                inst = kwargs.get("instance", {})
-                insts = None
-                if inst:
-                    if hasattr(inst, "emendaloa_id") and inst.emendaloa_id:
-                        inst = inst.emendaloa_id
-                    elif (
-                        hasattr(inst, "emendaloa")
-                        and inst.emendaloa
-                        and hasattr(inst.emendaloa, "id")
-                    ):
-                        inst = inst.emendaloa.id
-                    elif (
-                        hasattr(inst, "emendaloa")
-                        and inst.emendaloa
-                        and hasattr(inst.emendaloa, "exists")
-                        and inst.emendaloa.exists()
-                    ):
-                        insts = inst.emendaloa.all().values_list("id", flat=True)
-                    elif hasattr(inst, "id"):
-                        inst = inst.id
-                    else:
-                        inst = None
-
-                    if inst:
-                        key = make_template_fragment_key("l.el.l", [inst])
-                        cache.delete(key)
-                    if insts:
-                        for i in insts:
-                            key = make_template_fragment_key("l.el.l", [i])
-                            cache.delete(key)
-
-            except Exception as e:
-                logger.error("Erro ao tentar invalidar cache: {}".format(e))
+    if not sender or not hasattr(sender, "_meta"):
+        return
+    if sender._meta.app_label not in ("loa", "materia", "parlamentares"):
+        return
+    try:
+        ids = emendas_do_cartao(kwargs.get("instance"))
+        if ids:
+            cache.delete_many(chaves_do_cartao(ids))
+    except Exception as e:
+        logger.error("Erro ao tentar invalidar cache: {}".format(e))

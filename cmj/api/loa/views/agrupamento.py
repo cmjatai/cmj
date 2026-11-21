@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from cmj.api.loa.views.emendaloa import EmendaLoaSearchSerializer, EmendaLoaViewSet
 from cmj.loa.models import EmendaLoa
 from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetivaError
-from cmj.utils.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf, pdf_base_url
 from drfautoapi.drfautoapi import wrapper_queryset_response_for_drf_action
 
 
@@ -146,7 +146,7 @@ class AgrupamentoViewSet:
         permission_classes=(AgrupamentoEditorPermission,),
     )
     def view(self, request, *args, **kwargs):
-        base_url = request.build_absolute_uri()
+        base_url = pdf_base_url(request)  # LOA-LST-086
 
         agrupamento = self.get_object()
         emendas_coletivas_structured = agrupamento.preparar_dados_para_coletiva(

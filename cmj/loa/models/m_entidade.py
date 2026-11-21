@@ -1,9 +1,38 @@
+import re
+
+from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.core.validators import RegexValidator
 from django.db import models
 from django.db.models.deletion import SET_NULL
 from django.db.models.fields.json import JSONField
 from django.utils.translation import gettext_lazy as _
+
+
+def cnpj_valido(valor):
+    """Confere os dígitos verificadores; aceita máscara e zeros à esquerda."""
+    digitos = re.sub(r"\D", "", valor or "").lstrip("0").zfill(14)
+    if len(digitos) != 14 or digitos == digitos[0] * 14:
+        return False
+    for n, pesos in (
+        (12, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]),
+        (13, [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]),
+    ):
+        resto = sum(int(digitos[i]) * pesos[i] for i in range(n)) % 11
+        if (0 if resto < 2 else 11 - resto) != int(digitos[n]):
+            return False
+    return True
+
+
+def validar_cnpj_entidade(valor):
+    """LOA-LST-090: a entidade beneficiária é pessoa jurídica; o campo aceita
+    só CNPJ válido ou vazio (só zeros conta como vazio)."""
+    if not re.sub(r"\D", "", valor or "").strip("0"):
+        return
+    if re.search(r"[^\d./\-\s]", valor) or not cnpj_valido(valor):
+        raise ValidationError(
+            "Informe um CNPJ válido. A entidade beneficiária é pessoa jurídica."
+        )
 
 
 class NaturezaJuridica(models.Model):
@@ -93,7 +122,7 @@ class Entidade(models.Model):
         null=True,
         default=None,
         verbose_name=_("CNPJ"),
-        # validators=[CNPJValidator()],
+        validators=[validar_cnpj_entidade],
     )
 
     cnes = models.CharField(

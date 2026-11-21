@@ -20,6 +20,16 @@
               {{text|safe}}
           </a>
         {% endfor %}
+        {% if view.tem_emendas_liberadas %}
+          {# LOA-LST-016: o registro altera dados e vai por POST, com CSRF #}
+          <form method="post" action="{% url 'cmj.loa:emendaloa_list' view.kwargs.pk %}" class="form-register-emendas-liberadas p-0 d-inline">
+            {% csrf_token %}
+            <button type="submit" name="registrar" value="1" class="btn btn-sm btn-warning rounded-0"
+              title="Registrar todas as emendas Liberadas no módulo de proposições. Emendas já registradas serão atualizadas se ainda não enviadas ao protocolo.">
+              <i class="fas fa-file-contract"></i> Registrar Emendas Liberadas
+            </button>
+          </form>
+        {% endif %}
       </div>
     </div>
   {% endif %}
@@ -52,14 +62,11 @@
           {% if not emenda.materia and user.is_authenticated or DEBUG %}
             {% include "loa/emendaloa_filter_cache.html" %}
           {% else %}
-            {% cache 604800 l.el.l emenda.id %}
+            {% cache 86400 l.el.l emenda.id user.is_authenticated %}
             {% include "loa/emendaloa_filter_cache.html" %}
             {% endcache %}
           {% endif %}
         </div>
-        {% comment %}
-        {% include "loa/emendaloa_filter_cache.html" %}
-        {% endcomment %}
       {% endfor %}
     </div>
   </div>
@@ -69,12 +76,9 @@
 {% block extra_js %}
 <script type="text/javascript">
   $(document).ready(function() {
-    $('.btn-register-emendas-liberadas').on('click', function(e) {
-        e.preventDefault();
-        var url = $(this).attr('href');
-        if (confirm('Confirma a criação automatizada de proposições para suas emendas em fase "Liberado pela Contabilidade e/ou Aguardando Protocolo"? Você poderá acompanhar o andamento no módulo de proposições.')) {
-            window.location.href = url;
-        } else {
+    $('.form-register-emendas-liberadas').on('submit', function(e) {
+        if (!confirm('Confirma a criação automatizada de proposições para suas emendas em fase "Liberado pela Contabilidade e/ou Aguardando Protocolo"? Você poderá acompanhar o andamento no módulo de proposições.')) {
+            e.preventDefault();
             return false;
         }
     });

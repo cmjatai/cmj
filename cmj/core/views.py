@@ -53,6 +53,7 @@ from cmj.core.serializers import TrechoSearchSerializer, TrechoSerializer
 from cmj.core.views_estatisticas import get_numeros
 from cmj.mixins import PluginSignMixin
 from cmj.utils import make_pagination, normalize
+from cmj.utils.utils_report import pdf_base_url, pdf_url_fetcher
 from sapl.crud.base import (
     RP_DETAIL,
     RP_LIST,
@@ -788,11 +789,16 @@ class CertidaoPublicacaoCrud(Crud):
                     self.object.certificado = None
 
             if not self.object.certificado:
-                base_url = request.build_absolute_uri()
+                base_url = pdf_base_url(request)
                 html_template = render_to_string(
                     template if template else "core/certidao_publicacao.html", context
                 )
-                html = HTML(base_url=base_url, string=html_template)
+                # LOA-LST-082: todo PDF só busca recursos por http, https e data:
+                html = HTML(
+                    base_url=base_url,
+                    string=html_template,
+                    url_fetcher=pdf_url_fetcher(),
+                )
                 main_doc = html.render(stylesheets=[])
                 fpdf = main_doc.write_pdf()
 

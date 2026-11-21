@@ -12,7 +12,7 @@ from django.utils.html import strip_tags
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
 
-from cmj.utils.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf, pdf_base_url
 from sapl.base.models import CasaLegislativa
 from sapl.materia.models import (
     Autoria,
@@ -1376,7 +1376,7 @@ def get_pauta_sessao(sessao, casa):
 
 
 def relatorio_doc_administrativos(request, context):
-    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else pdf_base_url(request)
     casa = CasaLegislativa.objects.first()
     rodape = " ".join(get_rodape(casa))
 
@@ -1407,7 +1407,7 @@ def relatorio_doc_administrativos(request, context):
 
 
 def relatorio_sessao_plenaria_pdf(request, pk):
-    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else pdf_base_url(request)
     # base_url = request.build_absolute_uri()
     logger = logging.getLogger(__name__)
     username = request.user.username
@@ -1495,7 +1495,7 @@ def relatorio_sessao_plenaria_pdf(request, pk):
 
 def relatorio_pauta_sessao(request, pk):
 
-    base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
+    base_url = settings.MEDIA_ROOT if settings.DEBUG else pdf_base_url(request)
     # base_url = request.build_absolute_uri()
     logger = logging.getLogger(__name__)
     username = request.user.username

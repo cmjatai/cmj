@@ -2,13 +2,10 @@ import logging
 from decimal import Decimal
 
 import pymupdf
-from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Sum
 from django.http.response import HttpResponse
-from django.template.loader import render_to_string
 from django.utils import formats
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError as DRFValidationError
@@ -17,7 +14,7 @@ from rest_framework.response import Response
 from cmj.api.forms import EmendaLoaFilterSet
 from cmj.api.loa.serializers import EmendaLoaSearchSerializer
 from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, Empenho
-from cmj.utils.utils_report import make_pdf
+from cmj.utils.utils_report import pdf_base_url
 from sapl.api.permissions import SaplModelPermissions
 
 logger = logging.getLogger(__name__)
@@ -60,6 +57,14 @@ class EmendaLoaViewSet:
 
     permission_classes = (EmendaLoaPermission,)
     filterset_class = EmendaLoaFilterSet
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # LOA-LST-083: a consulta segue a visibilidade da listagem; a escrita
+        # continua decidida pelas permissões de edição
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            qs = EmendaLoa.service.visiveis(self.request.user, qs)
+        return qs
 
     @staticmethod
     def fase_do_request(request, default=None):
@@ -238,26 +243,9 @@ class EmendaLoaViewSet:
 
         return Response(serializer.data)
 
-    @property
-    def art(self):
-        if not hasattr(self, "_art"):
-            self._art = 0
-
-        self._art += 1
-        return self._art
-
-    @property
-    def paragrafo(self):
-        if not hasattr(self, "_paragrafo"):
-            self._paragrafo = 0
-
-        self._paragrafo += 1
-        return self._paragrafo
-
     @action(detail=True)
     def view(self, request, *args, **kwargs):
-        # base_url = settings.MEDIA_ROOT if settings.DEBUG else request.build_absolute_uri()
-        base_url = request.build_absolute_uri()
+        base_url = pdf_base_url(request)  # LOA-LST-086
 
         el = self.get_object()
         el_changed = False
@@ -295,23 +283,12 @@ class EmendaLoaViewSet:
         if el_changed and pode_gravar:
             el.save()
 
-        context = {
-            "view": self,
-            "object": el,
-            "lineHeight": str(el.metadata["style"]["lineHeight"] / 100.0),
-            "base_url": settings.BASE_URL if not settings.DEBUG else "",
-            "espacoAssinatura": str(
-                el.metadata["style"].get("espacoAssinatura", "") or ""
-            ),
-        }
-
         try:
             p = int(request.GET.get("page", 0))
         except:
             p = 0
 
-        template = render_to_string("loa/pdf/emendaloa_preview.html", context)
-        pdf_file = make_pdf(base_url=base_url, main_template=template)
+        pdf_file = EmendaLoa.service.documento_pdf(el, base_url)
         ext = "pdf"
 
         doc = pymupdf.Document(stream=pdf_file)
@@ -328,21 +305,7 @@ class EmendaLoaViewSet:
         else:
             bresponse = doc.tobytes()
 
-        if el.emendaloaparlamentar_set.count() > 1:
-            nome_autor = "coletiva"
-        else:
-            nome_autor = (el.owner.operadorautor_set.first() or "") if el.owner else ""
-            if nome_autor:
-                nome_autor = nome_autor.autor.nome
-
-        arcname = "{}-{}-{:04d}-{}{}.{}".format(
-            el.loa.ano,
-            slugify(nome_autor),
-            el.id,
-            slugify(el.get_tipo_display()),
-            f"-p{p+1}" if p else "",
-            ext,
-        )
+        arcname = EmendaLoa.service.nome_documento(el, f"-p{p+1}" if p else "", ext)
 
         response = HttpResponse(
             bresponse, content_type="image/png" if p else "application/pdf"

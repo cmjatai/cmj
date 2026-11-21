@@ -17,7 +17,23 @@ from cmj.loa.models import (
 from cmj.loa.models.m_financeiro_execucao import Empenho
 
 
-class EmendaLoaSearchSerializer(CmjSerializerMixin):
+class OcultaCamposInternosDaEmendaMixin:
+    """LOA-LST-091: ``owner``, ``metadata`` e ``search`` só para quem pode
+    editar a emenda em alguma fase."""
+
+    CAMPOS_INTERNOS = ("owner", "metadata", "search")
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not EmendaLoa.service.ve_campos_internos(user, obj):
+            for campo in self.CAMPOS_INTERNOS:
+                data.pop(campo, None)
+        return data
+
+
+class EmendaLoaSearchSerializer(OcultaCamposInternosDaEmendaMixin, CmjSerializerMixin):
 
     str_valor = SerializerMethodField()
     str_parlamentares = SerializerMethodField()
@@ -102,7 +118,7 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
         return total["total"] if total["total"] else 0
 
 
-class EmendaLoaSerializer(CmjSerializerMixin):
+class EmendaLoaSerializer(OcultaCamposInternosDaEmendaMixin, CmjSerializerMixin):
 
     str_valor = serializers.CharField(
         read_only=True,

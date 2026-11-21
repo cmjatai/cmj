@@ -22,7 +22,7 @@ from pdfminer.high_level import extract_text
 from xlsxwriter.workbook import Workbook as XlsxWorkbook
 
 from cmj.utils import ProcessoExterno, get_settings_auth_user_model, normalize, run_sql
-from cmj.utils.utils_report import make_pdf
+from cmj.utils.utils_report import make_pdf, pdf_base_url
 from sapl import sanitize
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_row
 
@@ -687,7 +687,7 @@ class AudigLogFilterMixin:
 
 class PdfOutputMixin:
     def render_to_response(self, context, **response_kwargs):
-        base_url = self.request.build_absolute_uri()
+        base_url = pdf_base_url(self.request)
 
         context = self.get_context_data()
 
@@ -985,7 +985,7 @@ class MultiFormatOutputMixin:
             yield (f"{verbose_name}", "")
 
     def render_to_pdf(self, context):
-        base_url = self.request.build_absolute_uri()
+        base_url = pdf_base_url(self.request)
 
         template_pdf = self.get_template_pdf()
 
