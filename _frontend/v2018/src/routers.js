@@ -20,8 +20,8 @@ export const routes = [
         component: () => import('@/modules/loa/LoaDetail')
       },
       {
-        path: ':pkloa(\\d+)/prestacaocontaloa',
-        name: 'prestacaocontaloa_route',
+        path: ':pkloa(\\d+)/prestacaoconta',
+        name: 'prestacaoconta_route',
         component: () => import('@/modules/loa/pcl/PrestacaoContaLoaLayout')
       },
       {

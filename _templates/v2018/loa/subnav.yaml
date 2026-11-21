@@ -2,17 +2,19 @@
 - title: {% trans 'Resumo' %}
   url: loa_detail
 - title: {% trans 'Prestação de Contas' %}
-  url: prestacaocontaloa_list
+  url: prestacaoconta_detail
 - title: {% trans 'Registros' %}
   children:
-  - title: {% trans 'Emendas Impositivas/Modificativas' %}
+  - title: "{% trans 'Registro: Emendas Impositivas/Modificativas' %}"
     url: emendaloa_list
-  - title: {% trans 'Ajustes Técnicos' %}
+  - title: "{% trans 'Registro: Ajustes Técnicos' %}"
     url: oficioajusteloa_list
-  - title: {% trans 'Empenhos' %}
+  - title: "{% trans 'Registro: Empenhos' %}"
     url: empenho_list
-  - title: {% trans 'Despesas Orçamentárias' %}
+  - title: "{% trans 'Registro: Despesas Orçamentárias' %}"
     url: loa_despesas_espelho
+  - title: "{% trans 'Registro: Prestação de Contas' %}"
+    url: prestacaocontaloa_list
   {% if perms.loa.emendaloa_full_editor %}
   - title: {% trans 'Agrupamentos' %}
     url: agrupamento_list

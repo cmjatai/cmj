@@ -1,6 +1,6 @@
 from decimal import ROUND_DOWN, Decimal
 
-from django.db.models import Q
+from django.db.models import Exists, OuterRef, Q
 from django.db.models.aggregates import Sum
 from django.http import HttpResponse
 from django.http.response import Http404
@@ -11,6 +11,7 @@ from django.utils import formats, timezone
 from django.utils.decorators import classonlymethod
 from django.utils.translation import gettext_lazy as _
 
+from cmj.api.forms import EmendaLoaFilterSet, RegistroAjusteLoaFilterSet
 from cmj.loa.forms.f_loa import LoaForm
 from cmj.loa.models import (
     EmendaLoa,
@@ -22,6 +23,8 @@ from cmj.loa.models.m_ajusteloa import RegistroAjusteLoa
 from cmj.loa.models.m_financeiro_execucao import Empenho
 from cmj.loa.models.m_prestacaoconta import PrestacaoContaRegistro
 from cmj.loa.views.v_mixins import LoaContextDataMixin
+from cmj.mixins import GoogleRecapthaViewMixin
+from cmj.search.views import InfoFilterMixin
 from cmj.utils import quantize
 from sapl.crud.base import RP_DETAIL, RP_LIST, Crud
 from sapl.parlamentares.models import Legislatura, Parlamentar
@@ -43,7 +46,7 @@ class LoaCrud(Crud):
                 latest_loa = Loa.objects.filter(
                     publicado=True, emendaloa_set__isnull=False
                 ).latest("ano")
-                return redirect("cmj.loa:prestacaocontaloa_list", pk=latest_loa.pk)
+                return redirect("cmj.loa:prestacaoconta_detail", pk=latest_loa.pk)
             except Loa.DoesNotExist:
                 raise Http404(_("Nenhuma LOA publicada encontrada."))
 
@@ -65,6 +68,11 @@ class LoaCrud(Crud):
         urls = [
             path("/atual", redirect_to_latest_loa, name="loa_atual"),
             path("/<int:pk>/despesas", despesas_espelho, name="loa_despesas_espelho"),
+            path(
+                "/<int:pk>/prestacaoconta",
+                LoaCrud.PrestacaoContaView.as_view(),
+                name="prestacaoconta_detail",
+            ),
         ] + urls
         return urls
 
@@ -858,4 +866,163 @@ class LoaCrud(Crud):
             return (
                 "Resumo Por Entidades <small>(Totalização na aprovação, sem ajustes por impedimento técnico)</small>",
                 rendered,
+            )
+
+    class PrestacaoContaView(InfoFilterMixin, GoogleRecapthaViewMixin, Crud.DetailView):
+        model = Loa
+        permission_required = ()
+        template_name = "loa/prestacaoconta_detail.html"
+
+        recaptcha_trigger_param = "print"
+        recaptcha_trigger_value = "True"
+        recaptcha_gate_title = _(
+            "Gerar Relatório de Prestação de Contas das Emendas Impositivas"
+        )
+        recaptcha_success_method = "print"
+
+        def dispatch(self, request, *args, **kwargs):
+            return super().dispatch(request, *args, **kwargs)
+
+        def get(self, request, *args, **kwargs):
+            self.loa = self.object = Loa.objects.filter(pk=self.kwargs["pk"]).first()
+            if not self.loa:
+                return redirect("cmj.loa:loa_list")
+            if not self.loa.materia or not self.loa.materia.normajuridica():
+                return redirect("cmj.loa:loa_detail", pk=self.loa.pk)
+            return super().get(request, *args, **kwargs)
+
+        def get_context_data(self, **kwargs):
+            context = super().get_context_data(**kwargs)
+            path = context.get("path", "")
+            context["path"] = f"{path} prestacaoconta-detail"
+            return context
+
+        def print(self, request, *args, **kwargs):
+            pk = self.kwargs["pk"]
+            self.loa = Loa.objects.filter(pk=pk).first()
+            filterset_classes = {
+                EmendaLoaFilterSet: EmendaLoaFilterSet._meta.model.objects.filter(
+                    loa=pk
+                )
+                .order_by("materia__tipo__sigla", "materia__numero", "id")
+                .distinct()
+                .select_related(
+                    "unidade",
+                    "entidade",
+                    "materia__tipo",
+                )
+                .prefetch_related(
+                    "parlamentares",
+                    "prestacaocontaregistro_set__prestacao_conta",
+                    "prestacaocontaregistro_set__registro_ajuste",
+                    "empenhoemendaajuste_set__empenho",
+                    "registroajusteloa_set__oficio_ajuste_loa",
+                    "registroajusteloa_set__unidade",
+                    "registroajusteloa_set__entidade",
+                    "registrocontabil_set",
+                    "materia__tramitacao_set__status",
+                    "materia__tramitacao_set__unidade_tramitacao_local",
+                    "materia__tramitacao_set__unidade_tramitacao_destino",
+                    "materia__documentoacessorio_set",
+                    "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
+                    "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
+                )
+                .annotate(
+                    ann_has_ajustes=Exists(
+                        RegistroAjusteLoaParlamentar.objects.filter(
+                            registro__in=RegistroAjusteLoa.objects.filter(
+                                emendaloa=OuterRef("pk")
+                            )
+                        )
+                    )
+                ),
+                RegistroAjusteLoaFilterSet: RegistroAjusteLoaFilterSet._meta.model.objects.filter(
+                    oficio_ajuste_loa__loa=pk
+                )
+                .distinct()
+                .select_related(
+                    "oficio_ajuste_loa",
+                    "unidade",
+                    "entidade",
+                )
+                .prefetch_related(
+                    "oficio_ajuste_loa__parlamentares",
+                    "emendaloa",
+                    "prestacaocontaregistro_set__prestacao_conta",
+                    "prestacaocontaregistro_set__arquivoprestacaocontaregistro_set",
+                    "prestacaocontaregistro_set__prestacao_conta__arquivoprestacaocontaloa_set",
+                    "empenhoemendaajuste_set__empenho",
+                ),
+            }
+
+            filtersets = []
+
+            for filterset_class, queryset in filterset_classes.items():
+                data = self.request.GET if self.request.GET else {}
+                data = data.copy()
+                if filterset_class == RegistroAjusteLoaFilterSet:
+                    if "parlamentares" in data:
+                        parlamentares = self.request.GET.getlist("parlamentares")
+                        del data["parlamentares"]
+                        data["parlamentares_valor"] = ",".join(parlamentares)
+
+                filterset = filterset_class(
+                    data=data,
+                    request=self.request,
+                    queryset=queryset,
+                )
+                if (
+                    not filterset.is_bound
+                    or filterset.is_valid()
+                    # or not self.get_strict()
+                ):
+                    if filterset_class == EmendaLoaFilterSet:
+                        if data.get("ajustes", None) == "True" and not data.get(
+                            "tipo__in", None
+                        ):
+                            continue
+                    elif filterset_class == RegistroAjusteLoaFilterSet:
+                        if data.get("ajustes", None) == "False" and data.get(
+                            "tipo__in", None
+                        ):
+                            continue
+
+                    filtersets.append(filterset)
+
+            context = {}
+            for filterset in filtersets:
+                context[f"{filterset._meta.model._meta.model_name}_list"] = filterset.qs
+
+            context["loa_title"] = (
+                f"Prestação de Contas das Emendas Impositivas <br>{self.loa}"
+                if hasattr(self, "loa") and self.loa
+                else "Prestação de Contas da LOA"
+            )
+
+            context["infofilter"] = (
+                self.infofilter(
+                    data,
+                    form=filtersets[0].form if filtersets else None,
+                    model=filtersets[0]._meta.model if filtersets else None,
+                )
+                or ""
+            )
+
+            if data.get("ajustes", None) == "True":
+                context["infofilter"] += " - Registros de Ajuste Técnico"
+
+            context["infofilter"] = (
+                context["infofilter"]
+                .replace("EM_EXECUCAO", "Em Execução")
+                .replace("FINALIZADO", "Finalizado")
+                .replace("IMPEDIMENTO", "Impedimento")
+            )
+
+            # print(str(filterset.qs.query))
+
+            return self.response_class(
+                request=self.request,
+                template=["loa/prestacaoconta_print.html"],
+                context=context,
+                using=self.template_engine,
             )
