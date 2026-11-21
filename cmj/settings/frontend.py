@@ -5,9 +5,11 @@ if DEBUG:
     DEV_BACKENDPORT = config("DEV_BACKENDPORT", default=8000, cast=int)
     DEV_V2018PORT = config("DEV_V2018PORT", default=8080, cast=int)
     DEV_V6PORT = config("DEV_V6PORT", default=5173, cast=int)
+    DEV_V8PORT = config("DEV_V8PORT", default=5174, cast=int)
 
 Fv2018 = "v2018"
 Fv6 = "v6"
+Fv8 = "v8"
 
 
 TEMPLATE_MODE = config("TEMPLATE_MODE", default=Fv2018, cast=str)
@@ -17,6 +19,7 @@ def front_version():
     return (
         [
             str(PROJECT_DIR.child("_templates").child(Fv6)),
+            str(PROJECT_DIR.child("_templates").child(Fv8)),
         ]
         + (
             [str(PROJECT_DIR.child("_templates").child(TEMPLATE_MODE))]
@@ -69,6 +72,7 @@ CRISPY_FAIL_SILENTLY = not DEBUG
 
 PROJECT_DIR_FRONTEND_2018 = PROJECT_DIR.child("_frontend").child(Fv2018)
 PROJECT_DIR_FRONTEND_2026 = PROJECT_DIR.child("_frontend").child(Fv6)
+PROJECT_DIR_FRONTEND_V8 = PROJECT_DIR.child("_frontend").child(Fv8)
 
 FRONTEND_BRASAO_PATH = {
     "32": PROJECT_DIR_FRONTEND_2018.child("src")
@@ -118,6 +122,7 @@ WEBPACK_LOADER = {
 
 
 V6_DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_2026.child("dist")
+V8_DJANGO_VITE_ASSETS_PATH = PROJECT_DIR_FRONTEND_V8.child("dist")
 
 V6_DJANGO_VITE_DEV_MODE = config("DJANGO_VITE_DEV_MODE", default=False, cast=bool)
 V6_DJANGO_VITE_DEV_MODE = V6_DJANGO_VITE_DEV_MODE and DEBUG
@@ -128,7 +133,14 @@ DJANGO_VITE = {
         "manifest_path": V6_DJANGO_VITE_ASSETS_PATH.child(
             Fv6, ".vite", "manifest.json"
         ),
-    }
+    },
+    Fv8: {
+        "dev_mode": V6_DJANGO_VITE_DEV_MODE,
+        "dev_server_port": DEV_V8PORT if DEBUG else 5174,
+        "manifest_path": V8_DJANGO_VITE_ASSETS_PATH.child(
+            Fv8, ".vite", "manifest.json"
+        ),
+    },
 }
 
 STATIC_URL = "/static/"
@@ -143,6 +155,7 @@ if not DEBUG:
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child("dist"),
         PROJECT_DIR_FRONTEND_2026.child("dist"),
+        PROJECT_DIR_FRONTEND_V8.child("dist"),
     ]
 
 
@@ -155,16 +168,21 @@ if DEBUG and not WEBPACK_LOADER["DEFAULT"]["STATS_FILE"].exists():
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child("dist"),
         PROJECT_DIR_FRONTEND_2026.child("src", "assets"),
+        PROJECT_DIR_FRONTEND_V8.child("src", "assets"),
     ]
 
 elif DEBUG:
     STATICFILES_DIRS += [
         PROJECT_DIR_FRONTEND_2018.child("src", "assets"),
         PROJECT_DIR_FRONTEND_2026.child("src", "assets"),
+        PROJECT_DIR_FRONTEND_V8.child("src", "assets"),
     ]
 
 if DEBUG and not V6_DJANGO_VITE_DEV_MODE:
-    STATICFILES_DIRS += [PROJECT_DIR_FRONTEND_2026.child("dist")]
+    STATICFILES_DIRS += [
+        PROJECT_DIR_FRONTEND_2026.child("dist"),
+        PROJECT_DIR_FRONTEND_V8.child("dist"),
+    ]
 
 # apenas para debug - na produção nginx deve entregar sw
 # PWA_SERVICE_WORKER_PATH = PROJECT_DIR.child(

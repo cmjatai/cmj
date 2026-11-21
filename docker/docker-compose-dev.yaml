@@ -88,6 +88,21 @@ services:
       - cmj-net
     ports:
       - "5173:5173"
+  cmjfrontv8:
+    build:
+      context: ../_frontend/v8/
+      dockerfile: ../../docker/Dockerfile.FrontV8Dev
+    #command: yarn build
+    restart: no
+    container_name: cmjfrontv8
+    labels:
+       NAME: "cmjfrontv8"
+    volumes:
+      - ../:/var/cmjatai/cmj
+    networks:
+      - cmj-net
+    ports:
+      - "5174:5174"
   cmjdb18:
     image: pgvector/pgvector:0.8.7-pg18-bookworm
     restart: always
@@ -128,6 +143,7 @@ services:
       - cmjredis
       - cmjfront2018
       - cmjfront2026
+      - cmjfrontv8
       - cmjsolr
       - cmjdb18
     ports:

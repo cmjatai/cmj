@@ -19,13 +19,21 @@ DJANGO_VITE = {
         "manifest_path": V6_DJANGO_VITE_ASSETS_PATH.child(
             Fv6, ".vite", "manifest.json"
         ),
-    }
+    },
+    Fv8: {
+        "dev_mode": V6_DJANGO_VITE_DEV_MODE,
+        "dev_server_port": 5174,
+        "manifest_path": V8_DJANGO_VITE_ASSETS_PATH.child(
+            Fv8, ".vite", "manifest.json"
+        ),
+    },
 }
 
 STATICFILES_DIRS = [
     PROJECT_DIR.child("sapl", "static"),
     PROJECT_DIR_FRONTEND_2018.child("dist"),
     PROJECT_DIR_FRONTEND_2026.child("dist"),
+    PROJECT_DIR_FRONTEND_V8.child("dist"),
 ]
 
 # --- Cache: in-memory (sem dependência de Redis) ---

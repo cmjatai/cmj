@@ -26,7 +26,7 @@ FOLDER_DEBUG_CONTAINER = Path(
     config("FOLDER_DEBUG_CONTAINER", default=__file__, cast=str)
 )
 
-ALLOWED_HOSTS = ["localhost:5173", "*"]
+ALLOWED_HOSTS = ["localhost:5173", "localhost:5174", "*"]
 
 # BASE_URL = 'http://localhost'
 BASE_URL = config("BASE_URL", default="https://www.jatai.go.leg.br", cast=str)

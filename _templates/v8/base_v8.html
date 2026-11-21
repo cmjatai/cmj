@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% load i18n static django_vite %}
+<html class="{% block html_class %}{% endblock %}" lang="pt-br" data-bs-theme="auto">
+<head>
+  <meta charset="utf-8">
+  <meta name="theme-color" content="#114d81">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PortalCMJ</title>
+
+  {% vite_hmr_client app='v8' %}
+  {% vite_asset 'main.js' app='v8' %}
+
+  {% if not DEBUG %}
+    <link rel="icon" type="image/x-icon" href="{% static 'v8/favicon.ico' %}">
+    <link rel="manifest" href="{% static 'v8/manifest.json' %}">
+  {% else %}
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  {% endif %}
+  {% block head_content %}{% endblock head_content %}
+</head>
+<body class="{% block body_class %}{% endblock body_class %}">
+  <div id="cmj-app-root">
+    <cmj-app>
+      {% block root_body %}
+        {% block main_content %}
+          <router-view></router-view>
+        {% endblock main_content %}
+
+        {% block footer_content %}
+        {% endblock footer_content %}
+
+      {% endblock root_body %}
+    </cmj-app>
+  </div>
+  {% block extra_js %}
+  {% endblock %}
+</body>
+</html>
