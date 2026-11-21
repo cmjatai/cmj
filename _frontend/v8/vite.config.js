@@ -4,6 +4,7 @@ import path from 'path'
 import { defineConfig, loadEnv } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 
 import inject from "@rollup/plugin-inject"
 import Components from 'unplugin-vue-components/vite'
@@ -33,6 +34,7 @@ export default defineConfig(({command, mode}) => {
     },
     plugins: [
       vue(),
+      tailwindcss(),
       VitePWA({
         registerType: 'autoUpdate',
         scope: '/v8/',
@@ -78,8 +80,7 @@ export default defineConfig(({command, mode}) => {
       }),
       inject({   // => that should be first under plugins array
         '_': 'lodash',
-        include: ['src/**/*.js', 'src/**/*.vue'],
-        exclude: 'src/routers/**'
+        include: ['src/**/*.js', 'src/**/*.vue']
       }),
       eslintPlugin({
         // include: ['src/**/*.js', 'src/**/*.vue'],
@@ -125,7 +126,6 @@ export default defineConfig(({command, mode}) => {
       extensions: ['.js', '.json', '.vue',],
       alias: {
         '~@': path.resolve(INPUT_DIR),
-        'vue': 'vue/dist/vue.esm-bundler.js',
       },
     },
 
@@ -167,9 +167,6 @@ export default defineConfig(({command, mode}) => {
           chunkFileNames: undefined,
           manualChunks(id) {
             console.debug('manualChunks processing id:', id);
-            if (id.includes('fortawesome')) {
-              return 'vendor_fortawesome'
-            }
             if (id.includes('node_modules')) {
               return 'vendor'
             }

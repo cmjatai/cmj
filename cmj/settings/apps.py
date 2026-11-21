@@ -71,6 +71,7 @@ CMJ_APPS = (
     "cmj.painelset",
     "cmj.api",
     "cmj.dashboard",
+    "cmj.v8",
 )
 
 RULES_APPS = (

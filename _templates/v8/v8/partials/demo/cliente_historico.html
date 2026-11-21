@@ -1,0 +1,9 @@
+{% load v8_tags %}
+<section>
+  <h2 data-overlay-title>Histórico de {{ cliente.nome }}</h2>
+  <ol>
+    {% for evento in eventos %}
+      <li><time datetime="{{ evento.data }}">{{ evento.data|v8_data }}</time> {{ evento.texto }}</li>
+    {% endfor %}
+  </ol>
+</section>

@@ -42,6 +42,7 @@ import cmj.ouvidoria.urls
 import cmj.painelset.urls
 import cmj.search.urls
 import cmj.sigad.urls
+import cmj.v8.urls
 import cmj.videos.urls
 import sapl.api.urls
 import sapl.audiencia.urls
@@ -72,6 +73,7 @@ urlpatterns_all = [
     re_path(r"^message$", TemplateView.as_view(template_name="base.html")),
     re_path("", include("social_django.urls", namespace="social")),
     re_path(r"", include(cmj.globalrules.urls)),
+    re_path(r"", include(cmj.v8.urls)),
     re_path(r"", include(cmj.core.urls)),
     re_path(r"", include(cmj.cerimonial.urls)),
     re_path(r"", include(cmj.diarios.urls)),

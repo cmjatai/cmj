@@ -1,0 +1,24 @@
+{% load v8_tags %}{% v8_preferencias as v8_pref %}{% v8_usuario as v8_usuario %}
+<header class="v8-topbar">
+  <button type="button" class="v8-btn v8-btn-icone" data-v8-acao="sidebar" aria-controls="v8-sidebar" aria-expanded="{% if v8_pref.sidebar == 'expandida' %}true{% else %}false{% endif %}" aria-label="Menu">
+    <svg class="v8-icone" aria-hidden="true"><use href="#v8-i-menu"></use></svg>
+  </button>
+  <a class="v8-topbar-marca" href="{% url 'cmj.v8:inicio' %}">PortalCMJ</a>
+  <button type="button" class="v8-btn v8-btn-icone" data-v8-acao="tema" aria-pressed="{% if v8_pref.tema == 'escuro' %}true{% else %}false{% endif %}" aria-label="Tema escuro">
+    <svg class="v8-icone v8-icone-sol" aria-hidden="true"><use href="#v8-i-sol"></use></svg>
+    <svg class="v8-icone v8-icone-lua" aria-hidden="true"><use href="#v8-i-lua"></use></svg>
+  </button>
+  <div class="v8-usuario">
+    {% if v8_usuario %}
+      {% if v8_usuario.avatar %}
+        <img class="v8-avatar" src="{{ v8_usuario.avatar }}" alt="">
+      {% else %}
+        <svg class="v8-icone" aria-hidden="true"><use href="#v8-i-usuario"></use></svg>
+      {% endif %}
+      <span class="v8-usuario-nome">{{ v8_usuario.nome }}</span>
+      <form method="post" action="{% url 'cmj.core:logout' %}">{% csrf_token %}<button type="submit" class="v8-btn v8-btn-fantasma">Sair</button></form>
+    {% else %}
+      <a class="v8-btn v8-btn-fantasma" href="{% url 'cmj.core:login' %}?next={{ request.get_full_path|urlencode:'' }}">Entrar</a>
+    {% endif %}
+  </div>
+</header>

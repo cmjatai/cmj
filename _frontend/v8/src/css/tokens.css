@@ -1,0 +1,130 @@
+/*
+ * Tokens do v8 (V8-ARQ-051). É o único arquivo com cor literal e com o valor das camadas.
+ * Os dois temas definem as mesmas variáveis (V8-SHELL-042).
+ */
+
+:root {
+  color-scheme: light;
+
+  --cor-fundo: #f3f5f8;
+  --cor-superficie: #ffffff;
+  --cor-superficie-2: #e9edf2;
+  --cor-texto: #1a2330;
+  --cor-texto-suave: #566273;
+  --cor-borda: #d3dae3;
+  --cor-primaria: #114d81;
+  --cor-primaria-forte: #0b3a63;
+  --cor-sobre-primaria: #ffffff;
+  --cor-perigo: #b3261e;
+  --cor-sobre-perigo: #ffffff;
+  --cor-sucesso: #17754a;
+  --cor-aviso: #8a5a00;
+  --cor-info: #1b5fa6;
+  --cor-realce: #2f7fd1;
+  --cor-topo: #114d81;
+  --cor-sobre-topo: #ffffff;
+  --cor-scrim: rgb(12 22 36 / 0.5);
+  --cor-sombra: rgb(12 22 36 / 0.18);
+  --cor-barra-navegador: #114d81;
+
+  /* Camadas (V8-OVL-001): todo z-index do v8 usa uma destas. */
+  --z-base: 0;
+  --z-sticky: 100;
+  --z-drawer: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+  --z-popover: 500;
+
+  /* Movimento (V8-OVL-026). */
+  --duracao: 180ms;
+  --curva: cubic-bezier(0.2, 0, 0, 1);
+
+  /* Layout. */
+  --altura-topbar: 3.5rem;
+  --largura-sidebar: 16rem;
+  --largura-sidebar-recolhida: 3.75rem;
+  --largura-sm: 20rem;
+  --largura-md: 28rem;
+  --largura-lg: 42rem;
+  --deslocamento-drawer: 1.5rem;
+  --raio: 0.5rem;
+}
+
+:root[data-theme="escuro"] {
+  color-scheme: dark;
+
+  --cor-fundo: #0e151f;
+  --cor-superficie: #17212e;
+  --cor-superficie-2: #202d3d;
+  --cor-texto: #e6ebf2;
+  --cor-texto-suave: #9eabbc;
+  --cor-borda: #2f3d50;
+  --cor-primaria: #6aaee8;
+  --cor-primaria-forte: #8fc4f1;
+  --cor-sobre-primaria: #0a1622;
+  --cor-perigo: #f2867c;
+  --cor-sobre-perigo: #2b0c09;
+  --cor-sucesso: #5cc48f;
+  --cor-aviso: #e3b659;
+  --cor-info: #77b6f0;
+  --cor-realce: #8fc4f1;
+  --cor-topo: #17212e;
+  --cor-sobre-topo: #e6ebf2;
+  --cor-scrim: rgb(0 0 0 / 0.6);
+  --cor-sombra: rgb(0 0 0 / 0.5);
+  --cor-barra-navegador: #17212e;
+}
+
+/* Sem cookie de tema, vale a preferência do sistema, sem JavaScript (V8-SHELL-040). */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+
+    --cor-fundo: #0e151f;
+    --cor-superficie: #17212e;
+    --cor-superficie-2: #202d3d;
+    --cor-texto: #e6ebf2;
+    --cor-texto-suave: #9eabbc;
+    --cor-borda: #2f3d50;
+    --cor-primaria: #6aaee8;
+    --cor-primaria-forte: #8fc4f1;
+    --cor-sobre-primaria: #0a1622;
+    --cor-perigo: #f2867c;
+    --cor-sobre-perigo: #2b0c09;
+    --cor-sucesso: #5cc48f;
+    --cor-aviso: #e3b659;
+    --cor-info: #77b6f0;
+    --cor-realce: #8fc4f1;
+    --cor-topo: #17212e;
+    --cor-sobre-topo: #e6ebf2;
+    --cor-scrim: rgb(0 0 0 / 0.6);
+    --cor-sombra: rgb(0 0 0 / 0.5);
+    --cor-barra-navegador: #17212e;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duracao: 0ms;
+  }
+}
+
+/* A paleta padrão do Tailwind sai: só existem as cores semânticas abaixo. */
+@theme inline {
+  --color-*: initial;
+  --color-fundo: var(--cor-fundo);
+  --color-superficie: var(--cor-superficie);
+  --color-superficie-2: var(--cor-superficie-2);
+  --color-texto: var(--cor-texto);
+  --color-texto-suave: var(--cor-texto-suave);
+  --color-borda: var(--cor-borda);
+  --color-primaria: var(--cor-primaria);
+  --color-primaria-forte: var(--cor-primaria-forte);
+  --color-sobre-primaria: var(--cor-sobre-primaria);
+  --color-perigo: var(--cor-perigo);
+  --color-sobre-perigo: var(--cor-sobre-perigo);
+  --color-sucesso: var(--cor-sucesso);
+  --color-aviso: var(--cor-aviso);
+  --color-info: var(--cor-info);
+  --color-realce: var(--cor-realce);
+}

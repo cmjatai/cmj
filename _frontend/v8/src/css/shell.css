@@ -1,0 +1,281 @@
+/* Moldura renderizada pelo Django: topbar, sidebar, trilha e áreas de conteúdo (shell.md). */
+
+@layer base {
+  body.v8-body {
+    margin: 0;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+  }
+
+  .v8-body :focus-visible {
+    outline: 2px solid var(--cor-realce);
+    outline-offset: 2px;
+  }
+
+  .v8-body a {
+    color: var(--cor-primaria);
+  }
+}
+
+@layer components {
+  .v8-pular {
+    position: absolute;
+    left: 0.5rem;
+    top: -5rem;
+    z-index: var(--z-popover);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    box-shadow: 0 2px 8px var(--cor-sombra);
+  }
+
+  .v8-pular:focus {
+    top: 0.5rem;
+  }
+
+  .v8-shell {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+  }
+
+  .v8-topbar {
+    position: sticky;
+    top: 0;
+    z-index: var(--z-sticky);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: var(--altura-topbar);
+    padding: 0 0.75rem;
+    background: var(--cor-topo);
+    color: var(--cor-sobre-topo);
+    box-shadow: 0 1px 3px var(--cor-sombra);
+  }
+
+  .v8-topbar .v8-btn,
+  .v8-body .v8-topbar a.v8-btn {
+    color: inherit;
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .v8-topbar .v8-btn:hover {
+    background: color-mix(in srgb, var(--cor-sobre-topo) 14%, transparent);
+  }
+
+  .v8-body .v8-topbar-marca {
+    margin-right: auto;
+    color: inherit;
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-decoration: none;
+  }
+
+  .v8-usuario {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .v8-avatar {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .v8-icone {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+  }
+
+  /* O botão de tema mostra a lua no tema claro e o sol no escuro. */
+  [data-v8-acao="tema"] .v8-icone-sol,
+  [data-v8-acao="tema"][aria-pressed="true"] .v8-icone-lua {
+    display: none;
+  }
+
+  [data-v8-acao="tema"][aria-pressed="true"] .v8-icone-sol {
+    display: inline;
+  }
+
+  .v8-usuario-nome {
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (width < 40rem) {
+    .v8-usuario-nome {
+      display: none;
+    }
+  }
+
+  .v8-corpo {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .v8-sidebar {
+    position: sticky;
+    top: var(--altura-topbar);
+    flex-shrink: 0;
+    width: var(--largura-sidebar);
+    height: calc(100dvh - var(--altura-topbar));
+    overflow-y: auto;
+    border-right: 1px solid var(--cor-borda);
+    background: var(--cor-superficie);
+    transition: width var(--duracao) var(--curva);
+  }
+
+  .v8-menu {
+    padding: 0.5rem;
+  }
+
+  .v8-menu ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .v8-menu ul ul {
+    padding-left: 1.75rem;
+  }
+
+  .v8-body .v8-menu-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.625rem;
+    border-radius: var(--raio);
+    color: var(--cor-texto);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .v8-menu-link:hover {
+    background: var(--cor-superficie-2);
+  }
+
+  .v8-body .v8-menu-link[aria-current="page"] {
+    background: color-mix(in srgb, var(--cor-primaria) 14%, transparent);
+    color: var(--cor-primaria-forte);
+    font-weight: 600;
+  }
+
+  .v8-menu-grupo > summary {
+    list-style: none;
+  }
+
+  .v8-menu-grupo > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Sidebar recolhida: só os ícones (V8-SHELL-030). */
+  html[data-sidebar="recolhida"] .v8-sidebar {
+    width: var(--largura-sidebar-recolhida);
+  }
+
+  html[data-sidebar="recolhida"] .v8-sidebar .v8-menu-rotulo {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  html[data-sidebar="recolhida"] .v8-sidebar .v8-menu ul ul {
+    padding-left: 0;
+  }
+
+  /* Tela estreita: a sidebar sai da lateral e o botão a abre como drawer (V8-SHELL-032). */
+  @media (width < 64rem) {
+    .v8-corpo {
+      flex-direction: column;
+    }
+
+    .v8-sidebar {
+      display: none;
+      position: static;
+      width: auto;
+      height: auto;
+      border-right: 0;
+      border-bottom: 1px solid var(--cor-borda);
+    }
+
+    html[data-sidebar="recolhida"] .v8-sidebar {
+      width: auto;
+    }
+  }
+
+  .v8-doca {
+    flex-shrink: 0;
+  }
+
+  .v8-doca:empty {
+    display: none;
+  }
+
+  .v8-main {
+    flex: 1;
+    min-width: 0;
+    margin-inline-start: var(--v8-empurra-left, 0);
+    margin-inline-end: var(--v8-empurra-right, 0);
+    transition: margin var(--duracao) var(--curva);
+  }
+
+  .v8-main:focus {
+    outline: none;
+  }
+
+  .v8-conteudo {
+    padding: 1rem 1.25rem 2.5rem;
+  }
+
+  .v8-trilha {
+    padding: 0.75rem 1.25rem 0;
+    color: var(--cor-texto-suave);
+    font-size: 0.875rem;
+  }
+
+  .v8-trilha ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .v8-trilha li + li::before {
+    content: "/";
+    margin-right: 0.375rem;
+    color: var(--cor-borda);
+  }
+
+  .v8-trilha [aria-current="page"] {
+    color: var(--cor-texto);
+    font-weight: 600;
+  }
+
+  .v8-nua {
+    display: grid;
+    place-items: center;
+    min-height: 100dvh;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .v8-zona-espera {
+    color: var(--cor-texto-suave);
+  }
+}

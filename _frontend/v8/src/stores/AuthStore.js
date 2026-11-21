@@ -1,9 +1,42 @@
 import { defineStore } from 'pinia'
 import Resources from '~@/utils/resources'
+import { useGlobalStore } from '~@/stores/GlobalStore'
+
+// Estado de quem não tem sessão.
+function conexaoAnonima() {
+  return {
+    is_authenticated: false,
+    user: null,
+    permissions: []
+  }
+}
+
+// Monta data_connect com os dados globais que o Django escreveu na página (V8-ARQ-032).
+function conexaoDoGlobal(global) {
+  if (!global.autenticado || !global.usuario) {
+    return conexaoAnonima()
+  }
+  const usuario = global.usuario
+  const user = {
+    id: usuario.id,
+    username: usuario.username,
+    fullname: usuario.nome,
+    avatar: usuario.avatar
+  }
+  if (usuario.votante) {
+    user.votante = usuario.votante
+  }
+  return {
+    is_authenticated: true,
+    user,
+    permissions: [...(global.permissoes || [])]
+  }
+}
 
 export const useAuthStore = defineStore('authStore', {
+  // O store já nasce com o que o GlobalStore tem, sem requisição.
   state: () => ({
-    data_connect: {}
+    data_connect: conexaoDoGlobal(useGlobalStore())
   }),
   getters: {
     isAuthenticated: (state) => {
@@ -27,26 +60,31 @@ export const useAuthStore = defineStore('authStore', {
     }
   },
   actions: {
+    // Preenche o estado com os dados globais da página, lendo-os se ainda não foram lidos.
+    hidratar() {
+      const global = useGlobalStore()
+      global.carregar()
+      this.data_connect = conexaoDoGlobal(global)
+      return this.data_connect
+    },
+    // Aplica a resposta de /api/version. Usada também ao retomar a sessão expirada (V8-HTTP-023).
+    aplicarVersao(dados) {
+      this.data_connect = dados?.is_authenticated
+        ? {
+          is_authenticated: true,
+          user: dados.user || null,
+          permissions: dados.permissions || []
+        }
+        : conexaoAnonima()
+      return this.data_connect
+    },
     loginStatus() {
       const utils = Resources.Utils
       const getVersion = utils.getVersion
       return getVersion()
         .then(response => {
-          this.data_connect = response.data
+          this.aplicarVersao(response.data)
           return response.data
-        })
-    },
-    loginPortalCMJ(username, password) {
-      const utils = Resources.Utils
-      const login = utils.login
-      const getVersion = utils.getVersion
-      return login(username, password)
-        .then(() => {
-          return getVersion()
-            .then(resp_version => {
-              this.data_connect = resp_version.data
-              return resp_version.data
-            })
         })
     },
     logoutPortalCMJ() {
@@ -57,7 +95,7 @@ export const useAuthStore = defineStore('authStore', {
         .then(() => {
           return getVersion()
             .then(resp_version => {
-              this.data_connect = resp_version.data
+              this.aplicarVersao(resp_version.data)
               return resp_version.data
             })
         })

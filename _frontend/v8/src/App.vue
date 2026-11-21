@@ -1,19 +1,20 @@
 <template>
-  <slot />
+  <IslandHost />
+  <ZoneOutlet />
+  <OverlayHost />
+  <ToastHost />
 </template>
 <script setup>
+// Raiz do app único do v8. É montada em #cmj-v8-app, que o Django entrega vazio, e alcança o
+// resto da página por Teleport: as ilhas, a zona SPA, os overlays e os toasts (V8-ARQ-031).
 
 // 1. Imports
-import { useSyncStore } from '~@/stores/SyncStore'
-import { useAuthStore } from '~@/stores/AuthStore'
+import IslandHost from '~@/core/IslandHost.vue'
+import ZoneOutlet from '~@/core/ZoneOutlet.vue'
+import OverlayHost from '~@/overlays/OverlayHost.vue'
+import ToastHost from '~@/overlays/ToastHost.vue'
 
 // 2. Composables
-const syncStore = useSyncStore()
-syncStore.initialize()
-
-const authStore = useAuthStore()
-authStore.loginStatus()
-
 // 3. Props & Emits
 // 4. State & Refs
 // 5. Computed Properties

@@ -1,0 +1,52 @@
+{% extends "v8/layouts/admin.html" %}
+{% load v8_tags %}
+{% block content %}
+  <h1 class="v8-pagina-titulo">{{ cliente.nome }}</h1>
+  <p class="v8-aviso-demo">Esta é uma demonstração com clientes fictícios. Nada do que for feito aqui é gravado.</p>
+
+  <section class="v8-cartao">
+    <dl class="v8-lista-dados">
+      <dt>E-mail</dt>
+      <dd>{{ cliente.email }}</dd>
+      <dt>Cidade</dt>
+      <dd>{{ cliente.cidade }}</dd>
+      <dt>Situação</dt>
+      <dd>{% if cliente.situacao == "ativo" %}<span class="v8-etiqueta v8-etiqueta-ok">Ativo</span>{% else %}<span class="v8-etiqueta v8-etiqueta-neutra">Inativo</span>{% endif %}</dd>
+      {% if cliente.motivo %}
+        <dt>Motivo</dt>
+        <dd>{{ cliente.motivo }}</dd>
+      {% endif %}
+      <dt>Cliente desde</dt>
+      <dd><time datetime="{{ cliente.desde }}">{{ cliente.desde|v8_data }}</time></dd>
+    </dl>
+  </section>
+
+  <h2>Pedidos</h2>
+  <table class="v8-tabela">
+    <thead>
+      <tr>
+        <th scope="col">Número</th>
+        <th scope="col">Descrição</th>
+        <th scope="col">Data</th>
+        <th scope="col">Valor (R$)</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for pedido in cliente.pedidos %}
+        <tr>
+          <td>{{ pedido.id }}</td>
+          <td>{{ pedido.descricao }}</td>
+          <td><time datetime="{{ pedido.data }}">{{ pedido.data|v8_data }}</time></td>
+          <td>{{ pedido.valor|floatformat:2 }}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4">Nenhum pedido.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="v8-barra-acoes">
+    <a class="v8-btn" href="{% url 'cmj.v8:demo_frag_cliente_historico' cliente.id %}" data-drawer="frag:demo/cliente/{{ cliente.id }}/historico" data-drawer-side="right">Histórico</a>
+    <a class="v8-btn v8-btn-fantasma" href="{% url 'cmj.v8:demo_clientes' %}">Voltar para a lista</a>
+  </div>
+{% endblock %}

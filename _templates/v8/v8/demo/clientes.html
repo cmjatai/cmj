@@ -1,0 +1,79 @@
+{% extends "v8/layouts/admin.html" %}
+{% load v8_tags %}
+{% block content %}
+  <h1 class="v8-pagina-titulo">Clientes</h1>
+  <p class="v8-aviso-demo">Esta é uma demonstração com clientes fictícios. Nada do que for feito aqui é gravado.</p>
+
+  <form id="demo-filtros" method="get" action="{% url 'cmj.v8:demo_clientes' %}" data-drawer-auto data-drawer-side="left" data-drawer-size="sm" data-drawer-mode="docked" data-drawer-mode-estreito="overlay" data-drawer-title="Filtros">
+    <div class="v8-campo">
+      <label class="v8-rotulo" for="demo-filtro-q">Nome ou e-mail</label>
+      <input class="v8-entrada" type="search" id="demo-filtro-q" name="q" value="{{ filtros.q }}" maxlength="100">
+    </div>
+    <div class="v8-campo">
+      <label class="v8-rotulo" for="demo-filtro-situacao">Situação</label>
+      <select class="v8-entrada" id="demo-filtro-situacao" name="situacao">
+        <option value="">Todas</option>
+        {% for valor, rotulo in situacoes %}
+          <option value="{{ valor }}"{% if valor == filtros.situacao %} selected{% endif %}>{{ rotulo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="v8-campo">
+      <label class="v8-rotulo" for="demo-filtro-cidade">Cidade</label>
+      <select class="v8-entrada" id="demo-filtro-cidade" name="cidade">
+        <option value="">Todas</option>
+        {% for cidade in cidades %}
+          <option value="{{ cidade }}"{% if cidade == filtros.cidade %} selected{% endif %}>{{ cidade }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="v8-barra-acoes">
+      <button type="submit" class="v8-btn v8-btn-primario">Filtrar</button>
+      <a class="v8-btn v8-btn-fantasma" href="{% url 'cmj.v8:demo_clientes' %}">Limpar</a>
+    </div>
+  </form>
+
+  <div class="v8-barra-acoes">
+    <button type="button" class="v8-btn" data-drawer="el:#demo-filtros" data-drawer-side="left" data-drawer-title="Filtros">Filtros</button>
+    <form id="demo-arquivar" method="post" action="{% url 'cmj.v8:demo_clientes_arquivar' %}" data-confirm="Arquivar os clientes selecionados?" data-confirm-title="Arquivar clientes" data-confirm-ok="Arquivar">{% csrf_token %}<button type="submit" class="v8-btn v8-btn-perigo">Arquivar selecionados</button></form>
+  </div>
+
+  <p>{{ resultado.total }} cliente{{ resultado.total|pluralize }} encontrado{{ resultado.total|pluralize }}.</p>
+
+  {% v8_island "demo-clientes-tabela" props_tabela %}
+    <table class="v8-tabela">
+      <thead>
+        <tr>
+          <th scope="col"><span class="sr-only">Selecionar</span></th>
+          <th scope="col">Nome</th>
+          <th scope="col">E-mail</th>
+          <th scope="col">Cidade</th>
+          <th scope="col">Situação</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cliente in resultado.itens %}
+          <tr>
+            <td><input type="checkbox" name="ids" value="{{ cliente.id }}" form="demo-arquivar" aria-label="Selecionar {{ cliente.nome }}"></td>
+            <td><a href="{% url 'cmj.v8:demo_cliente' cliente.id %}" data-drawer="cliente:{{ cliente.id }}" data-drawer-side="right">{{ cliente.nome }}</a></td>
+            <td>{{ cliente.email }}</td>
+            <td>{{ cliente.cidade }}</td>
+            <td>{% if cliente.situacao == "ativo" %}<span class="v8-etiqueta v8-etiqueta-ok">Ativo</span>{% else %}<span class="v8-etiqueta v8-etiqueta-neutra">Inativo</span>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">Nenhum cliente encontrado com estes filtros.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endv8_island %}
+
+  {% if resultado.paginas > 1 %}
+    <nav class="v8-paginacao" aria-label="Paginação">
+      {% if paginacao.anterior %}<a class="v8-btn" href="{{ paginacao.anterior }}" rel="prev">Anterior</a>{% endif %}
+      {% for pagina in paginacao.paginas %}
+        <a class="v8-btn{% if pagina.atual %} v8-btn-primario{% endif %}" href="{{ pagina.url }}"{% if pagina.atual %} aria-current="page"{% endif %}><span class="sr-only">Página </span>{{ pagina.numero }}</a>
+      {% endfor %}
+      {% if paginacao.proxima %}<a class="v8-btn" href="{{ paginacao.proxima }}" rel="next">Próxima</a>{% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}

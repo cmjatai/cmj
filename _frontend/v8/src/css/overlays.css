@@ -1,0 +1,290 @@
+/* Drawers, modals e toasts (overlays.md). Todo z-index usa um token de camada (V8-OVL-002). */
+
+@layer components {
+  .v8-scrim {
+    position: fixed;
+    inset: 0;
+    background: var(--cor-scrim);
+  }
+
+  .v8-scrim-transparente {
+    background: transparent;
+  }
+
+  .v8-camada-drawer {
+    z-index: calc(var(--z-drawer) + var(--v8-ordem, 0));
+  }
+
+  .v8-camada-modal {
+    z-index: calc(var(--z-modal) + var(--v8-ordem, 0));
+  }
+
+  .v8-overlay {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    max-width: 100vw;
+    max-height: 100dvh;
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    box-shadow: 0 8px 32px var(--cor-sombra);
+  }
+
+  .v8-overlay:focus {
+    outline: none;
+  }
+
+  .v8-overlay-cabecalho {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 0.75rem 0.75rem 1rem;
+    border-bottom: 1px solid var(--cor-borda);
+  }
+
+  .v8-overlay-titulo {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 650;
+  }
+
+  .v8-overlay-corpo {
+    flex: 1;
+    min-height: 0;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .v8-overlay-rodape {
+    flex-shrink: 0;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--cor-borda);
+  }
+
+  .v8-overlay-rodape:has(> .v8-encaixe > div:empty) {
+    display: none;
+  }
+
+  .v8-overlay-rodape-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  /* Larguras comuns a drawer e modal. */
+  .v8-tamanho-sm {
+    --v8-largura: var(--largura-sm);
+  }
+
+  .v8-tamanho-md {
+    --v8-largura: var(--largura-md);
+  }
+
+  .v8-tamanho-lg {
+    --v8-largura: var(--largura-lg);
+  }
+
+  /* Drawer modal: preso a um lado, com deslocamento quando há outro por cima (V8-OVL-034). */
+  .v8-drawer {
+    top: 0;
+    bottom: 0;
+    width: min(var(--v8-largura, var(--largura-md)), 100vw);
+    transition: transform var(--duracao) var(--curva);
+  }
+
+  .v8-drawer-right {
+    right: 0;
+    transform: translateX(calc(var(--v8-profundidade, 0) * var(--deslocamento-drawer) * -1));
+  }
+
+  .v8-drawer-left {
+    left: 0;
+    transform: translateX(calc(var(--v8-profundidade, 0) * var(--deslocamento-drawer)));
+  }
+
+  /* Modal: centralizado. */
+  .v8-modal {
+    top: 50%;
+    left: 50%;
+    width: min(var(--v8-largura, var(--largura-md)), calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    border-radius: calc(var(--raio) * 1.5);
+    transform: translate(-50%, -50%);
+  }
+
+  .v8-modal-fullscreen {
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    max-height: 100dvh;
+    border-radius: 0;
+    transform: none;
+  }
+
+  /* Drawer não modal: push fica fixo ao lado; docked entra na doca do layout (V8-OVL-032). */
+  .v8-lateral {
+    display: flex;
+    flex-direction: column;
+    width: min(var(--v8-largura, var(--largura-sm)), 100vw);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+  }
+
+  .v8-lateral-docked {
+    position: sticky;
+    top: var(--altura-topbar);
+    height: calc(100dvh - var(--altura-topbar));
+  }
+
+  .v8-lateral-docked.v8-lateral-left {
+    border-right: 1px solid var(--cor-borda);
+  }
+
+  .v8-lateral-docked.v8-lateral-right {
+    border-left: 1px solid var(--cor-borda);
+  }
+
+  .v8-lateral-push {
+    position: fixed;
+    top: var(--altura-topbar);
+    bottom: 0;
+    z-index: var(--z-drawer);
+    box-shadow: 0 0 16px var(--cor-sombra);
+  }
+
+  .v8-lateral-push.v8-lateral-left {
+    left: 0;
+  }
+
+  .v8-lateral-push.v8-lateral-right {
+    right: 0;
+  }
+
+  /* Entrada e saída (V8-OVL-026). Com prefers-reduced-motion, --duracao é zero. */
+  .v8-t-scrim-enter-active,
+  .v8-t-scrim-leave-active,
+  .v8-t-modal-enter-active,
+  .v8-t-modal-leave-active {
+    transition: opacity var(--duracao) var(--curva);
+  }
+
+  .v8-t-scrim-enter-from,
+  .v8-t-scrim-leave-to,
+  .v8-t-modal-enter-from,
+  .v8-t-modal-leave-to {
+    opacity: 0;
+  }
+
+  .v8-t-drawer-right-enter-active,
+  .v8-t-drawer-right-leave-active,
+  .v8-t-drawer-left-enter-active,
+  .v8-t-drawer-left-leave-active {
+    transition: transform var(--duracao) var(--curva);
+  }
+
+  .v8-t-drawer-right-enter-from,
+  .v8-t-drawer-right-leave-to {
+    transform: translateX(100%);
+  }
+
+  .v8-t-drawer-left-enter-from,
+  .v8-t-drawer-left-leave-to {
+    transform: translateX(-100%);
+  }
+
+  /* Um overlay que está saindo não recebe mais cliques. */
+  .v8-t-scrim-leave-active,
+  .v8-t-modal-leave-active,
+  .v8-t-drawer-right-leave-active,
+  .v8-t-drawer-left-leave-active {
+    pointer-events: none;
+  }
+
+  /* Fragmento do servidor: o título dele já aparece no cabeçalho do overlay. */
+  .v8-fragmento [data-overlay-title] {
+    display: none;
+  }
+
+  .v8-fragmento ol,
+  .v8-fragmento ul {
+    margin: 0 0 1rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .v8-fragmento li + li {
+    margin-top: 0.375rem;
+  }
+
+  .v8-overlay-estado {
+    display: grid;
+    place-items: center;
+    gap: 0.75rem;
+    min-height: 8rem;
+    color: var(--cor-texto-suave);
+    text-align: center;
+  }
+
+  /*
+   * Toasts: no alto e ao centro, para não cobrir o rodapé de ações dos drawers. Ficam clicáveis
+   * mesmo com um modal aberto, que desliga os cliques do resto da página.
+   */
+  .v8-toasts {
+    position: fixed;
+    top: calc(var(--altura-topbar) + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: min(22rem, calc(100vw - 2rem));
+    pointer-events: auto;
+  }
+
+  .v8-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.625rem 0.5rem 0.625rem 0.875rem;
+    border: 1px solid var(--cor-borda);
+    border-left-width: 4px;
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    box-shadow: 0 4px 16px var(--cor-sombra);
+    font-size: 0.9rem;
+  }
+
+  .v8-toast-success {
+    border-left-color: var(--cor-sucesso);
+  }
+
+  .v8-toast-info {
+    border-left-color: var(--cor-info);
+  }
+
+  .v8-toast-warning {
+    border-left-color: var(--cor-aviso);
+  }
+
+  .v8-toast-error {
+    border-left-color: var(--cor-perigo);
+  }
+
+  .v8-toast-enter-active,
+  .v8-toast-leave-active {
+    transition:
+      opacity var(--duracao) var(--curva),
+      transform var(--duracao) var(--curva);
+  }
+
+  .v8-toast-enter-from,
+  .v8-toast-leave-to {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+}

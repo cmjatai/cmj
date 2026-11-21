@@ -1,53 +1,10 @@
 import 'vite/modulepreload-polyfill'
-// Add the necessary CSS
 
-// Import our custom CSS
-import '~@/scss/styles.scss'
+import '~@/css/app.css'
 
-import axios from 'axios'
+import { iniciar } from '~@/core/boot'
 
-import './utils'
-
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-
-import router from './routers'
-
-import EventBus from './utils/EventBus'
-import registerComponents from './registerComponents'
-
-document.querySelectorAll('[data-bs-toggle="popover"]')
-  .forEach(popover => {
-    new bootstrap.Popover(popover)
-  })
-
-axios.defaults.headers.get['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-axios.defaults.headers.get['Pragma'] = 'no-cache' // Suporte para navegadores mais antigos
-axios.defaults.headers.get['Expires'] = '0' // Expira imediatamente
-
-axios.defaults.xsrfCookieName = 'csrftoken'
-axios.defaults.xsrfHeaderName = 'X-CSRFToken'
-
-const app = createApp({
-  delimiters: ['[[', ']]'],
-  components: registerComponents.rootComponents,
-  setup() {
-  }
-})
-
-Object.keys(registerComponents.globalComponents).forEach(name => {
-  app.component(name, registerComponents.globalComponents[name])
-})
-
-// EventBus para comunicação entre componentes via Composite API
-app.provide('EventBus', EventBus)
-// EventBus para comunicação entre componentes via Option API
-app.config.globalProperties.$EventBus = EventBus
-
-app
-  .use(router)
-  .use(createPinia())
-  .mount('#cmj-app-root')
+iniciar()
 
 // Registro manual do Service Worker para controle total da URL
 console.debug('Environment Mode:', import.meta.env.MODE)
@@ -63,4 +20,3 @@ if ('serviceWorker' in navigator && import.meta.env.PROD) {
       console.error('Falha ao registrar o Service Worker:', error)
     })
 }
-

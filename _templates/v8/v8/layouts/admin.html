@@ -1,0 +1,29 @@
+{% extends "base_v8.html" %}
+{% load v8_tags %}
+{% block title %}{% if v8.titulo %}{{ v8.titulo }} · {% endif %}PortalCMJ{% endblock %}
+{% block body %}
+  {% include "v8/shell/icones.html" %}
+  <a class="v8-pular" href="#conteudo">Ir para o conteúdo</a>
+  <div class="v8-shell">
+    {% include "v8/shell/topbar.html" %}
+    <div class="v8-corpo">
+      {% include "v8/shell/sidebar.html" %}
+      <div class="v8-doca" data-v8-doca="left"></div>
+      <main id="conteudo" class="v8-main" tabindex="-1">
+        {% include "v8/shell/breadcrumbs.html" %}
+        <div class="v8-conteudo">
+          {% if messages %}
+            {# Sem JavaScript não há toast: as mensagens aparecem aqui. #}
+            <noscript>
+              {% for mensagem in messages %}
+                <p class="v8-alerta v8-alerta-{{ mensagem.level_tag|v8_alerta }}">{{ mensagem }}</p>
+              {% endfor %}
+            </noscript>
+          {% endif %}
+          {% block content %}{% endblock %}
+        </div>
+      </main>
+      <div class="v8-doca" data-v8-doca="right"></div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,5 @@
+{% extends "base_v8.html" %}
+{% block title %}{% if v8.titulo %}{{ v8.titulo }} · {% endif %}PortalCMJ{% endblock %}
+{% block body %}
+  <main id="conteudo" class="v8-nua">{% block content %}{% endblock %}</main>
+{% endblock %}

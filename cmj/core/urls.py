@@ -32,7 +32,6 @@ from cmj.core.views import (
     TrechoJsonSearchView,
     TrechoJsonView,
     app_vue_view_v6,
-    app_vue_view_v8,
     app_vue_view_v2018,
     chanel_index,
     chanel_room,
@@ -113,7 +112,6 @@ if settings.DEBUG:
 
 vue_urlpatterns = [
     re_path(r"^v6/(?P<slug>[^.]*)$", app_vue_view_v6, name="app_vue_view_v6_url"),
-    re_path(r"^v8/(?P<slug>[^.]*)$", app_vue_view_v8, name="app_vue_view_v8_url"),
     re_path(
         r"^app/(?P<slug>[^.]*)$", app_vue_view_v2018, name="app_vue_view_v2018_url"
     ),

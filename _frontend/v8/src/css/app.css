@@ -1,0 +1,8 @@
+/* Folha de estilos única do v8. O Tailwind lê as classes de src/ e dos templates Django do v8. */
+@import "tailwindcss";
+@source "../../../../_templates/v8";
+
+@import "./tokens.css";
+@import "./shell.css";
+@import "./componentes.css";
+@import "./overlays.css";

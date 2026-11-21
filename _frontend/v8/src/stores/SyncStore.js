@@ -17,6 +17,9 @@ export const useSyncStore = defineStore('syncStore', {
   },
   actions: {
     // Define your actions here
+
+    // Abre o WebSocket /ws/sync/ na primeira vez em que é chamada. Nada a chama no boot: as
+    // actions que dependem do socket a chamam antes de agir (V8-ARQ-041).
     initialize() {
       if (this.wsManager) {
         return
@@ -114,6 +117,7 @@ export const useSyncStore = defineStore('syncStore', {
 
     // Timer functions for cronometro
     startLocalCronometro(id) {
+      this.initialize()
       TimerWorkerService.startTimer(id, (timestamp) => {
         // console.debug('TIMER', cronometroId, timestamp)
         const cronometro = this.data_cache.painelset_cronometro[id]
@@ -143,6 +147,7 @@ export const useSyncStore = defineStore('syncStore', {
     // Fetch data from API and update cache
     async fetchSync ({ app, model, id, action, params, only_first_page = false, force_fetch = true}) {
       const _fetch = Resources.Utils.fetch
+      this.initialize()
       if (!this.models[app] || !this.models[app][model]) {
         //faz auto registro do modelo
         this.registerModels(app, [model])
@@ -202,6 +207,7 @@ export const useSyncStore = defineStore('syncStore', {
     },
 
     sendSyncMessage (message) {
+      this.initialize()
       if (this.wsManager && this.wsConnected) {
         this.wsManager.send(message)
       } else {
@@ -293,6 +299,7 @@ export const useSyncStore = defineStore('syncStore', {
     registerModels(app, models) {
       // o registro é para controlar quais modelos são "sincronizáveis" via WebSocket
       // fetchSync auto registra os modelos ao buscar dados
+      this.initialize()
       if (!this.models[app]) {
         this.models[app] = {}
       }

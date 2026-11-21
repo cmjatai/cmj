@@ -1,7 +1,11 @@
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.db import transaction
+from django.middleware.csrf import get_token
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_protect
+from django_ratelimit.decorators import ratelimit
 from image_cropping.utils import get_backend
 from rest_framework import status, viewsets
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -24,6 +28,7 @@ from cmj.core.models import Bi
 from cmj.sigad.models import Documento, Midia, ReferenciaEntreDocumentos, VersaoDeMidia
 from drfautoapi.drfautoapi import ApiViewSetConstrutor
 from sapl.api.views import LastModifiedDecorator
+from sapl.utils import ratelimit_ip
 
 CmjApiViewSetConstrutor = ApiViewSetConstrutor
 CmjApiViewSetConstrutor.last_modified_class(LastModifiedDecorator)
@@ -47,6 +52,9 @@ class AppVersionView(APIView):
     permission_classes = (AllowAny,)
 
     def get(self, request):
+        # Garante o cookie csrftoken a quem ainda não entrou: o login por sessão
+        # o exige (docs/specs/api/login.md).
+        get_token(request._request)
 
         content = {
             "name": "PortalCMJ",
@@ -98,7 +106,39 @@ class AppVersionView(APIView):
         return Response(content)
 
 
+def _taxa_de_login(group, request):
+    # Lida a cada requisição, para acompanhar a configuração.
+    return settings.RATE_LIMITER_RATE
+
+
+# Limite de tentativas do login pela API (docs/specs/api/login.md): o mesmo
+# da tela /login/, por IP, com uma contagem só para as rotas que o usam. Fica no
+# dispatch para que o excesso responda 429 pelo handler403 de cmj/urls.py.
+limite_de_login = method_decorator(
+    ratelimit(
+        group="cmj.api.login",
+        key=ratelimit_ip,
+        rate=_taxa_de_login,
+        method="POST",
+        block=True,
+    ),
+    name="dispatch",
+)
+
+
+@limite_de_login
+class AppTokenAuthView(ObtainAuthToken):
+    """Login por token (``/api/auth/token``)."""
+
+
+@limite_de_login
+@method_decorator(csrf_protect, name="dispatch")
 class AppSessionAuthView(ObtainAuthToken):
+    """Sessão por cookie (``/api/auth/session``).
+
+    Abrir e encerrar a sessão exigem o token CSRF, também de quem ainda não
+    entrou. O cookie do token é entregue pelo ``GET`` daqui e de ``/api/version``.
+    """
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -127,6 +167,7 @@ class AppSessionAuthView(ObtainAuthToken):
         return super().options(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+        get_token(request._request)
         if request.user.is_authenticated:
             return Response(
                 {

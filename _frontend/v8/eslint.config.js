@@ -8,16 +8,13 @@ import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 export default defineConfig([
   {
     name: 'app/files-to-lint',
-    files: ['./src/**/*.{js,mjs,jsx,vue}'],
+    files: ['./src/**/*.{js,mjs,jsx,vue}', './tests/**/*.js'],
     languageOptions: {
       globals: {
         ...globals.browser,
         ...globals.node,
         // ...globals.browser,
         // ...globals.node,
-        EventBus: 'readonly',
-        bootstrap: 'readonly',
-        // createBootstrap: 'readonly',
         _: 'readonly',
        }
     },

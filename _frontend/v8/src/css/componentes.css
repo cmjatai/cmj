@@ -1,0 +1,259 @@
+/* Classes de componente usadas por templates Django e por componentes Vue. */
+
+@layer components {
+  .v8-pagina-titulo {
+    margin: 0 0 1rem;
+    font-size: 1.5rem;
+    font-weight: 650;
+    line-height: 1.25;
+  }
+
+  .v8-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.25rem;
+    padding: 0.375rem 0.875rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.25;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background var(--duracao) var(--curva);
+  }
+
+  .v8-body a.v8-btn {
+    color: var(--cor-texto);
+  }
+
+  .v8-btn:hover {
+    background: var(--cor-superficie-2);
+  }
+
+  .v8-btn:disabled,
+  .v8-btn[aria-disabled="true"] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .v8-btn-primario,
+  .v8-body a.v8-btn-primario {
+    border-color: var(--cor-primaria);
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-btn-primario:hover {
+    border-color: var(--cor-primaria-forte);
+    background: var(--cor-primaria-forte);
+  }
+
+  .v8-btn-perigo,
+  .v8-body a.v8-btn-perigo {
+    border-color: var(--cor-perigo);
+    background: var(--cor-perigo);
+    color: var(--cor-sobre-perigo);
+  }
+
+  .v8-btn-perigo:hover {
+    background: color-mix(in srgb, var(--cor-perigo) 85%, var(--cor-texto));
+  }
+
+  .v8-btn-fantasma {
+    border-color: transparent;
+    background: transparent;
+  }
+
+  .v8-btn-icone {
+    width: 2.25rem;
+    padding: 0;
+  }
+
+  .v8-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .v8-rotulo {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .v8-entrada {
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0.375rem 0.625rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    font: inherit;
+    font-size: 0.9rem;
+  }
+
+  .v8-entrada[aria-invalid="true"] {
+    border-color: var(--cor-perigo);
+  }
+
+  .v8-erro-campo {
+    color: var(--cor-perigo);
+    font-size: 0.825rem;
+  }
+
+  .v8-alerta {
+    margin: 0 0 1rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--cor-borda);
+    border-left-width: 4px;
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    font-size: 0.9rem;
+  }
+
+  .v8-alerta-erro {
+    border-color: var(--cor-perigo);
+    background: color-mix(in srgb, var(--cor-perigo) 10%, var(--cor-superficie));
+  }
+
+  .v8-alerta-aviso {
+    border-color: var(--cor-aviso);
+    background: color-mix(in srgb, var(--cor-aviso) 10%, var(--cor-superficie));
+  }
+
+  .v8-alerta-info {
+    border-color: var(--cor-info);
+    background: color-mix(in srgb, var(--cor-info) 10%, var(--cor-superficie));
+  }
+
+  .v8-alerta-sucesso {
+    border-color: var(--cor-sucesso);
+    background: color-mix(in srgb, var(--cor-sucesso) 10%, var(--cor-superficie));
+  }
+
+  .v8-alerta ul {
+    margin: 0;
+    padding-left: 1.125rem;
+  }
+
+  .v8-aviso-demo {
+    margin: 0 0 1rem;
+    padding: 0.5rem 0.875rem;
+    border: 1px dashed var(--cor-aviso);
+    border-radius: var(--raio);
+    color: var(--cor-aviso);
+    font-size: 0.875rem;
+  }
+
+  .v8-cartao {
+    padding: 1rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+  }
+
+  .v8-tabela {
+    width: 100%;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--cor-superficie);
+    font-size: 0.9rem;
+  }
+
+  .v8-tabela th,
+  .v8-tabela td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--cor-borda);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .v8-tabela th {
+    background: var(--cor-superficie-2);
+    font-weight: 600;
+  }
+
+  .v8-tabela tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .v8-tabela tbody tr:hover {
+    background: color-mix(in srgb, var(--cor-primaria) 6%, transparent);
+  }
+
+  .v8-etiqueta {
+    display: inline-block;
+    padding: 0.0625rem 0.5rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  .v8-etiqueta-ok {
+    border-color: var(--cor-sucesso);
+    color: var(--cor-sucesso);
+  }
+
+  .v8-etiqueta-neutra {
+    color: var(--cor-texto-suave);
+  }
+
+  .v8-barra-acoes {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .v8-paginacao {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .v8-lista-dados {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.375rem 1rem;
+    margin: 0 0 1rem;
+  }
+
+  .v8-lista-dados dt {
+    color: var(--cor-texto-suave);
+    font-size: 0.875rem;
+  }
+
+  .v8-lista-dados dd {
+    margin: 0;
+  }
+
+  .v8-erro-404 {
+    display: grid;
+    place-items: center;
+    gap: 0.5rem;
+    min-height: 50vh;
+    text-align: center;
+  }
+
+  .v8-erro-codigo {
+    margin: 0;
+    color: var(--cor-perigo);
+    font-size: 5rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+}

@@ -34,9 +34,9 @@ python -m pytest -m "not slow"
 python -m black <arquivos>
 python -m isort --profile black <arquivos>
 
-# Frontend (sem testes automatizados; o compose já mantém os dev servers no ar)
+# Frontend (o compose já mantém os dev servers no ar; só o v8 tem testes automatizados)
 cd _frontend/v6    && npm run dev | build | lint | format
-cd _frontend/v8    && npm run dev | build | lint | format
+cd _frontend/v8    && npm run dev | build | lint | format | test
 cd _frontend/v2018 && npm run serve | build | lint
 ```
 
@@ -63,6 +63,7 @@ cd _frontend/v2018 && npm run serve | build | lint
 | `cmj/painelset` | Painéis e cronômetros de sessão, em tempo real |
 | `cmj/search` | Busca, embeddings e chat RAG |
 | `cmj/agenda`, `cerimonial`, `ouvidoria`, `videos`, `dashboard` | Módulos do portal |
+| `cmj/v8` | Lado Django do frontend v8: rotas `^v8/`, views, tags e `services/s_*`; sem models |
 | `cmj/api/` | `views_<app>.py`, `loa/`, serializers e filtros da API (`urls.py` está vazio) |
 | `cmj/globalrules`, `sapl/rules` | Grupos e permissões (`map_rules.py`) |
 | `sapl/crud/base.py` | `Crud`, `CrudAux`, `MasterDetailCrud` |
@@ -70,10 +71,11 @@ cd _frontend/v2018 && npm run serve | build | lint
 | `sapl/api/urls.py` | Rotas `/api/` de SAPL **e** CMJ, schema e autenticação |
 | `drfautoapi/` | Geração de ViewSets, serializers e filtros por model |
 | `_templates/v2018/<app_label>/` | Templates Django e `layouts.yaml` (a maioria do HTML) |
-| `_templates/v6/`, `_templates/v8/` | Shell do v6 (`base_v6.html`) e do v8 (`base_v8.html`) |
+| `_templates/v6/` | Shell do v6 (`base_v6.html`) |
+| `_templates/v8/` | `base_v8.html` na raiz; layouts, shell, parciais e páginas do v8 em `v8/` |
 | `_templates/vs/` | Só entra com `TEMPLATE_MODE=vs` |
 | `_frontend/v6/` | Vue 3, Vite, Pinia, Bootstrap 5, bootstrap-vue-next |
-| `_frontend/v8/` | Vue 3, Vite 8, Pinia; esqueleto derivado do v6, sem UI nem telas |
+| `_frontend/v8/` | Vue 3, Vite 8, Pinia, Reka UI, Tailwind v4; híbrido com o Django, por ilhas e zonas SPA |
 | `_frontend/v2018/` | Vue 2, Vue CLI/Webpack, Vuex, BootstrapVue |
 | `docker/` | Compose, Dockerfiles, `start*.sh`, nginx |
 | `solr/` | Configsets `cmj_configset` e `arq_configset` |
@@ -115,7 +117,8 @@ Fora de uso: `cmj/legacy_cep`, `cmj/checklist` e `sapl/lexml` não estão em `IN
 ## Convenções do frontend
 
 O código novo vai para o **v6**. O v2018 é só manutenção: não migre para Vue 3 nem Pinia.
-O **v8** é um esqueleto derivado do v6, ainda sem telas: só mexa nele quando a tarefa pedir.
+O **v8** é a arquitetura híbrida que vai substituir o v6 e o v2018. Por ora só tem a demonstração:
+só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 
 | | v6 | v2018 |
 | --- | --- | --- |
@@ -127,14 +130,16 @@ O **v8** é um esqueleto derivado do v6, ainda sem telas: só mexa nele quando a
 | EventBus | `inject('EventBus')` | `import { EventBus } from '@/event-bus'` |
 | HTTP | `Resources.Utils.fetch({ app, model, id })` | `Resources.Utils.getModel(app, model, id)` |
 
-- **v8**: `/v8/<slug>` → `base_v8.html`, `django_vite` com `app='v8'`. Usa o mesmo alias,
-  `<script setup>`, `useSyncStore`, `useAuthStore`, EventBus e `Resources.Utils` do v6. Não tem
-  Bootstrap, bootstrap-vue-next, jQuery, `useMessageStore` nem rotas além do 404.
+- **v8**: rotas `^v8/` em `cmj/v8/urls.py`; o Django renderiza a página e o Vue entra em ilhas
+  (`{% v8_island %}`) e zonas SPA, com um único app montado em `#cmj-v8-app`. O HTML do Django não é
+  compilado como template Vue. Usa o alias `~@/` e `<script setup>`. Drawers, modals e toasts vêm
+  de `~@/overlays/`, e toda requisição passa por `~@/http/client`. Não tem Bootstrap, jQuery nem
+  axios. Tudo o que o v8 cria fica contido em `/v8/`.
 - Componente **novo** no v6 e no v8 segue a ordem de seções em `<script setup>`: `// 1. Imports`,
   `// 2. Composables`, `// 3. Props & Emits`, `// 4. State & Refs`, `// 5. Computed Properties`,
   `// 6. Watchers`, `// 7. Events & Lifecycle Hooks`, `// 8. Functions`. Não reordene os existentes.
 - No v6 e no v2018, `_` (lodash) e `$` são globais injetados. No v8 só `_`: não há jQuery nem
-  Bootstrap. No v6 e no v8 a injeção não cobre `src/routers/`.
+  Bootstrap. No v6 a injeção não cobre `src/routers/`.
 - Cache sincronizado: `data_cache?.<app>_<model>?.[id]`, preenchido por `fetchSync`.
 - No v2018 só `store__sync` tem namespace. `store__auth`, `store__message` e `store__online` são
   globais: use `mapGetters` e `mapActions(['sendMessage'])`.
@@ -144,6 +149,8 @@ O **v8** é um esqueleto derivado do v6, ainda sem telas: só mexa nele quando a
 
 - **Ordem das URLs importa**: quase tudo é incluído com prefixo vazio e `cmj.sigad.urls` é o
   catch-all final. `APPEND_SLASH = False`: a barra final precisa bater com o padrão.
+- **`_templates/v8` é consultado antes de `_templates/v2018`**: um arquivo como `base.html` ou
+  `404.html` na raiz dele encobre o do portal. Template do v8 vai em `_templates/v8/v8/`.
 - **Signals globais**: auditoria e rede social escutam `post_save` de todos os models.
   `QuerySet.update()` e `bulk_*` não disparam signals nem atualizam `search`.
 - **Testes sem banco falham**: a fixture autouse de `conftest.py` acessa o banco, e teste sem
@@ -188,8 +195,12 @@ O **v8** é um esqueleto derivado do v6, ainda sem telas: só mexa nele quando a
 - `docs/commands/ocrmypdf_command.md`: command `ocrmypdf`.
 - `docs/backend/convencoes.md`: exemplos de CRUD, mixins, API, permissões, testes e novo app.
 - `docs/frontend/v6.md`: stores, `Resources.Utils`, rotas e padrões do v6.
-- `docs/frontend/v8.md`: estrutura do v8, diferenças para o v6, integração com o Django, PWA e
-  restos da cópia do v6. Leia antes de mexer em `_frontend/v8`.
+- `docs/frontend/v8.md`: qual modo de tela usar, tags e atributos do lado Django, composables do
+  lado Vue, CSS e testes. Leia antes de mexer em `_frontend/v8`, `_templates/v8` ou `cmj/v8`.
+- `docs/specs/api/login.md`: login por usuário e senha pela API (`/api/auth/session` e
+  `/api/auth/token`): limite de tentativas e token CSRF. Leia antes de alterar essas rotas.
+- `docs/specs/v8/README.md`: índice das specs do v8 (arquitetura, shell, overlays, cliente HTTP e
+  demonstração). Leia a spec da parte que for alterar.
 - `docs/frontend/v2018.md`: Vuex, `Resources.Utils` e padrões do v2018.
 - `docs/specs/loa/fases-emenda.md`: comportamento atual das fases da emenda. Leia antes de alterá-las.
 - `docs/specs/loa/edicao-emenda.md`: telas de criação e edição da emenda, API usada por elas e

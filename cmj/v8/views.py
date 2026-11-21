@@ -1,0 +1,383 @@
+"""Views do v8: páginas, zonas SPA, fragmentos, endpoints JSON e o 404.
+
+As views só autenticam, autorizam, validam a entrada, chamam o serviço e
+respondem. Dados e decisões vêm de ``cmj/v8/services``.
+
+As respostas HTML saem por ``django.shortcuts.render``. Não use
+``TemplateResponse``: um middleware do legado reescreve o contexto dela.
+"""
+
+import hashlib
+import json
+from urllib.parse import quote, urlencode
+
+from django.contrib import messages
+from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.middleware.csrf import get_token
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils.cache import patch_cache_control
+from django.views import View
+
+from cmj.v8.services import s_demo, s_global, s_respostas
+
+PASTA_FRAGMENTOS = "v8/partials/"
+
+
+def requisicao_do_cliente(request):
+    """Diz se a requisição veio do cliente HTTP do frontend, e não de navegação."""
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return True
+    aceita = request.headers.get("Accept", "")
+    return "application/json" in aceita and "text/html" not in aceita
+
+
+def dados_layout(titulo, menu_ativo=None, trilha=(), zona=None):
+    """Monta a variável de contexto ``v8``, a única que os layouts leem."""
+    return {
+        "titulo": titulo,
+        "menu_ativo": menu_ativo,
+        "trilha": list(trilha),
+        "zona": zona,
+    }
+
+
+def responder_pagina(request, template, v8, contexto=None, status=200):
+    """Resposta HTML de página: privada e com o cookie ``csrftoken`` garantido."""
+    get_token(request)
+    resposta = render(request, template, {**(contexto or {}), "v8": v8}, status=status)
+    patch_cache_control(resposta, private=True)
+    return resposta
+
+
+def _inteiro(valor, padrao):
+    try:
+        return int(valor)
+    except (TypeError, ValueError):
+        return padrao
+
+
+class AcessoV8Mixin:
+    """Regra de acesso comum a todas as views do v8.
+
+    ``exige`` é ``None`` (pública), ``s_global.AUTENTICADO``,
+    ``s_global.SUPERUSUARIO`` ou uma permissão. A recusa sai em JSON para o
+    cliente HTTP do frontend, e como redirecionamento ao login ou página de
+    erro para a navegação comum. Views com ``responde_json`` respondem sempre
+    em JSON.
+    """
+
+    exige = None
+    responde_json = False
+
+    def get_exige(self):
+        return self.exige
+
+    def quer_json(self):
+        return self.responde_json or requisicao_do_cliente(self.request)
+
+    def dispatch(self, request, *args, **kwargs):
+        metodo = request.method.lower()
+        if metodo not in self.http_method_names or not hasattr(self, metodo):
+            return self.http_method_not_allowed(request, *args, **kwargs)
+        situacao = s_global.situacao_acesso(request.user, self.get_exige())
+        if situacao == s_global.NAO_AUTENTICADO:
+            return self.responder_nao_autenticado()
+        if situacao == s_global.SEM_PERMISSAO:
+            return self.responder_sem_permissao()
+        try:
+            return super().dispatch(request, *args, **kwargs)
+        except Http404:
+            return self.responder_nao_encontrado()
+
+    def responder_nao_autenticado(self):
+        if self.quer_json():
+            return JsonResponse(s_respostas.nao_autenticado(), status=401)
+        # O retorno leva só o caminho e a query da página pedida, sem host.
+        retorno = quote(self.request.get_full_path(), safe="/")
+        return HttpResponseRedirect(f"{reverse('cmj.core:login')}?next={retorno}")
+
+    def responder_sem_permissao(self):
+        if self.quer_json():
+            return JsonResponse(s_respostas.sem_permissao(), status=403)
+        return responder_pagina(
+            self.request,
+            "v8/erros/403.html",
+            dados_layout("Acesso negado"),
+            status=403,
+        )
+
+    def responder_nao_encontrado(self):
+        if self.quer_json():
+            return JsonResponse(s_respostas.nao_encontrado(), status=404)
+        # A página não reproduz o caminho pedido.
+        return responder_pagina(
+            self.request,
+            "v8/erros/404.html",
+            dados_layout("Página não encontrada"),
+            status=404,
+        )
+
+
+class PaginaV8View(AcessoV8Mixin, View):
+    """Base das páginas renderizadas pelo Django. Só ``GET`` e ``HEAD``."""
+
+    http_method_names = ["get", "head"]
+
+
+class FragmentoV8View(AcessoV8Mixin, View):
+    """Base dos fragmentos: só o HTML do template, sem layout.
+
+    ``publico`` só vale em fragmento que não exige autenticação. Nos demais a
+    resposta é sempre privada.
+    """
+
+    http_method_names = ["get", "head"]
+    template_name = None
+    publico = False
+
+    def dispatch(self, request, *args, **kwargs):
+        resposta = super().dispatch(request, *args, **kwargs)
+        resposta["X-Robots-Tag"] = "noindex"
+        if self.publico and self.get_exige() is None and resposta.status_code == 200:
+            patch_cache_control(resposta, public=True)
+        else:
+            patch_cache_control(resposta, private=True)
+        return resposta
+
+    def responder_fragmento(self, contexto=None):
+        if not self.template_name.startswith(PASTA_FRAGMENTOS):
+            raise ValueError(f"Fragmento fora de {PASTA_FRAGMENTOS}")
+        # Diferencia os ids das ilhas do fragmento dos ids da página que o recebe.
+        resumo = hashlib.sha256(self.request.path.encode("utf-8")).hexdigest()[:8]
+        contexto = {**(contexto or {}), "v8_ilha_prefixo": f"f{resumo}"}
+        return render(self.request, self.template_name, contexto)
+
+
+class JsonV8View(AcessoV8Mixin, View):
+    """Base dos endpoints JSON. Erros de acesso e 404 saem sempre em JSON."""
+
+    responde_json = True
+
+    def ler_corpo(self):
+        """Corpo da requisição como dict, ou ``None`` se não for um objeto JSON."""
+        try:
+            dados = json.loads(self.request.body)
+        except ValueError:
+            return None
+        return dados if isinstance(dados, dict) else None
+
+
+class InicioView(PaginaV8View):
+    def get(self, request):
+        return responder_pagina(
+            request,
+            "v8/paginas/inicio.html",
+            dados_layout("Início", "inicio", [("Início", None)]),
+        )
+
+
+class ZonaV8View(PaginaV8View):
+    """Entrega o shell de uma zona SPA para o prefixo e qualquer subcaminho.
+
+    O subcaminho é assunto do Vue Router: aqui ele não escolhe template nem é
+    renderizado.
+    """
+
+    zona = None
+
+    def get_exige(self):
+        return s_global.ZONAS[self.zona].exige
+
+    def get(self, request, subcaminho=None):
+        zona = s_global.ZONAS[self.zona]
+        return responder_pagina(
+            request,
+            "v8/layouts/spa.html",
+            dados_layout(
+                zona.titulo,
+                zona.menu_ativo,
+                [("Início", s_global.URL_BASE), (zona.titulo, None)],
+                zona.nome,
+            ),
+        )
+
+
+class NaoEncontradoV8View(AcessoV8Mixin, View):
+    """Todo caminho de ``/v8/`` que não é página, zona, fragmento nem endpoint."""
+
+    def dispatch(self, request, *args, **kwargs):
+        return self.responder_nao_encontrado()
+
+
+# ---------------------------------------------------------------------------
+# Demonstração: tudo exige superusuário e nada é gravado.
+# ---------------------------------------------------------------------------
+
+
+def _filtros_demo(request):
+    return s_demo.normalizar_filtros(
+        request.GET.get("q", ""),
+        request.GET.get("situacao", ""),
+        request.GET.get("cidade", ""),
+    )
+
+
+def _paginacao_demo(url, filtros, resultado):
+    """Links de paginação que mantêm os filtros."""
+
+    def link(pagina):
+        parametros = {chave: valor for chave, valor in filtros.items() if valor}
+        if pagina > 1:
+            parametros["pagina"] = pagina
+        return f"{url}?{urlencode(parametros)}" if parametros else url
+
+    atual = resultado["pagina"]
+    ultima = resultado["paginas"]
+    return {
+        "anterior": link(atual - 1) if atual > 1 else None,
+        "proxima": link(atual + 1) if atual < ultima else None,
+        "paginas": [
+            {"numero": numero, "url": link(numero), "atual": numero == atual}
+            for numero in range(1, ultima + 1)
+        ],
+    }
+
+
+def _cliente_ou_404(pk):
+    cliente = s_demo.obter(_inteiro(pk, None))
+    if cliente is None:
+        raise Http404
+    return cliente
+
+
+class DemoClientesView(PaginaV8View):
+    exige = s_global.SUPERUSUARIO
+
+    def get(self, request):
+        filtros = _filtros_demo(request)
+        resultado = s_demo.listar(
+            **filtros, pagina=_inteiro(request.GET.get("pagina"), 1)
+        )
+        url = reverse("cmj.v8:demo_clientes")
+        return responder_pagina(
+            request,
+            "v8/demo/clientes.html",
+            dados_layout(
+                "Clientes",
+                "demo-clientes",
+                [("Início", s_global.URL_BASE), ("Clientes", None)],
+            ),
+            {
+                "filtros": filtros,
+                "situacoes": s_demo.SITUACOES,
+                "cidades": s_demo.cidades(),
+                "resultado": resultado,
+                "paginacao": _paginacao_demo(url, filtros, resultado),
+                "props_tabela": {
+                    "clientes": resultado["itens"],
+                    "formulario": "demo-arquivar",
+                },
+            },
+        )
+
+
+class DemoArquivarView(AcessoV8Mixin, View):
+    """Ação em massa da lista: ``POST`` com CSRF, mensagem e redirecionamento."""
+
+    exige = s_global.SUPERUSUARIO
+    http_method_names = ["post"]
+
+    def post(self, request):
+        total = s_demo.arquivar(request.POST.getlist("ids"))
+        if total:
+            messages.success(
+                request,
+                f"{total} cliente(s) arquivado(s). Demonstração: nada foi gravado.",
+            )
+        else:
+            messages.warning(request, "Nenhum cliente selecionado para arquivar.")
+        return HttpResponseRedirect(reverse("cmj.v8:demo_clientes"))
+
+
+class DemoClienteView(PaginaV8View):
+    exige = s_global.SUPERUSUARIO
+
+    def get(self, request, pk):
+        cliente = _cliente_ou_404(pk)
+        return responder_pagina(
+            request,
+            "v8/demo/cliente.html",
+            dados_layout(
+                cliente["nome"],
+                "demo-clientes",
+                [
+                    ("Início", s_global.URL_BASE),
+                    ("Clientes", reverse("cmj.v8:demo_clientes")),
+                    (cliente["nome"], None),
+                ],
+            ),
+            {"cliente": cliente},
+        )
+
+
+class DemoClienteHistoricoFragmento(FragmentoV8View):
+    exige = s_global.SUPERUSUARIO
+    template_name = "v8/partials/demo/cliente_historico.html"
+
+    def get(self, request, pk):
+        cliente = _cliente_ou_404(pk)
+        return self.responder_fragmento(
+            {"cliente": cliente, "eventos": s_demo.historico(cliente["id"])}
+        )
+
+
+class DemoApiClientesView(JsonV8View):
+    exige = s_global.SUPERUSUARIO
+    http_method_names = ["get", "post"]
+
+    def get(self, request):
+        return JsonResponse(
+            s_demo.listar(
+                **_filtros_demo(request),
+                pagina=_inteiro(request.GET.get("pagina"), 1),
+                tamanho=_inteiro(request.GET.get("tamanho"), s_demo.TAMANHO_PADRAO),
+            )
+        )
+
+    def post(self, request):
+        dados = self.ler_corpo()
+        if dados is None:
+            return JsonResponse(s_respostas.erro_corpo_invalido(), status=400)
+        cliente, form = s_demo.validar(dados)
+        if cliente is None:
+            return JsonResponse(s_respostas.erro_validacao(form), status=400)
+        return JsonResponse(cliente, status=201)
+
+
+class DemoApiClienteView(JsonV8View):
+    exige = s_global.SUPERUSUARIO
+    http_method_names = ["get", "put"]
+
+    def get(self, request, pk):
+        return JsonResponse(_cliente_ou_404(pk))
+
+    def put(self, request, pk):
+        atual = _cliente_ou_404(pk)
+        dados = self.ler_corpo()
+        if dados is None:
+            return JsonResponse(s_respostas.erro_corpo_invalido(), status=400)
+        cliente, form = s_demo.validar(dados, pk=atual["id"])
+        if cliente is None:
+            return JsonResponse(s_respostas.erro_validacao(form), status=400)
+        return JsonResponse(cliente)
+
+
+class DemoApiNegadoView(JsonV8View):
+    """Responde sempre 403, para a demonstração do tratamento de ``sem_permissao``."""
+
+    exige = s_global.SUPERUSUARIO
+    http_method_names = ["get"]
+
+    def get(self, request):
+        return JsonResponse(s_respostas.sem_permissao(), status=403)
