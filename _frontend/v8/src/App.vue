@@ -1,6 +1,5 @@
 <template>
   <slot />
-  <DisplayMessage />
 </template>
 <script setup>
 
