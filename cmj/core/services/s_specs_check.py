@@ -167,7 +167,10 @@ def ler_spec(raiz, caminho):
             if m.group("tipo") == "|":
                 atual = None
         elif atual and linha.startswith((" ", "\t")) and linha.strip():
+            # parágrafo indentado continua a regra, mesmo depois de linha em branco
             atual.texto += "\n" + linha
+        elif atual and not linha.strip():
+            atual.texto += "\n"
         else:
             atual = None
     return spec

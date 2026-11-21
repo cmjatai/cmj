@@ -101,6 +101,24 @@ def test_id_fora_do_formato(repo):
     assert codigos(checar(repo)) == ["SPEC-FMT"]
 
 
+def test_paragrafo_indentado_apos_linha_em_branco_continua_a_regra(repo):
+    spec(
+        repo,
+        """\
+        - TST-CAP-001 [observado] Regra.
+
+          Evidência: `app/codigo.py:2`.
+
+        Parágrafo comum, fora da regra: `app/codigo.py:3`.
+        - TST-CAP-002 [observado] Sem evidência.
+
+        Evidência fora do bloco: `app/codigo.py:4`.
+        """,
+    )
+    achados = checar(repo)
+    assert [(a.codigo, a.id) for a in achados] == [("SPEC-EVID", "TST-CAP-002")]
+
+
 def test_definicao_em_bloco_de_codigo_e_ignorada(repo):
     spec(repo, "```\n- TST-CAP-001 sem marcador\n```\n")
     assert checar(repo) == []
