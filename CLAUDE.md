@@ -5,8 +5,9 @@ PostgreSQL 18 + pgvector, SAPL modificado (`sapl/`), apps próprios e CMS SIGAD 
 gerada automaticamente (`drfautoapi/`) e três frontends Vue (`_frontend/`).
 Serviços: Redis (cache, broker, Channels), Solr 9.5 (Haystack), Celery + beat, Daphne (WebSocket).
 
-CI: `.github/workflows/ci.yml` roda só o `specs_check` no GitHub Actions (runner padrão, grátis em
-repositório público), em push e PR para o `master`. O resto da validação é local.
+CI: `.github/workflows/ci.yml` roda o `specs_check` e os testes do v8 (`npm test`) no GitHub
+Actions (runner padrão, grátis em repositório público), em push e PR para o `master`. O resto da
+validação é local.
 
 ## Comandos
 

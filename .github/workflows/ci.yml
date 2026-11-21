@@ -19,3 +19,21 @@ jobs:
           python-version: "3.12"
       # Só biblioteca padrão do Python: não instala dependências do projeto.
       - run: python cmj/core/services/s_specs_check.py
+
+  frontend-v8:
+    # Testes do frontend v8 (Vitest com jsdom). Não roda lint, que corrige arquivos, nem build.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: _frontend/v8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          # Guarda o cache do npm entre execuções, para o npm ci ficar mais rápido.
+          cache: npm
+          cache-dependency-path: _frontend/v8/package-lock.json
+      # Instala exatamente as versões do package-lock.json.
+      - run: npm ci
+      - run: npm test
