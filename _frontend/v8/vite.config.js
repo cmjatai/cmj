@@ -8,7 +8,6 @@ import vue from '@vitejs/plugin-vue'
 import inject from "@rollup/plugin-inject"
 import Components from 'unplugin-vue-components/vite'
 import eslintPlugin from '@nabla/vite-plugin-eslint'
-import { BootstrapVueNextResolver } from 'bootstrap-vue-next'
 
 export default defineConfig(({command, mode}) => {
 
@@ -96,11 +95,6 @@ export default defineConfig(({command, mode}) => {
       }),
       Components({
         resolvers: [
-          BootstrapVueNextResolver({
-            aliases: {
-              //BInput: 'BFormInput',
-            }
-          })
         ]
       }),
       {
