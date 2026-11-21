@@ -5,7 +5,7 @@ PostgreSQL 18 + pgvector, SAPL modificado (`sapl/`), apps próprios e CMS SIGAD 
 gerada automaticamente (`drfautoapi/`) e três frontends Vue (`_frontend/`).
 Serviços: Redis (cache, broker, Channels), Solr 9.5 (Haystack), Celery + beat, Daphne (WebSocket).
 
-CI: `.github/workflows/ci.yml` roda o `specs_check` e os testes do v8 (`npm test`) no GitHub
+CI: `.github/workflows/ci.yml` roda o `specs_check` e os testes do v8 e do v2018 (`npm test`) no GitHub
 Actions (runner padrão, grátis em repositório público), em push e PR para o `master`. O resto da
 validação é local.
 
@@ -36,10 +36,10 @@ python -m pytest -m "not slow"
 python -m black <arquivos>
 python -m isort --profile black <arquivos>
 
-# Frontend (o compose já mantém os dev servers no ar; só o v8 tem testes automatizados)
+# Frontend (o compose já mantém os dev servers no ar; v8 e v2018 têm testes automatizados)
 cd _frontend/v6    && npm run dev | build | lint | format
 cd _frontend/v8    && npm run dev | build | lint | format | test
-cd _frontend/v2018 && npm run serve | build | lint
+cd _frontend/v2018 && npm run serve | build | lint | test
 ```
 
 `npm run lint` altera arquivos nos três frontends (autofix).
@@ -118,7 +118,9 @@ Fora de uso: `cmj/legacy_cep`, `cmj/checklist` e `sapl/lexml` não estão em `IN
 
 ## Convenções do frontend
 
-O código novo vai para o **v6**. O v2018 é só manutenção: não migre para Vue 3 nem Pinia.
+O código novo vai para o **v6**. O v2018 é manutenção, mas continua em uso a médio e longo prazo:
+não migre para Vue 3 nem Pinia e não crie nele módulo ou entrada novos. Funcionalidade nova que
+complementa uma tela do v2018 pode ser feita nele quando for urgente e a migração não couber no prazo.
 O **v8** é a arquitetura híbrida que vai substituir o v6 e o v2018. Por ora só tem a demonstração:
 só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 
@@ -170,6 +172,11 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   servers em 5173 e 5174; desligada, lê os `dist/`, e mudança em `src/` só aparece após build.
 - **`dist/` é versionado** nos três frontends e vai para a imagem de produção. Commits de
   funcionalidade não incluem rebuild; ele sai em commits "rebuild frontends".
+- **`package-lock.json` é versionado** nos três frontends e o CI instala com `npm ci`. O rebuild
+  regenera o lock. Commit que muda um `package.json` leva o lock junto.
+- **`.npmrc` com `min-release-age=7`** nos três frontends: o npm recusa versão publicada há menos
+  de 7 dias. `rm package-lock.json && npm install` não atualiza o que já está em `node_modules`;
+  para renovar versões use `npm update`.
 - **Produção roda `migrate` ao subir** (`docker/start.sh`), com containers blue e green.
   Prefira migrations compatíveis com a versão ainda em execução.
 - **Settings ignoradas**: `USE_SOLR`, `SOLR_URL` e `SOLR_COLLECTION` são fixas em `project.py`.
@@ -203,7 +210,10 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   `/api/auth/token`): limite de tentativas e token CSRF. Leia antes de alterar essas rotas.
 - `docs/specs/v8/README.md`: índice das specs do v8 (arquitetura, shell, overlays, cliente HTTP e
   demonstração). Leia a spec da parte que for alterar.
-- `docs/frontend/v2018.md`: Vuex, `Resources.Utils` e padrões do v2018.
+- `docs/frontend/v2018.md`: Vuex, `Resources.Utils`, padrões e testes do v2018.
+- `docs/specs/v2018/README.md`: índice das specs do v2018 (estrutura do projeto webpack e
+  infraestrutura de testes). Leia antes de mexer em `vue.config.js`, nas entradas ou em
+  `_frontend/v2018/tests`.
 - `docs/specs/loa/fases-emenda.md`: comportamento atual das fases da emenda. Leia antes de alterá-las.
 - `docs/specs/loa/edicao-emenda.md`: telas de criação e edição da emenda, API usada por elas e
   autosave. Leia antes de alterar essas telas.

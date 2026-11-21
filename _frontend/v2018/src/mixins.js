@@ -9,7 +9,7 @@ Vue.use(Vuex)
 Vue.mixin({
 
   computed: {
-    ...Vuex.mapState('store__sync', ['data_cache', 'wsConnected']),
+    ...Vuex.mapState('store__sync', ['data_cache']),
     ...Vuex.mapGetters([
       'getCache',
       'cache',
@@ -30,8 +30,7 @@ Vue.mixin({
   },
   methods: {
     ...Vuex.mapActions('store__sync', [
-      'fetchSync',
-      'registerModels'
+      'fetchSync'
     ]),
     ...Vuex.mapActions([
       'setSideleftVisivel',
@@ -79,81 +78,6 @@ Vue.mixin({
     },
     isString: function (value) {
       return typeof value === 'string' || value instanceof String
-    },
-    ws_endpoint (ws) {
-      return (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + (ws !== undefined ? ws : this.ws)
-    },
-    ws_reconnect () {
-      this.$disconnect()
-      this.$connect()
-    },
-    on_ws_message (data) {
-      let _this = this
-
-      if (_this.app === undefined) {
-        return
-      }
-
-      if (this.id !== undefined && this.id !== null && data.id !== this.id) {
-        return
-      }
-
-      if (_this.model === undefined) {
-        if (Array.isArray(_this.app)) {
-          if (_.indexOf(_this.app, data.app) !== -1) {
-            _this.fetch(data)
-          }
-        } else {
-          if (data.app === _this.app) {
-            _this.fetch(data)
-          }
-        }
-      } else if (Array.isArray(_this.app) && Array.isArray(_this.model)) {
-        if (_.indexOf(_this.app, data.app) !== -1 &&
-            _.indexOf(_this.model, data.model) !== -1) {
-          _this.fetch(data)
-        }
-      } else {
-        if (data.app === _this.app && data.model === _this.model) {
-          _this.fetch(data)
-        }
-      }
-    },
-    handleWebSocketMessageTimeRefresh_error (event) {
-      /**
-       * Define um ouvinte para o socket implementado por VueNativeSock
-       */
-      let data = JSON.parse(event.data)
-      // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-      // console.debug(performance.now(), 'ws-message', data)
-      this
-        .$nextTick(() => {
-          // console.debug(performance.now(), 'ws-message-exec', data)
-          EventBus.$emit('ws-message', data.message)
-          // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-        })
-    },
-    handleWebSocketMessageTimeRefresh (event) {
-      /**
-       * Define um ouvinte para o socket implementado por VueNativeSock
-       */
-      let data = JSON.parse(event.data)
-      // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-      // console.debug(performance.now(), 'ws-message', data)
-      this.$nextTick(() => {
-        this.refreshState(data.message)
-          .then(value => {
-            // Emite um evento pelo barramento parelelo global.
-            // O componente que estiver ouvindo esse barramento será informado que um
-            // evento ws-message ocorreu. Será chamada o method on_ws_message
-            console.debug(performance.now(), 'ws-message-exec', data)
-            EventBus.$emit('ws-message', data.message)
-            // this.sendMessage({ alert: 'info', message: 'Base Atualizada', time: 3 })
-          })
-          .catch(err => {
-            console.error('Erro ao atualizar o estado da aplicação', err)
-          })
-      })
     },
     fetchModelOrderedList (app = null, model = null, ordering = null, page = 1, query_string = '', func = null) {
       if (page === null || model === null || ordering === null) {
@@ -253,15 +177,12 @@ Vue.mixin({
     }
   },
   created: function () {
-    /*
-      Observador para o WebSocket...
-      O Componente que se interesse por monitorar notificacões vindas
-      do servidor de que um model possui alteracão, basta re-implementar
-      o método on_ws_message, ou usar o on_ws_message do mixin e implementar o fetch
-    */
     let _this = this
-    EventBus.$on('ws-message', _this.on_ws_message)
     EventBus.$on('user-logged-in', _this.user_logged_in)
     EventBus.$on('user-logged-out', _this.user_logged_out)
+  },
+  beforeDestroy: function () {
+    EventBus.$off('user-logged-in', this.user_logged_in)
+    EventBus.$off('user-logged-out', this.user_logged_out)
   }
 })

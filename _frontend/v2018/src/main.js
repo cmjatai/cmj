@@ -4,7 +4,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResize from 'vue-resize'
 import BootstrapVue from 'bootstrap-vue'
-import VueNativeSock from 'vue-native-websocket'
 import Router from 'vue-router'
 
 import VuexStore from './store'
@@ -34,25 +33,6 @@ Vue.use(Vuex)
 Vue.use(Router)
 Vue.use(VueResize)
 Vue.use(BootstrapVue)
-
-/*
-ws/time-refresh recebe uma notificacão sempre que um model do Sapl
-é alterado. Um JSON é enviado pelo servidor no formato:
-{
-  action: 'post_save' | 'post_delete',
-  id: 9999, // 9999 - pk do model alterado
-  app: 'app_name', // de que app é esse id
-  model; 'model_name', // de que model é esse id
-}
-*/
-
-Vue.use(VueNativeSock, (window.location.protocol === 'https:' ? 'wss://' : 'ws://') + window.location.host + '/ws/time-refresh/', {
-  // reconnection: true // (Boolean) whether to reconnect automatically (false)
-  connectManually: true,
-  format: 'json' // (String) send and receive data in JSON format (json)
-  // reconnectionAttempts: 5, // (Number) number of reconnection attempts before giving up (Infinity),
-  // reconnectionDelay: 3000, // (Number) how long to initially wait before attempting a new (1000)
-})
 
 Vue.config.productionTip = false
 

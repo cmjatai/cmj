@@ -278,6 +278,24 @@ def test_titulos_vitest_ligam_regras(repo):
     assert "TST-CAP-003" in achados[0].mensagem
 
 
+@pytest.mark.spec("V2018-TST-006")
+def test_titulos_vitest_do_v2018_ligam_regras(repo):
+    spec(repo, "- TST-CAP-001 [observado] A. `app/codigo.py:1`\n")
+    escrever(
+        repo,
+        "_frontend/v2018/tests/cap.spec.js",
+        """\
+        it('TST-CAP-001: faz A', () => {})
+        it('TST-CAP-004: faz D', () => {})
+        """,
+    )
+    achados = checar(repo)
+    assert codigos(achados) == ["TEST-CAB", "TEST-ORFAO"]
+    mensagens = {a.codigo: a.mensagem for a in achados}
+    assert "_frontend/v2018/tests/cap.spec.js" in mensagens["TEST-CAB"]
+    assert "TST-CAP-004" in mensagens["TEST-ORFAO"]
+
+
 def test_referencias_orfas_e_retiradas(repo):
     spec(
         repo,

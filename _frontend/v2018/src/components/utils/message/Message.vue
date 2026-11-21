@@ -8,7 +8,7 @@
       :key="key"
       v-model="msg.time"
       :message_id="msg.id">
-      <span v-html="msg.message"></span>
+      <span>{{ msg.message }}</span>
     </alert>
   </div>
 </template>

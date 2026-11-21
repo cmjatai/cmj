@@ -18,7 +18,6 @@ from sapl.sessao.views import (
     OradorExpedienteCrud,
     OradorOrdemDiaCrud,
     OrdemDiaLeituraView,
-    PainelView,
     PresencaOrdemDiaView,
     PresencaView,
     RetiradaPautaCrud,
@@ -209,7 +208,6 @@ urlpatterns = [
         r"^sessao/(?P<pk>\d+)/expediente$", ExpedienteView.as_view(), name="expediente"
     ),
     re_path(r"^sessao/(?P<pk>\d+)/presenca$", PresencaView.as_view(), name="presenca"),
-    re_path(r"^sessao/(?P<pk>\d+)/painel$", PainelView.as_view(), name="painel"),
     re_path(
         r"^sessao/(?P<pk>\d+)/presencaordemdia$",
         PresencaOrdemDiaView.as_view(),

@@ -28,7 +28,6 @@ import sapl.comissoes.urls
 import sapl.compilacao.urls
 import sapl.materia.urls
 import sapl.norma.urls
-import sapl.painel.urls
 import sapl.parlamentares.urls
 import sapl.protocoloadm.urls
 import sapl.redireciona_urls.urls
@@ -44,7 +43,6 @@ urlpatterns = [
     re_path(r"", include(sapl.parlamentares.urls)),
     re_path(r"", include(sapl.materia.urls)),
     re_path(r"", include(sapl.norma.urls)),
-    re_path(r"", include(sapl.painel.urls)),
     re_path(r"", include(sapl.protocoloadm.urls)),
     re_path(r"", include(sapl.compilacao.urls)),
     re_path(r"", include(sapl.relatorios.urls)),

@@ -5,34 +5,6 @@ from django.conf import settings
 from django.http.response import HttpResponse
 from django.shortcuts import render
 
-
-def service_worker_proxy_dev_old(request):
-    if settings.DEBUG and "dev" in request.path:
-        host, port = request.get_host().split(":")
-        host = "cmjfront2018" if port == "9099" else host
-        try:
-            try:
-                response = requests.get(
-                    f"http://{host}:8080/service-worker-dev.js", timeout=5
-                )
-                response = HttpResponse(response.content)
-            except Exception:
-                response = HttpResponse(
-                    "/* Service Worker not found on dev server (port 8080) */"
-                )
-        except ImportError:
-            response = HttpResponse("/* Requests library not found */")
-    else:
-        sw_file = settings.PROJECT_DIR_FRONTEND_2018.child(
-            "dist", "v2018", "service-worker.js"
-        )
-        response = HttpResponse(open(sw_file).read())
-
-    response.headers["Content-Type"] = "application/javascript"
-    response.headers["Service-Worker-Allowed"] = "/"
-    return response
-
-
 # Frontends Vite: prefixo da URL -> (diretório do frontend, container dev, porta dev)
 VITE_FRONTENDS = {
     "v6": ("PROJECT_DIR_FRONTEND_2026", "cmjfront2026", 5173),
@@ -68,14 +40,18 @@ def service_worker_proxy(request):
 
     if settings.DEBUG:
 
-        host, port = request.get_host().split(":")
+        # O destino vem da configuração, nunca do host pedido: o dev server fica em
+        # DEV_HOST_NAME ou, quando o acesso é pela porta publicada do container do
+        # backend (9099), no container do frontend.
+        em_container = request.get_host().rpartition(":")[2] == "9099"
+        host_dev = getattr(settings, "DEV_HOST_NAME", "localhost")
 
         if version:
-            host = dev_container if port == "9099" else host
+            host = dev_container if em_container else host_dev
             url = f"http://{host}:{dev_port}/static/service-worker.js"
             sw_file = sw_vite_file
         else:
-            host = "cmjfront2018" if port == "9099" else host
+            host = "cmjfront2018" if em_container else host_dev
             url = f"http://{host}:8080/service-worker.js"
             sw_file = sw_2018_file
 

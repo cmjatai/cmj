@@ -126,6 +126,10 @@ yarn.lock
 .node_repl_history
 
 package-lock.json
+# O lock dos três frontends é versionado: o rebuild o regenera e o commita junto com o dist/.
+!/_frontend/v2018/package-lock.json
+!/_frontend/v6/package-lock.json
+!/_frontend/v8/package-lock.json
 security.json
 /.pytest_cache/
 .eslintcache

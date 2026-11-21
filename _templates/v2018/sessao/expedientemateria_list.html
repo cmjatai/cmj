@@ -27,12 +27,6 @@
     var pk_sessao = {{root_pk}};
     var pk_list = {{ object_list|to_list_pk|safe }};
 
-    $(document).on('keyup', (e) => {
-      if (e.keyCode == 86){
-        window.open("{% url 'sapl.painel:voto_individual' %}",'Voto Individual','width=1000, height=800, scrollbars=yes');
-      };
-    });
-
     {% if perms.sessao.add_expedientemateria and not sessao.iniciada or user.is_superuser %} {# DJANGO template perms.sessao.add_expedientemateria #}
       $('tbody').sortable({
         start: function(event, ui) {

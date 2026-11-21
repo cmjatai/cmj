@@ -1,29 +1,13 @@
-# frontend
+# Frontend v2018
 
-## Project setup
-```
-yarn install
-```
+Vue 2 com Vue CLI/Webpack. Está em manutenção.
 
-### Compiles and hot-reloads for development
-```
-yarn run serve
-```
-
-### Compiles and minifies for production
-```
-yarn run build
+```bash
+npm install
+npm run serve   # dev server em :8080
+npm run lint    # corrige arquivos
+npm test        # Vitest com jsdom
+npm run build   # gera dist/v2018 e webpack-stats.json, ambos versionados
 ```
 
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+Guia de uso: `docs/frontend/v2018.md`. Estrutura e testes: `docs/specs/v2018/`.

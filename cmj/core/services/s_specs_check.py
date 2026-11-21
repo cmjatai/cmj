@@ -2,8 +2,8 @@
 
 Lê as specs de ``docs/specs/<dominio>/<capacidade>.md``, as marcas
 ``pytest.mark.spec`` dos testes Python, os títulos ``'ID: ...'`` dos testes
-Vitest do v8 e as referências a IDs em todo arquivo versionado, e devolve a
-lista de inconsistências. Não usa banco nem Django.
+Vitest do v8 e do v2018 e as referências a IDs em todo arquivo versionado, e
+devolve a lista de inconsistências. Não usa banco nem Django.
 """
 
 import ast
@@ -42,6 +42,9 @@ RE_ABREV = re.compile(r"\s*(?:,|\be|\ba)\s+(\d{3})(?![\w-])")
 RE_TITULO_VITEST = re.compile(
     r"""['"`]\s*(""" + ID_RE + r"(?:\s*,\s*" + ID_RE + r""")*)\s*:"""
 )
+
+# Frontends cujos testes Vitest (``*.spec.js``) ligam regras pelo título.
+FRONTENDS_VITEST = ("_frontend/v8/", "_frontend/v2018/")
 
 EXCLUIR_REFS = (
     "node_modules/",
@@ -361,7 +364,7 @@ def checar(raiz, branch=None):
                 continue
             marcas, erros = marcas_python(raiz, p)
             achados += erros
-        elif p.name.endswith(".spec.js") and rel.startswith("_frontend/v8/"):
+        elif p.name.endswith(".spec.js") and rel.startswith(FRONTENDS_VITEST):
             marcas = marcas_vitest(raiz, p)
         else:
             continue

@@ -83,7 +83,8 @@ Como a checagem lê:
 - Uma regra é a linha `- ID [marcador]` ou `| ID [marcador] |`, mais as linhas indentadas que a
   seguem. Linhas dentro de blocos de código não contam.
 - Nos testes Python vale `pytest.mark.spec("ID", ...)`, lido pela árvore sintática. Nos testes do
-  v8 (`_frontend/v8/**/*.spec.js`) vale o título que começa por `'ID: '` ou `'ID, ID: '`.
+  v8 e do v2018 (`_frontend/v8/**/*.spec.js` e `_frontend/v2018/**/*.spec.js`) vale o título que
+  começa por `'ID: '` ou `'ID, ID: '`.
 - Nas referências, as abreviações `LOA-FASE-056, 057 e 064` e `LOA-EMD-070 a 073` contam com o
   prefixo do ID completo. Num intervalo, só as pontas são checadas. IDs de domínios que não têm spec
   são ignorados.

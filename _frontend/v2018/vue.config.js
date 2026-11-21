@@ -9,13 +9,16 @@ const CopyPlugin = require('copy-webpack-plugin')
 const WebpackPwaManifest = require('webpack-pwa-manifest')
 const WorkboxPlugin = require('workbox-webpack-plugin')
 
+const fs = require('fs')
 const dotenv = require('dotenv')
-dotenv.config({
-   path: '../../cmj/.env'
-})
 
-let DEV_HOST_NAME = process.env.DEV_HOST_NAME || 'localhost'
-let DEV_BACKENDPORT = process.env.DEV_BACKENDPORT || '8000'
+// Do .env do backend só interessam DEV_HOST_NAME e DEV_BACKENDPORT. O arquivo é lido para uma
+// variável local: o resto dele não entra no ambiente deste processo.
+const envBackendPath = path.resolve(__dirname, '../../cmj/.env')
+const envBackend = fs.existsSync(envBackendPath) ? dotenv.parse(fs.readFileSync(envBackendPath)) : {}
+
+let DEV_HOST_NAME = process.env.DEV_HOST_NAME || envBackend.DEV_HOST_NAME || 'localhost'
+let DEV_BACKENDPORT = process.env.DEV_BACKENDPORT || envBackend.DEV_BACKENDPORT || '8000'
 
 module.exports = {
   runtimeCompiler: true,
@@ -125,7 +128,7 @@ module.exports = {
 
     if (process.env.NODE_ENV === 'production') {
       config.devtool(false)
-      shell.rm('./dev-webpack-stats.json')
+      shell.rm('-f', './dev-webpack-stats.json')
 
       config.optimization.splitChunks({
         chunks: 'all',

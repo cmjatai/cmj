@@ -19,7 +19,6 @@ re_path(r'^sapl/', include(sapl.parlamentares.urls)),
 re_path(r'^sapl/', include(sapl.materia.urls)),
 re_path(r'^sapl/', include(sapl.norma.urls)),
 re_path(r'^sapl/', include(sapl.lexml.urls)),
-re_path(r'^sapl/', include(sapl.painel.urls)),
 re_path(r'^sapl/', include(sapl.protocoloadm.urls)),
 re_path(r'^sapl/', include(sapl.compilacao.urls)),
 re_path(r'^sapl/', include(sapl.relatorios.urls)),
@@ -53,7 +52,6 @@ import sapl.compilacao.urls
 # import sapl.lexml.urls
 import sapl.materia.urls
 import sapl.norma.urls
-import sapl.painel.urls
 import sapl.parlamentares.urls
 import sapl.protocoloadm.urls
 import sapl.redireciona_urls.urls
@@ -90,7 +88,6 @@ urlpatterns_all = [
     re_path(r"", include(sapl.materia.urls)),
     re_path(r"", include(sapl.norma.urls)),
     # re_path(r'', include(sapl.lexml.urls)),
-    re_path(r"", include(sapl.painel.urls)),
     re_path(r"", include(sapl.protocoloadm.urls)),
     re_path(r"", include(sapl.compilacao.urls)),
     re_path(r"", include(sapl.relatorios.urls)),

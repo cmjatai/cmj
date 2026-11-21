@@ -30,9 +30,26 @@ jobs:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
-          node-version: "24"
-          # Sem cache: ele exige o package-lock.json, que não é versionado.
+          # A mesma versão dos containers de desenvolvimento (docker/Dockerfile.Front*Dev).
+          node-version: "24.22.3"
           package-manager-cache: false
-      # Sem lock, como no build local: instala as versões mais recentes que o package.json aceita.
-      - run: npm install
+      # Instala as versões do package-lock.json, que o rebuild dos frontends regenera e commita.
+      - run: npm ci
+      - run: npm test
+
+  frontend-v2018:
+    # Testes do frontend v2018 (Vitest com jsdom). Não roda lint, que corrige arquivos, nem build.
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: _frontend/v2018
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          # A mesma versão dos containers de desenvolvimento (docker/Dockerfile.Front*Dev).
+          node-version: "24.22.3"
+          package-manager-cache: false
+      # Instala as versões do package-lock.json, que o rebuild dos frontends regenera e commita.
+      - run: npm ci
       - run: npm test
