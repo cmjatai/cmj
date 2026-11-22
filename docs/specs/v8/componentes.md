@@ -3,8 +3,10 @@
 Status: em implementação: as regras `[implementado]` têm teste; as `[desejado]` são dos próximos
 grupos
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `2ba9aef96`)
-Código principal: `_frontend/v8/src/componentes/`, `_frontend/v8/src/css/temas/oficial/primitivos.css`
-Testes: `_frontend/v8/tests/componentes/componentes.spec.js`
+Código principal: `_frontend/v8/src/componentes/`, `_frontend/v8/src/css/temas/oficial/primitivos.css`,
+`_frontend/v8/src/css/temas/oficial/campos.css`
+Testes: `_frontend/v8/tests/componentes/componentes.spec.js`,
+`_frontend/v8/tests/componentes/campos.spec.js`
 
 Componentes Vue de uso geral, construídos sobre as primitivas do Reka UI e vestidos pelo tema em
 vigor. São a base das telas do v8 e aparecem na vitrine do design system (`ds.md`). Cobrem todas
@@ -130,13 +132,13 @@ visual ficam fora (Fora do escopo).
 
 ### Grupos
 
-- V8-CMP-010 [desejado] Os componentes de campo da tabela "Campos" ficam em `src/componentes/`,
+- V8-CMP-010 [implementado] Os componentes de campo da tabela "Campos" ficam em `src/componentes/`,
   cada um sobre a primitiva indicada. `GrupoAlternadores`, `Deslizante`, `CampoNumero`,
   `CampoCodigo`, `CampoEtiquetas`, `TextoEditavel`, `Avaliacao`, `SelecaoBusca`, `Autocompletar` e
   `ListaOpcoes`, com `name` e dentro de um `<form>`, participam do envio nativo. `Alternador` não
-  participa (D6). Evidência: a criar.
-- V8-CMP-011 [desejado] `CampoNumero` formata e lê o número no idioma pt-BR, e no formulário vai o
-  número sem formatação. Evidência: a criar.
+  participa (D6). Evidência: `_frontend/v8/src/componentes/Deslizante.vue:8`, `_frontend/v8/src/componentes/SelecaoBusca.vue:6`.
+- V8-CMP-011 [implementado] `CampoNumero` formata e lê o número no idioma pt-BR, e no formulário vai o
+  número sem formatação. Evidência: `_frontend/v8/src/componentes/CampoNumero.vue:10`.
 - V8-CMP-020 [desejado] Os componentes da tabela "Navegação e estrutura" ficam em
   `src/componentes/`, cada um sobre a primitiva indicada. O conteúdo flutuante de `BarraMenus`,
   `MenuContexto` e `CartaoFlutuante` vai para o `body`, na camada `--z-popover`, e o painel do

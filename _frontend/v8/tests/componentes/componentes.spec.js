@@ -2,7 +2,6 @@
 import fs from 'fs'
 import path from 'path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import { DialogContent, DialogPortal, DialogRoot, DialogTitle } from 'reka-ui'
 import Abas from '~@/componentes/Abas.vue'
@@ -17,22 +16,7 @@ import Selecao from '~@/componentes/Selecao.vue'
 import { ilhas } from '~@/core/ilhas'
 import DsComponentes from '~@/modules/ds/ilhas/DsComponentes.vue'
 import { assentar } from '../demo/apoio'
-
-const RAIZ = path.resolve(__dirname, '../..')
-const PASTA = path.join(RAIZ, 'src/componentes')
-const OFICIAL = path.join(RAIZ, 'src/css/temas/oficial')
-
-const PRIMITIVAS = {
-  Abas: 'Tabs',
-  Sanfona: 'Accordion',
-  Dica: 'Tooltip',
-  Popover: 'Popover',
-  MenuSuspenso: 'DropdownMenu',
-  Selecao: 'Select',
-  CaixaMarcacao: 'Checkbox',
-  GrupoOpcoes: 'RadioGroup',
-  Chave: 'Switch'
-}
+import { CSS_DOS_COMPONENTES, OFICIAL, PASTA, PRIMITIVAS, SO_EXIBICAO, desmontarTodos, fonte, ler, montar } from './apoio'
 
 const OPCOES = [
   { valor: 'centro', rotulo: 'Centro' },
@@ -40,21 +24,8 @@ const OPCOES = [
   { valor: 'sul', rotulo: 'Sul' }
 ]
 
-const montados = []
-function montar(componente, opcoes = {}) {
-  const wrapper = mount(componente, { attachTo: document.body, ...opcoes })
-  montados.push(wrapper)
-  return wrapper
-}
-
-const ler = arquivo => fs.readFileSync(arquivo, 'utf8')
-const fonte = nome => ler(path.join(PASTA, `${nome}.vue`))
-
 describe('componentes base', () => {
-  afterEach(() => {
-    montados.splice(0).forEach(wrapper => wrapper.unmount())
-    document.body.innerHTML = ''
-  })
+  afterEach(desmontarTodos)
 
   it('V8-CMP-001: os nove componentes ficam em src/componentes, cada um sobre a primitiva do Reka UI', () => {
     const arquivos = fs.readdirSync(PASTA).filter(f => f.endsWith('.vue')).map(f => f.replace('.vue', '')).sort()
@@ -62,8 +33,14 @@ describe('componentes base', () => {
     Object.entries(PRIMITIVAS).forEach(([nome, primitiva]) => {
       const importados = /import\s*\{([^}]+)\}\s*from\s*'reka-ui'/.exec(fonte(nome))[1]
       const partes = importados.split(',').map(p => p.trim()).filter(Boolean)
-      expect(partes.length, nome).toBeGreaterThan(1)
-      partes.forEach(parte => expect(parte.startsWith(primitiva), `${nome}: ${parte}`).toBe(true))
+      expect(partes.length, nome).toBeGreaterThan(0)
+      // ToggleGroup começa por Toggle: o prefixo tem de ser exatamente o da primitiva.
+      partes.forEach(parte => {
+        expect(parte === primitiva || parte.startsWith(primitiva), `${nome}: ${parte}`).toBe(true)
+        Object.values(PRIMITIVAS)
+          .filter(outra => outra.length > primitiva.length && outra.startsWith(primitiva))
+          .forEach(outra => expect(parte.startsWith(outra), `${nome}: ${parte}`).toBe(false))
+      })
     })
   })
 
@@ -71,8 +48,7 @@ describe('componentes base', () => {
     Object.keys(PRIMITIVAS).forEach(nome => {
       const codigo = fonte(nome)
       expect(codigo, nome).not.toMatch(/\bfetch\(|XMLHttpRequest|http\/client|Resources\.|useGlobalStore|useAuthStore/)
-      // A dica só mostra texto: não tem valor a devolver.
-      if (nome !== 'Dica') {
+      if (!SO_EXIBICAO.includes(nome)) {
         expect(codigo, nome).toMatch(/defineModel|defineEmits/)
       }
     })
@@ -95,9 +71,9 @@ describe('componentes base', () => {
   })
 
   it('V8-CMP-003: o visual vem de classes v8-* e os estados dos atributos do Reka UI', async () => {
-    const css = ler(path.join(OFICIAL, 'primitivos.css'))
+    const css = CSS_DOS_COMPONENTES.map(arquivo => ler(path.join(OFICIAL, arquivo))).join('\n')
     const definidas = new Set(
-      ['primitivos.css', 'componentes.css', 'shell.css']
+      [...CSS_DOS_COMPONENTES, 'componentes.css', 'shell.css']
         .flatMap(arquivo => [...ler(path.join(OFICIAL, arquivo)).matchAll(/\.(v8-[a-z0-9-]+)/g)].map(m => m[1]))
     )
     Object.keys(PRIMITIVAS).forEach(nome => {
@@ -231,7 +207,7 @@ describe('componentes base', () => {
   })
 
   it('V8-CMP-007: cor, raio, sombra, duração e camada vêm dos tokens', () => {
-    const css = ler(path.join(OFICIAL, 'primitivos.css'))
+    const css = CSS_DOS_COMPONENTES.map(arquivo => ler(path.join(OFICIAL, arquivo))).join('\n')
     ;[...css.matchAll(/z-index:\s*([^;]+);/g)].forEach(m => expect(m[1].trim()).toBe('var(--z-popover)'))
     ;[...css.matchAll(/(?:transition|animation):\s*([^;]+);/g)].forEach(m => {
       expect(m[1], m[0]).toMatch(/var\(--duracao\)/)
