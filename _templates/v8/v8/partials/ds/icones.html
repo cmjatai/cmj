@@ -1,0 +1,5 @@
+<ul class="grid grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] gap-3">
+  {% for nome in amostras.icones %}
+    <li class="flex flex-col items-center gap-1 rounded-md border border-borda p-3"><svg class="v8-icone" aria-hidden="true"><use href="#v8-i-{{ nome }}"></use></svg><code class="text-xs text-texto-suave">{{ nome }}</code></li>
+  {% endfor %}
+</ul>

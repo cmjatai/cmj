@@ -88,3 +88,25 @@ export function blocosDeCor(css, seletorRaiz) {
     sistema: achar(`${seletorRaiz}:not([data-modo])`, escuroDoSistema)
   }
 }
+
+// Partes de uma lista de seletores, separadas pelas vírgulas que não estão entre parênteses.
+export function partesDoSeletor(seletor) {
+  const partes = []
+  let nivel = 0
+  let atual = ''
+  for (const caractere of seletor) {
+    if (caractere === '(') {
+      nivel++
+    } else if (caractere === ')') {
+      nivel--
+    }
+    if (caractere === ',' && nivel === 0) {
+      partes.push(atual.trim())
+      atual = ''
+    } else {
+      atual += caractere
+    }
+  }
+  partes.push(atual.trim())
+  return partes.filter(Boolean)
+}

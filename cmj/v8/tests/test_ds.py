@@ -11,6 +11,7 @@ from cmj.v8 import views
 from cmj.v8.services import s_ds, s_global
 
 from .conftest import (
+    DIR_CSS_OFICIAL,
     DIR_TEMPLATES_V8,
     URLS_DS,
     cliente_http,
@@ -302,3 +303,171 @@ def test_design_system_nao_le_nem_grava_model_arquivo_cache_fila_ou_indice(
         s_ds.temas("tema1")
         s_ds.tema("tema2", "oficial")
     assert len(consultas) == 0
+
+
+# --- Conteúdo da vitrine ---------------------------------------------------------------
+
+
+def vitrine(usuario):
+    return html_de(cliente_http(usuario).get(URL_VITRINE))
+
+
+def secao(html, ancora):
+    """O HTML de uma seção da vitrine, do ``<section id>`` ao ``</section>`` que a fecha."""
+    inicio = html.index(f'<section id="{ancora}"')
+    ancoras = [item.ancora for item in s_ds.SECOES]
+    seguintes = ancoras[ancoras.index(ancora) + 1 :]
+    fim = (
+        html.index(f'<section id="{seguintes[0]}"')
+        if seguintes
+        else html.index("</main>")
+    )
+    return html[inicio:fim]
+
+
+def tokens_do_oficial():
+    css = (DIR_CSS_OFICIAL / "tokens.css").read_text("utf-8")
+    bloco = css[css.index(":root {") : css.index("\n}")]
+    return re.findall(r"(--[a-z][a-z0-9-]*)\s*:", bloco)
+
+
+def sem_classe(html, tag):
+    """Aberturas de ``<tag>`` sem atributo ``class``."""
+    return [
+        m.group(0)
+        for m in re.finditer(rf"<{tag}(?:\s[^>]*)?>", html)
+        if "class=" not in m.group(0)
+    ]
+
+
+@pytest.mark.spec("V8-DS-003")
+def test_vitrine_tem_amostras_e_rotulos_curtos_sem_texto_explicativo(superusuario):
+    miolo = conteudo(vitrine(superusuario))
+    miolo = re.sub(r"<pre>.*?</pre>", "", miolo, flags=re.S)
+    trechos = [t.strip() for t in re.split(r"<[^>]+>", miolo) if t.strip()]
+    assert trechos
+    longos = [t for t in trechos if len(t) > 100]
+    assert longos == []
+    # Os rótulos das amostras são nomes: de classe, de token ou de ícone.
+    rotulos = re.findall(r'<code class="text-(?:xs|sm)[^"]*">([^<]+)</code>', miolo)
+    assert rotulos
+    assert all(re.fullmatch(r"[a-z0-9-]+(, [a-z0-9-]+)*", r) for r in rotulos), rotulos
+
+
+@pytest.mark.spec("V8-DS-004")
+def test_amostras_sao_fixas_e_ficticias(superusuario):
+    assert s_ds.amostras() == s_ds.amostras()
+    pessoas = s_ds.amostras()["pessoas"]
+    assert pessoas
+    assert all(p["email"].endswith("@exemplo.invalid") for p in pessoas)
+    html = vitrine(superusuario)
+    tabelas = secao(html, "ds-tabelas")
+    for pessoa in pessoas:
+        assert pessoa["nome"] in tabelas and pessoa["email"] in tabelas
+    with CaptureQueriesContext(connection) as consultas:
+        s_ds.amostras()
+    assert len(consultas) == 0
+
+
+@pytest.mark.spec("V8-DS-005")
+def test_todo_token_de_cor_fonte_raio_e_sombra_tem_amostra(superusuario):
+    nomes = tokens_do_oficial()
+    cores = [n for n in nomes if n.startswith("--cor-")]
+    forma = [n for n in nomes if re.match(r"--(fonte|raio|sombra)", n)]
+    assert len(cores) >= 20 and len(forma) >= 10
+    html = vitrine(superusuario)
+    parte_cores = secao(html, "ds-cores")
+    for nome in cores:
+        assert f"bg-({nome})" in parte_cores, nome
+        assert f">{nome}</code>" in parte_cores, nome
+    parte_tokens = secao(html, "ds-tokens")
+    for nome in forma:
+        assert f">{nome}</code>" in parte_tokens, nome
+
+
+@pytest.mark.spec("V8-DS-006")
+def test_elementos_html_aparecem_sem_classe(superusuario):
+    miolo = conteudo(vitrine(superusuario))
+    tags = (
+        "h1 h2 h3 h4 h5 h6 p a strong em mark del ins small sub sup abbr cite q time code "
+        "kbd samp blockquote pre hr address figure figcaption details summary ul ol li dl "
+        "dt dd table caption thead tbody tfoot tr th td fieldset legend label select "
+        "optgroup option textarea datalist progress meter output button"
+    ).split()
+    for tag in tags:
+        assert sem_classe(miolo, tag), tag
+    entradas = sem_classe(miolo, "input")
+    tipos = (
+        "text search email url tel password number date time datetime-local month week "
+        "color range file checkbox radio submit reset button"
+    ).split()
+    for tipo in tipos:
+        assert any(f'type="{tipo}"' in e for e in entradas), tipo
+    for estado in ("disabled", "readonly", "required", 'aria-invalid="true"'):
+        assert any(estado in e for e in entradas), estado
+    assert any("multiple" in s for s in sem_classe(miolo, "select"))
+
+
+@pytest.mark.spec("V8-DS-007")
+def test_toda_classe_de_componentes_css_aparece(superusuario):
+    css = (DIR_CSS_OFICIAL / "componentes.css").read_text("utf-8")
+    classes = sorted(set(re.findall(r"\.(v8-[a-z0-9-]+)", css)))
+    assert len(classes) > 20
+    html = vitrine(superusuario)
+    usadas = {
+        nome
+        for atributo in re.findall(r'class="([^"]*)"', html)
+        for nome in atributo.split()
+    }
+    assert [c for c in classes if c not in usadas] == []
+
+
+@pytest.mark.spec("V8-DS-008")
+def test_todo_icone_do_sprite_aparece_com_o_nome(superusuario):
+    sprite = (DIR_TEMPLATES_V8 / "v8" / "shell" / "icones.html").read_text("utf-8")
+    assert re.findall(r'<symbol id="v8-i-([a-z-]+)"', sprite) == list(s_ds.ICONES)
+    parte = secao(vitrine(superusuario), "ds-icones")
+    for nome in s_ds.ICONES:
+        assert f'href="#v8-i-{nome}"></use></svg><code' in parte, nome
+        assert f">{nome}</code>" in parte, nome
+
+
+@pytest.mark.spec("V8-DS-009")
+def test_drawers_por_gatilho_e_modals_e_toasts_pela_ilha(superusuario):
+    html = vitrine(superusuario)
+    drawers = secao(html, "ds-drawers")
+    gatilhos = re.findall(r"<a [^>]*data-drawer=[^>]*>", drawers)
+    assert len(gatilhos) >= 8
+
+    def valores(atributo):
+        return {
+            m.group(1)
+            for g in gatilhos
+            for m in [re.search(rf'{atributo}="([^"]+)"', g)]
+            if m
+        }
+
+    assert valores("data-drawer-side") == {"left", "right"}
+    assert {"sm", "md", "lg"} <= valores("data-drawer-size")
+    assert valores("data-drawer-mode") == {"overlay", "push", "docked"}
+    assert valores("data-drawer-scrim") == {"false"}
+    assert 'data-confirm="' in drawers and 'data-confirm-variant="perigo"' in drawers
+    assert 'data-vue-island="ds-overlays"' in secao(html, "ds-overlays")
+
+
+@pytest.mark.spec("V8-DS-010")
+def test_sem_javascript_as_secoes_em_html_ficam_completas(superusuario):
+    html = vitrine(superusuario)
+    com_ilha = {"overlays"}
+    for item in s_ds.SECOES:
+        parte = secao(html, item.ancora)
+        if item.id in com_ilha:
+            ilha = parte[parte.index("data-vue-island=") :]
+            assert '<p class="v8-alerta v8-alerta-aviso">' in ilha, item.id
+        else:
+            assert "data-vue-island" not in parte, item.id
+    # Sem JavaScript, os gatilhos levam ao conteúdo do drawer na própria página.
+    drawers = secao(html, "ds-drawers")
+    destinos = set(re.findall(r'<a [^>]*href="([^"]+)"[^>]*data-drawer=', drawers))
+    assert destinos == {"#ds-drawer-conteudo"}
+    assert drawers.count('id="ds-drawer-conteudo"') == 1

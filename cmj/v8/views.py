@@ -431,7 +431,7 @@ class DsVitrineView(PaginaV8View):
     tema = None
 
     def get(self, request):
-        contexto = {"secoes": s_ds.SECOES}
+        contexto = {"secoes": s_ds.SECOES, "amostras": s_ds.amostras()}
         if self.tema is None:
             v8 = dados_layout(
                 "Design system",

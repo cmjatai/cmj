@@ -30,7 +30,65 @@ class Secao:
 
 
 # Ordem do índice e da página. A parcial de cada seção sai só deste registro.
-SECOES = (Secao("cores", "Cores"),)
+SECOES = (
+    Secao("cores", "Cores"),
+    Secao("tokens", "Fontes, raios e sombras"),
+    Secao("texto", "Títulos e texto"),
+    Secao("listas", "Listas"),
+    Secao("tabelas", "Tabelas"),
+    Secao("formularios", "Formulários"),
+    Secao("botoes", "Botões"),
+    Secao("avisos", "Alertas e etiquetas"),
+    Secao("blocos", "Cartão, dados e paginação"),
+    Secao("icones", "Ícones"),
+    Secao("drawers", "Drawers"),
+    Secao("overlays", "Modals e toasts"),
+)
+
+# Símbolos do sprite ``v8/shell/icones.html``, na ordem dele.
+ICONES = (
+    "menu",
+    "sol",
+    "lua",
+    "casa",
+    "grade",
+    "usuario",
+    "sair",
+    "entrar",
+    "seta",
+    "filtro",
+    "fechar",
+    "historico",
+    "paleta",
+)
+
+# Dados de amostra: nomes inventados e e-mails no domínio reservado ``.invalid``.
+_PESSOAS = (
+    ("Ana Lima", "ana.lima@exemplo.invalid", "Centro", "ativo", "12/03/2026"),
+    ("Bruno Costa", "bruno.costa@exemplo.invalid", "Vila Nova", "ativo", "02/05/2026"),
+    ("Carla Dias", "carla.dias@exemplo.invalid", "Jardim Sul", "inativo", "18/07/2026"),
+    ("Davi Rocha", "davi.rocha@exemplo.invalid", "Centro", "ativo", "30/09/2026"),
+)
+
+
+def amostras():
+    """Dados fixos que as seções da vitrine mostram."""
+    return {
+        "pessoas": [
+            {
+                "nome": nome,
+                "email": email,
+                "bairro": bairro,
+                "situacao": situacao,
+                "data": data,
+            }
+            for nome, email, bairro, situacao, data in _PESSOAS
+        ],
+        "opcoes": ["Centro", "Vila Nova", "Jardim Sul", "Setor Norte"],
+        "paginas": [1, 2, 3, 4, 5],
+        "pagina_atual": 2,
+        "icones": list(ICONES),
+    }
 
 
 def temas(em_vigor):

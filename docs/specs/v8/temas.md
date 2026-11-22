@@ -50,19 +50,22 @@ Regras de outras specs que mudam com esta (D2):
 ### Tema e modo
 
 - V8-TEMA-001 [implementado] Tema é o design; modo é `claro` ou `escuro`. Todo tema define os dois
-  modos. Trocar o tema não muda o modo, e trocar o modo não muda o tema. Evidência: `cmj/v8/services/s_global.py:130`, `_frontend/v8/src/core/shell.js:159`.
+  modos. Trocar o tema não muda o modo, e trocar o modo não muda o tema. Evidência:
+  `cmj/v8/services/s_global.py:130`, `_frontend/v8/src/core/shell.js:159`.
 - V8-TEMA-002 [implementado] Os temas são um registro fixo em `s_global.TEMAS`, de nome para rótulo,
   com `oficial` como padrão. O nome tem só minúsculas, dígitos e hífen, começa por letra e não é o
-  nome de um modo. Registro fora dessas regras impede o projeto de subir. Evidência: `cmj/v8/services/s_global.py:50`, `cmj/v8/services/s_global.py:68`.
-- V8-TEMA-003 [implementado] Cada tema do registro tem a pasta `css/temas/<nome>/`, com `index.css`, e
-  `app.css` importa os `index.css` na ordem do registro, com o `oficial` primeiro. Não há pasta nem
-  import de tema fora do registro. Evidência: `_frontend/v8/src/css/app.css:11`.
+  nome de um modo. Registro fora dessas regras impede o projeto de subir. Evidência:
+  `cmj/v8/services/s_global.py:50`, `cmj/v8/services/s_global.py:68`.
+- V8-TEMA-003 [implementado] Cada tema do registro tem a pasta `css/temas/<nome>/`, com `index.css`,
+  e `app.css` importa os `index.css` na ordem do registro, com o `oficial` primeiro. Não há pasta
+  nem import de tema fora do registro. Evidência: `_frontend/v8/src/css/app.css:11`.
 
 ### CSS
 
-- V8-TEMA-010 [implementado] `css/temas/oficial/` reúne o CSS padrão do v8: tokens, elementos
-  HTML, shell, componentes, overlays e componentes base. Só o oficial declara `@theme` e classes de
-  componente. Evidência: `_frontend/v8/src/css/temas/oficial/index.css:5`, `_frontend/v8/src/css/temas/oficial/tokens.css:131`.
+- V8-TEMA-010 [implementado] `css/temas/oficial/` reúne o CSS padrão do v8: tokens, elementos HTML,
+  shell, componentes, overlays e componentes base. Só o oficial declara `@theme` e classes de
+  componente. Evidência: `_frontend/v8/src/css/temas/oficial/index.css:5`,
+  `_frontend/v8/src/css/temas/oficial/tokens.css:131`.
 - V8-TEMA-011 [implementado] Tokens (`--cor-*`, `--z-*`, `--duracao`, `--curva`, `--largura-*`,
   `--altura-*`, `--raio*`, `--deslocamento-*`, `--fonte-*`, `--sombra-*`) só são definidos no
   `tokens.css` de um tema. Camadas e movimento (`--z-*`, `--duracao`, `--curva`) só no oficial.
@@ -71,52 +74,64 @@ Regras de outras specs que mudam com esta (D2):
   `_frontend/v8/src/css/temas/oficial/tokens.css:2`.
 - V8-TEMA-013 [implementado] No oficial, toda `--cor-*` tem valor no modo claro, no escuro e no
   bloco que vale sem modo escolhido, que segue `prefers-color-scheme` sem JavaScript. Evidência:
-  `_frontend/v8/src/css/temas/oficial/tokens.css:6`, `_frontend/v8/src/css/temas/oficial/tokens.css:68`, `_frontend/v8/src/css/temas/oficial/tokens.css:95`.
+  `_frontend/v8/src/css/temas/oficial/tokens.css:6`,
+  `_frontend/v8/src/css/temas/oficial/tokens.css:68`,
+  `_frontend/v8/src/css/temas/oficial/tokens.css:95`.
 - V8-TEMA-014 [implementado] Um tema só redefine tokens que existem no oficial, sempre sob
   `:root[data-tema="<nome>"]`. Cor redefinida aparece nos três blocos do tema (claro, escuro e sem
-  modo escolhido), para que a cor de um modo não vaze para o outro. Evidência: `_frontend/v8/src/css/temas/tema1/tokens.css:6`, `_frontend/v8/src/css/temas/tema2/tokens.css:6`.
+  modo escolhido), para que a cor de um modo não vaze para o outro. Evidência:
+  `_frontend/v8/src/css/temas/tema1/tokens.css:6`, `_frontend/v8/src/css/temas/tema2/tokens.css:6`.
 - V8-TEMA-015 [implementado] As regras CSS próprias de um tema ficam em `regras.css`, na camada
   `temas`, que fica acima de `components` e abaixo de `utilities`. Todo seletor dele começa por
   `:root[data-tema="<nome>"]`. Tema não declara `@theme`, `@import`, `@font-face` nem `@layer` com
   outro nome. Evidência: `_frontend/v8/src/css/temas/tema3/regras.css:5`.
 - V8-TEMA-016 [implementado] O `@theme inline` do oficial é o único e expõe ao Tailwind as cores
   semânticas, as fontes e os raios, por `var()`. Com isso as utilities seguem o tema e o modo em
-  vigor. A paleta padrão do Tailwind continua fora. Evidência: `_frontend/v8/src/css/temas/oficial/tokens.css:131`.
+  vigor. A paleta padrão do Tailwind continua fora. Evidência:
+  `_frontend/v8/src/css/temas/oficial/tokens.css:131`.
 - V8-TEMA-017 [implementado] `font-family` e `box-shadow` fora do `tokens.css` usam token, e
-  `border-radius` usa token, `0` ou `50%`. Evidência: `_frontend/v8/src/css/temas/oficial/tokens.css:52`, `_frontend/v8/src/css/temas/oficial/tokens.css:62`,
+  `border-radius` usa token, `0` ou `50%`. Evidência:
+  `_frontend/v8/src/css/temas/oficial/tokens.css:52`,
+  `_frontend/v8/src/css/temas/oficial/tokens.css:62`,
   `_frontend/v8/src/css/temas/oficial/shell.css:12`.
 
 ### Aplicação
 
-- V8-TEMA-020 [implementado] Toda página do v8 sai com `<html data-tema="<nome>">`, sempre com um nome
-  do registro: o tema que a página de prévia fixa, senão o do cookie `v8_tema` se estiver no
-  registro, senão `oficial`. Evidência: `cmj/v8/services/s_global.py:119`, `cmj/v8/templatetags/v8_tags.py:49`, `_templates/v8/base_v8.html:3`.
-- V8-TEMA-021 [implementado] `#v8-global` informa `tema`, sempre um nome do registro, e `modo`, que é
-  `claro`, `escuro` ou `null`. Evidência: `cmj/v8/services/s_global.py:290`, `_frontend/v8/src/stores/GlobalStore.js:25`.
-- V8-TEMA-022 [implementado] A prévia de um tema não grava nada: abrir `/v8/ds/temas/<nome>/` não cria
-  nem altera cookie. Evidência: `cmj/v8/views.py:423`.
+- V8-TEMA-020 [implementado] Toda página do v8 sai com `<html data-tema="<nome>">`, sempre com um
+  nome do registro: o tema que a página de prévia fixa, senão o do cookie `v8_tema` se estiver no
+  registro, senão `oficial`. Evidência: `cmj/v8/services/s_global.py:119`,
+  `cmj/v8/templatetags/v8_tags.py:49`, `_templates/v8/base_v8.html:3`.
+- V8-TEMA-021 [implementado] `#v8-global` informa `tema`, sempre um nome do registro, e `modo`, que
+  é `claro`, `escuro` ou `null`. Evidência: `cmj/v8/services/s_global.py:290`,
+  `_frontend/v8/src/stores/GlobalStore.js:25`.
+- V8-TEMA-022 [implementado] A prévia de um tema não grava nada: abrir `/v8/ds/temas/<nome>/` não
+  cria nem altera cookie. Evidência: `cmj/v8/views.py:423`.
 - V8-TEMA-023 [implementado] "Usar este tema" é um `POST` que grava `v8_tema` e redireciona para a
-  lista de temas, com mensagem. Dali em diante as páginas do v8 abrem nesse tema, naquele
-  navegador. Funciona sem JavaScript. Evidência: `cmj/v8/views.py:479`, `_templates/v8/v8/ds/vitrine.html:4`.
+  lista de temas, com mensagem. Dali em diante as páginas do v8 abrem nesse tema, naquele navegador.
+  Funciona sem JavaScript. Evidência: `cmj/v8/views.py:479`, `_templates/v8/v8/ds/vitrine.html:4`.
 - V8-TEMA-024 [implementado] `/v8/ds/temas/` lista os temas do registro, na ordem dele, cada um com
-  rótulo, link para a prévia e o botão de usar, e marca o tema em vigor. Evidência: `cmj/v8/services/s_ds.py:36`, `_templates/v8/v8/ds/temas.html:6`.
+  rótulo, link para a prévia e o botão de usar, e marca o tema em vigor. Evidência:
+  `cmj/v8/services/s_ds.py:94`, `_templates/v8/v8/ds/temas.html:6`.
 - V8-TEMA-025 [implementado] Ao carregar a página e ao trocar o modo, `<meta name="theme-color">`
-  recebe o valor de `--cor-barra-navegador` em vigor, que cada tema pode redefinir.
-  Evidência: `_frontend/v8/src/core/shell.js:159`.
+  recebe o valor de `--cor-barra-navegador` em vigor, que cada tema pode redefinir. Evidência:
+  `_frontend/v8/src/core/shell.js:159`.
 
 ## Requisitos de segurança
 
-- V8-TEMA-040 [implementado] Nome de tema só chega ao HTML, ao JSON e ao cookie depois de conferido no
-  registro. Cookie com outro valor vale como `oficial`, e as rotas de prévia e de uso existem só
-  para os nomes do registro: outro nome responde 404. Itens da varredura: 4 e 6. Evidência: `cmj/v8/urls.py:72`, `cmj/v8/services/s_global.py:119`.
+- V8-TEMA-040 [implementado] Nome de tema só chega ao HTML, ao JSON e ao cookie depois de conferido
+  no registro. Cookie com outro valor vale como `oficial`, e as rotas de prévia e de uso existem só
+  para os nomes do registro: outro nome responde 404. Itens da varredura: 4 e 6. Evidência:
+  `cmj/v8/urls.py:72`, `cmj/v8/services/s_global.py:119`.
 - V8-TEMA-041 [implementado] Usar um tema exige superusuário, aceita só `POST` com CSRF e não grava
   nada além do cookie. Item da varredura: 1. Evidência: `cmj/v8/views.py:485`.
 - V8-TEMA-042 [implementado] O redirecionamento depois de usar um tema é fixo: `next`, `Referer` e o
   corpo da requisição são ignorados. Item da varredura: 6. Evidência: `cmj/v8/views.py:490`.
 - V8-TEMA-043 [implementado] O cookie `v8_tema` sai com `Path=/v8/`, `SameSite=Lax`, `HttpOnly`,
-  `Secure` fora de DEBUG e um valor do registro. Item da varredura: 6. Evidência: `cmj/v8/services/s_global.py:146`.
+  `Secure` fora de DEBUG e um valor do registro. Item da varredura: 6. Evidência:
+  `cmj/v8/services/s_global.py:146`.
 - V8-TEMA-044 [implementado] O trecho do menu em `{% cache %}` não depende do tema, e o CSS de todos
-  os temas é o mesmo arquivo estático. Item da varredura: 5. Evidência: `_templates/v8/v8/shell/menu.html:5`.
+  os temas é o mesmo arquivo estático. Item da varredura: 5. Evidência:
+  `_templates/v8/v8/shell/menu.html:5`.
 
 ## Riscos de segurança
 

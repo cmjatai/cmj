@@ -1,0 +1,34 @@
+<div class="flex flex-col gap-6">
+  <table>
+    <caption>Tabela sem classe</caption>
+    <thead>
+      <tr><th scope="col">Nome</th><th scope="col">Bairro</th><th scope="col">Desde</th></tr>
+    </thead>
+    <tbody>
+      {% for pessoa in amostras.pessoas %}
+        <tr><td>{{ pessoa.nome }}</td><td>{{ pessoa.bairro }}</td><td>{{ pessoa.data }}</td></tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr><td colspan="2">Total</td><td>{{ amostras.pessoas|length }}</td></tr>
+    </tfoot>
+  </table>
+  <div>
+    <code class="mb-2 block text-xs text-texto-suave">v8-tabela</code>
+    <table class="v8-tabela">
+      <thead>
+        <tr><th scope="col">Nome</th><th scope="col">E-mail</th><th scope="col">Bairro</th><th scope="col">Situação</th></tr>
+      </thead>
+      <tbody>
+        {% for pessoa in amostras.pessoas %}
+          <tr>
+            <td>{{ pessoa.nome }}</td>
+            <td>{{ pessoa.email }}</td>
+            <td>{{ pessoa.bairro }}</td>
+            <td>{% if pessoa.situacao == "ativo" %}<span class="v8-etiqueta v8-etiqueta-ok">Ativo</span>{% else %}<span class="v8-etiqueta v8-etiqueta-neutra">Inativo</span>{% endif %}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -3,6 +3,7 @@
  * Tailwind e do Reka UI. Vale em todos os temas; os outros só alteram o que quiserem.
  */
 @import "./tokens.css";
+@import "./elementos.css";
 @import "./shell.css";
 @import "./componentes.css";
 @import "./overlays.css";

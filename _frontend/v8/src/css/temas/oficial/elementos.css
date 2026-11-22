@@ -1,0 +1,246 @@
+/*
+ * Elementos HTML sem classe (V8-DS-011). O Tailwind zera o estilo de todos eles; aqui eles ganham o
+ * padrão do tema, só dentro do conteúdo da página e do corpo dos overlays, e só quando não têm
+ * classe. O cabeçalho, o menu, a moldura dos overlays e os componentes não são afetados.
+ */
+@layer base {
+  :where(.v8-conteudo, .v8-overlay-corpo, .v8-nua) {
+    :where(h1, h2, h3, h4, h5, h6):not([class]) {
+      margin: 1.5rem 0 0.75rem;
+      font-family: var(--fonte-titulo);
+      font-weight: 650;
+      line-height: 1.25;
+    }
+
+    h1:not([class]) {
+      font-size: 1.875rem;
+    }
+
+    h2:not([class]) {
+      font-size: 1.5rem;
+    }
+
+    h3:not([class]) {
+      font-size: 1.25rem;
+    }
+
+    h4:not([class]) {
+      font-size: 1.125rem;
+    }
+
+    h5:not([class]) {
+      font-size: 1rem;
+    }
+
+    h6:not([class]) {
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    :where(p, address, figure):not([class]) {
+      margin: 0 0 0.75rem;
+    }
+
+    mark:not([class]) {
+      padding: 0 0.15em;
+      border-radius: var(--raio-sm);
+      background: color-mix(in srgb, var(--cor-aviso) 30%, transparent);
+      color: inherit;
+    }
+
+    blockquote:not([class]) {
+      margin: 0 0 1rem;
+      padding: 0.25rem 0 0.25rem 1rem;
+      border-left: 4px solid var(--cor-borda);
+      color: var(--cor-texto-suave);
+    }
+
+    :where(code, kbd, samp):not([class]) {
+      padding: 0.1em 0.35em;
+      border-radius: var(--raio-sm);
+      background: var(--cor-superficie-2);
+      font-family: var(--fonte-mono);
+      font-size: 0.875em;
+    }
+
+    kbd:not([class]) {
+      border: 1px solid var(--cor-borda);
+      border-bottom-width: 2px;
+    }
+
+    pre:not([class]) {
+      margin: 0 0 1rem;
+      padding: 0.75rem 1rem;
+      overflow: auto;
+      border-radius: var(--raio);
+      background: var(--cor-superficie-2);
+      font-family: var(--fonte-mono);
+      font-size: 0.875rem;
+    }
+
+    pre:not([class]) > code:not([class]) {
+      padding: 0;
+      background: transparent;
+      font-size: inherit;
+    }
+
+    hr:not([class]) {
+      margin: 1.5rem 0;
+      border: 0;
+      border-top: 1px solid var(--cor-borda);
+    }
+
+    :where(ul, ol):not([class]) {
+      margin: 0 0 0.75rem;
+      padding-left: 1.5rem;
+    }
+
+    ul:not([class]) {
+      list-style: disc;
+    }
+
+    ul:not([class]) ul:not([class]) {
+      list-style: circle;
+    }
+
+    ol:not([class]) {
+      list-style: decimal;
+    }
+
+    :where(ul, ol):not([class]) :where(ul, ol):not([class]) {
+      margin-bottom: 0;
+    }
+
+    dl:not([class]) {
+      margin: 0 0 0.75rem;
+    }
+
+    dt:not([class]) {
+      font-weight: 600;
+    }
+
+    dd:not([class]) {
+      margin: 0 0 0.5rem 1.5rem;
+    }
+
+    table:not([class]) {
+      margin: 0 0 1rem;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    caption:not([class]) {
+      padding-bottom: 0.375rem;
+      color: var(--cor-texto-suave);
+      text-align: left;
+    }
+
+    :where(th, td):not([class]) {
+      padding: 0.375rem 0.625rem;
+      border: 1px solid var(--cor-borda);
+      text-align: left;
+    }
+
+    :where(th, tfoot td):not([class]) {
+      background: var(--cor-superficie-2);
+      font-weight: 600;
+    }
+
+    figcaption:not([class]) {
+      color: var(--cor-texto-suave);
+      font-size: 0.85rem;
+    }
+
+    details:not([class]) {
+      margin: 0 0 0.75rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio);
+    }
+
+    summary:not([class]) {
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    details[open]:not([class]) > summary:not([class]) {
+      margin-bottom: 0.5rem;
+    }
+
+    fieldset:not([class]) {
+      margin: 0 0 1rem;
+      padding: 0.75rem 1rem 1rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio);
+    }
+
+    legend:not([class]) {
+      padding: 0 0.375rem;
+      font-weight: 600;
+    }
+
+    label:not([class]) {
+      font-weight: 500;
+    }
+
+    :where(
+        input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"], [type="file"],
+            [type="submit"], [type="reset"], [type="button"], [type="image"], [type="hidden"]),
+        select,
+        textarea
+      ):not([class]) {
+      min-height: 2rem;
+      padding: 0.25rem 0.5rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-sm);
+      background: var(--cor-superficie);
+      color: var(--cor-texto);
+    }
+
+    :where(input, select, textarea, button):not([class]):disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    :where(input, select, textarea):not([class])[aria-invalid="true"] {
+      border-color: var(--cor-perigo);
+    }
+
+    :where(input[type="checkbox"], input[type="radio"], input[type="range"], progress, meter):not([class]) {
+      accent-color: var(--cor-primaria);
+    }
+
+    input[type="color"]:not([class]) {
+      inline-size: 3rem;
+      block-size: 2rem;
+      padding: 0.125rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio-sm);
+    }
+
+    :where(
+        button,
+        input[type="submit"],
+        input[type="reset"],
+        input[type="button"]
+      ):not([class]),
+    input[type="file"]:not([class])::file-selector-button {
+      min-height: 2rem;
+      padding: 0.25rem 0.75rem;
+      border: 1px solid var(--cor-borda);
+      border-radius: var(--raio);
+      background: var(--cor-superficie-2);
+      color: var(--cor-texto);
+      cursor: pointer;
+    }
+
+    input[type="file"]:not([class])::file-selector-button {
+      margin-right: 0.75rem;
+    }
+
+    :where(progress, meter):not([class]) {
+      inline-size: 12rem;
+    }
+  }
+}

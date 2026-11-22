@@ -11,6 +11,7 @@ import {
   blocosDeCor,
   cores,
   ler,
+  partesDoSeletor,
   pastasDeTema,
   semComentarios,
   variaveis
@@ -137,6 +138,26 @@ describe('CSS dos temas', () => {
         expect(classesDoOficial.has(m[1]), `${nome}: ${m[1]}`).toBe(true)
       })
     })
+  })
+
+  it('V8-DS-011: elementos sem classe só recebem estilo no conteúdo e no corpo dos overlays', () => {
+    const css = ler(path.join(OFICIAL, 'elementos.css'))
+    const todos = blocos(css)
+    expect(todos.filter(b => b.nivel === 0).map(b => b.seletor)).toEqual(['@layer base'])
+    expect(todos.filter(b => b.nivel === 1).map(b => b.seletor)).toEqual([
+      ':where(.v8-conteudo, .v8-overlay-corpo, .v8-nua)'
+    ])
+    const regras = todos.filter(b => b.nivel === 2)
+    expect(regras.length).toBeGreaterThan(20)
+    regras.forEach(regra => {
+      partesDoSeletor(regra.seletor).forEach(parte => {
+        expect(parte, regra.seletor).toMatch(/:not\(\[class\]\)/)
+      })
+    })
+    expect(todos.filter(b => b.nivel > 2)).toEqual([])
+    // O elementos.css entra no oficial depois dos tokens que ele usa.
+    const indice = semComentarios(ler(path.join(OFICIAL, 'index.css')))
+    expect(indice.indexOf('./elementos.css')).toBeGreaterThan(indice.indexOf('./tokens.css'))
   })
 
   it('V8-TEMA-016: o @theme do oficial expõe cores, fontes e raios por var() e tira a paleta', () => {

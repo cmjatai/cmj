@@ -1,0 +1,28 @@
+<div class="flex flex-col gap-4">
+  <div class="v8-barra-acoes" role="group" aria-label="Lado e tamanho">
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="right" data-drawer-size="sm" data-drawer-title="Direita, sm">Direita, sm</a>
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="right" data-drawer-size="md" data-drawer-title="Direita, md">Direita, md</a>
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="right" data-drawer-size="lg" data-drawer-title="Direita, lg">Direita, lg</a>
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="left" data-drawer-size="md" data-drawer-title="Esquerda, md">Esquerda, md</a>
+  </div>
+  <div class="v8-barra-acoes" role="group" aria-label="Modo">
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="right" data-drawer-mode="overlay" data-drawer-title="overlay">overlay</a>
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="right" data-drawer-mode="push" data-drawer-mode-estreito="overlay" data-drawer-title="push">push</a>
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="left" data-drawer-mode="docked" data-drawer-mode-estreito="overlay" data-drawer-title="docked">docked</a>
+    <a class="v8-btn" href="#ds-drawer-conteudo" data-drawer="el:#ds-drawer-conteudo" data-drawer-side="right" data-drawer-scrim="false" data-drawer-title="Sem fundo">Sem fundo</a>
+  </div>
+  <form method="get" action="#ds-drawers" data-confirm="Seguir com a ação de exemplo?" data-confirm-title="Confirmação" data-confirm-ok="Seguir" data-confirm-variant="perigo">
+    <button type="submit" class="v8-btn v8-btn-perigo">data-confirm</button>
+  </form>
+  <section id="ds-drawer-conteudo" class="v8-cartao" aria-label="Conteúdo do drawer">
+    <p>Conteúdo do drawer.</p>
+    {% with pessoa=amostras.pessoas.1 %}
+      <dl class="v8-lista-dados">
+        <dt>Nome</dt>
+        <dd>{{ pessoa.nome }}</dd>
+        <dt>Bairro</dt>
+        <dd>{{ pessoa.bairro }}</dd>
+      </dl>
+    {% endwith %}
+  </section>
+</div>

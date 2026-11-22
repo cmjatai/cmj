@@ -1,0 +1,37 @@
+<div class="grid gap-8 lg:grid-cols-2">
+  <div class="flex flex-col gap-4">
+    <p class="v8-pagina-titulo">v8-pagina-titulo</p>
+    <section class="v8-cartao">
+      <code class="mb-3 block text-xs text-texto-suave">v8-cartao, v8-lista-dados</code>
+      {% with pessoa=amostras.pessoas.0 %}
+        <dl class="v8-lista-dados">
+          <dt>Nome</dt>
+          <dd>{{ pessoa.nome }}</dd>
+          <dt>E-mail</dt>
+          <dd>{{ pessoa.email }}</dd>
+          <dt>Bairro</dt>
+          <dd>{{ pessoa.bairro }}</dd>
+          <dt>Desde</dt>
+          <dd><time>{{ pessoa.data }}</time></dd>
+        </dl>
+      {% endwith %}
+    </section>
+    <div>
+      <code class="block text-xs text-texto-suave">v8-paginacao</code>
+      <nav class="v8-paginacao" aria-label="Paginação de exemplo">
+        <a class="v8-btn" href="#ds-blocos" rel="prev">Anterior</a>
+        {% for pagina in amostras.paginas %}
+          <a class="v8-btn{% if pagina == amostras.pagina_atual %} v8-btn-primario{% endif %}" href="#ds-blocos"{% if pagina == amostras.pagina_atual %} aria-current="page"{% endif %}><span class="sr-only">Página </span>{{ pagina }}</a>
+        {% endfor %}
+        <a class="v8-btn" href="#ds-blocos" rel="next">Próxima</a>
+      </nav>
+    </div>
+  </div>
+  <section class="v8-cartao">
+    <code class="text-xs text-texto-suave">v8-erro-404, v8-erro-codigo</code>
+    <div class="v8-erro-404">
+      <p class="v8-erro-codigo">404</p>
+      <p>Página não encontrada.</p>
+    </div>
+  </section>
+</div>

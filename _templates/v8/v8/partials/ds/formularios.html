@@ -1,0 +1,87 @@
+<div class="grid gap-8 lg:grid-cols-2">
+  <fieldset>
+    <legend>Elementos sem classe</legend>
+    <div class="grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
+      <label for="ds-f-text">text</label><input id="ds-f-text" type="text" placeholder="Texto">
+      <label for="ds-f-search">search</label><input id="ds-f-search" type="search" placeholder="Buscar">
+      <label for="ds-f-email">email</label><input id="ds-f-email" type="email" placeholder="nome@exemplo.invalid">
+      <label for="ds-f-url">url</label><input id="ds-f-url" type="url" placeholder="https://exemplo.invalid">
+      <label for="ds-f-tel">tel</label><input id="ds-f-tel" type="tel" placeholder="(00) 0000-0000">
+      <label for="ds-f-password">password</label><input id="ds-f-password" type="password" value="segredo">
+      <label for="ds-f-number">number</label><input id="ds-f-number" type="number" value="42">
+      <label for="ds-f-date">date</label><input id="ds-f-date" type="date" value="2026-11-22">
+      <label for="ds-f-time">time</label><input id="ds-f-time" type="time" value="14:30">
+      <label for="ds-f-datetime">datetime-local</label><input id="ds-f-datetime" type="datetime-local" value="2026-11-22T14:30">
+      <label for="ds-f-month">month</label><input id="ds-f-month" type="month" value="2026-11">
+      <label for="ds-f-week">week</label><input id="ds-f-week" type="week" value="2026-W47">
+      <label for="ds-f-color">color</label><input id="ds-f-color" type="color">
+      <label for="ds-f-range">range</label><input id="ds-f-range" type="range" min="0" max="10" value="6">
+      <label for="ds-f-file">file</label><input id="ds-f-file" type="file">
+      <label for="ds-f-lista">datalist</label><input id="ds-f-lista" type="text" list="ds-f-bairros" placeholder="Bairro">
+      <datalist id="ds-f-bairros">{% for opcao in amostras.opcoes %}<option value="{{ opcao }}"></option>{% endfor %}</datalist>
+      <label for="ds-f-select">select</label>
+      <select id="ds-f-select">{% for opcao in amostras.opcoes %}<option>{{ opcao }}</option>{% endfor %}</select>
+      <label for="ds-f-multiplo">select multiple</label>
+      <select id="ds-f-multiplo" multiple size="4">
+        <optgroup label="Região central">{% for opcao in amostras.opcoes|slice:":2" %}<option selected>{{ opcao }}</option>{% endfor %}</optgroup>
+        <optgroup label="Outras regiões">{% for opcao in amostras.opcoes|slice:"2:" %}<option>{{ opcao }}</option>{% endfor %}</optgroup>
+      </select>
+      <label for="ds-f-textarea">textarea</label><textarea id="ds-f-textarea" rows="3">Texto em várias linhas.</textarea>
+      <label for="ds-f-progress">progress</label><progress id="ds-f-progress" max="100" value="60">60%</progress>
+      <label for="ds-f-meter">meter</label><meter id="ds-f-meter" min="0" max="10" low="3" high="8" optimum="9" value="7">7</meter>
+      <label for="ds-f-output">output</label><output id="ds-f-output">42</output>
+    </div>
+    <p class="mt-4 flex flex-wrap gap-4">
+      <label><input type="checkbox" checked> checkbox</label>
+      <label><input type="checkbox"> checkbox</label>
+      <label><input type="radio" name="ds-f-radio" checked> radio</label>
+      <label><input type="radio" name="ds-f-radio"> radio</label>
+    </p>
+    <p class="mt-2 flex flex-wrap gap-2">
+      <button type="button">button</button>
+      <input type="submit" value="submit">
+      <input type="reset" value="reset">
+      <input type="button" value="input button">
+    </p>
+  </fieldset>
+  <div class="flex flex-col gap-6">
+    <fieldset>
+      <legend>Estados</legend>
+      <div class="grid grid-cols-[max-content_1fr] items-center gap-x-4 gap-y-2">
+        <label for="ds-f-desabilitado">disabled</label><input id="ds-f-desabilitado" type="text" value="Desabilitado" disabled>
+        <label for="ds-f-leitura">readonly</label><input id="ds-f-leitura" type="text" value="Só leitura" readonly>
+        <label for="ds-f-obrigatorio">required</label><input id="ds-f-obrigatorio" type="text" required>
+        <label for="ds-f-invalido">aria-invalid</label><input id="ds-f-invalido" type="text" value="Valor inválido" aria-invalid="true">
+        <label for="ds-f-select-desabilitado">select disabled</label><select id="ds-f-select-desabilitado" disabled><option>Desabilitado</option></select>
+      </div>
+      <p class="mt-4 flex flex-wrap gap-4">
+        <label><input type="checkbox" checked disabled> checkbox disabled</label>
+        <button type="button" disabled>button disabled</button>
+      </p>
+    </fieldset>
+    <div>
+      <code class="mb-2 block text-xs text-texto-suave">v8-campo, v8-rotulo, v8-entrada, v8-erro-campo</code>
+      <div class="v8-campo">
+        <label class="v8-rotulo" for="ds-v8-nome">Nome</label>
+        <input id="ds-v8-nome" class="v8-entrada" type="text" value="Ana Lima">
+      </div>
+      <div class="v8-campo">
+        <label class="v8-rotulo" for="ds-v8-email">E-mail</label>
+        <input id="ds-v8-email" class="v8-entrada" type="email" value="ana" aria-invalid="true" aria-describedby="ds-v8-email-erro">
+        <p id="ds-v8-email-erro" class="v8-erro-campo">Informe um e-mail válido.</p>
+      </div>
+      <div class="v8-campo">
+        <label class="v8-rotulo" for="ds-v8-bairro">Bairro</label>
+        <select id="ds-v8-bairro" class="v8-entrada">{% for opcao in amostras.opcoes %}<option>{{ opcao }}</option>{% endfor %}</select>
+      </div>
+      <div class="v8-campo">
+        <label class="v8-rotulo" for="ds-v8-obs">Observação</label>
+        <textarea id="ds-v8-obs" class="v8-entrada" rows="3"></textarea>
+      </div>
+      <div class="v8-campo">
+        <label class="v8-rotulo" for="ds-v8-desabilitado">Desabilitado</label>
+        <input id="ds-v8-desabilitado" class="v8-entrada" type="text" value="Sem edição" disabled>
+      </div>
+    </div>
+  </div>
+</div>
