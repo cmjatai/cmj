@@ -34,7 +34,7 @@ base_v8.html                     nível 1: o esqueleto do documento
 - **Nível 3, as páginas.** Escolhem um layout e preenchem o conteúdo.
 
 Abra `_templates/v8/v8/layouts/_shell.html` e leia. Você vai reconhecer o cabeçalho, o botão de
-tema, a área do usuário e, lá no meio, `{% block content %}{% endblock %}`: é a lacuna que a sua
+modo, a área do usuário e, lá no meio, `{% block content %}{% endblock %}`: é a lacuna que a sua
 página preencheu. Depois abra `app_sidebar.html`: ele é curto, porque só acrescenta a barra lateral.
 
 `_shell.html` começa com `_` porque é **abstrato**: existe para os layouts estenderem. Uma página

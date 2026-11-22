@@ -74,7 +74,7 @@ exceção.
 4. O HTML traz uma referência ao JavaScript do v8, que o navegador busca no Vite.
 5. O JavaScript inicia **um único** aplicativo Vue para a página inteira.
 6. Esse aplicativo procura na página os trechos marcados como ilha e coloca um componente em
-   cada um. Ele também liga os botões de tema e de menu, e passa a atender os links que abrem
+   cada um. Ele também liga os botões de modo e de menu, e passa a atender os links que abrem
    drawers e modals.
 
 Repare na ordem: primeiro existe uma página que funciona, depois o JavaScript a melhora. Se o

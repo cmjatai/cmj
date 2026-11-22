@@ -78,7 +78,7 @@ Regras de outras specs que mudaram com esta (D9):
   cliente de HMR e o entry `main.js` do app `v8`, e `#cmj-v8-app`. Um template que sobrescreve todos
   os blocks com vazio ainda sai com todos eles. Evidência: `_templates/v8/base_v8.html:16`,
   `_templates/v8/base_v8.html:20`, `_templates/v8/base_v8.html:25`.
-- V8-TPL-013 [implementado] A base emite em `<html>` só `lang` e, havendo o cookie, `data-theme`.
+- V8-TPL-013 [implementado] A base emite em `<html>` só `lang` e, havendo o cookie, `data-modo`.
   Qualquer outro atributo de `<html>` vem de um layout, pelo block `html_attrs`. Evidência:
   `_templates/v8/base_v8.html:3`.
 - V8-TPL-014 [implementado] O padrão do block `title` é `<v8.titulo> · PortalCMJ`, ou só `PortalCMJ`
@@ -99,7 +99,7 @@ Regras de outras specs que mudaram com esta (D9):
   `messages` e `content`) e `footer`. O block `layout_name`, sem conteúdo padrão, recebe o nome do
   layout (V8-TPL-024). Evidência: `_templates/v8/v8/layouts/_shell.html:4`.
 - V8-TPL-021 [implementado] Têm conteúdo padrão em `_shell.html`, escrito uma única vez: o sprite de
-  ícones, o link "Ir para o conteúdo", a marca, o botão de tema (em `header_actions`), a área do
+  ícones, o link "Ir para o conteúdo", a marca, o botão de modo (em `header_actions`), a área do
   usuário, a trilha e as mensagens. Nascem vazios `header_start`, `header_nav`, `aside`, `hero`,
   `content` e `footer`. Evidência: `_templates/v8/v8/layouts/_shell.html:11`,
   `_templates/v8/v8/layouts/_shell.html:15`, `_templates/v8/v8/layouts/_shell.html:21`.
@@ -149,7 +149,7 @@ Regras de outras specs que mudaram com esta (D9):
   `_templates/v8/v8/layouts/_shell.html:61`.
 - V8-TPL-041 [implementado] As parciais do shell, em `v8/shell/`, são três: o sprite de ícones, o
   menu e as mensagens em `<noscript>`. O menu ocupa dois arquivos: `menu.html`, com o `{% cache %}`,
-  e `menu_itens.html`, com a recursão dos itens. Marca, botão de tema, área do usuário e trilha não
+  e `menu_itens.html`, com a recursão dos itens. Marca, botão de modo, área do usuário e trilha não
   são parciais: ficam nos blocks de `_shell.html`. Evidência:
   `_templates/v8/v8/shell/icones.html:1`, `_templates/v8/v8/shell/menu.html:5`,
   `_templates/v8/v8/shell/menu_itens.html:6`, `_templates/v8/v8/shell/mensagens.html:4`.

@@ -33,7 +33,7 @@ if (!Element.prototype.hasPointerCapture) {
 afterEach(() => {
   document.body.innerHTML = ''
   document.head.querySelectorAll('script[type="application/json"]').forEach(el => el.remove())
-  document.documentElement.removeAttribute('data-theme')
+  document.documentElement.removeAttribute('data-modo')
   document.documentElement.removeAttribute('data-sidebar')
   document.cookie.split(';').forEach(c => {
     const nome = c.split('=')[0].trim()

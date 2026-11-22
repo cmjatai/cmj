@@ -250,21 +250,21 @@ def test_o_essencial_fica_fora_de_block_e_chega_a_toda_pagina():
 
 
 @pytest.mark.spec("V8-TPL-013")
-def test_base_emite_em_html_so_lang_e_tema():
+def test_base_emite_em_html_so_lang_e_modo():
     for layout in LAYOUTS:
         sem_cookie = pagina_no_layout(layout)
-        com_tema = pagina_no_layout(
-            layout, cookies={"v8_tema": "escuro", "v8_sidebar": "recolhida"}
+        com_modo = pagina_no_layout(
+            layout, cookies={"v8_modo": "escuro", "v8_sidebar": "recolhida"}
         )
         if layout == "app_sidebar":
             assert '<html lang="pt-br" data-sidebar="expandida">' in sem_cookie
             assert (
-                '<html lang="pt-br" data-theme="escuro" data-sidebar="recolhida">'
-                in com_tema
+                '<html lang="pt-br" data-modo="escuro" data-sidebar="recolhida">'
+                in com_modo
             )
         else:
             assert '<html lang="pt-br">' in sem_cookie, layout
-            assert '<html lang="pt-br" data-theme="escuro">' in com_tema, layout
+            assert '<html lang="pt-br" data-modo="escuro">' in com_modo, layout
 
     assert '<html lang="pt-br">' in renderizar(f'{{% extends "{BASE}" %}}')
     # O atributo a mais entra pelo block, e só por ele.
@@ -318,10 +318,10 @@ def test_base_nao_tem_include_cache_menu_nem_usuario():
     fonte = fonte_de(BASE)
     for proibido in ("{% include", "{% cache", "v8_menu", "v8_usuario", "csrf_token"):
         assert proibido not in fonte, proibido
-    # Do contexto, só o título. O tema vem da tag de preferências.
+    # Do contexto, só o título. O modo vem da tag de preferências.
     assert sorted(set(re.findall(r"{{\s*([\w.]+)", fonte))) == [
         "v8.titulo",
-        "v8_pref.tema",
+        "v8_pref.modo",
     ]
     assert "v8_pref.sidebar" not in fonte
 
@@ -361,7 +361,7 @@ def test_conteudo_padrao_do_shell_e_escrito_uma_unica_vez():
         '<svg class="v8-icones"',
         '<a class="v8-pular" href="#conteudo">Ir para o conteúdo</a>',
         '<a class="v8-topbar-marca" href="/v8/">PortalCMJ</a>',
-        'data-v8-acao="tema"',
+        'data-v8-acao="modo"',
         '<div class="v8-usuario">',
         '<nav class="v8-trilha" aria-label="Trilha">',
         '<p class="v8-alerta v8-alerta-sucesso">Feito.</p>',
@@ -388,7 +388,7 @@ def test_conteudo_padrao_do_shell_e_escrito_uma_unica_vez():
     for marca in (
         "v8-pular",
         "v8-topbar-marca",
-        'data-v8-acao="tema"',
+        'data-v8-acao="modo"',
         "v8-usuario",
         "v8-trilha",
     ):

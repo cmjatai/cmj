@@ -8,7 +8,7 @@ Três formas de mostrar algo por cima da página, sem sair dela:
   errado.
 
 O v8 já tem os três prontos. Você não cria o painel nem a janela: você pede que eles abram. Todos
-fecham com ESC, devolvem o foco ao lugar de onde vieram e funcionam nos dois temas.
+fecham com ESC, devolvem o foco ao lugar de onde vieram e funcionam nos dois modos, claro e escuro.
 
 Neste capítulo o título de cada livro vai abrir o detalhe num drawer, marcar um livro vai mostrar
 um toast, e um botão novo vai pedir confirmação num modal.

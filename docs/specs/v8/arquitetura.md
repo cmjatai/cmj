@@ -88,7 +88,7 @@ As camadas de templates, os blocks de cada nível e os layouts estão em `templa
   type="application/json">` com exatamente estas chaves: `versao`, `debug`, `autenticado`, `usuario`
   (`null` ou `id`, `username`, `nome`, `avatar`), `permissoes` (lista ordenada), `urls` (`api`,
   `versao`, `sessao`, `login`, `logout`, `base`, `frag`), `zonas` (nome para prefixo), `zona` (a da
-  página ou `null`), `flags`, `tema` e `sidebar`. O conteúdo vem de `s_global.dados_globais`. Como o
+  página ou `null`), `flags`, `modo` e `sidebar`. O conteúdo vem de `s_global.dados_globais`. Como o
   login do portal é o e-mail, `username` é só a parte antes do `@`, e `nome` usa esse valor quando o
   usuário não tem nome completo. Evidência: `cmj/v8/services/s_global.py:196`,
   `cmj/v8/templatetags/v8_tags.py:63`.

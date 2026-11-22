@@ -1,6 +1,6 @@
 /*
  * Tokens do v8 (V8-ARQ-051). É o único arquivo com cor literal e com o valor das camadas.
- * Os dois temas definem as mesmas variáveis (V8-SHELL-042).
+ * Os dois modos definem as mesmas variáveis (V8-SHELL-042).
  */
 
 :root {
@@ -51,7 +51,7 @@
   --raio: 0.5rem;
 }
 
-:root[data-theme="escuro"] {
+:root[data-modo="escuro"] {
   color-scheme: dark;
 
   --cor-fundo: #0e151f;
@@ -76,9 +76,9 @@
   --cor-barra-navegador: #17212e;
 }
 
-/* Sem cookie de tema, vale a preferência do sistema, sem JavaScript (V8-SHELL-040). */
+/* Sem cookie de modo, vale a preferência do sistema, sem JavaScript (V8-SHELL-040). */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
+  :root:not([data-modo]) {
     color-scheme: dark;
 
     --cor-fundo: #0e151f;

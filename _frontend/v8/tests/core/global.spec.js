@@ -19,7 +19,7 @@ function esperarAnonimo(store) {
   expect(store.permissoes).toEqual([])
   expect(store.urls).toEqual(padrao.urls)
   expect(store.sidebar).toBe('expandida')
-  expect(store.tema).toBeNull()
+  expect(store.modo).toBeNull()
   expect(store.carregado).toBe(true)
 }
 
@@ -37,7 +37,7 @@ describe('GlobalStore', () => {
       urls: { login: '/entrar/' },
       zonas: { demo: '/v8/demo/' },
       zona: 'demo',
-      tema: 'escuro',
+      modo: 'escuro',
       sidebar: 'recolhida'
     }))
     const store = useGlobalStore()
@@ -49,7 +49,7 @@ describe('GlobalStore', () => {
     expect(store.autenticado).toBe(true)
     expect(store.usuario).toEqual({ id: 7, nome: 'Fulana' })
     expect(store.permissoes).toEqual(['materia.add_materialegislativa'])
-    expect(store.tema).toBe('escuro')
+    expect(store.modo).toBe('escuro')
     expect(store.sidebar).toBe('recolhida')
     expect(store.prefixoZona).toBe('/v8/demo/')
     // As URLs que o servidor não informou continuam com o padrão.

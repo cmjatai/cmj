@@ -29,9 +29,9 @@ URL_BASE = "/v8/"
 URL_FRAG = "/v8/_frag/"
 
 # Cookies de preferência: nome, valores aceitos e valor padrão.
-COOKIE_TEMA = "v8_tema"
+COOKIE_MODO = "v8_modo"
 COOKIE_SIDEBAR = "v8_sidebar"
-TEMAS = ("claro", "escuro")
+MODOS = ("claro", "escuro")
 SIDEBARS = ("expandida", "recolhida")
 SIDEBAR_PADRAO = "expandida"
 
@@ -78,16 +78,16 @@ ZONAS = {
 
 
 def preferencias(cookies):
-    """Lê tema e sidebar dos cookies, aceitando só os valores previstos.
+    """Lê modo e sidebar dos cookies, aceitando só os valores previstos.
 
-    Valor fora da lista é descartado: o tema fica ``None`` (o CSS segue o
+    Valor fora da lista é descartado: o modo fica ``None`` (o CSS segue o
     sistema) e a sidebar volta ao padrão.
     """
     cookies = cookies or {}
-    tema = cookies.get(COOKIE_TEMA)
+    modo = cookies.get(COOKIE_MODO)
     sidebar = cookies.get(COOKIE_SIDEBAR)
     return {
-        "tema": tema if tema in TEMAS else None,
+        "modo": modo if modo in MODOS else None,
         "sidebar": sidebar if sidebar in SIDEBARS else SIDEBAR_PADRAO,
     }
 
@@ -196,7 +196,7 @@ def dados_usuario(usuario):
 def dados_globais(usuario, zona=None, preferencias=None):
     """Conteúdo de ``<script id="v8-global">``, com exatamente estas chaves."""
     preferencias = preferencias or {}
-    tema = preferencias.get("tema")
+    modo = preferencias.get("modo")
     sidebar = preferencias.get("sidebar")
     return {
         "versao": settings.PORTALCMJ_VERSION,
@@ -216,6 +216,6 @@ def dados_globais(usuario, zona=None, preferencias=None):
         "zonas": {nome: URL_BASE + z.prefixo for nome, z in ZONAS.items()},
         "zona": zona if zona in ZONAS else None,
         "flags": {},
-        "tema": tema if tema in TEMAS else None,
+        "modo": modo if modo in MODOS else None,
         "sidebar": sidebar if sidebar in SIDEBARS else SIDEBAR_PADRAO,
     }

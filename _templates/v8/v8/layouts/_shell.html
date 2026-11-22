@@ -12,7 +12,7 @@
         {% block header_nav %}{% endblock %}
         {% block header_actions %}
           {% v8_preferencias as v8_pref %}
-          <button type="button" class="v8-btn v8-btn-icone" data-v8-acao="tema" aria-pressed="{% if v8_pref.tema == 'escuro' %}true{% else %}false{% endif %}" aria-label="Tema escuro">
+          <button type="button" class="v8-btn v8-btn-icone" data-v8-acao="modo" aria-pressed="{% if v8_pref.modo == 'escuro' %}true{% else %}false{% endif %}" aria-label="Modo escuro">
             <svg class="v8-icone v8-icone-sol" aria-hidden="true"><use href="#v8-i-sol"></use></svg>
             <svg class="v8-icone v8-icone-lua" aria-hidden="true"><use href="#v8-i-lua"></use></svg>
           </button>

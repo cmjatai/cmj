@@ -80,12 +80,12 @@ describe('fontes do v8', () => {
     expect(achadas).toEqual([])
   })
 
-  it('V8-SHELL-042: os dois temas definem as mesmas cores', () => {
+  it('V8-SHELL-042: os dois modos definem as mesmas cores', () => {
     const tokens = ler(path.join(RAIZ, 'src/css/tokens.css'))
     const cores = bloco => [...bloco.matchAll(/(--cor-[a-z0-9-]+)\s*:/g)].map(m => m[1]).sort()
     const claro = /:root\s*\{([\s\S]*?)\n\}/.exec(tokens)[1]
-    const escuro = /:root\[data-theme="escuro"\]\s*\{([\s\S]*?)\n\}/.exec(tokens)[1]
-    const sistema = /:root:not\(\[data-theme\]\)\s*\{([\s\S]*?)\n {2}\}/.exec(tokens)[1]
+    const escuro = /:root\[data-modo="escuro"\]\s*\{([\s\S]*?)\n\}/.exec(tokens)[1]
+    const sistema = /:root:not\(\[data-modo\]\)\s*\{([\s\S]*?)\n {2}\}/.exec(tokens)[1]
     expect(cores(claro).length).toBeGreaterThan(10)
     expect(cores(escuro)).toEqual(cores(claro))
     expect(cores(sistema)).toEqual(cores(claro))

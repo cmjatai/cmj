@@ -312,8 +312,8 @@ def test_topbar_tem_marca_botoes_e_area_do_usuario(cache_real, superusuario):
         in topbar_de(pagina_no_layout("app_sidebar"))
     )
     assert (
-        '<button type="button" class="v8-btn v8-btn-icone" data-v8-acao="tema" '
-        'aria-pressed="false" aria-label="Tema escuro">' in anonimo
+        '<button type="button" class="v8-btn v8-btn-icone" data-v8-acao="modo" '
+        'aria-pressed="false" aria-label="Modo escuro">' in anonimo
     )
     assert 'href="#v8-i-sol"' in anonimo and 'href="#v8-i-lua"' in anonimo
     assert '<div class="v8-usuario">' in anonimo
@@ -324,7 +324,7 @@ def test_topbar_tem_marca_botoes_e_area_do_usuario(cache_real, superusuario):
     assert "Sair" not in anonimo
 
     cliente = cliente_http(superusuario)
-    cliente.cookies["v8_tema"] = "escuro"
+    cliente.cookies["v8_modo"] = "escuro"
     cliente.cookies["v8_sidebar"] = "recolhida"
     autenticado = topbar_de(html_de(cliente.get("/v8/demo/clientes/")))
     assert "Sofia Super" in autenticado
@@ -420,7 +420,7 @@ def test_shell_usa_marcos_semanticos_e_link_de_pular(layout):
     assert corpo.index(pular) == corpo.index(focaveis[0])
 
 
-# --- Sidebar e tema ---------------------------------------------------------------
+# --- Sidebar e modo ---------------------------------------------------------------
 
 
 @pytest.mark.spec("V8-SHELL-030")
@@ -480,27 +480,27 @@ def test_menu_funciona_sem_javascript(superusuario):
 def test_tema_vem_do_cookie_e_sem_cookie_nao_ha_atributo():
     cliente = cliente_http()
     html = html_de(cliente.get("/v8/"))
-    assert "data-theme" not in html
-    assert ler_json_script(html, "v8-global")["tema"] is None
-    assert 'data-v8-acao="tema" aria-pressed="false"' in html
+    assert "data-modo" not in html
+    assert ler_json_script(html, "v8-global")["modo"] is None
+    assert 'data-v8-acao="modo" aria-pressed="false"' in html
 
-    cliente.cookies["v8_tema"] = "escuro"
+    cliente.cookies["v8_modo"] = "escuro"
     html = html_de(cliente.get("/v8/"))
-    assert '<html lang="pt-br" data-theme="escuro">' in html
-    assert 'data-v8-acao="tema" aria-pressed="true"' in html
-    assert ler_json_script(html, "v8-global")["tema"] == "escuro"
+    assert '<html lang="pt-br" data-modo="escuro">' in html
+    assert 'data-v8-acao="modo" aria-pressed="true"' in html
+    assert ler_json_script(html, "v8-global")["modo"] == "escuro"
 
-    cliente.cookies["v8_tema"] = "claro"
+    cliente.cookies["v8_modo"] = "claro"
     html = html_de(cliente.get("/v8/"))
-    assert '<html lang="pt-br" data-theme="claro">' in html
-    assert 'data-v8-acao="tema" aria-pressed="false"' in html
+    assert '<html lang="pt-br" data-modo="claro">' in html
+    assert 'data-v8-acao="modo" aria-pressed="false"' in html
     assert (
-        '<html lang="pt-br" data-theme="claro" data-sidebar="expandida">'
-        in pagina_no_layout("app_sidebar", cookies={"v8_tema": "claro"})
+        '<html lang="pt-br" data-modo="claro" data-sidebar="expandida">'
+        in pagina_no_layout("app_sidebar", cookies={"v8_modo": "claro"})
     )
 
     # Vale também no layout sem shell.
-    assert 'data-theme="claro"' in html_de(cliente.get("/v8/nao-existe/"))
+    assert 'data-modo="claro"' in html_de(cliente.get("/v8/nao-existe/"))
 
 
 # --- Requisitos de segurança ---------------------------------------------------------
@@ -538,17 +538,17 @@ def test_cache_real_nao_mistura_menus_de_usuarios_diferentes(
 )
 def test_valor_invalido_de_cookie_nunca_chega_ao_html(valor):
     cliente = cliente_http()
-    cliente.cookies["v8_tema"] = valor
+    cliente.cookies["v8_modo"] = valor
     cliente.cookies["v8_sidebar"] = valor
     paginas = [html_de(cliente.get(url)) for url in ("/v8/", "/v8/nao-existe/")]
     paginas.append(
-        pagina_no_layout("app_sidebar", cookies={"v8_tema": valor, "v8_sidebar": valor})
+        pagina_no_layout("app_sidebar", cookies={"v8_modo": valor, "v8_sidebar": valor})
     )
     for html in paginas:
-        assert "data-theme" not in html
+        assert "data-modo" not in html
         assert "zzqx" not in html and "ESCURO" not in html
         dados = ler_json_script(html, "v8-global")
-        assert dados["tema"] is None and dados["sidebar"] == "expandida"
+        assert dados["modo"] is None and dados["sidebar"] == "expandida"
     # No layout com sidebar, o atributo sai com o valor padrão.
     assert '<html lang="pt-br" data-sidebar="expandida">' in paginas[-1]
 

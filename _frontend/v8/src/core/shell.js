@@ -2,17 +2,17 @@ import { gravarCookieV8 } from '~@/core/cookies'
 
 // Comportamentos do shell que o Django renderiza (docs/specs/v8/shell.md).
 //
-// O HTML já chega pronto: `<html data-theme>` e `<html data-sidebar>` vêm dos cookies, e os botões
+// O HTML já chega pronto: `<html data-modo>` e `<html data-sidebar>` vêm dos cookies, e os botões
 // trazem `data-v8-acao`. Aqui há um ouvinte de clique e um de teclado no documento: eles trocam os
 // atributos, gravam os cookies e fecham os grupos do menu do cabeçalho, sem recarregar a página.
 
-export const TEMAS = ['claro', 'escuro']
+export const MODOS = ['claro', 'escuro']
 export const ESTADOS_SIDEBAR = ['expandida', 'recolhida']
 
-const COOKIE_TEMA = 'v8_tema'
+const COOKIE_MODO = 'v8_modo'
 const COOKIE_SIDEBAR = 'v8_sidebar'
 const SELETOR_ACAO = '[data-v8-acao]'
-const SELETOR_TEMA = '[data-v8-acao="tema"]'
+const SELETOR_MODO = '[data-v8-acao="modo"]'
 const SELETOR_SIDEBAR = '[data-v8-acao="sidebar"]'
 const SELETOR_MENU_DO_CABECALHO = '.v8-topbar .v8-menu'
 const SELETOR_GRUPO_ABERTO = '.v8-topbar .v8-menu details[open]'
@@ -26,10 +26,10 @@ function marcar(seletor, atributo, valor) {
   })
 }
 
-// Tema em vigor: o do atributo ou, sem atributo válido, o do sistema (V8-SHELL-040).
-export function temaEmVigor() {
-  const atributo = document.documentElement.getAttribute('data-theme')
-  if (TEMAS.includes(atributo)) {
+// Modo em vigor: o do atributo ou, sem atributo válido, o do sistema (V8-SHELL-040).
+export function modoEmVigor() {
+  const atributo = document.documentElement.getAttribute('data-modo')
+  if (MODOS.includes(atributo)) {
     return atributo
   }
   return window.matchMedia(CONSULTA_ESCURO).matches ? 'escuro' : 'claro'
@@ -49,13 +49,13 @@ function atualizarCorDaBarra() {
 }
 
 // Só `claro` e `escuro` chegam ao atributo e ao cookie (V8-SHELL-052).
-export function aplicarTema(tema) {
-  if (!TEMAS.includes(tema)) {
+export function aplicarModo(modo) {
+  if (!MODOS.includes(modo)) {
     return false
   }
-  document.documentElement.setAttribute('data-theme', tema)
-  gravarCookieV8(COOKIE_TEMA, tema)
-  marcar(SELETOR_TEMA, 'aria-pressed', tema === 'escuro')
+  document.documentElement.setAttribute('data-modo', modo)
+  gravarCookieV8(COOKIE_MODO, modo)
+  marcar(SELETOR_MODO, 'aria-pressed', modo === 'escuro')
   atualizarCorDaBarra()
   return true
 }
@@ -76,8 +76,8 @@ export function aplicarSidebar(estado) {
   return true
 }
 
-function alternarTema() {
-  aplicarTema(temaEmVigor() === 'escuro' ? 'claro' : 'escuro')
+function alternarModo() {
+  aplicarModo(modoEmVigor() === 'escuro' ? 'claro' : 'escuro')
 }
 
 function alternarSidebar(botao, abrirMenuEstreito) {
@@ -121,9 +121,9 @@ export function iniciarShell({ abrirMenuEstreito } = {}) {
       return
     }
     const acao = botao.getAttribute('data-v8-acao')
-    if (acao === 'tema') {
+    if (acao === 'modo') {
       event.preventDefault()
-      alternarTema()
+      alternarModo()
     } else if (acao === 'sidebar') {
       event.preventDefault()
       alternarSidebar(botao, abrirMenuEstreito)
@@ -153,8 +153,8 @@ export function iniciarShell({ abrirMenuEstreito } = {}) {
   document.addEventListener('keydown', aoTeclar)
   prepararMenuDoCabecalho()
 
-  // O servidor só conhece o cookie: sem ele, quem sabe o tema em vigor é o navegador.
-  marcar(SELETOR_TEMA, 'aria-pressed', temaEmVigor() === 'escuro')
+  // O servidor só conhece o cookie: sem ele, quem sabe o modo em vigor é o navegador.
+  marcar(SELETOR_MODO, 'aria-pressed', modoEmVigor() === 'escuro')
 
   return () => {
     document.removeEventListener('click', aoClicar)
@@ -162,4 +162,4 @@ export function iniciarShell({ abrirMenuEstreito } = {}) {
   }
 }
 
-export default { iniciarShell, temaEmVigor, aplicarTema, sidebarEmVigor, aplicarSidebar }
+export default { iniciarShell, modoEmVigor, aplicarModo, sidebarEmVigor, aplicarSidebar }

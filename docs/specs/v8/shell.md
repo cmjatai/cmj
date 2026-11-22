@@ -11,7 +11,7 @@ Testes: `cmj/v8/tests/test_shell.py`, `_frontend/v8/tests/core/shell.spec.js`,
 
 O shell é a moldura dos layouts `landing`, `app_topbar` e `app_sidebar` (`templates.md`): cabeçalho,
 menu, breadcrumbs e, no `app_sidebar`, a barra lateral. Quem o renderiza é o Django. O JavaScript só
-acrescenta o recolher da sidebar, a troca de tema, o menu em drawer na tela estreita e o fechar dos
+acrescenta o recolher da sidebar, a troca de modo (claro ou escuro), o menu em drawer na tela estreita e o fechar dos
 grupos do menu do cabeçalho.
 
 ## Escopo
@@ -50,7 +50,7 @@ grupos do menu do cabeçalho.
 
 ### Topbar e breadcrumbs
 
-- V8-SHELL-020 [implementado] A topbar tem a marca, o botão de tema e a área do usuário, e não fica
+- V8-SHELL-020 [implementado] A topbar tem a marca, o botão de modo e a área do usuário, e não fica
   em cache. No layout `app_sidebar` tem também o botão da sidebar, e em `app_topbar` e `landing`, o
   botão do menu. Autenticado vê nome, avatar e "Sair". Anônimo vê "Entrar", com retorno para a
   página atual. Evidência: `_templates/v8/v8/layouts/_shell.html:9`,
@@ -93,17 +93,17 @@ grupos do menu do cabeçalho.
   não são afetados. Evidência: `_frontend/v8/src/core/shell.js:95`,
   `_frontend/v8/src/core/shell.js:105`, `_frontend/v8/src/css/shell.css:281`.
 
-### Tema
+### Modo claro e escuro
 
-- V8-SHELL-040 [implementado] O tema fica no cookie `v8_tema`, com valor `claro` ou `escuro`. O
-  Django renderiza `<html data-theme="...">` a partir dele. Sem cookie, o atributo não é emitido e o
+- V8-SHELL-040 [implementado] O modo fica no cookie `v8_modo`, com valor `claro` ou `escuro`. O
+  Django renderiza `<html data-modo="...">` a partir dele. Sem cookie, o atributo não é emitido e o
   CSS segue `prefers-color-scheme`, sem JavaScript. Evidência: `_frontend/v8/src/core/shell.js:29`,
   `_frontend/v8/src/css/tokens.css:79`.
-- V8-SHELL-041 [implementado] O botão de tema alterna entre claro e escuro a partir do tema em
+- V8-SHELL-041 [implementado] O botão de modo alterna entre claro e escuro a partir do modo em
   vigor, grava o cookie, atualiza o atributo e o `<meta name="theme-color">`, sem recarregar. O
   botão informa o estado por `aria-pressed`. Evidência: `_frontend/v8/src/core/shell.js:52`.
 - V8-SHELL-042 [implementado] Toda cor de template e de componente vem de token semântico com valor
-  nos dois temas. Não há cor literal fora de `src/css/tokens.css`. Evidência:
+  nos dois modos. Não há cor literal fora de `src/css/tokens.css`. Evidência:
   `_frontend/v8/src/css/tokens.css:3`.
 
 ## Requisitos de segurança
@@ -113,7 +113,7 @@ grupos do menu do cabeçalho.
 - V8-SHELL-051 [implementado] Com cache real, dois usuários de permissões diferentes recebem menus
   diferentes, e nenhum recebe item que não pode ver. Item da varredura: 5. Evidência:
   `cmj/v8/services/s_global.py:135`.
-- V8-SHELL-052 [implementado] Valor de `v8_sidebar` ou `v8_tema` fora da lista válida é ignorado e
+- V8-SHELL-052 [implementado] Valor de `v8_sidebar` ou `v8_modo` fora da lista válida é ignorado e
   nunca chega ao HTML. Item da varredura: 6. Evidência: `_frontend/v8/src/core/shell.js:51`.
 - V8-SHELL-053 [implementado] O link "Entrar" leva como retorno só o caminho e a query da página
   atual, codificados, sem host. "Sair" usa a rota de logout existente. Item da varredura: 6.

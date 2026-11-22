@@ -99,13 +99,13 @@
     flex-shrink: 0;
   }
 
-  /* O botão de tema mostra a lua no tema claro e o sol no escuro. */
-  [data-v8-acao="tema"] .v8-icone-sol,
-  [data-v8-acao="tema"][aria-pressed="true"] .v8-icone-lua {
+  /* O botão de modo mostra a lua no modo claro e o sol no escuro. */
+  [data-v8-acao="modo"] .v8-icone-sol,
+  [data-v8-acao="modo"][aria-pressed="true"] .v8-icone-lua {
     display: none;
   }
 
-  [data-v8-acao="tema"][aria-pressed="true"] .v8-icone-sol {
+  [data-v8-acao="modo"][aria-pressed="true"] .v8-icone-sol {
     display: inline;
   }
 

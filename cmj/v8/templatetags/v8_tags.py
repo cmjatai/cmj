@@ -49,7 +49,7 @@ def _preferencias(context):
 
 @register.simple_tag(takes_context=True)
 def v8_preferencias(context):
-    """Tema e sidebar lidos dos cookies, só com valores da lista válida."""
+    """Modo e sidebar lidos dos cookies, só com valores da lista válida."""
     return _preferencias(context)
 
 

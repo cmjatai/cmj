@@ -2,11 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   ESTADOS_SIDEBAR,
-  TEMAS,
+  MODOS,
   aplicarSidebar,
-  aplicarTema,
+  aplicarModo,
   iniciarShell,
-  temaEmVigor
+  modoEmVigor
 } from '~@/core/shell'
 
 const html = document.documentElement
@@ -15,7 +15,7 @@ const SUFIXO_COOKIE = '; Path=/v8/; Max-Age=31536000; SameSite=Lax'
 let parar = null
 let gravacao = null
 
-// Substitui o matchMedia do teste: largura da tela e tema do sistema.
+// Substitui o matchMedia do teste: largura da tela e modo do sistema.
 function ambiente({ telaLarga = true, sistemaEscuro = false } = {}) {
   const respostas = {
     '(min-width: 64rem)': telaLarga,
@@ -30,21 +30,21 @@ function ambiente({ telaLarga = true, sistemaEscuro = false } = {}) {
 }
 
 // O shell como o Django o renderiza: dois botões de cada ação, um deles com conteúdo interno.
-function montarShell({ tema = null, sidebar = null, ariaTema = 'false', ariaSidebar = 'true' } = {}) {
-  if (tema !== null) html.setAttribute('data-theme', tema)
+function montarShell({ modo = null, sidebar = null, ariaModo = 'false', ariaSidebar = 'true' } = {}) {
+  if (modo !== null) html.setAttribute('data-modo', modo)
   if (sidebar !== null) html.setAttribute('data-sidebar', sidebar)
   document.body.innerHTML = `
     <header>
       <button id="sidebar-1" type="button" data-v8-acao="sidebar" aria-expanded="${ariaSidebar}">
         <span id="sidebar-icone">menu</span>
       </button>
-      <button id="tema-1" type="button" data-v8-acao="tema" aria-pressed="${ariaTema}">
-        <span id="tema-icone">tema</span>
+      <button id="modo-1" type="button" data-v8-acao="modo" aria-pressed="${ariaModo}">
+        <span id="modo-icone">modo</span>
       </button>
     </header>
     <footer>
       <button id="sidebar-2" type="button" data-v8-acao="sidebar" aria-expanded="${ariaSidebar}">menu</button>
-      <button id="tema-2" type="button" data-v8-acao="tema" aria-pressed="${ariaTema}">tema</button>
+      <button id="modo-2" type="button" data-v8-acao="modo" aria-pressed="${ariaModo}">modo</button>
       <button id="outra" type="button" data-v8-acao="outra">outra</button>
       <button id="comum" type="button">comum</button>
     </footer>`
@@ -54,7 +54,7 @@ function montarShell({ tema = null, sidebar = null, ariaTema = 'false', ariaSide
 // grupos em <details> e, fora dele, uma sidebar com um grupo aberto. O tabindex existe só porque o
 // DOM simulado não trata <summary> como focável.
 function montarCabecalho({ aberto = true } = {}) {
-  html.removeAttribute('data-theme')
+  html.removeAttribute('data-modo')
   html.removeAttribute('data-sidebar')
   document.body.innerHTML = `
     <header class="v8-topbar">
@@ -318,79 +318,79 @@ describe('shell', () => {
     })
   })
 
-  describe('tema', () => {
-    it('V8-SHELL-041: o botão alterna o tema, grava o cookie e informa o estado por aria-pressed', () => {
+  describe('modo', () => {
+    it('V8-SHELL-041: o botão alterna o modo, grava o cookie e informa o estado por aria-pressed', () => {
       ambiente()
-      montarShell({ tema: 'claro' })
+      montarShell({ modo: 'claro' })
       iniciar()
 
-      clicar('tema-1')
+      clicar('modo-1')
 
-      expect(html.getAttribute('data-theme')).toBe('escuro')
-      expect(cookiesGravados()).toEqual([`v8_tema=escuro${SUFIXO_COOKIE}`])
-      expect(atributos('[data-v8-acao="tema"]', 'aria-pressed')).toEqual(['true', 'true'])
-      expect(temaEmVigor()).toBe('escuro')
+      expect(html.getAttribute('data-modo')).toBe('escuro')
+      expect(cookiesGravados()).toEqual([`v8_modo=escuro${SUFIXO_COOKIE}`])
+      expect(atributos('[data-v8-acao="modo"]', 'aria-pressed')).toEqual(['true', 'true'])
+      expect(modoEmVigor()).toBe('escuro')
 
-      clicar('tema-icone')
+      clicar('modo-icone')
 
-      expect(html.getAttribute('data-theme')).toBe('claro')
+      expect(html.getAttribute('data-modo')).toBe('claro')
       expect(cookiesGravados()).toEqual([
-        `v8_tema=escuro${SUFIXO_COOKIE}`,
-        `v8_tema=claro${SUFIXO_COOKIE}`
+        `v8_modo=escuro${SUFIXO_COOKIE}`,
+        `v8_modo=claro${SUFIXO_COOKIE}`
       ])
-      expect(atributos('[data-v8-acao="tema"]', 'aria-pressed')).toEqual(['false', 'false'])
+      expect(atributos('[data-v8-acao="modo"]', 'aria-pressed')).toEqual(['false', 'false'])
     })
 
-    it('V8-SHELL-041: sem data-theme o tema em vigor é o do sistema, e o clique parte dele', () => {
+    it('V8-SHELL-041: sem data-modo o modo em vigor é o do sistema, e o clique parte dele', () => {
       ambiente({ sistemaEscuro: true })
-      montarShell({ ariaTema: 'false' })
+      montarShell({ ariaModo: 'false' })
 
-      expect(temaEmVigor()).toBe('escuro')
+      expect(modoEmVigor()).toBe('escuro')
 
       iniciar()
 
-      // O servidor não sabia do tema do sistema: o boot corrige o aria-pressed sem gravar nada.
-      expect(atributos('[data-v8-acao="tema"]', 'aria-pressed')).toEqual(['true', 'true'])
-      expect(html.hasAttribute('data-theme')).toBe(false)
+      // O servidor não sabia do modo do sistema: o boot corrige o aria-pressed sem gravar nada.
+      expect(atributos('[data-v8-acao="modo"]', 'aria-pressed')).toEqual(['true', 'true'])
+      expect(html.hasAttribute('data-modo')).toBe(false)
       expect(cookiesGravados()).toEqual([])
 
-      clicar('tema-2')
+      clicar('modo-2')
 
-      expect(html.getAttribute('data-theme')).toBe('claro')
-      expect(cookiesGravados()).toEqual([`v8_tema=claro${SUFIXO_COOKIE}`])
-      expect(atributos('[data-v8-acao="tema"]', 'aria-pressed')).toEqual(['false', 'false'])
+      expect(html.getAttribute('data-modo')).toBe('claro')
+      expect(cookiesGravados()).toEqual([`v8_modo=claro${SUFIXO_COOKIE}`])
+      expect(atributos('[data-v8-acao="modo"]', 'aria-pressed')).toEqual(['false', 'false'])
     })
 
-    it('V8-SHELL-041: sem data-theme e com o sistema claro, o clique leva ao escuro', () => {
+    it('V8-SHELL-041: sem data-modo e com o sistema claro, o clique leva ao escuro', () => {
       ambiente({ sistemaEscuro: false })
-      montarShell({ ariaTema: 'true' })
+      montarShell({ ariaModo: 'true' })
       iniciar()
 
-      expect(atributos('[data-v8-acao="tema"]', 'aria-pressed')).toEqual(['false', 'false'])
+      expect(atributos('[data-v8-acao="modo"]', 'aria-pressed')).toEqual(['false', 'false'])
 
-      clicar('tema-1')
+      clicar('modo-1')
 
-      expect(html.getAttribute('data-theme')).toBe('escuro')
+      expect(html.getAttribute('data-modo')).toBe('escuro')
     })
 
-    it('V8-SHELL-041: o meta theme-color recebe o valor de --cor-barra-navegador do tema', () => {
+    it('V8-SHELL-041: o meta theme-color recebe o valor de --cor-barra-navegador do modo', () => {
       ambiente()
       const estilo = document.createElement('style')
       estilo.textContent = `
         :root { --cor-barra-navegador: #fafafa; }
-        [data-theme="escuro"] { --cor-barra-navegador: #101418; }`
+        [data-modo="escuro"] { --cor-barra-navegador: #101418; }`
       document.head.appendChild(estilo)
       const meta = document.createElement('meta')
       meta.name = 'theme-color'
       meta.content = '#fafafa'
       document.head.appendChild(meta)
-      montarShell({ tema: 'claro' })
+      montarShell({ modo: 'claro' })
       iniciar()
 
-      clicar('tema-1')
+      clicar('modo-1')
       expect(meta.getAttribute('content')).toBe('#101418')
 
-      clicar('tema-1')
+      clicar('modo-1')
       expect(meta.getAttribute('content')).toBe('#fafafa')
     })
 
@@ -400,12 +400,12 @@ describe('shell', () => {
       meta.name = 'theme-color'
       meta.content = '#abcdef'
       document.head.appendChild(meta)
-      montarShell({ tema: 'claro' })
+      montarShell({ modo: 'claro' })
       iniciar()
 
-      clicar('tema-1')
+      clicar('modo-1')
 
-      expect(html.getAttribute('data-theme')).toBe('escuro')
+      expect(html.getAttribute('data-modo')).toBe('escuro')
       expect(meta.getAttribute('content')).toBe('#abcdef')
     })
   })
@@ -413,7 +413,7 @@ describe('shell', () => {
   describe('ouvinte', () => {
     it('V8-SHELL-031: há um ouvinte de clique e um de teclado, e a função devolvida os remove', () => {
       ambiente({ telaLarga: true })
-      montarShell({ tema: 'claro', sidebar: 'expandida' })
+      montarShell({ modo: 'claro', sidebar: 'expandida' })
       const instalar = vi.spyOn(document, 'addEventListener')
       const retirar = vi.spyOn(document, 'removeEventListener')
 
@@ -424,16 +424,16 @@ describe('shell', () => {
       remover()
       expect(retirar.mock.calls.map(chamada => chamada[0])).toEqual(['click', 'keydown'])
       clicar('sidebar-1')
-      clicar('tema-1')
+      clicar('modo-1')
 
       expect(html.getAttribute('data-sidebar')).toBe('expandida')
-      expect(html.getAttribute('data-theme')).toBe('claro')
+      expect(html.getAttribute('data-modo')).toBe('claro')
       expect(cookiesGravados()).toEqual([])
     })
 
     it('V8-SHELL-041: clique fora dos botões ou em ação desconhecida não altera nada', () => {
       ambiente({ telaLarga: true })
-      montarShell({ tema: 'claro', sidebar: 'expandida' })
+      montarShell({ modo: 'claro', sidebar: 'expandida' })
       const abrirMenuEstreito = vi.fn()
       iniciar({ abrirMenuEstreito })
 
@@ -441,7 +441,7 @@ describe('shell', () => {
       clicar('comum')
       document.body.click()
 
-      expect(html.getAttribute('data-theme')).toBe('claro')
+      expect(html.getAttribute('data-modo')).toBe('claro')
       expect(html.getAttribute('data-sidebar')).toBe('expandida')
       expect(cookiesGravados()).toEqual([])
       expect(abrirMenuEstreito).not.toHaveBeenCalled()
@@ -450,13 +450,13 @@ describe('shell', () => {
 
   describe('valores válidos', () => {
     it.each(['roxo', '', 'ESCURO', 'escuro; Path=/', '<script>', null, undefined, 1])(
-      'V8-SHELL-052: aplicarTema recusa valor fora da lista (%s)',
+      'V8-SHELL-052: aplicarModo recusa valor fora da lista (%s)',
       valor => {
-        montarShell({ tema: 'claro' })
+        montarShell({ modo: 'claro' })
 
-        expect(aplicarTema(valor)).toBe(false)
+        expect(aplicarModo(valor)).toBe(false)
 
-        expect(html.getAttribute('data-theme')).toBe('claro')
+        expect(html.getAttribute('data-modo')).toBe('claro')
         expect(cookiesGravados()).toEqual([])
       }
     )
@@ -475,20 +475,20 @@ describe('shell', () => {
 
     it('V8-SHELL-052: atributo inválido no HTML é ignorado e nunca vai para o cookie', () => {
       ambiente({ telaLarga: true, sistemaEscuro: true })
-      montarShell({ tema: 'roxo"><script>', sidebar: 'aberta' })
+      montarShell({ modo: 'roxo"><script>', sidebar: 'aberta' })
       iniciar()
 
       // Atributo fora da lista vale como ausente: segue o sistema e o padrão.
-      expect(temaEmVigor()).toBe('escuro')
-      expect(atributos('[data-v8-acao="tema"]', 'aria-pressed')).toEqual(['true', 'true'])
+      expect(modoEmVigor()).toBe('escuro')
+      expect(atributos('[data-v8-acao="modo"]', 'aria-pressed')).toEqual(['true', 'true'])
 
-      clicar('tema-1')
+      clicar('modo-1')
       clicar('sidebar-1')
 
-      expect(html.getAttribute('data-theme')).toBe('claro')
+      expect(html.getAttribute('data-modo')).toBe('claro')
       expect(html.getAttribute('data-sidebar')).toBe('recolhida')
       expect(cookiesGravados()).toEqual([
-        `v8_tema=claro${SUFIXO_COOKIE}`,
+        `v8_modo=claro${SUFIXO_COOKIE}`,
         `v8_sidebar=recolhida${SUFIXO_COOKIE}`
       ])
     })
@@ -499,17 +499,17 @@ describe('shell', () => {
       iniciar()
 
       for (let i = 0; i < 5; i += 1) {
-        clicar('tema-1')
+        clicar('modo-1')
         clicar('sidebar-2')
       }
 
       const gravados = cookiesGravados().map(cookie => cookie.split(';')[0].split('='))
       expect(gravados).toHaveLength(10)
       gravados.forEach(([nome, valor]) => {
-        expect(['v8_tema', 'v8_sidebar']).toContain(nome)
-        expect(nome === 'v8_tema' ? TEMAS : ESTADOS_SIDEBAR).toContain(valor)
+        expect(['v8_modo', 'v8_sidebar']).toContain(nome)
+        expect(nome === 'v8_modo' ? MODOS : ESTADOS_SIDEBAR).toContain(valor)
       })
-      expect(TEMAS).toEqual(['claro', 'escuro'])
+      expect(MODOS).toEqual(['claro', 'escuro'])
       expect(ESTADOS_SIDEBAR).toEqual(['expandida', 'recolhida'])
     })
   })
