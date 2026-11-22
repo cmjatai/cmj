@@ -73,6 +73,7 @@
 
   .v8-body .v8-topbar-marca {
     margin-right: auto;
+    font-family: var(--fonte-titulo);
     color: inherit;
     font-weight: 600;
     font-size: 1.05rem;

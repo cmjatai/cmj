@@ -426,13 +426,14 @@ def test_shell_usa_marcos_semanticos_e_link_de_pular(layout):
 @pytest.mark.spec("V8-SHELL-030")
 def test_estado_da_sidebar_vem_do_cookie(superusuario):
     cliente = cliente_http(superusuario)
-    assert '<html lang="pt-br" data-sidebar="expandida">' in html_de(
-        cliente.get("/v8/demo/clientes/")
+    assert (
+        '<html lang="pt-br" data-tema="oficial" data-sidebar="expandida">'
+        in html_de(cliente.get("/v8/demo/clientes/"))
     )
 
     cliente.cookies["v8_sidebar"] = "recolhida"
     html = html_de(cliente.get("/v8/demo/clientes/"))
-    assert '<html lang="pt-br" data-sidebar="recolhida">' in html
+    assert '<html lang="pt-br" data-tema="oficial" data-sidebar="recolhida">' in html
     assert (
         'data-v8-acao="sidebar" aria-controls="v8-sidebar" aria-expanded="false"'
         in html
@@ -486,16 +487,16 @@ def test_tema_vem_do_cookie_e_sem_cookie_nao_ha_atributo():
 
     cliente.cookies["v8_modo"] = "escuro"
     html = html_de(cliente.get("/v8/"))
-    assert '<html lang="pt-br" data-modo="escuro">' in html
+    assert '<html lang="pt-br" data-tema="oficial" data-modo="escuro">' in html
     assert 'data-v8-acao="modo" aria-pressed="true"' in html
     assert ler_json_script(html, "v8-global")["modo"] == "escuro"
 
     cliente.cookies["v8_modo"] = "claro"
     html = html_de(cliente.get("/v8/"))
-    assert '<html lang="pt-br" data-modo="claro">' in html
+    assert '<html lang="pt-br" data-tema="oficial" data-modo="claro">' in html
     assert 'data-v8-acao="modo" aria-pressed="false"' in html
     assert (
-        '<html lang="pt-br" data-modo="claro" data-sidebar="expandida">'
+        '<html lang="pt-br" data-tema="oficial" data-modo="claro" data-sidebar="expandida">'
         in pagina_no_layout("app_sidebar", cookies={"v8_modo": "claro"})
     )
 
@@ -550,7 +551,10 @@ def test_valor_invalido_de_cookie_nunca_chega_ao_html(valor):
         dados = ler_json_script(html, "v8-global")
         assert dados["modo"] is None and dados["sidebar"] == "expandida"
     # No layout com sidebar, o atributo sai com o valor padrão.
-    assert '<html lang="pt-br" data-sidebar="expandida">' in paginas[-1]
+    assert (
+        '<html lang="pt-br" data-tema="oficial" data-sidebar="expandida">'
+        in paginas[-1]
+    )
 
 
 @pytest.mark.spec("V8-SHELL-053")

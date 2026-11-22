@@ -1,0 +1,59 @@
+/*
+ * Tokens do tema 3 (V8-TEMA-014): alto contraste. Preto e branco, com azul forte no claro e
+ * amarelo no escuro.
+ */
+
+:root[data-tema="tema3"] {
+  --cor-fundo: #ffffff;
+  --cor-superficie: #ffffff;
+  --cor-superficie-2: #f0f0f0;
+  --cor-texto: #000000;
+  --cor-texto-suave: #2b2b2b;
+  --cor-borda: #000000;
+  --cor-primaria: #0030c0;
+  --cor-primaria-forte: #001f80;
+  --cor-sobre-primaria: #ffffff;
+  --cor-realce: #0030c0;
+  --cor-topo: #000000;
+  --cor-sobre-topo: #ffffff;
+  --cor-barra-navegador: #000000;
+
+  --sombra-1: none;
+  --sombra-2: 0 0 0 2px var(--cor-texto);
+  --sombra-3: 0 0 0 3px var(--cor-texto);
+  --sombra-lateral: 0 0 0 2px var(--cor-texto);
+}
+
+:root[data-tema="tema3"][data-modo="escuro"] {
+  --cor-fundo: #000000;
+  --cor-superficie: #000000;
+  --cor-superficie-2: #1a1a1a;
+  --cor-texto: #ffffff;
+  --cor-texto-suave: #e0e0e0;
+  --cor-borda: #ffffff;
+  --cor-primaria: #ffd400;
+  --cor-primaria-forte: #ffe766;
+  --cor-sobre-primaria: #000000;
+  --cor-realce: #ffd400;
+  --cor-topo: #000000;
+  --cor-sobre-topo: #ffffff;
+  --cor-barra-navegador: #000000;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-tema="tema3"]:not([data-modo]) {
+    --cor-fundo: #000000;
+    --cor-superficie: #000000;
+    --cor-superficie-2: #1a1a1a;
+    --cor-texto: #ffffff;
+    --cor-texto-suave: #e0e0e0;
+    --cor-borda: #ffffff;
+    --cor-primaria: #ffd400;
+    --cor-primaria-forte: #ffe766;
+    --cor-sobre-primaria: #000000;
+    --cor-realce: #ffd400;
+    --cor-topo: #000000;
+    --cor-sobre-topo: #ffffff;
+    --cor-barra-navegador: #000000;
+  }
+}

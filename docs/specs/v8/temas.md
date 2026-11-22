@@ -5,7 +5,9 @@ etapas
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `485a3a988`)
 Código principal: `cmj/v8/services/s_global.py`, `_frontend/v8/src/css/`, a criar: as pastas de
 tema em css/temas
-Testes: `_frontend/v8/tests/css/temas.spec.js`, `_frontend/v8/tests/core/fonte.spec.js`
+Testes: `cmj/v8/tests/test_temas.py`, `_frontend/v8/tests/css/temas.spec.js`,
+`_frontend/v8/tests/core/fonte.spec.js`, `_frontend/v8/tests/core/shell.spec.js`,
+`_frontend/v8/tests/core/global.spec.js`
 
 Tema é o design do v8: cores, fontes, arredondamentos, sombras e, se preciso, regras CSS próprias.
 Modo é claro ou escuro. Todo tema tem os dois modos, e os dois são escolhas independentes.
@@ -47,14 +49,14 @@ Regras de outras specs que mudam com esta (D2):
 
 ### Tema e modo
 
-- V8-TEMA-001 [desejado] Tema é o design; modo é `claro` ou `escuro`. Todo tema define os dois
-  modos. Trocar o tema não muda o modo, e trocar o modo não muda o tema. Evidência: a criar.
-- V8-TEMA-002 [desejado] Os temas são um registro fixo em `s_global.TEMAS`, de nome para rótulo,
+- V8-TEMA-001 [implementado] Tema é o design; modo é `claro` ou `escuro`. Todo tema define os dois
+  modos. Trocar o tema não muda o modo, e trocar o modo não muda o tema. Evidência: `cmj/v8/services/s_global.py:130`, `_frontend/v8/src/core/shell.js:159`.
+- V8-TEMA-002 [implementado] Os temas são um registro fixo em `s_global.TEMAS`, de nome para rótulo,
   com `oficial` como padrão. O nome tem só minúsculas, dígitos e hífen, começa por letra e não é o
-  nome de um modo. Registro fora dessas regras impede o projeto de subir. Evidência: a criar.
-- V8-TEMA-003 [desejado] Cada tema do registro tem a pasta `css/temas/<nome>/`, com `index.css`, e
+  nome de um modo. Registro fora dessas regras impede o projeto de subir. Evidência: `cmj/v8/services/s_global.py:50`, `cmj/v8/services/s_global.py:68`.
+- V8-TEMA-003 [implementado] Cada tema do registro tem a pasta `css/temas/<nome>/`, com `index.css`, e
   `app.css` importa os `index.css` na ordem do registro, com o `oficial` primeiro. Não há pasta nem
-  import de tema fora do registro. Evidência: a criar.
+  import de tema fora do registro. Evidência: `_frontend/v8/src/css/app.css:11`.
 
 ### CSS
 
@@ -70,13 +72,13 @@ Regras de outras specs que mudam com esta (D2):
 - V8-TEMA-013 [implementado] No oficial, toda `--cor-*` tem valor no modo claro, no escuro e no
   bloco que vale sem modo escolhido, que segue `prefers-color-scheme` sem JavaScript. Evidência:
   `_frontend/v8/src/css/temas/oficial/tokens.css:6`, `_frontend/v8/src/css/temas/oficial/tokens.css:68`, `_frontend/v8/src/css/temas/oficial/tokens.css:95`.
-- V8-TEMA-014 [desejado] Um tema só redefine tokens que existem no oficial, sempre sob
+- V8-TEMA-014 [implementado] Um tema só redefine tokens que existem no oficial, sempre sob
   `:root[data-tema="<nome>"]`. Cor redefinida aparece nos três blocos do tema (claro, escuro e sem
-  modo escolhido), para que a cor de um modo não vaze para o outro. Evidência: a criar.
-- V8-TEMA-015 [desejado] As regras CSS próprias de um tema ficam em `regras.css`, na camada
+  modo escolhido), para que a cor de um modo não vaze para o outro. Evidência: `_frontend/v8/src/css/temas/tema1/tokens.css:6`, `_frontend/v8/src/css/temas/tema2/tokens.css:6`.
+- V8-TEMA-015 [implementado] As regras CSS próprias de um tema ficam em `regras.css`, na camada
   `temas`, que fica acima de `components` e abaixo de `utilities`. Todo seletor dele começa por
   `:root[data-tema="<nome>"]`. Tema não declara `@theme`, `@import`, `@font-face` nem `@layer` com
-  outro nome. Evidência: a criar.
+  outro nome. Evidência: `_frontend/v8/src/css/temas/tema3/regras.css:5`.
 - V8-TEMA-016 [implementado] O `@theme inline` do oficial é o único e expõe ao Tailwind as cores
   semânticas, as fontes e os raios, por `var()`. Com isso as utilities seguem o tema e o modo em
   vigor. A paleta padrão do Tailwind continua fora. Evidência: `_frontend/v8/src/css/temas/oficial/tokens.css:131`.
@@ -86,11 +88,11 @@ Regras de outras specs que mudam com esta (D2):
 
 ### Aplicação
 
-- V8-TEMA-020 [desejado] Toda página do v8 sai com `<html data-tema="<nome>">`, sempre com um nome
+- V8-TEMA-020 [implementado] Toda página do v8 sai com `<html data-tema="<nome>">`, sempre com um nome
   do registro: o tema que a página de prévia fixa, senão o do cookie `v8_tema` se estiver no
-  registro, senão `oficial`. Evidência: a criar.
-- V8-TEMA-021 [desejado] `#v8-global` informa `tema`, sempre um nome do registro, e `modo`, que é
-  `claro`, `escuro` ou `null`. Evidência: a criar.
+  registro, senão `oficial`. Evidência: `cmj/v8/services/s_global.py:119`, `cmj/v8/templatetags/v8_tags.py:49`, `_templates/v8/base_v8.html:3`.
+- V8-TEMA-021 [implementado] `#v8-global` informa `tema`, sempre um nome do registro, e `modo`, que é
+  `claro`, `escuro` ou `null`. Evidência: `cmj/v8/services/s_global.py:290`, `_frontend/v8/src/stores/GlobalStore.js:25`.
 - V8-TEMA-022 [desejado] A prévia de um tema não grava nada: abrir `/v8/ds/temas/<nome>/` não cria
   nem altera cookie. Evidência: a criar.
 - V8-TEMA-023 [desejado] "Usar este tema" é um `POST` que grava `v8_tema` e redireciona para a
@@ -98,9 +100,9 @@ Regras de outras specs que mudam com esta (D2):
   navegador. Funciona sem JavaScript. Evidência: a criar.
 - V8-TEMA-024 [desejado] `/v8/ds/temas/` lista os temas do registro, na ordem dele, cada um com
   rótulo, link para a prévia e o botão de usar, e marca o tema em vigor. Evidência: a criar.
-- V8-TEMA-025 [desejado] Ao carregar a página e ao trocar o modo, `<meta name="theme-color">`
+- V8-TEMA-025 [implementado] Ao carregar a página e ao trocar o modo, `<meta name="theme-color">`
   recebe o valor de `--cor-barra-navegador` em vigor, que cada tema pode redefinir.
-  Evidência: a criar.
+  Evidência: `_frontend/v8/src/core/shell.js:159`.
 
 ## Requisitos de segurança
 
@@ -113,8 +115,8 @@ Regras de outras specs que mudam com esta (D2):
   corpo da requisição são ignorados. Item da varredura: 6. Evidência: a criar.
 - V8-TEMA-043 [desejado] O cookie `v8_tema` sai com `Path=/v8/`, `SameSite=Lax`, `HttpOnly`,
   `Secure` fora de DEBUG e um valor do registro. Item da varredura: 6. Evidência: a criar.
-- V8-TEMA-044 [desejado] O trecho do menu em `{% cache %}` não depende do tema, e o CSS de todos
-  os temas é o mesmo arquivo estático. Item da varredura: 5. Evidência: a criar.
+- V8-TEMA-044 [implementado] O trecho do menu em `{% cache %}` não depende do tema, e o CSS de todos
+  os temas é o mesmo arquivo estático. Item da varredura: 5. Evidência: `_templates/v8/v8/shell/menu.html:5`.
 
 ## Riscos de segurança
 

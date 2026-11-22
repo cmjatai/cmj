@@ -63,7 +63,7 @@ Regras de outras specs que mudaram com esta (D9):
   `_templates/v8/v8/layouts/app_sidebar.html:1`, `_templates/v8/v8/layouts/minimal.html:1`.
 - V8-TPL-003 [implementado] Layout cujo nome de arquivo começa com `_` é abstrato: nenhuma página o
   estende. Nenhuma view renderiza direto um arquivo de `v8/layouts/` nem `base_v8.html`. Evidência:
-  `_templates/v8/v8/layouts/_shell.html:3`, `cmj/v8/views.py:196`.
+  `_templates/v8/v8/layouts/_shell.html:3`, `cmj/v8/views.py:201`.
 
 ### Nível 1: base
 
@@ -79,9 +79,9 @@ Regras de outras specs que mudaram com esta (D9):
   cliente de HMR e o entry `main.js` do app `v8`, e `#cmj-v8-app`. Um template que sobrescreve todos
   os blocks com vazio ainda sai com todos eles. Evidência: `_templates/v8/base_v8.html:16`,
   `_templates/v8/base_v8.html:20`, `_templates/v8/base_v8.html:25`.
-- V8-TPL-013 [implementado] A base emite em `<html>` só `lang` e, havendo o cookie, `data-modo`.
-  Qualquer outro atributo de `<html>` vem de um layout, pelo block `html_attrs`. Evidência:
-  `_templates/v8/base_v8.html:3`.
+- V8-TPL-013 [implementado] A base emite em `<html>` só `lang`, `data-tema` (sempre, com um tema do
+  registro de `temas.md`) e, havendo o cookie, `data-modo`. Qualquer outro atributo de `<html>`
+  vem de um layout, pelo block `html_attrs`. Evidência: `_templates/v8/base_v8.html:3`.
 - V8-TPL-014 [implementado] O padrão do block `title` é `<v8.titulo> · PortalCMJ`, ou só `PortalCMJ`
   quando a view não informa título. Os layouts não repetem essa regra. Evidência:
   `_templates/v8/base_v8.html:8`.
@@ -90,7 +90,8 @@ Regras de outras specs que mudaram com esta (D9):
   só entradas extras do Vite e `json_script`. Evidência: `_templates/v8/base_v8.html:9`,
   `_templates/v8/base_v8.html:21`, `_templates/v8/base_v8.html:26`.
 - V8-TPL-016 [implementado] A base não usa `{% include %}`, `{% cache %}`, `v8_menu` nem
-  `v8_usuario`. Do contexto, lê apenas `v8.titulo`. Evidência: `_templates/v8/base_v8.html:2`.
+  `v8_usuario`. Do contexto, lê apenas `v8.titulo`; tema e modo vêm da tag `v8_preferencias`.
+  Evidência: `_templates/v8/base_v8.html:2`.
 
 ### Nível 2: shell abstrato
 
@@ -127,14 +128,14 @@ Regras de outras specs que mudaram com esta (D9):
   `header_nav` com o menu na horizontal e `header_start` com o botão que abre o menu em tela
   estreita, e deixa `aside` vazio. O conteúdo fica centralizado, com largura máxima dada por um
   token de `tokens.css`. Não emite `data-sidebar`. Evidência:
-  `_templates/v8/v8/layouts/app_topbar.html:10`, `_frontend/v8/src/css/temas/oficial/shell.css:373`,
+  `_templates/v8/v8/layouts/app_topbar.html:10`, `_frontend/v8/src/css/temas/oficial/shell.css:374`,
   `_frontend/v8/src/css/temas/oficial/tokens.css:46`.
 - V8-TPL-032 [implementado] `landing.html` é o layout de capa: preenche `header_nav` e
   `header_start` como o `app_topbar`, e `footer` com a marca e uma linha de texto neutro, mais os
   sub-blocks `footer_nav` e `footer_info`, que nascem vazios. O `hero` ocupa a largura inteira da
   página, antes do conteúdo, e nasce vazio, para a página preencher. Não tem `aside` nem trilha, e
   não traz dado institucional. Evidência: `_templates/v8/v8/layouts/landing.html:10`,
-  `_templates/v8/v8/layouts/landing.html:14`, `_frontend/v8/src/css/temas/oficial/shell.css:384`.
+  `_templates/v8/v8/layouts/landing.html:14`, `_frontend/v8/src/css/temas/oficial/shell.css:385`.
 - V8-TPL-033 [implementado] `minimal.html` não tem cabeçalho, navegação, `aside`, rodapé nem docas:
   só o `<main id="conteudo">`, com os blocks `messages` e `content`. Evidência:
   `_templates/v8/v8/layouts/minimal.html:4`.
@@ -170,7 +171,7 @@ Regras de outras specs que mudaram com esta (D9):
 - V8-TPL-052 [implementado] A zona SPA é uma página, `v8/paginas/zona.html`, que põe o elemento
   `[data-vue-zone]` no block `content`. O layout dela vem do registro de zonas, e o padrão é
   `app_sidebar`. Evidência: `_templates/v8/v8/paginas/zona.html:1`,
-  `cmj/v8/services/s_global.py:64`, `cmj/v8/views.py:203`.
+  `cmj/v8/services/s_global.py:103`, `cmj/v8/views.py:208`.
 - V8-TPL-053 [implementado] `/v8/` usa `landing`, as páginas da demonstração usam `app_sidebar`, e o
   403 e o 404 do v8 usam `minimal`. Evidência: `_templates/v8/v8/paginas/inicio.html:1`,
   `_templates/v8/v8/demo/clientes.html:1`, `_templates/v8/v8/erros/403.html:1`.
@@ -182,8 +183,8 @@ Regras de outras specs que mudaram com esta (D9):
 - V8-TPL-060 [implementado] O layout de uma página nunca vem da requisição: nem da query string, nem
   do caminho, nem de cabeçalho, nem de cookie. As páginas têm o nome do layout escrito no `extends`.
   O layout de uma zona vem só do registro de zonas, e um nome fora da lista dos quatro impede o
-  projeto de subir. Itens da varredura: 3 e 4. Evidência: `cmj/v8/services/s_global.py:66`,
-  `cmj/v8/views.py:203`, `cmj/v8/urls.py:61`.
+  projeto de subir. Itens da varredura: 3 e 4. Evidência: `cmj/v8/services/s_global.py:105`,
+  `cmj/v8/views.py:208`, `cmj/v8/urls.py:61`.
 - V8-TPL-061 [implementado] `#v8-global`, `#v8-messages` e o token CSRF nunca ficam dentro de `{%
   cache %}` nem dentro de um block que layout ou página possa sobrescrever. Item da varredura: 5.
   Evidência: `_templates/v8/base_v8.html:16`, `_templates/v8/v8/shell/menu.html:5`.
@@ -197,7 +198,7 @@ Regras de outras specs que mudaram com esta (D9):
   `_templates/v8/base_v8.html:9`.
 - V8-TPL-064 [implementado] As páginas de demonstração dos layouts exigem superusuário, aceitam só
   `GET` e `HEAD`, mostram só texto fixo e não disparam PDF, IA, OCR nem task. Itens da varredura: 1
-  e 7. Evidência: `cmj/v8/views.py:292`.
+  e 7. Evidência: `cmj/v8/views.py:297`.
 
 ## Riscos de segurança
 

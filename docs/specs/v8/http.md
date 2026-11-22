@@ -31,7 +31,7 @@ entregar os erros sempre no mesmo formato.
   o valor do cookie `csrftoken` lido no momento da requisição. Evidência:
   `_frontend/v8/src/http/client.js:75`.
 - V8-HTTP-004 [implementado] Toda página do v8 garante que o cookie `csrftoken` exista. Evidência:
-  `cmj/v8/views.py:47`.
+  `cmj/v8/views.py:52`.
 - V8-HTTP-005 [implementado] Toda requisição leva `X-Requested-With: XMLHttpRequest` e um `Accept`
   conforme o pedido: `application/json` ou, para fragmentos, `text/html`. Evidência:
   `_frontend/v8/src/http/client.js:72`.
@@ -84,7 +84,7 @@ entregar os erros sempre no mesmo formato.
   modal: a requisição rejeita com `nao_autenticado`. Evidência: `_frontend/v8/src/http/sessao.js:1`.
 - V8-HTTP-026 [implementado] Endpoint ou fragmento do v8 que exige autenticação responde 401 em JSON
   a uma requisição do cliente, e redireciona ao login uma navegação comum. Evidência:
-  `cmj/v8/views.py:93`.
+  `cmj/v8/views.py:98`.
 
 ### Código existente do v8
 

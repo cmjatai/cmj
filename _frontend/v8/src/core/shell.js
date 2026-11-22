@@ -2,7 +2,7 @@ import { gravarCookieV8 } from '~@/core/cookies'
 
 // Comportamentos do shell que o Django renderiza (docs/specs/v8/shell.md).
 //
-// O HTML já chega pronto: `<html data-modo>` e `<html data-sidebar>` vêm dos cookies, e os botões
+// O HTML já chega pronto: `<html data-tema>`, `data-modo` e `data-sidebar` vêm dos cookies, e os botões
 // trazem `data-v8-acao`. Aqui há um ouvinte de clique e um de teclado no documento: eles trocam os
 // atributos, gravam os cookies e fecham os grupos do menu do cabeçalho, sem recarregar a página.
 
@@ -155,6 +155,8 @@ export function iniciarShell({ abrirMenuEstreito } = {}) {
 
   // O servidor só conhece o cookie: sem ele, quem sabe o modo em vigor é o navegador.
   marcar(SELETOR_MODO, 'aria-pressed', modoEmVigor() === 'escuro')
+  // O HTML traz a cor do oficial; o tema e o modo em vigor podem ter outra (V8-TEMA-025).
+  atualizarCorDaBarra()
 
   return () => {
     document.removeEventListener('click', aoClicar)

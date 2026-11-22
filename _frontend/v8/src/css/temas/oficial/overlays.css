@@ -45,6 +45,7 @@
 
   .v8-overlay-titulo {
     flex: 1;
+    font-family: var(--fonte-titulo);
     min-width: 0;
     margin: 0;
     font-size: 1.05rem;

@@ -1,0 +1,56 @@
+/*
+ * Tokens do tema 2 (V8-TEMA-014): cores em terracota, títulos com serifa e cantos quase retos.
+ * Fontes e raios valem nos dois modos e ficam só no primeiro bloco.
+ */
+
+:root[data-tema="tema2"] {
+  --cor-fundo: #faf6f2;
+  --cor-superficie: #fffdfb;
+  --cor-superficie-2: #f1e7de;
+  --cor-texto: #2b1d16;
+  --cor-texto-suave: #6b5548;
+  --cor-borda: #e0d0c3;
+  --cor-primaria: #a3401c;
+  --cor-primaria-forte: #7d2f12;
+  --cor-realce: #c8643a;
+  --cor-topo: #3a2219;
+  --cor-sobre-topo: #fbefe7;
+  --cor-barra-navegador: #3a2219;
+
+  --fonte-titulo: Georgia, Cambria, "Times New Roman", Times, serif;
+  --raio-sm: 0;
+  --raio: 0.125rem;
+  --raio-lg: 0.25rem;
+}
+
+:root[data-tema="tema2"][data-modo="escuro"] {
+  --cor-fundo: #17110e;
+  --cor-superficie: #221915;
+  --cor-superficie-2: #2e231d;
+  --cor-texto: #f3e6dc;
+  --cor-texto-suave: #c2ab9b;
+  --cor-borda: #45362d;
+  --cor-primaria: #f09a73;
+  --cor-primaria-forte: #f6b89b;
+  --cor-realce: #f6b89b;
+  --cor-topo: #221915;
+  --cor-sobre-topo: #f3e6dc;
+  --cor-barra-navegador: #221915;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-tema="tema2"]:not([data-modo]) {
+    --cor-fundo: #17110e;
+    --cor-superficie: #221915;
+    --cor-superficie-2: #2e231d;
+    --cor-texto: #f3e6dc;
+    --cor-texto-suave: #c2ab9b;
+    --cor-borda: #45362d;
+    --cor-primaria: #f09a73;
+    --cor-primaria-forte: #f6b89b;
+    --cor-realce: #f6b89b;
+    --cor-topo: #221915;
+    --cor-sobre-topo: #f3e6dc;
+    --cor-barra-navegador: #221915;
+  }
+}

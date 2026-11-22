@@ -394,6 +394,33 @@ describe('shell', () => {
       expect(meta.getAttribute('content')).toBe('#fafafa')
     })
 
+    it('V8-TEMA-025: ao iniciar, o meta theme-color recebe a cor da barra do tema em vigor', () => {
+      ambiente()
+      const estilo = document.createElement('style')
+      estilo.textContent = `
+        :root { --cor-barra-navegador: #114d81; }
+        :root[data-tema="tema1"] { --cor-barra-navegador: #0f6b4f; }
+        :root[data-tema="tema1"][data-modo="escuro"] { --cor-barra-navegador: #13211b; }`
+      document.head.appendChild(estilo)
+      const meta = document.createElement('meta')
+      meta.name = 'theme-color'
+      meta.content = '#114d81'
+      document.head.appendChild(meta)
+      montarShell({ modo: 'claro' })
+      html.setAttribute('data-tema', 'tema1')
+
+      iniciar()
+      expect(meta.getAttribute('content')).toBe('#0f6b4f')
+
+      // Trocar o modo não muda o tema (V8-TEMA-001), e a cor segue os dois.
+      clicar('modo-1')
+      expect(html.getAttribute('data-tema')).toBe('tema1')
+      expect(meta.getAttribute('content')).toBe('#13211b')
+      html.removeAttribute('data-tema')
+      estilo.remove()
+      meta.remove()
+    })
+
     it('V8-SHELL-041: sem o token --cor-barra-navegador o meta theme-color não muda', () => {
       ambiente()
       const meta = document.createElement('meta')

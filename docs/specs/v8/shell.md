@@ -43,7 +43,7 @@ grupos do menu do cabeçalho.
   menu, por um hash do conjunto de permissões do usuário e pelo `id` do item ativo. Usuários com as
   mesmas permissões compartilham a entrada. Evidência: `_templates/v8/v8/shell/menu.html:5`.
 - V8-SHELL-011 [implementado] Mudança nas permissões de um usuário aparece no menu na requisição
-  seguinte, sem invalidação, porque o hash muda. Evidência: `cmj/v8/services/s_global.py:135`.
+  seguinte, sem invalidação, porque o hash muda. Evidência: `cmj/v8/services/s_global.py:205`.
 - V8-SHELL-012 [implementado] O trecho em cache não contém nome, avatar, token CSRF, mensagem nem
   outro dado próprio de um usuário. Evidência: `_templates/v8/v8/shell/menu.html:5`,
   `_templates/v8/v8/layouts/_shell.html:21`.
@@ -71,7 +71,7 @@ grupos do menu do cabeçalho.
   ou `recolhida`. Nas páginas do layout `app_sidebar`, o Django lê o cookie e renderiza
   `<html data-sidebar="...">`, de modo que a página já chega no estado certo. Sem cookie, vale
   `expandida`. Os outros layouts não emitem o atributo. Evidência:
-  `_templates/v8/v8/layouts/app_sidebar.html:4`, `_frontend/v8/src/css/temas/oficial/shell.css:186`.
+  `_templates/v8/v8/layouts/app_sidebar.html:4`, `_frontend/v8/src/css/temas/oficial/shell.css:187`.
 - V8-SHELL-031 [implementado] O botão da sidebar alterna o estado, grava o cookie e atualiza o
   atributo sem recarregar a página. Evidência: `_frontend/v8/src/core/shell.js:69`.
 - V8-SHELL-032 [implementado] Em tela estreita a sidebar não ocupa a lateral. O mesmo botão a abre
@@ -79,19 +79,19 @@ grupos do menu do cabeçalho.
   `_frontend/v8/src/core/boot.js:20`, `_frontend/v8/src/core/shell.js:88`.
 - V8-SHELL-033 [implementado] Com o JavaScript desligado, o menu continua visível e seus links
   funcionam, em qualquer largura, na sidebar e no cabeçalho. Quem garante é o CSS, com
-  `@media (scripting: none)`. Evidência: `_frontend/v8/src/css/temas/oficial/shell.css:295`.
+  `@media (scripting: none)`. Evidência: `_frontend/v8/src/css/temas/oficial/shell.css:296`.
 
 ### Menu no cabeçalho
 
 - V8-SHELL-034 [implementado] Em `app_topbar` e `landing` o menu fica no cabeçalho, na horizontal,
   com os filhos de cada grupo num painel suspenso. Em tela estreita ele sai do cabeçalho, e o botão
   `data-v8-acao="menu"`, que só aparece nessa largura, o abre como drawer, sem gravar cookie.
-  Evidência: `_frontend/v8/src/core/shell.js:130`, `_frontend/v8/src/css/temas/oficial/shell.css:226`.
+  Evidência: `_frontend/v8/src/core/shell.js:130`, `_frontend/v8/src/css/temas/oficial/shell.css:227`.
 - V8-SHELL-035 [implementado] No menu do cabeçalho, em tela larga, o grupo do item ativo começa
   fechado, embora o servidor o entregue aberto, para a sidebar. Um grupo aberto fecha ao clicar fora
   dele, ao abrir outro grupo ou com ESC, que devolve o foco ao rótulo do grupo. Os grupos da sidebar
   não são afetados. Evidência: `_frontend/v8/src/core/shell.js:95`,
-  `_frontend/v8/src/core/shell.js:105`, `_frontend/v8/src/css/temas/oficial/shell.css:281`.
+  `_frontend/v8/src/core/shell.js:105`, `_frontend/v8/src/css/temas/oficial/shell.css:282`.
 
 ### Modo claro e escuro
 
@@ -108,10 +108,10 @@ grupos do menu do cabeçalho.
 ## Requisitos de segurança
 
 - V8-SHELL-050 [implementado] O menu não protege nada: a URL de um item escondido responde 403 ou
-  redireciona ao login conforme a view dela. Item da varredura: 1. Evidência: `cmj/v8/views.py:100`.
+  redireciona ao login conforme a view dela. Item da varredura: 1. Evidência: `cmj/v8/views.py:105`.
 - V8-SHELL-051 [implementado] Com cache real, dois usuários de permissões diferentes recebem menus
   diferentes, e nenhum recebe item que não pode ver. Item da varredura: 5. Evidência:
-  `cmj/v8/services/s_global.py:135`.
+  `cmj/v8/services/s_global.py:205`.
 - V8-SHELL-052 [implementado] Valor de `v8_sidebar` ou `v8_modo` fora da lista válida é ignorado e
   nunca chega ao HTML. Item da varredura: 6. Evidência: `_frontend/v8/src/core/shell.js:51`.
 - V8-SHELL-053 [implementado] O link "Entrar" leva como retorno só o caminho e a query da página

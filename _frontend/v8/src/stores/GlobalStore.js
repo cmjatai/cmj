@@ -22,6 +22,7 @@ export function dadosPadrao() {
     zonas: {},
     zona: null,
     flags: {},
+    tema: 'oficial',
     modo: null,
     sidebar: 'expandida'
   }

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load static django_vite v8_tags %}{% v8_preferencias as v8_pref %}
-<html lang="pt-br"{% if v8_pref.modo %} data-modo="{{ v8_pref.modo }}"{% endif %}{% block html_attrs %}{% endblock %}>
+<html lang="pt-br" data-tema="{{ v8_pref.tema }}"{% if v8_pref.modo %} data-modo="{{ v8_pref.modo }}"{% endif %}{% block html_attrs %}{% endblock %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

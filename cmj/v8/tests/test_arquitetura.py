@@ -46,6 +46,7 @@ CHAVES_GLOBAIS = {
     "zonas",
     "zona",
     "flags",
+    "tema",
     "modo",
     "sidebar",
 }
@@ -105,6 +106,8 @@ def test_templates_do_v8_nao_encobrem_nem_sao_encobertos():
 def test_django_nao_cria_cookie_de_preferencia_e_os_nomes_tem_prefixo():
     assert s_global.COOKIE_MODO.startswith("v8_")
     assert s_global.COOKIE_SIDEBAR.startswith("v8_")
+    assert s_global.COOKIE_TEMA.startswith("v8_")
+    assert s_global.cookie_tema("tema1")["path"] == "/v8/"
 
     resposta = cliente_http().get("/v8/")
     assert set(resposta.cookies) <= {"csrftoken"}
@@ -242,6 +245,7 @@ def test_dados_globais_tem_exatamente_as_chaves_previstas(superusuario):
     assert anonimo["zonas"] == {"demo-spa": "/v8/demo/spa"}
     assert anonimo["zona"] is None
     assert anonimo["flags"] == {}
+    assert anonimo["tema"] == "oficial"
     assert anonimo["modo"] is None
     assert anonimo["sidebar"] == "expandida"
 
@@ -258,6 +262,7 @@ def test_dados_globais_tem_exatamente_as_chaves_previstas(superusuario):
     assert dados["permissoes"] == sorted(superusuario.get_all_permissions())
     assert dados["permissoes"]
     assert dados["zona"] == "demo-spa"
+    assert dados["tema"] == "oficial"
     assert dados["modo"] == "escuro"
     assert dados["sidebar"] == "recolhida"
 
@@ -267,7 +272,11 @@ def test_dados_globais_tem_exatamente_as_chaves_previstas(superusuario):
             s_global.dados_globais(
                 superusuario,
                 zona="demo-spa",
-                preferencias={"modo": "escuro", "sidebar": "recolhida"},
+                preferencias={
+                    "tema": "oficial",
+                    "modo": "escuro",
+                    "sidebar": "recolhida",
+                },
             )
         )
     )
@@ -518,21 +527,23 @@ def test_paginas_zonas_e_fragmentos_aceitam_so_get_e_head(superusuario):
 
 @pytest.mark.spec("V8-ARQ-067")
 def test_cookie_de_preferencia_so_vale_com_valor_da_lista():
-    assert s_global.preferencias({}) == {"modo": None, "sidebar": "expandida"}
-    assert s_global.preferencias(None) == {"modo": None, "sidebar": "expandida"}
-    assert s_global.preferencias({"v8_modo": "escuro", "v8_sidebar": "recolhida"}) == {
-        "modo": "escuro",
-        "sidebar": "recolhida",
-    }
+    padrao = {"tema": "oficial", "modo": None, "sidebar": "expandida"}
+    assert s_global.preferencias({}) == padrao
+    assert s_global.preferencias(None) == padrao
+    assert s_global.preferencias(
+        {"v8_tema": "tema2", "v8_modo": "escuro", "v8_sidebar": "recolhida"}
+    ) == {"tema": "tema2", "modo": "escuro", "sidebar": "recolhida"}
     assert s_global.preferencias({"v8_modo": "claro"})["modo"] == "claro"
     for invalido in ["", "Escuro", "escuro ", "dark", "auto", '"><b>', "claro;x"]:
-        lido = s_global.preferencias({"v8_modo": invalido, "v8_sidebar": invalido})
-        assert lido == {"modo": None, "sidebar": "expandida"}, invalido
-    # Só os dois cookies de preferência são lidos.
-    assert s_global.preferencias({"modo": "escuro", "v8_outro": "recolhida"}) == {
-        "modo": None,
-        "sidebar": "expandida",
-    }
+        lido = s_global.preferencias(
+            {"v8_tema": invalido, "v8_modo": invalido, "v8_sidebar": invalido}
+        )
+        assert lido == padrao, invalido
+    # Só os três cookies de preferência são lidos.
+    assert (
+        s_global.preferencias({"tema": "tema1", "modo": "escuro", "v8_outro": "x"})
+        == padrao
+    )
 
 
 @pytest.mark.spec("V8-ARQ-068")

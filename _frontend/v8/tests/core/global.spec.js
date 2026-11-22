@@ -19,6 +19,7 @@ function esperarAnonimo(store) {
   expect(store.permissoes).toEqual([])
   expect(store.urls).toEqual(padrao.urls)
   expect(store.sidebar).toBe('expandida')
+  expect(store.tema).toBe('oficial')
   expect(store.modo).toBeNull()
   expect(store.carregado).toBe(true)
 }
@@ -28,7 +29,7 @@ describe('GlobalStore', () => {
     setActivePinia(createPinia())
   })
 
-  it('V8-ARQ-032: carregar() preenche o store com o JSON de #v8-global', () => {
+  it('V8-TEMA-021, V8-ARQ-032: carregar() preenche o store com o JSON de #v8-global', () => {
     escreverGlobal(JSON.stringify({
       versao: 'v8.1',
       autenticado: true,
@@ -37,6 +38,7 @@ describe('GlobalStore', () => {
       urls: { login: '/entrar/' },
       zonas: { demo: '/v8/demo/' },
       zona: 'demo',
+      tema: 'tema2',
       modo: 'escuro',
       sidebar: 'recolhida'
     }))
@@ -49,6 +51,7 @@ describe('GlobalStore', () => {
     expect(store.autenticado).toBe(true)
     expect(store.usuario).toEqual({ id: 7, nome: 'Fulana' })
     expect(store.permissoes).toEqual(['materia.add_materialegislativa'])
+    expect(store.tema).toBe('tema2')
     expect(store.modo).toBe('escuro')
     expect(store.sidebar).toBe('recolhida')
     expect(store.prefixoZona).toBe('/v8/demo/')

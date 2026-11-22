@@ -32,13 +32,18 @@ def requisicao_do_cliente(request):
     return "application/json" in aceita and "text/html" not in aceita
 
 
-def dados_layout(titulo, menu_ativo=None, trilha=(), zona=None):
-    """Monta a variável de contexto ``v8``, a única que os layouts leem."""
+def dados_layout(titulo, menu_ativo=None, trilha=(), zona=None, tema=None):
+    """Monta a variável de contexto ``v8``, a única que os layouts leem.
+
+    ``tema`` fixa o tema da página, só na prévia de um tema; sem ele vale o do
+    cookie.
+    """
     return {
         "titulo": titulo,
         "menu_ativo": menu_ativo,
         "trilha": list(trilha),
         "zona": zona,
+        "tema": tema,
     }
 
 

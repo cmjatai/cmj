@@ -44,12 +44,18 @@ def _dados_v8(context):
 
 
 def _preferencias(context):
-    return s_global.preferencias(getattr(context.get("request"), "COOKIES", None))
+    return s_global.preferencias(
+        getattr(context.get("request"), "COOKIES", None),
+        tema=_dados_v8(context).get("tema"),
+    )
 
 
 @register.simple_tag(takes_context=True)
 def v8_preferencias(context):
-    """Modo e sidebar lidos dos cookies, só com valores da lista válida."""
+    """Tema, modo e sidebar, só com valores da lista válida.
+
+    O tema é o que a view fixa em ``v8.tema`` (prévia), senão o do cookie.
+    """
     return _preferencias(context)
 
 

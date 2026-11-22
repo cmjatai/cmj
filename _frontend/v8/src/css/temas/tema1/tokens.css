@@ -1,0 +1,42 @@
+/*
+ * Tokens do tema 1 (V8-TEMA-014): só cores, em verde. Cada cor redefinida aparece nos três blocos,
+ * para que o valor de um modo não vaze para o outro.
+ */
+
+:root[data-tema="tema1"] {
+  --cor-fundo: #f1f6f3;
+  --cor-superficie: #ffffff;
+  --cor-superficie-2: #e3eee8;
+  --cor-borda: #cbdcd3;
+  --cor-primaria: #0f6b4f;
+  --cor-primaria-forte: #0a4f3a;
+  --cor-realce: #1d9a72;
+  --cor-topo: #0f6b4f;
+  --cor-barra-navegador: #0f6b4f;
+}
+
+:root[data-tema="tema1"][data-modo="escuro"] {
+  --cor-fundo: #0b1511;
+  --cor-superficie: #13211b;
+  --cor-superficie-2: #1b2d25;
+  --cor-borda: #2a4137;
+  --cor-primaria: #5ccfa3;
+  --cor-primaria-forte: #8ae0be;
+  --cor-realce: #8ae0be;
+  --cor-topo: #13211b;
+  --cor-barra-navegador: #13211b;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-tema="tema1"]:not([data-modo]) {
+    --cor-fundo: #0b1511;
+    --cor-superficie: #13211b;
+    --cor-superficie-2: #1b2d25;
+    --cor-borda: #2a4137;
+    --cor-primaria: #5ccfa3;
+    --cor-primaria-forte: #8ae0be;
+    --cor-realce: #8ae0be;
+    --cor-topo: #13211b;
+    --cor-barra-navegador: #13211b;
+  }
+}

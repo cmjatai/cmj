@@ -1,7 +1,7 @@
 """Dados globais das páginas do v8.
 
-Reúne o que toda página precisa: o registro das zonas SPA, as preferências
-guardadas em cookie, a regra de acesso usada por views e menu e o conteúdo de
+Reúne o que toda página precisa: o registro das zonas SPA e dos temas, as
+preferências guardadas em cookie, a regra de acesso usada por views e menu e o conteúdo de
 ``<script id="v8-global">``.
 
 As funções recebem o usuário e valores simples. Nenhuma recebe a requisição.
@@ -9,6 +9,7 @@ As funções recebem o usuário e valores simples. Nenhuma recebe a requisição
 
 import hashlib
 import json
+import re
 from dataclasses import dataclass
 
 from django.conf import settings
@@ -31,9 +32,47 @@ URL_FRAG = "/v8/_frag/"
 # Cookies de preferência: nome, valores aceitos e valor padrão.
 COOKIE_MODO = "v8_modo"
 COOKIE_SIDEBAR = "v8_sidebar"
+COOKIE_TEMA = "v8_tema"
 MODOS = ("claro", "escuro")
 SIDEBARS = ("expandida", "recolhida")
 SIDEBAR_PADRAO = "expandida"
+
+# Validade do cookie de tema, em segundos: um ano, como os gravados pelo navegador.
+_IDADE_COOKIE = 365 * 24 * 60 * 60
+
+# Temas (docs/specs/v8/temas.md): o design do v8. Modo é claro ou escuro, e todo
+# tema tem os dois. O nome é o da pasta em ``_frontend/v8/src/css/temas/`` e o
+# valor de ``<html data-tema>``.
+TEMA_PADRAO = "oficial"
+_NOME_DE_TEMA = re.compile(r"[a-z][a-z0-9-]*")
+
+
+def validar_temas(temas):
+    """Confere o registro de temas e o devolve.
+
+    O padrão vem primeiro, e cada nome tem só minúsculas, dígitos e hífen,
+    começa por letra e não é o nome de um modo. Outro registro é erro na carga
+    do projeto.
+    """
+    nomes = list(temas)
+    if not nomes or nomes[0] != TEMA_PADRAO:
+        raise ValueError(f"O primeiro tema do registro deve ser {TEMA_PADRAO}.")
+    for nome in nomes:
+        if not _NOME_DE_TEMA.fullmatch(nome) or nome in MODOS:
+            raise ValueError(f"Nome de tema inválido: {nome!r}")
+    return dict(temas)
+
+
+# Nome do tema e rótulo. A ordem é a da lista de temas e a dos imports de
+# ``app.css``.
+TEMAS = validar_temas(
+    {
+        "oficial": "Oficial",
+        "tema1": "Tema 1",
+        "tema2": "Tema 2",
+        "tema3": "Tema 3",
+    }
+)
 
 # Layouts concretos dos templates (docs/specs/v8/templates.md): nome e arquivo.
 # É a única lista de onde sai o layout de uma zona.
@@ -77,18 +116,49 @@ ZONAS = {
 }
 
 
-def preferencias(cookies):
-    """Lê modo e sidebar dos cookies, aceitando só os valores previstos.
+def tema_em_vigor(cookies, tema=None):
+    """Tema da página: o que ela fixa, senão o do cookie, senão o padrão.
 
-    Valor fora da lista é descartado: o modo fica ``None`` (o CSS segue o
-    sistema) e a sidebar volta ao padrão.
+    Só nomes do registro passam. ``tema`` é o da página de prévia de um tema.
+    """
+    if tema in TEMAS:
+        return tema
+    escolhido = (cookies or {}).get(COOKIE_TEMA)
+    return escolhido if escolhido in TEMAS else TEMA_PADRAO
+
+
+def preferencias(cookies, tema=None):
+    """Lê tema, modo e sidebar dos cookies, aceitando só os valores previstos.
+
+    Valor fora da lista é descartado: o tema volta ao padrão, o modo fica
+    ``None`` (o CSS segue o sistema) e a sidebar volta ao padrão.
     """
     cookies = cookies or {}
     modo = cookies.get(COOKIE_MODO)
     sidebar = cookies.get(COOKIE_SIDEBAR)
     return {
+        "tema": tema_em_vigor(cookies, tema),
         "modo": modo if modo in MODOS else None,
         "sidebar": sidebar if sidebar in SIDEBARS else SIDEBAR_PADRAO,
+    }
+
+
+def cookie_tema(nome):
+    """Parâmetros de ``set_cookie`` para escolher o tema, ou ``None``.
+
+    Só um nome do registro produz cookie. O navegador não precisa lê-lo: o
+    Django emite o tema no HTML.
+    """
+    if nome not in TEMAS:
+        return None
+    return {
+        "key": COOKIE_TEMA,
+        "value": nome,
+        "max_age": _IDADE_COOKIE,
+        "path": URL_BASE,
+        "samesite": "Lax",
+        "httponly": True,
+        "secure": not settings.DEBUG,
     }
 
 
@@ -196,6 +266,7 @@ def dados_usuario(usuario):
 def dados_globais(usuario, zona=None, preferencias=None):
     """Conteúdo de ``<script id="v8-global">``, com exatamente estas chaves."""
     preferencias = preferencias or {}
+    tema = preferencias.get("tema")
     modo = preferencias.get("modo")
     sidebar = preferencias.get("sidebar")
     return {
@@ -216,6 +287,7 @@ def dados_globais(usuario, zona=None, preferencias=None):
         "zonas": {nome: URL_BASE + z.prefixo for nome, z in ZONAS.items()},
         "zona": zona if zona in ZONAS else None,
         "flags": {},
+        "tema": tema if tema in TEMAS else TEMA_PADRAO,
         "modo": modo if modo in MODOS else None,
         "sidebar": sidebar if sidebar in SIDEBARS else SIDEBAR_PADRAO,
     }

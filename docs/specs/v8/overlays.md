@@ -65,7 +65,7 @@ Vale para modals e para drawers em modo `overlay`.
   nativo do navegador. Evidência: `_frontend/v8/src/overlays/OverlayHost.vue:83`.
 - V8-OVL-026 [implementado] Entrada e saída usam `<Transition>`. Com `prefers-reduced-motion:
   reduce`, não há animação. O drawer guardado na rota entra animado e sai sem animação. Evidência:
-  `_frontend/v8/src/css/temas/oficial/overlays.css:167`,
+  `_frontend/v8/src/css/temas/oficial/overlays.css:168`,
   `_frontend/v8/src/css/temas/oficial/tokens.css:38`.
 
 ### Drawer
@@ -80,14 +80,14 @@ Vale para modals e para drawers em modo `overlay`.
 - V8-OVL-032 [implementado] `push` e `docked` não são modais: não prendem o foco, não bloqueiam a
   página, não entram na pilha e usam `role="complementary"`. Em `push` o conteúdo da página se
   desloca; em `docked` o drawer faz parte do layout. Evidência:
-  `_frontend/v8/src/css/temas/oficial/overlays.css:128`, `_frontend/v8/src/overlays/OverlayFrame.vue:133`.
+  `_frontend/v8/src/css/temas/oficial/overlays.css:129`, `_frontend/v8/src/overlays/OverlayFrame.vue:133`.
 - V8-OVL-033 [implementado] Um drawer pode declarar um modo para tela larga e outro para tela
   estreita, como `docked` e `overlay`. Ao cruzar a largura de corte ele troca de modo sem perder o
   conteúdo nem o estado. Evidência: `_frontend/v8/src/overlays/Drawer.vue:42`,
   `_frontend/v8/src/overlays/Encaixe.vue:9`.
 - V8-OVL-034 [implementado] Drawers empilhados do mesmo lado aparecem deslocados, de modo que a
   borda de cada um abaixo do topo continue visível. Evidência:
-  `_frontend/v8/src/css/temas/oficial/overlays.css:91`, `_frontend/v8/src/overlays/OverlayStore.js:54`.
+  `_frontend/v8/src/css/temas/oficial/overlays.css:92`, `_frontend/v8/src/overlays/OverlayStore.js:54`.
 
 ### Conteúdo do drawer e do modal
 
@@ -194,12 +194,12 @@ Vale para modals e para drawers em modo `overlay`.
 ### Fragmentos no servidor
 
 - V8-OVL-090 [implementado] Uma view de fragmento devolve só o HTML do fragmento, sem layout, a
-  partir de um template de `v8/partials/`. Evidência: `cmj/v8/views.py:128`.
+  partir de um template de `v8/partials/`. Evidência: `cmj/v8/views.py:133`.
 - V8-OVL-091 [implementado] Por padrão o fragmento sai com `Cache-Control: private`. Só sai `public`
   o fragmento que a view declara público e que não exige autenticação. Evidência:
-  `cmj/v8/views.py:143`.
+  `cmj/v8/views.py:148`.
 - V8-OVL-092 [implementado] Requisição de fragmento sem autenticação, quando a view a exige, recebe
-  401 em JSON, e não redirecionamento. Evidência: `cmj/v8/views.py:93`.
+  401 em JSON, e não redirecionamento. Evidência: `cmj/v8/views.py:98`.
 
 ## Requisitos de segurança
 
@@ -210,10 +210,10 @@ Vale para modals e para drawers em modo `overlay`.
   `_frontend/v8/src/overlays/urlSync.js:22`.
 - V8-OVL-101 [implementado] Cada view de fragmento confere autenticação e permissão por conta
   própria, e filtra pelo usuário os registros que devolve. Abrir o fragmento pela URL direta dá o
-  mesmo resultado que abri-lo pelo drawer. Item da varredura: 1. Evidência: `cmj/v8/views.py:349`.
+  mesmo resultado que abri-lo pelo drawer. Item da varredura: 1. Evidência: `cmj/v8/views.py:354`.
 - V8-OVL-102 [implementado] Fragmento que depende do usuário não usa cache compartilhado de
   resposta. Havendo `{% cache %}`, a chave inclui o usuário ou as permissões de que o conteúdo
-  depende. Item da varredura: 5. Evidência: `cmj/v8/views.py:128`,
+  depende. Item da varredura: 5. Evidência: `cmj/v8/views.py:133`,
   `_templates/v8/v8/shell/menu.html:5`.
 - V8-OVL-103 [implementado] O HTML do fragmento é inserido sem executar `<script>`, e o template do
   fragmento mantém o autoescape. Item da varredura: 4. Evidência:
@@ -224,9 +224,9 @@ Vale para modals e para drawers em modo `overlay`.
   `_frontend/v8/src/overlays/useToast.js:11`.
 - V8-OVL-105 [implementado] `data-confirm` não é proteção: ação que altera estado é `POST` com CSRF
   e o servidor a valida de novo. Nenhuma ação que altera estado é `GET`. Item da varredura: 1.
-  Evidência: `cmj/v8/views.py:310`.
+  Evidência: `cmj/v8/views.py:315`.
 - V8-OVL-106 [implementado] A resposta de fragmento leva `X-Robots-Tag: noindex`. Item da varredura:
-  5. Evidência: `cmj/v8/views.py:141`.
+  5. Evidência: `cmj/v8/views.py:146`.
 
 ## Riscos de segurança
 

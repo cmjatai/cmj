@@ -62,18 +62,18 @@ Router.
 ### Rotas Django
 
 - V8-ARQ-010 [implementado] `/v8/` responde 200 com a página inicial no layout `landing`. Evidência:
-  `cmj/v8/views.py:171`.
+  `cmj/v8/views.py:176`.
 - V8-ARQ-011 [implementado] Cada zona SPA é declarada uma única vez, em `s_global.py`, com nome,
   prefixo e layout. A rota da zona responde 200 com a página da zona, no layout que ela declara,
   para o prefixo e para qualquer subcaminho dele, com ou sem barra final. Evidência:
-  `cmj/v8/services/s_global.py:73`, `_frontend/v8/src/core/router.js:35`.
+  `cmj/v8/services/s_global.py:112`, `_frontend/v8/src/core/router.js:35`.
 - V8-ARQ-012 [implementado] Caminho `/v8/...` que não é página, zona nem fragmento responde 404, no
-  layout `minimal`. Evidência: `cmj/v8/views.py:207`.
+  layout `minimal`. Evidência: `cmj/v8/views.py:212`.
 - V8-ARQ-013 [implementado] Páginas e fragmentos renderizados pelo Django têm URL terminada em `/`.
   Evidência: `cmj/v8/urls.py:19`.
 - V8-ARQ-014 [implementado] As views do v8 só autenticam, validam a entrada, chamam o serviço e
   respondem. Decisões e dados vêm de `cmj/v8/services/`, que recebe o usuário por parâmetro e nunca
-  o `request`. Evidência: `cmj/v8/services/s_global.py:196`, `cmj/v8/views.py:60`.
+  o `request`. Evidência: `cmj/v8/services/s_global.py:266`, `cmj/v8/views.py:65`.
 
 ### Templates
 
@@ -88,13 +88,13 @@ As camadas de templates, os blocks de cada nível e os layouts estão em `templa
   type="application/json">` com exatamente estas chaves: `versao`, `debug`, `autenticado`, `usuario`
   (`null` ou `id`, `username`, `nome`, `avatar`), `permissoes` (lista ordenada), `urls` (`api`,
   `versao`, `sessao`, `login`, `logout`, `base`, `frag`), `zonas` (nome para prefixo), `zona` (a da
-  página ou `null`), `flags`, `modo` e `sidebar`. O conteúdo vem de `s_global.dados_globais`. Como o
+  página ou `null`), `flags`, `tema`, `modo` e `sidebar`. O conteúdo vem de `s_global.dados_globais`. Como o
   login do portal é o e-mail, `username` é só a parte antes do `@`, e `nome` usa esse valor quando o
-  usuário não tem nome completo. Evidência: `cmj/v8/services/s_global.py:196`,
-  `cmj/v8/templatetags/v8_tags.py:63`.
+  usuário não tem nome completo. Evidência: `cmj/v8/services/s_global.py:266`,
+  `cmj/v8/templatetags/v8_tags.py:69`.
 - V8-ARQ-024 [implementado] `{% v8_mensagens %}` emite `<script id="v8-messages"
   type="application/json">` com a lista das mensagens do `django.contrib.messages`, cada uma com
-  `nivel` e `texto`. Sem mensagens, a lista é vazia. Evidência: `cmj/v8/templatetags/v8_tags.py:74`.
+  `nivel` e `texto`. Sem mensagens, a lista é vazia. Evidência: `cmj/v8/templatetags/v8_tags.py:80`.
 - V8-ARQ-025 [implementado] Dados de uma página vão no bloco `page_data`, sempre por `json_script`.
   Evidência: `_templates/v8/base_v8.html:18`.
 - V8-ARQ-026 [implementado] O conteúdo do bloco `content` é HTML do servidor e é legível e navegável
@@ -127,7 +127,7 @@ As camadas de templates, os blocks de cada nível e os layouts estão em `templa
   `_frontend/v8/src/core/IslandHost.vue:14`.
 - V8-ARQ-036 [implementado] `{% v8_island "nome" props %}...{% endv8_island %}` emite o elemento da
   ilha, o `json_script` das props com id único na página e o conteúdo do bloco como HTML de espera.
-  Evidência: `cmj/v8/templatetags/v8_tags.py:140`.
+  Evidência: `cmj/v8/templatetags/v8_tags.py:146`.
 - V8-ARQ-037 [implementado] Há um único Vue Router. Numa página de zona, o boot importa só o módulo
   de rotas daquela zona e o registra sob o prefixo lido de `#v8-global`. O `<RouterView>` aparece em
   `[data-vue-zone]`. Evidência: `_frontend/v8/src/core/ZoneOutlet.vue:30`,
@@ -163,14 +163,14 @@ As camadas de templates, os blocks de cada nível e os layouts estão em `templa
 
 - V8-ARQ-060 [implementado] `#v8-global` contém só as chaves de V8-ARQ-023. Não contém e-mail, CPF,
   telefone, token, id de sessão nem dados de outro usuário. Para anônimo, `usuario` é `null` e
-  `permissoes` é vazia. Item da varredura: 2. Evidência: `cmj/v8/services/s_global.py:174`.
+  `permissoes` é vazia. Item da varredura: 2. Evidência: `cmj/v8/services/s_global.py:244`.
 - V8-ARQ-061 [implementado] `#v8-global` e `#v8-messages` nunca ficam dentro de `{% cache %}`. Toda
   resposta HTML de página do v8 sai com `Cache-Control: private`. Item da varredura: 5. Evidência:
-  `cmj/v8/views.py:49`, `_templates/v8/base_v8.html:16`.
+  `cmj/v8/views.py:54`, `_templates/v8/base_v8.html:16`.
 - V8-ARQ-062 [implementado] Dado do servidor só chega ao JavaScript por `json_script`. Não há
   `<script>` com valor interpolado nem `|safe` sobre dado de usuário. Um valor com `</script>`,
   aspas e `&` chega ao store idêntico ao original. Item da varredura: 4. Evidência:
-  `cmj/v8/templatetags/v8_tags.py:70`.
+  `cmj/v8/templatetags/v8_tags.py:76`.
 - V8-ARQ-063 [implementado] Texto com `{{ }}` ou `[[ ]]` vindo do servidor aparece literal e nunca é
   avaliado pelo Vue. Item da varredura: 4. Evidência: `_frontend/v8/src/core/boot.js:39`.
 - V8-ARQ-064 [implementado] O nome em `data-vue-island` e o nome da zona só são resolvidos pelos
@@ -179,17 +179,17 @@ As camadas de templates, os blocks de cada nível e os layouts estão em `templa
   `_frontend/v8/src/core/ilhas.js:2`.
 - V8-ARQ-065 [implementado] As permissões no navegador servem só para esconder o que o servidor
   recusaria. Toda view e todo endpoint do v8 conferem autenticação e permissão no servidor. Item da
-  varredura: 1. Evidência: `cmj/v8/views.py:60`.
+  varredura: 1. Evidência: `cmj/v8/views.py:65`.
 - V8-ARQ-066 [implementado] Views de página, de zona e de fragmento aceitam só `GET` e `HEAD`. Outro
-  método recebe 405. Item da varredura: 1. Evidência: `cmj/v8/views.py:125`.
+  método recebe 405. Item da varredura: 1. Evidência: `cmj/v8/views.py:130`.
 - V8-ARQ-067 [implementado] Valor de cookie do v8 só é aceito se estiver na lista de valores válidos
   daquele cookie. Fora dela, vale o padrão. Os cookies não guardam dado sensível, têm `SameSite=Lax`
   e, fora de DEBUG, `Secure`. Item da varredura: 6. Evidência: `_frontend/v8/src/core/cookies.js:1`.
 - V8-ARQ-068 [implementado] O subcaminho capturado pela rota de zona não escolhe template nem
   arquivo e não é renderizado. A página 404 do v8 não reproduz o caminho pedido. Itens da varredura:
-  3 e 4. Evidência: `cmj/v8/views.py:180`, `cmj/v8/views.py:110`.
+  3 e 4. Evidência: `cmj/v8/views.py:185`, `cmj/v8/views.py:115`.
 - V8-ARQ-069 [implementado] Página do v8 acessível a anônimo não dispara PDF, IA, OCR nem task. Item
-  da varredura: 7. Evidência: `cmj/v8/views.py:171`.
+  da varredura: 7. Evidência: `cmj/v8/views.py:176`.
 
 ## Riscos de segurança
 

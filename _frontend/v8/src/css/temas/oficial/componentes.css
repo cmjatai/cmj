@@ -3,6 +3,7 @@
 @layer components {
   .v8-pagina-titulo {
     margin: 0 0 1rem;
+    font-family: var(--fonte-titulo);
     font-size: 1.5rem;
     font-weight: 650;
     line-height: 1.25;

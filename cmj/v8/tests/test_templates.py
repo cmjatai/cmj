@@ -250,28 +250,35 @@ def test_o_essencial_fica_fora_de_block_e_chega_a_toda_pagina():
 
 
 @pytest.mark.spec("V8-TPL-013")
-def test_base_emite_em_html_so_lang_e_modo():
+def test_base_emite_em_html_so_lang_tema_e_modo():
     for layout in LAYOUTS:
         sem_cookie = pagina_no_layout(layout)
         com_modo = pagina_no_layout(
             layout, cookies={"v8_modo": "escuro", "v8_sidebar": "recolhida"}
         )
         if layout == "app_sidebar":
-            assert '<html lang="pt-br" data-sidebar="expandida">' in sem_cookie
             assert (
-                '<html lang="pt-br" data-modo="escuro" data-sidebar="recolhida">'
+                '<html lang="pt-br" data-tema="oficial" data-sidebar="expandida">'
+                in sem_cookie
+            )
+            assert (
+                '<html lang="pt-br" data-tema="oficial" data-modo="escuro" data-sidebar="recolhida">'
                 in com_modo
             )
         else:
-            assert '<html lang="pt-br">' in sem_cookie, layout
-            assert '<html lang="pt-br" data-modo="escuro">' in com_modo, layout
+            assert '<html lang="pt-br" data-tema="oficial">' in sem_cookie, layout
+            assert (
+                '<html lang="pt-br" data-tema="oficial" data-modo="escuro">' in com_modo
+            ), layout
 
-    assert '<html lang="pt-br">' in renderizar(f'{{% extends "{BASE}" %}}')
+    assert '<html lang="pt-br" data-tema="oficial">' in renderizar(
+        f'{{% extends "{BASE}" %}}'
+    )
     # O atributo a mais entra pelo block, e só por ele.
     html = renderizar(
         f'{{% extends "{BASE}" %}}{{% block html_attrs %}} data-zz="1"{{% endblock %}}'
     )
-    assert '<html lang="pt-br" data-zz="1">' in html
+    assert '<html lang="pt-br" data-tema="oficial" data-zz="1">' in html
 
 
 @pytest.mark.spec("V8-TPL-014")
@@ -318,10 +325,11 @@ def test_base_nao_tem_include_cache_menu_nem_usuario():
     fonte = fonte_de(BASE)
     for proibido in ("{% include", "{% cache", "v8_menu", "v8_usuario", "csrf_token"):
         assert proibido not in fonte, proibido
-    # Do contexto, só o título. O modo vem da tag de preferências.
+    # Do contexto, só o título. Tema e modo vêm da tag de preferências.
     assert sorted(set(re.findall(r"{{\s*([\w.]+)", fonte))) == [
         "v8.titulo",
         "v8_pref.modo",
+        "v8_pref.tema",
     ]
     assert "v8_pref.sidebar" not in fonte
 
@@ -450,7 +458,7 @@ def test_elemento_raiz_do_layout_informa_o_nome():
 @pytest.mark.spec("V8-TPL-030")
 def test_app_sidebar_tem_barra_lateral_botao_e_data_sidebar():
     html = pagina_no_layout("app_sidebar", cookies={"v8_sidebar": "recolhida"})
-    assert '<html lang="pt-br" data-sidebar="recolhida">' in html
+    assert '<html lang="pt-br" data-tema="oficial" data-sidebar="recolhida">' in html
     lateral = trecho(html, '<aside id="v8-sidebar" class="v8-sidebar">', "</aside>")
     assert '<nav id="v8-menu-principal" class="v8-menu"' in lateral
 

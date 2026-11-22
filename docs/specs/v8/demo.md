@@ -47,7 +47,7 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
 
 - V8-DEMO-010 [implementado] `/v8/demo/clientes/` renderiza no servidor a lista paginada e filtrada
   por `q`, `situacao` e `cidade`, no layout `app_sidebar`. Com o JavaScript desligado, filtrar, paginar,
-  abrir o detalhe e arquivar funcionam. Evidência: `cmj/v8/views.py:255`,
+  abrir o detalhe e arquivar funcionam. Evidência: `cmj/v8/views.py:260`,
   `_templates/v8/v8/demo/clientes.html:1`.
 - V8-DEMO-011 [implementado] A tabela é a ilha `demo-clientes-tabela`: o HTML do servidor é o
   conteúdo de espera, e o componente acrescenta seleção de linhas, "selecionar todos" e a contagem
@@ -64,7 +64,7 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
   `_frontend/v8/src/modules/demo/paineis/PainelCliente.vue:40`.
 - V8-DEMO-015 [implementado] "Arquivar selecionados" é um formulário `POST` com `data-confirm`.
   Confirmada, a ação responde com redirecionamento e uma mensagem do Django, que aparece como toast
-  na página seguinte. Evidência: `cmj/v8/views.py:310`, `_templates/v8/v8/demo/clientes.html:38`.
+  na página seguinte. Evidência: `cmj/v8/views.py:315`, `_templates/v8/v8/demo/clientes.html:38`.
 
 ### Zona SPA
 
@@ -97,7 +97,7 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
 - V8-DEMO-040 [implementado] `/v8/demo/layouts/<nome>/` existe para cada um dos quatro layouts de
   `templates.md`. Cada página estende o layout do nome e mostra um resumo dele, os blocks que ele
   oferece e links para as quatro páginas, com a atual marcada por `aria-current`. O texto é fixo e
-  vem de `s_demo.py`. Evidência: `cmj/v8/services/s_demo.py:44`, `cmj/v8/views.py:286`,
+  vem de `s_demo.py`. Evidência: `cmj/v8/services/s_demo.py:44`, `cmj/v8/views.py:291`,
   `_templates/v8/v8/partials/demo/layout.html:9`.
 - V8-DEMO-041 [implementado] A página da `landing` preenche `hero`, `footer_nav` e `footer_info` com
   texto de exemplo. As quatro páginas estão no grupo "Demonstração" do menu, e a página aberta sai
@@ -109,12 +109,12 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
 - V8-DEMO-030 [implementado] Todas as rotas da demonstração exigem superusuário, em qualquer
   ambiente. Anônimo é redirecionado ao login nas páginas e recebe 401 na API e nos fragmentos.
   Autenticado que não é superusuário recebe 403. Itens da varredura: 1 e 7. Evidência:
-  `cmj/v8/views.py:256`.
+  `cmj/v8/views.py:261`.
 - V8-DEMO-031 [implementado] As ações que simulam escrita aceitam só `POST` ou `PUT`, com CSRF. Item
-  da varredura: 1. Evidência: `cmj/v8/views.py:314`, `cmj/v8/views.py:385`.
+  da varredura: 1. Evidência: `cmj/v8/views.py:319`, `cmj/v8/views.py:390`.
 - V8-DEMO-032 [implementado] `id` inexistente responde 404 na página, na API e no fragmento. Os
   filtros aceitam só os campos previstos, e o tamanho da página tem limite máximo. Itens da
-  varredura: 1 e 7. Evidência: `cmj/v8/views.py:248`, `cmj/v8/services/s_demo.py:18`.
+  varredura: 1 e 7. Evidência: `cmj/v8/views.py:253`, `cmj/v8/services/s_demo.py:18`.
 - V8-DEMO-033 [implementado] Nenhuma rota da demonstração lê ou grava model, arquivo, cache
   compartilhado, fila ou índice. Itens da varredura: 3 e 5. Evidência:
   `cmj/v8/services/s_demo.py:129`.

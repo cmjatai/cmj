@@ -28,9 +28,9 @@ export function arquivosDoTema(nome) {
 
 export const semComentarios = css => css.replace(/\/\*[\s\S]*?\*\//g, '')
 
-// Blocos do CSS, com o seletor (ou a at-rule), o corpo e a at-rule que os contém. Desce nas
-// at-rules (`@media`, `@layer`) e nas regras aninhadas.
-export function blocos(css, pai = '') {
+// Blocos do CSS, com o seletor (ou a at-rule), o corpo, a at-rule que os contém e a profundidade
+// (0 no topo do arquivo). Desce nas at-rules (`@media`, `@layer`) e nas regras aninhadas.
+export function blocos(css, pai = '', nivel = 0) {
   const texto = semComentarios(css)
   const achados = []
   let inicio = 0
@@ -41,20 +41,20 @@ export function blocos(css, pai = '') {
     }
     const antes = Math.max(texto.lastIndexOf('}', abre), texto.lastIndexOf(';', abre), inicio - 1)
     const seletor = texto.slice(antes + 1, abre).trim()
-    let nivel = 1
+    let abertas = 1
     let fim = abre + 1
-    while (fim < texto.length && nivel) {
+    while (fim < texto.length && abertas) {
       if (texto[fim] === '{') {
-        nivel++
+        abertas++
       } else if (texto[fim] === '}') {
-        nivel--
+        abertas--
       }
       fim++
     }
     const corpo = texto.slice(abre + 1, fim - 1)
-    achados.push({ seletor, corpo, pai })
+    achados.push({ seletor, corpo, pai, nivel })
     if (corpo.includes('{')) {
-      achados.push(...blocos(corpo, seletor.startsWith('@') ? seletor : pai))
+      achados.push(...blocos(corpo, seletor.startsWith('@') ? seletor : pai, nivel + 1))
     }
     inicio = fim
   }

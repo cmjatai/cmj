@@ -12,7 +12,8 @@ import {
   cores,
   ler,
   pastasDeTema,
-  semComentarios
+  semComentarios,
+  variaveis
 } from './apoio'
 
 const OFICIAL = path.join(PASTA_TEMAS, 'oficial')
@@ -66,6 +67,76 @@ describe('CSS dos temas', () => {
     expect(claro.corpo).toMatch(/color-scheme:\s*light/)
     expect(escuro.corpo).toMatch(/color-scheme:\s*dark/)
     expect(sistema.corpo).toMatch(/color-scheme:\s*dark/)
+  })
+
+  it('V8-TEMA-014: um tema só redefine tokens do oficial, e cada cor nos três blocos', () => {
+    const doOficial = new Set(
+      blocos(tokensOficial())
+        .filter(b => b.seletor.startsWith(':root'))
+        .flatMap(b => variaveis(b.corpo))
+    )
+    const outros = pastasDeTema().filter(nome => nome !== 'oficial')
+    expect(outros.length).toBeGreaterThan(0)
+    outros.forEach(nome => {
+      const raiz = `:root[data-tema="${nome}"]`
+      const css = ler(path.join(PASTA_TEMAS, nome, 'tokens.css'))
+      const permitidos = [raiz, `${raiz}[data-modo="escuro"]`, `${raiz}:not([data-modo])`]
+      const deSeletor = blocos(css).filter(b => !b.seletor.startsWith('@'))
+      deSeletor.forEach(b => expect(permitidos, `${nome}: ${b.seletor}`).toContain(b.seletor))
+      blocos(css)
+        .filter(b => b.seletor.startsWith('@'))
+        .forEach(b => expect(b.seletor, nome).toMatch(/^@media \(prefers-color-scheme: dark\)$/))
+      deSeletor.forEach(b => {
+        variaveis(b.corpo).forEach(variavel => {
+          expect(doOficial.has(variavel), `${nome}: ${variavel}`).toBe(true)
+        })
+      })
+      const { claro, escuro, sistema } = blocosDeCor(css, raiz)
+      expect(claro, nome).toBeDefined()
+      const deCor = cores(claro.corpo)
+      expect(deCor.length, nome).toBeGreaterThan(0)
+      expect(cores(escuro.corpo), nome).toEqual(deCor)
+      expect(cores(sistema.corpo), nome).toEqual(deCor)
+
+      const indice = semComentarios(ler(path.join(PASTA_TEMAS, nome, 'index.css')))
+      const importados = [...indice.matchAll(/@import\s+"([^"]+)"/g)].map(m => m[1])
+      expect(importados[0], nome).toBe('./tokens.css')
+      importados.forEach(arquivo => expect(arquivo, nome).toMatch(/^\.\/(tokens|regras)\.css$/))
+    })
+  })
+
+  it('V8-TEMA-015: as regras de um tema ficam na camada temas, sob o seletor do tema', () => {
+    const classesDoOficial = new Set(
+      arquivosDoTema('oficial').flatMap(f => [...ler(f).matchAll(/\.(v8-[a-z0-9-]+)/g)].map(m => m[1]))
+    )
+    const comRegras = pastasDeTema().filter(nome => fs.existsSync(path.join(PASTA_TEMAS, nome, 'regras.css')))
+    expect(comRegras.length).toBeGreaterThan(0)
+    pastasDeTema()
+      .filter(nome => nome !== 'oficial')
+      .forEach(nome => {
+        arquivosDoTema(nome).forEach(arquivo => {
+          const css = semComentarios(ler(arquivo))
+          expect(css, arquivo).not.toMatch(/@(theme|font-face|source|plugin|utility)\b/)
+          if (!arquivo.endsWith('index.css')) {
+            expect(css, arquivo).not.toMatch(/@import\b/)
+          }
+        })
+      })
+    comRegras.forEach(nome => {
+      const css = semComentarios(ler(path.join(PASTA_TEMAS, nome, 'regras.css')))
+      const doTopo = blocos(css).filter(b => b.nivel === 0)
+      expect(doTopo.map(b => b.seletor), nome).toEqual(['@layer temas'])
+      const raiz = `:root[data-tema="${nome}"]`
+      const camada = doTopo[0].corpo
+      const primeiroNivel = blocos(camada).filter(b => b.nivel === 0)
+      expect(primeiroNivel.length, nome).toBeGreaterThan(0)
+      primeiroNivel.forEach(b => {
+        b.seletor.split(',').forEach(parte => expect(parte.trim().startsWith(raiz), `${nome}: ${parte}`).toBe(true))
+      })
+      ;[...css.matchAll(/\.(v8-[a-z0-9-]+)/g)].forEach(m => {
+        expect(classesDoOficial.has(m[1]), `${nome}: ${m[1]}`).toBe(true)
+      })
+    })
   })
 
   it('V8-TEMA-016: o @theme do oficial expõe cores, fontes e raios por var() e tira a paleta', () => {
