@@ -75,6 +75,10 @@ tema e no modo em vigor. Não é documentação: é um cenário, com amostras e 
   base", pela ilha `ds-componentes`. Evidência: `_templates/v8/v8/partials/ds/componentes.html:2`,
   `_frontend/v8/src/core/ilhas.js:6`.
 
+- V8-DS-015 [desejado] Os grupos de componentes de `componentes.md` que vão além da base aparecem
+  numa seção cada um: "Campos" pela ilha `ds-campos`, "Navegação e estrutura" pela `ds-estrutura`,
+  "Datas e horas" pela `ds-datas` e "Cor" pela `ds-cor`. Evidência: a criar.
+
 ## Requisitos de segurança
 
 - V8-DS-040 [implementado] Todas as rotas do design system exigem superusuário. Anônimo é levado ao

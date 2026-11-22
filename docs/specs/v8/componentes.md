@@ -1,13 +1,17 @@
 # V8: componentes base
 
-Status: implementado
+Status: em implementação: as regras `[implementado]` têm teste; as `[desejado]` são dos próximos
+grupos
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `2ba9aef96`)
 Código principal: `_frontend/v8/src/componentes/`, `_frontend/v8/src/css/temas/oficial/primitivos.css`
 Testes: `_frontend/v8/tests/componentes/componentes.spec.js`
 
 Componentes Vue de uso geral, construídos sobre as primitivas do Reka UI e vestidos pelo tema em
-vigor. São a base das telas do v8 e aparecem na vitrine do design system (`ds.md`). Este primeiro
-lote cobre as primitivas mais usadas em formulários e em navegação dentro da página.
+vigor. São a base das telas do v8 e aparecem na vitrine do design system (`ds.md`). Cobrem todas
+as primitivas do Reka UI que têm visual próprio; as que duplicam o que o v8 já tem e as que não têm
+visual ficam fora (Fora do escopo).
+
+### Base
 
 | Componente | Primitivas do Reka UI | Uso |
 | --- | --- | --- |
@@ -21,11 +25,78 @@ lote cobre as primitivas mais usadas em formulários e em navegação dentro da 
 | `GrupoOpcoes` | RadioGroup | Uma opção entre várias |
 | `Chave` | Switch | Liga e desliga |
 
+### Campos
+
+| Componente | Primitivas do Reka UI | Uso |
+| --- | --- | --- |
+| `Rotulo` | Label | Rótulo de campo |
+| `Alternador` | Toggle | Botão que fica pressionado |
+| `GrupoAlternadores` | ToggleGroup | Um ou vários valores entre botões lado a lado |
+| `Deslizante` | Slider | Número, ou intervalo, numa faixa |
+| `CampoNumero` | NumberField | Número com botões de mais e menos, formatado em pt-BR |
+| `CampoCodigo` | PinInput | Código com uma casa por caractere |
+| `CampoEtiquetas` | TagsInput | Lista de textos digitados como etiquetas |
+| `TextoEditavel` | Editable | Texto que vira campo no lugar |
+| `Avaliacao` | Rating | Nota em estrelas |
+| `SelecaoBusca` | Combobox | Escolha numa lista filtrada pelo texto digitado |
+| `Autocompletar` | Autocomplete | Texto livre com sugestões |
+| `ListaOpcoes` | Listbox | Lista de opções sempre visível |
+| `GrupoEtiquetas` | TagGroup | Etiquetas existentes, selecionáveis e removíveis |
+
+### Navegação e estrutura
+
+| Componente | Primitivas do Reka UI | Uso |
+| --- | --- | --- |
+| `Recolhivel` | Collapsible | Um trecho que abre e fecha |
+| `BarraFerramentas` | Toolbar | Botões, links e alternadores agrupados |
+| `BarraMenus` | Menubar | Menus de aplicativo na horizontal |
+| `MenuContexto` | ContextMenu | Menu do botão direito |
+| `MenuNavegacao` | NavigationMenu | Links de navegação com painéis |
+| `CartaoFlutuante` | HoverCard | Prévia ao passar o mouse num link |
+| `Paginacao` | Pagination | Páginas de uma lista |
+| `Etapas` | Stepper | Passos de um processo |
+| `Arvore` | Tree | Itens hierárquicos que abrem e fecham |
+| `Divisor` | Splitter | Painéis com divisória arrastável |
+| `AreaRolagem` | ScrollArea | Rolagem com barra própria |
+| `Separador` | Separator | Linha entre conteúdos |
+| `Avatar` | Avatar | Imagem de pessoa, com iniciais na falta dela |
+| `Progresso` | Progress | Barra de progresso |
+| `Proporcao` | AspectRatio | Caixa com proporção fixa |
+
+### Datas e horas
+
+| Componente | Primitivas do Reka UI | Uso |
+| --- | --- | --- |
+| `Calendario` | Calendar | Escolha de um dia num calendário |
+| `CalendarioPeriodo` | RangeCalendar | Escolha de um período num calendário |
+| `CampoData` | DateField | Data digitada por partes |
+| `CampoPeriodo` | DateRangeField | Período digitado por partes |
+| `SeletorData` | DatePicker | Data digitada ou escolhida num calendário |
+| `SeletorPeriodo` | DateRangePicker | Período digitado ou escolhido num calendário |
+| `CampoHora` | TimeField | Hora digitada por partes |
+| `CampoIntervaloHoras` | TimeRangeField | Intervalo de horas |
+| `SeletorMes` | MonthPicker | Escolha de um mês |
+| `SeletorMeses` | MonthRangePicker | Escolha de um intervalo de meses |
+| `SeletorAno` | YearPicker | Escolha de um ano |
+| `SeletorAnos` | YearRangePicker | Escolha de um intervalo de anos |
+
+### Cor
+
+| Componente | Primitivas do Reka UI | Uso |
+| --- | --- | --- |
+| `AreaCor` | ColorArea | Cor escolhida num plano de dois canais |
+| `CampoCor` | ColorField | Cor digitada em hexadecimal |
+| `DeslizanteCor` | ColorSlider | Um canal da cor numa faixa |
+| `AmostraCor` | ColorSwatch | Amostra de uma cor |
+| `PaletaCores` | ColorSwatchPicker | Escolha entre cores prontas |
+
 ## Escopo
 
 - Frontend: a pasta `componentes` de `_frontend/v8/src/` e o CSS dos componentes no tema oficial.
 - Pontos de entrada: nenhum novo. Os componentes são usados por ilhas, zonas e overlays, e a
-  vitrine os mostra pela ilha `ds-componentes`.
+  vitrine os mostra numa seção por grupo, cada uma com a sua ilha.
+- Dependência declarada: `@internationalized/date`, que o Reka UI já instalava, passa a constar do
+  `package.json` do v8, porque os componentes de data convertem os valores com ela (D5).
 - Legado tocado: nenhum.
 
 ## Regras
@@ -57,6 +128,34 @@ lote cobre as primitivas mais usadas em formulários e em navegação dentro da 
   tudo vem dos tokens, e por isso seguem o tema e o modo em vigor. Evidência:
   `_frontend/v8/src/css/temas/oficial/primitivos.css:105`.
 
+### Grupos
+
+- V8-CMP-010 [desejado] Os componentes de campo da tabela "Campos" ficam em `src/componentes/`,
+  cada um sobre a primitiva indicada. `GrupoAlternadores`, `Deslizante`, `CampoNumero`,
+  `CampoCodigo`, `CampoEtiquetas`, `TextoEditavel`, `Avaliacao`, `SelecaoBusca`, `Autocompletar` e
+  `ListaOpcoes`, com `name` e dentro de um `<form>`, participam do envio nativo. `Alternador` não
+  participa (D6). Evidência: a criar.
+- V8-CMP-011 [desejado] `CampoNumero` formata e lê o número no idioma pt-BR, e no formulário vai o
+  número sem formatação. Evidência: a criar.
+- V8-CMP-020 [desejado] Os componentes da tabela "Navegação e estrutura" ficam em
+  `src/componentes/`, cada um sobre a primitiva indicada. O conteúdo flutuante de `BarraMenus`,
+  `MenuContexto` e `CartaoFlutuante` vai para o `body`, na camada `--z-popover`, e o painel do
+  `MenuNavegacao` também usa essa camada. Evidência: a criar.
+- V8-CMP-030 [desejado] Os componentes da tabela "Datas e horas" ficam em `src/componentes/`, cada
+  um sobre a primitiva indicada, no idioma pt-BR. O v-model é texto ISO: `AAAA-MM-DD` para dia,
+  `HH:MM` para hora, `AAAA-MM` para mês e `AAAA` para ano, e `{ inicio, fim }` para período e
+  intervalo. Texto que não é uma data válida vale como vazio. A conversão fica num só módulo,
+  `src/componentes/datas.js`. Evidência: a criar.
+- V8-CMP-031 [desejado] Mês e ano escolhidos saem sem o dia nem o mês de hoje: `SeletorMes` devolve
+  só ano e mês, e `SeletorAno`, só o ano. Período vazio vai ao formulário como texto vazio.
+  Evidência: a criar.
+- V8-CMP-035 [desejado] Os componentes da tabela "Cor" ficam em `src/componentes/`, cada um sobre
+  a primitiva indicada, com o v-model em texto hexadecimal. O código não tem cor literal: as cores
+  de amostra da vitrine são lidas dos tokens do tema em vigor. Evidência: a criar.
+- V8-CMP-008 [desejado] Os textos que o Reka UI traz em inglês (rótulos de botões de mais e menos,
+  de páginas, de remover, de mostrar opções, de passos e de calendário) saem em português nos
+  componentes. Evidência: a criar.
+
 ## Requisitos de segurança
 
 - V8-CMP-040 [implementado] Os componentes não renderizam HTML recebido por prop: rótulos e textos
@@ -79,12 +178,29 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   biblioteca vai crescer e não é assunto da página da vitrine. Decisão: pendente; aplicada a
   recomendação.
 
+- D4. O que entra em "todo o Reka UI". Decisão (2026-11-22): só as primitivas com visual novo. Ficam
+  fora as que duplicam o que o v8 já tem e os utilitários sem visual (Fora do escopo).
+- D5. Declarar `@internationalized/date` no `package.json`. Os componentes de data precisam dela
+  para ir e voltar do texto ISO, e o Reka UI não a reexporta. Recomendação: declarar a mesma versão
+  já instalada (3.12.4), mudando só o `package.json` e o lock. Alternativa: componentes de data com
+  v-model nos objetos de data do Reka, sem conversão, o que leva esse tipo para quem usa o
+  componente. Decisão: pendente; aplicada a recomendação.
+- D6. `Alternador` no formulário. O Toggle do Reka UI 2.11 gera um campo oculto que nunca fica
+  marcado, então o valor não iria no envio. Recomendação: o `Alternador` não participa do
+  formulário; quem precisa do valor num `<form>` usa `Chave` ou `CaixaMarcacao`. Alternativa: um
+  campo oculto próprio no componente. Decisão: pendente; aplicada a recomendação.
+- D7. Nomes dos componentes novos. Recomendação: em português, como os do primeiro lote (tabelas
+  acima), mantendo `Avatar`. Decisão: pendente; aplicada a recomendação.
+- D8. Formato do v-model das datas. Recomendação: texto ISO (V8-CMP-030), o mesmo dos formulários
+  do Django e da API, e `{ inicio, fim }` para períodos. Alternativa: os objetos de data do Reka.
+  Decisão: pendente; aplicada a recomendação.
+
 ## Fora do escopo
 
-- Prioridade do próximo plano: as demais primitivas do Reka UI (Combobox, Calendar, DatePicker,
-  DateField, NumberField, PinInput, TagsInput, Slider, Toggle, ToggleGroup, Toolbar, Menubar,
-  ContextMenu, NavigationMenu, HoverCard, Collapsible, Progress, ScrollArea, Splitter, Stepper,
-  Pagination, Listbox, Tree, Avatar, Separator, Label, Editable, Rating, os de cor e de data em
-  intervalo).
+- Primitivas do Reka UI que duplicam o v8: Dialog, AlertDialog e Drawer (a pilha de overlays do v8
+  já usa o Dialog), Toast (os toasts do v8) e Form e Field (o `CampoForm` e os erros do Django).
+- Utilitários sem visual: ConfigProvider, FocusScope, VisuallyHidden, Primitive, Presence,
+  Teleport, Viewport, Collection, DismissableLayer, RovingFocus e Popper.
+- Conferir no jsdom a navegação por setas das primitivas: fica para a conferência no navegador.
 - Componentes de regra de negócio do projeto.
 - Substituir as classes `v8-*` usadas nas páginas Django por componentes Vue.
