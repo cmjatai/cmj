@@ -1,0 +1,24 @@
+{% extends "v8/layouts/_shell.html" %}
+{# Layout de capa: menu na horizontal, hero de largura total e rodapé. Sem aside nem trilha. #}
+{% block layout_name %}landing{% endblock %}
+{% block header_start %}
+  <button type="button" class="v8-btn v8-btn-icone v8-botao-menu" data-v8-acao="menu" aria-controls="v8-menu-principal" aria-haspopup="dialog" aria-label="Menu">
+    <svg class="v8-icone" aria-hidden="true"><use href="#v8-i-menu"></use></svg>
+  </button>
+{% endblock %}
+{% block header_nav %}
+  {% block menu %}{% include "v8/shell/menu.html" %}{% endblock %}
+{% endblock %}
+{% block breadcrumbs %}{% endblock %}
+{% block footer %}
+  <footer class="v8-rodape">
+    <div class="v8-rodape-miolo">
+      <div class="v8-rodape-marca">
+        <strong>PortalCMJ</strong>
+        <p>Portal da Câmara Municipal de Jataí</p>
+      </div>
+      {% block footer_nav %}{% endblock %}
+      {% block footer_info %}{% endblock %}
+    </div>
+  </footer>
+{% endblock %}

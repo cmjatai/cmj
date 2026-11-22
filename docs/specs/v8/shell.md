@@ -1,22 +1,24 @@
 # V8: shell
 
 Status: implementado
-Última verificação: 2026-11-21 (branch `v8-arquitetura-hibrida`, sobre o commit `32325c9a2`)
+Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `6b527f42a`)
 Código principal: `cmj/v8/services/s_menu.py`, `cmj/v8/templatetags/v8_tags.py`,
-`_templates/v8/v8/shell/`, `_frontend/v8/src/core/shell.js`
+`_templates/v8/v8/layouts/_shell.html`, `_templates/v8/v8/shell/`, `_frontend/v8/src/core/shell.js`,
+`_frontend/v8/src/css/shell.css`
 Testes: `cmj/v8/tests/test_shell.py`, `_frontend/v8/tests/core/shell.spec.js`,
 `_frontend/v8/tests/core/router.spec.js`, `_frontend/v8/tests/core/fonte.spec.js`,
 `cmj/v8/tests/test_arquitetura.py`
 
-O shell é a moldura dos layouts `admin` e `spa`: topbar, sidebar e breadcrumbs. Quem o renderiza é
-o Django. O JavaScript só acrescenta o recolher da sidebar, a troca de tema e a gaveta em tela
-estreita.
+O shell é a moldura dos layouts `landing`, `app_topbar` e `app_sidebar` (`templates.md`): cabeçalho,
+menu, breadcrumbs e, no `app_sidebar`, a barra lateral. Quem o renderiza é o Django. O JavaScript só
+acrescenta o recolher da sidebar, a troca de tema, o menu em drawer na tela estreita e o fechar dos
+grupos do menu do cabeçalho.
 
 ## Escopo
 
 - Serviço: `cmj/v8/services/s_menu.py`.
-- Pontos de entrada: a tag `{% v8_menu %}` e os includes `v8/shell/topbar.html`,
-  `v8/shell/sidebar.html` e `v8/shell/breadcrumbs.html`.
+- Pontos de entrada: a tag `{% v8_menu %}`, os blocks de `v8/layouts/_shell.html` e a parcial
+  `v8/shell/menu.html`.
 - Legado tocado: nenhum. O shell só aponta para as rotas existentes de login e logout.
 
 ## Regras
@@ -28,10 +30,10 @@ estreita.
   Evidência: `cmj/v8/services/s_menu.py:17`.
 - V8-SHELL-002 [implementado] `menu_para(usuario)` devolve só os itens que o usuário pode ver. Item
   sem permissão exigida aparece para todos, inclusive anônimo. Grupo sem filho visível some.
-  Evidência: `cmj/v8/services/s_menu.py:80`.
+  Evidência: `cmj/v8/services/s_menu.py:104`.
 - V8-SHELL-003 [implementado] A view informa o item ativo pelo `id`. Esse item sai com
   `aria-current="page"`, e os grupos acima dele saem abertos. Evidência:
-  `cmj/v8/services/s_menu.py:57`, `_templates/v8/v8/shell/menu.html:9`.
+  `cmj/v8/services/s_menu.py:81`, `_templates/v8/v8/shell/menu_itens.html:9`.
 - V8-SHELL-004 [implementado] O menu inicial tem "Início" e o grupo "Demonstração", com os itens de
   `demo.md`. O grupo só aparece para superusuário. Evidência: `cmj/v8/services/s_menu.py:32`.
 
@@ -39,50 +41,67 @@ estreita.
 
 - V8-SHELL-010 [implementado] O HTML do menu fica em `{% cache %}` com chave formada pela versão do
   menu, por um hash do conjunto de permissões do usuário e pelo `id` do item ativo. Usuários com as
-  mesmas permissões compartilham a entrada. Evidência: `_templates/v8/v8/shell/sidebar.html:7`.
+  mesmas permissões compartilham a entrada. Evidência: `_templates/v8/v8/shell/menu.html:5`.
 - V8-SHELL-011 [implementado] Mudança nas permissões de um usuário aparece no menu na requisição
-  seguinte, sem invalidação, porque o hash muda. Evidência: `cmj/v8/services/s_global.py:116`.
+  seguinte, sem invalidação, porque o hash muda. Evidência: `cmj/v8/services/s_global.py:135`.
 - V8-SHELL-012 [implementado] O trecho em cache não contém nome, avatar, token CSRF, mensagem nem
-  outro dado próprio de um usuário. Evidência: `_templates/v8/v8/shell/sidebar.html:7`,
-  `_templates/v8/v8/shell/topbar.html:11`.
+  outro dado próprio de um usuário. Evidência: `_templates/v8/v8/shell/menu.html:5`,
+  `_templates/v8/v8/layouts/_shell.html:21`.
 
 ### Topbar e breadcrumbs
 
-- V8-SHELL-020 [implementado] A topbar tem a marca, o botão da sidebar, o botão de tema e a área do
-  usuário, e não fica em cache. Autenticado vê nome, avatar e "Sair". Anônimo vê "Entrar", com
-  retorno para a página atual. Evidência: `_templates/v8/v8/shell/topbar.html:2`.
+- V8-SHELL-020 [implementado] A topbar tem a marca, o botão de tema e a área do usuário, e não fica
+  em cache. No layout `app_sidebar` tem também o botão da sidebar, e em `app_topbar` e `landing`, o
+  botão do menu. Autenticado vê nome, avatar e "Sair". Anônimo vê "Entrar", com retorno para a
+  página atual. Evidência: `_templates/v8/v8/layouts/_shell.html:9`,
+  `_templates/v8/v8/layouts/app_sidebar.html:8`.
 - V8-SHELL-021 [implementado] As breadcrumbs vêm da lista que a view informa, de pares rótulo e URL.
-  O último item não é link e tem `aria-current="page"`. Evidência:
-  `_templates/v8/v8/shell/breadcrumbs.html:3`.
+  O último item não é link e tem `aria-current="page"`. O layout `landing` não mostra breadcrumbs.
+  Evidência: `_templates/v8/v8/layouts/_shell.html:44`.
 - V8-SHELL-022 [implementado] Dentro de uma zona SPA, a rota atual acrescenta seus níveis às
   breadcrumbs do servidor, a partir de `meta.breadcrumb`. Evidência:
   `_frontend/v8/src/core/ZoneOutlet.vue:31`.
-- V8-SHELL-023 [implementado] O shell usa `header`, `nav` com rótulo, `main` e um link "Ir para o
-  conteúdo" como primeiro elemento focável. Evidência: `_templates/v8/v8/layouts/admin.html:6`.
+- V8-SHELL-023 [implementado] Os três layouts com shell usam `header`, `nav` com rótulo, `main` e um
+  link "Ir para o conteúdo" como primeiro elemento focável. Evidência:
+  `_templates/v8/v8/layouts/_shell.html:6`.
 
 ### Sidebar
 
 - V8-SHELL-030 [implementado] O estado da sidebar fica no cookie `v8_sidebar`, com valor `expandida`
-  ou `recolhida`. O Django lê o cookie e renderiza `<html data-sidebar="...">`, de modo que a página
-  já chega no estado certo. Sem cookie, vale `expandida`. Evidência:
-  `_frontend/v8/src/css/shell.css:182`.
+  ou `recolhida`. Nas páginas do layout `app_sidebar`, o Django lê o cookie e renderiza
+  `<html data-sidebar="...">`, de modo que a página já chega no estado certo. Sem cookie, vale
+  `expandida`. Os outros layouts não emitem o atributo. Evidência:
+  `_templates/v8/v8/layouts/app_sidebar.html:4`, `_frontend/v8/src/css/shell.css:186`.
 - V8-SHELL-031 [implementado] O botão da sidebar alterna o estado, grava o cookie e atualiza o
-  atributo sem recarregar a página. Evidência: `_frontend/v8/src/core/shell.js:67`.
+  atributo sem recarregar a página. Evidência: `_frontend/v8/src/core/shell.js:69`.
 - V8-SHELL-032 [implementado] Em tela estreita a sidebar não ocupa a lateral. O mesmo botão a abre
   como drawer, pelo componente de `overlays.md`, e não altera o cookie. Evidência:
-  `_frontend/v8/src/core/boot.js:19`, `_frontend/v8/src/core/shell.js:86`.
+  `_frontend/v8/src/core/boot.js:20`, `_frontend/v8/src/core/shell.js:88`.
 - V8-SHELL-033 [implementado] Com o JavaScript desligado, o menu continua visível e seus links
-  funcionam, em qualquer largura. Evidência: `_templates/v8/v8/shell/sidebar.html:3`.
+  funcionam, em qualquer largura, na sidebar e no cabeçalho. Quem garante é o CSS, com
+  `@media (scripting: none)`. Evidência: `_frontend/v8/src/css/shell.css:295`.
+
+### Menu no cabeçalho
+
+- V8-SHELL-034 [implementado] Em `app_topbar` e `landing` o menu fica no cabeçalho, na horizontal,
+  com os filhos de cada grupo num painel suspenso. Em tela estreita ele sai do cabeçalho, e o botão
+  `data-v8-acao="menu"`, que só aparece nessa largura, o abre como drawer, sem gravar cookie.
+  Evidência: `_frontend/v8/src/core/shell.js:130`, `_frontend/v8/src/css/shell.css:226`.
+- V8-SHELL-035 [implementado] No menu do cabeçalho, em tela larga, o grupo do item ativo começa
+  fechado, embora o servidor o entregue aberto, para a sidebar. Um grupo aberto fecha ao clicar fora
+  dele, ao abrir outro grupo ou com ESC, que devolve o foco ao rótulo do grupo. Os grupos da sidebar
+  não são afetados. Evidência: `_frontend/v8/src/core/shell.js:95`,
+  `_frontend/v8/src/core/shell.js:105`, `_frontend/v8/src/css/shell.css:281`.
 
 ### Tema
 
 - V8-SHELL-040 [implementado] O tema fica no cookie `v8_tema`, com valor `claro` ou `escuro`. O
   Django renderiza `<html data-theme="...">` a partir dele. Sem cookie, o atributo não é emitido e o
-  CSS segue `prefers-color-scheme`, sem JavaScript. Evidência: `_frontend/v8/src/core/shell.js:27`,
-  `_frontend/v8/src/css/tokens.css:78`.
+  CSS segue `prefers-color-scheme`, sem JavaScript. Evidência: `_frontend/v8/src/core/shell.js:29`,
+  `_frontend/v8/src/css/tokens.css:79`.
 - V8-SHELL-041 [implementado] O botão de tema alterna entre claro e escuro a partir do tema em
   vigor, grava o cookie, atualiza o atributo e o `<meta name="theme-color">`, sem recarregar. O
-  botão informa o estado por `aria-pressed`. Evidência: `_frontend/v8/src/core/shell.js:50`.
+  botão informa o estado por `aria-pressed`. Evidência: `_frontend/v8/src/core/shell.js:52`.
 - V8-SHELL-042 [implementado] Toda cor de template e de componente vem de token semântico com valor
   nos dois temas. Não há cor literal fora de `src/css/tokens.css`. Evidência:
   `_frontend/v8/src/css/tokens.css:3`.
@@ -93,12 +112,12 @@ estreita.
   redireciona ao login conforme a view dela. Item da varredura: 1. Evidência: `cmj/v8/views.py:100`.
 - V8-SHELL-051 [implementado] Com cache real, dois usuários de permissões diferentes recebem menus
   diferentes, e nenhum recebe item que não pode ver. Item da varredura: 5. Evidência:
-  `cmj/v8/services/s_global.py:116`.
+  `cmj/v8/services/s_global.py:135`.
 - V8-SHELL-052 [implementado] Valor de `v8_sidebar` ou `v8_tema` fora da lista válida é ignorado e
-  nunca chega ao HTML. Item da varredura: 6. Evidência: `_frontend/v8/src/core/shell.js:49`.
+  nunca chega ao HTML. Item da varredura: 6. Evidência: `_frontend/v8/src/core/shell.js:51`.
 - V8-SHELL-053 [implementado] O link "Entrar" leva como retorno só o caminho e a query da página
   atual, codificados, sem host. "Sair" usa a rota de logout existente. Item da varredura: 6.
-  Evidência: `_templates/v8/v8/shell/topbar.html:21`.
+  Evidência: `_templates/v8/v8/layouts/_shell.html:32`.
 
 ## Riscos de segurança
 

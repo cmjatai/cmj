@@ -20,6 +20,7 @@ from cmj.v8.tests.conftest import (
     CABECALHOS_FRAGMENTO,
     URL_DEMO_FRAGMENTO,
     URLS_DEMO_API,
+    URLS_DEMO_LAYOUTS,
     URLS_DEMO_PAGINAS,
     cliente_http,
     html_de,
@@ -403,6 +404,53 @@ def test_arquivar_e_post_com_confirmacao_mensagem_e_redirecionamento(superusuari
     assert s_demo.arquivar([1, "2", 2, None, "x", 43]) == 2
 
 
+# --- Páginas dos layouts -------------------------------------------------------------
+
+
+@pytest.mark.spec("V8-DEMO-040")
+def test_cada_layout_tem_pagina_de_demonstracao_com_blocks_e_links(superusuario):
+    cliente = cliente_http(superusuario)
+    paginas = s_demo.layouts_demo()
+    assert [p["nome"] for p in paginas] == list(s_global.LAYOUTS)
+    assert [p["url"] for p in paginas] == URLS_DEMO_LAYOUTS
+    assert s_demo.layout_demo("outro") is None
+
+    for pagina in paginas:
+        html = html_de(cliente.get(pagina["url"]))
+        assert f'data-v8-layout="{pagina["nome"]}"' in html
+        assert f'<h1 class="v8-pagina-titulo">Layout {pagina["nome"]}</h1>' in html
+        assert '<p class="v8-aviso-demo">' in html
+        assert f'<p>{pagina["resumo"]}</p>' in html
+        for bloco, uso in pagina["regioes"]:
+            assert f"<dt>{bloco}</dt>" in html and f"<dd>{uso}</dd>" in html
+        # Links para as quatro páginas, com a atual marcada.
+        navegacao = trecho(html, '<nav class="v8-barra-acoes"', "</nav>")
+        links = re.findall(r'href="([^"]+)"( aria-current="page")?', navegacao)
+        assert [url for url, _ in links] == URLS_DEMO_LAYOUTS
+        assert [url for url, atual in links if atual] == [pagina["url"]]
+
+
+@pytest.mark.spec("V8-DEMO-041")
+def test_landing_preenche_hero_e_rodape_e_o_menu_marca_cada_pagina(superusuario):
+    cliente = cliente_http(superusuario)
+    html = html_de(cliente.get("/v8/demo/layouts/landing/"))
+    hero = trecho(html, '<section class="v8-hero">', "</section>")
+    assert "<code>hero</code>" in hero and "Layout landing" in hero
+    rodape = trecho(html, '<footer class="v8-rodape">', "</footer>")
+    assert "<code>footer_nav</code>" in rodape and "<code>footer_info</code>" in rodape
+    assert html.index("</section>") < html.index('<div class="v8-conteudo">')
+
+    for url in URLS_DEMO_LAYOUTS:
+        html = html_de(cliente.get(url))
+        if url.endswith("/minimal/"):
+            assert "v8-menu-principal" not in html
+            continue
+        menu = trecho(html, '<nav id="v8-menu-principal"', "</nav>")
+        assert f'<a class="v8-menu-link" href="{url}" aria-current="page">' in menu
+        assert menu.count('aria-current="page"') == 1
+        assert '<details class="v8-menu-grupo" open>' in menu
+
+
 # --- Requisitos de segurança --------------------------------------------------------
 
 
@@ -415,7 +463,7 @@ def test_todas_as_rotas_da_demonstracao_exigem_superusuario(
     rotas_demo = [
         r for r in cmj.v8.urls.urlpatterns if "demo" in r.pattern.regex.pattern
     ]
-    assert len(rotas_demo) == 8
+    assert len(rotas_demo) == 12
     for rota in rotas_demo:
         classe = rota.callback.view_class
         exige = (

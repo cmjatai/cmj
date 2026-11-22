@@ -204,12 +204,12 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 - `docs/commands/ocrmypdf_command.md`: command `ocrmypdf`.
 - `docs/backend/convencoes.md`: exemplos de CRUD, mixins, API, permissões, testes e novo app.
 - `docs/frontend/v6.md`: stores, `Resources.Utils`, rotas e padrões do v6.
-- `docs/frontend/v8.md`: qual modo de tela usar, tags e atributos do lado Django, composables do
-  lado Vue, CSS e testes. Leia antes de mexer em `_frontend/v8`, `_templates/v8` ou `cmj/v8`.
+- `docs/frontend/v8.md`: qual modo de tela usar, layouts e blocks dos templates, tags e atributos do
+  lado Django, composables do lado Vue, CSS e testes. Leia antes de mexer em `_frontend/v8`, `_templates/v8` ou `cmj/v8`.
 - `docs/specs/api/login.md`: login por usuário e senha pela API (`/api/auth/session` e
   `/api/auth/token`): limite de tentativas e token CSRF. Leia antes de alterar essas rotas.
-- `docs/specs/v8/README.md`: índice das specs do v8 (arquitetura, shell, overlays, cliente HTTP e
-  demonstração). Leia a spec da parte que for alterar.
+- `docs/specs/v8/README.md`: índice das specs do v8 (arquitetura, templates em camadas, shell,
+  overlays, cliente HTTP e demonstração). Leia a spec da parte que for alterar.
 - `docs/frontend/v2018.md`: Vuex, `Resources.Utils`, padrões e testes do v2018.
 - `docs/specs/v2018/README.md`: índice das specs do v2018 (estrutura do projeto webpack e
   infraestrutura de testes). Leia antes de mexer em `vue.config.js`, nas entradas ou em

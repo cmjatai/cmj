@@ -10,7 +10,7 @@ from cmj.v8.services.s_global import SUPERUSUARIO, atende
 
 # Entra na chave de cache do HTML do menu. Aumente ao mudar a árvore ou o
 # template do menu.
-VERSAO_MENU = 1
+VERSAO_MENU = 2
 
 
 @dataclass(frozen=True)
@@ -47,6 +47,30 @@ MENU = (
                 "demo-spa",
                 "Clientes (zona SPA)",
                 "/v8/demo/spa/",
+                permissao=SUPERUSUARIO,
+            ),
+            ItemMenu(
+                "demo-layout-landing",
+                "Layout landing",
+                "/v8/demo/layouts/landing/",
+                permissao=SUPERUSUARIO,
+            ),
+            ItemMenu(
+                "demo-layout-app_topbar",
+                "Layout app_topbar",
+                "/v8/demo/layouts/app_topbar/",
+                permissao=SUPERUSUARIO,
+            ),
+            ItemMenu(
+                "demo-layout-app_sidebar",
+                "Layout app_sidebar",
+                "/v8/demo/layouts/app_sidebar/",
+                permissao=SUPERUSUARIO,
+            ),
+            ItemMenu(
+                "demo-layout-minimal",
+                "Layout minimal",
+                "/v8/demo/layouts/minimal/",
                 permissao=SUPERUSUARIO,
             ),
         ),

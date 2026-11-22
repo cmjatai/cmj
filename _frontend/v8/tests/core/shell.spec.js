@@ -50,6 +50,48 @@ function montarShell({ tema = null, sidebar = null, ariaTema = 'false', ariaSide
     </footer>`
 }
 
+// O cabeçalho dos layouts com menu horizontal, como o Django o renderiza: botão do menu, dois
+// grupos em <details> e, fora dele, uma sidebar com um grupo aberto. O tabindex existe só porque o
+// DOM simulado não trata <summary> como focável.
+function montarCabecalho({ aberto = true } = {}) {
+  html.removeAttribute('data-theme')
+  html.removeAttribute('data-sidebar')
+  document.body.innerHTML = `
+    <header class="v8-topbar">
+      <button id="botao-menu" type="button" data-v8-acao="menu">
+        <span id="botao-menu-icone">menu</span>
+      </button>
+      <nav id="v8-menu-principal" class="v8-menu">
+        <ul>
+          <li>
+            <details id="grupo-1" class="v8-menu-grupo"${aberto ? ' open' : ''}>
+              <summary id="rotulo-1" tabindex="0">Grupo 1</summary>
+              <ul><li><button id="dentro-1" type="button">Filho 1</button></li></ul>
+            </details>
+          </li>
+          <li>
+            <details id="grupo-2" class="v8-menu-grupo">
+              <summary id="rotulo-2" tabindex="0">Grupo 2</summary>
+              <ul><li><button id="dentro-2" type="button">Filho 2</button></li></ul>
+            </details>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <aside class="v8-sidebar">
+      <nav class="v8-menu"><details id="grupo-lateral" open><summary>Lateral</summary></details></nav>
+    </aside>
+    <main><p id="fora">fora</p></main>`
+}
+
+function grupo(id) {
+  return document.getElementById(id)
+}
+
+function teclar(tecla) {
+  document.dispatchEvent(new KeyboardEvent('keydown', { key: tecla, bubbles: true }))
+}
+
 function iniciar(opcoes) {
   parar = iniciarShell(opcoes)
   return parar
@@ -173,6 +215,109 @@ describe('shell', () => {
     })
   })
 
+  describe('menu do cabeçalho', () => {
+    it('V8-SHELL-034: o botão do menu abre o menu como drawer e não grava cookie nem atributo', () => {
+      ambiente({ telaLarga: false })
+      montarCabecalho()
+      const abrirMenuEstreito = vi.fn()
+      iniciar({ abrirMenuEstreito })
+
+      clicar('botao-menu-icone')
+
+      expect(abrirMenuEstreito).toHaveBeenCalledTimes(1)
+      expect(abrirMenuEstreito).toHaveBeenCalledWith(document.getElementById('botao-menu'))
+      expect(cookiesGravados()).toEqual([])
+      expect(html.hasAttribute('data-sidebar')).toBe(false)
+    })
+
+    it('V8-SHELL-034: sem abrirMenuEstreito o clique no botão do menu não faz nada', () => {
+      ambiente({ telaLarga: false })
+      montarCabecalho()
+      iniciar()
+
+      expect(() => clicar('botao-menu')).not.toThrow()
+
+      expect(cookiesGravados()).toEqual([])
+      expect(html.hasAttribute('data-sidebar')).toBe(false)
+    })
+
+    it('V8-SHELL-035: em tela larga o grupo que o servidor abriu começa fechado, só no cabeçalho', () => {
+      ambiente({ telaLarga: true })
+      montarCabecalho({ aberto: true })
+
+      iniciar()
+
+      expect(grupo('grupo-1').open).toBe(false)
+      expect(grupo('grupo-lateral').open).toBe(true)
+      expect(document.getElementById('v8-menu-principal').hasAttribute('data-v8-pronto')).toBe(true)
+      expect(document.querySelector('.v8-sidebar .v8-menu').hasAttribute('data-v8-pronto')).toBe(false)
+    })
+
+    it('V8-SHELL-035: em tela estreita o grupo continua aberto, para o menu no drawer', () => {
+      ambiente({ telaLarga: false })
+      montarCabecalho({ aberto: true })
+
+      iniciar()
+
+      expect(grupo('grupo-1').open).toBe(true)
+      expect(document.getElementById('v8-menu-principal').hasAttribute('data-v8-pronto')).toBe(true)
+    })
+
+    it('V8-SHELL-035: clique dentro do grupo o mantém aberto, e clique fora o fecha', () => {
+      ambiente({ telaLarga: true })
+      montarCabecalho()
+      iniciar()
+      grupo('grupo-1').open = true
+
+      clicar('dentro-1')
+      expect(grupo('grupo-1').open).toBe(true)
+
+      clicar('fora')
+      expect(grupo('grupo-1').open).toBe(false)
+      // A sidebar não é do cabeçalho: os grupos dela não fecham.
+      expect(grupo('grupo-lateral').open).toBe(true)
+    })
+
+    it('V8-SHELL-035: clicar em outro grupo fecha o que estava aberto', () => {
+      ambiente({ telaLarga: true })
+      montarCabecalho()
+      iniciar()
+      grupo('grupo-1').open = true
+
+      clicar('dentro-2')
+
+      expect(grupo('grupo-1').open).toBe(false)
+    })
+
+    it('V8-SHELL-035: ESC fecha o grupo aberto e devolve o foco ao rótulo dele', () => {
+      ambiente({ telaLarga: true })
+      montarCabecalho()
+      iniciar()
+      grupo('grupo-1').open = true
+      document.getElementById('dentro-1').focus()
+
+      teclar('Enter')
+      expect(grupo('grupo-1').open).toBe(true)
+
+      teclar('Escape')
+      expect(grupo('grupo-1').open).toBe(false)
+      expect(document.activeElement).toBe(document.getElementById('rotulo-1'))
+      expect(grupo('grupo-lateral').open).toBe(true)
+    })
+
+    it('V8-SHELL-035: ESC sem grupo aberto não mexe no foco', () => {
+      ambiente({ telaLarga: true })
+      montarCabecalho({ aberto: false })
+      iniciar()
+      document.getElementById('botao-menu').focus()
+
+      teclar('Escape')
+
+      expect(document.activeElement).toBe(document.getElementById('botao-menu'))
+      expect(grupo('grupo-lateral').open).toBe(true)
+    })
+  })
+
   describe('tema', () => {
     it('V8-SHELL-041: o botão alterna o tema, grava o cookie e informa o estado por aria-pressed', () => {
       ambiente()
@@ -266,17 +411,18 @@ describe('shell', () => {
   })
 
   describe('ouvinte', () => {
-    it('V8-SHELL-031: há um único ouvinte de clique, e a função devolvida o remove', () => {
+    it('V8-SHELL-031: há um ouvinte de clique e um de teclado, e a função devolvida os remove', () => {
       ambiente({ telaLarga: true })
       montarShell({ tema: 'claro', sidebar: 'expandida' })
       const instalar = vi.spyOn(document, 'addEventListener')
+      const retirar = vi.spyOn(document, 'removeEventListener')
 
       const remover = iniciar()
 
-      expect(instalar).toHaveBeenCalledTimes(1)
-      expect(instalar.mock.calls[0][0]).toBe('click')
+      expect(instalar.mock.calls.map(chamada => chamada[0])).toEqual(['click', 'keydown'])
 
       remover()
+      expect(retirar.mock.calls.map(chamada => chamada[0])).toEqual(['click', 'keydown'])
       clicar('sidebar-1')
       clicar('tema-1')
 

@@ -1,0 +1,9 @@
+{% load v8_tags %}
+{% if messages %}
+  {# Sem JavaScript não há toast: as mensagens aparecem aqui. #}
+  <noscript>
+    {% for mensagem in messages %}
+      <p class="v8-alerta v8-alerta-{{ mensagem.level_tag|v8_alerta }}">{{ mensagem }}</p>
+    {% endfor %}
+  </noscript>
+{% endif %}

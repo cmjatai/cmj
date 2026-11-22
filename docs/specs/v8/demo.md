@@ -1,7 +1,7 @@
 # V8: demonstração
 
 Status: implementado
-Última verificação: 2026-11-21 (branch `v8-arquitetura-hibrida`, sobre o commit `32325c9a2`)
+Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `6b527f42a`)
 Código principal: `cmj/v8/services/s_demo.py`, `cmj/v8/views.py`, `_templates/v8/v8/demo/`,
 `_frontend/v8/src/modules/demo/`
 Testes: `cmj/v8/tests/test_demo.py`, `_frontend/v8/tests/demo/`, `_frontend/v8/tests/overlays/url.spec.js`
@@ -21,6 +21,7 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
 | `/v8/demo/clientes/<id>/` | Página de detalhe, destino dos links sem JavaScript |
 | `/v8/_frag/demo/cliente/<id>/historico/` | Fragmento HTML |
 | `/v8/demo/spa/` e subcaminhos | Zona SPA `demo-spa` |
+| `/v8/demo/layouts/<nome>/` | Página de demonstração de cada layout de `templates.md` |
 | `/v8/demo/api/clientes/` | JSON: lista (`GET`) e criação (`POST`) |
 | `/v8/demo/api/clientes/<id>/` | JSON: detalhe (`GET`) e edição (`PUT`) |
 | `/v8/demo/api/negado/` | JSON: responde sempre 403, para a regra V8-DEMO-025 |
@@ -33,20 +34,20 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
 
 - V8-DEMO-001 [implementado] Os clientes são uma lista fixa, gerada em memória por `s_demo.py`, com
   nomes fictícios e e-mails no domínio `exemplo.invalid`. Não há CPF, telefone, endereço nem dado de
-  pessoa real. Evidência: `cmj/v8/services/s_demo.py:63`.
+  pessoa real. Evidência: `cmj/v8/services/s_demo.py:107`.
 - V8-DEMO-002 [implementado] Nada é gravado: criar, editar e arquivar validam a entrada e respondem
   como se tivessem gravado, e a lista continua a mesma. As telas avisam que é uma demonstração.
   Evidência: `_frontend/v8/src/modules/demo/api.js:2`.
 - V8-DEMO-003 [implementado] A validação de cliente é um formulário Django em `s_demo.py`: nome
   obrigatório com ao menos três letras, e-mail válido e ainda não usado por outro cliente (erros de
   campo), e situação "inativo" só com motivo preenchido (erro geral). Evidência:
-  `cmj/v8/services/s_demo.py:89`.
+  `cmj/v8/services/s_demo.py:133`.
 
 ### Página Django com ilhas
 
 - V8-DEMO-010 [implementado] `/v8/demo/clientes/` renderiza no servidor a lista paginada e filtrada
-  por `q`, `situacao` e `cidade`, no layout `admin`. Com o JavaScript desligado, filtrar, paginar,
-  abrir o detalhe e arquivar funcionam. Evidência: `cmj/v8/views.py:254`,
+  por `q`, `situacao` e `cidade`, no layout `app_sidebar`. Com o JavaScript desligado, filtrar, paginar,
+  abrir o detalhe e arquivar funcionam. Evidência: `cmj/v8/views.py:255`,
   `_templates/v8/v8/demo/clientes.html:1`.
 - V8-DEMO-011 [implementado] A tabela é a ilha `demo-clientes-tabela`: o HTML do servidor é o
   conteúdo de espera, e o componente acrescenta seleção de linhas, "selecionar todos" e a contagem
@@ -63,12 +64,13 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
   `_frontend/v8/src/modules/demo/paineis/PainelCliente.vue:40`.
 - V8-DEMO-015 [implementado] "Arquivar selecionados" é um formulário `POST` com `data-confirm`.
   Confirmada, a ação responde com redirecionamento e uma mensagem do Django, que aparece como toast
-  na página seguinte. Evidência: `cmj/v8/views.py:285`, `_templates/v8/v8/demo/clientes.html:38`.
+  na página seguinte. Evidência: `cmj/v8/views.py:310`, `_templates/v8/v8/demo/clientes.html:38`.
 
 ### Zona SPA
 
 - V8-DEMO-020 [implementado] `/v8/demo/spa/` mostra a lista de clientes, carregada da API da demo,
-  no layout `spa`. Evidência: `_frontend/v8/src/modules/demo/spa/ClientesLista.vue:127`,
+  na página da zona, no layout `app_sidebar`. Evidência:
+  `_frontend/v8/src/modules/demo/spa/ClientesLista.vue:127`,
   `_frontend/v8/src/modules/demo/spa/DemoSpaLayout.vue:11`.
 - V8-DEMO-021 [implementado] `/v8/demo/spa/clientes/<id>` é rota aninhada e mostra o detalhe num
   drawer direito sobre a lista. `/v8/demo/spa/clientes/<id>/pedidos/<pedido>` empilha um segundo
@@ -90,22 +92,34 @@ Django com ilhas e uma zona SPA. Servem de referência de uso e de roteiro de ve
   o tratamento de `sem_permissao`. Evidência: `_frontend/v8/src/modules/demo/api.js:34`,
   `_frontend/v8/src/modules/demo/spa/ClientesLista.vue:131`.
 
+### Páginas dos layouts
+
+- V8-DEMO-040 [implementado] `/v8/demo/layouts/<nome>/` existe para cada um dos quatro layouts de
+  `templates.md`. Cada página estende o layout do nome e mostra um resumo dele, os blocks que ele
+  oferece e links para as quatro páginas, com a atual marcada por `aria-current`. O texto é fixo e
+  vem de `s_demo.py`. Evidência: `cmj/v8/services/s_demo.py:44`, `cmj/v8/views.py:286`,
+  `_templates/v8/v8/partials/demo/layout.html:9`.
+- V8-DEMO-041 [implementado] A página da `landing` preenche `hero`, `footer_nav` e `footer_info` com
+  texto de exemplo. As quatro páginas estão no grupo "Demonstração" do menu, e a página aberta sai
+  como item ativo nos layouts que têm menu. Evidência:
+  `_templates/v8/v8/demo/layouts/landing.html:2`, `cmj/v8/services/s_menu.py:53`.
+
 ## Requisitos de segurança
 
 - V8-DEMO-030 [implementado] Todas as rotas da demonstração exigem superusuário, em qualquer
   ambiente. Anônimo é redirecionado ao login nas páginas e recebe 401 na API e nos fragmentos.
   Autenticado que não é superusuário recebe 403. Itens da varredura: 1 e 7. Evidência:
-  `cmj/v8/views.py:255`.
+  `cmj/v8/views.py:256`.
 - V8-DEMO-031 [implementado] As ações que simulam escrita aceitam só `POST` ou `PUT`, com CSRF. Item
-  da varredura: 1. Evidência: `cmj/v8/views.py:289`, `cmj/v8/views.py:360`.
+  da varredura: 1. Evidência: `cmj/v8/views.py:314`, `cmj/v8/views.py:385`.
 - V8-DEMO-032 [implementado] `id` inexistente responde 404 na página, na API e no fragmento. Os
   filtros aceitam só os campos previstos, e o tamanho da página tem limite máximo. Itens da
-  varredura: 1 e 7. Evidência: `cmj/v8/views.py:247`, `cmj/v8/services/s_demo.py:18`.
+  varredura: 1 e 7. Evidência: `cmj/v8/views.py:248`, `cmj/v8/services/s_demo.py:18`.
 - V8-DEMO-033 [implementado] Nenhuma rota da demonstração lê ou grava model, arquivo, cache
   compartilhado, fila ou índice. Itens da varredura: 3 e 5. Evidência:
-  `cmj/v8/services/s_demo.py:85`.
+  `cmj/v8/services/s_demo.py:129`.
 - V8-DEMO-034 [implementado] As respostas da API da demo contêm só os campos fictícios do cliente.
-  Item da varredura: 2. Evidência: `cmj/v8/services/s_demo.py:156`.
+  Item da varredura: 2. Evidência: `cmj/v8/services/s_demo.py:200`.
 
 ## Riscos de segurança
 

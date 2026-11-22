@@ -1,4 +1,5 @@
-{% extends "v8/layouts/admin.html" %}
+{% extends v8_layout_zona %}
+{# O layout vem do registro de zonas (s_global.ZONAS), nunca da requisição. #}
 {% block content %}
   <div class="v8-zona" data-vue-zone="{{ v8.zona }}">
     <p class="v8-zona-espera">Carregando…</p>

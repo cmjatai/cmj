@@ -1,0 +1,8 @@
+{% extends "base_v8.html" %}
+{# Layout sem navegação: login, erro e outras telas de foco. #}
+{% block layout %}
+  <main id="conteudo" class="v8-nua" data-v8-layout="minimal">
+    {% block messages %}{% include "v8/shell/mensagens.html" %}{% endblock %}
+    {% block content %}{% endblock %}
+  </main>
+{% endblock %}

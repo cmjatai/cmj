@@ -1,0 +1,12 @@
+{% for item in itens %}
+  <li>
+    {% if item.filhos %}
+      <details class="v8-menu-grupo"{% if item.aberto %} open{% endif %}>
+        <summary class="v8-menu-link">{% if item.icone %}<svg class="v8-icone" aria-hidden="true"><use href="#v8-i-{{ item.icone }}"></use></svg>{% endif %}<span class="v8-menu-rotulo">{{ item.rotulo }}</span></summary>
+        <ul>{% include "v8/shell/menu_itens.html" with itens=item.filhos %}</ul>
+      </details>
+    {% else %}
+      <a class="v8-menu-link" href="{{ item.url }}"{% if item.ativo %} aria-current="page"{% endif %}>{% if item.icone %}<svg class="v8-icone" aria-hidden="true"><use href="#v8-i-{{ item.icone }}"></use></svg>{% endif %}<span class="v8-menu-rotulo">{{ item.rotulo }}</span></a>
+    {% endif %}
+  </li>
+{% endfor %}

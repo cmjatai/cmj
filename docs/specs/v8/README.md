@@ -7,6 +7,7 @@ v2018. Marcadores, IDs, ligação com testes e varredura de segurança seguem
 | Spec | Prefixo | Assunto |
 | --- | --- | --- |
 | [arquitetura.md](./arquitetura.md) | `V8-ARQ` | App `cmj/v8`, rotas, templates base e layouts, dados globais, app Vue único, ilhas e zonas SPA |
+| [templates.md](./templates.md) | `V8-TPL` | Herança em três níveis: base, layouts (`landing`, `app_topbar`, `app_sidebar`, `minimal`) e páginas; blocks de cada nível |
 | [shell.md](./shell.md) | `V8-SHELL` | Topbar, sidebar, breadcrumbs, menu por permissão, cache, tema claro e escuro |
 | [overlays.md](./overlays.md) | `V8-OVL` | Camadas, pilha, drawers, modals, toasts, gatilhos em HTML, fragmentos do servidor |
 | [http.md](./http.md) | `V8-HTTP` | Cliente HTTP, CSRF, sessão expirada, formato de erro |

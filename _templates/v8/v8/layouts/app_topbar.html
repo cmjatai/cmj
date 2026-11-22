@@ -1,0 +1,11 @@
+{% extends "v8/layouts/_shell.html" %}
+{# Layout de navegação superior: menu na horizontal e conteúdo centralizado. #}
+{% block layout_name %}app_topbar{% endblock %}
+{% block header_start %}
+  <button type="button" class="v8-btn v8-btn-icone v8-botao-menu" data-v8-acao="menu" aria-controls="v8-menu-principal" aria-haspopup="dialog" aria-label="Menu">
+    <svg class="v8-icone" aria-hidden="true"><use href="#v8-i-menu"></use></svg>
+  </button>
+{% endblock %}
+{% block header_nav %}
+  {% block menu %}{% include "v8/shell/menu.html" %}{% endblock %}
+{% endblock %}

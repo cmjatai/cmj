@@ -12,11 +12,11 @@ import EventBus from '~@/utils/EventBus'
 // Boot do v8: um app Vue e um Pinia por página (V8-ARQ-030). Chamar de novo devolve o mesmo.
 
 export const ID_DO_APP = 'cmj-v8-app'
-const ID_DO_MENU = 'v8-sidebar-menu'
+const ID_DO_MENU = 'v8-menu-principal'
 
 let inicio = null
 
-// Em tela estreita o menu do servidor abre como drawer, pela mesma pilha (V8-SHELL-032).
+// Em tela estreita o menu do servidor abre como drawer, pela mesma pilha (V8-SHELL-032 e 034).
 function abrirMenuEstreito(botao) {
   abrirElemento(ID_DO_MENU, { side: 'left', size: 'sm', title: 'Menu' }, botao)
 }

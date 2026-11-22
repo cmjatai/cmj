@@ -11,11 +11,8 @@ from pathlib import Path
 import pytest
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 from django.template import engines
-from django.template.loader import get_template, render_to_string
-from django.template.loader_tags import BlockNode, ExtendsNode
-from django.test import RequestFactory
+from django.template.loader import render_to_string
 from django.urls import resolve
 
 import cmj.v8.urls
@@ -23,21 +20,22 @@ from cmj.v8 import views
 from cmj.v8.services import s_demo, s_global, s_menu, s_respostas
 from cmj.v8.tests.conftest import (
     CABECALHOS_CLIENTE,
+    DIR_TEMPLATES_V8,
     URL_DEMO_FRAGMENTO,
     URLS_DEMO_API,
+    URLS_DEMO_LAYOUTS,
     URLS_DEMO_PAGINAS,
     cliente_http,
     criar_usuario,
     html_de,
     ler_json_script,
+    renderizar,
+    templates_v8,
 )
 
 pytestmark = pytest.mark.django_db
 
 DIR_APP = Path(cmj.v8.urls.__file__).parent
-DIR_TEMPLATES_V8 = next(
-    Path(d) for d in settings.TEMPLATES[0]["DIRS"] if Path(d).name == "v8"
-)
 CHAVES_GLOBAIS = {
     "versao",
     "debug",
@@ -53,17 +51,6 @@ CHAVES_GLOBAIS = {
 }
 NOME_HOSTIL_1 = "</script><script>alert(1)"
 NOME_HOSTIL_2 = "</script>\"'&"
-
-
-def templates_v8():
-    return sorted(p for p in DIR_TEMPLATES_V8.rglob("*") if p.is_file())
-
-
-def renderizar(fonte, usuario=None, contexto=None, caminho="/v8/"):
-    """Renderiza um template escrito no teste, como uma view faria com ``render``."""
-    request = RequestFactory().get(caminho)
-    request.user = usuario or AnonymousUser()
-    return engines["django"].from_string(fonte).render(contexto or {}, request)
 
 
 # --- Contenção ---------------------------------------------------------------
@@ -136,12 +123,12 @@ def test_app_nao_tem_models_nem_migrations():
 
 
 @pytest.mark.spec("V8-ARQ-010")
-def test_inicio_responde_200_no_layout_admin():
+def test_inicio_responde_200_no_layout_landing():
     resposta = cliente_http().get("/v8/")
     html = html_de(resposta)
     assert resposta.status_code == 200
-    assert 'class="v8-shell"' in html
-    assert '<h1 class="v8-pagina-titulo">Início</h1>' in html
+    assert '<div class="v8-shell" data-v8-layout="landing">' in html
+    assert '<h1 class="v8-pagina-titulo">PortalCMJ</h1>' in html
 
 
 @pytest.mark.spec("V8-ARQ-011")
@@ -165,7 +152,7 @@ def test_zona_responde_no_prefixo_e_em_qualquer_subcaminho(superusuario):
         html = html_de(resposta)
         assert resposta.status_code == 200, caminho
         assert '<div class="v8-zona" data-vue-zone="demo-spa">' in html
-        assert 'class="v8-shell"' in html
+        assert '<div class="v8-shell" data-v8-layout="app_sidebar">' in html
         assert ler_json_script(html, "v8-global")["zona"] == "demo-spa"
 
     # Só o prefixo exato: um caminho parecido não é da zona.
@@ -173,12 +160,12 @@ def test_zona_responde_no_prefixo_e_em_qualquer_subcaminho(superusuario):
 
 
 @pytest.mark.spec("V8-ARQ-012")
-def test_caminho_desconhecido_responde_404_no_layout_bare():
+def test_caminho_desconhecido_responde_404_no_layout_minimal():
     for caminho in ["/v8/nao-existe/", "/v8/nao/existe.png", "/v8/_frag/nada/"]:
         resposta = cliente_http().get(caminho)
         html = html_de(resposta)
         assert resposta.status_code == 404, caminho
-        assert 'class="v8-nua"' in html
+        assert '<main id="conteudo" class="v8-nua" data-v8-layout="minimal">' in html
         assert 'class="v8-shell"' not in html
         assert "Página não encontrada" in html
 
@@ -217,50 +204,8 @@ def test_servicos_nao_recebem_a_requisicao():
 # --- Templates ---------------------------------------------------------------
 
 
-@pytest.mark.spec("V8-ARQ-020")
-def test_base_oferece_os_blocos_e_carrega_o_essencial():
-    base = get_template("base_v8.html").template
-    blocos = {no.name for no in base.nodelist.get_nodes_by_type(BlockNode)}
-    assert {
-        "title",
-        "extra_head",
-        "page_data",
-        "vite_entries",
-        "body",
-        "content",
-    } <= blocos
-
-    html = html_de(cliente_http().get("/v8/"))
-    assert '<script id="v8-global" type="application/json">' in html
-    assert '<script id="v8-messages" type="application/json">' in html
-    assert '<div id="cmj-v8-app"></div>' in html
-    assert re.search(r'<script[^>]*type="module"[^>]*src="[^"]*main[^"]*\.js"', html)
-
-
-@pytest.mark.spec("V8-ARQ-021")
-def test_tres_layouts_estendem_a_base():
-    def pai(nome):
-        no = get_template(nome).template.nodelist.get_nodes_by_type(ExtendsNode)[0]
-        return no.parent_name.resolve({})
-
-    assert pai("v8/layouts/admin.html") == "base_v8.html"
-    assert pai("v8/layouts/bare.html") == "base_v8.html"
-    assert pai("v8/layouts/spa.html") == "v8/layouts/admin.html"
-
-    admin = renderizar('{% extends "v8/layouts/admin.html" %}')
-    bare = renderizar('{% extends "v8/layouts/bare.html" %}')
-    spa = renderizar(
-        '{% extends "v8/layouts/spa.html" %}', contexto={"v8": {"zona": "demo-spa"}}
-    )
-    for html in (admin, bare, spa):
-        assert '<div id="cmj-v8-app"></div>' in html
-    assert 'class="v8-shell"' in admin and "data-vue-zone" not in admin
-    assert 'class="v8-shell"' not in bare and 'class="v8-nua"' in bare
-    assert 'class="v8-shell"' in spa and 'data-vue-zone="demo-spa"' in spa
-
-
 @pytest.mark.spec("V8-ARQ-022")
-@pytest.mark.parametrize("layout", ["admin", "bare", "spa"])
+@pytest.mark.parametrize("layout", ["landing", "app_topbar", "app_sidebar", "minimal"])
 def test_layout_renderiza_so_com_os_context_processors(layout, comum):
     fonte = (
         f'{{% extends "v8/layouts/{layout}.html" %}}'
@@ -538,7 +483,7 @@ def test_servidor_confere_o_acesso_de_cada_rota_escondida_no_menu(comum, superus
         for filho in item.filhos
         if filho.permissao == s_global.SUPERUSUARIO
     ]
-    assert urls_do_menu == ["/v8/demo/clientes/", "/v8/demo/spa/"]
+    assert urls_do_menu == ["/v8/demo/clientes/", "/v8/demo/spa/", *URLS_DEMO_LAYOUTS]
 
     for url in urls_do_menu + URLS_DEMO_PAGINAS + [URL_DEMO_FRAGMENTO]:
         anonimo = cliente_http().get(url)

@@ -1,12 +1,9 @@
-{% for item in itens %}
-  <li>
-    {% if item.filhos %}
-      <details class="v8-menu-grupo"{% if item.aberto %} open{% endif %}>
-        <summary class="v8-menu-link">{% if item.icone %}<svg class="v8-icone" aria-hidden="true"><use href="#v8-i-{{ item.icone }}"></use></svg>{% endif %}<span class="v8-menu-rotulo">{{ item.rotulo }}</span></summary>
-        <ul>{% include "v8/shell/menu.html" with itens=item.filhos %}</ul>
-      </details>
-    {% else %}
-      <a class="v8-menu-link" href="{{ item.url }}"{% if item.ativo %} aria-current="page"{% endif %}>{% if item.icone %}<svg class="v8-icone" aria-hidden="true"><use href="#v8-i-{{ item.icone }}"></use></svg>{% endif %}<span class="v8-menu-rotulo">{{ item.rotulo }}</span></a>
-    {% endif %}
-  </li>
-{% endfor %}
+{% load cache v8_tags %}
+<nav id="v8-menu-principal" class="v8-menu" aria-label="Menu principal">
+  {% v8_menu_versao as v8_versao %}{% v8_menu_chave as v8_chave %}
+  {# A chave tem tudo de que o menu depende: versão, permissões e item ativo. Nada próprio de um usuário nem do layout entra neste trecho. #}
+  {% cache 600 v8_menu v8_versao v8_chave v8.menu_ativo %}
+    {% v8_menu as v8_itens %}
+    <ul>{% include "v8/shell/menu_itens.html" with itens=v8_itens %}</ul>
+  {% endcache %}
+</nav>

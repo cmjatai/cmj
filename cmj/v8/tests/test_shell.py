@@ -13,10 +13,12 @@ from django.core.cache.utils import make_template_fragment_key
 from cmj.v8.services import s_global, s_menu
 from cmj.v8.services.s_menu import ItemMenu
 from cmj.v8.tests.conftest import (
+    DIR_CSS_V8,
     cliente_http,
     criar_usuario,
     html_de,
     ler_json_script,
+    pagina_no_layout,
     trecho,
 )
 
@@ -24,7 +26,7 @@ pytestmark = pytest.mark.django_db
 
 
 def menu_de(html):
-    return trecho(html, '<nav id="v8-sidebar-menu"', "</nav>")
+    return trecho(html, '<nav id="v8-menu-principal"', "</nav>")
 
 
 def topbar_de(html):
@@ -180,7 +182,17 @@ def test_menu_inicial_tem_inicio_e_demonstracao_so_para_superusuario(
     menu = s_menu.menu_para(superusuario)
     assert ids(menu) == [
         ("inicio", []),
-        ("demo", [("demo-clientes", []), ("demo-spa", [])]),
+        (
+            "demo",
+            [
+                ("demo-clientes", []),
+                ("demo-spa", []),
+                ("demo-layout-landing", []),
+                ("demo-layout-app_topbar", []),
+                ("demo-layout-app_sidebar", []),
+                ("demo-layout-minimal", []),
+            ],
+        ),
     ]
     assert [(i["rotulo"], i["url"], i["icone"]) for i in menu] == [
         ("Início", "/v8/", "casa"),
@@ -189,6 +201,10 @@ def test_menu_inicial_tem_inicio_e_demonstracao_so_para_superusuario(
     assert [(f["rotulo"], f["url"]) for f in menu[1]["filhos"]] == [
         ("Clientes (página com ilhas)", "/v8/demo/clientes/"),
         ("Clientes (zona SPA)", "/v8/demo/spa/"),
+        ("Layout landing", "/v8/demo/layouts/landing/"),
+        ("Layout app_topbar", "/v8/demo/layouts/app_topbar/"),
+        ("Layout app_sidebar", "/v8/demo/layouts/app_sidebar/"),
+        ("Layout minimal", "/v8/demo/layouts/minimal/"),
     ]
 
 
@@ -288,9 +304,12 @@ def test_trecho_em_cache_nao_tem_dado_proprio_de_usuario(cache_real, superusuari
 def test_topbar_tem_marca_botoes_e_area_do_usuario(cache_real, superusuario):
     anonimo = topbar_de(html_de(cliente_http().get("/v8/?a=1&b=dois")))
     assert '<a class="v8-topbar-marca" href="/v8/">PortalCMJ</a>' in anonimo
+    # O botão da sidebar só existe no layout que tem sidebar.
+    assert 'data-v8-acao="sidebar"' not in anonimo
     assert (
         '<button type="button" class="v8-btn v8-btn-icone" data-v8-acao="sidebar" '
-        'aria-controls="v8-sidebar" aria-expanded="true" aria-label="Menu">' in anonimo
+        'aria-controls="v8-sidebar" aria-expanded="true" aria-label="Menu">'
+        in topbar_de(pagina_no_layout("app_sidebar"))
     )
     assert (
         '<button type="button" class="v8-btn v8-btn-icone" data-v8-acao="tema" '
@@ -307,7 +326,7 @@ def test_topbar_tem_marca_botoes_e_area_do_usuario(cache_real, superusuario):
     cliente = cliente_http(superusuario)
     cliente.cookies["v8_tema"] = "escuro"
     cliente.cookies["v8_sidebar"] = "recolhida"
-    autenticado = topbar_de(html_de(cliente.get("/v8/")))
+    autenticado = topbar_de(html_de(cliente.get("/v8/demo/clientes/")))
     assert "Sofia Super" in autenticado
     assert 'href="#v8-i-usuario"' in autenticado
     assert re.search(
@@ -347,10 +366,19 @@ def test_trilha_vem_da_view_e_o_ultimo_item_nao_e_link(superusuario):
             for li in re.findall(r"<li.*?</li>", html, re.S)
         ]
 
-    inicio = trilha("/v8/")
-    assert '<nav class="v8-trilha" aria-label="Trilha">' in inicio
-    assert "<ol data-v8-trilha>" in inicio
-    assert itens(inicio) == ['<li aria-current="page">Início</li>']
+    lista = trilha("/v8/demo/clientes/")
+    assert '<nav class="v8-trilha" aria-label="Trilha">' in lista
+    assert "<ol data-v8-trilha>" in lista
+    assert itens(lista) == [
+        '<li><a href="/v8/">Início</a></li>',
+        '<li aria-current="page">Clientes</li>',
+    ]
+    unico = trecho(
+        pagina_no_layout("app_topbar", contexto={"v8": {"trilha": [("Só", None)]}}),
+        '<nav class="v8-trilha"',
+        "</nav>",
+    )
+    assert itens(unico) == ['<li aria-current="page">Só</li>']
 
     assert itens(trilha("/v8/demo/clientes/2/")) == [
         '<li><a href="/v8/">Início</a></li>',
@@ -367,19 +395,24 @@ def test_trilha_vem_da_view_e_o_ultimo_item_nao_e_link(superusuario):
 
 
 @pytest.mark.spec("V8-SHELL-023")
-def test_shell_usa_marcos_semanticos_e_link_de_pular():
-    html = html_de(cliente_http().get("/v8/"))
+@pytest.mark.parametrize("layout", ["landing", "app_topbar", "app_sidebar"])
+def test_shell_usa_marcos_semanticos_e_link_de_pular(layout):
+    html = pagina_no_layout(layout, contexto={"v8": {"trilha": [("Início", None)]}})
     corpo = html[html.index("<body") :]
 
     assert '<header class="v8-topbar">' in corpo
     assert (
-        '<nav id="v8-sidebar-menu" class="v8-menu" aria-label="Menu principal">'
+        '<nav id="v8-menu-principal" class="v8-menu" aria-label="Menu principal">'
         in corpo
     )
-    assert '<nav class="v8-trilha" aria-label="Trilha">' in corpo
     assert corpo.count("<main") == 1
     assert '<main id="conteudo" class="v8-main" tabindex="-1">' in corpo
-    assert '<aside id="v8-sidebar" class="v8-sidebar">' in corpo
+    if layout == "landing":
+        assert "<footer" in corpo and "v8-trilha" not in corpo
+    else:
+        assert '<nav class="v8-trilha" aria-label="Trilha">' in corpo
+    if layout == "app_sidebar":
+        assert '<aside id="v8-sidebar" class="v8-sidebar">' in corpo
 
     # O link de pular é o primeiro elemento focável do corpo.
     pular = '<a class="v8-pular" href="#conteudo">Ir para o conteúdo</a>'
@@ -391,14 +424,14 @@ def test_shell_usa_marcos_semanticos_e_link_de_pular():
 
 
 @pytest.mark.spec("V8-SHELL-030")
-def test_estado_da_sidebar_vem_do_cookie():
-    cliente = cliente_http()
+def test_estado_da_sidebar_vem_do_cookie(superusuario):
+    cliente = cliente_http(superusuario)
     assert '<html lang="pt-br" data-sidebar="expandida">' in html_de(
-        cliente.get("/v8/")
+        cliente.get("/v8/demo/clientes/")
     )
 
     cliente.cookies["v8_sidebar"] = "recolhida"
-    html = html_de(cliente.get("/v8/"))
+    html = html_de(cliente.get("/v8/demo/clientes/"))
     assert '<html lang="pt-br" data-sidebar="recolhida">' in html
     assert (
         'data-v8-acao="sidebar" aria-controls="v8-sidebar" aria-expanded="false"'
@@ -407,24 +440,40 @@ def test_estado_da_sidebar_vem_do_cookie():
     assert ler_json_script(html, "v8-global")["sidebar"] == "recolhida"
 
     cliente.cookies["v8_sidebar"] = "expandida"
-    assert 'data-sidebar="expandida"' in html_de(cliente.get("/v8/"))
+    assert 'data-sidebar="expandida"' in html_de(cliente.get("/v8/demo/clientes/"))
+
+    # Só o layout com sidebar emite o atributo; o JSON global informa o estado sempre.
+    cliente.cookies["v8_sidebar"] = "recolhida"
+    for url in ("/v8/", "/v8/demo/layouts/app_topbar/", "/v8/nao-existe/"):
+        html = html_de(cliente.get(url))
+        assert "data-sidebar" not in html, url
+        assert ler_json_script(html, "v8-global")["sidebar"] == "recolhida"
 
 
 @pytest.mark.spec("V8-SHELL-033")
 def test_menu_funciona_sem_javascript(superusuario):
-    html = html_de(cliente_http(superusuario).get("/v8/"))
-    menu = menu_de(html)
-    # Links comuns, com href, e grupos em <details>, que abrem sem script.
-    for url in ["/v8/", "/v8/demo/clientes/", "/v8/demo/spa/"]:
-        assert f'<a class="v8-menu-link" href="{url}"' in menu
-    assert '<details class="v8-menu-grupo">' in menu
-    assert '<summary class="v8-menu-link">' in menu
-    assert "<button" not in menu
-    # Sem script a sidebar fica visível em qualquer largura.
-    assert (
-        "<noscript><style>.v8-sidebar{display:block!important}</style></noscript>"
-        in html
+    cliente = cliente_http(superusuario)
+    for pagina in (
+        "/v8/",
+        "/v8/demo/layouts/app_topbar/",
+        "/v8/demo/layouts/app_sidebar/",
+    ):
+        menu = menu_de(html_de(cliente.get(pagina)))
+        # Links comuns, com href, e grupos em <details>, que abrem sem script.
+        for url in ["/v8/", "/v8/demo/clientes/", "/v8/demo/spa/"]:
+            assert f'<a class="v8-menu-link" href="{url}"' in menu
+        assert '<details class="v8-menu-grupo"' in menu
+        assert '<summary class="v8-menu-link">' in menu
+        assert "<button" not in menu
+
+    # Sem script o menu fica visível em qualquer largura, na sidebar e no cabeçalho.
+    css = (DIR_CSS_V8 / "shell.css").read_text(encoding="utf-8")
+    sem_script = "".join(
+        re.findall(r"@media \(scripting: none\)[^{]*{(?:[^{}]*{[^}]*})*\s*}", css)
     )
+    assert re.search(r"\.v8-sidebar\s*{\s*display: block;", sem_script)
+    assert re.search(r"\.v8-topbar \.v8-menu\s*{\s*display: block;", sem_script)
+    assert re.search(r"\.v8-botao-menu\s*{\s*display: none;", sem_script)
 
 
 @pytest.mark.spec("V8-SHELL-040")
@@ -437,14 +486,18 @@ def test_tema_vem_do_cookie_e_sem_cookie_nao_ha_atributo():
 
     cliente.cookies["v8_tema"] = "escuro"
     html = html_de(cliente.get("/v8/"))
-    assert '<html lang="pt-br" data-theme="escuro" data-sidebar="expandida">' in html
+    assert '<html lang="pt-br" data-theme="escuro">' in html
     assert 'data-v8-acao="tema" aria-pressed="true"' in html
     assert ler_json_script(html, "v8-global")["tema"] == "escuro"
 
     cliente.cookies["v8_tema"] = "claro"
     html = html_de(cliente.get("/v8/"))
-    assert '<html lang="pt-br" data-theme="claro" data-sidebar="expandida">' in html
+    assert '<html lang="pt-br" data-theme="claro">' in html
     assert 'data-v8-acao="tema" aria-pressed="false"' in html
+    assert (
+        '<html lang="pt-br" data-theme="claro" data-sidebar="expandida">'
+        in pagina_no_layout("app_sidebar", cookies={"v8_tema": "claro"})
+    )
 
     # Vale também no layout sem shell.
     assert 'data-theme="claro"' in html_de(cliente.get("/v8/nao-existe/"))
@@ -487,13 +540,17 @@ def test_valor_invalido_de_cookie_nunca_chega_ao_html(valor):
     cliente = cliente_http()
     cliente.cookies["v8_tema"] = valor
     cliente.cookies["v8_sidebar"] = valor
-    for url in ("/v8/", "/v8/nao-existe/"):
-        html = html_de(cliente.get(url))
+    paginas = [html_de(cliente.get(url)) for url in ("/v8/", "/v8/nao-existe/")]
+    paginas.append(
+        pagina_no_layout("app_sidebar", cookies={"v8_tema": valor, "v8_sidebar": valor})
+    )
+    for html in paginas:
         assert "data-theme" not in html
-        assert 'data-sidebar="expandida"' in html
         assert "zzqx" not in html and "ESCURO" not in html
         dados = ler_json_script(html, "v8-global")
         assert dados["tema"] is None and dados["sidebar"] == "expandida"
+    # No layout com sidebar, o atributo sai com o valor padrão.
+    assert '<html lang="pt-br" data-sidebar="expandida">' in paginas[-1]
 
 
 @pytest.mark.spec("V8-SHELL-053")

@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 {% load static django_vite v8_tags %}{% v8_preferencias as v8_pref %}
-<html lang="pt-br"{% if v8_pref.tema %} data-theme="{{ v8_pref.tema }}"{% endif %} data-sidebar="{{ v8_pref.sidebar }}">
+<html lang="pt-br"{% if v8_pref.tema %} data-theme="{{ v8_pref.tema }}"{% endif %}{% block html_attrs %}{% endblock %}>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#114d81">
-  <title>{% block title %}PortalCMJ{% endblock %}</title>
+  <title>{% block title %}{% if v8.titulo %}{{ v8.titulo }} · {% endif %}PortalCMJ{% endblock %}</title>
+  {% block meta %}{% endblock %}
   {% if not DEBUG %}
     <link rel="icon" type="image/x-icon" href="{% static 'v8/favicon.ico' %}">
     <link rel="manifest" href="{% static 'v8/manifest.json' %}">
@@ -17,11 +18,11 @@
   {% block page_data %}{% endblock %}
   {% vite_hmr_client app='v8' %}
   {% vite_asset 'main.js' app='v8' %}
-  {% block vite_entries %}{% endblock %}
-  {% block extra_head %}{% endblock %}
+  {% block assets %}{% endblock %}
 </head>
 <body class="v8-body {% block body_class %}{% endblock %}">
-  {% block body %}{% block content %}{% endblock %}{% endblock %}
+  {% block layout %}{% endblock %}
   <div id="cmj-v8-app"></div>
+  {% block scripts %}{% endblock %}
 </body>
 </html>

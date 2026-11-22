@@ -1,5 +1,12 @@
-{% extends "v8/layouts/admin.html" %}
+{% extends "v8/layouts/landing.html" %}
+{% block hero %}
+  <section class="v8-hero">
+    <div class="v8-hero-miolo">
+      <h1 class="v8-pagina-titulo">PortalCMJ</h1>
+      <p>Esta é a base do frontend v8 do PortalCMJ: páginas renderizadas pelo Django, com componentes Vue onde a tela pede.</p>
+    </div>
+  </section>
+{% endblock %}
 {% block content %}
-  <h1 class="v8-pagina-titulo">Início</h1>
-  <p>Esta é a base do frontend v8 do PortalCMJ: páginas renderizadas pelo Django, com componentes Vue onde a tela pede.</p>
+  <p>A navegação desta área está no menu do cabeçalho.</p>
 {% endblock %}

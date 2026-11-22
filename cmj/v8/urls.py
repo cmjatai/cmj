@@ -57,6 +57,16 @@ urlpatterns_demo = [
     ),
 ]
 
+# Uma rota por layout: o nome vem do registro, nunca do caminho pedido.
+urlpatterns_demo_layouts = [
+    re_path(
+        rf"^v8/demo/layouts/{re.escape(nome)}/$",
+        views.DemoLayoutView.as_view(layout=nome),
+        name=f"demo_layout_{nome}",
+    )
+    for nome in s_global.LAYOUTS
+]
+
 # Uma rota por zona: o prefixo e qualquer subcaminho, com ou sem barra final.
 urlpatterns_zonas = [
     re_path(
@@ -70,6 +80,7 @@ urlpatterns_zonas = [
 urlpatterns = (
     urlpatterns_paginas
     + urlpatterns_demo
+    + urlpatterns_demo_layouts
     + urlpatterns_zonas
     + [
         re_path(

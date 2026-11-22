@@ -173,15 +173,15 @@ class InicioView(PaginaV8View):
         return responder_pagina(
             request,
             "v8/paginas/inicio.html",
-            dados_layout("Início", "inicio", [("Início", None)]),
+            dados_layout("Início", "inicio"),
         )
 
 
 class ZonaV8View(PaginaV8View):
-    """Entrega o shell de uma zona SPA para o prefixo e qualquer subcaminho.
+    """Entrega a página de uma zona SPA para o prefixo e qualquer subcaminho.
 
     O subcaminho é assunto do Vue Router: aqui ele não escolhe template nem é
-    renderizado.
+    renderizado. O layout é o que a zona declara em ``s_global.ZONAS``.
     """
 
     zona = None
@@ -193,13 +193,14 @@ class ZonaV8View(PaginaV8View):
         zona = s_global.ZONAS[self.zona]
         return responder_pagina(
             request,
-            "v8/layouts/spa.html",
+            "v8/paginas/zona.html",
             dados_layout(
                 zona.titulo,
                 zona.menu_ativo,
                 [("Início", s_global.URL_BASE), (zona.titulo, None)],
                 zona.nome,
             ),
+            {"v8_layout_zona": s_global.LAYOUTS[zona.layout]},
         )
 
 
@@ -279,6 +280,30 @@ class DemoClientesView(PaginaV8View):
                     "formulario": "demo-arquivar",
                 },
             },
+        )
+
+
+class DemoLayoutView(PaginaV8View):
+    """Página de demonstração de um layout.
+
+    O layout é fixado na rota, uma por layout, e nunca vem da requisição.
+    """
+
+    exige = s_global.SUPERUSUARIO
+    layout = None
+
+    def get(self, request):
+        layout = s_demo.layout_demo(self.layout)
+        titulo = f"Layout {layout['nome']}"
+        return responder_pagina(
+            request,
+            f"v8/demo/layouts/{layout['nome']}.html",
+            dados_layout(
+                titulo,
+                f"demo-layout-{layout['nome']}",
+                [("Início", s_global.URL_BASE), (titulo, None)],
+            ),
+            {"layout": layout, "layouts": s_demo.layouts_demo()},
         )
 
 

@@ -39,6 +39,50 @@ _PRODUTOS = (
 )
 _INICIO = date(2021, 1, 4)
 
+# Páginas de demonstração dos layouts (docs/specs/v8/templates.md). Só texto
+# fixo: o nome do layout, um resumo e o que cada block recebe.
+LAYOUTS_DEMO = (
+    {
+        "nome": "landing",
+        "resumo": "Capa: menu na horizontal, hero de largura total e rodapé.",
+        "regioes": (
+            ("header_nav", "Menu principal, na horizontal"),
+            ("hero", "Vazio no layout. Esta página o preenche"),
+            ("content", "Conteúdo centralizado, com largura máxima"),
+            ("footer", "Marca e uma linha de texto"),
+            ("footer_nav, footer_info", "Vazios no layout. Esta página os preenche"),
+        ),
+    },
+    {
+        "nome": "app_topbar",
+        "resumo": "Navegação superior: menu na horizontal e conteúdo centralizado.",
+        "regioes": (
+            ("header_start", "Botão que abre o menu em tela estreita"),
+            ("header_nav", "Menu principal, na horizontal"),
+            ("breadcrumbs", "Trilha informada pela view"),
+            ("content", "Conteúdo centralizado, com largura máxima"),
+        ),
+    },
+    {
+        "nome": "app_sidebar",
+        "resumo": "Operacional: barra lateral à esquerda e área de trabalho fluida.",
+        "regioes": (
+            ("header_start", "Botão que recolhe a barra lateral"),
+            ("aside", "Barra lateral com o menu principal"),
+            ("breadcrumbs", "Trilha informada pela view"),
+            ("content", "Área de trabalho, com toda a largura que sobra"),
+        ),
+    },
+    {
+        "nome": "minimal",
+        "resumo": "Foco: sem cabeçalho, menu, barra lateral nem rodapé.",
+        "regioes": (
+            ("messages", "Mensagens do Django, para quem está sem JavaScript"),
+            ("content", "Conteúdo centralizado na tela"),
+        ),
+    },
+)
+
 
 def _sem_acento(texto):
     normal = unicodedata.normalize("NFKD", str(texto))
@@ -258,3 +302,19 @@ def historico(pk):
             }
         )
     return eventos
+
+
+def layouts_demo():
+    """As páginas de demonstração dos layouts, cada uma com a própria URL."""
+    return [
+        {**copy.deepcopy(layout), "url": f"/v8/demo/layouts/{layout['nome']}/"}
+        for layout in LAYOUTS_DEMO
+    ]
+
+
+def layout_demo(nome):
+    """Dados da página de demonstração de um layout, ou ``None``."""
+    for layout in layouts_demo():
+        if layout["nome"] == nome:
+            return layout
+    return None

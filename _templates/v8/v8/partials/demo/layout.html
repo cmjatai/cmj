@@ -1,0 +1,13 @@
+<p class="v8-aviso-demo">Página de demonstração: mostra o layout e os blocks que ele oferece.</p>
+<p>{{ layout.resumo }}</p>
+<dl class="v8-lista-dados">
+  {% for bloco, uso in layout.regioes %}
+    <dt>{{ bloco }}</dt>
+    <dd>{{ uso }}</dd>
+  {% endfor %}
+</dl>
+<nav class="v8-barra-acoes" aria-label="Layouts">
+  {% for outro in layouts %}
+    <a class="v8-btn{% if outro.nome == layout.nome %} v8-btn-primario{% endif %}" href="{{ outro.url }}"{% if outro.nome == layout.nome %} aria-current="page"{% endif %}>{{ outro.nome }}</a>
+  {% endfor %}
+</nav>

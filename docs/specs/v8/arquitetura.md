@@ -1,7 +1,7 @@
 # V8: arquitetura híbrida
 
 Status: implementado
-Última verificação: 2026-11-21 (branch `v8-arquitetura-hibrida`, sobre o commit `32325c9a2`)
+Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `6b527f42a`)
 Código principal: `cmj/v8/`, `_templates/v8/`, `_frontend/v8/src/core/`, `_frontend/v8/src/stores/`
 Testes: `cmj/v8/tests/test_arquitetura.py`, `_frontend/v8/tests/core/`, `_frontend/v8/tests/stores/`
 
@@ -42,7 +42,7 @@ Router.
 ### Contenção
 
 - V8-ARQ-001 [implementado] Toda rota de `cmj/v8/urls.py` casa apenas com caminhos iniciados por
-  `/v8/`. Evidência: `cmj/v8/urls.py:70`.
+  `/v8/`. Evidência: `cmj/v8/urls.py:80`.
 - V8-ARQ-002 [implementado] As rotas que já existiam continuam resolvendo para as mesmas views:
   `/v6/<slug>`, `/app/<slug>`, `/v8/service-worker.js`, `/v8/manifest.json`, `/admin/` e o catch-all
   de `cmj.sigad` para caminhos fora de `/v8/`. Evidência: `cmj/urls.py:76`.
@@ -50,7 +50,7 @@ Router.
   `v8/...`. Na raiz de `_templates/v8/` só existe `base_v8.html`. Nenhum caminho relativo de
   `_templates/v8` existe em outro diretório de templates do projeto. Motivo: `_templates/v8` vem
   antes de `_templates/v2018` na busca (`cmj/settings/frontend.py:18-32`), e um `base.html` ou
-  `404.html` na raiz encobriria os do portal. Evidência: `cmj/v8/tests/test_arquitetura.py:97`.
+  `404.html` na raiz encobriria os do portal. Evidência: `cmj/v8/tests/test_arquitetura.py:84`.
 - V8-ARQ-004 [implementado] Todo cookie criado pelo v8 tem nome iniciado por `v8_` e `Path=/v8/`.
   Evidência: `_frontend/v8/src/core/cookies.js:1`.
 - V8-ARQ-005 [implementado] Fora de `/v8/`, o frontend só chama o que já existe e sem alterá-lo:
@@ -61,29 +61,26 @@ Router.
 
 ### Rotas Django
 
-- V8-ARQ-010 [implementado] `/v8/` responde 200 com a página inicial no layout `admin`. Evidência:
+- V8-ARQ-010 [implementado] `/v8/` responde 200 com a página inicial no layout `landing`. Evidência:
   `cmj/v8/views.py:171`.
-- V8-ARQ-011 [implementado] Cada zona SPA é declarada uma única vez, em `s_global.py`, com nome e
-  prefixo. A rota da zona responde 200 com o layout `spa` para o prefixo e para qualquer subcaminho
-  dele, com ou sem barra final. Evidência: `_frontend/v8/src/core/router.js:35`.
+- V8-ARQ-011 [implementado] Cada zona SPA é declarada uma única vez, em `s_global.py`, com nome,
+  prefixo e layout. A rota da zona responde 200 com a página da zona, no layout que ela declara,
+  para o prefixo e para qualquer subcaminho dele, com ou sem barra final. Evidência:
+  `cmj/v8/services/s_global.py:73`, `_frontend/v8/src/core/router.js:35`.
 - V8-ARQ-012 [implementado] Caminho `/v8/...` que não é página, zona nem fragmento responde 404, no
-  layout `bare`. Evidência: `cmj/v8/views.py:206`.
+  layout `minimal`. Evidência: `cmj/v8/views.py:207`.
 - V8-ARQ-013 [implementado] Páginas e fragmentos renderizados pelo Django têm URL terminada em `/`.
   Evidência: `cmj/v8/urls.py:19`.
 - V8-ARQ-014 [implementado] As views do v8 só autenticam, validam a entrada, chamam o serviço e
   respondem. Decisões e dados vêm de `cmj/v8/services/`, que recebe o usuário por parâmetro e nunca
-  o `request`. Evidência: `cmj/v8/services/s_global.py:177`, `cmj/v8/views.py:60`.
+  o `request`. Evidência: `cmj/v8/services/s_global.py:196`, `cmj/v8/views.py:60`.
 
 ### Templates
 
-- V8-ARQ-020 [implementado] `base_v8.html` oferece os blocos `title`, `extra_head`, `page_data`,
-  `vite_entries`, `body`, `body_class` e `content`. Em toda página ele carrega o entry `main.js` do
-  app `v8`, os dados globais, as mensagens e o elemento vazio `#cmj-v8-app`. Evidência:
-  `_templates/v8/base_v8.html:8`.
-- V8-ARQ-021 [implementado] Três layouts estendem `base_v8.html`: `v8/layouts/admin.html` (shell e
-  conteúdo), `v8/layouts/bare.html` (sem shell, para login e erro) e `v8/layouts/spa.html` (shell e
-  o elemento `[data-vue-zone]`). Evidência: `_templates/v8/v8/layouts/admin.html:1`,
-  `_templates/v8/v8/layouts/bare.html:1`, `_templates/v8/v8/layouts/spa.html:1`.
+As camadas de templates, os blocks de cada nível e os layouts estão em `templates.md`.
+
+- V8-ARQ-020 [retirada] Substituída por V8-TPL-011 e V8-TPL-012.
+- V8-ARQ-021 [retirada] Substituída por V8-TPL-002.
 - V8-ARQ-022 [implementado] Um template que estende um layout do v8 renderiza sem erro tendo no
   contexto apenas o que os context processors fornecem. O que faltar, as tags do v8 calculam.
   Evidência: `cmj/v8/templatetags/v8_tags.py:40`.
@@ -93,18 +90,18 @@ Router.
   `versao`, `sessao`, `login`, `logout`, `base`, `frag`), `zonas` (nome para prefixo), `zona` (a da
   página ou `null`), `flags`, `tema` e `sidebar`. O conteúdo vem de `s_global.dados_globais`. Como o
   login do portal é o e-mail, `username` é só a parte antes do `@`, e `nome` usa esse valor quando o
-  usuário não tem nome completo. Evidência: `cmj/v8/services/s_global.py:177`,
+  usuário não tem nome completo. Evidência: `cmj/v8/services/s_global.py:196`,
   `cmj/v8/templatetags/v8_tags.py:63`.
 - V8-ARQ-024 [implementado] `{% v8_mensagens %}` emite `<script id="v8-messages"
   type="application/json">` com a lista das mensagens do `django.contrib.messages`, cada uma com
   `nivel` e `texto`. Sem mensagens, a lista é vazia. Evidência: `cmj/v8/templatetags/v8_tags.py:74`.
 - V8-ARQ-025 [implementado] Dados de uma página vão no bloco `page_data`, sempre por `json_script`.
-  Evidência: `_templates/v8/base_v8.html:17`.
+  Evidência: `_templates/v8/base_v8.html:18`.
 - V8-ARQ-026 [implementado] O conteúdo do bloco `content` é HTML do servidor e é legível e navegável
   com o JavaScript desligado. Evidência: `_templates/v8/v8/demo/clientes.html:43`.
 - V8-ARQ-027 [implementado] As páginas renderizam o mesmo HTML com `DummyCache` e com cache real.
   Todo `{% cache %}` tem na chave tudo de que o trecho depende. Evidência:
-  `_templates/v8/v8/shell/sidebar.html:7`.
+  `_templates/v8/v8/shell/menu.html:5`.
 
 ### App Vue único
 
@@ -167,10 +164,10 @@ Router.
 
 - V8-ARQ-060 [implementado] `#v8-global` contém só as chaves de V8-ARQ-023. Não contém e-mail, CPF,
   telefone, token, id de sessão nem dados de outro usuário. Para anônimo, `usuario` é `null` e
-  `permissoes` é vazia. Item da varredura: 2. Evidência: `cmj/v8/services/s_global.py:155`.
+  `permissoes` é vazia. Item da varredura: 2. Evidência: `cmj/v8/services/s_global.py:174`.
 - V8-ARQ-061 [implementado] `#v8-global` e `#v8-messages` nunca ficam dentro de `{% cache %}`. Toda
   resposta HTML de página do v8 sai com `Cache-Control: private`. Item da varredura: 5. Evidência:
-  `cmj/v8/views.py:49`, `_templates/v8/base_v8.html:15`.
+  `cmj/v8/views.py:49`, `_templates/v8/base_v8.html:16`.
 - V8-ARQ-062 [implementado] Dado do servidor só chega ao JavaScript por `json_script`. Não há
   `<script>` com valor interpolado nem `|safe` sobre dado de usuário. Um valor com `</script>`,
   aspas e `&` chega ao store idêntico ao original. Item da varredura: 4. Evidência:

@@ -3,8 +3,8 @@ import { gravarCookieV8 } from '~@/core/cookies'
 // Comportamentos do shell que o Django renderiza (docs/specs/v8/shell.md).
 //
 // O HTML já chega pronto: `<html data-theme>` e `<html data-sidebar>` vêm dos cookies, e os botões
-// trazem `data-v8-acao`. Aqui só há um ouvinte de clique no documento, que troca os atributos e
-// grava os cookies, sem recarregar a página.
+// trazem `data-v8-acao`. Aqui há um ouvinte de clique e um de teclado no documento: eles trocam os
+// atributos, gravam os cookies e fecham os grupos do menu do cabeçalho, sem recarregar a página.
 
 export const TEMAS = ['claro', 'escuro']
 export const ESTADOS_SIDEBAR = ['expandida', 'recolhida']
@@ -14,6 +14,8 @@ const COOKIE_SIDEBAR = 'v8_sidebar'
 const SELETOR_ACAO = '[data-v8-acao]'
 const SELETOR_TEMA = '[data-v8-acao="tema"]'
 const SELETOR_SIDEBAR = '[data-v8-acao="sidebar"]'
+const SELETOR_MENU_DO_CABECALHO = '.v8-topbar .v8-menu'
+const SELETOR_GRUPO_ABERTO = '.v8-topbar .v8-menu details[open]'
 const CONSULTA_ESCURO = '(prefers-color-scheme: dark)'
 const CONSULTA_TELA_LARGA = '(min-width: 64rem)'
 const TOKEN_BARRA_NAVEGADOR = '--cor-barra-navegador'
@@ -89,9 +91,31 @@ function alternarSidebar(botao, abrirMenuEstreito) {
   }
 }
 
-// Instala o único ouvinte de clique do shell e devolve a função que o remove.
+// Fecha os grupos abertos do menu do cabeçalho, menos o que contém `exceto` (V8-SHELL-035).
+function fecharGruposDoCabecalho(exceto = null) {
+  document.querySelectorAll(SELETOR_GRUPO_ABERTO).forEach(grupo => {
+    if (!exceto || !grupo.contains(exceto)) {
+      grupo.removeAttribute('open')
+    }
+  })
+}
+
+// O servidor abre o grupo do item ativo, que é o certo para a sidebar. No cabeçalho, em tela
+// larga, ele começa fechado. O atributo avisa o CSS de que o menu já foi assumido (V8-SHELL-035).
+function prepararMenuDoCabecalho() {
+  const telaLarga = window.matchMedia(CONSULTA_TELA_LARGA).matches
+  document.querySelectorAll(SELETOR_MENU_DO_CABECALHO).forEach(menu => {
+    if (telaLarga) {
+      menu.querySelectorAll('details[open]').forEach(grupo => grupo.removeAttribute('open'))
+    }
+    menu.setAttribute('data-v8-pronto', '')
+  })
+}
+
+// Instala os ouvintes do shell, um de clique e um de teclado, e devolve a função que os remove.
 export function iniciarShell({ abrirMenuEstreito } = {}) {
   function aoClicar(event) {
+    fecharGruposDoCabecalho(event.target)
     const botao = event.target?.closest?.(SELETOR_ACAO)
     if (!botao) {
       return
@@ -103,15 +127,39 @@ export function iniciarShell({ abrirMenuEstreito } = {}) {
     } else if (acao === 'sidebar') {
       event.preventDefault()
       alternarSidebar(botao, abrirMenuEstreito)
+    } else if (acao === 'menu') {
+      // Layouts com o menu no cabeçalho: o botão só existe em tela estreita (V8-SHELL-034).
+      event.preventDefault()
+      if (typeof abrirMenuEstreito === 'function') {
+        abrirMenuEstreito(botao)
+      }
     }
   }
 
+  function aoTeclar(event) {
+    if (event.key !== 'Escape') {
+      return
+    }
+    const abertos = [...document.querySelectorAll(SELETOR_GRUPO_ABERTO)]
+    if (!abertos.length) {
+      return
+    }
+    const comFoco = abertos.find(grupo => grupo.contains(document.activeElement))
+    fecharGruposDoCabecalho()
+    comFoco?.querySelector('summary')?.focus()
+  }
+
   document.addEventListener('click', aoClicar)
+  document.addEventListener('keydown', aoTeclar)
+  prepararMenuDoCabecalho()
 
   // O servidor só conhece o cookie: sem ele, quem sabe o tema em vigor é o navegador.
   marcar(SELETOR_TEMA, 'aria-pressed', temaEmVigor() === 'escuro')
 
-  return () => document.removeEventListener('click', aoClicar)
+  return () => {
+    document.removeEventListener('click', aoClicar)
+    document.removeEventListener('keydown', aoTeclar)
+  }
 }
 
 export default { iniciarShell, temaEmVigor, aplicarTema, sidebarEmVigor, aplicarSidebar }

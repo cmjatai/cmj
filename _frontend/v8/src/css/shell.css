@@ -1,4 +1,8 @@
-/* Moldura renderizada pelo Django: topbar, sidebar, trilha e áreas de conteúdo (shell.md). */
+/*
+ * Moldura renderizada pelo Django: cabeçalho, menu, trilha, áreas de conteúdo e rodapé.
+ * As regiões são os blocks de v8/layouts/_shell.html (templates.md), e o comportamento está em
+ * shell.md. Os layouts se distinguem pelo atributo data-v8-layout.
+ */
 
 @layer base {
   body.v8-body {
@@ -217,6 +221,104 @@
     }
   }
 
+  /* Botão do menu dos layouts com menu no cabeçalho: só aparece em tela estreita (V8-SHELL-034). */
+  @media (width >= 64rem) {
+    .v8-botao-menu {
+      display: none;
+    }
+  }
+
+  /* Menu no cabeçalho (app_topbar e landing): a mesma marcação da sidebar, na horizontal. */
+  .v8-topbar .v8-menu {
+    flex: 1;
+    min-width: 0;
+    margin-inline-start: 0.75rem;
+    padding: 0;
+  }
+
+  .v8-topbar .v8-menu > ul {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .v8-topbar .v8-menu > ul > li {
+    position: relative;
+  }
+
+  .v8-body .v8-topbar .v8-menu > ul > li > .v8-menu-link,
+  .v8-body .v8-topbar .v8-menu > ul > li > .v8-menu-grupo > summary {
+    color: inherit;
+    white-space: nowrap;
+  }
+
+  .v8-topbar .v8-menu > ul > li > .v8-menu-link:hover,
+  .v8-topbar .v8-menu > ul > li > .v8-menu-grupo > summary:hover {
+    background: color-mix(in srgb, var(--cor-sobre-topo) 14%, transparent);
+  }
+
+  .v8-body .v8-topbar .v8-menu > ul > li > .v8-menu-link[aria-current="page"] {
+    background: color-mix(in srgb, var(--cor-sobre-topo) 18%, transparent);
+  }
+
+  /* Os filhos de um grupo abrem num painel suspenso, abaixo do cabeçalho. */
+  .v8-topbar .v8-menu > ul > li > .v8-menu-grupo > ul {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    min-width: 15rem;
+    padding: 0.375rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    box-shadow: 0 4px 16px var(--cor-sombra);
+  }
+
+  /*
+   * O grupo do item ativo chega aberto do servidor, para a sidebar. No cabeçalho o painel só
+   * aparece depois que o shell.js assume o menu e fecha esse grupo (V8-SHELL-035).
+   */
+  @media (scripting: enabled) {
+    .v8-topbar .v8-menu:not([data-v8-pronto]) .v8-menu-grupo[open] > ul {
+      display: none;
+    }
+  }
+
+  /* Tela estreita: o menu sai do cabeçalho e o botão o abre como drawer (V8-SHELL-034). */
+  @media (width < 64rem) {
+    .v8-topbar .v8-menu {
+      display: none;
+    }
+  }
+
+  /* Sem JavaScript não há drawer: o menu fica visível em qualquer largura (V8-SHELL-033). */
+  @media (scripting: none) {
+    .v8-sidebar {
+      display: block;
+    }
+
+    .v8-botao-menu {
+      display: none;
+    }
+  }
+
+  @media (scripting: none) and (width < 64rem) {
+    .v8-topbar {
+      flex-wrap: wrap;
+      height: auto;
+    }
+
+    .v8-topbar .v8-menu {
+      display: block;
+      flex-basis: 100%;
+      margin-inline-start: 0;
+    }
+
+    .v8-topbar .v8-menu > ul {
+      flex-wrap: wrap;
+    }
+  }
+
   .v8-doca {
     flex-shrink: 0;
   }
@@ -267,9 +369,58 @@
     font-weight: 600;
   }
 
+  /* Conteúdo centralizado dos layouts sem barra lateral (V8-TPL-031 e 032). */
+  [data-v8-layout="app_topbar"] .v8-conteudo,
+  [data-v8-layout="app_topbar"] .v8-trilha,
+  [data-v8-layout="landing"] .v8-conteudo,
+  .v8-hero-miolo,
+  .v8-rodape-miolo {
+    width: 100%;
+    max-width: var(--largura-conteudo);
+    margin-inline: auto;
+  }
+
+  /* Hero da capa: largura inteira da página, antes do conteúdo (V8-TPL-032). */
+  .v8-hero {
+    padding: 3rem 1.25rem;
+    border-bottom: 1px solid var(--cor-borda);
+    background: var(--cor-superficie);
+  }
+
+  .v8-hero .v8-pagina-titulo {
+    font-size: 2rem;
+  }
+
+  .v8-rodape {
+    border-top: 1px solid var(--cor-borda);
+    background: var(--cor-superficie);
+    color: var(--cor-texto-suave);
+    font-size: 0.875rem;
+  }
+
+  .v8-rodape-miolo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 3rem;
+    padding: 1.5rem 1.25rem;
+  }
+
+  .v8-rodape-marca strong {
+    color: var(--cor-texto);
+  }
+
+  .v8-rodape ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Layout minimal: uma coluna no centro da tela (V8-TPL-033). */
   .v8-nua {
     display: grid;
     place-items: center;
+    align-content: center;
+    gap: 0.75rem;
     min-height: 100dvh;
     padding: 1.5rem;
     text-align: center;

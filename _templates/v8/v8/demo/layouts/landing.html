@@ -1,0 +1,26 @@
+{% extends "v8/layouts/landing.html" %}
+{% block hero %}
+  <section class="v8-hero">
+    <div class="v8-hero-miolo">
+      <h1 class="v8-pagina-titulo">Layout {{ layout.nome }}</h1>
+      <p>Block <code>hero</code>: ocupa a largura inteira da página, antes do conteúdo.</p>
+    </div>
+  </section>
+{% endblock %}
+{% block content %}
+  {% include "v8/partials/demo/layout.html" %}
+{% endblock %}
+{% block footer_nav %}
+  <nav class="v8-rodape-bloco" aria-label="Rodapé">
+    <p>Block <code>footer_nav</code></p>
+    <ul>
+      <li><a href="{% url 'cmj.v8:inicio' %}">Início</a></li>
+    </ul>
+  </nav>
+{% endblock %}
+{% block footer_info %}
+  <div class="v8-rodape-bloco">
+    <p>Block <code>footer_info</code></p>
+    <p>Texto de exemplo, sem dado institucional.</p>
+  </div>
+{% endblock %}

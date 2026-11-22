@@ -209,11 +209,11 @@ Vale para modals e para drawers em modo `overlay`.
   `_frontend/v8/src/overlays/urlSync.js:22`.
 - V8-OVL-101 [implementado] Cada view de fragmento confere autenticação e permissão por conta
   própria, e filtra pelo usuário os registros que devolve. Abrir o fragmento pela URL direta dá o
-  mesmo resultado que abri-lo pelo drawer. Item da varredura: 1. Evidência: `cmj/v8/views.py:324`.
+  mesmo resultado que abri-lo pelo drawer. Item da varredura: 1. Evidência: `cmj/v8/views.py:349`.
 - V8-OVL-102 [implementado] Fragmento que depende do usuário não usa cache compartilhado de
   resposta. Havendo `{% cache %}`, a chave inclui o usuário ou as permissões de que o conteúdo
   depende. Item da varredura: 5. Evidência: `cmj/v8/views.py:128`,
-  `_templates/v8/v8/shell/sidebar.html:7`.
+  `_templates/v8/v8/shell/menu.html:5`.
 - V8-OVL-103 [implementado] O HTML do fragmento é inserido sem executar `<script>`, e o template do
   fragmento mantém o autoescape. Item da varredura: 4. Evidência:
   `_frontend/v8/src/overlays/FragmentContent.vue:30`.
@@ -223,7 +223,7 @@ Vale para modals e para drawers em modo `overlay`.
   `_frontend/v8/src/overlays/useToast.js:11`.
 - V8-OVL-105 [implementado] `data-confirm` não é proteção: ação que altera estado é `POST` com CSRF
   e o servidor a valida de novo. Nenhuma ação que altera estado é `GET`. Item da varredura: 1.
-  Evidência: `cmj/v8/views.py:285`.
+  Evidência: `cmj/v8/views.py:310`.
 - V8-OVL-106 [implementado] A resposta de fragmento leva `X-Robots-Tag: noindex`. Item da varredura:
   5. Evidência: `cmj/v8/views.py:141`.
 

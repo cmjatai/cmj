@@ -35,18 +35,37 @@ TEMAS = ("claro", "escuro")
 SIDEBARS = ("expandida", "recolhida")
 SIDEBAR_PADRAO = "expandida"
 
+# Layouts concretos dos templates (docs/specs/v8/templates.md): nome e arquivo.
+# É a única lista de onde sai o layout de uma zona.
+LAYOUTS = {
+    "landing": "v8/layouts/landing.html",
+    "app_topbar": "v8/layouts/app_topbar.html",
+    "app_sidebar": "v8/layouts/app_sidebar.html",
+    "minimal": "v8/layouts/minimal.html",
+}
+LAYOUT_PADRAO = "app_sidebar"
+
 _TAMANHO_AVATAR = (128, 128)
 
 
 @dataclass(frozen=True)
 class Zona:
-    """Zona SPA: trecho de ``/v8/`` cujo miolo é do Vue Router."""
+    """Zona SPA: trecho de ``/v8/`` cujo miolo é do Vue Router.
+
+    ``layout`` é um dos nomes de ``LAYOUTS``. Outro valor é erro na carga do
+    projeto, porque as zonas são declaradas no módulo.
+    """
 
     nome: str
     prefixo: str
     titulo: str
     menu_ativo: str | None = None
     exige: object = None
+    layout: str = LAYOUT_PADRAO
+
+    def __post_init__(self):
+        if self.layout not in LAYOUTS:
+            raise ValueError(f"Layout desconhecido na zona {self.nome}: {self.layout}")
 
 
 # Cada zona é declarada uma única vez, aqui. As rotas Django e o JSON global

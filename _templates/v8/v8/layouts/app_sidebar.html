@@ -1,0 +1,16 @@
+{% extends "v8/layouts/_shell.html" %}
+{% load v8_tags %}
+{# Layout operacional: barra lateral à esquerda e área de trabalho fluida. #}
+{% block html_attrs %}{% v8_preferencias as v8_pref %} data-sidebar="{{ v8_pref.sidebar }}"{% endblock %}
+{% block layout_name %}app_sidebar{% endblock %}
+{% block header_start %}
+  {% v8_preferencias as v8_pref %}
+  <button type="button" class="v8-btn v8-btn-icone" data-v8-acao="sidebar" aria-controls="v8-sidebar" aria-expanded="{% if v8_pref.sidebar == 'expandida' %}true{% else %}false{% endif %}" aria-label="Menu">
+    <svg class="v8-icone" aria-hidden="true"><use href="#v8-i-menu"></use></svg>
+  </button>
+{% endblock %}
+{% block aside %}
+  <aside id="v8-sidebar" class="v8-sidebar">
+    {% block menu %}{% include "v8/shell/menu.html" %}{% endblock %}
+  </aside>
+{% endblock %}
