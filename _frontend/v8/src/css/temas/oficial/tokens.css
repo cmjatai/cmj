@@ -1,6 +1,6 @@
 /*
- * Tokens do v8 (V8-ARQ-051). É o único arquivo com cor literal e com o valor das camadas.
- * Os dois modos definem as mesmas variáveis (V8-SHELL-042).
+ * Tokens do tema oficial (V8-TEMA-011). Só o tokens.css de um tema tem cor literal, e só o do
+ * oficial tem camadas e movimento. Os três blocos de cor definem as mesmas variáveis (V8-TEMA-013).
  */
 
 :root {
@@ -48,7 +48,21 @@
   --largura-md: 28rem;
   --largura-lg: 42rem;
   --deslocamento-drawer: 1.5rem;
+
+  /* Forma (V8-TEMA-017). */
+  --raio-sm: 0.25rem;
   --raio: 0.5rem;
+  --raio-lg: 0.75rem;
+  --raio-pilula: 999px;
+  --sombra-1: 0 1px 3px var(--cor-sombra);
+  --sombra-2: 0 4px 16px var(--cor-sombra);
+  --sombra-3: 0 8px 32px var(--cor-sombra);
+  --sombra-lateral: 0 0 16px var(--cor-sombra);
+
+  /* Tipografia (V8-TEMA-017): pilhas de fontes do sistema, sem fonte web. */
+  --fonte-base: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fonte-titulo: var(--fonte-base);
+  --fonte-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 :root[data-modo="escuro"] {
@@ -110,7 +124,10 @@
   }
 }
 
-/* A paleta padrão do Tailwind sai: só existem as cores semânticas abaixo. */
+/*
+ * O único @theme do v8 (V8-TEMA-016). A paleta padrão do Tailwind sai: só existem as cores
+ * semânticas abaixo. Por serem var(), as utilities seguem o tema e o modo em vigor.
+ */
 @theme inline {
   --color-*: initial;
   --color-fundo: var(--cor-fundo);
@@ -128,4 +145,13 @@
   --color-aviso: var(--cor-aviso);
   --color-info: var(--cor-info);
   --color-realce: var(--cor-realce);
+
+  --font-sans: var(--fonte-base);
+  --font-titulo: var(--fonte-titulo);
+  --font-mono: var(--fonte-mono);
+
+  --radius-*: initial;
+  --radius-sm: var(--raio-sm);
+  --radius-md: var(--raio);
+  --radius-lg: var(--raio-lg);
 }

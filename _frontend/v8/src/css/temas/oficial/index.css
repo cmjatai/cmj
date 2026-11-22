@@ -1,0 +1,8 @@
+/*
+ * Tema oficial (docs/specs/v8/temas.md): o CSS padrão do v8, a customização do que vem do
+ * Tailwind e do Reka UI. Vale em todos os temas; os outros só alteram o que quiserem.
+ */
+@import "./tokens.css";
+@import "./shell.css";
+@import "./componentes.css";
+@import "./overlays.css";

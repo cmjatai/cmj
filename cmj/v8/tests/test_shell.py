@@ -13,7 +13,7 @@ from django.core.cache.utils import make_template_fragment_key
 from cmj.v8.services import s_global, s_menu
 from cmj.v8.services.s_menu import ItemMenu
 from cmj.v8.tests.conftest import (
-    DIR_CSS_V8,
+    DIR_CSS_OFICIAL,
     cliente_http,
     criar_usuario,
     html_de,
@@ -467,7 +467,7 @@ def test_menu_funciona_sem_javascript(superusuario):
         assert "<button" not in menu
 
     # Sem script o menu fica visível em qualquer largura, na sidebar e no cabeçalho.
-    css = (DIR_CSS_V8 / "shell.css").read_text(encoding="utf-8")
+    css = (DIR_CSS_OFICIAL / "shell.css").read_text(encoding="utf-8")
     sem_script = "".join(
         re.findall(r"@media \(scripting: none\)[^{]*{(?:[^{}]*{[^}]*})*\s*}", css)
     )

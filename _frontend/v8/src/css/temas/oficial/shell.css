@@ -9,7 +9,7 @@
     margin: 0;
     background: var(--cor-fundo);
     color: var(--cor-texto);
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--fonte-base);
     line-height: 1.5;
   }
 
@@ -33,7 +33,7 @@
     border-radius: var(--raio);
     background: var(--cor-superficie);
     color: var(--cor-texto);
-    box-shadow: 0 2px 8px var(--cor-sombra);
+    box-shadow: var(--sombra-2);
   }
 
   .v8-pular:focus {
@@ -57,7 +57,7 @@
     padding: 0 0.75rem;
     background: var(--cor-topo);
     color: var(--cor-sobre-topo);
-    box-shadow: 0 1px 3px var(--cor-sombra);
+    box-shadow: var(--sombra-1);
   }
 
   .v8-topbar .v8-btn,
@@ -271,7 +271,7 @@
     border: 1px solid var(--cor-borda);
     border-radius: var(--raio);
     background: var(--cor-superficie);
-    box-shadow: 0 4px 16px var(--cor-sombra);
+    box-shadow: var(--sombra-2);
   }
 
   /*

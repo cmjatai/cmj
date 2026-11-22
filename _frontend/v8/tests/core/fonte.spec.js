@@ -30,7 +30,9 @@ const fontes = [
 ]
 const relativo = caminho => path.relative(path.resolve(RAIZ, '../..'), caminho)
 const ler = caminho => fs.readFileSync(caminho, 'utf8')
-const ehTokens = caminho => caminho.endsWith(path.join('css', 'tokens.css'))
+// O tokens.css de cada tema, em src/css/temas/<nome>/ (V8-TEMA-011).
+const ehTokens = caminho => /[\\/]css[\\/]temas[\\/][a-z][a-z0-9-]*[\\/]tokens\.css$/.test(caminho)
+const TOKENS_OFICIAL = 'src/css/temas/oficial/tokens.css'
 
 function ocorrencias(expressao, filtro = () => true) {
   const achadas = []
@@ -51,7 +53,7 @@ describe('fontes do v8', () => {
   })
 
   it('V8-OVL-001: os tokens de camada existem e estão em ordem crescente', () => {
-    const tokens = ler(path.join(RAIZ, 'src/css/tokens.css'))
+    const tokens = ler(path.join(RAIZ, TOKENS_OFICIAL))
     const valor = nome => Number(new RegExp(`--z-${nome}:\\s*(\\d+)`).exec(tokens)[1])
     const ordem = ['base', 'sticky', 'drawer', 'modal', 'toast', 'popover'].map(valor)
     expect(ordem).toEqual([...ordem].sort((a, b) => a - b))
@@ -66,7 +68,7 @@ describe('fontes do v8', () => {
     expect([...semToken, ...classes, ...emJs]).toEqual([])
   })
 
-  it('V8-SHELL-042: não há cor literal fora de tokens.css', () => {
+  it('V8-TEMA-012: não há cor literal fora do tokens.css de um tema', () => {
     const hex = /#(?:[0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})\b/
     const funcoes = /\b(?:rgba?|hsla?|oklch|oklab)\(/
     const achadas = [
@@ -80,19 +82,8 @@ describe('fontes do v8', () => {
     expect(achadas).toEqual([])
   })
 
-  it('V8-SHELL-042: os dois modos definem as mesmas cores', () => {
-    const tokens = ler(path.join(RAIZ, 'src/css/tokens.css'))
-    const cores = bloco => [...bloco.matchAll(/(--cor-[a-z0-9-]+)\s*:/g)].map(m => m[1]).sort()
-    const claro = /:root\s*\{([\s\S]*?)\n\}/.exec(tokens)[1]
-    const escuro = /:root\[data-modo="escuro"\]\s*\{([\s\S]*?)\n\}/.exec(tokens)[1]
-    const sistema = /:root:not\(\[data-modo\]\)\s*\{([\s\S]*?)\n {2}\}/.exec(tokens)[1]
-    expect(cores(claro).length).toBeGreaterThan(10)
-    expect(cores(escuro)).toEqual(cores(claro))
-    expect(cores(sistema)).toEqual(cores(claro))
-  })
-
   it('V8-OVL-026: a duração das animações é um token, zerado com prefers-reduced-motion', () => {
-    const tokens = ler(path.join(RAIZ, 'src/css/tokens.css'))
+    const tokens = ler(path.join(RAIZ, TOKENS_OFICIAL))
     expect(/prefers-reduced-motion:\s*reduce\)\s*\{\s*:root\s*\{\s*--duracao:\s*0ms/.test(tokens)).toBe(true)
     const literais = ocorrencias(/(?:transition|animation)[a-z-]*\s*:[^;]*\b\d+(?:\.\d+)?m?s\b/, f => f.endsWith('.css') && !ehTokens(f))
     expect(literais).toEqual([])
@@ -113,8 +104,8 @@ describe('fontes do v8', () => {
     expect(path.resolve(RAIZ, 'src/css', origem)).toBe(TEMPLATES)
   })
 
-  it('V8-ARQ-051: os tokens ficam em um único arquivo', () => {
-    const definicoes = ocorrencias(/^\s*--(?:cor|z|duracao|curva|largura|altura|raio|deslocamento)-?[a-z0-9-]*\s*:/, f => f.endsWith('.css') && !ehTokens(f))
+  it('V8-TEMA-011: os tokens só são definidos no tokens.css de um tema', () => {
+    const definicoes = ocorrencias(/^\s*--(?:cor|z|duracao|curva|largura|altura|raio|deslocamento|fonte|sombra)-?[a-z0-9-]*\s*:/, f => /\.(css|vue)$/.test(f) && !ehTokens(f))
     expect(definicoes).toEqual([])
   })
 

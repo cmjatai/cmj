@@ -1,8 +1,11 @@
-/* Folha de estilos única do v8. O Tailwind lê as classes de src/ e dos templates Django do v8. */
+/*
+ * Folha de estilos única do v8. O Tailwind lê as classes de src/ e dos templates Django do v8.
+ * A ordem das camadas põe as regras dos temas acima dos
+ * componentes do oficial e abaixo das utilities (V8-TEMA-015).
+ */
+@layer theme, base, components, temas, utilities;
 @import "tailwindcss";
 @source "../../../../_templates/v8";
 
-@import "./tokens.css";
-@import "./shell.css";
-@import "./componentes.css";
-@import "./overlays.css";
+/* Um import por tema do registro (s_global.TEMAS), na mesma ordem, o oficial primeiro (V8-TEMA-003). */
+@import "./temas/oficial/index.css";

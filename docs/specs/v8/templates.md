@@ -4,7 +4,7 @@ Status: implementado
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `6b527f42a`)
 Código principal: `_templates/v8/base_v8.html`, `_templates/v8/v8/layouts/`, `_templates/v8/v8/shell/`,
 `_templates/v8/v8/paginas/zona.html`, `cmj/v8/views.py`, `cmj/v8/urls.py`,
-`cmj/v8/services/s_global.py`, `_frontend/v8/src/css/shell.css`
+`cmj/v8/services/s_global.py`, `_frontend/v8/src/css/temas/oficial/shell.css`
 Testes: `cmj/v8/tests/test_templates.py`
 
 Os templates do v8 formam três níveis de herança. A base só tem a infraestrutura da página. Os
@@ -28,8 +28,9 @@ base_v8.html                     nível 1: infraestrutura
   `cmj/v8/services/s_global.py`.
 - Templates: `_templates/v8/base_v8.html`, `_templates/v8/v8/layouts/`, `_templates/v8/v8/shell/` e
   o `extends` das páginas existentes.
-- CSS e JavaScript do shell: `_frontend/v8/src/css/shell.css`, `_frontend/v8/src/css/tokens.css`,
-  `_frontend/v8/src/core/shell.js` e `_frontend/v8/src/core/boot.js`.
+- CSS e JavaScript do shell: `_frontend/v8/src/css/temas/oficial/shell.css`,
+  `_frontend/v8/src/css/temas/oficial/tokens.css`, `_frontend/v8/src/core/shell.js` e
+  `_frontend/v8/src/core/boot.js`.
 - Pontos de entrada: as páginas que já existiam (`/v8/`, a demonstração, a zona `demo-spa`, o 403 e
   o 404) e as páginas de demonstração dos layouts, em `/v8/demo/layouts/<nome>/`, cujo conteúdo
   está em `demo.md`.
@@ -126,14 +127,14 @@ Regras de outras specs que mudaram com esta (D9):
   `header_nav` com o menu na horizontal e `header_start` com o botão que abre o menu em tela
   estreita, e deixa `aside` vazio. O conteúdo fica centralizado, com largura máxima dada por um
   token de `tokens.css`. Não emite `data-sidebar`. Evidência:
-  `_templates/v8/v8/layouts/app_topbar.html:10`, `_frontend/v8/src/css/shell.css:373`,
-  `_frontend/v8/src/css/tokens.css:46`.
+  `_templates/v8/v8/layouts/app_topbar.html:10`, `_frontend/v8/src/css/temas/oficial/shell.css:373`,
+  `_frontend/v8/src/css/temas/oficial/tokens.css:46`.
 - V8-TPL-032 [implementado] `landing.html` é o layout de capa: preenche `header_nav` e
   `header_start` como o `app_topbar`, e `footer` com a marca e uma linha de texto neutro, mais os
   sub-blocks `footer_nav` e `footer_info`, que nascem vazios. O `hero` ocupa a largura inteira da
   página, antes do conteúdo, e nasce vazio, para a página preencher. Não tem `aside` nem trilha, e
   não traz dado institucional. Evidência: `_templates/v8/v8/layouts/landing.html:10`,
-  `_templates/v8/v8/layouts/landing.html:14`, `_frontend/v8/src/css/shell.css:384`.
+  `_templates/v8/v8/layouts/landing.html:14`, `_frontend/v8/src/css/temas/oficial/shell.css:384`.
 - V8-TPL-033 [implementado] `minimal.html` não tem cabeçalho, navegação, `aside`, rodapé nem docas:
   só o `<main id="conteudo">`, com os blocks `messages` e `content`. Evidência:
   `_templates/v8/v8/layouts/minimal.html:4`.

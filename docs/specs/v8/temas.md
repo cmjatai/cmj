@@ -1,10 +1,11 @@
 # V8: temas e modos
 
-Status: desejado
+Status: em implementação: as regras `[implementado]` têm teste; as `[desejado]` são das próximas
+etapas
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `485a3a988`)
 Código principal: `cmj/v8/services/s_global.py`, `_frontend/v8/src/css/`, a criar: as pastas de
 tema em css/temas
-Testes: a criar
+Testes: `_frontend/v8/tests/css/temas.spec.js`, `_frontend/v8/tests/core/fonte.spec.js`
 
 Tema é o design do v8: cores, fontes, arredondamentos, sombras e, se preciso, regras CSS próprias.
 Modo é claro ou escuro. Todo tema tem os dois modos, e os dois são escolhas independentes.
@@ -57,16 +58,18 @@ Regras de outras specs que mudam com esta (D2):
 
 ### CSS
 
-- V8-TEMA-010 [desejado] `css/temas/oficial/` reúne o CSS padrão do v8: tokens, elementos HTML,
-  shell, componentes, overlays e componentes base. Só o oficial declara `@theme` e classes de
-  componente. Evidência: a criar.
-- V8-TEMA-011 [desejado] Tokens (`--cor-*`, `--z-*`, `--duracao`, `--curva`, `--largura-*`,
+- V8-TEMA-010 [implementado] `css/temas/oficial/` reúne o CSS padrão do v8: tokens, elementos
+  HTML, shell, componentes, overlays e componentes base. Só o oficial declara `@theme` e classes de
+  componente. Evidência: `_frontend/v8/src/css/temas/oficial/index.css:5`, `_frontend/v8/src/css/temas/oficial/tokens.css:131`.
+- V8-TEMA-011 [implementado] Tokens (`--cor-*`, `--z-*`, `--duracao`, `--curva`, `--largura-*`,
   `--altura-*`, `--raio*`, `--deslocamento-*`, `--fonte-*`, `--sombra-*`) só são definidos no
   `tokens.css` de um tema. Camadas e movimento (`--z-*`, `--duracao`, `--curva`) só no oficial.
-  Evidência: a criar.
-- V8-TEMA-012 [desejado] Cor literal só existe no `tokens.css` de um tema. Evidência: a criar.
-- V8-TEMA-013 [desejado] No oficial, toda `--cor-*` tem valor no modo claro, no escuro e no bloco
-  que vale sem modo escolhido, que segue `prefers-color-scheme` sem JavaScript. Evidência: a criar.
+  Evidência: `_frontend/v8/src/css/temas/oficial/tokens.css:2`.
+- V8-TEMA-012 [implementado] Cor literal só existe no `tokens.css` de um tema. Evidência:
+  `_frontend/v8/src/css/temas/oficial/tokens.css:2`.
+- V8-TEMA-013 [implementado] No oficial, toda `--cor-*` tem valor no modo claro, no escuro e no
+  bloco que vale sem modo escolhido, que segue `prefers-color-scheme` sem JavaScript. Evidência:
+  `_frontend/v8/src/css/temas/oficial/tokens.css:6`, `_frontend/v8/src/css/temas/oficial/tokens.css:68`, `_frontend/v8/src/css/temas/oficial/tokens.css:95`.
 - V8-TEMA-014 [desejado] Um tema só redefine tokens que existem no oficial, sempre sob
   `:root[data-tema="<nome>"]`. Cor redefinida aparece nos três blocos do tema (claro, escuro e sem
   modo escolhido), para que a cor de um modo não vaze para o outro. Evidência: a criar.
@@ -74,11 +77,12 @@ Regras de outras specs que mudam com esta (D2):
   `temas`, que fica acima de `components` e abaixo de `utilities`. Todo seletor dele começa por
   `:root[data-tema="<nome>"]`. Tema não declara `@theme`, `@import`, `@font-face` nem `@layer` com
   outro nome. Evidência: a criar.
-- V8-TEMA-016 [desejado] O `@theme inline` do oficial é o único e expõe ao Tailwind as cores
+- V8-TEMA-016 [implementado] O `@theme inline` do oficial é o único e expõe ao Tailwind as cores
   semânticas, as fontes e os raios, por `var()`. Com isso as utilities seguem o tema e o modo em
-  vigor. A paleta padrão do Tailwind continua fora. Evidência: a criar.
-- V8-TEMA-017 [desejado] `font-family` e `box-shadow` fora do `tokens.css` usam token, e
-  `border-radius` usa token, `0` ou `50%`. Evidência: a criar.
+  vigor. A paleta padrão do Tailwind continua fora. Evidência: `_frontend/v8/src/css/temas/oficial/tokens.css:131`.
+- V8-TEMA-017 [implementado] `font-family` e `box-shadow` fora do `tokens.css` usam token, e
+  `border-radius` usa token, `0` ou `50%`. Evidência: `_frontend/v8/src/css/temas/oficial/tokens.css:52`, `_frontend/v8/src/css/temas/oficial/tokens.css:62`,
+  `_frontend/v8/src/css/temas/oficial/shell.css:12`.
 
 ### Aplicação
 

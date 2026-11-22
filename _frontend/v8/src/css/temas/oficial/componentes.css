@@ -194,7 +194,7 @@
     display: inline-block;
     padding: 0.0625rem 0.5rem;
     border: 1px solid var(--cor-borda);
-    border-radius: 999px;
+    border-radius: var(--raio-pilula);
     font-size: 0.78rem;
     font-weight: 600;
   }

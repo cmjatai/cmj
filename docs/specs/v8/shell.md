@@ -4,7 +4,7 @@ Status: implementado
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `6b527f42a`)
 Código principal: `cmj/v8/services/s_menu.py`, `cmj/v8/templatetags/v8_tags.py`,
 `_templates/v8/v8/layouts/_shell.html`, `_templates/v8/v8/shell/`, `_frontend/v8/src/core/shell.js`,
-`_frontend/v8/src/css/shell.css`
+`_frontend/v8/src/css/temas/oficial/shell.css`
 Testes: `cmj/v8/tests/test_shell.py`, `_frontend/v8/tests/core/shell.spec.js`,
 `_frontend/v8/tests/core/router.spec.js`, `_frontend/v8/tests/core/fonte.spec.js`,
 `cmj/v8/tests/test_arquitetura.py`
@@ -71,7 +71,7 @@ grupos do menu do cabeçalho.
   ou `recolhida`. Nas páginas do layout `app_sidebar`, o Django lê o cookie e renderiza
   `<html data-sidebar="...">`, de modo que a página já chega no estado certo. Sem cookie, vale
   `expandida`. Os outros layouts não emitem o atributo. Evidência:
-  `_templates/v8/v8/layouts/app_sidebar.html:4`, `_frontend/v8/src/css/shell.css:186`.
+  `_templates/v8/v8/layouts/app_sidebar.html:4`, `_frontend/v8/src/css/temas/oficial/shell.css:186`.
 - V8-SHELL-031 [implementado] O botão da sidebar alterna o estado, grava o cookie e atualiza o
   atributo sem recarregar a página. Evidência: `_frontend/v8/src/core/shell.js:69`.
 - V8-SHELL-032 [implementado] Em tela estreita a sidebar não ocupa a lateral. O mesmo botão a abre
@@ -79,32 +79,31 @@ grupos do menu do cabeçalho.
   `_frontend/v8/src/core/boot.js:20`, `_frontend/v8/src/core/shell.js:88`.
 - V8-SHELL-033 [implementado] Com o JavaScript desligado, o menu continua visível e seus links
   funcionam, em qualquer largura, na sidebar e no cabeçalho. Quem garante é o CSS, com
-  `@media (scripting: none)`. Evidência: `_frontend/v8/src/css/shell.css:295`.
+  `@media (scripting: none)`. Evidência: `_frontend/v8/src/css/temas/oficial/shell.css:295`.
 
 ### Menu no cabeçalho
 
 - V8-SHELL-034 [implementado] Em `app_topbar` e `landing` o menu fica no cabeçalho, na horizontal,
   com os filhos de cada grupo num painel suspenso. Em tela estreita ele sai do cabeçalho, e o botão
   `data-v8-acao="menu"`, que só aparece nessa largura, o abre como drawer, sem gravar cookie.
-  Evidência: `_frontend/v8/src/core/shell.js:130`, `_frontend/v8/src/css/shell.css:226`.
+  Evidência: `_frontend/v8/src/core/shell.js:130`, `_frontend/v8/src/css/temas/oficial/shell.css:226`.
 - V8-SHELL-035 [implementado] No menu do cabeçalho, em tela larga, o grupo do item ativo começa
   fechado, embora o servidor o entregue aberto, para a sidebar. Um grupo aberto fecha ao clicar fora
   dele, ao abrir outro grupo ou com ESC, que devolve o foco ao rótulo do grupo. Os grupos da sidebar
   não são afetados. Evidência: `_frontend/v8/src/core/shell.js:95`,
-  `_frontend/v8/src/core/shell.js:105`, `_frontend/v8/src/css/shell.css:281`.
+  `_frontend/v8/src/core/shell.js:105`, `_frontend/v8/src/css/temas/oficial/shell.css:281`.
 
 ### Modo claro e escuro
 
 - V8-SHELL-040 [implementado] O modo fica no cookie `v8_modo`, com valor `claro` ou `escuro`. O
   Django renderiza `<html data-modo="...">` a partir dele. Sem cookie, o atributo não é emitido e o
   CSS segue `prefers-color-scheme`, sem JavaScript. Evidência: `_frontend/v8/src/core/shell.js:29`,
-  `_frontend/v8/src/css/tokens.css:79`.
+  `_frontend/v8/src/css/temas/oficial/tokens.css:93`.
 - V8-SHELL-041 [implementado] O botão de modo alterna entre claro e escuro a partir do modo em
   vigor, grava o cookie, atualiza o atributo e o `<meta name="theme-color">`, sem recarregar. O
   botão informa o estado por `aria-pressed`. Evidência: `_frontend/v8/src/core/shell.js:52`.
-- V8-SHELL-042 [implementado] Toda cor de template e de componente vem de token semântico com valor
-  nos dois modos. Não há cor literal fora de `src/css/tokens.css`. Evidência:
-  `_frontend/v8/src/css/tokens.css:3`.
+- V8-SHELL-042 [retirada] Toda cor vinha de token com valor nos dois modos, e cor literal só existia
+  em `src/css/tokens.css`. Substituída por V8-TEMA-012 e V8-TEMA-013.
 
 ## Requisitos de segurança
 

@@ -19,6 +19,7 @@ DIR_TEMPLATES_V8 = next(
     Path(d) for d in settings.TEMPLATES[0]["DIRS"] if Path(d).name == "v8"
 )
 DIR_CSS_V8 = Path(settings.PROJECT_DIR_FRONTEND_V8) / "src" / "css"
+DIR_CSS_OFICIAL = DIR_CSS_V8 / "temas" / "oficial"
 
 CACHE_REAL = {
     "default": {

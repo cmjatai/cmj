@@ -19,7 +19,7 @@ import cmj.v8.urls
 from cmj.v8 import views
 from cmj.v8.services import s_global, s_menu
 from cmj.v8.tests.conftest import (
-    DIR_CSS_V8,
+    DIR_CSS_OFICIAL,
     DIR_TEMPLATES_V8,
     URLS_DEMO_LAYOUTS,
     cliente_http,
@@ -439,7 +439,7 @@ def test_elemento_raiz_do_layout_informa_o_nome():
     assert minimal.count("data-v8-layout=") == 1
 
     # CSS e JavaScript não usam outra marca de layout.
-    css = (DIR_CSS_V8 / "shell.css").read_text(encoding="utf-8")
+    css = (DIR_CSS_OFICIAL / "shell.css").read_text(encoding="utf-8")
     assert set(re.findall(r'data-v8-layout="(\w+)"', css)) <= set(LAYOUTS)
     assert "v8-layout-" not in css
 
@@ -480,8 +480,8 @@ def test_app_topbar_tem_menu_no_cabecalho_e_conteudo_centralizado():
         assert ausente not in html, ausente
 
     # A largura máxima do conteúdo é um token.
-    tokens = (DIR_CSS_V8 / "tokens.css").read_text(encoding="utf-8")
-    css = (DIR_CSS_V8 / "shell.css").read_text(encoding="utf-8")
+    tokens = (DIR_CSS_OFICIAL / "tokens.css").read_text(encoding="utf-8")
+    css = (DIR_CSS_OFICIAL / "shell.css").read_text(encoding="utf-8")
     assert re.search(r"--largura-conteudo:\s*[\d.]+rem;", tokens)
     regra = re.search(r'\[data-v8-layout="app_topbar"\] \.v8-conteudo[^{]*{[^}]*}', css)
     assert "max-width: var(--largura-conteudo);" in regra.group(0)

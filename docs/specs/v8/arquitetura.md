@@ -145,11 +145,10 @@ As camadas de templates, os blocks de cada nível e os layouts estão em `templa
 ### CSS
 
 - V8-ARQ-050 [implementado] O CSS é gerado pelo Tailwind v4 (`@tailwindcss/vite`), que lê as classes
-  de `_frontend/v8/src` e de `_templates/v8`. Evidência: `_frontend/v8/src/css/app.css:3`,
+  de `_frontend/v8/src` e de `_templates/v8`. Evidência: `_frontend/v8/src/css/app.css:8`,
   `_frontend/v8/vite.config.js:37`.
-- V8-ARQ-051 [implementado] Cores, espaçamentos de layout, durações de animação e camadas de z-index
-  são tokens declarados em um único arquivo, `src/css/tokens.css`. Evidência:
-  `_frontend/v8/src/css/tokens.css:2`.
+- V8-ARQ-051 [retirada] Cores, espaçamentos de layout, durações de animação e camadas de z-index
+  eram tokens declarados em um único arquivo, `src/css/tokens.css`. Substituída por V8-TEMA-011.
 - V8-ARQ-052 [implementado] Os primitivos de overlay, popover e tooltip vêm do Reka UI. Evidência:
   `_frontend/v8/src/overlays/OverlayFrame.vue:137`.
 

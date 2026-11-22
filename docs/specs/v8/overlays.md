@@ -24,9 +24,9 @@ ligação com a URL ficam no `OverlayStore`.
 
 - V8-OVL-001 [implementado] As camadas são tokens CSS, nesta ordem crescente: `--z-base`,
   `--z-sticky`, `--z-drawer`, `--z-modal`, `--z-toast` e `--z-popover` (popover e tooltip).
-  Evidência: `_frontend/v8/src/css/tokens.css:30`.
+  Evidência: `_frontend/v8/src/css/temas/oficial/tokens.css:30`.
 - V8-OVL-002 [implementado] Nenhum `z-index` em `_frontend/v8/src` ou `_templates/v8` tem valor
-  literal: todos usam um token. Evidência: `_frontend/v8/src/css/overlays.css:1`.
+  literal: todos usam um token. Evidência: `_frontend/v8/src/css/temas/oficial/overlays.css:1`.
 - V8-OVL-003 [implementado] Um overlay aberto por cima de outro nunca fica atrás dele, mesmo sendo
   de camada menor, como um drawer aberto a partir de um modal. Evidência:
   `_frontend/v8/src/overlays/OverlayFrame.vue:227`, `_frontend/v8/src/overlays/OverlayStore.js:50`.
@@ -65,7 +65,8 @@ Vale para modals e para drawers em modo `overlay`.
   nativo do navegador. Evidência: `_frontend/v8/src/overlays/OverlayHost.vue:83`.
 - V8-OVL-026 [implementado] Entrada e saída usam `<Transition>`. Com `prefers-reduced-motion:
   reduce`, não há animação. O drawer guardado na rota entra animado e sai sem animação. Evidência:
-  `_frontend/v8/src/css/overlays.css:167`, `_frontend/v8/src/css/tokens.css:38`.
+  `_frontend/v8/src/css/temas/oficial/overlays.css:167`,
+  `_frontend/v8/src/css/temas/oficial/tokens.css:38`.
 
 ### Drawer
 
@@ -79,14 +80,14 @@ Vale para modals e para drawers em modo `overlay`.
 - V8-OVL-032 [implementado] `push` e `docked` não são modais: não prendem o foco, não bloqueiam a
   página, não entram na pilha e usam `role="complementary"`. Em `push` o conteúdo da página se
   desloca; em `docked` o drawer faz parte do layout. Evidência:
-  `_frontend/v8/src/css/overlays.css:128`, `_frontend/v8/src/overlays/OverlayFrame.vue:133`.
+  `_frontend/v8/src/css/temas/oficial/overlays.css:128`, `_frontend/v8/src/overlays/OverlayFrame.vue:133`.
 - V8-OVL-033 [implementado] Um drawer pode declarar um modo para tela larga e outro para tela
   estreita, como `docked` e `overlay`. Ao cruzar a largura de corte ele troca de modo sem perder o
   conteúdo nem o estado. Evidência: `_frontend/v8/src/overlays/Drawer.vue:42`,
   `_frontend/v8/src/overlays/Encaixe.vue:9`.
 - V8-OVL-034 [implementado] Drawers empilhados do mesmo lado aparecem deslocados, de modo que a
   borda de cada um abaixo do topo continue visível. Evidência:
-  `_frontend/v8/src/css/overlays.css:91`, `_frontend/v8/src/overlays/OverlayStore.js:54`.
+  `_frontend/v8/src/css/temas/oficial/overlays.css:91`, `_frontend/v8/src/overlays/OverlayStore.js:54`.
 
 ### Conteúdo do drawer e do modal
 
