@@ -8,10 +8,13 @@ v2018. Marcadores, IDs, ligação com testes e varredura de segurança seguem
 | --- | --- | --- |
 | [arquitetura.md](./arquitetura.md) | `V8-ARQ` | App `cmj/v8`, rotas, templates base e layouts, dados globais, app Vue único, ilhas e zonas SPA |
 | [templates.md](./templates.md) | `V8-TPL` | Herança em três níveis: base, layouts (`landing`, `app_topbar`, `app_sidebar`, `minimal`) e páginas; blocks de cada nível |
-| [shell.md](./shell.md) | `V8-SHELL` | Topbar, sidebar, breadcrumbs, menu por permissão, cache, tema claro e escuro |
+| [shell.md](./shell.md) | `V8-SHELL` | Topbar, sidebar, breadcrumbs, menu por permissão, cache, modo claro e escuro |
 | [overlays.md](./overlays.md) | `V8-OVL` | Camadas, pilha, drawers, modals, toasts, gatilhos em HTML, fragmentos do servidor |
 | [http.md](./http.md) | `V8-HTTP` | Cliente HTTP, CSRF, sessão expirada, formato de erro |
 | [demo.md](./demo.md) | `V8-DEMO` | Páginas de demonstração dos dois modos |
+| [temas.md](./temas.md) | `V8-TEMA` | Temas nomeados (design) e modos claro e escuro, registro, CSS de cada tema, escolha por cookie |
+| [ds.md](./ds.md) | `V8-DS` | Design system: vitrine dos elementos, classes, overlays, ícones e tokens, e prévia de cada tema |
+| [componentes.md](./componentes.md) | `V8-CMP` | Componentes base sobre o Reka UI: abas, sanfona, dica, popover, menu suspenso, seleção, caixa de marcação, opções e chave |
 
 ## Os dois modos de tela
 
