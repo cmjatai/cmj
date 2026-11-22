@@ -57,6 +57,15 @@ URLS_DEMO_API = [
     "/v8/demo/api/negado/",
 ]
 URL_DEMO_FRAGMENTO = "/v8/_frag/demo/cliente/1/historico/"
+# Páginas do design system: a vitrine, a lista de temas e a prévia de cada tema.
+URLS_DS = [
+    "/v8/ds/",
+    "/v8/ds/temas/",
+    "/v8/ds/temas/oficial/",
+    "/v8/ds/temas/tema1/",
+    "/v8/ds/temas/tema2/",
+    "/v8/ds/temas/tema3/",
+]
 
 
 def criar_usuario(nome, superusuario=False, **campos):

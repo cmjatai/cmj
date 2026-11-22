@@ -67,6 +67,31 @@ urlpatterns_demo_layouts = [
     for nome in s_global.LAYOUTS
 ]
 
+# Design system. Prévia e escolha: uma rota por tema do registro, e o nome do
+# tema vem dele, nunca do caminho pedido.
+urlpatterns_ds = (
+    [
+        re_path(r"^v8/ds/$", views.DsVitrineView.as_view(), name="ds"),
+        re_path(r"^v8/ds/temas/$", views.DsTemasView.as_view(), name="ds_temas"),
+    ]
+    + [
+        re_path(
+            rf"^v8/ds/temas/{re.escape(nome)}/$",
+            views.DsVitrineView.as_view(tema=nome),
+            name=f"ds_tema_{nome}",
+        )
+        for nome in s_global.TEMAS
+    ]
+    + [
+        re_path(
+            rf"^v8/ds/temas/{re.escape(nome)}/usar/$",
+            views.DsTemaUsarView.as_view(tema=nome),
+            name=f"ds_tema_usar_{nome}",
+        )
+        for nome in s_global.TEMAS
+    ]
+)
+
 # Uma rota por zona: o prefixo e qualquer subcaminho, com ou sem barra final.
 urlpatterns_zonas = [
     re_path(
@@ -81,6 +106,7 @@ urlpatterns = (
     urlpatterns_paginas
     + urlpatterns_demo
     + urlpatterns_demo_layouts
+    + urlpatterns_ds
     + urlpatterns_zonas
     + [
         re_path(

@@ -1,0 +1,21 @@
+{% extends "v8/layouts/app_sidebar.html" %}
+{% block content %}
+  {% if previa %}
+    <div class="v8-alerta v8-alerta-info flex flex-wrap items-center gap-3" data-ds-previa="{{ previa.nome }}">
+      <span>Prévia do tema <strong>{{ previa.rotulo }}</strong> (<code>{{ previa.nome }}</code>)</span>
+      {% if previa.em_vigor %}<span class="v8-etiqueta v8-etiqueta-ok">Em uso</span>{% endif %}
+      <form method="post" action="{{ previa.url_usar }}">{% csrf_token %}<button type="submit" class="v8-btn v8-btn-primario">Usar este tema</button></form>
+      <a href="{% url 'cmj.v8:ds_temas' %}">Todos os temas</a>
+    </div>
+  {% endif %}
+  <h1 class="v8-pagina-titulo">{% if previa %}{{ previa.rotulo }}{% else %}Design system{% endif %}</h1>
+  <nav class="v8-barra-acoes mb-8" aria-label="Seções da vitrine">
+    {% for secao in secoes %}<a class="v8-btn v8-btn-fantasma" href="#{{ secao.ancora }}">{{ secao.rotulo }}</a>{% endfor %}
+  </nav>
+  {% for secao in secoes %}
+    <section id="{{ secao.ancora }}" class="mb-12 scroll-mt-20" aria-labelledby="{{ secao.ancora }}-titulo">
+      <h2 id="{{ secao.ancora }}-titulo" class="mb-4 border-b border-borda pb-2 font-titulo text-xl font-semibold">{{ secao.rotulo }}</h2>
+      {% include secao.parcial %}
+    </section>
+  {% endfor %}
+{% endblock %}

@@ -17,7 +17,7 @@ from django.urls import resolve
 
 import cmj.v8.urls
 from cmj.v8 import views
-from cmj.v8.services import s_demo, s_global, s_menu, s_respostas
+from cmj.v8.services import s_demo, s_ds, s_global, s_menu, s_respostas
 from cmj.v8.tests.conftest import (
     CABECALHOS_CLIENTE,
     DIR_TEMPLATES_V8,
@@ -25,6 +25,7 @@ from cmj.v8.tests.conftest import (
     URLS_DEMO_API,
     URLS_DEMO_LAYOUTS,
     URLS_DEMO_PAGINAS,
+    URLS_DS,
     cliente_http,
     criar_usuario,
     html_de,
@@ -189,7 +190,7 @@ def test_paginas_e_fragmentos_tem_url_terminada_em_barra(superusuario):
 
 @pytest.mark.spec("V8-ARQ-014")
 def test_servicos_nao_recebem_a_requisicao():
-    for modulo in (s_global, s_menu, s_demo, s_respostas):
+    for modulo in (s_global, s_menu, s_demo, s_ds, s_respostas):
         assert "request" not in inspect.getsource(modulo), modulo.__name__
         for nome, funcao in inspect.getmembers(modulo, inspect.isfunction):
             if funcao.__module__ != modulo.__name__:
@@ -492,9 +493,14 @@ def test_servidor_confere_o_acesso_de_cada_rota_escondida_no_menu(comum, superus
         for filho in item.filhos
         if filho.permissao == s_global.SUPERUSUARIO
     ]
-    assert urls_do_menu == ["/v8/demo/clientes/", "/v8/demo/spa/", *URLS_DEMO_LAYOUTS]
+    assert urls_do_menu == [
+        "/v8/demo/clientes/",
+        "/v8/demo/spa/",
+        *URLS_DEMO_LAYOUTS,
+        *URLS_DS[:2],
+    ]
 
-    for url in urls_do_menu + URLS_DEMO_PAGINAS + [URL_DEMO_FRAGMENTO]:
+    for url in urls_do_menu + URLS_DEMO_PAGINAS + URLS_DS + [URL_DEMO_FRAGMENTO]:
         anonimo = cliente_http().get(url)
         assert anonimo.status_code == 302, url
         assert anonimo["Location"].startswith("/login/?next=/v8/"), url

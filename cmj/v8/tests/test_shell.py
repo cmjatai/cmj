@@ -174,6 +174,7 @@ def test_html_do_menu_marca_o_ativo_e_abre_o_grupo(superusuario):
 
 
 @pytest.mark.spec("V8-SHELL-004")
+@pytest.mark.spec("V8-DS-012")
 def test_menu_inicial_tem_inicio_e_demonstracao_so_para_superusuario(
     comum, superusuario
 ):
@@ -193,10 +194,16 @@ def test_menu_inicial_tem_inicio_e_demonstracao_so_para_superusuario(
                 ("demo-layout-minimal", []),
             ],
         ),
+        ("ds", [("ds-vitrine", []), ("ds-temas", [])]),
     ]
     assert [(i["rotulo"], i["url"], i["icone"]) for i in menu] == [
         ("Início", "/v8/", "casa"),
         ("Demonstração", "", "grade"),
+        ("Design system", "", "paleta"),
+    ]
+    assert [(f["rotulo"], f["url"]) for f in menu[2]["filhos"]] == [
+        ("Vitrine", "/v8/ds/"),
+        ("Temas", "/v8/ds/temas/"),
     ]
     assert [(f["rotulo"], f["url"]) for f in menu[1]["filhos"]] == [
         ("Clientes (página com ilhas)", "/v8/demo/clientes/"),

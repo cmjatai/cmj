@@ -30,12 +30,13 @@ grupos do menu do cabeçalho.
   Evidência: `cmj/v8/services/s_menu.py:17`.
 - V8-SHELL-002 [implementado] `menu_para(usuario)` devolve só os itens que o usuário pode ver. Item
   sem permissão exigida aparece para todos, inclusive anônimo. Grupo sem filho visível some.
-  Evidência: `cmj/v8/services/s_menu.py:104`.
+  Evidência: `cmj/v8/services/s_menu.py:114`.
 - V8-SHELL-003 [implementado] A view informa o item ativo pelo `id`. Esse item sai com
   `aria-current="page"`, e os grupos acima dele saem abertos. Evidência:
-  `cmj/v8/services/s_menu.py:81`, `_templates/v8/v8/shell/menu_itens.html:9`.
-- V8-SHELL-004 [implementado] O menu inicial tem "Início" e o grupo "Demonstração", com os itens de
-  `demo.md`. O grupo só aparece para superusuário. Evidência: `cmj/v8/services/s_menu.py:32`.
+  `cmj/v8/services/s_menu.py:91`, `_templates/v8/v8/shell/menu_itens.html:9`.
+- V8-SHELL-004 [implementado] O menu inicial tem "Início", o grupo "Demonstração", com os itens de
+  `demo.md`, e o grupo "Design system", com os de `ds.md`. Os dois grupos só aparecem para
+  superusuário. Evidência: `cmj/v8/services/s_menu.py:32`.
 
 ### Cache do menu
 

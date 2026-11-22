@@ -5,7 +5,7 @@ etapas
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `485a3a988`)
 Código principal: `cmj/v8/services/s_global.py`, `_frontend/v8/src/css/`, a criar: as pastas de
 tema em css/temas
-Testes: `cmj/v8/tests/test_temas.py`, `_frontend/v8/tests/css/temas.spec.js`,
+Testes: `cmj/v8/tests/test_temas.py`, `cmj/v8/tests/test_ds.py`, `_frontend/v8/tests/css/temas.spec.js`,
 `_frontend/v8/tests/core/fonte.spec.js`, `_frontend/v8/tests/core/shell.spec.js`,
 `_frontend/v8/tests/core/global.spec.js`
 
@@ -93,28 +93,28 @@ Regras de outras specs que mudam com esta (D2):
   registro, senão `oficial`. Evidência: `cmj/v8/services/s_global.py:119`, `cmj/v8/templatetags/v8_tags.py:49`, `_templates/v8/base_v8.html:3`.
 - V8-TEMA-021 [implementado] `#v8-global` informa `tema`, sempre um nome do registro, e `modo`, que é
   `claro`, `escuro` ou `null`. Evidência: `cmj/v8/services/s_global.py:290`, `_frontend/v8/src/stores/GlobalStore.js:25`.
-- V8-TEMA-022 [desejado] A prévia de um tema não grava nada: abrir `/v8/ds/temas/<nome>/` não cria
-  nem altera cookie. Evidência: a criar.
-- V8-TEMA-023 [desejado] "Usar este tema" é um `POST` que grava `v8_tema` e redireciona para a
+- V8-TEMA-022 [implementado] A prévia de um tema não grava nada: abrir `/v8/ds/temas/<nome>/` não cria
+  nem altera cookie. Evidência: `cmj/v8/views.py:423`.
+- V8-TEMA-023 [implementado] "Usar este tema" é um `POST` que grava `v8_tema` e redireciona para a
   lista de temas, com mensagem. Dali em diante as páginas do v8 abrem nesse tema, naquele
-  navegador. Funciona sem JavaScript. Evidência: a criar.
-- V8-TEMA-024 [desejado] `/v8/ds/temas/` lista os temas do registro, na ordem dele, cada um com
-  rótulo, link para a prévia e o botão de usar, e marca o tema em vigor. Evidência: a criar.
+  navegador. Funciona sem JavaScript. Evidência: `cmj/v8/views.py:479`, `_templates/v8/v8/ds/vitrine.html:4`.
+- V8-TEMA-024 [implementado] `/v8/ds/temas/` lista os temas do registro, na ordem dele, cada um com
+  rótulo, link para a prévia e o botão de usar, e marca o tema em vigor. Evidência: `cmj/v8/services/s_ds.py:36`, `_templates/v8/v8/ds/temas.html:6`.
 - V8-TEMA-025 [implementado] Ao carregar a página e ao trocar o modo, `<meta name="theme-color">`
   recebe o valor de `--cor-barra-navegador` em vigor, que cada tema pode redefinir.
   Evidência: `_frontend/v8/src/core/shell.js:159`.
 
 ## Requisitos de segurança
 
-- V8-TEMA-040 [desejado] Nome de tema só chega ao HTML, ao JSON e ao cookie depois de conferido no
+- V8-TEMA-040 [implementado] Nome de tema só chega ao HTML, ao JSON e ao cookie depois de conferido no
   registro. Cookie com outro valor vale como `oficial`, e as rotas de prévia e de uso existem só
-  para os nomes do registro: outro nome responde 404. Itens da varredura: 4 e 6. Evidência: a criar.
-- V8-TEMA-041 [desejado] Usar um tema exige superusuário, aceita só `POST` com CSRF e não grava
-  nada além do cookie. Item da varredura: 1. Evidência: a criar.
-- V8-TEMA-042 [desejado] O redirecionamento depois de usar um tema é fixo: `next`, `Referer` e o
-  corpo da requisição são ignorados. Item da varredura: 6. Evidência: a criar.
-- V8-TEMA-043 [desejado] O cookie `v8_tema` sai com `Path=/v8/`, `SameSite=Lax`, `HttpOnly`,
-  `Secure` fora de DEBUG e um valor do registro. Item da varredura: 6. Evidência: a criar.
+  para os nomes do registro: outro nome responde 404. Itens da varredura: 4 e 6. Evidência: `cmj/v8/urls.py:72`, `cmj/v8/services/s_global.py:119`.
+- V8-TEMA-041 [implementado] Usar um tema exige superusuário, aceita só `POST` com CSRF e não grava
+  nada além do cookie. Item da varredura: 1. Evidência: `cmj/v8/views.py:485`.
+- V8-TEMA-042 [implementado] O redirecionamento depois de usar um tema é fixo: `next`, `Referer` e o
+  corpo da requisição são ignorados. Item da varredura: 6. Evidência: `cmj/v8/views.py:490`.
+- V8-TEMA-043 [implementado] O cookie `v8_tema` sai com `Path=/v8/`, `SameSite=Lax`, `HttpOnly`,
+  `Secure` fora de DEBUG e um valor do registro. Item da varredura: 6. Evidência: `cmj/v8/services/s_global.py:146`.
 - V8-TEMA-044 [implementado] O trecho do menu em `{% cache %}` não depende do tema, e o CSS de todos
   os temas é o mesmo arquivo estático. Item da varredura: 5. Evidência: `_templates/v8/v8/shell/menu.html:5`.
 

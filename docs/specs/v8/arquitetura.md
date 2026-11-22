@@ -42,7 +42,7 @@ Router.
 ### Contenção
 
 - V8-ARQ-001 [implementado] Toda rota de `cmj/v8/urls.py` casa apenas com caminhos iniciados por
-  `/v8/`. Evidência: `cmj/v8/urls.py:80`.
+  `/v8/`. Evidência: `cmj/v8/urls.py:105`.
 - V8-ARQ-002 [implementado] As rotas que já existiam continuam resolvendo para as mesmas views:
   `/v6/<slug>`, `/app/<slug>`, `/v8/service-worker.js`, `/v8/manifest.json`, `/admin/` e o catch-all
   de `cmj.sigad` para caminhos fora de `/v8/`. Evidência: `cmj/urls.py:76`.

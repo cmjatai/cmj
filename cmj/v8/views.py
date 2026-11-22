@@ -19,7 +19,7 @@ from django.urls import reverse
 from django.utils.cache import patch_cache_control
 from django.views import View
 
-from cmj.v8.services import s_demo, s_global, s_respostas
+from cmj.v8.services import s_demo, s_ds, s_global, s_respostas
 
 PASTA_FRAGMENTOS = "v8/partials/"
 
@@ -411,3 +411,85 @@ class DemoApiNegadoView(JsonV8View):
 
     def get(self, request):
         return JsonResponse(s_respostas.sem_permissao(), status=403)
+
+
+# ---------------------------------------------------------------------------
+# Design system (docs/specs/v8/ds.md e temas.md): tudo exige superusuário.
+# ---------------------------------------------------------------------------
+
+_URL_DS = "/v8/ds/"
+
+
+class DsVitrineView(PaginaV8View):
+    """Vitrine do padrão visual. Com ``tema``, a prévia desse tema.
+
+    O tema da prévia é fixado na rota, uma por tema do registro, e nunca vem da
+    requisição. A prévia não grava nada.
+    """
+
+    exige = s_global.SUPERUSUARIO
+    tema = None
+
+    def get(self, request):
+        contexto = {"secoes": s_ds.SECOES}
+        if self.tema is None:
+            v8 = dados_layout(
+                "Design system",
+                "ds-vitrine",
+                [("Início", s_global.URL_BASE), ("Design system", None)],
+            )
+        else:
+            em_vigor = s_global.tema_em_vigor(request.COOKIES)
+            previa = s_ds.tema(self.tema, em_vigor)
+            v8 = dados_layout(
+                previa["rotulo"],
+                "ds-temas",
+                [
+                    ("Início", s_global.URL_BASE),
+                    ("Design system", _URL_DS),
+                    ("Temas", reverse("cmj.v8:ds_temas")),
+                    (previa["rotulo"], None),
+                ],
+                tema=self.tema,
+            )
+            contexto["previa"] = previa
+        return responder_pagina(request, "v8/ds/vitrine.html", v8, contexto)
+
+
+class DsTemasView(PaginaV8View):
+    exige = s_global.SUPERUSUARIO
+
+    def get(self, request):
+        return responder_pagina(
+            request,
+            "v8/ds/temas.html",
+            dados_layout(
+                "Temas",
+                "ds-temas",
+                [
+                    ("Início", s_global.URL_BASE),
+                    ("Design system", _URL_DS),
+                    ("Temas", None),
+                ],
+            ),
+            {"temas": s_ds.temas(s_global.tema_em_vigor(request.COOKIES))},
+        )
+
+
+class DsTemaUsarView(AcessoV8Mixin, View):
+    """Escolhe o tema para o navegador: ``POST`` com CSRF, cookie e redirecionamento.
+
+    O tema é fixado na rota. O destino é sempre a lista de temas.
+    """
+
+    exige = s_global.SUPERUSUARIO
+    http_method_names = ["post"]
+    tema = None
+
+    def post(self, request):
+        resposta = HttpResponseRedirect(reverse("cmj.v8:ds_temas"))
+        resposta.set_cookie(**s_global.cookie_tema(self.tema))
+        messages.success(
+            request, f"{s_global.TEMAS[self.tema]} em uso neste navegador."
+        )
+        return resposta
