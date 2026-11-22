@@ -1,13 +1,12 @@
 # V8: temas e modos
 
-Status: em implementação: as regras `[implementado]` têm teste; as `[desejado]` são das próximas
-etapas
-Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `485a3a988`)
-Código principal: `cmj/v8/services/s_global.py`, `_frontend/v8/src/css/`, a criar: as pastas de
-tema em css/temas
-Testes: `cmj/v8/tests/test_temas.py`, `cmj/v8/tests/test_ds.py`, `_frontend/v8/tests/css/temas.spec.js`,
-`_frontend/v8/tests/core/fonte.spec.js`, `_frontend/v8/tests/core/shell.spec.js`,
-`_frontend/v8/tests/core/global.spec.js`
+Status: implementado
+Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `2ba9aef96`)
+Código principal: `cmj/v8/services/s_global.py`, `_frontend/v8/src/css/app.css`,
+`_frontend/v8/src/css/temas/`, `cmj/v8/views.py`
+Testes: `cmj/v8/tests/test_temas.py`, `cmj/v8/tests/test_ds.py`,
+`_frontend/v8/tests/css/temas.spec.js`, `_frontend/v8/tests/core/fonte.spec.js`,
+`_frontend/v8/tests/core/shell.spec.js`, `_frontend/v8/tests/core/global.spec.js`
 
 Tema é o design do v8: cores, fontes, arredondamentos, sombras e, se preciso, regras CSS próprias.
 Modo é claro ou escuro. Todo tema tem os dois modos, e os dois são escolhas independentes.
@@ -135,7 +134,7 @@ Regras de outras specs que mudam com esta (D2):
 
 ## Riscos de segurança
 
-A varredura sobre o código entra no fechamento da implementação.
+Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código escrito.
 
 ## Dúvidas
 

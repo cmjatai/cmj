@@ -1,7 +1,7 @@
 # V8: componentes base
 
 Status: implementado
-Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `485a3a988`)
+Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `2ba9aef96`)
 Código principal: `_frontend/v8/src/componentes/`, `_frontend/v8/src/css/temas/oficial/primitivos.css`
 Testes: `_frontend/v8/tests/componentes/componentes.spec.js`
 
@@ -65,7 +65,7 @@ lote cobre as primitivas mais usadas em formulários e em navegação dentro da 
 
 ## Riscos de segurança
 
-A varredura sobre o código entra no fechamento da implementação.
+Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código escrito.
 
 ## Dúvidas
 

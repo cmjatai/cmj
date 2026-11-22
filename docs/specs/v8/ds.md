@@ -1,8 +1,7 @@
 # V8: design system
 
-Status: em implementação: as regras `[implementado]` têm teste; as `[desejado]` são das próximas
-etapas
-Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `485a3a988`)
+Status: implementado
+Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `2ba9aef96`)
 Código principal: `cmj/v8/services/s_ds.py`, `cmj/v8/views.py`, `cmj/v8/urls.py`,
 `_templates/v8/v8/ds/`, `_templates/v8/v8/partials/ds/`, `_frontend/v8/src/modules/ds/`,
 `_frontend/v8/src/css/temas/oficial/elementos.css`
@@ -92,7 +91,7 @@ tema e no modo em vigor. Não é documentação: é um cenário, com amostras e 
 
 ## Riscos de segurança
 
-A varredura sobre o código entra no fechamento da implementação.
+Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código escrito.
 
 ## Dúvidas
 

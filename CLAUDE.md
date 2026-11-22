@@ -121,8 +121,9 @@ Fora de uso: `cmj/legacy_cep`, `cmj/checklist` e `sapl/lexml` não estão em `IN
 O código novo vai para o **v6**. O v2018 é manutenção, mas continua em uso a médio e longo prazo:
 não migre para Vue 3 nem Pinia e não crie nele módulo ou entrada novos. Funcionalidade nova que
 complementa uma tela do v2018 pode ser feita nele quando for urgente e a migração não couber no prazo.
-O **v8** é a arquitetura híbrida que vai substituir o v6 e o v2018. Por ora só tem a demonstração:
-só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
+O **v8** é a arquitetura híbrida que vai substituir o v6 e o v2018. Por ora tem a demonstração, o
+design system (`/v8/ds/`, com temas nomeados e componentes base sobre o Reka UI) e nenhuma tela
+real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 
 | | v6 | v2018 |
 | --- | --- | --- |
@@ -210,7 +211,8 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 - `docs/specs/api/login.md`: login por usuário e senha pela API (`/api/auth/session` e
   `/api/auth/token`): limite de tentativas e token CSRF. Leia antes de alterar essas rotas.
 - `docs/specs/v8/README.md`: índice das specs do v8 (arquitetura, templates em camadas, shell,
-  overlays, cliente HTTP e demonstração). Leia a spec da parte que for alterar.
+  overlays, cliente HTTP, demonstração, temas, design system e componentes base). Leia a spec da
+  parte que for alterar.
 - `docs/frontend/v2018.md`: Vuex, `Resources.Utils`, padrões e testes do v2018.
 - `docs/specs/v2018/README.md`: índice das specs do v2018 (estrutura do projeto webpack e
   infraestrutura de testes). Leia antes de mexer em `vue.config.js`, nas entradas ou em
