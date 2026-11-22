@@ -5,7 +5,7 @@ de reindexar e sem depender de impressão.
 
 ## 8.1 Conjunto de referência
 
-[cmj/search/rag_eval/perguntas_referencia.json](../../cmj/search/rag_eval/perguntas_referencia.json): **93 perguntas**,
+[cmj/search/rag_eval/perguntas_referencia.json](../../../cmj/search/rag_eval/perguntas_referencia.json): **93 perguntas**,
 cada uma com o(s) artigo(s) que a respondem (`ta_id` + rótulo do artigo mais externo; `ordem` opcional desambigua
 rótulos repetidos, comum no Código Tributário, que tem dois "Art. 153", dois "Art. 175" etc.).
 
@@ -30,7 +30,7 @@ Foi elaborado sobre o banco de produção de out/2026 (os `ta_id` dependem dele)
 tipos variados, perguntas **parafraseadas** (sem copiar os termos do texto) e **sem dados pessoais** (portarias e decretos
 de homenagem foram descartados). O comando **recusa** perguntas cuja norma esperada esteja revogada ou não publicada
 (nenhuma estratégia a indexa; seriam "não encontradas" por construção). Um teste
-([test_rag_eval.py](../../cmj/search/test_rag_eval.py)) valida a estrutura do arquivo.
+([test_rag_eval.py](../../../cmj/search/test_rag_eval.py)) valida a estrutura do arquivo.
 
 ## 8.2 Métricas (por artigo)
 

@@ -1,7 +1,7 @@
 # 3. Recuperação Híbrida – `Embedding.make_context`
 
 Implementação: `Embedding.make_context(search_query, query_embedding, top_k=60)` em
-[cmj/search/models.py](../../cmj/search/models.py).
+[cmj/search/models.py](../../../cmj/search/models.py).
 
 É a etapa de **Retrieval** do RAG. Recebe o texto da consulta e seu vetor (1536 dim) e devolve **uma
 string** pronta para ser entregue ao LLM como resultado da *tool* `buscar_na_base_dados`.
@@ -41,7 +41,7 @@ flowchart TD
 `top_k` (60) mais próximos.
 
 ### 2) Busca por palavra-chave (FTS) – em duas camadas
-Implementada em `Embedding._fts_ids` com os construtores de [cmj/search/fts.py](../../cmj/search/fts.py).
+Implementada em `Embedding._fts_ids` com os construtores de [cmj/search/fts.py](../../../cmj/search/fts.py).
 Cada termo da consulta vira um `SearchQuery` **plain** (`plainto_tsquery`, config `portuguese`, com *stemming*;
 não interpreta operadores digitados pelo LLM ou usuário). Os termos são combinados em duas consultas:
 

@@ -49,15 +49,15 @@ gemini-embedding-2 (1536 dim) ─▶ vetor1536 ───────────
 
 | Arquivo | Papel |
 |---------|-------|
-| [cmj/search/models.py](../../cmj/search/models.py) | `Embedding` (+ `make_context`), `ChatSession`, `ChatMessage` |
-| [cmj/search/consumers.py](../../cmj/search/consumers.py) | `ChatConsumer` (WebSocket) |
-| [cmj/search/chat_manager.py](../../cmj/search/chat_manager.py) | `ChatManager` (regras de negócio do chat e ponte com a I.A.) |
-| [cmj/utils/genia/base.py](../../cmj/utils/genia/base.py) | `IAGenaiBase` (cliente Gemini e cotas) |
-| [cmj/utils/genia/chat.py](../../cmj/utils/genia/chat.py) | `IAChatService` (chat, *system instruction*, limites de uso) |
-| [cmj/utils/genia/embeddings.py](../../cmj/utils/genia/embeddings.py) | `IAEmbeddingService` (embeddings) |
-| [docs/specs/genia/](../specs/genia/README.md) | Specs do pacote `genia` |
-| [cmj/utils/genia/genia_system_instruction_v3.py](../../cmj/utils/genia/genia_system_instruction_v3.py) | *System instruction* do RAG |
-| [cmj/search/routing.py](../../cmj/search/routing.py) | Rota WebSocket |
-| [cmj/search/tasks.py](../../cmj/search/tasks.py) | Task de sincronização de embeddings |
-| [sapl/compilacao/models.py](../../sapl/compilacao/models.py) | `TextoArticulado.generate_chunks` e `Dispositivo.embeddings` |
-| [cmj/core/models.py](../../cmj/core/models.py) | `IAQuota` / `IAQuotasLog` |
+| [cmj/search/models.py](../../../cmj/search/models.py) | `Embedding` (+ `make_context`), `ChatSession`, `ChatMessage` |
+| [cmj/search/consumers.py](../../../cmj/search/consumers.py) | `ChatConsumer` (WebSocket) |
+| [cmj/search/chat_manager.py](../../../cmj/search/chat_manager.py) | `ChatManager` (regras de negócio do chat e ponte com a I.A.) |
+| [cmj/utils/genia/base.py](../../../cmj/utils/genia/base.py) | `IAGenaiBase` (cliente Gemini e cotas) |
+| [cmj/utils/genia/chat.py](../../../cmj/utils/genia/chat.py) | `IAChatService` (chat, *system instruction*, limites de uso) |
+| [cmj/utils/genia/embeddings.py](../../../cmj/utils/genia/embeddings.py) | `IAEmbeddingService` (embeddings) |
+| [docs/specs/genia/](../../specs/genia/README.md) | Specs do pacote `genia` |
+| [cmj/utils/genia/genia_system_instruction_v3.py](../../../cmj/utils/genia/genia_system_instruction_v3.py) | *System instruction* do RAG |
+| [cmj/search/routing.py](../../../cmj/search/routing.py) | Rota WebSocket |
+| [cmj/search/tasks.py](../../../cmj/search/tasks.py) | Task de sincronização de embeddings |
+| [sapl/compilacao/models.py](../../../sapl/compilacao/models.py) | `TextoArticulado.generate_chunks` e `Dispositivo.embeddings` |
+| [cmj/core/models.py](../../../cmj/core/models.py) | `IAQuota` / `IAQuotasLog` |

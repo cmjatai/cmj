@@ -8,7 +8,8 @@ Testes: `cmj/utils/genia/test_genia.py`, `cmj/search/test_embeddings.py`
 ## Escopo
 
 `IAEmbeddingService`: vetorização de documentos e de consultas para a busca semântica. Ingestão e
-recuperação estão em `docs/rag/02-ingestao-e-indexacao.md` e `docs/rag/03-recuperacao-hibrida.md`.
+recuperação estão em `docs/tutorials/rag/02-ingestao-e-indexacao.md` e
+`docs/tutorials/rag/03-recuperacao-hibrida.md`.
 
 ## Regras
 

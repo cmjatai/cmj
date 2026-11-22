@@ -199,8 +199,9 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 - `docs/specs/README.md`: convenções das specs (marcadores, IDs, checagem com `specs_check`,
   varredura de segurança, publicação). Leia antes de criar ou alterar uma spec. Skills: `spec-legado` para comportamento
   existente, `spec-nova` para funcionalidade nova.
-- `docs/rag/README.md`: índice do chat RAG, com arquitetura, ingestão, recuperação, WebSocket/LLM,
-  modelos, operação, diagnóstico e avaliação (`docs/rag/01` a `08`). Leia antes de mexer em `cmj/search`.
+- `docs/tutorials/rag/README.md`: índice do chat RAG, com arquitetura, ingestão, recuperação,
+  WebSocket/LLM, modelos, operação, diagnóstico e avaliação (`docs/tutorials/rag/01` a `08`). Leia
+  antes de mexer em `cmj/search`.
 - `docs/commands/ocrmypdf_command.md`: command `ocrmypdf`.
 - `docs/backend/convencoes.md`: exemplos de CRUD, mixins, API, permissões, testes e novo app.
 - `docs/frontend/v6.md`: stores, `Resources.Utils`, rotas e padrões do v6.
@@ -221,9 +222,10 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   emendas coletivas e autosave. Leia antes de alterar essa tela.
 - `docs/specs/loa/listagem-emendas.md`: listagem das emendas da LOA, filtros, cache do cartão, PDF da
   listagem e dependências do v2018. Leia antes de alterar essa tela.
-- `docs/tutorials/`: material de aprendizado para quem está chegando ao projeto. Não é fonte de
-  regra nem de referência: para implementar, use as specs e os guias acima. Os tutoriais não citam
-  IDs de regra.
+- `docs/tutorials/README.md`: índice dos tutoriais. Tutorial explica e não define regra: as regras
+  ficam nas specs. O de `frontend/v8` é material de aprendizado para quem está chegando: para
+  implementar no v8, use `docs/frontend/v8.md` e as specs. O de `rag` é o que a linha do chat RAG,
+  acima, manda ler.
 
 ## A confirmar
 

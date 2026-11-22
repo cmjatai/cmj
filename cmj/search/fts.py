@@ -16,8 +16,8 @@ RANKERS = {
     "cd1": {"cover_density": True, "normalization": 1},
     "cd2": {"cover_density": True, "normalization": 2},
 }
-# Escolhido por avaliação (docs/rag/07): o "base" (ts_rank sem normalização) favorece
-# chunks longos que repetem os termos; n1 divide pelo log do tamanho do documento.
+# Escolhido por avaliação (docs/tutorials/rag/07): o "base" (ts_rank sem normalização)
+# favorece chunks longos que repetem os termos; n1 divide pelo log do tamanho do documento.
 RANKER_PADRAO = "n1"
 
 _EDGE_PUNCTUATION = ".,;:!?()[]{}\"'“”‘’«»"

@@ -2,14 +2,14 @@
 
 Arquivos:
 
-* [cmj/search/routing.py](../../cmj/search/routing.py) – rota
-* [cmj/search/consumers.py](../../cmj/search/consumers.py) – `ChatConsumer`
-* [cmj/search/chat_manager.py](../../cmj/search/chat_manager.py) – `ChatManager`
-* [cmj/utils/genia/base.py](../../cmj/utils/genia/base.py) – `IAGenaiBase`
-* [cmj/utils/genia/chat.py](../../cmj/utils/genia/chat.py) – `IAChatService`
-* [cmj/utils/genia/embeddings.py](../../cmj/utils/genia/embeddings.py) – `IAEmbeddingService`
-* [cmj/utils/genia/genia_system_instruction_v3.py](../../cmj/utils/genia/genia_system_instruction_v3.py)
-* Frontend: [ChatSessionView.vue](../../_frontend/v6/src/modules/chat/ChatSessionView.vue), `ChatModule.vue`, `ChatHistoryList.vue`
+* [cmj/search/routing.py](../../../cmj/search/routing.py) – rota
+* [cmj/search/consumers.py](../../../cmj/search/consumers.py) – `ChatConsumer`
+* [cmj/search/chat_manager.py](../../../cmj/search/chat_manager.py) – `ChatManager`
+* [cmj/utils/genia/base.py](../../../cmj/utils/genia/base.py) – `IAGenaiBase`
+* [cmj/utils/genia/chat.py](../../../cmj/utils/genia/chat.py) – `IAChatService`
+* [cmj/utils/genia/embeddings.py](../../../cmj/utils/genia/embeddings.py) – `IAEmbeddingService`
+* [cmj/utils/genia/genia_system_instruction_v3.py](../../../cmj/utils/genia/genia_system_instruction_v3.py)
+* Frontend: [ChatSessionView.vue](../../../_frontend/v6/src/modules/chat/ChatSessionView.vue), `ChatModule.vue`, `ChatHistoryList.vue`
 
 ## 4.1 Rota e protocolo WebSocket
 
@@ -159,7 +159,7 @@ buscas o LLM fez, o contexto recuperado e o consumo de tokens.
 
 ## 4.4 `IAChatService` e `IAGenaiBase`
 
-As regras do pacote estão em [docs/specs/genia/](../specs/genia/README.md). `IAGenaiBase` é o cliente
+As regras do pacote estão em [docs/specs/genia/](../../specs/genia/README.md). `IAGenaiBase` é o cliente
 fino sobre `google-genai`, com o controle de cota. `IAChatService` herda dela e reúne o que é só do chat.
 
 | Atributo | `IAGenaiBase` | `IAChatService` |

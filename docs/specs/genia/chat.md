@@ -10,7 +10,7 @@ Testes: `cmj/utils/genia/test_genia.py`, `cmj/search/test_chat_manager.py`
 
 `IAChatService`: o que o chat RAG acrescenta à classe-base, ou seja, system instruction, formato de
 resposta, cota própria e limites de uso por usuário. O fluxo do chat (WebSocket, histórico,
-recuperação) está em `docs/rag/04-chat-websocket-e-llm.md`.
+recuperação) está em `docs/tutorials/rag/04-chat-websocket-e-llm.md`.
 
 ## Regras
 
@@ -71,5 +71,5 @@ O `ChatManager` sempre envia a tool `buscar_na_base_dados`, então o fluxo atual
 
 ## Fora do escopo
 
-Recuperação híbrida, histórico e protocolo WebSocket (`docs/rag/`). Geração do embedding da consulta
-([embeddings.md](./embeddings.md)).
+Recuperação híbrida, histórico e protocolo WebSocket (`docs/tutorials/rag/`). Geração do embedding da
+consulta ([embeddings.md](./embeddings.md)).

@@ -4,11 +4,11 @@ Responsável por popular `search_embedding` com os trechos pesquisáveis das nor
 
 Arquivos envolvidos:
 
-* Gatilho: [sapl/compilacao/views.py](../../sapl/compilacao/views.py) (publicação do T.A.)
-* Orquestração: [cmj/search/tasks.py](../../cmj/search/tasks.py)
-* Segmentação: `TextoArticulado.generate_chunks` em [sapl/compilacao/models.py](../../sapl/compilacao/models.py)
-* Persistência/vetorização: `Embedding` em [cmj/search/models.py](../../cmj/search/models.py)
-* API de embeddings: `IAEmbeddingService.embed_documents` em [cmj/utils/genia/embeddings.py](../../cmj/utils/genia/embeddings.py)
+* Gatilho: [sapl/compilacao/views.py](../../../sapl/compilacao/views.py) (publicação do T.A.)
+* Orquestração: [cmj/search/tasks.py](../../../cmj/search/tasks.py)
+* Segmentação: `TextoArticulado.generate_chunks` em [sapl/compilacao/models.py](../../../sapl/compilacao/models.py)
+* Persistência/vetorização: `Embedding` em [cmj/search/models.py](../../../cmj/search/models.py)
+* API de embeddings: `IAEmbeddingService.embed_documents` em [cmj/utils/genia/embeddings.py](../../../cmj/utils/genia/embeddings.py)
 
 ## 2.1 Gatilho
 
@@ -55,7 +55,7 @@ Pontos importantes:
 ### Quais dispositivos geram chunks
 
 Somente os tipos **individualizáveis** (constante `CHUNK_TIPOS_INDIVIDUALIZAVEIS` em
-[sapl/compilacao/models.py](../../sapl/compilacao/models.py)):
+[sapl/compilacao/models.py](../../../sapl/compilacao/models.py)):
 
 ```python
 ["Ementa", "Artigo", "Parágrafo", "Inciso", "Alinea", "Item",
@@ -183,7 +183,7 @@ mudar, **todos os vetores precisam ser regenerados** para manter a comparabilida
 
 ## 2.5 Reindexação e completude do índice (`sync_embeddings`)
 
-O comando [sync_embeddings](../../cmj/search/management/commands/sync_embeddings.py) completa o índice
+O comando [sync_embeddings](../../../cmj/search/management/commands/sync_embeddings.py) completa o índice
 sem depender de uma nova publicação. Ele reindexa (chunks) os T.A. selecionados e, ao final, vetoriza
 **todos** os embeddings pendentes (`vetor1536` nulo) e preenche `search_vector` ausentes.
 
@@ -216,8 +216,8 @@ Outros cenários (alterar modelo de embedding, formato do prefixo ou algoritmo d
 
 ## 2.6 Chunking v2 (por artigo)
 
-Código: [sapl/compilacao/chunking.py](../../sapl/compilacao/chunking.py) (lógica **pura**, sem banco, testada em
-[test_chunking.py](../../sapl/compilacao/test_chunking.py)) e `TextoArticulado.generate_chunks_v2()` (persistência).
+Código: [sapl/compilacao/chunking.py](../../../sapl/compilacao/chunking.py) (lógica **pura**, sem banco, testada em
+[test_chunking.py](../../../sapl/compilacao/test_chunking.py)) e `TextoArticulado.generate_chunks_v2()` (persistência).
 Ativação: `RAG_CHUNK_STRATEGY=v2` (padrão `v1`); roteiro de adoção em [07 §7.4](./07-diagnostico-e-evolucao.md#74-como-adotar-o-v2).
 
 ### Unidade de busca

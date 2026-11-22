@@ -1,7 +1,7 @@
 # 5. Modelos de Dados
 
-Todos em [cmj/search/models.py](../../cmj/search/models.py), exceto `IAQuota`/`IAQuotasLog`
-([cmj/core/models.py](../../cmj/core/models.py)).
+Todos em [cmj/search/models.py](../../../cmj/search/models.py), exceto `IAQuota`/`IAQuotasLog`
+([cmj/core/models.py](../../../cmj/core/models.py)).
 
 ## 5.1 Diagrama ER
 
@@ -103,7 +103,7 @@ Ver [02 §2.4](./02-ingestao-e-indexacao.md#24-vetorização-e-tokens-embedding)
 
 * Índice `(user, -updated_at)`.
 * **Permissão customizada:** `search.can_use_chat_module` ("Usuário pode usar o módulo de chat").
-  Mapeada em [cmj/globalrules/map_rules.py](../../cmj/globalrules/map_rules.py) para `ChatSession` e `ChatMessage`.
+  Mapeada em [cmj/globalrules/map_rules.py](../../../cmj/globalrules/map_rules.py) para `ChatSession` e `ChatMessage`.
 
 ## 5.4 `ChatMessage`
 

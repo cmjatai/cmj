@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 ESTRATEGIA = "v2"
 
 CHARS_POR_TOKEN = 3.2  # medido no índice de produção: ~3,16 caracteres/token
-MAX_TOKENS = 350  # escolhido por avaliação: ver docs/rag/07-diagnostico-e-evolucao.md
+MAX_TOKENS = 350  # escolhido por avaliação (docs/tutorials/rag/07)
 EMENTA_MAX_CHARS = 300
 ANCESTRAL_MAX_CHARS = 300
 CABECALHO_CONTINUACAO_MAX_CHARS = 400

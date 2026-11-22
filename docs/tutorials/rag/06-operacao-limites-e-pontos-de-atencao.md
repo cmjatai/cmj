@@ -72,7 +72,7 @@ task_sync_embeddings_textoarticulado_function([793])
 ## 6.5 Pontos de atenção
 
 Os itens abaixo foram identificados na leitura inicial do código. Os marcados com ✅ já foram corrigidos
-(testes em [cmj/search/test_chat_manager.py](../../cmj/search/test_chat_manager.py)).
+(testes em [cmj/search/test_chat_manager.py](../../../cmj/search/test_chat_manager.py)).
 
 ### Segurança / privacidade
 
