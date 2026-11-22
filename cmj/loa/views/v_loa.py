@@ -226,7 +226,7 @@ class LoaCrud(Crud):
                     f"""
                 <a href="{args[2]}" title="Detalhes do Cadastro do Orçamento Impositivo">LOA {args[1]}</a><br>
                 <div class="btn-group" role="group">
-                    <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/prestacaocontaloa" title="Prestação de Contas"><i class="fas fa-hand-holding-usd"></i></a>
+                    <a class="btn btn-sm btn-outline-primary" href="/loa/{l.id}/prestacaoconta" title="Prestação de Contas"><i class="fas fa-hand-holding-usd"></i></a>
                 </div>
                 """,
                     "",
