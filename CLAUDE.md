@@ -221,6 +221,9 @@ só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   emendas coletivas e autosave. Leia antes de alterar essa tela.
 - `docs/specs/loa/listagem-emendas.md`: listagem das emendas da LOA, filtros, cache do cartão, PDF da
   listagem e dependências do v2018. Leia antes de alterar essa tela.
+- `docs/tutorials/`: material de aprendizado para quem está chegando ao projeto. Não é fonte de
+  regra nem de referência: para implementar, use as specs e os guias acima. Os tutoriais não citam
+  IDs de regra.
 
 ## A confirmar
 
