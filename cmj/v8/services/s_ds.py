@@ -43,6 +43,7 @@ SECOES = (
     Secao("icones", "Ícones"),
     Secao("drawers", "Drawers"),
     Secao("overlays", "Modals e toasts"),
+    Secao("componentes", "Componentes base"),
 )
 
 # Símbolos do sprite ``v8/shell/icones.html``, na ordem dele.

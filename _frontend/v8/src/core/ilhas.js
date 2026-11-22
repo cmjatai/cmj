@@ -2,5 +2,6 @@
 // Só o que está aqui pode ser montado (V8-ARQ-064).
 export const ilhas = {
   'demo-clientes-tabela': () => import('~@/modules/demo/ilhas/ClientesTabela.vue'),
-  'ds-overlays': () => import('~@/modules/ds/ilhas/DsOverlays.vue')
+  'ds-overlays': () => import('~@/modules/ds/ilhas/DsOverlays.vue'),
+  'ds-componentes': () => import('~@/modules/ds/ilhas/DsComponentes.vue')
 }

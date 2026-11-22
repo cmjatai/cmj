@@ -134,4 +134,5 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-21. A demonstração não al
 ## Fora do escopo
 
 - Persistir os dados da demonstração.
-- Demonstrar popover, tooltip e os demais primitivos do Reka UI.
+- Demonstrar popover, tooltip e os demais primitivos do Reka UI: eles ficam na vitrine do design
+  system (`ds.md`) e em `componentes.md`.

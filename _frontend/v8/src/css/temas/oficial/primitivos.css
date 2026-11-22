@@ -1,0 +1,384 @@
+/*
+ * Componentes base sobre o Reka UI (docs/specs/v8/componentes.md). O Reka não traz visual: os
+ * estados vêm dos atributos que ele põe nos elementos (data-state, data-disabled,
+ * data-highlighted, data-placeholder), e tudo usa tokens (V8-CMP-003 e 007).
+ */
+@layer components {
+  /* Abas */
+  .v8-abas {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .v8-abas-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    border-bottom: 1px solid var(--cor-borda);
+  }
+
+  .v8-abas-gatilho {
+    margin-bottom: -1px;
+    padding: 0.5rem 0.875rem;
+    border-bottom: 2px solid transparent;
+    color: var(--cor-texto-suave);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .v8-abas-gatilho:hover {
+    color: var(--cor-texto);
+  }
+
+  .v8-abas-gatilho[data-state="active"] {
+    border-bottom-color: var(--cor-primaria);
+    color: var(--cor-primaria);
+  }
+
+  .v8-abas-gatilho[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .v8-abas-painel {
+    padding: 1rem 0;
+  }
+
+  /* Sanfona */
+  .v8-sanfona {
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+  }
+
+  .v8-sanfona-item + .v8-sanfona-item {
+    border-top: 1px solid var(--cor-borda);
+  }
+
+  .v8-sanfona-cabecalho {
+    margin: 0;
+  }
+
+  .v8-sanfona-gatilho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .v8-sanfona-gatilho:hover {
+    background: var(--cor-superficie-2);
+  }
+
+  .v8-sanfona-seta {
+    width: 1.1rem;
+    height: 1.1rem;
+    flex-shrink: 0;
+    transition: transform var(--duracao) var(--curva);
+  }
+
+  .v8-sanfona-gatilho[data-state="open"] .v8-sanfona-seta {
+    transform: rotate(180deg);
+  }
+
+  .v8-sanfona-painel {
+    overflow: hidden;
+  }
+
+  .v8-sanfona-painel[data-state="open"] {
+    animation: v8-sanfona-abrir var(--duracao) var(--curva);
+  }
+
+  .v8-sanfona-painel[data-state="closed"] {
+    animation: v8-sanfona-fechar var(--duracao) var(--curva);
+  }
+
+  .v8-sanfona-miolo {
+    padding: 0 1rem 1rem;
+  }
+
+  /* Conteúdo flutuante: dica, popover, menu suspenso e seleção (V8-CMP-004). */
+  .v8-dica,
+  .v8-popover,
+  .v8-suspenso,
+  .v8-selecao {
+    z-index: var(--z-popover);
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    box-shadow: var(--sombra-2);
+    animation: v8-flutuante-entrar var(--duracao) var(--curva);
+  }
+
+  .v8-dica {
+    max-width: 18rem;
+    padding: 0.375rem 0.625rem;
+    border-color: var(--cor-texto);
+    background: var(--cor-texto);
+    color: var(--cor-fundo);
+    font-size: 0.8rem;
+    line-height: 1.35;
+  }
+
+  .v8-dica-seta {
+    fill: var(--cor-texto);
+  }
+
+  .v8-popover {
+    width: min(20rem, calc(100vw - 2rem));
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .v8-popover-cabecalho {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .v8-popover-titulo {
+    flex: 1;
+    margin: 0;
+    font-family: var(--fonte-titulo);
+    font-weight: 650;
+  }
+
+  .v8-popover-fechar {
+    margin-left: auto;
+  }
+
+  .v8-popover-seta {
+    fill: var(--cor-superficie);
+    stroke: var(--cor-borda);
+  }
+
+  .v8-suspenso {
+    min-width: 12rem;
+    padding: 0.25rem;
+  }
+
+  .v8-suspenso-titulo {
+    padding: 0.375rem 0.625rem 0.25rem;
+    color: var(--cor-texto-suave);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .v8-suspenso-separador {
+    height: 1px;
+    margin: 0.25rem 0;
+    background: var(--cor-borda);
+  }
+
+  .v8-suspenso-item,
+  .v8-selecao-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: var(--raio-sm);
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+    user-select: none;
+  }
+
+  .v8-suspenso-item[data-highlighted],
+  .v8-selecao-item[data-highlighted] {
+    background: color-mix(in srgb, var(--cor-primaria) 12%, transparent);
+  }
+
+  .v8-suspenso-item[data-disabled],
+  .v8-selecao-item[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .v8-suspenso-item-perigo {
+    color: var(--cor-perigo);
+  }
+
+  .v8-suspenso-item-perigo[data-highlighted] {
+    background: color-mix(in srgb, var(--cor-perigo) 12%, transparent);
+  }
+
+  /* Seleção */
+  .v8-selecao-gatilho {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .v8-selecao-gatilho[data-placeholder] {
+    color: var(--cor-texto-suave);
+  }
+
+  .v8-selecao-gatilho[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  .v8-selecao-icone {
+    display: inline-flex;
+    color: var(--cor-texto-suave);
+  }
+
+  .v8-selecao {
+    min-width: var(--reka-select-trigger-width);
+    max-height: var(--reka-select-content-available-height);
+  }
+
+  .v8-selecao-lista {
+    padding: 0.25rem;
+  }
+
+  .v8-selecao-item {
+    justify-content: space-between;
+  }
+
+  .v8-selecao-marca {
+    display: inline-flex;
+    color: var(--cor-primaria);
+  }
+
+  /* Caixa de marcação, opções e chave */
+  .v8-caixa-rotulo,
+  .v8-opcao-rotulo,
+  .v8-chave-rotulo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+  }
+
+  .v8-caixa,
+  .v8-opcao {
+    display: inline-grid;
+    place-items: center;
+    width: 1.125rem;
+    height: 1.125rem;
+    flex-shrink: 0;
+    border: 1.5px solid var(--cor-texto-suave);
+    background: var(--cor-superficie);
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-caixa {
+    border-radius: var(--raio-sm);
+  }
+
+  .v8-opcao {
+    border-radius: 50%;
+  }
+
+  .v8-caixa[data-state="checked"],
+  .v8-caixa[data-state="indeterminate"],
+  .v8-opcao[data-state="checked"] {
+    border-color: var(--cor-primaria);
+    background: var(--cor-primaria);
+  }
+
+  .v8-caixa-marca {
+    display: inline-flex;
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+
+  .v8-opcao-marca {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--cor-sobre-primaria);
+  }
+
+  .v8-opcoes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .v8-opcoes[data-orientacao="horizontal"] {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .v8-chave {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 2.5rem;
+    height: 1.4rem;
+    flex-shrink: 0;
+    padding: 0.15rem;
+    border-radius: var(--raio-pilula);
+    background: var(--cor-borda);
+    transition: background-color var(--duracao) var(--curva);
+  }
+
+  .v8-chave[data-state="checked"] {
+    background: var(--cor-primaria);
+  }
+
+  .v8-chave-pino {
+    display: block;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--cor-superficie);
+    box-shadow: var(--sombra-1);
+    transition: transform var(--duracao) var(--curva);
+  }
+
+  .v8-chave-pino[data-state="checked"] {
+    transform: translateX(1.1rem);
+  }
+
+  :is(.v8-caixa, .v8-opcao, .v8-chave)[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+@keyframes v8-sanfona-abrir {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--reka-accordion-content-height);
+  }
+}
+
+@keyframes v8-sanfona-fechar {
+  from {
+    height: var(--reka-accordion-content-height);
+  }
+
+  to {
+    height: 0;
+  }
+}
+
+@keyframes v8-flutuante-entrar {
+  from {
+    opacity: 0;
+    transform: translateY(0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
