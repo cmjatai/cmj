@@ -149,7 +149,7 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
 - D2. Como registrar as mudanças nas outras specs. Recomendação: V8-ARQ-051 e V8-SHELL-042
   recebem `[retirada]`, substituídas pelas regras V8-TEMA, porque o que elas exigiam (um arquivo
   único de tokens, dois temas) deixa de valer. As demais da tabela do Escopo mantêm o ID e têm texto
-  e evidência atualizados, como na D9 de `templates.md`. Decisão: pendente; aplicada a recomendação.
+  e evidência atualizados, como na D9 de `templates.md`. Decisão (2026-11-22): a recomendação.
 - D3. Escolha do tema. Recomendação: lista fixa no código, escolha por navegador em cookie, e sem
   escolha vale o `oficial`. Alternativa: só a prévia, sem escolha. Decisão (2026-11-22): escolha
   por cookie, valendo para todo o v8 naquele navegador.
