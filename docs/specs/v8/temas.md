@@ -164,8 +164,8 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   de conseguir ler `--cor-barra-navegador` diretamente. Recomendação: três blocos, com teste de
   paridade. Decisão: pendente; aplicada a recomendação.
 - D7. `data-tema` sempre emitido, inclusive com `oficial`. Recomendação: sempre, para o CSS e os
-  testes terem um único caso. Alternativa: só quando o tema não é o oficial. Decisão: pendente;
-  aplicada a recomendação.
+  testes terem um único caso. Alternativa: só quando o tema não é o oficial. Decisão
+  (2026-11-22): sempre.
 - D8. Temas de exemplo. O pedido trouxe os nomes `tema1`, `tema2` e `tema3`, e o conteúdo exercita
   uma capacidade do mecanismo em cada um: só cores; cores, fonte dos títulos e raios; e alto
   contraste com `regras.css`. Recomendação: manter os três como estão. Alternativas: renomeá-los
