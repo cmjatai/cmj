@@ -120,7 +120,7 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   conteúdo da página e no corpo dos overlays, e só em elemento sem `class`.
 - D3. Uma página só ou uma página por seção. Recomendação: uma página com índice de âncoras, que
   permite ver tudo de uma vez e comparar temas rolando a mesma tela. Alternativa: uma página por
-  seção, quando a vitrine crescer. Decisão: pendente; aplicada a recomendação.
+  seção, quando a vitrine crescer. Decisão (2026-11-22): uma página com índice.
 
 ## Fora do escopo
 
