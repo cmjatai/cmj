@@ -148,7 +148,8 @@ visual ficam fora (Fora do escopo).
   `MenuContexto` e `CartaoFlutuante` vai para o `body`, na camada `--z-popover`, e o painel do
   `MenuNavegacao` também usa essa camada. Evidência: `_frontend/v8/src/componentes/MenuContexto.vue:9`, `_frontend/v8/src/css/temas/oficial/estrutura.css:112`.
 - V8-CMP-030 [implementado] Os componentes da tabela "Datas e horas" ficam em `src/componentes/`, cada
-  um sobre a primitiva indicada, no idioma pt-BR. O v-model é texto ISO: `AAAA-MM-DD` para dia,
+  um sobre a primitiva indicada, no idioma pt-BR: o usuário vê e digita `DD/MM/AAAA`, horas no
+  relógio de 24 horas e meses por extenso. Por baixo, o v-model é texto ISO: `AAAA-MM-DD` para dia,
   `HH:MM` para hora, `AAAA-MM` para mês e `AAAA` para ano, e `{ inicio, fim }` para período e
   intervalo. Texto que não é uma data válida vale como vazio. A conversão fica num só módulo,
   `src/componentes/datas.js`. Evidência: `_frontend/v8/src/componentes/datas.js:34`, `_frontend/v8/src/componentes/Calendario.vue:2`.
@@ -199,9 +200,10 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   `Alternador` fora do formulário. Decisão (2026-11-22): campo oculto próprio.
 - D7. Nomes dos componentes novos. Recomendação: em português, como os do primeiro lote (tabelas
   acima), mantendo `Avatar`. Decisão (2026-11-22): em português, junto com a D1.
-- D8. Formato do v-model das datas. Recomendação: texto ISO (V8-CMP-030), o mesmo dos formulários
-  do Django e da API, e `{ inicio, fim }` para períodos. Alternativa: os objetos de data do Reka.
-  Decisão: pendente; aplicada a recomendação.
+- D8. Formato em que os componentes de data entregam o valor ao código e ao servidor. O usuário
+  sempre vê e digita `DD/MM/AAAA`. Recomendação: texto ISO (V8-CMP-030), o mesmo dos formulários do
+  Django e da API, e `{ inicio, fim }` para períodos. Alternativas: o texto como o usuário vê, ou os
+  objetos de data do Reka. Decisão (2026-11-22): texto ISO.
 
 ## Fora do escopo
 

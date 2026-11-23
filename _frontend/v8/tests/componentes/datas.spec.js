@@ -58,11 +58,13 @@ describe('componentes de data e hora', () => {
     expect(celula(periodo, '2026-11-20').attributes('data-selection-end')).toBeDefined()
   })
 
-  it('V8-CMP-030: os campos por partes mostram dia, mês e ano em pt-BR, e hora em 24 horas', async () => {
+  it('V8-CMP-030: os campos por partes mostram DD/MM/AAAA, e hora em 24 horas', async () => {
     const data = montar(CampoData, { props: { modelValue: '2026-11-05', rotulo: 'Data' } })
     await assentar()
     const partes = data.findAll('.v8-campo-data-segmento').map(s => s.text())
     expect(partes).toEqual(['05', '11', '2026'])
+    // O usuário vê e digita DD/MM/AAAA.
+    expect(data.find('.v8-campo-data').text().replace(/\s/g, '')).toBe('05/11/2026')
     expect(data.find('[role="group"]').attributes('aria-label')).toBe('Data')
 
     const horario = montar(CampoHora, { props: { modelValue: '14:30' } })
