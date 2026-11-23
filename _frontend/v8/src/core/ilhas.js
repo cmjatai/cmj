@@ -5,5 +5,6 @@ export const ilhas = {
   'ds-overlays': () => import('~@/modules/ds/ilhas/DsOverlays.vue'),
   'ds-componentes': () => import('~@/modules/ds/ilhas/DsComponentes.vue'),
   'ds-campos': () => import('~@/modules/ds/ilhas/DsCampos.vue'),
-  'ds-estrutura': () => import('~@/modules/ds/ilhas/DsEstrutura.vue')
+  'ds-estrutura': () => import('~@/modules/ds/ilhas/DsEstrutura.vue'),
+  'ds-datas': () => import('~@/modules/ds/ilhas/DsDatas.vue')
 }

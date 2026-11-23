@@ -1,0 +1,170 @@
+/*
+ * Componentes base de data e hora (docs/specs/v8/componentes.md): calendários, campos por partes,
+ * seletores com calendário e seletores de mês e de ano. Os estados vêm dos atributos do Reka UI
+ * (data-selected, data-today, data-outside-view, data-selection-start/end, data-highlighted,
+ * data-placeholder), e tudo usa tokens (V8-CMP-003 e 007).
+ */
+@layer components {
+  /* Calendário */
+  .v8-calendario {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+  }
+
+  .v8-seletor-data .v8-calendario {
+    padding: 0;
+    border: 0;
+  }
+
+  .v8-calendario-meses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .v8-calendario-cabecalho {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .v8-calendario-titulo {
+    font-family: var(--fonte-titulo);
+    font-weight: 650;
+    text-transform: capitalize;
+  }
+
+  .v8-calendario-grade {
+    border-collapse: collapse;
+  }
+
+  .v8-calendario-dia-semana {
+    width: 2.25rem;
+    padding-bottom: 0.25rem;
+    color: var(--cor-texto-suave);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .v8-calendario-celula {
+    padding: 0.0625rem;
+    text-align: center;
+  }
+
+  .v8-calendario-dia {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: var(--raio-sm);
+    font-size: 0.875rem;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .v8-calendario-mes {
+    width: 4.5rem;
+    text-transform: capitalize;
+  }
+
+  .v8-calendario-dia:hover,
+  .v8-calendario-dia:focus-visible,
+  .v8-calendario-dia[data-highlighted] {
+    background: var(--cor-superficie-2);
+  }
+
+  .v8-calendario-dia:focus-visible {
+    outline: 2px solid var(--cor-realce);
+    outline-offset: 1px;
+  }
+
+  .v8-calendario-dia[data-today] {
+    color: var(--cor-primaria);
+    font-weight: 700;
+  }
+
+  .v8-calendario-dia[data-outside-view] {
+    color: var(--cor-texto-suave);
+    opacity: 0.5;
+  }
+
+  .v8-calendario-dia[data-selected],
+  .v8-calendario-dia[data-selection-start],
+  .v8-calendario-dia[data-selection-end] {
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-calendario-dia[data-selected]:not([data-selection-start], [data-selection-end]) {
+    background: color-mix(in srgb, var(--cor-primaria) 18%, transparent);
+    color: var(--cor-texto);
+  }
+
+  .v8-calendario:not(:has([data-selection-start], [data-selection-end])) .v8-calendario-dia[data-selected] {
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-calendario-dia[data-disabled],
+  .v8-calendario-dia[data-unavailable] {
+    cursor: not-allowed;
+    opacity: 0.4;
+    text-decoration: line-through;
+  }
+
+  /* Campos digitados por partes */
+  .v8-campo-data {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.0625rem;
+    width: auto;
+    min-width: 0;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .v8-campo-data:focus-within {
+    border-color: var(--cor-primaria);
+  }
+
+  .v8-campo-data-segmento {
+    padding: 0 0.125rem;
+    border-radius: var(--raio-sm);
+    outline: none;
+  }
+
+  .v8-campo-data-segmento:focus {
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-campo-data-segmento[data-placeholder] {
+    color: var(--cor-texto-suave);
+  }
+
+  .v8-campo-data-literal {
+    padding: 0 0.125rem;
+    color: var(--cor-texto-suave);
+  }
+
+  .v8-campo-data[data-invalid] {
+    border-color: var(--cor-perigo);
+  }
+
+  .v8-campo-data-gatilho {
+    min-height: 1.75rem;
+    margin-left: 0.25rem;
+  }
+
+  /* Calendário aberto pelo seletor: usa a moldura do popover. */
+  .v8-seletor-data {
+    width: auto;
+    padding: 0.75rem;
+  }
+}

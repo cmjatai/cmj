@@ -48,14 +48,27 @@ export const PRIMITIVAS = {
   Separador: 'Separator',
   Avatar: 'Avatar',
   Progresso: 'Progress',
-  Proporcao: 'AspectRatio'
+  Proporcao: 'AspectRatio',
+  // Datas e horas
+  Calendario: 'Calendar',
+  CalendarioPeriodo: 'RangeCalendar',
+  CampoData: 'DateField',
+  CampoPeriodo: 'DateRangeField',
+  SeletorData: 'DatePicker',
+  SeletorPeriodo: 'DateRangePicker',
+  CampoHora: 'TimeField',
+  CampoIntervaloHoras: 'TimeRangeField',
+  SeletorMes: 'MonthPicker',
+  SeletorMeses: 'MonthRangePicker',
+  SeletorAno: 'YearPicker',
+  SeletorAnos: 'YearRangePicker'
 }
 
 // Componentes que só exibem: não têm valor a devolver por v-model nem evento.
 export const SO_EXIBICAO = ['Dica', 'Rotulo', 'Divisor', 'AreaRolagem', 'Separador', 'Avatar', 'Proporcao']
 
 // Os arquivos CSS do oficial onde ficam as classes dos componentes.
-export const CSS_DOS_COMPONENTES = ['primitivos.css', 'campos.css', 'estrutura.css']
+export const CSS_DOS_COMPONENTES = ['primitivos.css', 'campos.css', 'estrutura.css', 'datas.css']
 
 export const ler = arquivo => fs.readFileSync(arquivo, 'utf8')
 export const fonte = nome => ler(path.join(PASTA, `${nome}.vue`))
