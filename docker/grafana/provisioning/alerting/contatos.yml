@@ -1,0 +1,18 @@
+# Contato "portalcmj" desligado: os alertas aparecem só na interface do
+# Grafana (Alerting > Alert rules). O webhook aponta para a porta de descarte
+# do próprio container, de propósito.
+#
+# O compose de monitoramento troca este arquivo pelo de
+# docker/grafana/contatos/${GRAFANA_CONTATO}.yml (telegram na produção,
+# webhook-local na produção simulada). No dev vale este.
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: portalcmj
+    receivers:
+      - uid: portalcmj-desligado
+        type: webhook
+        settings:
+          url: http://127.0.0.1:9/descartar
+        disableResolveMessage: true

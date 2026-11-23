@@ -1,0 +1,258 @@
+# Regras de alerta do PortalCMJ (Grafana Alerting).
+# Avaliadas a cada minuto sobre o Prometheus. Uma regra dispara quando a
+# condição fica verdadeira pelo tempo de "for". Os avisos vão para o contato
+# "portalcmj" (contatos.yml), conforme politicas.yml.
+# Documentação: docs/backend/monitoramento.md.
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: portalcmj
+    folder: PortalCMJ
+    interval: 1m
+    rules:
+      - uid: portalcmj-site-fora
+        title: Site fora
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: sum(up{job="django"}) or vector(0)
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: lt, params: [1] } }]
+              refId: C
+        for: 2m
+        noDataState: Alerting
+        execErrState: Alerting
+        labels: { severidade: critico }
+        annotations:
+          summary: Nenhuma cor da aplicação (blue ou green) responde ao Prometheus.
+          description: O portal provavelmente está fora do ar.
+
+      - uid: portalcmj-erros-5xx
+        title: Erros 5xx
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              # Só avalia com algum tráfego (mais de 0,1 req/s), para poucas
+              # requisições não virarem porcentagem alta.
+              expr: >-
+                (sum(rate(django_http_responses_total_by_status_view_method_total{status=~"5.."}[5m]))
+                / sum(rate(django_http_responses_total_by_status_view_method_total[5m])))
+                and on() (sum(rate(django_http_responses_total_by_status_view_method_total[5m])) > 0.1)
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [0.05] } }]
+              refId: C
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: critico }
+        annotations:
+          summary: Mais de 5% das respostas da aplicação são erros 5xx.
+          description: Veja os painéis Exceções/s e Respostas 4xx e 5xx na visão geral.
+
+      - uid: portalcmj-disco
+        title: Disco quase cheio
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: >-
+                node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"}
+                / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"}
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: lt, params: [0.15] } }]
+              refId: C
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: critico }
+        annotations:
+          summary: 'Menos de 15% livre em {{ .Labels.mountpoint }}.'
+          description: Postgres, Solr, logs e backups param quando o disco enche.
+
+      - uid: portalcmj-servico-fora
+        title: Serviço fora
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              # up: o exporter ou serviço não responde à coleta (o job django
+              # fica de fora: no blue/green uma cor está sempre parada).
+              # redis_up e pg_up: o exporter responde, mas o serviço não.
+              expr: up{job!="django"} or redis_up or pg_up
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: lt, params: [1] } }]
+              refId: C
+        for: 5m
+        noDataState: Alerting
+        execErrState: Error
+        labels: { severidade: alto }
+        annotations:
+          summary: '{{ .Labels.job }} {{ .Labels.instance }} não responde.'
+          description: Confira o container com docker ps e docker logs.
+
+      - uid: portalcmj-postgres-conexoes
+        title: Conexões do Postgres
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: sum(pg_stat_activity_count) / max(pg_settings_max_connections)
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [0.8] } }]
+              refId: C
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: alto }
+        annotations:
+          summary: Mais de 80% das conexões do Postgres estão em uso.
+          description: Acima do limite, a aplicação e o Celery passam a receber erro de conexão.
+
+      - uid: portalcmj-celery-fila
+        title: Fila do Celery acumulando
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: max by (queue_name) (celery_queue_length)
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [200] } }]
+              refId: C
+        for: 15m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: alto }
+        annotations:
+          summary: 'Mais de 200 tarefas esperando na fila {{ .Labels.queue_name }}.'
+          description: Os workers não estão dando conta ou travaram.
+
+      - uid: portalcmj-celery-worker
+        title: Worker do Celery fora
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: max by (hostname) (celery_worker_up)
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: lt, params: [1] } }]
+              refId: C
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: alto }
+        annotations:
+          summary: 'O worker {{ .Labels.hostname }} parou de responder.'
+          description: As tarefas da fila dele deixam de ser processadas.
+
+      - uid: portalcmj-lentidao
+        title: Lentidão
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 900, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: >-
+                histogram_quantile(0.95, sum by (le) (rate(django_http_requests_latency_seconds_by_view_method_bucket[10m])))
+                and on() (sum(rate(django_http_requests_latency_seconds_by_view_method_count[10m])) > 0.1)
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [3] } }]
+              refId: C
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: medio }
+        annotations:
+          summary: 95% das requisições demoram até mais de 3 segundos.
+          description: Veja o painel Views mais lentas na visão geral.
+
+      - uid: portalcmj-memoria
+        title: Memória do servidor
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [0.9] } }]
+              refId: C
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: medio }
+        annotations:
+          summary: Mais de 90% da memória do servidor está em uso.
+          description: Veja Memória por container na visão geral.

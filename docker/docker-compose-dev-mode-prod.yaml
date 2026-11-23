@@ -103,6 +103,17 @@ services:
     networks:
       - cmj-net
 
+  # Recebe os alertas do Grafana (contato webhook-local) e só os mostra no
+  # log: sudo docker logs prodsim-alerta-receptor
+  alerta-receptor:
+    image: mendhak/http-https-echo:43
+    container_name: prodsim-alerta-receptor
+    restart: "no"
+    environment:
+      LOG_IGNORE_PATH: /ping
+    networks:
+      - cmj-net
+
 networks:
   cmj-net:
     name: ${APP_NETWORK_NAME:?use os scripts de docker/prodsim, que passam --env-file docker/prodsim/compose.env}

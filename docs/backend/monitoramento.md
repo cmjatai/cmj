@@ -95,6 +95,57 @@ O compose da produção não sobe sem o `docker/.env`: faltam `GRAFANA_ADMIN_PAS
 Os dashboards provisionados ficam na pasta PortalCMJ do Grafana e não aceitam edição pela
 interface: para mudar, exporte o JSON e substitua o arquivo em `docker/grafana/dashboards/`.
 
+## Alertas
+
+O Grafana avalia a cada minuto as regras de `docker/grafana/provisioning/alerting/regras.yml` e
+manda os avisos para o contato `portalcmj`. Alertas que disparam juntos chegam numa mensagem só;
+um alerta ativo é lembrado a cada 4 horas, e outra mensagem avisa quando normaliza.
+
+| Regra | Dispara quando | Severidade |
+| --- | --- | --- |
+| Site fora | nenhuma cor da aplicação responde há 2 min | crítico |
+| Erros 5xx | mais de 5% das respostas são 5xx há 5 min (com tráfego acima de 0,1 req/s) | crítico |
+| Disco quase cheio | menos de 15% livre num sistema de arquivos há 10 min | crítico |
+| Serviço fora | exporter, Redis ou Postgres sem responder há 5 min | alto |
+| Conexões do Postgres | acima de 80% de `max_connections` há 5 min | alto |
+| Fila do Celery acumulando | mais de 200 tarefas numa fila há 15 min | alto |
+| Worker do Celery fora | um worker sem responder há 5 min | alto |
+| Lentidão | p95 acima de 3 s há 10 min (com tráfego acima de 0,1 req/s) | médio |
+| Memória do servidor | acima de 90% há 10 min | médio |
+
+O destino é escolhido por `GRAFANA_CONTATO` no `docker/.env`, que monta um dos arquivos de
+`docker/grafana/contatos/`:
+
+- `desligado` (padrão e dev): os alertas aparecem só em Alerting > Alert rules.
+- `telegram` (produção): manda para o chat de `TELEGRAM_ALERTAS_CHAT_ID`.
+- `webhook-local` (produção simulada): manda para o container `alerta-receptor`, que só mostra no
+  log (`sudo docker logs prodsim-alerta-receptor`). Nada sai para a internet.
+
+### Ligar o Telegram na produção
+
+1. No Telegram, falar com o @BotFather, criar um bot (`/newbot`) e guardar o token.
+2. Adicionar o bot como administrador do canal, com permissão de publicar mensagens.
+3. Descobrir o ID do canal: publicar qualquer mensagem no canal e abrir, no navegador,
+   `https://api.telegram.org/bot<token>/getUpdates`. O ID está em `channel_post.chat.id` e começa
+   com `-100`.
+4. No `docker/.env` do servidor:
+
+   ```bash
+   GRAFANA_CONTATO=telegram
+   TELEGRAM_ALERTAS_BOT_TOKEN=<token>
+   TELEGRAM_ALERTAS_CHAT_ID=<-100...>
+   ```
+
+5. Recriar só o Grafana:
+   `sudo docker compose -f docker/docker-compose.yaml --env-file docker/.env up -d --no-deps --force-recreate grafana`.
+6. Testar: no Grafana, Alerting > Contact points > `portalcmj` > Test. A mensagem de teste deve
+   chegar ao canal.
+
+O servidor precisa alcançar `api.telegram.org` pela internet.
+
+Para mudar um limite, edite `regras.yml` e recrie o Grafana como no passo 5. As regras
+provisionadas não aceitam edição pela interface.
+
 ## Produção simulada
 
 `docker/docker-compose-dev-mode-prod.yaml`: a imagem da produção (`docker/Dockerfile`), com

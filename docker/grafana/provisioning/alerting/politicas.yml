@@ -1,0 +1,12 @@
+# Para onde e com que frequência os alertas vão.
+apiVersion: 1
+
+policies:
+  - orgId: 1
+    receiver: portalcmj
+    # Tudo o que dispara junto chega numa mensagem só.
+    group_by: [grafana_folder]
+    group_wait: 30s
+    group_interval: 5m
+    # Alerta que continua ativo é lembrado a cada 4 horas.
+    repeat_interval: 4h

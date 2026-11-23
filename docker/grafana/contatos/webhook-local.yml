@@ -1,0 +1,15 @@
+# Contato "portalcmj" da produção simulada: manda os alertas para o
+# container alerta-receptor (só ecoa no log), sem sair para a internet. O host
+# vem de ALERTA_RECEPTOR_HOST, o que também prova que o Grafana expande as
+# variáveis de ambiente, como o contato do Telegram precisa.
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: portalcmj
+    receivers:
+      - uid: portalcmj-webhook-local
+        type: webhook
+        settings:
+          url: http://$ALERTA_RECEPTOR_HOST:8080/alertas
+        disableResolveMessage: false

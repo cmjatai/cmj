@@ -40,10 +40,16 @@ services:
       GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
       GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
       GF_NEWS_NEWS_FEED_ENABLED: "false"
+      # Alertas: lidos por docker/grafana/contatos/telegram.yml
+      TELEGRAM_ALERTAS_BOT_TOKEN: ${TELEGRAM_ALERTAS_BOT_TOKEN:-}
+      TELEGRAM_ALERTAS_CHAT_ID: ${TELEGRAM_ALERTAS_CHAT_ID:-}
+      ALERTA_RECEPTOR_HOST: ${ALERTA_RECEPTOR_HOST:-alerta-receptor}
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning:ro
       - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      # Para onde vão os alertas: desligado (padrão), telegram ou webhook-local
+      - ./grafana/contatos/${GRAFANA_CONTATO:-desligado}.yml:/etc/grafana/provisioning/alerting/contatos.yml:ro
     ports:
       - "${MONITORING_BIND_IP:-127.0.0.1}:${GRAFANA_PORT:-3000}:3000"
     depends_on:

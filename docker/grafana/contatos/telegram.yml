@@ -1,0 +1,16 @@
+# Contato "portalcmj" pelo Telegram (produção). Token do bot e ID do chat vêm
+# do docker/.env do servidor (TELEGRAM_ALERTAS_BOT_TOKEN e
+# TELEGRAM_ALERTAS_CHAT_ID), passados ao container do Grafana.
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: portalcmj
+    receivers:
+      - uid: portalcmj-telegram
+        type: telegram
+        settings:
+          bottoken: $TELEGRAM_ALERTAS_BOT_TOKEN
+          chatid: "$TELEGRAM_ALERTAS_CHAT_ID"
+          disable_web_page_preview: true
+        disableResolveMessage: false

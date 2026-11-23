@@ -104,6 +104,30 @@ else
     passa "alvos do Prometheus"
 fi
 
+echo "Alertas do Grafana"
+GAUTH=(-u "admin:${GRAFANA_ADMIN_PASSWORD}")
+regras="$(curl -s --max-time 10 "${GAUTH[@]}" "$GRAF/api/v1/provisioning/alert-rules" \
+    | python3 -c 'import json,sys; print(len([r for r in json.load(sys.stdin) if r.get("uid","").startswith("portalcmj-")]))' 2>/dev/null)"
+if [ "${regras:-0}" = 9 ]; then passa "9 regras de alerta carregadas"; else falha "regras de alerta carregadas: ${regras:-0} (esperado 9)"; fi
+
+url_contato="$(curl -s --max-time 10 "${GAUTH[@]}" "$GRAF/api/v1/provisioning/contact-points?name=portalcmj" \
+    | python3 -c 'import json,sys; print(json.load(sys.stdin)[0]["settings"].get("url",""))' 2>/dev/null)"
+if [ "$url_contato" = "http://alerta-receptor:8080/alertas" ]; then
+    passa "contato portalcmj com a variável de ambiente expandida"
+else
+    falha "contato portalcmj com url '$url_contato' (esperado http://alerta-receptor:8080/alertas)"
+fi
+
+teste="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${GAUTH[@]}" -H 'Content-Type: application/json' \
+    -X POST "$GRAF/api/alertmanager/grafana/config/api/v1/receivers/test" \
+    -d '{"receivers":[{"name":"teste","grafana_managed_receiver_configs":[{"uid":"","name":"teste","type":"webhook","disableResolveMessage":false,"settings":{"url":"http://alerta-receptor:8080/alertas"},"secureFields":{}}]}]}')"
+sleep 2
+if [ "$teste" = 200 ] && docker logs prodsim-alerta-receptor 2>&1 | grep -q '/alertas'; then
+    passa "notificação de teste chegou ao alerta-receptor"
+else
+    falha "notificação de teste: HTTP $teste; veja sudo docker logs prodsim-alerta-receptor"
+fi
+
 echo
 echo "Resultado: $OK ok, $FALHA falha(s)"
 [ "$FALHA" = 0 ]
