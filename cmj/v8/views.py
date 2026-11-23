@@ -415,7 +415,7 @@ class DemoApiNegadoView(JsonV8View):
 
 # ---------------------------------------------------------------------------
 # Design system (docs/specs/v8/ds.md e temas.md): as páginas são públicas, e
-# escolher o tema exige s_ds.EXIGE_USAR_TEMA.
+# escolher o tema segue s_ds.EXIGE_USAR_TEMA, hoje também público.
 # ---------------------------------------------------------------------------
 
 _URL_DS = "/v8/ds/"

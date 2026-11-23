@@ -12,9 +12,9 @@ from cmj.v8.services import s_global
 
 PASTA_SECOES = "v8/partials/ds/"
 
-# A vitrine e as prévias são públicas (ds.md, D1). Escolher o tema do navegador
-# exige isto (temas.md, D9).
-EXIGE_USAR_TEMA = s_global.SUPERUSUARIO
+# A vitrine e as prévias são públicas (ds.md, D1), e qualquer pessoa escolhe o
+# tema do próprio navegador (temas.md, D9). O cookie só muda a aparência.
+EXIGE_USAR_TEMA = None
 
 
 def pode_usar_tema(usuario):

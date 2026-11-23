@@ -179,27 +179,26 @@ def test_usar_um_tema_grava_o_cookie_e_vale_em_todo_o_v8(superusuario):
 
 @pytest.mark.spec("V8-DS-040")
 @pytest.mark.spec("V8-TEMA-041")
-def test_design_system_e_publico_e_escolher_tema_exige_superusuario(
-    comum, superusuario
-):
+def test_design_system_e_escolha_de_tema_sao_publicos(comum, superusuario):
     for url in URLS_DS:
         for usuario in (None, comum, superusuario):
             resposta = cliente_http(usuario).get(url)
             assert resposta.status_code == 200, (url, usuario)
             assert "private" in resposta["Cache-Control"], url
-            # O botão de escolher o tema só aparece para quem pode usá-lo.
+            # Na lista e nas prévias, todos veem o botão de escolher o tema.
             html = html_de(resposta)
-            espera_botao = usuario == superusuario and url != URL_VITRINE
-            assert ("Usar este tema" in html) is espera_botao, (url, usuario)
+            assert ("Usar este tema" in html) is (url != URL_VITRINE), (url, usuario)
 
-    for nome in s_global.TEMAS:
-        anonimo = cliente_http().post(url_usar(nome))
-        assert anonimo.status_code == 302
-        assert anonimo["Location"].startswith("/login/?next=")
-        assert "v8_tema" not in anonimo.cookies
-        negado = cliente_http(comum).post(url_usar(nome))
-        assert negado.status_code == 403
-        assert "v8_tema" not in negado.cookies
+    for usuario in (None, comum):
+        for nome in s_global.TEMAS:
+            cliente = cliente_http(usuario)
+            resposta = cliente.post(url_usar(nome))
+            assert resposta.status_code == 302, (usuario, nome)
+            assert resposta["Location"] == URL_TEMAS
+            assert resposta.cookies["v8_tema"].value == nome
+            html = html_de(cliente.get("/v8/"))
+            assert f'data-tema="{nome}"' in atributos_html(html), (usuario, nome)
+    assert s_ds.EXIGE_USAR_TEMA is None
 
 
 @pytest.mark.spec("V8-DS-041")

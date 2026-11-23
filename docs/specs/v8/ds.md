@@ -92,7 +92,7 @@ tema e no modo em vigor. Não é documentação: é um cenário, com amostras e 
 
 - V8-DS-040 [implementado] A vitrine, a lista de temas e as prévias são públicas, inclusive para
   anônimo (D1), e respondem com `Cache-Control: private`. Só mostram dados fixos e fictícios e não
-  disparam tarefa cara. O botão "Usar este tema" só aparece para quem pode escolher o tema
+  disparam tarefa cara. O botão "Usar este tema" aparece para todos na lista e nas prévias
   (`temas.md`, V8-TEMA-041). Itens da varredura: 1 e 7. Evidência: `cmj/v8/views.py:424`,
   `cmj/v8/views.py:437`, `cmj/v8/services/s_ds.py:20`.
 - V8-DS-041 [implementado] A vitrine e a lista de temas aceitam só `GET` e `HEAD`. Item da

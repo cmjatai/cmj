@@ -121,8 +121,10 @@ Regras de outras specs que mudam com esta (D2):
   no registro. Cookie com outro valor vale como `oficial`, e as rotas de prévia e de uso existem só
   para os nomes do registro: outro nome responde 404. Itens da varredura: 4 e 6. Evidência:
   `cmj/v8/urls.py:72`, `cmj/v8/services/s_global.py:119`.
-- V8-TEMA-041 [implementado] Usar um tema exige superusuário, aceita só `POST` com CSRF e não grava
-  nada além do cookie. Item da varredura: 1. Evidência: `cmj/v8/views.py:492`.
+- V8-TEMA-041 [implementado] Qualquer pessoa, inclusive anônima, pode usar um tema no próprio
+  navegador (D9). A rota aceita só `POST` com CSRF e não grava nada além do cookie, que só muda a
+  aparência daquele navegador. Item da varredura: 1. Evidência: `cmj/v8/views.py:492`,
+  `cmj/v8/services/s_ds.py:17`.
 - V8-TEMA-042 [implementado] O redirecionamento depois de usar um tema é fixo: `next`, `Referer` e o
   corpo da requisição são ignorados. Item da varredura: 6. Evidência: `cmj/v8/views.py:497`.
 - V8-TEMA-043 [implementado] O cookie `v8_tema` sai com `Path=/v8/`, `SameSite=Lax`, `HttpOnly`,
@@ -167,10 +169,10 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
 - D8. Temas de exemplo. Os nomes `tema1`, `tema2` e `tema3` vieram do pedido; o conteúdo não.
   Recomendação: cada um exercita uma capacidade: `tema1` troca só cores, `tema2` troca cores,
   fontes e raios, e `tema3` tem também `regras.css`. Decisão: pendente; aplicada a recomendação.
-- D9. Quem pode escolher o tema. Recomendação: por ora, só quem acessa o design system
-  (superusuário, D1 de `ds.md`). Para abrir a escolha a todos, a lista sairia do design system e
-  iria para o cabeçalho ou para uma página de preferências. Decisão: pendente; aplicada a
-  recomendação.
+- D9. Quem pode escolher o tema. Com o design system público (D1 de `ds.md`), as opções eram
+  qualquer pessoa, qualquer autenticado ou só superusuário. Recomendação: qualquer pessoa, porque o
+  cookie só muda a aparência do próprio navegador, sem dado pessoal nem efeito para outros.
+  Decisão (2026-11-22): qualquer pessoa, inclusive anônima.
 
 ## Fora do escopo
 
