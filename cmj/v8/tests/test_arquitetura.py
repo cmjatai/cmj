@@ -497,10 +497,9 @@ def test_servidor_confere_o_acesso_de_cada_rota_escondida_no_menu(comum, superus
         "/v8/demo/clientes/",
         "/v8/demo/spa/",
         *URLS_DEMO_LAYOUTS,
-        *URLS_DS[:2],
     ]
 
-    for url in urls_do_menu + URLS_DEMO_PAGINAS + URLS_DS + [URL_DEMO_FRAGMENTO]:
+    for url in urls_do_menu + URLS_DEMO_PAGINAS + [URL_DEMO_FRAGMENTO]:
         anonimo = cliente_http().get(url)
         assert anonimo.status_code == 302, url
         assert anonimo["Location"].startswith("/login/?next=/v8/"), url
@@ -599,5 +598,7 @@ def test_pagina_publica_nao_dispara_tarefa_cara():
         if getattr(r.callback.view_class, "exige", None) is None
         and not hasattr(r.callback.view_class, "zona")
     ]
-    assert sorted(publicas) == ["inicio", "nao_encontrado"]
+    # Além da capa e do 404, só as páginas do design system (ds.md, D1).
+    do_ds = ["ds", "ds_temas"] + [f"ds_tema_{nome}" for nome in s_global.TEMAS]
+    assert sorted(publicas) == sorted(["inicio", "nao_encontrado", *do_ds])
     assert cliente_http().get("/v8/").status_code == 200

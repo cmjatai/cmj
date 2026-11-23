@@ -104,13 +104,13 @@ Regras de outras specs que mudam com esta (D2):
   é `claro`, `escuro` ou `null`. Evidência: `cmj/v8/services/s_global.py:290`,
   `_frontend/v8/src/stores/GlobalStore.js:25`.
 - V8-TEMA-022 [implementado] A prévia de um tema não grava nada: abrir `/v8/ds/temas/<nome>/` não
-  cria nem altera cookie. Evidência: `cmj/v8/views.py:423`.
+  cria nem altera cookie. Evidência: `cmj/v8/views.py:424`.
 - V8-TEMA-023 [implementado] "Usar este tema" é um `POST` que grava `v8_tema` e redireciona para a
   lista de temas, com mensagem. Dali em diante as páginas do v8 abrem nesse tema, naquele navegador.
-  Funciona sem JavaScript. Evidência: `cmj/v8/views.py:479`, `_templates/v8/v8/ds/vitrine.html:4`.
+  Funciona sem JavaScript. Evidência: `cmj/v8/views.py:486`, `_templates/v8/v8/ds/vitrine.html:4`.
 - V8-TEMA-024 [implementado] `/v8/ds/temas/` lista os temas do registro, na ordem dele, cada um com
   rótulo, link para a prévia e o botão de usar, e marca o tema em vigor. Evidência:
-  `cmj/v8/services/s_ds.py:99`, `_templates/v8/v8/ds/temas.html:6`.
+  `cmj/v8/services/s_ds.py:108`, `_templates/v8/v8/ds/temas.html:6`.
 - V8-TEMA-025 [implementado] Ao carregar a página e ao trocar o modo, `<meta name="theme-color">`
   recebe o valor de `--cor-barra-navegador` em vigor, que cada tema pode redefinir. Evidência:
   `_frontend/v8/src/core/shell.js:159`.
@@ -122,9 +122,9 @@ Regras de outras specs que mudam com esta (D2):
   para os nomes do registro: outro nome responde 404. Itens da varredura: 4 e 6. Evidência:
   `cmj/v8/urls.py:72`, `cmj/v8/services/s_global.py:119`.
 - V8-TEMA-041 [implementado] Usar um tema exige superusuário, aceita só `POST` com CSRF e não grava
-  nada além do cookie. Item da varredura: 1. Evidência: `cmj/v8/views.py:485`.
+  nada além do cookie. Item da varredura: 1. Evidência: `cmj/v8/views.py:492`.
 - V8-TEMA-042 [implementado] O redirecionamento depois de usar um tema é fixo: `next`, `Referer` e o
-  corpo da requisição são ignorados. Item da varredura: 6. Evidência: `cmj/v8/views.py:490`.
+  corpo da requisição são ignorados. Item da varredura: 6. Evidência: `cmj/v8/views.py:497`.
 - V8-TEMA-043 [implementado] O cookie `v8_tema` sai com `Path=/v8/`, `SameSite=Lax`, `HttpOnly`,
   `Secure` fora de DEBUG e um valor do registro. Item da varredura: 6. Evidência:
   `cmj/v8/services/s_global.py:146`.

@@ -12,6 +12,15 @@ from cmj.v8.services import s_global
 
 PASTA_SECOES = "v8/partials/ds/"
 
+# A vitrine e as prévias são públicas (ds.md, D1). Escolher o tema do navegador
+# exige isto (temas.md, D9).
+EXIGE_USAR_TEMA = s_global.SUPERUSUARIO
+
+
+def pode_usar_tema(usuario):
+    """Diz se o usuário vê e usa o botão "Usar este tema"."""
+    return s_global.atende(usuario, EXIGE_USAR_TEMA)
+
 
 @dataclass(frozen=True)
 class Secao:

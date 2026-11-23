@@ -4,7 +4,7 @@
     <div class="v8-alerta v8-alerta-info flex flex-wrap items-center gap-3" data-ds-previa="{{ previa.nome }}">
       <span>Prévia do tema <strong>{{ previa.rotulo }}</strong> (<code>{{ previa.nome }}</code>)</span>
       {% if previa.em_vigor %}<span class="v8-etiqueta v8-etiqueta-ok">Em uso</span>{% endif %}
-      <form method="post" action="{{ previa.url_usar }}">{% csrf_token %}<button type="submit" class="v8-btn v8-btn-primario">Usar este tema</button></form>
+      {% if pode_usar_tema %}<form method="post" action="{{ previa.url_usar }}">{% csrf_token %}<button type="submit" class="v8-btn v8-btn-primario">Usar este tema</button></form>{% endif %}
       <a href="{% url 'cmj.v8:ds_temas' %}">Todos os temas</a>
     </div>
   {% endif %}

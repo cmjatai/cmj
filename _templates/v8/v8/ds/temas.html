@@ -8,7 +8,7 @@
         <p class="flex items-center gap-2"><code>{{ tema.nome }}</code>{% if tema.em_vigor %}<span class="v8-etiqueta v8-etiqueta-ok">Em uso</span>{% endif %}</p>
         <div class="v8-barra-acoes">
           <a class="v8-btn" href="{{ tema.url_previa }}">Prévia</a>
-          <form method="post" action="{{ tema.url_usar }}">{% csrf_token %}<button type="submit" class="v8-btn v8-btn-primario">Usar este tema</button></form>
+          {% if pode_usar_tema %}<form method="post" action="{{ tema.url_usar }}">{% csrf_token %}<button type="submit" class="v8-btn v8-btn-primario">Usar este tema</button></form>{% endif %}
         </div>
       </li>
     {% endfor %}

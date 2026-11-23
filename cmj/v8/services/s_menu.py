@@ -10,7 +10,7 @@ from cmj.v8.services.s_global import SUPERUSUARIO, atende
 
 # Entra na chave de cache do HTML do menu. Aumente ao mudar a árvore ou o
 # template do menu.
-VERSAO_MENU = 3
+VERSAO_MENU = 4
 
 
 @dataclass(frozen=True)
@@ -75,14 +75,14 @@ MENU = (
             ),
         ),
     ),
+    # Público (docs/specs/v8/ds.md, D1).
     ItemMenu(
         "ds",
         "Design system",
         icone="paleta",
-        permissao=SUPERUSUARIO,
         filhos=(
-            ItemMenu("ds-vitrine", "Vitrine", "/v8/ds/", permissao=SUPERUSUARIO),
-            ItemMenu("ds-temas", "Temas", "/v8/ds/temas/", permissao=SUPERUSUARIO),
+            ItemMenu("ds-vitrine", "Vitrine", "/v8/ds/"),
+            ItemMenu("ds-temas", "Temas", "/v8/ds/temas/"),
         ),
     ),
 )

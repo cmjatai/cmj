@@ -414,24 +414,28 @@ class DemoApiNegadoView(JsonV8View):
 
 
 # ---------------------------------------------------------------------------
-# Design system (docs/specs/v8/ds.md e temas.md): tudo exige superusuário.
+# Design system (docs/specs/v8/ds.md e temas.md): as páginas são públicas, e
+# escolher o tema exige s_ds.EXIGE_USAR_TEMA.
 # ---------------------------------------------------------------------------
 
 _URL_DS = "/v8/ds/"
 
 
 class DsVitrineView(PaginaV8View):
-    """Vitrine do padrão visual. Com ``tema``, a prévia desse tema.
+    """Vitrine do padrão visual, pública. Com ``tema``, a prévia desse tema.
 
     O tema da prévia é fixado na rota, uma por tema do registro, e nunca vem da
     requisição. A prévia não grava nada.
     """
 
-    exige = s_global.SUPERUSUARIO
     tema = None
 
     def get(self, request):
-        contexto = {"secoes": s_ds.SECOES, "amostras": s_ds.amostras()}
+        contexto = {
+            "secoes": s_ds.SECOES,
+            "amostras": s_ds.amostras(),
+            "pode_usar_tema": s_ds.pode_usar_tema(request.user),
+        }
         if self.tema is None:
             v8 = dados_layout(
                 "Design system",
@@ -457,7 +461,7 @@ class DsVitrineView(PaginaV8View):
 
 
 class DsTemasView(PaginaV8View):
-    exige = s_global.SUPERUSUARIO
+    """Lista dos temas, pública."""
 
     def get(self, request):
         return responder_pagina(
@@ -472,7 +476,10 @@ class DsTemasView(PaginaV8View):
                     ("Temas", None),
                 ],
             ),
-            {"temas": s_ds.temas(s_global.tema_em_vigor(request.COOKIES))},
+            {
+                "temas": s_ds.temas(s_global.tema_em_vigor(request.COOKIES)),
+                "pode_usar_tema": s_ds.pode_usar_tema(request.user),
+            },
         )
 
 
@@ -482,7 +489,7 @@ class DsTemaUsarView(AcessoV8Mixin, View):
     O tema é fixado na rota. O destino é sempre a lista de temas.
     """
 
-    exige = s_global.SUPERUSUARIO
+    exige = s_ds.EXIGE_USAR_TEMA
     http_method_names = ["post"]
     tema = None
 

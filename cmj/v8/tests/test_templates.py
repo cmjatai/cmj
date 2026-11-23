@@ -802,8 +802,9 @@ def test_menu_em_cache_e_o_mesmo_nos_tres_layouts_e_nao_tem_dado_proprio(
     # Duas voltas: na segunda, todas as entradas já estão em cache.
     for _ in range(2):
         for layout in COM_SHELL:
-            assert links(layout, None) == ["/v8/"], layout
-            assert links(layout, comum) == ["/v8/"], layout
+            publicos = ["/v8/", "/v8/ds/", "/v8/ds/temas/"]
+            assert links(layout, None) == publicos, layout
+            assert links(layout, comum) == publicos, layout
             da_raiz = links(layout, superusuario)
             assert "/v8/demo/clientes/" in da_raiz and len(da_raiz) > 3, layout
 

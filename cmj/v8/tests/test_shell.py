@@ -178,8 +178,9 @@ def test_html_do_menu_marca_o_ativo_e_abre_o_grupo(superusuario):
 def test_menu_inicial_tem_inicio_e_demonstracao_so_para_superusuario(
     comum, superusuario
 ):
-    assert ids(s_menu.menu_para(AnonymousUser())) == [("inicio", [])]
-    assert ids(s_menu.menu_para(comum)) == [("inicio", [])]
+    publico = [("inicio", []), ("ds", [("ds-vitrine", []), ("ds-temas", [])])]
+    assert ids(s_menu.menu_para(AnonymousUser())) == publico
+    assert ids(s_menu.menu_para(comum)) == publico
     menu = s_menu.menu_para(superusuario)
     assert ids(menu) == [
         ("inicio", []),
