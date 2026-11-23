@@ -103,7 +103,7 @@ services:
       - cmjredis
       - cmjsolr
     ports:
-      - "8001:80"
+      - "127.0.0.1:8001:80"
     networks:
       - cmj-net
   cmj-green:
@@ -131,7 +131,7 @@ services:
       - cmjredis
       - cmjsolr
     ports:
-      - "8002:80"
+      - "127.0.0.1:8002:80"
     networks:
       - cmj-net
 networks:

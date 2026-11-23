@@ -58,13 +58,15 @@ class LoaViewSet:
 
             u = request.user
 
-            if request.method == "POST" and view.action in (
+            # o detalhe e as duas consultas de despesa seguem a publicação da LOA
+            consulta_de_despesa = request.method == "POST" and view.action in (
                 "despesas_agrupadas",
                 "espelho",
-            ):
-                return True
+            )
 
-            if request.method == "GET" and view.action in ("retrieve",):
+            if consulta_de_despesa or (
+                request.method == "GET" and view.action in ("retrieve",)
+            ):
                 self.object = view.get_object()
                 if not self.object.publicado and u.is_anonymous:
                     return False

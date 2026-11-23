@@ -67,6 +67,9 @@ def test_valida_campos_obrigatorios_ficha_seleciona_form():
     assert len(errors) == 1
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_ficha_seleciona_form_valido():
     materia = mommy.make(MateriaLegislativa)

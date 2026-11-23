@@ -714,6 +714,9 @@ def test_numeracao_materia_legislativa_por_legislatura(admin_client):
     assert response_content["numero"] == esperado_legislatura2["numero"]
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_numeracao_materia_legislativa_por_ano(admin_client):
 

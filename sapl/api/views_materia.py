@@ -1,8 +1,9 @@
 from django.apps.registry import apps
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Max, Q
 from django.utils.text import slugify
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_409_CONFLICT
 
@@ -30,8 +31,13 @@ class _TipoProposicaoViewset:
 
     @action(detail=False, methods=["GET"])
     def tipos_do_autor_contectado(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            raise NotAuthenticated()
+
+        # quem não opera nenhum autor não tem tipo de proposição
+        autor = request.user.autor_set.first()
         qs = self.get_queryset()
-        qs = qs.filter(tipo_autores=request.user.autor_set.first().tipo)
+        qs = qs.filter(tipo_autores=autor.tipo) if autor else qs.none()
 
         if (
             qs.exists()
@@ -222,15 +228,15 @@ class _MateriaLegislativaViewSet(ResponseFileMixin):
         return self.list(request, *args, **kwargs)
 
     def last_modified_func(self, request, *args, **kwargs):
-        for backend in list(self.filter_backends):
-            queryset = backend().filter_queryset(request, self.queryset, self)
+        # além da auditoria, vale a data que a própria matéria guarda
+        da_auditoria = super().last_modified_func(request, *args, **kwargs)
 
-        timestamp = (
-            queryset.order_by("-data_ultima_atualizacao")
-            .values_list("data_ultima_atualizacao", flat=True)[:1]
-            .first()
-        )
-        return timestamp
+        materias = self.queryset
+        if self.action == "retrieve":
+            materias = materias.filter(pk=self.kwargs["pk"])
+        da_materia = materias.aggregate(data=Max("data_ultima_atualizacao"))["data"]
+
+        return max(filter(None, (da_auditoria, da_materia)), default=None)
 
 
 @customize(TipoMateriaLegislativa)
@@ -247,9 +253,13 @@ class _TipoMateriaLegislativaViewSet:
                 try:
                     d["pos_fim"] = int(d["pos_fim"])
                 except (ValueError, TypeError):
-                    return Response({"status": 400, "message": "Invalid pos_fim"}, status=400)
+                    return Response(
+                        {"status": 400, "message": "Invalid pos_fim"}, status=400
+                    )
                 if d["pos_fim"] < 0:
-                    return Response({"status": 400, "message": "Invalid pos_fim"}, status=400)
+                    return Response(
+                        {"status": 400, "message": "Invalid pos_fim"}, status=400
+                    )
                 TipoMateriaLegislativa.objects.reposicione(pk, d["pos_fim"])
 
         return Response(result)

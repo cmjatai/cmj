@@ -7,8 +7,15 @@ from django.http.response import Http404
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from cmj.agenda.models import Evento
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
+from sapl.api.mixins import RegistrosDaAreaDoOperadorMixin
 
 logger = logging.getLogger(__name__)
 
 ApiViewSetConstrutor.build_class([apps.get_app_config("agenda")])
+
+
+@customize(Evento)
+class _EventoViewSet(RegistrosDaAreaDoOperadorMixin):
+    pass

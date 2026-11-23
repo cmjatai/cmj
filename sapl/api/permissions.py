@@ -1,4 +1,4 @@
-from rest_framework.permissions import DjangoModelPermissions
+from rest_framework.permissions import SAFE_METHODS, DjangoModelPermissions
 
 from cmj.globalrules.map_rules import rules_patterns_public as cmj_rpp
 from sapl.rules.map_rules import rules_patterns_public as sapl_rpp
@@ -64,9 +64,14 @@ class SaplModelPermissions(DjangoModelPermissions):
 
 
 class ContainerPermission(SaplModelPermissions):
+    """A leitura passa sem permissão de model: o que cada usuário vê é decidido
+    pelo ``get_queryset`` do viewset. Os demais métodos seguem
+    ``SaplModelPermissions`` (docs/specs/api/acesso.md)."""
 
     def has_permission(self, request, view):
         view.permission_required = self.get_required_permissions(
             request.method, view.queryset.model
         )
-        return True
+        if request.method in SAFE_METHODS:
+            return True
+        return super().has_permission(request, view)

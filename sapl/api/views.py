@@ -1,9 +1,14 @@
 import logging
+from calendar import timegm
 
 from django.conf import settings
-from django.views.decorators.http import condition as django_condition
+from django.contrib.contenttypes.models import ContentType
+from django.utils import timezone
+from django.utils.cache import get_conditional_response
+from django.utils.http import http_date
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import APIException
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -23,88 +28,117 @@ def recria_token(request, pk):
     return Response({"message": "Token recriado com sucesso!", "token": token.key})
 
 
-class LastModifiedDecorator:
-    def __call__(self, cls):
+class NaoModificado(Exception):
+    """A resposta condicional encerra a requisição antes do handler."""
 
-        original_dispatch = cls.dispatch
-        self.model = cls.queryset.model
+    def __init__(self, response):
+        self.response = response
 
-        def wrapped_dispatch(view, request, *args, **kwargs):
-            drf_request = request
-            wsgi_request = view.initialize_request(request, *args, **kwargs)
 
-            last_modified_func = (
-                self.last_modified_func
-                if not hasattr(view, "last_modified_func")
-                else view.last_modified_func
-            )
+class RespostaCondicionalMixin:
+    """Resposta condicional das rotas geradas (docs/specs/api/gerador.md).
 
-            def patched_viewset_method(*_args, **_kwargs):
-                return original_dispatch(view, drf_request, *args, **kwargs)
+    Vale para a lista e o detalhe, em ``GET`` e ``HEAD``, depois da
+    autenticação e da permissão. A data vem do registro de auditoria; o
+    viewset pode trocar o cálculo definindo ``last_modified_func``.
+    """
 
-            django_decorator = django_condition(last_modified_func=last_modified_func)
-            decorated_viewset_method = django_decorator(patched_viewset_method)
-            return decorated_viewset_method(wsgi_request, *args, view=view, **kwargs)
+    OPERACOES_DE_GRAVACAO = ("C", "U", "D")
 
-        cls.dispatch = wrapped_dispatch
-        return cls
+    def initial(self, request, *args, **kwargs):
+        self.ultima_alteracao = None
+        super().initial(request, *args, **kwargs)
 
-    def last_modified_func(self, request, *args, **kwargs):
-        """- Método padrão para obter o last_modified baseado no AuditLog
-        - Pode ser sobrescrito na customização do ViewSet caso necessário
-        - Existe um exemplo de sobrescrita em sapl/api/views_materia.py
-        """
+        self.ultima_alteracao = self.get_ultima_alteracao(request, *args, **kwargs)
+        if self.ultima_alteracao is None:
+            return
+
+        response = get_conditional_response(
+            request._request,
+            last_modified=timegm(self.ultima_alteracao.utctimetuple()),
+        )
+        if response is not None:
+            raise NaoModificado(response)
+
+    def handle_exception(self, exc):
+        if isinstance(exc, NaoModificado):
+            return exc.response
+        return super().handle_exception(exc)
+
+    def finalize_response(self, request, response, *args, **kwargs):
+        response = super().finalize_response(request, response, *args, **kwargs)
+        ultima_alteracao = getattr(self, "ultima_alteracao", None)
+        if ultima_alteracao is not None and response.status_code in (200, 304):
+            response["Last-Modified"] = http_date(ultima_alteracao.timestamp())
+            # o cliente revalida sempre, e cache intermediário não guarda
+            response["Cache-Control"] = "private, no-cache"
+        return response
+
+    def get_ultima_alteracao(self, request, *args, **kwargs):
+        """Data para a resposta condicional, ou ``None`` quando ela não se
+        aplica à requisição."""
+        if request.method not in ("GET", "HEAD"):
+            return None
+        if self.action not in ("list", "retrieve"):
+            return None
+        # a resposta traz objetos relacionados, que mudam sem o model mudar
+        if request.query_params.get("expand"):
+            return None
+        # o que o usuário vê depende de quem ele é, e não só do model
+        if ApiViewSetConstrutor.restricts_queryset(self.queryset.model):
+            return None
+
         try:
-            if "pk" in kwargs:
-                obj_id = kwargs["pk"]
-                last_log = (
-                    AuditLog.objects.filter(
-                        model_name=self.model._meta.model_name, object_id=obj_id
-                    )
-                    .order_by("-timestamp")
-                    .values_list("timestamp", flat=True)[:1]
-                    .first()
-                )
-            else:
-                view = kwargs.get("view", None)
-                if view:
-                    for backend in list(view.filter_backends):
-                        queryset = backend().filter_queryset(
-                            request, view.queryset, view
-                        )
-
-                    if queryset.exists():
-                        last_log = (
-                            AuditLog.objects.filter(
-                                model_name=self.model._meta.model_name,
-                                object_id__in=queryset.values_list("pk", flat=True),
-                            )
-                            .order_by("-timestamp")
-                            .values_list("timestamp", flat=True)[:1]
-                            .first()
-                        )
-                    else:
-                        last_log = None
-                else:
-                    last_log = (
-                        AuditLog.objects.filter(
-                            model_name=self.model._meta.model_name,
-                            object_id__in=self.model.objects.values_list(
-                                "pk", flat=True
-                            ),
-                        )
-                        .order_by("-timestamp")
-                        .values_list("timestamp", flat=True)[:1]
-                        .first()
-                    )
-
-            if last_log:
-                return last_log
-
+            ultima_alteracao = self.last_modified_func(request, *args, **kwargs)
+        except APIException:
+            raise
         except Exception as e:
             logger.error(f"Erro ao obter last_modified: {e}")
+            return None
 
-        return None
+        # Last-Modified tem precisão de segundo: uma gravação no mesmo segundo
+        # da resposta não seria percebida na revalidação
+        if ultima_alteracao is None or int(ultima_alteracao.timestamp()) >= int(
+            timezone.now().timestamp()
+        ):
+            return None
+        return ultima_alteracao
+
+    def last_modified_func(self, request, *args, **kwargs):
+        """Data da última gravação pelo registro de auditoria.
+
+        No detalhe, a do registro, se o usuário o alcança. Na lista, a do
+        model inteiro, exclusões inclusive, sem depender dos filtros.
+        Pode ser sobrescrito na customização do viewset: há um exemplo em
+        sapl/api/views_materia.py.
+        """
+        model = self.queryset.model
+        registros = AuditLog.objects.filter(operation__in=self.OPERACOES_DE_GRAVACAO)
+
+        if self.action == "retrieve":
+            pk = self.kwargs[self.lookup_url_kwarg or self.lookup_field]
+            if not self.get_queryset().filter(pk=pk).exists():
+                return None
+            registros = registros.filter(
+                content_type=ContentType.objects.get_for_model(model), object_id=pk
+            )
+        else:
+            registros = registros.filter(
+                app_name=model._meta.app_label, model_name=model._meta.model_name
+            )
+
+        return (
+            registros.order_by("-timestamp").values_list("timestamp", flat=True).first()
+        )
+
+
+class LastModifiedDecorator:
+    def __call__(self, cls):
+        return type(
+            cls.__name__,
+            (RespostaCondicionalMixin, cls),
+            {"__module__": cls.__module__},
+        )
 
 
 SaplApiViewSetConstrutor = ApiViewSetConstrutor

@@ -1,23 +1,32 @@
+import hashlib
 import io
 import logging
 import os
+import re
 
 import pymupdf
 from django.conf import settings
+from django.core.cache import cache
 from django.core.exceptions import PermissionDenied
-from django.http.response import HttpResponse
+from django.http.response import HttpResponse, JsonResponse
 from easy_thumbnails.files import get_thumbnailer
 from PIL import Image, ImageDraw
 from pymupdf import Rect
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotAuthenticated, NotFound
+from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
 
 from cmj.core.models import AreaTrabalho
+from cmj.core.services.s_areatrabalho import AreaTrabalhoService
 from cmj.utils import clean_text
 from sapl.utils import get_mime_type_from_file_extension
 
 logger = logging.getLogger(__name__)
 
 logger_xaccel = logging.getLogger("XAccelRedirect")
+
+
+class ValorInvalido(Exception):
+    """Valor inválido num parâmetro ou no sufixo de uma action de arquivo."""
 
 
 class ResponseFileMixin:
@@ -29,7 +38,10 @@ class ResponseFileMixin:
 
     def response_pagepdftoimage(self, arquivo, _page, _dpi, _grade="0"):
 
-        nocache = self.request.GET.get("nocache", False)
+        # nocache é auxílio de manutenção: só vale para superusuário
+        nocache = (
+            bool(self.request.GET.get("nocache")) and self.request.user.is_superuser
+        )
 
         _rect = None
         if _grade.isnumeric():
@@ -68,7 +80,11 @@ class ResponseFileMixin:
 
         fcache_path = f"{arquivo.file}-p{_page:0>3}-d{_dpi:0>3}.png"
         if _grade < 10:
-            if not nocache and os.path.exists(fcache_path):
+            # a imagem guardada só vale enquanto for mais nova que o arquivo
+            cache_valido = os.path.exists(fcache_path) and os.path.getmtime(
+                fcache_path
+            ) >= os.path.getmtime(arquivo.path)
+            if not nocache and cache_valido:
                 with open(fcache_path, "rb") as f:
                     response = HttpResponse(f, content_type="image/png")
                 self.log(
@@ -213,7 +229,7 @@ class ResponseFileMixin:
                 fout,
                 garbage=4,
                 deflate=True,
-                use_bojstms=True,
+                use_objstms=True,
             )
             doc.close()
             if os.path.exists(fout) and os.path.getsize(fout) > 0:
@@ -224,26 +240,77 @@ class ResponseFileMixin:
             logger_xaccel.error(f"Erro ao processar arquivo: {e}")
             pass
 
+    pdftotext_cache_timeout = 60 * 60 * 24 * 7
+
     def response_pdftotext(self, arquivo):
 
         fin = arquivo.path
-        doc = pymupdf.open(fin)
-        text = "\n".join([page.get_text() for page in doc])
-        text = clean_text(text)
+
+        # o texto extraído fica no cache enquanto o arquivo não mudar
+        stat = os.stat(fin)
+        versao = f"{fin}:{stat.st_mtime_ns}:{stat.st_size}"
+        key = "sapl.api.pdftotext:" + hashlib.md5(versao.encode()).hexdigest()
+
+        text = cache.get(key)
+        if text is None:
+            doc = pymupdf.open(fin)
+            text = "\n".join([page.get_text() for page in doc])
+            text = clean_text(text)
+            cache.set(key, text, self.pdftotext_cache_timeout)
 
         response = HttpResponse(text, content_type="text/plain; charset=utf-8")
 
         self.log(self.request, response, _type="pdftotext")
         return response
 
+    # limite técnico do tamanho de miniatura pedido no sufixo
+    thumbnail_tamanho_maximo = 99999
+
+    @staticmethod
+    def inteiro(valor):
+        """Inteiro sem sinal escrito só com algarismos; None se não for."""
+        if not (valor.isascii() and valor.isdigit()):
+            return None
+        try:
+            return int(valor)
+        except ValueError:
+            # mais algarismos do que o int() aceita converter
+            return None
+
     def response_file(self, request, *args, **kwargs):
+        # valor inválido sai como resposta pronta em JSON, com ou sem sufixo
+        # de arquivo na URL
+        try:
+            return self._response_file(request, *args, **kwargs)
+        except ValorInvalido as e:
+            return JsonResponse({"detail": str(e)}, status=400)
+
+    def _response_file(self, request, *args, **kwargs):
         self.request = request
         self.item = item = self.get_queryset().filter(pk=kwargs["pk"]).first()
         text = request.GET.get("text", "")
-        page = request.GET.get("page", 0)
+        page = request.GET.get("page", "")
         dpi = request.GET.get("dpi", 72)
-        grade = request.GET.get("grade", "0")
+        grade = request.GET.get("grade") or "0"
         anon = request.GET.get("anon", "")
+
+        if page:
+            page = self.inteiro(page)
+            if page is None:
+                raise ValorInvalido("O parâmetro page deve ser um número inteiro.")
+        else:
+            page = None
+
+        # grade é auxílio de manutenção: só vale para superusuário
+        if not request.user.is_superuser:
+            grade = "0"
+        else:
+            partes = grade.split(",")
+            if len(partes) not in (1, 4) or None in map(self.inteiro, partes):
+                raise ValorInvalido(
+                    "O parâmetro grade deve ser um número inteiro ou quatro "
+                    "inteiros separados por vírgula."
+                )
 
         try:
             dpi = int(dpi)
@@ -275,13 +342,23 @@ class ResponseFileMixin:
         mime = get_mime_type_from_file_extension(arquivo.name)
 
         if request.user.is_superuser and anon and mime == "application/pdf":
-            self.anon(arquivo, int(page), grade, anon)
+            if not self.is_direct_navigation(request):
+                raise PermissionDenied(
+                    "A anonimização só é aceita por navegação direta: digite a "
+                    "URL na barra de endereço ou abra-a de um favorito."
+                )
+            self.anon(arquivo, page or 0, grade, anon)
 
         if text and mime == "application/pdf":
             return self.response_pdftotext(arquivo)
 
-        if page and mime == "application/pdf":
-            return self.response_pagepdftoimage(arquivo, int(page), dpi, grade)
+        if page is not None and mime == "application/pdf":
+            # sem autenticação, só a primeira página é entregue como imagem
+            if page > 1 and not request.user.is_authenticated:
+                raise NotAuthenticated(
+                    "Só a primeira página é entregue como imagem sem autenticação."
+                )
+            return self.response_pagepdftoimage(arquivo, page, dpi, grade)
 
         if mime == "application/png":
             mime = "image/png"
@@ -340,6 +417,19 @@ class ResponseFileMixin:
 
         return response
 
+    @staticmethod
+    def is_direct_navigation(request):
+        """A requisição é uma navegação iniciada pelo próprio usuário (URL
+        digitada ou favorito), e não um link de outra página, uma imagem
+        embutida ou um script. Vale o que o navegador informa nos cabeçalhos
+        Fetch Metadata; sem eles, não é navegação direta."""
+        meta = request.META
+        return (
+            meta.get("HTTP_SEC_FETCH_SITE") == "none"
+            and meta.get("HTTP_SEC_FETCH_MODE") == "navigate"
+            and meta.get("HTTP_SEC_FETCH_DEST") == "document"
+        )
+
     def log(self, request, response, _type="download"):
         user = request.user.id if request.user.is_authenticated else "anonymous"
         logger_xaccel.info(
@@ -353,32 +443,38 @@ class ResponseFileMixin:
     def thumbnail(self):
 
         format = self.format_kwarg
-        ext = format
-
-        if "." in format:
-            format, ext = format.split(".")
-        else:
-            format = None
 
         arquivo = getattr(self.item, self.action)
 
-        if not format:
+        # sufixo só com a extensão: o arquivo como está
+        if "." not in format:
             return arquivo
 
-        if format[0] != "c":
+        pedido = re.fullmatch(r"(c?)([0-9]+)\.[a-zA-Z0-9]+", format)
+        size = self.inteiro(pedido.group(2)) if pedido else None
+        if size is None or not 1 <= size <= self.thumbnail_tamanho_maximo:
+            raise ValorInvalido(
+                "Tamanho de miniatura inválido: use <n>.<ext> ou c<n>.<ext>, "
+                f"com n de 1 a {self.thumbnail_tamanho_maximo}."
+            )
+
+        if not pedido.group(1):
             thumbnail = get_thumbnailer(arquivo).get_thumbnail(
                 {
-                    "size": (int(format), int(format)),
+                    "size": (size, size),
                     "box": None,
                     "crop": False,
                     "detail": True,
                 }
             )
         else:
-            size = format[1:]
+            if not hasattr(self.item, f"{self.action}_cropping"):
+                raise ValorInvalido(
+                    "Este arquivo não tem recorte: peça a miniatura sem o prefixo c."
+                )
             thumbnail = get_thumbnailer(arquivo).get_thumbnail(
                 {
-                    "size": (int(size), int(size)),
+                    "size": (size, size),
                     "box": getattr(self.item, f"{self.action}_cropping"),
                     "crop": True,
                     "detail": True,
@@ -412,3 +508,34 @@ class ControlAccessFileForContainerMixin(ResponseFileMixin):
                 qs = qs.filter(**param_tip_pub)
 
         return qs
+
+
+class RegistrosDaAreaDoOperadorMixin:
+    """Viewset de model ligado a área de trabalho: como nas telas, o usuário
+    alcança só os registros das áreas em que opera, e só grava nelas
+    (docs/specs/api/acesso.md)."""
+
+    area_field = "workspace"
+
+    def get_queryset(self):
+        return AreaTrabalhoService.registros_do_operador(
+            self.request.user, super().get_queryset(), self.area_field
+        )
+
+    def _confere_area(self, serializer, criando):
+        dados = serializer.validated_data
+        if not criando and self.area_field not in dados:
+            return
+        area = dados.get(self.area_field)
+        if not AreaTrabalhoService.opera_na_area(self.request.user, area):
+            raise DRFPermissionDenied(
+                "Só o operador da área de trabalho grava registros nela."
+            )
+
+    def perform_create(self, serializer):
+        self._confere_area(serializer, criando=True)
+        serializer.save()
+
+    def perform_update(self, serializer):
+        self._confere_area(serializer, criando=False)
+        serializer.save()

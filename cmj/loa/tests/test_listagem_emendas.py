@@ -1413,7 +1413,9 @@ def test_api_mostra_campos_internos_a_quem_edita(
     client.force_login(request.getfixturevalue(perfil))
 
     for campos in campos_da_api(client, emenda):
-        assert CAMPOS_INTERNOS <= campos
+        assert {"metadata", "search"} <= campos
+        # `owner` segue a regra geral da API: só para quem lista o model
+        assert ("owner" in campos) == (perfil == "superuser")
 
 
 @pytest.mark.spec("LOA-LST-091")
@@ -1428,3 +1430,36 @@ def test_busca_da_api_oculta_campos_internos_do_anonimo(
 
     (encontrada,) = [r for r in resultados if r["id"] == emenda.id]
     assert not set(encontrada) & CAMPOS_INTERNOS
+
+
+def ids_da_api(client, loa, **params):
+    resultados = client.get("/api/loa/emendaloa/", {"loa": loa.id, **params}).json()
+    return [r["id"] for r in resultados["results"]]
+
+
+@pytest.mark.spec("API-FIL-022")
+@pytest.mark.parametrize("perfil", [None, "conta_comum"])
+def test_api_ignora_filtro_e_ordenacao_por_campo_interno_de_quem_nao_o_ve(
+    client, loa, autor, autor_b, make_emenda, perfil
+):
+    primeira = make_emenda(fase=40, owner=autor_b)
+    segunda = make_emenda(fase=40, owner=autor)
+    if perfil:
+        client.force_login(_make_user("conta_comum_api"))
+    padrao = ids_da_api(client, loa)
+    assert sorted(padrao) == sorted([primeira.id, segunda.id])
+
+    assert ids_da_api(client, loa, owner=autor.id) == padrao
+    assert ids_da_api(client, loa, search__icontains="zzz") == padrao
+    assert ids_da_api(client, loa, o="-owner") == padrao
+
+
+@pytest.mark.spec("API-FIL-022")
+def test_api_filtra_por_campo_interno_para_quem_o_ve(
+    client, loa, autor, autor_b, make_emenda, superuser
+):
+    make_emenda(fase=40, owner=autor_b)
+    segunda = make_emenda(fase=40, owner=autor)
+    client.force_login(superuser)
+
+    assert ids_da_api(client, loa, owner=autor.id) == [segunda.id]

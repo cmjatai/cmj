@@ -189,6 +189,9 @@ def test_autor_nao_altera_unidade_na_fase_17(
     assert recarregar(el).unidade_id != outra_unidade.pk
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.spec("LOA-EMD-070")
 def test_editor_contabil_altera_unidade_mas_nao_materia(
     api, editor_contabil, make_emenda, outra_unidade, materia
@@ -203,6 +206,9 @@ def test_editor_contabil_altera_unidade_mas_nao_materia(
     assert el.materia_id is None
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.spec("LOA-EMD-070")
 def test_operador_da_loa_vincula_materia_pelo_patch(
     api, operador_loa, make_emenda, materia
@@ -369,6 +375,9 @@ def test_formulario_do_autor_grava_campo_base(client, autor, parlamentar, make_e
     assert recarregar(el).finalidade == "Nova finalidade"
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.spec("LOA-EMD-075")
 def test_formulario_do_autor_recusa_materia_forjada(
     client, autor, parlamentar, make_emenda, materia
@@ -411,6 +420,9 @@ def test_formulario_do_editor_contabil_grava_bairro(
     assert recarregar(el).bairro_id == bairro.pk
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.spec("LOA-EMD-075")
 def test_formulario_do_operador_vincula_materia(
     client, operador_loa, make_emenda, materia
@@ -954,6 +966,9 @@ def test_view_do_autor_nao_grava_estilo_na_fase_15(
     assert recarregar(el).metadata == ESTILO
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.spec("LOA-EMD-085")
 def test_view_do_operador_da_loa_grava_estilo_com_materia(
     api, get_view, operador_loa, make_emenda, materia

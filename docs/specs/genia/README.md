@@ -39,7 +39,7 @@ IAGenaiBase                      conexão, cota e geração; sem regra de funcio
 
 1. Herde de `IAGenaiBase` em um módulo próprio do pacote.
 2. Declare a cota: `quota_service_name` com uma chave de `IAQuota.ServicosAutorizados`
-   (`cmj/core/models.py:1106`), ou `quota_exempt = True` com `ia_model_name` fixo. Chave nova exige
+   (`cmj/core/models.py:1108`), ou `quota_exempt = True` com `ia_model_name` fixo. Chave nova exige
    migration de `cmj.core`, porque as chaves são `choices` do campo.
 3. Sobrescreva só os parâmetros de geração que diferem do padrão. `None` deixa o padrão da API.
 4. Chame `self.generate_content(...)`. Não chame `self.client.models.generate_content` direto: isso

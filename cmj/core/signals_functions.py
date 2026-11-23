@@ -13,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.core import tasks
 from cmj.core.models import AuditLog, Bi, OcrMyPDF
+from cmj.core.services.s_auditoria import AuditoriaService
 from cmj.loa.models import DespesaPaga
 from cmj.loa.models.m_scrap_sigep import ScrapRecordSigep
 from cmj.painelset.models import Cronometro
@@ -83,7 +84,9 @@ def auditlog_signal_function(sender, **kwargs):
         al.user = u
         al.email = u.email if u else ""
         al.operation = operation
-        al.obj = json.loads(serializers.serialize("json", (instance,)))
+        al.obj = AuditoriaService.sem_campos_nao_guardados(
+            json.loads(serializers.serialize("json", (instance,)))
+        )
         al.content_object = instance if operation != "D" else None
         al.obj_id = instance.id
         al.model_name = instance._meta.model_name

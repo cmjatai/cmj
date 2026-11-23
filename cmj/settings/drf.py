@@ -1,3 +1,5 @@
+from .zenv import config
+
 REST_FRAMEWORK = {
     "DEFAULT_PARSER_CLASSES": (
         "rest_framework.parsers.JSONParser",
@@ -10,7 +12,6 @@ REST_FRAMEWORK = {
         "drfautoapi.PngRenderer",
         "drfautoapi.JpgRenderer",
         "drfautoapi.JpegRenderer",
-        "drfautoapi.YamlRenderer",
     ),
     "DEFAULT_CONTENT_NEGOTIATION_CLASS": "drfautoapi.DrfautoapiNegotiation",
     "DEFAULT_PERMISSION_CLASSES": ("sapl.api.permissions.SaplModelPermissions",),
@@ -32,6 +33,10 @@ REST_FRAMEWORK = {
 
 
 # "rest_framework.permissions.IsAuthenticated",
+
+# Teto de itens de uma lista pedida com get_all=true por quem não tem a permissão
+# list_ do model (docs/specs/api/paginacao-custo.md)
+API_GET_ALL_MAX_ITEMS = config("API_GET_ALL_MAX_ITEMS", cast=int, default=2000)
 
 DRFAUTOAPI = {
     "DEFAULT_SERIALIZER_MODULE": "cmj.api.serializers,sapl.api.serializers",

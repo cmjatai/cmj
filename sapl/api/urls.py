@@ -1,29 +1,25 @@
 from django.urls.conf import include, re_path
-from drf_spectacular.views import (
-    SpectacularAPIView,
-    SpectacularRedocView,
-    SpectacularSwaggerView,
-)
+from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
 
 from cmj.api.views import (
     AppSessionAuthView,
     AppTokenAuthView,
     AppVersionView,
-    CmjApiViewSetConstrutor,
     DocumentoViewSet,
 )
 from sapl.api.views import SaplApiViewSetConstrutor, recria_token
+from sapl.api.views_schema import CachedSchemaAPIView
 
 from .apps import AppConfig
 
 app_name = AppConfig.name
 
-router_sapl = SaplApiViewSetConstrutor.router()
-router_cmj = CmjApiViewSetConstrutor.router()
+# um router só: SaplApiViewSetConstrutor e CmjApiViewSetConstrutor são a
+# mesma classe, com o mesmo registro de viewsets
+router = SaplApiViewSetConstrutor.router()
+router.register(r"documento", DocumentoViewSet)
 
-router_cmj.register(r"documento", DocumentoViewSet)
-
-urlpatterns_router = router_sapl.urls + router_cmj.urls
+urlpatterns_router = router.urls
 
 urlpatterns_api_doc = [
     re_path(
@@ -36,7 +32,7 @@ urlpatterns_api_doc = [
         SpectacularRedocView.as_view(url_name="sapl.api:schema_api"),
         name="redoc_schema_api",
     ),
-    re_path("^schema/", SpectacularAPIView.as_view(), name="schema_api"),
+    re_path("^schema/", CachedSchemaAPIView.as_view(), name="schema_api"),
 ]
 
 urlpatterns = [

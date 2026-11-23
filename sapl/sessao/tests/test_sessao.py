@@ -99,6 +99,9 @@ def test_numero_duplicado_sessao_plenaria_form():
     ]
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_expediente_materia_form_valido():
     tipo_materia = mommy.make(TipoMateriaLegislativa)
@@ -123,6 +126,9 @@ def test_expediente_materia_form_valido():
     assert form.is_valid()
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_registro_votacao_tem_ordem_xor_expediente():
 
@@ -163,6 +169,9 @@ def create_materia_legislativa():
     return mommy.make(MateriaLegislativa, tipo=tipo_materia)
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_delete_sessao_plenaria_cascade_registro_votacao_ordemdia():
     materia = create_materia_legislativa()
@@ -201,6 +210,9 @@ def test_delete_sessao_plenaria_cascade_registro_votacao_ordemdia():
     assert parlamentar_filter  # Não exclui Parlamentar
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_delete_sessao_plenaria_cascade_registro_votacao_expediente():
     materia = create_materia_legislativa()

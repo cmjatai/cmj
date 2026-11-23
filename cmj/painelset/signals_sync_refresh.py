@@ -22,6 +22,17 @@ regex_applabels_permitidos = [
 regex_applabels_permitidos = [re.compile(label) for label in regex_applabels_permitidos]
 
 
+def restringe_por_registro(model):
+    """O viewset do model na API restringe os registros por usuário
+    (docs/specs/api/acesso.md). Model sem rota na API não restringe."""
+    from drfautoapi.drfautoapi import ApiViewSetConstrutor
+
+    try:
+        return ApiViewSetConstrutor.restricts_queryset(model)
+    except KeyError:
+        return False
+
+
 def send_signal_for_websocket_sync_refresh(inst, **kwargs):
 
     action = "post_save" if "created" in kwargs else "post_delete"
@@ -53,7 +64,11 @@ def send_signal_for_websocket_sync_refresh(inst, **kwargs):
                 "instance": None,
             }
             try:
-                if inst_serialize:
+                if restringe_por_registro(inst._meta.model):
+                    # o registro não vai no aviso: quem pode vê-lo busca pela
+                    # API, que aplica a visibilidade por registro
+                    pass
+                elif inst_serialize:
                     message["instance"] = inst_serialize
                 else:
                     message["instance"] = (

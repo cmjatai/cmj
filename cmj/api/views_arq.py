@@ -19,7 +19,7 @@ from django.utils.translation import gettext_lazy as _
 from PIL import Image, ImageSequence
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound, PermissionDenied, ValidationError
 from rest_framework.response import Response
 
 from cmj.api.serializers import (
@@ -29,6 +29,7 @@ from cmj.api.serializers import (
 )
 from cmj.arq import tasks
 from cmj.arq.models import ArqClasse, ArqDoc, Draft, DraftMidia
+from cmj.arq.services.s_draft import DraftService
 from cmj.globalrules import GROUP_ARQ_OPERADOR
 from cmj.settings.project import DEBUG
 from cmj.utils.utils_files import TIPOS_MIDIAS_PERMITIDOS
@@ -47,8 +48,7 @@ class _Draft:
 
     def get_queryset(self, *args, **kwargs):
         qs = super().get_queryset(*args, **kwargs)
-        qs = qs.filter(owner=self.request.user)
-        return qs
+        return DraftService.drafts_do_usuario(self.request.user, qs)
 
     def destroy(self, request, *args, **kwargs):
         try:
@@ -395,6 +395,23 @@ class _DraftMidia(ResponseFileMixin):
 
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super().get_queryset(*args, **kwargs)
+        return DraftService.midias_do_usuario(self.request.user, qs)
+
+    def _confere_draft(self, serializer):
+        draft = serializer.validated_data.get("draft")
+        if draft and not DraftService.e_dono_do_draft(self.request.user, draft):
+            raise PermissionDenied()
+
+    def perform_create(self, serializer):
+        self._confere_draft(serializer)
+        serializer.save()
+
+    def perform_update(self, serializer):
+        self._confere_draft(serializer)
+        serializer.save()
 
     @action(detail=True)
     def arquivo(self, request, *args, **kwargs):

@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.core.paginator import EmptyPage
 from rest_framework import pagination
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 
 
@@ -10,8 +12,38 @@ class StandardPagination(pagination.PageNumberPagination):
 
     def paginate_queryset(self, queryset, request, view=None):
         if request.query_params.get("get_all", "").lower() == "true":
+            self.check_get_all_limit(queryset, request, view)
             return None
         return super().paginate_queryset(queryset, request, view=view)
+
+    def check_get_all_limit(self, queryset, request, view=None):
+        """``get_all`` só devolve a lista inteira até o teto configurado. Fica
+        sem teto quem tem a permissão ``list_`` do model listado."""
+        model = getattr(queryset, "model", None)
+        if model is None:
+            model = getattr(getattr(view, "queryset", None), "model", None)
+
+        user = getattr(request, "user", None)
+        if model is not None and user is not None and user.is_authenticated:
+            if user.has_perm(f"{model._meta.app_label}.list_{model._meta.model_name}"):
+                return
+
+        limit = settings.API_GET_ALL_MAX_ITEMS
+        if isinstance(queryset, (list, tuple)):
+            total = len(queryset)
+        else:
+            # conta só até passar do teto, sem percorrer a tabela inteira
+            total = queryset[: limit + 1].count()
+
+        if total > limit:
+            raise ValidationError(
+                {
+                    "get_all": [
+                        f"A consulta devolveria mais de {limit} itens. Restrinja os "
+                        "filtros ou use a paginação (page e page_size)."
+                    ]
+                }
+            )
 
     def get_paginated_response_schema(self, schema):
         r = {

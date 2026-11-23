@@ -2,7 +2,8 @@
 
 Status: implementado
 Última verificação: 2026-11-21 (branch `v8-arquitetura-hibrida`, sobre o commit `a63428717`)
-Código principal: `cmj/api/views.py`, `sapl/api/urls.py`, `cmj/urls.py`
+Código principal: `cmj/api/views.py`, `sapl/api/urls.py`, `cmj/urls.py`,
+`docker/nginx/cmj_docker.conf`, `docker/docker-compose.yaml`
 Testes: `cmj/api/tests/test_login.py`
 
 O login feito pela API segue o mesmo limite de tentativas da tela `/login/`, e a sessão por cookie
@@ -29,6 +30,20 @@ comportamento dessas rotas e da autenticação da API não tem spec.
 - API-AUTH-004 [implementado] Dentro do limite, credencial válida abre a sessão ou devolve o token,
   e credencial inválida responde 400 com `non_field_errors`. Evidência: `cmj/api/views.py:130`,
   `cmj/api/views.py:136`.
+- API-AUTH-009 [implementado] O IP da contagem é o do cliente. A aplicação lê o cabeçalho
+  `X-Real-IP`, que o nginx do container define nos três blocos de proxy (telas, API e WebSocket).
+  O nginx do container aceita o endereço informado pelo proxy da frente só quando a conexão vem de
+  endereço local ou privado; em conexão vinda de outro endereço, o `X-Real-IP` recebido é ignorado
+  e vale o endereço de quem conectou. Os containers de produção publicam a porta só no loopback do
+  host. Evidência: `cmj/settings/project.py:215-217`, `docker/nginx/cmj_docker.conf:17-26`,
+  `docker/nginx/cmj_docker.conf:100`, `docker/nginx/cmj_docker.conf:117`,
+  `docker/nginx/cmj_docker.conf:147`, `docker/docker-compose.yaml:106`,
+  `docker/docker-compose.yaml:134`.
+- API-AUTH-010 [observado] (executado) Sem `X-Real-IP`, a aplicação usa o `X-Forwarded-For` e, sem
+  ele, o endereço da conexão. Um `X-Forwarded-For` com mais de um endereço não é aceito como IP, e
+  as rotas de login respondem 500. Com o nginx do container na frente o caso não ocorre, porque o
+  `X-Real-IP` está sempre presente. Evidência: `cmj/settings/project.py:215-217`,
+  `sapl/utils.py:542-550`.
 - API-AUTH-005 [observado] A contagem fica no cache `default`. Com `DummyCache`, que é o cache em
   `DEBUG`, nada é guardado e o limite não atua, aqui e na tela `/login/`. Evidência:
   `cmj/settings/project.py:160-167`, `cmj/settings/project.py:213-220`. Por leitura do código.

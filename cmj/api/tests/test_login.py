@@ -1,6 +1,10 @@
 """Login por usuário e senha pela API (docs/specs/api/login.md)."""
 
+import re
+from pathlib import Path
+
 import pytest
+import yaml
 from django.core.cache import cache
 from django.test import Client
 
@@ -8,6 +12,7 @@ URL_SESSAO = "/api/auth/session"
 URL_TOKEN = "/api/auth/token"
 SENHA = "senha-de-teste-123"
 LIMITE = 3
+RAIZ = Path(__file__).resolve().parents[3]
 
 
 @pytest.fixture
@@ -226,3 +231,42 @@ def test_login_por_token_nao_depende_de_csrf(cliente_csrf, usuario):
 
     assert resposta.status_code == 200
     assert resposta.json()["token"]
+
+
+@pytest.mark.django_db
+@pytest.mark.spec("API-AUTH-009")
+@pytest.mark.parametrize(
+    "conf",
+    ["docker/nginx/cmj_docker.conf", "docker/nginx_indev_modprod/cmj_docker.conf"],
+)
+def test_nginx_do_container_informa_o_ip_do_cliente_nos_tres_blocos(conf):
+    texto = (RAIZ / conf).read_text()
+    blocos = dict(re.findall(r"location (@proxy_to_\w+) \{(.*?)\n    \}", texto, re.S))
+
+    assert set(blocos) == {"@proxy_to_ws", "@proxy_to_app", "@proxy_to_app_api"}
+    for nome, corpo in blocos.items():
+        assert "proxy_set_header X-Real-IP $remote_addr;" in corpo, nome
+    # o valor informado pelo proxy da frente só vale de conexão local ou privada
+    assert "real_ip_header X-Real-IP;" in texto
+    aceitos = set(re.findall(r"set_real_ip_from (\S+);", texto))
+    assert aceitos == {
+        "127.0.0.1",
+        "::1",
+        "10.0.0.0/8",
+        "172.16.0.0/12",
+        "192.168.0.0/16",
+    }
+
+
+@pytest.mark.django_db
+@pytest.mark.spec("API-AUTH-009")
+def test_containers_de_producao_publicam_a_porta_so_no_loopback():
+    compose = yaml.safe_load((RAIZ / "docker/docker-compose.yaml").read_text())
+    portas = [
+        porta
+        for servico in compose["services"].values()
+        for porta in servico.get("ports", [])
+    ]
+
+    assert portas
+    assert all(str(porta).startswith("127.0.0.1:") for porta in portas)

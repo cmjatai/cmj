@@ -55,6 +55,9 @@ def test_lista_protocolos_duplicados():
     assert lista_protocolos_duplicados[0][0].ano == 2031
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_lista_protocolos_com_materias():
     mommy.make(Protocolo, numero=15, ano=2035)
@@ -91,6 +94,9 @@ def test_lista_protocolos_com_materias():
     assert lista_protocolos_com_materias[0][0].ano == 2035
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_lista_materias_protocolo_inexistente():
     protocolo_a = mommy.make(Protocolo, numero=15, ano=2031)

@@ -69,9 +69,11 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   (`cmj/loa/services/s_emendaloa.py:54-80`).
 - LOA-EMD-073 [implementado] O PATCH com um campo que o usuário não pode alterar é recusado com 400, sem
   gravar nada, e a mensagem cita o campo. Chaves que não são campos do model, como `busca_despesa`,
-  continuam sendo ignoradas. Evidência: `cmj/api/loa/views/emendaloa.py:121-131`.
+  continuam sendo ignoradas. O `owner`, que o serializer trata como somente leitura
+  (API-SER-033), entra nessa conferência pelo valor enviado na requisição. Evidência:
+  `cmj/api/loa/views/emendaloa.py:108-121`.
 - LOA-EMD-074 [implementado] A action `updatevaloremenda` segue LOA-EMD-070 para o campo `valor`. Evidência:
-  `cmj/api/loa/views/emendaloa.py:193-197`. Substitui LOA-EMD-028 quanto à permissão.
+  `cmj/api/loa/views/emendaloa.py:199-203`. Substitui LOA-EMD-028 quanto à permissão.
 - LOA-EMD-075 [implementado] O POST do formulário de edição segue LOA-EMD-070. Campo alterado fora da lista,
   inclusive pelos campos ocultos de matéria, invalida o formulário. A criação não passa por essa
   regra: ela segue LOA-FASE-051. `indicacao` fica fora da verificação do formulário porque não é
@@ -97,13 +99,13 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `EmendaLoaService.pode_alterar_parlamentares` (`cmj/loa/services/s_emendaloa.py:143-147`).
 - LOA-EMD-078 [implementado] O parlamentar informado em `updatevalorparlamentar`,
   `update_parlassinantes` e no formulário precisa ser da LOA. Antes, a primeira action aceitava
-  qualquer parlamentar, e a segunda dava erro 500. Evidência: `cmj/loa/services/s_emendaloa.py:149-193`.
+  qualquer parlamentar, e a segunda dava erro 500. Evidência: `cmj/loa/services/s_emendaloa.py:149-207`.
 - LOA-EMD-079 [implementado] O parlamentar do autor do dono não pode ter o valor zerado nem ser
   desmarcado como assinante, por nenhum perfil. Na criação, vale o parlamentar do autor de quem cria.
   Substitui a regra anterior, que só impedia o próprio operador de zerar o seu parlamentar
   (LOA-EMD-021, LOA-EMD-022, LOA-EMD-026 e LOA-EMD-027). Evidência:
   `EmendaLoaService.parlamentar_protegido` (`cmj/loa/services/s_emendaloa.py:129-141`),
-  `cmj/api/loa/views/emendaloa.py:147-156`, `cmj/api/loa/views/emendaloa.py:230-239`,
+  `cmj/api/loa/views/emendaloa.py:153-162`, `cmj/api/loa/views/emendaloa.py:236-245`,
   `cmj/loa/forms/f_emendaloa.py:582-607`.
 
 ### Autor na fase 17 e registros contábeis (D8, decidida em 2026-11-20)
@@ -131,7 +133,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   operador de autor. A publicação da LOA não importa. Antes, para o operador de autor, a tela exigia
   LOA publicada e a API exigia LOA não publicada. A fase inicial continua seguindo LOA-FASE-051.
   Substitui LOA-EMD-001 e LOA-EMD-002 quanto à publicação. Evidência:
-  `EmendaLoaService.pode_criar` (`cmj/loa/services/s_emendaloa.py:201-209`),
+  `EmendaLoaService.pode_criar` (`cmj/loa/services/s_emendaloa.py:215-223`),
   `cmj/api/loa/views/emendaloa.py:45-46`, `cmj/loa/views/v_emendaloa.py:985-986`.
 
 ### Autosave só de campos do model (D5, decidida em 2026-11-20)
@@ -144,7 +146,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   chaves alheias. Substitui LOA-EMD-054. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:7-21`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:374-380`,
-  `cmj/api/loa/views/emendaloa.py:115-119`.
+  `cmj/api/loa/views/emendaloa.py:123-126`.
 
 ### Erros do servidor na tela de edição (D6, decidida em 2026-11-20)
 
@@ -181,7 +183,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   depois de cada pré-visualização, os controles voltam ao estilo gravado, e um aviso (LOA-EMD-084)
   informa quando o estilo pedido não foi gravado. Substitui LOA-EMD-052 quanto à permissão.
   Evidência: `EmendaLoaService.pode_editar` (`cmj/loa/services/s_emendaloa.py:133-154`),
-  `cmj/api/loa/views/emendaloa.py:247-291`,
+  `cmj/api/loa/views/emendaloa.py:253-297`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:156-210`.
 
 ### Registro de proposição pelo detalhe (decidido em 2026-11-20)
@@ -287,15 +289,15 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `cmj/loa/forms/f_mixins.py:23-62`, `cmj/loa/views/v_emendaloa.py:1133-1143`.
 - LOA-EMD-026 [observado] `update_parlassinantes` marca e desmarca o parlamentar na emenda. O operador
   de autor que não é superusuário não pode desmarcar o próprio parlamentar. Evidência:
-  `cmj/api/loa/views/emendaloa.py:142-169`.
+  `cmj/api/loa/views/emendaloa.py:148-175`.
 - LOA-EMD-027 [observado] `updatevalorparlamentar` cria ou altera o valor do parlamentar enviado e
   apaga o vínculo quando o valor é zero. O operador de autor que não é superusuário não pode zerar o
   valor do próprio parlamentar. O endpoint não confere se o parlamentar pertence à LOA nem se o
   usuário pode alterar o valor de outro parlamentar (ver D3). Um valor inválido vira 0,00. Evidência:
-  `cmj/api/loa/views/emendaloa.py:197-244`.
+  `cmj/api/loa/views/emendaloa.py:203-250`.
 - LOA-EMD-028 [observado] `updatevaloremenda` grava o Valor Global enviado sem aplicar a regra do
   campo somente leitura do formulário. Um valor inválido vira 0,01. Evidência:
-  `cmj/api/loa/views/emendaloa.py:177-200`.
+  `cmj/api/loa/views/emendaloa.py:183-206`.
 
 ### Efeito do save() no model
 
@@ -349,7 +351,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 - LOA-EMD-052 [observado] O GET de `/view/` grava em `metadata.style` a entrelinha recebida, limitada a
   100–300 no servidor, e o espaço para assinaturas. Assim, uma requisição GET altera a emenda.
   Substituída, quanto à permissão, por LOA-EMD-085.
-  Evidência: `cmj/api/loa/views/emendaloa.py:252-284`.
+  Evidência: `cmj/api/loa/views/emendaloa.py:258-290`.
 - LOA-EMD-053 [observado] O autosave reage ao evento `change` de qualquer campo com `name` do
   formulário e envia **um campo por requisição**:
 
@@ -369,16 +371,16 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   serializer ignora esses campos, mas a emenda é salva mesmo assim, o que dispara os signals e, com a
   LOA em tramitação, o `sync()` de LOA-EMD-031. Substituída por LOA-EMD-083. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:358-360`,
-  `cmj/api/loa/views/emendaloa.py:132-134`.
+  `cmj/api/loa/views/emendaloa.py:108-129`.
 - LOA-EMD-055 [observado] Mudar a fase pelo autosave envia `PATCH` com `fase`, sujeito às transições de
   LOA-FASE-052, LOA-FASE-053 e LOA-FASE-065. Enquanto a fase escolhida é 10, o select fica marcado em
   vermelho. Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:319-326`,
-  `cmj/api/loa/views/emendaloa.py:112-122`.
+  `cmj/api/loa/views/emendaloa.py:108-129`.
 - LOA-EMD-056 [retirada] O PATCH genérico usa o serializer com todos os campos do model e não aplica
   as restrições do formulário (LOA-EMD-010, LOA-EMD-016). Só a fase é conferida no servidor.
   Substituída por LOA-EMD-070 a 073.
-  Evidência: `cmj/api/serializers.py:32-33`, `cmj/api/loa/serializers/__init__.py:121-152`,
-  `cmj/api/loa/views/emendaloa.py:112-122`.
+  Evidência: `cmj/api/serializers.py:55-56`, `cmj/api/loa/serializers/__init__.py:132-163`,
+  `cmj/api/loa/views/emendaloa.py:108-129`.
 - LOA-EMD-057 [observado] Quando o autosave dá certo:
   - a tela atualiza a entrelinha e o Valor Global com os valores retornados;
   - recarrega os registros contábeis e a pré-visualização;
@@ -438,7 +440,7 @@ Problemas vistos ao implementar as regras acordadas, fora delas.
 
 - P1. **O PATCH genérico de `valor` sempre falha.** O `DecimalField` do serializer recusa "5000,00",
   e com "5000.00" o `validate_valor` recebe um `Decimal` e o trata como texto, o que também gera 400
-  (`cmj/api/loa/serializers/__init__.py:188-216`). A tela não é afetada porque grava o Valor Global
+  (`cmj/api/loa/serializers/__init__.py:199-227`). A tela não é afetada porque grava o Valor Global
   pela action `updatevaloremenda`. Por isso, a regra de `valor` é testada pelo service e pela action.
 
 ## Fora do escopo

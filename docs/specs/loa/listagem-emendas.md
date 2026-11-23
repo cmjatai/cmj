@@ -49,7 +49,7 @@ mesma view, entram só no que afeta esta tela.
   usuário não pode ver respondem 404 na lista, no PDF, no ZIP e no registro, antes até da verificação
   reCAPTCHA do PDF (LOA-LST-085). Assim, o formulário não mostra parlamentares, entidades e unidades
   de LOA que o usuário não pode ver. Evidência: `cmj/loa/views/v_emendaloa.py:243-252`,
-  `cmj/loa/services/s_emendaloa.py:236-270`. Testes: `test_loa_inexistente_responde_404`,
+  `cmj/loa/services/s_emendaloa.py:250-284`. Testes: `test_loa_inexistente_responde_404`,
   `test_anonimo_recebe_404_em_loa_nao_publicada`; na base de desenvolvimento,
   `/loa/999999/emendaloa` respondeu 404 na lista e com `?pdf` (executado).
 - LOA-LST-004 [observado] São listadas as emendas da LOA da URL com `fase > 0`: o manager padrão
@@ -57,14 +57,14 @@ mesma view, entram só no que afeta esta tela.
   `cmj/loa/models/m_emendaloa.py:35-39`; SQL com `"fase" > 0 AND "loa_id" = 1` (executado).
 - LOA-LST-005 [implementado] Para usuário anônimo, LOA não publicada responde 404 (LOA-LST-003), e a
   lista só traz emendas de LOA com `publicado=True`. Evidência: `cmj/loa/views/v_emendaloa.py:243-252`,
-  `cmj/loa/views/v_emendaloa.py:941-943`, `cmj/loa/services/s_emendaloa.py:236-270`. Teste:
+  `cmj/loa/views/v_emendaloa.py:941-943`, `cmj/loa/services/s_emendaloa.py:250-284`. Teste:
   `test_anonimo_recebe_404_em_loa_nao_publicada`, para a lista, `?pdf`, `?zip` e `?registrar`.
 - LOA-LST-006 [implementado] Em LOA publicada, qualquer usuário vê as emendas de todas as fases e de
   todos os autores. Em LOA não publicada, a conta comum recebe 404; o operador de autor vê todas se
   a matéria da LOA ainda não virou norma, e recebe 404 se já virou; quem tem
   `loa.emendaloa_full_editor`, e portanto o superusuário, vê todas. É a mesma regra da lista de
   LOAs, concentrada em `EmendaLoa.service.loas_visiveis`. Evidência:
-  `cmj/loa/views/v_emendaloa.py:941-943`, `cmj/loa/services/s_emendaloa.py:236-270`,
+  `cmj/loa/views/v_emendaloa.py:941-943`, `cmj/loa/services/s_emendaloa.py:250-284`,
   `cmj/loa/views/v_loa.py:124-141`. Testes: `test_conta_comum_recebe_404_em_loa_nao_publicada`,
   `test_operador_e_contabilidade_veem_loa_nao_publicada`,
   `test_operador_recebe_404_em_loa_nao_publicada_cuja_materia_virou_norma`,
@@ -75,11 +75,13 @@ mesma view, entram só no que afeta esta tela.
   `cmj/api/loa/views/emendaloa.py:61-67`. Testes:
   `test_api_anonimo_nao_consulta_emenda_de_loa_nao_publicada`,
   `test_api_operador_consulta_emenda_de_loa_nao_publicada`.
-- LOA-LST-091 [implementado] A API de emendas (detalhe, lista e `search`) só devolve `owner`,
-  `metadata` e `search` a quem pode editar a emenda em alguma fase: `change_emendaloa`,
+- LOA-LST-091 [implementado] A API de emendas (detalhe, lista e `search`) só devolve `metadata` e
+  `search` a quem pode editar a emenda em alguma fase: `change_emendaloa`,
   `emendaloa_full_editor` (e portanto o superusuário) ou o autor do dono. Para os demais, inclusive o
-  anônimo e o operador de outro autor, esses campos não aparecem. A tela de edição continua
-  recebendo `metadata.style`. Evidência: `cmj/api/loa/serializers/__init__.py:20-33`,
+  anônimo e o operador de outro autor, esses campos não aparecem. O `owner` exige, além disso, a
+  permissão de listagem do model (`list_emendaloa`), pela regra geral da API para relação com
+  usuário (API-SER-032): o operador do autor não o recebe. A tela de edição continua
+  recebendo `metadata.style`. Evidência: `cmj/api/loa/serializers/__init__.py:20-44`,
   `cmj/loa/services/s_emendaloa.py:156-169`. Testes:
   `test_api_oculta_campos_internos_de_quem_nao_edita`,
   `test_api_mostra_campos_internos_a_quem_edita`,
@@ -174,7 +176,7 @@ mesma view, entram só no que afeta esta tela.
   `LEIA-ME_emendas_nao_incluidas.txt`, que lista as emendas omitidas (id e epígrafe da matéria) e
   orienta a baixar de novo ou procurar o suporte. Sem falha, esse arquivo não existe. Evidência:
   `cmj/loa/views/v_emendaloa.py:58-72`, `cmj/loa/views/v_emendaloa.py:359-423`,
-  `cmj/loa/services/s_emendaloa.py:294-334`, `cmj/api/loa/views/emendaloa.py:291`. Testes:
+  `cmj/loa/services/s_emendaloa.py:308-348`, `cmj/api/loa/views/emendaloa.py:297`. Testes:
   `test_zip_gera_os_pdfs_no_processo_sem_usar_o_host`,
   `test_zip_omite_emenda_cujo_pdf_falha_e_lista_no_leia_me`, `test_zip_sem_falha_nao_tem_leia_me`,
   `test_documento_pdf_numera_artigos_a_partir_de_1_em_cada_documento`; na LOA 2026, o ZIP do autor
@@ -343,7 +345,7 @@ mesma view, entram só no que afeta esta tela.
   `settings.BASE_URL`, nunca com o `Host` da requisição. A exceção são os três relatórios de
   `sapl/relatorios/views_old.py`, que em DEBUG usam `MEDIA_ROOT`. Evidência:
   `cmj/utils/utils_report.py:21-27`, `cmj/loa/views/v_emendaloa.py:427`,
-  `cmj/api/loa/views/emendaloa.py:248`, `cmj/api/loa/views/agrupamento.py:149`; fora da LOA,
+  `cmj/api/loa/views/emendaloa.py:254`, `cmj/api/loa/views/agrupamento.py:149`; fora da LOA,
   `cmj/utils/utils_report.py:33` (`render_pdf_to_response`), `cmj/mixins.py:690`, `cmj/mixins.py:988`,
   `sapl/relatorios/view_reports/mixins.py:22`, `sapl/relatorios/views_old.py:1379`,
   `sapl/relatorios/views_old.py:1410`, `sapl/relatorios/views_old.py:1498`, `cmj/core/views.py:792`.

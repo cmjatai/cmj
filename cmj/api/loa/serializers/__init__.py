@@ -23,6 +23,17 @@ class OcultaCamposInternosDaEmendaMixin:
 
     CAMPOS_INTERNOS = ("owner", "metadata", "search")
 
+    def get_fields(self):
+        # quem não vê esses campos em emenda nenhuma não os tem no serializer:
+        # assim eles também não valem como filtro nem como ordenação
+        fields = super().get_fields()
+        request = self.context.get("request")
+        user = getattr(request, "user", None)
+        if not EmendaLoa.service.pode_ver_campos_internos(user):
+            for campo in self.CAMPOS_INTERNOS:
+                fields.pop(campo, None)
+        return fields
+
     def to_representation(self, obj):
         data = super().to_representation(obj)
         request = self.context.get("request")

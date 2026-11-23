@@ -8,6 +8,7 @@ from functools import cached_property
 import django_filters
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured
 from django.db.models.base import ModelBase
 from django.db.models.fields import CharField, TextField
 from django.db.models.fields.files import FileField
@@ -109,6 +110,49 @@ class ApiFilterSetMixin(FilterSet):
             },
         }
 
+    def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
+        self.base_filters = self.filters_named_in(data, prefix)
+        super().__init__(data, queryset, request=request, prefix=prefix)
+        self.drop_filters_of_unreadable_fields()
+
+    def filters_named_in(self, data, prefix=None):
+        """Só os filtros que a requisição cita são instanciados, mais os
+        declarados à mão: copiar e montar todos os filtros gerados do model a
+        cada requisição custa dezenas de milissegundos. A classe continua com
+        todos em ``base_filters``, de onde o esquema os lê."""
+        base_filters = type(self).base_filters
+        if prefix:
+            return base_filters
+        named = set(data or ())
+        return OrderedDict(
+            (name, f)
+            for name, f in base_filters.items()
+            if name in named or name in self.declared_filters
+        )
+
+    def drop_filters_of_unreadable_fields(self):
+        """Um filtro gerado só vale para campo que o serializer da rota entrega
+        ao usuário da requisição. Os demais saem do filterset e o parâmetro é
+        ignorado, como qualquer parâmetro desconhecido. Filtros declarados à
+        mão num filterset próprio não passam por esta conferência."""
+        used = [
+            name
+            for name in self.filters
+            if name in self.data and name not in self.declared_filters
+        ]
+        if not used:
+            return
+
+        view = request_view(self.request)
+        if view is None:
+            # uso do filterset fora de uma requisição da API
+            return
+
+        readable = readable_field_names(view, self.request)
+        for name in used:
+            if self.filters[name].field_name not in readable:
+                del self.filters[name]
+
     def filter_id__in(self, queryset, name, value):
         try:
             ids = list(map(lambda x: int(x.strip()), value.split(",")))
@@ -117,9 +161,9 @@ class ApiFilterSetMixin(FilterSet):
             return queryset
 
     def filter_o(self, queryset, name, value):
-
         try:
-            return queryset.order_by(*map(str.strip, value.split(",")))
+            ordering = allowed_ordering(self, value)
+            return queryset.order_by(*ordering) if ordering else queryset
         except:
             return queryset
 
@@ -155,6 +199,10 @@ class ApiFilterSetMixin(FilterSet):
                             "trigram_similar",
                             "unaccent",
                             "search",
+                            # sem filtro por expressão regular vinda do
+                            # cliente: o valor iria ao banco como está
+                            "regex",
+                            "iregex",
                         ):
                             continue
 
@@ -269,6 +317,14 @@ class ApiViewSetConstrutor:
         return cls._built_sets[model._meta.app_config][model]
 
     @classmethod
+    def restricts_queryset(cls, model):
+        """O viewset do model restringe os registros que entrega: tem
+        ``get_queryset`` próprio ou ``queryset`` filtrado."""
+        viewset = cls.get_viewset_for_model(model)
+        overrides = viewset.get_queryset is not ModelViewSet.get_queryset
+        return overrides or bool(viewset.queryset.query.where)
+
+    @classmethod
     def update(cls, other):
         cls._built_sets.update(other._built_sets)
 
@@ -289,6 +345,53 @@ class ApiViewSetConstrutor:
                 )
         return router
 
+    @staticmethod
+    def import_configured_module(name):
+        """Importa um módulo configurado de serializers ou de filtersets.
+
+        A geração não segue sem ele: se o módulo não importa, ou ainda está
+        sendo importado (importação circular, que deixaria de fora as classes
+        definidas depois deste ponto), a configuração é inválida.
+        """
+        name = name.strip()
+        try:
+            module = importlib.import_module(name)
+        except Exception as e:
+            raise ImproperlyConfigured(
+                f"drfautoapi: o módulo configurado '{name}' não pôde ser importado: {e}"
+            ) from e
+        if getattr(getattr(module, "__spec__", None), "_initializing", False):
+            raise ImproperlyConfigured(
+                f"drfautoapi: o módulo configurado '{name}' ainda está sendo "
+                "importado. Ele não pode importar, direta ou indiretamente, um "
+                "módulo que chama build_class."
+            )
+        return module
+
+    @classmethod
+    def import_configured_class(cls, dotted_path):
+        """Importa uma classe configurada pelo caminho ``modulo.Classe``."""
+        module_name, _sep, class_name = dotted_path.strip().rpartition(".")
+        module = cls.import_configured_module(module_name)
+        try:
+            return getattr(module, class_name)
+        except AttributeError as e:
+            raise ImproperlyConfigured(
+                f"drfautoapi: a classe configurada '{dotted_path}' não existe."
+            ) from e
+
+    @staticmethod
+    def check_declared_model(found_class, model):
+        """Uma classe achada pelo nome não serve a um model diferente do que
+        ela declara: é o caso de models de mesmo nome em apps diferentes."""
+        declared = getattr(getattr(found_class, "Meta", None), "model", None)
+        if declared is not None and declared is not model:
+            raise ImproperlyConfigured(
+                f"drfautoapi: {found_class.__module__}.{found_class.__name__} declara "
+                f"o model {declared._meta.label} e foi achada pelo nome para "
+                f"{model._meta.label}."
+            )
+
     @classmethod
     def build_class(
         cls,
@@ -307,71 +410,65 @@ class ApiViewSetConstrutor:
         global_serializer_mixin = rest_serializers.ModelSerializer
         global_filter_class = ApiFilterSetMixin
 
-        try:
-            SERIALIZER_MODULE = SERIALIZER_MODULE or (
-                DRFAUTOAPI and DRFAUTOAPI.get("DEFAULT_SERIALIZER_MODULE", None)
-            )
-            FILTER_MODULE = FILTER_MODULE or (
-                DRFAUTOAPI and DRFAUTOAPI.get("DEFAULT_FILTER_MODULE", None)
-            )
+        SERIALIZER_MODULE = SERIALIZER_MODULE or (
+            DRFAUTOAPI and DRFAUTOAPI.get("DEFAULT_SERIALIZER_MODULE", None)
+        )
+        FILTER_MODULE = FILTER_MODULE or (
+            DRFAUTOAPI and DRFAUTOAPI.get("DEFAULT_FILTER_MODULE", None)
+        )
 
-            SERIALIZER_MIXIN = SERIALIZER_MIXIN or (
-                DRFAUTOAPI and DRFAUTOAPI.get("GLOBAL_SERIALIZER_MIXIN", None)
-            )
-            FILTERSET_MIXIN = FILTERSET_MIXIN or (
-                DRFAUTOAPI and DRFAUTOAPI.get("GLOBAL_FILTERSET_MIXIN", None)
-            )
+        SERIALIZER_MIXIN = SERIALIZER_MIXIN or (
+            DRFAUTOAPI and DRFAUTOAPI.get("GLOBAL_SERIALIZER_MIXIN", None)
+        )
+        FILTERSET_MIXIN = FILTERSET_MIXIN or (
+            DRFAUTOAPI and DRFAUTOAPI.get("GLOBAL_FILTERSET_MIXIN", None)
+        )
 
-            if SERIALIZER_MODULE:
-                modules = (
-                    SERIALIZER_MODULE.split(",")
-                    if isinstance(SERIALIZER_MODULE, str)
-                    else SERIALIZER_MODULE
+        # um módulo ou mixin configurado que não importa interrompe a geração:
+        # seguir sem ele deixaria as rotas sem as classes próprias
+        if SERIALIZER_MODULE:
+            modules = (
+                SERIALIZER_MODULE.split(",")
+                if isinstance(SERIALIZER_MODULE, str)
+                else SERIALIZER_MODULE
+            )
+            for ms in modules:
+                module = cls.import_configured_module(ms)
+                imported_classes = inspect.getmembers(module)
+                serializers_classes.update(
+                    {
+                        i[0]: i[1]
+                        for i in filter(
+                            lambda x: x[0].endswith("Serializer"),
+                            imported_classes,
+                        )
+                    }
                 )
-                for ms in modules:
-                    module = importlib.import_module(ms.strip())
-                    imported_classes = inspect.getmembers(module)
-                    serializers_classes.update(
-                        {
-                            i[0]: i[1]
-                            for i in filter(
-                                lambda x: x[0].endswith("Serializer"),
-                                imported_classes,
-                            )
-                        }
-                    )
 
-            if FILTER_MODULE:
-                modules = (
-                    FILTER_MODULE.split(",")
-                    if isinstance(FILTER_MODULE, str)
-                    else FILTER_MODULE
+        if FILTER_MODULE:
+            modules = (
+                FILTER_MODULE.split(",")
+                if isinstance(FILTER_MODULE, str)
+                else FILTER_MODULE
+            )
+            for mf in modules:
+                module = cls.import_configured_module(mf)
+                imported_classes = inspect.getmembers(module)
+                filters_classes.update(
+                    {
+                        i[0]: i[1]
+                        for i in filter(
+                            lambda x: x[0].endswith("FilterSet"),
+                            imported_classes,
+                        )
+                    }
                 )
-                for mf in modules:
-                    module = importlib.import_module(mf.strip())
-                    imported_classes = inspect.getmembers(module)
-                    filters_classes.update(
-                        {
-                            i[0]: i[1]
-                            for i in filter(
-                                lambda x: x[0].endswith("FilterSet"),
-                                imported_classes,
-                            )
-                        }
-                    )
 
-            if FILTERSET_MIXIN:
-                cs = FILTERSET_MIXIN.split(".")
-                m = importlib.import_module(".".join(cs[0:-1]))
-                global_filter_class = getattr(m, cs[-1])
+        if FILTERSET_MIXIN:
+            global_filter_class = cls.import_configured_class(FILTERSET_MIXIN)
 
-            if SERIALIZER_MIXIN:
-                cs = SERIALIZER_MIXIN.split(".")
-                module = importlib.import_module(".".join(cs[0:-1]))
-                global_serializer_mixin = getattr(module, cs[-1])
-
-        except Exception as e:
-            logger.error(e)
+        if SERIALIZER_MIXIN:
+            global_serializer_mixin = cls.import_configured_class(SERIALIZER_MIXIN)
 
         built_sets = {}
 
@@ -385,6 +482,13 @@ class ApiViewSetConstrutor:
 
             filter_name = f"{object_name}FilterSet"
             _filterset_class = filters_classes.get(filter_name, global_filter_class)
+
+            for found_class in (
+                serializers_classes.get(serializer_name),
+                filters_classes.get(filter_name),
+            ):
+                if found_class is not None:
+                    cls.check_declared_model(found_class, _model)
 
             def create_class():
 
@@ -585,6 +689,7 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         max_expand_depth = 5
+        max_expand_paths = 8
 
     def get___str__(self, obj) -> str:
         return str(obj)
@@ -598,18 +703,39 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
 
     def get_control_fields(self, control_field="expand"):
         request = self.context.get("request", None)
-        if request:
+        if request and not self.context.get("drf_ignore_control_params"):
             param = request.query_params.get(control_field, "")
             param = [e.strip() for e in param.split(";") if e.strip()]
             param = [e.split(".") for e in param]
             return param
         return []
 
+    def check_expand_paths(self, expand_fields):
+        """Uma requisição não pede mais caminhos de ``expand`` do que o teto.
+        Cada alternativa separada por vírgula num nível conta um caminho."""
+        limit = getattr(self.Meta, "max_expand_paths", 8)
+        total = 0
+        for path in expand_fields:
+            alternatives = 1
+            for level in path:
+                alternatives *= len([name for name in level.split(",") if name.strip()])
+            total += alternatives
+        if limit and total > limit:
+            raise rest_serializers.ValidationError(
+                {
+                    "expand": [
+                        f"O expand aceita até {limit} caminhos por requisição; "
+                        f"esta pede {total}."
+                    ]
+                }
+            )
+
     def get_fields(self):
         fields = super().get_fields()
 
         if not hasattr(self.root, "drf_expand_fields"):
             self.root.drf_expand_fields = self.get_control_fields("expand")
+            self.check_expand_paths(self.root.drf_expand_fields)
             self.root.drf_include_fields = self.get_control_fields("include")
             self.root.drf_exclude_fields = self.get_control_fields("exclude")
             if not (
@@ -710,9 +836,15 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
 
             if model:
                 try:
-                    serializer_class = ApiViewSetConstrutor.get_viewset_for_model(
-                        model
-                    ).serializer_class
+                    # só expande o que o usuário poderia ler na rota do model
+                    # relacionado; sem isso, o campo segue como id
+                    view = self.get_expand_view(model)
+                    if view is None:
+                        continue
+
+                    serializer_class = expand_serializer_class(
+                        view.get_serializer_class()
+                    )
                     if (
                         hasattr(field, "many")
                         and field.many
@@ -721,10 +853,12 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
                         serializer_class = serializer_class(
                             many=True, read_only=True, context=self.context
                         )
+                        serializer_class.child.drf_expand_view = view
                     else:
                         serializer_class = serializer_class(
                             read_only=True, context=self.context
                         )
+                        serializer_class.drf_expand_view = view
 
                     fields[field_name] = serializer_class
 
@@ -734,3 +868,181 @@ class DrfAutoApiSerializerMixin(rest_serializers.ModelSerializer):
                     )
 
         return fields
+
+    def get_expand_view(self, model):
+        """Viewset do model relacionado, pronto para leitura pelo usuário da
+        requisição, ou None se ele não puder ler a rota desse model."""
+        if not hasattr(self.root, "drf_expand_views"):
+            self.root.drf_expand_views = {}
+        views = self.root.drf_expand_views
+
+        if model not in views:
+            views[model] = None
+            request = self.context.get("request", None)
+            if request is not None:
+                try:
+                    views[model] = build_expand_view(model, request)
+                except Exception as e:
+                    logger.error(
+                        f"Erro ao conferir a leitura do model {model} na expansão: {e}"
+                    )
+        return views[model]
+
+
+class ExpandReadRequest:
+    """A requisição em curso, vista como leitura. Serve para conferir se o
+    usuário leria a rota de um model relacionado, qualquer que seja o método
+    da requisição original."""
+
+    method = "GET"
+
+    def __init__(self, request):
+        self._request = request
+
+    def __getattr__(self, name):
+        return getattr(self._request, name)
+
+
+def build_expand_view(model, request):
+    """Instancia o viewset do model como numa listagem e aplica as permissões
+    dele. Devolve None se alguma negar a leitura."""
+    view = ApiViewSetConstrutor.get_viewset_for_model(model)()
+    view.request = ExpandReadRequest(request)
+    view.action = "list"
+    view.args = ()
+    view.kwargs = {}
+    view.format_kwarg = None
+
+    for permission in view.get_permissions():
+        if not permission.has_permission(view.request, view):
+            return None
+
+    # só confere objeto a objeto quando o viewset restringe o queryset
+    view.drf_expand_restricts_queryset = ApiViewSetConstrutor.restricts_queryset(model)
+    return view
+
+
+_expand_serializer_classes = {}
+
+
+def expand_serializer_class(serializer_class):
+    """Deriva o serializer usado na expansão: o objeto que o usuário não veria
+    na rota do model relacionado sai como id, como se não fosse expandido."""
+    if serializer_class not in _expand_serializer_classes:
+
+        class ExpandSerializer(serializer_class):
+            drf_expand_view = None
+
+            def to_representation(self, obj):
+                if not expand_object_is_visible(self, obj):
+                    return obj.pk
+                return super().to_representation(obj)
+
+        ExpandSerializer.__name__ = serializer_class.__name__
+        _expand_serializer_classes[serializer_class] = ExpandSerializer
+    return _expand_serializer_classes[serializer_class]
+
+
+def expand_object_is_visible(serializer, obj):
+    view = serializer.drf_expand_view
+    if view is None or not view.drf_expand_restricts_queryset:
+        return True
+
+    if not hasattr(serializer.root, "drf_expand_visible"):
+        serializer.root.drf_expand_visible = {}
+    visible = serializer.root.drf_expand_visible
+
+    key = (type(obj), obj.pk)
+    if key not in visible:
+        try:
+            visible[key] = view.get_queryset().filter(pk=obj.pk).exists()
+        except Exception as e:
+            logger.error(f"Erro ao conferir a visibilidade de {key} na expansão: {e}")
+            visible[key] = False
+    return visible[key]
+
+
+def request_view(request):
+    """Viewset que atende a requisição, ou None fora de uma requisição da API."""
+    context = getattr(request, "parser_context", None) or {}
+    return context.get("view", None)
+
+
+def readable_field_names(view, request):
+    """Nomes dos campos que o serializer do viewset entrega ao usuário da
+    requisição, sem contar ``expand``, ``include`` e ``exclude``. Se o
+    serializer não puder ser montado, nenhum campo conta como legível."""
+    cache = view.__dict__.setdefault("drf_readable_field_names", {})
+    try:
+        serializer_class = view.get_serializer_class()
+        if serializer_class not in cache:
+            # o contexto é montado aqui porque o filterset também roda antes
+            # de o viewset receber `request` e `format_kwarg`
+            context = {
+                "request": request,
+                "view": view,
+                "format": getattr(view, "format_kwarg", None),
+                "drf_ignore_control_params": True,
+            }
+            fields = serializer_class(context=context).fields
+            names = set(fields)
+            names.update(
+                field.source.split(".")[0]
+                for field in fields.values()
+                if field.source and field.source != "*"
+            )
+            cache[serializer_class] = names
+        return cache[serializer_class]
+    except Exception as e:
+        logger.error(f"Erro ao levantar os campos legíveis de {view}: {e}")
+        return set()
+
+
+def allowed_ordering(filterset, value):
+    """Termos de ``o``, se todos ordenam por campos que o usuário recebe.
+    Basta um termo fora disso para a ordenação inteira ser ignorada."""
+    terms = [term.strip() for term in value.split(",") if term.strip()]
+
+    view = request_view(filterset.request)
+    if view is None:
+        # uso do filterset fora de uma requisição da API
+        return terms
+
+    model = filterset._meta.model
+    for term in terms:
+        path = term.lstrip("-")
+        if path == "?":
+            continue
+        hops = path.split("__")
+        if not ordering_path_is_readable(view, filterset.request, model, hops):
+            return []
+    return terms
+
+
+def ordering_path_is_readable(view, request, model, hops):
+    """Cada passo do caminho é um campo legível, e uma relação só é
+    atravessada quando o ``expand`` a expandiria para o usuário."""
+    hop, rest = hops[0], hops[1:]
+    if hop == "pk":
+        hop = model._meta.pk.name
+
+    if hop not in readable_field_names(view, request):
+        return False
+    if not rest:
+        return True
+
+    try:
+        related = model._meta.get_field(hop).related_model
+    except FieldDoesNotExist:
+        return False
+    if related is None or related is get_user_model():
+        return False
+
+    try:
+        related_view = build_expand_view(related, request)
+    except Exception as e:
+        logger.error(f"Erro ao conferir a leitura do model {related} na ordenação: {e}")
+        return False
+    if related_view is None:
+        return False
+    return ordering_path_is_readable(related_view, related_view.request, related, rest)

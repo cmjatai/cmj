@@ -100,11 +100,31 @@ Fora de uso: `cmj/legacy_cep`, `cmj/checklist` e `sapl/lexml` não estão em `IN
   campo, `rel__campo` ou método `hook_*`. Busca Solr é outro mecanismo, descrito abaixo.
 - **Permissões**: radicais `RP_LIST`, `RP_DETAIL`, `RP_ADD`, `RP_CHANGE`, `RP_DELETE`. Grupos em
   `cmj/globalrules/map_rules.py` ou `sapl/rules/map_rules.py`, aplicados no `post_migrate`.
-  CRUD público usa `public = [RP_LIST, RP_DETAIL]`.
+  CRUD público usa `public = [RP_LIST, RP_DETAIL]`. O terceiro elemento da regra no `map_rules`
+  torna o model público na API e no WebSocket, sem depender do `public` do CRUD: os dois têm de
+  concordar.
 - **API**: `ApiViewSetConstrutor.build_class` gera `/api/<app_label>/<model>/` para os apps
   informados. Personalize com `@customize(Model)` em `cmj/api/views_<app>.py`,
   `cmj/api/loa/views/` ou `sapl/api/views_<app>.py`. Módulo novo em `cmj/api` precisa entrar em
-  `import_modules` de `cmj/api/views.py`. Serializers herdam `CmjSerializerMixin`.
+  `import_modules` de `cmj/api/views.py`. Serializers herdam `CmjSerializerMixin`. Campo que não
+  pode sair para todos é retirado na classe do serializer (`get_fields`), não no viewset: `expand`
+  e as actions usam a classe, e filtro e ordenação gerados só valem para campo que o serializer
+  entrega ao usuário. O `CmjSerializerMixin` já aplica a todas as rotas: num model com o par `ip`
+  e `user` (quem fez o registro), os dois campos só saem para superusuário, assim como as chaves
+  de armazenamento dentro de `metadata` (`s3_aws`, `s3_cmj`, `locaweb`); as demais relações com o
+  model de usuário só saem para quem tem `list_` do model; e `owner` e `modifier` são preenchidos
+  pelo servidor nas gravações, sem aceitar valor do cliente. A visibilidade dos registros de um model fica no `get_queryset` do viewset,
+  com a regra numa classe de serviço do app (exemplo: `sapl/compilacao/services/s_visibilidade.py`);
+  o `expand` e as actions de arquivo consultam esse ponto, e o canal de sincronização por WebSocket
+  manda o aviso desses models sem o conteúdo do registro. Os módulos de serializers e de filtersets
+  não importam `sapl.api.views`: módulo configurado que não importa, ou que é lido pela metade,
+  interrompe a inicialização, assim como classe achada pelo nome com `Meta.model` de outro app.
+  `get_all=true` só devolve a lista inteira até `API_GET_ALL_MAX_ITEMS` (2.000)
+  para quem não tem `list_` do model: tela pública que use `get_all` precisa filtrar por um
+  registro pai. `expand` aceita até 8 caminhos por requisição; acima disso a resposta é 400.
+  O model de usuário e o registro de auditoria não têm rota na API (`core/user`,
+  `core/auditlog`): contas, senhas, grupos e permissões ficam nas telas de usuário, e a auditoria,
+  na tela de pesquisa. A auditoria não guarda o campo `password` (`AuditoriaService`).
 - **Celery**: toda task declara `queue=`: `cq_arq`, `cq_core`, `cq_videos`, `cq_base` ou
   `cq_painelset`. Fila nova exige alterar os `docker/start*.sh`.
 - **Solr**: índices só em `cmj/search/search_indexes.py` e `cmj/arq/search_indexes.py`. Model novo
@@ -180,6 +200,9 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   para renovar versões use `npm update`.
 - **Produção roda `migrate` ao subir** (`docker/start.sh`), com containers blue e green.
   Prefira migrations compatíveis com a versão ainda em execução.
+- **IP do cliente**: a aplicação lê `X-Real-IP`. O nginx do container o define nos três blocos de
+  proxy (telas, API e WebSocket) e só aceita o valor do proxy da frente em conexão local ou
+  privada (`real_ip_header`). Não redefina o cabeçalho num bloco só.
 - **Settings ignoradas**: `USE_SOLR`, `SOLR_URL` e `SOLR_COLLECTION` são fixas em `project.py`.
 - **`requirements/dev-requirements.txt`** fixa versões de `pandas` diferentes de `requirements.txt`.
 
@@ -192,6 +215,12 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
 - Não use `DATABASE_URL_PRD` nem suba `docker/docker-compose.yaml` sem pedido explícito.
 - Não execute sem pedido: `restore_cmj_dev.sh` (apaga o banco), `docker/restore-db.sh`, `s3_restore`.
 - Não rode `npm run build` nem commite `dist/` sem pedido.
+- Não escreva teste nem script que comunique com API externa (Telegram, YouTube, S3 pelo `boto3`,
+  `google.genai`), nem com chave vazia: troque o cliente por mock. O `conftest.py` já impede o
+  envio do signal de rede social (`_rede_social_nao_envia_nos_testes`) e barra, em todo `pytest`,
+  a conexão por socket Python a destino que não seja local ou de rede privada (`vigia_de_rede`):
+  o teste que tenta é reprovado, mesmo que o código engula o erro. Script fora do `pytest` não
+  tem essa proteção.
 - Não edite `collected_static/`, `__notebooks_private/`, `cmj/legacy_cep/`.
 - Não reformate arquivos inteiros fora do escopo da tarefa.
 
@@ -210,6 +239,12 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   lado Django, composables do lado Vue, CSS e testes. Leia antes de mexer em `_frontend/v8`, `_templates/v8` ou `cmj/v8`.
 - `docs/specs/api/login.md`: login por usuário e senha pela API (`/api/auth/session` e
   `/api/auth/token`): limite de tentativas e token CSRF. Leia antes de alterar essas rotas.
+- `docs/specs/api/`: comportamento atual da API gerada pelo `drfautoapi`, em seis specs. Leia a da
+  parte que for alterar, e todas antes de expor um model novo na API: `gerador.md` (registro,
+  `@customize`, rotas e `Last-Modified`), `acesso.md` (permissões, o que anônimo alcança e
+  visibilidade dos registros), `serializacao.md` (campos por padrão, `expand`, `include` e
+  `exclude`), `filtros.md` (filtros e ordenação gerados), `paginacao-custo.md` (`get_all`, medições
+  e quem usa `get_all` nos frontends) e `arquivos.md` (`ResponseFileMixin` e renderers).
 - `docs/specs/v8/README.md`: índice das specs do v8 (arquitetura, templates em camadas, shell,
   overlays, cliente HTTP, demonstração, temas, design system e componentes base). Leia a spec da
   parte que for alterar.

@@ -23,10 +23,6 @@ class DisabledMiddleware:
 
         response = self.get_response(request)
 
-        if hasattr(request, "user") and not request.user.is_authenticated and "u" in request.GET:
-            return HttpResponse(status=444)
-            # return HttpResponseForbidden()
-
         # Captura qualquer erro (4xx ou 5xx)
         # if response.status_code >= 400:
         #    msg = f"Status {response.status_code} em {request.path}"
@@ -48,6 +44,12 @@ class DisabledMiddleware:
         # processar a requisição e possui os seguintes parâmetros:
         # None - continua as midd
         # httpreponse responde
+
+        # requisição anônima com o parâmetro ``u`` é recusada antes de a view
+        # rodar: era o carimbo de tempo das prévias de PDF, que as telas não
+        # mandam mais e que robôs continuam repetindo
+        if not request.user.is_authenticated and "u" in request.GET:
+            return HttpResponse(status=444)
 
         now = timezone.localtime()
         path = request.path

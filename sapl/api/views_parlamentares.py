@@ -35,13 +35,6 @@ class _ParlamentarViewSet(ResponseFileMixin):
     def fotografia(self, request, *args, **kwargs):
         return self.response_file(request, *args, **kwargs)
 
-    def get_serializer(self, *args, **kwargs):
-        from sapl.api.serializers import ParlamentarSerializerPublic
-
-        if not self.request.user.has_perm("parlamentares.add_parlamentar"):
-            self.serializer_class = ParlamentarSerializerPublic
-        return super().get_serializer(*args, **kwargs)
-
     @action(detail=True)
     def proposicoes(self, request, *args, **kwargs):
         """

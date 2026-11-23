@@ -343,6 +343,9 @@ def test_anular_protocolo_form_anula_protocolo_anulado():
     assert form.errors["__all__"] == [_("Protocolo 1/2017 já encontra-se anulado")]
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_anular_protocolo_form_anula_protocolo_com_doc_vinculado():
     tipo_materia = mommy.make(TipoMateriaLegislativa)

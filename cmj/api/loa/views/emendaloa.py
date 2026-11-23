@@ -106,18 +106,24 @@ class EmendaLoaViewSet:
         )
 
     def perform_update(self, serializer):
-        # LOA-EMD-083: sem campo do model no PATCH, a emenda não é gravada, o que
-        # evita signals e o sync() (LOA-EMD-031) sem mudança real
-        if not serializer.validated_data:
-            return
+        # LOA-EMD-071: `owner` é mantido pelo servidor e não chega aos dados
+        # validados; enviado no PATCH, entra na conferência para ser recusado
+        dados = dict(serializer.validated_data)
+        if "owner" in self.request.data:
+            dados["owner"] = self.request.data["owner"]
 
         # LOA-EMD-070 a 073: só os campos que o perfil pode alterar
         try:
             EmendaLoa.service.validar_alteracao(
-                self.request.user, serializer.instance, serializer.validated_data
+                self.request.user, serializer.instance, dados
             )
         except ValidationError as e:
             raise DRFValidationError(e.messages)
+
+        # LOA-EMD-083: sem campo do model no PATCH, a emenda não é gravada, o que
+        # evita signals e o sync() (LOA-EMD-031) sem mudança real
+        if not serializer.validated_data:
+            return
 
         serializer.instance._usuario_fase = self.request.user  # LOA-FASE-067
         serializer.save()

@@ -41,10 +41,10 @@ configuração de geração e contagem de tokens. É a classe-base de todos os s
 - GENIA-BASE-004 [implementado] Só serve a cota que está ativa, tem a chave do serviço em
   `servicos_autorizados` e cuja soma de `peso` dos logs da data local de hoje é menor que
   `quota_diaria`. Sem nenhuma, levanta `IAQuotaUnavailableError`. Evidência:
-  `cmj/utils/genia/base.py:66-74`, `cmj/core/models.py:1046-1066`.
+  `cmj/utils/genia/base.py:66-74`, `cmj/core/models.py:1048-1068`.
 - GENIA-BASE-005 [implementado] Entre as cotas que servem, `ascending=True` escolhe a de menor
   `quota_diaria` e `ascending=False`, a de maior. A escolhida define `self.ia_model_name`. Evidência:
-  `cmj/core/models.py:1064-1066`, `cmj/utils/genia/base.py:76`.
+  `cmj/core/models.py:1066-1068`, `cmj/utils/genia/base.py:76`.
 - GENIA-BASE-006 [implementado] Com `ia_model_name` informado, só a cota desse modelo serve. Se ela
   não existir ou não tiver margem, levanta `IAQuotaUnavailableError`, sem recorrer a outro modelo.
   Evidência: `cmj/utils/genia/base.py:69-74`.

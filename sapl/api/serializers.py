@@ -6,10 +6,11 @@ from django.db.models import Q
 from rest_framework import serializers
 
 from cmj.api.serializers import CmjSerializerMixin, ModelChoiceObjectRelatedField
-from sapl.api.views import SaplApiViewSetConstrutor
+from drfautoapi.drfautoapi import ApiViewSetConstrutor
 from sapl.base.models import Autor, CasaLegislativa
 from sapl.materia.models import MateriaLegislativa, Tramitacao
 from sapl.parlamentares.models import Legislatura, Mandato, Parlamentar
+from sapl.protocoloadm.models import DocumentoAdministrativo
 from sapl.sessao.models import OrdemDia, SessaoPlenaria
 
 
@@ -55,30 +56,67 @@ class MateriaLegislativaSerializer(CmjSerializerMixin):
         #    'id', flat=True)[:1].first()
         ultima_tramitacao = obj.tramitacao_set.first()
 
-        serializer_class = SaplApiViewSetConstrutor.get_viewset_for_model(
+        serializer_class = ApiViewSetConstrutor.get_viewset_for_model(
             Tramitacao
         ).serializer_class(ultima_tramitacao)
 
         return serializer_class.data
 
 
-class ParlamentarSerializerPublic(CmjSerializerMixin):
+class DocumentoAdministrativoSerializer(CmjSerializerMixin):
+    """O código de compartilhamento e os campos de importação do documento
+    administrativo, que tela nenhuma mostra, só saem para quem tem a
+    permissão de listagem do model (docs/specs/api/serializacao.md)."""
 
-    class Meta:
+    CAMPOS_INTERNOS = (
+        "link_share",
+        "old_path",
+        "old_json",
+        "temp_migracao_sislegis",
+    )
+
+    class Meta(CmjSerializerMixin.Meta):
+        model = DocumentoAdministrativo
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if not self.usuario_lista_o_model():
+            for campo in self.CAMPOS_INTERNOS:
+                fields.pop(campo, None)
+        return fields
+
+
+class ParlamentarSerializer(CmjSerializerMixin):
+    """Os campos pessoais só saem para quem pode cadastrar parlamentar, em
+    qualquer caminho que use este serializer (docs/specs/api/serializacao.md)."""
+
+    CAMPOS_PESSOAIS = (
+        "cpf",
+        "rg",
+        "fax",
+        "endereco_residencia",
+        "municipio_residencia",
+        "uf_residencia",
+        "cep_residencia",
+        "situacao_militar",
+        "telefone_residencia",
+        "titulo_eleitor",
+        "fax_residencia",
+        "data_nascimento",
+        "sexo",
+    )
+
+    class Meta(CmjSerializerMixin.Meta):
         model = Parlamentar
-        exclude = [
-            "cpf",
-            "rg",
-            "fax",
-            "endereco_residencia",
-            "municipio_residencia",
-            "uf_residencia",
-            "cep_residencia",
-            "situacao_militar",
-            "telefone_residencia",
-            "titulo_eleitor",
-            "fax_residencia",
-        ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request", None)
+        user = getattr(request, "user", None)
+        if not (user and user.has_perm("parlamentares.add_parlamentar")):
+            for campo in self.CAMPOS_PESSOAIS:
+                fields.pop(campo, None)
+        return fields
 
 
 class ParlamentarSerializerVerbose(CmjSerializerMixin):

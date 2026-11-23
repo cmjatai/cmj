@@ -129,7 +129,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   que ele não valha no `save()` seguinte. Na criação pela API, o histórico inicial recebe o usuário logo
   após o `save()`. O detalhe da emenda mostra o usuário ao superusuário. Evidência:
   `cmj/loa/models/m_emendaloa.py:1014-1023`, `cmj/loa/signals.py:23-38`,
-  `cmj/api/loa/views/emendaloa.py:100-123`, `cmj/loa/forms/f_emendaloa.py:649`,
+  `cmj/api/loa/views/emendaloa.py:100-129`, `cmj/loa/forms/f_emendaloa.py:649`,
   `cmj/loa/views/v_emendaloa.py:1081`, `cmj/loa/models/m_agrupamento.py:345-410`,
   `cmj/api/loa/views/agrupamentoemendaloa.py:125`, `cmj/loa/forms/f_agrupamento.py:320-326`,
   `sapl/materia/forms.py:3422`.
@@ -169,7 +169,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 | LOA-FASE-012 [observado] | Qualquer | 15, 17 | Campo `fase` no formulário | Editor contábil sem `add_emendaloa` e não superusuário | `cmj/loa/forms/f_emendaloa.py:285-288`, `cmj/loa/forms/f_emendaloa.py:486`, `cmj/loa/forms/f_emendaloa.py:546-548` |
 | LOA-FASE-013 [observado] | 15, 17 (LOA-FASE-069) | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1043-1064` |
 | LOA-FASE-014 [observado] | 15, 17 (LOA-FASE-069) | 10 | Botão "Devolver para correção" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1043-1064` |
-| LOA-FASE-015 [observado] | Busca: menor que 17; o servidor aceita 12 e 15 (LOA-FASE-059) | 15 | Adicionar ao agrupamento; o servidor define a fase e ignora o `emendaloa__fase` que a tela ainda envia (LOA-FASE-060) | `emendaloa_full_editor` | `cmj/api/loa/views/emendaloa.py:344`, `cmj/api/loa/views/agrupamentoemendaloa.py:18-19`, `cmj/api/loa/views/agrupamentoemendaloa.py:116-126`, `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:458-467` |
+| LOA-FASE-015 [observado] | Busca: menor que 17; o servidor aceita 12 e 15 (LOA-FASE-059) | 15 | Adicionar ao agrupamento; o servidor define a fase e ignora o `emendaloa__fase` que a tela ainda envia (LOA-FASE-060) | `emendaloa_full_editor` | `cmj/api/loa/views/emendaloa.py:350`, `cmj/api/loa/views/agrupamentoemendaloa.py:18-19`, `cmj/api/loa/views/agrupamentoemendaloa.py:116-126`, `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:458-467` |
 | LOA-FASE-016 [observado] | Entre 1 e 16, recusado se alguma estiver na 10 (LOA-AGR-082) | 17 | "Liberar para Protocolo" (salvar o formulário do agrupamento), incluindo as coletivas geradas | Formulário de agrupamento | `cmj/loa/forms/f_agrupamento.py:317-327` |
 | LOA-FASE-017 [observado] | Emenda de origem | -10 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:407-411`, `cmj/api/loa/views/agrupamento.py:15-17`, `cmj/api/loa/views/agrupamento.py:96-102` |
 | LOA-FASE-018 [observado] | Nova coletiva | 15 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:386-405` |

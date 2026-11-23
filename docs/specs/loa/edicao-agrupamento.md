@@ -272,7 +272,7 @@ inclusão continua substituindo os registros que ela tinha.
   - Ficam de fora as que já estão na lista de selecionadas. As que estão em outro agrupamento aparecem.
   - Emendas na fase 10 aparecem sem o botão de incluir.
   - Evidência: `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:410-486`,
-    `cmj/api/loa/views/emendaloa.py:334-361`.
+    `cmj/api/loa/views/emendaloa.py:340-367`.
 
 - LOA-AGR-042 [observado] Incluir uma emenda envia `POST /api/loa/agrupamentoemendaloa/`. Fases aceitas,
   ano e fase resultante seguem LOA-FASE-058 a LOA-FASE-060.

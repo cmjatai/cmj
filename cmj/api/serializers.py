@@ -1,5 +1,6 @@
 import os
 
+from django.core.exceptions import FieldDoesNotExist
 from django.db.models import Max
 from django.forms.models import model_to_dict
 from django.urls.base import reverse
@@ -27,10 +28,148 @@ from drfautoapi.drfautoapi import DrfAutoApiSerializerMixin
 
 
 class CmjSerializerMixin(DrfAutoApiSerializerMixin):
+    """Serializer padrão das rotas geradas (docs/specs/api/serializacao.md).
+
+    Leitura, em qualquer caminho que use o serializer:
+
+    - os campos ``ip`` e ``user`` de um model que guarda quem fez o
+      registro, isto é, que tem o par, só saem para superusuário;
+    - dentro de ``metadata``, as chaves que descrevem onde os arquivos do
+      registro estão armazenados só saem para superusuário;
+    - as demais relações com o model de usuário só saem para quem tem a
+      permissão de listagem do próprio model.
+
+    Gravação:
+
+    - ``owner`` e ``modifier`` são preenchidos com o usuário da requisição,
+      e o que o cliente enviar neles é ignorado;
+    - quem não é superusuário não cria, altera nem apaga as chaves de
+      armazenamento de ``metadata``."""
+
+    CAMPOS_DE_REGISTRO = ("ip", "user")
+    CAMPOS_DE_AUDITORIA = ("owner", "modifier")
+    METADATA_CHAVES_DE_ARMAZENAMENTO = ("s3_aws", "s3_cmj", "locaweb")
+
     link_detail_backend = serializers.SerializerMethodField()
 
     class Meta(DrfAutoApiSerializerMixin.Meta):
         fields = "__all__"
+
+    def get_extra_kwargs(self):
+        extra_kwargs = super().get_extra_kwargs()
+        for campo in self.campos_de_auditoria():
+            extra_kwargs[campo] = {**extra_kwargs.get(campo, {}), "read_only": True}
+        return extra_kwargs
+
+    def get_fields(self):
+        fields = super().get_fields()
+        if self.model_guarda_quem_registrou() and not self.usuario_e_superusuario():
+            for campo in self.CAMPOS_DE_REGISTRO:
+                fields.pop(campo, None)
+        if not self.usuario_lista_o_model():
+            for campo in self.relacoes_com_usuario():
+                fields.pop(campo, None)
+        return fields
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        metadata = data.get("metadata")
+        if isinstance(metadata, dict) and not self.usuario_e_superusuario():
+            # cópia: o dicionário original é o do próprio objeto
+            data["metadata"] = self.sem_chaves_de_armazenamento(metadata)
+        return data
+
+    def create(self, validated_data):
+        self.preenche_auditoria(validated_data, criando=True)
+        self.preserva_armazenamento(validated_data, None)
+        return super().create(validated_data)
+
+    def update(self, instance, validated_data):
+        self.preenche_auditoria(validated_data, criando=False)
+        self.preserva_armazenamento(validated_data, instance)
+        return super().update(instance, validated_data)
+
+    def usuario_da_requisicao(self):
+        request = self.context.get("request", None)
+        return getattr(request, "user", None)
+
+    def usuario_e_superusuario(self):
+        user = self.usuario_da_requisicao()
+        return bool(user and user.is_superuser)
+
+    def usuario_lista_o_model(self):
+        model = self.model_do_serializer()
+        user = self.usuario_da_requisicao()
+        if model is None or user is None:
+            return False
+        return user.has_perm(f"{model._meta.app_label}.list_{model._meta.model_name}")
+
+    def model_do_serializer(self):
+        return getattr(getattr(self, "Meta", None), "model", None)
+
+    def model_guarda_quem_registrou(self):
+        model = self.model_do_serializer()
+        if model is None:
+            return False
+        try:
+            for campo in self.CAMPOS_DE_REGISTRO:
+                model._meta.get_field(campo)
+        except FieldDoesNotExist:
+            return False
+        return True
+
+    def relacoes_com_usuario(self):
+        """Campos do model que apontam para o model de usuário."""
+        model = self.model_do_serializer()
+        if model is None:
+            return []
+        return [
+            field.name
+            for field in model._meta.get_fields()
+            if field.is_relation
+            and not field.auto_created
+            and field.related_model is self.user_model
+        ]
+
+    def campos_de_auditoria(self):
+        """``owner`` e ``modifier`` do model, quando apontam para o usuário."""
+        relacoes = self.relacoes_com_usuario()
+        return [campo for campo in self.CAMPOS_DE_AUDITORIA if campo in relacoes]
+
+    def preenche_auditoria(self, validated_data, criando):
+        user = self.usuario_da_requisicao()
+        if user is None or not user.is_authenticated:
+            return
+        for campo in self.campos_de_auditoria():
+            if criando or campo == "modifier":
+                validated_data[campo] = user
+
+    def sem_chaves_de_armazenamento(self, metadata):
+        return {
+            chave: valor
+            for chave, valor in metadata.items()
+            if chave not in self.METADATA_CHAVES_DE_ARMAZENAMENTO
+        }
+
+    def preserva_armazenamento(self, validated_data, instance):
+        """Na gravação por quem não é superusuário, as chaves de
+        armazenamento de ``metadata`` ficam como estão no registro."""
+        if "metadata" not in validated_data or self.usuario_e_superusuario():
+            return
+        recebido = validated_data["metadata"]
+        atual = getattr(instance, "metadata", None)
+        guardadas = {
+            chave: valor
+            for chave, valor in (atual if isinstance(atual, dict) else {}).items()
+            if chave in self.METADATA_CHAVES_DE_ARMAZENAMENTO
+        }
+        if isinstance(recebido, dict):
+            validated_data["metadata"] = {
+                **self.sem_chaves_de_armazenamento(recebido),
+                **guardadas,
+            }
+        elif guardadas:
+            validated_data["metadata"] = guardadas
 
     def get_link_detail_backend(self, obj) -> str:
         try:

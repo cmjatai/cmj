@@ -337,6 +337,8 @@ class AuditLog(models.Model):
         indexes = [
             models.Index(fields=["app_name", "model_name"]),
             models.Index(fields=["model_name", "app_name"]),
+            # última gravação de um model, para a resposta condicional da API
+            models.Index(fields=["app_name", "model_name", "-timestamp"]),
             models.Index(fields=["content_type", "object_id"]),
             models.Index(fields=["obj_id"]),
             models.Index(fields=["timestamp"]),

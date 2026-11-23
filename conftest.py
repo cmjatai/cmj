@@ -1,4 +1,8 @@
+import ipaddress
 import logging
+import socket
+from urllib.parse import urlparse
+
 import pytest
 from django_webtest import DjangoTestApp, WebTestMixin
 
@@ -164,6 +168,192 @@ def _cleanup_django_signals():
             logger.debug(f"Signal {signal} tem {len(signal.receivers)} receivers ativos")
     except Exception as e:
         logger.debug(f"Erro ao limpar signals de teste: {e}")
+
+
+@pytest.fixture(autouse=True)
+def _rede_social_nao_envia_nos_testes(monkeypatch):
+    """Nenhum teste publica em rede social: a task que o signal de rede
+    social aciona encontra, no lugar de cada função de envio, uma que não
+    faz nada."""
+    from cmj.core import tasks
+
+    for nome in [n for n in vars(tasks) if n.startswith("send_")]:
+        monkeypatch.setattr(tasks, nome, lambda pk: None)
+
+
+class ConexaoExternaBarrada(OSError):
+    """Um teste tentou comunicar com um destino que não é local."""
+
+
+class VigiaDeRede:
+    """Barra, durante os testes, a comunicação com destino que não é local.
+
+    Troca as funções de socket do Python que abrem conexão, enviam datagrama
+    ou resolvem nome. Passam o loopback, as redes privadas, os sockets de
+    arquivo e os nomes dos serviços das settings (banco, Redis, Solr e dev
+    server). Qualquer outro destino levanta ``ConexaoExternaBarrada`` antes de
+    sair da máquina, sem consulta de DNS, e fica em ``tentativas``.
+
+    Só enxerga sockets Python: bibliotecas que abrem a conexão em código
+    nativo, como a libpq do PostgreSQL, não passam por aqui.
+    """
+
+    def __init__(self):
+        self.tentativas = []
+        self._nomes_liberados = None
+        self._originais = {}
+
+    @property
+    def nomes_liberados(self):
+        if self._nomes_liberados is None:
+            from django.conf import settings
+
+            nomes = {"localhost", socket.gethostname()}
+            nomes.update(db.get("HOST") for db in settings.DATABASES.values())
+            nomes.add(getattr(settings, "REDIS_HOST", None))
+            nomes.add(urlparse(getattr(settings, "SOLR_URL", "")).hostname)
+            nomes.add(getattr(settings, "DEV_HOST_NAME", None))
+            self._nomes_liberados = {n.lower() for n in nomes if n}
+        return self._nomes_liberados
+
+    # loopback, redes privadas e link-local. Não se usa ``is_private``, que
+    # também aceita faixas reservadas que não são da rede local
+    redes_locais = [
+        ipaddress.ip_network(rede)
+        for rede in (
+            "127.0.0.0/8",
+            "10.0.0.0/8",
+            "172.16.0.0/12",
+            "192.168.0.0/16",
+            "169.254.0.0/16",
+            "::1/128",
+            "fc00::/7",
+            "fe80::/10",
+        )
+    ]
+
+    @classmethod
+    def ip_local(cls, host):
+        """``None`` quando ``host`` não é um IP."""
+        try:
+            ip = ipaddress.ip_address(host)
+        except ValueError:
+            return None
+        ip = getattr(ip, "ipv4_mapped", None) or ip
+        return any(
+            ip.version == rede.version and ip in rede for rede in cls.redes_locais
+        )
+
+    def liberado(self, endereco, por_nome):
+        # socket de arquivo (AF_UNIX) e outras famílias sem host
+        if not isinstance(endereco, tuple):
+            return True
+        host = endereco[0]
+        if isinstance(host, bytes):
+            host = host.decode("ascii", "replace")
+        if not host:
+            return True
+        local = self.ip_local(host)
+        if local is not None:
+            return local
+        # nome só vale para resolver; a conexão é conferida pelo IP resolvido
+        return por_nome and host.lower() in self.nomes_liberados
+
+    def confere(self, operacao, endereco, por_nome=False):
+        if not self.liberado(endereco, por_nome):
+            self.tentativas.append(f"{operacao} {endereco!r}")
+            raise ConexaoExternaBarrada(
+                f"Comunicação externa barrada nos testes: {operacao} {endereco!r}. "
+                "Troque o cliente por mock."
+            )
+
+    def reprovacao(self):
+        """Mensagem para reprovar o teste que tentou sair, ainda que o código
+        testado tenha engolido o erro; ``None`` se não houve tentativa."""
+        if not self.tentativas:
+            return None
+        return (
+            "O teste tentou comunicar com destino externo: "
+            + "; ".join(self.tentativas)
+            + ". Troque o cliente por mock."
+        )
+
+    def instalar(self):
+        vigia = self
+        self._originais = {
+            (socket.socket, "connect"): socket.socket.connect,
+            (socket.socket, "connect_ex"): socket.socket.connect_ex,
+            (socket.socket, "sendto"): socket.socket.sendto,
+            (socket, "getaddrinfo"): socket.getaddrinfo,
+            (socket, "gethostbyname"): socket.gethostbyname,
+            (socket, "gethostbyname_ex"): socket.gethostbyname_ex,
+        }
+        originais = self._originais
+
+        def connect(sock, address):
+            vigia.confere("connect", address)
+            return originais[socket.socket, "connect"](sock, address)
+
+        def connect_ex(sock, address):
+            vigia.confere("connect_ex", address)
+            return originais[socket.socket, "connect_ex"](sock, address)
+
+        def sendto(sock, data, *args):
+            vigia.confere("sendto", args[-1] if args else None)
+            return originais[socket.socket, "sendto"](sock, data, *args)
+
+        def getaddrinfo(host, *args, **kwargs):
+            vigia.confere("getaddrinfo", (host,), por_nome=True)
+            return originais[socket, "getaddrinfo"](host, *args, **kwargs)
+
+        def gethostbyname(host):
+            vigia.confere("gethostbyname", (host,), por_nome=True)
+            return originais[socket, "gethostbyname"](host)
+
+        def gethostbyname_ex(host):
+            vigia.confere("gethostbyname_ex", (host,), por_nome=True)
+            return originais[socket, "gethostbyname_ex"](host)
+
+        for troca in (
+            connect,
+            connect_ex,
+            sendto,
+            getaddrinfo,
+            gethostbyname,
+            gethostbyname_ex,
+        ):
+            dono = socket if troca.__name__.startswith("get") else socket.socket
+            setattr(dono, troca.__name__, troca)
+
+    def remover(self):
+        for (dono, nome), original in self._originais.items():
+            setattr(dono, nome, original)
+        self._originais = {}
+
+
+_vigia_de_rede = VigiaDeRede()
+
+
+def pytest_configure(config):
+    _vigia_de_rede.instalar()
+
+
+def pytest_unconfigure(config):
+    _vigia_de_rede.remover()
+
+
+@pytest.fixture(autouse=True)
+def vigia_de_rede():
+    """Nenhum teste comunica com destino externo: a tentativa é barrada na
+    hora e o teste é reprovado no fim, mesmo que o erro tenha sido engolido."""
+    _vigia_de_rede.tentativas.clear()
+
+    yield _vigia_de_rede
+
+    reprovacao = _vigia_de_rede.reprovacao()
+    _vigia_de_rede.tentativas.clear()
+    if reprovacao:
+        pytest.fail(reprovacao, pytrace=False)
 
 
 @pytest.fixture(scope="session")

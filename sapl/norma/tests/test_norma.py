@@ -123,6 +123,9 @@ def test_norma_juridica_materia_inexistente():
     ]
 
 
+@pytest.mark.skip(
+    reason="Chama a API do Telegram: signal de rede social ao salvar a matéria."
+)
 @pytest.mark.django_db(transaction=False)
 def test_norma_juridica_materia_existente():
     tipo = mommy.make(TipoNormaJuridica)

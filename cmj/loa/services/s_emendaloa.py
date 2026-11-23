@@ -168,6 +168,20 @@ class EmendaLoaService:
             return True
         return self.e_autor_da_emenda(user, emenda)
 
+    def pode_ver_campos_internos(self, user):
+        """Pode ver ``owner``, ``metadata`` e ``search`` de alguma emenda (LOA-LST-091).
+
+        Quem tem uma das permissões de edição ou opera algum autor. Quem não passa
+        aqui não vê esses campos em emenda nenhuma.
+        """
+        if not user or user.is_anonymous:
+            return False
+        if user.has_perm("loa.change_emendaloa") or user.has_perm(
+            "loa.emendaloa_full_editor"
+        ):
+            return True
+        return self.autor_do_usuario(user) is not None
+
     def parlamentar_protegido(self, emenda, user=None):
         """Parlamentar cujo valor não pode ser zerado nem desmarcado (LOA-EMD-079).
 
