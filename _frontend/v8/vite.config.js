@@ -50,7 +50,7 @@ export default defineConfig(({command, mode}) => {
           cleanupOutdatedCaches: true,
         },
         injectManifest: {
-          globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,gif,woff2}'],
+          globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,gif,ico,woff2}'],
           // O service worker é servido em /v8/ (service_worker_proxy), não em
           // /static/v8/: sem o prefixo, o workbox resolve as URLs do precache
           // contra /v8/ e elas dão 404.
