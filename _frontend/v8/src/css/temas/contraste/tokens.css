@@ -1,9 +1,9 @@
 /*
- * Tokens do tema 3 (V8-TEMA-014): alto contraste. Preto e branco, com azul forte no claro e
+ * Tokens do tema contraste (V8-TEMA-014): alto contraste. Preto e branco, com azul forte no claro e
  * amarelo no escuro.
  */
 
-:root[data-tema="tema3"] {
+:root[data-tema="contraste"] {
   --cor-fundo: #ffffff;
   --cor-superficie: #ffffff;
   --cor-superficie-2: #f0f0f0;
@@ -24,7 +24,7 @@
   --sombra-lateral: 0 0 0 2px var(--cor-texto);
 }
 
-:root[data-tema="tema3"][data-modo="escuro"] {
+:root[data-tema="contraste"][data-modo="escuro"] {
   --cor-fundo: #000000;
   --cor-superficie: #000000;
   --cor-superficie-2: #1a1a1a;
@@ -41,7 +41,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root[data-tema="tema3"]:not([data-modo]) {
+  :root[data-tema="contraste"]:not([data-modo]) {
     --cor-fundo: #000000;
     --cor-superficie: #000000;
     --cor-superficie-2: #1a1a1a;

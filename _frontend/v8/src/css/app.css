@@ -9,6 +9,6 @@
 
 /* Um import por tema do registro (s_global.TEMAS), na mesma ordem, o oficial primeiro (V8-TEMA-003). */
 @import "./temas/oficial/index.css";
-@import "./temas/tema1/index.css";
-@import "./temas/tema2/index.css";
-@import "./temas/tema3/index.css";
+@import "./temas/verde/index.css";
+@import "./temas/terracota/index.css";
+@import "./temas/contraste/index.css";

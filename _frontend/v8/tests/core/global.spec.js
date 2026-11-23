@@ -38,7 +38,7 @@ describe('GlobalStore', () => {
       urls: { login: '/entrar/' },
       zonas: { demo: '/v8/demo/' },
       zona: 'demo',
-      tema: 'tema2',
+      tema: 'terracota',
       modo: 'escuro',
       sidebar: 'recolhida'
     }))
@@ -51,7 +51,7 @@ describe('GlobalStore', () => {
     expect(store.autenticado).toBe(true)
     expect(store.usuario).toEqual({ id: 7, nome: 'Fulana' })
     expect(store.permissoes).toEqual(['materia.add_materialegislativa'])
-    expect(store.tema).toBe('tema2')
+    expect(store.tema).toBe('terracota')
     expect(store.modo).toBe('escuro')
     expect(store.sidebar).toBe('recolhida')
     expect(store.prefixoZona).toBe('/v8/demo/')

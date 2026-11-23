@@ -33,7 +33,7 @@ def atributos_html(html):
 def test_registro_de_temas_tem_o_oficial_primeiro_e_nomes_validos():
     assert s_global.TEMA_PADRAO == "oficial"
     assert list(s_global.TEMAS)[0] == "oficial"
-    assert list(s_global.TEMAS) == ["oficial", "tema1", "tema2", "tema3"]
+    assert list(s_global.TEMAS) == ["oficial", "verde", "terracota", "contraste"]
     assert all(isinstance(rotulo, str) and rotulo for rotulo in s_global.TEMAS.values())
     assert s_global.validar_temas({"oficial": "O", "azul-2": "A"}) == {
         "oficial": "O",
@@ -41,7 +41,7 @@ def test_registro_de_temas_tem_o_oficial_primeiro_e_nomes_validos():
     }
     invalidos = [
         {},
-        {"tema1": "Sem o oficial primeiro", "oficial": "Oficial"},
+        {"verde": "Sem o oficial primeiro", "oficial": "Oficial"},
         {"oficial": "O", "Azul": "Maiúscula"},
         {"oficial": "O", "2azul": "Começa por dígito"},
         {"oficial": "O", "azul escuro": "Espaço"},
@@ -82,27 +82,27 @@ def test_html_sempre_traz_um_tema_do_registro():
         # Sem cookie: o oficial.
         assert 'data-tema="oficial"' in atributos_html(pagina_no_layout(layout)), layout
         # Com cookie válido: o do cookie.
-        html = pagina_no_layout(layout, cookies={"v8_tema": "tema2"})
-        assert 'data-tema="tema2"' in atributos_html(html), layout
+        html = pagina_no_layout(layout, cookies={"v8_tema": "terracota"})
+        assert 'data-tema="terracota"' in atributos_html(html), layout
         # A página de prévia fixa o tema e vence o cookie.
         html = pagina_no_layout(
-            layout, cookies={"v8_tema": "tema2"}, contexto={"v8": {"tema": "tema3"}}
+            layout, cookies={"v8_tema": "terracota"}, contexto={"v8": {"tema": "contraste"}}
         )
-        assert 'data-tema="tema3"' in atributos_html(html), layout
+        assert 'data-tema="contraste"' in atributos_html(html), layout
         # Prévia com nome fora do registro não vale: fica o do cookie.
         html = pagina_no_layout(
-            layout, cookies={"v8_tema": "tema1"}, contexto={"v8": {"tema": "zzqx"}}
+            layout, cookies={"v8_tema": "verde"}, contexto={"v8": {"tema": "zzqx"}}
         )
-        assert 'data-tema="tema1"' in atributos_html(html), layout
+        assert 'data-tema="verde"' in atributos_html(html), layout
         assert "zzqx" not in html
 
     resposta = cliente_http().get("/v8/")
     assert '<html lang="pt-br" data-tema="oficial">' in html_de(resposta)
     cliente = cliente_http()
-    cliente.cookies["v8_tema"] = "tema1"
-    assert '<html lang="pt-br" data-tema="tema1">' in html_de(cliente.get("/v8/"))
+    cliente.cookies["v8_tema"] = "verde"
+    assert '<html lang="pt-br" data-tema="verde">' in html_de(cliente.get("/v8/"))
     # Vale também no layout sem shell.
-    assert 'data-tema="tema1"' in atributos_html(
+    assert 'data-tema="verde"' in atributos_html(
         html_de(cliente.get("/v8/nao-existe/"))
     )
 
@@ -110,16 +110,16 @@ def test_html_sempre_traz_um_tema_do_registro():
 @pytest.mark.spec("V8-TEMA-001")
 def test_tema_e_modo_sao_independentes():
     cliente = cliente_http()
-    cliente.cookies["v8_tema"] = "tema1"
+    cliente.cookies["v8_tema"] = "verde"
     cliente.cookies["v8_modo"] = "escuro"
     html = html_de(cliente.get("/v8/"))
-    assert '<html lang="pt-br" data-tema="tema1" data-modo="escuro">' in html
+    assert '<html lang="pt-br" data-tema="verde" data-modo="escuro">' in html
 
     cliente.cookies["v8_modo"] = "claro"
-    assert 'data-tema="tema1" data-modo="claro"' in html_de(cliente.get("/v8/"))
+    assert 'data-tema="verde" data-modo="claro"' in html_de(cliente.get("/v8/"))
 
-    cliente.cookies["v8_tema"] = "tema3"
-    assert 'data-tema="tema3" data-modo="claro"' in html_de(cliente.get("/v8/"))
+    cliente.cookies["v8_tema"] = "contraste"
+    assert 'data-tema="contraste" data-modo="claro"' in html_de(cliente.get("/v8/"))
     # Os dois valores de modo valem em qualquer tema.
     for tema in s_global.TEMAS:
         for modo in s_global.MODOS:
@@ -133,12 +133,12 @@ def test_json_global_informa_tema_e_modo():
     dados = ler_json_script(html_de(cliente.get("/v8/")), "v8-global")
     assert dados["tema"] == "oficial" and dados["modo"] is None
 
-    cliente.cookies["v8_tema"] = "tema2"
+    cliente.cookies["v8_tema"] = "terracota"
     cliente.cookies["v8_modo"] = "escuro"
     dados = ler_json_script(html_de(cliente.get("/v8/")), "v8-global")
-    assert dados["tema"] == "tema2" and dados["modo"] == "escuro"
+    assert dados["tema"] == "terracota" and dados["modo"] == "escuro"
 
-    for invalido in ["zzqx", "", "Oficial", "escuro", "../tema1"]:
+    for invalido in ["zzqx", "", "Oficial", "escuro", "../verde"]:
         cliente.cookies["v8_tema"] = invalido
         dados = ler_json_script(html_de(cliente.get("/v8/")), "v8-global")
         assert dados["tema"] == "oficial", invalido

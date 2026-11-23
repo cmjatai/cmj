@@ -1,9 +1,9 @@
 /*
- * Tokens do tema 1 (V8-TEMA-014): só cores, em verde. Cada cor redefinida aparece nos três blocos,
+ * Tokens do tema verde (V8-TEMA-014): só cores, em verde. Cada cor redefinida aparece nos três blocos,
  * para que o valor de um modo não vaze para o outro.
  */
 
-:root[data-tema="tema1"] {
+:root[data-tema="verde"] {
   --cor-fundo: #f1f6f3;
   --cor-superficie: #ffffff;
   --cor-superficie-2: #e3eee8;
@@ -15,7 +15,7 @@
   --cor-barra-navegador: #0f6b4f;
 }
 
-:root[data-tema="tema1"][data-modo="escuro"] {
+:root[data-tema="verde"][data-modo="escuro"] {
   --cor-fundo: #0b1511;
   --cor-superficie: #13211b;
   --cor-superficie-2: #1b2d25;
@@ -28,7 +28,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root[data-tema="tema1"]:not([data-modo]) {
+  :root[data-tema="verde"]:not([data-modo]) {
     --cor-fundo: #0b1511;
     --cor-superficie: #13211b;
     --cor-superficie-2: #1b2d25;

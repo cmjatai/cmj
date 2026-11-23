@@ -108,7 +108,7 @@ def test_django_nao_cria_cookie_de_preferencia_e_os_nomes_tem_prefixo():
     assert s_global.COOKIE_MODO.startswith("v8_")
     assert s_global.COOKIE_SIDEBAR.startswith("v8_")
     assert s_global.COOKIE_TEMA.startswith("v8_")
-    assert s_global.cookie_tema("tema1")["path"] == "/v8/"
+    assert s_global.cookie_tema("verde")["path"] == "/v8/"
 
     resposta = cliente_http().get("/v8/")
     assert set(resposta.cookies) <= {"csrftoken"}
@@ -536,8 +536,8 @@ def test_cookie_de_preferencia_so_vale_com_valor_da_lista():
     assert s_global.preferencias({}) == padrao
     assert s_global.preferencias(None) == padrao
     assert s_global.preferencias(
-        {"v8_tema": "tema2", "v8_modo": "escuro", "v8_sidebar": "recolhida"}
-    ) == {"tema": "tema2", "modo": "escuro", "sidebar": "recolhida"}
+        {"v8_tema": "terracota", "v8_modo": "escuro", "v8_sidebar": "recolhida"}
+    ) == {"tema": "terracota", "modo": "escuro", "sidebar": "recolhida"}
     assert s_global.preferencias({"v8_modo": "claro"})["modo"] == "claro"
     for invalido in ["", "Escuro", "escuro ", "dark", "auto", '"><b>', "claro;x"]:
         lido = s_global.preferencias(
@@ -546,7 +546,7 @@ def test_cookie_de_preferencia_so_vale_com_valor_da_lista():
         assert lido == padrao, invalido
     # Só os três cookies de preferência são lidos.
     assert (
-        s_global.preferencias({"tema": "tema1", "modo": "escuro", "v8_outro": "x"})
+        s_global.preferencias({"tema": "verde", "modo": "escuro", "v8_outro": "x"})
         == padrao
     )
 

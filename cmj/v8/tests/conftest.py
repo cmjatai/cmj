@@ -62,9 +62,9 @@ URLS_DS = [
     "/v8/ds/",
     "/v8/ds/temas/",
     "/v8/ds/temas/oficial/",
-    "/v8/ds/temas/tema1/",
-    "/v8/ds/temas/tema2/",
-    "/v8/ds/temas/tema3/",
+    "/v8/ds/temas/verde/",
+    "/v8/ds/temas/terracota/",
+    "/v8/ds/temas/contraste/",
 ]
 
 

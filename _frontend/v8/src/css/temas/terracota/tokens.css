@@ -1,9 +1,9 @@
 /*
- * Tokens do tema 2 (V8-TEMA-014): cores em terracota, títulos com serifa e cantos quase retos.
+ * Tokens do tema terracota (V8-TEMA-014): cores em terracota, títulos com serifa e cantos quase retos.
  * Fontes e raios valem nos dois modos e ficam só no primeiro bloco.
  */
 
-:root[data-tema="tema2"] {
+:root[data-tema="terracota"] {
   --cor-fundo: #faf6f2;
   --cor-superficie: #fffdfb;
   --cor-superficie-2: #f1e7de;
@@ -23,7 +23,7 @@
   --raio-lg: 0.25rem;
 }
 
-:root[data-tema="tema2"][data-modo="escuro"] {
+:root[data-tema="terracota"][data-modo="escuro"] {
   --cor-fundo: #17110e;
   --cor-superficie: #221915;
   --cor-superficie-2: #2e231d;
@@ -39,7 +39,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root[data-tema="tema2"]:not([data-modo]) {
+  :root[data-tema="terracota"]:not([data-modo]) {
     --cor-fundo: #17110e;
     --cor-superficie: #221915;
     --cor-superficie-2: #2e231d;

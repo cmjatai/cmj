@@ -721,7 +721,7 @@ def test_cada_pagina_existente_usa_o_layout_previsto(comum, superusuario):
     assert layout_de(cliente.get("/v8/demo/spa/")) == "app_sidebar"
     assert layout_de(cliente.get("/v8/ds/")) == "app_sidebar"
     assert layout_de(cliente.get("/v8/ds/temas/")) == "app_sidebar"
-    assert layout_de(cliente.get("/v8/ds/temas/tema1/")) == "app_sidebar"
+    assert layout_de(cliente.get("/v8/ds/temas/verde/")) == "app_sidebar"
     assert layout_de(cliente.get("/v8/nao-existe/")) == "minimal"
     assert layout_de(cliente_http(comum).get("/v8/demo/clientes/")) == "minimal"
 

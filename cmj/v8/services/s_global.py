@@ -68,9 +68,9 @@ def validar_temas(temas):
 TEMAS = validar_temas(
     {
         "oficial": "Oficial",
-        "tema1": "Tema 1",
-        "tema2": "Tema 2",
-        "tema3": "Tema 3",
+        "verde": "Verde",
+        "terracota": "Terracota",
+        "contraste": "Alto contraste",
     }
 )
 

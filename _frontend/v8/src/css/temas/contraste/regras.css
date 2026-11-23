@@ -1,9 +1,9 @@
 /*
- * Regras próprias do tema 3 (V8-TEMA-015): bordas grossas, botões em caixa alta e foco largo.
+ * Regras próprias do tema contraste (V8-TEMA-015): bordas grossas, botões em caixa alta e foco largo.
  * Ficam na camada "temas", acima dos componentes do oficial, e todas sob o seletor do tema.
  */
 @layer temas {
-  :root[data-tema="tema3"] {
+  :root[data-tema="contraste"] {
     .v8-btn {
       border-width: 2px;
       font-weight: 700;

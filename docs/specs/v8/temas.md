@@ -20,7 +20,7 @@ _frontend/v8/src/css/
 ├─ app.css                 Tailwind, @source e um @import por tema, o oficial primeiro
 └─ temas/
    ├─ oficial/             index.css, tokens.css e o CSS dos elementos, shell, componentes e overlays
-   ├─ tema1/               index.css, tokens.css e, opcional, regras.css
+   ├─ verde/               index.css, tokens.css e, opcional, regras.css
    └─ ...
 ```
 
@@ -79,11 +79,11 @@ Regras de outras specs que mudam com esta (D2):
 - V8-TEMA-014 [implementado] Um tema só redefine tokens que existem no oficial, sempre sob
   `:root[data-tema="<nome>"]`. Cor redefinida aparece nos três blocos do tema (claro, escuro e sem
   modo escolhido), para que a cor de um modo não vaze para o outro. Evidência:
-  `_frontend/v8/src/css/temas/tema1/tokens.css:6`, `_frontend/v8/src/css/temas/tema2/tokens.css:6`.
+  `_frontend/v8/src/css/temas/verde/tokens.css:6`, `_frontend/v8/src/css/temas/terracota/tokens.css:6`.
 - V8-TEMA-015 [implementado] As regras CSS próprias de um tema ficam em `regras.css`, na camada
   `temas`, que fica acima de `components` e abaixo de `utilities`. Todo seletor dele começa por
   `:root[data-tema="<nome>"]`. Tema não declara `@theme`, `@import`, `@font-face` nem `@layer` com
-  outro nome. Evidência: `_frontend/v8/src/css/temas/tema3/regras.css:5`.
+  outro nome. Evidência: `_frontend/v8/src/css/temas/contraste/regras.css:5`.
 - V8-TEMA-016 [implementado] O `@theme inline` do oficial é o único e expõe ao Tailwind as cores
   semânticas, as fontes e os raios, por `var()`. Com isso as utilities seguem o tema e o modo em
   vigor. A paleta padrão do Tailwind continua fora. Evidência:
@@ -166,9 +166,11 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
 - D7. `data-tema` sempre emitido, inclusive com `oficial`. Recomendação: sempre, para o CSS e os
   testes terem um único caso. Alternativa: só quando o tema não é o oficial. Decisão: pendente;
   aplicada a recomendação.
-- D8. Temas de exemplo. Os nomes `tema1`, `tema2` e `tema3` vieram do pedido; o conteúdo não.
-  Recomendação: cada um exercita uma capacidade: `tema1` troca só cores, `tema2` troca cores,
-  fontes e raios, e `tema3` tem também `regras.css`. Decisão: pendente; aplicada a recomendação.
+- D8. Temas de exemplo. O pedido trouxe os nomes `tema1`, `tema2` e `tema3`, e o conteúdo exercita
+  uma capacidade do mecanismo em cada um: só cores; cores, fonte dos títulos e raios; e alto
+  contraste com `regras.css`. Recomendação: manter os três como estão. Alternativas: renomeá-los
+  pelo que são, ou deixar só o oficial. Decisão (2026-11-22): renomear para `verde` (Verde),
+  `terracota` (Terracota) e `contraste` (Alto contraste), com o mesmo conteúdo.
 - D9. Quem pode escolher o tema. Com o design system público (D1 de `ds.md`), as opções eram
   qualquer pessoa, qualquer autenticado ou só superusuário. Recomendação: qualquer pessoa, porque o
   cookie só muda a aparência do próprio navegador, sem dado pessoal nem efeito para outros.

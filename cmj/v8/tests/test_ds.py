@@ -58,10 +58,10 @@ def test_vitrine_e_pagina_no_app_sidebar_no_tema_em_vigor(superusuario):
     assert 'data-tema="oficial"' in atributos_html(html)
     assert '<h1 class="v8-pagina-titulo">Design system</h1>' in html
 
-    cliente.cookies["v8_tema"] = "tema2"
+    cliente.cookies["v8_tema"] = "terracota"
     cliente.cookies["v8_modo"] = "escuro"
     html = html_de(cliente.get(URL_VITRINE))
-    assert 'data-tema="tema2" data-modo="escuro"' in atributos_html(html)
+    assert 'data-tema="terracota" data-modo="escuro"' in atributos_html(html)
     assert "data-ds-previa" not in html
 
 
@@ -110,9 +110,9 @@ def test_previa_e_a_vitrine_no_tema_com_faixa_e_botao(superusuario):
         assert f'<li><a href="{URL_TEMAS}">Temas</a></li>' in html
 
     # A prévia vence o tema escolhido no navegador.
-    cliente.cookies["v8_tema"] = "tema1"
-    assert 'data-tema="tema3"' in atributos_html(
-        html_de(cliente.get(url_previa("tema3")))
+    cliente.cookies["v8_tema"] = "verde"
+    assert 'data-tema="contraste"' in atributos_html(
+        html_de(cliente.get(url_previa("contraste")))
     )
 
 
@@ -132,9 +132,9 @@ def test_lista_de_temas_marca_o_tema_em_vigor(superusuario):
     marcado = re.findall(r'data-ds-tema="([^"]+)" aria-current="true"', html)
     assert marcado == ["oficial"]
 
-    cliente.cookies["v8_tema"] = "tema2"
+    cliente.cookies["v8_tema"] = "terracota"
     html = html_de(cliente.get(URL_TEMAS))
-    assert re.findall(r'data-ds-tema="([^"]+)" aria-current="true"', html) == ["tema2"]
+    assert re.findall(r'data-ds-tema="([^"]+)" aria-current="true"', html) == ["terracota"]
 
 
 @pytest.mark.spec("V8-TEMA-022")
@@ -151,23 +151,23 @@ def test_previa_nao_grava_nada(superusuario):
 @pytest.mark.spec("V8-TEMA-023")
 def test_usar_um_tema_grava_o_cookie_e_vale_em_todo_o_v8(superusuario):
     cliente = cliente_http(superusuario)
-    resposta = cliente.post(url_usar("tema2"))
+    resposta = cliente.post(url_usar("terracota"))
     assert resposta.status_code == 302
     assert resposta["Location"] == URL_TEMAS
-    assert resposta.cookies["v8_tema"].value == "tema2"
+    assert resposta.cookies["v8_tema"].value == "terracota"
 
     seguinte = cliente.get(resposta["Location"])
     html = html_de(seguinte)
-    assert 'data-tema="tema2"' in atributos_html(html)
+    assert 'data-tema="terracota"' in atributos_html(html)
     mensagens = ler_json_script(html, "v8-messages")
     assert mensagens == [
-        {"nivel": "success", "texto": "Tema 2 em uso neste navegador."}
+        {"nivel": "success", "texto": "Terracota em uso neste navegador."}
     ]
 
     for url in ("/v8/", "/v8/demo/clientes/", URL_VITRINE, "/v8/nao-existe/"):
         html = html_de(cliente.get(url))
-        assert 'data-tema="tema2"' in atributos_html(html), url
-        assert ler_json_script(html, "v8-global")["tema"] == "tema2", url
+        assert 'data-tema="terracota"' in atributos_html(html), url
+        assert ler_json_script(html, "v8-global")["tema"] == "terracota", url
 
     # Voltar ao padrão é usar o oficial.
     cliente.post(url_usar("oficial"))
@@ -216,14 +216,14 @@ def test_paginas_so_aceitam_get_e_head_e_usar_so_post_com_csrf(superusuario):
             assert "v8_tema" not in resposta.cookies
 
     rigoroso = cliente_http(superusuario, enforce_csrf_checks=True)
-    sem_token = rigoroso.post(url_usar("tema1"))
+    sem_token = rigoroso.post(url_usar("verde"))
     assert sem_token.status_code == 403
     assert "v8_tema" not in sem_token.cookies
     rigoroso.get(URL_TEMAS)
     token = rigoroso.cookies["csrftoken"].value
-    com_token = rigoroso.post(url_usar("tema1"), {"csrfmiddlewaretoken": token})
+    com_token = rigoroso.post(url_usar("verde"), {"csrfmiddlewaretoken": token})
     assert com_token.status_code == 302
-    assert com_token.cookies["v8_tema"].value == "tema1"
+    assert com_token.cookies["v8_tema"].value == "verde"
     assert views.DsTemaUsarView.http_method_names == ["post"]
 
 
@@ -249,9 +249,9 @@ def test_nome_de_tema_fora_do_registro_nao_tem_rota_nem_vale(superusuario):
 def test_destino_depois_de_usar_um_tema_e_fixo(superusuario):
     cliente = cliente_http(superusuario)
     for extra in (
-        {"path": url_usar("tema1") + "?next=https://exemplo.invalid/"},
-        {"path": url_usar("tema1"), "data": {"next": "//exemplo.invalid/"}},
-        {"path": url_usar("tema1"), "headers": {"Referer": "https://exemplo.invalid/"}},
+        {"path": url_usar("verde") + "?next=https://exemplo.invalid/"},
+        {"path": url_usar("verde"), "data": {"next": "//exemplo.invalid/"}},
+        {"path": url_usar("verde"), "headers": {"Referer": "https://exemplo.invalid/"}},
     ):
         resposta = cliente.post(**extra)
         assert resposta.status_code == 302
@@ -262,9 +262,9 @@ def test_destino_depois_de_usar_um_tema_e_fixo(superusuario):
 @pytest.mark.parametrize("debug", [False, True])
 def test_cookie_de_tema_tem_os_atributos_de_preferencia(superusuario, settings, debug):
     settings.DEBUG = debug
-    resposta = cliente_http(superusuario).post(url_usar("tema3"))
+    resposta = cliente_http(superusuario).post(url_usar("contraste"))
     cookie = resposta.cookies["v8_tema"]
-    assert cookie.value == "tema3"
+    assert cookie.value == "contraste"
     assert cookie["path"] == "/v8/"
     assert cookie["samesite"] == "Lax"
     assert cookie["httponly"] is True
@@ -304,8 +304,8 @@ def test_design_system_nao_le_nem_grava_model_arquivo_cache_fila_ou_indice(
     ):
         assert proibido not in fonte, proibido
     with CaptureQueriesContext(connection) as consultas:
-        s_ds.temas("tema1")
-        s_ds.tema("tema2", "oficial")
+        s_ds.temas("verde")
+        s_ds.tema("terracota", "oficial")
     assert len(consultas) == 0
 
 

@@ -399,22 +399,22 @@ describe('shell', () => {
       const estilo = document.createElement('style')
       estilo.textContent = `
         :root { --cor-barra-navegador: #114d81; }
-        :root[data-tema="tema1"] { --cor-barra-navegador: #0f6b4f; }
-        :root[data-tema="tema1"][data-modo="escuro"] { --cor-barra-navegador: #13211b; }`
+        :root[data-tema="verde"] { --cor-barra-navegador: #0f6b4f; }
+        :root[data-tema="verde"][data-modo="escuro"] { --cor-barra-navegador: #13211b; }`
       document.head.appendChild(estilo)
       const meta = document.createElement('meta')
       meta.name = 'theme-color'
       meta.content = '#114d81'
       document.head.appendChild(meta)
       montarShell({ modo: 'claro' })
-      html.setAttribute('data-tema', 'tema1')
+      html.setAttribute('data-tema', 'verde')
 
       iniciar()
       expect(meta.getAttribute('content')).toBe('#0f6b4f')
 
       // Trocar o modo não muda o tema (V8-TEMA-001), e a cor segue os dois.
       clicar('modo-1')
-      expect(html.getAttribute('data-tema')).toBe('tema1')
+      expect(html.getAttribute('data-tema')).toBe('verde')
       expect(meta.getAttribute('content')).toBe('#13211b')
       html.removeAttribute('data-tema')
       estilo.remove()
