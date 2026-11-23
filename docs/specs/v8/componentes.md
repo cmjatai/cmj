@@ -184,8 +184,7 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
 - D2. Quais primitivas entram agora. Decisão (2026-11-22): o lote essencial desta spec; as demais
   primitivas do Reka UI ficam como prioridade do próximo plano (Fora do escopo).
 - D3. Uma spec própria para os componentes. Recomendação: sim, separada de `ds.md`, porque a
-  biblioteca vai crescer e não é assunto da página da vitrine. Decisão: pendente; aplicada a
-  recomendação.
+  biblioteca vai crescer e não é assunto da página da vitrine. Decisão (2026-11-22): spec própria.
 
 - D4. O que entra em "todo o Reka UI". Decisão (2026-11-22): só as primitivas com visual novo. Ficam
   fora as que duplicam o que o v8 já tem e os utilitários sem visual (Fora do escopo).
