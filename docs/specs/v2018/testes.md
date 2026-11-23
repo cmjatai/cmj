@@ -39,15 +39,17 @@ conferidas por `tests/sanidade.spec.js`, por `tests/estrutura/infra.spec.js` e, 
   `_frontend/v2018/vitest.config.mjs:15`, `_frontend/v2018/vitest.config.mjs:29-41`,
   `_frontend/v2018/tests/setup.js:14`.
 - V2018-TST-005 [implementado] Os testes ficam em `_frontend/v2018/tests/**/*.spec.js`, fora de `src/`,
-  em `estrutura/` (regras conferidas lendo arquivos), `app/` (peças da entrada `app`) e `entradas/`
-  (subida das outras entradas). O apoio comum fica em `tests/apoio.js`. Evidência:
+  em `estrutura/` (regras conferidas lendo arquivos), `app/` (peças da entrada `app`), `entradas/`
+  (subida das outras entradas) e `apps/` (comportamento dos módulos de `src/__apps`, numa subpasta
+  por módulo). O apoio comum fica em `tests/apoio.js`. Evidência:
   `_frontend/v2018/vitest.config.mjs:45`.
 - V2018-TST-006 [implementado] O teste que cobre uma regra de spec abre o título com o ID dela, e o
   `specs_check` lê os títulos dos testes do v2018 como lê os do v8. Evidência:
   `cmj/core/services/s_specs_check.py:47`.
-- V2018-TST-007 [acordado] Os testes iniciais cobrem só a estrutura: entradas, bundles pedidos
-  pelos templates, subida das entradas, store, mixin global, `Resources.Utils` e rotas. Não há
-  teste de regra de negócio dos módulos. Evidência: `_frontend/v2018/tests/sanidade.spec.js:7`.
+- V2018-TST-007 [acordado] Os testes iniciais cobrem a estrutura: entradas, bundles pedidos
+  pelos templates, subida das entradas, store, mixin global, `Resources.Utils` e rotas. Teste de
+  regra de negócio de um módulo entra em `apps/` quando a correção do módulo pede, ligado à regra
+  da spec do módulo. Evidência: `_frontend/v2018/tests/sanidade.spec.js:7`.
 - V2018-TST-008 [acordado] Nenhum arquivo de `src/` é alterado para acomodar teste. O que o teste
   precisa e o jsdom não tem entra em `tests/setup.js`. Evidência:
   `_frontend/v2018/tests/setup.js:36`.

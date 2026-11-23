@@ -1072,7 +1072,9 @@ class EmendaLoaFilterSet(FilterSet):
         ]
         self.form.helper = EmendaLoaFilterSet.ELSaplFormHelper()
         self.form.helper.form_method = "GET"
-        self.form.helper.form_class = "container"
+        # LOA-LST-066: a classe separa o filtro do formulário de registro
+        # (LOA-LST-016), que fica no mesmo container da tela
+        self.form.helper.form_class = "container form-filter-emendaloa"
         self.form.helper.layout = SaplFormLayout(
             *fields, cancel_label=None, save_label=_("Filtrar")
         )

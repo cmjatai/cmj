@@ -8,8 +8,8 @@ Código principal: `cmj/loa/views/v_emendaloa.py` (`EmendaLoaCrud.ListView`),
 `_templates/v2018/loa/emendaloa_filter_cache.html`, `_templates/v2018/loa/pdf/emendaloa_list.html`,
 `_templates/v2018/css/emendaloa-list.css`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js`,
 `_frontend/v2018/src/__apps/loa/scss/loa.scss`
-Testes: `cmj/loa/tests/test_listagem_emendas.py` e `cmj/utils/tests/test_utils_report.py`, para as
-regras `[implementado]`. As demais regras não têm teste.
+Testes: `cmj/loa/tests/test_listagem_emendas.py`, `cmj/utils/tests/test_utils_report.py` e
+`_frontend/v2018/tests/apps/loa/`, para as regras `[implementado]`. As demais regras não têm teste.
 
 As regras `[observado]` descrevem o que o código faz hoje e nenhuma foi confirmada como
 regra de negócio. Foram obtidas por leitura do código. As marcadas com "(executado)" também foram
@@ -545,18 +545,23 @@ mesma view, entram só no que afeta esta tela.
   "Filtrar" ao lado da busca por termos, que é `type="button"` com a classe `btn-filtrar`: o script
   liga o clique só a ele, e os botões criados pelo `bootstrap-select` não interferem. Enter no campo
   "Busca por termos" também aplica o filtro; nos demais campos, não faz nada. Marcar ou desmarcar
-  opções não reenvia a tela. Evidência: `_frontend/v2018/src/__apps/loa/scss/loa.scss:97-99`,
-  `sapl/crispy_layout_mixin.py:51-74`, `cmj/loa/forms/f_emendaloa.py:999-1005`,
-  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:15-18`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:65-79`. Teste:
-  `test_formulario_tem_um_unico_botao_filtrar_para_o_script`, que cobre só a marcação do servidor; o
-  script não foi executado (sem navegador) e só chega à produção com o rebuild do `dist/`
-  (LOA-LST-078). Na LOA 2026, o HTML tem um único `button.btn-filtrar` e os submits `pdf` e
-  `salvar` (executado).
+  opções não reenvia a tela. O script age só sobre o formulário com a classe `form-filter-emendaloa`:
+  o formulário POST de registro das emendas liberadas (LOA-LST-016) fica no mesmo container, e
+  "Filtrar" ou Enter na busca nunca o enviam nem abrem a confirmação dele. Evidência:
+  `_frontend/v2018/src/__apps/loa/scss/loa.scss:97-99`, `sapl/crispy_layout_mixin.py:51-74`,
+  `cmj/loa/forms/f_emendaloa.py:999-1005`, `cmj/loa/forms/f_emendaloa.py:1073-1077`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:2-8`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:17-20`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:67-81`. Testes:
+  `test_formulario_tem_um_unico_botao_filtrar_para_o_script`, para a marcação do servidor, e o teste
+  Vitest de `_frontend/v2018/tests/apps/loa/emendaloa-list.spec.js`, para o script, que só chega à
+  produção com o rebuild do `dist/` (LOA-LST-078). Na LOA 2026, o HTML tem um único
+  `button.btn-filtrar` e os submits `pdf` e `salvar` (executado).
 - LOA-LST-067 [acordado] O filtro não é lembrado entre visitas: fica só na URL, e a tela aberta sem
   parâmetros mostra todas as emendas. Ao abrir a tela, o script apaga do `localStorage` a chave
   `portalcmj_emendaloa_filter`, usada por versões anteriores para guardar e reaplicar o filtro.
   Substitui as antigas LOA-LST-068 e 069. Evidência:
-  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:8-13`. Sem teste automatizado: o v2018
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:10-15`. Sem teste automatizado: o v2018
   não tem testes, e o script não foi executado (sem navegador); a mudança só chega à produção com o
   rebuild do `dist/` (LOA-LST-078).
 - LOA-LST-068 [retirada] Substituída por LOA-LST-067.
@@ -567,7 +572,7 @@ mesma view, entram só no que afeta esta tela.
   ficam visíveis e habilitadas, e unidade é marcada. Nas outras vias, entidade é escondida,
   desabilitada e desmarcada e, se nada estiver marcado, a segunda opção (unidade) é marcada. Como
   isso roda na abertura, a tela sempre parte de `sem_registro` com unidade marcada. Evidência:
-  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:20-48`; o servidor só envia marcado
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:22-50`; o servidor só envia marcado
   `autoria=ambas` (executado).
 - LOA-LST-071 [implementado] "Gerar PDF" abre em nova aba (`formtarget="_blank"`) e envia o estado
   atual de todos os campos, inclusive filtros alterados e ainda não aplicados com "Filtrar": o PDF
@@ -580,20 +585,20 @@ mesma view, entram só no que afeta esta tela.
   `dist/` (LOA-LST-078).
 - LOA-LST-072 [observado] A seleção de parlamentar é visual: o script alterna a classe `active` na
   foto ao marcar o checkbox, que fica escondido. Evidência:
-  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:50-62`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:52-64`,
   `_frontend/v2018/src/__apps/loa/scss/loa.scss:97-99`. A foto do parlamentar que já vem marcado
   na URL é destacada pelo servidor (`cmj/loa/forms/f_emendaloa.py:887-940`).
 - LOA-LST-073 [observado] O script depende de nomes e marcação gerados pelo backend: `name` dos
   campos `agrupamento`, `tipo_agrupamento` e `finalidade`, os valores `sem_registro`,
   `despesa__unidade` e `entidade`, o id `div_id_parlamentares`, a classe `btn-filtrar` dentro do
   formulário e a ordem das opções de `agrupamento` (a segunda é unidade). Evidência:
-  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:20-79`,
+  `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:22-81`,
   `cmj/loa/forms/f_emendaloa.py:739-751`.
 - LOA-LST-074 [observado] Os seletores de entidade e unidade usam `bootstrap-select`, iniciado pelo
   bundle global 500 ms depois do carregamento. Como o clique de "Filtrar" é ligado pela classe
   `btn-filtrar` (LOA-LST-066), a ordem entre essa inicialização e o script da listagem não importa.
   Evidência: `_frontend/v2018/src/__globals/js/index.js:17-23`,
-  `_frontend/v2018/src/__globals/js/functions.js:20-30`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:65-69`.
+  `_frontend/v2018/src/__globals/js/functions.js:20-30`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:67-71`.
 - LOA-LST-075 [observado] O estilo da tela está em `loa.scss`, sob `.container-loa.emendaloa-list`:
   formulário, bloco do PDF (`.relatorio-select`), fotos (`.container-avatar`, `.avatar`), cartão
   (`.emendaloa-item`, `.btn-expand`, `.emenda-card`) e ajustes para telas estreitas. Evidência:

@@ -1,7 +1,9 @@
 export default class EmendaLoaList {
   constructor (container) {
     this.container = container
-    this.form = container.find('form')
+    // LOA-LST-066: só o formulário do filtro; o de registro das emendas
+    // liberadas (LOA-LST-016) está no mesmo container
+    this.form = container.find('form.form-filter-emendaloa')
     this.init()
   }
 

@@ -48,7 +48,7 @@ describe('infraestrutura de testes', () => {
     expect(arquivos(path.join(RAIZ, 'src'), ['.spec.js', '.test.js'])).toEqual([])
     const pastas = fs.readdirSync(path.join(RAIZ, 'tests'), { withFileTypes: true })
       .filter(item => item.isDirectory()).map(item => item.name).sort()
-    expect(pastas).toEqual(['app', 'entradas', 'estrutura'])
+    expect(pastas).toEqual(['app', 'apps', 'entradas', 'estrutura'])
     expect(ler(RAIZ, 'vitest.config.mjs')).toContain("include: ['tests/**/*.spec.js']")
   })
 

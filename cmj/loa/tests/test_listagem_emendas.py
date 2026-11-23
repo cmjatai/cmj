@@ -1184,6 +1184,9 @@ def test_formulario_tem_um_unico_botao_filtrar_para_o_script(client, loa):
 
     botoes = re.findall(r"<button[^>]*btn-filtrar[^>]*>\s*([^<]*?)\s*<", html)
     assert botoes == ["Filtrar"]
+    # o script acha o filtro por esta classe, e não o formulário de registro
+    (filtro,) = re.findall(r"<form[^>]*form-filter-emendaloa[^>]*>", html)
+    assert 'method="get"' in filtro.lower()
 
 
 @pytest.mark.spec("LOA-LST-071")
