@@ -193,7 +193,7 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   para ir e voltar do texto ISO, e o Reka UI não a reexporta. Recomendação: declarar a mesma versão
   já instalada (3.12.4), mudando só o `package.json` e o lock. Alternativa: componentes de data com
   v-model nos objetos de data do Reka, sem conversão, o que leva esse tipo para quem usa o
-  componente. Decisão: pendente; aplicada a recomendação.
+  componente. Decisão (2026-11-22): declarar.
 - D6. `Alternador` no formulário. O Toggle do Reka UI 2.11 gera um campo oculto que nunca fica
   marcado, então o valor não iria no envio. Recomendação: um campo oculto próprio no componente,
   que envia o `value` só quando pressionado, como uma caixa de marcação. Alternativa: deixar o
