@@ -27,19 +27,19 @@ const OPCOES = [
 describe('componentes base', () => {
   afterEach(desmontarTodos)
 
-  it('V8-CMP-001: os nove componentes ficam em src/componentes, cada um sobre a primitiva do Reka UI', () => {
+  it('V8-CMP-001: os componentes base ficam em src/componentes, cada um sobre a sua primitiva do Reka UI', () => {
     const arquivos = fs.readdirSync(PASTA).filter(f => f.endsWith('.vue')).map(f => f.replace('.vue', '')).sort()
     expect(arquivos).toEqual(Object.keys(PRIMITIVAS).sort())
-    Object.entries(PRIMITIVAS).forEach(([nome, primitiva]) => {
+    const prefixos = Object.values(PRIMITIVAS).flat()
+    Object.entries(PRIMITIVAS).forEach(([nome, primitivas]) => {
       const importados = /import\s*\{([^}]+)\}\s*from\s*'reka-ui'/.exec(fonte(nome))[1]
       const partes = importados.split(',').map(p => p.trim()).filter(Boolean)
       expect(partes.length, nome).toBeGreaterThan(0)
-      // ToggleGroup começa por Toggle: o prefixo tem de ser exatamente o da primitiva.
+      // Cada parte é da primitiva do componente, pelo prefixo mais longo que casa
+      // (ToggleGroup começa por Toggle, e ColorSwatchPicker por ColorSwatch).
       partes.forEach(parte => {
-        expect(parte === primitiva || parte.startsWith(primitiva), `${nome}: ${parte}`).toBe(true)
-        Object.values(PRIMITIVAS)
-          .filter(outra => outra.length > primitiva.length && outra.startsWith(primitiva))
-          .forEach(outra => expect(parte.startsWith(outra), `${nome}: ${parte}`).toBe(false))
+        const dona = prefixos.filter(p => parte.startsWith(p)).sort((a, b) => b.length - a.length)[0]
+        expect([primitivas].flat(), `${nome}: ${parte}`).toContain(dona)
       })
     })
   })

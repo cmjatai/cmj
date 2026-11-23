@@ -1,0 +1,130 @@
+/*
+ * Componentes base de cor (docs/specs/v8/componentes.md): área, campo, deslizante, amostra e
+ * paleta. A cor mostrada vem da variável que o Reka UI põe em cada amostra; o resto usa tokens
+ * (V8-CMP-003 e 007).
+ */
+@layer components {
+  /* Amostra */
+  .v8-amostra-cor {
+    display: inline-block;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio-sm);
+    background: var(--reka-color-swatch-color);
+  }
+
+  .v8-amostra-cor[data-tamanho="sm"] {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .v8-amostra-cor[data-tamanho="lg"] {
+    width: 3rem;
+    height: 3rem;
+    border-radius: var(--raio);
+  }
+
+  .v8-amostra-cor[data-no-color] {
+    background: repeating-linear-gradient(45deg, var(--cor-superficie-2) 0 4px, var(--cor-superficie) 4px 8px);
+  }
+
+  /* Área de cor */
+  .v8-area-cor {
+    display: block;
+    width: 100%;
+    max-width: 16rem;
+  }
+
+  .v8-area-cor-plano {
+    position: relative;
+    height: 10rem;
+    border-radius: var(--raio);
+    touch-action: none;
+  }
+
+  .v8-area-cor-pino,
+  .v8-deslizante-cor .v8-deslizante-pino {
+    display: block;
+    width: 1.1rem;
+    height: 1.1rem;
+    border: 2px solid var(--cor-superficie);
+    border-radius: 50%;
+    box-shadow: var(--sombra-2);
+  }
+
+  .v8-area-cor-pino {
+    transform: translate(-50%, -50%);
+  }
+
+  .v8-area-cor-pino:focus-visible,
+  .v8-deslizante-cor .v8-deslizante-pino:focus-visible {
+    outline: 2px solid var(--cor-realce);
+    outline-offset: 2px;
+  }
+
+  /* Deslizante de cor */
+  .v8-deslizante-cor {
+    max-width: 16rem;
+  }
+
+  .v8-deslizante-cor-trilho {
+    position: relative;
+    flex-grow: 1;
+    height: 0.75rem;
+    border-radius: var(--raio-pilula);
+  }
+
+  /* Campo de cor */
+  .v8-campo-cor {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .v8-campo-cor-entrada {
+    width: 8rem;
+    font-family: var(--fonte-mono);
+  }
+
+  /* Paleta de cores */
+  .v8-paleta-cores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+  }
+
+  .v8-paleta-cores-item {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    padding: 0.125rem;
+    border: 2px solid transparent;
+    border-radius: var(--raio);
+    cursor: pointer;
+    outline: none;
+  }
+
+  .v8-paleta-cores-item[data-highlighted],
+  .v8-paleta-cores-item:focus-visible {
+    border-color: var(--cor-realce);
+  }
+
+  .v8-paleta-cores-item[data-state="checked"] {
+    border-color: var(--cor-texto);
+  }
+
+  .v8-paleta-cores-marca {
+    position: absolute;
+    display: inline-grid;
+    place-items: center;
+    width: 1rem;
+    height: 1rem;
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-paleta-cores-item[data-color-contrast="light"] .v8-paleta-cores-marca {
+    color: var(--cor-texto);
+  }
+}

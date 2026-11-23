@@ -25,6 +25,7 @@
         v-else
         :part="segmento.part"
         :type="'start'"
+        :aria-label="NOMES_DAS_PARTES[segmento.part]"
         class="v8-campo-data-segmento"
       >
         {{ segmento.value }}
@@ -50,6 +51,7 @@
         v-else
         :part="segmento.part"
         :type="'end'"
+        :aria-label="NOMES_DAS_PARTES[segmento.part]"
         class="v8-campo-data-segmento"
       >
         {{ segmento.value }}
@@ -79,7 +81,7 @@
 // 1. Imports
 import { computed } from 'vue'
 import { TimeRangeFieldInput, TimeRangeFieldRoot } from 'reka-ui'
-import { IDIOMA, hora, periodoParaObjeto, periodoParaTexto } from '~@/componentes/datas'
+import { IDIOMA, NOMES_DAS_PARTES, hora, periodoParaObjeto, periodoParaTexto } from '~@/componentes/datas'
 
 // 3. Props & Emits
 defineProps({

@@ -9,7 +9,8 @@ Testes: `cmj/v8/tests/test_ds.py`, `cmj/v8/tests/test_shell.py`,
 `_frontend/v8/tests/ds/ilha-overlays.spec.js`, `_frontend/v8/tests/css/temas.spec.js`,
 `_frontend/v8/tests/componentes/componentes.spec.js`, `_frontend/v8/tests/componentes/campos.spec.js`,
 `_frontend/v8/tests/componentes/estrutura.spec.js`,
-`_frontend/v8/tests/componentes/datas.spec.js`
+`_frontend/v8/tests/componentes/datas.spec.js`,
+`_frontend/v8/tests/componentes/cor.spec.js`
 
 O design system do v8 é o lugar onde se vê como está o padrão visual: cada elemento HTML, cada
 classe `v8-*`, os overlays, os ícones, os tokens e, depois, os componentes base do projeto, todos no
@@ -44,7 +45,7 @@ tema e no modo em vigor. Não é documentação: é um cenário, com amostras e 
   elemento ou do token), sem texto explicativo. Evidência:
   `_templates/v8/v8/partials/ds/cores.html:4`, `_templates/v8/v8/partials/ds/avisos.html:3`.
 - V8-DS-004 [implementado] Os dados de amostra são fixos e fictícios, declarados em `s_ds.py`.
-  Evidência: `cmj/v8/services/s_ds.py:70`, `cmj/v8/services/s_ds.py:78`.
+  Evidência: `cmj/v8/services/s_ds.py:71`, `cmj/v8/services/s_ds.py:79`.
 - V8-DS-005 [implementado] Toda `--cor-*` do tema oficial tem amostra, com o nome do token, e os
   tokens de fonte, raio e sombra também. Evidência: `_templates/v8/v8/partials/ds/cores.html:3`,
   `_templates/v8/v8/partials/ds/tokens.html:5`.
@@ -57,7 +58,7 @@ tema e no modo em vigor. Não é documentação: é um cenário, com amostras e 
   Evidência: `_templates/v8/v8/partials/ds/botoes.html:3`,
   `_templates/v8/v8/partials/ds/blocos.html:3`.
 - V8-DS-008 [implementado] Todo símbolo do sprite de ícones aparece, com o nome. Evidência:
-  `cmj/v8/services/s_ds.py:53`, `_templates/v8/v8/partials/ds/icones.html:3`.
+  `cmj/v8/services/s_ds.py:54`, `_templates/v8/v8/partials/ds/icones.html:3`.
 - V8-DS-009 [implementado] Os drawers aparecem pelos gatilhos em HTML, nos dois lados, nos três
   tamanhos e nos três modos, com uma confirmação por `data-confirm`. Modals e toasts aparecem pela
   ilha `ds-overlays`. Evidência: `_templates/v8/v8/partials/ds/drawers.html:3`,
@@ -84,8 +85,8 @@ tema e no modo em vigor. Não é documentação: é um cenário, com amostras e 
   ilha `ds-estrutura`. Evidência: `_templates/v8/v8/partials/ds/estrutura.html:2`, `_frontend/v8/src/core/ilhas.js:8`.
 - V8-DS-017 [implementado] Os do grupo "Datas e horas" aparecem na seção de mesmo nome, pela ilha
   `ds-datas`. Evidência: `_templates/v8/v8/partials/ds/datas.html:2`, `_frontend/v8/src/core/ilhas.js:9`.
-- V8-DS-018 [desejado] Os do grupo "Cor" aparecem na seção "Seletores de cor", pela ilha `ds-cor`.
-  Evidência: a criar.
+- V8-DS-018 [implementado] Os do grupo "Cor" aparecem na seção "Seletores de cor", pela ilha `ds-cor`.
+  Evidência: `_templates/v8/v8/partials/ds/seletores-cor.html:2`, `_frontend/v8/src/core/ilhas.js:10`.
 
 ## Requisitos de segurança
 

@@ -110,7 +110,7 @@ Regras de outras specs que mudam com esta (D2):
   Funciona sem JavaScript. Evidência: `cmj/v8/views.py:479`, `_templates/v8/v8/ds/vitrine.html:4`.
 - V8-TEMA-024 [implementado] `/v8/ds/temas/` lista os temas do registro, na ordem dele, cada um com
   rótulo, link para a prévia e o botão de usar, e marca o tema em vigor. Evidência:
-  `cmj/v8/services/s_ds.py:98`, `_templates/v8/v8/ds/temas.html:6`.
+  `cmj/v8/services/s_ds.py:99`, `_templates/v8/v8/ds/temas.html:6`.
 - V8-TEMA-025 [implementado] Ao carregar a página e ao trocar o modo, `<meta name="theme-color">`
   recebe o valor de `--cor-barra-navegador` em vigor, que cada tema pode redefinir. Evidência:
   `_frontend/v8/src/core/shell.js:159`.

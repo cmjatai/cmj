@@ -7,7 +7,7 @@ export const RAIZ = path.resolve(__dirname, '../..')
 export const PASTA = path.join(RAIZ, 'src/componentes')
 export const OFICIAL = path.join(RAIZ, 'src/css/temas/oficial')
 
-// Cada componente base e o prefixo das partes do Reka UI que ele usa.
+// Cada componente base e o prefixo das partes do Reka UI que ele usa (ou a lista deles).
 export const PRIMITIVAS = {
   // Base
   Abas: 'Tabs',
@@ -61,14 +61,20 @@ export const PRIMITIVAS = {
   SeletorMes: 'MonthPicker',
   SeletorMeses: 'MonthRangePicker',
   SeletorAno: 'YearPicker',
-  SeletorAnos: 'YearRangePicker'
+  SeletorAnos: 'YearRangePicker',
+  // Cor
+  AreaCor: 'ColorArea',
+  CampoCor: ['ColorField', 'ColorSwatch'],
+  DeslizanteCor: 'ColorSlider',
+  AmostraCor: 'ColorSwatch',
+  PaletaCores: 'ColorSwatchPicker'
 }
 
 // Componentes que só exibem: não têm valor a devolver por v-model nem evento.
-export const SO_EXIBICAO = ['Dica', 'Rotulo', 'Divisor', 'AreaRolagem', 'Separador', 'Avatar', 'Proporcao']
+export const SO_EXIBICAO = ['Dica', 'Rotulo', 'Divisor', 'AreaRolagem', 'Separador', 'Avatar', 'Proporcao', 'AmostraCor']
 
 // Os arquivos CSS do oficial onde ficam as classes dos componentes.
-export const CSS_DOS_COMPONENTES = ['primitivos.css', 'campos.css', 'estrutura.css', 'datas.css']
+export const CSS_DOS_COMPONENTES = ['primitivos.css', 'campos.css', 'estrutura.css', 'datas.css', 'cor.css']
 
 export const ler = arquivo => fs.readFileSync(arquivo, 'utf8')
 export const fonte = nome => ler(path.join(PASTA, `${nome}.vue`))

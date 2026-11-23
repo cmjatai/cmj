@@ -189,6 +189,11 @@
     gap: 0.5rem;
   }
 
+  /* O aviso "Step N of M" do Reka sai em inglês; o componente mostra o seu (V8-CMP-008). */
+  .v8-etapas > [role="status"]:not([data-etapas-aviso]) {
+    display: none;
+  }
+
   .v8-etapas[data-orientation="vertical"] {
     flex-direction: column;
   }

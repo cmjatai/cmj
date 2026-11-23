@@ -1,14 +1,14 @@
 # V8: componentes base
 
-Status: em implementação: as regras `[implementado]` têm teste; as `[desejado]` são dos próximos
-grupos
+Status: implementado
 Última verificação: 2026-11-22 (branch `refact_v8`, sobre o commit `2ba9aef96`)
 Código principal: `_frontend/v8/src/componentes/`, `_frontend/v8/src/css/temas/oficial/primitivos.css`,
 `_frontend/v8/src/css/temas/oficial/campos.css`, `_frontend/v8/src/css/temas/oficial/estrutura.css`,
-`_frontend/v8/src/css/temas/oficial/datas.css`
+`_frontend/v8/src/css/temas/oficial/datas.css`, `_frontend/v8/src/css/temas/oficial/cor.css`
 Testes: `_frontend/v8/tests/componentes/componentes.spec.js`,
 `_frontend/v8/tests/componentes/campos.spec.js`,
-`_frontend/v8/tests/componentes/estrutura.spec.js`, `_frontend/v8/tests/componentes/datas.spec.js`
+`_frontend/v8/tests/componentes/estrutura.spec.js`, `_frontend/v8/tests/componentes/datas.spec.js`,
+`_frontend/v8/tests/componentes/cor.spec.js`, `_frontend/v8/tests/componentes/textos.spec.js`
 
 Componentes Vue de uso geral, construídos sobre as primitivas do Reka UI e vestidos pelo tema em
 vigor. São a base das telas do v8 e aparecem na vitrine do design system (`ds.md`). Cobrem todas
@@ -106,7 +106,7 @@ visual ficam fora (Fora do escopo).
 ## Regras
 
 - V8-CMP-001 [implementado] Os componentes base ficam em `src/componentes/`, um por arquivo, com os
-  nomes da tabela acima, e cada um usa as primitivas do Reka UI correspondentes. Evidência:
+  nomes das tabelas acima, e cada um usa as primitivas do Reka UI correspondentes. Evidência:
   `_frontend/v8/src/componentes/Abas.vue:43`, `_frontend/v8/src/componentes/Selecao.vue:85`.
 - V8-CMP-002 [implementado] Cada componente é um invólucro fino: recebe os dados por props e devolve
   o valor por `v-model`, sem regra de negócio e sem requisição ao servidor. Evidência:
@@ -149,18 +149,18 @@ visual ficam fora (Fora do escopo).
   um sobre a primitiva indicada, no idioma pt-BR. O v-model é texto ISO: `AAAA-MM-DD` para dia,
   `HH:MM` para hora, `AAAA-MM` para mês e `AAAA` para ano, e `{ inicio, fim }` para período e
   intervalo. Texto que não é uma data válida vale como vazio. A conversão fica num só módulo,
-  `src/componentes/datas.js`. Evidência: `_frontend/v8/src/componentes/datas.js:22`, `_frontend/v8/src/componentes/Calendario.vue:2`.
+  `src/componentes/datas.js`. Evidência: `_frontend/v8/src/componentes/datas.js:34`, `_frontend/v8/src/componentes/Calendario.vue:2`.
 - V8-CMP-031 [implementado] Mês e ano escolhidos saem sem o dia nem o mês de hoje: `SeletorMes` devolve
   só ano e mês, e `SeletorAno`, só o ano. Com `name`, todo componente de data põe o valor no
   formulário num campo oculto próprio, no mesmo texto ISO do v-model; período e intervalo vão em
   `<name>_inicio` e `<name>_fim`, vazios quando não preenchidos.
-  Evidência: `_frontend/v8/src/componentes/datas.js:32`, `_frontend/v8/src/componentes/datas.js:41`, `_frontend/v8/src/componentes/CampoPeriodo.vue:59`.
-- V8-CMP-035 [desejado] Os componentes da tabela "Cor" ficam em `src/componentes/`, cada um sobre
+  Evidência: `_frontend/v8/src/componentes/datas.js:44`, `_frontend/v8/src/componentes/datas.js:53`, `_frontend/v8/src/componentes/CampoPeriodo.vue:61`.
+- V8-CMP-035 [implementado] Os componentes da tabela "Cor" ficam em `src/componentes/`, cada um sobre
   a primitiva indicada, com o v-model em texto hexadecimal. O código não tem cor literal: as cores
-  de amostra da vitrine são lidas dos tokens do tema em vigor. Evidência: a criar.
-- V8-CMP-008 [desejado] Os textos que o Reka UI traz em inglês (rótulos de botões de mais e menos,
+  de amostra da vitrine são lidas dos tokens do tema em vigor. Evidência: `_frontend/v8/src/componentes/PaletaCores.vue:2`, `_frontend/v8/src/modules/ds/ilhas/DsCor.vue:71`.
+- V8-CMP-008 [implementado] Os textos que o Reka UI traz em inglês (rótulos de botões de mais e menos,
   de páginas, de remover, de mostrar opções, de passos e de calendário) saem em português nos
-  componentes. Evidência: a criar.
+  componentes. Evidência: `_frontend/v8/src/componentes/datas.js:13`, `_frontend/v8/src/componentes/Etapas.vue:39`, `_frontend/v8/src/componentes/Paginacao.vue:17`.
 
 ## Requisitos de segurança
 

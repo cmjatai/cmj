@@ -6,5 +6,6 @@ export const ilhas = {
   'ds-componentes': () => import('~@/modules/ds/ilhas/DsComponentes.vue'),
   'ds-campos': () => import('~@/modules/ds/ilhas/DsCampos.vue'),
   'ds-estrutura': () => import('~@/modules/ds/ilhas/DsEstrutura.vue'),
-  'ds-datas': () => import('~@/modules/ds/ilhas/DsDatas.vue')
+  'ds-datas': () => import('~@/modules/ds/ilhas/DsDatas.vue'),
+  'ds-cor': () => import('~@/modules/ds/ilhas/DsCor.vue')
 }

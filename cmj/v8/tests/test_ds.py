@@ -458,7 +458,14 @@ def test_drawers_por_gatilho_e_modals_e_toasts_pela_ilha(superusuario):
 @pytest.mark.spec("V8-DS-010")
 def test_sem_javascript_as_secoes_em_html_ficam_completas(superusuario):
     html = vitrine(superusuario)
-    com_ilha = {"overlays", "componentes", "campos", "estrutura", "datas"}
+    com_ilha = {
+        "overlays",
+        "componentes",
+        "campos",
+        "estrutura",
+        "datas",
+        "seletores-cor",
+    }
     for item in s_ds.SECOES:
         parte = secao(html, item.ancora)
         if item.id in com_ilha:

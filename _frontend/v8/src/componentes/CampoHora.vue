@@ -23,6 +23,7 @@
       <TimeFieldInput
         v-else
         :part="segmento.part"
+        :aria-label="NOMES_DAS_PARTES[segmento.part]"
         class="v8-campo-data-segmento"
       >
         {{ segmento.value }}
@@ -46,7 +47,7 @@
 // 1. Imports
 import { computed } from 'vue'
 import { TimeFieldInput, TimeFieldRoot } from 'reka-ui'
-import { IDIOMA, hora } from '~@/componentes/datas'
+import { IDIOMA, NOMES_DAS_PARTES, hora } from '~@/componentes/datas'
 
 // 3. Props & Emits
 defineProps({

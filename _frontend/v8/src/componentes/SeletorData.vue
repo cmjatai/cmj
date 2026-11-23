@@ -27,6 +27,7 @@
         <DatePickerInput
           v-else
           :part="segmento.part"
+          :aria-label="NOMES_DAS_PARTES[segmento.part]"
           class="v8-campo-data-segmento"
         >
           {{ segmento.value }}
@@ -170,7 +171,7 @@ import {
   DatePickerRoot,
   DatePickerTrigger
 } from 'reka-ui'
-import { IDIOMA, dia } from '~@/componentes/datas'
+import { IDIOMA, NOMES_DAS_PARTES, dia } from '~@/componentes/datas'
 import { ICONES } from '~@/componentes/icones'
 
 // 3. Props & Emits

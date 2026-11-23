@@ -8,6 +8,18 @@ import { CalendarDate, parseDate, parseTime } from '@internationalized/date'
 
 export const IDIOMA = 'pt-BR'
 
+// Nome de cada parte de uma data ou hora digitada por partes, para o leitor de tela. O Reka UI os
+// traz em inglês (V8-CMP-008).
+export const NOMES_DAS_PARTES = {
+  day: 'dia',
+  month: 'mês',
+  year: 'ano',
+  hour: 'hora',
+  minute: 'minuto',
+  second: 'segundo',
+  dayPeriod: 'período do dia'
+}
+
 const DOIS = n => String(n).padStart(2, '0')
 const QUATRO = n => String(n).padStart(4, '0')
 
