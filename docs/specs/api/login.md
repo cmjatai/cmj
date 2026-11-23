@@ -35,18 +35,18 @@ comportamento dessas rotas e da autenticação da API não tem spec.
   O nginx do container aceita o endereço informado pelo proxy da frente só quando a conexão vem de
   endereço local ou privado; em conexão vinda de outro endereço, o `X-Real-IP` recebido é ignorado
   e vale o endereço de quem conectou. Os containers de produção publicam a porta só no loopback do
-  host. Evidência: `cmj/settings/project.py:215-217`, `docker/nginx/cmj_docker.conf:17-26`,
-  `docker/nginx/cmj_docker.conf:100`, `docker/nginx/cmj_docker.conf:117`,
-  `docker/nginx/cmj_docker.conf:147`, `docker/docker-compose.yaml:106`,
-  `docker/docker-compose.yaml:134`.
+  host. Evidência: `cmj/settings/project.py:218-220`, `docker/nginx/cmj_docker.conf:17-26`,
+  `docker/nginx/cmj_docker.conf:128`, `docker/nginx/cmj_docker.conf:145`,
+  `docker/nginx/cmj_docker.conf:175`, `docker/docker-compose.yaml:78`,
+  `docker/docker-compose.yaml:106`.
 - API-AUTH-010 [observado] (executado) Sem `X-Real-IP`, a aplicação usa o `X-Forwarded-For` e, sem
   ele, o endereço da conexão. Um `X-Forwarded-For` com mais de um endereço não é aceito como IP, e
   as rotas de login respondem 500. Com o nginx do container na frente o caso não ocorre, porque o
-  `X-Real-IP` está sempre presente. Evidência: `cmj/settings/project.py:215-217`,
+  `X-Real-IP` está sempre presente. Evidência: `cmj/settings/project.py:218-220`,
   `sapl/utils.py:542-550`.
 - API-AUTH-005 [observado] A contagem fica no cache `default`. Com `DummyCache`, que é o cache em
   `DEBUG`, nada é guardado e o limite não atua, aqui e na tela `/login/`. Evidência:
-  `cmj/settings/project.py:160-167`, `cmj/settings/project.py:213-220`. Por leitura do código.
+  `cmj/settings/project.py:163-170`, `cmj/settings/project.py:216-223`. Por leitura do código.
 
 ### Token CSRF
 

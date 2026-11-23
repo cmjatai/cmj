@@ -1,42 +1,64 @@
-name: portalcmj
+# Produção simulada: a imagem e a configuração da produção, só em localhost.
+#
+# Isolada do dev: projeto, rede (prodsim-net) e volumes próprios, com Postgres,
+# Redis e Solr próprios. Os serviços têm os mesmos nomes da produção (cmjdb18,
+# cmjredis, cmjsolr, cmj-blue, cmj-green), e por isso o start.sh, o
+# prometheus.yml e os exporters valem sem mudança.
+#
+# Não suba este arquivo direto: use os scripts de docker/prodsim/ (up.sh,
+# down.sh, smoke.sh, db-from-dev.sh), que passam o --env-file
+# docker/prodsim/compose.env. Sem ele, o compose recusa a configuração.
+# Documentação: docs/backend/monitoramento.md.
+name: portalcmj-prodsim
+include:
+  - docker-compose-monitoring.yaml
 services:
+  cmjdb18:
+    image: pgvector/pgvector:0.8.7-pg18-bookworm
+    container_name: prodsim-postgres18
+    restart: "no"
+    environment:
+      POSTGRES_PASSWORD: cmj_dt1
+      POSTGRES_USER: cmj_dt1
+      POSTGRES_DB: cmj
+      PGDATA: /var/lib/postgresql/data/
+    volumes:
+      - prodsim_db_data:/var/lib/postgresql/data/
+    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
+    networks:
+      cmj-net:
+        aliases: [cmjpostgres18]
+
   cmjredis:
     image: redis:alpine
-    container_name: cmjredis
-    restart: always
-    labels:
-       NAME: "cmjredis"
+    container_name: prodsim-redis
+    restart: "no"
     volumes:
-      - credis_data:/data
-    #ports:
-    #  - "6379:6379"
+      - prodsim_redis_data:/data
     networks:
       - cmj-net
+
   cmjsolr:
     image: solr:9.5
-    restart: always
+    container_name: prodsim-solr
+    restart: "no"
     command: bin/solr start -c -f
-    container_name: cmjsolr
-    labels:
-        NAME: "cmjsolr"
     environment:
-      - SOLR_HEAP=4g
+      - SOLR_HEAP=${PRODSIM_SOLR_HEAP:-1g}
     volumes:
-      - csolr9_data:/var/solr
-      - csolr9_configsets:/opt/solr/server/solr/configsets
-    #ports:
-    #  - "8983:8983"
+      - prodsim_solr_data:/var/solr
+      - prodsim_solr_configsets:/opt/solr/server/solr/configsets
     networks:
       - cmj-net
-  cmj:
+
+  cmj-blue: &cmj
     build:
       context: ../
-      dockerfile: ./docker/Dockerfile.DevModeProd
-    container_name: cmj
+      dockerfile: ./docker/Dockerfile
+    image: portalcmj-prodsim:local
+    container_name: prodsim-cmj-blue
     user: "root:root"
-    labels:
-       NAME: "cmj"
-    restart: always
+    restart: "no"
     environment:
       DEBUG: 'False'
       USE_SOLR: 'True'
@@ -45,24 +67,52 @@ services:
       IS_ZK_EMBEDDED: 'True'
       TZ: America/Sao_Paulo
     volumes:
-      - cmj_data:/var/cmjatai/cmj_data
-      - /mnt/volumes/cmj_media:/var/cmjatai/cmj_media
-      - cmj_logs:/var/cmjatai/cmj/logs
+      - prodsim_cmj_data:/var/cmjatai/cmj_data
+      # .env da aplicação (DEBUG=False, banco, BASE_URL...): criado pelo up.sh
+      # a partir de docker/prodsim/cmj.env.example
+      - ./prodsim/cmj.env:/var/cmjatai/cmj_data/.env:ro
+      # Volume próprio; PRODSIM_MEDIA_SRC aponta para outra origem, se preciso
+      - ${PRODSIM_MEDIA_SRC:-prodsim_cmj_media}:/var/cmjatai/cmj_media
+      - prodsim_cmj_logs:/var/cmjatai/cmj/logs
     depends_on:
+      - cmjdb18
       - cmjredis
       - cmjsolr
-    ports:
-      - "80:80"
     networks:
       - cmj-net
+
+  cmj-green:
+    <<: *cmj
+    container_name: prodsim-cmj-green
+    profiles: [green]
+
+  # Faz o papel do nginx do host da produção: TLS, X-Real-IP,
+  # $proxy_add_x_forwarded_for, 444 e o log que o fail2ban leria.
+  front:
+    image: nginx:1.29-alpine
+    container_name: prodsim-front
+    restart: "no"
+    volumes:
+      - ./prodsim/nginx-front.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./prodsim/certs:/etc/nginx/certs:ro
+    ports:
+      - "127.0.0.1:${PRODSIM_HTTP_PORT:-8088}:80"
+      - "127.0.0.1:${PRODSIM_HTTPS_PORT:-8443}:443"
+    depends_on:
+      - cmj-blue
+    networks:
+      - cmj-net
+
 networks:
   cmj-net:
-    name: cmj-net
+    name: ${APP_NETWORK_NAME:?use os scripts de docker/prodsim, que passam --env-file docker/prodsim/compose.env}
     driver: bridge
+
 volumes:
-  cmj_data:
-  cmj_media:
-  cmj_logs:
-  csolr9_data:
-  csolr9_configsets:
-  credis_data:
+  prodsim_db_data:
+  prodsim_redis_data:
+  prodsim_solr_data:
+  prodsim_solr_configsets:
+  prodsim_cmj_data:
+  prodsim_cmj_media:
+  prodsim_cmj_logs:

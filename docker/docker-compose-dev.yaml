@@ -1,28 +1,41 @@
 name: portalcmj
 services:
+  # Monitoramento leve do dev: só as métricas da aplicação (cmj:9000 e o
+  # runserver do host em 9098). A stack completa, com exporters, está em
+  # docker-compose-monitoring.yaml (produção e produção simulada).
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.16.0
     container_name: prometheus
-    restart: always
+    restart: 'no'
     labels:
        NAME: "prometheus"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=7d
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/prometheus-dev.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090"
     networks:
       - cmj-net
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:13.3.1
     environment:
-      GF_INSTALL_PLUGINS: "grafana-clock-panel,grafana-simple-json-datasource"
       GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
     restart: 'no'
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
     ports:
-      - 3000:3000
+      - "127.0.0.1:3000:3000"
     depends_on:
       - prometheus
     container_name: grafana

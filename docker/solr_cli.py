@@ -86,9 +86,10 @@ def upload_security_file(zk_host):
             zk.set("/security.json", str.encode(data))
         else:
             zk.create("/security.json", str.encode(data))
-        data, stat = zk.get("/security.json")
+        # Confere a gravação sem imprimir o conteúdo, que tem o hash da senha.
+        if not zk.exists("/security.json"):
+            raise RuntimeError("security.json não foi gravado no ZooKeeper")
         print("file uploaded!")
-        print(data.decode("utf-8"))
         zk.stop()
     except Exception as e:
         print(e)

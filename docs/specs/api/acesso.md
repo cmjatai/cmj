@@ -285,7 +285,7 @@ negócio de cada viewset customizado entram só como inventário. O mecanismo de
   script de qualquer origem, sem os cookies do visitante. O cabeçalho `Authorization` está entre
   os liberados, e por isso a autenticação por token funciona entre origens; os frontends do
   portal chamam a API na mesma origem e não passam por essa conferência. Decisão de 2026-11-22.
-  Evidência: `docker/nginx/cmj_docker.conf:127-141`.
+  Evidência: `docker/nginx/cmj_docker.conf:155-169`.
 
 ## Riscos de segurança
 

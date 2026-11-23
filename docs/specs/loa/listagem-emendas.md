@@ -317,7 +317,7 @@ mesma view, entram só no que afeta esta tela.
   emenda 435 apagou as duas versões do cartão (executado, sem gravar no banco).
 - LOA-LST-042 [observado] Em desenvolvimento o cache é `DummyCache` e nada disso é exercitado.
   Evidência: `CACHES["default"]["BACKEND"]` e `DEBUG == True` (executado no ambiente local).
-  Evidência: `cmj/settings/project.py:160-167`.
+  Evidência: `cmj/settings/project.py:163-170`.
 
 ### PDF da listagem
 

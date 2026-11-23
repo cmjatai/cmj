@@ -134,3 +134,7 @@ security.json
 /.pytest_cache/
 .eslintcache
 .claude/settings.local.json
+
+# produção simulada (docker/prodsim): .env da aplicação e certificado local
+docker/prodsim/cmj.env
+docker/prodsim/certs/

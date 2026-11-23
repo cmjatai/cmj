@@ -1,0 +1,159 @@
+# Monitoramento da produção e da produção simulada.
+#
+# Incluído (include:) por docker-compose.yaml e docker-compose-dev-mode-prod.yaml.
+# Não suba este arquivo sozinho. As variáveis vêm do docker/.env do servidor,
+# que não é versionado (modelo em docker/.env.example), ou do --env-file da
+# produção simulada. Documentação: docs/backend/monitoramento.md.
+#
+# Só o Grafana pode sair do loopback, por MONITORING_BIND_IP (IP interno do
+# servidor). O Prometheus fica em 127.0.0.1 e os exporters não publicam porta.
+
+services:
+  prometheus:
+    image: prom/prometheus:v3.16.0
+    restart: ${MONITORING_RESTART:-always}
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=${PROMETHEUS_RETENTION_TIME:-30d}
+      - --storage.tsdb.retention.size=${PROMETHEUS_RETENTION_SIZE:-10GB}
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:${PROMETHEUS_PORT:-9090}:9090"
+    networks:
+      - cmj-net
+
+  grafana:
+    image: grafana/grafana:13.3.1
+    restart: ${MONITORING_RESTART:-always}
+    environment:
+      # A senha só vale na criação do volume grafana_data. Com o volume já
+      # existente, troque com: grafana cli admin reset-admin-password
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:?defina GRAFANA_ADMIN_PASSWORD no docker/.env}
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT_URL:-http://localhost:3000}
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+    ports:
+      - "${MONITORING_BIND_IP:-127.0.0.1}:${GRAFANA_PORT:-3000}:3000"
+    depends_on:
+      - prometheus
+    networks:
+      - cmj-net
+
+  # Servidor: CPU, memória, disco e carga. Fica na rede do docker para não
+  # abrir a porta 9100 no host; por isso as métricas de rede (netdev) são as
+  # do container, não as da placa do servidor (use as do cAdvisor).
+  node-exporter:
+    image: prom/node-exporter:v1.13.1
+    restart: ${MONITORING_RESTART:-always}
+    command:
+      - --path.rootfs=/host
+    pid: host
+    volumes:
+      - /:/host:ro,rslave
+    networks:
+      - cmj-net
+
+  # Consumo por container (blue, green, solr, postgres...).
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.55.1
+    restart: ${MONITORING_RESTART:-always}
+    privileged: true
+    devices:
+      - /dev/kmsg
+    command:
+      - --docker_only=true
+      - --housekeeping_interval=15s
+      - --store_container_labels=false
+      - --disable_metrics=advtcp,cpu_topology,disk,hugetlb,memory_numa,percpu,referenced_memory,resctrl,sched,tcp,udp
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    networks:
+      - cmj-net
+
+  # Usuário só com pg_monitor (ver docs/backend/monitoramento.md).
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.21.1
+    restart: ${MONITORING_RESTART:-always}
+    command:
+      - --collector.stat_statements
+    environment:
+      DATA_SOURCE_NAME: ${PG_EXPORTER_DSN:?defina PG_EXPORTER_DSN no docker/.env}
+    networks:
+      - cmj-net
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.98.0-alpine
+    restart: ${MONITORING_RESTART:-always}
+    environment:
+      REDIS_ADDR: redis://cmjredis:6379
+    networks:
+      - cmj-net
+
+  # Lê os eventos de tarefa (CELERY_WORKER_SEND_TASK_EVENTS) no broker.
+  celery-exporter:
+    image: danihodovic/celery-exporter:0.12.2
+    restart: ${MONITORING_RESTART:-always}
+    command:
+      - --broker-url=redis://cmjredis:6379/0
+      - --retry-interval=5
+    networks:
+      - cmj-net
+
+  # Um por container da aplicação: lê o /nginx_status do nginx interno.
+  nginx-exporter-blue:
+    image: nginx/nginx-prometheus-exporter:1.5.3
+    restart: ${MONITORING_RESTART:-always}
+    command:
+      - --nginx.scrape-uri=http://cmj-blue/nginx_status
+    networks:
+      - cmj-net
+
+  nginx-exporter-green:
+    image: nginx/nginx-prometheus-exporter:1.5.3
+    restart: ${MONITORING_RESTART:-always}
+    command:
+      - --nginx.scrape-uri=http://cmj-green/nginx_status
+    networks:
+      - cmj-net
+
+  # Exporter que acompanha o próprio Solr 9.5, apontado para o ZooKeeper
+  # embutido do cmjsolr.
+  solr-exporter:
+    image: solr:9.5
+    restart: ${MONITORING_RESTART:-always}
+    entrypoint: ["/opt/solr/prometheus-exporter/bin/solr-exporter"]
+    command: ["-p", "9854", "-z", "cmjsolr:9983", "-s", "30", "-n", "4"]
+    environment:
+      # Heap pelo JAVA_MEM do script (com -Xmx no JAVA_OPTS, o -Xms padrão do
+      # script fica maior que o máximo e a JVM não sobe).
+      JAVA_MEM: -Xms128m -Xmx256m
+      JAVA_OPTS: >-
+        -Dsolr.httpclient.builder.factory=org.apache.solr.client.solrj.impl.PreemptiveBasicAuthClientBuilderFactory
+        -Dbasicauth=${SOLR_BASIC_AUTH:-solr:solr}
+    networks:
+      - cmj-net
+
+networks:
+  cmj-net:
+    name: ${APP_NETWORK_NAME:-cmj-net}
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:

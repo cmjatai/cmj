@@ -84,7 +84,7 @@ e a negociação de formato. O controle de acesso por área de trabalho está em
   `logs/x_accel_redirect.log`, com guarda por tamanho (15 MB por arquivo e dez cópias antigas),
   no volume de logs do servidor, junto dos logs de acesso; quem o lê é quem administra o
   servidor. Mantido assim por decisão de 2026-11-22. Evidência: `sapl/api/mixins.py:433-441`,
-  `cmj/settings/logs.py:79-87`, `cmj/settings/logs.py:119-123`, `docker/docker-compose.yaml:100`.
+  `cmj/settings/logs.py:79-87`, `cmj/settings/logs.py:119-123`, `docker/docker-compose.yaml:72`.
 
 ### Conversões a pedido do cliente
 

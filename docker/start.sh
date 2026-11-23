@@ -14,12 +14,14 @@ NUM_SHARDS=${NUM_SHARDS:=1}
 RF=${RF:=1}
 MAX_SHARDS_PER_NODE=${MAX_SHARDS_PER_NODE:=1}
 IS_ZK_EMBEDDED="${IS_ZK_EMBEDDED:=False}"
+# URL do Solr para o log, sem a senha (http://usuario:***@host:porta)
+SOLR_URL_LOG=$(printf '%s' "$SOLR_URL" | sed -E 's#(://[^:/@]+):[^@]*@#\1:***@#')
 
 if [ "${USE_SOLR-False}" == "True" ] || [ "${USE_SOLR-False}" == "true" ]; then
 
     echo "Solr configurations"
     echo "==================="
-    echo "URL: $SOLR_URL"
+    echo "URL: $SOLR_URL_LOG"
     echo "COLLECTION: $SOLR_COLLECTIONS"
     echo "NUM_SHARDS: $NUM_SHARDS"
     echo "REPLICATION FACTOR: $RF"

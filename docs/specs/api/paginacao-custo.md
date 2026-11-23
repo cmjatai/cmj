@@ -59,7 +59,7 @@ comparação.
 - API-CUS-005 [observado] A aplicação não limita o número de requisições (throttling) em nenhuma
   rota gerada: as settings do DRF não declaram classes de throttle, e o limite por IP existente
   cobre só o login. O nginx do container também não limita `/api`. Evidência:
-  `cmj/settings/drf.py:3-32`, `cmj/api/views.py:117-120`, `docker/nginx/cmj_docker.conf:86-88`.
+  `cmj/settings/drf.py:3-32`, `cmj/api/views.py:117-120`, `docker/nginx/cmj_docker.conf:114-116`.
 - API-CUS-024 [acordado] O limite de requisições por IP das rotas `/api` fica no proxy da frente, o
   nginx do host, e não na aplicação: ele vê o IP do cliente, atua antes de a requisição chegar aos
   containers e vale para todos eles. A aplicação não usa o throttling do DRF. A taxa é escolhida a
@@ -129,7 +129,7 @@ comparação.
 
 - API-CUS-012 [observado] Em produção, o gunicorn sobe 16 processos com tempo limite de 300 s, e o
   nginx espera a aplicação por até 600 s. Evidência: `docker/start_gunicorn.sh:7-9`,
-  `docker/nginx/cmj_docker.conf:152-153`.
+  `docker/nginx/cmj_docker.conf:180-181`.
 
 ### `expand`, filtros e esquema
 

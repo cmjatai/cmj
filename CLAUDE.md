@@ -50,6 +50,11 @@ cd _frontend/v2018 && npm run serve | build | lint | test
 | Backend no container `cmj` | 9099 → 9000 |
 | Vite (v6) / Vite (v8) / Webpack (v2018) | 5173 / 5174 / 8080 |
 | PostgreSQL / Redis / Solr | 5433 / 6379 / 8983 |
+| Prometheus / Grafana (só em 127.0.0.1) | 9090 / 3000 |
+
+Produção simulada (imagem da produção, isolada do dev, só localhost): `sudo docker/prodsim/up.sh`,
+`smoke.sh`, `db-from-dev.sh` e `down.sh`. Portal em `https://localhost:8443`, Grafana em 3001 e
+Prometheus em 9091. Detalhes em `docs/backend/monitoramento.md`.
 
 ## Mapa do projeto
 
@@ -234,9 +239,14 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   antes de mexer em `cmj/search`.
 - `docs/commands/ocrmypdf_command.md`: command `ocrmypdf`.
 - `docs/backend/convencoes.md`: exemplos de CRUD, mixins, API, permissões, testes e novo app.
+- `docs/backend/monitoramento.md`: Prometheus, Grafana e exporters (dev e produção), métricas em
+  modo multiprocess, acesso aos endpoints de operação e produção simulada. Leia antes de mexer em
+  `docker/`, no `/metrics` ou no `EndpointRestrictionMiddleware`.
 - `docs/frontend/v6.md`: stores, `Resources.Utils`, rotas e padrões do v6.
 - `docs/frontend/v8.md`: qual modo de tela usar, layouts e blocks dos templates, tags e atributos do
   lado Django, composables do lado Vue, CSS e testes. Leia antes de mexer em `_frontend/v8`, `_templates/v8` ou `cmj/v8`.
+- `docs/specs/infra/endpoints-operacao.md`: quem alcança `/metrics`, `/health/`, `/ready/`, `/version/`
+  e `/nginx_status` (nginx do container e `EndpointRestrictionMiddleware`). Leia antes de alterá-los.
 - `docs/specs/api/login.md`: login por usuário e senha pela API (`/api/auth/session` e
   `/api/auth/token`): limite de tentativas e token CSRF. Leia antes de alterar essas rotas.
 - `docs/specs/api/`: comportamento atual da API gerada pelo `drfautoapi`, em seis specs. Leia a da

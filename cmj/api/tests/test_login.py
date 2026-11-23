@@ -237,7 +237,7 @@ def test_login_por_token_nao_depende_de_csrf(cliente_csrf, usuario):
 @pytest.mark.spec("API-AUTH-009")
 @pytest.mark.parametrize(
     "conf",
-    ["docker/nginx/cmj_docker.conf", "docker/nginx_indev_modprod/cmj_docker.conf"],
+    ["docker/nginx/cmj_docker.conf"],
 )
 def test_nginx_do_container_informa_o_ip_do_cliente_nos_tres_blocos(conf):
     texto = (RAIZ / conf).read_text()
