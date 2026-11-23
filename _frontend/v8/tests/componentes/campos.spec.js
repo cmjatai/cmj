@@ -102,7 +102,9 @@ describe('componentes de campo', () => {
       h(SelecaoBusca, { name: 'bairro', modelValue: 'norte', opcoes: OPCOES }),
       h(Autocompletar, { name: 'cidade', modelValue: 'Jataí', sugestoes: ['Jataí'] }),
       h(ListaOpcoes, { name: 'regiao', modelValue: 'sul', opcoes: OPCOES }),
-      h(Alternador, { name: 'negrito', modelValue: true, texto: 'N' })
+      h(Alternador, { name: 'negrito', modelValue: true, texto: 'N' }),
+      h(Alternador, { name: 'italico', modelValue: false, texto: 'I' }),
+      h(Alternador, { name: 'sublinhado', value: 'sim', modelValue: true, texto: 'S' })
     ])
     await assentar()
     const dados = dadosDoFormulario()
@@ -116,8 +118,10 @@ describe('componentes de campo', () => {
     expect(dados.get('bairro')).toBe('norte')
     expect(dados.get('cidade')).toBe('Jataí')
     expect(dados.get('regiao')).toBe('sul')
-    // O Alternador não participa do envio (D6).
-    expect(dados.get('negrito')).toBeNull()
+    // O Alternador vai como uma caixa de marcação: o value só quando pressionado (D6).
+    expect(dados.get('negrito')).toBe('on')
+    expect(dados.get('italico')).toBeNull()
+    expect(dados.get('sublinhado')).toBe('sim')
   })
 
   it('V8-CMP-011: o campo de número formata em pt-BR e envia o número cru', async () => {

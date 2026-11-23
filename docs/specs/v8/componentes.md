@@ -137,8 +137,10 @@ visual ficam fora (Fora do escopo).
 - V8-CMP-010 [implementado] Os componentes de campo da tabela "Campos" ficam em `src/componentes/`,
   cada um sobre a primitiva indicada. `GrupoAlternadores`, `Deslizante`, `CampoNumero`,
   `CampoCodigo`, `CampoEtiquetas`, `TextoEditavel`, `Avaliacao`, `SelecaoBusca`, `Autocompletar` e
-  `ListaOpcoes`, com `name` e dentro de um `<form>`, participam do envio nativo. `Alternador` não
-  participa (D6). Evidência: `_frontend/v8/src/componentes/Deslizante.vue:8`, `_frontend/v8/src/componentes/SelecaoBusca.vue:6`.
+  `ListaOpcoes`, com `name` e dentro de um `<form>`, participam do envio nativo. O `Alternador`
+  participa como uma caixa de marcação, com um campo oculto próprio: vai o `value` só quando está
+  pressionado (D6). Evidência: `_frontend/v8/src/componentes/Deslizante.vue:8`,
+  `_frontend/v8/src/componentes/SelecaoBusca.vue:6`, `_frontend/v8/src/componentes/Alternador.vue:11`.
 - V8-CMP-011 [implementado] `CampoNumero` formata e lê o número no idioma pt-BR, e no formulário vai o
   número sem formatação. Evidência: `_frontend/v8/src/componentes/CampoNumero.vue:10`.
 - V8-CMP-020 [implementado] Os componentes da tabela "Navegação e estrutura" ficam em
@@ -192,9 +194,9 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   v-model nos objetos de data do Reka, sem conversão, o que leva esse tipo para quem usa o
   componente. Decisão: pendente; aplicada a recomendação.
 - D6. `Alternador` no formulário. O Toggle do Reka UI 2.11 gera um campo oculto que nunca fica
-  marcado, então o valor não iria no envio. Recomendação: o `Alternador` não participa do
-  formulário; quem precisa do valor num `<form>` usa `Chave` ou `CaixaMarcacao`. Alternativa: um
-  campo oculto próprio no componente. Decisão: pendente; aplicada a recomendação.
+  marcado, então o valor não iria no envio. Recomendação: um campo oculto próprio no componente,
+  que envia o `value` só quando pressionado, como uma caixa de marcação. Alternativa: deixar o
+  `Alternador` fora do formulário. Decisão (2026-11-22): campo oculto próprio.
 - D7. Nomes dos componentes novos. Recomendação: em português, como os do primeiro lote (tabelas
   acima), mantendo `Avatar`. Decisão (2026-11-22): em português, junto com a D1.
 - D8. Formato do v-model das datas. Recomendação: texto ISO (V8-CMP-030), o mesmo dos formulários
