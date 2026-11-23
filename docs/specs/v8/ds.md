@@ -116,7 +116,8 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
 - D2. Onde vale o estilo dos elementos HTML sem classe. O Tailwind zera o estilo de todos eles.
   Recomendação: só dentro do conteúdo da página e do corpo dos overlays (V8-DS-011), e só em
   elemento sem `class`, para não mudar o shell nem os componentes. Alternativas: em toda a página,
-  ou só dentro de uma classe opcional como `v8-prosa`. Decisão: pendente; aplicada a recomendação.
+  ou só dentro de uma classe opcional como `v8-prosa`. Decisão (2026-11-22): a recomendação, só no
+  conteúdo da página e no corpo dos overlays, e só em elemento sem `class`.
 - D3. Uma página só ou uma página por seção. Recomendação: uma página com índice de âncoras, que
   permite ver tudo de uma vez e comparar temas rolando a mesma tela. Alternativa: uma página por
   seção, quando a vitrine crescer. Decisão: pendente; aplicada a recomendação.
