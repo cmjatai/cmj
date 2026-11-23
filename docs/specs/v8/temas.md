@@ -162,7 +162,7 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
 - D6. Três blocos de cor por tema ou `light-dark()`. Com `light-dark()` cada tema teria um bloco só,
   mas o piso de navegadores sobe para Safari 17.5, Chrome 123 e Firefox 120, e o JavaScript deixa
   de conseguir ler `--cor-barra-navegador` diretamente. Recomendação: três blocos, com teste de
-  paridade. Decisão: pendente; aplicada a recomendação.
+  paridade. Decisão (2026-11-22): três blocos.
 - D7. `data-tema` sempre emitido, inclusive com `oficial`. Recomendação: sempre, para o CSS e os
   testes terem um único caso. Alternativa: só quando o tema não é o oficial. Decisão
   (2026-11-22): sempre.
