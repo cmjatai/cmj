@@ -118,7 +118,9 @@ visual ficam fora (Fora do escopo).
   `_frontend/v8/src/css/temas/oficial/primitivos.css:285`.
 - V8-CMP-004 [implementado] O conteúdo flutuante de `Dica`, `Popover`, `MenuSuspenso` e `Selecao`
   vai para o `body` e usa a camada `--z-popover`, que fica acima de drawers, modals e toasts. Aberto
-  dentro de um modal, ESC fecha só o flutuante. Evidência:
+  dentro de um modal, ESC fecha só o flutuante. `SelecaoBusca` e `Autocompletar` usam a lista de
+  `Selecao`, e `SeletorData` e `SeletorPeriodo` abrem o calendário na moldura do `Popover`, com a
+  mesma camada. Evidência:
   `_frontend/v8/src/css/temas/oficial/primitivos.css:110`,
   `_frontend/v8/src/componentes/Popover.vue:6`.
 - V8-CMP-005 [implementado] Os papéis ARIA e o teclado das primitivas são preservados: abas com
@@ -146,7 +148,8 @@ visual ficam fora (Fora do escopo).
 - V8-CMP-020 [implementado] Os componentes da tabela "Navegação e estrutura" ficam em
   `src/componentes/`, cada um sobre a primitiva indicada. O conteúdo flutuante de `BarraMenus`,
   `MenuContexto` e `CartaoFlutuante` vai para o `body`, na camada `--z-popover`, e o painel do
-  `MenuNavegacao` também usa essa camada. Evidência: `_frontend/v8/src/componentes/MenuContexto.vue:9`, `_frontend/v8/src/css/temas/oficial/estrutura.css:112`.
+  `MenuNavegacao` também usa essa camada. Evidência: `_frontend/v8/src/componentes/MenuContexto.vue:9`,
+  `_frontend/v8/src/css/temas/oficial/estrutura.css:112`.
 - V8-CMP-030 [implementado] Os componentes da tabela "Datas e horas" ficam em `src/componentes/`, cada
   um sobre a primitiva indicada, no idioma pt-BR: o usuário vê e digita `DD/MM/AAAA`, horas no
   relógio de 24 horas e meses por extenso. Por baixo, o v-model é texto ISO: `AAAA-MM-DD` para dia,
