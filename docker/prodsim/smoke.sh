@@ -105,7 +105,12 @@ else
 fi
 
 echo "Alertas do Grafana"
-GAUTH=(-u "admin:${GRAFANA_ADMIN_PASSWORD}")
+# Se a senha do admin foi trocada na interface: GRAFANA_SENHA=<senha> sudo -E docker/prodsim/smoke.sh
+GAUTH=(-u "admin:${GRAFANA_SENHA:-$GRAFANA_ADMIN_PASSWORD}")
+login="$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "${GAUTH[@]}" "$GRAF/api/user")"
+if [ "$login" != 200 ]; then
+    falha "login no Grafana recusado (HTTP $login): a senha do admin foi trocada? Use GRAFANA_SENHA=<senha> sudo -E docker/prodsim/smoke.sh"
+fi
 regras="$(curl -s --max-time 10 "${GAUTH[@]}" "$GRAF/api/v1/provisioning/alert-rules" \
     | python3 -c 'import json,sys; print(len([r for r in json.load(sys.stdin) if r.get("uid","").startswith("portalcmj-")]))' 2>/dev/null)"
 if [ "${regras:-0}" = 9 ]; then passa "9 regras de alerta carregadas"; else falha "regras de alerta carregadas: ${regras:-0} (esperado 9)"; fi
