@@ -123,14 +123,16 @@ else
     falha "contato portalcmj com url '$url_contato' (esperado http://alerta-receptor:8080/alertas)"
 fi
 
-teste="$(curl -s -o /dev/null -w '%{http_code}' --max-time 20 "${GAUTH[@]}" -H 'Content-Type: application/json' \
-    -X POST "$GRAF/api/alertmanager/grafana/config/api/v1/receivers/test" \
-    -d '{"receivers":[{"name":"teste","grafana_managed_receiver_configs":[{"uid":"","name":"teste","type":"webhook","disableResolveMessage":false,"settings":{"url":"http://alerta-receptor:8080/alertas"},"secureFields":{}}]}]}')"
-sleep 2
-if [ "$teste" = 200 ] && docker logs prodsim-alerta-receptor 2>&1 | grep -q '/alertas'; then
-    passa "notificação de teste chegou ao alerta-receptor"
+# Chamada direta do container do Grafana ao receptor (o endpoint de teste de
+# contato da API foi retirado no Grafana 13). O envio real das regras se vê
+# parando um exporter: docs/backend/monitoramento.md.
+docker exec portalcmj-prodsim-grafana-1 wget -q -O /dev/null --header 'Content-Type: application/json' \
+    --post-data '{"teste":"smoke"}' http://alerta-receptor:8080/alertas-smoke 2>/dev/null
+sleep 1
+if docker logs prodsim-alerta-receptor 2>&1 | grep -q '/alertas-smoke'; then
+    passa "Grafana alcança o alerta-receptor"
 else
-    falha "notificação de teste: HTTP $teste; veja sudo docker logs prodsim-alerta-receptor"
+    falha "Grafana não alcança o alerta-receptor; veja sudo docker logs prodsim-alerta-receptor"
 fi
 
 echo

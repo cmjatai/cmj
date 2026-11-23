@@ -143,6 +143,17 @@ O destino é escolhido por `GRAFANA_CONTATO` no `docker/.env`, que monta um dos 
 
 O servidor precisa alcançar `api.telegram.org` pela internet.
 
+Na produção simulada, para ver uma regra disparar de verdade, pare um exporter e acompanhe a regra
+em Alerting > Alert rules (Pending, e Firing depois de 5 minutos):
+
+```bash
+sudo docker stop portalcmj-prodsim-redis-exporter-1
+sudo docker logs prodsim-alerta-receptor 2>&1 | grep -i "Serviço fora"   # depois do Firing
+sudo docker start portalcmj-prodsim-redis-exporter-1
+```
+
+A regra de disco ignora montagens de rede (`fuse.*`, como o sshfs) e as do snap.
+
 Para mudar um limite, edite `regras.yml` e recrie o Grafana como no passo 5. As regras
 provisionadas não aceitam edição pela interface.
 

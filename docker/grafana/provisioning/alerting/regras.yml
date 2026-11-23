@@ -76,9 +76,11 @@ groups:
             relativeTimeRange: { from: 600, to: 0 }
             datasourceUid: prometheus
             model:
+              # Só discos locais: fora montagens de rede (fuse.*, como sshfs) e as
+              # do snap, que repetem o mesmo disco.
               expr: >-
-                node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"}
-                / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs"}
+                node_filesystem_avail_bytes{fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs|fuse.*",mountpoint!~"/(var/)?snap/.*"}
+                / node_filesystem_size_bytes{fstype!~"tmpfs|overlay|squashfs|nsfs|ramfs|fuse.*",mountpoint!~"/(var/)?snap/.*"}
               instant: true
               refId: A
           - refId: C
