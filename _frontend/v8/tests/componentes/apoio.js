@@ -32,14 +32,30 @@ export const PRIMITIVAS = {
   SelecaoBusca: 'Combobox',
   Autocompletar: 'Autocomplete',
   ListaOpcoes: 'Listbox',
-  GrupoEtiquetas: 'TagGroup'
+  GrupoEtiquetas: 'TagGroup',
+  // Navegação e estrutura
+  Recolhivel: 'Collapsible',
+  BarraFerramentas: 'Toolbar',
+  BarraMenus: 'Menubar',
+  MenuContexto: 'ContextMenu',
+  MenuNavegacao: 'NavigationMenu',
+  CartaoFlutuante: 'HoverCard',
+  Paginacao: 'Pagination',
+  Etapas: 'Stepper',
+  Arvore: 'Tree',
+  Divisor: 'Splitter',
+  AreaRolagem: 'ScrollArea',
+  Separador: 'Separator',
+  Avatar: 'Avatar',
+  Progresso: 'Progress',
+  Proporcao: 'AspectRatio'
 }
 
 // Componentes que só exibem: não têm valor a devolver por v-model nem evento.
-export const SO_EXIBICAO = ['Dica', 'Rotulo']
+export const SO_EXIBICAO = ['Dica', 'Rotulo', 'Divisor', 'AreaRolagem', 'Separador', 'Avatar', 'Proporcao']
 
 // Os arquivos CSS do oficial onde ficam as classes dos componentes.
-export const CSS_DOS_COMPONENTES = ['primitivos.css', 'campos.css']
+export const CSS_DOS_COMPONENTES = ['primitivos.css', 'campos.css', 'estrutura.css']
 
 export const ler = arquivo => fs.readFileSync(arquivo, 'utf8')
 export const fonte = nome => ler(path.join(PASTA, `${nome}.vue`))

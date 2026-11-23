@@ -1,0 +1,492 @@
+/*
+ * Componentes base de navegação e estrutura (docs/specs/v8/componentes.md): recolhível, barras de
+ * ferramentas e de menus, menu de contexto, menu de navegação, cartão flutuante, paginação, etapas,
+ * árvore, divisor, área de rolagem, separador, avatar, progresso e proporção. Os estados vêm dos
+ * atributos do Reka UI, e tudo usa tokens (V8-CMP-003 e 007).
+ */
+@layer components {
+  /* Recolhível */
+  .v8-recolhivel {
+    display: block;
+  }
+
+  .v8-recolhivel-gatilho {
+    gap: 0.375rem;
+  }
+
+  .v8-recolhivel-seta {
+    transition: transform var(--duracao) var(--curva);
+  }
+
+  .v8-recolhivel-gatilho[data-state="open"] .v8-recolhivel-seta {
+    transform: rotate(180deg);
+  }
+
+  .v8-recolhivel-painel {
+    overflow: hidden;
+  }
+
+  .v8-recolhivel-painel[data-state="open"] {
+    animation: v8-recolhivel-abrir var(--duracao) var(--curva);
+  }
+
+  .v8-recolhivel-painel[data-state="closed"] {
+    animation: v8-recolhivel-fechar var(--duracao) var(--curva);
+  }
+
+  .v8-recolhivel-miolo {
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* Barra de ferramentas e barra de menus */
+  .v8-barra-ferramentas,
+  .v8-barra-menus {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+  }
+
+  .v8-barra-ferramentas-separador {
+    align-self: stretch;
+    width: 1px;
+    margin: 0.25rem 0.25rem;
+    background: var(--cor-borda);
+  }
+
+  .v8-barra-menus-gatilho {
+    padding: 0.375rem 0.75rem;
+    border-radius: var(--raio-sm);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .v8-barra-menus-gatilho[data-highlighted],
+  .v8-barra-menus-gatilho[data-state="open"] {
+    background: var(--cor-superficie-2);
+  }
+
+  /* Menu de contexto: a área que recebe o botão direito. */
+  .v8-menu-contexto-alvo {
+    display: block;
+    cursor: context-menu;
+  }
+
+  /* Menu de navegação */
+  .v8-menu-navegacao {
+    position: relative;
+  }
+
+  .v8-menu-navegacao-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .v8-menu-navegacao-item {
+    position: relative;
+  }
+
+  .v8-menu-navegacao-gatilho {
+    gap: 0.25rem;
+  }
+
+  .v8-menu-navegacao-seta {
+    transition: transform var(--duracao) var(--curva);
+  }
+
+  .v8-menu-navegacao-gatilho[data-state="open"] .v8-menu-navegacao-seta {
+    transform: rotate(180deg);
+  }
+
+  .v8-menu-navegacao-painel {
+    position: absolute;
+    top: calc(100% + 0.25rem);
+    left: 0;
+    z-index: var(--z-popover);
+    width: max-content;
+    max-width: min(28rem, calc(100vw - 2rem));
+    padding: 0.5rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    box-shadow: var(--sombra-2);
+    animation: v8-flutuante-entrar var(--duracao) var(--curva);
+  }
+
+  .v8-menu-navegacao-links {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .v8-menu-navegacao-link {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem 0.625rem;
+    border-radius: var(--raio-sm);
+    text-decoration: none;
+  }
+
+  .v8-body .v8-menu-navegacao-link {
+    color: var(--cor-texto);
+  }
+
+  .v8-menu-navegacao-link:hover,
+  .v8-menu-navegacao-link[data-active] {
+    background: var(--cor-superficie-2);
+  }
+
+  .v8-menu-navegacao-link-titulo {
+    font-weight: 600;
+  }
+
+  .v8-menu-navegacao-link-descricao {
+    color: var(--cor-texto-suave);
+    font-size: 0.85rem;
+  }
+
+  /* Cartão flutuante */
+  .v8-cartao-flutuante {
+    z-index: var(--z-popover);
+    width: min(20rem, calc(100vw - 2rem));
+    padding: 1rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+    color: var(--cor-texto);
+    box-shadow: var(--sombra-2);
+    animation: v8-flutuante-entrar var(--duracao) var(--curva);
+  }
+
+  /* Paginação: o componente usa o visual de v8-paginacao. */
+  .v8-paginacao-lista {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .v8-paginacao-pagina[data-selected] {
+    border-color: var(--cor-primaria);
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-paginacao-reticencias {
+    padding: 0 0.25rem;
+    color: var(--cor-texto-suave);
+  }
+
+  /* Etapas */
+  .v8-etapas {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .v8-etapas[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+
+  .v8-etapas-item {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .v8-etapas-gatilho {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .v8-etapas-gatilho[data-disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .v8-etapas-indicador {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex-shrink: 0;
+    border: 2px solid var(--cor-borda);
+    border-radius: 50%;
+    background: var(--cor-superficie);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .v8-etapas-item[data-state="active"] .v8-etapas-indicador {
+    border-color: var(--cor-primaria);
+    color: var(--cor-primaria);
+  }
+
+  .v8-etapas-item[data-state="completed"] .v8-etapas-indicador {
+    border-color: var(--cor-primaria);
+    background: var(--cor-primaria);
+    color: var(--cor-sobre-primaria);
+  }
+
+  .v8-etapas-textos {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .v8-etapas-titulo {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .v8-etapas-descricao {
+    margin: 0;
+    color: var(--cor-texto-suave);
+    font-size: 0.8rem;
+  }
+
+  .v8-etapas-separador {
+    flex: 1;
+    height: 2px;
+    min-width: 1rem;
+    background: var(--cor-borda);
+  }
+
+  .v8-etapas-separador[data-state="completed"] {
+    background: var(--cor-primaria);
+  }
+
+  /* Árvore */
+  .v8-arvore {
+    padding: 0.25rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+  }
+
+  .v8-arvore-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    border-radius: var(--raio-sm);
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+  }
+
+  .v8-arvore-item:hover,
+  .v8-arvore-item:focus-visible {
+    background: var(--cor-superficie-2);
+  }
+
+  .v8-arvore-item[data-selected] {
+    background: color-mix(in srgb, var(--cor-primaria) 14%, transparent);
+    color: var(--cor-primaria);
+    font-weight: 600;
+  }
+
+  .v8-arvore-seta {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+  }
+
+  .v8-arvore-folha {
+    width: 1rem;
+    flex-shrink: 0;
+  }
+
+  /* Divisor */
+  .v8-divisor {
+    min-height: 10rem;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+  }
+
+  .v8-divisor-painel {
+    padding: 0.75rem;
+    overflow: auto;
+  }
+
+  .v8-divisor-alca {
+    position: relative;
+    flex-shrink: 0;
+    width: 0.375rem;
+    background: var(--cor-borda);
+    transition: background-color var(--duracao) var(--curva);
+  }
+
+  .v8-divisor-alca[data-orientation="vertical"] {
+    width: auto;
+    height: 0.375rem;
+  }
+
+  .v8-divisor-alca[data-state="hover"],
+  .v8-divisor-alca[data-state="drag"],
+  .v8-divisor-alca:focus-visible {
+    background: var(--cor-primaria);
+  }
+
+  /* Área de rolagem */
+  .v8-area-rolagem {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--cor-borda);
+    border-radius: var(--raio);
+    background: var(--cor-superficie);
+  }
+
+  .v8-area-rolagem-janela {
+    width: 100%;
+    height: 100%;
+  }
+
+  .v8-area-rolagem-barra {
+    display: flex;
+    padding: 0.125rem;
+    touch-action: none;
+    user-select: none;
+  }
+
+  .v8-area-rolagem-barra[data-orientation="vertical"] {
+    width: 0.625rem;
+  }
+
+  .v8-area-rolagem-barra[data-orientation="horizontal"] {
+    flex-direction: column;
+    height: 0.625rem;
+  }
+
+  .v8-area-rolagem-pino {
+    position: relative;
+    flex: 1;
+    border-radius: var(--raio-pilula);
+    background: var(--cor-texto-suave);
+    opacity: 0.6;
+  }
+
+  /* Separador */
+  .v8-separador {
+    flex-shrink: 0;
+    background: var(--cor-borda);
+  }
+
+  .v8-separador[data-orientation="horizontal"] {
+    width: 100%;
+    height: 1px;
+    margin: 0.75rem 0;
+  }
+
+  .v8-separador[data-orientation="vertical"] {
+    align-self: stretch;
+    width: 1px;
+    margin: 0 0.75rem;
+  }
+
+  /* Avatar */
+  .v8-avatar-base {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: 50%;
+    background: var(--cor-superficie-2);
+    color: var(--cor-texto);
+    font-weight: 600;
+  }
+
+  .v8-avatar-base[data-tamanho="sm"] {
+    width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.75rem;
+  }
+
+  .v8-avatar-base[data-tamanho="lg"] {
+    width: 3.5rem;
+    height: 3.5rem;
+    font-size: 1.25rem;
+  }
+
+  .v8-avatar-base-imagem {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .v8-avatar-base-iniciais {
+    line-height: 1;
+  }
+
+  /* Progresso */
+  .v8-progresso {
+    position: relative;
+    width: 100%;
+    height: 0.5rem;
+    overflow: hidden;
+    border-radius: var(--raio-pilula);
+    background: var(--cor-superficie-2);
+  }
+
+  .v8-progresso-indicador {
+    width: 100%;
+    height: 100%;
+    background: var(--cor-primaria);
+    transition: transform var(--duracao) var(--curva);
+  }
+
+  .v8-progresso-indicador[data-state="indeterminate"] {
+    width: 40%;
+    animation: v8-progresso-indeterminado calc(var(--duracao) * 8) linear infinite;
+  }
+
+  /* Proporção */
+  .v8-proporcao {
+    overflow: hidden;
+    border-radius: var(--raio);
+    background: var(--cor-superficie-2);
+  }
+}
+
+@keyframes v8-recolhivel-abrir {
+  from {
+    height: 0;
+  }
+
+  to {
+    height: var(--reka-collapsible-content-height);
+  }
+}
+
+@keyframes v8-recolhivel-fechar {
+  from {
+    height: var(--reka-collapsible-content-height);
+  }
+
+  to {
+    height: 0;
+  }
+}
+
+@keyframes v8-progresso-indeterminado {
+  from {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(250%);
+  }
+}

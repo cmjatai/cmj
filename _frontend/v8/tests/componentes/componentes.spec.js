@@ -214,7 +214,8 @@ describe('componentes base', () => {
     })
     Object.keys(PRIMITIVAS).forEach(nome => {
       const codigo = fonte(nome)
-      expect(codigo, nome).not.toMatch(/\sstyle=|:style=|<style/)
+      // Geometria calculada (largura da barra, recuo por nível) pode ir em :style.
+      expect(codigo, nome).not.toMatch(/\sstyle=|<style/)
       expect(codigo, nome).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\brgba?\(/)
     })
   })
