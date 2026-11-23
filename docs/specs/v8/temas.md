@@ -157,8 +157,8 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   Decisão (2026-11-22): tokens e regras CSS (V8-TEMA-015).
 - D5. Onde ficam as pastas. O pedido fala em uma subpasta `oficial` na pasta `css` e em temas que a
   customizam. Recomendação: `css/temas/oficial/` ao lado de `css/temas/<nome>/`, espelhando a URL
-  `/v8/ds/temas/<nome>/`. Alternativa: `css/oficial/` e `css/temas/<nome>/`. Decisão: pendente;
-  aplicada a recomendação.
+  `/v8/ds/temas/<nome>/`. Alternativa: `css/oficial/` e `css/temas/<nome>/`. Decisão
+  (2026-11-22): `css/temas/<nome>/`, com o oficial ao lado dos outros.
 - D6. Três blocos de cor por tema ou `light-dark()`. Com `light-dark()` cada tema teria um bloco só,
   mas o piso de navegadores sobe para Safari 17.5, Chrome 123 e Firefox 120, e o JavaScript deixa
   de conseguir ler `--cor-barra-navegador` diretamente. Recomendação: três blocos, com teste de
