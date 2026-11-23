@@ -247,6 +247,9 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   lado Django, composables do lado Vue, CSS e testes. Leia antes de mexer em `_frontend/v8`, `_templates/v8` ou `cmj/v8`.
 - `docs/specs/infra/endpoints-operacao.md`: quem alcança `/metrics`, `/health/`, `/ready/`, `/version/`
   e `/nginx_status` (nginx do container e `EndpointRestrictionMiddleware`). Leia antes de alterá-los.
+- `docs/specs/infra/versionamento.md`: versão do backend (`vAAAA.MM.N`, do git, em
+  `PORTALCMJ_VERSION` e na tag que o CI cria a cada push no master) e dos frontends
+  (`<frontend>.AAAA.MM.N`, incrementada pelo `prebuild` e gravada no service worker).
 - `docs/specs/api/login.md`: login por usuário e senha pela API (`/api/auth/session` e
   `/api/auth/token`): limite de tentativas e token CSRF. Leia antes de alterar essas rotas.
 - `docs/specs/api/`: comportamento atual da API gerada pelo `drfautoapi`, em seis specs. Leia a da

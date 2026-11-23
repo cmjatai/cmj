@@ -10,6 +10,11 @@ import inject from "@rollup/plugin-inject"
 import Components from 'unplugin-vue-components/vite'
 import eslintPlugin from '@nabla/vite-plugin-eslint'
 
+// Versão do package.json, gravada pelo prebuild (docs/specs/infra/versionamento.md). Entra no
+// service worker pelo `define`, que o VitePWA repassa ao build do SW: cada build muda o arquivo do
+// SW e o navegador instala o novo.
+const VERSAO = JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url))).version
+
 export default defineConfig(({command, mode}) => {
 
   // eslint-disable-next-line
@@ -29,6 +34,9 @@ export default defineConfig(({command, mode}) => {
   const INPUT_DIR = './src'
 
   return {
+    define: {
+      __PORTALCMJ_VERSAO__: JSON.stringify(VERSAO),
+    },
     esbuild: {
       pure: mode === 'production' ? ['console.log', 'console.debug'] : [],
     },

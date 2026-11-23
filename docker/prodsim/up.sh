@@ -22,6 +22,17 @@ if [ ! -f "$PRODSIM_DIR/cmj.env" ]; then
     echo "Criado $PRODSIM_DIR/cmj.env a partir do exemplo."
 fi
 
+# Versão da imagem (docs/specs/infra/versionamento.md). O git roda como quem chamou o sudo: como
+# root ele recusa o repositório de outro dono.
+RAIZ="$(dirname "$DOCKER_DIR")"
+if [ -n "${SUDO_USER:-}" ]; then
+    PORTALCMJ_VERSION="$(sudo -u "$SUDO_USER" python3 "$RAIZ/cmj/core/services/s_versao.py")"
+else
+    PORTALCMJ_VERSION="$(python3 "$RAIZ/cmj/core/services/s_versao.py")"
+fi
+export PORTALCMJ_VERSION
+echo "Versão: $PORTALCMJ_VERSION"
+
 prodsim_compose "${PERFIS[@]}" up -d "${BUILD[@]}"
 
 echo

@@ -8,7 +8,29 @@ on:
   pull_request:
     branches: [master]
 
+# Só leitura por padrão: o job de tag é o único que pede escrita.
+permissions:
+  contents: read
+
 jobs:
+  tag:
+    # Tag com a versão do backend (vAAAA.MM.N) no último commit de cada push no master
+    # (docs/specs/infra/versionamento.md). Não depende dos testes: a tag identifica o commit,
+    # não o aprova. Nunca roda em pull request.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: tag-versao
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Histórico completo e tags: em clone raso o número da versão não é calculado.
+          fetch-depth: 0
+      - run: python3 cmj/core/services/s_versao.py --tag
+
   specs:
     # Consistência das specs com testes e código (docs/specs/README.md, seção Checagem).
     runs-on: ubuntu-latest

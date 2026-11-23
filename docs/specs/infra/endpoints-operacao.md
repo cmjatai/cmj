@@ -43,7 +43,7 @@ repositório e fora desta spec.
 - INFRA-OPS-007 [implementado] `/health/`, `/ready/` e `/version/` informam a versão de
   `PORTALCMJ_VERSION` e, para a rede privada, `/health/` e `/version/` respondem 200 (`/ready/`
   responde 503 quando o banco ou o cache falham). Evidência: `cmj/api/views_health.py:39`,
-  `cmj/api/views_health.py:81`, `cmj/api/views_health.py:113`, `cmj/settings/project.py:84`.
+  `cmj/api/views_health.py:81`, `cmj/api/views_health.py:113`, `cmj/settings/project.py:86`.
 - INFRA-OPS-008 [implementado] `ALLOWED_IPS` aceita só loopback (`127.0.0.1` e `::1`) e as redes
   privadas `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` e `fc00::/7`. Evidência:
   `cmj/middleware/endpoint_restriction.py:8-15`.

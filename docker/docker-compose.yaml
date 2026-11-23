@@ -54,6 +54,8 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
+      args:
+        PORTALCMJ_VERSION: ${PORTALCMJ_VERSION:-master}
     container_name: cmj-blue
     user: "root:root"
     labels:
@@ -82,6 +84,8 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
+      args:
+        PORTALCMJ_VERSION: ${PORTALCMJ_VERSION:-master}
     container_name: cmj-green
     user: "root:root"
     labels:

@@ -58,6 +58,11 @@ RUN chmod +x /var/cmjatai/cmj/docker/start.sh && \
 # Debian não possui usuário 'nginx' necessário para o Debian
 RUN useradd -r -u 1002 --no-create-home -g root nginx
 
+# Versão de produção (docs/specs/infra/versionamento.md), calculada do git fora da imagem e
+# passada pelo compose. Fica no fim para não invalidar o cache das camadas anteriores.
+ARG PORTALCMJ_VERSION=master
+ENV PORTALCMJ_VERSION=$PORTALCMJ_VERSION
+
 USER nginx
 
 ENV DEBIAN_FRONTEND teletype

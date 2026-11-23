@@ -1,6 +1,6 @@
 {
   "name": "portalcmj-plenario-frontend-v8",
-  "version": "v8.26.05.24.1",
+  "version": "v8.2026.11.1",
   "type": "module",
   "description": "CMJ Frontend Plenario Project",
   "author": "Leandro Roberto <leandroroberto.br@gmail.com>",
@@ -9,6 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
+    "prebuild": "node ../versao.mjs v8",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint src/ --fix",

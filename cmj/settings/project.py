@@ -81,7 +81,16 @@ if DEBUG and FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
     DATABASES["default"]["HOST"] = "localhost" if host == "cmjdb18" else host
     DATABASES["default"]["PORT"] = 5433 if host == "cmjdb18" else port
 
-PORTALCMJ_VERSION = "master"
+# Versão de produção (docs/specs/infra/versionamento.md): na imagem vem do argumento de build;
+# no host, do git; sem os dois, "master".
+PORTALCMJ_VERSION = config("PORTALCMJ_VERSION", default="")
+if not PORTALCMJ_VERSION:
+    try:
+        from cmj.core.services.s_versao import calcular_versao
+
+        PORTALCMJ_VERSION = calcular_versao(repo=PROJECT_DIR)
+    except Exception:
+        PORTALCMJ_VERSION = "master"
 
 USE_SOLR = True
 SOLR_URL = "http://solr:solr@cmjsolr:8983"

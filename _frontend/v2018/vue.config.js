@@ -8,6 +8,7 @@ const CompressionPlugin = require('compression-webpack-plugin')
 const CopyPlugin = require('copy-webpack-plugin')
 const WebpackPwaManifest = require('webpack-pwa-manifest')
 const WorkboxPlugin = require('workbox-webpack-plugin')
+const webpack = require('webpack')
 
 const fs = require('fs')
 const dotenv = require('dotenv')
@@ -195,7 +196,14 @@ module.exports = {
           swSrc: path.resolve(__dirname, 'src/service-worker.js'),
           swDest: 'service-worker.js',
           exclude: [/\.map$/, /hot-update/, /manifest\.(json|js)$/],
-          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+          // Versão do package.json, gravada pelo prebuild (docs/specs/infra/versionamento.md):
+          // muda o arquivo do SW a cada build e o navegador instala o novo.
+          webpackCompilationPlugins: [
+            new webpack.DefinePlugin({
+              __PORTALCMJ_VERSAO__: JSON.stringify(require('./package.json').version)
+            })
+          ]
         }])
     }
   },

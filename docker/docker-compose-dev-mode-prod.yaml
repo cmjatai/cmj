@@ -55,6 +55,8 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile
+      args:
+        PORTALCMJ_VERSION: ${PORTALCMJ_VERSION:-master}
     image: portalcmj-prodsim:local
     container_name: prodsim-cmj-blue
     user: "root:root"
