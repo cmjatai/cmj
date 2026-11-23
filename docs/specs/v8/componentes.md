@@ -176,8 +176,8 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
 
 - D1. Nomes dos componentes. Recomendação: em português, como o resto do v8 (`Abas`, `Sanfona`,
   `Dica`, `MenuSuspenso`, `Selecao`, `CaixaMarcacao`, `GrupoOpcoes`, `Chave`), mantendo `Popover`,
-  que não tem nome corrente em português. Alternativa: os nomes do Reka UI em inglês. Decisão:
-  pendente; aplicada a recomendação.
+  que não tem nome corrente em português. Alternativa: os nomes do Reka UI em inglês. Decisão
+  (2026-11-22): em português.
 - D2. Quais primitivas entram agora. Decisão (2026-11-22): o lote essencial desta spec; as demais
   primitivas do Reka UI ficam como prioridade do próximo plano (Fora do escopo).
 - D3. Uma spec própria para os componentes. Recomendação: sim, separada de `ds.md`, porque a
@@ -196,7 +196,7 @@ Nenhum risco encontrado nos itens 1 a 7, em 2026-11-22, na revisão do código e
   formulário; quem precisa do valor num `<form>` usa `Chave` ou `CaixaMarcacao`. Alternativa: um
   campo oculto próprio no componente. Decisão: pendente; aplicada a recomendação.
 - D7. Nomes dos componentes novos. Recomendação: em português, como os do primeiro lote (tabelas
-  acima), mantendo `Avatar`. Decisão: pendente; aplicada a recomendação.
+  acima), mantendo `Avatar`. Decisão (2026-11-22): em português, junto com a D1.
 - D8. Formato do v-model das datas. Recomendação: texto ISO (V8-CMP-030), o mesmo dos formulários
   do Django e da API, e `{ inicio, fim }` para períodos. Alternativa: os objetos de data do Reka.
   Decisão: pendente; aplicada a recomendação.
