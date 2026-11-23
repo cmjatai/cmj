@@ -1,1 +1,0 @@
-import{et as t,it as e,j as i,tt as o,z as s}from"./vendor-DGQAoUFJ.js";import{i as r}from"./formatos-R8STBQoq.js";var m={__name:"EtiquetaSituacao",props:{situacao:{type:String,default:""}},setup(a){return(u,c)=>(s(),i("span",{class:o(["v8-etiqueta",a.situacao==="ativo"?"v8-etiqueta-ok":"v8-etiqueta-neutra"])},e(t(r)(a.situacao)),3))}};export{m as t};
