@@ -50,6 +50,10 @@ export default defineConfig(({command, mode}) => {
         },
         injectManifest: {
           globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,gif,woff2}'],
+          // O service worker é servido em /v6/ (service_worker_proxy), não em
+          // /static/v6/: sem o prefixo, o workbox resolve as URLs do precache
+          // contra /v6/ e elas dão 404.
+          modifyURLPrefix: { '': '/static/v6/' },
         },
         manifest: {
           id: 'br.leg.go.jatai.portalcmj.v6',
