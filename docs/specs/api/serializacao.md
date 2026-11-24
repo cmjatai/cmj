@@ -86,7 +86,7 @@ campos, em [filtros.md](./filtros.md) (`API-FIL`); o custo do `expand`, em
   a objeto para quem não pode editar aquela emenda. Por estar na classe, a regra vale também quando
   a emenda chega por `expand`. O `owner` segue ainda API-SER-032: quem edita a emenda sem ter
   `list_emendaloa`, como o operador do autor, recebe `metadata` e `search`, mas não `owner`.
-  Evidência: `cmj/api/loa/serializers/__init__.py:20-43`.
+  Evidência: `cmj/api/loa/serializers/__init__.py:100-123`.
 - API-SER-017 [retirada] Substituída por API-SER-025.
 - API-SER-018 [retirada] Substituída por API-SER-026.
 - API-SER-025 [implementado] `expand` só troca o id pelo objeto se o usuário passar nas permissões
@@ -165,10 +165,10 @@ campos, em [filtros.md](./filtros.md) (`API-FIL`); o custo do `expand`, em
   (a aba de empenhos do painel do v2018 lê `scrap.values`); `selos`; `zipfile`, com os nomes dos
   arquivos do zip do documento administrativo; `send`, com a data de envio a rede social; e
   `import_fields`, em `loa/entidade`. `scrap.values` traz `CpfCnpjCredor` e `import_fields` traz
-  `NU_CPF`: é a mesma decisão de transparência da dúvida D3 do painel de prestação de contas da
-  LOA. Os filtros gerados sobre `metadata` não devolvem resultado para valor nenhum, salvo
-  `isnull`. Evidência: `drfautoapi/drfautoapi.py:513-514`,
-  `_frontend/v2018/src/modules/loa/pcl/tabs/PclTabEmpenhos.vue:194-200`.
+  `NU_CPF`: é a mesma decisão de transparência do painel de prestação de contas da LOA, que os
+  aceitou como dado público (LOA-PCL-087 e 088). Os filtros gerados sobre `metadata` não devolvem
+  resultado para valor nenhum, salvo `isnull`. Evidência: `drfautoapi/drfautoapi.py:513-514`,
+  `_frontend/v2018/src/modules/loa/pcl/tabs/PclTabEmpenhos.vue:202-208`.
 - API-SER-024 [observado] (executado) Outros campos internos em rotas públicas: `hash_code` em
   `materia/proposicao`, `cpfcnpj` em `loa/entidade` e `loa/empenho`, e `search` em `loa/empenho` e
   `loa/registroajusteloa`, que é o texto normalizado de campos que a rota já entrega. Evidência:
@@ -193,8 +193,8 @@ Nenhuma dúvida em aberto.
 - Os serializers próprios da LOA, do `painelset`, do `arq` e de `DocumentoViewSet`, além do que
   escondem ou expõem na lista acima.
 - O documento do fornecedor (`cpfcnpj` em `loa/empenho` e `loa/entidade`, e os campos equivalentes
-  dentro de `metadata`, API-SER-031): é decisão de transparência da dúvida D3 do painel de
-  prestação de contas da LOA. A forma de esconder um campo está definida aqui: regra na classe do
-  serializer (API-SER-027, 028, 029 e 032).
+  dentro de `metadata`, API-SER-031): é decisão de transparência do painel de prestação de contas
+  da LOA, que o aceitou como dado público (LOA-PCL-087 e 088). A forma de esconder um campo está
+  definida aqui: regra na classe do serializer (API-SER-027, 028, 029 e 032).
 - Filtros e ordenação sobre campos ocultos: [filtros.md](./filtros.md).
 - Renderers e arquivos: [arquivos.md](./arquivos.md).

@@ -1,6 +1,7 @@
 from decimal import Decimal
 
-from django.db.models import Sum
+from django.db.models import Count, Exists, IntegerField, OuterRef, Prefetch, Subquery
+from django.db.models.functions import Coalesce
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -11,10 +12,89 @@ from cmj.api.serializers import CmjSerializerMixin
 from cmj.loa.models import (
     ArquivoPrestacaoContaRegistro,
     EmendaLoa,
+    EmendaLoaParlamentar,
     PrestacaoContaRegistro,
     RegistroAjusteLoa,
+    RegistroAjusteLoaParlamentar,
 )
 from cmj.loa.models.m_financeiro_execucao import Empenho
+
+
+def emendas_para_serializar(queryset):
+    """Emendas com o que os serializers leem já carregado, para o custo não
+    crescer com a quantidade de itens (LOA-PCC-080)."""
+    ajustes_da_emenda = RegistroAjusteLoa.emendaloa.through.objects.filter(
+        emendaloa_id=OuterRef("pk")
+    )
+    return (
+        queryset.select_related(
+            "loa", "unidade", "entidade__tipo_entidade", "bairro", "materia__tipo"
+        )
+        .prefetch_related(
+            "parlamentares",
+            Prefetch(
+                "emendaloaparlamentar_set",
+                queryset=EmendaLoaParlamentar.objects.select_related("parlamentar"),
+            ),
+            "empenhoemendaajuste_set__empenho",
+        )
+        .annotate(
+            # os dois que EmendaLoa.has_ajustes e valor_computado consultariam
+            ann_has_ajustes=Exists(
+                RegistroAjusteLoaParlamentar.objects.filter(
+                    registro__emendaloa=OuterRef("pk")
+                )
+            ),
+            ann_num_ajustes=Coalesce(
+                Subquery(
+                    ajustes_da_emenda.order_by()
+                    .values("emendaloa_id")
+                    .annotate(total=Count("pk"))
+                    .values("total"),
+                    output_field=IntegerField(),
+                ),
+                0,
+            ),
+        )
+    )
+
+
+def ajustes_para_serializar(queryset):
+    """Registros de ajuste com o que os serializers leem já carregado
+    (LOA-PCC-080). As emendas vinculadas vêm prontas para o ``expand``."""
+    return queryset.select_related(
+        "oficio_ajuste_loa", "unidade", "entidade"
+    ).prefetch_related(
+        "registroajusteloaparlamentar_set",
+        "parlamentares_valor",
+        "empenhoemendaajuste_set__empenho",
+        Prefetch(
+            "emendaloa", queryset=emendas_para_serializar(EmendaLoa.objects.all())
+        ),
+    )
+
+
+class SomaDosEmpenhosMixin:
+    """As quatro somas de empenhos de um item saem de um cálculo só."""
+
+    def get_soma_empenhos(self, obj):
+        if not hasattr(obj, "_soma_dos_empenhos"):
+            obj._soma_dos_empenhos = (
+                obj.empenhoemendaajuste_set.aggregate_sum_dos_empenhos()
+            )
+        return obj._soma_dos_empenhos
+
+    def get_soma_valor_empenhado(self, obj):
+        return self.get_soma_empenhos(obj)["valor_empenhado"] or Decimal("0.00")
+
+    def get_soma_valor_liquidado(self, obj):
+        return self.get_soma_empenhos(obj)["valor_liquidado"] or Decimal("0.00")
+
+    def get_soma_valor_pago_bruto(self, obj):
+        return self.get_soma_empenhos(obj)["valor_pago_bruto"] or Decimal("0.00")
+
+    def get_soma_valor_anulado(self, obj):
+        return self.get_soma_empenhos(obj)["valor_anulado"] or Decimal("0.00")
 
 
 class OcultaCamposInternosDaEmendaMixin:
@@ -74,7 +154,7 @@ class EmendaLoaSearchSerializer(OcultaCamposInternosDaEmendaMixin, CmjSerializer
         return r
 
 
-class RegistroAjusteLoaSerializer(CmjSerializerMixin):
+class RegistroAjusteLoaSerializer(SomaDosEmpenhosMixin, CmjSerializerMixin):
     str_valor = serializers.CharField(read_only=True)
 
     str_valor_computado = serializers.CharField(
@@ -94,42 +174,34 @@ class RegistroAjusteLoaSerializer(CmjSerializerMixin):
     class Meta(CmjSerializerMixin.Meta):
         model = RegistroAjusteLoa
 
-    def get_soma_empenhos(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate_sum_dos_empenhos()
-
-    def get_soma_valor_empenhado(self, obj):
-        return self.get_soma_empenhos(obj)["valor_empenhado"] or Decimal("0.00")
-
-    def get_soma_valor_liquidado(self, obj):
-        return self.get_soma_empenhos(obj)["valor_liquidado"] or Decimal("0.00")
-
-    def get_soma_valor_pago_bruto(self, obj):
-        return self.get_soma_empenhos(obj)["valor_pago_bruto"] or Decimal("0.00")
-
-    def get_soma_valor_anulado(self, obj):
-        return self.get_soma_empenhos(obj)["valor_anulado"] or Decimal("0.00")
-
     def get_valor_por_parlamentar(self, obj):
         valores = {}
+        valor_computado = obj.valor_computado
         for registro in obj.registroajusteloaparlamentar_set.all():
-            parlamentar = registro.parlamentar
-            if parlamentar:
-                if obj.valor_computado:
-                    valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
+            parlamentar_id = registro.parlamentar_id
+            if parlamentar_id:
+                if valor_computado:
+                    valores[parlamentar_id] = valores.get(parlamentar_id, 0) + (
                         registro.valor or Decimal("0.00")
                     )
                 else:
-                    valores[parlamentar.id] = Decimal("0.00")
+                    valores[parlamentar_id] = Decimal("0.00")
         return valores
 
     def get_valor(self, obj):
-        total = obj.registroajusteloaparlamentar_set.order_by("parlamentar").aggregate(
-            total=Sum("valor")
-        )
-        return total["total"] if total["total"] else 0
+        # a soma das partes; .all() aproveita o prefetch
+        partes = [
+            registro.valor
+            for registro in obj.registroajusteloaparlamentar_set.all()
+            if registro.valor is not None
+        ]
+        total = sum(partes, Decimal("0.00")) if partes else None
+        return total if total else 0
 
 
-class EmendaLoaSerializer(OcultaCamposInternosDaEmendaMixin, CmjSerializerMixin):
+class EmendaLoaSerializer(
+    SomaDosEmpenhosMixin, OcultaCamposInternosDaEmendaMixin, CmjSerializerMixin
+):
 
     str_valor = serializers.CharField(
         read_only=True,
@@ -163,27 +235,12 @@ class EmendaLoaSerializer(OcultaCamposInternosDaEmendaMixin, CmjSerializerMixin)
     class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
 
-    def get_soma_empenhos(self, obj):
-        return obj.empenhoemendaajuste_set.aggregate_sum_dos_empenhos()
-
-    def get_soma_valor_empenhado(self, obj):
-        return self.get_soma_empenhos(obj)["valor_empenhado"] or Decimal("0.00")
-
-    def get_soma_valor_liquidado(self, obj):
-        return self.get_soma_empenhos(obj)["valor_liquidado"] or Decimal("0.00")
-
-    def get_soma_valor_pago_bruto(self, obj):
-        return self.get_soma_empenhos(obj)["valor_pago_bruto"] or Decimal("0.00")
-
-    def get_soma_valor_anulado(self, obj):
-        return self.get_soma_empenhos(obj)["valor_anulado"] or Decimal("0.00")
-
     def get_valor_inicial_por_parlamentar(self, obj):
         valores = {}
         for registro in obj.emendaloaparlamentar_set.all():
-            parlamentar = registro.parlamentar
-            if parlamentar:
-                valores[parlamentar.id] = valores.get(parlamentar.id, 0) + (
+            parlamentar_id = registro.parlamentar_id
+            if parlamentar_id:
+                valores[parlamentar_id] = valores.get(parlamentar_id, 0) + (
                     registro.valor or Decimal("0.00")
                 )
         return valores

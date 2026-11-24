@@ -97,12 +97,14 @@ comparação.
 | `sessao/ordemdia` | 17.180 | 605 | 6 | 263 ms | 56 kB |
 | `materia/materialegislativa` | 23.596 | 804 | 8 | 692 ms | 346 kB |
 | `sessao/registrovotacao` | 14.574 | 1.105 | 11 | 546 ms | 61 kB |
-| `loa/emendaloa` (serializer próprio) | 907 | 1.313 | 13 | 927 ms | 222 kB |
-| `loa/registroajusteloa` (serializer próprio) | 290 | 1.321 | 13 | 1.061 ms | 233 kB |
+| `loa/emendaloa` (serializer próprio) | 907 | 7 | 0,1 | 93 ms | 217 kB |
+| `loa/registroajusteloa` (serializer próprio) | 290 | 12 | 0,1 | 275 ms | 244 kB |
 
-- API-CUS-010 [observado] (executado) As listas da LOA com serializer próprio custam 13 consultas
-  por item, e as do gerador puro, de 0 a 11: o custo por item não é só dos serializers da LOA.
-  Evidência: `cmj/api/loa/serializers/__init__.py:166-189`, `drfautoapi/drfautoapi.py:694-695`.
+- API-CUS-010 [observado] (executado) As listas do gerador puro custam de 0 a 11 consultas por item.
+  As duas da LOA com serializer próprio, `loa/emendaloa` e `loa/registroajusteloa`, custavam 13 por
+  item e, desde 2026-11-23, têm custo fixo por página, porque o queryset carrega de uma vez o que o
+  serializer lê (LOA-PCC-080); as linhas delas na tabela são dessa data. Evidência:
+  `cmj/api/loa/serializers/__init__.py:23-75`, `drfautoapi/drfautoapi.py:694-695`.
 
 ### `get_all` medido
 
@@ -119,7 +121,7 @@ comparação.
 | --- | --- | --- | --- | --- | --- |
 | `parlamentares/parlamentar` | 172 | 4 | 0,06 s | 0,4 MB | sem aumento |
 | `sessao/sessaoplenaria` | 1.313 | 4.128 | 2,0 s | 2,2 MB | sem aumento |
-| `loa/emendaloa` | 907 | 12.587 | 8,7 s | 1,6 MB | não medido |
+| `loa/emendaloa` (em 2026-11-23, LOA-PCC-080) | 907 | 7 | 0,7 s | 1,5 MB | não medido |
 | `norma/normajuridica` | 7.928 | 23.788 | 13,5 s | 14,6 MB | +84 MB |
 | `materia/autoria` | 30.084 | 117.686 | 59 s | 6,5 MB | +164 MB |
 | `loa/empenho` | 117.327 | 117.331 | 69 s | 294 MB | +1.523 MB |
@@ -167,11 +169,11 @@ comparação.
 
 ### Quem usa `get_all`
 
-- API-CUS-016 [observado] `get_all` é enviado em 46 pontos dos frontends (31 no v6 e 15 no v2018) e
+- API-CUS-016 [observado] `get_all` é enviado em 43 pontos dos frontends (31 no v6 e 12 no v2018) e
   em 5 templates. Há mais 4 ocorrências em arquivos `* copy.vue` do v6 e 1 comentada no v2018. O v8
   não usa, e nenhum código Python chama a API com ele. Evidência:
   `_frontend/v6/src/modules/sessao/SessaoPlenariaView.vue:122`,
-  `_frontend/v2018/src/modules/loa/pcl/PrestacaoContaLoaLayout.vue:649`,
+  `_frontend/v2018/src/modules/loa/pcl/PclDetalheEmenda.vue:403`,
   `_templates/v2018/materia/autoria_form.html:17-18`.
 
 | Onde | Usos | Rotas chamadas com `get_all` | Tela |
@@ -183,26 +185,24 @@ comparação.
 | v6, normas em destaque | 1 | `norma/normajuridica/destaques` | pública |
 | v6, arquivo e draft | 6 | `arq/draft`, `arq/arqdoc`, `arq/arqclasse` | restrita |
 | v6, arquivos `* copy.vue` | 4 | `loa/entidade`, `loa/unidadeorcamentaria`, `loa/loa` | código sem uso aparente |
-| v2018, prestação de contas da LOA (`pcl/`) | 10 | `loa/prestacaocontaregistro`, `loa/registroajusteloa`, `loa/empenhoemendaajuste`, `loa/emendaloa`, `loa/loa`, `materia/documentoacessorio`, `materia/tramitacao` | pública |
+| v2018, prestação de contas da LOA (`pcl/`, conteúdo das abas dos cartões) | 7 | `loa/prestacaocontaregistro`, `loa/registroajusteloa`, `loa/empenhoemendaajuste`, `materia/documentoacessorio`, `materia/tramitacao` | pública |
 | v2018, edição de emenda, agrupamento e empenho | 5 | `loa/emendaloaregistrocontabil`, `loa/agrupamentoregistrocontabil`, `loa/agrupamento/<pk>/emendas`, `loa/emendaloa/search`, `loa/empenhoemendaajuste` | restrita |
 | templates de autoria e protocolo | 5 | `base/autor/possiveis` | restrita |
 
-- API-CUS-017 [observado] Em 41 dos 46 usos, a requisição leva um filtro que restringe o resultado
+- API-CUS-017 [observado] Em 39 dos 43 usos, a requisição leva um filtro que restringe o resultado
   a um registro pai ou a um conjunto de ids (uma sessão, uma emenda, uma LOA, uma matéria, um nó).
-  Os outros 5 pedem a tabela inteira ou quase: `sessao/tiporesultadovotacao`, `loa/loa` (no v6, sem
-  filtro; no v2018, de 2023 em diante), a action de normas em destaque e `arq/draft`, que o
-  servidor restringe ao dono. São tabelas pequenas. O maior resultado esperado é o do dashboard da
+  Os outros 4 pedem a tabela inteira ou quase: `sessao/tiporesultadovotacao`, `loa/loa` (no v6, sem
+  filtro), a action de normas em destaque e `arq/draft`, que o servidor restringe ao dono. São tabelas pequenas. O maior resultado esperado é o do dashboard da
   LOA, que pede as emendas de todas as LOAs carregadas. Evidência:
   `_frontend/v6/src/modules/sessao/SessaoPlenariaView.vue:252`,
   `_frontend/v6/src/modules/loa/dashboard/LoaDashboard.vue:149`,
-  `_frontend/v6/src/modules/loa/dashboard/LoaDashboard.vue:171`,
-  `_frontend/v2018/src/modules/loa/pcl/PrestacaoContaLoaLayout.vue:826`.
+  `_frontend/v6/src/modules/loa/dashboard/LoaDashboard.vue:171`.
 - API-CUS-018 [observado] Os três frontends têm um `fetchSync` que, sem `get_all`, percorre todas
-  as páginas seguindo `pagination.next_page`, a menos que receba `only_first_page`. O painel de
-  prestação de contas do v2018 tem um laço próprio (`_fetchAllPages`). Com isso, uma lista grande
-  sem `get_all` vira uma requisição por página. Evidência:
-  `_frontend/v6/src/stores/SyncStore.js:198-199`, `_frontend/v2018/src/stores/sync/sync.js:67-68`,
-  `_frontend/v2018/src/modules/loa/pcl/PrestacaoContaLoaLayout.vue:678-695`.
+  as páginas seguindo `pagination.next_page`, a menos que receba `only_first_page`. Com isso, uma
+  lista grande sem `get_all` vira uma requisição por página. O painel de prestação de contas do
+  v2018, que tinha um laço próprio para isso, pede uma página por vez à consulta consolidada
+  (LOA-PCL-099). Evidência: `_frontend/v6/src/stores/SyncStore.js:198-199`,
+  `_frontend/v2018/src/stores/sync/sync.js:67-68`.
 - API-CUS-019 [observado] O maior `page_size` pedido pelos frontends é 100, o teto do servidor.
   Evidência: `_frontend/v6/src/modules/loa/pcl/PclFiltros.vue:111`,
   `sapl/api/pagination.py:11`.
@@ -238,8 +238,7 @@ Pontos de eficiência medidos e deixados como estão por decisão de 2026-11-22.
 
 ## Fora do escopo
 
-- Otimização dos serializers próprios da LOA, do `painelset` e do `arq`. As 13 consultas por item
-  das listas da LOA (API-CUS-010) ficam como pendência do app `loa`, a tratar com a dúvida D1 do
-  painel de prestação de contas.
+- Otimização dos serializers próprios do `painelset` e do `arq`. A das listas da LOA foi feita no
+  app `loa` (LOA-PCC-080).
 - Custo das actions que convertem PDF: [arquivos.md](./arquivos.md).
 - Carga real de produção, índices do banco e configuração de cache.

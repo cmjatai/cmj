@@ -12,7 +12,7 @@ from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.response import Response
 
 from cmj.api.forms import EmendaLoaFilterSet
-from cmj.api.loa.serializers import EmendaLoaSearchSerializer
+from cmj.api.loa.serializers import EmendaLoaSearchSerializer, emendas_para_serializar
 from cmj.loa.models import EmendaLoa, EmendaLoaParlamentar, Empenho
 from cmj.utils.utils_report import pdf_base_url
 from sapl.api.permissions import SaplModelPermissions
@@ -64,7 +64,7 @@ class EmendaLoaViewSet:
         # continua decidida pelas permissões de edição
         if self.request.method in ("GET", "HEAD", "OPTIONS"):
             qs = EmendaLoa.service.visiveis(self.request.user, qs)
-        return qs
+        return emendas_para_serializar(qs)
 
     @staticmethod
     def fase_do_request(request, default=None):

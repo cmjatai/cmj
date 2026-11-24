@@ -1,3 +1,4 @@
+import re
 import socket
 
 from dj_database_url import parse as db_url
@@ -80,6 +81,17 @@ if DEBUG and FOLDER_DEBUG_CONTAINER != PROJECT_DIR:
     port = DATABASES["default"]["PORT"]
     DATABASES["default"]["HOST"] = "localhost" if host == "cmjdb18" else host
     DATABASES["default"]["PORT"] = 5433 if host == "cmjdb18" else port
+
+# Banco de teste por checkout: o principal (pasta "cmj") usa test_cmj e cada worktree em
+# cmj.worktrees/<nome> usa test_cmj_<nome>, para que execuções paralelas não apaguem o banco
+# umas das outras. DATABASE_TEST_NAME no .env sobrescreve.
+_checkout = re.sub(r"\W+", "_", PROJECT_DIR.name.lower()).strip("_")
+DATABASES["default"]["TEST"] = {
+    "NAME": config(
+        "DATABASE_TEST_NAME",
+        default="test_cmj" if _checkout == "cmj" else f"test_cmj_{_checkout}",
+    )
+}
 
 # Versão de produção (docs/specs/infra/versionamento.md): na imagem vem do argumento de build;
 # no host, do git; sem os dois, "master".

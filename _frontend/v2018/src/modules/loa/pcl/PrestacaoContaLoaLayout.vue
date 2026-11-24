@@ -6,12 +6,12 @@
         :disabled="!ready || !firstPageLoaded"
         v-model="filters_value"
         :parlamentares-choice="parlamentares_choice"
-        :qs-loa="qs_loa"
-        :qs-emenda-loa="qs_emenda_loa__loa"
+        :entidades-choice="entidades_choice"
+        :unidades-choice="unidades_choice"
         :loas-choice="loas_choice"
         :selected-loa-ids="selected_loa_ids"
         :locked-loa-id="loa.id"
-        :total-items="emendas_ajustes_list.length"
+        :total-items="total_itens"
         :page-size="pageSize"
         :current-page="currentPage"
         :fetching="fetching"
@@ -22,28 +22,31 @@
         @reset="resetFilters"
         @loas-change="on_loas_change"
       />
+      <div v-if="erro" class="pcl-erro card text-center my-3 p-3 mx-5">
+        <span class="font-weight-bold text-danger">
+          <i class="fas fa-exclamation-triangle mr-1"></i>Não foi possível carregar os dados da prestação de contas.
+        </span>
+        <div class="mt-2">
+          <button type="button" class="btn btn-sm btn-outline-primary" @click="fetch()">Tentar novamente</button>
+        </div>
+      </div>
       <pcl-totalizacao
-        v-if="emendas_ajustes_list.length && viewMode === 'list'"
-        :lista="emendas_ajustes_list"
-        :parlamentar-selecionado="filters_value.parlamentares"
-        :loas-choice="loas_choice"
-        :selected-loa-ids="selected_loa_ids"
-        :totais-empenhos="totais_empenhos"
+        v-if="resumo && viewMode === 'list'"
+        :resumo="resumo"
         class="mt-3 dash-section"
       />
       <pcl-dashboard
-        v-if="filters_value.dash_activated && viewMode === 'dashboard' && emendas_ajustes_list.length"
-        :lista="emendas_ajustes_list"
+        v-if="filters_value.dash_activated && viewMode === 'dashboard' && dashboard && resumo && resumo.itens"
+        :dados="dashboard"
         :parlamentar-selecionado="filters_value.parlamentares"
-        :loas-choice="loas_choice"
         :selected-loa-ids="selected_loa_ids"
-        :totais-empenhos="totais_empenhos"
+        :resumo="resumo"
         @filter-unidade="applyUnidadeFilter"
         @filter-entidade="applyEntidadeFilter"
         @filter-parlamentar="applyParlamentarFilter"
       />
-      <div class="pcldetalhe-list" v-else-if="viewMode === 'list' && (emendas_ajustes_list.length || fetching)">
-        <template v-for="item in paginatedList">
+      <div class="pcldetalhe-list" v-else-if="viewMode === 'list' && (itens.length || fetching)">
+        <template v-for="item in itens">
           <pcl-detalhe-emenda
             v-if="item.__label__ === 'loa_emendaloa'"
             :key="`emenda_${item.id}`"
@@ -65,8 +68,16 @@
           />
         </template>
       </div>
-      <div v-else-if="ready && viewMode === 'list'" class="card text-muted text-center my-3 p-3 mx-5 font-weight-bold">
+      <div v-else-if="ready && viewMode === 'list' && !erro" class="card text-muted text-center my-3 p-3 mx-5 font-weight-bold">
         Nenhum resultado encontrado para os filtros selecionados.
+      </div>
+    </div>
+    <div v-else-if="erro" class="pcl-erro card text-center my-3 p-3 mx-5">
+      <span class="font-weight-bold text-danger">
+        <i class="fas fa-exclamation-triangle mr-1"></i>Não foi possível carregar os dados da prestação de contas.
+      </span>
+      <div class="mt-2">
+        <button type="button" class="btn btn-sm btn-outline-primary" @click="carregar()">Tentar novamente</button>
       </div>
     </div>
   </div>
@@ -93,7 +104,9 @@ export default {
       loa: { id: this.$route.params.pkloa },
       loas_list: [],
       selected_loa_ids: [],
-      loas_data: {},
+      // opções dos seletores de filtro para os exercícios selecionados
+      // (prestacaoconta_opcoes)
+      opcoes: { parlamentares: [], unidades: [], entidades: [] },
       ready: false,
       viewMode: 'list',
       dash_activated: true,
@@ -116,40 +129,18 @@ export default {
         'ajustes',
         'search'
       ],
-      results: {
-        emendas: [],
-        ajustes: []
-      },
-      // cache local dos registros completos já obtidos, por modelo e id,
-      // para evitar refazer buscas com joins/expand a cada filtro aplicado
-      record_cache: {
-        emendaloa: {},
-        registroajusteloa: {}
-      },
-      // true depois da 1a busca tradicional (completa) de cada modelo
-      full_load_done: {
-        emendaloa: false,
-        registroajusteloa: false
-      },
-      // params usados apenas na busca individual (por id) do registro completo
-      detail_params: {
-        emendaloa: {
-          exclude: 'search;metadata;prefixo_finalidade;prefixo_indicacao;owner;finalidade;finalidade_format;proposicao',
-          include: 'parlamentares.id,__str__,fotografia;unidade.id,__str__;materia.id;entidade.id,nome_fantasia,__str__',
-          expand: 'parlamentares;unidade;materia;entidade'
-        },
-        registroajusteloa: {
-          exclude: 'search',
-          include: 'parlamentares_valor.id,__str__,fotografia;oficio_ajuste_loa.id,__str__',
-          expand: 'emendaloa.id,__str__;unidade;parlamentares_valor;oficio_ajuste_loa'
-        }
-      },
-      totais_empenhos: {
-        total_empenhado: 0,
-        total_liquidado: 0,
-        total_pago_bruto: 0,
-        total_anulado: 0
-      },
+      // a página de cartões em exibição e o total da seleção, ambos do
+      // backend (prestacaoconta_itens): a paginação é do servidor
+      itens: [],
+      total_itens: 0,
+      // totalização e execução, calculadas no backend (prestacaoconta_resumo)
+      resumo: null,
+      // distribuições do dashboard (prestacaoconta_dashboard), pedidas só
+      // quando o modo dashboard está aberto
+      dashboard: null,
+      // falha numa requisição da carga inicial ou da busca: a tela avisa e
+      // oferece repetir
+      erro: false,
       fetching: false,
       firstPageLoaded: false,
       currentPage: 1,
@@ -157,14 +148,6 @@ export default {
     }
   },
   computed: {
-    qs_loa () {
-      if (this.selected_loa_ids.length === 1) return `loa=${this.selected_loa_ids[0]}`
-      return ''
-    },
-    qs_emenda_loa__loa () {
-      if (this.selected_loa_ids.length === 1) return `&emendaloa_set__loa=${this.selected_loa_ids[0]}`
-      return ''
-    },
     loas_choice () {
       if (!this.loas_list.length) return []
       return this.loas_list.map(l => ({
@@ -172,57 +155,23 @@ export default {
         text: l.ano
       }))
     },
-    all_parlamentares () {
-      const map = {}
-      this.selected_loa_ids.forEach(id => {
-        const loaData = this.loas_data[id]
-        if (loaData && loaData.parlamentares) {
-          loaData.parlamentares.forEach(p => {
-            if (!map[p.id]) map[p.id] = p
-          })
-        }
-      })
-      return Object.values(map).sort((a, b) =>
-        (a.nome_parlamentar || '').localeCompare(b.nome_parlamentar || '')
-      )
-    },
     parlamentares_choice () {
-      if (this.all_parlamentares.length > 1) {
-        return [
-          { value: null, text: '----------------' },
-          ...this.all_parlamentares.map((p) => ({
-            value: p,
-            text: p.nome_parlamentar
-          }))
-        ]
-      }
-      return this.all_parlamentares.map((p) => ({
-        value: p,
-        text: p.nome_parlamentar
-      }))
+      return this.comOpcaoVazia(this.opcoes.parlamentares.map((p) => ({
+        value: { id: p.id, nome_parlamentar: p.nome, __str__: p.nome },
+        text: p.nome
+      })), this.opcoes.parlamentares.length > 1)
     },
-    emendas_ajustes_list () {
-      const selectedIds = this.selected_loa_ids
-      const emendas = (Array.isArray(this.results.emendas)
-        ? this.results.emendas
-        : []).filter(item => selectedIds.includes(item._loa_id))
-      const ajustes = (Array.isArray(this.results.ajustes)
-        ? this.results.ajustes
-        : []).filter(item => selectedIds.includes(item._loa_id))
-      const all = [...emendas, ...ajustes]
-      if (this.selected_loa_ids.length > 1) {
-        const loaOrder = this.loas_list.map(l => l.id)
-        all.sort((a, b) => {
-          const ia = a._loa_id !== undefined ? loaOrder.indexOf(a._loa_id) : loaOrder.length
-          const ib = b._loa_id !== undefined ? loaOrder.indexOf(b._loa_id) : loaOrder.length
-          return ia - ib
-        })
-      }
-      return all
+    entidades_choice () {
+      return this.comOpcaoVazia(this.opcoes.entidades.map((e) => ({
+        value: { id: e.id, nome_fantasia: e.nome, __str__: e.rotulo },
+        text: e.rotulo
+      })))
     },
-    paginatedList () {
-      const start = (this.currentPage - 1) * this.pageSize
-      return this.emendas_ajustes_list.slice(start, start + this.pageSize)
+    unidades_choice () {
+      return this.comOpcaoVazia(this.opcoes.unidades.map((u) => ({
+        value: { id: u.id, __str__: u.nome },
+        text: u.nome
+      })))
     }
   },
   watch: {
@@ -237,11 +186,52 @@ export default {
     }
   },
   methods: {
+    comOpcaoVazia (opcoes, comVazia = true) {
+      return comVazia ? [{ value: null, text: '----------------' }, ...opcoes] : opcoes
+    },
+    // Opções dos seletores para os exercícios selecionados. Filtro que ficou
+    // sem a sua opção (exercício desmarcado) é descartado; devolve `true`
+    // quando descartou algum, caso em que o observador dos filtros já refaz
+    // a busca.
+    fetchOpcoes () {
+      const extras = this.selected_loa_ids.filter(id => id !== this.loa.id)
+      return this.utils.fetch({
+        app: 'loa',
+        model: 'loa',
+        id: this.loa.id,
+        action: 'prestacaoconta_opcoes',
+        params: extras.length ? { loas: extras.join(',') } : {}
+      }).then((response) => {
+        this.opcoes = { parlamentares: [], unidades: [], entidades: [], ...response.data }
+        return this.descartarFiltrosSemOpcao()
+      }).catch((error) => {
+        this.opcoes = { parlamentares: [], unidades: [], entidades: [] }
+        this.registrarFalha(error)
+        return false
+      })
+    },
+    descartarFiltrosSemOpcao () {
+      const sem = {}
+      const confere = (filtro, opcoes) => {
+        const atual = this.filters_value[filtro]
+        if (atual && typeof atual === 'object' && !opcoes.some(o => o.id === atual.id)) sem[filtro] = null
+      }
+      confere('parlamentares', this.opcoes.parlamentares)
+      confere('entidade', this.opcoes.entidades)
+      confere('unidade', this.opcoes.unidades)
+      if (!Object.keys(sem).length) return false
+      this.filters_value = { ...this.filters_value, ...sem }
+      return true
+    },
     viewModeChange (val) {
       // armazena o valor do modo de visualização no localstorage
       localStorage.setItem('portalcmj_pcl_view_mode', val)
       this.viewMode = val
       this.syncQueryString()
+      // os filtros podem ter mudado enquanto o dashboard estava fechado
+      if (val === 'dashboard' && this.ready && !this.dashboard) {
+        this.fetchDashboard(this._fetchId)
+      }
     },
     viewModeRestore () {
       // restaura o valor do modo de visualização a partir da url ou, na ausência, do localstorage
@@ -254,161 +244,55 @@ export default {
         : (localStorage.getItem('portalcmj_pcl_view_mode') || this.viewMode)
       return this.viewMode
     },
-    emptyTotaisEmpenhos () {
-      return {
-        total_empenhado: 0,
-        total_liquidado: 0,
-        total_pago_bruto: 0,
-        total_anulado: 0
-      }
-    },
-    normalizeTotaisEmpenhos (totais) {
-      return {
-        total_empenhado: Number(totais && totais.total_empenhado ? totais.total_empenhado : 0),
-        total_liquidado: Number(totais && totais.total_liquidado ? totais.total_liquidado : 0),
-        total_pago_bruto: Number(totais && totais.total_pago_bruto ? totais.total_pago_bruto : 0),
-        total_anulado: Number(totais && totais.total_anulado ? totais.total_anulado : 0)
-      }
-    },
-    somarTotaisEmpenhos (listaTotais) {
-      return listaTotais.reduce((acc, totais) => {
-        const normalized = this.normalizeTotaisEmpenhos(totais)
-        acc.total_empenhado += normalized.total_empenhado
-        acc.total_liquidado += normalized.total_liquidado
-        acc.total_pago_bruto += normalized.total_pago_bruto
-        acc.total_anulado += normalized.total_anulado
-        return acc
-      }, this.emptyTotaisEmpenhos())
-    },
-    getSharedFilterParams () {
-      const params = {
-        situacao: this.filters_value.situacao.join(',')
-      }
-
-      if (
-        this.filters_value.unidade &&
-        typeof this.filters_value.unidade === 'object'
-      ) {
-        params.unidade = this.filters_value.unidade.id
-      }
-
-      if (
-        this.filters_value.entidade &&
-        typeof this.filters_value.entidade === 'object'
-      ) {
-        params.entidade = this.filters_value.entidade.id
-      }
-
-      if (this.filters_value.search) {
-        params.search = this.filters_value.search
-      }
-
-      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
-      if (Array.isArray(emendasTipos) && emendasTipos.length > 0) {
-        params.tipo__in = emendasTipos.join(',')
-      }
-
+    getResumoParams () {
+      const f = this.filters_value
+      const params = {}
+      const situacao = (f.situacao || []).join(',')
+      if (situacao) params.situacao = situacao
+      if (f.unidade && typeof f.unidade === 'object') params.unidade = f.unidade.id
+      if (f.entidade && typeof f.entidade === 'object') params.entidade = f.entidade.id
+      if (f.parlamentares && typeof f.parlamentares === 'object') params.parlamentar = f.parlamentares.id
+      if (f.search) params.search = f.search
+      const tipos = _.filter(f.emendas_tipos, (v) => v)
+      if (tipos.length) params.tipo__in = tipos.join(',')
+      if (f.ajustes === 'True') params.ajustes = 'True'
+      const extras = this.selected_loa_ids.filter(id => id !== this.loa.id)
+      if (extras.length) params.loas = extras.join(',')
       return params
     },
-    getEmendaParams (loaId, options = {}) {
-      const params = {
-        ...this.getSharedFilterParams(),
-        loa: loaId
-      }
-
-      if (
-        this.filters_value.parlamentares &&
-        typeof this.filters_value.parlamentares === 'object'
-      ) {
-        params.parlamentares = this.filters_value.parlamentares.id
-      }
-
-      if (options.withListOptions) {
-        Object.assign(params, {
-          o: 'materia__tipo__sigla,materia__numero',
-          // 1a busca (cache vazio): traz o registro completo direto na listagem.
-          // Buscas seguintes: só o id, resolvido via cache (record_cache)
-          ...(options.traditional ? this.detail_params.emendaloa : { include: 'id' }),
-          page_size: 40
-        })
-      }
-
-      return params
+    fetchResumo (fetchId) {
+      const pedidos = [this.fetchConsulta('resumo', fetchId)]
+      // o dashboard usa os mesmos filtros; fechado, fica para quando abrir
+      this.dashboard = null
+      if (this.viewMode === 'dashboard') pedidos.push(this.fetchDashboard(fetchId))
+      return Promise.all(pedidos)
     },
-    getAjusteParams (loaId, options = {}) {
-      const params = {
-        ...this.getSharedFilterParams(),
-        oficio_ajuste_loa__loa: loaId
-      }
-
-      if (
-        this.filters_value.parlamentares &&
-        typeof this.filters_value.parlamentares === 'object'
-      ) {
-        params.parlamentares_valor = this.filters_value.parlamentares.id
-      }
-
-      if (options.withListOptions) {
-        Object.assign(params, {
-          o: 'parlamentares_valor__nome_parlamentar',
-          // 1a busca (cache vazio): traz o registro completo direto na listagem.
-          // Buscas seguintes: só o id, resolvido via cache (record_cache)
-          ...(options.traditional ? this.detail_params.registroajusteloa : { include: 'id' }),
-          page_size: 40
-        })
-      }
-      return params
+    fetchDashboard (fetchId) {
+      return this.fetchConsulta('dashboard', fetchId)
     },
-    fetchTotaisEmpenhos (fetchId, loaIds = this.selected_loa_ids) {
-      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
-      const fetchEmendas =
-        (Array.isArray(emendasTipos) && emendasTipos.length > 0) ||
-        (this.filters_value.ajustes === 'False' &&
-          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
-      const fetchAjustes =
-        (this.filters_value.ajustes === 'True') ||
-        (this.filters_value.ajustes === 'False' &&
-          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
-
-      const pending = []
-      loaIds.forEach(loaId => {
-        if (fetchEmendas) {
-          pending.push(
-            this.utils.fetch({
-              app: 'loa',
-              model: 'emendaloa',
-              action: 'totalize_empenhos',
-              params: this.getEmendaParams(loaId)
-            })
-          )
-        }
-
-        if (fetchAjustes) {
-          pending.push(
-            this.utils.fetch({
-              app: 'loa',
-              model: 'registroajusteloa',
-              action: 'totalize_empenhos',
-              params: this.getAjusteParams(loaId)
-            })
-          )
-        }
-      })
-
-      if (!pending.length) {
-        this.totais_empenhos = this.emptyTotaisEmpenhos()
-        return Promise.resolve()
-      }
-
-      return Promise.all(pending).then((responses) => {
+    // Pede uma das consultas consolidadas e guarda a resposta em `this[nome]`.
+    // A resposta de uma busca anterior é descartada.
+    fetchConsulta (nome, fetchId) {
+      return this.utils.fetch({
+        app: 'loa',
+        model: 'loa',
+        id: this.loa.id,
+        action: `prestacaoconta_${nome}`,
+        params: this.getResumoParams()
+      }).then((response) => {
         if (this._fetchId !== fetchId) return
-        this.totais_empenhos = this.somarTotaisEmpenhos(
-          responses.map(response => response.data || {})
-        )
-      }).catch(() => {
+        this[nome] = response.data
+      }).catch((error) => {
         if (this._fetchId !== fetchId) return
-        this.totais_empenhos = this.emptyTotaisEmpenhos()
+        this[nome] = null
+        this.registrarFalha(error)
       })
+    },
+    // 404 é a resposta de quem não tem prestação de contas para consultar
+    // (LOA sem norma, anterior ao ano inicial): não é falha, é lista vazia.
+    registrarFalha (error) {
+      const status = error && error.response && error.response.status
+      if (status !== 404) this.erro = true
     },
     syncQueryString () {
       const query = { view: this.viewMode }
@@ -509,10 +393,95 @@ export default {
       this.pageSize = size
       this.currentPage = 1
       localStorage.setItem('portalcmj_page_size', size)
+      this.fetchItens(this._fetchId)
     },
     onPageChange (page) {
-      const totalPages = Math.max(1, Math.ceil(this.emendas_ajustes_list.length / this.pageSize))
+      const totalPages = Math.max(1, Math.ceil(this.total_itens / this.pageSize))
       this.currentPage = Math.max(1, Math.min(page, totalPages))
+      this.fetchItens(this._fetchId)
+    },
+    // Pede ao backend a página de cartões em exibição. Só a resposta do
+    // pedido mais recente é usada: a de uma busca ou de uma página anterior
+    // é descartada.
+    fetchItens (fetchId) {
+      const pedido = this._itensId = (this._itensId || 0) + 1
+      this.fetching = true
+      return this.utils.fetch({
+        app: 'loa',
+        model: 'loa',
+        id: this.loa.id,
+        action: 'prestacaoconta_itens',
+        params: {
+          ...this.getResumoParams(),
+          page: this.currentPage,
+          page_size: this.pageSize
+        }
+      }).then((response) => {
+        if (this._fetchId !== fetchId || this._itensId !== pedido) return
+        this.itens = response.data.results.map(this.registroDoItem)
+        this.total_itens = response.data.pagination.total_entries
+      }).catch((error) => {
+        if (this._fetchId !== fetchId || this._itensId !== pedido) return
+        this.itens = []
+        this.total_itens = 0
+        this.registrarFalha(error)
+      }).finally(() => {
+        if (this._itensId === pedido) this.fetching = false
+      })
+    },
+    // Item da consulta no formato que os cartões já usam. Os valores chegam
+    // decididos pelo backend; aqui só se formata.
+    registroDoItem (item) {
+      const dinheiro = v => Number(v).toLocaleString('pt-BR', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })
+      const parlamentares = item.parlamentares.map(p => ({
+        id: p.id,
+        __str__: p.nome,
+        nome_parlamentar: p.nome,
+        fotografia: p.fotografia,
+        valor: p.valor
+      }))
+      const comum = {
+        id: item.id,
+        _loa_id: item.loa.id,
+        loa: item.loa.id,
+        __str__: item.titulo,
+        link_detail_backend: item.link,
+        tipo: item.tipo,
+        fase: item.fase,
+        fase_rotulo: item.fase_rotulo,
+        unidade: item.unidade ? { id: item.unidade.id, __str__: item.unidade.nome } : null,
+        valor_computado: Number(item.valor_final),
+        str_valor_computado: dinheiro(item.valor_final),
+        abas: item.abas
+      }
+      if (item.classe === 'emenda') {
+        return {
+          ...comum,
+          __label__: 'loa_emendaloa',
+          parlamentares,
+          entidade: item.entidade
+            ? { id: item.entidade.id, nome_fantasia: item.entidade.nome, __str__: item.entidade.nome }
+            : null,
+          materia: item.materia ? { id: item.materia } : null,
+          epigrafe_short: item.titulo,
+          str_valor: dinheiro(item.valor_original),
+          has_ajustes: item.tem_ajustes,
+          ementa_format: item.objeto
+        }
+      }
+      const valor = Number(item.valor)
+      return {
+        ...comum,
+        __label__: 'loa_registroajusteloa',
+        parlamentares_valor: parlamentares,
+        emendaloa: item.emendas.map(e => ({ id: e.id, __str__: e.titulo })),
+        descricao: item.descricao,
+        // valor negativo entre parênteses, como o cartão sempre mostrou
+        str_valor: valor < 0 ? `(${dinheiro(-valor)})` : dinheiro(valor)
+      }
     },
 
     on_loas_change (loaIds) {
@@ -525,49 +494,32 @@ export default {
 
       if (!removedIds.length && !addedIds.length) return
 
-      // Remove itens das LOAs desmarcadas
-      if (removedIds.length) {
-        this.results = {
-          emendas: this.results.emendas.filter(item => !removedIds.includes(item._loa_id)),
-          ajustes: this.results.ajustes.filter(item => !removedIds.includes(item._loa_id))
-        }
-      }
-
       this.syncQueryString()
 
-      if (!addedIds.length) {
-        this._fetchId = (this._fetchId || 0) + 1
-        return this.fetchTotaisEmpenhos(this._fetchId)
-      }
-
-      // Busca detalhes das novas LOAs e depois seus itens
-      const newDataIds = addedIds.filter(id => !this.loas_data[id])
-      const loadData = newDataIds.length
-        ? Promise.all(newDataIds.map(id =>
-          this.utils.fetch({
-            app: 'loa',
-            model: 'loa',
-            id,
-            params: {
-              expand: 'parlamentares',
-              include: 'parlamentares.id,nome_parlamentar'
-            }
-          }).then(resp => {
-            this.$set(this.loas_data, id, resp.data)
-          })
-        ))
-        : Promise.resolve()
-
-      loadData.then(() => {
+      // Opções dos seletores para a nova seleção e depois a busca
+      return this.fetchOpcoes().then((descartou) => {
+        // filtro descartado dispara o observador, que faz a busca completa
+        if (descartou) return
         if (loaIds.length > 1 && this.filters_value.unidade) {
           // Limpar unidade dispara o watcher que faz fetch() completo
           this.filters_value = { ...this.filters_value, unidade: null }
           return
         }
-        this.fetch(addedIds)
+        return this.fetch()
       })
     },
 
+    // As opções do seletor chegam aos poucos: espera a do id pedido na URL
+    // aparecer para aplicar o filtro. Desiste depois de 10 s (100 tentativas),
+    // e o filtro da URL é descartado.
+    aplicarFiltroQuandoHouverOpcao (filtro, id, select, tentativas = 100) {
+      const opt = select.options.find((o) => o.value && o.value.id === id)
+      if (opt) {
+        this.filters_value[filtro] = opt.value
+      } else if (tentativas > 1) {
+        setTimeout(() => this.aplicarFiltroQuandoHouverOpcao(filtro, id, select, tentativas - 1), 100)
+      }
+    },
     applyQueryFilters () {
       const query = this.$route.query
       this.filters.forEach((f) => {
@@ -577,55 +529,20 @@ export default {
               typeof query[f] === 'string' ? query[f].split(',') : query[f]
           } else if (f === 'parlamentares') {
             const pid = parseInt(query[f])
-            if (pid && this.loa.parlamentares) {
-              const found = this.loa.parlamentares.find((p) => p.id === pid)
-              if (found) {
-                this.filters_value[f] = found
-              }
-            }
+            const opt = pid && this.parlamentares_choice.find((o) => o.value && o.value.id === pid)
+            if (opt) this.filters_value[f] = opt.value
           } else if (f === 'emendas_tipos') {
             this.filters_value[f] =
               typeof query[f] === 'string' ? query[f].split(',') : query[f]
-          } else if (f === 'unidade') {
-            const uid = parseInt(query[f])
-            if (uid) {
+          } else if (f === 'unidade' || f === 'entidade') {
+            const id = parseInt(query[f])
+            if (id) {
               this.$nextTick(() => {
-                const unidadeSelect =
-                  this.$refs.filtros && this.$refs.filtros.getUnidadeSelectRef()
-                if (unidadeSelect) {
-                  const checkOptions = () => {
-                    const opt = unidadeSelect.options.find(
-                      (o) => o.value && o.value.id === uid
-                    )
-                    if (opt) {
-                      this.filters_value.unidade = opt.value
-                    } else {
-                      setTimeout(checkOptions, 100)
-                    }
-                  }
-                  checkOptions()
-                }
-              })
-            }
-          } else if (f === 'entidade') {
-            const eid = parseInt(query[f])
-            if (eid) {
-              this.$nextTick(() => {
-                const entidadeSelect =
-                  this.$refs.filtros && this.$refs.filtros.getEntidadeSelectRef()
-                if (entidadeSelect) {
-                  const checkOptions = () => {
-                    const opt = entidadeSelect.options.find(
-                      (o) => o.value && o.value.id === eid
-                    )
-                    if (opt) {
-                      this.filters_value.entidade = opt.value
-                    } else {
-                      setTimeout(checkOptions, 100)
-                    }
-                  }
-                  checkOptions()
-                }
+                const filtros = this.$refs.filtros
+                const select = filtros && (f === 'unidade'
+                  ? filtros.getUnidadeSelectRef()
+                  : filtros.getEntidadeSelectRef())
+                if (select) this.aplicarFiltroQuandoHouverOpcao(f, id, select)
               })
             }
           } else {
@@ -635,202 +552,49 @@ export default {
       })
     },
 
-    // Resolve uma pagina de ids no registro completo, usando o cache local.
-    // So dispara requisicao individual (com expand/include/exclude) para os
-    // ids que ainda nao foram carregados nesta sessao do componente.
-    resolveRecords (model, idsPage) {
-      const cache = this.record_cache[model]
-      const missingIds = idsPage
-        .filter(item => item && item.id !== undefined && !cache[item.id])
-        .map(item => item.id)
-
-      // cria sequencia Ids separados por vírgula
-      const idsSequence = missingIds.join(',')
-      const params = { ...this.detail_params[model], id__in: idsSequence, get_all: true }
-
-      const fetchMissing = missingIds.length
-        ? this.utils.fetch({
-          app: 'loa',
-          model,
-          params: params
-        }).then(response => {
-          missingIds.forEach(id => {
-            cache[id] = response.data.find(item => item.id === id)
-          })
-        })
-        : Promise.resolve()
-
-      return fetchMissing.then(() =>
-        idsPage
-          .map(item => item && cache[item.id])
-          .filter(record => record)
-      )
-    },
-    // Busca tradicional (1a busca): a pagina já vem com o registro completo,
-    // só precisamos guardá-lo no cache
-    cacheFullRecords (model, pageItems) {
-      const cache = this.record_cache[model]
-      pageItems.forEach(item => {
-        if (item && item.id !== undefined) cache[item.id] = item
-      })
-      return pageItems
-    },
-    _fetchAllPages (resultKey, model, params, fetchId, loaId, traditional) {
-      const fetchPage = (page) => {
-        if (this._fetchId !== fetchId) return Promise.resolve()
-
-        return this.utils.fetch({
-          app: 'loa',
-          model: model,
-          params: { ...params, page }
-        }).then((response) => {
-          if (this._fetchId !== fetchId) return
-
-          const data = response.data
-          let pageItems = []
-          let nextPage = null
-
-          if (data && data.pagination && Array.isArray(data.results)) {
-            pageItems = data.results
-            nextPage = data.pagination.next_page
-          } else if (Array.isArray(data)) {
-            pageItems = data
-          }
-
-          const resolved = traditional
-            ? Promise.resolve(this.cacheFullRecords(model, pageItems))
-            : this.resolveRecords(model, pageItems)
-
-          return resolved.then((items) => {
-            if (this._fetchId !== fetchId) return
-
-            if (items.length && this.selected_loa_ids.includes(loaId)) {
-              items = items.map(item => Object.assign({}, item, { _loa_id: loaId }))
-              this.results = Object.assign({}, this.results, {
-                [resultKey]: [...this.results[resultKey], ...items]
-              })
-              this.firstPageLoaded = true
-            }
-
-            if (nextPage) {
-              return fetchPage(nextPage)
-            }
-          })
-        })
-      }
-      return fetchPage(1)
-    },
-
-    fetch (onlyLoaIds) {
+    // Uma busca: o resumo (e o dashboard, se aberto) e a página de cartões,
+    // todos com os mesmos filtros. Nada da LOA é carregado inteiro.
+    fetch () {
       if (!this.selected_loa_ids.length) return Promise.resolve()
 
-      const isIncremental = Array.isArray(onlyLoaIds) && onlyLoaIds.length > 0
-
-      if (!isIncremental) {
-        this._fetchId = (this._fetchId || 0) + 1
-      }
+      this._fetchId = (this._fetchId || 0) + 1
       const currentFetchId = this._fetchId
 
-      this.fetching = true
-      this.totais_empenhos = this.emptyTotaisEmpenhos()
-      if (!isIncremental) {
-        this.firstPageLoaded = false
-        this.results = { emendas: [], ajustes: [] }
-      }
+      this.firstPageLoaded = false
+      this.erro = false
+      this.itens = []
+      this.total_itens = 0
+      this.resumo = null
 
-      const emendasTipos = _.filter(this.filters_value.emendas_tipos, (v) => v)
-      const fetchEmendas =
-        (Array.isArray(emendasTipos) && emendasTipos.length > 0) ||
-        (this.filters_value.ajustes === 'False' &&
-          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
-      const fetchAjustes =
-        (this.filters_value.ajustes === 'True') ||
-        (this.filters_value.ajustes === 'False' &&
-          (!Array.isArray(emendasTipos) || emendasTipos.length === 0))
-
-      const pending = [this.fetchTotaisEmpenhos(currentFetchId, this.selected_loa_ids)]
-
-      const orderedLoaIds = this.loas_list
-        .map(l => l.id)
-        .filter(id => (isIncremental ? onlyLoaIds : this.selected_loa_ids).includes(id))
-
-      // 1a busca de cada modelo (cache ainda vazio): traz os registros completos direto.
-      // Depois disso, toda busca passa a ser leve (include=id) resolvida via cache.
-      const emendaTraditional = !this.full_load_done.emendaloa
-      const ajusteTraditional = !this.full_load_done.registroajusteloa
-      const emendaTraditionalPending = []
-      const ajusteTraditionalPending = []
-
-      orderedLoaIds.forEach(loaId => {
-        if (fetchEmendas) {
-          const params_emendas = this.getEmendaParams(loaId, { withListOptions: true, traditional: emendaTraditional })
-          const p = this._fetchAllPages('emendas', 'emendaloa', params_emendas, currentFetchId, loaId, emendaTraditional)
-          pending.push(p)
-          if (emendaTraditional) emendaTraditionalPending.push(p)
-        }
-
-        if (fetchAjustes) {
-          const params_ajustes = this.getAjusteParams(loaId, { withListOptions: true, traditional: ajusteTraditional })
-          const p = this._fetchAllPages('ajustes', 'registroajusteloa', params_ajustes, currentFetchId, loaId, ajusteTraditional)
-          pending.push(p)
-          if (ajusteTraditional) ajusteTraditionalPending.push(p)
-        }
+      return Promise.all([
+        this.fetchResumo(currentFetchId),
+        this.fetchItens(currentFetchId)
+      ]).finally(() => {
+        if (this._fetchId === currentFetchId) this.firstPageLoaded = true
       })
-
-      // so marca a 1a busca como concluida quando TODAS as paginas de TODAS
-      // as loas dessa rodada tiverem terminado (nao no disparo da page=1)
-      if (emendaTraditionalPending.length) {
-        Promise.all(emendaTraditionalPending).then(() => {
-          if (this._fetchId === currentFetchId) this.full_load_done.emendaloa = true
-        })
-      }
-      if (ajusteTraditionalPending.length) {
-        Promise.all(ajusteTraditionalPending).then(() => {
-          if (this._fetchId === currentFetchId) this.full_load_done.registroajusteloa = true
-        })
-      }
-
-      if (!pending.length) {
-        this.fetching = false
-        this.firstPageLoaded = true
-        return Promise.resolve()
-      }
-
-      return Promise.all(pending).finally(() => {
-        if (this._fetchId === currentFetchId) {
-          this.fetching = false
-          this.firstPageLoaded = true
-        }
-      })
-    }
-  },
-  mounted () {
-    const t = this
-    t.viewModeRestore()
-    t.removeAside()
-    t.$nextTick().then(() => {
+    },
+    // Carga inicial: a LOA da rota e os exercícios disponíveis, depois a
+    // primeira busca. A falha da LOA é avisada na tela.
+    carregar () {
+      const t = this
+      t.erro = false
       const fetchLoa = t.utils.fetch({
         app: 'loa',
         model: 'loa',
         id: t.loa.id,
-        params: {
-          expand: 'parlamentares',
-          include: 'parlamentares.id,nome_parlamentar'
-        }
+        params: { include: 'id,ano' }
       })
+      // os exercícios com prestação de contas para este usuário vêm do
+      // backend, do mais recente para o mais antigo
       const fetchLoas = t.utils.fetch({
         app: 'loa',
         model: 'loa',
-        params: {
-          ano__gte: 2023,
-          get_all: 'True',
-          o: '-ano'
-        }
-      })
-      Promise.all([fetchLoa, fetchLoas]).then(([loaResp, loasResp]) => {
+        id: t.loa.id,
+        action: 'prestacaoconta_resumo'
+      }).then(resp => resp.data.exercicios).catch(() => [])
+      return Promise.all([fetchLoa, fetchLoas]).then(([loaResp, exercicios]) => {
         t.loa = loaResp.data
-        t.loas_list = loasResp.data
-        t.loas_data = { [t.loa.id]: t.loa }
+        t.loas_list = exercicios.map(e => ({ id: e.id, ano: e.ano }))
         t.selected_loa_ids = [t.loa.id]
 
         // Restaura LOAs extras da query string
@@ -843,33 +607,23 @@ export default {
           }
         }
 
-        // Carrega dados das LOAs extras selecionadas
-        const missingDataIds = t.selected_loa_ids.filter(id => !t.loas_data[id])
-        const loadExtra = missingDataIds.length
-          ? Promise.all(missingDataIds.map(id =>
-            t.utils.fetch({
-              app: 'loa',
-              model: 'loa',
-              id,
-              params: {
-                expand: 'parlamentares',
-                include: 'parlamentares.id,nome_parlamentar'
-              }
-            }).then(resp => {
-              t.$set(t.loas_data, id, resp.data)
-            })
-          ))
-          : Promise.resolve()
-
-        loadExtra.then(() => {
+        // As opções dos seletores chegam antes da leitura dos filtros da URL
+        return t.fetchOpcoes().then(() => {
           t.applyQueryFilters()
           t.ready = true
           // normaliza a querystring somente agora, com os filtros já lidos da url original
           t.syncQueryString()
           t.fetch()
         })
+      }).catch(() => {
+        t.erro = true
       })
-    })
+    }
+  },
+  mounted () {
+    this.viewModeRestore()
+    this.removeAside()
+    this.$nextTick().then(() => this.carregar())
   }
 }
 </script>

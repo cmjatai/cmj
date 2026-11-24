@@ -124,7 +124,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   formulário. Antes, o POST gravava os novos valores dos parlamentares depois do `sync()` e deixava o
   valor e os registros desatualizados. O reajuste depende do `sync()` (LOA-EMD-031), que roda com a
   LOA em tramitação. Esse é sempre o caso na fase 17: quando a LOA sai de tramitação, todas as
-  emendas já passaram da fase 20. Evidência: `cmj/loa/models/m_emendaloa.py:723-813`,
+  emendas já passaram da fase 20. Evidência: `cmj/loa/models/m_emendaloa.py:726-816`,
   `cmj/loa/forms/f_emendaloa.py:689-692`.
 
 ### Criação (D1, decidida em 2026-11-20)
@@ -302,7 +302,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 ### Efeito do save() no model
 
 - LOA-EMD-030 [observado] Todo `save()` copia a especificação da unidade para `indicacao` e, no fim,
-  chama `loa.update_disponibilidades()`. Evidência: `cmj/loa/models/m_emendaloa.py:815-842`.
+  chama `loa.update_disponibilidades()`. Evidência: `cmj/loa/models/m_emendaloa.py:818-845`.
 - LOA-EMD-031 [observado] Enquanto a LOA tem matéria e ainda não tem norma jurídica, o `save()` de uma
   emenda existente chama `sync()`, que tem estes efeitos:
   - **Emenda impositiva:**
@@ -315,7 +315,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
       - sem registros, é criada uma dedução na despesa padrão da LOA, conforme a área da unidade.
   - **Emenda modificativa:** os registros são apagados e o Valor Global é dividido igualmente entre
     os parlamentares.
-  - Evidência: `cmj/loa/models/m_emendaloa.py:723-813`, `cmj/loa/models/m_emendaloa.py:827-832`.
+  - Evidência: `cmj/loa/models/m_emendaloa.py:726-816`, `cmj/loa/models/m_emendaloa.py:830-835`.
 
 ### Frontend: criação
 
@@ -379,7 +379,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 - LOA-EMD-056 [retirada] O PATCH genérico usa o serializer com todos os campos do model e não aplica
   as restrições do formulário (LOA-EMD-010, LOA-EMD-016). Só a fase é conferida no servidor.
   Substituída por LOA-EMD-070 a 073.
-  Evidência: `cmj/api/serializers.py:55-56`, `cmj/api/loa/serializers/__init__.py:132-163`,
+  Evidência: `cmj/api/serializers.py:55-56`, `cmj/api/loa/serializers/__init__.py:202-254`,
   `cmj/api/loa/views/emendaloa.py:108-129`.
 - LOA-EMD-057 [observado] Quando o autosave dá certo:
   - a tela atualiza a entrelinha e o Valor Global com os valores retornados;
@@ -426,7 +426,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - inserções + deduções;
   - Valor Global − inserções.
   - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:223-249`,
-    `cmj/loa/models/m_emendaloa.py:844-866`.
+    `cmj/loa/models/m_emendaloa.py:847-869`.
 
 ## Dúvidas
 
@@ -440,7 +440,7 @@ Problemas vistos ao implementar as regras acordadas, fora delas.
 
 - P1. **O PATCH genérico de `valor` sempre falha.** O `DecimalField` do serializer recusa "5000,00",
   e com "5000.00" o `validate_valor` recebe um `Decimal` e o trata como texto, o que também gera 400
-  (`cmj/api/loa/serializers/__init__.py:199-227`). A tela não é afetada porque grava o Valor Global
+  (`cmj/api/loa/serializers/__init__.py:256-284`). A tela não é afetada porque grava o Valor Global
   pela action `updatevaloremenda`. Por isso, a regra de `valor` é testada pelo service e pela action.
 
 ## Fora do escopo

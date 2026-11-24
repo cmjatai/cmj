@@ -18,7 +18,7 @@
           >
           {{ loa.text }}
           <a
-            :href="`/loa/${loa.value}/prestacaocontaloa`"
+            :href="`/loa/${loa.value}/prestacaoconta`"
             class="btn-change-principal"
             title="Tornar este exercício o principal"
             @click.stop>
@@ -58,33 +58,23 @@
       </div>
       <div class="col-lg-3 col-md-4 col-sm-6 mb-2 px-1">
         <label class="pcl-filtros-label">Entidades</label>
-        <model-select
+        <b-form-select
           @change="val => updateFilter('entidade', val)"
           :value="value.entidade"
-          app="loa"
-          model="entidade"
-          choice="__str__"
-          ordering="nome_fantasia"
+          :options="entidadesChoice"
           ref="entidadeSelect"
-          :required="false"
-          :extra_query="`${qsLoa}${ qsLoa ? '&' : '' }ativo=True&page_size=100`"
           :disabled="filtersDisabled"
-        ></model-select>
+        ></b-form-select>
       </div>
       <div class="col-lg-3 col-md-4 mb-2 px-1">
         <label class="pcl-filtros-label">Unidade Orçamentária</label>
-        <model-select
+        <b-form-select
           @change="val => updateFilter('unidade', val)"
           :value="value.unidade"
-          app="loa"
-          model="unidadeorcamentaria"
-          choice="__str__"
-          ordering="codigo"
+          :options="unidadesChoice"
           ref="unidadeSelect"
-          :required="false"
-          :extra_query="`${qsLoa}${ qsLoa ? '&' : '' }recebe_emenda_impositiva=True&page_size=100`"
           :disabled="filtersDisabled || multiLoaSelected"
-        ></model-select>
+        ></b-form-select>
       </div>
     </div>
     <div class="row align-items-end mt-2">
@@ -202,13 +192,8 @@
 </template>
 
 <script>
-import ModelSelect from '@/components/selects/ModelSelect.vue'
-
 export default {
   name: 'pcl-filtros',
-  components: {
-    ModelSelect
-  },
   data () {
     const url = new URL(window.location.href)
     url.searchParams.set('print', 'True')
@@ -230,13 +215,14 @@ export default {
       type: Array,
       default: () => []
     },
-    qsLoa: {
-      type: String,
-      default: ''
+    // opções dos seletores, vindas do backend para os exercícios selecionados
+    entidadesChoice: {
+      type: Array,
+      default: () => []
     },
-    qsEmendaLoa: {
-      type: String,
-      default: ''
+    unidadesChoice: {
+      type: Array,
+      default: () => []
     },
     disabled: {
       type: Boolean,

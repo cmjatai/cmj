@@ -468,7 +468,7 @@ def test_rota_de_area_de_trabalho_so_grava_na_area_do_operador(
 @pytest.mark.django_db
 @pytest.mark.spec("API-ACS-045")
 @pytest.mark.parametrize("action", ["despesas_agrupadas", "espelho"])
-def test_consulta_de_despesa_de_loa_nao_publicada_exige_autenticacao(action):
+def test_consulta_de_despesa_segue_a_visibilidade_da_loa(action, django_user_model):
     nao_publicada = baker.make(Loa, ano=2090, publicado=False)
     publicada = baker.make(Loa, ano=2091, publicado=True)
     dados = {"agrupamento": "orgao", "itens": 5, "hist": 0}
@@ -476,7 +476,17 @@ def test_consulta_de_despesa_de_loa_nao_publicada_exige_autenticacao(action):
     resposta = APIClient().post(
         f"/api/loa/loa/{nao_publicada.pk}/{action}/", dados, format="json"
     )
-    assert resposta.status_code == 401
+    assert resposta.status_code == 404
+
+    comum = django_user_model.objects.create_user(
+        email="conta-comum@exemplo.invalid", password="senha-de-teste-123"
+    )
+    client = APIClient()
+    client.force_authenticate(user=comum)
+    resposta = client.post(
+        f"/api/loa/loa/{nao_publicada.pk}/{action}/", dados, format="json"
+    )
+    assert resposta.status_code == 404
 
     resposta = APIClient().post(
         f"/api/loa/loa/{publicada.pk}/{action}/", dados, format="json"

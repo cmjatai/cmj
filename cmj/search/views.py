@@ -5,6 +5,8 @@ from django.forms import ChoiceField, ValidationError
 from django.http import HttpResponseRedirect
 from django.urls.base import reverse
 from django.utils.encoding import force_str
+from django.utils.html import format_html
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from haystack.views import SearchView
 
@@ -106,6 +108,11 @@ class CmjSearchView(AudigLogFilterMixin, SearchView):
 
 class InfoFilterMixin:
 
+    @staticmethod
+    def _infofilter_item(label, valor):
+        # Rótulo e valor saem como texto; a marcação é só o negrito.
+        return format_html("<strong>{}:</strong> {}", label, valor)
+
     def infofilter(self, data, form=None, model=None):
         if form is not None:
             self.form = form
@@ -126,18 +133,18 @@ class InfoFilterMixin:
             queryset = getattr(self.form.fields[k], "queryset", None)
 
             if k == "autoria_is":
-                filtro = f"<strong>{label}:</strong> {Autor.objects.get(id=v).nome}"
+                filtro = self._infofilter_item(label, Autor.objects.get(id=v).nome)
             elif queryset is not None:
                 if not isinstance(v, (list, tuple, QuerySet)):
                     v = [v]
                 if v and not isinstance(v[0], int):
                     v = [x.id for x in v]
                 items = queryset.filter(id__in=v)
-                filtro = (
-                    f'<strong>{label}:</strong> {" / ".join([str(x) for x in items])}'
+                filtro = self._infofilter_item(
+                    label, " / ".join([str(x) for x in items])
                 )
             elif isinstance(v, bool):
-                filtro = f'<strong>{label}:</strong> {"Sim" if v else ("Não")}'
+                filtro = self._infofilter_item(label, "Sim" if v else "Não")
             elif isinstance(self.form.fields[k], ChoiceField):
                 choices_dict = {
                     str(key): value for key, value in self.form.fields[k].choices
@@ -145,8 +152,10 @@ class InfoFilterMixin:
 
                 if not isinstance(v, (list, tuple)):
                     v = [v]
-                filtro = " / ".join([str(choices_dict.get(str(x), str(x))) for x in v])
-                filtro = f"<strong>{label}:</strong> {filtro}"
+                filtro = self._infofilter_item(
+                    label,
+                    " / ".join([str(choices_dict.get(str(x), str(x))) for x in v]),
+                )
             elif "__in" in k and isinstance(v, (list, tuple)):
                 try:
                     field = k.split("__in")[0]
@@ -160,18 +169,22 @@ class InfoFilterMixin:
                             choices_dict = {
                                 str(key): value for key, value in model_field.choices
                             }
-                            filtro = " / ".join(
-                                [str(choices_dict.get(str(x), str(x))) for x in v]
+                            filtro = self._infofilter_item(
+                                label,
+                                " / ".join(
+                                    [str(choices_dict.get(str(x), str(x))) for x in v]
+                                ),
                             )
-                            filtro = f"<strong>{label}:</strong> {filtro}"
                         else:
-                            filtro = f"<strong>{label}:</strong> {', '.join([str(x) for x in v])}"
+                            filtro = self._infofilter_item(
+                                label, ", ".join([str(x) for x in v])
+                            )
                 except Exception as e:
-                    filtro = (
-                        f"<strong>{label}:</strong> {', '.join([str(x) for x in v])}"
+                    filtro = self._infofilter_item(
+                        label, ", ".join([str(x) for x in v])
                     )
             else:
-                filtro = f"<strong>{label}:</strong> {v}"
+                filtro = self._infofilter_item(label, v)
 
             filters.append(filtro)
 
@@ -179,7 +192,7 @@ class InfoFilterMixin:
             filters.insert(0, "<strong>FILTROS APLICADOS</strong>")
             filters.append("")
 
-        return "<br>".join(filters)
+        return mark_safe("<br>".join(filters))
 
 
 class MateriaSearchView(

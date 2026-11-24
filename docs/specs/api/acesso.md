@@ -1,17 +1,18 @@
 # API: acesso às rotas geradas
 
-Status: observado, com API-ACS-010, 011, 030, 031, 032, 034 a 037, 039, 041 a 045, 047, 049 e 050 implementadas e
+Status: observado, com API-ACS-010, 011, 030, 031, 032, 034 a 037, 039, 041 a 045, 047 e 049 a 051 implementadas e
 API-ACS-018, 019, 033 e 048 acordadas (2026-11-21 e 22)
 Última verificação: 2026-11-21 (commit `2452ae3d8`)
 Código principal: `sapl/api/permissions.py`, `cmj/settings/drf.py`, `sapl/rules/map_rules.py`,
 `cmj/globalrules/map_rules.py`, `sapl/api/urls.py`, `sapl/api/mixins.py`, `sapl/api/views_*.py`,
 `cmj/api/views_*.py`, `cmj/api/loa/views/`, `sapl/compilacao/services/s_visibilidade.py`,
 `cmj/search/services/s_chat.py`, `cmj/arq/services/s_draft.py`, `cmj/core/services/s_auditoria.py`,
-`cmj/core/services/s_areatrabalho.py`, `cmj/painelset/signals_sync_refresh.py`
+`cmj/core/services/s_areatrabalho.py`, `cmj/loa/services/s_visibilidade.py`,
+`cmj/painelset/signals_sync_refresh.py`
 Testes: `sapl/api/tests/test_api_acesso.py`, `sapl/api/tests/test_api_esquema.py`,
 `cmj/painelset/test_sync_refresh.py`,
 `sapl/compilacao/tests/test_visibilidade.py`, `cmj/search/test_chat_service.py`,
-`cmj/arq/test_draft_service.py`, `cmj/core/test_auditoria.py`
+`cmj/arq/test_draft_service.py`, `cmj/core/test_auditoria.py`, `cmj/loa/tests/test_visibilidade_api.py`
 
 Quem alcança cada rota `/api/<app_label>/<model>/`, por qual método, e onde a visibilidade dos
 registros é decidida.
@@ -184,11 +185,12 @@ negócio de cada viewset customizado entram só como inventário. O mecanismo de
   `sapl/api/permissions.py:45`.
 - API-ACS-022 [observado] (executado, sonda) Das 49 actions com método de escrita, anônimo passa em
   duas: `loa/loa/<pk>/despesas_agrupadas` e `loa/loa/<pk>/espelho` (`POST`), que só consultam, e
-  só em LOA publicada (API-ACS-045). As demais negam o acesso a anônimo e ao autenticado sem
+  só em LOA que o usuário vê (API-ACS-045). As demais negam o acesso a anônimo e ao autenticado sem
   vínculo. Evidência: `cmj/api/loa/views/loa.py:61-73`.
 - API-ACS-045 [implementado] As consultas `despesas_agrupadas` e `espelho` de `loa/loa` seguem a
-  publicação da LOA, como o detalhe: em LOA não publicada, anônimo recebe 401; em LOA publicada,
-  qualquer um consulta. Evidência: `cmj/api/loa/views/loa.py:61-73`.
+  visibilidade da LOA, como o detalhe (API-ACS-051): em LOA publicada, qualquer um consulta; na
+  LOA que o usuário não vê, a resposta é 404, para anônimo e para conta comum. Evidência:
+  `cmj/api/loa/views/loa.py:64-75`.
 - API-ACS-023 [retirada] Substituída por API-ACS-049.
 - API-ACS-049 [implementado] `materia/tipoproposicao/tipos_do_autor_contectado/` devolve os tipos
   de proposição do tipo do autor que o usuário opera. Anônimo recebe 401; usuário autenticado que
@@ -197,7 +199,8 @@ negócio de cada viewset customizado entram só como inventário. O mecanismo de
 ### Visibilidade dos registros
 
 - API-ACS-024 [observado] (executado, inventário) Sem `get_queryset` próprio, o viewset gerado
-  devolve `Model.objects.all()`. Dezenove viewsets têm `get_queryset` próprio, conforme a tabela.
+  devolve `Model.objects.all()`. Quarenta e oito viewsets têm `get_queryset` próprio, conforme a
+  tabela.
   Evidência: `drfautoapi/drfautoapi.py:539`.
 
 | Rota | Restrição | Evidência |
@@ -206,6 +209,7 @@ negócio de cada viewset customizado entram só como inventário. O mecanismo de
 | 5 de `compilacao` | visibilidade do texto articulado e da nota (API-ACS-034, 035) | `sapl/api/views_compilacao.py:22-58` |
 | 5 de `protocoloadm` | área de trabalho pública ou do operador | `sapl/api/mixins.py:488-510` |
 | `loa/emendaloa` | leitura segue a visibilidade da listagem | `cmj/api/loa/views/emendaloa.py:61-67` |
+| 31 de `loa`, `loa/emendaloa` inclusive | leitura segue a visibilidade da LOA (API-ACS-051) | `cmj/api/loa/views/__init__.py:130-143` |
 | `loa/subfuncao` | filtro opcional, sem efeito de visibilidade | `cmj/api/loa/views/subfuncao.py:3-11` |
 | `arq/draft` e `arq/draftmidia` | só os do usuário (API-ACS-037) | `cmj/api/views_arq.py:49-51`, `cmj/api/views_arq.py:399-401` |
 | `search/chatsession` e `search/chatmessage` | só os do usuário (API-ACS-036) | `cmj/api/views_search.py:18-32` |
@@ -264,6 +268,17 @@ negócio de cada viewset customizado entram só como inventário. O mecanismo de
   `cmj/core/services/s_areatrabalho.py:4-26`, `sapl/api/mixins.py:513-541`,
   `cmj/api/views_agenda.py:19-21`, `sapl/api/views_protocoloadm.py:123-125`,
   `cmj/agenda/views.py:15-19`, `sapl/protocoloadm/views.py:195-198`.
+- API-ACS-051 [implementado] Todo registro que pertence a uma LOA segue a visibilidade dela na
+  consulta: a LOA, as emendas e o que pertence a elas, ofícios e registros de ajuste, agrupamentos,
+  a peça orçamentária (órgãos, unidades, funções, ações, naturezas, fontes, despesas e receitas), os
+  empenhos e despesas pagas, e a prestação de contas com os arquivos. É a regra da lista de LOAs
+  (LOA-LST-006): anônimo e conta comum só veem LOA publicada; operador de autor vê também a não
+  publicada cuja matéria ainda não virou norma; quem tem `loa.emendaloa_full_editor` vê todas. A
+  LOA que o usuário não vê some das listas, dos totais e das actions, e o detalhe responde 404. O
+  vínculo do empenho com emenda ou ajuste segue a LOA de um ou de outro. A regra vale na leitura
+  (`GET`, `HEAD`, `OPTIONS`) e no `expand`; a escrita continua decidida pelas permissões de edição.
+  Evidência: `cmj/loa/services/s_visibilidade.py:19-80`, `cmj/api/loa/views/__init__.py:130-143`,
+  `cmj/loa/services/s_emendaloa.py:250-271`.
 - API-ACS-046 [observado] `cerimonial/visita` não pertence a uma área de trabalho: o model guarda
   só os setores visitados, e a tela de visitas também não filtra por área. Quem tem a permissão do
   model lê todas as visitas, na tela e na API. Evidência: `cmj/cerimonial/models.py:1153-1174`,
@@ -305,8 +320,6 @@ Nenhuma dúvida em aberto.
 ## Fora do escopo
 
 - Regras de negócio dos viewsets da LOA, do `painelset`, do `arq` e de `DocumentoViewSet`.
-- A visibilidade por `publicado` nas rotas da LOA (LOA, ajustes, prestação de contas): é a dúvida
-  D2 do painel de prestação de contas, a resolver com a convenção de API-ACS-033.
 - Login e token (`docs/specs/api/login.md`); `recria_token` exige `IsAdminUser`
   (`sapl/api/views.py:22-24`) e não foi analisado além disso.
 - Campos devolvidos e `expand`: [serializacao.md](./serializacao.md). Filtros:

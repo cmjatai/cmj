@@ -36,7 +36,7 @@
                 {{ tipoLabel(registro.tipo, true) }}</span>
               <span
                 :class="['badge', 'badge-' + faseVariant(registro.fase, true)]"
-              >{{ faseLabel(registro.fase, true) }}</span>
+              >{{ registro.fase_rotulo || faseLabel(registro.fase, true) }}</span>
             </div>
           </div>
 
@@ -107,20 +107,20 @@
           content-class="p-0"
           small
         >
-          <b-tab v-if="prestacaoItems && prestacaoItems.length" active>
+          <b-tab v-if="temDados('prestacao')" active>
             <template #title>
               Prestação de Contas
               <b-badge
                 variant="secondary"
                 pill
                 class="ml-1"
-              >{{ prestacaoItems.length }}</b-badge>
+              >{{ contagem('prestacao') }}</b-badge>
             </template>
-            <pcl-tab-prestacao :items="prestacaoItems" :registro="registro" />
+            <pcl-tab-prestacao :items="prestacaoItems" :erro="!!erros.prestacao" @tentar="fetchTabData(registro)" :registro="registro" />
           </b-tab>
 
           <b-tab
-            :active="!(prestacaoItems && prestacaoItems.length)"
+            :active="!temDados('prestacao')"
           >
             <template #title>
               Empenhos
@@ -128,10 +128,10 @@
                 variant="secondary"
                 pill
                 class="ml-1"
-                v-if="empenhosItems"
-              >{{ empenhosItems.length }}</b-badge>
+                v-if="contagem('empenhos') !== null"
+              >{{ contagem('empenhos') }}</b-badge>
             </template>
-            <pcl-tab-empenhos :items="empenhosItems" />
+            <pcl-tab-empenhos :items="empenhosItems" :erro="!!erros.empenhos" @tentar="fetchTabData(registro)" />
           </b-tab>
         </b-tabs>
       </div>
@@ -172,6 +172,8 @@ export default {
     return {
       prestacaoItems: null,
       empenhosItems: null,
+      // abas cuja requisição falhou
+      erros: {},
       visible: false
     }
   },
@@ -204,9 +206,10 @@ export default {
     }
   },
   computed: {
+    // As abas só aparecem se alguma tiver dados; sai das contagens que o
+    // item já traz (LOA-PCC-043), sem esperar as requisições
     hasTabs () {
-      return (Array.isArray(this.prestacaoItems) && this.prestacaoItems.length > 0) ||
-        (Array.isArray(this.empenhosItems) && this.empenhosItems.length > 0)
+      return this.temDados('prestacao') || this.temDados('empenhos')
     },
     emendasLoaList () {
       if (!this.registro.emendaloa) return []
@@ -233,37 +236,57 @@ export default {
       if (!url) return ''
       return url.replace(/\.png$/, '.c128.png')
     },
+    // Quantos registros a aba tem: os já carregados ou, antes disso, a
+    // contagem que veio com o item. `null` quando ainda não se sabe.
+    contagem (aba) {
+      const itens = this[`${aba}Items`]
+      if (Array.isArray(itens)) return itens.length
+      const abas = this.registro.abas
+      return abas && abas[aba] !== undefined ? abas[aba] : null
+    },
+    temDados (aba) {
+      return this.contagem(aba) > 0
+    },
+    // A aba que o item diz estar vazia não gera requisição
+    buscarAba (registro, aba, pedido) {
+      if (registro.abas && !registro.abas[aba]) return Promise.resolve([])
+      return this.utils.fetch(pedido)
+        .then(response => response.data || [])
+        .catch(() => this.falhou(aba))
+    },
+    // Marca a aba com falha: ela mostra o aviso e o "Tentar novamente"
+    falhou (aba) {
+      this.$set(this.erros, aba, true)
+      return null
+    },
     fetchTabData (registro) {
       this.prestacaoItems = null
       this.empenhosItems = null
+      this.erros = {}
 
-      this.utils
-        .fetch({
-          app: 'loa',
-          model: 'prestacaocontaregistro',
-          params: {
-            registro_ajuste: registro.id,
-            get_all: 'True',
-            expand: 'prestacao_conta;registro_ajuste'
-          }
-        })
-        .then((response) => {
-          this.prestacaoItems = response.data
-        })
+      this.buscarAba(registro, 'prestacao', {
+        app: 'loa',
+        model: 'prestacaocontaregistro',
+        params: {
+          registro_ajuste: registro.id,
+          get_all: 'True',
+          expand: 'prestacao_conta;registro_ajuste'
+        }
+      }).then((itens) => {
+        this.prestacaoItems = itens
+      })
 
-      this.utils
-        .fetch({
-          app: 'loa',
-          model: 'empenhoemendaajuste',
-          params: {
-            ajuste: registro.id,
-            get_all: 'True',
-            expand: 'empenho'
-          }
-        })
-        .then((response) => {
-          this.empenhosItems = response.data
-        })
+      this.buscarAba(registro, 'empenhos', {
+        app: 'loa',
+        model: 'empenhoemendaajuste',
+        params: {
+          ajuste: registro.id,
+          get_all: 'True',
+          expand: 'empenho'
+        }
+      }).then((itens) => {
+        this.empenhosItems = itens
+      })
     }
   }
 }

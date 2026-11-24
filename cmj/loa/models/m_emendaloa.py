@@ -636,22 +636,14 @@ class EmendaLoa(CmjSearchMixin):
     @property
     def valor_computado(self):
         valor = Decimal("0.00")
-        num_ajustes = RegistroAjusteLoa.objects.filter(emendaloa=self).count()
+        # usa a contagem anotada no queryset, quando houver (evita consulta por emenda)
+        num_ajustes = getattr(self, "ann_num_ajustes", None)
+        if num_ajustes is None:
+            num_ajustes = RegistroAjusteLoa.objects.filter(emendaloa=self).count()
         if not num_ajustes and self.fase != self.IMPEDIMENTO_TECNICO:
             valor = self.valor
         # _print = f"""{"." * 20} - {self.id} - {self.materia.epigrafe_short if self.materia else ""} - {self.valor} - {self.fase} - {self.tipo} - {valor} """
         # print(_print)
-        return valor
-
-        soma_ajustes = RegistroAjusteLoaParlamentar.objects.filter(
-            registro__emendaloa=self
-        ).aggregate(Sum("valor"))
-
-        valor = (
-            soma_ajustes["valor__sum"]
-            if soma_ajustes["valor__sum"] is not None
-            else self.valor
-        )
         return valor
 
     @property

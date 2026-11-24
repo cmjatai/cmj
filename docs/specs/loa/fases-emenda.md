@@ -128,7 +128,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   informa o usuário em `EmendaLoa._usuario_fase` antes do `save()`, e o signal consome o atributo para
   que ele não valha no `save()` seguinte. Na criação pela API, o histórico inicial recebe o usuário logo
   após o `save()`. O detalhe da emenda mostra o usuário ao superusuário. Evidência:
-  `cmj/loa/models/m_emendaloa.py:1014-1023`, `cmj/loa/signals.py:23-38`,
+  `cmj/loa/models/m_emendaloa.py:1017-1026`, `cmj/loa/signals.py:23-38`,
   `cmj/api/loa/views/emendaloa.py:100-129`, `cmj/loa/forms/f_emendaloa.py:649`,
   `cmj/loa/views/v_emendaloa.py:1081`, `cmj/loa/models/m_agrupamento.py:345-410`,
   `cmj/api/loa/views/agrupamentoemendaloa.py:125`, `cmj/loa/forms/f_agrupamento.py:320-326`,
@@ -145,7 +145,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 ### Valor
 
 - LOA-FASE-061 [implementado] Emenda com ajuste tem valor computado zero, porque o ajuste assume o papel
-  da emenda. Evidência: `cmj/loa/models/m_emendaloa.py:637-644`.
+  da emenda. Evidência: `cmj/loa/models/m_emendaloa.py:637-647`.
 
 ## Regras observadas
 
@@ -158,7 +158,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   `cmj/loa/models/m_emendaloa.py:35-60`, confirmado pelo SQL de `Agrupamento.emendas`.
 - LOA-FASE-003 [observado] Cada `save()` cuja fase difere do último histórico cria um registro em
   `EmendaLoaHistoricoFase`, com fase, horário e, quando informado, o usuário (LOA-FASE-067).
-  Evidência: `cmj/loa/signals.py:23-38`, `cmj/loa/models/m_emendaloa.py:999-1031`.
+  Evidência: `cmj/loa/signals.py:23-38`, `cmj/loa/models/m_emendaloa.py:1002-1034`.
 
 ### Transições
 
@@ -214,9 +214,9 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 - LOA-FASE-042 [observado] Emenda na fase -10 não pode ser removida do agrupamento. Evidência:
   `cmj/api/loa/views/agrupamentoemendaloa.py:42-45`.
 - LOA-FASE-043 [observado] O total de impedimentos do parlamentar considera emendas que já passaram
-  pelas fases 40 ou 50, com base no histórico. Evidência: `cmj/loa/views/v_loa.py:523-535`.
+  pelas fases 40 ou 50, com base no histórico. Evidência: `cmj/loa/views/v_loa.py:525-537`.
 - LOA-FASE-044 [observado] Emenda em impedimento técnico, mesmo sem ajuste, também tem valor computado
-  zero. Evidência: `cmj/loa/models/m_emendaloa.py:637-644`.
+  zero. Evidência: `cmj/loa/models/m_emendaloa.py:637-647`.
 
 ## Dúvidas
 
@@ -228,7 +228,7 @@ Problemas vistos ao escrever os testes, fora das regras desta spec. Não bloquei
 
 - P1. **`RegistroAjusteLoa` novo não salva com `save()` padrão.** `CmjSearchMixin.save()` chama
   `hook_emendaloa__search`, que lê o M2M `emendaloa` antes de existir `pk` e lança `ValueError`
-  (`cmj/mixins.py:406-421`, `cmj/loa/models/m_ajusteloa.py:199-201`). O teste de LOA-FASE-061 contorna
+  (`cmj/mixins.py:406-421`, `cmj/loa/models/m_ajusteloa.py:200-202`). O teste de LOA-FASE-061 contorna
   com `save(auto_update_search=False)`. Falta verificar se a tela de cadastro passa pelo mesmo erro.
 - P2. **A incorporação que leva a fase a 20 (LOA-FASE-054) não tem teste.** O fluxo de
   `ConfirmarProposicaoForm` exige proposição e protocolo completos. Pelo mesmo motivo, o registro do

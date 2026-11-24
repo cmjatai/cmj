@@ -65,7 +65,7 @@ mesma view, entram só no que afeta esta tela.
   `loa.emendaloa_full_editor`, e portanto o superusuário, vê todas. É a mesma regra da lista de
   LOAs, concentrada em `EmendaLoa.service.loas_visiveis`. Evidência:
   `cmj/loa/views/v_emendaloa.py:941-943`, `cmj/loa/services/s_emendaloa.py:250-284`,
-  `cmj/loa/views/v_loa.py:124-141`. Testes: `test_conta_comum_recebe_404_em_loa_nao_publicada`,
+  `cmj/loa/views/v_loa.py:126-143`. Testes: `test_conta_comum_recebe_404_em_loa_nao_publicada`,
   `test_operador_e_contabilidade_veem_loa_nao_publicada`,
   `test_operador_recebe_404_em_loa_nao_publicada_cuja_materia_virou_norma`,
   `test_qualquer_um_ve_todas_as_fases_de_loa_publicada`.
@@ -81,7 +81,7 @@ mesma view, entram só no que afeta esta tela.
   anônimo e o operador de outro autor, esses campos não aparecem. O `owner` exige, além disso, a
   permissão de listagem do model (`list_emendaloa`), pela regra geral da API para relação com
   usuário (API-SER-032): o operador do autor não o recebe. A tela de edição continua
-  recebendo `metadata.style`. Evidência: `cmj/api/loa/serializers/__init__.py:20-44`,
+  recebendo `metadata.style`. Evidência: `cmj/api/loa/serializers/__init__.py:100-124`,
   `cmj/loa/services/s_emendaloa.py:156-169`. Testes:
   `test_api_oculta_campos_internos_de_quem_nao_edita`,
   `test_api_mostra_campos_internos_a_quem_edita`,
@@ -159,7 +159,7 @@ mesma view, entram só no que afeta esta tela.
   `test_registro_do_operador_vai_para_a_lista_de_proposicoes`; na LOA 2026, anônimo e conta comum
   voltaram para `/loa/2026/emendaloa` com o aviso, sem disparar o registro (executado). O registro
   gera o PDF de cada emenda no processo, por `EmendaLoa.service.documento_pdf`, sem requisição HTTP, e
-  funciona também em LOA não publicada (`cmj/loa/models/m_emendaloa.py:868-890`, teste
+  funciona também em LOA não publicada (`cmj/loa/models/m_emendaloa.py:871-893`, teste
   `test_registro_pela_listagem_gera_pdf_sem_http_em_loa_nao_publicada`).
 - LOA-LST-084 [retirada] Substituída por LOA-EMD-086 de `docs/specs/loa/edicao-emenda.md`: o registro de
   proposição pelo detalhe da emenda foi removido em 2026-11-20.
@@ -335,7 +335,7 @@ mesma view, entram só no que afeta esta tela.
   string; com a verificação aceita, o PDF é gerado com esses filtros, e com a verificação recusada a
   página volta com a mensagem de erro. Usuário logado recebe o PDF direto. O botão "Gerar PDF" do
   v2018 envia o formulário por GET, então o anônimo abre essa página na nova aba (LOA-LST-071). Evidência:
-  `cmj/loa/views/v_emendaloa.py:162-184`, `cmj/mixins.py:517-615`. Testes:
+  `cmj/loa/views/v_emendaloa.py:162-184`, `cmj/mixins.py:535-623`. Testes:
   `test_anonimo_recebe_gate_em_vez_do_pdf`, `test_anonimo_com_recaptcha_invalido_volta_ao_gate`,
   `test_anonimo_com_recaptcha_valido_recebe_pdf_com_os_filtros`,
   `test_usuario_logado_gera_pdf_sem_gate`; no banco de dev, `?pdf&fase=40` na LOA 2026 deu a página
@@ -346,7 +346,7 @@ mesma view, entram só no que afeta esta tela.
   `sapl/relatorios/views_old.py`, que em DEBUG usam `MEDIA_ROOT`. Evidência:
   `cmj/utils/utils_report.py:21-27`, `cmj/loa/views/v_emendaloa.py:427`,
   `cmj/api/loa/views/emendaloa.py:254`, `cmj/api/loa/views/agrupamento.py:149`; fora da LOA,
-  `cmj/utils/utils_report.py:33` (`render_pdf_to_response`), `cmj/mixins.py:690`, `cmj/mixins.py:988`,
+  `cmj/utils/utils_report.py:33` (`render_pdf_to_response`), `cmj/mixins.py:698`, `cmj/mixins.py:996`,
   `sapl/relatorios/view_reports/mixins.py:22`, `sapl/relatorios/views_old.py:1379`,
   `sapl/relatorios/views_old.py:1410`, `sapl/relatorios/views_old.py:1498`, `cmj/core/views.py:792`.
   Testes: `test_pdf_base_url_usa_base_url_e_mantem_o_caminho`,

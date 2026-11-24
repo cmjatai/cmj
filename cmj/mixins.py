@@ -294,7 +294,7 @@ class CommonMixin(models.Model):
         finally:
             self._paginas = count_pages
             run_sql(
-                'update {} set _paginas = {} where id = {};'.format(
+                "update {} set _paginas = {} where id = {};".format(
                     "%s_%s" % (self._meta.app_label, self._meta.model_name),
                     count_pages,
                     self.id,
@@ -449,6 +449,44 @@ class CmjSearchMixin(models.Model):
         )
 
 
+RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
+# segundos de espera pela resposta do Google
+RECAPTCHA_VERIFY_TIMEOUT = 5.0
+
+
+def recaptcha_confirmado(
+    resposta, url=RECAPTCHA_VERIFY_URL, timeout=RECAPTCHA_VERIFY_TIMEOUT
+):
+    """Pergunta ao Google se a resposta do reCAPTCHA vale.
+
+    A chave e a resposta vão no corpo da requisição, não na URL, com tempo
+    limite e sem novas tentativas, para o worker não ficar preso. Qualquer
+    falha (rede, tempo esgotado, resposta fora do formato) conta como não
+    confirmado.
+    """
+    import json
+
+    import urllib3
+
+    http = urllib3.PoolManager()
+    try:
+        r = http.request(
+            "POST",
+            url,
+            fields={
+                "secret": settings.GOOGLE_RECAPTCHA_SECRET_KEY,
+                "response": resposta,
+            },
+            encode_multipart=False,
+            timeout=timeout,
+            retries=False,
+        )
+        jdata = json.loads(r.data.decode("utf-8"))
+    except Exception:
+        return False
+    return isinstance(jdata, dict) and bool(jdata.get("success"))
+
+
 class GoogleRecapthaFormMixin:
 
     def __init__(self, *args, **kwargs):
@@ -486,27 +524,7 @@ class GoogleRecapthaFormMixin:
         if not recaptcha:
             raise ValidationError(_("Verificação do reCAPTCHA não efetuada."))
 
-        import json
-
-        import urllib3
-
-        # encoded_data = json.dumps(fields).encode('utf-8')
-
-        url = (
-            "https://www.google.com/recaptcha/api/siteverify?"
-            "secret=%s"
-            "&response=%s" % (settings.GOOGLE_RECAPTCHA_SECRET_KEY, recaptcha)
-        )
-
-        http = urllib3.PoolManager()
-        try:
-            r = http.request("POST", url)
-            data = r.data.decode("utf-8")
-            jdata = json.loads(data)
-        except Exception as e:
-            raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
-
-        if jdata["success"]:
+        if recaptcha_confirmado(recaptcha):
             return cd
         else:
             raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
@@ -536,6 +554,8 @@ class GoogleRecapthaViewMixin:
     recaptcha_gate_button = _("Acessar Conteúdo")
     recaptcha_success_method = None
     recaptcha_return_url = "/"
+    recaptcha_verify_url = RECAPTCHA_VERIFY_URL
+    recaptcha_verify_timeout = RECAPTCHA_VERIFY_TIMEOUT
 
     recaptcha_gate_template = "crud/gate.html"
 
@@ -571,25 +591,11 @@ class GoogleRecapthaViewMixin:
         if not recaptcha:
             raise ValidationError(_("Verificação do reCAPTCHA não efetuada."))
 
-        import json
-
-        import urllib3
-
-        url = (
-            "https://www.google.com/recaptcha/api/siteverify?"
-            "secret=%s"
-            "&response=%s" % (settings.GOOGLE_RECAPTCHA_SECRET_KEY, recaptcha)
-        )
-
-        http = urllib3.PoolManager()
-        try:
-            r = http.request("POST", url)
-            data = r.data.decode("utf-8")
-            jdata = json.loads(data)
-        except Exception as e:
-            raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
-
-        if jdata["success"]:
+        if recaptcha_confirmado(
+            recaptcha,
+            url=self.recaptcha_verify_url,
+            timeout=self.recaptcha_verify_timeout,
+        ):
             return True
         else:
             raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
@@ -597,10 +603,12 @@ class GoogleRecapthaViewMixin:
     def dispatch(self, request, *args, **kwargs):
         if self._is_recaptcha_triggered(request):
             if request.method == "GET":
-                # if settings.DEBUG and self.recaptcha_success_method:
-                #    return getattr(self, self.recaptcha_success_method)(
-                #        request, *args, **kwargs
-                #    )
+                # em desenvolvimento (DEBUG) o gate é dispensado: o conteúdo
+                # sai direto, sem reCAPTCHA
+                if settings.DEBUG and self.recaptcha_success_method:
+                    return getattr(self, self.recaptcha_success_method)(
+                        request, *args, **kwargs
+                    )
                 return self._recaptcha_gate(request)
             elif request.method == "POST":
                 try:

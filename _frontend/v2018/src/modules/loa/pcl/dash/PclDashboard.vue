@@ -1,13 +1,9 @@
 <template>
-  <div class="pcl-dashboard" v-if="lista.length">
+  <div class="pcl-dashboard" v-if="dados">
 
     <pcl-totalizacao
-      v-if="lista.length"
-      :lista="lista"
-      :parlamentar-selecionado="parlamentarSelecionado"
-      :loas-choice="loasChoice"
-      :selected-loa-ids="selectedLoaIds"
-      :totais-empenhos="totaisEmpenhos"
+      v-if="resumo"
+      :resumo="resumo"
       class="mt-3 dash-section"
     />
 
@@ -339,7 +335,6 @@
 </template>
 
 <script>
-import { isEmenda, faseLabel, situacaoLabel } from '../utils/pcl-helpers'
 import PclTotalizacao from './PclTotalizacao.vue'
 const TOP_N = 10
 
@@ -366,12 +361,14 @@ export default {
   components: {
     PclTotalizacao
   },
+  // Só apresenta: as distribuições vêm prontas do backend
+  // (prestacaoconta_dashboard, docs/specs/loa/prestacao-contas-consulta.md).
+  // Aqui ficam o corte nas maiores, as barras proporcionais e as cores.
   props: {
-    lista: { type: Array, default: () => [] },
+    dados: { type: Object, default: null },
+    resumo: { type: Object, default: null },
     parlamentarSelecionado: { type: Object, default: null },
-    loasChoice: { type: Array, default: () => [] },
-    selectedLoaIds: { type: Array, default: () => [] },
-    totaisEmpenhos: { type: Object, default: () => ({}) }
+    selectedLoaIds: { type: Array, default: () => [] }
   },
   data () {
     return {
@@ -384,100 +381,75 @@ export default {
   },
   computed: {
     faseSecoes () {
-      return [
-        { titulo: 'Situação — Saúde', icon: 'fa-heartbeat', dados: this.distribuicaoPorFase(10) },
-        { titulo: 'Situação — Áreas Diversas', icon: 'fa-th-large', dados: this.distribuicaoPorFase(99) }
-      ]
+      const secoes = {
+        10: { titulo: 'Situação — Saúde', icon: 'fa-heartbeat' },
+        99: { titulo: 'Situação — Áreas Diversas', icon: 'fa-th-large' }
+      }
+      return [10, 99].map(tipo => {
+        const secao = (this.dados.situacao || []).find(s => s.tipo === tipo)
+        const grupos = secao ? secao.grupos : []
+        const max = (grupos.length && grupos[0].quantidade) || 1
+        return {
+          ...secoes[tipo],
+          dados: grupos.map((g, i) => ({
+            key: g.chave,
+            label: g.rotulo,
+            count: g.quantidade,
+            total: Number(g.valor),
+            pct: (g.quantidade / max) * 100,
+            color: DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length],
+            parlamentares: this.porParlamentar(g.parlamentares)
+          }))
+        }
+      })
     },
 
     parlamentarDistribuicao () {
-      const map = {}
-      const unidadeTotais = {}
-      // apenas emendas/ajustes de 99 (Áreas Diversas) entram na soma
-      const itensValidos = this.lista.filter(item => item.tipo === 99)
-      itensValidos.forEach(item => {
-        const parlamentares = isEmenda(item) ? item.parlamentares : item.parlamentares_valor
-        if (!parlamentares || !parlamentares.length) return
-        const val = Number(this.valorEfetivo(item))
-        // key por __str__ permite identificar unidades de forma única ao longo dos anos de LOA
-        const unidadeKey = item.unidade ? item.unidade.id : 'sem-unidade'
-        const unidadeLabel = item.unidade ? item.unidade.__str__ : 'Sem unidade' // label também usa __str__ para consistência
-        if (!unidadeTotais[unidadeKey]) unidadeTotais[unidadeKey] = { label: unidadeLabel, total: 0 }
-        unidadeTotais[unidadeKey].total += val
-        parlamentares.forEach(p => {
-          if (!map[p.id]) {
-            map[p.id] = {
-              id: p.id,
-              nome: p.__str__ || p.nome_parlamentar || `Parlamentar ${p.id}`,
-              fotografia: p.fotografia || null,
-              total: 0,
-              emendas: 0,
-              ajustes: 0,
-              unidades: {}
-            }
-          }
-          const valorParlamentar = this.valorEfetivoPorParlamentar(item, p.id)
-          map[p.id].total += valorParlamentar
-          if (!map[p.id].unidades[unidadeKey]) {
-            map[p.id].unidades[unidadeKey] = {
-              id: unidadeKey,
-              label: `${unidadeLabel} ${this.selectedLoaIds.length > 1 ? ('(' + (item.loa || item._loa_id) + ')') : ''}`,
-              total: 0
-            }
-          }
-          map[p.id].unidades[unidadeKey].total += valorParlamentar
-          if (isEmenda(item)) map[p.id].emendas++
-          else map[p.id].ajustes++
-        })
-      })
+      const lista = this.dados.parlamentares || []
+      const chave = u => (u.id === null ? 'sem-unidade' : u.id)
 
       // cores fixas por unidade, na mesma ordem em todos os parlamentares
-      const unidadeKeys = Object.keys(unidadeTotais).sort((a, b) => unidadeTotais[b].total - unidadeTotais[a].total)
+      const totalPorUnidade = {}
+      lista.forEach(p => p.unidades.forEach(u => {
+        totalPorUnidade[chave(u)] = (totalPorUnidade[chave(u)] || 0) + Number(u.valor)
+      }))
       const corPorUnidade = {}
-      unidadeKeys.forEach((key, i) => {
-        corPorUnidade[key] = DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length]
-      })
+      Object.keys(totalPorUnidade)
+        .sort((a, b) => totalPorUnidade[b] - totalPorUnidade[a])
+        .forEach((key, i) => {
+          corPorUnidade[key] = DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length]
+        })
 
-      const list = Object.values(map).sort((a, b) => b.total - a.total)
-      const max = list.length ? list[0].total : 1
-      return list.map(({ unidades, ...p }) => {
-        const segmentos = Object.entries(unidades)
-          // .filter(([, u]) => u.total !== 0)
-          .map(([key, u]) => ({
-            key: u.id, // preserva o tipo original do id (Object.entries sempre retorna chaves em string)
-            label: u.label,
-            total: u.total,
-            pct: (u.total / max) * 100,
-            color: corPorUnidade[key]
+      const variosExercicios = this.selectedLoaIds.length > 1
+      const max = (lista.length && Number(lista[0].valor)) || 1
+      return lista.map(p => {
+        const total = Number(p.valor)
+        return {
+          id: p.id,
+          nome: p.nome,
+          fotografia: p.fotografia,
+          total,
+          emendas: p.emendas,
+          ajustes: p.ajustes,
+          pct: (total / max) * 100,
+          segmentos: p.unidades.map(u => ({
+            key: chave(u),
+            label: u.id === null
+              ? 'Sem unidade'
+              : `${u.nome}${variosExercicios ? ` (${u.ano})` : ''}`,
+            total: Number(u.valor),
+            pct: (Number(u.valor) / max) * 100,
+            color: corPorUnidade[chave(u)]
           }))
-          .sort((a, b) => b.total - a.total)
-        return { ...p, pct: (p.total / max) * 100, segmentos }
+        }
       })
     },
 
     unidadeDistribuicaoAll () {
-      const map = {}
-      this.lista.forEach(item => {
-        if (item.tipo !== 99) return
-        const u = item.unidade
-        if (!u) return
-        const key = u.id
-        if (!map[key]) {
-          map[key] = { id: key, nome: u.__str__, total: 0, count: 0, itens: [] }
-        }
-        map[key].total += Number(this.valorEfetivo(item))
-        map[key].count++
-        map[key].itens.push(item)
-      })
-      return Object.values(map)
-        // .filter(u => u.total !== 0)
-        .sort((a, b) => b.total - a.total)
+      return this.comBarra(this.dados.unidades || [])
     },
     unidadeDistribuicao () {
-      const all = this.unidadeDistribuicaoAll
-      const top = this.parlamentarSelecionado ? all : all.slice(0, TOP_N)
-      const max = top.length ? top[0].total : 1
-      return top.map(({ itens, ...u }) => ({ ...u, pct: (u.total / max) * 100, parlamentares: this.distribuicaoPorParlamentar(itens) }))
+      return this.asMaiores(this.unidadeDistribuicaoAll)
     },
     unidadeDistribuicaoExtra () {
       if (this.parlamentarSelecionado) return 0
@@ -485,29 +457,10 @@ export default {
     },
 
     entidadeDistribuicaoAll () {
-      const map = {}
-      this.lista.forEach(item => {
-        if (!isEmenda(item)) return
-        if (item.tipo === 0) return
-        const e = item.entidade
-        if (!e || !e.nome_fantasia) return
-        const key = e.id
-        if (!map[key]) {
-          map[key] = { id: key, nome: e.nome_fantasia, total: 0, count: 0, itens: [] }
-        }
-        map[key].total += Number(this.valorEfetivo(item))
-        map[key].count++
-        map[key].itens.push(item)
-      })
-      return Object.values(map)
-        // .filter(e => e.total !== 0)
-        .sort((a, b) => b.total - a.total)
+      return this.comBarra(this.dados.entidades || [])
     },
     entidadeDistribuicao () {
-      const all = this.entidadeDistribuicaoAll
-      const top = this.parlamentarSelecionado ? all : all.slice(0, TOP_N)
-      const max = top.length ? top[0].total : 1
-      return top.map(({ itens, ...e }) => ({ ...e, pct: (e.total / max) * 100, parlamentares: this.distribuicaoPorParlamentar(itens) }))
+      return this.asMaiores(this.entidadeDistribuicaoAll)
     },
     entidadeDistribuicaoExtra () {
       if (this.parlamentarSelecionado) return 0
@@ -530,85 +483,29 @@ export default {
     }
   },
   methods: {
-    // Agrupa emenda + ajuste do mesmo tipo por fase/situação, sem distinguir a origem do documento
-    distribuicaoPorFase (tipo) {
-      const map = {}
-      this.lista.forEach(item => {
-        if (item.tipo !== tipo) return
-        const label = isEmenda(item)
-          ? faseLabel(item.fase)
-          : situacaoLabel(item.fase || 'Ajustes Sem Prestação de Contas')
-        if (!map[label]) {
-          map[label] = { key: label, label, count: 0, total: 0, itens: [] }
-        }
-        map[label].count++
-        map[label].total += Number(this.valorEfetivo(item))
-        map[label].itens.push(item)
-      })
-      const sorted = Object.values(map)
-        // .filter(f => f.total !== 0)
-        .sort((a, b) => b.count - a.count)
-      const max = sorted.length ? sorted[0].count : 1
-      return sorted.map(({ itens, ...f }, i) => ({
-        ...f,
-        pct: (f.count / max) * 100,
-        color: DASH_SITUACAO_PALETTE[i % DASH_SITUACAO_PALETTE.length],
-        parlamentares: this.distribuicaoPorParlamentar(itens)
+    // Parlamentares de um grupo, no formato das tabelas de detalhe
+    porParlamentar (parlamentares) {
+      return (parlamentares || []).map(p => ({
+        key: p.id,
+        label: p.nome,
+        total: Number(p.valor)
       }))
     },
-    valorEfetivo (item) {
-      if (!isEmenda(item)) {
-        let valor = Number(item.valor_computado || 0)
-        if (this.parlamentarSelecionado && item.valor_por_parlamentar) {
-          const vp = item.valor_por_parlamentar[this.parlamentarSelecionado.id]
-          if (vp !== undefined) valor = Number(vp)
-        }
-        return valor
-      }
-      const valor_computado = Number(item.valor_computado || 0)
-      if (item.has_ajustes || item.fase === 40) return valor_computado
-
-      let valor_inicial = Number(item.valor_inicial || 0)
-      if (this.parlamentarSelecionado && item.valor_inicial_por_parlamentar) {
-        const vid = item.valor_inicial_por_parlamentar[this.parlamentarSelecionado.id]
-        if (vid !== undefined) valor_inicial = Number(vid)
-      }
-      return valor_inicial
+    // Lista do backend (já do maior para o menor), no formato das barras
+    comBarra (lista) {
+      return lista.map(item => ({
+        id: item.id,
+        nome: item.nome,
+        total: Number(item.valor),
+        count: item.quantidade,
+        parlamentares: this.porParlamentar(item.parlamentares)
+      }))
     },
-    // Valor de um item atribuído a um parlamentar específico (independente do parlamentarSelecionado)
-    valorEfetivoPorParlamentar (item, parlamentarId) {
-      if (!isEmenda(item)) {
-        const vp = item.valor_por_parlamentar && item.valor_por_parlamentar[parlamentarId]
-        return vp !== undefined ? Number(vp) : 0
-      }
-      const valorInicialTotal = Number(item.valor_inicial || 0)
-      const vip = item.valor_inicial_por_parlamentar && item.valor_inicial_por_parlamentar[parlamentarId]
-      const valorInicialParlamentar = vip !== undefined ? Number(vip) : 0
-
-      if (item.has_ajustes || item.fase === 40) {
-        if (!valorInicialTotal) return 0
-        const valor_computado = Number(item.valor_computado || 0)
-        // mantém a proporção original do parlamentar aplicada ao valor computado
-        return (valorInicialParlamentar / valorInicialTotal) * valor_computado
-      }
-      return valorInicialParlamentar
-    },
-    // Agrupa o valor de um conjunto de itens por parlamentar (usado nos detalhes das seções 4 e 5)
-    distribuicaoPorParlamentar (itens) {
-      const map = {}
-      itens.forEach(item => {
-        const parlamentares = isEmenda(item) ? item.parlamentares : item.parlamentares_valor
-        if (!parlamentares || !parlamentares.length) return
-        parlamentares.forEach(p => {
-          if (!map[p.id]) {
-            map[p.id] = { key: p.id, label: p.__str__ || p.nome_parlamentar || `Parlamentar ${p.id}`, total: 0 }
-          }
-          map[p.id].total += this.valorEfetivoPorParlamentar(item, p.id)
-        })
-      })
-      return Object.values(map)
-        // .filter(s => s.total !== 0)
-        .sort((a, b) => b.total - a.total)
+    // As dez maiores, ou todas quando há filtro de parlamentar
+    asMaiores (todas) {
+      const lista = this.parlamentarSelecionado ? todas : todas.slice(0, TOP_N)
+      const max = (lista.length && lista[0].total) || 1
+      return lista.map(item => ({ ...item, pct: (item.total / max) * 100 }))
     },
     formatCurrency (value) {
       return Number(value).toLocaleString('pt-BR', {

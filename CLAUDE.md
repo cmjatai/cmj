@@ -187,7 +187,9 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   `django_db` termina com `Database access not allowed`.
 - **Views SQL não existem nos testes**: `--no-migrations` ignora `RunSQL`, o que afeta os models
   `managed = False` em `sapl/materia/models.py` e `cmj/loa/models/m_financeiro_orcamento.py`.
-- **`--reuse-db`**: mudança de model exige `--create-db`.
+- **`--reuse-db`**: mudança de model exige `--create-db`. O banco de teste é por checkout: `test_cmj`
+  no principal e `test_cmj_<nome>` em cada worktree de `cmj.worktrees/<nome>` (`DATABASE_TEST_NAME`
+  sobrescreve).
 - **Testes ignorados**: veja `collect_ignore_glob` em `conftest.py`.
 - **Cache em DEBUG é `DummyCache`**: locks com `cache.add` sempre passam e nada fica em cache.
 - **Host x container**: fora do container, alguns fluxos executam a função da task de forma
@@ -196,8 +198,10 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   desligado. Com o dev server parado, remova esse arquivo.
 - **`DJANGO_VITE_DEV_MODE` vale para v6 e v8 juntos**: ligada, o Django aponta para os dev
   servers em 5173 e 5174; desligada, lê os `dist/`, e mudança em `src/` só aparece após build.
-- **`dist/` é versionado** nos três frontends e vai para a imagem de produção. Commits de
-  funcionalidade não incluem rebuild; ele sai em commits "rebuild frontends".
+- **`dist/` é versionado** nos três frontends e vai para a imagem de produção. O branch de uma
+  tarefa completa inclui o rebuild dos três frontends e entra no `master` num commit só (squash):
+  cada push no `master` gera uma tag de versão (`docs/specs/infra/versionamento.md`), e a versão
+  tem de trazer o código e o `dist/` dele juntos.
 - **`package-lock.json` é versionado** nos três frontends e o CI instala com `npm ci`. O rebuild
   regenera o lock. Commit que muda um `package.json` leva o lock junto.
 - **`.npmrc` com `min-release-age=7`** nos três frontends: o npm recusa versão publicada há menos
@@ -272,6 +276,16 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   emendas coletivas e autosave. Leia antes de alterar essa tela.
 - `docs/specs/loa/listagem-emendas.md`: listagem das emendas da LOA, filtros, cache do cartão, PDF da
   listagem e dependências do v2018. Leia antes de alterar essa tela.
+- `docs/specs/loa/prestacao-contas-tela.md`: lado Django de `/loa/<pk>/prestacaoconta`: rota, gate do
+  reCAPTCHA, relatório para impressão (`?print=True`) e `InfoFilterMixin`. Leia antes de alterar a
+  view, os templates do relatório ou o mixin do reCAPTCHA.
+- `docs/specs/loa/prestacao-contas-consulta.md`: consulta consolidada da prestação de contas
+  (`PrestacaoContaService` e as actions `prestacaoconta_resumo`, `_dashboard` e `_itens` de
+  `loa/loa`): valor de cada item, totalização, execução, dashboard e lista paginada. Leia antes de
+  alterar o cálculo de valores da prestação de contas; a regra fica no serviço, não no frontend.
+- `docs/specs/loa/prestacao-contas-painel.md`: painel Vue da prestação de contas no v2018
+  (`modules/loa/pcl`): filtros, busca, cache, cartões, abas, totalização, dashboard e a API
+  consumida. Leia antes de alterar esses componentes.
 - `docs/tutorials/README.md`: índice dos tutoriais. Tutorial explica e não define regra: as regras
   ficam nas specs. O de `frontend/v8` é material de aprendizado para quem está chegando: para
   implementar no v8, use `docs/frontend/v8.md` e as specs. O de `rag` é o que a linha do chat RAG,

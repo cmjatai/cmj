@@ -11,8 +11,10 @@ from django.utils import formats
 from django.utils.datastructures import OrderedSet
 from django.utils.translation import gettext_lazy as _
 from rest_framework.decorators import action
+from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
 
+from cmj.api.loa.views.prestacaoconta import PrestacaoContaActions
 from cmj.loa.models import (
     Acao,
     Despesa,
@@ -25,6 +27,7 @@ from cmj.loa.models import (
     SubFuncao,
     UnidadeOrcamentaria,
 )
+from cmj.loa.services.s_visibilidade import VisibilidadeLoaService
 from cmj.utils import decimal2str, run_sql
 from sapl.api.permissions import SaplModelPermissions
 
@@ -47,7 +50,7 @@ filters_base = [
 dict_filter_base = dict(filters_base)
 
 
-class LoaViewSet:
+class LoaViewSet(PrestacaoContaActions):
 
     class LoaPermission(SaplModelPermissions):
         def has_permission(self, request, view):
@@ -64,12 +67,21 @@ class LoaViewSet:
                 "espelho",
             )
 
-            if consulta_de_despesa or (
-                request.method == "GET" and view.action in ("retrieve",)
-            ):
+            if consulta_de_despesa:
+                # são POST, que o get_queryset não filtra: a LOA que o
+                # usuário não vê responde como inexistente
                 self.object = view.get_object()
-                if not self.object.publicado and u.is_anonymous:
-                    return False
+                if not VisibilidadeLoaService().loa_visivel(u, self.object):
+                    raise NotFound()
+                return True
+            elif request.method == "GET" and view.action in (
+                "retrieve",
+                "prestacaoconta_resumo",
+                "prestacaoconta_dashboard",
+                "prestacaoconta_itens",
+                "prestacaoconta_opcoes",
+            ):
+                # o get_queryset aplica a visibilidade da LOA
                 return True
             elif request.method == "GET" and view.action == "despesas_executadas":
                 return u.has_perm("loa.view_despesasexecutadas")

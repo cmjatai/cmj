@@ -176,7 +176,8 @@ class RegistroAjusteLoa(CmjSearchMixin):
     class Meta:
         verbose_name = _("Registro do Ajuste Técnico")
         verbose_name_plural = _("Registros do Ajuste Técnico")
-        ordering = ["id"]
+        # pela numeração do registro (RAT número/ano)
+        ordering = ["ano", "numero", "id"]
 
         indexes = [
             GinIndex(
@@ -212,15 +213,11 @@ class RegistroAjusteLoa(CmjSearchMixin):
     def soma_valor(self):
         if self.pk is None:
             return Decimal("0.00")
+        # .all() aproveita o prefetch das partes, quando houver
         soma = sum(
-            list(
-                filter(
-                    lambda x: x,
-                    self.registroajusteloaparlamentar_set.values_list(
-                        "valor", flat=True
-                    ),
-                )
-            )
+            parte.valor
+            for parte in self.registroajusteloaparlamentar_set.all()
+            if parte.valor
         )
         return soma
 

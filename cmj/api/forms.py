@@ -146,7 +146,8 @@ class RegistroAjusteLoaFilterSet(CmjFilterSetMixin):
         qs = super().qs
         if "situacao" not in self.data or not self.data.get("situacao"):
             qs = self.filter_situacao(qs, "situacao", "")
-        return qs.order_by("id").distinct()
+        # pela numeração do registro (RAT número/ano)
+        return qs.order_by("ano", "numero", "id").distinct()
 
     def filter_oficio_ajuste_loa__loa(self, queryset, name, value):
         return queryset.filter(oficio_ajuste_loa__loa=value).distinct()

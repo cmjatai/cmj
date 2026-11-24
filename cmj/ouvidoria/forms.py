@@ -8,6 +8,7 @@ from django.utils.safestring import SafeString
 from django.utils.translation import gettext_lazy as _
 
 from cmj.core.models import AreaTrabalho, Notificacao
+from cmj.mixins import recaptcha_confirmado
 from cmj.ouvidoria.models import MensagemSolicitacao, Solicitacao
 from cmj.utils import AlertSafe
 from sapl.crispy_layout_mixin import SaplFormLayout, form_actions, to_column, to_row
@@ -150,32 +151,10 @@ class DenunciaForm(ModelForm):
         if not recaptcha:
             raise ValidationError(_("Verificação do reCAPTCHA não efetuada."))
 
-        import json
-
-        import urllib3
-
-        # encoded_data = json.dumps(fields).encode('utf-8')
-
-        url = (
-            "https://www.google.com/recaptcha/api/siteverify?"
-            "secret=%s"
-            "&response=%s" % (settings.GOOGLE_RECAPTCHA_SECRET_KEY, recaptcha)
-        )
-
-        http = urllib3.PoolManager()
-        try:
-            r = http.request("POST", url)
-            data = r.data.decode("utf-8")
-            jdata = json.loads(data)
-        except Exception as e:
-            raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
-
-        if jdata["success"]:
+        if recaptcha_confirmado(recaptcha):
             return cd
         else:
             raise ValidationError(_("Ocorreu um erro na validação do reCAPTCHA."))
-
-        return cd
 
 
 class SolicitacaoForm(ModelForm):

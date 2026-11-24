@@ -3,11 +3,15 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 
 from cmj.api.forms import RegistroAjusteLoaFilterSet
+from cmj.api.loa.serializers import ajustes_para_serializar
 from cmj.loa.models import Empenho
 
 
 class RegistroAjusteLoaViewSet:
     filterset_class = RegistroAjusteLoaFilterSet
+
+    def get_queryset(self):
+        return ajustes_para_serializar(super().get_queryset())
 
     @action(detail=False)
     def totalize_empenhos(self, request, pk=None):

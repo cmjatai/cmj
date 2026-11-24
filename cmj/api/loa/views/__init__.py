@@ -37,9 +37,12 @@ from cmj.loa.models import (
     SubFuncao,
 )
 from cmj.loa.models.m_financeiro_execucao import Empenho
+from cmj.loa.services.s_visibilidade import VisibilidadeLoaService
 from drfautoapi.drfautoapi import ApiViewSetConstrutor, customize
 
 logger = logging.getLogger(__name__)
+
+visibilidade = VisibilidadeLoaService()
 
 ApiViewSetConstrutor.build_class(
     [apps.get_app_config("loa")],
@@ -122,3 +125,19 @@ class _EntidadeViewSet(EntidadeViewSet):
 @customize(Empenho)
 class _EmpenhoViewSet(EmpenhoViewSet):
     pass
+
+
+class _VisibilidadeDaLoaViewSet:
+    """A consulta segue a visibilidade da LOA a que o registro pertence; a
+    escrita continua decidida pelas permissões de edição."""
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.method in ("GET", "HEAD", "OPTIONS"):
+            qs = visibilidade.visiveis(self.request.user, qs)
+        return qs
+
+
+for _model in apps.get_app_config("loa").get_models():
+    if _model._meta.model_name in VisibilidadeLoaService.CAMINHOS:
+        customize(_model)(_VisibilidadeDaLoaViewSet)

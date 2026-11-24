@@ -6,7 +6,7 @@
 {% if emendaloa_list %}
 <h2 class="secao-titulo">Emendas Impositivas / Modificativas</h2>
 
-{% for emenda in emendaloa_list.all %}
+{% for emenda in emendaloa_list %}
 <div class="emenda-item">
 
   {# --- Cabeçalho do bloco --- #}
@@ -27,9 +27,9 @@
     </dd>
     <dt>Valor Original:</dt>
     <dd>R$ {{ emenda.str_valor }}</dd>
-    {% if emenda.has_ajustes %}
-    <dt>Valor Redefinido:</dt>
-    <dd>R$ {{ emenda.str_valor_computado }}</dd>
+    {% if emenda.zerada_por %}
+    <dt>Valor Final:</dt>
+    <dd>R$ {{ emenda.valor_final|decimal2str }} <small>({% if emenda.zerada_por == "ajuste" %}valor remanejado para os registros de ajuste{% else %}impedimento técnico{% endif %})</small></dd>
     {% endif %}
     {% if emenda.unidade %}
     <dt>Unid. Orçamentária:</dt>
@@ -192,7 +192,7 @@
     <h4 class="sub-titulo">Registros Contábeis ({{ emenda.registrocontabil_set.count }})</h4>
     <ul style="font-size:0.87rem;margin:0;padding-left:1.2rem;font-family:'Courier New',Courier,monospace;">
       {% for rc in emenda.registrocontabil_set.all %}
-      <li>{{ rc }}</li>
+      <li>{{ rc.texto }}</li>
       {% endfor %}
     </ul>
   </div>

@@ -1,5 +1,6 @@
 import ipaddress
 import logging
+import re
 import socket
 from urllib.parse import urlparse
 
@@ -55,7 +56,10 @@ def django_db_setup(
         )
 
     db = settings.DATABASES["default"]
-    template_db = "template_cmj_test"
+    # Um template por checkout (TEST.NAME sem o sufixo _gwN do xdist): duas sessões clonando o
+    # mesmo template ao mesmo tempo fazem o CREATE DATABASE falhar.
+    test_name = db.get("TEST", {}).get("NAME") or f"test_{db['NAME']}"
+    template_db = "template_" + re.sub(r"_gw\d+$", "", test_name)
 
     conn_params = {
         "dbname": "postgres",
@@ -68,24 +72,26 @@ def django_db_setup(
 
     with django_db_blocker.unblock():
         # Cria/atualiza template database com extensões necessárias
+        # O advisory lock serializa os workers do xdist: sem ele, dois workers
+        # veem o template inexistente e os dois tentam criá-lo.
         admin_conn = psycopg.connect(**conn_params)
         with admin_conn.cursor() as cur:
+            cur.execute("SELECT pg_advisory_lock(hashtext(%s))", (template_db,))
             cur.execute(
                 "SELECT 1 FROM pg_database WHERE datname = %s",
                 (template_db,),
             )
             if not cur.fetchone():
                 cur.execute(f'CREATE DATABASE "{template_db}"')
-        admin_conn.close()
 
-        # Instala extensões no template
-        conn_params["dbname"] = template_db
-        tpl_conn = psycopg.connect(**conn_params)
-        with tpl_conn.cursor() as cur:
-            cur.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
-            cur.execute("CREATE EXTENSION IF NOT EXISTS unaccent")
-            cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
-        tpl_conn.close()
+            # Instala extensões no template
+            tpl_conn = psycopg.connect(**{**conn_params, "dbname": template_db})
+            with tpl_conn.cursor() as tpl_cur:
+                tpl_cur.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
+                tpl_cur.execute("CREATE EXTENSION IF NOT EXISTS unaccent")
+                tpl_cur.execute("CREATE EXTENSION IF NOT EXISTS vector")
+            tpl_conn.close()
+        admin_conn.close()
 
         # Configura Django para usar o template ao criar o banco de teste
         settings.DATABASES["default"].setdefault("TEST", {})

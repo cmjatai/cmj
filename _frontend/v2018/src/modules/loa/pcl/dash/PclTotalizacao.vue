@@ -1,5 +1,5 @@
 <template>
-  <div class="pcl-totalizacao px-2 py-1" v-if="lista.length">
+  <div class="pcl-totalizacao px-2 py-1" v-if="resumo && resumo.itens">
     <div class="d-flex align-items-center justify-content-between mb-1 ">
       <div class="d-flex align-items-center">
         <i class="fas fa-chart-bar text-primary mr-2"></i>
@@ -9,243 +9,124 @@
         <em>
           A Totalização é calculada sobre as emendas e ajustes listados conforme o filtro acima aplicado:
         </em>
-        <strong>
-          {{ lista.length }} {{ lista.length === 1 ? 'registro' : 'registros' }}.
+        <strong class="total-registros">
+          {{ resumo.itens }} {{ registros(resumo.itens) }}.
         </strong>
       </span>
     </div>
 
     <div class="d-flex align-items-stretch total-geral-row mb-2">
-      <div class="total-geral-box flex-fill d-flex flex-column px-3 py-2">
-        <div class="d-flex">
-          <i class="fas fa-coins text-success mr-2"></i>
-          <span class="font-weight-bold mr-2">Total Impositivas:</span>
-        </div>
-        <div class="d-flex flex-column align-items-center justify-content-center">
-          <h2 class="font-weight-bold text-success mb-0">R$ {{ formatCurrency(totalGeral) }}</h2>
-          <small class="text-muted">({{ countGeral }} {{ countGeral === 1 ? 'registro' : 'registros' }})</small>
-        </div>
-      </div>
-      <div class="total-geral-box sub-total-box flex-fill d-flex flex-column px-3 py-2 ml-2">
-        <div class="d-flex">
-          <i class="fas fa-heartbeat text-success mr-1"></i>
-          <span class="font-weight-bold mr-1">Saúde:</span>
-        </div>
-        <div class="d-flex flex-column align-items-center justify-content-center">
-          <h2 class="font-weight-bold text-success mb-0">R$ {{ formatCurrency(totalSaude) }}</h2>
-          <small class="text-muted">({{ countSaude }} {{ countSaude === 1 ? 'registro' : 'registros' }})</small>
-        </div>
-      </div>
-      <div class="total-geral-box sub-total-box flex-fill d-flex flex-column px-3 py-2 ml-2">
-        <div class="d-flex">
-          <i class="fas fa-th-large text-info mr-1"></i>
-          <span class="font-weight-bold mr-1">Áreas Diversas:</span>
-        </div>
-        <div class="d-flex flex-column align-items-center justify-content-center">
-          <h2 class="font-weight-bold text-info mb-0">R$ {{ formatCurrency(totalAreasDiversas) }}</h2>
-          <small class="text-muted">({{ countAreasDiversas }} {{ countAreasDiversas === 1 ? 'registro' : 'registros' }})</small>
-        </div>
-      </div>
-      <div v-if="totalModificativas > 0" class="total-geral-box sub-total-box flex-fill d-flex flex-column px-3 py-2 ml-2">
-        <div class="d-flex">
-          <i class="fas fa-pen-fancy text-secondary mr-1"></i>
-          <span class="font-weight-bold mr-1">Modificativas:</span>
-        </div>
-        <div class="d-flex flex-column align-items-center justify-content-center">
-          <h2 class="font-weight-bold text-secondary mb-0">R$ {{ formatCurrency(totalModificativas) }}</h2>
-          <small class="text-muted">({{ countModificativas }} {{ countModificativas === 1 ? 'registro' : 'registros' }})</small>
-        </div>
-      </div>
-    </div>
-
-    <div class="row mx-0 mb-1" v-if="mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
-      <div class="col-md-3 d-flex flex-column text-center py-1 border-right">
-        <span class="d-inline">
-          <small class="text-muted">Total Empenhado</small> <small class="text-muted text-blue">({{ percentual('empenhado').toFixed(2) }}%)</small>
-        </span>
-        <strong class="text-primary">R$ {{ formatCurrency(totalEmpenhado) }}</strong>
-      </div>
-      <div class="col-md-3 d-flex flex-column text-center py-1 border-right">
-        <span class="d-inline">
-          <small class="text-muted">Total Liquidado</small> <small class="text-muted text-blue">({{ percentual('liquidado').toFixed(2) }}%)</small>
-        </span>
-        <strong class="text-info">R$ {{ formatCurrency(totalLiquidado) }}</strong>
-      </div>
-      <div class="col-md-3 d-flex flex-column text-center py-1 border-right">
-        <span class="d-inline">
-          <small class="text-muted">Total Pago</small> <small class="text-muted text-blue">({{ percentual('pago_bruto').toFixed(2) }}%)</small>
-        </span>
-        <strong class="text-success">R$ {{ formatCurrency(totalPago) }}</strong>
-      </div>
-      <div class="col-md-3 d-flex flex-column text-center py-1">
-        <span class="d-inline">
-          <small class="text-muted">Total Anulado</small> <small class="text-muted text-blue">({{ percentual('anulado').toFixed(2) }}%)</small>
-        </span>
-        <strong class="text-danger">R$ {{ formatCurrency(totalAnulado) }}</strong>
-      </div>
-    </div>
-    <div class="row mx-0 mb-1" v-else-if="!mostrarExecucao && (totalEmpenhado > 0 || totalLiquidado > 0 || totalPago > 0 || totalAnulado > 0)">
-      <div class="col-md-12 text-center py-1">
-        <small class="text-muted d-block">Totais de Empenho, Liquidação, Pagamento e Anulação computados apenas a partir da LOA 2026.</small>
-      </div>
-    </div>
-
-    <div class="grupos-row d-none flex-wrap justify-content-center">
       <div
         v-for="g in grupos"
         :key="g.key"
-        class="grupo-box d-flex align-items-center mr-2 mb-1 px-2 py-1"
-        :class="`border-${g.variant}`"
+        class="total-geral-box flex-fill d-flex flex-column px-3 py-2"
+        :class="[`total-${g.key}`, { 'sub-total-box ml-2': g.key !== 'impositivas' }]"
       >
-        <i :class="[g.icon, `text-${g.variant}`]" class="mr-1"></i>
-        <span class="grupo-label mr-1">{{ g.label }}</span>
-        <b-badge :variant="g.variant" pill class="mr-1">{{ g.count }}</b-badge>
-        <span class="grupo-valor font-weight-bold">R$ {{ formatCurrency(g.total) }}</span>
+        <div class="d-flex">
+          <i :class="[g.icon, `text-${g.variant}`, g.key === 'impositivas' ? 'mr-2' : 'mr-1']"></i>
+          <span class="font-weight-bold" :class="g.key === 'impositivas' ? 'mr-2' : 'mr-1'">{{ g.label }}:</span>
+        </div>
+        <div class="d-flex flex-column align-items-center justify-content-center">
+          <h2 class="font-weight-bold mb-0" :class="`text-${g.variant}`">R$ {{ formatCurrency(g.valor) }}</h2>
+          <small class="text-muted">({{ g.quantidade }} {{ registros(g.quantidade) }})</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="aviso-zeradas text-center mb-1" v-if="avisosZeradas.length">
+      <small class="text-muted d-block" v-for="aviso in avisosZeradas" :key="aviso">
+        <i class="fas fa-info-circle mr-1"></i>{{ aviso }}
+      </small>
+    </div>
+
+    <div class="row mx-0 mb-1 linha-execucao" v-if="temExecucao && execucao.vale">
+      <div
+        v-for="(t, i) in totaisExecucao"
+        :key="t.key"
+        class="col-md-3 d-flex flex-column text-center py-1"
+        :class="{ 'border-right': i < totaisExecucao.length - 1 }"
+      >
+        <span class="d-inline">
+          <small class="text-muted">{{ t.label }}</small> <small class="text-muted text-blue">({{ percentual(t.valor).toFixed(2) }}%)</small>
+        </span>
+        <strong :class="`text-${t.variant}`">R$ {{ formatCurrency(t.valor) }}</strong>
+      </div>
+    </div>
+    <div class="row mx-0 mb-1 aviso-execucao" v-else-if="temExecucao">
+      <div class="col-md-12 text-center py-1">
+        <small class="text-muted d-block">Totais de Empenho, Liquidação, Pagamento e Anulação computados apenas a partir da LOA {{ execucao.ano_inicial }}.</small>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { isEmenda, tipoLabel, tipoVariant } from './../utils/pcl-helpers'
-
-const TIPO_ICONS = {
-  0: 'fas fa-pen-fancy',
-  10: 'fas fa-heartbeat',
-  99: 'fas fa-th-large'
-}
-
+// Só apresenta: os números vêm prontos do backend (prestacaoconta_resumo,
+// docs/specs/loa/prestacao-contas-consulta.md). Nenhuma regra de valor aqui.
 export default {
   name: 'pcl-totalizacao',
   props: {
-    lista: { type: Array, default: () => [] },
-    parlamentarSelecionado: { type: Object, default: null },
-    loasChoice: { type: Array, default: () => [] },
-    selectedLoaIds: { type: Array, default: () => [] },
-    totaisEmpenhos: {
-      type: Object,
-      default: () => ({
-        total_empenhado: 0,
-        total_liquidado: 0,
-        total_pago_bruto: 0,
-        total_anulado: 0
-      })
-    }
+    resumo: { type: Object, default: null }
   },
   computed: {
-    permissionEdit () {
-      return this.permissions.includes('loa.change_empenho')
-    },
-    countGeral () {
-      return this.lista.length
-    },
-    countSaude () {
-      return this.lista.filter(item => item.tipo === 10).length
-    },
-    countAreasDiversas () {
-      return this.lista.filter(item => item.tipo === 99).length
-    },
-    countModificativas () {
-      return this.lista.filter(item => item.tipo === 0).length
-    },
-    totalGeral () {
-      return this.lista
-        .filter(item => item.tipo !== 0)
-        .reduce((sum, item) => {
-          return sum + Number(this.valorEfetivo(item))
-        }, 0)
-    },
-    totalSaude () {
-      return this.lista
-        .filter(item => item.tipo === 10)
-        .reduce((sum, item) => sum + Number(this.valorEfetivo(item)), 0)
-    },
-    totalAreasDiversas () {
-      return this.lista
-        .filter(item => item.tipo === 99)
-        .reduce((sum, item) => sum + Number(this.valorEfetivo(item)), 0)
-    },
-    totalModificativas () {
-      return this.lista
-        .filter(item => item.tipo === 0)
-        .reduce((sum, item) => sum + Number(this.valorEfetivo(item)), 0)
-    },
-    mostrarExecucao () {
-      if (!this.loasChoice.length || !this.selectedLoaIds.length) return true
-      return this.selectedLoaIds.every(id => {
-        const loa = this.loasChoice.find(l => l.value === id)
-        return loa ? Number(loa.text) >= 2026 : true
-      })
-    },
-    totalEmpenhado () {
-      return Number(this.totaisEmpenhos.total_empenhado || 0)
-    },
-    totalLiquidado () {
-      return Number(this.totaisEmpenhos.total_liquidado || 0)
-    },
-    totalPago () {
-      return Number(this.totaisEmpenhos.total_pago_bruto || 0)
-    },
-    totalAnulado () {
-      return Number(this.totaisEmpenhos.total_anulado || 0)
-    },
     grupos () {
-      const map = {}
-      this.lista.forEach(item => {
-        const emenda = isEmenda(item)
-        const tipo = item.tipo
-        const prefix = emenda ? 'emenda' : 'ajuste'
-        const key = `${prefix}_${tipo}`
-
-        if (tipo === 0) {
-          return
-        }
-
-        if (!map[key]) {
-          const label = emenda
-            ? tipoLabel(tipo)
-            : `Ajuste ${tipo === 10 ? 'Saúde' : 'Áreas Diversas'}`
-          map[key] = {
-            key,
-            label,
-            variant: emenda ? tipoVariant(tipo) : 'warning',
-            icon: emenda ? (TIPO_ICONS[tipo] || 'fas fa-file-alt') : 'fas fa-exchange-alt',
-            count: 0,
-            total: 0,
-            order: (emenda && tipo !== 0) ? tipo : (!emenda ? 1000 + tipo : 10000)
-          }
-        }
-        map[key].count++
-        map[key].total += Number(this.valorEfetivo(item))
+      const r = this.resumo
+      const grupo = (key, label, icon, variant) => ({
+        key,
+        label,
+        icon,
+        variant,
+        valor: Number(r[key].valor),
+        quantidade: r[key].quantidade
       })
-      return Object.values(map).sort((a, b) => a.order - b.order)
+      const lista = [
+        grupo('impositivas', 'Total Impositivas', 'fas fa-coins', 'success'),
+        grupo('saude', 'Saúde', 'fas fa-heartbeat', 'success'),
+        grupo('areas_diversas', 'Áreas Diversas', 'fas fa-th-large', 'info')
+      ]
+      const modificativas = grupo('modificativas', 'Modificativas', 'fas fa-pen-fancy', 'secondary')
+      if (modificativas.valor > 0) lista.push(modificativas)
+      return lista
+    },
+    execucao () {
+      return this.resumo.execucao || {}
+    },
+    totaisExecucao () {
+      const e = this.execucao
+      return [
+        { key: 'empenhado', label: 'Total Empenhado', variant: 'primary', valor: Number(e.empenhado || 0) },
+        { key: 'liquidado', label: 'Total Liquidado', variant: 'info', valor: Number(e.liquidado || 0) },
+        { key: 'pago_bruto', label: 'Total Pago', variant: 'success', valor: Number(e.pago_bruto || 0) },
+        { key: 'anulado', label: 'Total Anulado', variant: 'danger', valor: Number(e.anulado || 0) }
+      ]
+    },
+    temExecucao () {
+      return this.totaisExecucao.some(t => t.valor > 0)
+    },
+    avisosZeradas () {
+      const avisos = []
+      const emAjuste = this.resumo.emendas_com_valor_em_ajuste
+      if (emAjuste && emAjuste.quantidade) {
+        const fora = this.resumo.ajustes ? '' : ', que não estão nesta seleção'
+        avisos.push(
+          `${emAjuste.quantidade} ${emAjuste.quantidade === 1 ? 'emenda conta' : 'emendas contam'} com valor zero ` +
+          `(valor original de R$ ${this.formatCurrency(emAjuste.valor_original)}): ` +
+          `o valor foi remanejado para registros de ajuste${fora}.`
+        )
+      }
+      const impedidas = this.resumo.emendas_em_impedimento
+      if (impedidas && impedidas.quantidade) {
+        avisos.push(
+          `${impedidas.quantidade} ${impedidas.quantidade === 1 ? 'emenda em impedimento técnico conta' : 'emendas em impedimento técnico contam'} ` +
+          `com valor zero (valor original de R$ ${this.formatCurrency(impedidas.valor_original)}).`
+        )
+      }
+      return avisos
     }
   },
   methods: {
-    valorEfetivo (item) {
-      if (!isEmenda(item)) {
-        let valor = Number(item.valor_computado || 0)
-        if (this.parlamentarSelecionado && item.valor_por_parlamentar) {
-          const vp = item.valor_por_parlamentar[this.parlamentarSelecionado.id]
-          if (vp !== undefined) {
-            valor = Number(vp)
-          }
-        }
-        return valor
-      }
-      const valor_computado = Number(item.valor_computado || 0)
-      if (item.has_ajustes || item.fase === 40) {
-        return valor_computado
-      }
-
-      let valor_inicial = Number(item.valor_inicial || 0)
-      if (this.parlamentarSelecionado && item.valor_inicial_por_parlamentar) {
-        const vid = item.valor_inicial_por_parlamentar[this.parlamentarSelecionado.id]
-        if (vid !== undefined) {
-          valor_inicial = Number(vid)
-        }
-      }
-      return valor_inicial
+    registros (quantidade) {
+      return quantidade === 1 ? 'registro' : 'registros'
     },
     formatCurrency (value) {
       return Number(value).toLocaleString('pt-BR', {
@@ -253,9 +134,8 @@ export default {
         maximumFractionDigits: 2
       })
     },
-    percentual (item) {
-      const valor = this.totaisEmpenhos[`total_${item}`] || 0
-      const total = Number(this.totalGeral || 0)
+    percentual (valor) {
+      const total = Number(this.resumo.impositivas.valor || 0)
       return total ? (valor / total) * 100 : 0
     }
   }
@@ -274,26 +154,6 @@ export default {
   border-radius: 0.25rem;
   font-size: 0.95rem;
 }
-.grupo-box {
-  background: #fff;
-  border: 1px solid;
-  border-radius: 0.25rem;
-  font-size: 0.82rem;
-  white-space: nowrap;
-}
-.grupo-label {
-  color: #495057;
-}
-.grupo-valor {
-  color: #212529;
-}
-
-/* ===== Responsivo < 992px ===== */
-@media (max-width: 991.98px) {
-  .grupos-row .grupo-box {
-    flex: 1 1 auto;
-  }
-}
 
 /* ===== Responsivo < 768px ===== */
 @media (max-width: 767.98px) {
@@ -306,21 +166,6 @@ export default {
   }
   .total-geral-box {
     font-size: 0.85rem;
-  }
-  .grupo-box {
-    font-size: 0.75rem;
-    white-space: normal;
-  }
-}
-
-/* ===== Responsivo < 425px ===== */
-@media (max-width: 425px) {
-  .grupos-row {
-    flex-direction: column;
-  }
-  .grupo-box {
-    margin-right: 0 !important;
-    width: 100%;
   }
 }
 </style>

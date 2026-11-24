@@ -116,7 +116,7 @@ Como o filterset é escolhido está em [gerador.md](./gerador.md) (`API-GER`).
   autor. Para esses usuários os três campos não valem como filtro nem como ordenação. Quem pode
   vê-los em alguma emenda continua filtrando por eles; `owner` exige ainda `list_emendaloa`
   (API-SER-032). Evidência:
-  `cmj/api/loa/serializers/__init__.py:26-35`, `cmj/loa/services/s_emendaloa.py:171-183`.
+  `cmj/api/loa/serializers/__init__.py:106-115`, `cmj/loa/services/s_emendaloa.py:171-183`.
 - API-FIL-024 [acordado] Em `loa/emendaloa`, quem vê `metadata` e `search` em alguma emenda filtra
   e ordena por eles em todas, inclusive nas emendas em que não os recebe: é o caso do operador de
   autor diante das emendas dos outros autores. Aceito em 2026-11-22 porque não há o que revelar:

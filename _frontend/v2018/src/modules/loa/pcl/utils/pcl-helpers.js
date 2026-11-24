@@ -62,13 +62,13 @@ const FASE_AJUSTE_VARIANTS = {
   10: 'secondary',
   40: 'danger',
   60: 'warning',
-  90: 'success'
+  99: 'success'
 }
 const FASE_AJUSTE_LABELS = {
   10: 'Registrado',
   40: 'Impedimento',
   60: 'Em Execução',
-  90: 'Finalizado'
+  99: 'Finalizado'
 }
 const SITUACAO_AJUSTE_VARIANTS = {
   10: 'secondary',

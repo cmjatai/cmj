@@ -41,7 +41,7 @@
               </span>
               <span
                 :class="['badge', 'mr-1', 'badge-' + faseVariant(registro.fase)]"
-              >{{ faseLabel(registro.fase) }}</span>
+              >{{ registro.fase_rotulo || faseLabel(registro.fase) }}</span>
             </div>
           </div>
 
@@ -140,10 +140,10 @@
                   variant="secondary"
                   pill
                   class="ml-1"
-                  v-if="prestacaoItems"
-                >{{ prestacaoItems.length }}</b-badge>
+                  v-if="contagem('prestacao') !== null"
+                >{{ contagem('prestacao') }}</b-badge>
               </template>
-              <pcl-tab-prestacao :items="prestacaoItems" :registro="registro" />
+              <pcl-tab-prestacao :items="prestacaoItems" :erro="!!erros.prestacao" @tentar="fetchTabData(registro)" :registro="registro" />
             </b-tab>
 
             <b-tab
@@ -157,10 +157,10 @@
                   variant="secondary"
                   pill
                   class="ml-1"
-                  v-if="ajustesItems"
-                >{{ ajustesItems.length }}</b-badge>
+                  v-if="contagem('ajustes') !== null"
+                >{{ contagem('ajustes') }}</b-badge>
               </template>
-              <pcl-tab-ajustes :items="ajustesItems" @search-emenda="val => $emit('search-emenda', val)" />
+              <pcl-tab-ajustes :items="ajustesItems" :erro="!!erros.ajustes" @tentar="fetchTabData(registro)" @search-emenda="val => $emit('search-emenda', val)" />
             </b-tab>
 
             <b-tab
@@ -174,10 +174,10 @@
                   variant="secondary"
                   pill
                   class="ml-1"
-                  v-if="documentosItems"
-                >{{ documentosItems.length }}</b-badge>
+                  v-if="contagem('documentos') !== null"
+                >{{ contagem('documentos') }}</b-badge>
               </template>
-              <pcl-tab-documentos :items="documentosItems" />
+              <pcl-tab-documentos :items="documentosItems" :erro="!!erros.documentos" @tentar="fetchTabData(registro)" />
             </b-tab>
 
             <b-tab
@@ -191,10 +191,10 @@
                   variant="secondary"
                   pill
                   class="ml-1"
-                  v-if="tramitacoesItems"
-                >{{ tramitacoesItems.length }}</b-badge>
+                  v-if="contagem('tramitacoes') !== null"
+                >{{ contagem('tramitacoes') }}</b-badge>
               </template>
-              <pcl-tab-tramitacoes :items="tramitacoesItems" />
+              <pcl-tab-tramitacoes :items="tramitacoesItems" :erro="!!erros.tramitacoes" @tentar="fetchTabData(registro)" />
             </b-tab>
 
             <b-tab
@@ -208,10 +208,10 @@
                   variant="secondary"
                   pill
                   class="ml-1"
-                  v-if="empenhosItems"
-                >{{ empenhosItems.length }}</b-badge>
+                  v-if="contagem('empenhos') !== null"
+                >{{ contagem('empenhos') }}</b-badge>
               </template>
-              <pcl-tab-empenhos :items="empenhosItems" />
+              <pcl-tab-empenhos :items="empenhosItems" :erro="!!erros.empenhos" @tentar="fetchTabData(registro)" />
             </b-tab>
           </template>
         </b-tabs>
@@ -262,6 +262,8 @@ export default {
       documentosItems: null,
       tramitacoesItems: null,
       empenhosItems: null,
+      // abas cuja requisição falhou
+      erros: {},
       visible: false
     }
   },
@@ -333,35 +335,15 @@ export default {
       if (i2 === -1) return [str.substring(0, i1), str.substring(i1 + 1), '']
       return [str.substring(0, i1), str.substring(i1 + 1, i2), str.substring(i2 + 1)]
     },
+    // As abas com dados vêm na frente. A ordem sai das contagens que o item
+    // já traz (LOA-PCC-043), sem esperar as requisições de cada aba.
     orderedTabs () {
-      const tabs = []
-
-      tabs.push({
-        key: 'prestacao',
-        hasData: Array.isArray(this.prestacaoItems) && this.prestacaoItems.length > 0
-      })
-
-      tabs.push({
-        key: 'ajustes',
-        hasData: Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0
-      })
-
-      tabs.push({
-        key: 'empenhos',
-        hasData: Array.isArray(this.empenhosItems) && this.empenhosItems.length > 0
-      })
-
+      const tabs = ['prestacao', 'ajustes', 'empenhos'].map(key => ({ key, hasData: this.temDados(key) }))
       tabs.sort((a, b) => (b.hasData ? 1 : 0) - (a.hasData ? 1 : 0))
 
       if (this.registro.materia) {
-        tabs.push({
-          key: 'tramitacoes',
-          hasData: Array.isArray(this.tramitacoesItems) && this.tramitacoesItems.length > 0
-        })
-        tabs.push({
-          key: 'documentos',
-          hasData: Array.isArray(this.documentosItems) && this.documentosItems.length > 0
-        })
+        tabs.push({ key: 'tramitacoes', hasData: this.temDados('tramitacoes') })
+        tabs.push({ key: 'documentos', hasData: this.temDados('documentos') })
       }
       return tabs
     }
@@ -381,112 +363,115 @@ export default {
       if (!val) return ''
       return val.replace(/[0\s]/g, '') ? val.trim() : ''
     },
+    // Quantos registros a aba tem: os já carregados ou, antes disso, a
+    // contagem que veio com o item. `null` quando ainda não se sabe.
+    contagem (aba) {
+      const itens = this[`${aba}Items`]
+      if (Array.isArray(itens)) return itens.length
+      const abas = this.registro.abas
+      return abas && abas[aba] !== undefined ? abas[aba] : null
+    },
+    temDados (aba) {
+      return this.contagem(aba) > 0
+    },
+    // Busca o conteúdo de uma aba. A que o item diz estar vazia não gera
+    // requisição.
+    buscarAba (registro, aba, pedido) {
+      if (registro.abas && !registro.abas[aba]) return Promise.resolve([])
+      return this.utils.fetch(pedido)
+        .then(response => response.data || [])
+        .catch(() => this.falhou(aba))
+    },
+    // Marca a aba com falha: ela mostra o aviso e o "Tentar novamente"
+    falhou (aba) {
+      this.$set(this.erros, aba, true)
+      return null
+    },
     fetchTabData (registro) {
       this.prestacaoItems = null
       this.ajustesItems = null
       this.documentosItems = null
       this.tramitacoesItems = null
       this.empenhosItems = null
+      this.erros = {}
 
-      this.utils
-        .fetch({
-          app: 'loa',
-          model: 'prestacaocontaregistro',
-          params: {
-            emendaloa: registro.id,
-            get_all: 'True',
-            expand: 'prestacao_conta;registro_ajuste'
-          }
-        })
-        .then((response) => {
-          this.prestacaoItems = response.data
-        })
+      this.buscarAba(registro, 'prestacao', {
+        app: 'loa',
+        model: 'prestacaocontaregistro',
+        params: {
+          emendaloa: registro.id,
+          get_all: 'True',
+          expand: 'prestacao_conta;registro_ajuste'
+        }
+      }).then((itens) => {
+        this.prestacaoItems = itens
+      })
 
-      this.utils
-        .fetch({
-          app: 'loa',
-          model: 'registroajusteloa',
-          params: {
-            emendaloa: registro.id,
-            get_all: 'True',
-            expand: 'oficio_ajuste_loa;unidade;materia'
-          }
-        })
-        .then((response) => {
-          this.ajustesItems = response.data
-        })
+      const ajustes = this.buscarAba(registro, 'ajustes', {
+        app: 'loa',
+        model: 'registroajusteloa',
+        params: {
+          emendaloa: registro.id,
+          get_all: 'True',
+          expand: 'oficio_ajuste_loa;unidade;materia'
+        }
+      })
+      ajustes.then((itens) => {
+        this.ajustesItems = itens
+      })
 
-      // Fetch empenhos da emenda
-      this.utils
-        .fetch({
-          app: 'loa',
-          model: 'empenhoemendaajuste',
-          params: {
-            emendaloa: registro.id,
-            get_all: 'True',
-            expand: 'empenho'
-          }
-        })
-        .then((response) => {
-          this.empenhosItems = response.data
+      // Empenhos da emenda e dos ajustes dela, sem repetir. Espera a lista de
+      // ajustes chegar antes de buscar os empenhos deles.
+      const empenhosDe = (filtro) => this.utils.fetch({
+        app: 'loa',
+        model: 'empenhoemendaajuste',
+        params: { ...filtro, get_all: 'True', expand: 'empenho' }
+      }).then(response => response.data || [])
 
-          // Fetch empenhos dos ajustes
-          if (Array.isArray(this.ajustesItems) && this.ajustesItems.length > 0) {
-            const ajustePromises = this.ajustesItems.map((ajuste) =>
-              this.utils.fetch({
-                app: 'loa',
-                model: 'empenhoemendaajuste',
-                params: {
-                  ajuste: ajuste.id,
-                  get_all: 'True',
-                  expand: 'empenho'
-                }
+      if (registro.abas && !registro.abas.empenhos) {
+        this.empenhosItems = []
+      } else {
+        Promise.all([empenhosDe({ emendaloa: registro.id }), ajustes])
+          .then(([daEmenda, itensAjustes]) =>
+            Promise.all((itensAjustes || []).map(ajuste => empenhosDe({ ajuste: ajuste.id })))
+              .then((dosAjustes) => {
+                const vistos = new Set(daEmenda.map(e => e.id))
+                const novos = dosAjustes.flat().filter(e => !vistos.has(e.id) && vistos.add(e.id))
+                this.empenhosItems = [...daEmenda, ...novos]
               })
-            )
-            Promise.all(ajustePromises).then((responses) => {
-              const ajusteEmpenhos = responses.flatMap((r) => r.data || [])
-              if (ajusteEmpenhos.length > 0) {
-                const existingIds = new Set(this.empenhosItems.map((e) => e.id))
-                const novos = ajusteEmpenhos.filter((e) => !existingIds.has(e.id))
-                this.empenhosItems = [...this.empenhosItems, ...novos]
-              }
-            })
-          }
-        })
+          )
+          .catch(() => this.falhou('empenhos'))
+      }
 
       if (registro.materia) {
         const materiaId = typeof registro.materia === 'object'
           ? registro.materia.id
           : registro.materia
 
-        this.utils
-          .fetch({
-            app: 'materia',
-            model: 'documentoacessorio',
-            params: {
-              materia: materiaId,
-              get_all: 'True',
-              expand: 'tipo'
-            }
-          })
-          .then((response) => {
-            this.documentosItems = response.data
-          })
+        this.buscarAba(registro, 'documentos', {
+          app: 'materia',
+          model: 'documentoacessorio',
+          params: {
+            materia: materiaId,
+            get_all: 'True',
+            expand: 'tipo'
+          }
+        }).then((itens) => {
+          this.documentosItems = itens
+        })
 
-        this.utils
-          .fetch({
-            app: 'materia',
-            model: 'tramitacao',
-            params: {
-              materia: materiaId,
-              get_all: 'True',
-              expand: 'unidade_tramitacao_local;unidade_tramitacao_destino;status',
-              include: 'status.id,__str__;unidade_tramitacao_local.id,__str__;unidade_tramitacao_destino.id,__str__'
-            }
-          })
-          .then((response) => {
-            this.tramitacoesItems = response.data
-          })
+        this.buscarAba(registro, 'tramitacoes', {
+          app: 'materia',
+          model: 'tramitacao',
+          params: {
+            materia: materiaId,
+            get_all: 'True',
+            expand: 'unidade_tramitacao_local;unidade_tramitacao_destino;status',
+            include: 'status.id,__str__;unidade_tramitacao_local.id,__str__;unidade_tramitacao_destino.id,__str__'
+          }
+        }).then((itens) => {
+          this.tramitacoesItems = itens
+        })
       }
     }
   }

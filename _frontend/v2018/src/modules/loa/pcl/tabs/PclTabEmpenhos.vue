@@ -1,6 +1,10 @@
 <template>
   <div>
-    <div v-if="items === null" class="text-center py-2">
+    <div v-if="erro" class="pcl-aba-erro text-center text-danger small py-2">
+      Não foi possível carregar.
+      <a href="#" @click.prevent="$emit('tentar')">Tentar novamente</a>
+    </div>
+    <div v-else-if="items === null" class="text-center py-2">
       <b-spinner small></b-spinner> Carregando...
     </div>
     <div v-else-if="items.length === 0" class="text-muted small py-3 text-center">
@@ -159,6 +163,10 @@ export default {
     items: {
       type: Array,
       default: null
+    },
+    erro: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
