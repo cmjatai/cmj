@@ -6,6 +6,7 @@ PortalCMJ. A datasource é a `prometheus` (uid fixo).
 | Arquivo | Origem |
 | --- | --- |
 | `portalcmj-visao-geral.json` | próprio do projeto |
+| `portalcmj-postgres.json` | próprio do projeto, gerado por `docker/grafana/geradores/portalcmj_postgres.py` |
 | `node-exporter-full.json` | grafana.com/dashboards/1860 |
 | `cadvisor.json` | grafana.com/dashboards/14282 |
 | `postgres.json` | grafana.com/dashboards/14114 |

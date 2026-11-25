@@ -45,7 +45,10 @@ services:
       PGDATA : /var/lib/postgresql/data/
     volumes:
       - cmjdb18_data:/var/lib/postgresql/data/
-    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements"]
+    # track_io_timing: tempos de I/O no pg_stat_statements e no pg_stat_database.
+    # track_utility=off: DDL e CREATE/ALTER ROLE (com senha) fora do pg_stat_statements,
+    # cujo texto vai para o Prometheus.
+    command: ["postgres", "-c", "shared_preload_libraries=pg_stat_statements", "-c", "track_io_timing=on", "-c", "pg_stat_statements.track_utility=off"]
     #ports:
     #  - "5433:5432"
     networks:

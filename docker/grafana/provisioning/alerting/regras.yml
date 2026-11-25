@@ -153,6 +153,140 @@ groups:
           summary: Mais de 80% das conexões do Postgres estão em uso.
           description: Acima do limite, a aplicação e o Celery passam a receber erro de conexão.
 
+      - uid: portalcmj-postgres-transacao-ociosa
+        title: Transação ociosa aberta no Postgres
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              # "idle in transaction" e "idle in transaction (aborted)".
+              expr: max(pg_stat_activity_max_tx_duration{datname="cmj", state=~"idle in transaction.*"})
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [300] } }]
+              refId: C
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: alto }
+        annotations:
+          summary: Uma conexão abriu transação e está parada há mais de 5 minutos.
+          description: Ela segura locks e impede o vacuum de limpar linhas mortas. Veja pg_stat_activity com state = 'idle in transaction'.
+
+      - uid: portalcmj-postgres-transacao-longa
+        title: Transação longa no Postgres
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 300, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: max(pg_stat_activity_max_tx_duration{datname="cmj", state="active"})
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [1800] } }]
+              refId: C
+        for: 5m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: medio }
+        annotations:
+          summary: Uma transação está em execução há mais de 30 minutos.
+          description: Pode ser consulta travada, tarefa do Celery longa ou autovacuum de tabela grande. Veja pg_stat_activity ordenado por xact_start.
+
+      - uid: portalcmj-postgres-deadlocks
+        title: Deadlocks no Postgres
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 900, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: sum(increase(pg_stat_database_deadlocks{datname="cmj"}[15m]))
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [0] } }]
+              refId: C
+        for: 0s
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: medio }
+        annotations:
+          summary: O Postgres desfez transações por deadlock nos últimos 15 minutos.
+          description: Uma das transações recebeu erro. A consulta envolvida fica no log do Postgres (docker logs do container do banco).
+
+      - uid: portalcmj-postgres-cache-hit
+        title: Cache hit baixo no Postgres
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 1800, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: >-
+                sum(increase(pg_stat_database_blks_hit{datname="cmj"}[30m]))
+                / (sum(increase(pg_stat_database_blks_hit{datname="cmj"}[30m]))
+                + sum(increase(pg_stat_database_blks_read{datname="cmj"}[30m])))
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: lt, params: [0.95] } }]
+              refId: C
+        for: 30m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: medio }
+        annotations:
+          summary: Menos de 95% dos blocos lidos pelo Postgres estão no cache.
+          description: As consultas estão indo ao disco. Veja no dashboard do Postgres as consultas e os índices que mais leem do disco, e o shared_buffers.
+
+      - uid: portalcmj-postgres-wraparound
+        title: Wraparound de transações no Postgres
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange: { from: 600, to: 0 }
+            datasourceUid: prometheus
+            model:
+              expr: max(pg_database_wraparound_age_datfrozenxid{datname="cmj"})
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              type: threshold
+              expression: A
+              conditions: [{ evaluator: { type: gt, params: [1000000000] } }]
+              refId: C
+        for: 10m
+        noDataState: OK
+        execErrState: Error
+        labels: { severidade: alto }
+        annotations:
+          summary: A idade do datfrozenxid do banco cmj passou de 1 bilhão de transações.
+          description: O autovacuum não está congelando as tabelas. Perto de 2 bilhões o Postgres para de aceitar escritas. Rode VACUUM (FREEZE) nas tabelas mais antigas.
+
       - uid: portalcmj-celery-fila
         title: Fila do Celery acumulando
         condition: C

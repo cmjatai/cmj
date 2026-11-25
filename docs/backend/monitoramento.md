@@ -19,7 +19,7 @@ O que é coletado:
 | `nginx` | `/nginx_status` do nginx de cada container, via `nginx-exporter-blue/green` |
 | `node` | node-exporter: CPU, memória, disco e carga do servidor |
 | `cadvisor` | consumo de cada container |
-| `postgres` | postgres-exporter com `pg_stat_statements` |
+| `postgres` | postgres-exporter com `pg_stat_statements` e coletores extras (seção Postgres) |
 | `redis` | redis-exporter |
 | `celery` | celery-exporter, que lê os eventos de tarefa no broker |
 | `solr` | `solr-exporter` da imagem do Solr 9.5, pelo ZooKeeper embutido |
@@ -92,6 +92,54 @@ O compose da produção não sobe sem o `docker/.env`: faltam `GRAFANA_ADMIN_PAS
    `django` da cor parada fica sempre fora do ar; o painel "Cores da aplicação no ar" mostra 1
    fora de um deploy.
 
+### Postgres
+
+Além dos coletores padrão, o `postgres-exporter` liga em `docker/docker-compose-monitoring.yaml`:
+
+| Coletor | Para quê |
+| --- | --- |
+| `stat_statements` com `include_query` | tempo, chamadas e linhas por consulta, com o texto (até 300 caracteres) |
+| `stat_checkpointer` | checkpoints e buffers escritos; no PG 17+ saíram de `pg_stat_bgwriter` |
+| `database_wraparound` | idade do `datfrozenxid` e do `datminmxid` |
+| `statio_user_indexes` | blocos de cada índice lidos do cache e do disco |
+| `stat_activity_autovacuum` | tabelas com autovacuum em andamento |
+| `postmaster` | horário do último início do Postgres |
+
+O texto das consultas vem normalizado pelo `pg_stat_statements` (constantes viram `$1`), então não
+leva dados do banco para o Prometheus. Isso vale para `SELECT`, `INSERT`, `UPDATE` e `DELETE`, mas
+não para todo comando utilitário: um `CREATE ROLE ... PASSWORD '...'` poderia ir com a senha. Por
+isso o Postgres roda com `pg_stat_statements.track_utility=off`, que também evita que DDL de
+restore e migrations ocupe as vagas das consultas. O exporter envia só as 100 consultas de maior tempo
+acumulado. O `extend.query-path` (consultas próprias em `queries.yaml`) não é usado: está
+deprecated no exporter.
+
+O Postgres roda com `track_io_timing=on` (no `command` dos três composes), que preenche os tempos de
+leitura e escrita de bloco do `pg_stat_statements` e do `pg_stat_database`. Sem ele, esses painéis
+ficam em zero.
+
+Na produção, as duas configurações valem sem reiniciar o banco, antes de recriar o
+`postgres-exporter` com o `include_query` (como superusuário, no banco `cmj`):
+
+```sql
+ALTER SYSTEM SET track_io_timing = on;
+ALTER SYSTEM SET pg_stat_statements.track_utility = off;
+SELECT pg_reload_conf();
+SHOW track_io_timing;
+SHOW pg_stat_statements.track_utility;
+-- apaga o que já foi registrado, inclusive comandos utilitários (zera o histórico das consultas)
+SELECT pg_stat_statements_reset();
+```
+
+O `command` do compose vale na próxima recriação do container e tem prioridade sobre o
+`postgresql.auto.conf` gravado pelo `ALTER SYSTEM`.
+
+O dashboard `PortalCMJ – Postgres` (`portalcmj-postgres.json`, gerado por
+`docker/grafana/geradores/portalcmj_postgres.py`: altere o script e rode-o, sem editar o JSON) reúne saúde, atividade (conexões,
+transações longas, locks), as consultas que mais consumiram tempo, as maiores tabelas com vacuum e
+seq scans, os índices que mais leem do disco e checkpoints. O `postgres.json` da comunidade fica
+como foi baixado; o painel "Buffers" dele está vazio, porque usa nomes de métrica anteriores ao
+sufixo `_total` e colunas que o PG 18 não tem mais.
+
 Os dashboards provisionados ficam na pasta PortalCMJ do Grafana e não aceitam edição pela
 interface: para mudar, exporte o JSON e substitua o arquivo em `docker/grafana/dashboards/`.
 
@@ -108,10 +156,15 @@ um alerta ativo é lembrado a cada 4 horas, e outra mensagem avisa quando normal
 | Disco quase cheio | menos de 15% livre num sistema de arquivos há 10 min | crítico |
 | Serviço fora | exporter, Redis ou Postgres sem responder há 5 min | alto |
 | Conexões do Postgres | acima de 80% de `max_connections` há 5 min | alto |
+| Transação ociosa aberta no Postgres | conexão `idle in transaction` há mais de 5 min, por 5 min | alto |
+| Wraparound de transações no Postgres | idade do `datfrozenxid` acima de 1 bilhão há 10 min | alto |
 | Fila do Celery acumulando | mais de 200 tarefas numa fila há 15 min | alto |
 | Worker do Celery fora | um worker sem responder há 5 min | alto |
 | Lentidão | p95 acima de 3 s há 10 min (com tráfego acima de 0,1 req/s) | médio |
 | Memória do servidor | acima de 90% há 10 min | médio |
+| Transação longa no Postgres | transação em execução há mais de 30 min, por 5 min (inclui autovacuum) | médio |
+| Deadlocks no Postgres | algum deadlock nos últimos 15 min | médio |
+| Cache hit baixo no Postgres | menos de 95% dos blocos lidos no cache, em 30 min, por 30 min | médio |
 
 O destino é escolhido por `GRAFANA_CONTATO` no `docker/.env`, que monta um dos arquivos de
 `docker/grafana/contatos/`:

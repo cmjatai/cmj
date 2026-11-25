@@ -93,11 +93,20 @@ services:
       - cmj-net
 
   # Usuário só com pg_monitor (ver docs/backend/monitoramento.md).
+  # include_query: texto normalizado do pg_stat_statements (constantes viram $1);
+  # o Postgres roda com pg_stat_statements.track_utility=off (ver a documentação).
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.21.1
     restart: ${MONITORING_RESTART:-always}
     command:
       - --collector.stat_statements
+      - --collector.stat_statements.include_query
+      - --collector.stat_statements.query_length=300
+      - --collector.stat_checkpointer
+      - --collector.database_wraparound
+      - --collector.statio_user_indexes
+      - --collector.stat_activity_autovacuum
+      - --collector.postmaster
     environment:
       DATA_SOURCE_NAME: ${PG_EXPORTER_DSN:?defina PG_EXPORTER_DSN no docker/.env}
     networks:
