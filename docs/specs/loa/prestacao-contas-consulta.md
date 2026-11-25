@@ -200,8 +200,8 @@ na LOA 2026 (497 itens): resumo, 9 a 14 consultas ao banco; dashboard, 11; pági
   pontos que definem a sequência continuavam pelo id, a ordem de cadastro. (executado) Os 290
   ajustes da base têm número e ano, sem pares repetidos; a numeração foi atribuída por exercício e
   por ofício de ajuste, de modo que em 2026 as duas ordens coincidem e em 2023, 2024 e 2025 os
-  ajustes passam a sair agrupados por ofício. Evidência: `cmj/loa/models/m_ajusteloa.py:179-180`,
-  `cmj/api/forms.py:144-150`, `cmj/loa/services/s_prestacaoconta.py:573-576`.
+  ajustes passam a sair agrupados por ofício. Evidência: `cmj/loa/models/m_ajusteloa.py:180-181`,
+  `cmj/api/forms.py:147-153`, `cmj/loa/services/s_prestacaoconta.py:573-576`.
 
 ### Opções dos filtros
 
@@ -225,7 +225,7 @@ na LOA 2026 (497 itens): resumo, 9 a 14 consultas ao banco; dashboard, 11; pági
   2026-11-23, com o plano de levar o relatório ao serviço. O texto dos registros contábeis vem de
   uma view do banco que não existe nos testes: esse trecho foi conferido só na base de
   desenvolvimento. Evidência: `cmj/loa/services/s_prestacaoconta.py:670-803`,
-  `cmj/loa/views/v_loa.py:931-972`.
+  `cmj/loa/views/v_loa.py:588-629`.
 
 ### Rotas de emendas e de ajustes
 

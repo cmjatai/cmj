@@ -79,16 +79,16 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   Operador da LOA podem escolher essa fase: nenhuma lista de transições de autor ou editor chega a 20.
 - LOA-FASE-055 [implementado] Emenda já na fase 20 ou superior só é movimentada por superusuário ou
   Operador da LOA. A tela bloqueia os demais ao abrir a edição acima de 17
-  (`cmj/loa/views/v_emendaloa.py:1085-1093`), e o PATCH e o formulário recusam a transição.
+  (`cmj/loa/views/v_emendaloa.py:1087-1095`), e o PATCH e o formulário recusam a transição.
 - LOA-FASE-062 [implementado] O superusuário usa a mesma tela de edição do autor, sem limitação das fases
-  no select. Evidência: `cmj/loa/forms/f_emendaloa.py:486-548`, `cmj/loa/views/v_emendaloa.py:1025-1039`.
+  no select. Evidência: `cmj/loa/forms/f_emendaloa.py:486-548`, `cmj/loa/views/v_emendaloa.py:1027-1041`.
 - LOA-FASE-063 [implementado] O editor contábil pode devolver para a fase 10, pelo botão "Devolver para
-  correção", emendas nas fases 15 ou 17. Evidência: `cmj/loa/views/v_emendaloa.py:1043-1067`.
+  correção", emendas nas fases 15 ou 17. Evidência: `cmj/loa/views/v_emendaloa.py:1045-1069`.
 - LOA-FASE-069 [implementado] Os botões "Concluir edição contábil" (→ 17) e "Devolver para correção"
   (→ 10) só agem sobre emendas nas fases 15 e 17, para qualquer usuário, inclusive o Operador da LOA e
   o superusuário. Em outra fase, o servidor recusa a ação com erro no formulário e mantém a fase.
   Evidência: `FASES_DOS_BOTOES_CONTABEIS` (`cmj/loa/models/m_emendaloa.py:123`),
-  `cmj/loa/views/v_emendaloa.py:1043-1067`. Decidido em D13.
+  `cmj/loa/views/v_emendaloa.py:1045-1069`. Decidido em D13.
 - LOA-FASE-065 [implementado] O Operador da LOA acessa e edita a emenda em qualquer fase, vê todas as
   fases no select e pode fazer as transições disponíveis nele. O acesso é identificado pelas permissões
   `add_emendaloa`, `change_emendaloa` e `emendaloa_full_editor` (`EmendaLoa.edita_em_qualquer_fase`).
@@ -97,7 +97,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   `cmj/globalrules/map_rules.py:241-250`.
 - LOA-FASE-066 [implementado] A captura automática de 12 para 15 ao abrir a edição vale só para o editor
   contábil. O superusuário abre a emenda sem mudar a fase e só a altera manualmente no formulário.
-  Evidência: `cmj/loa/views/v_emendaloa.py:1072-1082`.
+  Evidência: `cmj/loa/views/v_emendaloa.py:1074-1084`.
 
 ### Emenda coletiva
 
@@ -130,7 +130,7 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   após o `save()`. O detalhe da emenda mostra o usuário ao superusuário. Evidência:
   `cmj/loa/models/m_emendaloa.py:1017-1026`, `cmj/loa/signals.py:23-38`,
   `cmj/api/loa/views/emendaloa.py:100-129`, `cmj/loa/forms/f_emendaloa.py:649`,
-  `cmj/loa/views/v_emendaloa.py:1081`, `cmj/loa/models/m_agrupamento.py:345-410`,
+  `cmj/loa/views/v_emendaloa.py:1083`, `cmj/loa/models/m_agrupamento.py:345-410`,
   `cmj/api/loa/views/agrupamentoemendaloa.py:125`, `cmj/loa/forms/f_agrupamento.py:320-326`,
   `sapl/materia/forms.py:3422`.
 
@@ -165,10 +165,10 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 | ID | De | Para | Gatilho | Quem | Evidência |
 | --- | --- | --- | --- | --- | --- |
 | LOA-FASE-010 [observado] | 10, 12 | 10, 12 | Campo `fase` no formulário, com autosave por PATCH | Quem não tem `add_emendaloa` nem é editor contábil | `cmj/loa/forms/f_emendaloa.py:486-498`, `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:480-491` |
-| LOA-FASE-011 [implementado] | 12 | 15 | Abrir a tela de edição (GET) | Editor contábil (ver LOA-FASE-066) | `cmj/loa/views/v_emendaloa.py:1072-1082` |
+| LOA-FASE-011 [implementado] | 12 | 15 | Abrir a tela de edição (GET) | Editor contábil (ver LOA-FASE-066) | `cmj/loa/views/v_emendaloa.py:1074-1084` |
 | LOA-FASE-012 [observado] | Qualquer | 15, 17 | Campo `fase` no formulário | Editor contábil sem `add_emendaloa` e não superusuário | `cmj/loa/forms/f_emendaloa.py:285-288`, `cmj/loa/forms/f_emendaloa.py:486`, `cmj/loa/forms/f_emendaloa.py:546-548` |
-| LOA-FASE-013 [observado] | 15, 17 (LOA-FASE-069) | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1043-1064` |
-| LOA-FASE-014 [observado] | 15, 17 (LOA-FASE-069) | 10 | Botão "Devolver para correção" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1043-1064` |
+| LOA-FASE-013 [observado] | 15, 17 (LOA-FASE-069) | 17 | Botão "Concluir edição contábil" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1045-1066` |
+| LOA-FASE-014 [observado] | 15, 17 (LOA-FASE-069) | 10 | Botão "Devolver para correção" | `emendaloa_full_editor` | `cmj/loa/views/v_emendaloa.py:1045-1066` |
 | LOA-FASE-015 [observado] | Busca: menor que 17; o servidor aceita 12 e 15 (LOA-FASE-059) | 15 | Adicionar ao agrupamento; o servidor define a fase e ignora o `emendaloa__fase` que a tela ainda envia (LOA-FASE-060) | `emendaloa_full_editor` | `cmj/api/loa/views/emendaloa.py:350`, `cmj/api/loa/views/agrupamentoemendaloa.py:18-19`, `cmj/api/loa/views/agrupamentoemendaloa.py:116-126`, `_frontend/v2018/src/__apps/loa/agrupamento/AgrupamentoUpdate.js:458-467` |
 | LOA-FASE-016 [observado] | Entre 1 e 16, recusado se alguma estiver na 10 (LOA-AGR-082) | 17 | "Liberar para Protocolo" (salvar o formulário do agrupamento), incluindo as coletivas geradas | Formulário de agrupamento | `cmj/loa/forms/f_agrupamento.py:317-327` |
 | LOA-FASE-017 [observado] | Emenda de origem | -10 | Gerar emenda coletiva | `emendaloa_full_editor` | `cmj/loa/models/m_agrupamento.py:407-411`, `cmj/api/loa/views/agrupamento.py:15-17`, `cmj/api/loa/views/agrupamento.py:96-102` |
@@ -186,10 +186,10 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
 ### Edição
 
 - LOA-FASE-030 [observado] Na tela, operador de autor sem as permissões de LOA-FASE-065 não envia POST quando a fase é
-  maior que 12 e diferente de 17. Evidência: `cmj/loa/views/v_emendaloa.py:1027-1041`.
+  maior que 12 e diferente de 17. Evidência: `cmj/loa/views/v_emendaloa.py:1029-1043`.
 - LOA-FASE-031 [observado] Fora do caso do editor contábil nas fases 12 a 17 e de quem tem as
   permissões de LOA-FASE-065, o GET da edição bloqueia não superusuários em fase maior que 17, usuários de outro autor e a fase 15. Evidência:
-  `cmj/loa/views/v_emendaloa.py:1069-1114`.
+  `cmj/loa/views/v_emendaloa.py:1071-1116`.
 - LOA-FASE-032 [observado] Para quem não tem `add_emendaloa` nem é editor contábil, fase maior que 12
   limita ao valor atual no formulário `tipo`, `fase`, `unidade`, `entidade`, `permite_juncao_coletiva`
   e `bairro`, e deixa somente leitura `prefixo_indicacao` e `prefixo_finalidade` (LOA-EMD-080).
@@ -213,8 +213,9 @@ Evidência: `cmj/loa/models/m_emendaloa.py:75-105`.
   `cmj/loa/tasks.py:26-32`.
 - LOA-FASE-042 [observado] Emenda na fase -10 não pode ser removida do agrupamento. Evidência:
   `cmj/api/loa/views/agrupamentoemendaloa.py:42-45`.
-- LOA-FASE-043 [observado] O total de impedimentos do parlamentar considera emendas que já passaram
-  pelas fases 40 ou 50, com base no histórico. Evidência: `cmj/loa/views/v_loa.py:525-537`.
+- LOA-FASE-043 [retirada] O total de impedimentos do parlamentar considerava emendas que já
+  passaram pelas fases 40 ou 50, com base no histórico. Substituída por LOA-CRUD-043
+  (`docs/specs/loa/crud-loa.md`).
 - LOA-FASE-044 [observado] Emenda em impedimento técnico, mesmo sem ajuste, também tem valor computado
   zero. Evidência: `cmj/loa/models/m_emendaloa.py:637-647`.
 
@@ -228,7 +229,7 @@ Problemas vistos ao escrever os testes, fora das regras desta spec. Não bloquei
 
 - P1. **`RegistroAjusteLoa` novo não salva com `save()` padrão.** `CmjSearchMixin.save()` chama
   `hook_emendaloa__search`, que lê o M2M `emendaloa` antes de existir `pk` e lança `ValueError`
-  (`cmj/mixins.py:406-421`, `cmj/loa/models/m_ajusteloa.py:200-202`). O teste de LOA-FASE-061 contorna
+  (`cmj/mixins.py:406-421`, `cmj/loa/models/m_ajusteloa.py:201-203`). O teste de LOA-FASE-061 contorna
   com `save(auto_update_search=False)`. Falta verificar se a tela de cadastro passa pelo mesmo erro.
 - P2. **A incorporação que leva a fase a 20 (LOA-FASE-054) não tem teste.** O fluxo de
   `ConfirmarProposicaoForm` exige proposição e protocolo completos. Pelo mesmo motivo, o registro do

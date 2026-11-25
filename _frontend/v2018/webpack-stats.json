@@ -1223,15 +1223,15 @@
       "path": "js/npm.jquery-ui.61452a34.js.gz",
       "publicPath": "/static/v2018/js/npm.jquery-ui.61452a34.js.gz"
     },
-    "js/npm.jquery.47e488a9.js": {
-      "name": "js/npm.jquery.47e488a9.js",
-      "path": "js/npm.jquery.47e488a9.js",
-      "publicPath": "/static/v2018/js/npm.jquery.47e488a9.js"
+    "js/npm.jquery.4dc824d5.js": {
+      "name": "js/npm.jquery.4dc824d5.js",
+      "path": "js/npm.jquery.4dc824d5.js",
+      "publicPath": "/static/v2018/js/npm.jquery.4dc824d5.js"
     },
-    "js/npm.jquery.47e488a9.js.gz": {
-      "name": "js/npm.jquery.47e488a9.js.gz",
-      "path": "js/npm.jquery.47e488a9.js.gz",
-      "publicPath": "/static/v2018/js/npm.jquery.47e488a9.js.gz"
+    "js/npm.jquery.4dc824d5.js.gz": {
+      "name": "js/npm.jquery.4dc824d5.js.gz",
+      "path": "js/npm.jquery.4dc824d5.js.gz",
+      "publicPath": "/static/v2018/js/npm.jquery.4dc824d5.js.gz"
     },
     "js/npm.js-yaml.32a0289f.js": {
       "name": "js/npm.js-yaml.32a0289f.js",
@@ -2185,7 +2185,7 @@
     "app": [
       "js/runtime.629637bc.js",
       "js/npm.core-js.8682c6b2.js",
-      "js/npm.jquery.47e488a9.js",
+      "js/npm.jquery.4dc824d5.js",
       "js/npm.lodash.430ce3b2.js",
       "js/npm.axios.6498c37f.js",
       "js/npm.popper.js.64c1300a.js",
@@ -2216,7 +2216,7 @@
     "compilacao": [
       "js/runtime.629637bc.js",
       "js/npm.core-js.8682c6b2.js",
-      "js/npm.jquery.47e488a9.js",
+      "js/npm.jquery.4dc824d5.js",
       "js/npm.lodash.430ce3b2.js",
       "js/npm.popper.js.64c1300a.js",
       "js/npm.jquery-ui.61452a34.js",
@@ -2229,7 +2229,7 @@
     "construct": [
       "js/runtime.629637bc.js",
       "js/npm.core-js.8682c6b2.js",
-      "js/npm.jquery.47e488a9.js",
+      "js/npm.jquery.4dc824d5.js",
       "js/npm.lodash.430ce3b2.js",
       "js/npm.axios.6498c37f.js",
       "js/npm.popper.js.64c1300a.js",
@@ -2251,14 +2251,14 @@
     ],
     "libsuserauth": [
       "js/runtime.629637bc.js",
-      "js/npm.jquery.47e488a9.js",
+      "js/npm.jquery.4dc824d5.js",
       "js/npm.tinymce.b45e24eb.js",
       "js/libsuserauth.5573198a.js"
     ],
     "loa": [
       "js/runtime.629637bc.js",
       "js/npm.core-js.8682c6b2.js",
-      "js/npm.jquery.47e488a9.js",
+      "js/npm.jquery.4dc824d5.js",
       "js/npm.lodash.430ce3b2.js",
       "js/npm.axios.6498c37f.js",
       "js/774.621fe9bb.js",

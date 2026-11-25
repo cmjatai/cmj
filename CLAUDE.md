@@ -274,6 +274,9 @@ real: só mexa nele quando a tarefa pedir, e leia `docs/frontend/v8.md` antes.
   autosave. Leia antes de alterar essas telas.
 - `docs/specs/loa/edicao-agrupamento.md`: tela de edição do agrupamento, registros contábeis,
   emendas coletivas e autosave. Leia antes de alterar essa tela.
+- `docs/specs/loa/crud-loa.md`: `LoaCrud` (lista, formulário, exclusão e detalhe da LOA), os três
+  resumos do detalhe (por parlamentar, unidade e entidade) e `LoaService.update_disponibilidades`.
+  Leia antes de alterar essas telas ou esses cálculos.
 - `docs/specs/loa/listagem-emendas.md`: listagem das emendas da LOA, filtros, cache do cartão, PDF da
   listagem e dependências do v2018. Leia antes de alterar essa tela.
 - `docs/specs/loa/prestacao-contas-tela.md`: lado Django de `/loa/<pk>/prestacaoconta`: rota, gate do

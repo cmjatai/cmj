@@ -34,14 +34,17 @@ class EntidadeFilterSet(CmjFilterSetMixin):
         model = Entidade
 
     def filter_loa(self, queryset, name, value):
+        # LOA-PCL-083: a emenda transformada em coletiva (fase -10) não conta
         return (
-            queryset.filter(emendaloa_set__loa=value)
+            queryset.filter(emendaloa_set__loa=value, emendaloa_set__fase__gt=0)
             .union(queryset.filter(registroajusteloa_set__oficio_ajuste_loa__loa=value))
             .order_by("nome_fantasia")
         )
 
     def filter_emendaloa_set__loa(self, queryset, name, value):
-        return queryset.filter(emendaloa_set__loa=value).distinct()
+        return queryset.filter(
+            emendaloa_set__loa=value, emendaloa_set__fase__gt=0
+        ).distinct()
 
     def filter_search(self, queryset, name, value):
         query = value.split(" ")

@@ -57,14 +57,14 @@ mesma view, entram só no que afeta esta tela.
   `cmj/loa/models/m_emendaloa.py:35-39`; SQL com `"fase" > 0 AND "loa_id" = 1` (executado).
 - LOA-LST-005 [implementado] Para usuário anônimo, LOA não publicada responde 404 (LOA-LST-003), e a
   lista só traz emendas de LOA com `publicado=True`. Evidência: `cmj/loa/views/v_emendaloa.py:243-252`,
-  `cmj/loa/views/v_emendaloa.py:941-943`, `cmj/loa/services/s_emendaloa.py:250-284`. Teste:
+  `cmj/loa/views/v_emendaloa.py:943-945`, `cmj/loa/services/s_emendaloa.py:250-284`. Teste:
   `test_anonimo_recebe_404_em_loa_nao_publicada`, para a lista, `?pdf`, `?zip` e `?registrar`.
 - LOA-LST-006 [implementado] Em LOA publicada, qualquer usuário vê as emendas de todas as fases e de
   todos os autores. Em LOA não publicada, a conta comum recebe 404; o operador de autor vê todas se
   a matéria da LOA ainda não virou norma, e recebe 404 se já virou; quem tem
   `loa.emendaloa_full_editor`, e portanto o superusuário, vê todas. É a mesma regra da lista de
   LOAs, concentrada em `EmendaLoa.service.loas_visiveis`. Evidência:
-  `cmj/loa/views/v_emendaloa.py:941-943`, `cmj/loa/services/s_emendaloa.py:250-284`,
+  `cmj/loa/views/v_emendaloa.py:943-945`, `cmj/loa/services/s_emendaloa.py:250-284`,
   `cmj/loa/views/v_loa.py:126-143`. Testes: `test_conta_comum_recebe_404_em_loa_nao_publicada`,
   `test_operador_e_contabilidade_veem_loa_nao_publicada`,
   `test_operador_recebe_404_em_loa_nao_publicada_cuja_materia_virou_norma`,
@@ -90,7 +90,7 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-007 [observado] A ordem da tela é `tipo` decrescente (Áreas Diversas 99, Saúde 10,
   Modificativa 0), depois `fase` crescente, número da matéria crescente e `id` decrescente. Não há
   ordenação pelo usuário (`ordered_list` é `False`). Evidência:
-  `cmj/loa/views/v_emendaloa.py:943`, `cmj/loa/views/v_emendaloa.py:97-99`,
+  `cmj/loa/views/v_emendaloa.py:945`, `cmj/loa/views/v_emendaloa.py:97-99`,
   `cmj/loa/models/m_emendaloa.py:62-69`.
 - LOA-LST-008 [observado] A lista é paginada de 10 em 10 e os links de página repetem os parâmetros
   de filtro da URL. Evidência: `sapl/crud/base.py:441`, `sapl/crud/base.py:595-598`,
@@ -105,7 +105,7 @@ mesma view, entram só no que afeta esta tela.
   `_templates/v2018/loa/emendaloa_filter.html:43-54`.
 - LOA-LST-010 [observado] O título da tela é "Emendas Impositivas/Modificativas à LOA <ano>" seguido
   da epígrafe curta da matéria da LOA, quando existe. O título padrão do CRUD é removido do contexto.
-  Evidência: `cmj/loa/views/v_emendaloa.py:238-241`, `cmj/loa/views/v_emendaloa.py:950`,
+  Evidência: `cmj/loa/views/v_emendaloa.py:238-241`, `cmj/loa/views/v_emendaloa.py:952`,
   `_templates/v2018/base.html:75-77`.
 - LOA-LST-011 [observado] O template usado é `loa/emendaloa_filter.html`, pelo sufixo `_filter` do
   `FilterView`, que vem antes do CRUD na herança. Evidência: `cmj/loa/views/v_emendaloa.py:162`;
@@ -114,8 +114,8 @@ mesma view, entram só no que afeta esta tela.
   "Emendas em Elaboração", conforme a LOA tenha ou não norma) e por links do resumo da LOA que já
   trazem `?unidade=`, `?entidade=` e `?parlamentares=`. Evidência: `_templates/v2018/loa/subnav.yaml:8-9`,
   `_templates/v2018/loa/subnav_loa_em_tramitacao.yaml:4-5`, `cmj/loa/views/v_mixins.py:23-35`,
-  `_templates/v2018/loa/emendaloa_totalize_unidade.html:22`,
-  `_templates/v2018/loa/emendaloa_totalize_unidade.html:39`,
+  `_templates/v2018/loa/emendaloa_totalize_unidade.html:24`,
+  `_templates/v2018/loa/emendaloa_totalize_unidade.html:43`,
   `_templates/v2018/loa/emendaloa_totalize_entidade.html:23`,
   `_templates/v2018/loa/emendaloa_totalize_entidade.html:40`.
 
@@ -124,7 +124,7 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-013 [observado] O botão "OpenAPI" leva à listagem da API `/api/loa/emendaloa/`, que usa
   outro filterset (`cmj/api/forms.py`), não o desta tela. Evidência:
   `_templates/v2018/loa/emendaloa_filter.html:5-12`, `cmj/api/loa/views/emendaloa.py:14`,
-  `cmj/api/forms.py:58`.
+  `cmj/api/forms.py:61`.
 - LOA-LST-014 [observado] O botão "Adicionar" aparece para quem tem a permissão de inclusão e também
   para superusuário ou operador de autor sem ela. Evidência: `cmj/loa/views/v_emendaloa.py:101-113`,
   `_templates/v2018/crud/list.html:31-35`; ausente para anônimo e usuário comum, presente para
@@ -236,9 +236,11 @@ mesma view, entram só no que afeta esta tela.
   atual geraria (por exemplo, sem "acrescenta-se" e "caput" na emenda 366). Mantido assim por
   decisão em 2026-11-20. Evidência: `cmj/loa/models/m_emendaloa.py:375-399`,
   `cmj/mixins.py:406-442`.
-- LOA-LST-030 [observado] `entidade` oferece as entidades ativas usadas em emendas da LOA e `unidade`
-  as unidades orçamentárias usadas em emendas da LOA; cada um filtra por igualdade. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:790-815`, `cmj/loa/forms/f_emendaloa.py:1092-1103`.
+- LOA-LST-030 [implementado] `entidade` oferece as entidades ativas usadas em emendas da LOA e
+  `unidade` as unidades orçamentárias usadas em emendas da LOA; cada um filtra por igualdade. A
+  emenda transformada em coletiva (fase -10) não conta (LOA-CRUD-065). Evidência:
+  `cmj/loa/forms/f_emendaloa.py:790-815`, `cmj/loa/forms/f_emendaloa.py:1092-1109`. Teste:
+  `test_filtro_nao_oferece_entidade_nem_unidade_so_da_emenda_transformada_em_coletiva`.
 - LOA-LST-031 [observado] Existe o filtro `indicacao`, por igualdade exata, que não aparece no
   formulário e só é alcançado pela URL. Evidência: `cmj/loa/forms/f_emendaloa.py:872-884`,
   `cmj/loa/forms/f_emendaloa.py:1006-1068`; `indicacao: CharFilter:exact` (executado).
@@ -431,7 +433,7 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-051 [observado] Sem `agrupamento`, o PDF tem uma tabela única com as colunas "Emendas" e
   "Valores", ordenada pelo número da matéria, com "Soma das Emendas" e "Total" iguais à soma de
   `valor` das emendas filtradas. Evidência: `cmj/loa/views/v_emendaloa.py:581-628`,
-  `cmj/loa/views/v_emendaloa.py:932`, `_templates/v2018/loa/pdf/emendaloa_list.html:66-81`,
+  `cmj/loa/views/v_emendaloa.py:934`, `_templates/v2018/loa/pdf/emendaloa_list.html:66-81`,
   `_templates/v2018/loa/pdf/emendaloa_list.html:104-108`; 7 emendas da fase 40, total 108.369,25,
   igual à soma no banco (executado).
 
@@ -506,11 +508,14 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-061 [implementado] Nas vias de inserção e de dedução, cada grupo mostra "Orçamento
   Original" (soma de `valor_materia` das despesas da LOA no grupo), "Movimentação Geral" (soma dos
   registros contábeis de todas as emendas da LOA no grupo, sem os filtros da tela) e "Saldo" (a soma
-  dos dois), com nota de rodapé explicando que não seguem os filtros. Na via do valor da emenda esses
-  valores não são exibidos nem calculados. Evidência: `cmj/loa/views/v_emendaloa.py:863-905`,
+  dos dois), com nota de rodapé explicando que não seguem os filtros. A Movimentação Geral não soma
+  os registros da emenda transformada em coletiva (fase -10), que ela mantém e que a coletiva
+  repete (LOA-CRUD-065). Na via do valor da emenda esses
+  valores não são exibidos nem calculados. Evidência: `cmj/loa/views/v_emendaloa.py:863-907`,
   `_templates/v2018/loa/pdf/emendaloa_list.html:44-48`,
-  `_templates/v2018/loa/pdf/emendaloa_list.html:90-103`. Teste:
-  `test_orcamento_do_grupo_so_e_calculado_nas_vias_com_registro`; na LOA 2026, fase 40 por unidade,
+  `_templates/v2018/loa/pdf/emendaloa_list.html:90-103`. Testes:
+  `test_orcamento_do_grupo_so_e_calculado_nas_vias_com_registro`,
+  `test_movimentacao_geral_nao_soma_os_registros_da_emenda_transformada_em_coletiva`; na LOA 2026, fase 40 por unidade,
   a via do valor da emenda não fez nenhuma dessas consultas e a de inserção fez 6, duas por grupo,
   com o mesmo total de 108.369,25 (executado).
 - LOA-LST-062 [implementado] Com totalização, o "Total" final é a soma dos valores das emendas
@@ -519,7 +524,7 @@ mesma view, entram só no que afeta esta tela.
   que apareça em mais de um agrupamento". Emendas sem registro contábil não aparecem nas vias de
   inserção e de dedução, e por isso também não entram no total delas. Evidência:
   `cmj/loa/views/v_emendaloa.py:768`, `cmj/loa/views/v_emendaloa.py:817-823`,
-  `cmj/loa/views/v_emendaloa.py:932`, `_templates/v2018/loa/pdf/emendaloa_list.html:107-120`. Teste:
+  `cmj/loa/views/v_emendaloa.py:934`, `_templates/v2018/loa/pdf/emendaloa_list.html:107-120`. Teste:
   `test_total_soma_cada_emenda_uma_vez_e_e_positivo`; fase 40 da LOA 2026 por unidade: total de
   108.369,25 nas três vias, igual à soma das emendas (executado). Na base de dev, em todas as emendas
   com registro, as inserções somam o valor da emenda e as deduções somam o valor negativo.
@@ -536,7 +541,7 @@ mesma view, entram só no que afeta esta tela.
   `_frontend/v2018/vue.config.js:67-68`.
 - LOA-LST-065 [observado] O JavaScript da listagem só é ativado se o contêiner da página tiver as
   classes `container-loa` e `emendaloa-list`, que vêm da variável de contexto `path`. Evidência:
-  `cmj/loa/views/v_mixins.py:8-9`, `cmj/loa/views/v_emendaloa.py:947-948`,
+  `cmj/loa/views/v_mixins.py:8-9`, `cmj/loa/views/v_emendaloa.py:949-950`,
   `_templates/v2018/base.html:67`, `_frontend/v2018/src/__apps/loa/main.js:13-17`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaCRUD.js:7-14`; a página veio com
   `class="container emendaloa-list container container-loa container-box"` (executado).

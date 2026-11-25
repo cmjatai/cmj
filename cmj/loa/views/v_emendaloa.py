@@ -896,8 +896,10 @@ class EmendaLoaCrud(MasterDetailCrud):
                                 ]
                             )
                         )
+                        # LOA-LST-061: a emenda transformada em coletiva (fase
+                        # -10) mantém os registros, que a coletiva repete
                         movimentacao_valores = EmendaLoaRegistroContabil.objects.filter(
-                            emendaloa__loa=self.loa, **params
+                            emendaloa__loa=self.loa, emendaloa__fase__gt=0, **params
                         ).order_by(*agrupset).aggregate(Sum("valor")).get(
                             "valor__sum"
                         ) or Decimal(

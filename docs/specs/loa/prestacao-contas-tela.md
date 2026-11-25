@@ -55,14 +55,14 @@ Não foi executado:
   página própria, de painel, e não uma tela de CRUD da LOA; a conferência de acesso é feita pela
   própria view (LOA-PCT-064). Evidência: `cmj/loa/views/v_loa.py:75-79`, `sapl/crud/base.py:1125-1141`.
 - LOA-PCT-003 [observado] A herança é `InfoFilterMixin`, `GoogleRecapthaViewMixin`,
-  `Crud.DetailView`, com `model = Loa`. Evidência: `cmj/loa/views/v_loa.py:875-878`.
+  `Crud.DetailView`, com `model = Loa`. Evidência: `cmj/loa/views/v_loa.py:532-535`.
 - LOA-PCT-004 [observado] `permission_required = ()` torna a view pública: sem permissão exigida,
   `has_permission` devolve `True` para qualquer usuário, inclusive anônimo. Evidência:
-  `cmj/loa/views/v_loa.py:876`, `sapl/crud/base.py:206-213`.
+  `cmj/loa/views/v_loa.py:533`, `sapl/crud/base.py:206-213`.
 - LOA-PCT-005 [observado] Como a view não tem `crud`, `container_field` é `None` e o `dispatch` do
   CRUD não aplica nenhum filtro por dono. Evidência: `sapl/crud/base.py:222-255`.
 - LOA-PCT-006 [observado] A view aceita só `GET`, `HEAD` e `OPTIONS`. `POST` sem `print=True` na
-  query string responde 405 (executado). Evidência: `cmj/loa/views/v_loa.py:875`,
+  query string responde 405 (executado). Evidência: `cmj/loa/views/v_loa.py:532`,
   `cmj/mixins.py:623`.
 - LOA-PCT-007 [implementado] `/loa/atual`, o link "Emendas Impositivas" da barra lateral do portal,
   redireciona para a prestação de contas da LOA de maior ano entre as publicadas que têm ao menos
@@ -70,7 +70,7 @@ Não foi executado:
   seguinte tramita, o link acaba na página de detalhe dela (LOA-PCT-064), com as emendas ainda em
   proposta, e volta à prestação de contas quando ela vira norma. Aceito em 2026-11-23 como o
   comportamento desejado. Na base de desenvolvimento o destino é a LOA 2027 (executado). Evidência:
-  `cmj/loa/views/v_loa.py:48-55`, `_templates/v2018/base_sidebar.html:35-40`.
+  `cmj/loa/views/v_loa.py:47-55`, `_templates/v2018/base_sidebar.html:35-40`.
 - LOA-PCT-008 [observado] O item "Prestação de Contas" do subnav da LOA aponta para esta rota.
   Evidência: `_templates/v2018/loa/subnav.yaml:4-5`.
 
@@ -78,7 +78,7 @@ Não foi executado:
 
 - LOA-PCT-009 [observado] A ordem do `dispatch` é: o da própria view, que confere a LOA
   (LOA-PCT-064); o do reCAPTCHA, que não é acionado sem `print=True`; o do CRUD, que checa a
-  permissão; e por fim o `get`. Evidência: `cmj/loa/views/v_loa.py:904-916`, `cmj/mixins.py:603-623`,
+  permissão; e por fim o `get`. Evidência: `cmj/loa/views/v_loa.py:561-573`, `cmj/mixins.py:603-623`,
   `sapl/crud/base.py:222-255`.
 - LOA-PCT-010 [retirada] Substituída por LOA-PCT-064.
 - LOA-PCT-011 [retirada] Substituída por LOA-PCT-064.
@@ -88,31 +88,31 @@ Não foi executado:
   da lista de LOAs (LOA-LST-006), com anônimo e conta comum vendo só LOA publicada. A LOA visível
   cuja matéria não existe ou não virou norma redireciona para o detalhe da LOA, também nos três;
   na base de desenvolvimento é o caso da LOA 2027 (302 para `/loa/2027`, executado). Assim o gate
-  só aparece para quem vai receber o relatório. Evidência: `cmj/loa/views/v_loa.py:904-916`,
+  só aparece para quem vai receber o relatório. Evidência: `cmj/loa/views/v_loa.py:561-573`,
   `cmj/loa/services/s_visibilidade.py:64-67`.
 - LOA-PCT-013 [observado] Passadas as checagens, o `get` do CRUD busca a LOA de novo pelo `pk` e
   monta o contexto só com `object` e `loa`, sem listagem, porque não há `model_set`. Evidência:
   `sapl/crud/base.py:936-947`, `sapl/crud/base.py:966-994`.
 - LOA-PCT-014 [acordado] O contexto ganha `path = " prestacaoconta-detail"`. As classes
   `container container-loa` e a troca do subnav para `subnav_loa_em_tramitacao.yaml` são de
-  `LoaContextDataMixin`, que esta view não herda. Evidência: `cmj/loa/views/v_loa.py:918-922`,
+  `LoaContextDataMixin`, que esta view não herda. Evidência: `cmj/loa/views/v_loa.py:575-579`,
   `cmj/loa/views/v_mixins.py:6-9`.
 - LOA-PCT-015 [observado] A resposta é 200 com `loa/prestacaoconta_detail.html`, sem cookie novo
-  para anônimo (executado na LOA 2026). Evidência: `cmj/loa/views/v_loa.py:878`.
+  para anônimo (executado na LOA 2026). Evidência: `cmj/loa/views/v_loa.py:535`.
 
 ### reCAPTCHA
 
 - LOA-PCT-016 [observado] O gate é acionado só quando a query string traz `print` com o valor
   exato `True`. `print=true` e `print=False` seguem para a tela normal (executado). Evidência:
-  `cmj/loa/views/v_loa.py:880-881`, `cmj/mixins.py:562-570`.
+  `cmj/loa/views/v_loa.py:537-538`, `cmj/mixins.py:562-570`.
 - LOA-PCT-017 [observado] Fora do modo de desenvolvimento (LOA-PCT-065), `GET` com `print=True` não
   gera o relatório: responde 200 com `crud/gate.html`, que mostra o widget do reCAPTCHA, o título
   "Gerar Relatório de Prestação de Contas das Emendas Impositivas", o botão "Acessar Conteúdo" e o
   link "Retornar" (LOA-PCT-068). Evidência: `cmj/mixins.py:605-612`, `cmj/mixins.py:572-586`,
-  `cmj/loa/views/v_loa.py:882-884`, `_templates/v2018/crud/gate.html:17-48`.
+  `cmj/loa/views/v_loa.py:539-541`, `_templates/v2018/crud/gate.html:17-48`.
 - LOA-PCT-068 [implementado] O link "Retornar" do gate volta à prestação de contas da mesma LOA, com
   os filtros que estavam aplicados: é a URL do pedido sem o `print`. Evidência:
-  `cmj/loa/views/v_loa.py:887-894`, `_templates/v2018/crud/gate.html:40-43`.
+  `cmj/loa/views/v_loa.py:544-551`, `_templates/v2018/crud/gate.html:40-43`.
 - LOA-PCT-065 [implementado] Com `DEBUG` ligado, o que só vale em desenvolvimento, o gate do
   reCAPTCHA é dispensado: `GET` com `print=True` devolve o relatório direto. A conferência da LOA
   (LOA-PCT-064) continua valendo. A dispensa está no `GoogleRecapthaViewMixin` e alcança as outras
@@ -137,7 +137,7 @@ Não foi executado:
   `cmj/ouvidoria/forms.py:154-157`.
 - LOA-PCT-021 [observado] Validado o reCAPTCHA, o `dispatch` chama `print()` e devolve a resposta
   dele. O `get` e a checagem de permissão do CRUD não rodam nesse caminho; a conferência da LOA
-  (LOA-PCT-064) roda antes. Evidência: `cmj/mixins.py:619-622`, `cmj/loa/views/v_loa.py:885`.
+  (LOA-PCT-064) roda antes. Evidência: `cmj/mixins.py:619-622`, `cmj/loa/views/v_loa.py:542`.
 - LOA-PCT-022 [observado] As chaves vêm de `GOOGLE_RECAPTCHA_SITE_KEY` e
   `GOOGLE_RECAPTCHA_SECRET_KEY`, com default vazio. Com a chave secreta vazia a validação depende da
   resposta do Google (não executado). Evidência: `cmj/settings/auth.py:37-40`,
@@ -155,38 +155,38 @@ Não foi executado:
   `REGISTRADO` é a fase 30 (aprovada), `IMPEDIMENTO` a 40, `EM_EXECUCAO` a 60 e `FINALIZADO` a 99.
   Para ajustes, os mesmos nomes levam às fases registrado, impedido, em execução e finalizado do
   ajuste. Nenhum valor reconhecido, ou os quatro juntos, não filtra. Evidência:
-  `cmj/api/forms.py:74-111`, `cmj/api/forms.py:173-209`.
+  `cmj/api/forms.py:77-114`, `cmj/api/forms.py:176-212`.
 - LOA-PCT-029 [observado] O filtro `search` com um único termo numérico busca pelo número da matéria
   (emendas) ou pelo número do registro (ajustes). Nos demais casos exige todos os termos no campo
-  `search` do model, sem acento e sem diferenciar caixa. Evidência: `cmj/api/forms.py:113-128`,
-  `cmj/api/forms.py:155-171`.
+  `search` do model, sem acento e sem diferenciar caixa. Evidência: `cmj/api/forms.py:116-131`,
+  `cmj/api/forms.py:158-174`.
 - LOA-PCT-030 [retirada] Substituída por LOA-PCC-002.
 - LOA-PCT-031 [observado] `tipo__in` aceita os tipos separados por vírgula num parâmetro só, que é a
   forma que o painel envia; repetido (`tipo__in=10&tipo__in=99`), valem todos. Evidência:
-  `cmj/loa/views/v_loa.py:931-941`.
+  `cmj/loa/views/v_loa.py:588-598`.
 - LOA-PCT-032 [retirada] Substituída por LOA-PCT-066.
 
 ### Modo print: contexto e `InfoFilterMixin`
 
 - LOA-PCT-033 [observado] O contexto do relatório tem `emendaloa_list` e `registroajusteloa_list`,
   `loa_title` e `infofilter`. Não tem `object`, e por isso o subnav da LOA não aparece. Evidência:
-  `cmj/loa/views/v_loa.py:964-971`, `cmj/core/templatetags/menus.py:176-185`.
+  `cmj/loa/views/v_loa.py:621-628`, `cmj/core/templatetags/menus.py:176-185`.
 - LOA-PCT-034 [observado] `loa_title` é "Prestação de Contas das Emendas Impositivas", uma quebra de
-  linha e o `str` da LOA da rota (LOA-PCT-070). Evidência: `cmj/loa/views/v_loa.py:967-970`.
+  linha e o `str` da LOA da rota (LOA-PCT-070). Evidência: `cmj/loa/views/v_loa.py:624-627`.
 - LOA-PCT-070 [implementado] No título do relatório, o nome da LOA sai como texto: a única marcação
-  é a quebra de linha entre o título e o nome. Evidência: `cmj/loa/views/v_loa.py:967-970`,
+  é a quebra de linha entre o título e o nome. Evidência: `cmj/loa/views/v_loa.py:624-627`,
   `_templates/v2018/loa/prestacaoconta_print.html:173`.
 - LOA-PCT-035 [observado] `infofilter` é montado com o formulário do filterset das emendas, ou com o
   dos ajustes quando só os ajustes entram (`ajustes=True` sem `tipo__in`), caso em que
   `parlamentares` é lido como `parlamentares_valor`. Com `ajustes=True` o texto ganha "- Registros
   de Ajuste Técnico", e com mais de um exercício, a linha "Exercícios" com os anos. Evidência:
-  `cmj/loa/views/v_loa.py:973-1008`.
+  `cmj/loa/views/v_loa.py:630-665`.
 - LOA-PCT-066 [implementado] O relatório usa a mesma seleção das consultas do painel
   (`PrestacaoContaService`, LOA-PCC-070): os mesmos filtros, lidos da query string da página
   (`situacao`, `unidade`, `entidade`, `parlamentares`, `search`, `tipo__in`, `ajustes` e `loas`), as
   mesmas condições de exercício e a mesma regra de valor. Cobre os exercícios extras selecionados no
   painel. Filtro inválido responde 400 com uma mensagem, e não mais erro 500. Parâmetros que não são
-  filtro, como `print` e `view`, são ignorados. Evidência: `cmj/loa/views/v_loa.py:924-962`.
+  filtro, como `print` e `view`, são ignorados. Evidência: `cmj/loa/views/v_loa.py:581-619`.
 - LOA-PCT-036 [observado] `InfoFilterMixin.infofilter` percorre os dados limpos do formulário e
   ignora os campos vazios, `ordenacao` e `tipo_listagem`. Para cada campo restante gera
   `<strong>rótulo:</strong> valor`, e o valor depende do tipo do campo:
@@ -205,7 +205,7 @@ Não foi executado:
 - LOA-PCT-067 [implementado] No texto dos filtros do relatório, as situações saem com o nome legível
   ("Registrado", "Impedimento", "Em Execução" e "Finalizado"), separadas por vírgula e espaço:
   `situacao=EM_EXECUCAO,REGISTRADO` aparece como "Situação: Em Execução, Registrado". Evidência:
-  `cmj/loa/views/v_loa.py:897-902`, `cmj/loa/views/v_loa.py:976-983`.
+  `cmj/loa/views/v_loa.py:554-559`, `cmj/loa/views/v_loa.py:633-640`.
 - LOA-PCT-038 [observado] O template emite `infofilter` e `loa_title` com `|safe`. Evidência:
   `_templates/v2018/loa/prestacaoconta_print.html:173`,
   `_templates/v2018/loa/prestacaoconta_print.html:186-188`.
@@ -318,7 +318,7 @@ Não foi executado:
 - LOA-PCT-060 [acordado] A página carrega só a entrada `app` do v2018. `crud/list.html` carregaria
   também a entrada indicada em `view.crud.frontend` (`loa`), mas a view não tem `crud`
   (LOA-PCT-002). Evidência: `_templates/v2018/crud/list.html:5-16`,
-  `cmj/loa/views/v_loa.py:41`.
+  `cmj/loa/views/v_loa.py:40`.
 - LOA-PCT-061 [observado] A entrada `app` monta o Vue em `#app`, com roteador em modo `history`. O
   roteador casa a URL do navegador com `/loa/:pkloa(\d+)/prestacaoconta` (`prestacaoconta_route`),
   filha de `/loa/`, e carrega `PrestacaoContaLoaLayout` sob demanda dentro de `LoaLayout`. A mesma

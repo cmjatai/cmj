@@ -4,7 +4,6 @@ from decimal import ROUND_DOWN, Decimal
 import yaml
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.forms.models import ModelForm
 from django.utils.translation import gettext_lazy as _
 
@@ -68,18 +67,13 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
 
         instance = self.instance
 
+        parlamentares = self._parlamentares_para_vincular()
+
         if not instance or not instance.pk or not instance.materia:
-            parlamentares = Parlamentar.objects.filter(ativo=True)
             despesa_default_deducao_saude = Despesa.objects.none()
             despesa_default_deducao_diversos = Despesa.objects.none()
             despesa_default_deducao_educacao = Despesa.objects.none()
         else:
-            ano_materia = instance.materia.ano
-            parlamentares = Parlamentar.objects.filter(
-                Q(ativo=True)
-                | Q(emendaloaparlamentar_set__emendaloa__materia__ano=ano_materia)
-            ).distinct()
-
             despesa_default_deducao_diversos = Despesa.objects.filter(
                 loa=instance, funcao__codigo="99", fonte__codigo__startswith="100"
             ).order_by("fonte__codigo")
@@ -104,6 +98,24 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         self.fields["despesa_default_deducao_saude"].queryset = (
             despesa_default_deducao_saude
         )
+
+    def _parlamentares_para_vincular(self):
+        """LOA-CRUD-020: os que têm mandato na legislatura do projeto ou na do
+        ano da LOA, e os já vinculados. Sem ano ou sem mandato registrado, os
+        ativos do cadastro."""
+        instance = self.instance
+        ano = instance.ano if instance and instance.pk else self.data.get("ano")
+        try:
+            ano = int(ano)
+        except (TypeError, ValueError):
+            ano = None
+
+        ids = Loa.service.parlamentares_elegiveis(ano) if ano else set()
+        if not ids:
+            return Parlamentar.objects.filter(ativo=True)
+        if instance and instance.pk:
+            ids |= set(instance.parlamentares.values_list("id", flat=True))
+        return Parlamentar.objects.filter(id__in=ids)
 
     def clean(self):
         cd = super().clean()

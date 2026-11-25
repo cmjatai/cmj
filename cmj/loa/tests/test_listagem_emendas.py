@@ -1466,3 +1466,66 @@ def test_api_filtra_por_campo_interno_para_quem_o_ve(
     client.force_login(superuser)
 
     assert ids_da_api(client, loa, owner=autor.id) == [segunda.id]
+
+
+# ------------------------------- emenda transformada em coletiva (fase -10)
+
+
+def _transformada_em_coletiva(make_emenda, **kwargs):
+    return make_emenda(fase=EmendaLoa.TRANSFORMADA_EM_COLETIVA, **kwargs)
+
+
+@pytest.mark.spec("LOA-LST-061")
+def test_movimentacao_geral_nao_soma_os_registros_da_emenda_transformada_em_coletiva(
+    client, loa, unidade, make_emenda
+):
+    # a coletiva repete os registros das emendas que a formaram
+    registrar(make_emenda(fase=40, valor=Decimal("10.00")), unidade, "10.00")
+    registrar(
+        _transformada_em_coletiva(make_emenda, valor=Decimal("10.00")),
+        unidade,
+        "10.00",
+    )
+    client.force_login(_make_user("conta_comum_movimentacao_coletiva"))
+
+    contexto = contexto_do_pdf(
+        client, loa, "fase=40&agrupamento=despesa__unidade&tipo_agrupamento=insercao"
+    )
+
+    assert [g["movimentacao_valores"] for g in contexto["groups"]] == ["10,00"]
+
+
+@pytest.mark.spec("LOA-LST-030")
+def test_filtro_nao_oferece_entidade_nem_unidade_so_da_emenda_transformada_em_coletiva(
+    client, loa, unidade, make_emenda
+):
+    so_coletiva = mommy.make(
+        UnidadeOrcamentaria, loa=loa, codigo="02", especificacao="Só coletiva"
+    )
+    entidade = mommy.make(Entidade, nome_fantasia="Só coletiva", ativo=True)
+    make_emenda(fase=40)
+    _transformada_em_coletiva(make_emenda, unidade=so_coletiva, entidade=entidade)
+    client.force_login(_make_user("conta_comum_filtro_coletiva"))
+
+    response = client.get(reverse("cmj.loa:emendaloa_list", kwargs={"pk": loa.pk}))
+    campos = response.context["filter"].form.fields
+
+    assert list(campos["unidade"].queryset) == [unidade]
+    assert list(campos["entidade"].queryset) == []
+
+
+@pytest.mark.spec("LOA-PCL-083")
+def test_entidades_da_loa_na_api_ignoram_a_emenda_transformada_em_coletiva(
+    api, loa, make_emenda
+):
+    com_emenda = mommy.make(Entidade, nome_fantasia="Com emenda", ativo=True)
+    so_coletiva = mommy.make(Entidade, nome_fantasia="Só coletiva", ativo=True)
+    make_emenda(fase=40, entidade=com_emenda)
+    _transformada_em_coletiva(make_emenda, entidade=so_coletiva)
+    cliente = api(_make_user("superuser_entidades_coletiva", is_superuser=True))
+
+    for filtro in ("loa", "emendaloa_set__loa"):
+        resposta = cliente.get(f"/api/loa/entidade/?{filtro}={loa.pk}&get_all=true")
+        assert resposta.status_code == 200, filtro
+        ids = [e["id"] for e in resposta.json()]
+        assert ids == [com_emenda.id], filtro

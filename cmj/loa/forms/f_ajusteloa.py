@@ -74,15 +74,16 @@ class RegistroAjusteLoaForm(ModelForm):
         ),
     )
 
+    # LOA-CRUD-066: o valor do parlamentar no ajuste não é negativo
     parlamentares__valor = SplitArrayField(
         DecimalField(
             required=False,
             max_digits=14,
             decimal_places=2,
+            min_value=Decimal("0.00"),
         ),
         10,
         label="Valores por Parlamentar",
-        help_text="Valores negativos sem seleção de emenda são meramente informativos com a finalidade de concentração em outro item.",
         required=False,
     )
 

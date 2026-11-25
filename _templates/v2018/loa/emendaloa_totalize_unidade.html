@@ -14,7 +14,9 @@
       {% endif %}
       {% if forloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
         <td class="text-left" rowspan="{{ values.parlamentares|length }}">
-          {% if loa.materia.normajuridica %}
+          {% if unidade.0 is None %}
+            Sem unidade orçamentária
+          {% elif tem_norma %}
             <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?unidade={{ unidade.0 }}">
               {{ unidade.1 }}
             </a>
@@ -31,7 +33,9 @@
             {% if forloop.parentloop.counter|divisibleby:2 %}<tr class="tr-odd">{% else %}<tr class="tr-even">{% endif %}
           {% endif %}
             <td class="text-left ">
-              {% if loa.materia.normajuridica %}
+              {% if unidade.0 is None %}
+                <small>{{ parlamentar.nome_parlamentar }}</small>
+              {% elif tem_norma %}
                 <a href="{% url 'cmj.loa:prestacaocontaloa_list' loa.id %}?parlamentares={{ parlamentar.id }}&unidade={{ unidade.0 }}">
                   <small>{{ parlamentar.nome_parlamentar }}</small>
                 </a>

@@ -113,7 +113,11 @@ class EmpenhoCrud(MasterDetailCrud):
             return (
                 qs.filter(
                     Q(empenhoemendaajuste_set__ajuste__oficio_ajuste_loa__loa=self.loa)
-                    | Q(empenhoemendaajuste_set__emendaloa__loa=self.loa)
+                    # a emenda transformada em coletiva (fase -10) não conta
+                    | Q(
+                        empenhoemendaajuste_set__emendaloa__loa=self.loa,
+                        empenhoemendaajuste_set__emendaloa__fase__gt=0,
+                    )
                 )
                 .order_by("-empenhoemendaajuste_set__empenho__codigo", "-codigo")
                 .distinct()

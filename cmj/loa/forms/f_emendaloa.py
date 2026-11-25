@@ -1091,14 +1091,18 @@ class EmendaLoaFilterSet(FilterSet):
             self.form.fields["fase"].choices = EmendaLoa.FASE_CHOICE[1:6]
         self.form.fields["tipo"].choices = EmendaLoa.TIPOEMENDALOA_CHOICE
 
+        # LOA-LST-030: a emenda transformada em coletiva (fase -10) não conta
         self.form.fields["entidade"].queryset = (
-            Entidade.objects.filter(emendaloa_set__loa=self.loa, ativo=True)
+            Entidade.objects.filter(
+                emendaloa_set__loa=self.loa, emendaloa_set__fase__gt=0, ativo=True
+            )
             .order_by("nome_fantasia", "id")
             .distinct()
         )
         self.form.fields["unidade"].queryset = (
             UnidadeOrcamentaria.objects.filter(
                 emendaloa_set__loa=self.loa,
+                emendaloa_set__fase__gt=0,
             )
             .order_by("codigo", "especificacao", "id")
             .distinct()

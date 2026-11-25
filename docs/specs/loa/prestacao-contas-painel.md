@@ -1,13 +1,13 @@
 # LOA: painel de prestação de contas (v2018)
 
-Status: observado
+Status: observado, com uma regra implementada (LOA-PCL-083)
 Última verificação: 2026-11-23 (sobre o `master` `edd6cae51`, depois da revisão da API em `docs/specs/api/`)
 Código principal: `_frontend/v2018/src/modules/loa/pcl/` (o layout `PrestacaoContaLoaLayout`, os
 filtros, os dois cartões, as abas, o dashboard e os helpers),
 `_frontend/v2018/src/components/selects/ModelSelect.vue`,
 `_frontend/v2018/src/resources/index.js`, `_frontend/v2018/src/mixins.js`, `cmj/api/forms.py`,
 `cmj/api/loa/views/`, `cmj/api/loa/serializers/__init__.py`
-Testes: `cmj/loa/tests/test_visibilidade_api.py`,
+Testes: `cmj/loa/tests/test_visibilidade_api.py`, `cmj/loa/tests/test_listagem_emendas.py`,
 `_frontend/v2018/tests/apps/loa/pcl-totalizacao.spec.js`,
 `_frontend/v2018/tests/apps/loa/pcl-filtros.spec.js`,
 `_frontend/v2018/tests/apps/loa/pcl-dashboard.spec.js`,
@@ -482,13 +482,15 @@ Não foi executado:
 - LOA-PCL-082 [observado] No conteúdo da aba Empenhos, o empenho expandido vem com todos os campos,
   entre eles `nome`, `cpfcnpj`, `search` e `metadata` (executado; LOA-PCL-087). Evidência:
   `_frontend/v2018/src/modules/loa/pcl/PclDetalheEmenda.vue:425-429`.
-- LOA-PCL-083 [observado] A consulta de entidades por `loa` devolve as que têm emenda ou registro
-  de ajuste na LOA. Evidência: `cmj/api/forms.py:36-41`.
+- LOA-PCL-083 [implementado] A consulta de entidades por `loa` devolve as que têm emenda ou registro
+  de ajuste na LOA; o filtro `emendaloa_set__loa`, as que têm emenda. A emenda transformada em
+  coletiva (fase -10) não conta (LOA-CRUD-065). Evidência: `cmj/api/forms.py:36-47`. Teste:
+  `test_entidades_da_loa_na_api_ignoram_a_emenda_transformada_em_coletiva`.
 - LOA-PCL-085 [observado] (executado, 2026-11-23) O painel não depende de campo que a API esconde
   de anônimo. As tramitações chegam sem `ip` e `user` (API-SER-028), e as emendas sem `owner`,
   `metadata` e `search`, que para anônimo também não valem como filtro nem como ordenação
   (API-FIL-022). A busca do painel usa o filtro declarado `search`, que continua valendo para todos.
-  Evidência: `cmj/api/forms.py:58-60`, `cmj/api/loa/serializers/__init__.py:100-116`,
+  Evidência: `cmj/api/forms.py:61-63`, `cmj/api/loa/serializers/__init__.py:100-116`,
   `_frontend/v2018/src/modules/loa/pcl/PrestacaoContaLoaLayout.vue:320-322`.
 - LOA-PCL-087 [acordado] Nome e documento do credor de cada empenho são dado público de
   transparência, na API e nas telas: `loa/empenho` e `loa/empenhoemendaajuste` entregam `nome`,
