@@ -45,7 +45,7 @@
     "markdown-it-task-lists": "^2.1.1",
     "markdown-it-toc-done-right": "^4.2.0",
     "register-service-worker": "^1.7.2",
-    "tinymce": "^7.9.3",
+    "tinymce": "^8.9.3",
     "vue": "^2.7.16",
     "vue-chartjs": "^4",
     "vue-cookie": "^1.1.4",
