@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db.models import Count, Exists, IntegerField, OuterRef, Prefetch, Subquery
 from django.db.models.functions import Coalesce
+from django.urls import reverse
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -133,11 +134,30 @@ class EmendaLoaSearchSerializer(OcultaCamposInternosDaEmendaMixin, CmjSerializer
 
     str_fase = SerializerMethodField()
 
+    agrupamento = SerializerMethodField()
+
     class Meta(CmjSerializerMixin.Meta):
         model = EmendaLoa
 
     def get_finalidade(self, obj):
         return obj.finalidade_format
+
+    def get_agrupamento(self, obj):
+        """Agrupamento em que a emenda está, ou None (LOA-AGR-096).
+
+        Nome e detalhe do agrupamento já são públicos (LOA-AGR-001).
+        """
+        vinculo = getattr(obj, "agrupamentoemendaloa", None)
+        if vinculo is None:
+            return None
+        agrupamento = vinculo.agrupamento
+        return {
+            "id": agrupamento.id,
+            "nome": agrupamento.nome,
+            "link_detail_backend": reverse(
+                "cmj.loa:agrupamento_detail", kwargs={"pk": agrupamento.id}
+            ),
+        }
 
     def get_str_fase(self, obj):
         return obj.get_fase_display()

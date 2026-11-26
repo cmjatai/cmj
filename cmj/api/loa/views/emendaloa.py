@@ -3,7 +3,7 @@ from decimal import Decimal
 
 import pymupdf
 from django.core.exceptions import ValidationError
-from django.db.models import Q, Sum
+from django.db.models import F, Q, Sum
 from django.http.response import HttpResponse
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -95,6 +95,10 @@ class EmendaLoaViewSet:
                     "Você não tem permissão para mudar a fase de "
                     f'"{fases.get(el.fase, el.fase)}" para "{fases.get(destino, destino)}".'
                 )
+            try:  # LOA-FASE-072
+                EmendaLoa.service.validar_fase_da_coletiva(el, destino)
+            except ValidationError as e:
+                raise DRFValidationError(e.messages)
         return super().update(request, *args, **kwargs)
 
     def perform_create(self, serializer):
@@ -353,9 +357,10 @@ class EmendaLoaViewSet:
             if query:
                 qs = qs.filter(q)
 
-            return qs.order_by(
+            # LOA-AGR-096: as que estão em agrupamento vêm sempre no fim da lista
+            return qs.select_related("agrupamentoemendaloa__agrupamento").order_by(
+                F("agrupamentoemendaloa").asc(nulls_first=True),
                 "-tipo",
-                "-agrupamentoemendaloa",
                 "unidade__especificacao",
                 "entidade",
                 "-fase",

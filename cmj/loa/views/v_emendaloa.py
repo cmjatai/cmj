@@ -9,7 +9,7 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db.models import Exists, OuterRef, Q
 from django.db.models.aggregates import Sum
 from django.http import Http404
@@ -1060,6 +1060,14 @@ class EmendaLoaCrud(MasterDetailCrud):
                             f'"{fases[EmendaLoa.LIBERACAO_CONTABIL]}".',
                         )
                         return self.form_invalid(form)
+                    if submit_devolver:  # LOA-FASE-072
+                        try:
+                            EmendaLoa.service.validar_fase_da_coletiva(
+                                form.instance, EmendaLoa.PROPOSTA
+                            )
+                        except ValidationError as e:
+                            form.add_error(None, e.messages)
+                            return self.form_invalid(form)
                     form.instance.fase = (
                         EmendaLoa.LIBERACAO_CONTABIL
                         if submit_concluir

@@ -49,7 +49,7 @@ mesma view, entram só no que afeta esta tela.
   usuário não pode ver respondem 404 na lista, no PDF, no ZIP e no registro, antes até da verificação
   reCAPTCHA do PDF (LOA-LST-085). Assim, o formulário não mostra parlamentares, entidades e unidades
   de LOA que o usuário não pode ver. Evidência: `cmj/loa/views/v_emendaloa.py:243-252`,
-  `cmj/loa/services/s_emendaloa.py:250-284`. Testes: `test_loa_inexistente_responde_404`,
+  `cmj/loa/services/s_emendaloa.py:287-321`. Testes: `test_loa_inexistente_responde_404`,
   `test_anonimo_recebe_404_em_loa_nao_publicada`; na base de desenvolvimento,
   `/loa/999999/emendaloa` respondeu 404 na lista e com `?pdf` (executado).
 - LOA-LST-004 [observado] São listadas as emendas da LOA da URL com `fase > 0`: o manager padrão
@@ -57,14 +57,14 @@ mesma view, entram só no que afeta esta tela.
   `cmj/loa/models/m_emendaloa.py:35-39`; SQL com `"fase" > 0 AND "loa_id" = 1` (executado).
 - LOA-LST-005 [implementado] Para usuário anônimo, LOA não publicada responde 404 (LOA-LST-003), e a
   lista só traz emendas de LOA com `publicado=True`. Evidência: `cmj/loa/views/v_emendaloa.py:243-252`,
-  `cmj/loa/views/v_emendaloa.py:943-945`, `cmj/loa/services/s_emendaloa.py:250-284`. Teste:
+  `cmj/loa/views/v_emendaloa.py:943-945`, `cmj/loa/services/s_emendaloa.py:287-321`. Teste:
   `test_anonimo_recebe_404_em_loa_nao_publicada`, para a lista, `?pdf`, `?zip` e `?registrar`.
 - LOA-LST-006 [implementado] Em LOA publicada, qualquer usuário vê as emendas de todas as fases e de
   todos os autores. Em LOA não publicada, a conta comum recebe 404; o operador de autor vê todas se
   a matéria da LOA ainda não virou norma, e recebe 404 se já virou; quem tem
   `loa.emendaloa_full_editor`, e portanto o superusuário, vê todas. É a mesma regra da lista de
   LOAs, concentrada em `EmendaLoa.service.loas_visiveis`. Evidência:
-  `cmj/loa/views/v_emendaloa.py:943-945`, `cmj/loa/services/s_emendaloa.py:250-284`,
+  `cmj/loa/views/v_emendaloa.py:943-945`, `cmj/loa/services/s_emendaloa.py:287-321`,
   `cmj/loa/views/v_loa.py:126-143`. Testes: `test_conta_comum_recebe_404_em_loa_nao_publicada`,
   `test_operador_e_contabilidade_veem_loa_nao_publicada`,
   `test_operador_recebe_404_em_loa_nao_publicada_cuja_materia_virou_norma`,
@@ -81,7 +81,7 @@ mesma view, entram só no que afeta esta tela.
   anônimo e o operador de outro autor, esses campos não aparecem. O `owner` exige, além disso, a
   permissão de listagem do model (`list_emendaloa`), pela regra geral da API para relação com
   usuário (API-SER-032): o operador do autor não o recebe. A tela de edição continua
-  recebendo `metadata.style`. Evidência: `cmj/api/loa/serializers/__init__.py:100-124`,
+  recebendo `metadata.style`. Evidência: `cmj/api/loa/serializers/__init__.py:101-125`,
   `cmj/loa/services/s_emendaloa.py:156-169`. Testes:
   `test_api_oculta_campos_internos_de_quem_nao_edita`,
   `test_api_mostra_campos_internos_a_quem_edita`,
@@ -176,7 +176,7 @@ mesma view, entram só no que afeta esta tela.
   `LEIA-ME_emendas_nao_incluidas.txt`, que lista as emendas omitidas (id e epígrafe da matéria) e
   orienta a baixar de novo ou procurar o suporte. Sem falha, esse arquivo não existe. Evidência:
   `cmj/loa/views/v_emendaloa.py:58-72`, `cmj/loa/views/v_emendaloa.py:359-423`,
-  `cmj/loa/services/s_emendaloa.py:308-348`, `cmj/api/loa/views/emendaloa.py:297`. Testes:
+  `cmj/loa/services/s_emendaloa.py:345-385`, `cmj/api/loa/views/emendaloa.py:301`. Testes:
   `test_zip_gera_os_pdfs_no_processo_sem_usar_o_host`,
   `test_zip_omite_emenda_cujo_pdf_falha_e_lista_no_leia_me`, `test_zip_sem_falha_nao_tem_leia_me`,
   `test_documento_pdf_numera_artigos_a_partir_de_1_em_cada_documento`; na LOA 2026, o ZIP do autor
@@ -188,21 +188,21 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-020 [observado] O formulário usa GET e tem dois blocos: "Pesquisa de Emendas Parlamentares"
   (parlamentares, entidade, unidade, fase, tipo, autoria e busca por termos) e "Listagem em PDF"
   (totalização, via de totalização, quebra de página e botão "Gerar PDF"). Evidência:
-  `cmj/loa/forms/f_emendaloa.py:999-1078`.
+  `cmj/loa/forms/f_emendaloa.py:1018-1097`.
 - LOA-LST-021 [observado] Filtros diferentes se combinam com E. Dentro de `tipo`, de `fase` e de
   `parlamentares`, os valores marcados se combinam com OU. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:708-720`, `cmj/loa/forms/f_emendaloa.py:942-952`; SQL com `AND` entre
+  `cmj/loa/forms/f_emendaloa.py:727-739`, `cmj/loa/forms/f_emendaloa.py:961-971`; SQL com `AND` entre
   os filtros (executado).
 - LOA-LST-022 [observado] `parlamentares` oferece os parlamentares da LOA; quando a matéria da LOA já
   virou norma, só os que têm emenda. O filtro mantém a emenda que tenha ao menos um dos marcados.
-  Evidência: `cmj/loa/forms/f_mixins.py:12-20`, `cmj/loa/forms/f_emendaloa.py:771-776`,
-  `cmj/loa/forms/f_emendaloa.py:942-952`.
+  Evidência: `cmj/loa/forms/f_mixins.py:12-20`, `cmj/loa/forms/f_emendaloa.py:790-795`,
+  `cmj/loa/forms/f_emendaloa.py:961-971`.
 - LOA-LST-023 [observado] Cada parlamentar aparece como foto: o HTML do formulário é reescrito por
   expressão regular depois de renderizado, com uma consulta por parlamentar. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:887-940`.
+  `cmj/loa/forms/f_emendaloa.py:906-959`.
 - LOA-LST-024 [implementado] `fase` oferece 25, 30, 40, 50, 60 e 99 quando a matéria da LOA já tem
   norma jurídica, e 10, 12, 15, 17 e 20 quando ainda não tem. A fase -10 nunca é oferecida. É o mesmo
-  critério da visibilidade (LOA-LST-006). Evidência: `cmj/loa/forms/f_emendaloa.py:1083-1089`,
+  critério da visibilidade (LOA-LST-006). Evidência: `cmj/loa/forms/f_emendaloa.py:1102-1108`,
   `cmj/loa/models/m_emendaloa.py:89-105`. Testes: `test_loa_com_norma_oferece_fases_de_25_em_diante`,
   `test_loa_sem_norma_oferece_fases_ate_20`; a LOA 2026, com norma, ofereceu 25 a 99, e a LOA 2027,
   sem norma, 10 a 20 (executado).
@@ -218,15 +218,15 @@ mesma view, entram só no que afeta esta tela.
   `cmj/loa/views/v_emendaloa.py:243-252`. Teste: `test_loa_sem_materia_nao_abre_a_listagem`; na base
   de desenvolvimento não há LOA sem matéria.
 - LOA-LST-026 [observado] `tipo` oferece Em.Imp. Saúde, Em.Imp. Áreas Diversas e Emenda Modificativa.
-  Evidência: `cmj/loa/forms/f_emendaloa.py:708-713`, `cmj/loa/forms/f_emendaloa.py:1090`.
+  Evidência: `cmj/loa/forms/f_emendaloa.py:727-732`, `cmj/loa/forms/f_emendaloa.py:1109`.
 - LOA-LST-027 [observado] `autoria` tem "Ambas" (padrão, sem filtro), "Individual" (exatamente um
   parlamentar na emenda) e "Coletiva" (mais de um). A contagem considera todos os parlamentares da
   emenda, independentemente do filtro `parlamentares`. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:722-734`, `cmj/loa/forms/f_emendaloa.py:974-992`.
+  `cmj/loa/forms/f_emendaloa.py:741-753`, `cmj/loa/forms/f_emendaloa.py:993-1011`.
 - LOA-LST-028 [acordado] "Busca por termos" (parâmetro `finalidade`) separa o texto por espaços e
   exige que todos os termos apareçam no campo `search` da emenda, sem diferenciar acentos nem
   maiúsculas. Não pesquisa a coluna `finalidade` diretamente. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:778-782`, `cmj/loa/forms/f_emendaloa.py:963-972`; SQL com
+  `cmj/loa/forms/f_emendaloa.py:797-801`, `cmj/loa/forms/f_emendaloa.py:982-991`; SQL com
   `UPPER(UNACCENT("search")) LIKE` por termo; `saude` e `saúde` devolveram as mesmas 56 emendas
   (executado).
 - LOA-LST-029 [acordado] O campo `search` é montado no `save()` da emenda com a epígrafe curta da
@@ -239,13 +239,13 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-030 [implementado] `entidade` oferece as entidades ativas usadas em emendas da LOA e
   `unidade` as unidades orçamentárias usadas em emendas da LOA; cada um filtra por igualdade. A
   emenda transformada em coletiva (fase -10) não conta (LOA-CRUD-065). Evidência:
-  `cmj/loa/forms/f_emendaloa.py:790-815`, `cmj/loa/forms/f_emendaloa.py:1092-1109`. Teste:
+  `cmj/loa/forms/f_emendaloa.py:809-834`, `cmj/loa/forms/f_emendaloa.py:1111-1128`. Teste:
   `test_filtro_nao_oferece_entidade_nem_unidade_so_da_emenda_transformada_em_coletiva`.
 - LOA-LST-031 [observado] Existe o filtro `indicacao`, por igualdade exata, que não aparece no
-  formulário e só é alcançado pela URL. Evidência: `cmj/loa/forms/f_emendaloa.py:872-884`,
-  `cmj/loa/forms/f_emendaloa.py:1006-1068`; `indicacao: CharFilter:exact` (executado).
+  formulário e só é alcançado pela URL. Evidência: `cmj/loa/forms/f_emendaloa.py:891-903`,
+  `cmj/loa/forms/f_emendaloa.py:1025-1087`; `indicacao: CharFilter:exact` (executado).
 - LOA-LST-032 [observado] `agrupamento`, `tipo_agrupamento` e `quebrar_pagina` não filtram: só
-  configuram o PDF. Evidência: `cmj/loa/forms/f_emendaloa.py:954-961`.
+  configuram o PDF. Evidência: `cmj/loa/forms/f_emendaloa.py:973-980`.
 
 ### Cartão da emenda
 
@@ -325,7 +325,7 @@ mesma view, entram só no que afeta esta tela.
 
 - LOA-LST-043 [observado] "Gerar PDF" envia o formulário com `pdf` na query; a view responde com
   `application/pdf`, `Content-Disposition: inline`, nome `emendaloa_<ano>.pdf` e cabeçalhos contra
-  cache. Evidência: `cmj/loa/forms/f_emendaloa.py:1051-1060`,
+  cache. Evidência: `cmj/loa/forms/f_emendaloa.py:1070-1079`,
   `cmj/loa/views/v_emendaloa.py:335-349`, `cmj/loa/views/v_emendaloa.py:458-465`; resposta
   `application/pdf`, `inline; filename="emendaloa_2026.pdf"` (executado).
 - LOA-LST-044 [observado] O PDF está disponível a qualquer visitante, com as mesmas regras de
@@ -347,7 +347,7 @@ mesma view, entram só no que afeta esta tela.
   `settings.BASE_URL`, nunca com o `Host` da requisição. A exceção são os três relatórios de
   `sapl/relatorios/views_old.py`, que em DEBUG usam `MEDIA_ROOT`. Evidência:
   `cmj/utils/utils_report.py:21-27`, `cmj/loa/views/v_emendaloa.py:427`,
-  `cmj/api/loa/views/emendaloa.py:254`, `cmj/api/loa/views/agrupamento.py:149`; fora da LOA,
+  `cmj/api/loa/views/emendaloa.py:258`, `cmj/api/loa/views/agrupamento.py:198`; fora da LOA,
   `cmj/utils/utils_report.py:33` (`render_pdf_to_response`), `cmj/mixins.py:698`, `cmj/mixins.py:996`,
   `sapl/relatorios/view_reports/mixins.py:22`, `sapl/relatorios/views_old.py:1379`,
   `sapl/relatorios/views_old.py:1410`, `sapl/relatorios/views_old.py:1498`, `cmj/core/views.py:792`.
@@ -442,7 +442,7 @@ mesma view, entram só no que afeta esta tela.
 - LOA-LST-052 [observado] "Totalizar listagem por" aceita órgão, unidade orçamentária, função,
   subfunção, programa, ação, natureza, fonte e entidade, em qualquer combinação. "Via de
   Totalização" aceita dotações de inserção, dotações de dedução e valor da emenda (`sem_registro`).
-  Evidência: `cmj/loa/forms/f_emendaloa.py:736-769`.
+  Evidência: `cmj/loa/forms/f_emendaloa.py:755-788`.
 - LOA-LST-088 [implementado] O servidor recusa as combinações que a tela não permite (LOA-LST-070):
   totalização sem via ("Escolha a via de totalização.", no campo da via), entidade na via de
   inserção ou de dedução ("Entidades só podem ser totalizadas na via do valor da emenda.") e, na via
@@ -450,7 +450,7 @@ mesma view, entram só no que afeta esta tela.
   possível totalizar por unidades orçamentárias e por entidades."), as duas no campo de
   totalização. Como na LOA-LST-025, o erro aparece no campo, a lista segue com os demais filtros e,
   com `?pdf`, o PDF não é gerado e a tela mostra o aviso de filtros inválidos. Via sem totalização
-  não é erro. Evidência: `cmj/loa/forms/f_emendaloa.py:832-869`,
+  não é erro. Evidência: `cmj/loa/forms/f_emendaloa.py:851-888`,
   `cmj/loa/views/v_emendaloa.py:335-345`. Testes:
   `test_pdf_com_totalizacao_invalida_mostra_a_tela_com_erro_no_campo`,
   `test_totalizacao_valida_nao_tem_erro`; na LOA 2026, com `?pdf&fase=40`, as três combinações
@@ -554,7 +554,7 @@ mesma view, entram só no que afeta esta tela.
   o formulário POST de registro das emendas liberadas (LOA-LST-016) fica no mesmo container, e
   "Filtrar" ou Enter na busca nunca o enviam nem abrem a confirmação dele. Evidência:
   `_frontend/v2018/src/__apps/loa/scss/loa.scss:97-99`, `sapl/crispy_layout_mixin.py:51-74`,
-  `cmj/loa/forms/f_emendaloa.py:999-1005`, `cmj/loa/forms/f_emendaloa.py:1073-1077`,
+  `cmj/loa/forms/f_emendaloa.py:1018-1024`, `cmj/loa/forms/f_emendaloa.py:1092-1096`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:2-8`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:17-20`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:67-81`. Testes:
@@ -584,7 +584,7 @@ mesma view, entram só no que afeta esta tela.
   reflete o que está marcado no formulário no momento do clique. A listagem fica como estava, sem
   mensagem de carregamento. O que a view devolver no lugar do PDF (verificação reCAPTCHA, tela com
   filtro inválido ou com erro na geração) também aparece na nova aba. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:1051-1060`. Teste: `test_gerar_pdf_abre_em_nova_aba`, que cobre a
+  `cmj/loa/forms/f_emendaloa.py:1070-1079`. Teste: `test_gerar_pdf_abre_em_nova_aba`, que cobre a
   marcação do servidor; na LOA 2026, o botão saiu com `formtarget="_blank"` (executado). O script
   não foi executado (sem navegador), e a remoção da mensagem só chega à produção com o rebuild do
   `dist/` (LOA-LST-078).
@@ -592,13 +592,13 @@ mesma view, entram só no que afeta esta tela.
   foto ao marcar o checkbox, que fica escondido. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:52-64`,
   `_frontend/v2018/src/__apps/loa/scss/loa.scss:97-99`. A foto do parlamentar que já vem marcado
-  na URL é destacada pelo servidor (`cmj/loa/forms/f_emendaloa.py:887-940`).
+  na URL é destacada pelo servidor (`cmj/loa/forms/f_emendaloa.py:906-959`).
 - LOA-LST-073 [observado] O script depende de nomes e marcação gerados pelo backend: `name` dos
   campos `agrupamento`, `tipo_agrupamento` e `finalidade`, os valores `sem_registro`,
   `despesa__unidade` e `entidade`, o id `div_id_parlamentares`, a classe `btn-filtrar` dentro do
   formulário e a ordem das opções de `agrupamento` (a segunda é unidade). Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaList.js:22-81`,
-  `cmj/loa/forms/f_emendaloa.py:739-751`.
+  `cmj/loa/forms/f_emendaloa.py:758-770`.
 - LOA-LST-074 [observado] Os seletores de entidade e unidade usam `bootstrap-select`, iniciado pelo
   bundle global 500 ms depois do carregamento. Como o clique de "Filtrar" é ligado pela classe
   `btn-filtrar` (LOA-LST-066), a ordem entre essa inicialização e o script da listagem não importa.
@@ -608,7 +608,7 @@ mesma view, entram só no que afeta esta tela.
   formulário, bloco do PDF (`.relatorio-select`), fotos (`.container-avatar`, `.avatar`), cartão
   (`.emendaloa-item`, `.btn-expand`, `.emenda-card`) e ajustes para telas estreitas. Evidência:
   `_frontend/v2018/src/__apps/loa/scss/loa.scss:68-305`,
-  `_frontend/v2018/src/__apps/loa/scss/loa.scss:565-607`.
+  `_frontend/v2018/src/__apps/loa/scss/loa.scss:572-614`.
 - LOA-LST-076 [observado] As abas do cartão usam `data-toggle="tab"` do Bootstrap carregado pelo
   bundle global; a confirmação do registro e a tela cheia são scripts do próprio template, que usam
   o `$` global. Evidência: `_templates/v2018/loa/emendaloa_filter_cache.html:125-178`,
@@ -631,7 +631,7 @@ para fora da máquina.
 
 Nenhum risco aberto. Item 2: a tela não chama a API (o v2018 não guarda dados da tela). Item 4: os
 parâmetros de agrupamento passam por `choices` antes de chegar ao ORM
-(`cmj/loa/forms/f_emendaloa.py:736-769`) e não há SQL cru, `subprocess` nem template montado com
+(`cmj/loa/forms/f_emendaloa.py:755-788`) e não há SQL cru, `subprocess` nem template montado com
 texto do usuário.
 
 ## Dúvidas

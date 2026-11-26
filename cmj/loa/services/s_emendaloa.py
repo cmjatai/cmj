@@ -233,6 +233,43 @@ class EmendaLoaService:
                     "ser retirado nem ter o valor zerado."
                 )
 
+    # --------------------------------------------------------- emenda coletiva
+
+    @staticmethod
+    def e_coletiva(emenda):
+        """Emenda coletiva: gerada por um agrupamento (LOA-AGR-071)."""
+        return emenda.agrupamento_de_origem_id is not None
+
+    def validar_fase_da_coletiva(self, emenda, destino):
+        """A coletiva não volta para a fase 10 (LOA-FASE-072).
+
+        Ela não tem autor para corrigi-la (LOA-FASE-071). Vale para todo perfil e
+        para todo caminho: botão "Devolver para correção", PATCH e formulário.
+        Levanta ``ValidationError``.
+        """
+        from cmj.loa.models import EmendaLoa
+
+        if int(destino) != EmendaLoa.PROPOSTA or not self.e_coletiva(emenda):
+            return
+        if emenda.fase == EmendaLoa.PROPOSTA:
+            return  # já está na 10: não é uma mudança de fase
+        raise ValidationError(
+            "A Emenda Coletiva não pode ser devolvida para correção: ela não tem "
+            "autor para corrigi-la. Corrija-a na edição contábil ou cancele as "
+            "Emendas Coletivas do agrupamento e devolva as emendas de origem."
+        )
+
+    # --------------------------------------------------------------- proposição
+
+    def vira_proposicao(self, emenda):
+        """A emenda pode ser registrada como Proposição Legislativa (LOA-FASE-070).
+
+        Só a emenda cujo dono opera um autor: a proposição é desse autor. A de dono
+        sem autor, como a coletiva sob o Operador da LOA, segue para a matéria sem
+        proposição.
+        """
+        return self.autor_da_emenda(emenda) is not None
+
     # ------------------------------------------------------------------ criação
 
     @staticmethod

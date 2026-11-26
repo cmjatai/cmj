@@ -178,7 +178,7 @@ def test_previa_marca_aviso(ia_falha, agrupamento, agrupado):
 
 @pytest.mark.spec("GENIA-LOA-005", "GENIA-LOA-006")
 def test_geracao_da_coletiva_interrompe_com_mensagem(
-    ia_falha, api, editor_contabil, agrupamento, agrupado
+    ia_falha, api, editor_contabil, agrupamento, agrupado, responsavel_coletivas
 ):
     agrupamento.finalidade = ""
     agrupamento.save()

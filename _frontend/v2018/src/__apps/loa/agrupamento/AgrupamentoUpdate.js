@@ -17,6 +17,10 @@ const CHAVE_MENSAGEM_GUARDADA = 'agrupamento-mensagem-guardada'
 // Tempo até sumirem as mensagens de sucesso e informação (LOA-AGR-090)
 const TEMPO_MENSAGEM_MS = 8000
 
+// Fases em que a emenda é devolvida para correção por esta tela (LOA-AGR-091). O servidor
+// confere de novo e recusa a coletiva e a emenda de outro agrupamento.
+const FASES_DEVOLVIVEIS = [12, 15, 17]
+
 export default class AgrupamentoUpdate {
   constructor (container) {
     this.container = container
@@ -403,6 +407,12 @@ export default class AgrupamentoUpdate {
                 inner.prepend($(`<div class="alert alert-danger">${error.response?.data?.detail || (error.response?.data && error.response?.data[0]) || error.message}</div>`))
               })
           })
+
+          // LOA-AGR-092: a devolvida sai do agrupamento; a lista e a finalidade são recarregadas
+          this.botaoDevolver(value, inner_actions, (data) => {
+            this.loadEmendasAgrupamento()
+            this.alertAvisoFinalidade(data.aviso_finalidade)
+          })
         })
       })
   }
@@ -440,6 +450,9 @@ export default class AgrupamentoUpdate {
           if (emendaloa_selecteds.find(`.item-emendaloa[pk="${value.id}"]`).length > 0) {
             return
           }
+          if (value.agrupamento && String(value.agrupamento.id) === String(this.pk)) {
+            return
+          }
           const inner_item = $('<div class="inner-item"></div>').appendTo(inner)
 
           let text_html = this.renderEmendaItem(value, inner_item, true) // true = return html string
@@ -454,6 +467,15 @@ export default class AgrupamentoUpdate {
 
           // Re-append actions container since we overwrote html
           const inner_actions = $('<div class="inner-actions"></div>').appendTo(inner_item)
+
+          // LOA-AGR-096: a emenda de outro agrupamento é só informação, sem botões; o servidor
+          // já a manda para o fim da lista
+          if (value.agrupamento) {
+            const aviso = $('<small class="agrupamento-da-emenda text-muted">No agrupamento <a target="_blank"></a></small>')
+            aviso.find('a').attr('href', value.agrupamento.link_detail_backend).text(value.agrupamento.nome)
+            inner_item.find('.item-emendaloa').append(aviso)
+            return
+          }
 
           if (value.fase === 10) return
 
@@ -481,7 +503,33 @@ export default class AgrupamentoUpdate {
                 inner.prepend($(`<div class="pt-2"><div class="alert alert-danger">${error.response.data[0]}</div></div>`))
               })
           })
+
+          // LOA-AGR-093: a devolvida sai da busca
+          this.botaoDevolver(value, inner_actions, () => inner_item.remove())
         })
+      })
+  }
+
+  // Botão "Devolver para correção", abaixo da seta e da lixeira (LOA-AGR-091)
+  botaoDevolver (value, inner_actions, aoDevolver) {
+    if (!FASES_DEVOLVIVEIS.includes(value.fase)) return
+    $(
+      '<span class="btn btn-devolver text-warning" title="Devolver para correção: a Emenda volta ao autor, na fase Proposta Legislativa."><i class="fas fa-undo-alt"></i></span>'
+    ).appendTo(inner_actions).click(() => this.devolverEmenda(value, aoDevolver))
+  }
+
+  // Pede confirmação, devolve e mostra a mensagem de sucesso ou o erro (LOA-AGR-093)
+  devolverEmenda (value, aoDevolver) {
+    const pergunta = `Devolver a Emenda R$ ${value.str_valor} - ${value.indicacao} para correção pelo autor?`
+    if (!window.confirm(pergunta)) return Promise.resolve()
+
+    return axios.post(`${this.urlBase}/devolver_emenda/`, { emendaloa: value.id })
+      .then((response) => {
+        aoDevolver(response.data)
+        this.mostrarMensagem(response.data.detail, 'success')
+      })
+      .catch((error) => {
+        this.mostrarMensagem(mensagemDoErro(error), 'danger', 'Não foi possível devolver a Emenda.')
       })
   }
 

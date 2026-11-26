@@ -449,7 +449,7 @@ Não foi executado:
   recebe as emendas de LOA publicada, em qualquer fase. Na LOA 2027, publicada e ainda sem norma, a
   API entrega as 164 emendas das fases 12 e 15 (executado). `owner`, `metadata` e `search` não são
   entregues a quem não edita a emenda (LOA-LST-091). Evidência:
-  `cmj/api/loa/views/emendaloa.py:61-67`, `cmj/api/loa/serializers/__init__.py:100-124`.
+  `cmj/api/loa/views/emendaloa.py:61-67`, `cmj/api/loa/serializers/__init__.py:101-125`.
 - LOA-PCL-077 [retirada] Substituída por LOA-PCL-086.
 - LOA-PCL-086 [implementado] Os demais endpoints que o painel consulta seguem a mesma visibilidade
   das emendas, pela LOA a que o registro pertence (API-ACS-051): a lista de LOAs e o detalhe, os
@@ -465,20 +465,20 @@ Não foi executado:
   `sapl/api/pagination.py:9-35`.
 - LOA-PCL-079 [observado] `totalize_empenhos` aplica os filtros da lista, reúne os empenhos
   distintos ligados aos itens filtrados e soma empenhado, liquidado, pago bruto e anulado.
-  Evidência: `cmj/api/loa/views/emendaloa.py:369-386`,
+  Evidência: `cmj/api/loa/views/emendaloa.py:374-391`,
   `cmj/api/loa/views/registroajusteloa.py:16-33`.
 - LOA-PCL-080 [observado] Cada item de emenda traz valores calculados no serializer: `str_valor`,
   `str_valor_computado`, `valor_inicial`, `valor_computado`, `valor_inicial_por_parlamentar`,
   `has_ajustes`, `ementa_format`, `epigrafe_short` e as quatro somas de empenhos. O ajuste traz
   `valor` (soma das partes), `valor_por_parlamentar` (zerado quando o valor computado é zero) e as
-  mesmas somas. Evidência: `cmj/api/loa/serializers/__init__.py:157-199`,
-  `cmj/api/loa/serializers/__init__.py:202-254`.
+  mesmas somas. Evidência: `cmj/api/loa/serializers/__init__.py:177-219`,
+  `cmj/api/loa/serializers/__init__.py:222-274`.
 - LOA-PCL-081 [observado] (executado na LOA 2026, em 2026-11-23) As rotas `loa/emendaloa` e
   `loa/registroajusteloa`, que o painel percorria e não percorre mais (LOA-PCL-099), deixaram de
   custar 13 consultas por item (LOA-PCC-080): uma página de 100 emendas faz 7 consultas, e uma de
   100 ajustes, 12. Com os parâmetros de `expand` que o painel usava, 100 ajustes fazem 201 consultas
   (0,35 s), contra 2.740 (2,1 s) antes. A página de 40 cartões da consulta nova custa de 7 a 10.
-  Evidência: `cmj/api/loa/serializers/__init__.py:23-75`.
+  Evidência: `cmj/api/loa/serializers/__init__.py:24-76`.
 - LOA-PCL-082 [observado] No conteúdo da aba Empenhos, o empenho expandido vem com todos os campos,
   entre eles `nome`, `cpfcnpj`, `search` e `metadata` (executado; LOA-PCL-087). Evidência:
   `_frontend/v2018/src/modules/loa/pcl/PclDetalheEmenda.vue:425-429`.
@@ -490,7 +490,7 @@ Não foi executado:
   de anônimo. As tramitações chegam sem `ip` e `user` (API-SER-028), e as emendas sem `owner`,
   `metadata` e `search`, que para anônimo também não valem como filtro nem como ordenação
   (API-FIL-022). A busca do painel usa o filtro declarado `search`, que continua valendo para todos.
-  Evidência: `cmj/api/forms.py:61-63`, `cmj/api/loa/serializers/__init__.py:100-116`,
+  Evidência: `cmj/api/forms.py:61-63`, `cmj/api/loa/serializers/__init__.py:101-117`,
   `_frontend/v2018/src/modules/loa/pcl/PrestacaoContaLoaLayout.vue:320-322`.
 - LOA-PCL-087 [acordado] Nome e documento do credor de cada empenho são dado público de
   transparência, na API e nas telas: `loa/empenho` e `loa/empenhoemendaajuste` entregam `nome`,

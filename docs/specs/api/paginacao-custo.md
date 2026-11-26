@@ -104,7 +104,7 @@ comparação.
   As duas da LOA com serializer próprio, `loa/emendaloa` e `loa/registroajusteloa`, custavam 13 por
   item e, desde 2026-11-23, têm custo fixo por página, porque o queryset carrega de uma vez o que o
   serializer lê (LOA-PCC-080); as linhas delas na tabela são dessa data. Evidência:
-  `cmj/api/loa/serializers/__init__.py:23-75`, `drfautoapi/drfautoapi.py:694-695`.
+  `cmj/api/loa/serializers/__init__.py:24-76`, `drfautoapi/drfautoapi.py:694-695`.
 
 ### `get_all` medido
 

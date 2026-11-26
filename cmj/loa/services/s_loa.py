@@ -152,6 +152,70 @@ class LoaService:
                 resultado[p].append(valor)
         return {p: tuple(v) for p, v in resultado.items()}
 
+    # ------------------------------------- responsável pelas Emendas Coletivas
+
+    # as permissões do Operador da LOA (EmendaLoa.edita_em_qualquer_fase)
+    PERMISSOES_RESPONSAVEL_COLETIVAS = (
+        "loa.add_emendaloa",
+        "loa.change_emendaloa",
+        "loa.emendaloa_full_editor",
+    )
+
+    def responsaveis_coletivas_elegiveis(self):
+        """Usuários que podem ser o responsável pelas Emendas Coletivas (LOA-CRUD-072).
+
+        Ativos, com as permissões do Operador da LOA, diretas, por grupo ou como
+        superusuário, e sem vínculo de operador de autor: a coletiva não é de um
+        autor e não vira proposição (LOA-FASE-070).
+        """
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        qs = User.objects.filter(is_active=True)
+        for perm in self.PERMISSOES_RESPONSAVEL_COLETIVAS:
+            app_label, codename = perm.split(".")
+            com_perm = User.objects.filter(
+                Q(
+                    user_permissions__content_type__app_label=app_label,
+                    user_permissions__codename=codename,
+                )
+                | Q(
+                    groups__permissions__content_type__app_label=app_label,
+                    groups__permissions__codename=codename,
+                )
+            )
+            qs = qs.filter(Q(is_superuser=True) | Q(pk__in=com_perm.values("pk")))
+        return qs.exclude(operadorautor_set__isnull=False).distinct()
+
+    def pode_ser_responsavel_coletivas(self, user):
+        """Mesmo critério de ``responsaveis_coletivas_elegiveis``, para um usuário."""
+        return bool(
+            user
+            and user.is_active
+            and user.has_perms(self.PERMISSOES_RESPONSAVEL_COLETIVAS)
+            and not user.operadorautor_set.exists()
+        )
+
+    def responsavel_coletivas(self, loa):
+        """Dono das Emendas Coletivas geradas na LOA (LOA-FASE-071).
+
+        Levanta ``ValueError`` com a mensagem para a tela quando a LOA não tem
+        responsável ou quando ele deixou de atender a LOA-CRUD-072.
+        """
+        user = loa.responsavel_coletivas
+        if user is None:
+            raise ValueError(
+                "A LOA não tem responsável pelas Emendas Coletivas. Defina-o no "
+                "cadastro da LOA para gerar as Emendas Coletivas."
+            )
+        if not self.pode_ser_responsavel_coletivas(user):
+            raise ValueError(
+                f"O responsável pelas Emendas Coletivas da LOA ({user}) não tem as "
+                "permissões do Operador da LOA ou é operador de autor. Altere-o no "
+                "cadastro da LOA para gerar as Emendas Coletivas."
+            )
+        return user
+
     def tem_norma(self, loa):
         """A matéria da LOA já virou norma. Fica guardado na instância, para
         ser consultado uma vez só por acesso (LOA-CRUD-071)."""

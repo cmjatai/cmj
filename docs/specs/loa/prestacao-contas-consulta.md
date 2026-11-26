@@ -239,7 +239,7 @@ na LOA 2026 (497 itens): resumo, 9 a 14 consultas ao banco; dashboard, 11; pági
   de 1.313 consultas para 7, a de 100 ajustes de 1.321 para 12, e as 907 emendas de uma vez, de
   12.587 consultas e 8,7 s para 7 e 0,7 s. Com `expand`, cada objeto expandido ainda custa as
   consultas do mecanismo genérico (API-SER-026). Evidência:
-  `cmj/api/loa/serializers/__init__.py:23-75`, `cmj/api/loa/serializers/__init__.py:77-97`,
+  `cmj/api/loa/serializers/__init__.py:24-76`, `cmj/api/loa/serializers/__init__.py:78-98`,
   `cmj/api/loa/views/emendaloa.py:61-67`, `cmj/api/loa/views/registroajusteloa.py:13-14`,
   `cmj/loa/models/m_emendaloa.py:637-647`.
 

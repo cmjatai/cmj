@@ -4,6 +4,7 @@ Loa:
   - ano:2 receita_corrente_liquida:3 tipo_materia:3 numero_materia:2 ano_materia:2 materia:0
   - publicado:1 perc_disp_total:3 perc_disp_saude:3 perc_disp_diversos:3 forcar_detalhamento_de_fonte:2
   - despesa_default_deducao_diversos despesa_default_deducao_educacao despesa_default_deducao_saude
+  - responsavel_coletivas:6
   - parlamentares
   - yaml_obs
 

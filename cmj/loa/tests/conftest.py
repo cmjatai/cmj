@@ -142,6 +142,14 @@ def operador_loa(db):
 
 
 @pytest.fixture
+def responsavel_coletivas(loa, operador_loa):
+    """Operador da LOA definido como responsável pelas coletivas da LOA (LOA-FASE-071)."""
+    loa.responsavel_coletivas = operador_loa
+    loa.save()
+    return operador_loa
+
+
+@pytest.fixture
 def superuser(db):
     return _make_user("super", is_superuser=True)
 

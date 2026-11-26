@@ -1,7 +1,8 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
-from django.db.models.deletion import CASCADE, PROTECT
+from django.db.models.deletion import CASCADE, PROTECT, SET_NULL
 from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.services.s_loa import LoaService
@@ -141,6 +142,22 @@ class Loa(models.Model):
         default="",
         help_text=_(
             "Forçar detalhamento de fonte com 3 caracteres para destinação de Emendas Impositivas"
+        ),
+    )
+
+    # LOA-CRUD-072 e LOA-FASE-071: dono de todas as Emendas Coletivas da LOA
+    responsavel_coletivas = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        default=None,
+        on_delete=SET_NULL,
+        related_name="+",
+        verbose_name=_("Responsável pelas Emendas Coletivas"),
+        help_text=_(
+            "Usuário que será o dono de todas as Emendas Coletivas desta LOA. Só "
+            "aparecem os usuários com as permissões do Operador da LOA que não são "
+            "operadores de autor. Sem ele, as Emendas Coletivas não são geradas."
         ),
     )
 

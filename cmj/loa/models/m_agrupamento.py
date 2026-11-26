@@ -11,6 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cmj.loa.models.m_emendaloa import EmendaLoa, EmendaLoaParlamentar
 from cmj.loa.models.m_registrocontabil import EmendaLoaRegistroContabil
+from cmj.loa.services.s_agrupamento import AgrupamentoService
 from cmj.utils import PERCENTAGE_VALIDATOR, quantize
 from cmj.utils.genia.loa_agrupamento import (
     IAEmentaEmendaColetiva,
@@ -34,6 +35,8 @@ class FinalidadeManualRemovida(ValueError):
 
 
 class Agrupamento(models.Model):
+    service = AgrupamentoService()
+
     SAUDE = 10
     DIVERSOS = 99
     TIPOEMENDALOA_CHOICE = (
@@ -372,6 +375,9 @@ class Agrupamento(models.Model):
         return excluidas, devolvidas
 
     def gerar_emendas_coletivas(self, user=None):
+        # LOA-FASE-071: sem responsável válido, recusa antes da I.A. e de qualquer gravação
+        responsavel = self.loa.service.responsavel_coletivas(self.loa)
+
         emendas_preparadas = self.preparar_dados_para_coletiva()
 
         emendas_criadas = []  # Lista para armazenar as emendas coletivas criadas
@@ -386,8 +392,8 @@ class Agrupamento(models.Model):
                     ec = EmendaLoa()  # ec -> emenda_coletiva
                     ec.permite_juncao_coletiva = False
                     ec.agrupamento_de_origem = self
-                    # dono da coletiva: owner da primeira emenda do conjunto (ordem por id)
-                    ec.owner_id = emenda["emendas"][0].owner_id
+                    # LOA-FASE-071: dono da coletiva é o responsável definido na LOA
+                    ec.owner = responsavel
                     ec.valor = emenda["total_via_parlamentares"]
                     ec.loa = self.loa
                     ec.prefixo_finalidade = ""

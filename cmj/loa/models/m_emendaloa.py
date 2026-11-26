@@ -929,9 +929,17 @@ class EmendaLoa(CmjSearchMixin):
 
     def registrar_proposicao(self):
         try:
+            # LOA-FASE-070: dono sem autor não gera proposição, nem o PDF
+            if not self.service.vira_proposicao(self):
+                raise Exception(
+                    "o dono da Emenda não é operador de autor. A Emenda não vira "
+                    "Proposição Legislativa e a matéria é vinculada pelo Operador "
+                    "da LOA."
+                )
+
             arq_bytes, arq_name = self.retrieve_file_bytes()
 
-            autor = self.owner.operadorautor_set.first().autor
+            autor = self.service.autor_da_emenda(self)
 
             proposicao = self.proposicao
             created = False

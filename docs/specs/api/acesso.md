@@ -278,7 +278,7 @@ negócio de cada viewset customizado entram só como inventário. O mecanismo de
   vínculo do empenho com emenda ou ajuste segue a LOA de um ou de outro. A regra vale na leitura
   (`GET`, `HEAD`, `OPTIONS`) e no `expand`; a escrita continua decidida pelas permissões de edição.
   Evidência: `cmj/loa/services/s_visibilidade.py:19-80`, `cmj/api/loa/views/__init__.py:130-143`,
-  `cmj/loa/services/s_emendaloa.py:250-271`.
+  `cmj/loa/services/s_emendaloa.py:287-308`.
 - API-ACS-046 [observado] `cerimonial/visita` não pertence a uma área de trabalho: o model guarda
   só os setores visitados, e a tela de visitas também não filtra por área. Quem tem a permissão do
   model lê todas as visitas, na tela e na API. Evidência: `cmj/cerimonial/models.py:1153-1174`,

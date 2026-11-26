@@ -36,7 +36,7 @@ RE_CAMPO_CAB = re.compile(r"^(" + "|".join(CABECALHO) + r"):\s*(.*)$")
 RE_CAMINHO = re.compile(r"`([^`\s]+)`")
 RE_DUVIDA = re.compile(r"^\s*(?:[-*]|#+)\s*\**D(\d+)\b", re.M)
 RE_DUVIDA_REF = re.compile(r"\bD(\d+)\b")
-# Abreviações depois de um ID completo: "LOA-FASE-056, 057, 064 e 017 a 019".
+# Abreviações depois de um ID completo: "LOA-FASE-056, 057, 071 e 017 a 019".
 RE_ABREV = re.compile(r"\s*(?:,|\be|\ba)\s+(\d{3})(?![\w-])")
 # Título de teste Vitest que liga regras: 'V8-ARQ-004: ...' ou 'V8-ARQ-004, V8-ARQ-005: ...'.
 RE_TITULO_VITEST = re.compile(

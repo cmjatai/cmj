@@ -5,6 +5,7 @@ passar. Testes de regras ``[desejado]`` mostram a divergência atual e devem fal
 """
 
 from decimal import Decimal
+from unittest import mock
 
 import pytest
 from django.urls import reverse
@@ -21,6 +22,7 @@ from cmj.loa.models import (
     RegistroAjusteLoa,
 )
 from cmj.loa.tests.conftest import ANO, recarregar
+from sapl.materia.models import Proposicao
 
 pytestmark = pytest.mark.django_db
 
@@ -162,7 +164,13 @@ def test_inclusao_em_agrupamento_define_fase_15_no_servidor(
 
 @pytest.fixture
 def agrupamento_com_coletiva(
-    make_emenda, agrupamento, autor, autor_b, parlamentar, parlamentar_b
+    make_emenda,
+    agrupamento,
+    autor,
+    autor_b,
+    parlamentar,
+    parlamentar_b,
+    responsavel_coletivas,
 ):
     """Duas emendas que viram coletiva e uma que fica de fora (sem junção, fase 17)."""
     a = make_emenda(
@@ -221,11 +229,202 @@ def test_cancelar_coletiva_devolve_para_15_quem_estava_em_17(
     assert recarregar(fora).fase == EC
 
 
-@pytest.mark.spec("LOA-FASE-064")
-def test_coletiva_recebe_owner_da_primeira_emenda(agrupamento_com_coletiva, autor):
+@pytest.mark.spec("LOA-FASE-071")
+def test_coletiva_recebe_como_dono_o_responsavel_da_loa(
+    agrupamento_com_coletiva, autor, responsavel_coletivas
+):
     _, a, _, _, coletivas = agrupamento_com_coletiva
 
-    assert recarregar(coletivas[0]).owner_id == a.owner_id == autor.pk
+    assert a.owner_id == autor.pk  # a primeira emenda do conjunto é do autor
+    assert recarregar(coletivas[0]).owner_id == responsavel_coletivas.pk
+
+
+def emendas_que_formariam_coletiva(make_emenda, agrupamento, autor, autor_b, p, pb):
+    emendas = [
+        make_emenda(fase=EC, owner=o, parlamentar=par, permite_juncao_coletiva=True)
+        for o, par in ((autor, p), (autor_b, pb))
+    ]
+    for el in emendas:
+        AgrupamentoEmendaLoa.objects.create(agrupamento=agrupamento, emendaloa=el)
+    return emendas
+
+
+@pytest.mark.spec("LOA-FASE-071")
+@pytest.mark.parametrize("responsavel", [None, "editor_contabil", "operador_autor"])
+def test_gerar_coletiva_recusa_loa_sem_responsavel_valido(
+    request,
+    api,
+    editor_contabil,
+    operador_loa,
+    loa,
+    make_emenda,
+    agrupamento,
+    autor,
+    autor_b,
+    parlamentar,
+    parlamentar_b,
+    responsavel,
+):
+    from sapl.base.models import OperadorAutor
+
+    if responsavel == "editor_contabil":
+        loa.responsavel_coletivas = editor_contabil
+    elif responsavel == "operador_autor":
+        # tinha as permissões, mas passou a operar um autor depois de escolhido
+        mommy.make(
+            OperadorAutor,
+            user=operador_loa,
+            autor=autor.operadorautor_set.first().autor,
+        )
+        loa.responsavel_coletivas = operador_loa
+    loa.save()
+    emendas = emendas_que_formariam_coletiva(
+        make_emenda, agrupamento, autor, autor_b, parlamentar, parlamentar_b
+    )
+
+    with mock.patch.object(
+        type(agrupamento), "preparar_dados_para_coletiva"
+    ) as preparar:
+        r = api(editor_contabil).post(
+            f"/api/loa/agrupamento/{agrupamento.pk}/gerar_emenda_coletiva/"
+        )
+
+    assert r.status_code == 400
+    assert "responsável pelas Emendas Coletivas" in r.json()["error"]
+    preparar.assert_not_called()  # nem a I.A. é chamada
+    assert not EmendaLoa.all_objects.filter(agrupamento_de_origem=agrupamento).exists()
+    assert all(recarregar(el).fase == EC for el in emendas)
+
+
+def coletiva_na_fase(agrupamento_com_coletiva, fase):
+    coletiva = agrupamento_com_coletiva[4][0]
+    EmendaLoa.all_objects.all_objects().filter(pk=coletiva.pk).update(fase=fase)
+    return recarregar(coletiva)
+
+
+@pytest.mark.spec("LOA-FASE-072")
+@pytest.mark.parametrize("perfil", ["editor_contabil", "operador_loa"])
+@pytest.mark.parametrize("origem", [EC, LC])
+def test_botao_devolver_recusa_a_coletiva(
+    request, client, agrupamento_com_coletiva, perfil, origem
+):
+    user = request.getfixturevalue(perfil)
+    coletiva = coletiva_na_fase(agrupamento_com_coletiva, origem)
+
+    r = post_edicao(client, user, coletiva, submit_devolver="1")
+
+    assert r.status_code == 200  # volta ao formulário com o erro
+    assert "não pode ser devolvida para correção" in r.content.decode()
+    assert recarregar(coletiva).fase == origem
+
+
+@pytest.mark.spec("LOA-FASE-072")
+@pytest.mark.parametrize("perfil", ["operador_loa", "superuser"])
+def test_patch_nao_leva_a_coletiva_para_a_fase_10(
+    request, api, agrupamento_com_coletiva, perfil
+):
+    coletiva = coletiva_na_fase(agrupamento_com_coletiva, LC)
+
+    r = patch_fase(api(request.getfixturevalue(perfil)), coletiva, P)
+
+    assert r.status_code == 400
+    assert "não pode ser devolvida para correção" in r.content.decode()
+    assert recarregar(coletiva).fase == LC
+
+
+@pytest.mark.spec("LOA-FASE-072")
+def test_formulario_da_coletiva_nao_oferece_a_fase_10_nem_o_botao(
+    client, editor_contabil, operador_loa, agrupamento_com_coletiva, make_emenda
+):
+    coletiva = coletiva_na_fase(agrupamento_com_coletiva, EC)
+    comum = make_emenda(fase=EC)
+
+    assert P not in fases_do_select(operador_loa, coletiva)
+    assert P in fases_do_select(operador_loa, comum)
+    with pytest.raises(Exception, match="não pode ser devolvida"):
+        EmendaLoa.service.validar_fase_da_coletiva(coletiva, P)
+
+    assert (
+        "submit_devolver"
+        not in get_edicao(client, editor_contabil, coletiva).content.decode()
+    )
+    assert (
+        "submit_devolver" in get_edicao(client, editor_contabil, comum).content.decode()
+    )
+
+
+# ------------------------------------------------------------ proposição
+
+
+@pytest.fixture
+def coletiva_do_operador_da_loa(
+    make_emenda,
+    agrupamento,
+    autor,
+    autor_b,
+    parlamentar,
+    parlamentar_b,
+    responsavel_coletivas,
+):
+    """Coletiva na fase 17 cujo dono é o Operador da LOA, responsável na LOA."""
+    emendas_que_formariam_coletiva(
+        make_emenda, agrupamento, autor, autor_b, parlamentar, parlamentar_b
+    )
+
+    (coletiva,) = agrupamento.gerar_emendas_coletivas()
+    EmendaLoa.all_objects.all_objects().filter(pk=coletiva.pk).update(fase=LC)
+    coletiva = recarregar(coletiva)
+    assert coletiva.owner_id == responsavel_coletivas.pk  # LOA-FASE-071
+    return coletiva
+
+
+@pytest.mark.spec("LOA-FASE-070")
+def test_vira_proposicao_so_emenda_de_dono_operador_de_autor(
+    make_emenda, autor, operador_loa, coletiva_do_operador_da_loa
+):
+    do_autor = make_emenda(fase=LC, owner=autor)
+    do_operador = make_emenda(fase=LC, owner=operador_loa)
+
+    assert EmendaLoa.service.vira_proposicao(do_autor)
+    assert not EmendaLoa.service.vira_proposicao(do_operador)
+    assert not EmendaLoa.service.vira_proposicao(coletiva_do_operador_da_loa)
+
+
+@pytest.mark.spec("LOA-FASE-070")
+@pytest.mark.parametrize("quem_registra", ["autor", "autor_b"])
+def test_registro_em_lote_nao_pega_coletiva_de_dono_sem_autor(
+    request, loa, make_emenda, coletiva_do_operador_da_loa, quem_registra
+):
+    """Os dois parlamentares participam da coletiva, e nenhum dos operadores a registra."""
+    from cmj.loa import tasks
+
+    usuario = request.getfixturevalue(quem_registra)
+    propria = make_emenda(fase=LC, owner=usuario)
+
+    with mock.patch.object(
+        EmendaLoa, "registrar_proposicao", autospec=True
+    ) as registrar:
+        tasks.task_register_emendaloa_proposicao_function(loa.pk, usuario.pk)
+
+    registradas = [chamada.args[0].pk for chamada in registrar.call_args_list]
+    assert registradas == [propria.pk]
+
+
+@pytest.mark.spec("LOA-FASE-070")
+def test_registrar_proposicao_recusa_dono_sem_autor_sem_gerar_pdf(
+    coletiva_do_operador_da_loa,
+):
+    coletiva = coletiva_do_operador_da_loa
+
+    with mock.patch.object(EmendaLoa, "retrieve_file_bytes") as gerar_pdf:
+        with pytest.raises(Exception, match="não é operador de autor"):
+            coletiva.registrar_proposicao()
+
+    gerar_pdf.assert_not_called()
+    assert not Proposicao.objects.exists()
+    coletiva = recarregar(coletiva)
+    assert coletiva.proposicao_id is None
+    assert coletiva.fase == LC
 
 
 # -------------------------------------------------------- criação pelo autor
@@ -648,6 +847,7 @@ def test_historico_registra_usuario_ao_gerar_e_cancelar_coletiva(
     autor_b,
     parlamentar,
     parlamentar_b,
+    responsavel_coletivas,
 ):
     a = make_emenda(
         fase=EC, owner=autor, parlamentar=parlamentar, permite_juncao_coletiva=True

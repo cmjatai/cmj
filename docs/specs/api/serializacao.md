@@ -86,7 +86,7 @@ campos, em [filtros.md](./filtros.md) (`API-FIL`); o custo do `expand`, em
   a objeto para quem não pode editar aquela emenda. Por estar na classe, a regra vale também quando
   a emenda chega por `expand`. O `owner` segue ainda API-SER-032: quem edita a emenda sem ter
   `list_emendaloa`, como o operador do autor, recebe `metadata` e `search`, mas não `owner`.
-  Evidência: `cmj/api/loa/serializers/__init__.py:100-123`.
+  Evidência: `cmj/api/loa/serializers/__init__.py:101-124`.
 - API-SER-017 [retirada] Substituída por API-SER-025.
 - API-SER-018 [retirada] Substituída por API-SER-026.
 - API-SER-025 [implementado] `expand` só troca o id pelo objeto se o usuário passar nas permissões

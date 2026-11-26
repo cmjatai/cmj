@@ -6,8 +6,8 @@
       "_vendor-BinAeRXK.js"
     ]
   },
-  "_DrawerRota-DXPRCjIh.js": {
-    "file": "v8/DrawerRota-DXPRCjIh.js",
+  "_DrawerRota-h5h5mjsd.js": {
+    "file": "v8/DrawerRota-h5h5mjsd.js",
     "name": "DrawerRota",
     "imports": [
       "_vendor-BinAeRXK.js",
@@ -21,8 +21,8 @@
       "_vendor-BinAeRXK.js"
     ]
   },
-  "_EstadoCarga-D7Z9PgxI.js": {
-    "file": "v8/EstadoCarga-D7Z9PgxI.js",
+  "_EstadoCarga-O6odDWb_.js": {
+    "file": "v8/EstadoCarga-O6odDWb_.js",
     "name": "EstadoCarga",
     "imports": [
       "_rolldown-runtime-la_ZsWYt.js",
@@ -47,8 +47,8 @@
       "_EtiquetaSituacao-Bhra7g-v.js"
     ]
   },
-  "_amostras-CCKU0wzc.js": {
-    "file": "v8/amostras-CCKU0wzc.js",
+  "_amostras-DVySvyH1.js": {
+    "file": "v8/amostras-DVySvyH1.js",
     "name": "amostras",
     "imports": [
       "main.js",
@@ -75,24 +75,24 @@
     "file": "v8/rolldown-runtime-la_ZsWYt.js",
     "name": "rolldown-runtime"
   },
-  "_useCliente-CYQAPzIl.js": {
-    "file": "v8/useCliente-CYQAPzIl.js",
+  "_useCliente-Cx_BYWst.js": {
+    "file": "v8/useCliente-Cx_BYWst.js",
     "name": "useCliente",
     "imports": [
       "_vendor-BinAeRXK.js",
-      "_EstadoCarga-D7Z9PgxI.js"
+      "_EstadoCarga-O6odDWb_.js"
     ]
   },
-  "_useFormModal-LnrNJnCS.js": {
-    "file": "v8/useFormModal-LnrNJnCS.js",
+  "_useFormModal-BYgqhjH4.js": {
+    "file": "v8/useFormModal-BYgqhjH4.js",
     "name": "useFormModal",
     "imports": [
       "_vendor-BinAeRXK.js",
       "main.js"
     ]
   },
-  "_useModal-DyPSFMXV.js": {
-    "file": "v8/useModal-DyPSFMXV.js",
+  "_useModal-fAtw7gHF.js": {
+    "file": "v8/useModal-fAtw7gHF.js",
     "name": "useModal",
     "imports": [
       "main.js",
@@ -110,7 +110,7 @@
     ]
   },
   "http/ModalSessao.vue": {
-    "file": "v8/ModalSessao-_cAn0k3v.js",
+    "file": "v8/ModalSessao-Dr94LenB.js",
     "name": "ModalSessao",
     "src": "http/ModalSessao.vue",
     "isDynamicEntry": true,
@@ -120,7 +120,7 @@
     ]
   },
   "main.js": {
-    "file": "v8/main-D4Fb4s3e.js",
+    "file": "v8/main-BtBp3L9j.js",
     "name": "main",
     "src": "main.js",
     "isEntry": true,
@@ -143,7 +143,7 @@
       "modules/demo/modais/ClienteResumo.vue"
     ],
     "css": [
-      "v8/main-DoJNJEOK.css"
+      "v8/main--GP8pMGi.css"
     ]
   },
   "modules/demo/ilhas/ClientesTabela.vue": {
@@ -157,7 +157,7 @@
     ]
   },
   "modules/demo/modais/ClienteForm.vue": {
-    "file": "v8/ClienteForm-C0NqG4gQ.js",
+    "file": "v8/ClienteForm-DkBFDZK6.js",
     "name": "ClienteForm",
     "src": "modules/demo/modais/ClienteForm.vue",
     "isDynamicEntry": true,
@@ -166,13 +166,13 @@
       "_CampoForm-XL1V7aAr.js",
       "_ErrosGerais-CnIsst83.js",
       "main.js",
-      "_useFormModal-LnrNJnCS.js",
-      "_EstadoCarga-D7Z9PgxI.js",
+      "_useFormModal-BYgqhjH4.js",
+      "_EstadoCarga-O6odDWb_.js",
       "_formatos-R8STBQoq.js"
     ]
   },
   "modules/demo/modais/ClienteResumo.vue": {
-    "file": "v8/ClienteResumo-C07_z_rL.js",
+    "file": "v8/ClienteResumo-DFcn2LmZ.js",
     "name": "ClienteResumo",
     "src": "modules/demo/modais/ClienteResumo.vue",
     "isDynamicEntry": true,
@@ -181,13 +181,13 @@
       "_vendor-BinAeRXK.js",
       "main.js",
       "_PedidosTabela-Bckyt6JH.js",
-      "_EstadoCarga-D7Z9PgxI.js",
+      "_EstadoCarga-O6odDWb_.js",
       "_formatos-R8STBQoq.js",
-      "_useCliente-CYQAPzIl.js"
+      "_useCliente-Cx_BYWst.js"
     ]
   },
   "modules/demo/paineis/PainelCliente.vue": {
-    "file": "v8/PainelCliente-D6_lZd-O.js",
+    "file": "v8/PainelCliente-C5ruHFva.js",
     "name": "PainelCliente",
     "src": "modules/demo/paineis/PainelCliente.vue",
     "isDynamicEntry": true,
@@ -195,23 +195,23 @@
       "_vendor-BinAeRXK.js",
       "main.js",
       "_PedidosTabela-Bckyt6JH.js",
-      "_EstadoCarga-D7Z9PgxI.js",
-      "_useCliente-CYQAPzIl.js"
+      "_EstadoCarga-O6odDWb_.js",
+      "_useCliente-Cx_BYWst.js"
     ]
   },
   "modules/demo/spa/ClienteDetalhe.vue": {
-    "file": "v8/ClienteDetalhe-0WqBoa7f.js",
+    "file": "v8/ClienteDetalhe-BEzGmS0y.js",
     "name": "ClienteDetalhe",
     "src": "modules/demo/spa/ClienteDetalhe.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-BinAeRXK.js",
-      "_DrawerRota-DXPRCjIh.js",
+      "_DrawerRota-h5h5mjsd.js",
       "main.js",
-      "_useModal-DyPSFMXV.js",
+      "_useModal-fAtw7gHF.js",
       "_PedidosTabela-Bckyt6JH.js",
-      "_EstadoCarga-D7Z9PgxI.js",
-      "_useCliente-CYQAPzIl.js",
+      "_EstadoCarga-O6odDWb_.js",
+      "_useCliente-Cx_BYWst.js",
       "_preload-helper-Da3k9pLa.js"
     ],
     "dynamicImports": [
@@ -220,7 +220,7 @@
     ]
   },
   "modules/demo/spa/ClientesLista.vue": {
-    "file": "v8/ClientesLista-C1NhoBDu.js",
+    "file": "v8/ClientesLista-Cykq6rLq.js",
     "name": "ClientesLista",
     "src": "modules/demo/spa/ClientesLista.vue",
     "isDynamicEntry": true,
@@ -228,9 +228,9 @@
       "_rolldown-runtime-la_ZsWYt.js",
       "_vendor-BinAeRXK.js",
       "main.js",
-      "_DrawerRota-DXPRCjIh.js",
-      "_useModal-DyPSFMXV.js",
-      "_EstadoCarga-D7Z9PgxI.js",
+      "_DrawerRota-h5h5mjsd.js",
+      "_useModal-fAtw7gHF.js",
+      "_EstadoCarga-O6odDWb_.js",
       "_EtiquetaSituacao-Bhra7g-v.js",
       "_preload-helper-Da3k9pLa.js"
     ],
@@ -241,16 +241,16 @@
     ]
   },
   "modules/demo/spa/PedidoDetalhe.vue": {
-    "file": "v8/PedidoDetalhe-Cw47tNEy.js",
+    "file": "v8/PedidoDetalhe-Dprhu1cq.js",
     "name": "PedidoDetalhe",
     "src": "modules/demo/spa/PedidoDetalhe.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-BinAeRXK.js",
       "main.js",
-      "_EstadoCarga-D7Z9PgxI.js",
+      "_EstadoCarga-O6odDWb_.js",
       "_formatos-R8STBQoq.js",
-      "_useCliente-CYQAPzIl.js"
+      "_useCliente-Cx_BYWst.js"
     ]
   },
   "modules/demo/wizard/PassoIdentificacao.vue": {
@@ -285,7 +285,7 @@
     ]
   },
   "modules/demo/zona.js": {
-    "file": "v8/zona-zSHdIhhJ.js",
+    "file": "v8/zona-C40s3QMK.js",
     "name": "zona",
     "src": "modules/demo/zona.js",
     "isDynamicEntry": true,
@@ -300,24 +300,24 @@
     ]
   },
   "modules/ds/ilhas/DsCampos.vue": {
-    "file": "v8/DsCampos-Cs-dA0BJ.js",
+    "file": "v8/DsCampos-Bzs1tRJp.js",
     "name": "DsCampos",
     "src": "modules/ds/ilhas/DsCampos.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-BinAeRXK.js",
       "_icones-Bqmid9BC.js",
-      "_amostras-CCKU0wzc.js"
+      "_amostras-DVySvyH1.js"
     ]
   },
   "modules/ds/ilhas/DsComponentes.vue": {
-    "file": "v8/DsComponentes-CLo-LRw5.js",
+    "file": "v8/DsComponentes-C17VYaL7.js",
     "name": "DsComponentes",
     "src": "modules/ds/ilhas/DsComponentes.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-BinAeRXK.js",
-      "_amostras-CCKU0wzc.js"
+      "_amostras-DVySvyH1.js"
     ]
   },
   "modules/ds/ilhas/DsCor.vue": {
@@ -351,15 +351,15 @@
     ]
   },
   "modules/ds/ilhas/DsOverlays.vue": {
-    "file": "v8/DsOverlays-Bh0CRi8G.js",
+    "file": "v8/DsOverlays-DSk4p_nr.js",
     "name": "DsOverlays",
     "src": "modules/ds/ilhas/DsOverlays.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-BinAeRXK.js",
-      "_useModal-DyPSFMXV.js",
+      "_useModal-fAtw7gHF.js",
       "main.js",
-      "_amostras-CCKU0wzc.js",
+      "_amostras-DVySvyH1.js",
       "_preload-helper-Da3k9pLa.js"
     ],
     "dynamicImports": [
@@ -368,7 +368,7 @@
     ]
   },
   "modules/ds/modais/AmostraConteudo.vue": {
-    "file": "v8/AmostraConteudo-9Fzw4yyF.js",
+    "file": "v8/AmostraConteudo-5a2hiqpR.js",
     "name": "AmostraConteudo",
     "src": "modules/ds/modais/AmostraConteudo.vue",
     "isDynamicEntry": true,
@@ -378,7 +378,7 @@
     ]
   },
   "modules/ds/modais/AmostraForm.vue": {
-    "file": "v8/AmostraForm-D1PpeNYI.js",
+    "file": "v8/AmostraForm-BkPN-Mz0.js",
     "name": "AmostraForm",
     "src": "modules/ds/modais/AmostraForm.vue",
     "isDynamicEntry": true,
@@ -387,19 +387,19 @@
       "_CampoForm-XL1V7aAr.js",
       "_ErrosGerais-CnIsst83.js",
       "main.js",
-      "_useFormModal-LnrNJnCS.js",
-      "_amostras-CCKU0wzc.js"
+      "_useFormModal-BYgqhjH4.js",
+      "_amostras-DVySvyH1.js"
     ]
   },
   "modules/ds/modais/PassoBairro.vue": {
-    "file": "v8/PassoBairro-DviB6hHW.js",
+    "file": "v8/PassoBairro-29PDe4YH.js",
     "name": "PassoBairro",
     "src": "modules/ds/modais/PassoBairro.vue",
     "isDynamicEntry": true,
     "imports": [
       "_vendor-BinAeRXK.js",
       "_CampoForm-XL1V7aAr.js",
-      "_amostras-CCKU0wzc.js"
+      "_amostras-DVySvyH1.js"
     ]
   },
   "modules/ds/modais/PassoIdentificacao.vue": {
@@ -413,7 +413,7 @@
     ]
   },
   "overlays/ModalWizard.vue": {
-    "file": "v8/ModalWizard-CUCBwLid.js",
+    "file": "v8/ModalWizard-DoyUz0KS.js",
     "name": "ModalWizard",
     "src": "overlays/ModalWizard.vue",
     "isDynamicEntry": true,

@@ -424,20 +424,29 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
 
         self.helper = FormHelper()
 
+        # LOA-FASE-072: a coletiva não é devolvida para correção
+        coletiva = bool(self.instance.pk) and EmendaLoa.service.e_coletiva(
+            self.instance
+        )
+
         btns = {}
         if full_editor:
             btns = {
                 "actions": form_actions(
                     label="CONCLUIR EDIÇÃO CONTÁBIL E FINALIZAR",
                     name="submit_concluir",
-                    more=[
-                        Submit(
-                            "submit_devolver",
-                            "DEVOLVER PARA CORREÇÃO",
-                            css_class="btn btn-secondary",
-                            title="Devolver para Correção",
-                        ),
-                    ],
+                    more=(
+                        []
+                        if coletiva
+                        else [
+                            Submit(
+                                "submit_devolver",
+                                "DEVOLVER PARA CORREÇÃO",
+                                css_class="btn btn-secondary",
+                                title="Devolver para Correção",
+                            ),
+                        ]
+                    ),
                     disabled=False,
                 )
             }
@@ -547,6 +556,14 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                 self.fields["fase"].widget.attrs["class"] = "is-invalid"
                 self.fields["fase"].choices = EmendaLoa.FASE_CHOICE[3:5]
 
+        # LOA-FASE-072: a fase 10 sai do select da coletiva que não está nela
+        if coletiva and self.instance.fase != EmendaLoa.PROPOSTA:
+            self.fields["fase"].choices = [
+                (v, r)
+                for v, r in self.fields["fase"].choices
+                if v != EmendaLoa.PROPOSTA
+            ]
+
         if full_editor:
             self.fields.pop("parlamentares__valor")
             self.fields.pop("parl_assinantes")
@@ -599,6 +616,8 @@ class EmendaLoaForm(MateriaCheckFormMixin, ModelForm):
                     "Você não tem permissão para levar a Emenda para a fase "
                     f'"{dict(EmendaLoa.FASE_CHOICE).get(destino, destino)}".'
                 )
+            if self.instance.pk:  # LOA-FASE-072
+                EmendaLoa.service.validar_fase_da_coletiva(self.instance, destino)
 
         # LOA-EMD-077 a 079: perfil, parlamentares da LOA e parlamentar do dono.
         # O editor contábil não tem esses campos e não passa por aqui.

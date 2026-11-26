@@ -5,6 +5,7 @@ from unittest import mock
 
 import pytest
 from django.contrib.messages import get_messages
+from django.core.exceptions import PermissionDenied, ValidationError
 from model_mommy import mommy
 
 from cmj.loa.models import (
@@ -534,7 +535,9 @@ def test_criacao_cria_outro_quando_o_ultimo_nao_esta_vazio(
 
 
 @pytest.fixture
-def cancelavel(agrupamento, make_emenda, parlamentar, parlamentar_b):
+def cancelavel(
+    agrupamento, make_emenda, parlamentar, parlamentar_b, responsavel_coletivas
+):
     """Duas emendas que viram coletiva, uma na 17, uma na 12 e uma na 10."""
     juntas = [
         make_emenda(fase=EC, parlamentar=p, permite_juncao_coletiva=True)
@@ -640,3 +643,210 @@ def test_cancelar_nao_mexe_em_outro_agrupamento(
     assert all(
         recarregar(el).fase == EmendaLoa.TRANSFORMADA_EM_COLETIVA for el in juntas
     )
+
+
+# ------------------- devolução para correção pela tela (LOA-AGR-091 a 096)
+
+PL = EmendaLoa.PROPOSTA_LIBERADA  # 12
+
+
+def devolver(client, agrupamento, emenda):
+    return client.post(
+        f"/api/loa/agrupamento/{agrupamento.pk}/devolver_emenda/",
+        {"emendaloa": getattr(emenda, "pk", emenda)},
+        format="json",
+    )
+
+
+def ultimo_usuario_do_historico(emenda):
+    return emenda.emendaloahistoricofase_set.order_by("-id").first().usuario_id
+
+
+@pytest.mark.spec("LOA-AGR-091")
+@pytest.mark.parametrize("fase", [PL, EC, LC])
+def test_devolve_para_a_fase_10_nas_fases_12_15_e_17(
+    editor_contabil, agrupamento, make_emenda, fase
+):
+    el = make_emenda(fase=fase)
+
+    saiu = Agrupamento.service.devolver_emenda(editor_contabil, agrupamento, el)
+
+    assert saiu is False
+    el = recarregar(el)
+    assert el.fase == P
+    assert ultimo_usuario_do_historico(el) == editor_contabil.pk
+
+
+@pytest.mark.spec("LOA-AGR-091")
+@pytest.mark.parametrize(
+    "fase", [P, EmendaLoa.EM_TRAMITACAO, EmendaLoa.TRANSFORMADA_EM_COLETIVA]
+)
+def test_nao_devolve_fora_das_fases_12_15_e_17(
+    editor_contabil, agrupamento, make_emenda, fase
+):
+    el = make_emenda(fase=fase)
+
+    with pytest.raises(ValidationError, match="Só é possível devolver"):
+        Agrupamento.service.devolver_emenda(editor_contabil, agrupamento, el)
+
+    assert recarregar(el).fase == fase
+
+
+@pytest.mark.spec("LOA-AGR-091")
+def test_nao_devolve_a_coletiva(editor_contabil, agrupamento, make_emenda):
+    coletiva = make_emenda(fase=EC, agrupamento_de_origem=agrupamento)
+
+    with pytest.raises(ValidationError, match="não pode ser devolvida"):
+        Agrupamento.service.devolver_emenda(editor_contabil, agrupamento, coletiva)
+
+    assert recarregar(coletiva).fase == EC
+
+
+@pytest.mark.spec("LOA-AGR-092")
+def test_devolvida_sai_do_agrupamento_com_os_registros(
+    editor_contabil, agrupada, agrupamento_liberavel
+):
+    antes = registros(agrupada)
+    assert [v for _, v in antes] == [Decimal("-1000.00"), Decimal("1000.00")]
+
+    saiu = Agrupamento.service.devolver_emenda(
+        editor_contabil, agrupamento_liberavel, agrupada
+    )
+
+    assert saiu is True
+    assert not AgrupamentoEmendaLoa.objects.filter(emendaloa=agrupada).exists()
+    assert recarregar(agrupada).fase == P
+    assert registros(agrupada) == antes
+
+
+@pytest.mark.spec("LOA-AGR-092")
+def test_nao_devolve_emenda_de_outro_agrupamento(
+    editor_contabil, agrupamento, loa, make_emenda
+):
+    outro = mommy.make(Agrupamento, loa=loa, nome="Outro", finalidade="")
+    el = make_emenda(fase=EC)
+    AgrupamentoEmendaLoa.objects.create(agrupamento=outro, emendaloa=el)
+
+    with pytest.raises(ValidationError, match='está no agrupamento "Outro"'):
+        Agrupamento.service.devolver_emenda(editor_contabil, agrupamento, el)
+
+    assert recarregar(el).fase == EC
+    assert AgrupamentoEmendaLoa.objects.filter(agrupamento=outro, emendaloa=el).exists()
+
+
+@pytest.mark.spec("LOA-AGR-094")
+def test_rota_devolve_e_responde_a_mensagem_de_sucesso(
+    api, editor_contabil, agrupada, agrupamento_liberavel
+):
+    r = devolver(api(editor_contabil), agrupamento_liberavel, agrupada)
+
+    assert r.status_code == 200, r.content
+    assert r.json()["detail"] == "Emenda devolvida para correção com sucesso."
+    assert r.json()["saiu_do_agrupamento"] is True
+    # LOA-AGR-095, item 2: a resposta não traz dados da emenda
+    assert set(r.json()) == {
+        "detail",
+        "saiu_do_agrupamento",
+        "aviso_finalidade",
+        "agrupamento_finalidade",
+    }
+    assert recarregar(agrupada).fase == P
+
+
+@pytest.mark.spec("LOA-AGR-095")
+def test_operador_da_loa_tambem_devolve(api, operador_loa, agrupamento, make_emenda):
+    el = make_emenda(fase=EC)
+
+    r = devolver(api(operador_loa), agrupamento, el)
+
+    assert r.status_code == 200, r.content
+    assert recarregar(el).fase == P
+
+
+@pytest.mark.spec("LOA-AGR-095")
+@pytest.mark.parametrize("perfil", ["anonimo", "comum", "autor"])
+def test_rota_recusa_quem_nao_e_editor(
+    request, client, api, django_user_model, agrupamento, make_emenda, perfil
+):
+    el = make_emenda(fase=EC)
+    if perfil == "anonimo":
+        cliente = client
+    elif perfil == "comum":
+        cliente = api(
+            django_user_model.objects.create_user(
+                email="comum@test.local", password="testpass123!"
+            )
+        )
+    else:
+        cliente = api(request.getfixturevalue("autor"))
+
+    r = (
+        cliente.post(
+            f"/api/loa/agrupamento/{agrupamento.pk}/devolver_emenda/",
+            {"emendaloa": el.pk},
+            content_type="application/json",
+        )
+        if perfil == "anonimo"
+        else devolver(cliente, agrupamento, el)
+    )
+
+    assert r.status_code in (401, 403)
+    assert recarregar(el).fase == EC
+
+
+@pytest.mark.spec("LOA-AGR-095")
+def test_servico_revalida_a_permissao(autor, agrupamento, make_emenda):
+    el = make_emenda(fase=EC)
+
+    with pytest.raises(PermissionDenied):
+        Agrupamento.service.devolver_emenda(autor, agrupamento, el)
+
+    assert recarregar(el).fase == EC
+
+
+@pytest.mark.spec("LOA-AGR-095")
+def test_rota_recusa_emenda_de_outra_loa_ou_inexistente(
+    api, editor_contabil, agrupamento, make_emenda, unidade
+):
+    from cmj.loa.models import Loa
+
+    outra_loa = mommy.make(Loa, ano=agrupamento.loa.ano + 1, publicado=True)
+    de_outra_loa = make_emenda(fase=EC, loa=outra_loa)
+    cliente = api(editor_contabil)
+
+    r = devolver(cliente, agrupamento, de_outra_loa)
+    assert r.status_code == 400
+    assert "não é da LOA deste agrupamento" in r.content.decode()
+    assert recarregar(de_outra_loa).fase == EC
+
+    r = devolver(cliente, agrupamento, 999999)
+    assert r.status_code == 400
+    assert "não encontrada" in r.content.decode()
+
+
+@pytest.mark.spec("LOA-AGR-096")
+def test_busca_mostra_emenda_de_outro_agrupamento_no_fim_com_o_agrupamento(
+    api, editor_contabil, loa, make_emenda, parlamentar
+):
+    outro = mommy.make(Agrupamento, loa=loa, nome="Outro", finalidade="")
+    # a de Diversos (99) vinha antes da de Saúde (10), pela ordem "-tipo"
+    agrupada_em_outro = make_emenda(fase=EC, parlamentar=parlamentar)
+    solta = make_emenda(fase=EC, tipo=EmendaLoa.SAUDE, parlamentar=parlamentar)
+    for el in (agrupada_em_outro, solta):
+        el.save()  # o search, pelos parlamentares, só é preenchido com eles gravados
+    AgrupamentoEmendaLoa.objects.create(agrupamento=outro, emendaloa=agrupada_em_outro)
+
+    r = api(editor_contabil).get(
+        f"/api/loa/emendaloa/search/?get_all=true&ano={loa.ano}&q=Parlamentar"
+    )
+
+    assert r.status_code == 200, r.content
+    ids = [e["id"] for e in r.json()]
+    assert ids == [solta.pk, agrupada_em_outro.pk]
+    por_id = {e["id"]: e for e in r.json()}
+    assert por_id[solta.pk]["agrupamento"] is None
+    assert por_id[agrupada_em_outro.pk]["agrupamento"] == {
+        "id": outro.pk,
+        "nome": "Outro",
+        "link_detail_backend": f"/loa/agrupamento/{outro.pk}",
+    }

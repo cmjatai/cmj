@@ -1,10 +1,14 @@
 import pymupdf
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import HttpResponse, JsonResponse
 from django.template.loader import render_to_string
 from rest_framework.decorators import action
+from rest_framework.exceptions import PermissionDenied as DRFPermissionDenied
+from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.response import Response
 
 from cmj.api.loa.views.emendaloa import EmendaLoaSearchSerializer, EmendaLoaViewSet
-from cmj.loa.models import EmendaLoa
+from cmj.loa.models import Agrupamento, EmendaLoa
 from cmj.utils.genia.loa_agrupamento import IAEmentaEmendaColetivaError
 from cmj.utils.utils_report import make_pdf, pdf_base_url
 from drfautoapi.drfautoapi import wrapper_queryset_response_for_drf_action
@@ -44,13 +48,58 @@ class AgrupamentoViewSet:
     def emendas(self, request, *args, **kwargs):
         return self.get_emendas(**kwargs)
 
+    @action(
+        methods=[
+            "post",
+        ],
+        detail=True,
+        permission_classes=(AgrupamentoPermission,),
+    )
+    def devolver_emenda(self, request, *args, **kwargs):
+        """Devolve a emenda para correção pela tela do agrupamento (LOA-AGR-091 a 095)."""
+        from cmj.api.loa.views.agrupamentoemendaloa import AgrupamentoEmendaLoaViewSet
+
+        agrupamento = self.get_queryset().filter(id=kwargs["pk"]).first()
+        if not agrupamento:
+            return JsonResponse({"detail": "Agrupamento não encontrado."}, status=404)
+        try:
+            emenda = EmendaLoa.objects.filter(pk=int(request.data["emendaloa"])).first()
+        except (KeyError, TypeError, ValueError):
+            emenda = None
+        if not emenda:
+            raise DRFValidationError("Emenda Impositiva não encontrada.")
+
+        try:
+            saiu = Agrupamento.service.devolver_emenda(
+                request.user, agrupamento, emenda
+            )
+        except PermissionDenied as e:
+            raise DRFPermissionDenied(str(e))
+        except ValidationError as e:
+            raise DRFValidationError(e.messages)
+
+        dados = {
+            "detail": "Emenda devolvida para correção com sucesso.",
+            "saiu_do_agrupamento": saiu,
+            "aviso_finalidade": "",
+        }
+        if saiu:
+            # LOA-AGR-092: como na lixeira, a finalidade é gerada de novo sem a emenda
+            dados["aviso_finalidade"] = (
+                AgrupamentoEmendaLoaViewSet.atualizar_finalidade(agrupamento)
+            )
+            dados["agrupamento_finalidade"] = agrupamento.finalidade
+        return Response(dados)
+
     @wrapper_queryset_response_for_drf_action(model=EmendaLoa)
     def get_emendas(self, **kwargs):
         self.serializer_class = EmendaLoaSearchSerializer
         qs = self.get_queryset()
         # remove filtro padrão de fase do EmendaLoaManager, que filtra apenas fases maiores que 0
         qs = qs.model._base_manager.all()
-        return qs.filter(agrupamentoemendaloa__agrupamento_id=kwargs["pk"])
+        return qs.filter(
+            agrupamentoemendaloa__agrupamento_id=kwargs["pk"]
+        ).select_related("agrupamentoemendaloa__agrupamento")
 
     @action(
         methods=[

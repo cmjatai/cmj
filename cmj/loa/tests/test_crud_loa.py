@@ -876,3 +876,99 @@ def test_formulario_de_loa_nova_sem_mandato_registrado_oferece_os_ativos():
     oferecidos = {pk for pk, _nome in LoaForm().fields["parlamentares"].choices}
 
     assert oferecidos == {ativo.pk}
+
+
+# ------------------------------------- responsável pelas Emendas Coletivas
+
+
+def _grupo_operador_da_loa():
+    from django.contrib.auth.models import Group, Permission
+
+    grupo, criado = Group.objects.get_or_create(name="Operador da LOA (teste)")
+    if not criado:
+        return grupo
+    for codename in ("add_emendaloa", "change_emendaloa", "emendaloa_full_editor"):
+        grupo.permissions.add(
+            Permission.objects.get(content_type__app_label="loa", codename=codename)
+        )
+    return grupo
+
+
+@pytest.mark.spec("LOA-CRUD-072")
+def test_responsavel_pelas_coletivas_oferece_so_operador_da_loa_sem_autor(
+    django_user_model, operador_loa, editor_contabil, autor, superuser
+):
+    from sapl.base.models import OperadorAutor
+
+    pelo_grupo = django_user_model.objects.create_user(
+        email="grupo@test.local", password="testpass123!"
+    )
+    pelo_grupo.groups.add(_grupo_operador_da_loa())
+    inativo = django_user_model.objects.create_user(
+        email="inativo@test.local", password="testpass123!"
+    )
+    inativo.is_active = False
+    inativo.save()
+    inativo.groups.add(_grupo_operador_da_loa())
+    operador_e_autor = django_user_model.objects.create_user(
+        email="operador_e_autor@test.local", password="testpass123!"
+    )
+    operador_e_autor.groups.add(_grupo_operador_da_loa())
+    mommy.make(
+        OperadorAutor,
+        user=operador_e_autor,
+        autor=autor.operadorautor_set.first().autor,
+    )
+
+    oferecidos = set(
+        LoaForm().fields["responsavel_coletivas"].queryset.values_list("pk", flat=True)
+    )
+
+    assert oferecidos == {operador_loa.pk, pelo_grupo.pk, superuser.pk}
+    for user in (operador_loa, pelo_grupo, superuser):
+        assert Loa.service.pode_ser_responsavel_coletivas(user)
+    for user in (editor_contabil, autor, inativo, operador_e_autor):
+        assert not Loa.service.pode_ser_responsavel_coletivas(
+            django_user_model.objects.get(pk=user.pk)
+        )
+
+
+@pytest.mark.spec("LOA-CRUD-072")
+def test_formulario_grava_o_responsavel_e_recusa_quem_nao_e_elegivel(
+    operador_loa, editor_contabil
+):
+    loa = mommy.make(Loa, ano=2076, receita_corrente_liquida=Decimal("1000.00"))
+    dados = {
+        "ano": 2076,
+        "receita_corrente_liquida": "1000.00",
+        "perc_disp_total": "2.00",
+        "perc_disp_saude": "1.00",
+        "perc_disp_diversos": "1.00",
+        "yaml_obs": "",
+    }
+
+    form = LoaForm(
+        instance=loa, data={**dados, "responsavel_coletivas": editor_contabil.pk}
+    )
+    assert not form.is_valid()
+    assert "responsavel_coletivas" in form.errors
+
+    form = LoaForm(
+        instance=loa, data={**dados, "responsavel_coletivas": operador_loa.pk}
+    )
+    assert form.is_valid(), form.errors
+    form.save()
+    loa.refresh_from_db()
+    assert loa.responsavel_coletivas_id == operador_loa.pk
+
+
+@pytest.mark.spec("LOA-CRUD-072")
+def test_api_publica_da_loa_nao_mostra_o_responsavel(client, operador_loa):
+    loa = _loa(
+        2077, publicado=True, com_norma=False, responsavel_coletivas=operador_loa
+    )
+
+    response = client.get(f"/api/loa/loa/{loa.pk}/")
+
+    assert response.status_code == 200
+    assert "responsavel_coletivas" not in response.json()

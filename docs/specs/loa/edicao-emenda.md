@@ -71,14 +71,14 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   gravar nada, e a mensagem cita o campo. Chaves que não são campos do model, como `busca_despesa`,
   continuam sendo ignoradas. O `owner`, que o serializer trata como somente leitura
   (API-SER-033), entra nessa conferência pelo valor enviado na requisição. Evidência:
-  `cmj/api/loa/views/emendaloa.py:108-121`.
+  `cmj/api/loa/views/emendaloa.py:112-125`.
 - LOA-EMD-074 [implementado] A action `updatevaloremenda` segue LOA-EMD-070 para o campo `valor`. Evidência:
-  `cmj/api/loa/views/emendaloa.py:199-203`. Substitui LOA-EMD-028 quanto à permissão.
+  `cmj/api/loa/views/emendaloa.py:203-207`. Substitui LOA-EMD-028 quanto à permissão.
 - LOA-EMD-075 [implementado] O POST do formulário de edição segue LOA-EMD-070. Campo alterado fora da lista,
   inclusive pelos campos ocultos de matéria, invalida o formulário. A criação não passa por essa
   regra: ela segue LOA-FASE-051. `indicacao` fica fora da verificação do formulário porque não é
   exibida e o `save()` a deriva da unidade (LOA-EMD-030). Evidência:
-  `cmj/loa/forms/f_emendaloa.py:262-274`, `cmj/loa/forms/f_emendaloa.py:609-618`.
+  `cmj/loa/forms/f_emendaloa.py:262-274`, `cmj/loa/forms/f_emendaloa.py:628-637`.
 
 ### Autoria, coautores e parlamentares (D3 e D7, decididas em 2026-11-20)
 
@@ -91,8 +91,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   que o dono sem autor (`None`) era igual a qualquer usuário sem autor, o que abria a edição para
   qualquer usuário logado. Evidência: `EmendaLoaService.e_autor_da_emenda`
   (`cmj/loa/services/s_emendaloa.py:108-127`), `cmj/api/loa/views/emendaloa.py:54-75`,
-  `cmj/loa/views/v_emendaloa.py:133-135`, `cmj/loa/views/v_emendaloa.py:1099-1106`,
-  `cmj/loa/views/v_emendaloa.py:1131-1135`.
+  `cmj/loa/views/v_emendaloa.py:133-135`, `cmj/loa/views/v_emendaloa.py:1107-1114`,
+  `cmj/loa/views/v_emendaloa.py:1139-1143`.
 - LOA-EMD-077 [implementado] Alteram valores por parlamentar e assinantes só o autor do dono, o
   Operador da LOA e o superusuário. O editor contábil não altera, como já acontecia no formulário. O
   autor do dono pode definir o valor dos coautores. Evidência:
@@ -105,8 +105,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   Substitui a regra anterior, que só impedia o próprio operador de zerar o seu parlamentar
   (LOA-EMD-021, LOA-EMD-022, LOA-EMD-026 e LOA-EMD-027). Evidência:
   `EmendaLoaService.parlamentar_protegido` (`cmj/loa/services/s_emendaloa.py:129-141`),
-  `cmj/api/loa/views/emendaloa.py:153-162`, `cmj/api/loa/views/emendaloa.py:236-245`,
-  `cmj/loa/forms/f_emendaloa.py:582-607`.
+  `cmj/api/loa/views/emendaloa.py:157-166`, `cmj/api/loa/views/emendaloa.py:240-249`,
+  `cmj/loa/forms/f_emendaloa.py:599-626`.
 
 ### Autor na fase 17 e registros contábeis (D8, decidida em 2026-11-20)
 
@@ -115,7 +115,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   modificativa, altera também o Valor Global, que é o valor da emenda. Prefixos, bairro e junção em
   coletiva ficam presos no formulário e são recusados pelo servidor. Evidência:
   `cmj/loa/services/s_emendaloa.py:20-23`, `cmj/loa/services/s_emendaloa.py:47-51`,
-  `cmj/loa/forms/f_emendaloa.py:501-524`.
+  `cmj/loa/forms/f_emendaloa.py:510-533`.
 - LOA-EMD-081 [implementado] Quando muda o valor de um parlamentar, inclusive com a inclusão ou a
   retirada de um coautor, o Valor Global passa a ser a soma dos parlamentares. Os registros contábeis
   da emenda são reajustados na mesma proporção do total. Na emenda em agrupamento, eles são refeitos
@@ -125,7 +125,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   valor e os registros desatualizados. O reajuste depende do `sync()` (LOA-EMD-031), que roda com a
   LOA em tramitação. Esse é sempre o caso na fase 17: quando a LOA sai de tramitação, todas as
   emendas já passaram da fase 20. Evidência: `cmj/loa/models/m_emendaloa.py:726-816`,
-  `cmj/loa/forms/f_emendaloa.py:689-692`.
+  `cmj/loa/forms/f_emendaloa.py:708-711`.
 
 ### Criação (D1, decidida em 2026-11-20)
 
@@ -146,7 +146,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   chaves alheias. Substitui LOA-EMD-054. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:7-21`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:374-380`,
-  `cmj/api/loa/views/emendaloa.py:123-126`.
+  `cmj/api/loa/views/emendaloa.py:127-130`.
 
 ### Erros do servidor na tela de edição (D6, decidida em 2026-11-20)
 
@@ -167,7 +167,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   - Sem teste automatizado: o v2018 não tem testes.
   - Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:39-72`,
     `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:503-513`, `_frontend/v2018/src/__apps/loa/mensagens.js:4-30`,
-    `_frontend/v2018/src/__apps/loa/scss/loa.scss:608-621`.
+    `_frontend/v2018/src/__apps/loa/scss/loa.scss:615-628`.
 
   Substitui a parte de falha de LOA-EMD-057.
 
@@ -183,7 +183,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   depois de cada pré-visualização, os controles voltam ao estilo gravado, e um aviso (LOA-EMD-084)
   informa quando o estilo pedido não foi gravado. Substitui LOA-EMD-052 quanto à permissão.
   Evidência: `EmendaLoaService.pode_editar` (`cmj/loa/services/s_emendaloa.py:133-154`),
-  `cmj/api/loa/views/emendaloa.py:253-297`,
+  `cmj/api/loa/views/emendaloa.py:257-301`,
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:156-210`.
 
 ### Registro de proposição pelo detalhe (decidido em 2026-11-20)
@@ -194,7 +194,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   POST com CSRF (LOA-LST-016), que processa todas as emendas liberadas do autor
   (LOA-FASE-041). O registro individual que existia no detalhe não tinha botão em nenhuma tela e foi
   removido, junto com o `extras_url` sem uso do detalhe. Evidência:
-  `cmj/loa/views/v_emendaloa.py:1151-1155`. Teste:
+  `cmj/loa/views/v_emendaloa.py:1159-1163`. Teste:
   `test_detalhe_com_registrar_nao_registra_proposicao`; na LOA 2026, o detalhe da emenda 365, aberto
   pelo operador do autor com e sem `?registrar`, respondeu 200 sem criar proposição (executado).
 
@@ -212,10 +212,10 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   superusuário e o Operador da LOA. Os demais só entram se forem operadores do mesmo autor do `owner`
   da emenda. Não é preciso participar da emenda: basta ser do mesmo autor. O trecho seguinte, que
   liberaria participantes de coletiva, nunca executa, porque fica depois do `return` (ver D7).
-  Evidência: `cmj/loa/views/v_emendaloa.py:1118-1133`.
+  Evidência: `cmj/loa/views/v_emendaloa.py:1126-1141`.
 - LOA-EMD-004 [observado] Os bloqueios por fase ao abrir e ao enviar a edição seguem LOA-FASE-030,
   LOA-FASE-031, LOA-FASE-055 e LOA-FASE-065. A captura de 12 para 15 ao abrir segue LOA-FASE-011 e
-  LOA-FASE-066. Evidência: `cmj/loa/views/v_emendaloa.py:1053-1150`.
+  LOA-FASE-066. Evidência: `cmj/loa/views/v_emendaloa.py:1053-1158`.
 - LOA-EMD-005 [observado] O PATCH da API, inclusive as actions `update_parlassinantes`,
   `updatevaloremenda` e `updatevalorparlamentar`, segue LOA-FASE-033:
   - com `change_emendaloa`, passa direto;
@@ -236,17 +236,17 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 - LOA-EMD-010 [observado] Sem `add_emendaloa`, os campos de matéria (tipo, número e ano) ficam ocultos
   e o campo `valor` (Valor Global) fica somente leitura. Com `add_emendaloa` (Operador da LOA e
   superusuário), os campos de matéria aparecem e o valor é editável. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:472-478`.
+  `cmj/loa/forms/f_emendaloa.py:481-487`.
 - LOA-EMD-011 [observado] Com `full_editor`, o formulário remove os campos de valor por parlamentar e
   de parlamentares assinantes, mostra o bloco "Registrar Deduções e Inserções" (busca de despesa e
   inclusão de registro contábil) e troca o botão Salvar por "CONCLUIR EDIÇÃO CONTÁBIL E FINALIZAR" e
   "DEVOLVER PARA CORREÇÃO". O efeito dos botões segue LOA-FASE-063 e LOA-FASE-069. Evidência:
   `cmj/loa/forms/f_emendaloa.py:314-316`, `cmj/loa/forms/f_emendaloa.py:325-376`,
-  `cmj/loa/forms/f_emendaloa.py:413-433`, `cmj/loa/forms/f_emendaloa.py:515-518`,
-  `cmj/loa/views/v_emendaloa.py:1069-1093`.
+  `cmj/loa/forms/f_emendaloa.py:413-449`, `cmj/loa/forms/f_emendaloa.py:524-527`,
+  `cmj/loa/views/v_emendaloa.py:1077-1101`.
 - LOA-EMD-012 [observado] O superusuário vê, ao mesmo tempo, o bloco de registros contábeis e os
   campos de parlamentares, com o botão Salvar padrão. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:325`, `cmj/loa/forms/f_emendaloa.py:431-433`.
+  `cmj/loa/forms/f_emendaloa.py:325`, `cmj/loa/forms/f_emendaloa.py:432-433`.
 - LOA-EMD-013 [observado] Na edição, os demais perfis veem a lista de registros contábeis só para
   leitura. A classe `btn-delete-d-none` esconde o botão de excluir apenas por CSS. Na criação, a lista
   não aparece. Evidência: `cmj/loa/forms/f_emendaloa.py:377-388`.
@@ -255,11 +255,11 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   pré-visualização. Evidência: `cmj/loa/forms/f_emendaloa.py:393-407`.
 - LOA-EMD-015 [observado] As opções de unidade são as unidades orçamentárias da LOA com
   `recebe_emenda_impositiva`. As de entidade são as entidades ativas. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:444-470`.
+  `cmj/loa/forms/f_emendaloa.py:453-479`.
 - LOA-EMD-016 [observado] Quando o usuário não tem `add_emendaloa` nem é `full_editor`, as opções de
   fase seguem LOA-FASE-010. Com fase maior que 12, `tipo`, `fase`, `unidade` e `entidade` ficam
   presos ao valor atual (LOA-FASE-032), e `indicacao` fica somente leitura. Os demais campos de texto
-  continuam editáveis. Evidência: `cmj/loa/forms/f_emendaloa.py:480-509`.
+  continuam editáveis. Evidência: `cmj/loa/forms/f_emendaloa.py:489-518`.
 
 ### Valores e parlamentares
 
@@ -270,34 +270,34 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `cmj/loa/forms/f_emendaloa.py:47-94`.
 - LOA-EMD-021 [observado] No envio do formulário de emenda impositiva (tipo diferente de 0), o operador
   de autor que não é superusuário precisa informar o valor do próprio parlamentar. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:568-582`.
+  `cmj/loa/forms/f_emendaloa.py:585-599`.
 - LOA-EMD-022 [observado] No envio do formulário de emenda modificativa (tipo 0), o Valor Global
   precisa ser maior que zero, e o operador de autor que não é superusuário precisa marcar o próprio
-  parlamentar entre os assinantes. Evidência: `cmj/loa/forms/f_emendaloa.py:583-605`.
+  parlamentar entre os assinantes. Evidência: `cmj/loa/forms/f_emendaloa.py:600-624`.
 - LOA-EMD-023 [observado] Ao salvar o formulário de emenda impositiva sem `full_editor`:
   - o Valor Global passa a ser a soma dos valores por parlamentar;
   - os vínculos `EmendaLoaParlamentar` são apagados e recriados só para os valores não nulos.
-  - Evidência: `cmj/loa/forms/f_emendaloa.py:655-662`, `cmj/loa/forms/f_emendaloa.py:672-701`.
+  - Evidência: `cmj/loa/forms/f_emendaloa.py:674-681`, `cmj/loa/forms/f_emendaloa.py:691-720`.
 
   Na modificativa, cada assinante é recriado com valor 1,00.
 - LOA-EMD-024 [observado] Na criação, o formulário define `owner` como o usuário e grava
   `metadata.style` com entrelinha 150 e espaço para assinaturas. Evidência:
-  `cmj/loa/forms/f_emendaloa.py:617-619`.
+  `cmj/loa/forms/f_emendaloa.py:636-638`.
 - LOA-EMD-025 [observado] O envio do formulário vincula a matéria informada por tipo, número e ano. Se
   qualquer um dos três estiver vazio, a matéria é desvinculada. Sem `add_emendaloa`, os três campos
   vão ocultos com os valores atuais, o que preserva o vínculo. Evidência:
-  `cmj/loa/forms/f_mixins.py:23-62`, `cmj/loa/views/v_emendaloa.py:1135-1145`.
+  `cmj/loa/forms/f_mixins.py:23-62`, `cmj/loa/views/v_emendaloa.py:1143-1153`.
 - LOA-EMD-026 [observado] `update_parlassinantes` marca e desmarca o parlamentar na emenda. O operador
   de autor que não é superusuário não pode desmarcar o próprio parlamentar. Evidência:
-  `cmj/api/loa/views/emendaloa.py:148-175`.
+  `cmj/api/loa/views/emendaloa.py:152-179`.
 - LOA-EMD-027 [observado] `updatevalorparlamentar` cria ou altera o valor do parlamentar enviado e
   apaga o vínculo quando o valor é zero. O operador de autor que não é superusuário não pode zerar o
   valor do próprio parlamentar. O endpoint não confere se o parlamentar pertence à LOA nem se o
   usuário pode alterar o valor de outro parlamentar (ver D3). Um valor inválido vira 0,00. Evidência:
-  `cmj/api/loa/views/emendaloa.py:203-250`.
+  `cmj/api/loa/views/emendaloa.py:207-254`.
 - LOA-EMD-028 [observado] `updatevaloremenda` grava o Valor Global enviado sem aplicar a regra do
   campo somente leitura do formulário. Um valor inválido vira 0,01. Evidência:
-  `cmj/api/loa/views/emendaloa.py:183-206`.
+  `cmj/api/loa/views/emendaloa.py:187-210`.
 
 ### Efeito do save() no model
 
@@ -351,7 +351,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
 - LOA-EMD-052 [observado] O GET de `/view/` grava em `metadata.style` a entrelinha recebida, limitada a
   100–300 no servidor, e o espaço para assinaturas. Assim, uma requisição GET altera a emenda.
   Substituída, quanto à permissão, por LOA-EMD-085.
-  Evidência: `cmj/api/loa/views/emendaloa.py:258-290`.
+  Evidência: `cmj/api/loa/views/emendaloa.py:262-294`.
 - LOA-EMD-053 [observado] O autosave reage ao evento `change` de qualquer campo com `name` do
   formulário e envia **um campo por requisição**:
 
@@ -371,16 +371,16 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   serializer ignora esses campos, mas a emenda é salva mesmo assim, o que dispara os signals e, com a
   LOA em tramitação, o `sync()` de LOA-EMD-031. Substituída por LOA-EMD-083. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:358-360`,
-  `cmj/api/loa/views/emendaloa.py:108-129`.
+  `cmj/api/loa/views/emendaloa.py:112-133`.
 - LOA-EMD-055 [observado] Mudar a fase pelo autosave envia `PATCH` com `fase`, sujeito às transições de
   LOA-FASE-052, LOA-FASE-053 e LOA-FASE-065. Enquanto a fase escolhida é 10, o select fica marcado em
   vermelho. Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:319-326`,
-  `cmj/api/loa/views/emendaloa.py:108-129`.
+  `cmj/api/loa/views/emendaloa.py:112-133`.
 - LOA-EMD-056 [retirada] O PATCH genérico usa o serializer com todos os campos do model e não aplica
   as restrições do formulário (LOA-EMD-010, LOA-EMD-016). Só a fase é conferida no servidor.
   Substituída por LOA-EMD-070 a 073.
-  Evidência: `cmj/api/serializers.py:55-56`, `cmj/api/loa/serializers/__init__.py:202-254`,
-  `cmj/api/loa/views/emendaloa.py:108-129`.
+  Evidência: `cmj/api/serializers.py:55-56`, `cmj/api/loa/serializers/__init__.py:222-274`,
+  `cmj/api/loa/views/emendaloa.py:112-133`.
 - LOA-EMD-057 [observado] Quando o autosave dá certo:
   - a tela atualiza a entrelinha e o Valor Global com os valores retornados;
   - recarrega os registros contábeis e a pré-visualização;
@@ -393,8 +393,8 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   resultado quando há só um. Evidência: `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:305-317`.
 - LOA-EMD-059 [observado] O botão Salvar e os botões contábeis enviam o formulário inteiro por POST
   para a view de edição, que valida e grava pelas regras de LOA-EMD-021 a LOA-EMD-025, em adição ao que
-  o autosave já gravou. Evidência: `cmj/loa/views/v_emendaloa.py:1053-1093`,
-  `cmj/loa/forms/f_emendaloa.py:548-664`.
+  o autosave já gravou. Evidência: `cmj/loa/views/v_emendaloa.py:1053-1101`,
+  `cmj/loa/forms/f_emendaloa.py:557-683`.
 
 ### Frontend: registros contábeis na edição
 
@@ -412,7 +412,7 @@ A decisão de quais campos o usuário pode alterar fica em `EmendaLoaService`
   `pk` da despesa escolhida (quando houver) e `valor_despesa`, que começa com o Valor Global da
   emenda. Os erros aparecem abaixo da busca, e os campos com problema ficam marcados. Evidência:
   `_frontend/v2018/src/__apps/loa/emenda/EmendaLoaUpdate.js:188-234`,
-  `cmj/loa/forms/f_emendaloa.py:436-438`.
+  `cmj/loa/forms/f_emendaloa.py:459-461`.
 - LOA-EMD-062 [observado] Excluir um registro envia `DELETE /api/loa/emendaloaregistrocontabil/<pk>/`
   e atualiza a lista, os totais e a pré-visualização. A permissão para criar e excluir registros segue
   LOA-FASE-068. Emenda que está num agrupamento não inclui, altera nem exclui registros pela própria
@@ -440,7 +440,7 @@ Problemas vistos ao implementar as regras acordadas, fora delas.
 
 - P1. **O PATCH genérico de `valor` sempre falha.** O `DecimalField` do serializer recusa "5000,00",
   e com "5000.00" o `validate_valor` recebe um `Decimal` e o trata como texto, o que também gera 400
-  (`cmj/api/loa/serializers/__init__.py:256-284`). A tela não é afetada porque grava o Valor Global
+  (`cmj/api/loa/serializers/__init__.py:276-304`). A tela não é afetada porque grava o Valor Global
   pela action `updatevaloremenda`. Por isso, a regra de `valor` é testada pelo service e pela action.
 
 ## Fora do escopo

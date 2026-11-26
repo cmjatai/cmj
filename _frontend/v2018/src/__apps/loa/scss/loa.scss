@@ -380,7 +380,14 @@
       .inner-actions {
         background-color: #fff;
         display: flex;
+        // LOA-AGR-091: o botão de devolver fica abaixo da seta e da lixeira
+        flex-direction: column;
+        justify-content: center;
         align-items: center;
+      }
+      .agrupamento-da-emenda {
+        display: block;
+        font-size: 85%;
       }
       .inner-item {
         &:hover {

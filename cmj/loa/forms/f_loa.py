@@ -60,6 +60,7 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
             "despesa_default_deducao_diversos",
             "despesa_default_deducao_educacao",
             "forcar_detalhamento_de_fonte",
+            "responsavel_coletivas",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -97,6 +98,10 @@ class LoaForm(MateriaCheckFormMixin, ModelForm):
         )
         self.fields["despesa_default_deducao_saude"].queryset = (
             despesa_default_deducao_saude
+        )
+        # LOA-CRUD-072: só quem pode ser dono das Emendas Coletivas
+        self.fields["responsavel_coletivas"].queryset = (
+            Loa.service.responsaveis_coletivas_elegiveis()
         )
 
     def _parlamentares_para_vincular(self):

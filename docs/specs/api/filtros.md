@@ -116,7 +116,7 @@ Como o filterset é escolhido está em [gerador.md](./gerador.md) (`API-GER`).
   autor. Para esses usuários os três campos não valem como filtro nem como ordenação. Quem pode
   vê-los em alguma emenda continua filtrando por eles; `owner` exige ainda `list_emendaloa`
   (API-SER-032). Evidência:
-  `cmj/api/loa/serializers/__init__.py:106-115`, `cmj/loa/services/s_emendaloa.py:171-183`.
+  `cmj/api/loa/serializers/__init__.py:107-116`, `cmj/loa/services/s_emendaloa.py:171-183`.
 - API-FIL-024 [acordado] Em `loa/emendaloa`, quem vê `metadata` e `search` em alguma emenda filtra
   e ordena por eles em todas, inclusive nas emendas em que não os recebe: é o caso do operador de
   autor diante das emendas dos outros autores. Aceito em 2026-11-22 porque não há o que revelar:
@@ -125,7 +125,7 @@ Como o filterset é escolhido está em [gerador.md](./gerador.md) (`API-GER`).
   pública já pesquisa para qualquer usuário. Guardar conteúdo reservado no `metadata` da emenda
   exige rever esta regra. Evidência: `cmj/loa/services/s_emendaloa.py:171-183`,
   `cmj/api/forms.py:116-131`, `cmj/loa/models/m_emendaloa.py:376-398`,
-  `cmj/loa/forms/f_emendaloa.py:653`.
+  `cmj/loa/forms/f_emendaloa.py:672`.
 - API-FIL-025 [acordado] A conferência da ordenação por relação (API-FIL-021) é por rota, e não
   objeto a objeto: a ordem da lista pode refletir um atributo de um objeto relacionado que o
   `expand` não mostraria ao usuário. Aceito em 2026-11-22: revela só a posição relativa, os filtros
