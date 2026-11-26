@@ -1,4 +1,5 @@
 import logging
+import re
 
 from django.conf import settings
 from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
@@ -42,6 +43,15 @@ class MateriaLegislativaSerializer(CmjSerializerMixin):
     class Meta:
         model = MateriaLegislativa
         exclude = ["similaridades"]
+
+    def validate_ementa(self, value):
+        # Sistemas externos enviam a ementa com as quebras de linha do PDF,
+        # reais ou escapadas como texto (\r\n, \\r\\n, \n, \\n...): tudo vira
+        # um espaço só.
+        if not value:
+            return value
+        value = re.sub(r"(?:\\+[rnt])+", " ", value)
+        return " ".join(value.split())
 
     def get_anexadas(self, obj):
         return list(obj.anexadas.materias_anexadas().values_list("id", flat=True))

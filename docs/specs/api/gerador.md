@@ -137,7 +137,7 @@ aparece só como inventário em [acesso.md](./acesso.md).
   parlamentar não troca o serializer da resposta: os campos pessoais do parlamentar são retirados
   na classe do serializer (API-SER-027), em qualquer rota ou action. Os demais usos do decorator
   seguem como em API-GER-020. Evidência: `sapl/api/views_parlamentares.py:38-62`,
-  `sapl/parlamentares/views.py:332-341`, `sapl/api/serializers.py:89-119`.
+  `sapl/parlamentares/views.py:332-341`, `sapl/api/serializers.py:99-129`.
 
 ### Resposta condicional
 

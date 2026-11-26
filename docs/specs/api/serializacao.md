@@ -105,7 +105,7 @@ campos, em [filtros.md](./filtros.md) (`API-FIL`); o custo do `expand`, em
   `data_nascimento` e `sexo`. O `email` e o `telefone`, contato do mandato que a página do
   parlamentar exibe, saem para todos. A regra fica na classe do serializer e vale na rota do
   parlamentar, no `expand` de qualquer rota e em todo outro uso do serializer; sem requisição no
-  contexto, os campos também não saem. Evidência: `sapl/api/serializers.py:89-119`,
+  contexto, os campos também não saem. Evidência: `sapl/api/serializers.py:99-129`,
   `_templates/v2018/parlamentares/layouts.yaml:46-62`.
 - API-SER-028 [implementado] Num model que guarda quem fez o registro, pelo par de campos `ip` e
   `user`, os dois só saem para superusuário, como nas telas de detalhe desses models. Hoje são
@@ -145,7 +145,7 @@ campos, em [filtros.md](./filtros.md) (`API-FIL`); o custo do `expand`, em
   `old_json` e `temp_migracao_sislegis`), que tela nenhuma mostra, só saem para quem tem
   `list_documentoadministrativo`. (executado) Na área pública da base local, 2 documentos têm
   `interessado`, nenhum tem `email` ou `link_share`, e 1.610 têm os campos de importação.
-  Evidência: `sapl/api/serializers.py:66-86`,
+  Evidência: `sapl/api/serializers.py:76-96`,
   `_templates/v2018/protocoloadm/documentoadministrativo_item_filter.html:88-91`.
 
 ### Campos internos e pessoais nas rotas públicas
