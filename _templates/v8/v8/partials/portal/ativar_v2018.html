@@ -1,0 +1,4 @@
+{% load v8_tags %}{% v8_portal_pode_ativar as v8_pode_ativar %}{% if v8_pode_ativar %}
+{# Incluído pela página inicial do v2018, fora dos fragmentos em cache. Visual do Bootstrap do v2018. #}
+<div class="container text-right py-2"><form method="post" action="{% url 'cmj.v8:portal_ativar' %}" class="d-inline" data-v8-portal="ativar">{% csrf_token %}<input type="hidden" name="next" value="/"><button type="submit" class="btn btn-primary btn-sm">Conferir o novo portal</button></form></div>
+{% endif %}

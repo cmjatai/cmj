@@ -9,6 +9,7 @@ MIDDLEWARE = (
     "cmj.middleware.endpoint_restriction.EndpointRestrictionMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "cmj.v8.middleware.PortalV8Middleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django.middleware.security.SecurityMiddleware",

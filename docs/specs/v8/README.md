@@ -15,6 +15,7 @@ v2018. Marcadores, IDs, ligação com testes e varredura de segurança seguem
 | [temas.md](./temas.md) | `V8-TEMA` | Temas nomeados (design) e modos claro e escuro, registro, CSS de cada tema, escolha por cookie |
 | [ds.md](./ds.md) | `V8-DS` | Design system: vitrine dos elementos, classes, overlays, ícones e tokens, e prévia de cada tema |
 | [componentes.md](./componentes.md) | `V8-CMP` | Componentes base sobre o Reka UI: abas, sanfona, dica, popover, menu suspenso, seleção, caixa de marcação, opções e chave |
+| [portal.md](./portal.md) | `V8-PORTAL` | Troca de portal: o v8 nas mesmas rotas do portal, ligado por cookie assinado que só o superusuário emite |
 
 ## Os dois modos de tela
 
@@ -27,7 +28,8 @@ Nos dois modos a página tem um único app Vue, um único Pinia e uma única pil
 
 ## Limites que valem para todas as specs
 
-- Tudo o que o v8 cria responde em `/v8/...`.
+- Tudo o que o v8 cria responde em `/v8/...`. A exceção é a troca de portal (`portal.md`), que
+  serve as páginas migradas nos caminhos do portal, só para quem tem o cookie `v8_portal`.
 - Os únicos arquivos existentes alterados fora de `_frontend/v8` e `_templates/v8` estão listados no
   Escopo de `arquitetura.md`.
 - `_frontend/v6`, `_frontend/v2018`, `_templates/v6`, `_templates/v2018` e os apps existentes não

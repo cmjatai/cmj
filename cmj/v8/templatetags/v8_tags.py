@@ -12,7 +12,7 @@ from django import template
 from django.contrib.auth.models import AnonymousUser
 from django.utils.html import format_html, json_script
 
-from cmj.v8.services import s_global, s_menu
+from cmj.v8.services import s_global, s_menu, s_portal
 
 register = template.Library()
 
@@ -190,3 +190,15 @@ def v8_island(parser, token):
     nodelist = parser.parse(("endv8_island",))
     parser.delete_first_token()
     return IlhaNode(nome, props, nodelist)
+
+
+@register.simple_tag(takes_context=True)
+def v8_portal_pode_ativar(context):
+    """Diz se o usuário pode ligar o v8 na raiz do portal (docs/specs/v8/portal.md)."""
+    return s_portal.pode_ativar(_usuario(context))
+
+
+@register.simple_tag(takes_context=True)
+def v8_portal_ativo(context):
+    """Diz se a requisição está com o v8 ligado na raiz do portal."""
+    return bool(getattr(context.get("request"), "v8_portal", False))

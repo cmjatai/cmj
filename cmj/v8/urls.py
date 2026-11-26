@@ -19,6 +19,20 @@ urlpatterns_paginas = [
     re_path(r"^v8/$", views.InicioView.as_view(), name="inicio"),
 ]
 
+# Troca de portal (docs/specs/v8/portal.md): só POST, com CSRF.
+urlpatterns_portal = [
+    re_path(
+        r"^v8/portal/ativar/$",
+        views.PortalAtivarView.as_view(),
+        name="portal_ativar",
+    ),
+    re_path(
+        r"^v8/portal/desativar/$",
+        views.PortalDesativarView.as_view(),
+        name="portal_desativar",
+    ),
+]
+
 urlpatterns_demo = [
     re_path(
         r"^v8/demo/clientes/$",
@@ -104,6 +118,7 @@ urlpatterns_zonas = [
 
 urlpatterns = (
     urlpatterns_paginas
+    + urlpatterns_portal
     + urlpatterns_demo
     + urlpatterns_demo_layouts
     + urlpatterns_ds

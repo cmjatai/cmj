@@ -11,6 +11,7 @@
         {% block brand %}<a class="v8-topbar-marca" href="{% url 'cmj.v8:inicio' %}">PortalCMJ</a>{% endblock %}
         {% block header_nav %}{% endblock %}
         {% block header_actions %}
+          {% v8_portal_ativo as v8_portal %}{% if v8_portal %}<form method="post" action="{% url 'cmj.v8:portal_desativar' %}" data-v8-portal="voltar">{% csrf_token %}<input type="hidden" name="next" value="{{ request.path }}"><button type="submit" class="v8-btn v8-btn-fantasma">Voltar ao portal antigo</button></form>{% endif %}
           {% v8_preferencias as v8_pref %}
           <button type="button" class="v8-btn v8-btn-icone" data-v8-acao="modo" aria-pressed="{% if v8_pref.modo == 'escuro' %}true{% else %}false{% endif %}" aria-label="Modo escuro">
             <svg class="v8-icone v8-icone-sol" aria-hidden="true"><use href="#v8-i-sol"></use></svg>

@@ -120,7 +120,7 @@ Regras de outras specs que mudam com esta (D2):
 - V8-TEMA-040 [implementado] Nome de tema só chega ao HTML, ao JSON e ao cookie depois de conferido
   no registro. Cookie com outro valor vale como `oficial`, e as rotas de prévia e de uso existem só
   para os nomes do registro: outro nome responde 404. Itens da varredura: 4 e 6. Evidência:
-  `cmj/v8/urls.py:72`, `cmj/v8/services/s_global.py:119`.
+  `cmj/v8/urls.py:86`, `cmj/v8/services/s_global.py:119`.
 - V8-TEMA-041 [implementado] Qualquer pessoa, inclusive anônima, pode usar um tema no próprio
   navegador (D9). A rota aceita só `POST` com CSRF e não grava nada além do cookie, que só muda a
   aparência daquele navegador. Item da varredura: 1. Evidência: `cmj/v8/views.py:492`,

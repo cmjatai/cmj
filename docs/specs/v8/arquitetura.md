@@ -11,8 +11,9 @@ Vue e um único Pinia.
 
 ## Escopo
 
-App novo `cmj/v8` (`name = "cmj.v8"`, `label = "v8"`), sem models, migrations, signals, context
-processor nem middleware. Recebe as views, as rotas, as template tags e os serviços do v8:
+App novo `cmj/v8` (`name = "cmj.v8"`, `label = "v8"`), sem models, migrations, signals nem context
+processor. O único middleware é o da troca de portal (`portal.md`). Recebe as views, as rotas, as
+template tags e os serviços do v8:
 
 | Arquivo | Conteúdo |
 | --- | --- |
@@ -32,17 +33,20 @@ Arquivos existentes alterados, e só eles:
 | `cmj/urls.py` | `include(cmj.v8.urls)` antes de `cmj.core.urls` |
 | `cmj/core/urls.py`, `cmj/core/views.py` | Saem a rota `^v8/(?P<slug>[^.]*)$` e a view `app_vue_view_v8`, que passam para o app novo |
 | `_templates/v8/base_v8.html` | Reescrito como base dos layouts |
+| `cmj/settings/middleware.py` | `cmj.v8.middleware.PortalV8Middleware` depois do `AuthenticationMiddleware` (`portal.md`) |
+| `_templates/v2018/path/pagina_inicial.html` | `include` do botão "Conferir o novo portal", fora dos fragmentos em cache (`portal.md`) |
 | `_frontend/v8/` | `package.json`, `vite.config.js`, `eslint.config.js` e `src/` |
 
-Legado tocado: só a rota e a view do v8 em `cmj/core`, que serviam de teste entre o Django e o Vue
-Router.
+Legado tocado: a rota e a view do v8 em `cmj/core`, que serviam de teste entre o Django e o Vue
+Router; e, para a troca de portal (`portal.md`), uma linha da lista de middlewares e um `include`
+na página inicial do v2018.
 
 ## Regras
 
 ### Contenção
 
 - V8-ARQ-001 [implementado] Toda rota de `cmj/v8/urls.py` casa apenas com caminhos iniciados por
-  `/v8/`. Evidência: `cmj/v8/urls.py:105`.
+  `/v8/`. Evidência: `cmj/v8/urls.py:119`.
 - V8-ARQ-002 [implementado] As rotas que já existiam continuam resolvendo para as mesmas views:
   `/v6/<slug>`, `/app/<slug>`, `/v8/service-worker.js`, `/v8/manifest.json`, `/admin/` e o catch-all
   de `cmj.sigad` para caminhos fora de `/v8/`. Evidência: `cmj/urls.py:76`.
@@ -51,7 +55,8 @@ Router.
   `_templates/v8` existe em outro diretório de templates do projeto. Motivo: `_templates/v8` vem
   antes de `_templates/v2018` na busca (`cmj/settings/frontend.py:18-32`), e um `base.html` ou
   `404.html` na raiz encobriria os do portal. Evidência: `cmj/v8/tests/test_arquitetura.py:84`.
-- V8-ARQ-004 [implementado] Todo cookie criado pelo v8 tem nome iniciado por `v8_` e `Path=/v8/`.
+- V8-ARQ-004 [implementado] Todo cookie criado pelo v8 tem nome iniciado por `v8_` e `Path=/v8/`,
+  exceto o `v8_portal`, que tem `Path=/` porque liga o v8 nas rotas do portal (`portal.md`).
   Evidência: `_frontend/v8/src/core/cookies.js:1`.
 - V8-ARQ-005 [implementado] Fora de `/v8/`, o frontend só chama o que já existe e sem alterá-lo:
   `/api/version`, `/api/auth/session`, `/api/<app>/<model>/` e `/ws/sync/`. Evidência:

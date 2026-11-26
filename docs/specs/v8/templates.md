@@ -101,17 +101,18 @@ Regras de outras specs que mudaram com esta (D9):
   `messages` e `content`) e `footer`. O block `layout_name`, sem conteúdo padrão, recebe o nome do
   layout (V8-TPL-024). Evidência: `_templates/v8/v8/layouts/_shell.html:4`.
 - V8-TPL-021 [implementado] Têm conteúdo padrão em `_shell.html`, escrito uma única vez: o sprite de
-  ícones, o link "Ir para o conteúdo", a marca, o botão de modo (em `header_actions`), a área do
+  ícones, o link "Ir para o conteúdo", a marca, o botão de modo e o de voltar ao portal antigo
+  (em `header_actions`; o segundo, só com a troca de portal ligada, `portal.md`), a área do
   usuário, a trilha e as mensagens. Nascem vazios `header_start`, `header_nav`, `aside`, `hero`,
   `content` e `footer`. Evidência: `_templates/v8/v8/layouts/_shell.html:11`,
-  `_templates/v8/v8/layouts/_shell.html:15`, `_templates/v8/v8/layouts/_shell.html:21`.
+  `_templates/v8/v8/layouts/_shell.html:16`, `_templates/v8/v8/layouts/_shell.html:22`.
 - V8-TPL-022 [implementado] Os layouts que estendem `_shell.html` não redefinem o block `layout`: só
   sobrescrevem blocks de região. A ordem das regiões é a mesma nos três. Evidência:
   `_templates/v8/v8/layouts/app_sidebar.html:12`, `_templates/v8/v8/layouts/app_topbar.html:9`,
   `_templates/v8/v8/layouts/landing.html:13`.
 - V8-TPL-023 [implementado] Toda página de layout com shell tem um único `<main id="conteudo">`, com
   as docas `[data-v8-doca="left"]` e `[data-v8-doca="right"]` ao lado dele. Evidência:
-  `_templates/v8/v8/layouts/_shell.html:41`.
+  `_templates/v8/v8/layouts/_shell.html:42`.
 - V8-TPL-024 [implementado] O elemento raiz de cada layout informa o nome dele em `data-v8-layout`,
   com um dos valores `landing`, `app_topbar`, `app_sidebar` ou `minimal`. O CSS e o JavaScript
   distinguem os layouts só por esse atributo. Evidência: `_templates/v8/v8/layouts/_shell.html:7`,
@@ -142,13 +143,13 @@ Regras de outras specs que mudaram com esta (D9):
 - V8-TPL-034 [implementado] Os quatro layouts oferecem os blocks `content` e `messages`. Um template
   que estende qualquer um deles e preenche só `content` renderiza sem erro tendo no contexto apenas
   o que os context processors fornecem, e sai com `#v8-global`, `#v8-messages` e `#cmj-v8-app`.
-  Evidência: `_templates/v8/v8/layouts/_shell.html:62`, `_templates/v8/v8/layouts/minimal.html:6`.
+  Evidência: `_templates/v8/v8/layouts/_shell.html:63`, `_templates/v8/v8/layouts/minimal.html:6`.
 
 ### Includes
 
 - V8-TPL-040 [implementado] Em layout e em página, todo `{% include %}` fica dentro de um block, de
   modo que o nível de baixo possa trocá-lo. Evidência: `_templates/v8/v8/layouts/_shell.html:5`,
-  `_templates/v8/v8/layouts/_shell.html:61`.
+  `_templates/v8/v8/layouts/_shell.html:62`.
 - V8-TPL-041 [implementado] As parciais do shell, em `v8/shell/`, são três: o sprite de ícones, o
   menu e as mensagens em `<noscript>`. O menu ocupa dois arquivos: `menu.html`, com o `{% cache %}`,
   e `menu_itens.html`, com a recursão dos itens. Marca, botão de modo, área do usuário e trilha não
@@ -184,7 +185,7 @@ Regras de outras specs que mudaram com esta (D9):
   do caminho, nem de cabeçalho, nem de cookie. As páginas têm o nome do layout escrito no `extends`.
   O layout de uma zona vem só do registro de zonas, e um nome fora da lista dos quatro impede o
   projeto de subir. Itens da varredura: 3 e 4. Evidência: `cmj/v8/services/s_global.py:105`,
-  `cmj/v8/views.py:208`, `cmj/v8/urls.py:61`.
+  `cmj/v8/views.py:208`, `cmj/v8/urls.py:75`.
 - V8-TPL-061 [implementado] `#v8-global`, `#v8-messages` e o token CSRF nunca ficam dentro de `{%
   cache %}` nem dentro de um block que layout ou página possa sobrescrever. Item da varredura: 5.
   Evidência: `_templates/v8/base_v8.html:16`, `_templates/v8/v8/shell/menu.html:5`.

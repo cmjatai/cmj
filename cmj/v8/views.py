@@ -19,7 +19,7 @@ from django.urls import reverse
 from django.utils.cache import patch_cache_control
 from django.views import View
 
-from cmj.v8.services import s_demo, s_ds, s_global, s_respostas
+from cmj.v8.services import s_demo, s_ds, s_global, s_portal, s_respostas
 
 PASTA_FRAGMENTOS = "v8/partials/"
 
@@ -499,4 +499,35 @@ class DsTemaUsarView(AcessoV8Mixin, View):
         messages.success(
             request, f"{s_global.TEMAS[self.tema]} em uso neste navegador."
         )
+        return resposta
+
+
+class PortalAtivarView(AcessoV8Mixin, View):
+    """Liga o v8 na raiz do portal neste navegador (docs/specs/v8/portal.md).
+
+    Só superusuário, só ``POST`` com CSRF. Volta para ``next`` se for caminho do
+    mesmo host, senão para ``/``.
+    """
+
+    exige = s_global.SUPERUSUARIO
+    http_method_names = ["post"]
+
+    def post(self, request):
+        resposta = HttpResponseRedirect(
+            s_portal.destino(request.POST.get("next"), request.get_host())
+        )
+        resposta.set_cookie(**s_portal.cookie_ativar(request.user))
+        return resposta
+
+
+class PortalDesativarView(AcessoV8Mixin, View):
+    """Desliga o v8 na raiz do portal neste navegador. Qualquer pessoa, só ``POST``."""
+
+    http_method_names = ["post"]
+
+    def post(self, request):
+        resposta = HttpResponseRedirect(
+            s_portal.destino(request.POST.get("next"), request.get_host())
+        )
+        resposta.delete_cookie(**s_portal.cookie_desativar())
         return resposta

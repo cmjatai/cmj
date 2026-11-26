@@ -598,9 +598,12 @@ def test_pagina_publica_nao_dispara_tarefa_cara():
         if getattr(r.callback.view_class, "exige", None) is None
         and not hasattr(r.callback.view_class, "zona")
     ]
-    # Além da capa e do 404, só as páginas do design system (ds.md, D1).
+    # Além da capa e do 404, só as páginas do design system (ds.md, D1) e o
+    # desligar da troca de portal (portal.md), que só apaga um cookie.
     do_ds = ["ds", "ds_temas"] + [
         f"ds_tema{acao}_{nome}" for nome in s_global.TEMAS for acao in ("", "_usar")
     ]
-    assert sorted(publicas) == sorted(["inicio", "nao_encontrado", *do_ds])
+    assert sorted(publicas) == sorted(
+        ["inicio", "nao_encontrado", "portal_desativar", *do_ds]
+    )
     assert cliente_http().get("/v8/").status_code == 200

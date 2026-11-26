@@ -46,7 +46,7 @@ grupos do menu do cabeçalho.
   seguinte, sem invalidação, porque o hash muda. Evidência: `cmj/v8/services/s_global.py:205`.
 - V8-SHELL-012 [implementado] O trecho em cache não contém nome, avatar, token CSRF, mensagem nem
   outro dado próprio de um usuário. Evidência: `_templates/v8/v8/shell/menu.html:5`,
-  `_templates/v8/v8/layouts/_shell.html:21`.
+  `_templates/v8/v8/layouts/_shell.html:22`.
 
 ### Topbar e breadcrumbs
 
@@ -57,7 +57,7 @@ grupos do menu do cabeçalho.
   `_templates/v8/v8/layouts/app_sidebar.html:8`.
 - V8-SHELL-021 [implementado] As breadcrumbs vêm da lista que a view informa, de pares rótulo e URL.
   O último item não é link e tem `aria-current="page"`. O layout `landing` não mostra breadcrumbs.
-  Evidência: `_templates/v8/v8/layouts/_shell.html:44`.
+  Evidência: `_templates/v8/v8/layouts/_shell.html:45`.
 - V8-SHELL-022 [implementado] Dentro de uma zona SPA, a rota atual acrescenta seus níveis às
   breadcrumbs do servidor, a partir de `meta.breadcrumb`. Evidência:
   `_frontend/v8/src/core/ZoneOutlet.vue:31`.
@@ -116,7 +116,7 @@ grupos do menu do cabeçalho.
   nunca chega ao HTML. Item da varredura: 6. Evidência: `_frontend/v8/src/core/shell.js:51`.
 - V8-SHELL-053 [implementado] O link "Entrar" leva como retorno só o caminho e a query da página
   atual, codificados, sem host. "Sair" usa a rota de logout existente. Item da varredura: 6.
-  Evidência: `_templates/v8/v8/layouts/_shell.html:32`.
+  Evidência: `_templates/v8/v8/layouts/_shell.html:33`.
 
 ## Riscos de segurança
 
